@@ -104,7 +104,7 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 	builder.append(pan); builder.append(keyWarningDialog); builder.nextLine();
 	// Create a new panel with its own FormLayout for the last items:
 	FormLayout layout2 = new FormLayout
-	    ("left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");                
+	    ("left:pref, 8dlu, fill:60dlu, 4dlu, fill:pref", "");                
 	DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
 	builder2.append(useOwner); builder2.append(defOwnerField);
 	JButton hlp = new JButton(ownerHelp);

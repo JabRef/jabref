@@ -125,7 +125,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 	cm.getColumn(1).setPreferredWidth(80);
 
 	FormLayout layout = new FormLayout
-	    ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
+	    ("1dlu, 8dlu, left:pref, 4dlu, fill:pref",//, 4dlu, fill:60dlu, 4dlu, fill:pref",
 	     "");                
 	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 	JLabel lab;
@@ -156,10 +156,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 	builder.appendSeparator("Entry table columns");
 	builder.nextLine();
 	builder.append(pan); builder.append(tabPanel); builder.nextLine();
-	//lab = new JLabel("Update to current column widths");
+	lab = new JLabel("<HTML>("+Globals.lang("this button will update the column width settings<BR>"
+						+"to match the current widths in your table")+")</HTML>");
 	builder.append(pan); 
 	JButton button = new JButton(new UpdateWidthsAction());
 	builder.append(button); builder.nextLine();
+	builder.append(pan); builder.append(lab);
+	builder.nextLine();
 	pan = builder.getPanel();
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	add(pan, BorderLayout.CENTER);

@@ -124,17 +124,24 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(namesFf); builder.nextLine();
 	builder.append(pan); builder.append(namesFl); builder.nextLine();
 	builder.appendSeparator("Sort options");
+	// Create a new panel with its own FormLayout for these items:
+	FormLayout layout2 = new FormLayout
+	    ("left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");             
+	DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
 	lab = new JLabel(Globals.lang("Secondary sort criterion"));
-	builder.append(pan); builder.append(lab);
-	builder.append(secSort);
-	builder.append(secField);
-	builder.append(secDesc);
-	builder.nextLine();
+	builder2.append(lab);
+	builder2.append(secSort);
+	builder2.append(secField);
+	builder2.append(secDesc);
+	builder2.nextLine();
 	lab = new JLabel(Globals.lang("Tertiary sort criterion"));
-	builder.append(pan); builder.append(lab);
-	builder.append(terSort);
-	builder.append(terField);
-	builder.append(terDesc);
+	builder2.append(lab);
+	builder2.append(terSort);
+	builder2.append(terField);
+	builder2.append(terDesc);
+	builder.nextLine();
+	builder.append(pan);
+	builder.append(builder2.getPanel());
 	builder.nextLine();
 	builder.appendSeparator("Table appearance");
 	builder.append(pan); builder.append(colorCodes); builder.nextLine();
