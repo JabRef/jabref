@@ -84,7 +84,14 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:
+1.x:	- When a single entry is selected, right-click menu now shows a checkbox menu for group
+	  memberships instead of the regular "Add to" and "Remove from" menus.
+	- Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+	- Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
+	- Added check for spaces in custom entry type names.
+	- Added several new key pattern markers.
+        - Fixed bug that made it possible to leave a source edit when the source didn't validate
+          properly. Also made it impossible to change table selection until source validates.
 1.5:	- Enabled selection of default encoding, and started storing encoding information in
 	  saved .bib files, which is used when reopening.
 	- Added Highlight and select options to the group interface, and made it possible

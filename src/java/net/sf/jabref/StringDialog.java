@@ -196,12 +196,19 @@ public class StringDialog extends JDialog {
 								   +"already exists"),
 						      Globals.lang("Label"),
 						      JOptionPane.ERROR_MESSAGE);
-		    else if ((value != null) && isNumber((String)value)) {
-			JOptionPane.showMessageDialog
-			    (parent,
-			     Globals.lang("The label of the string can not be a number."),
-			     Globals.lang("Label"),
-			     JOptionPane.ERROR_MESSAGE);
+                      else if (((String)value).indexOf(" ") >= 0) {
+                        JOptionPane.showMessageDialog
+                            (parent,
+                             Globals.lang("The label of the string can not contain spaces."),
+                             Globals.lang("Label"),
+                             JOptionPane.ERROR_MESSAGE);
+                      }
+                      else if ((value != null) && isNumber((String)value)) {
+                          JOptionPane.showMessageDialog
+                              (parent,
+                               Globals.lang("The label of the string can not be a number."),
+                               Globals.lang("Label"),
+                               JOptionPane.ERROR_MESSAGE);
 		    }
 		    else {
 			// Store undo information.
@@ -311,7 +318,14 @@ public class StringDialog extends JDialog {
 		     JOptionPane.ERROR_MESSAGE);
 		return;
 	    }
-
+           if (name.indexOf(" ") >= 0) {
+             JOptionPane.showMessageDialog
+                 (parent,
+                  Globals.lang("The label of the string can not contain spaces."),
+                  Globals.lang("Label"),
+                  JOptionPane.ERROR_MESSAGE);
+             return;
+           }
 	    try {
 		BibtexString bs = new BibtexString(name, "");
 

@@ -172,7 +172,7 @@ public class EntryTableModel
           }
           else {
             if (namesFf) {
-              return ImportFormatReader.fixAuthor( (String) o);
+              return ImportFormatReader.fixAuthor_nocomma( (String) o);
             }
             else {
               return ImportFormatReader.fixAuthor_lastnameFirst( (String) o);
@@ -298,9 +298,9 @@ public class EntryTableModel
     }
     if(panel.sortingByCiteSeerResults) {
         fields.add("citeseercitationcount");
-        directions.add(new Boolean(true));        
+        directions.add(new Boolean(true));
     }
-    
+
     // Then the sort options:
     directions.add(new Boolean(frame.prefs.getBoolean("priDescending")));
     directions.add(new Boolean(frame.prefs.getBoolean("secDescending")));

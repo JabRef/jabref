@@ -104,6 +104,7 @@ public class ImportFormatReader
     //========================================================
     // rearranges the author names
     // input format string: LN, FN [and LN, FN]*
+    
     // output format string: FN LN [and FN LN]*
     //========================================================
 
@@ -460,7 +461,7 @@ public class ImportFormatReader
 		    Type = "article"; //make all of them PT?
  		}
 		else if(beg.equals("AU"))
-		    hm.put( "author", fixAuthor( fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," and ") ));
+		    hm.put( "author", fixAuthor_lastnameFirst( fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," and ") ));
 		else if(beg.equals("TI"))
 		    hm.put("title", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
 		else if(beg.equals("SO")){ // journal name
@@ -510,6 +511,7 @@ public class ImportFormatReader
     //==================================================
     public static Pattern ovid_src_pat= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
     public static Pattern ovid_src_pat_no_issue= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+ //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([ \\w&\\-]+)");
 
     public static ArrayList readOvid( String filename){
 	ArrayList bibitems = new ArrayList();
@@ -524,8 +526,9 @@ public class ImportFormatReader
 	    String line;
 	    StringBuffer sb=new StringBuffer();
 	    while((line=in.readLine()) != null){
-		if(line.length()>0 && line.charAt(0) != ' ')
-		    sb.append("__NEWFIELD__");
+		if(line.length()>0 && line.charAt(0) != ' ') {
+                  sb.append("__NEWFIELD__");
+                }
 		sb.append(line);
 	    }
 	    in.close();
@@ -549,10 +552,11 @@ public class ImportFormatReader
 
 			}
 			if(author.split(" and ").length > 1){ // single author or no ";"
-			    if(isComma==false)
-				h.put("author",  fixAuthor( author) );
+                          h.put("author",  fixAuthor_lastnameFirst( author) );
+			   /* if(isComma==false)
+
 			    else
-				h.put("author",  fixAuthor_nocomma( author) );
+				h.put("author",  fixAuthor_nocomma( author) );*/
 			}
 			else
 			    h.put("author",author);
@@ -560,6 +564,7 @@ public class ImportFormatReader
 		    else if(fields[j].indexOf("Title") == 0)
 			h.put("title", fields[j].substring(6,fields[j].length()).replaceAll("\\[.+\\]","") );
 		    else if(fields[j].indexOf("Source") == 0){
+                      System.out.println(fields[j]);
 			String s=fields[j];
 			Matcher matcher = ovid_src_pat.matcher(s);
 			boolean matchfound = matcher.find();
@@ -744,9 +749,9 @@ public class ImportFormatReader
 	    }
 	    //fixauthorscomma
             if (!Author.equals(""))
-              hm.put("author",fixAuthor(Author));
+              hm.put("author",fixAuthor_lastnameFirst(Author));
 	    if( !Editor.equals(""))
-		hm.put("editor",fixAuthor(Editor));
+		hm.put("editor",fixAuthor_lastnameFirst(Editor));
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
@@ -836,7 +841,7 @@ public class ImportFormatReader
 		}
 	    }
 	    // fix authors
-	    Author = fixAuthor(Author);
+	    Author = fixAuthor_lastnameFirst(Author);
 	    if(Author.endsWith("."))
 		hm.put("author", Author.substring(0,Author.length()-1));
 	    else
@@ -996,7 +1001,7 @@ public class ImportFormatReader
 		    String frest = s.substring(5);
 		    if(f3.equals("TI")) h.put("title", frest);
 		    else if(f3.equals("PY")) h.put("year", frest);
-		    else if(f3.equals("AU")) h.put("author", fixAuthor(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
+		    else if(f3.equals("AU")) h.put("author", fixAuthor_lastnameFirst(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
 		    else if(f3.equals("AB")) h.put("abstract", frest);
 		    else if(f3.equals("ID")) h.put("keywords", frest);
 		    else if(f3.equals("SO")){

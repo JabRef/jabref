@@ -34,6 +34,8 @@ import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.imports.ImportFormatReader;
 import java.awt.*;
 import java.util.regex.Pattern;
+import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.groups.GroupSelector;
 
 /**
  * Describe class <code>Util</code> here.
@@ -337,29 +339,24 @@ public class Util {
      */
     public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException
     {
+      File file;
 
-        File file = new File(link);
       if(fieldName.equals("pdf")) {
         String dir = prefs.get("pdfDirectory");
-        if (!file.exists() && (dir != null))
-        {
-          if (dir.endsWith(System.getProperty("file.separator")))
-            link = dir + link;
-          else
-            link = dir + System.getProperty("file.separator") + link;
-          file = new File(link);
-        }
-      }
+        file = expandFilename(link, dir);
+      } else
+        file = new File(link);
 
       if (fieldName.equals("ps") || fieldName.equals("pdf")) {
         // Check that the file exists:
 
-        if (!file.exists()) {
+        if ((file == null) || !file.exists()) {
           throw new IOException(Globals.lang("File not found") + ": '" + link +
                                 "'.");
         }
 
         // Use the correct viewer even if pdf and ps are mixed up:
+        link = file.getPath();
         String[] split = file.getName().split("\\.");
         if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("pdf")))
           fieldName = "pdf";
@@ -472,6 +469,25 @@ public class Util {
         return null;
     }
 
+    /**
+     * Converts a relative filename to an absolute one, if necessary. Returns null if
+     * the file does not exist.
+     */
+    public static File expandFilename(String name, String dir) {
+      File file = new File(name);
+      if (!file.exists() && (dir != null))
+      {
+        if (dir.endsWith(System.getProperty("file.separator")))
+          name = dir + name;
+        else
+          name = dir + System.getProperty("file.separator") + name;
+        file = new File(name);
+        return (file.exists() ? file : null);
+      }
+      else
+        return file;
+    }
+
     private static String findInDir(String file, String dir) {
       File f = new File(dir, file);
       if (f.exists())
@@ -561,6 +577,31 @@ public class Util {
   }
 
 
+  public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
+    HashSet allFields = new HashSet();//one.getAllFields());
+    Object[] o = one.getAllFields();
+    for (int i=0; i<o.length; i++)
+      allFields.add(o[i]);
+    o = two.getAllFields();
+    for (int i=0; i<o.length; i++)
+      allFields.add(o[i]);
+    int score = 0;
+    for (Iterator fld = allFields.iterator(); fld.hasNext();) {
+      String field = (String)fld.next();
+      Object en = one.getField(field),
+          to = two.getField(field);
+      if ((en != null) && (to != null) && (en.equals(to)))
+        score++;
+      else if ((en == null) && (to == null))
+        score++;
+    }
+    if (score == allFields.size())
+      return 1.01; // Just to make sure we can use score>1 without trouble.
+    else
+      return ((double)score)/allFields.size();
+  }
+
+
 
   /**
      * This methods assures all words in the given entry are recorded
@@ -602,5 +643,59 @@ public class Util {
                 }
         }
 
+
+        public static void printEntry(BibtexEntry entry) {
+          StringWriter sw = new StringWriter();
+          try {
+            entry.write(sw, new LatexFieldFormatter(), false);
+          } catch (IOException ex) {}
+          pr(sw.toString());
+        }
+
+        /**
+         * Copies a file.
+         * @param source File Source file
+         * @param dest File Destination file
+         * @param deleteIfExists boolean Determines whether the copy goes on even if the file exists.
+         * @returns boolean Whether the copy succeeded, or was stopped due to the file already existing.
+         * @throws IOException
+         */
+        public static boolean copyFile(File source, File dest, boolean deleteIfExists)
+            throws IOException
+        {
+
+          // Check if the file already exists.
+          if (dest.exists()) {
+            if (!deleteIfExists)
+              return false;
+            else
+              dest.delete();
+          }
+
+          BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
+          BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest));
+          int el;
+          while ((el = in.read()) >= 0)
+            out.write(el);
+
+          in.close();
+          out.close();
+          return true;
+        }
+
+        /**
+         * Look for a group name in a groups vector
+         * @param nameToFind String The group name to search for.
+         * @param v Vector The vector to search in.
+         * @return int The group number where the name was found, or -1 if not found.
+         */
+        public static int findGroup(String nameToFind, Vector v) {
+          for (int i=GroupSelector.OFFSET; (i+2)<v.size(); i+=GroupSelector.DIM) {
+            String name = (String)v.elementAt(i+1);
+            if (name.equals(nameToFind))
+              return i;
+          }
+          return -1;
+        }
 
 }

@@ -175,7 +175,7 @@ public class BibtexDatabase
         String id = entry.getId();
         if (getEntryById(id) != null)
         {
-            throw new KeyCollisionException(
+          throw new KeyCollisionException(
                 "ID is already in use, please choose another");
         }
 

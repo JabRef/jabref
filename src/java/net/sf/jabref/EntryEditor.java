@@ -253,14 +253,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             label = type;
             addMouseListener(new MouseAdapter() {
               public void mouseClicked(MouseEvent e) {
-                JPopupMenu typeMenu = new JPopupMenu();
-                //typeMenu.add(new JLabel(Globals.lang("Set entry type")));
-                //typeMenu.addSeparator();
-                for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
-                     i.hasNext();) {
-                  typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType((String)i.next()), panel));
+                boolean ctrlClick = prefs.getBoolean("ctrlClick");
+                if ( (e.getButton() == MouseEvent.BUTTON3) ||
+                    (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) &&
+                     e.isControlDown())) {
+                  JPopupMenu typeMenu = new JPopupMenu();
+                  //typeMenu.add(new JLabel(Globals.lang("Set entry type")));
+                  //typeMenu.addSeparator();
+                  for (Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator();
+                       i.hasNext(); ) {
+                    typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType( (
+                        String) i.next()), panel));
+                  }
+                  typeMenu.show(ths, e.getX(), e.getY());
                 }
-                typeMenu.show(ths, e.getX(), e.getY());
               }
             });
         }
@@ -759,8 +765,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		((FieldPanel)parent).setActive(ta);
 	    } else {
 		// The source panel must have been chosen. Update it.
-		if (panel.baseChanged)
-                  updateSource();
+		//if (panel.baseChanged)
+                //  updateSource();
 	    }
 	}
 
@@ -1040,107 +1046,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	    } else if ((source.isEditable())
 		       && (!source.getText().equals(lastSourceStringAccepted))) {
-		// Store edited bibtex code.
-		BibtexParser bp = new BibtexParser
-		    (new java.io.StringReader(source.getText()));
-		try {
-		    BibtexDatabase db = bp.parse().getDatabase();
-		    if (db.getEntryCount() > 1)
-			throw new Exception("More than one entry found.");
-		    if (db.getEntryCount() < 1)
-			throw new Exception("No entries found.");
-		    NamedCompound compound = new NamedCompound("source edit");
-		    BibtexEntry nu = db.getEntryById
-			((String)db.getKeySet().iterator().next());
-		    String id = entry.getId(),
-			//oldKey = entry.getCiteKey(),
-			newKey = nu.getCiteKey();
-		    boolean anyChanged = false, duplicateWarning = false;
+              boolean accepted = storeSource(true);
+              if (accepted) {
 
-		    if (panel.database.setCiteKeyForEntry(id, newKey))
-			duplicateWarning = true;
-
-		    // First, remove fields that the user have removed.
-		    Object[] fields = entry.getAllFields();
-		    for (int i=0; i<fields.length; i++)
-			if (GUIGlobals.isWriteableField(fields[i].toString()))
-			    if (nu.getField(fields[i].toString()) == null) {
-				compound.addEdit(new UndoableFieldChange
-						 (entry, fields[i].toString(),
-						  entry.getField(fields[i].toString()),
-						  (Object)null));
-				entry.clearField(fields[i].toString());
-				anyChanged = true;
-			    }
-
-		    // Then set all fields that have been set by the user.
-		    fields = nu.getAllFields();
-		    for (int i=0; i<fields.length; i++)
-			if (entry.getField(fields[i].toString()) !=
-			    nu.getField(fields[i].toString()))
-			    {
-                              String toSet = (String)nu.getField(fields[i].toString());
-
-                              // Test if the field is legally set.
-                              (new LatexFieldFormatter()).format
-                                  (toSet, GUIGlobals.isStandardField(fields[i].toString()));
-
-				compound.addEdit
-				    (new UndoableFieldChange
-				     (entry, fields[i].toString(),
-				      entry.getField(fields[i].toString()),
-				      toSet));
-				entry.setField(fields[i].toString(),
-					       toSet);
-				anyChanged = true;
-			    }
-		    compound.end();
-		    if (!anyChanged)
-			return;
-
-		    panel.undoManager.addEdit(compound);
-
-		    /*if (((oldKey == null) && (newKey != null)) ||
-			((oldKey != null) && (newKey == null)) ||
-			((oldKey != null) && (newKey != null)
-			 && !oldKey.equals(newKey))) {
-
-			 } */
-
-		    if (duplicateWarning)
-			panel.output(Globals.lang("Warning: duplicate bibtex key."));
-		    else
-			panel.output(Globals.lang("Stored entry")+".");
-
-		    lastSourceStringAccepted = source.getText();
-		    updateAllFields();
-		    lastSourceAccepted = true;
-
-		    updateSource = true;
-		    panel.refreshTable();
-		    panel.markBaseChanged();
-		} catch (Throwable ex) {
-                  ex.printStackTrace();
-		    // The source couldn't be parsed, so the user is given an
-		    // error message, and the choice to keep or revert the contents
-		    // of the source text field.
-		    updateSource = false;
-		    lastSourceAccepted = false;
-		    tabbed.setSelectedComponent(srcPanel);
-
-		    Object[] options = { "Edit","Revert to original source" };
-
-		    int answer = JOptionPane.showOptionDialog
-			(frame, "Error: "+ex.getMessage(),
-			 "Problem with parsing entry",
-			 JOptionPane.YES_NO_OPTION,
-			 JOptionPane.ERROR_MESSAGE,null, options,options[0]);
-		    if (answer != 0) {
-			updateSource = true;
-			updateSource();
-		    }
-		}
-
+              }
 	    }
 	}
     }
@@ -1170,51 +1079,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      	        // Set focus to the last used textfield.
 	}
     }
-    /*
-    class ShowReqAction extends AbstractAction {
-	public ShowReqAction() {
-	    super("Show required",
-		  new ImageIcon(GUIGlobals.showReqIconFile));
-	    putValue(SHORT_DESCRIPTION, "Show required fields");
-	    putValue(MNEMONIC_KEY, GUIGlobals.showReqKeyCode);
-	}
 
-	public void actionPerformed(ActionEvent e) {
-	    //System.out.println("Show required fields");
-	    tabbed.setSelectedIndex(REQ);
-	    reqPanel.activate(); // Set focus to the last used textfield.
-	}
-    }
-
-    class ShowOptAction extends AbstractAction {
-	public ShowOptAction() {
-	    super("Show optional",
-		  new ImageIcon(GUIGlobals.showOptIconFile));
-	    putValue(SHORT_DESCRIPTION, "Show optional fields");
-	    putValue(MNEMONIC_KEY, GUIGlobals.showOptKeyCode);
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    tabbed.setSelectedIndex(OPT);
-	    optPanel.activate(); // Set focus to the last used textfield.
-	}
-    }
-
-
-    class ShowGenAction extends AbstractAction {
-	public ShowGenAction() {
-	    super("Show general",
-		  new ImageIcon(GUIGlobals.showGenIconFile));
-	    putValue(SHORT_DESCRIPTION, "Show general fields");
-	    putValue(MNEMONIC_KEY, GUIGlobals.showGenKeyCode);
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    tabbed.setSelectedIndex(GEN);
-	    genPanel.activate(); // Set focus to the last used textfield.
-	}
-    }
-    */
 
     class NextEntryAction extends AbstractAction {
 	    public NextEntryAction() {
@@ -1452,8 +1317,137 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       }
     }
 
+    /**
+     * Returns false if the contents of the source panel has not been validated, true othervise.
+     */
+    public boolean lastSourceAccepted() {
+      //Util.pr("Sourceaccepted ....");
+      if (tabbed.getSelectedComponent() == srcPanel) {
+        storeSource(false);
+      }
+      //Util.pr(".."+tabbed.getSelectedComponent().toString());
+      //Util.pr("Sourceaccepted: "+lastSourceAccepted);
+      return lastSourceAccepted;
+    }
+
+    /*public boolean storeSourceIfNeeded() {
+      if (tabbed.getSelectedIndex() == sourceIndex)
+        return storeSource();
+      else
+        return true;
+    }*/
+
+    public boolean storeSource(boolean showError) {
+      //Util.pr("StoreSource");
+
+      // Store edited bibtex code.
+      BibtexParser bp = new BibtexParser
+          (new java.io.StringReader(source.getText()));
+      try {
+        BibtexDatabase db = bp.parse().getDatabase();
+        if (db.getEntryCount() > 1)
+          throw new Exception("More than one entry found.");
+        if (db.getEntryCount() < 1)
+          throw new Exception("No entries found.");
+        NamedCompound compound = new NamedCompound("source edit");
+        BibtexEntry nu = db.getEntryById
+            ((String)db.getKeySet().iterator().next());
+        String id = entry.getId(),
+            //oldKey = entry.getCiteKey(),
+            newKey = nu.getCiteKey();
+        boolean anyChanged = false, duplicateWarning = false;
+
+        if (panel.database.setCiteKeyForEntry(id, newKey))
+          duplicateWarning = true;
+
+          // First, remove fields that the user have removed.
+        Object[] fields = entry.getAllFields();
+        for (int i=0; i<fields.length; i++)
+          if (GUIGlobals.isWriteableField(fields[i].toString()))
+            if (nu.getField(fields[i].toString()) == null) {
+              compound.addEdit(new UndoableFieldChange
+                               (entry, fields[i].toString(),
+                                entry.getField(fields[i].toString()),
+                                (Object)null));
+              entry.clearField(fields[i].toString());
+              anyChanged = true;
+            }
+
+        // Then set all fields that have been set by the user.
+        fields = nu.getAllFields();
+        for (int i=0; i<fields.length; i++)
+          if (entry.getField(fields[i].toString()) !=
+              nu.getField(fields[i].toString()))
+          {
+            String toSet = (String)nu.getField(fields[i].toString());
+
+            // Test if the field is legally set.
+            (new LatexFieldFormatter()).format
+                (toSet, GUIGlobals.isStandardField(fields[i].toString()));
+
+            compound.addEdit
+                (new UndoableFieldChange
+                 (entry, fields[i].toString(),
+                  entry.getField(fields[i].toString()),
+                  toSet));
+            entry.setField(fields[i].toString(),
+                           toSet);
+            anyChanged = true;
+          }
+        compound.end();
+        if (!anyChanged)
+          return true;
+
+        panel.undoManager.addEdit(compound);
+
+        /*if (((oldKey == null) && (newKey != null)) ||
+            ((oldKey != null) && (newKey == null)) ||
+            ((oldKey != null) && (newKey != null)
+             && !oldKey.equals(newKey))) {
+
+             } */
+
+        if (duplicateWarning)
+          panel.output(Globals.lang("Warning: duplicate bibtex key."));
+        else
+          panel.output(Globals.lang("Stored entry")+".");
+
+        lastSourceStringAccepted = source.getText();
+        updateAllFields();
+        lastSourceAccepted = true;
+        updateSource = true;
+        //panel.refreshTable();
+        panel.markBaseChanged();
+        return true;
+
+      } catch (Throwable ex) {
+        //ex.printStackTrace();
+        // The source couldn't be parsed, so the user is given an
+        // error message, and the choice to keep or revert the contents
+        // of the source text field.
+        updateSource = false;
+        lastSourceAccepted = false;
+        tabbed.setSelectedComponent(srcPanel);
+
+        if (showError) {
+          Object[] options = { Globals.lang("Edit"),Globals.lang("Revert to original source") };
+
+          int answer = JOptionPane.showOptionDialog
+              (frame, "Error: "+ex.getMessage(),
+               Globals.lang("Problem with parsing entry"),
+               JOptionPane.YES_NO_OPTION,
+               JOptionPane.ERROR_MESSAGE,null, options,options[0]);
+          if (answer != 0) {
+            updateSource = true;
+            updateSource();
+          }
+        }
+        return false;
+      }
+    }
+
     public boolean setField(String fieldName, String newFieldData){
-        // iterate through all tabs and fields within those tabs until we get
+      // iterate through all tabs and fields within those tabs until we get
         // the appropriate field name.
         // Thanks to reflection, this shouldn't be too bad
 

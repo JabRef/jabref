@@ -74,6 +74,8 @@ public class Globals {
   public static boolean ON_MAC = (osName.equals(MAC)),
       ON_WIN = (osName.startsWith("Windows"));
 
+  public static String[] SKIP_WORDS = {"a", "an", "the", "for"};
+
   public static void logger(String s) {
     Logger.global.info(s);
   }
@@ -135,8 +137,8 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      //System.err.println("Warning: could not get translation for \""
-      //                   + key + "\"");
+      System.err.println("Warning: could not get translation for \""
+                         + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
       return translation.replaceAll("_", " ");

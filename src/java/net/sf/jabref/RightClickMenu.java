@@ -32,6 +32,7 @@ import javax.swing.event.*;
 import java.awt.event.*;
 import java.util.Vector;
 import java.util.Iterator;
+import net.sf.jabref.groups.QuickSearchRule;
 
 public class RightClickMenu extends JPopupMenu
     implements PopupMenuListener {
@@ -40,7 +41,9 @@ public class RightClickMenu extends JPopupMenu
     MetaData metaData;
     JMenu groupMenu = new JMenu(Globals.lang("Add to group")),
 	groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
-	typeMenu = new JMenu(Globals.lang("Change entry type"));
+	typeMenu = new JMenu(Globals.lang("Change entry type")),
+        setGroups = new JMenu(Globals.lang("Groups"));
+    boolean forOneEntryOnly = false;
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
 	panel = panel_;
@@ -152,8 +155,7 @@ public class RightClickMenu extends JPopupMenu
 	populateTypeMenu();
 	add(typeMenu);
 	addSeparator();
-	add(groupMenu);
-	add(groupRemoveMenu);
+
     }
 
     /**
@@ -173,30 +175,58 @@ public class RightClickMenu extends JPopupMenu
      * Set the dynamic contents of "Add to group ..." submenu.
      */
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-	Vector groups = metaData.getData("groups");
-	if (groups == null) {
-	    groupMenu.setEnabled(false);
-	    groupRemoveMenu.setEnabled(false);
-	    return;
-	}
-	groupMenu.setEnabled(true);
-	groupRemoveMenu.setEnabled(true);
-	groupMenu.removeAll();
-	groupRemoveMenu.removeAll();
-	for (int i=GroupSelector.OFFSET; i<groups.size()-2;
-	     i+=GroupSelector.DIM) {
-	    String name = (String)groups.elementAt(i+1),
-		regexp = (String)groups.elementAt(i+2),
-		field = (String)groups.elementAt(i);
-	    groupMenu.add(new AddToGroupAction(name, regexp, field));
-	    groupRemoveMenu.add
-		(new RemoveFromGroupAction(name, regexp, field));
-	}
+      BibtexEntry[] bes = panel.entryTable.getSelectedEntries();
+      Vector groups = metaData.getData("groups");
+      if ((groups == null) || (groups.size() == 0)) {
+        groupMenu.setEnabled(false);
+        groupRemoveMenu.setEnabled(false);
+        return;
+      } else {
+        groupMenu.setEnabled(true);
+        groupRemoveMenu.setEnabled(true);
+      }
+      groupMenu.removeAll();
+      groupRemoveMenu.removeAll();
+      setGroups.removeAll();
+      if (bes == null)
+        return;
+      else if (bes.length < 2) {
+        forOneEntryOnly = true;
+        add(setGroups);
+      }
+      else {
+        forOneEntryOnly = false;
+        add(groupMenu);
+        add(groupRemoveMenu);
+      }
 
+      for (int i=GroupSelector.OFFSET; i<groups.size()-2;
+           i+=GroupSelector.DIM) {
+        String name = (String)groups.elementAt(i+1),
+            regexp = (String)groups.elementAt(i+2),
+            field = (String)groups.elementAt(i);
+
+        if (forOneEntryOnly) {
+          // Only bes[0] is selected, so we can build specialized menus for it.
+          QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+          int score = qsr.applyRule(null, bes[0]);
+          //groupMenu.add(new JCheckBoxMenuItem(name, (score == 0)));
+          ToggleGroupAction item = new ToggleGroupAction(name, regexp, field, (score > 0));
+          setGroups.add(item);
+        }
+        else {
+          groupMenu.add(new AddToGroupAction(name, regexp, field));
+          groupRemoveMenu.add
+              (new RemoveFromGroupAction(name, regexp, field));
+        }
+
+      }
     }
 
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-
+      remove(groupMenu);
+      remove(groupRemoveMenu);
+      remove(setGroups);
     }
 
     public void popupMenuCanceled(PopupMenuEvent e) {
@@ -204,16 +234,16 @@ public class RightClickMenu extends JPopupMenu
     }
 
     class AddToGroupAction extends AbstractAction {
-	String grp, regexp, field;
-	public AddToGroupAction(String grp, String regexp, String field) {
-	    super(grp);
-	    this.grp = grp;
-	    this.regexp = regexp;
-	    this.field = field;
-	}
-	public void actionPerformed(ActionEvent evt) {
-	    panel.addToGroup(grp, regexp, field);
-	}
+        String grp, regexp, field;
+        public AddToGroupAction(String grp, String regexp, String field) {
+            super(grp);
+            this.grp = grp;
+            this.regexp = regexp;
+            this.field = field;
+        }
+        public void actionPerformed(ActionEvent evt) {
+            panel.addToGroup(grp, regexp, field);
+        }
     }
 
     class RemoveFromGroupAction extends AbstractAction {
@@ -230,6 +260,25 @@ public class RightClickMenu extends JPopupMenu
 	    panel.removeFromGroup(grp, regexp, field);
 	}
     }
+
+    class ToggleGroupAction extends JCheckBoxMenuItem implements ActionListener {
+        String grp, regexp, field;
+        boolean isIn;
+        public ToggleGroupAction(String name, String regexp, String field, boolean isIn) {
+            super(name, isIn);
+            this.isIn = isIn;
+            this.grp = grp;
+            this.regexp = regexp;
+            this.field = field;
+            addActionListener(this);
+        }
+        public void actionPerformed(ActionEvent evt) {
+          if (isIn)
+            panel.removeFromGroup(grp, regexp, field);
+          else
+            panel.addToGroup(grp, regexp, field);
+        }
+  }
 
     class ChangeTypeAction extends AbstractAction {
       BibtexEntryType type;

@@ -68,6 +68,9 @@ public class JabRef {
 
     boolean graphicFailure = false;
 
+    // Make sure of a proper cleanup when quitting (e.g. deleting temporary files).
+    System.runFinalizersOnExit(true);
+
     // ----------------------------------------------------------------
     // First instantiate preferences and set language.
     // ----------------------------------------------------------------
@@ -305,42 +308,43 @@ public class JabRef {
     if (!graphicFailure && !disableGui.isInvoked()) {
 
       //Font fnt = new Font("plain", Font.PLAIN, 12);
-      /*        Object fnt = new UIDefaults.ProxyLazyValue
-                ("javax.swing.plaf.FontUIResource", null,
-       new Object[] {"Arial", new Integer(Font.PLAIN), new Integer(12)});
+	/*
+      Object fnt = new UIDefaults.ProxyLazyValue
+          ("javax.swing.plaf.FontUIResource", null,
+           new Object[] {"Plain", new Integer(Font.PLAIN), new Integer(10)});
 
-            UIManager.put("Button.font", fnt);
-            UIManager.put("ToggleButton.font", fnt);
-            UIManager.put("RadioButton.font", fnt);
-            UIManager.put("CheckBox.font", fnt);
-            UIManager.put("ColorChooser.font", fnt);
-            UIManager.put("ComboBox.font", fnt);
-            UIManager.put("Label.font", fnt);
-            UIManager.put("List.font", fnt);
-            UIManager.put("MenuBar.font", fnt);
-            UIManager.put("MenuItem.font", fnt);
-            UIManager.put("RadioButtonMenuItem.font", fnt);
-            UIManager.put("CheckBoxMenuItem.font", fnt);
-            UIManager.put("Menu.font", fnt);
-            UIManager.put("PopupMenu.font", fnt);
-            UIManager.put("OptionPane.font", fnt);
-            UIManager.put("Panel.font", fnt);
-            UIManager.put("ProgressBar.font", fnt);
-            UIManager.put("ScrollPane.font", fnt);
-            UIManager.put("Viewport.font", fnt);
-            UIManager.put("TabbedPane.font", fnt);
-            UIManager.put("Table.font", fnt);
-            UIManager.put("TableHeader.font", fnt);
-            UIManager.put("TextField.font", fnt);
-            UIManager.put("PasswordField.font", fnt);
-            UIManager.put("TextArea.font", fnt);
-            UIManager.put("TextPane.font", fnt);
-            UIManager.put("EditorPane.font", fnt);
-            UIManager.put("TitledBorder.font", fnt);
-            UIManager.put("ToolBar.font", fnt);
-            UIManager.put("ToolTip.font", fnt);
-            UIManager.put("Tree.font", fnt);
-       */
+      UIManager.put("Button.font", fnt);
+      UIManager.put("ToggleButton.font", fnt);
+      UIManager.put("RadioButton.font", fnt);
+      UIManager.put("CheckBox.font", fnt);
+      UIManager.put("ColorChooser.font", fnt);
+      UIManager.put("ComboBox.font", fnt);
+      UIManager.put("Label.font", fnt);
+      UIManager.put("List.font", fnt);
+      UIManager.put("MenuBar.font", fnt);
+      UIManager.put("MenuItem.font", fnt);
+      UIManager.put("RadioButtonMenuItem.font", fnt);
+      UIManager.put("CheckBoxMenuItem.font", fnt);
+      UIManager.put("Menu.font", fnt);
+      UIManager.put("PopupMenu.font", fnt);
+      UIManager.put("OptionPane.font", fnt);
+      UIManager.put("Panel.font", fnt);
+      UIManager.put("ProgressBar.font", fnt);
+      UIManager.put("ScrollPane.font", fnt);
+      UIManager.put("Viewport.font", fnt);
+      UIManager.put("TabbedPane.font", fnt);
+      UIManager.put("Table.font", fnt);
+      UIManager.put("TableHeader.font", fnt);
+      UIManager.put("TextField.font", fnt);
+      UIManager.put("PasswordField.font", fnt);
+      UIManager.put("TextArea.font", fnt);
+      UIManager.put("TextPane.font", fnt);
+      UIManager.put("EditorPane.font", fnt);
+      UIManager.put("TitledBorder.font", fnt);
+      UIManager.put("ToolBar.font", fnt);
+      UIManager.put("ToolTip.font", fnt);
+      UIManager.put("Tree.font", fnt);
+	*/
       // This property is set to make the Mac OSX Java VM move the menu bar to the top
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");

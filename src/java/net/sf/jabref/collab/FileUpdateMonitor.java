@@ -1,5 +1,7 @@
 package net.sf.jabref.collab;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.util.Iterator;
 public class FileUpdateMonitor extends Thread {
 
   final int WAIT = 5000;
+  static int tmpNum = 0;
   int no = 0;
   HashMap entries = new HashMap();
   boolean running;
@@ -82,7 +85,9 @@ public class FileUpdateMonitor extends Thread {
     Object o = entries.get(key);
     if (o == null)
       throw new IllegalArgumentException("Entry not found");
-    ((Entry)o).updateTimeStamp();
+    Entry entry = (Entry)o;
+    entry.updateTimeStamp();
+
   }
 
   public void changeFile(String key, File file) throws IOException, IllegalArgumentException {
@@ -95,17 +100,34 @@ public class FileUpdateMonitor extends Thread {
   }
 
   /**
+   * Method for getting the temporary file used for this database. The tempfile
+   * is used for comparison with the changed on-disk version.
+   * @param key String The handle for this monitor.
+   * @throws IllegalArgumentException If the handle doesn't correspond to an entry.
+   * @return File The temporary file.
+   */
+  public File getTempFile(String key) throws IllegalArgumentException {
+    Object o = entries.get(key);
+    if (o == null)
+      throw new IllegalArgumentException("Entry not found");
+    return ((Entry)o).tmpFile;
+  }
+
+  /**
    * A class containing the File, the FileUpdateListener and the current time stamp for one file.
    */
   class Entry {
     FileUpdateListener listener;
     File file;
+    File tmpFile;
     long timeStamp;
 
     public Entry(FileUpdateListener ul, File f) {
       listener = ul;
       file = f;
       timeStamp = file.lastModified();
+      tmpFile = getTempFile();
+      copy();
     }
 
     /**
@@ -124,6 +146,20 @@ public class FileUpdateMonitor extends Thread {
       timeStamp = file.lastModified();
       if (timeStamp == 0L)
         notifyFileRemoved();
+
+      copy();
+    }
+
+    public boolean copy() {
+      Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
+      boolean res = false;
+      try {
+        res = Util.copyFile(file, tmpFile, true);
+      } catch (IOException ex) {
+        Globals.logger("Cannot copy to temporary file '"+tmpFile.getPath()+"'");
+      }
+      Util.pr("</copy>");
+      return res;
     }
 
     /**
@@ -141,6 +177,20 @@ public class FileUpdateMonitor extends Thread {
     public void notifyFileRemoved() {
       listener.fileRemoved();
     }
+
+    public void finalize() {
+      try {
+        tmpFile.delete();
+      } catch (Throwable e) {
+        Globals.logger("Cannot delete temporary file '"+tmpFile.getPath()+"'");
+      }
+    }
   }
 
+  static synchronized File getTempFile() {
+    File f = null;
+    while ((f = new File(Globals.prefs.get("tempDir")+"jabref"+(tmpNum++)+".tmp")).exists());
+    System.out.println(f.getPath());
+    return f;
+  }
 }

@@ -63,13 +63,13 @@ public void run() {
   st.start();
   int current = 0;
   DuplicateResolverDialog drd = null;
+  boolean cancelled = false;
 
 /*
   loop: while (!st.finished() || (current < duplicates.size()))
   {
     if ( current >= duplicates.size() )
     {
-
       // No more duplicates to resolve, but search is still in progress. Sleep a little.
        try
        {

@@ -12,18 +12,25 @@ import java.awt.Graphics2D;
 
 public class PreviewPanel extends JEditorPane {
 
-  public String CONTENT_TYPE = "text/html",
-      LAYOUT_FILE = "simplehtml";
+  public String CONTENT_TYPE = "text/html";
+      //LAYOUT_FILE = "simplehtml";
   BibtexEntry entry;
   Layout layout;
   String prefix = "", postfix = "";
   Dimension DIM = new Dimension(650, 110);
-    HashMap layouts = new HashMap();
+  HashMap layouts = new HashMap();
+  String layoutFile;
+  JScrollPane sp;
 
-  public PreviewPanel(BibtexEntry be) {
+  public PreviewPanel(BibtexEntry be, String layoutFile) {
     entry = be;
-    setEditable(false);
-    setContentType(CONTENT_TYPE);
+    sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+    //Util.pr(layoutFile);
+    init();
+    this.layoutFile = layoutFile;
+
     try {
       readLayout();
     }
@@ -31,33 +38,68 @@ public class PreviewPanel extends JEditorPane {
       ex.printStackTrace();
     }
     update();
+
+  }
+
+  public PreviewPanel(String layoutFile) {
+    sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    this.layoutFile = layoutFile;
+
+
+    init();
+    //setText("<HTML></HTML>");
+  }
+
+  private void init() {
+    setEditable(false);
+    setContentType(CONTENT_TYPE);
+    //setSize(100, 100);
+  }
+
+  public JScrollPane getPane() {
+    return sp;
+  }
+
+  public void readLayout(String layoutFormat) throws Exception {
+    layoutFile = layoutFormat;
+    readLayout();
   }
 
   public void readLayout() throws Exception {
-      String entryType = entry.getType().getName().toLowerCase();
+    LayoutHelper layoutHelper = null;
+    StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+    layoutHelper = new LayoutHelper(sr);
+    layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+
+      /*String entryType = entry.getType().getName().toLowerCase();
       if (layouts.get(entryType) != null) {
 	  layout = (Layout)layouts.get(entryType);
 	  return;
-      }
+      }*/
 
-      LayoutHelper layoutHelper = null;
-      URL reso = JabRefFrame.class.getResource
-	  (Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entryType+".layout");
+
+      //URL reso = JabRefFrame.class.getResource
+      //  (Globals.LAYOUT_PREFIX+layoutFile+"."+entryType+".layout");
+
       //Util.pr(Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entryType+".layout");
-      try {
-	  if (reso == null)
-	      reso = JabRefFrame.class.getResource(Globals.LAYOUT_PREFIX+LAYOUT_FILE+".layout");
 
-	  layoutHelper = new LayoutHelper(new InputStreamReader(reso.openStream()));
+
+
+      /*try {
+        if (reso == null)
+          reso = JabRefFrame.class.getResource(Globals.LAYOUT_PREFIX+layoutFile+".layout");
+        layoutHelper = new LayoutHelper(new InputStreamReader(reso.openStream()));
       }
       catch (IOException ex) {
-      }
-      layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+      }*/
 
-      layouts.put(entryType, layout);
 
-    reso = JabRefFrame.class.getResource
-        (Globals.LAYOUT_PREFIX+LAYOUT_FILE+".begin.layout");
+
+      //layouts.put(entryType, layout);
+
+    /*reso = JabRefFrame.class.getResource
+        (Globals.LAYOUT_PREFIX+layoutFile+".begin.layout");
     StringWriter stw = new StringWriter();
     InputStreamReader reader;
     int c;
@@ -71,7 +113,7 @@ public class PreviewPanel extends JEditorPane {
     prefix = stw.toString();
 
     reso = JabRefFrame.class.getResource
-        (Globals.LAYOUT_PREFIX+LAYOUT_FILE+".end.layout");
+        (Globals.LAYOUT_PREFIX+layoutFile+".end.layout");
     stw = new StringWriter();
     if (reso != null) {
       reader = new InputStreamReader(reso.openStream());
@@ -81,10 +123,11 @@ public class PreviewPanel extends JEditorPane {
       reader.close();
     }
     postfix = stw.toString();
-
+*/
   }
 
   public void setEntry(BibtexEntry newEntry) {
+    //Util.pr("en");
     entry = newEntry;
     try {
       readLayout();
@@ -92,19 +135,48 @@ public class PreviewPanel extends JEditorPane {
     catch (Exception ex) {
     }
     update();
+    //Util.pr("to");
   }
 
   public void update() {
+
     //StringBuffer sb = new StringBuffer(prefix);
     StringBuffer sb = new StringBuffer();
     sb.append(layout.doLayout(entry));
     //sb.append(postfix);
     setText(sb.toString());
+    invalidate();
+    revalidate();
+    // Scroll to top:
+    final JScrollBar bar = sp.getVerticalScrollBar();
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        bar.setValue(0);
+      }
+    });
+
+
     //Util.pr(sb.toString());
+    //revalidate();
+
+    //Util.pr(""+getPreferredSize()+"\t"+getMinimumSize());
+
+
   }
 
-  public Dimension getPreferredSize() { return DIM; }
-  public Dimension getMinimumSize() { return DIM; }
+  public boolean hasEntry() {
+    return (entry != null);
+  }
+
+  public Dimension getPreferredScrollableViewportSize() {
+    return getPreferredSize();
+  }
+
+/*  public Dimension getPreferredSize() {
+    Util.pr(""+super.getPreferredSize());
+    return super.getPreferredSize();
+  }*/
+  /*public Dimension getMinimumSize() { return DIM; }*/
 
   public void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D)g;
@@ -113,6 +185,8 @@ public class PreviewPanel extends JEditorPane {
     g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                         RenderingHints.VALUE_RENDER_QUALITY);
     super.paintComponent(g2);
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_OFF);
   }
 
 }

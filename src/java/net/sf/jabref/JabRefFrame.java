@@ -1137,10 +1137,23 @@ public JabRefPreferences prefs() {
     // avoid problems when changing the column set.
     for (int i = 0; i < tabbedPane.getTabCount(); i++) {
       BasePanel bf = baseAt(i);
+
+      // Update tables:
       if (bf.database != null) {
         bf.entryTable.updateFont();
         bf.setupTable();
       }
+
+      // Reread layout for previews:
+      for (int j=0; j<bf.previewPanel.length; j++)
+        if (bf.previewPanel[j] != null)
+          try {
+            bf.previewPanel[j].readLayout(prefs.get("preview"+j));
+            //bf.previewPanel[j].update();
+          } catch (Exception ex) {
+            ex.printStackTrace();
+          }
+      bf.updateViewToSelected();
     }
   }
 

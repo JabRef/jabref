@@ -184,7 +184,7 @@
                         link="http://java.sun.com/j2se/1.4.1/docs/api/">
 
                     <fileset dir="${java.dir}" defaultexcludes="yes">
-                        <include name="**.java" />
+                        <include name="**/*.java" />
                     </fileset>
 
                     <classpath refid="classpath" />

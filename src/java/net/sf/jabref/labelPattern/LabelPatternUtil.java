@@ -13,6 +13,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.Util;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 /**
  *
@@ -145,103 +146,98 @@ public class LabelPatternUtil {
 		else if (val.equals("lowercase")) {
 		    forceLower = true;
 		    }*/
-		if (val.equals("auth")) {
-		    _sbvalue.append(firstAuthor(_entry.getField("author").toString()));
-		}
-		else if (val.equals("edtr")) {
-		    _sbvalue.append(firstAuthor(_entry.getField("editor").toString()));
-		}
-		else if (val.equals("authors")) {
-		    _sbvalue.append(allAuthors(_entry.getField("author").toString()));
-		}
-		else if (val.equals("editors")) {
-		    _sbvalue.append(allAuthors(_entry.getField("editor").toString()));
-		}
-		else if (val.equals("authorIni")) {
-		    _sbvalue.append(oneAuthorPlusIni(_entry.getField("author").toString()));
-		}
-		else if (val.equals("editorIni")) {
-		    _sbvalue.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
-		}
-		else if (val.equals("firstpage")) {
-		    _sbvalue.append(firstPage(_entry.getField("pages").toString()));
-		}
-		else if (val.equals("lastpage")) {
-		    _sbvalue.append(lastPage(_entry.getField("pages").toString()));
-		}
-		else if (val.equals("shorttitle")) {
-		    String ss = _entry.getField("title").toString();
-		    int piv = 0, wrd = 0;
-		    while ( (piv < ss.length()) && (wrd < 3)) {
-			if (Character.isWhitespace(ss.charAt(piv))) {
-			    wrd++;
-			}
-			else {
-			    _sbvalue.append(ss.charAt(piv));
-			}
-			piv++;
-		    }
-		}
-		else if (val.equals("shortyear")) {
-		    String ss = _entry.getField("year").toString();
-		    if (ss.length() > 2) {
-			_sbvalue.append(ss.substring(ss.length() - 2));
-		    }
-		    else {
-			_sbvalue.append(ss);
-		    }
-		}
+                if (val.startsWith("auth")) {
+                  // Gather all author-related checks, so we don't have to check all all the time.
+                  if (val.equals("auth")) {
+                    _sbvalue.append(firstAuthor(_entry.getField("author").toString()));
+                  }
+                  else if (val.equals("authors")) {
+                    _sbvalue.append(allAuthors(_entry.getField("author").toString()));
+                  }
+                  else if (val.equals("authorIni")) {
+                    _sbvalue.append(oneAuthorPlusIni(_entry.getField("author").toString()));
+                  }
+                  else if (val.equals("auth.auth.ea")) {
+                    _sbvalue.append(authAuthEa(_entry.getField("author").toString()));
+                  }
+                  else if (val.matches("auth[\\d]+_[\\d]+")) {
+                    String[] nums = val.substring(4).split("_");
+                    _sbvalue.append(authN_M(_entry.getField("author").toString(),
+                                            Integer.parseInt(nums[0]),
+                                            Integer.parseInt(nums[1]) - 1));
+                  }
+                  // authN.  First N chars of the first author's last name.
+                  else if (val.matches("auth\\d+")) {
+                    int num = Integer.parseInt(val.substring(4));
+                    String fa = firstAuthor(_entry.getField("author").toString());
+                    if ( num > fa.length() )
+                      num = fa.length();
+                    _sbvalue.append(fa.substring(0,num));
+                  }
 
-		else if(val.equals("veryshorttitle")) {
-		    String ss = _entry.getField("title").toString();
-		    int piv=0;
-		    String[] skipWords = {"a", "an", "the"};
-		    // sorry for being English-centric. I guess these
-		    // words should really be an editable preference.
+                  else {
+                    // This "auth" business was a dead end, so just use it literally:
+                    _sbvalue.append(_entry.getField(val).toString());
+                  }
+                }
+                else if (val.startsWith("ed")) {
+                  // Gather all markers starting with "ed" here, so we don't have to check all all the time.
+                  if (val.equals("edtr")) {
+                    _sbvalue.append(firstAuthor(_entry.getField("editor").toString()));
+                  }
+                  else if (val.equals("editors")) {
+                    _sbvalue.append(allAuthors(_entry.getField("editor").toString()));
+                  }
+                  else if (val.equals("editorIni")) {
+                      _sbvalue.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
+                  }
+                  else if (val.matches("edtr[\\d]+_[\\d]+")) {
+                    String[] nums = val.substring(4).split("_");
+                    _sbvalue.append(authN_M(_entry.getField("editor").toString(), Integer.parseInt(nums[0]),
+                                            Integer.parseInt(nums[1])-1));
+                  }
+                  else if (val.equals("edtr.edtr.ea")) {
+                    _sbvalue.append(authAuthEa(_entry.getField("editor").toString()));
+                  }
+                  // authN.  First N chars of the first author's last name.
+                  else if (val.matches("edtr\\d+")) {
+                    int num = Integer.parseInt(val.substring(4));
+                    String fa = firstAuthor(_entry.getField("editor").toString());
+                    if ( num > fa.length() )
+                      num = fa.length();
+                    _sbvalue.append(fa.substring(0,num));
+                  }
+                  else {
+                    // This "ed" business was a dead end, so just use it literally:
+                    _sbvalue.append(_entry.getField(val).toString());
+                  }
+                }
+                else if (val.equals("firstpage")) {
+                  _sbvalue.append(firstPage(_entry.getField("pages").toString()));
+                }
+                else if (val.equals("lastpage")) {
+                  _sbvalue.append(lastPage(_entry.getField("pages").toString()));
+                }
+                else if (val.equals("shorttitle")) {
+                  _sbvalue.append(getTitleWords(3, _entry));
+                }
+                else if (val.equals("shortyear")) {
+                  String ss = _entry.getField("year").toString();
+                  if (ss.length() > 2) {
+                    _sbvalue.append(ss.substring(ss.length() - 2));
+                  }
+                  else {
+                    _sbvalue.append(ss);
+                  }
+                }
 
-		    for(int _i=0; _i< skipWords.length; _i++) {
-			if(ss.toLowerCase().startsWith(skipWords[_i]+" ")) {
-			    piv=skipWords[_i].length()+1;
-			}
-		    }
-		    // skip multiple whitespaces:
-		    while ((piv<ss.length()) && Character.isWhitespace(ss.charAt(piv))) {
-			piv++;
-		    }
-		    // copy next word:
-		    while ((piv<ss.length()) && !Character.isWhitespace(ss.charAt(piv))) {
-			_sbvalue.append(ss.charAt(piv));
-			piv++;
-		    }
-		}
-
-		// authN.  First N chars of the first author's last name.
-		else if ( Pattern.matches("^auth\\d+$", val ) ) {
-			Pattern p = Pattern.compile("^auth(\\d+)$");
-			Matcher m = p.matcher( val );
-			m.matches(); // necessary
-			int num = Integer.parseInt(m.group(1));
-			String fa = firstAuthor(_entry.getField("author").toString());
-			if ( num > fa.length() )
-				num = fa.length();
-		    _sbvalue.append(fa.substring(0,num));
-		}
-
-		// edtrN.  First N chars of the first editor's last name.
-		else if ( Pattern.matches("^edtr\\d+$", val ) ) {
-			Pattern p = Pattern.compile("^edtr(\\d+)$");
-			Matcher m = p.matcher( val );
-			m.matches(); // necessary
-			int num = Integer.parseInt(m.group(1));
-			String fa = firstAuthor(_entry.getField("editor").toString());
-			if ( num > fa.length() )
-				num = fa.length();
-		    _sbvalue.append(fa.substring(0,num));
-		}
+                else if(val.equals("veryshorttitle")) {
+                  _sbvalue.append(getTitleWords(1, _entry));
+                }
 
 		// we havent seen any special demands
 		else {
-		    _sbvalue.append(_entry.getField(val).toString());
+                  _sbvalue.append(_entry.getField(val).toString());
 		}
 	    }
 	    catch (Exception ex) {
@@ -308,6 +304,43 @@ public class LabelPatternUtil {
   }
 
 
+  static String getTitleWords(int number, BibtexEntry _entry) {
+    String ss = (new RemoveLatexCommands()).format(_entry.getField("title").toString());
+    StringBuffer _sbvalue = new StringBuffer(),
+        current;
+    int piv=0, words = 0;
+
+    // sorry for being English-centric. I guess these
+    // words should really be an editable preference.
+    mainl: while ((piv < ss.length()) && (words < number)) {
+      current = new StringBuffer();
+      // Get the next word:
+      while ((piv<ss.length()) && !Character.isWhitespace(ss.charAt(piv))) {
+        current.append(ss.charAt(piv));
+        piv++;
+        //System.out.println(".. "+piv+" '"+current.toString()+"'");
+      }
+      piv++;
+      // Check if it is ok:
+      String word = current.toString().trim();
+      if (word.length() == 0)
+        continue mainl;
+      for(int _i=0; _i< Globals.SKIP_WORDS.length; _i++) {
+        if (word.equalsIgnoreCase(Globals.SKIP_WORDS[_i])) {
+          continue mainl;
+        }
+      }
+
+      // If we get here, the word was accepted.
+      if (_sbvalue.length() > 0)
+        _sbvalue.append(" ");
+      _sbvalue.append(word);
+      words++;
+    }
+
+    return _sbvalue.toString();
+  }
+
   /**
    * This method returns a truely unique label (in the BibtexDatabase), by taking a
    * label and add the letters a-z until a unique key is found.
@@ -373,16 +406,11 @@ public class LabelPatternUtil {
   private static String firstAuthor(String authorField) {
     String author = "";
     // This code was part of 'ApplyRule' in 'ArticleLabelRule'
-    String[] tokens = authorField.split("\\band\\b");
+    String[] tokens = ImportFormatReader.fixAuthor_lastnameFirst(authorField).split("\\band\\b");
+
     if (tokens.length > 0) { // if author is empty
-      if (tokens[0].indexOf(",") > 0) {
-        tokens[0] = ImportFormatReader.fixAuthor(tokens[0]); // convert lastname, firstname to firstname lastname
-
-      }
       String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").split(" ");
-      // lastname, firstname
-
-      author += firstAuthor[firstAuthor.length - 1];
+      author += firstAuthor[0];
 
     }
     return author;
@@ -396,18 +424,13 @@ public class LabelPatternUtil {
   private static String allAuthors(String authorField) {
     String author = "";
     // This code was part of 'ApplyRule' in 'ArticleLabelRule'
-    String[] tokens = authorField.split("\\band\\b");
+    String[] tokens = ImportFormatReader.fixAuthor_lastnameFirst(authorField).split("\\band\\b");
     int i = 0;
     while (tokens.length > i) {
       // convert lastname, firstname to firstname lastname
-      if (tokens[i].indexOf(",") > 0) {
-        tokens[i] = ImportFormatReader.fixAuthor(tokens[i]);
-
-      }
-      String[] firstAuthor = tokens[i].replaceAll("\\s+", " ").split(" ");
+      String[] firstAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
       // lastname, firstname
-
-      author += firstAuthor[firstAuthor.length - 1];
+      author += firstAuthor[0];
       i++;
     }
     return author;
@@ -442,6 +465,51 @@ public class LabelPatternUtil {
     return author;
 
   }
+
+  /**
+   * auth.auth.ea format:
+   * Isaac Newton and James Maxwell and Albert Einstein (1960)
+   * Isaac Newton and James Maxwell (1960)
+   *  give:
+   * Newton.Maxwell.ea
+   * Newton.Maxwell
+   */
+  private static String authAuthEa(String authorField) {
+    authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+    StringBuffer author = new StringBuffer();
+
+    String[] tokens = authorField.split("\\band\\b");
+    if (tokens.length == 0) {
+      return "";
+    }
+    author.append((tokens[0].split(","))[0]);
+    if (tokens.length >= 2)
+      author.append("."+(tokens[1].split(","))[0]);
+    if (tokens.length > 2)
+      author.append(".ea");
+
+    return author.toString();
+  }
+
+  /**
+   * The first N characters of the Mth author/editor.
+   */
+  private static String authN_M(String authorField, int n, int m) {
+    authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+    StringBuffer author = new StringBuffer();
+
+    String[] tokens = authorField.split("\\band\\b");
+    if ((tokens.length <= m) || (n<0) || (m<0)) {
+      return "";
+    }
+    String lastName = (tokens[m].split(","))[0].trim();
+    //System.out.println(lastName);
+    if (lastName.length() <= n)
+      return lastName;
+    else
+      return lastName.substring(0, n);
+  }
+
 
   /**
    * Split the pages field into two and return the first one

@@ -85,7 +85,9 @@ public class GUIGlobals {
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
       KEYBIND_COL_1 = 80, // Added to the font size when determining table
-      PREVIEW_HEIGHT = 115;
+      PREVIEW_PANEL_PADDING = 15; // Extra room given to the preview editor, in addition to its own
+  // calculated preferred size
+  //public static final int[] PREVIEW_HEIGHT = {115, 300};
   // row height
   public static final double
       VERTICAL_DIVIDER_LOCATION = 0.4;

@@ -46,6 +46,11 @@ public class GroupSelector
       DIM = 3, // The number of vector elements for each group.
       OFFSET = 0; // The number of vector elements before first group.
 
+  /*
+  Groups are stored in the vector like the following:
+      field1, name1, regexp1, field2, name2, regexp2, ...
+   */
+
   JButton newButton = new JButton
       (new ImageIcon(GUIGlobals.newSmallIconFile)),
       helpButton = new JButton

@@ -38,7 +38,7 @@ public class DuplicateResolverDialog extends JDialog {
   JButton first = new JButton(Globals.lang("Keep upper")),
       second = new JButton(Globals.lang("Keep lower")),
       both = new JButton(Globals.lang("Keep both")),
-      closeButton = new JButton(Globals.lang("Close"));
+      cancel = new JButton(Globals.lang("Cancel"));
   JPanel options = new JPanel(),
       main = new JPanel(),
       source = new JPanel();
@@ -48,8 +48,9 @@ public class DuplicateResolverDialog extends JDialog {
   public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two) {
     super(frame, Globals.lang("Possible duplicate entries"), true);
 
-    p1 = new PreviewPanel(one);
-    p2 = new PreviewPanel(two);
+    String layout = Globals.prefs.get("preview0");
+    p1 = new PreviewPanel(one, layout);
+    p2 = new PreviewPanel(two, layout);
     ta1 = new JTextArea();
     ta2 = new JTextArea();
     ta1.setEditable(false);
@@ -82,7 +83,8 @@ public class DuplicateResolverDialog extends JDialog {
     options.add(first);
     options.add(second);
     options.add(both);
-    options.add(closeButton);
+    options.add(Box.createHorizontalStrut(5));
+    options.add(cancel);
 
     first.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -108,9 +110,9 @@ public class DuplicateResolverDialog extends JDialog {
       }
     });
 
-    closeButton.addActionListener(new ActionListener(){
+    cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        status = BREAK;
+        //status = KEEP_BOTH;
         block = false;
         dispose();
       }

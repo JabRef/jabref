@@ -179,6 +179,13 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 
     void save()
     {
+      String typeName = name.getText().trim();
+      if (typeName.indexOf(" ") >= 0) {
+        JOptionPane.showMessageDialog(ths, Globals.lang("The type name can not contain spaces."),
+                                      Globals.lang("Illegal type name"), JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+
 
 	String
 	    reqStr = req_ta.getText().replaceAll("\\s+","")
@@ -186,8 +193,6 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	    optStr = opt_ta.getText().replaceAll("\\s+","")
 	    .replaceAll("\\n+","").trim();
 
-
-	String typeName = name.getText().trim();
 
 	if(! typeName.equals("")) {
 	    CustomEntryType typ = new CustomEntryType

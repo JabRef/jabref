@@ -45,7 +45,7 @@ public class EntryTable extends JTable {
     JabRefPreferences prefs;
     protected boolean showingSearchResults = false,
 	showingGroup = false;
-    private EntryTable ths = this;
+    protected EntryTable ths = this;
     private boolean antialiasing = true,
         ctrlClick = false,
         selectionListenerOn = true,
@@ -108,7 +108,23 @@ public class EntryTable extends JTable {
 
         addMouseListener(new TableClickListener()); // Add the listener that responds to clicks on the table.
 
+        // Trying this to get better handling of the row selection stuff.
+        setSelectionModel(new javax.swing.DefaultListSelectionModel() {
+          public void setSelectionInterval(int index0, int index1) {
+            // Prompt user here
+            //Util.pr("Selection model: "+panel.entryEditorAllowsChange());
+            if (panel.entryEditorAllowsChange() == false) {
+              panel.moveFocusToEntryEditor();
+              return;
+            }
+            super.setSelectionInterval(index0, index1);
+          }
+        });
+
         addSelectionListener(); // Add the listener that responds to new entry selection.
+
+
+
         // (to update entry editor or preview)
         setWidths();
         sp.getViewport().setBackground(GUIGlobals.tableBackground);
@@ -123,13 +139,29 @@ public class EntryTable extends JTable {
         if (previewListener == null)
           previewListener = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+              //Util.pr("Selection listener");
               if (!selectionListenerOn) return;
               if (!e.getValueIsAdjusting()) {
                 if (getSelectedRowCount() == 1) {
                   int row = getSelectedRow(); //e.getFirstIndex();
                   if (row >= 0) {
-                    panel.updateViewToSelected();//panel.database().getEntryById(
-                        //tableModel.getNameFromNumber(row)));
+                   //System.out.println(""+panel.validateEntryEditor());
+
+                   /*
+                    * Can't call validateEntryEditor, before the FocusLost beats us to it and
+                    * makes the entry editor store its source. So we need to find out if the
+                    * entry editor is happy. But can we prevent the selection?
+                   */
+                   panel.updateViewToSelected();
+
+
+                   //   setRowSelectionInterval(row, row);
+                   // }
+                   // else {
+                      // Oops, an error occured.
+                   // }
+                  //panel.database().getEntryById(
+                  //tableModel.getNameFromNumber(row)));
                   }
                 } else {
                   /* With a multiple selection, there are three alternative behaviours:
@@ -261,6 +293,9 @@ public class EntryTable extends JTable {
         // Check if the user has right-clicked. If so, open the right-click menu.
         if ( (e.getButton() == MouseEvent.BUTTON3) ||
              (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+          int selRow = getSelectedRow();
+          if (selRow == -1)
+            addRowSelectionInterval(row, row);
           rightClickMenu = new RightClickMenu(panel, panel.metaData);
           rightClickMenu.show(ths, e.getX(), e.getY());
         }

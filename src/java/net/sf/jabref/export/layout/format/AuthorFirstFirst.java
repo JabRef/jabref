@@ -26,7 +26,7 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.imports.ImportFormatReader;
 
 /**
- * Changes {\^o} or {\^{o}} to ô
+ * Changes {\^o} or {\^{o}} to \uFFFD
  *
  * @author $author$
  * @version $Revision$
@@ -38,7 +38,7 @@ public class AuthorFirstFirst implements LayoutFormatter
     {
 	//ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
 	//return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
-        return ImportFormatReader.fixAuthor(fieldText);
+        return ImportFormatReader.fixAuthor_nocomma(fieldText);
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -16,9 +16,11 @@ public class CustomExportList extends TreeSet {
 
   private Object[] array;
   JabRefPreferences prefs;
+//  ExportComparator comp = new ExportComparator();
 
-  public CustomExportList(JabRefPreferences prefs_) {
-    super(new ExportComparator());
+  public CustomExportList(JabRefPreferences prefs_, Comparator comp) {
+    super(comp);
+    //super(new ExportComparator());
     prefs = prefs_;
     readPrefs();
     sort();
@@ -76,12 +78,3 @@ public class CustomExportList extends TreeSet {
   }
 
 }
-
-class ExportComparator implements Comparator {
-  public int compare(Object o1, Object o2) {
-    String[] s1 = (String[])o1,
-        s2 = (String[])o2;
-    return s1[0].compareTo(s2[0]);
-  }
-}
-

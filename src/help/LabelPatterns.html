@@ -27,11 +27,15 @@ Special field markers:
 <li><b>[<code>authorIni</code>]</b>: The first 5 characters of the first author's last name,
           and the last name initials of the remaining authors.<BR>
 <li><b>[<code>authN</code>]</b>: The first N characters of the first author's last name<BR>
+<li><b>[<code>authN_M</code>]</b>: The first N characters of the Mth author's last name<BR>
+<li><b>[<code>auth.auth.ea</code>]</b>: The last name of the first two authors, and ".ea" if there are more than two.<BR>
 <li><b>[<code>edtr</code>]</b>: The last name of the first editor<BR>
 <li><b>[<code>editors</code>]</b>: The last name of all editors<BR>
 <li><b>[<code>editorIni</code>]</b>: The first 5 characters of the first editor's last name,
  	and the last name initials of the remaining editors.<BR>
 <li><b>[<code>edtrN</code>]</b>: The first N characters of the first editor's last name<BR>
+<li><b>[<code>edtrN_M</code>]</b>: The first N characters of the Mth editor's last name<BR>
+<li><b>[<code>edtr.edtr.ea</code>]</b>: The last name of the first two editors, and ".ea" if there are more than two.<BR>
 <li><b>[<code>firstpage</code>]</b>: The number of the first page of the publication<BR>
 <li><b>[<code>lastpage</code>]</b>: The number of the last page of the publication<BR>
 <li><b>[<code>shorttitle</code>]</b>: The first 3 words of the title<BR>
@@ -39,7 +43,7 @@ Special field markers:
 <li><b>[<code>veryshorttitle</code>]</b>: The first word of the title,
 discounting 'the', 'a', 'an'.<BR>
  </ul>
- 
+
 <P>
 A field name (or one of the above pseudo-field names) may optionally
 be followed by a modifier. Currently the only defined modifier is

@@ -38,6 +38,7 @@ import java.awt.Dimension;
 import java.util.prefs.*;
 import java.util.*;
 import java.awt.event.*;
+import net.sf.jabref.export.ExportComparator;
 
 public class JabRefPreferences {
 
@@ -153,13 +154,47 @@ public class JabRefPreferences {
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
         defaults.put("confirmDelete", new Boolean(true));
+        defaults.put("preview0", "<font face=\"arial\">"
+                     +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                     +"\\end{bibtexkey}</b><br>\n"
+                     +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}\n"
+                     +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}\n"
+                     +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
+                     +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
+                     +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
+                     +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
+                     +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
+                     +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
+                     +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
+                     +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
+                     +"</dd>\n<p></p></font>");
+
+        defaults.put("preview1", "<font face=\"arial\">"
+                       +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                       +"\\end{bibtexkey}</b><br>\n"
+                       +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}\n"
+                       +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}\n"
+                       +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
+                       +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
+                       +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
+                       +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
+                       +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
+                       +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
+                       +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
+                       +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n"
+                       +"\\begin{abstract}<BR><BR><B>Abstract:</B> <I>\\format[HTMLChars]{\\abstract}</I>\\end{abstract}"
+                       +"</dd>\n<p></p></font>");
+
+
+        defaults.put("tempDir", "/tmp/");
 
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 
 	restoreKeyBindings();
 
-        customExports = new CustomExportList(this);
+        customExports = new CustomExportList(this, new ExportComparator());
+
 	//defaults.put("oooWarning", new Boolean(true));
 
     }

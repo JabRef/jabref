@@ -28,28 +28,21 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.undo.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.SAXException;
-
+import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.*;
 import net.sf.jabref.undo.*;
-import net.sf.jabref.collab.*;
 
 public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateListener {
 
@@ -57,7 +50,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     BasePanel ths = this;
     JSplitPane splitPane;
-    PreviewPanel previewPanel = null;
+    //BibtexEntry testE = new BibtexEntry("tt");
+    PreviewPanel[] previewPanel = new PreviewPanel[]
+        {new PreviewPanel(Globals.prefs.get("preview0")),
+        new PreviewPanel(Globals.prefs.get("preview1"))};
+    int activePreview = 1;
+    boolean previewActive = true;
 
     JabRefFrame frame;
     BibtexDatabase database;
@@ -66,7 +64,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     File file = null,
         fileToOpen = null; // The filename of the database.
     String fileMonitorHandle = null;
-    boolean saving = false;
+    boolean saving = false, updatedExternally = false;
     String encoding = null;
 
     //Hashtable autoCompleters = new Hashtable();
@@ -171,6 +169,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public BibtexDatabase database() { return database; }
+    public MetaData metaData() { return metaData; }
+    public File file() { return file; }
     public JabRefFrame frame() { return frame; }
     public JabRefPreferences prefs() { return prefs; }
 
@@ -214,12 +214,21 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
             });
 
-        // The action for saving a database.
-        actions.put("save", new BaseAction() {
-                public void action() throws Throwable {
-                    if (file == null)
-                        runCommand("saveAs");
-                    else {
+	// The action for saving a database.
+	actions.put("save", new BaseAction() {
+		public void action() throws Throwable {
+		    if (file == null)
+			runCommand("saveAs");
+		    else {
+
+                      if (updatedExternally) {
+                        int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
+                            +"Are you sure you want to save?"), Globals.lang("File updated externally"),
+                                                                   JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                        if (choice == JOptionPane.NO_OPTION)
+                          return;
+                      }
+
                       saving = true;
                       saveDatabase(file, false);
                       try {
@@ -236,6 +245,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       // since last save:
                       nonUndoableChange = false;
                       baseChanged = false;
+                      updatedExternally = false;
                       frame.setTabTitle(ths, file.getName());
                       frame.output(Globals.lang("Saved database")+" '"
                                    +file.getPath()+"'.");
@@ -404,7 +414,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                                     : Globals.lang("entry")) + ".");
                       ce.end();
                       undoManager.addEdit(ce);
-                      entryTable.clearSelection();
+                      //entryTable.clearSelection();
                       refreshTable();
                       markBaseChanged();
 
@@ -1158,7 +1168,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
               actions.put("togglePreview", new BaseAction() {
                   public void action() {
-                    previewEnabled = !previewEnabled;
+                    if (!previewEnabled) {
+                      previewEnabled = true;
+                      activePreview = 0;
+                    } else {
+                      if (activePreview < previewPanel.length-1)
+                        activePreview++;
+                      else
+                        previewEnabled = false;
+                    }
                     if (!previewEnabled)
                       hidePreview();
                     else {
@@ -1325,6 +1343,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
                 public void keyPressed(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER){
+			e.consume();
                         try { runCommand("edit");
                         } catch (Throwable ex) {
                             ex.printStackTrace();
@@ -1346,40 +1365,53 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
             });
 
 
-        // Set the right-click menu for the entry table.
-        //rcm = new RightClickMenu(this, metaData);
-        entryTable.setRightClickMenu(rcm);
-        int pos = splitPane.getDividerLocation();
-        splitPane.setTopComponent(entryTable.getPane());
-        splitPane.setDividerLocation(pos);
-        //splitPane.revalidate();
+	// Set the right-click menu for the entry table.
+	//rcm = new RightClickMenu(this, metaData);
+	entryTable.setRightClickMenu(rcm);
+	int pos = splitPane.getDividerLocation();
+	splitPane.setTopComponent(entryTable.getPane());
+	splitPane.setDividerLocation(pos);
+	//splitPane.revalidate();
+
     }
 
     public void setupMainPanel() {
 
-        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-        // We replace the default FocusTraversalPolicy with a subclass
-        // that only allows FieldEditor components to gain keyboard focus,
-        // if there is an entry editor open.
-        /*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
-                protected boolean accept(Component c) {
-                    Util.pr("jaa");
-                    if (showing == null)
-                        return super.accept(c);
-                    else
-                        return (super.accept(c) &&
-                                (c instanceof FieldEditor));
-                }
-                });*/
+	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+	// We replace the default FocusTraversalPolicy with a subclass
+	// that only allows FieldEditor components to gain keyboard focus,
+	// if there is an entry editor open.
+	/*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
+		protected boolean accept(Component c) {
+		    Util.pr("jaa");
+		    if (showing == null)
+			return super.accept(c);
+		    else
+			return (super.accept(c) &&
+				(c instanceof FieldEditor));
+		}
+		});*/
 
-        setupTable();
-        // If an entry is currently being shown, make sure it stays shown,
-        // otherwise set the bottom component to null.
-        if (showing == null) {
-          splitPane.setBottomComponent(previewPanel);
-          if (previewPanel != null)
-            splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
+	setupTable();
+	// If an entry is currently being shown, make sure it stays shown,
+	// otherwise set the bottom component to null.
+	if (showing == null) {
+          splitPane.setBottomComponent(previewPanel[activePreview].getPane());
+          if ((previewPanel[activePreview] != null) && previewPanel[activePreview].hasEntry()) {
+            //splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT[activePreview]);
+            final int prevSize = Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPreferredSize().height
+                                          + GUIGlobals.PREVIEW_PANEL_PADDING);
+            //            Util.pr(""+prevSize+" "+(splitPane.getHeight()/2)+" "+previewPanel[activePreview].getPreferredSize().height);
+            splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+            /*SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+              }
+            });*/
+
+          } else
+            splitPane.setBottomComponent(null);
         }
         else
             showEntry(showing);
@@ -1463,14 +1495,58 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         splitPane.setBottomComponent(null);
         return; // Do nothing if previews are disabled.
       }
-      if (previewPanel == null) {
-        previewPanel = new PreviewPanel(be);
+      if (previewPanel[activePreview] == null) {
+        previewPanel[activePreview] = new PreviewPanel(be, prefs.get("preview"+activePreview));
+
       } else
-        previewPanel.setEntry(be);
-      splitPane.setBottomComponent(previewPanel);
-      splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
-      previewPanel.repaint();
+        previewPanel[activePreview].setEntry(be);
+
+      //splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT[activePreview]);
+
+
+      //Util.pr(""+prevSize+" "+(splitPane.getHeight()/2)+" "+previewPanel[activePreview].getPreferredSize().height);
+
+      //splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+      //splitPane.resetToPreferredSizes();
+      //previewPanel[activePreview].getPane().invalidate();
+
+    splitPane.setBottomComponent(previewPanel[activePreview].getPane());
+
+    int prevSize = Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPane().getPreferredSize().height
+                            + GUIGlobals.PREVIEW_PANEL_PADDING);
+  //  int prevSize = 130;
+
+          splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+
+/*      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+
+        }
+      });*/
+
+      //previewPanel[activePreview].repaint();
       //throw new NullPointerException("..");
+    }
+
+    /**
+     * Stores the source view in the entry editor, if one is open, has the source view
+     * selected and the source has been edited.
+     * @return boolean false if there is a validation error in the source panel, true otherwise.
+     */
+    public boolean entryEditorAllowsChange() {
+      Component c = splitPane.getBottomComponent();
+      if ((c != null) && (c instanceof EntryEditor)) {
+        return ((EntryEditor)c).lastSourceAccepted();
+      }
+      else
+        return true;
+    }
+
+    public void moveFocusToEntryEditor() {
+      Component c = splitPane.getBottomComponent();
+      if ((c != null) && (c instanceof EntryEditor)) {
+        new FocusRequester(c);
+      }
     }
 
     /**
@@ -1478,9 +1554,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      * a preview is in fact visible before doing anything rash.
      */
     public void hidePreview() {
-      previewPanel = null;
+      previewEnabled = false;
+      //previewPanel[activePreview] = null;
       Component c = splitPane.getBottomComponent();
-      if ((c != null) && (c instanceof PreviewPanel))
+      if ((c != null) && !(c instanceof EntryEditor))
         splitPane.setBottomComponent(null);
     }
 
@@ -1756,55 +1833,56 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     public void addToGroup(String groupName, String regexp, String field) {
 
-        boolean giveWarning = false;
-        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-            if (field.equals(GUIGlobals.ALL_FIELDS[i])
-                && !field.equals("keywords")) {
-                giveWarning = true;
-                break;
-            }
-        }
-        if (giveWarning) {
-            String message = "This action will modify the '"+field+"' field "
-                +"of your entries.\nThis could cause undesired changes to "
-                +"your entries, so it\nis recommended that you change the field "
-                +"in your group\ndefinition to 'keywords' or a non-standard name."
-                +"\n\nDo you still want to continue?";
-            int choice = JOptionPane.showConfirmDialog
-                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE);
+	boolean giveWarning = false;
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
+		&& !field.equals("keywords")) {
+		giveWarning = true;
+		break;
+	    }
+	}
+	if (giveWarning) {
+	    String message = "This action will modify the '"+field+"' field "
+		+"of your entries.\nThis could cause undesired changes to "
+		+"your entries, so it\nis recommended that you change the field "
+		+"in your group\ndefinition to 'keywords' or a non-standard name."
+		+"\n\nDo you still want to continue?";
+	    int choice = JOptionPane.showConfirmDialog
+		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+		 JOptionPane.WARNING_MESSAGE);
 
-            if (choice == JOptionPane.NO_OPTION)
-                return;
-        }
+	    if (choice == JOptionPane.NO_OPTION)
+		return;
+	}
 
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0)) {
-            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-            NamedCompound ce = new NamedCompound("add to group");
-            boolean hasEdits = false;
-            for (int i=0; i<bes.length; i++) {
-                if (qsr.applyRule(null, bes[i]) == 0) {
-                    String oldContent = (String)bes[i].getField(field),
-                        pre = " ",
-                        post = "";
-                    String newContent =
-                        (oldContent==null ? "" : oldContent+pre)
-                        +regexp+post;
-                    bes[i].setField
-                        (field, newContent);
+	BibtexEntry[] bes = entryTable.getSelectedEntries();
+	if ((bes != null) && (bes.length > 0)) {
+	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+	    NamedCompound ce = new NamedCompound("add to group");
+	    boolean hasEdits = false;
+	    for (int i=0; i<bes.length; i++) {
+		if (qsr.applyRule(null, bes[i]) == 0) {
+		    String oldContent = (String)bes[i].getField(field),
+			pre = " ",
+			post = "";
+		    String newContent =
+			(oldContent==null ? "" : oldContent+pre)
+			+regexp+post;
+		    bes[i].setField
+			(field, newContent);
 
-                    // Store undo information.
-                    ce.addEdit(new UndoableFieldChange
-                               (bes[i], field, oldContent, newContent));
-                    hasEdits = true;
-                }
-            }
-            if (hasEdits) {
-                ce.end();
-                undoManager.addEdit(ce);
-                refreshTable();
-                markBaseChanged();
+		    // Store undo information.
+		    ce.addEdit(new UndoableFieldChange
+			       (bes[i], field, oldContent, newContent));
+		    hasEdits = true;
+		}
+	    }
+	    if (hasEdits) {
+		ce.end();
+		undoManager.addEdit(ce);
+		refreshTable();
+		markBaseChanged();
+                updateEntryEditorIfShowing();
                 updateViewToSelected();
             }
 
@@ -1817,49 +1895,50 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     public void removeFromGroup
         (String groupName, String regexp, String field) {
 
-        boolean giveWarning = false;
-        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-            if (field.equals(GUIGlobals.ALL_FIELDS[i])
-                && !field.equals("keywords")) {
-                giveWarning = true;
-                break;
-            }
-        }
-        if (giveWarning) {
-            String message = "This action will modify the '"+field+"' field "
-                +"of your entries.\nThis could cause undesired changes to "
-                +"your entries, so it\nis recommended that you change the field "
-                +"in your group\ndefinition to 'keywords' or a non-standard name."
-                +"\n\nDo you still want to continue?";
-            int choice = JOptionPane.showConfirmDialog
-                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE);
+	boolean giveWarning = false;
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
+		&& !field.equals("keywords")) {
+		giveWarning = true;
+		break;
+	    }
+	}
+	if (giveWarning) {
+	    String message = "This action will modify the '"+field+"' field "
+		+"of your entries.\nThis could cause undesired changes to "
+		+"your entries, so it\nis recommended that you change the field "
+		+"in your group\ndefinition to 'keywords' or a non-standard name."
+		+"\n\nDo you still want to continue?";
+	    int choice = JOptionPane.showConfirmDialog
+		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+		 JOptionPane.WARNING_MESSAGE);
 
-            if (choice == JOptionPane.NO_OPTION)
-                return;
-        }
+	    if (choice == JOptionPane.NO_OPTION)
+		return;
+	}
 
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0)) {
-            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-            NamedCompound ce = new NamedCompound("remove from group");
-            boolean hasEdits = false;
-            for (int i=0; i<bes.length; i++) {
-                if (qsr.applyRule(null, bes[i]) > 0) {
-                    String oldContent = (String)bes[i].getField(field);
-                    qsr.removeMatches(bes[i]);
-                                        // Store undo information.
-                    ce.addEdit(new UndoableFieldChange
-                               (bes[i], field, oldContent,
-                                bes[i].getField(field)));
-                    hasEdits = true;
-                }
-            }
-            if (hasEdits) {
-                ce.end();
-                undoManager.addEdit(ce);
-                refreshTable();
-                markBaseChanged();
+	BibtexEntry[] bes = entryTable.getSelectedEntries();
+	if ((bes != null) && (bes.length > 0)) {
+	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+	    NamedCompound ce = new NamedCompound("remove from group");
+	    boolean hasEdits = false;
+	    for (int i=0; i<bes.length; i++) {
+		if (qsr.applyRule(null, bes[i]) > 0) {
+		    String oldContent = (String)bes[i].getField(field);
+		    qsr.removeMatches(bes[i]);
+		    		    // Store undo information.
+		    ce.addEdit(new UndoableFieldChange
+			       (bes[i], field, oldContent,
+				bes[i].getField(field)));
+		    hasEdits = true;
+		}
+	    }
+	    if (hasEdits) {
+		ce.end();
+		undoManager.addEdit(ce);
+		refreshTable();
+		markBaseChanged();
+                updateEntryEditorIfShowing();
                 updateViewToSelected();
             }
 
@@ -1979,12 +2058,25 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
   }
 
+  public String fileMonitorHandle() { return fileMonitorHandle; }
+
     public void fileUpdated() {
       if (saving)
         return; // We are just saving the file, so this message is most likely due
       // to bad timing. If not, we'll handle it on the next polling.
-
       Util.pr("File '"+file.getPath()+"' has been modified.");
+      updatedExternally = true;
+
+      // Adding the sidepane component is Swing work, so we must do this in the Swing
+      // thread:
+      Thread t = new Thread() {
+        public void run() {
+          FileUpdatePanel pan = new FileUpdatePanel(frame, ths, sidePaneManager, Globals.prefs);
+          sidePaneManager.add("fileUpdate", pan);
+        }
+      };
+      SwingUtilities.invokeLater(t);
+
     }
 
       public void fileRemoved() {
@@ -1996,4 +2088,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         if (fileMonitorHandle != null)
           Globals.fileUpdateMonitor.removeUpdateListener(fileMonitorHandle);
       }
+
+  public void setUpdatedExternally(boolean b) {
+    updatedExternally = b;
+  }
 }

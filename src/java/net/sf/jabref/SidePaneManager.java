@@ -148,14 +148,15 @@ public class SidePaneManager {
       //sidep.setComponents(visible);
       updateView();
       comp.componentOpening();
-	/*sidep.add(comp);
-	components.put(name, comp);
-	visibleComponents++;
-	if (visibleComponents == 1)
-	    panel.setLeftComponent(sidep);
+        /*sidep.add(comp);
+        components.put(name, comp);
+        visibleComponents++;
+        if (visibleComponents == 1)
+            panel.setLeftComponent(sidep);
           comp.componentOpening();
-	comp.setVisibility(true);*/
+        comp.setVisibility(true);*/
     }
+
 
     public synchronized void register(String name, SidePaneComponent comp) {
       components.put(name, comp);

@@ -47,4 +47,10 @@ public class NamedCompound extends CompoundEdit {
 	return Globals.lang("Redo")+": "+name;
     }
 
+    /**
+     * Returns the name of this compound, without the Undo or Redo prefix.
+     */
+    public String getNameOnly() {
+      return name;
+    }
 }
