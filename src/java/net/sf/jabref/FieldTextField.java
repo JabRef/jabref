@@ -41,9 +41,9 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	label.setBorder(BorderFactory.createEtchedBorder
-			 (Color.white, Color.gray));	
+			 (GUIGlobals.lightGray, Color.gray));	
 	label.setOpaque(true);
-	label.setBackground(Color.white);
+	label.setBackground(GUIGlobals.lightGray);
 	if ((content != null) && (content.length() > 0))
 	    label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.

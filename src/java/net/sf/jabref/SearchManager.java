@@ -41,7 +41,7 @@ class SearchManager extends JPanel
 
 
     private JabRefFrame frame;
-    private JTextField searchField = new JTextField("", 30);
+    private JTextField searchField = new JTextField("", 20);
     private JLabel lab = //new JLabel(Globals.lang("Search")+":");
 	new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
     private JPopupMenu settings = new JPopupMenu();

@@ -61,7 +61,7 @@ public class SidePane extends JPanel {
 	//super.add(sp, BorderLayout.CENTER);
 	super.add(mainPanel, BorderLayout.NORTH);
 	JPanel pan = new JPanel();
-	pan.setBackground(Color.white);
+	pan.setBackground(GUIGlobals.lightGray);
 	super.add(pan, BorderLayout.CENTER);
     }
 
@@ -78,7 +78,7 @@ public class SidePane extends JPanel {
 	gbl.setConstraints(c, con);
 	mainPanel.add(c);
 	pan = new JPanel();
-	pan.setBackground(Color.white);
+	pan.setBackground(GUIGlobals.lightGray);
 	con.gridheight = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(pan, con);
 	//mainPanel.add(pan);

@@ -214,6 +214,7 @@ public class GUIGlobals {
 
     // Colors.
     public static Color
+	lightGray = new Color(230, 230, 230),      // Light gray background
 	nullFieldColor = new Color(100, 100, 150), // Empty field, blue.
 	validFieldColor = new Color(75, 130, 75), // Valid field, green.
 	invalidFieldColor = new Color(141,0,61), // Invalid field, red.	

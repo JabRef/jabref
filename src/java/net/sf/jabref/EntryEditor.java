@@ -49,7 +49,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * else.
      */
 
-    Color bg = new Color(235, 235, 235);
+
 
     // A reference to the entry this object works on.
     BibtexEntry entry;
@@ -118,7 +118,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	entry = entry_;
 	prefs = prefs_;
 
-	setBackground(bg);//Color.white);
+	setBackground(GUIGlobals.lightGray);//Color.white);
 
 	entry.addPropertyChangeListener(this);
 
@@ -197,7 +197,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tlb.setMargin(new Insets(2,2,2,2));
 	// The toolbar carries all the key bindings that are valid for the whole
 	// window.
-	tlb.setBackground(bg);//Color.white);
+	tlb.setBackground(GUIGlobals.lightGray);//Color.white);
 	ActionMap am = tlb.getActionMap();
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	

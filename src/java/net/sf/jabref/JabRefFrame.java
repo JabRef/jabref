@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 USA
 
 Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html0
+http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 package net.sf.jabref;
@@ -151,7 +151,7 @@ public class JabRefFrame extends JFrame {
     public JabRefFrame() {
 
 		//Globals.setLanguage("no", "");
-		setTitle(GUIGlobals.frameTitle);
+		setTitle(GUIGlobals.frameTitle);	       
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
@@ -160,7 +160,7 @@ public class JabRefFrame extends JFrame {
 			});
 		
 		initLabelMaker();
-		
+				
 		setupLayout();		
 		setSize(new Dimension(prefs.getInt("sizeX"),
 							  prefs.getInt("sizeY")));
@@ -193,9 +193,10 @@ public class JabRefFrame extends JFrame {
     }
 
     private void setupLayout() {
-	fillMenu();
+	fillMenu();	
 	createToolBar();
 	getContentPane().setLayout(gbl);
+	getContentPane().setBackground(GUIGlobals.lightGray);
 	con.fill = GridBagConstraints.HORIZONTAL;
 	con.anchor = GridBagConstraints.WEST;
 	con.weightx = 1;
@@ -204,15 +205,21 @@ public class JabRefFrame extends JFrame {
 	mb.setMinimumSize(mb.getPreferredSize());
 	gbl.setConstraints(mb, con);
 	getContentPane().add(mb);
-
-	con.gridwidth = 1;
+	con.anchor = GridBagConstraints.NORTH;
+	con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
 	gbl.setConstraints(tlb, con);
 	getContentPane().add(tlb);
-
+	
+	Component lim = Box.createGlue();
+	gbl.setConstraints(lim, con);
+	getContentPane().add(lim);
+	/*
 	JPanel empt = new JPanel();
+	empt.setBackground(GUIGlobals.lightGray);
 	gbl.setConstraints(empt, con);
         getContentPane().add(empt); 
-
+	*/
+	con.insets = new Insets(1,0,1,1);
 	con.anchor = GridBagConstraints.EAST;
 	con.weightx = 0;      
 	con.gridwidth = GridBagConstraints.REMAINDER;
@@ -220,9 +227,16 @@ public class JabRefFrame extends JFrame {
 	getContentPane().add(searchManager);
 
 	con.weightx = 1;
-	con.weighty = 1;
+	con.weighty = 0;
 	con.fill = GridBagConstraints.BOTH;
 	con.anchor = GridBagConstraints.WEST;
+	con.insets = new Insets(0,0,0,0);
+	lim = Box.createGlue();
+	gbl.setConstraints(lim, con);
+	getContentPane().add(lim);
+	//tabbedPane.setVisible(false);
+	//tabbedPane.setForeground(GUIGlobals.lightGray);
+	con.weighty = 1;
 	gbl.setConstraints(tabbedPane, con);
 	getContentPane().add(tabbedPane);
 
@@ -239,6 +253,7 @@ public class JabRefFrame extends JFrame {
 	status.add(statusLine);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	statusLabel.setForeground(GUIGlobals.nullFieldColor.darker());
+	con.insets = new Insets(0,0,0,0);
 	gbl.setConstraints(status, con);
 	getContentPane().add(status);
 
@@ -454,13 +469,28 @@ public class JabRefFrame extends JFrame {
     }
 
     private void createToolBar() {
+	tlb.setRollover(true);
+	
+	tlb.setBorderPainted(true);
+	tlb.setBackground(GUIGlobals.lightGray);
+	tlb.setForeground(GUIGlobals.lightGray);
 	tlb.setFloatable(false);
 	tlb.add(newDatabaseAction);
 	tlb.add(open);
 	tlb.add(save);
+	tlb.addSeparator();       
+	tlb.add(cut);
+	tlb.add(copy);
+	tlb.add(paste);
 	tlb.addSeparator();
 	tlb.add(editPreamble);
 	tlb.add(editStrings);
+	tlb.addSeparator();
+	tlb.add(showPrefs);
+
+	for (int i=0; i<tlb.getComponentCount(); i++)
+	    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
+
 	//tb.add(closeDatabaseAction);
 	//tb.addSeparator();
 	/*tlb.add(copyKeyAction);
