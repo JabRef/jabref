@@ -1,3 +1,30 @@
+/*
+Copyright (C) 2003  Morten O. Alver and Nizar N. Batada
+
+All programs in this directory and
+subdirectories are published under the GNU General Public License as
+described below.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+Further information about the GNU GPL is available at:
+http://www.gnu.org/copyleft/gpl.ja.html
+
+*/
+
 package net.sf.jabref;
 import java.util.*;
 import java.io.*;
@@ -352,7 +379,8 @@ public class ImportFormatReader
 	    return f;
 	
     }
-    
+    // check here for details on the format
+    // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
     static ArrayList readEndnote(String filename){
 	String ENDOFRECORD="__EOREOR__";
 	ArrayList bibitems = new ArrayList();
@@ -383,23 +411,39 @@ public class ImportFormatReader
 
 	int rowNum=0;
 	HashMap hm=new HashMap();
-	String Author="",Type="";
+	String Author="",Type="",Editor="";
 	for(int i=0; i<entries.length-1; i++){
-	    if(entries[i].length() <=2 ) continue;
 	    hm.clear();
 	    Author=""; Type="";
 	    String[] fields = entries[i].split("\n");
 	    for(int j=0; j <fields.length; j++){
+		if(fields[j].length() < 3)
+		    continue;
 		String prefix=fields[j].substring(0,2);
 		String val = fields[j].substring(3);
-		if( prefix.equals("%A")) Author += " and " + val;
-		else if(prefix.equals("%T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
-		else if(prefix.equals("%O")){
-		    if(val.equals("Journal Article"))
-			Type="article";
+		if( prefix.equals("%A")){
+		    if( Author.equals(""))
+			Author=val;
 		    else
-			Type = "misc"; //
+			Author += " and " + val;
 		}
+		else if(prefix.equals("%Y")){
+		    if( Editor.equals("")) Editor=val;
+		    else Editor += " and " + val;
+		}
+		else if(prefix.equals("%T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
+		else if(prefix.equals("%0")){
+		    if(val.indexOf("Journal")==0)
+			Type="article";
+		    else if(val.indexOf("Book")==0)
+			Type="book";
+		    else if( val.indexOf("Conference")==0)// Proceedings
+			Type="inproceedings";
+		    else 
+			Type = "misc"; // 
+		    System.out.println(val);
+		}
+		else if(prefix.equals("%7")) hm.put("edition",val);
 		else if(prefix.equals("%D")) hm.put("year",val);
 		else if(prefix.equals("%J")) hm.put("journal",val);
 		else if(prefix.equals("%P")) hm.put("pages",val);
@@ -408,9 +452,9 @@ public class ImportFormatReader
 		else if(prefix.equals("%U")) hm.put("url",val);
 		else if(prefix.equals("%X")) hm.put("abstract",val);
 	    }
-	    Author=fixAuthor(Author);
 	    //fixauthorscomma
-	    hm.put("author",Author);
+	    hm.put("author",fixAuthor(Author));
+	    hm.put("editor",fixAuthor(Editor));
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);

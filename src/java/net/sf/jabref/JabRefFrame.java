@@ -122,8 +122,12 @@ public class JabRefFrame extends JFrame {
 	makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
 					  "Autogenerate BibTeX keys",
 					  GUIGlobals.genKeyIconFile,
-					  prefs.getKey("Autgenerate BibTeX keys"));
-
+					  prefs.getKey("Autgenerate BibTeX keys")),
+	lyxPushAction = new GeneralAction("pushToLyX", "Insert selected citations into LyX",
+					  "push selection to lyx",
+					  GUIGlobals.lyxIconFile,
+					  prefs.getKey("Push To LyX"));
+    
 
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -425,6 +429,7 @@ public class JabRefFrame extends JFrame {
 	mb.add(bibtex);
 
 	tools.add(makeKeyAction);
+	tools.add(lyxPushAction); 
 	mb.add(tools);
 
 	options.add(showPrefs);
@@ -627,7 +632,9 @@ public class JabRefFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			// Ask here if the user really wants to close, if the base
 			// has not been saved since last save.
-			boolean close = true;	    
+			boolean close = true;
+			if(basePanel()==null) // when it is initially empty
+			    return;//nbatada nov 7
 			if (basePanel().baseChanged) {
 				int answer = JOptionPane.showConfirmDialog
 					(ths, Globals.lang("Database has changed. Do you want to save "+
@@ -860,7 +867,7 @@ public class JabRefFrame extends JFrame {
 			// put in menu
 			//
 	    //########################################
-	    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Import Endnote"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+	    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Endnote"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newEndnoteFile_mItem.addActionListener(new ActionListener()
 			    {
 				public void actionPerformed(ActionEvent e)
@@ -874,7 +881,7 @@ public class JabRefFrame extends JFrame {
 			    });
 			importMenu.add(newEndnoteFile_mItem);
 			//########################################			
-			JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("Import INSPEC"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("INSPEC"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newINSPECFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 						String tempFilename=getNewFile();
@@ -887,7 +894,7 @@ public class JabRefFrame extends JFrame {
 			    });
 			importMenu.add(newINSPECFile_mItem);
 	    //########################################			
-			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("Import ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newISIFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    String tempFilename=getNewFile();
@@ -901,7 +908,7 @@ public class JabRefFrame extends JFrame {
 			importMenu.add( newISIFile_mItem);
 			
 	    //########################################			
-			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Import Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newMedlineFile_mItem.addActionListener(new ActionListener()
 			    {
 				public void actionPerformed(ActionEvent e)
@@ -915,7 +922,7 @@ public class JabRefFrame extends JFrame {
 			    });
 			importMenu.add(newMedlineFile_mItem);
 	    //########################################			
-			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Import Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newOvidFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    String tempFilename=getNewFile();
@@ -928,7 +935,7 @@ public class JabRefFrame extends JFrame {
 			    });
 			importMenu.add(newOvidFile_mItem);
 	    //########################################			
-			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("Import RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newRefMan_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    String tempFilename=getNewFile();
@@ -943,7 +950,7 @@ public class JabRefFrame extends JFrame {
 			
 	    //########################################			
 			
-			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("Import SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
 			newSciFinderFile_mItem.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e)

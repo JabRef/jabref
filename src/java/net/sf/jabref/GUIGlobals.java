@@ -106,6 +106,7 @@ public class GUIGlobals {
 	cutIconFile = GUIGlobals.class.getResource(pre+"Cut.gif"),
 	copyKeyIconFile = GUIGlobals.class.getResource(pre+"CopyKey.gif"),
 	genKeyIconFile = GUIGlobals.class.getResource(pre+"GenKey.gif"),
+	lyxIconFile = GUIGlobals.class.getResource(pre+"LyX.gif"),	
 	backIconFile = GUIGlobals.class.getResource(pre+"VCRBack.gif"),
 	forwardIconFile = GUIGlobals.class.getResource(pre+"VCRForward.gif"),
 	contentsIconFile = GUIGlobals.class.getResource(pre+"Contents.gif"),

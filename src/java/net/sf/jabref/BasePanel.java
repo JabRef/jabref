@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003 Morten O. Alver and Nizar N. Batada
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -464,6 +464,45 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
+	actions.put("pushToLyX",new BaseAction(){
+		public void action(){
+		    int[] rows = entryTable.getSelectedRows();
+		    int numSelected = rows.length;
+		    BibtexEntry bes = null;
+		    output("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
+		Object citekey;
+		// check if lyxpipe is defined
+		File lyxpipe = new File( System.getProperty("user.home")+File.separator+".lyx/lyxpipe" + ".in");
+		//File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+		if( !lyxpipe.exists() || !lyxpipe.canWrite()){
+		    output("ERROR: verify that LyX is running and that the lyxpipe is valid. [" + prefs.get("lyxpipe") +"]");
+		    return;
+		}
+		if( numSelected > 0){
+		    try {
+			BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
+			//String citeStr="LYXCMD:sampleclient:citation-insert:\\cite{"+(String) model.getValueAt( selectedRows[0], Globals.INDEX_KEY);
+			String citeStr="LYXCMD:sampleclient:citation-insert:"+ database.getEntryById( tableModel.getNameFromNumber( rows[0])).getField(GUIGlobals.KEY_FIELD);
+			String message="LYXPIPE: sent rows " + rows[0];
+			for(int i=1; i< numSelected; i++){
+			    bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
+			    citekey= bes.getField(GUIGlobals.KEY_FIELD);
+			    // if the key is empty we give a warning and ignore this entry
+
+			    citeStr += "," + citekey;
+			    message+= ", " + rows[i];
+			}
+			lyx_out.write(citeStr +"\n");
+			
+			lyx_out.close();
+			output(message);
+		    }
+		    catch (IOException excep) {
+			output("ERROR: unable to write to " + prefs.get("lyxpipe") +".in");
+		    }
+		}
+		}
+	    });
     // The action for auto-generating keys.
 	actions.put("makeKey", new BaseAction() {
 		public void action() {

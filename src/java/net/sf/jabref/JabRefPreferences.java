@@ -45,11 +45,11 @@ public class JabRefPreferences {
 
 	prefs = Preferences.userNodeForPackage(JabRef.class);
 	//Util.pr(prefs.toString());
-	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
+
 	defaults.put("pdfviewer","/usr/bin/acroread");
 	defaults.put("psviewer","/usr/X11R6/bin/gv");
 	defaults.put("htmlviewer","/usr/bin/mozilla");
-	defaults.put("lyxpipe","somewhere");
+	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
 	defaults.put("posX", new Integer(0));
 	defaults.put("posY", new Integer(0));
 	defaults.put("sizeX", new Integer(840));
@@ -261,6 +261,7 @@ public class JabRefPreferences {
     }
 
     private void defineDefaultKeyBindings() {
+	defKeyBinds.put("Push To LyX","ctrl L");
 	defKeyBinds.put("Quit JabRef", "ctrl Q");
 	defKeyBinds.put("Open", "ctrl O");
 	defKeyBinds.put("Save", "ctrl S");
