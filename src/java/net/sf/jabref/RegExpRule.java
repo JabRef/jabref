@@ -40,7 +40,13 @@ public class RegExpRule implements SearchRule{
 
     public RegExpRule(boolean caseSensitive, boolean searchAll, boolean searchReq, boolean searchOpt, boolean searchGen) {
         m_caseSensitiveSearch = caseSensitive;
-        m_searchAll = searchAll;
+
+        // 2005.03.29, trying to remove field category searches, to simplify
+        // search usability.
+        m_searchAll = true;
+        //m_searchAll = searchAll;
+        // ---------------------------------------------------
+
         m_searchReq = searchReq;
         m_searchOpt = searchOpt;
         m_searchGen = searchGen;
@@ -61,6 +67,7 @@ public class RegExpRule implements SearchRule{
 	if (!m_caseSensitiveSearch)
 	    flags = Pattern.CASE_INSENSITIVE; // testing
 	Pattern pattern = Pattern.compile(searchString, flags);
+
 
 	if (m_searchAll) {
 	    Object[] fields = bibtexEntry.getAllFields();

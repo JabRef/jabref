@@ -1,11 +1,14 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.imports.ImportFormatReader;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.awt.event.ActionEvent;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,12 +33,14 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
 public class ImportInspectionDialog extends JDialog {
     private BasePanel panel;
     private JabRefFrame frame;
+    private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
     private DefaultTableModel tableModel = new MyTableModel();
     private JTable table = new MyTable(tableModel);
     private String[] fields;
     private JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
     private JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel"));
+        cancel = new JButton(Globals.lang("Cancel")),
+        generate = new JButton(Globals.lang("Generate keys"));
     private List entries = new ArrayList();
     private String undoName;
     private ArrayList callBacks = new ArrayList();
@@ -42,6 +48,10 @@ public class ImportInspectionDialog extends JDialog {
     private JButton selectAll = new JButton(Globals.lang("Select all"));
     private JButton deselectAll = new JButton(Globals.lang("Deselect all"));
     private JButton stop = new JButton(Globals.lang("Stop"));
+    private PreviewPanel preview = new PreviewPanel(Globals.prefs.get("preview1"));
+    private ListSelectionListener previewListener = null;
+    private boolean generatedKeys = false;
+
     /**
      * Creates a dialog that displays the given set of fields in the table.
      * The dialog allows another process to add entries dynamically while the dialog
@@ -68,14 +78,22 @@ public class ImportInspectionDialog extends JDialog {
             table.getColumnModel().getColumn(i+1).setPreferredWidth(width);
         }
         table.getColumnModel().getColumn(0).setPreferredWidth(25);
-        table.setRowSelectionAllowed(false);
-        table.setCellSelectionEnabled(false);
+        table.setRowSelectionAllowed(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //table.setCellSelectionEnabled(false);
+        previewListener = new TableSelectionListener();
+        table.getSelectionModel().addListSelectionListener(previewListener);
+
         getContentPane().setLayout(new BorderLayout());
         progressBar.setIndeterminate(true);
         JPanel centerPan = new JPanel();
         centerPan.setLayout(new BorderLayout());
-        centerPan.add(new JScrollPane(table), BorderLayout.CENTER);
+        contentPane.setTopComponent(new JScrollPane(table));
+        contentPane.setBottomComponent(new JScrollPane(preview));
+
+        centerPan.add(contentPane, BorderLayout.CENTER);
         centerPan.add(progressBar, BorderLayout.SOUTH);
+        
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
 
@@ -84,23 +102,29 @@ public class ImportInspectionDialog extends JDialog {
         bb.addGridded(ok);
         bb.addGridded(stop);
         bb.addGridded(cancel);
+
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addGridded(selectAll);
         builder.addGridded(deselectAll);
+        builder.addRelatedGap();
+        builder.addGridded(generate);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         centerPan.add(builder.getPanel(), BorderLayout.WEST);
 
         ok.setEnabled(false);
+        generate.setEnabled(false);
         ok.addActionListener(new OkListener());
         cancel.addActionListener(new CancelListener());
+        generate.addActionListener(new GenerateListener());
         stop.addActionListener(new StopListener());
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        setSize(new Dimension(650, 500));
+        setSize(new Dimension(650, 650));
+        //contentPane.setDividerLocation(0.6f);
     }
 
     public void setProgress(int current, int max) {
@@ -137,6 +161,8 @@ public class ImportInspectionDialog extends JDialog {
         progressBar.setIndeterminate(false);
         progressBar.setVisible(false);
         ok.setEnabled(true);
+        if (!generatedKeys)
+            generate.setEnabled(true);
     }
 
 
@@ -154,6 +180,47 @@ public class ImportInspectionDialog extends JDialog {
             }
         }
         return selected;
+    }
+
+    /**
+     * Generate keys for all entries. All keys will be unique with respect to one another,
+     * and, if they are destined for an existing database, with respect to existing keys in
+     * the database.
+     */
+    public void generateKeys() {
+        BibtexDatabase database = null;
+        // Relate to the existing database, if any:
+        if (panel != null)
+            database = panel.database();
+        // ... or create a temporary one:
+        else
+            database = new BibtexDatabase();
+        List keys = new ArrayList(entries.size());
+        // Iterate over the entries, add them to the database we are working with,
+        // and generate unique keys:
+        for (Iterator i=entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry)i.next();
+            //if (newDatabase) {
+                try {
+                    entry.setId(Util.createNeutralId());
+                    database.insertEntry(entry);
+                } catch (KeyCollisionException ex) {
+                    ex.printStackTrace();
+                }
+            //}
+            LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+            // Add the generated key to our list:
+            keys.add(entry.getCiteKey());
+        }
+        // Remove the entries from the database again, since they are not supposed to
+        // added yet. They only needed to be in it while we generated the keys, to keep
+        // control over key uniqueness.
+        for (Iterator i=entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry)i.next();
+            database.removeEntry(entry.getId());
+        }
+        // Add a column to the table for displaying the generated keys:
+        tableModel.addColumn("Bibtexkey", keys.toArray());
     }
 
     public void addCallBack(CallBack cb) {
@@ -229,6 +296,15 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
+    class GenerateListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            generate.setEnabled(false);
+            generatedKeys = true; // To prevent the button from getting enabled again.
+            generateKeys(); // Generate the keys.
+        }
+    }
+
+
     class MyTable extends JTable {
         public MyTable(TableModel model) {
             super(model);
@@ -259,6 +335,18 @@ public class ImportInspectionDialog extends JDialog {
             for (int i=0; i<table.getRowCount(); i++) {
                 table.setValueAt(enable, i, 0);
             }
+        }
+    }
+
+    class TableSelectionListener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting())
+                return;
+            int row = table.getSelectedRow();
+            if (row < 0)
+                return;
+            preview.setEntry((BibtexEntry)entries.get(row));
+            contentPane.setDividerLocation(0.5f);
         }
     }
 

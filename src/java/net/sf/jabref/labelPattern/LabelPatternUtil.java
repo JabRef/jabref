@@ -320,7 +320,8 @@ public class LabelPatternUtil {
         if (!_label.equals(oldKey))
             _db.setCiteKeyForEntry(_entry.getId(), _label);
     }
-    else { 
+    else {
+
         // The key is already in use, so we must modify it.
         char c = 'b';
         String modKey = _label + "a";
@@ -330,13 +331,18 @@ public class LabelPatternUtil {
         //while (_db.setCiteKeyForEntry(_entry.getId(), modKey)) {
         while (occurences > 0) {
             modKey = _label + ( (char) (c++));
+
             occurences = _db.getNumberOfKeyOccurences(modKey);
             if ((oldKey != null) && oldKey.equals(modKey))
                 occurences--;
         }
-        if (!modKey.equals(oldKey))
-            _db.setCiteKeyForEntry(_entry.getId(), modKey);
+
+        if (!modKey.equals(oldKey))  {
+            System.out.println("LabelPatternUtil: "+modKey);
+            System.out.println(_db.setCiteKeyForEntry(_entry.getId(), modKey));
+        }
     }
+
     return _entry;
     /** End of edit, Morten Alver 2004.02.04.  */
 

@@ -4,10 +4,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.File;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
+
+import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 import java.util.List;
@@ -82,6 +80,7 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
             diag.addEntries(entries);
             diag.addCallBack(ImportUnknownMenuItem.this);
             diag.entryListComplete();
+            Util.placeDialog(diag, frame);
             diag.setVisible(true);
 
 		    //frame.addBibEntries(entries, filename, openInNew);

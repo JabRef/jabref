@@ -136,13 +136,15 @@ class SearchManager2 extends SidePaneComponent
 				      Globals.prefs.getBoolean("caseSensitiveSearch"));
 settings.add(select);
 
-
-        settings.addSeparator();
-	settings.add(searchReq);
-	settings.add(searchOpt);
-	settings.add(searchGen);
-	settings.addSeparator();
-	settings.add(searchAll);
+    // 2005.03.29, trying to remove field category searches, to simplify
+        // search usability.
+    //settings.addSeparator();
+	//settings.add(searchReq);
+	//settings.add(searchOpt);
+	//settings.add(searchGen);
+	//settings.addSeparator();
+	//settings.add(searchAll);
+    // ---------------------------------------------------------------
 	settings.addSeparator();
         settings.add(caseSensitive);
 	settings.add(regExpSearch);
@@ -212,7 +214,7 @@ settings.add(select);
         //con.insets = new Insets(0, 0, 0,  0);
         gbl.setConstraints(searchField,con);
         main.add(searchField) ;
-        con.gridwidth = 1;
+        //con.gridwidth = 1;
         gbl.setConstraints(search,con);
         main.add(search) ;
         con.gridwidth = GridBagConstraints.REMAINDER;

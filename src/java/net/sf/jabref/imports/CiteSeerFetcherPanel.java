@@ -42,7 +42,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     public CiteSeerFetcherPanel(SidePaneManager p0, final CiteSeerFetcher fetcher) {
 	super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
 
-	help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
+	help = new HelpAction(Globals.helpDiag, GUIGlobals.citeSeerHelp, "Help");
 
 	this.citeSeerFetcher = fetcher;
 	helpBut.addActionListener(help);

@@ -1,5 +1,5 @@
 
-JabRef 1.7
+JabRef 1.x
 ----------
 
 
@@ -88,6 +88,13 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.x     - [UNFINISHED] Added inspection dialog for previewing and generating keys for imported entries,
+          and deciding which ones to keep and discard. The dialog allows inspection during long import
+          processes such as Medline search.
+        - [KEEP?] Removed options to search only Required, Optional and/or General fields,
+          in order to simplify search interface.
+1.7?    - Fixed bug that made group tree disappear for certain keyword expressions.
+        - Fixed bug that made standard BibTeX fields be saved without line wrapping.
 1.7     - When fetching from Medline or CiteSeer, fetched entry is now opened in editor.
         - Added French translations of help files.
         - Added color highlighting of focused text field in entry editor.

@@ -124,7 +124,8 @@ public class LatexFieldFormatter implements FieldFormatter {
 	    //if (tell++ > 10) System.exit(0);
 	}
 
-	return sb.toString();
+    return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);
+	
     }
 
     private void writeText(String text, int start_pos,

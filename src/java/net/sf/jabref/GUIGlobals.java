@@ -274,6 +274,7 @@ public class GUIGlobals {
       pdfHelp = "ExternalFiles.html",
       exportCustomizationHelp = "CustomExports.html",
       medlineHelp = "MedlineHelp.html",
+        citeSeerHelp = "CiteSeerHelp.html",
       generalFieldsHelp = "GeneralFields.html",
 //      searchHelp = "SearchHelp.html",
       aboutPage = "About.html",
