@@ -39,7 +39,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     panel = panel_;
     tf.setMinimumSize(new Dimension(1,1));
     //add(hd, BorderLayout.NORTH);
-    ok.setToolTipText(Globals.lang("Fetch Medline"));
+    //ok.setToolTipText(Globals.lang("Fetch Medline"));
     setLayout(gbl);
     con.fill = GridBagConstraints.BOTH;
     con.insets = new Insets(0, 0, 2,  0);
@@ -92,14 +92,14 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
           }
         }
         ce.end();
-        panel.output(Globals.lang("Medline entries fetched:")+" "+bibs.size());
+        panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
         panel.undoManager.addEdit(ce);
         panel.markBaseChanged();
         panel.refreshTable();
       } else
         panel.output(Globals.lang("No Medline entries found."));
     } else {
-      JOptionPane.showMessageDialog(panel.frame,"Sorry, I was expecting a semicolon or comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
+	JOptionPane.showMessageDialog(panel.frame,Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
     }
   }
 

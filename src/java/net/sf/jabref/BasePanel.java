@@ -254,8 +254,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    = new TransferableBibtexEntry(bes);
 			Toolkit.getDefaultToolkit().getSystemClipboard()
 			    .setContents(trbe, ths);
-			output("Copied "+(bes.length>1 ? bes.length+" entries."
-					  : "1 entry."));
+			output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
+							   +Globals.lang("entries")
+							   : "1 "+Globals.lang("entry")+"."));
 		    } else {
 			// The user maybe selected a single cell.
 			int[] rows = entryTable.getSelectedRows(),
@@ -292,7 +293,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				       (database, bes[i], ths));
 			}
 			entryTable.clearSelection();
-			frame.output(Globals.lang("Cut")+" "+
+			frame.output(Globals.lang("Cut_pr")+" "+
 				     (bes.length>1 ? bes.length
 				      +" "+ Globals.lang("entries")
 				      : Globals.lang("entry"))+".");
@@ -395,7 +396,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				tableModel.remap();
 				entryTable.clearSelection();
 				entryTable.revalidate();
-				output("Pasted "+(bes.length>1 ? bes.length+" entries." : "1 entry."));
+				output(Globals.lang("Pasted")+" "+
+				       (bes.length>1 ? bes.length+" "+
+					Globals.lang("entries") : "1 "+Globals.lang("entry"))
+				       +".");
 				refreshTable();
 				markBaseChanged();
 			    }
@@ -533,12 +537,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    }
 			*/
 		    } else { // None selected. Inform the user to select entries first.
-			JOptionPane.showMessageDialog(frame, "First select the entries you want keys to be generated for.",
-						      "Autogenerate Bibtexkey", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
+						      Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
 			return ;
 		    }
 
-		    output("Generating Bibtexkey for "+numSelected+(numSelected>1 ? " entries" : "entry"));
+		    output(Globals.lang("Generating BibTeX key for")+" "+
+			   numSelected+" "+(numSelected>1 ? Globals.lang("entries") 
+					    : Globals.lang("entry")));
 
 		    NamedCompound ce = new NamedCompound("autogenerate keys");
 		    //BibtexEntry be;
@@ -795,7 +801,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 		// Create an UndoableInsertEntry object.
 		undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
-		output("Added new "+type.getName().toLowerCase()+" entry.");
+		output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
+		       +Globals.lang("entry")+".");
 		refreshTable();
 		markBaseChanged(); // The database just changed.
 		if (prefs.getBoolean("autoOpenForm")) {
