@@ -32,10 +32,18 @@ import java.util.regex.Pattern;
 
 public class RegExpRule implements SearchRule{
 
-    JabRefPreferences prefs;
+    final boolean m_caseSensitiveSearch;
+    final boolean m_searchAll;
+    final boolean m_searchReq;
+    final boolean m_searchOpt;
+    final boolean m_searchGen;
 
-    public RegExpRule(JabRefPreferences prefs) {
-	this.prefs = prefs;
+    public RegExpRule(boolean caseSensitive, boolean searchAll, boolean searchReq, boolean searchOpt, boolean searchGen) {
+        m_caseSensitiveSearch = caseSensitive;
+        m_searchAll = searchAll;
+        m_searchReq = searchReq;
+        m_searchOpt = searchOpt;
+        m_searchGen = searchGen;
     }
 
     public int applyRule(Map searchStrings,BibtexEntry bibtexEntry) {
@@ -50,23 +58,23 @@ public class RegExpRule implements SearchRule{
         String tempString = null ; 
 
 	int flags = 0;
-	if (!prefs.getBoolean("caseSensitiveSearch"))
+	if (!m_caseSensitiveSearch)
 	    flags = Pattern.CASE_INSENSITIVE; // testing
 	Pattern pattern = Pattern.compile(searchString, flags);
 
-	if (prefs.getBoolean("searchAll")) {
+	if (m_searchAll) {
 	    Object[] fields = bibtexEntry.getAllFields();
 	    score += searchFields(fields, bibtexEntry, pattern);
 	} else {
-	    if (prefs.getBoolean("searchReq")) {
+	    if (m_searchReq) {
 		String[] requiredField = bibtexEntry.getRequiredFields() ;
 		score += searchFields(requiredField, bibtexEntry, pattern);
 	    }
-	    if (prefs.getBoolean("searchOpt")) {
+	    if (m_searchOpt) {
 		String[] optionalField = bibtexEntry.getOptionalFields() ;
 		score += searchFields(optionalField, bibtexEntry, pattern);
 	    }
-	    if (prefs.getBoolean("searchGen")) {
+	    if (m_searchGen) {
 		String[] generalField = bibtexEntry.getGeneralFields() ;
 		score += searchFields(generalField, bibtexEntry, pattern);
 	    }

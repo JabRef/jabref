@@ -31,10 +31,18 @@ import java.util.Enumeration ;
 
 public class SimpleSearchRule implements SearchRule{
 
-    JabRefPreferences prefs;
+    final boolean m_caseSensitiveSearch;
+    final boolean m_searchAll;
+    final boolean m_searchReq;
+    final boolean m_searchOpt;
+    final boolean m_searchGen;
 
-    public SimpleSearchRule(JabRefPreferences prefs) {
-	this.prefs = prefs;
+    public SimpleSearchRule(boolean caseSensitive, boolean searchAll, boolean searchReq, boolean searchOpt, boolean searchGen) {
+        m_caseSensitiveSearch = caseSensitive;
+        m_searchAll = searchAll;
+        m_searchReq = searchReq;
+        m_searchOpt = searchOpt;
+        m_searchGen = searchGen;
     }
 
 
@@ -55,7 +63,7 @@ public class SimpleSearchRule implements SearchRule{
             upperString = searchString ; 
         }
 
-	if (prefs.getBoolean("caseSensitiveSearch")) {
+	if (m_caseSensitiveSearch) {
 	    score += doSearch(searchString,bibtexEntry) ; 
 	} else {
 	    score += doSearch(searchString,bibtexEntry) ; 
@@ -77,15 +85,15 @@ public class SimpleSearchRule implements SearchRule{
         int counter = 0 ; 
         //score += searchAllFields(searchString,bibtexEntry) ; 
 
-	if (prefs.getBoolean("searchAll")) {
+	if (m_searchAll) {
 	    score += searchAllFields(searchString,bibtexEntry) ; 
 	} else {
 	
-	    if (prefs.getBoolean("searchReq"))
+	    if (m_searchReq)
 		score += searchRequiredFields(searchString,bibtexEntry) ; 
-	    if (prefs.getBoolean("searchOpt"))
+	    if (m_searchOpt)
 		score += searchOptionalFields(searchString,bibtexEntry) ; 
-	    if (prefs.getBoolean("searchGen"))
+	    if (m_searchGen)
 		score += searchGeneralFields(searchString,bibtexEntry) ; 
 	
 	}
