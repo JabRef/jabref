@@ -38,7 +38,7 @@ public class Globals {
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
 	
-    public static void logThis(String s){
+    public static void logger(String s){
 	Logger.global.info(s);
     }
     

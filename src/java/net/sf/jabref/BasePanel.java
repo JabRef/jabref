@@ -1072,10 +1072,47 @@ public class BasePanel extends JSplitPane implements MouseListener,
     // Method pertaining to the ClipboardOwner interface.
     public void lostOwnership(Clipboard clipboard, Transferable contents) {}
 
+    //##########################################
+    //  usage: 
+    //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
+    //############################################
+        // if the newkey already exists and is not the same as oldkey it will give a warning
+    // else it will add the newkey to the to set and remove the oldkey
+    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
+	Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+	
+	boolean duplicate=false;
+	if(oldKey==null){// this is a new entry so don't bother removing oldKey
+	    duplicate= addKeyToSet( newKey);
+	}else{
+	    if(oldKey.equals(newKey)){// were OK because the user did not change keys
+		duplicate=false;
+	    }else{// user changed the key
+		
+		// removed the oldkey
+		// But what if more than two have the same key?
+		// this means that user can add another key and would not get a warning!
+		// consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
+		// removes this key from the allKey. then I add another key xxx. I don't get a warning!
+		// i need a way to count the number of keys of each type
+		// hashmap=>int (increment each time)
+		
+		removeKeyFromSet( oldKey);
+		duplicate = addKeyToSet( newKey );
+	    }
+	}
+	if(duplicate==true && issueWarning==true){
+	    JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
+					  Globals.lang("Duplicate Key Warning"),
+					  JOptionPane.WARNING_MESSAGE);//, options);
+	}
+	return duplicate;
+    }
+
     //========================================================
     // keep track of all the keys to warn if there are duplicates
     //========================================================
-    public boolean addKeyToSet(String key){
+    private boolean addKeyToSet(String key){
 	boolean exists=false;
 	if(  key.equals(""))
 	    return false;//don't put empty key
@@ -1091,7 +1128,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     // reduce the number of keys by 1. if this number goes to zero then remove from the set
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
-    public void removeKeyFromSet(String key){
+    private void removeKeyFromSet(String key){
 	if(key.equals("")) return;
 	if(allKeys.containsKey(key)){
 	    Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
