@@ -1465,6 +1465,7 @@ public JabRefPreferences prefs() {
           setEmptyState();
         } else
         {
+            sidePaneManager.stateChanged(new ChangeEvent(tabbedPane));
           markActiveBasePanel() ;
           if (tabbedPane.getTabCount() == 1) { setOnlyOne() ; }
         }
