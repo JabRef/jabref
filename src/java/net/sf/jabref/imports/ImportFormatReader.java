@@ -773,7 +773,7 @@ public class ImportFormatReader
 			if(val.equals("BOOK")) Type = "book";
 			else if (val.equals("JOUR")) Type = "article";
 			else Type = "other";
-		    }else if(lab.equals("T1"))
+		    }else if(lab.equals("T1") || lab.equals("TI"))
 			hm.put("title",val);//Title = val;
 
 		    else if(lab.equals("A1") ||lab.equals("AU")){
