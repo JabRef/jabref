@@ -91,9 +91,9 @@ public class JabRef {
       options.register("import", 'i', Globals.lang("Import file")+": "+Globals.lang("filename")+"[,import format]", importFile);
       options.register("output", 'o', Globals.lang("Output or export file")+": "+Globals.lang("filename")+"[,export format]", exportFile);
       options.register("help", 'h', Globals.lang("Display help on command line options"),helpO);
-      options.register("loadsession", 'l', Globals.lang("Load session"), loadSess);
-      options.register("prexport", 'x', Globals.lang("Export preferences to file"), exportPrefs);
-      options.register("primport", 'p', Globals.lang("Import preferences from file"), importPrefs);
+      options.register("loads", 'l', Globals.lang("Load session"), loadSess);
+      options.register("prexp", 'x', Globals.lang("Export preferences to file"), exportPrefs);
+      options.register("primp", 'p', Globals.lang("Import preferences from file"), importPrefs);
       options.setUseMenu(false);
 
 

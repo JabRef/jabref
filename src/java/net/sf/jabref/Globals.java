@@ -124,14 +124,14 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      System.err.println("Warning: could not get translation for \""
-                         + key + "\"");
+      //System.err.println("Warning: could not get translation for \""
+      //                   + key + "\"");
     }
-    if (translation != null) {
+    if ((translation != null) && (translation.length() != 0)) {
       return translation.replaceAll("_", " ");
     }
     else {
-      return null;
+      return key;
     }
   }
 
