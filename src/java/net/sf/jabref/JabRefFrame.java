@@ -760,10 +760,10 @@ public class JabRefFrame extends JFrame {
 				putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
 			}    
 			public void actionPerformed(ActionEvent e) {	    
-			    PrefsDialog.showPrefsDialog(ths, prefs);
-			    //PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
-			    //Util.placeDialog(pd, ths);
-			    //pd.show();
+			    //PrefsDialog.showPrefsDialog(ths, prefs);
+			    PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
+			    Util.placeDialog(pd, ths);
+			    pd.show();
 				
 				// This action can be invoked without an open database, so
 				// we have to check if we have one before trying to invoke
