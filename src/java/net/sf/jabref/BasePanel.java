@@ -37,6 +37,7 @@ import javax.swing.*;
 import javax.swing.undo.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.*;
+import net.sf.jabref.external.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.*;
 import net.sf.jabref.undo.*;
@@ -181,19 +182,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 	this.encoding = encoding;
     }
 
+    public BibtexEntry[] getSelectedEntries() {
+	return entryTable.getSelectedEntries();
+    }
+
     public void output(String s) {
 	//Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
         if (!suppressOutput)
             frame.output(s);
-    }
-
-    /**
-     * BaseAction is used to define actions that are called from the
-     * base frame through runCommand(). runCommand() finds the
-     * appropriate BaseAction object, and runs its action() method.
-     */
-    abstract class BaseAction {//implements Runnable {
-        abstract void action() throws Throwable;
     }
 
     private void setupActions() {
@@ -618,70 +614,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                 }
             });
 
-        actions.put("pushToLyX",new BaseAction(){
-                public void action(){
-                    final int[] rows = entryTable.getSelectedRows();
-                    final int numSelected = rows.length;
-                    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
-                    // check if lyxpipe is defined
-                    final File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-                    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-                        output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
-                               +". [" + prefs.get("lyxpipe") +"]");
-                        return;
-                    }
-                    //Util.pr("tre");
-                    if( numSelected > 0){
-                      Thread pushThread = new Thread()
-                      {
-                        public void run()
-                        {
-                          try {
-                            FileWriter fw = new FileWriter(lyxpipe);
-                            BufferedWriter lyx_out = new BufferedWriter(fw);
-                            String citeStr = "", citeKey = "", message = "";
-                            for (int i = 0; i < numSelected; i++)
-                            {
-                              BibtexEntry bes = database.getEntryById(tableModel.getNameFromNumber(rows[
-                                  i]));
-                              citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
-                              // if the key is empty we give a warning and ignore this entry
-                              if (citeKey == null || citeKey.equals(""))
-                                continue;
-                              if (citeStr.equals(""))
-                                citeStr = citeKey;
-                              else
-                                citeStr += "," + citeKey;
-                              if (i > 0)
-                                message += ", ";
-                              message += (1 + rows[i]);
-                            }
-                            if (citeStr.equals(""))
-                              output(Globals.lang("Please define BibTeX key first"));
-                            else
-                            {
-                              citeStr = "LYXCMD:sampleclient:citation-insert:" + citeStr;
-                              lyx_out.write(citeStr + "\n");
-                              output(Globals.lang("Pushed the citations for the following rows to")+" Lyx: " +
-                                     message);
-                            }
-                            lyx_out.close();
-
-                          }
-                          catch (IOException excep) {
-                            output(Globals.lang("Error")+": "+Globals.lang("unable to write to")+" " + prefs.get("lyxpipe") +
-                                   ".in");
-                          }
-                          // catch (InterruptedException e2) {}
-                        }
-                      };
-                      pushThread.start();
-                      Timeout t = new Timeout(2000, pushThread, Globals.lang("Error")+": "+
-                                              Globals.lang("unable to access LyX-pipe"));
-                      t.start();
-                    }
-                  }
-            });
+	// The action for pushing citations to an open Lyx/Kile instance:
+        actions.put("pushToLyX", new PushToLyx(ths));
 
             actions.put("pushToWinEdt",new BaseAction(){
               public void action(){
@@ -2466,20 +2400,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
           EntryEditor ed = (EntryEditor)splitPane.getBottomComponent();
           if (ed.isEnabled() != enabled)
             ed.setEnabled(enabled);
-    }
-  }
-
-  class Timeout extends javax.swing.Timer
-  {
-    public Timeout(int timeout, final Thread toStop, final String message) {
-      super(timeout, new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          toStop.stop();         // !!! <- deprecated
-          // toStop.interrupt(); // better ?, interrupts wait and IO
-          //stop();
-          //output(message);
-        }
-      });
     }
   }
 
