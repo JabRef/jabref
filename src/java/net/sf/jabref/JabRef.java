@@ -73,13 +73,18 @@ public class JabRef {
 	UIManager.put("ToolBar.font", fnt);
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
-	
-	try {
-	    LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
-	    //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
-	    UIManager.setLookAndFeel(lnf);
-	} catch (UnsupportedLookAndFeelException ex) {}
-	
+
+	String osName = System.getProperty("os.name", "def");
+	if (osName.equals("Mac OS X")) {
+	    Util.pr("Disabling Kunststoff look & feel on Mac OS X.");
+	} else {       
+	    try {
+		LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+		//com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
+		UIManager.setLookAndFeel(lnf);
+	    } catch (UnsupportedLookAndFeelException ex) {}
+	}
+
 	JabRefPreferences prefs = new JabRefPreferences();
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
