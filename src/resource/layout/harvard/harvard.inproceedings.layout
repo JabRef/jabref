@@ -1,0 +1,17 @@
+\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+\format[RemoveBrackets]{\title}
+, }{\\i in }{
+\begin{editor}
+\format[AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
+\end{editor}
+\begin{booktitle}
+'\format[RemoveBrackets]{\booktitle}'
+\end{booktitle}
+\begin{publisher}
+, \format[RemoveBrackets]{\publisher}, \format[RemoveBrackets]{\address}
+\end{publisher}
+\begin{pages}
+, pp. \pages
+\end{pages}.
+\\par
+\\par

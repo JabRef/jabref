@@ -1,0 +1,41 @@
+%0 Book Section
+%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%D \year
+%T \format[RemoveLatexCommands]{\title}
+%E \editor
+%B \booktitle
+%C \address
+%I \publisher
+%V \volume
+%6
+%N 
+%P \pages
+%& \chapter
+%Y 
+%S \series
+%7 \edition
+%8 \month
+%9 \type
+%? 
+%! \shorttitle
+%Z 
+%@ 
+%( 
+%)
+%* 
+%L
+%M
+%1 \pdf
+%2 \comment
+%3 incollection
+%4 \crossref
+%# \owner
+%$ \key
+%F \bibtexkey
+%K \keywords
+%X \abstract
+%Z \note
+%U \url
+%+
+%^
+

@@ -1,0 +1,37 @@
+\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+'\format[RemoveBrackets]{\title}'
+\begin{journal}
+, }{\\i \format[RemoveBrackets]{\journal}} {\\b \volume}{
+\end{journal}
+\begin{number}
+(\number)
+\end{number}
+\begin{editor}
+, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
+\end{editor}
+\begin{booktitle}
+'\format[RemoveBrackets]{\booktitle}'
+\end{booktitle}
+\begin{organization}
+, \organization
+\end{organization}
+\begin{institution}
+, Technical report, \institution
+\end{institution}
+\begin{publisher}
+, \format[RemoveBrackets]{\publisher}
+\end{publisher}
+\begin{howpublished}
+, \howpublished
+\end{howpublished}
+\begin{address}
+, \format[RemoveBrackets]{\address}
+\end{address}
+\begin{note}
+, \note
+\end{note}
+\begin{pages}
+, \pages
+\end{pages}.
+\\par
+\\par

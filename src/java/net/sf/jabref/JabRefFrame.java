@@ -2012,14 +2012,16 @@ class FetchCiteSeerAction
       //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
       docbookItem = new JMenuItem(Globals.lang("Docbook")),
       bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
-      modsItem = new JMenuItem(Globals.lang("MODS"));
+      modsItem = new JMenuItem(Globals.lang("MODS")),
+      rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
+      endnoteItem = new JMenuItem(Globals.lang("Endnote"));
 
 
   private void setUpExportMenu(JMenu menu) {
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem) e.getSource();
-        String lfFileName = null, extension = null;
+        String lfFileName = null, extension = null, directory = null;
         if (source == htmlItem) {
           lfFileName = "html";
           extension = ".html";
@@ -2042,7 +2044,16 @@ class FetchCiteSeerAction
           lfFileName = "mods";
           extension = ".xml";
         }
-
+        else if (source == rtfItem) {
+          lfFileName = "harvard";
+	  directory = "harvard";
+          extension = ".rtf";
+        }
+       else if (source == endnoteItem) {
+          lfFileName = "EndNote";
+	  directory = "endnote";
+          extension = ".enf";
+        }
 
         // We need to find out:
         // 1. The layout definition string to use. Or, rather, we
@@ -2052,6 +2063,8 @@ class FetchCiteSeerAction
         File outFile = null;
         String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
                                                extension, JFileChooser.SAVE_DIALOG, false);
+	final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
+			 Globals.LAYOUT_PREFIX+directory+"/");
 
          if (chosenFile != null)
            outFile = new File(chosenFile);
@@ -2062,13 +2075,11 @@ class FetchCiteSeerAction
 
         final String lfName = lfFileName;
         final File oFile = outFile;
-
         (new Thread() {
           public void run() {
             try {
               FileActions.exportDatabase
-                  (basePanel().database,
-                   lfName, oFile, prefs);
+                  (basePanel().database, dir, lfName, oFile, prefs);
               output(Globals.lang("Exported database to file") + " '" +
                      oFile.getPath() + "'.");
             }
@@ -2094,6 +2105,10 @@ class FetchCiteSeerAction
     menu.add(docbookItem);
     modsItem.addActionListener(listener);
     menu.add(modsItem);
+    rtfItem.addActionListener(listener);
+    menu.add(rtfItem);
+    endnoteItem.addActionListener(listener);
+    menu.add(endnoteItem);
 
     menu.add(exportCSV);
 

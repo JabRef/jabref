@@ -1,0 +1,19 @@
+\begin{author}
+\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author}
+\end{author}
+ (\year), 
+}{\\i \format[RemoveBrackets]{\title}}{
+\begin{publisher}
+, \format[RemoveBrackets]{\publisher}
+\end{publisher}
+\begin{address}
+, \format[RemoveBrackets]{\address}
+\end{address}
+\begin{chapter}
+, chapter \chapter
+\end{chapter}
+\begin{pages}
+, pp. \pages
+\end{pages}.
+\\par
+\\par

@@ -1,0 +1,7 @@
+\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+'\format[RemoveBrackets]{\title}'
+\begin{school}
+, PhD thesis, \school
+\end{school}.
+\\par
+\\par

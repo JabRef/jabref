@@ -1,0 +1,41 @@
+%0 Book
+%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%D \year
+%T \format[RemoveLatexCommands]{\title}
+%E
+%B
+%C \address
+%I \howpublished
+%V
+%6
+%N
+%P
+%& 
+%Y 
+%S 
+%7
+%8 \month
+%9
+%? 
+%! \shorttitle
+%Z 
+%@ \lastchecked
+%( 
+%)
+%* 
+%L
+%M
+%1 \pdf
+%2 \comment
+%3 booklet
+%4 \crossref
+%# \owner
+%$ \key
+%F \bibtexkey
+%K \keywords
+%X \abstract
+%Z \note
+%U \url
+%+
+%^
+
