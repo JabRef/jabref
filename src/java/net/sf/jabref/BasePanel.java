@@ -710,7 +710,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
                      if (!database.hasStringLabel(bs.getName())) {
                        pos = database.getStringCount();
                        database.addString(bs, pos);
-                       ce.addEdit(new UndoableInsertString(database, bs, pos));
+                       ce.addEdit(new UndoableInsertString(ths, database, bs, pos));
                      }
                    }
                  }

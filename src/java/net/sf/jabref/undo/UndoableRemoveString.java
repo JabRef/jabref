@@ -46,11 +46,11 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-	return "Undo: remove string ";
+	return Globals.lang("Undo")+": "+Globals.lang("remove string ");
     }
 
     public String getRedoPresentationName() {
-	return "Redo: remove string ";
+	return Globals.lang("Redo")+": "+Globals.lang("remove string ");
     }
 
     public void undo() {

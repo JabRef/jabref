@@ -30,24 +30,26 @@ import javax.swing.undo.*;
 import net.sf.jabref.*;
 
 public class UndoableInsertString extends AbstractUndoableEdit {
-
+    
     private BibtexDatabase base;
+    private BasePanel panel;
     private BibtexString string;
     private int pos;
 
-    public UndoableInsertString(BibtexDatabase base,
+    public UndoableInsertString(BasePanel panel, BibtexDatabase base,
 				BibtexString string, int pos) {
 	this.base = base;
+	this.panel = panel;
 	this.string = string;
 	this.pos = pos;
     }
 
     public String getUndoPresentationName() {
-	return "Undo: insert string ";
+	return Globals.lang("Undo")+": "+Globals.lang("insert string ");
     }
 
     public String getRedoPresentationName() {
-	return "Redo: insert string ";
+	return Globals.lang("Redo")+": "+Globals.lang("insert string ");
     }
 
     public void undo() {
@@ -55,9 +57,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 	
 	// Revert the change.
 	base.removeString(pos);
-
-	Util.pr("UndoableInsertString must notify after change.");
-	//baseFrame.updateStringDialog();
+	panel.updateStringDialog();
     }
 
     public void redo() {
@@ -70,8 +70,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 	    ex.printStackTrace();
 	}
 
-	Util.pr("UndoableInsertString must notify after change.");
-	//baseFrame.updateStringDialog();
+	panel.updateStringDialog();
     }
 
 

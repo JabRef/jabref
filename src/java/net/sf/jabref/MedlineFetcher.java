@@ -78,7 +78,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
       ArrayList bibs = fetchMedline(idList);
       if ((bibs != null) && (bibs.size() > 0)) {
         tf.setText("");
-        NamedCompound ce = new NamedCompound(Globals.lang("Fetch Medline"));
+        NamedCompound ce = new NamedCompound("fetch Medline");
         Iterator i = bibs.iterator();
         while (i.hasNext()) {
           try {

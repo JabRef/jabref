@@ -101,17 +101,17 @@ public class PreambleEditor extends JDialog {
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
 	// Set up key bindings and focus listener for the FieldEditor.
-	ta.getInputMap().put(KeyStroke.getKeyStroke(GUIGlobals.closeKey), "close");
+	ta.getInputMap().put(prefs.getKey("Close preamble editor"), "close");
 	ta.getActionMap().put("close", closeAction);
-	ta.getInputMap().put(KeyStroke.getKeyStroke(GUIGlobals.storeFieldKey), "store");
+	ta.getInputMap().put(prefs.getKey("Preamble editor: store changes"), "store");
+	Util.pr(prefs.getKey("Preamble editor: store changes").toString());
 	ta.getActionMap().put("store", storeFieldAction);
-	ta.getInputMap().put(KeyStroke.getKeyStroke(GUIGlobals.copyKeyKey), "copyKey");
 	ta.getInputMap().put(GUIGlobals.exitDialog, "close");
 	ta.getActionMap().put("close", closeAction);
 
-	ta.getInputMap().put(GUIGlobals.undoStroke, "undo");
+	ta.getInputMap().put(prefs.getKey("Undo"), "undo");
 	ta.getActionMap().put("undo", undoAction);
-	ta.getInputMap().put(GUIGlobals.redoStroke, "redo");
+	ta.getInputMap().put(prefs.getKey("Redo"), "redo");
 	ta.getActionMap().put("redo", redoAction);
 
 

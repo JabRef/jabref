@@ -49,11 +49,13 @@ public class UndoableStringChange extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-	return "Undo: change string "+(nameChange ? "name" : "content");
+	return Globals.lang("Undo")+": "
+	    +Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
     public String getRedoPresentationName() {
-	return "Redo: change string "+(nameChange ? "name" : "content");
+	return Globals.lang("Redo")+": "
+	    +Globals.lang(nameChange ? "change string name" : "change string content");
     }
 
     public void undo() {

@@ -49,11 +49,11 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-	return "Undo: change preamble";
+	return Globals.lang("Undo")+": "+Globals.lang("change preamble");
     }
 
     public String getRedoPresentationName() {
-	return "Redo: change preamble";
+	return Globals.lang("Redo")+": "+Globals.lang("change preamble");
     }
 
     public void undo() {
