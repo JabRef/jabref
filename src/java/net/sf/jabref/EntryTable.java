@@ -74,32 +74,32 @@ public class EntryTable extends JTable {
 		}
 	    });
 	addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
-		    if (e.getButton() == MouseEvent.BUTTON3) {
-			if (rightClickMenu != null)
-			    rightClickMenu.show(ths, e.getX(), e.getY());
-		    }
-
-		}
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					if (rightClickMenu != null)
+						rightClickMenu.show(ths, e.getX(), e.getY());
+				}
+				
+			}
 	    });
 	setWidths();
 	sp.getViewport().setBackground(GUIGlobals.tableBackground);
-        updateFont();
+	updateFont();
     }
 
     public void setWidths() {
-	// Setting column widths:
-
-	TableColumnModel cm = getColumnModel();
-	for (int i=0; i<getModel().getColumnCount(); i++) {
-	    cm.getColumn(i).setPreferredWidth(GUIGlobals.getPreferredFieldLength(getModel().getColumnName(i)));
-	}
+		// Setting column widths:
+		
+		TableColumnModel cm = getColumnModel();
+		for (int i=0; i<getModel().getColumnCount(); i++) {
+			cm.getColumn(i).setPreferredWidth(GUIGlobals.getPreferredFieldLength(getModel().getColumnName(i)));
+		}
     }
-
+	
     public JScrollPane getPane() {
-	return sp;
+		return sp;
     }
-
+	
     public void setShowingSearchResults(boolean search,
 					boolean group) {
 	showingSearchResults = search;
@@ -236,7 +236,7 @@ public class EntryTable extends JTable {
 	}
     }
 
-	    public void scrollToCenter( int rowIndex, int vColIndex) {
+	public void scrollToCenter( int rowIndex, int vColIndex) {
         if (!(this.getParent() instanceof JViewport)) {
             return;
         }
@@ -279,8 +279,8 @@ public class EntryTable extends JTable {
    * updateFont
    */
   public void updateFont() {
-    setFont(GUIGlobals.CURRENTFONT);
-    setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
+	  setFont(GUIGlobals.CURRENTFONT);
+	  setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
   }
-
+	
 }

@@ -541,21 +541,25 @@ public class JabRefFrame extends JFrame {
 	options.add(new AbstractAction("Font") {
 		public void actionPerformed(ActionEvent e) {
 		    // JDialog dl = new EntryCustomizationDialog(ths);
-			GUIGlobals.CURRENTFONT =new FontSelectorDialog
-                            (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
+			Font f=new FontSelectorDialog
+				(ths, GUIGlobals.CURRENTFONT).getSelectedFont();
+			if(f==null)
+				return;
+			else
+				GUIGlobals.CURRENTFONT=f;
 			// updatefont
-                        prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
-                        prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
-                        prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
-                        if (tabbedPane.getTabCount() > 0) {
-                          for (int i=0; i<tabbedPane.getTabCount(); i++) {
-                            baseAt(i).entryTable.updateFont();
-                            baseAt(i).refreshTable();
-                          }
-                        }
-                      }
-                    });
-
+			prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+			prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
+			prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
+			if (tabbedPane.getTabCount() > 0) {
+				for (int i=0; i<tabbedPane.getTabCount(); i++) {
+					baseAt(i).entryTable.updateFont();
+					baseAt(i).refreshTable();
+				}
+			}
+		}
+		});
+	
 //options.add(selectKeys);
 	mb.add(options);
 
