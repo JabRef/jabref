@@ -31,13 +31,14 @@ import net.sf.jabref.imports.ImportFormatReader;
  * @author $author$
  * @version $Revision$
  */
-public class FixAuthorLastFirstForXML implements LayoutFormatter
+public class AuthorLastFirst implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
     public String format(String fieldText)
     {
-	ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
-	return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
+	//ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
+	//return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
+        return ImportFormatReader.fixAuthor_lastnameFirst(fieldText);
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

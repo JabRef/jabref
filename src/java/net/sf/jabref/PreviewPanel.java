@@ -28,6 +28,7 @@ public class PreviewPanel extends JEditorPane {
       readLayout();
     }
     catch (Exception ex) {
+      ex.printStackTrace();
     }
     update();
   }

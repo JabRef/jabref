@@ -50,7 +50,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
         int oldPos = 0;
         String author;
         StringBuffer sb = new StringBuffer(100);
-        fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
+        //fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
 
         if (fieldText.indexOf(" and ") == -1)
         {

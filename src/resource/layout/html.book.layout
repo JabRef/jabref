@@ -22,19 +22,19 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[ConvertSpecialCharactersForHTML]{\title}
+			\format[HTMLChars]{\title}
 		</div>
 		\end{title}
 
 		\begin{author}
 		<div class="bibtex_author">
-			\format[FixAuthorForHTML]{\author}
+			\format[HTMLChars,AuthorFirstFirst]{\author}
 		</div>
 		\end{author}
 
 		\begin{publisher}
 		<div class="bibtex_publisher">
-			\format[ConvertSpecialCharactersForHTML]{\publisher}
+			\format[HTMLChars]{\publisher}
 		</div>,
 		\end{publisher}
 

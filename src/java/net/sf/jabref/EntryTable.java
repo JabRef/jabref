@@ -172,8 +172,12 @@ public class EntryTable extends JTable {
 	String[] widths = prefs.getStringArray("columnWidths");
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
-        for (int i=1; i<tableModel.padleft; i++)
+        for (int i=1; i<tableModel.padleft; i++) {
+          // Lock the width of icon columns.
           cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+          cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+          cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        }
 	for (int i=tableModel.padleft; i<getModel().getColumnCount(); i++) {
 	    try {
 		cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i-tableModel.padleft]));

@@ -80,29 +80,29 @@ which will be copied directly to the output.
 
   <p><code>\format[ToLowerCase]{\author}</code>
 
+<p>You can also specify multiple formatters separated by commas. These will be called sequentially,
+  from left to right, e.g.
+
+  <p><code>\format[ToLowerCase,HTMLChars]{\author}</code>
+
+<p>will cause the formatter <b>ToLowerCase</b> to be called first, and then <b>HTMLChars</b> will be
+  called to format the result. You can list an arbitrary number of formatters in this way.
+
 <p>JabRef provides the following set of formatters, some of which depend on the others:
 <ul>
-<li><code>ConvertSpecialCharactersForHTML</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
+<li><code>HTMLChars</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
   with their HTML representations.
-<li><code>ConvertSpecialCharactersForXML</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
+<li><code>XMLChars</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
   with their XML representations.
-<li><code>CreateDocBookAuthors</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
-  the author field in DocBook style.
-<li><code>FixAuthorForHTML</code> : calls <code>ConvertSpecialCharactersForHTML</code>, and formats
-  author/editor fields with the first names first.
-<li><code>FixAuthorForXML</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
-  author/editor fields with the first names first.
-<li><code>FixAuthorLastFirstForHTML</code> : calls <code>ConvertSpecialCharactersForHTML</code>, and formats
-  author/editor fields with the last names first.
-<li><code>FixAuthorLastFirstForXML</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
-  author/editor fields with the last names first.
+<li><code>CreateDocBookAuthors</code> : formats the author field in DocBook style.
+<li><code>AuthorFirstFirst</code> : formats author/editor fields with the first names first.
+<li><code>AuthorLastFirst</code> : formats author/editor fields with the last names first.
 <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
 <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".
 <li><code>ToLowerCase</code> : turns all characters into lower case.
 </ul>
 
-<p>Note that you can only call one formatter per field - i.e. nested formatters are not allowed. If none
-  of the available formatters can do what you want to achieve, you can add your own by implementing
+<p>If none of the available formatters can do what you want to achieve, you can add your own by implementing
   the <code>net.sf.jabref.export.layout.LayoutFormatter</code> interface. If you insert your class
   into the <code>net.sf.jabref.export.layout.format</code> package, you can call the formatter by its
   class name only, like with the standard formatters. Otherwise, you must call the formatter by its fully
@@ -114,13 +114,13 @@ which will be copied directly to the output.
 Some static output might only make sense if a specific field is set. For instance, say we want to follow
 the editor names with the text <code>(Ed.)</code>. This can be done with the following text:
 
-<p><code>\format[FixAuthorForHTML]{\editor} (Ed.)</code>
+<p><code>\format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)</code>
 
 <p>However, if the <code>editor</code> field has not been set - it might not even make sense for the entry
   being exported - the <code>(Ed.)</code> would be left hanging. This can be prevented by instead using the
 <code>\begin</code> and <code>\end</code> commands:
 
-<p><code>\begin{editor}<br>\format[FixAuthorForHTML]{\editor} (Ed.)
+<p><code>\begin{editor}<br>\format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)
 <br>\end{editor}</code>
 
 <p>The <code>\begin</code> and <code>\end</code> commands make sure the text in between is printed if and

@@ -45,7 +45,7 @@ public class LayoutEntry
 {
     //~ Instance fields ////////////////////////////////////////////////////////
 
-    private LayoutFormatter option;
+    private LayoutFormatter[] option;
     private String text;
     private LayoutEntry[] layoutEntries;
     private int type;
@@ -302,7 +302,9 @@ public class LayoutEntry
             //System.out.println("OPTION: "+option);
             if (option != null)
             {
-                fieldEntry = option.format(fieldEntry);
+              for (int i=0; i<option.length; i++) {
+                fieldEntry = option[i].format(fieldEntry);
+              }
             }
 
             return fieldEntry;
@@ -318,37 +320,41 @@ public class LayoutEntry
      * @param string
      * @return
      */
-    private LayoutFormatter getOptionalLayout(String formatterName)
+    private LayoutFormatter[] getOptionalLayout(String formatterName)
         throws Exception
     {
-        LayoutFormatter formatter;
-
-        try
-        {
-          try {
-            formatter = (LayoutFormatter) Class.forName(classPrefix + formatterName)
-                .newInstance();
-          } catch (Throwable ex2) {
-            formatter = (LayoutFormatter) Class.forName(formatterName)
-                .newInstance();
+      String[] formatters = formatterName.split(",");
+      //System.out.println(":"+formatterName);
+        LayoutFormatter[] formatter = new LayoutFormatter[formatters.length];
+        for (int i=0; i<formatter.length; i++) {
+          //System.out.println(":::"+formatters[i]);
+          try
+          {
+            try {
+              formatter[i] = (LayoutFormatter) Class.forName(classPrefix + formatters[i])
+                  .newInstance();
+            } catch (Throwable ex2) {
+              formatter[i] = (LayoutFormatter) Class.forName(formatters[i])
+                  .newInstance();
+            }
           }
-        }
-         catch (ClassNotFoundException ex)
-        {
-            throw new Exception(Globals.lang("Formatter not found")+": "+formatterName);
-        }
-         catch (InstantiationException ex)
-        {
+          catch (ClassNotFoundException ex)
+          {
+            throw new Exception(Globals.lang("Formatter not found")+": "+formatters[i]);
+          }
+          catch (InstantiationException ex)
+          {
             throw new Exception(formatterName + " can not be instantiated.");
-        }
-         catch (IllegalAccessException ex)
-        {
+          }
+          catch (IllegalAccessException ex)
+          {
             throw new Exception(formatterName + " can't be accessed.");
-        }
+          }
 
-        if (formatter == null)
-        {
-            throw new Exception(Globals.lang("Formatter not found")+": "+formatterName);
+          if (formatter == null)
+          {
+            throw new Exception(Globals.lang("Formatter not found")+": "+formatters[i]);
+          }
         }
 
         return formatter;

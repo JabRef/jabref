@@ -2,17 +2,17 @@
    <authorgroup>
 \begin{author}       \format[CreateDocBookAuthors]{\author} \end{author}
    </authorgroup>
-<citetitle pubwork="article">\format[ConvertSpecialCharactersForXML]{\title}</citetitle>
-\begin{journal}   <citetitle pubwork="journal">\format[ConvertSpecialCharactersForXML]{\journal}</citetitle>\end{journal}
+<citetitle pubwork="article">\format[XMLChars]{\title}</citetitle>
+\begin{journal}   <citetitle pubwork="journal">\format[XMLChars]{\journal}</citetitle>\end{journal}
 \begin{publisher}   <publisher>
-      <publishername>\format[ConvertSpecialCharactersForXML]{\publisher}</publishername>
+      <publishername>\format[XMLChars]{\publisher}</publishername>
    </publisher>\end{publisher}
 \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
 \begin{edition}   <edition>\edition</edition> \end{edition}
 \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
 \begin{year}   <pubdate>\year</pubdate>  \end{year}
 \begin{abstract}   <abstract>
-      <para>\format[ConvertSpecialCharactersForXML]{\abstract}
+      <para>\format[XMLChars]{\abstract}
       </para>
    </abstract>\end{abstract}
 </biblioentry>

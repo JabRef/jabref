@@ -23,7 +23,10 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.imports.ImportFormatReader;
+import java.util.regex.*;
+import java.util.Iterator;
+import net.sf.jabref.Util;
+import net.sf.jabref.Globals;
 
 /**
  * Changes {\^o} or {\^{o}} to ô
@@ -31,13 +34,33 @@ import net.sf.jabref.imports.ImportFormatReader;
  * @author $author$
  * @version $Revision$
  */
-public class FixAuthorForHTML implements LayoutFormatter
+public class HTMLChars implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
+    //Pattern pattern = Pattern.compile(".*\\{..[a-zA-Z].\\}.*");
+    Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
+
     public String format(String fieldText)
     {
-	ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
-	return conv.format(ImportFormatReader.fixAuthor(fieldText));
+	fieldText = firstFormat(fieldText);
+
+	if (!pattern.matcher(fieldText).matches())
+	    return restFormat(fieldText);
+
+	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
+	    String s = (String)i.next();
+	    fieldText = fieldText.replaceAll(s, (String)Globals.HTML_CHARS.get(s));
+	}
+	//RemoveBrackets rb = new RemoveBrackets();
+	return restFormat(fieldText);
+    }
+
+    private String firstFormat(String s) {
+	return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
+    }
+
+    private String restFormat(String s) {
+	return s.replaceAll("\\}","").replaceAll("\\{","");
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
