@@ -56,6 +56,7 @@ public class JabRefFrame extends JFrame {
 	statusLabel = new JLabel(Globals.lang("Status")+":",
 				 SwingConstants.LEFT);
     SearchManager searchManager  = new SearchManager(ths, prefs);
+    FileHistory fileHistory = new FileHistory(prefs, this);
 
     LabelMaker labelMaker;
     File fileToOpen = null;
@@ -380,18 +381,18 @@ public class JabRefFrame extends JFrame {
 	file.add(importMenu);
 	file.add(save);
 	file.add(saveAs);
-	file.add(new FileHistory(prefs));
+	file.add(fileHistory);
 	file.addSeparator();
 	file.add(close);
 	//==============================
 	// NB: I added this because my frame borders are so tiny that I cannot click
 	// on the "x" close button. Anyways, I think it is good to have and "exit" button
 	// I was too lazy to make a new ExitAction
-	JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
-	exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
+	//JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
+	//exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
 	// above keybinding should be from user define
-	exit_mItem.addActionListener(new CloseAction() );
-	file.add( exit_mItem);
+	//exit_mItem.addActionListener(new CloseAction() );
+	//file.add( exit_mItem);
 	//=====================================
 	file.add(quit);
 	mb.add(file);
@@ -596,6 +597,8 @@ public class JabRefFrame extends JFrame {
 						
 						prefs.putStringArray("lastEdited", names);
 					}
+
+					fileHistory.storeHistory();
 				}
 				
 				// Let the search interface store changes to prefs.
@@ -644,94 +647,108 @@ public class JabRefFrame extends JFrame {
 	
 
 		
-		// The action concerned with opening an existing database.
-		OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
-		class OpenDatabaseAction extends AbstractAction {
-			public OpenDatabaseAction() {
-				super(Globals.lang("Open database"), 
-					  new ImageIcon(GUIGlobals.openIconFile));
-				putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
-				putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-			}    
-			public void actionPerformed(ActionEvent e) {
-				// Open a new database.
-				if ((e.getActionCommand() == null) || 
-					(e.getActionCommand().equals("Open database"))) {
-					JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-						new JFileChooser((File)null) :
-						new JFileChooser(new File(prefs.get("workingDirectory")));
-					//chooser.setFileFilter(fileFilter);
-					chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-					
-					Util.pr("JabRefFrame: must set file filter.");
-					int returnVal = chooser.showOpenDialog(ths);
-					if(returnVal == JFileChooser.APPROVE_OPTION) {
-						fileToOpen = chooser.getSelectedFile();
-					}
-				} else {
-					Util.pr(NAME);
-					Util.pr(e.getActionCommand());
-					fileToOpen = new File(Util.checkName(e.getActionCommand()));
-				}
-				openIt();
-			}
-			
-			public void openIt() {
-				if ((fileToOpen != null) && (fileToOpen.exists())) {
-					try {
-						prefs.put("workingDirectory", fileToOpen.getPath());
-						// Should this be done _after_ we know it was successfully opened?
-						
-						ParserResult pr = loadDatabase(fileToOpen);
-						BibtexDatabase db = pr.getDatabase();
-						HashMap meta = pr.getMetaData();
-						
-						BasePanel bp = new BasePanel(ths, db, fileToOpen,
-													 meta, prefs);
-						/*
-						  if (prefs.getBoolean("autoComplete")) {
-						  db.setCompleters(autoCompleters);
-						  }
-						*/
-						tabbedPane.add(fileToOpen.getName(), bp);
-						tabbedPane.setSelectedComponent(bp);
-						output("Opened database '"+fileToOpen.getPath()+"' with "+
-							   db.getEntryCount()+" entries.");
-						
-						fileToOpen = null;
-						
-					} catch (Throwable ex) {
-						JOptionPane.showMessageDialog
-							(ths, ex.getMessage(), 
-							 "Open database", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		}
+    // The action concerned with opening an existing database.
+    OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
+    class OpenDatabaseAction extends AbstractAction {
+	public OpenDatabaseAction() {
+	    super(Globals.lang("Open database"), 
+		  new ImageIcon(GUIGlobals.openIconFile));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+	}    
+	public void actionPerformed(ActionEvent e) {
+	    // Open a new database.
+	    if ((e.getActionCommand() == null) || 
+		(e.getActionCommand().equals("Open database"))) {
+		JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+		    new JFileChooser((File)null) :
+		    new JFileChooser(new File(prefs.get("workingDirectory")));
+		//chooser.setFileFilter(fileFilter);
+		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
 		
-		// The action concerned with opening a new database.
-		class NewDatabaseAction extends AbstractAction {
-			public NewDatabaseAction() {
-				super(Globals.lang("New database"), 
-					  new ImageIcon(GUIGlobals.newIconFile));
-				putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
-				//putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);	    
-			}    
-			public void actionPerformed(ActionEvent e) {
-				
-				// Create a new, empty, database.
-				BasePanel bp = new BasePanel(ths, prefs);
-				tabbedPane.add(Globals.lang("untitled"), bp);
-				tabbedPane.setSelectedComponent(bp);
-				output(Globals.lang("New database created."));
-				
-				/*
-				  if (prefs.getBoolean("autoComplete"))
-				  db.setCompleters(autoCompleters);*/
-			}
+		Util.pr("JabRefFrame: must set file filter.");
+		int returnVal = chooser.showOpenDialog(ths);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+		    fileToOpen = chooser.getSelectedFile();
 		}
+	    } else {				
+		Util.pr(NAME);
+		Util.pr(e.getActionCommand());
+		fileToOpen = new File(Util.checkName(e.getActionCommand()));
+	    }
+	    
+	    // Run the actual open in a thread to prevent the program
+	    // locking until the file is loaded.
+	    if (fileToOpen != null) {
+		(new Thread() {
+			public void run() {
+			    openIt();
+			}
+		    }).start();
+		fileHistory.newFile(fileToOpen.getPath());
+	    }
+	}
+	
+	public void openIt() {
+	    if ((fileToOpen != null) && (fileToOpen.exists())) {
+		try {
+		    prefs.put("workingDirectory", fileToOpen.getPath());
+		    // Should this be done _after_ we know it was successfully opened?
+		    
+		    ParserResult pr = loadDatabase(fileToOpen);
+		    BibtexDatabase db = pr.getDatabase();
+		    HashMap meta = pr.getMetaData();
+		    
+		    BasePanel bp = new BasePanel(ths, db, fileToOpen,
+						 meta, prefs);
+		    /*
+		      if (prefs.getBoolean("autoComplete")) {
+		      db.setCompleters(autoCompleters);
+		      }
+		    */
+		    tabbedPane.add(fileToOpen.getName(), bp);
+		    tabbedPane.setSelectedComponent(bp);
+		    output("Opened database '"+fileToOpen.getPath()+"' with "+
+			   db.getEntryCount()+" entries.");
+		    
+		    fileToOpen = null;
+		    
+		} catch (Throwable ex) {
+		    JOptionPane.showMessageDialog
+			(ths, ex.getMessage(), 
+			 "Open database", JOptionPane.ERROR_MESSAGE);
+		}
+	    }
+	}
+    }
 		
+    // The action concerned with opening a new database.
+    class NewDatabaseAction extends AbstractAction {
+	public NewDatabaseAction() {
+	    super(Globals.lang("New database"), 
+		  
+		  new ImageIcon(GUIGlobals.newIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
+	    //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);	    
+	}    
+	public void actionPerformed(ActionEvent e) {
+	    
+	    // Create a new, empty, database.
+	    BasePanel bp = new BasePanel(ths, prefs);
+	    tabbedPane.add(Globals.lang("untitled"), bp);
+	    tabbedPane.setSelectedComponent(bp);
+	    output(Globals.lang("New database created."));
+	    
+	    /*
+	      if (prefs.getBoolean("autoComplete"))
+	      db.setCompleters(autoCompleters);*/
+	}
+    }
+		
+
+
 		// The action for opening the preferences dialog.
+
 		AbstractAction showPrefs = new ShowPrefsAction();
 		
 		class ShowPrefsAction extends AbstractAction {
@@ -815,7 +832,20 @@ public class JabRefFrame extends JFrame {
 				}
 				
 			}
-			//give message loaded succesfully 
+			HashMap meta = new HashMap();		    
+			// Metadata are only put in bibtex files, so we will not find it
+			// in imported files. Instead we pass an empty HashMap.	
+			BasePanel bp = new BasePanel(ths, database, null,
+						     meta, prefs);
+			/*
+			  if (prefs.getBoolean("autoComplete")) {
+			  db.setCompleters(autoCompleters);
+			  }
+			*/
+			tabbedPane.add(Globals.lang("untitled"), bp);
+			tabbedPane.setSelectedComponent(bp);
+			output("Imported database '"+filename+"' with "+
+			       database.getEntryCount()+" entries.");
 		}
 		private void setUpImportMenu(JMenu importMenu){
 			//

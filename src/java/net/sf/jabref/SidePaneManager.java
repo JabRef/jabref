@@ -60,8 +60,10 @@ public class SidePaneManager {
 	    add("groups", gs);
 	}
 	    
-	if (components.size() > 0)
+	if (components.size() > 0) {
 	    panel.setLeftComponent(sidep);
+	} else
+	    panel.setLeftComponent(null);
     }
 
     public void togglePanel(String name) {
