@@ -323,7 +323,6 @@ public class GroupSelector extends SidePaneComponent implements
         // header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new GroupsTree(this);
-        groupsTree.setShowsRootHandles(true);
         groupsTree.setCellRenderer(new GroupTreeCellRenderer());
         groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
@@ -536,6 +535,7 @@ public class GroupSelector extends SidePaneComponent implements
 
     public void setGroups(GroupTreeNode groupsRoot) {
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
+        this.groupsRoot = groupsRoot;
     }
 
     /**
@@ -736,14 +736,17 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public boolean moveNodeUp(GroupTreeNode node) {
         AbstractUndoableEdit undo = null;
+        TreePath[] selectionPaths = groupsTree.getSelectionPaths();
+        Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
-            frame.output(Globals.lang("Cannot move group") + " '"
-                    + node.getGroup().getName() + "' up.");
+            frame.output(Globals.lang("Cannot move group") + " '" // JZTODO: translation...
+                    + node.getGroup().getName() + "' " + Globals.lang("up."));
             return false; // not possible
         }
         // JZTODO really?:
-        revalidateGroups(groupsTree.getSelectionPaths(),
-                getExpandedPaths());
+//        revalidateGroups(groupsTree.getSelectionPaths(),
+//                getExpandedPaths());
+        revalidateGroups(selectionPaths,expandedPaths);
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -833,7 +836,6 @@ public class GroupSelector extends SidePaneComponent implements
             setGroups(metaData.getGroups());
         }
         else {
-            GroupTreeNode groupsRoot = new GroupTreeNode(new AllEntriesGroup());
             metaData.setGroups(groupsRoot);
             setGroups(groupsRoot); 
          }
