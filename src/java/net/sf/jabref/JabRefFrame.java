@@ -537,12 +537,22 @@ public class JabRefFrame extends JFrame {
 		}
 		});
 
-	
+
 	options.add(new AbstractAction("Font") {
 		public void actionPerformed(ActionEvent e) {
 		    // JDialog dl = new EntryCustomizationDialog(ths);
-			Globals.CURRENTFONT =new FontSelectorDialog(ths, Globals.CURRENTFONT).getSelectedFont();			
+			GUIGlobals.CURRENTFONT =new FontSelectorDialog
+                            (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
 			// updatefont
+                        prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+                        prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
+                        prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
+                        if (tabbedPane.getTabCount() > 0) {
+                          for (int i=0; i<tabbedPane.getTabCount(); i++) {
+                            baseAt(i).entryTable.updateFont();
+                            baseAt(i).refreshTable();
+                          }
+                        }
 		}
 		});
 

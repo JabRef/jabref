@@ -54,10 +54,10 @@ public class EntryTableModel extends AbstractTableModel {
 	REQ_NUMBER = 2,
 	OPT_STRING = 3,
 	OTHER = 3,
-	PADLEFT = 2;
+	PADLEFT = 1;
 
     public EntryTableModel(JabRefFrame frame_,
-			   BasePanel panel_, 
+			   BasePanel panel_,
 			   BibtexDatabase db_) {
 	panel = panel_;
 	frame = frame_;
@@ -66,24 +66,24 @@ public class EntryTableModel extends AbstractTableModel {
 	columns = panel.prefs
 	    .getStringArray("columnNames"); // This must be done again if the column
 	                   // preferences get changed.
-						      
+
 	remap();
 	//	entryIDs = db.getKeySet().toArray(); // Temporary
     }
 
-    /*public void numberRows() { 
-         for(int r=0; r < model.getRowCount(); r++) 
-                 model.setValueAt(r+1 + "", r, 0); 
+    /*public void numberRows() {
+         for(int r=0; r < model.getRowCount(); r++)
+                 model.setValueAt(r+1 + "", r, 0);
 		 } */
 
 
-    public String getColumnName(int col) { 
+    public String getColumnName(int col) {
 	if (col == 0)
 	    return GUIGlobals.NUMBER_COL;
-	else if (col == 1)
-	    return Util.nCase(TYPE);
+//	else if (col == 1)
+//	    return Util.nCase(TYPE);
 	else {
-	    return Util.nCase(columns[col-PADLEFT]); 
+	    return Util.nCase(columns[col-PADLEFT]);
 	}
     }
 
@@ -93,7 +93,7 @@ public class EntryTableModel extends AbstractTableModel {
 	    //entryIDs.length;  // Temporary?
     }
 
-    public int getColumnCount() { 
+    public int getColumnCount() {
 	return PADLEFT+columns.length;
     }
 
@@ -110,17 +110,22 @@ public class EntryTableModel extends AbstractTableModel {
 				  .getValueClass();*/
     }
 
-    public Object getValueAt(int row, int col) { 
+    public Object getValueAt(int row, int col) {
 	// Return the field named frame.prefs.columnNames[col] from the Entry
 	// corresponding to the row.
 	Object o;
 	BibtexEntry be = db.getEntryById(getNameFromNumber(row));
 	if (col == 0)
 	    o = ""+(row+1);
-	else if (col == 1) 
-	    o = be.getType().getName();
+            //else
+    //  if (col == 1)
+    //  o = be.getType().getName();
 	else {
-	    o = be.getField(columns[col-PADLEFT]);
+          if (columns[col-PADLEFT].equals(GUIGlobals.TYPE_HEADER)) {
+            o = be.getType().getName();
+          }
+          else
+            o = be.getField(columns[col-PADLEFT]);
 	}
 	return o;
     }
@@ -129,7 +134,7 @@ public class EntryTableModel extends AbstractTableModel {
 	if ((col == 0)  || (col == 1)) return OTHER;
 	BibtexEntryType type = (db.getEntryById(getNameFromNumber(row)))
 	    .getType();
-	if (columns[col-1].equals(GUIGlobals.KEY_FIELD) 
+	if (columns[col-1].equals(GUIGlobals.KEY_FIELD)
 	    || type.isRequired(columns[col-PADLEFT])) return REQUIRED;
 	if (type.isOptional(columns[col-PADLEFT])) return OPTIONAL;
 	return OTHER;
@@ -198,8 +203,8 @@ public class EntryTableModel extends AbstractTableModel {
 	// Make a three-layered sorted view.
 	sorter = db.getSorter(new EntryComparator(
 	    frame.prefs.getBoolean("priDescending"),
-	    frame.prefs.getBoolean("secDescending"), 
-	    frame.prefs.getBoolean("terDescending"), 
+	    frame.prefs.getBoolean("secDescending"),
+	    frame.prefs.getBoolean("terDescending"),
 	    pri, sec, ter));
 	//Util.pr("jau");
     }
@@ -211,8 +216,8 @@ public class EntryTableModel extends AbstractTableModel {
 	// Make a three-layered sorted view.
 	sorter = db.getSorter(new EntryComparator(
             true,
-	    frame.prefs.getBoolean("priDescending"), 
-	    frame.prefs.getBoolean("secDescending"), 
+	    frame.prefs.getBoolean("priDescending"),
+	    frame.prefs.getBoolean("secDescending"),
 	    "search", pri, sec));
 	//Util.pr("jau");
     }
@@ -235,7 +240,7 @@ public class EntryTableModel extends AbstractTableModel {
 
 	BibtexEntry be = db.getEntryById(getNameFromNumber(row));
 	boolean set = false;
-	String toSet = null, 
+	String toSet = null,
 	    fieldName = getColumnName(col),
 	    text;
 	if (value != null) {

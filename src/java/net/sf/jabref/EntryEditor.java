@@ -233,11 +233,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//tlb.addSeparator();
 	//tlb.add(copyKeyAction);
 	tlb.addSeparator();
-	tlb.add(deleteAction);
 	tlb.add(generateKeyAction);
 	tlb.addSeparator();
 	//tlb.add(undoAction);
 	//tlb.add(redoAction);
+        tlb.add(deleteAction);
 	tlb.add(prevEntryAction);
 	tlb.add(nextEntryAction);
 	tlb.addSeparator();

@@ -73,7 +73,11 @@ public class EntryComparator implements Comparator {
 		f1 = ImportFormatReader.fixAuthor_lastnameFirst((String)f1);
 	    if (f2 != null)
 		f2 = ImportFormatReader.fixAuthor_lastnameFirst((String)f2);
-	}
+	} else if (sortField.equals(GUIGlobals.TYPE_HEADER)) {
+          // Sort by type.
+          f1 = e1.getType().getName();
+          f2 = e2.getType().getName();
+        }
 
 	if ((f1 == null) && (f2 == null)) return idCompare(e1, e2);
 	if ((f1 != null) && (f2 == null)) return -1;

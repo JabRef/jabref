@@ -1255,14 +1255,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	}
     }
 
-
     public void mouseClicked(MouseEvent e) {
 	// Intercepts mouse clicks from the JTable showing the base contents.
 	// A double click on an entry should open the entry's editor.
-	if (e.getClickCount() == 2) {
+	/*if (e.getClickCount() == 2) {
 	    runCommand("edit");
-	}
-
+	}*/
     }
 
     public void mouseEntered(MouseEvent e) {}

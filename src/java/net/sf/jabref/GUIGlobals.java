@@ -54,7 +54,10 @@ public class GUIGlobals {
 	frameTitle = "JabRef",
 	stringsTitle = Globals.lang("Strings for database")+": ",
 	untitledStringsTitle = stringsTitle+Globals.lang("untitled"),
-	helpTitle = "JabRef help";
+	helpTitle = "JabRef help",
+        TYPE_HEADER="entrytype";
+
+    public static Font CURRENTFONT;
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =

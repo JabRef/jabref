@@ -26,6 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 import java.io.File;
+import java.awt.Font;
 
 public class JabRef {
 
@@ -36,6 +37,10 @@ public class JabRef {
 		JabRefPreferences prefs = new JabRefPreferences();
 		BibtexEntryType.loadCustomEntryTypes(prefs);
 		Globals.setLanguage(prefs.get("language"), "");
+                GUIGlobals.CURRENTFONT = new Font
+                    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
+                     prefs.getInt("fontSize"));
+
 		JabRefFrame jrf = new JabRefFrame();
 
 		if(args.length > 0){

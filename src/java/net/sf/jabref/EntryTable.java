@@ -27,12 +27,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import java.awt.Dimension;
-import java.io.*;
-import java.awt.Rectangle;
 public class EntryTable extends JTable {
 
     final int PREFERRED_WIDTH = 400, PREFERRED_HEIGHT = 30;
@@ -42,7 +40,7 @@ public class EntryTable extends JTable {
     EntryTableModel tableModel;
     JabRefPreferences prefs;
     protected boolean showingSearchResults = false,
-	showingGroup = false;    
+	showingGroup = false;
     private EntryTable ths = this;
 
     public EntryTable(EntryTableModel tm_, JabRefPreferences prefs_) {
@@ -65,18 +63,14 @@ public class EntryTable extends JTable {
 		    int col = getTableHeader().columnAtPoint(e.getPoint());
 		    if (col > 0) { // A valid column, but not the first.
 			String s = tableModel.getColumnName(col).toLowerCase();
-
-			// Change sort field ...
-			if (!s.equals(prefs.get("priSort")))
-			    prefs.put("priSort", s); 
-			// ... or change sort direction
-			else prefs.putBoolean("priDescending",
-				       !prefs.getBoolean("priDescending"));
-			tableModel.remap();
+                         if (!s.equals(prefs.get("priSort")))
+                          prefs.put("priSort", s);
+                          // ... or change sort direction
+                        else prefs.putBoolean("priDescending",
+                                              !prefs.getBoolean("priDescending"));
+                        tableModel.remap();
 			repaint();
 		    }
-
-							     
 		}
 	    });
 	addMouseListener(new MouseAdapter() {
@@ -85,11 +79,12 @@ public class EntryTable extends JTable {
 			if (rightClickMenu != null)
 			    rightClickMenu.show(ths, e.getX(), e.getY());
 		    }
-							     
+
 		}
 	    });
 	setWidths();
 	sp.getViewport().setBackground(GUIGlobals.tableBackground);
+        updateFont();
     }
 
     public void setWidths() {
@@ -133,7 +128,7 @@ public class EntryTable extends JTable {
 	if (score == -1)
 	    return grayedOutRenderer;
 
-	if (!prefs.getBoolean("tableColorCodesOn"))	
+	if (!prefs.getBoolean("tableColorCodesOn"))
 	    return defRenderer;
 	if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
@@ -145,7 +140,7 @@ public class EntryTable extends JTable {
 		else
 		    return incRenderer;
 	    }
-	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer); 
+	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
 	int status;
 	try { // This try clause is here to contain a bug.
@@ -171,7 +166,7 @@ public class EntryTable extends JTable {
     public BibtexEntry[] getSelectedEntries() {
 	BibtexEntry[] bes = null;
 	int[] rows = getSelectedRows();
-	//int[] cols = getSelectedColumns();	    
+	//int[] cols = getSelectedColumns();
 
 	// Entries are selected if only the first or multiple
 	// columns are selected.
@@ -182,22 +177,22 @@ public class EntryTable extends JTable {
 	    for (int i=0; i<rows.length; i++) {
 		bes[i] = tableModel.db.getEntryById(tableModel.getNameFromNumber(rows[i]));
 	    }
-	}		
+	}
 	return bes;
     }
-	
+
 
     // The following classes define the renderers used to render required
     // and optional fields in the table. The purpose of these renderers is
     // to visualize which fields are needed for each entry.
-    private DefaultTableCellRenderer defRenderer = new DefaultTableCellRenderer(); 
+    private DefaultTableCellRenderer defRenderer = new DefaultTableCellRenderer();
     private RequiredRenderer reqRenderer = new RequiredRenderer();
     private OptionalRenderer optRenderer = new OptionalRenderer();
     private IncompleteEntryRenderer incRenderer = new IncompleteEntryRenderer();
     private GrayedOutRenderer grayedOutRenderer = new GrayedOutRenderer();
-    private VeryGrayedOutRenderer veryGrayedOutRenderer 
+    private VeryGrayedOutRenderer veryGrayedOutRenderer
 	= new VeryGrayedOutRenderer();
-    private MaybeIncompleteEntryRenderer 
+    private MaybeIncompleteEntryRenderer
 	maybeIncRenderer = new MaybeIncompleteEntryRenderer();
 
     public class RequiredRenderer extends DefaultTableCellRenderer {
@@ -211,7 +206,7 @@ public class EntryTable extends JTable {
 	    super();
 	    setBackground(GUIGlobals.tableOptFieldBackground);
 	}
-    }    
+    }
     public class IncompleteEntryRenderer extends DefaultTableCellRenderer {
 	public IncompleteEntryRenderer() {
 	    super();
@@ -246,23 +241,23 @@ public class EntryTable extends JTable {
             return;
         }
         JViewport viewport = (JViewport)this.getParent();
-    
+
         // This rectangle is relative to the table where the
         // northwest corner of cell (0,0) is always (0,0).
         Rectangle rect = this.getCellRect(rowIndex, vColIndex, true);
-    
+
         // The location of the view relative to the table
         Rectangle viewRect = viewport.getViewRect();
-    
+
         // Translate the cell location so that it is relative
         // to the view, assuming the northwest corner of the
         // view is (0,0).
         rect.setLocation(rect.x-viewRect.x, rect.y-viewRect.y);
-    
+
         // Calculate location of rect if it were at the center of view
         int centerX = (viewRect.width-rect.width)/2;
         int centerY = (viewRect.height-rect.height)/2;
-    
+
         // Fake the location of the cell so that scrollRectToVisible
         // will move the cell to the center
         if (rect.x < centerX) {
@@ -272,12 +267,19 @@ public class EntryTable extends JTable {
             centerY = -centerY;
         }
         rect.translate(centerX, centerY);
-    
+
         // Scroll the area into view.
         viewport.scrollRectToVisible(rect);
 
 	revalidate();
 	repaint();
     }
+
+  /**
+   * updateFont
+   */
+  public void updateFont() {
+    setFont(GUIGlobals.CURRENTFONT);
+  }
 
 }
