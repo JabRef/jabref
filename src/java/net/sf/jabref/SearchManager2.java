@@ -30,13 +30,15 @@ import java.util.Hashtable;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
+import net.sf.jabref.search.*;
 import net.sf.jabref.search.SearchExpression;
 
 class SearchManager2 extends SidePaneComponent
-    implements ActionListener, KeyListener, ItemListener {
+    implements ActionListener, KeyListener, ItemListener, CaretListener {
 
     GridBagLayout gbl = new GridBagLayout() ;
     GridBagConstraints con = new GridBagConstraints() ;
@@ -48,10 +50,11 @@ class SearchManager2 extends SidePaneComponent
     private JLabel lab = //new JLabel(Globals.lang("Search")+":");
 	new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
     private JPopupMenu settings = new JPopupMenu();
-    private JButton openset = new JButton(Globals.lang("Settings")),
-	escape = new JButton(Globals.lang("Clear")),
-        help = new JButton(new ImageIcon(GUIGlobals.helpIconFile)),
-        search = new JButton(Globals.lang("Search"));
+    private JButton openset = new JButton(Globals.lang("Settings"));
+    private JButton escape = new JButton(Globals.lang("Clear"));
+    private JButton help = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    /** This button's text will be set later. */
+    private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
 
@@ -147,6 +150,7 @@ settings.add(select);
 
 
 	searchField.addActionListener(this);
+    searchField.addCaretListener(this);
         search.addActionListener(this);
 	searchField.addFocusListener(new FocusAdapter() {
           public void focusGained(FocusEvent e) {
@@ -252,7 +256,20 @@ settings.add(select);
 		    ths.actionPerformed(new ActionEvent(escape, 0, ""));
 		}
 	    });
-            
+    setSearchButtonSizes();
+    updateSearchButtonText();
+    }
+
+    /** force the search button to be large enough for
+     * the longer of the two texts */
+    private void setSearchButtonSizes() {
+        search.setText(Globals.lang("Search Specified Field(s)"));
+        Dimension size1 = search.getPreferredSize();
+        search.setText(Globals.lang("Search All Fields"));
+        Dimension size2 = search.getPreferredSize();
+        size2.width = Math.max(size1.width,size2.width); 
+        search.setMinimumSize(size2);
+        search.setPreferredSize(size2);
     }
 
     public void updatePrefs() {
@@ -345,10 +362,11 @@ settings.add(select);
                     Globals.prefs.getBoolean("searchGen"));
 
 		try {
-			// JZ: for testing; this does the new search if the
-			// search text is in correct syntax, and the regular search otherwise
+			// this searches specified fields if specified, 
+            // and all fields otherwise
 			rule1 = new SearchExpression(Globals.prefs,searchOptions);
 		} catch (Exception ex) {
+            // we'll do a search in all fields
 		}
 //		} catch (PatternSyntaxException ex) {
 //			System.out.println(ex);
@@ -472,5 +490,22 @@ settings.add(select);
 
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
+
+    public void caretUpdate(CaretEvent e) {
+        if (e.getSource() == searchField) {
+            updateSearchButtonText();
+        }
+    }
+    
+	/** Updates the text on the search button to reflect
+      * the type of search that will happen on click. */
+    private void updateSearchButtonText() {
+        search.setText(SearchExpressionParser.isValidSyntax(
+                searchField.getText(),
+                caseSensitive.isSelected(),
+                regExpSearch.isSelected()) 
+                ? Globals.lang("Search Specified Field(s)") 
+                : Globals.lang("Search All Fields"));
+    }
 
 }
