@@ -589,11 +589,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	
     }
 
-    public void setupMainPanel() {
+    public void validateMainPanel() {
+    }
+
+    public void setupTable() {
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, frame.prefs);
-	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+
 	entryTable.addMouseListener(this);
 	entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
 	entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
@@ -629,10 +631,24 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	// Set the right-click menu for the entry table.
 	RightClickMenu rcm = new RightClickMenu(this, metaData);
 	entryTable.setRightClickMenu(rcm);
-
-	//setRightComponent(entryTable.getPane());
+	int pos = splitPane.getDividerLocation();
 	splitPane.setTopComponent(entryTable.getPane());
-	splitPane.setBottomComponent(null);
+	splitPane.setDividerLocation(pos);
+	//splitPane.revalidate();
+    }
+
+    public void setupMainPanel() {
+	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+
+	setupTable();
+	// If an entry is currently being shown, make sure it stays shown,
+	// otherwise set the bottom component to null.
+	if (showing == null)
+	    splitPane.setBottomComponent(null);
+	else
+	    showEntry(showing);
+
 	setRightComponent(splitPane);
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
@@ -679,10 +695,24 @@ public class BasePanel extends JSplitPane implements MouseListener,
     }
 
     public void showEntry(BibtexEntry be) {
-	if (showing == be)
+	if (showing == be) {
+	    if (splitPane.getBottomComponent() == null) {
+		// This is the special occasion when showing is set to an
+		// entry, but no entry editor is in fact shown. This happens
+		// after Preferences dialog is closed, and it means that we
+		// must make sure the same entry is shown again. We do this by
+		// setting showing to null, and recursively calling this method.
+	        showing = null;
+		showEntry(be);
+	    }
 	    return;
+	}
+	
 	EntryEditor form;
-	int divLoc = -1;
+	int divLoc = -1, visPan = -1;
+	if (showing != null)
+	    visPan = ((EntryEditor)splitPane.getBottomComponent()).
+		getVisiblePanel();
 	if (showing != null)
 	    divLoc = splitPane.getDividerLocation();	
     
@@ -691,11 +721,15 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    form = (EntryEditor)entryEditors.get
 		((be.getType().getName()));
 	    form.switchTo(be);
+	    if (visPan >= 0)
+		form.setVisiblePanel(visPan);
 	    splitPane.setBottomComponent(form);
 	} else {
 	    // We must instantiate a new editor for this type.
 	    form = new EntryEditor
 		(frame, ths, be, prefs);
+	    if (visPan >= 0)
+		form.setVisiblePanel(visPan);
 	    splitPane.setBottomComponent(form);
 	    entryEditors.put(be.getType().getName(), form);
 	}
@@ -703,7 +737,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    splitPane.setDividerLocation(divLoc);
 	else
 	    splitPane.setDividerLocation
-		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);	
 	form.requestFocus();
 
 	showing = be;

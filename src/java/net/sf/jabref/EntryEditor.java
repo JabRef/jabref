@@ -465,7 +465,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void requestFocus() {
-	((FieldPanel)tabbed.getSelectedComponent()).activate();
+	if (tabbed.getSelectedComponent() instanceof FieldPanel)
+	    ((FieldPanel)tabbed.getSelectedComponent()).activate();
+	else
+	    source.requestFocus();
     }
 
     class FieldListener extends FocusAdapter {
@@ -928,6 +931,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     }
     
+
+    /**
+     * Returns the index of the active (visible) panel.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getVisiblePanel() {
+	return tabbed.getSelectedIndex();
+    }
+
+    /**
+     * Sets the panel with the given index visible.
+     *
+     * @param i an <code>int</code> value
+     */
+    public void setVisiblePanel(int i) {
+	tabbed.setSelectedIndex(i);
+    }
 	   
     /**
      * Updates this editor to show the given entry, regardless of
@@ -1034,7 +1055,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	Vector fields = pan.getFields() ; 
 	for(int i = 0 ; i < fields.size() ; i++){
 	    if(((FieldEditor) fields.elementAt(i)).getFieldName().equals(fieldName)){
-		((FieldEditor) fields.elementAt(i)).setText(newFieldData) ;
+		FieldEditor ed = ((FieldEditor) fields.elementAt(i));
+		ed.setText(newFieldData) ;
+		ed.setLabelColor(((newFieldData == null) || newFieldData.equals("")) 
+				 ? GUIGlobals.nullFieldColor :
+				 GUIGlobals.validFieldColor);
 		return true ; 
 	    }
 	}
@@ -1049,6 +1074,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		FieldEditor ed = (FieldEditor)fields.elementAt(j);
 		Object content = entry.getField(ed.getFieldName());
 		ed.setText(content == null ? "" : content.toString());
+		ed.setLabelColor(content == null ? GUIGlobals.nullFieldColor :
+				 GUIGlobals.validFieldColor);
 		//if (ed.getFieldName().equals("year"))
 		//    Util.pr(content.toString());
 	    }

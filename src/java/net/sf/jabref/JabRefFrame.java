@@ -781,7 +781,7 @@ public class JabRefFrame extends JFrame {
 				for (int i=0; i<tabbedPane.getTabCount(); i++) {
 					BasePanel bf = baseAt(i);
 					if (bf.database != null) {
-					    bf.setupMainPanel();
+					    bf.setupTable();
 					}
 				}
 				
