@@ -102,7 +102,7 @@ public class EntryTable extends JTable {
     public void setWidths() {
 	// Setting column widths:
 	String[] widths = prefs.getStringArray("columnWidths");
-	TableColumnModel cm = getColumnModel();
+        TableColumnModel cm = getColumnModel();
 	cm.getColumn(0).setPreferredWidth(GUIGlobals.NUMBER_COL_LANGTH);
 	for (int i=1; i<getModel().getColumnCount(); i++) {
 	    try {

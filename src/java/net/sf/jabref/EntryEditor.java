@@ -192,17 +192,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	im.put(GUIGlobals.exitDialog, "close");
 	am.put("close", closeAction);
-	im.put(prefs.getKey("Entry editor: store field"), "store");
+	im.put(prefs.getKey("Entry editor, store field"), "store");
 	am.put("store", storeFieldAction);
 	im.put(GUIGlobals.generateKeyStroke, "generateKey");
 	am.put("generateKey", generateKeyAction);
-	im.put(prefs.getKey("Entry editor: previous panel"), "left");
+	im.put(prefs.getKey("Entry editor, previous panel"), "left");
 	am.put("left", switchLeftAction);
-	im.put(prefs.getKey("Entry editor: next panel"), "right");
+	im.put(prefs.getKey("Entry editor, next panel"), "right");
 	am.put("right", switchRightAction);
-	im.put(prefs.getKey("Entry editor: previous entry"), "prev");
+	im.put(prefs.getKey("Entry editor, previous entry"), "prev");
 	am.put("prev", prevEntryAction);
-	im.put(prefs.getKey("Entry editor: next entry"), "next");
+	im.put(prefs.getKey("Entry editor, next entry"), "next");
 	am.put("next", nextEntryAction);
 	im.put(GUIGlobals.undoStroke, "undo");
 	am.put("undo", undoAction);
@@ -248,21 +248,21 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	}
 	public void paint(Graphics g) {
 	    Graphics2D g2 = (Graphics2D)g;
-	    g2.setColor(GUIGlobals.nullFieldColor);		    
-	    g2.setFont(font); 
+	    g2.setColor(GUIGlobals.nullFieldColor);
+	    g2.setFont(font);
 	    FontMetrics fm = g2.getFontMetrics();
 	    int width = fm.stringWidth(label);
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 	    g2.rotate(-Math.PI/2, 0, 0);
 	    g2.drawString(label,-width-5,28);
-	    
+
 	}
 	/*	public Dimension getPreferredSize() {
 	    return new Dimension(22, 30);
 	    }*/
     }
-    
+
 
     private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen) {
 
@@ -577,7 +577,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	ActionMap am = ta.getActionMap();
 	//im.put(KeyStroke.getKeyStroke(GUIGlobals.closeKey), "close");
 	//am.put("close", closeAction);
-        im.put(prefs.getKey("Entry editor: store field"), "store");
+        im.put(prefs.getKey("Entry editor, store field"), "store");
         am.put("store", storeFieldAction);
 	im.put(GUIGlobals.switchPanelLeft, "left");
 	am.put("left", switchLeftAction);
@@ -1073,7 +1073,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		final int nr = newRow;
 		(new Thread() {
 			public void run() {
-			    scrollTo(nr);			    
+			    scrollTo(nr);
 			}
 		    }).start();
 	    }

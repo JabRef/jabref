@@ -76,7 +76,9 @@ public class GUIGlobals {
       SPLIT_PANE_DIVIDER_SIZE = 2,
       SPLIT_PANE_DIVIDER_LOCATION = 145,
       GROUPS_VISIBLE_ROWS = 8,
-      TABLE_ROW_PADDING = 4; // Added to the font size when determining table
+      TABLE_ROW_PADDING = 4,
+      KEYBIND_COL_0 = 200,
+      KEYBIND_COL_1 = 80; // Added to the font size when determining table
 
   // row height
   public static final double

@@ -33,12 +33,13 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
+import javax.swing.table.TableColumnModel;
 
 //
 class KeyBindingsDialog
     extends JDialog {
-  JTable table;
-  AbstractTableModel tableModel;
+  KeystrokeTable table;
+  KeystrokeTableModel tableModel;
   //JList list = new JList();
   JTextField keyTF = new JTextField();
   JButton ok, cancel, grabB, defB;
@@ -149,14 +150,14 @@ class KeyBindingsDialog
       //}
       String newKey;
       if (!mod.equals("")) {
-        newKey = mod.toLowerCase() + " " + code;
+        newKey = mod.toLowerCase().replaceAll("\\+"," ") + " " + code;
       }
       else {
         newKey = code;
       }
       keyTF.setText(newKey);
       //find which key is selected and set its value int the bindHM
-      String selectedFunction = (String) table.getValueAt(selRow, 0);
+      String selectedFunction = (String) table.getOriginalName(selRow);
       table.setValueAt(newKey, selRow, 1);
       table.revalidate();
       table.repaint();
@@ -238,43 +239,55 @@ class KeyBindingsDialog
 
   //setup so that clicking on list will display the current binding
   void setList() {
-    //list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    //list.getModel().addListDataListener(new MyListDataListener());
-
-    // This method is called each time the user changes the set of selected items
-    //list.addListSelectionListener(new MyListSelectionListener());
 
     DefaultListModel listModel = new DefaultListModel();
-    TreeMap sorted = new TreeMap(bindHM);
-    Iterator it = sorted.keySet().iterator();
-    String[][] tableData = new String[sorted.size()][2];
+    Iterator it = bindHM.keySet().iterator();
+    String[][] tableData = new String[bindHM.size()][3];
     int i=0;
     while (it.hasNext()) {
       String s = (String) it.next();
-      tableData[i][0] = s;
+      tableData[i][2] = s;
       tableData[i][1] = (String) bindHM.get(s);
+      tableData[i][0] = Globals.lang(s);
       i++;
       //listModel.addElement(s + " (" + bindHM.get(s) + ")");
    }
+   TreeMap sorted = new TreeMap();
+   for (i=0; i<tableData.length; i++)
+     sorted.put(tableData[i][0], tableData[i]);
 
-    tableModel = new KeystrokeTableModel(tableData);
-    table = new JTable(tableModel) {
-      public boolean isCellEditable(int row, int col) { return false; }
-    };
+    tableModel = new KeystrokeTableModel(sorted);
+    table = new KeystrokeTable(tableModel);
     //table.setCellSelectionEnabled(false);
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(false);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     //list.setModel(listModel);
-
+    TableColumnModel cm = table.getColumnModel();
+    cm.getColumn(0).setPreferredWidth(GUIGlobals.KEYBIND_COL_0);
+    cm.getColumn(1).setPreferredWidth(GUIGlobals.KEYBIND_COL_1);
     table.setRowSelectionInterval(0, 0); //select the first entry
   }
 
+  class KeystrokeTable extends JTable {
+    public KeystrokeTable(KeystrokeTableModel model) { super(model); }
+     public boolean isCellEditable(int row, int col) { return false; }
+     public String getOriginalName(int row) { return ((KeystrokeTableModel)getModel()).data[row][2]; }
+   };
+
   class KeystrokeTableModel extends AbstractTableModel {
     String[][] data;
-    public KeystrokeTableModel(String[][] tableData) {
-      data = tableData;
+    //String[] trData;
+    public KeystrokeTableModel(TreeMap sorted) {
+      data = new String[sorted.size()][3];
+      Iterator i = sorted.keySet().iterator();
+      int row = 0;
+      while (i.hasNext()) {
+        data[row++] = ((String[])sorted.get(i.next()));
+      }
+      //for (int i=0; i<trData.length; i++)
+      //  trData[i] = Globals.lang(data[i][0]);
     }
     public boolean isCellEditable(int row, int col) { return false; }
     public String getColumnName(int col) {
@@ -288,7 +301,10 @@ class KeyBindingsDialog
       return data.length;
     }
     public Object getValueAt(int rowIndex, int columnIndex) {
+      //if (columnIndex == 0)
       return data[rowIndex][columnIndex];
+      //else
+      //return data[rowIndex][0];
     }
     public void setValueAt(Object o, int row, int col) {
       data[row][col] = (String)o;

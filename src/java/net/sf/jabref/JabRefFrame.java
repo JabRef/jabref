@@ -96,7 +96,7 @@ public class JabRefFrame extends JFrame {
                                GUIGlobals.aboutIcon),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
-				 prefs.getKey("Save")),
+				 prefs.getKey("Save database")),
 	saveAs = new GeneralAction("saveAs", "Save database as ...",
 				 "Save database as ...",
 				   GUIGlobals.saveAsIconFile),
@@ -140,8 +140,8 @@ public class JabRefFrame extends JFrame {
 					prefs.getKey("Copy \\cite{BibTeX key}")),
        mergeDatabaseAction = new GeneralAction("mergeDatabase", "Append database",
                                                "Append contents from a BibTeX database into the currently viewed database",
-                                               GUIGlobals.openIconFile,
-                                               prefs.getKey("Open")),
+                                               GUIGlobals.openIconFile),
+                                               //prefs.getKey("Open")),
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
 	  GUIGlobals.removeIconFile),*/
 	selectAll = new GeneralAction("selectAll", "Select all",
@@ -160,7 +160,7 @@ public class JabRefFrame extends JFrame {
 	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface",
 					 "Toggle groups interface",
 					 GUIGlobals.groupsIconFile,
-					 prefs.getKey("Toggle groups")),
+					 prefs.getKey("Toggle groups interface")),
 	makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
 					  "Autogenerate BibTeX keys",
 					  GUIGlobals.genKeyIconFile,
@@ -168,7 +168,7 @@ public class JabRefFrame extends JFrame {
         lyxPushAction = new GeneralAction("pushToLyX", "Insert selected citations into LyX",
                                           "push selection to lyx",
                                           GUIGlobals.lyxIconFile,
-                                          prefs.getKey("Push To LyX")),
+                                          prefs.getKey("Push to LyX")),
         openFile = new GeneralAction("openFile", "Open pdf or ps",
                                           "Open pdf or ps",
                                           GUIGlobals.pdfIcon,
@@ -975,7 +975,7 @@ public class JabRefFrame extends JFrame {
             public OpenDatabaseAction() {
                 super(Globals.lang("Open database"),
                       new ImageIcon(GUIGlobals.openIconFile));
-                putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
+                putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
                 putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
             }
             public void actionPerformed(ActionEvent e) {

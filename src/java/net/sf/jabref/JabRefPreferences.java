@@ -249,6 +249,9 @@ public class JabRefPreferences {
 	    // will appear in the KeyBindingsDialog.
 	    keyBinds.put(bindName, s);
 	}
+        if (s == null) {
+          Globals.logger("Could not get key binding for \"" + bindName + "\"");
+        }
 	return KeyStroke.getKeyStroke(s);
     }
 
@@ -362,10 +365,10 @@ public class JabRefPreferences {
     }
 
     private void defineDefaultKeyBindings() {
-	defKeyBinds.put("Push To LyX","ctrl L");
+	defKeyBinds.put("Push to LyX","ctrl L");
 	defKeyBinds.put("Quit JabRef", "ctrl Q");
-	defKeyBinds.put("Open", "ctrl O");
-	defKeyBinds.put("Save", "ctrl S");
+	defKeyBinds.put("Open database", "ctrl O");
+	defKeyBinds.put("Save database", "ctrl S");
 	defKeyBinds.put("Close database", "ctrl W");
 	defKeyBinds.put("New entry", "ctrl N");
 	defKeyBinds.put("Cut", "ctrl X");
@@ -384,25 +387,25 @@ public class JabRefPreferences {
 	defKeyBinds.put("Edit strings", "ctrl shift S");
 	defKeyBinds.put("Edit preamble", "ctrl P");
 	defKeyBinds.put("Select all", "ctrl A");
-	defKeyBinds.put("Toggle groups", "ctrl shift G");
+	defKeyBinds.put("Toggle groups interface", "ctrl shift G");
 	defKeyBinds.put("Autogenerate BibTeX keys", "ctrl G");
 	defKeyBinds.put("Search", "ctrl F");
 	defKeyBinds.put("Incremental search", "ctrl shift F");
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
 	defKeyBinds.put("Close entry editor", "ESCAPE");
 	defKeyBinds.put("Close preamble editor", "ESCAPE");
-	defKeyBinds.put("Preamble editor: store changes", "alt S");
+	defKeyBinds.put("Preamble editor, store changes", "alt S");
 	defKeyBinds.put("Clear search", "ESCAPE");
-	defKeyBinds.put("Entry editor: next panel", "ctrl shift RIGHT");
-	defKeyBinds.put("Entry editor: previous panel", "ctrl shift LEFT");
-	defKeyBinds.put("Entry editor: next entry", "ctrl shift DOWN");
-	defKeyBinds.put("Entry editor: previous entry", "ctrl shift UP");
-	defKeyBinds.put("Entry editor: store field", "alt S");
+	defKeyBinds.put("Entry editor, next panel", "ctrl shift Right");
+	defKeyBinds.put("Entry editor, previous panel", "ctrl shift Left");
+	defKeyBinds.put("Entry editor, next entry", "ctrl shift Down");
+	defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
+	defKeyBinds.put("Entry editor, store field", "alt S");
 	defKeyBinds.put("Save session", "F11");
 	defKeyBinds.put("Load session", "F12");
 	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
-	defKeyBinds.put("Next tab", "ctrl RIGHT");
-	defKeyBinds.put("Previous tab", "ctrl LEFT");
+	defKeyBinds.put("Next tab", "ctrl Right");
+	defKeyBinds.put("Previous tab", "ctrl Left");
 	defKeyBinds.put("Replace string", "ctrl R");
         defKeyBinds.put("Delete", "Delete");
         defKeyBinds.put("Open pdf or ps", "F4");
