@@ -40,6 +40,10 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
 	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
+	label.setBorder(BorderFactory.createEtchedBorder
+			 (Color.white, Color.gray));	
+	label.setOpaque(true);
+	label.setBackground(Color.white);
 	if ((content != null) && (content.length() > 0))
 	    label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.

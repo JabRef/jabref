@@ -49,6 +49,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * else.
      */
 
+    Color bg = new Color(235, 235, 235);
+
     // A reference to the entry this object works on.
     BibtexEntry entry;
 
@@ -116,6 +118,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	entry = entry_;
 	prefs = prefs_;
 
+	setBackground(bg);//Color.white);
+
 	entry.addPropertyChangeListener(this);
 
 	//setTitle(entry.getType().getName());
@@ -149,8 +153,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		}	       
 		});*/
 
-
-	setLayout(new BorderLayout());
+	BorderLayout bl = new BorderLayout();
+	//bl.setVgap(5);
+	setLayout(bl);
 	setupToolBar();
 	setupFieldPanels(reqPanel, optPanel, genPanel);
 	setupSourcePanel();
@@ -192,6 +197,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tlb.setMargin(new Insets(2,2,2,2));
 	// The toolbar carries all the key bindings that are valid for the whole
 	// window.
+	tlb.setBackground(bg);//Color.white);
 	ActionMap am = tlb.getActionMap();
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	
@@ -509,6 +515,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	 * field, on behalf of which it requests the focus when
 	 * it is told to.
 	 */
+
+	public FieldPanel() {
+	    //setBackground(Color.white);
+	}
 
 	FieldEditor activeField = null;
 	JScrollPane sp;
