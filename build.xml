@@ -62,6 +62,10 @@
 	<!-- Set the properties for library directories -->
 	<property name="library.directory" value="lib" />
 
+      <taskdef name="jarbundler"
+                  classpath="${library.directory}/jarbundler-1.4.jar"
+                  classname="com.loomcom.ant.tasks.jarbundler.JarBundler" />
+
 
 
 	<!-- Build classpath -->
@@ -227,6 +231,16 @@
 		<unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
 		<delete dir="${build.tmp}/META-INF"/>
 	</target>
+
+
+	<target name="osxjar">
+        <jarbundler dir="${build.lib}"
+                    name="JabRef"
+                    mainclass="net.sf.jabref.JabRef"
+                    jars="${build.lib}/jabref.jar" />
+		    
+	</target>
+
 
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         What's about the software design ?!;-)
