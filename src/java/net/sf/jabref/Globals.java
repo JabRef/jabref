@@ -45,6 +45,8 @@ public class Globals {
 	MAC = "Mac OS X";
 
 
+    public static String osName = System.getProperty("os.name", "def");
+
     public static void logger(String s){
 		Logger.global.info(s);
     }
@@ -100,7 +102,7 @@ public class Globals {
 	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
 	}catch(MissingResourceException ex){
 	    translation= key;
-	 
+
 	    System.err.println("Warning: could not get translation for \""
 	    	       + key +"\"");
 	}

@@ -50,8 +50,7 @@ import net.sf.jabref.undo.UndoableInsertString;
 public class JabRefFrame extends JFrame {
 
     JabRefFrame ths = this;
-    JabRefPreferences prefs = new JabRefPreferences
-	(System.getProperty("os.name", "def"));
+    JabRefPreferences prefs = new JabRefPreferences();
 
     JTabbedPane tabbedPane = new JTabbedPane();
     JToolBar tlb = new JToolBar();
@@ -93,7 +92,8 @@ public class JabRefFrame extends JFrame {
 				  GUIGlobals.helpContents, "Help contents",
 				  GUIGlobals.helpContentsIconFile),
 	about = new HelpAction("About JabRef", helpDiag,
-			       GUIGlobals.aboutPage, "About JabRef"),
+			       GUIGlobals.aboutPage, "About JabRef",
+                               GUIGlobals.aboutIcon),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
 				 prefs.getKey("Save")),
@@ -773,7 +773,7 @@ public class JabRefFrame extends JFrame {
 	// This action can be invoked without an open database, so
 	// we have to check if we have one before trying to invoke
 	// methods to execute changes in the preferences.
-	
+
 	// We want to notify all tabs about the changes to
 	// avoid problems when changing the column set.
 	for (int i=0; i<tabbedPane.getTabCount(); i++) {
@@ -1082,7 +1082,7 @@ public class JabRefFrame extends JFrame {
 			    //PrefsDialog.showPrefsDialog(ths, prefs);
 			    PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
 			    Util.placeDialog(pd, ths);
-			    pd.show();			    
+			    pd.show();
 			}
 		}
 
@@ -1358,7 +1358,7 @@ public class JabRefFrame extends JFrame {
 			return selectedFile.getAbsolutePath();
 		}
 
-    JMenuItem 
+    JMenuItem
 	htmlItem = new JMenuItem(Globals.lang("HTML")),
     //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
 		    docbookItem = new JMenuItem(Globals.lang("Docbook"));
@@ -1369,7 +1369,7 @@ public class JabRefFrame extends JFrame {
 		    JMenuItem source = (JMenuItem)e.getSource();
 		    String lfFileName = null, extension = null;
 		    if (source == htmlItem) {
-			lfFileName = "html"; 
+			lfFileName = "html";
 			extension = ".html";
 		    }
 		    //else if (source == plainTextItem)
@@ -1405,7 +1405,7 @@ public class JabRefFrame extends JFrame {
 			    public void run() {
 				try {
 				    FileActions.exportDatabase
-					(basePanel().database, 
+					(basePanel().database,
 					 lfName, oFile, prefs);
 				    output(Globals.lang("Exported database to file") +" '"+oFile.getPath()+"'.");
 				} catch (IOException ex) {
@@ -1414,18 +1414,18 @@ public class JabRefFrame extends JFrame {
 			    }
 			}).start();
 
-		    
+
 		}
 	    };
 	JMenuItem item;
-	
+
 	htmlItem.addActionListener(listener);
-	menu.add(htmlItem);	
+	menu.add(htmlItem);
 	//plainTextItem.addActionListener(listener);
 	//menu.add(plainTextItem);
 	docbookItem.addActionListener(listener);
 	menu.add(docbookItem);
-	
+
     }
 
     class SaveSessionAction extends AbstractAction {

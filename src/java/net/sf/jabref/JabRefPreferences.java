@@ -52,15 +52,15 @@ public class JabRefPreferences {
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
-    public JabRefPreferences(String osName) {
+    public JabRefPreferences() {
 
 	prefs = Preferences.userNodeForPackage(JabRef.class);
 	//Util.pr(prefs.toString());
 
-	if (osName.equals(Globals.MAC)) {
+	if (Globals.osName.equals(Globals.MAC)) {
 	    defaults.put("pdfviewer","open /Applications/Preview.app");
 	    defaults.put("psviewer","open /Applications/Preview.app");
-	    defaults.put("htmlviewer","/usr/bin/mozilla");
+	    defaults.put("htmlviewer","open /Applications/Safari.app");
 	}
 	else {
 	    defaults.put("pdfviewer","/usr/bin/acroread");
@@ -100,7 +100,7 @@ public class JabRefPreferences {
 	defaults.put("stringsSizeX", new Integer(600));
 	defaults.put("stringsSizeY", new Integer(400));
 	defaults.put("defaultShowSource", new Boolean(false));
-	defaults.put("defaultAutoSort", new Boolean(false));	
+	defaults.put("defaultAutoSort", new Boolean(false));
 	defaults.put("enableSourceEditing", new Boolean(true));
 	defaults.put("caseSensitiveSearch", new Boolean(false));
 	defaults.put("searchReq", new Boolean(true));
@@ -318,7 +318,7 @@ public class JabRefPreferences {
 	    if (parent == null)
 		return;
 
-	    // Store overridden definitions to Preferences.	    
+	    // Store overridden definitions to Preferences.
 	    Preferences pre = Preferences.userNodeForPackage
 		(net.sf.jabref.labelPattern.LabelPattern.class);
 	    try {

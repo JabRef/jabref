@@ -234,12 +234,15 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			File expFile = new File(path, name);
 			if (!expFile.exists() ||
 			    (JOptionPane.showConfirmDialog
-			     (frame, "File '"+name+"' exists. Overwrite?",
-			      "Save database", JOptionPane.OK_CANCEL_OPTION)
+			     (frame, Globals.lang("File")+" '"+name+"' "+
+                              Globals.lang("exists. Overwrite?"),
+			      Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
 			     == JOptionPane.OK_OPTION)) {
 			    saveDatabase(expFile, true);
 			    //runCommand("save");
                             frame.fileHistory.newFile(expFile.getPath());
+                            frame.output(Globals.lang("Saved selected to file")+" '"
+				     +expFile.getPath()+"'.");
 			}
 		    }
 		}
@@ -533,8 +536,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int[] rows = entryTable.getSelectedRows() ;
 		    int numSelected = rows.length ;
 		    BibtexEntry bes = null ;
-		    
-		    /*if (numSelected > 0) {			
+
+		    /*if (numSelected > 0) {
 			int answer = JOptionPane.showConfirmDialog
 			    (frame, "Generate bibtex key"+
 			     (numSelected>1 ? "s for the selected "
@@ -544,7 +547,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			     JOptionPane.YES_NO_CANCEL_OPTION);
 			if (answer != JOptionPane.YES_OPTION) {
 			    return ;
-			
+
 			    }
 			*/
 		    if (numSelected == 0) { // None selected. Inform the user to select entries first.
@@ -554,7 +557,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    }
 
 		    output(Globals.lang("Generating BibTeX key for")+" "+
-			   numSelected+" "+(numSelected>1 ? Globals.lang("entries") 
+			   numSelected+" "+(numSelected>1 ? Globals.lang("entries")
 					    : Globals.lang("entry")));
 
 		    NamedCompound ce = new NamedCompound("autogenerate keys");
@@ -566,7 +569,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			//bes = frame.labelMaker.applyRule(bes, database) ;
 			bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
 			ce.addEdit(new UndoableKeyChange
-				   (database, bes.getId(), (String)oldValue, 
+				   (database, bes.getId(), (String)oldValue,
 				    (String)bes.getField(GUIGlobals.KEY_FIELD)));
 		    }
 		    ce.end();
@@ -785,9 +788,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		      }
 		  }
 	      });
-	      
+
 	  actions.put("replaceAll", new BaseAction() {
-	  	  public void action() {		      
+	  	  public void action() {
 		      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
 		      rsd.show();
 		      if (!rsd.okPressed())
@@ -797,7 +800,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		      if (!rsd.selOnly()) {
 			  for (Iterator i=database.getKeySet().iterator();
 			       i.hasNext();)
-			      counter += rsd.replace(database.getEntryById((String)i.next()), ce);			  
+			      counter += rsd.replace(database.getEntryById((String)i.next()), ce);
 		      } else {
 			  BibtexEntry[] bes = entryTable.getSelectedEntries();
 			  for (int i=0; i<bes.length; i++)
@@ -852,7 +855,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		showEntry(ex.getEntry());
 	    }
 	    else ex.printStackTrace();
-	    
+
 	    JOptionPane.showMessageDialog
 		(frame, Globals.lang("Could not save file")
 		 +".\n"+ex.getMessage(),
@@ -918,7 +921,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
 	entryTable.getActionMap().put("Cut", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    try { runCommand("cut"); 
+		    try { runCommand("cut");
 		    } catch (Throwable ex) {
 			ex.printStackTrace();
 		    }
@@ -953,7 +956,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 	*/
-	
+
 	entryTable.addKeyListener(new KeyAdapter() {
 		public void keyPressed(KeyEvent e) {
 		    if (e.getKeyCode() == KeyEvent.VK_ENTER){

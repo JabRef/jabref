@@ -38,8 +38,8 @@ public class JabRef {
     public static void main(String[] args) {
 
 	//Font fnt = new Font("plain", Font.PLAIN, 12);
-	Object fnt = new UIDefaults.ProxyLazyValue 
-	    ("javax.swing.plaf.FontUIResource", null, 
+	Object fnt = new UIDefaults.ProxyLazyValue
+	    ("javax.swing.plaf.FontUIResource", null,
 	     new Object[] {"plain", new Integer(Font.PLAIN), new Integer(12)});
 
 	UIManager.put("Button.font", fnt);
@@ -74,10 +74,10 @@ public class JabRef {
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
 
-	String osName = System.getProperty("os.name", "def");
-	if (osName.equals(Globals.MAC)) {
+	//String osName = System.getProperty("os.name", "def");
+	if (Globals.osName.equals(Globals.MAC)) {
 	    Util.pr("Disabling Kunststoff look & feel on Mac OS X.");
-	} else {       
+	} else {
 	    try {
 		LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
 		//com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
@@ -85,13 +85,13 @@ public class JabRef {
 	    } catch (UnsupportedLookAndFeelException ex) {}
 	}
 
-	JabRefPreferences prefs = new JabRefPreferences(osName);
+	JabRefPreferences prefs = new JabRefPreferences();
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
 	GUIGlobals.CURRENTFONT = new Font
 	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
 	     prefs.getInt("fontSize"));
-	
+
 	JabRefFrame jrf = new JabRefFrame();
 
 	if(args.length > 0){
@@ -99,7 +99,7 @@ public class JabRef {
 	    jrf.output("Opening: " + args[0]);
 	    //verify the file
 	    File f = new File (args[0]);
-	    
+
 	    if( f.exists() && f.canRead() && f.isFile()) {
 		jrf.fileToOpen=f;
 		jrf.openDatabaseAction.openIt(true);
@@ -107,13 +107,13 @@ public class JabRef {
 		System.err.println("Error" + args[0] + " is not a valid file or is not readable");
 		//JOptionPane...
 	    }
-	    
-	    
+
+
 	}else{//no arguments (this will be for later and other command line switches)
 	    // ignore..
 	}
-	
-	
+
+
     }
-    
+
 }

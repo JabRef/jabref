@@ -54,7 +54,7 @@ public class EntryTable extends JTable {
 	//renderingHints.put(RenderingHints.KEY_ANTIALIASING,
 	//		   RenderingHints.VALUE_ANTIALIAS_ON);
 	//renderingHints.put(RenderingHints.KEY_RENDERING,
-	//		   RenderingHints.VALUE_RENDER_QUALITY);	
+	//		   RenderingHints.VALUE_RENDER_QUALITY);
 	prefs = prefs_;
 	antialiasing = prefs.getBoolean("antialias");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
@@ -85,10 +85,11 @@ public class EntryTable extends JTable {
 	addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
+                                    //|| (Globals.osName.equals(Globals.MAC) && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
 					if (rightClickMenu != null)
 						rightClickMenu.show(ths, e.getX(), e.getY());
 				}
-				
+
 			}
 	    });
 	setWidths();
@@ -111,11 +112,11 @@ public class EntryTable extends JTable {
 	    //cm.getColumn(i).setPreferredWidth(GUIGlobals.getPreferredFieldLength(getModel().getColumnName(i)));
 	}
     }
-	
+
     public JScrollPane getPane() {
 		return sp;
     }
-	
+
     public void setShowingSearchResults(boolean search,
 					boolean group) {
 	showingSearchResults = search;
@@ -174,11 +175,11 @@ public class EntryTable extends JTable {
 	else if (status == EntryTableModel.OPTIONAL)
 	    renderer = optRenderer;
 	else renderer = defRenderer;
-       
+
 	return renderer;
-	
+
 	/*
-	int test = row - 4*(row/4);	
+	int test = row - 4*(row/4);
 	if (test <= 1)
 	    return renderer;
 	else {
@@ -242,10 +243,10 @@ public class EntryTable extends JTable {
 	    this(c);
 	    setForeground(fg);
 	}
-	
+
     public void paintComponent(Graphics g) {
 	//Util.pr("her");
-	
+
 	Graphics2D g2 = (Graphics2D)g;
 	//Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
 	//g2.setColor(getBackground());
@@ -257,7 +258,7 @@ public class EntryTable extends JTable {
 	    rh.put(RenderingHints.KEY_ANTIALIASING,
 		   RenderingHints.VALUE_ANTIALIAS_ON);
 	    rh.put(RenderingHints.KEY_RENDERING,
-		   RenderingHints.VALUE_RENDER_QUALITY);	
+		   RenderingHints.VALUE_RENDER_QUALITY);
 	    g2.setRenderingHints(rh);
 	}
 	//g2.drawString(getText(), 3, f.getSize());
@@ -314,5 +315,5 @@ public class EntryTable extends JTable {
       setFont(GUIGlobals.CURRENTFONT);
       setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
   }
-	
+
 }
