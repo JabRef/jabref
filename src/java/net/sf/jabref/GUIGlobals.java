@@ -240,7 +240,10 @@ public class GUIGlobals {
       wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png"),
       clearInputArea = GUIGlobals.class.getResource(pre +"filenew.png"),
       markIcon = GUIGlobals.class.getResource(pre +"mark.png"),
-      unmarkIcon = GUIGlobals.class.getResource(pre +"unmark.png");
+      unmarkIcon = GUIGlobals.class.getResource(pre +"unmark.png"),
+      newBibFile = GUIGlobals.class.getResource(pre +"newBibFile.png"),
+      integrityCheck = GUIGlobals.class.getResource(pre +"integrity.png")
+      ;
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
     static {

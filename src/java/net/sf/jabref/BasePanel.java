@@ -237,9 +237,9 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                       saving = true;
                       saveDatabase(file, false);
 
-		      //Util.pr("Testing resolve string... BasePanel line 237");
-		      //Util.pr("Resolve aq: "+database.resolveString("aq"));
-		      //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
+                      //Util.pr("Testing resolve string... BasePanel line 237");
+                      //Util.pr("Resolve aq: "+database.resolveString("aq"));
+                      //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
 
                       try {
                         Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
@@ -672,8 +672,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                             //StringBuffer toSend = new StringBuffer
                             //    ("-e 'tell application \"iTeXMac\" to insert \"\\\\cite{");
                             //if (tmp)
-			    //  toSend = new StringBuffer
-			    //    ("-e 'tell application \"TeXShop\" to set the selection of the front document to \"\\\\cite{");
+                            //  toSend = new StringBuffer
+                            //    ("-e 'tell application \"TeXShop\" to set the selection of the front document to \"\\\\cite{");
                             String citeKey = "", message = "";
                             boolean first = true;
                             for (int i = 0; i < numSelected; i++) {
@@ -932,13 +932,13 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     if (importStrings) {
                       BibtexString bs;
                       int pos = 0;
-		      Iterator i = db.getStringKeySet().iterator();
+                      Iterator i = db.getStringKeySet().iterator();
                       for (; i.hasNext();) {
                         bs = (BibtexString)(db.getString(i.next()).clone());
                         if (!database.hasStringLabel(bs.getName())) {
-			    //pos = database.getStringCount();
-			    database.addString(bs);
-			    ce.addEdit(new UndoableInsertString(ths, database, bs));
+                            //pos = database.getStringCount();
+                            database.addString(bs);
+                            ce.addEdit(new UndoableInsertString(ths, database, bs));
                         }
                       }
                     }
@@ -1179,8 +1179,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                         }
                       }
                   });
-
-
 
               actions.put("markEntries", new BaseAction() {
                 public void action() {
@@ -2252,7 +2250,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         }
       };
       SwingUtilities.invokeLater(t);
-      
+
     }
 
       public void fileRemoved() {

@@ -35,6 +35,11 @@
 //            - create several bibtex entries in dialog
 //
 // modified :
+//            02.11.2004
+//            - integrity check, which reports errors and warnings for the fields
+//            22.10.2004
+//            - little help box
+//
 
 package net.sf.jabref.wizard.text.gui ;
 
@@ -52,6 +57,7 @@ import javax.swing.event.*;
 
 import net.sf.jabref.* ;
 import net.sf.jabref.wizard.text.*;
+import net.sf.jabref.wizard.integrity.*;
 
 
 public class TextInputDialog extends JDialog
@@ -63,6 +69,7 @@ public class TextInputDialog extends JDialog
   private JPanel buttonPanel = new JPanel() ;
   private JPanel rawPanel = new JPanel() ;
   private JPanel sourcePanel = new JPanel() ;
+  private JPanel warnPanel = new JPanel() ;
   private JList fieldList ;
   private JRadioButton overRadio, appRadio ;
 
@@ -72,6 +79,14 @@ public class TextInputDialog extends JDialog
   private StyledDocument doc ; // content from inputPane
   private JTextPane textPane ;
   private JTextArea preview ;
+
+  private JList warnings ;
+  private HintListModel warningData ;
+
+
+  private IntegrityCheck validChecker ;
+
+  private boolean inputChanged ; // input changed, fired by insert button
 
   private TagToMarkedTextStore marked ;
 
@@ -83,6 +98,9 @@ public class TextInputDialog extends JDialog
                           BibtexEntry bibEntry )
   {
     super( frame, title, modal ) ;
+
+    validChecker = new IntegrityCheck() ; // errors, warnings, hints
+    inputChanged = true ;  // for a first validCheck
 
     _frame = frame ;
 
@@ -118,10 +136,22 @@ public class TextInputDialog extends JDialog
     initRawPanel() ;
     initButtonPanel() ;
     initSourcePanel() ;
+    initWarnPanel() ;
 
     JTabbedPane tabbed = new JTabbedPane() ;
+    tabbed.addChangeListener(
+        new ChangeListener()
+        {
+          public void stateChanged(ChangeEvent e)
+          {
+            if (inputChanged)
+              checkInput() ;
+          }
+        });
+
     tabbed.add( rawPanel, Globals.lang( "Raw_source" ) ) ;
     tabbed.add( sourcePanel, Globals.lang( "BibTeX_source" ) ) ;
+    tabbed.add( warnPanel, Globals.lang("Messages_and_Hints")) ;
 
     // Panel Layout
     GridBagLayout gbl = new GridBagLayout() ;
@@ -346,11 +376,30 @@ public class TextInputDialog extends JDialog
     JScrollPane paneScrollPane = new JScrollPane( preview ) ;
     paneScrollPane.setVerticalScrollBarPolicy(
         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
-    paneScrollPane.setPreferredSize( new Dimension( 450, 255 ) ) ;
+    paneScrollPane.setPreferredSize( new Dimension( 500, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
     sourcePanel.add( paneScrollPane ) ;
   }
+
+  // ---------------------------------------------------------------------------
+
+    // Panel with warnings/errors
+    private void initWarnPanel()
+    {
+      warningData = new HintListModel() ;
+      warnings = new JList(warningData) ;
+
+
+      JScrollPane paneScrollPane = new JScrollPane( warnings ) ;
+      paneScrollPane.setVerticalScrollBarPolicy(
+          JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+      paneScrollPane.setPreferredSize( new Dimension( 540, 255 ) ) ;
+      paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
+
+      warnPanel.add( paneScrollPane ) ;
+    }
+
 
 // ---------------------------------------------------------------------------
   protected void addStylesToDocument( StyledDocument doc )
@@ -431,6 +480,16 @@ public class TextInputDialog extends JDialog
   }
 
 // ---------------------------------------------------------------------------
+
+  // starts an IntegrityCheck
+  private void checkInput()
+  {
+    warningData.setData( validChecker.checkBibtexEntry(entry)) ;
+//    if (hints != null)
+//      if (hints.size() > 0)
+//        warningData.setData(hints);
+
+  }
 
 // ---------------------------------------------------------------------------
   public boolean okPressed()

@@ -37,6 +37,7 @@ import net.sf.jabref.export.FileActions;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.wizard.auximport.* ;
 import net.sf.jabref.wizard.auximport.gui.*;
+import net.sf.jabref.wizard.integrity.*;
 
 import javax.swing.*;
 
@@ -80,7 +81,7 @@ public class JabRefFrame
       JButton b = new JButton(a);
       b.setText(null);
       if (!Globals.ON_MAC)
-	  b.setMargin(marg);
+          b.setMargin(marg);
       add(b);
     }
   }
@@ -132,6 +133,7 @@ public class JabRefFrame
       selectKeys = new SelectKeysAction(),
       newDatabaseAction = new NewDatabaseAction(),
       newSubDatabaseAction = new NewSubDatabaseAction(),
+      integrityCheckAction = new IntegrityCheckAction(),
       help = new HelpAction("JabRef help", helpDiag,
                             GUIGlobals.baseFrameHelp, "JabRef help",
                             prefs.getKey("Help")),
@@ -687,7 +689,7 @@ public JabRefPreferences prefs() {
       this.command = command;
     }
 
-    public GeneralAction(String command, String text, KeyStroke key) { 
+    public GeneralAction(String command, String text, KeyStroke key) {
       this.command = command;
       putValue(NAME, text);
       putValue(ACCELERATOR_KEY, key);
@@ -757,10 +759,10 @@ public JabRefPreferences prefs() {
     }
 
     public NewEntryAction(String type_, KeyStroke key) {
-	// This action leads to the creation of a specific entry.
-	putValue(NAME, Util.nCase(type_));
-	putValue(ACCELERATOR_KEY, key);
-	type = type_;
+        // This action leads to the creation of a specific entry.
+        putValue(NAME, Util.nCase(type_));
+        putValue(ACCELERATOR_KEY, key);
+        type = type_;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -907,6 +909,7 @@ public JabRefPreferences prefs() {
     tools.add(openUrl);
     tools.addSeparator();
     tools.add(newSubDatabaseAction);
+//    tools.add(integrityCheckAction) ;
 
     mb.add(tools);
 
@@ -953,17 +956,17 @@ public JabRefPreferences prefs() {
   }
 
     private JMenu subMenu(String name) {
-	name = Globals.menuTitle(name);
-	int i = name.indexOf('&');
-	JMenu res;
-	if (i >= 0) {
-	    res = new JMenu(name.substring(0, i)+name.substring(i+1));
-	    char mnemonic = Character.toUpperCase(name.charAt(i+1));
-	    res.setMnemonic((int)mnemonic);
-	}
-	else res = new JMenu(name);
-	
-	return res;
+        name = Globals.menuTitle(name);
+        int i = name.indexOf('&');
+        JMenu res;
+        if (i >= 0) {
+            res = new JMenu(name.substring(0, i)+name.substring(i+1));
+            char mnemonic = Character.toUpperCase(name.charAt(i+1));
+            res.setMnemonic((int)mnemonic);
+        }
+        else res = new JMenu(name);
+
+        return res;
     }
 
   private void createToolBar() {
@@ -1001,19 +1004,19 @@ public JabRefPreferences prefs() {
     searchToggle = new JToggleButton(normalSearch);
     searchToggle.setText(null);
     if (!Globals.ON_MAC)
-	searchToggle.setMargin(marg);
+        searchToggle.setMargin(marg);
     tlb.add(searchToggle);
 
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
     if (!Globals.ON_MAC)
-	groupToggle.setMargin(marg);
+        groupToggle.setMargin(marg);
     tlb.add(groupToggle);
 
     previewToggle = new JToggleButton(togglePreview);
     previewToggle.setText(null);
     if (!Globals.ON_MAC)
-	previewToggle.setMargin(marg);
+        previewToggle.setMargin(marg);
     tlb.add(previewToggle);
 
     tlb.addSeparator();
@@ -1318,11 +1321,11 @@ public JabRefPreferences prefs() {
   class CloseDatabaseAction
       extends MnemonicAwareAction {
     public CloseDatabaseAction() {
-	super(new ImageIcon(GUIGlobals.closeIconFile));
-	putValue(NAME, "Close database");
-	putValue(SHORT_DESCRIPTION,
-		 Globals.lang("Close the current database"));
-	putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
+        super(new ImageIcon(GUIGlobals.closeIconFile));
+        putValue(NAME, "Close database");
+        putValue(SHORT_DESCRIPTION,
+                 Globals.lang("Close the current database"));
+        putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -1489,10 +1492,10 @@ public JabRefPreferences prefs() {
   class NewDatabaseAction
       extends MnemonicAwareAction {
     public NewDatabaseAction() {
-	super(new ImageIcon(GUIGlobals.newIconFile));
-	putValue(NAME, "New database");
-	putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
-	//putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+        super(new ImageIcon(GUIGlobals.newIconFile));
+        putValue(NAME, "New database");
+        putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
+        //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -1669,7 +1672,7 @@ class FetchCiteSeerAction
       {
         super( Globals.lang( "New subdatabase based on AUX file" ),
 
-        new ImageIcon( GUIGlobals.newIconFile ) ) ;
+        new ImageIcon( GUIGlobals.newBibFile ) ) ;
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
@@ -1700,6 +1703,39 @@ class FetchCiteSeerAction
         }
       }
     }
+
+
+    // The action should test the database and report errors/warnings
+    class IntegrityCheckAction extends AbstractAction
+    {
+      public IntegrityCheckAction()
+      {
+        super( "Integrity Check", //Globals.lang( "" ),
+               new ImageIcon( GUIGlobals.integrityCheck ) ) ;
+               putValue( SHORT_DESCRIPTION, Globals.lang( "integrity" ) ) ;
+            //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+      }
+
+      public void actionPerformed( ActionEvent e )
+      {
+       Object selComp = tabbedPane.getSelectedComponent() ;
+       if (selComp != null)
+       {
+         BasePanel bp = ( BasePanel ) selComp ;
+         BibtexDatabase refBase = bp.getDatabase() ;
+         if (refBase != null)
+         {
+           System.out.println("check " +refBase);
+           IntegrityCheck iCheck = new IntegrityCheck() ;
+           iCheck.checkBibtexDatabase(refBase);
+         }
+       }
+       System.out.println("integrity") ;
+
+
+      }
+    }
+
 
 
   class FetchMedlineAction
@@ -2465,22 +2501,22 @@ class SaveSessionAction
   }
 
     class ExportCSV extends AbstractAction {
-	public ExportCSV() {
-	    super(Globals.lang("Tab-separated file"));
-	}
-	public void actionPerformed(ActionEvent e) {
-	    String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".csv",
-						   JFileChooser.SAVE_DIALOG, true);
-	    if (chosenFile == null)
-		return;
-	    try {
-		FileActions.exportToCSV(basePanel().database(), new File(chosenFile),
-					prefs);
-	    } catch (Exception ex) {
-		ex.printStackTrace();
-	    }
-				    
-	}
+        public ExportCSV() {
+            super(Globals.lang("Tab-separated file"));
+        }
+        public void actionPerformed(ActionEvent e) {
+            String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".csv",
+                                                   JFileChooser.SAVE_DIALOG, true);
+            if (chosenFile == null)
+                return;
+            try {
+                FileActions.exportToCSV(basePanel().database(), new File(chosenFile),
+                                        prefs);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
     }
 
 }
