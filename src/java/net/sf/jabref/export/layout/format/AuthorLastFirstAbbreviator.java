@@ -20,29 +20,76 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	/* (non-Javadoc)
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
-	public String format(String fieldText) {
+	public String format(String fieldText) 
+	{
 		String[] authors = fieldText.split(" and ");
 		
-		String[] authors_abrv = new String[authors.length];
+		return getAbbreviations(authors);
+	}
+				
+	/**
+	 * Abbreviates the names in the Last First format.
+	 * 
+	 * @param authors List of authors or editors.
+	 * @return the names abbreviated.
+	 * @throws RequiredOrderException
+	 * 
+	 */
+	private String getAbbreviations(String[] authors)
+	{
+		String s = null;
 		
+		try
+		{
+			verifyProperFormat(authors);
+		
+			String[] authors_abrv = new String[authors.length];
+
+			int i = 0;
+
+			for(i=0; i<authors.length; i++)
+			{
+				authors_abrv[i] = getAbbreviation(authors[i]);
+			}
+
+			//Faz o merge em um "unico string" usando " and " 
+			StringBuffer sb = new StringBuffer();
+
+			for(i=0; i<authors.length-1; i++)
+			{
+				sb.append(authors_abrv[i] + " and ");	
+			}
+			sb.append(authors_abrv[i]);
+
+			 s = new String(sb);		
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+			System.exit(-1);
+		}
+		
+		return s;
+	}
+
+	/**
+	 * Method that verifies if the author names are in the Last First format.
+	 * 
+	 * @param authors List of author or editor names.
+	 * @throws Exception
+	 */
+	private void verifyProperFormat(String[] authors) throws Exception 
+	{
 		int i = 0;
 		
 		for(i=0; i<authors.length; i++)
 		{
-			authors_abrv[i] = getAbbreviation(authors[i]);
+			//If the name does not have the comma it is not in the appropriate format.
+			if(authors[i].lastIndexOf(',')==-1)
+			{
+				throw new Exception("Error: names must be rearranged in Last, First format before formatted with AuthorLastFirstAbbreviator");
+			}
 		}
-		
-		//Faz o merge em um "unico string" usando " and " 
-		StringBuffer sb = new StringBuffer();
-
-		for(i=0; i<authors.length-1; i++)
-		{
-			sb.append(authors_abrv[i] + " and ");	
-		}
-		sb.append(authors_abrv[i]);
-		
-		String s = new String(sb);
-		return s;
 	}
 
 	/**
@@ -87,6 +134,5 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		
 		//System.out.println("The Abbreviated name is: " + s);
 		return s;
-	}
-
+	}	
 }
