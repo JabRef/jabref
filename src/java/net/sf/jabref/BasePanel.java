@@ -2063,17 +2063,20 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 	// properly while showing groups. The problem is that we don't
 	// know how many hits there are - the number reported includes
 	// hits outside of the current group selection.
-	if (sortingByGroup) {
+	/*if (sortingByGroup) {
 	    grayOut = true;
-	}
+	    }*/
 	
 	if (searchValueField == Globals.SEARCH) {
           sortingBySearchResults = reorder;
           coloringBySearchResults = grayOut;
         }
 
-	lastSearchHits = numberOfHits;
-	hidingNonHits = reorder && !grayOut; 
+	if (searchValueField == Globals.GROUPSEARCH) {
+	    lastSearchHits = numberOfHits;
+	    hidingNonHits = reorder && !grayOut; 
+	    //System.out.println("BasePanel: hidingNonHits="+hidingNonHits);
+	}
 	// We either gray out, or hide, non-hits.
 
         //tableModel.remap();
@@ -2146,7 +2149,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public void stopShowingSearchResults() {
       sortingBySearchResults = false;
       coloringBySearchResults = false;
-      hidingNonHits = false;
+      //hidingNonHits = false;
       /* entryTable.setShowingSearchResults(showingSearchResults,
         showingGroup);
        */
@@ -2158,6 +2161,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public void stopShowingGroup() {
       sortingByGroup = false;
       coloringByGroup = false;
+      hidingNonHits = false;
 /*
       entryTable.setShowingSearchResults(showingSearchResults,
                                          showingGroup);*/

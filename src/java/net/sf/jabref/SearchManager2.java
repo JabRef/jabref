@@ -52,11 +52,10 @@ class SearchManager2 extends SidePaneComponent
     private JabRefPreferences prefs;
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
-    private JRadioButtonMenuItem hideNonHits, grayOut;
+
     private JRadioButton increment, highlight, reorder;
     private JCheckBoxMenuItem select;
-    private ButtonGroup types = new ButtonGroup(),
-	nonHits = new ButtonGroup();
+    private ButtonGroup types = new ButtonGroup();
     private SearchManager2 ths = this;
     private boolean incSearch = false;
 
@@ -90,10 +89,7 @@ class SearchManager2 extends SidePaneComponent
         regExpSearch = new JCheckBoxMenuItem
 	    (Globals.lang("Use regular expressions"),
 	     prefs.getBoolean("regExpSearch"));
-	hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
-				       !prefs.getBoolean("grayOutNonHits"));
-	grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
-				   prefs.getBoolean("grayOutNonHits"));
+
 	
 	increment = new JRadioButton(Globals.lang("Incremental"), false);
 	highlight = new JRadioButton(Globals.lang("Highlight"), true);
@@ -101,8 +97,7 @@ class SearchManager2 extends SidePaneComponent
 	types.add(increment);
 	types.add(highlight);
 	types.add(reorder);
-	nonHits.add(hideNonHits);
-	nonHits.add(grayOut);
+
 
         select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
@@ -138,9 +133,8 @@ settings.add(select);
 	settings.addSeparator();
         settings.add(caseSensitive);
 	settings.add(regExpSearch);
-	settings.addSeparator();
-	settings.add(grayOut);
-	settings.add(hideNonHits);
+	//settings.addSeparator();
+
 
 	searchField.addActionListener(this);
         search.addActionListener(this);
@@ -256,7 +250,7 @@ settings.add(select);
 	prefs.putBoolean("searchAll", searchAll.isSelected());
 	prefs.putBoolean("incrementS", increment.isSelected());
 	prefs.putBoolean("selectS", highlight.isSelected());
-	prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
+	//	prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
 	prefs.putBoolean("caseSensitiveSearch",
 			 caseSensitive.isSelected());
 	prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
@@ -361,7 +355,7 @@ settings.add(select);
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions,searchRules, frame.basePanel(),
-		     Globals.SEARCH, true, Globals.prefs.getBoolean("grayOutNonHits"), select.isSelected());
+		     Globals.SEARCH, true, true/*Globals.prefs.getBoolean("grayOutNonHits")*/, select.isSelected());
 		search.start() ;
 	    }
 	    else if (highlight.isSelected()) {

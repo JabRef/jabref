@@ -64,6 +64,7 @@ public class GroupSelector extends SidePaneComponent implements
     String searchField;
     JPopupMenu groupsContextMenu = new JPopupMenu();
     JPopupMenu settings = new JPopupMenu();
+    private JRadioButtonMenuItem hideNonHits, grayOut;
     JRadioButtonMenuItem groupModeUnion = new JRadioButtonMenuItem(
             Globals.lang("Groups: Include Subgroups"), true);
     JRadioButtonMenuItem groupModeIntersection = new JRadioButtonMenuItem(
@@ -87,6 +88,7 @@ public class GroupSelector extends SidePaneComponent implements
     ButtonGroup groupModeGroup = new ButtonGroup();
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
+    ButtonGroup	nonHits = new ButtonGroup();
     JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
             reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
     SidePaneManager manager;
@@ -110,6 +112,12 @@ public class GroupSelector extends SidePaneComponent implements
         this.manager = manager;
         this.frame = frame;
         this.panel = panel;
+	hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
+				       !prefs.getBoolean("grayOutNonHits"));
+	grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
+				   prefs.getBoolean("grayOutNonHits"));
+	nonHits.add(hideNonHits);
+	nonHits.add(grayOut);
         floatCb.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
                 _prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
@@ -129,6 +137,11 @@ public class GroupSelector extends SidePaneComponent implements
         select.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
                 _prefs.putBoolean("groupSelectMatches", select.isSelected());
+            }
+        });
+        grayOut.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                _prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
             }
         });
         if (prefs.getBoolean("groupFloatSelections")) {
@@ -162,6 +175,9 @@ public class GroupSelector extends SidePaneComponent implements
         settings.addSeparator();
         settings.add(select);
         settings.addSeparator();
+	settings.add(grayOut);
+	settings.add(hideNonHits);
+
         // settings.add(moreRow);
         // settings.add(lessRow);
         openset.addActionListener(new ActionListener() {
@@ -431,7 +447,9 @@ public class GroupSelector extends SidePaneComponent implements
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
         DatabaseSearch search = new DatabaseSearch(searchOptions, searchRules,
-                panel, Globals.GROUPSEARCH, floatCb.isSelected(), true, select
+                panel, Globals.GROUPSEARCH, floatCb.isSelected(), 
+						   Globals.prefs.getBoolean("grayOutNonHits"),
+						   /*true,*/ select
                         .isSelected());
         search.start();
         frame.output(Globals.lang("Updated group selection") + ".");

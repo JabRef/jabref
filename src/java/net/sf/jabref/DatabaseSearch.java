@@ -91,6 +91,9 @@ public class DatabaseSearch extends Thread {
 	final int outputHits = hits;
 	SwingUtilities.invokeLater(new Thread() {
 		public void run() {
+		    //System.out.println("DatabaseSearch: grayOut="+grayOut);
+		    //System.out.println("DatabaseSearch: reorder="+reorder);
+		    //System.out.println("DatabaseSearch: outputHits="+outputHits);
 		    panel.entryTable.invalidate();
 		    panel.showSearchResults(searchValueField, reorder, grayOut, select, outputHits);
 		    if ((searchValueField == null)
