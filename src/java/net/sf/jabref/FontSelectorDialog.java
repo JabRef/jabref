@@ -1,14 +1,15 @@
+package net.sf.jabref;
 /*
   Taken from JpicEdt
 modified slightly by nizar batada for JabRef
-  
+
  EepicViewFactory.java - February 11, 2002 - jPicEdt, a picture editor for LaTeX.
  copyright (C) 1999-2002 Sylvain Reynal
  Portions copyright (C) 2000, 2001 Slava Pestov
  Portions copyright (C) 1999 Jason Ginchereau
 
- Département de Physique
- Ecole Nationale Supérieure de l'Electronique et de ses Applications (ENSEA)
+ D\uFFFDpartement de Physique
+ Ecole Nationale Sup\uFFFDrieure de l'Electronique et de ses Applications (ENSEA)
  6, avenue du Ponceau
  F-95014 CERGY CEDEX
 
@@ -16,17 +17,17 @@ modified slightly by nizar batada for JabRef
  Fax : +33 130 736 667
  e-mail : reynal@ensea.fr
  jPicEdt web page : http://trashx.ensea.fr/jpicedt/
-  
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  as published by the Free Software Foundation; either version 2
  of the License, or any later version.
-  
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-  
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -46,6 +47,9 @@ import javax.swing.*;
  * @version $Id$
  * <p>
  * $Log$
+ * Revision 1.2  2003/12/14 23:48:02  mortenalver
+ * .
+ *
  * Revision 1.1  2003/11/07 22:18:07  nbatada
  * modified it slightly from initial version
  *
@@ -59,11 +63,11 @@ import javax.swing.*;
  *
  * Enhanced class interface for some widgets.
  *
- 
+
  */
 
 class FontSelector extends JButton {
-	
+
 	static final String PLAIN="plain";
 	static final String BOLD="bold";
 	static final String BOLD_ITALIC="bold-italic";
@@ -73,7 +77,7 @@ class FontSelector extends JButton {
 	public FontSelector(){
 		this(new Font("SansSerif", Font.PLAIN, 10));
 	}
-	
+
 	/** init with the given font */
 	public FontSelector(Font font){
 		setFont(font);
@@ -85,7 +89,7 @@ class FontSelector extends JButton {
 		super.setFont(font);
 		updateText();
 	}
-	
+
 	/**
 	 * update button's text content from the current button's font.
 	 */
@@ -145,9 +149,9 @@ public class FontSelectorDialog extends JDialog {
 	static final String ITALIC="italic";
 
 	public FontSelectorDialog(Component comp, Font font) {
-		
+
 	    //super(JOptionPane.getFrameForComponent(comp),jpicedt.Localizer.currentLocalizer().get("widget.FontSelector"),true); //
-	    super(JOptionPane.getFrameForComponent(comp),"FontSelector",true); // 	    
+	    super(JOptionPane.getFrameForComponent(comp),"FontSelector",true); //
 		JPanel content = new JPanel(new BorderLayout());
 		content.setBorder(new EmptyBorder(12,12,12,12));
 		setContentPane(content);
@@ -155,14 +159,14 @@ public class FontSelectorDialog extends JDialog {
 		JPanel listPanel = new JPanel(new GridLayout(1,3,6,6));
 
 		JPanel familyPanel = createTextFieldAndListPanel(
-								 "Font Family", 
+								 "Font Family",
 								 familyField = new JTextField(),
 								 familyList = new JList(getFontList()));
 		listPanel.add(familyPanel);
 
 		String[] sizes = { "9", "10", "12", "14", "16", "18", "24" };
 		JPanel sizePanel = createTextFieldAndListPanel(
-							       "Font Size", 
+							       "Font Size",
 		                       sizeField = new JTextField(),
 		                       sizeList = new JList(sizes));
 		listPanel.add(sizePanel);
@@ -170,7 +174,7 @@ public class FontSelectorDialog extends JDialog {
 		String[] styles = {PLAIN,BOLD,ITALIC,BOLD_ITALIC};
 
 		JPanel stylePanel = createTextFieldAndListPanel(
-								"Font Style", 
+								"Font Style",
 		                        styleField = new JTextField(),
 		                        styleList = new JList(styles));
 		styleField.setEditable(false);
@@ -190,8 +194,8 @@ public class FontSelectorDialog extends JDialog {
 
 		content.add(BorderLayout.NORTH,listPanel);
 
-		preview = new JLabel("Font Preview"); 
-		preview.setBorder(new TitledBorder("Font Preview")); 
+		preview = new JLabel("Font Preview");
+		preview.setBorder(new TitledBorder("Font Preview"));
 
 		updatePreview();
 
@@ -213,7 +217,7 @@ public class FontSelectorDialog extends JDialog {
 
 		buttons.add(Box.createHorizontalStrut(6));
 
-		cancel = new JButton("Cancel"); 
+		cancel = new JButton("Cancel");
 		cancel.addActionListener(new ActionHandler());
 		buttons.add(cancel);
 
@@ -305,7 +309,7 @@ public class FontSelectorDialog extends JDialog {
 		cons.fill = GridBagConstraints.BOTH;
 		cons.weightx = 1.0f;
 
-		JLabel _label = new JLabel(label); 
+		JLabel _label = new JLabel(label);
 		layout.setConstraints(_label,cons);
 		panel.add(_label);
 
@@ -378,7 +382,7 @@ public class FontSelectorDialog extends JDialog {
     public static void main(String args[])
 	{
 	    Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
-			
+
 	}
 
 }
