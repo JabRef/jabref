@@ -8,9 +8,10 @@ public class AuthorDialog extends JDialog implements PropertyChangeListener{
     boolean[] checked;
     JCheckBox[] checkBox;
     JOptionPane optionPane;
-    int count;
+    int count, piv = 0;
 
-    public AuthorDialog(JFrame frame, String args[]) {
+
+    public AuthorDialog(JFrame frame, MedlineFetcher mf, String args[]) {
 	super(frame, "Pick titles",true);
 	count = args.length;
 	checked=new boolean[count];

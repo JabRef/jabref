@@ -96,7 +96,8 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	    return; // The first element is only for show.
 	String chosen = (String)list.getSelectedItem();
 	if (list.getSelectedIndex() == -1) {  // User edited in a new word. Add this.
-	    Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
+          addWord(chosen);
+	 /*   Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
 					    editor.getFieldName());
 	    boolean exists = false;
 	    int pos = -1;
@@ -113,7 +114,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 		items.add(Math.max(0, pos), chosen);
 		parent.panel.markNonUndoableBaseChanged();
 		updateList();
-	    }	   
+	    }*/
 	}
 	if (!editor.getText().equals(""))
 	    editor.append(DELIMITER);
@@ -121,5 +122,34 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	list.setSelectedIndex(0);
 	parent.storeFieldAction.actionPerformed
 	    (new ActionEvent(editor, 0, ""));
+    }
+
+  /**
+   * Adds a word to the selector (to the JList and to the MetaData), unless it
+   * is already there
+   *
+   * @param newWord String Word to add
+   */
+  public void addWord(String newWord) {
+
+      Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
+                                      editor.getFieldName());
+      boolean exists = false;
+      int pos = -1;
+      for (int i=0; i<items.size(); i++) {
+        String s = (String)items.elementAt(i);
+        if (s.equals(newWord)) {
+          exists = true;
+          break;
+        }
+        if (s.toLowerCase().compareTo(newWord.toLowerCase()) < 0)
+          pos = i+1;
+      }
+      if (!exists) {
+        items.add(Math.max(0, pos), newWord);
+        parent.panel.markNonUndoableBaseChanged();
+        updateList();
+      }
+
     }
 }

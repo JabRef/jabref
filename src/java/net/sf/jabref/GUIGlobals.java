@@ -53,7 +53,7 @@ public class GUIGlobals {
   // Frame titles.
   static String
       frameTitle = "JabRef",
-      version = "1.3",
+      version = "1.3.1",
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
@@ -209,7 +209,8 @@ public class GUIGlobals {
       doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
       doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
-      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");
+      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif"),
+      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png");
 
 
 // Help files (in HTML format):
@@ -403,6 +404,7 @@ public class GUIGlobals {
       "bibtexkey",
       "doi",
       "eid",
+      "date"
   };
 
   // These fields will not be saved to the .bib file.

@@ -37,6 +37,9 @@ public class JabRef {
 
     public static void main(String[] args) {
 
+      SplashScreen ss = new SplashScreen();
+      ss.show();
+
 	//Font fnt = new Font("plain", Font.PLAIN, 12);
 	Object fnt = new UIDefaults.ProxyLazyValue
 	    ("javax.swing.plaf.FontUIResource", null,
@@ -79,11 +82,16 @@ public class JabRef {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 	//String osName = System.getProperty("os.name", "def");
-	if (!Globals.ON_MAC) {
+        if (Globals.ON_WIN) {
+          try {
+            UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+          } catch (UnsupportedLookAndFeelException ex) {}
+        }
+	else if (!Globals.ON_MAC) {
           try {
             //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-            //new com.jgoodies.plaf.plastic.PlasticLookAndFeel();
-
+            //LookAndFeel lnf = new com.jgoodies.plaf.plastic.PlasticLookAndFeel();
+            //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
             LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
             //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
             UIManager.setLookAndFeel(lnf);
@@ -101,7 +109,10 @@ public class JabRef {
 	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
 	     prefs.getInt("fontSize"));
 
+
 	JabRefFrame jrf = new JabRefFrame();
+        ss.dispose();
+        jrf.setVisible(true);
 
 	if(args.length > 0){
 	    System.out.println("Opening: " + args[0]);

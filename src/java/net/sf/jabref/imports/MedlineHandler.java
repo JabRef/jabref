@@ -78,7 +78,8 @@ public class MedlineHandler extends DefaultHandler
 			inDescriptorName=true;
 			//descriptorName="";
 		}
-		else if(localName.equals("Author")){inAuthor=true;author="";}
+                else if(localName.equals("Author")){inAuthor=true;author="";}
+                else if(localName.equals("CollectiveName")){inForename=true;forename="";} // Morten A. 20040513.
 		else if(localName.equals("PMID")){inPubMedID=true;pubmedid="";}
 		else if(localName.equals("LastName")){inLastName=true; lastName="";}
 		else if(localName.equals("ForeName") || localName.equals("FirstName")) {

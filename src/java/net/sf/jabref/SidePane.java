@@ -51,8 +51,8 @@ public class SidePane extends JPanel {
 
 	setLayout(new BorderLayout());
 	mainPanel.setLayout(gbl);
-	setBackground(GUIGlobals.lightGray);//(Color.white);
-	mainPanel.setBackground(GUIGlobals.lightGray);
+	//setBackground(GUIGlobals.lightGray);//(Color.white);
+	//mainPanel.setBackground(GUIGlobals.lightGray);
 
 	sp = new JScrollPane
 	    (mainPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -61,7 +61,7 @@ public class SidePane extends JPanel {
 	//super.add(sp, BorderLayout.CENTER);
 	super.add(mainPanel, BorderLayout.NORTH);
 	JPanel pan = new JPanel();
-	pan.setBackground(GUIGlobals.lightGray);
+	//pan.setBackground(GUIGlobals.lightGray);
 	super.add(pan, BorderLayout.CENTER);
     }
 
@@ -78,7 +78,7 @@ public class SidePane extends JPanel {
 	gbl.setConstraints(c, con);
 	mainPanel.add(c);
 	pan = new JPanel();
-	pan.setBackground(GUIGlobals.lightGray);
+	//pan.setBackground(GUIGlobals.lightGray);
 	con.gridheight = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(pan, con);
 	//mainPanel.add(pan);

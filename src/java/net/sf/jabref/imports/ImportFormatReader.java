@@ -123,7 +123,8 @@ public class ImportFormatReader
 		    sb.append(t[t.length - 1]+ ","); // Last name
 		    for (int j=0; j<t.length-1; j++)
 			sb.append(" "+t[j]);
-		} else sb.append(t[0]);
+		} else if (t.length > 0)
+                  sb.append(t[0]);
 	    }
 	    else {
 		// The name is written with last name first, so it's ok.

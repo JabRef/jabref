@@ -245,7 +245,7 @@ public class JabRefFrame
       }
       output(Globals.lang("Files opened") + ": " + tabbedPane.getTabCount());
     }
-    setVisible(true);
+    //setVisible(true);
     if (tabbedPane.getTabCount() > 0) {
       tabbedPane.setSelectedIndex(0);
       new FocusRequester( ( (BasePanel) tabbedPane.getComponentAt(0))
@@ -459,7 +459,7 @@ public class JabRefFrame
     fillMenu();
     createToolBar();
     getContentPane().setLayout(gbl);
-    getContentPane().setBackground(GUIGlobals.lightGray);
+    //getContentPane().setBackground(GUIGlobals.lightGray);
     con.fill = GridBagConstraints.HORIZONTAL;
     con.anchor = GridBagConstraints.WEST;
     con.weightx = 1;
@@ -846,8 +846,8 @@ public class JabRefFrame
     //tlb.setRollover(true);
 
     //tlb.setBorderPainted(true);
-    tlb.setBackground(GUIGlobals.lightGray);
-    tlb.setForeground(GUIGlobals.lightGray);
+    //tlb.setBackground(GUIGlobals.lightGray);
+    //tlb.setForeground(GUIGlobals.lightGray);
     tlb.setFloatable(false);
     tlb.add(newDatabaseAction);
     tlb.add(open);

@@ -130,7 +130,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	entry = entry_;
 	prefs = prefs_;
 
-	setBackground(GUIGlobals.lightGray);//Color.white);
+	//setBackground(GUIGlobals.lightGray);//Color.white);
 
 	entry.addPropertyChangeListener(this);
 
@@ -485,7 +485,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     else if ((s!=null) && s.equals("browse")) {
       JButton but = new JButton(Globals.lang("Browse"));
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
-      but.setBackground(GUIGlobals.lightGray);
+      //but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String dir = ed.getText();
@@ -519,7 +519,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       JButton but = new JButton(Globals.lang("Browse")),
           auto = new JButton(Globals.lang("Auto"));
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
-      but.setBackground(GUIGlobals.lightGray);
+      //but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String pdfDir = prefs.get("pdfDirectory");

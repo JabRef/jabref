@@ -331,26 +331,31 @@ public class Util {
 	else if(fieldName.equals("url"))
 	    { // html
 		try
-		    {
-			System.err.println("Starting HTML browser: "
-					   + prefs.get("htmlviewer") + " " + link);
-                if(Globals.ON_MAC){
+                {
+                  // First check if the url is enclosed in \\url{}. If so, remove the wrapper.
+                  if (link.startsWith("\\url{") && link.endsWith("}"))
+                    link = link.substring(5, link.length()-1);
+
+                  System.err.println("Starting HTML browser: "
+                                     + prefs.get("htmlviewer") + " " + link);
+                  if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
-                }
-                else{
+                  }
+                  else{
                     cmdArray[0] = prefs.get("htmlviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray);
+                  }
+
                 }
-		    }
-		catch (IOException e)
-		    {
-			System.err.println("An error occured on the command: "
-					   + prefs.get("htmlviewer") + " " + link);
-		    }
-	    }
-	else if(fieldName.equals("ps"))
+                catch (IOException e)
+                {
+                  System.err.println("An error occured on the command: "
+                                     + prefs.get("htmlviewer") + " " + link);
+                }
+              }
+              else if(fieldName.equals("ps"))
 	    {
 		try
 		    {

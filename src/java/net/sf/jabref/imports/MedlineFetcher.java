@@ -126,6 +126,13 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
       URL url = new URL( baseUrl );
       HttpURLConnection data = (HttpURLConnection)url.openConnection();
 
+
+       /* Reader un = new InputStreamReader(data.getInputStream());
+        int c;
+        while ((c=un.read()) != -1) {
+          System.out.print((char)c);
+        }*/
+
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         // Configure the factory object to specify attributes of the parsers it creates
@@ -160,7 +167,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
              m2 = p2.matcher( idList );
          if ( m1.matches() ) {
            fetchById();
-         }/*
+         }
          else if ( m2.matches() ) {
 
            // Fetch by author.
@@ -171,23 +178,26 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    //---------------------------
 	    idList=setupTerm(idList); // fix the syntax
 	    String[] idListArray=getIds(idList); // get the ids from entrez
-	    int idMax=idListArray.length; // check length
-            Util.pr("fikk "+idListArray.length);
-	    String[] titles=new String[idMax]; // prepare an array of titles for the dialog
-	    titles=getTitles(idListArray);
-            Util.pr("titler "+titles.length);
+	    //int idMax=idListArray.length; // check length
+            //Util.pr("fikk "+idListArray.length);
+	    //String[] titles=new String[idMax]; // prepare an array of titles for the dialog
+	    //titles=getTitles(idListArray);
+            //Util.pr("titler "+titles.length);
 	    // get a list of which ids the user wants.
-	    authorDialog=new AuthorDialog(jFrame, titles);
-	    // prompt the user to select articles
-	    boolean[] picks=authorDialog.showDialog();
+            if (idListArray.length > 0) {
+              // prompt the user to select articles
+              authorDialog = new AuthorDialog(jFrame, this, idListArray);
 
-	    idList="";
-	    for (int i=0; i<titles.length;i++){
-		if (picks[i]){
-		    idList+=idListArray[i]+",";
+              //boolean[] picks = authorDialog.showDialog();
+            }
+
+	    //idList="";
+	    //for (int i=0; i<titles.length;i++){
+		//if (picks[i]){
+		  //  idList+=idListArray[i]+",";
 		    //System.out.println(idListArray[i]);
-		}
-	    }
+		//}
+	    //}
 	    //System.out.println(idList);
 		 //----------------------------
 		 // end my stuff
@@ -216,7 +226,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    } else
 		panel.output(Globals.lang("No Medline entries found."));
 
-	}*/ else {
+	} else {
                 JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),
                                               Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
 	    //JOptionPane.showMessageDialog(panel.frame(), Globals.lang("Please enter a semicolon or comma separated list of either Medline IDs (numbers), "+
