@@ -283,12 +283,12 @@ public class TextInputDialog
 
     // Radio buttons
     appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
-    appRadio.setToolTipText( "append the selected text to bibtex key" ) ;
+    appRadio.setToolTipText( Globals.lang( "append_the_selected_text_to_bibtex_key") ) ;
     appRadio.setMnemonic( KeyEvent.VK_A ) ;
     appRadio.setSelected( true ) ;
 
     overRadio = new JRadioButton( Globals.lang( "Override" ) ) ;
-    overRadio.setToolTipText( "override the bibtex key by the selected text" ) ;
+    overRadio.setToolTipText( Globals.lang( "override_the_bibtex_key_by_the_selected_text") ) ;
     overRadio.setMnemonic( KeyEvent.VK_O ) ;
     overRadio.setSelected( false ) ;
 
@@ -330,21 +330,46 @@ public class TextInputDialog
 
     // ----------------------------------------------------------------------
     // add a short info, if available
+    // load the info text from a help-file, the "normal" translation is
+    // to long and unpractical for the properties file (single line)
+    // => try to load the help file text, if it fails, show a short text
 
-    JEditorPane infoText = new JEditorPane() ;
+    //infoText.setText(Globals.lang("This_is_a_simple_copy_and_paste_dialog._First_load_or_paste_some_"
+    //        +"text_into_the_text_input_area._After_that,_you_can_mark_text_and_assign_it_to_a_bibtex_field."));
+
+    JEditorPane infoText =  new JEditorPane() ;
+
+    boolean loaded = false ;
+
+    URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
+                                           +GUIGlobals.shortPlainImport);
+
+    if (infoURL != null)
+    {
+      try
+      {
+         // get the info text from help file
+        infoText.setPage( infoURL ) ;
+        //infoText.setContentType("text/html");
+
+        loaded = true ; // text successfully loaded
+      }
+      catch (Exception e) {}
+    }
+
+    if (!loaded) // only if no help available
+    {
+      infoText.setText(
+         Globals.lang("This_is_a_simple_copy_and_paste_dialog_for_import_some_fields_from_normal_text.") ) ;
+    }
+
     infoText.setEditable(false);
-     // get the info text
-
-    //infoText.setContentType("text/html");
     infoText.setBackground(GUIGlobals.infoField);
     infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
     infoText.setPreferredSize( new Dimension(220, 50));
     infoText.setMinimumSize( new Dimension(180, 50));
-    infoText.setText(Globals.lang("This_is_a_simple_copy_and_paste_dialog._First_load_or_paste_some_"
-            +"text_into_the_text_input_area._After_that,_you_can_mark_text_and_assign_it_to_a_bibtex_field."));
-    
+
     rawPanel.add( infoText, BorderLayout.SOUTH ) ;
- 
   }
 
 // ---------------------------------------------------------------------------
