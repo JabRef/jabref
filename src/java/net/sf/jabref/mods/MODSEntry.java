@@ -31,8 +31,19 @@ public class MODSEntry {
 	// should really be handled with an enum
 	protected String type = "text";
 	protected String genre = null;
+	protected Set handledExtensions;
+	Map extensionFields;
+	
+	public static String BIBTEX = "bibtex_";
+	
 	
 	public MODSEntry(BibtexEntry bibtex) {
+		extensionFields = new HashMap();
+		handledExtensions = new HashSet();
+		handledExtensions.add(BIBTEX + "publisher");
+		handledExtensions.add(BIBTEX + "title");
+		handledExtensions.add(BIBTEX + "bibtexkey");
+		handledExtensions.add(BIBTEX + "author");
 		populateFromBibtex(bibtex);
 	}
 	
@@ -51,6 +62,17 @@ public class MODSEntry {
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
 			authors = getAuthors(bibtex.getField("author").toString());
+		populateExtensionFields(bibtex);
+	}
+	
+	protected void populateExtensionFields(BibtexEntry e) {
+		Object fields [] = e.getAllFields();
+		for(int i = 0; i < fields.length; i++) {
+			String field = (String) fields[i];
+			String value = (String) e.getField(field);
+			field = BIBTEX + field;
+			extensionFields.put(field, value);
+		}
 	}
 	
 	protected List getAuthors(String authors) {
@@ -80,7 +102,7 @@ public class MODSEntry {
 	}
 	// must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
 	protected String getMODSgenre(BibtexEntry bibtex) {
-		String bibtexType = bibtex.getType().toString();
+		String bibtexType = bibtex.getType().getName();
 		String result;
 		if (bibtexType.equals("Mastersthesis"))
 			result = "theses";
@@ -110,9 +132,7 @@ public class MODSEntry {
 	   	try {
 	   		Element mods = d.createElement("mods");
 	   		mods.setAttribute("version", "3.0");
-	   		mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
-	   		mods.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-	   		mods.setAttribute("xsi:schemaLocation", "http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
+	   		// mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
 	   		mods.setAttribute("ID", id);
 	   		// title
 			Element titleInfo = d.createElement("titleInfo");
@@ -137,7 +157,7 @@ public class MODSEntry {
 	   					namePart.setTextContent(name.getGivenNames());
 	   					modsName.appendChild(namePart);
 	   				}
-	   				Element role = d.createElement("name");
+	   				Element role = d.createElement("role");
 	   				Element roleTerm = d.createElement("roleTerm");
 	   				roleTerm.setAttribute("type", "text");
 	   				roleTerm.setTextContent("author");
@@ -176,6 +196,19 @@ public class MODSEntry {
 	   			genreElement.setAttribute("authority", "marc");
 	   			genreElement.setTextContent(genre);
 	   			mods.appendChild(genreElement);
+	   		}
+	   		/* now generate extension fields for unhandled data */
+	   		for(Iterator iter = extensionFields.entrySet().iterator(); iter.hasNext(); ) {
+	   			Element extension = d.createElement("extension");
+	   			Map.Entry theEntry = (Map.Entry) iter.next();
+	   			String field = (String) theEntry.getKey();
+	   			String value = (String) theEntry.getValue();
+	   			if (handledExtensions.contains(field))
+	   				continue;
+	   			Element theData = d.createElement(field);
+	   			theData.setTextContent(value);
+	   			extension.appendChild(theData);
+	   			mods.appendChild(extension);
 	   		}
 	   		return mods;
 	   	}

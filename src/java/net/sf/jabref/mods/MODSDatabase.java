@@ -40,11 +40,16 @@ public class MODSDatabase {
 														newDocumentBuilder();
 	   		result = dbuild.newDocument();
 	   		Element modsCollection = result.createElement("modsCollection");
+	   		modsCollection.setAttribute("xmlns", "http://www.loc.gov/mods/v3");
+	   		modsCollection.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+	   		modsCollection.setAttribute("xsi:schemaLocation", "http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
+	   		
 	   		for(Iterator iter = entries.iterator(); iter.hasNext(); ) {
 	   			MODSEntry entry = (MODSEntry) iter.next();
 	   			Node node = entry.getDOMrepresentation(result);
 	   			modsCollection.appendChild(node);
 	   		}
+	   		
 	   		result.appendChild(modsCollection);	   		
 	   	}
 	   	catch (Exception e)
