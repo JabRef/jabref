@@ -12,7 +12,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
-	defSource, editSource;
+		defSource, editSource,defSort;
     private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
@@ -37,6 +37,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("defaultShowSource"));
 	editSource = new JCheckBox(Globals.lang("Enable source editing"),
 				   _prefs.getBoolean("enableSourceEditing"));
+	defSort = new JCheckBox(Globals.lang("Sort Automatically"),
+				  _prefs.getBoolean("defaultAutoSort"));
+
 	JPanel general = new JPanel(),
 	    external = new JPanel();
         groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
@@ -65,6 +68,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	gbl.setConstraints(defSort, con);
+	general.add(defSort);
+	
+
         // Grouping field
         con.gridwidth = 1;
         JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
@@ -74,7 +82,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(groupField, con);
         general.add(groupField);
-
         // Language choice
         String oldLan = _prefs.get("language");
         int ilk = 0;
@@ -196,6 +203,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
+	_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
+	
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 
 	// We should maybe do some checking on the validity of the contents?

@@ -40,7 +40,7 @@ public class PrefsDialog extends JDialog {
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JCheckBox colorCodes, autoResizeMode, autoOpenForm,
-	backup, openLast, secDesc, terDesc, defSource, editSource,
+		backup, openLast, secDesc, terDesc, defSource, defSort, editSource,
 	autoComplete, groupsVisible;
     private JTextField groupsField;
     private JPopupMenu complFields = new JPopupMenu();
@@ -84,6 +84,7 @@ public class PrefsDialog extends JDialog {
 	secDesc = new JCheckBox("Descending",_prefs.getBoolean("secDescending"));
 	terDesc = new JCheckBox("Descending",_prefs.getBoolean("terDescending"));
 	defSource = new JCheckBox("Show source by default",_prefs.getBoolean("defaultShowSource"));
+	defSort = new JCheckBox("Automatically sort by default",_prefs.getBoolean("defaultAutoSort"));	
 	editSource = new JCheckBox("Enable source editing",_prefs.getBoolean("enableSourceEditing"));
 	autoComplete = new JCheckBox("Enable autocompletion",_prefs.getBoolean("autoComplete"));
 	groupsVisible = new JCheckBox("Show groups interface if "
@@ -416,6 +417,7 @@ public class PrefsDialog extends JDialog {
 	    _prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
 	    _prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
 	    _prefs.putBoolean("defaultShowSource", defSource.isSelected());
+	    _prefs.putBoolean("defaultAutoSort", defSort.isSelected());		
 	    _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
 	    _prefs.putBoolean("autoComplete", autoComplete.isSelected());
 	    /*if (autoComplete.isSelected()) {
