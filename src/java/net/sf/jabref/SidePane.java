@@ -71,7 +71,7 @@ public class SidePane extends JPanel {
 	con.anchor = GridBagConstraints.NORTH;
 	con.fill = GridBagConstraints.BOTH;
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.insets = new Insets(1, 1, 0, 0);
+	con.insets = new Insets(1, 1, 2, 0);
 	con.gridheight = 1;
 	con.weightx = 1;
 	con.weighty = 1;

@@ -84,7 +84,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	genPanel = new FieldPanel();
     JTextField bibtexKey;
     JTextArea source;
-    JTabbedPane tabbed = new JTabbedPane(JTabbedPane.RIGHT);
+    JTabbedPane tabbed = new JTabbedPane();//JTabbedPane.RIGHT);
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JLabel lab;

@@ -237,14 +237,13 @@ public class JabRefFrame extends JFrame {
 	empt.setBackground(GUIGlobals.lightGray);
 	gbl.setConstraints(empt, con);
         getContentPane().add(empt); 
-	*/
+	
 	con.insets = new Insets(1,0,1,1);
 	con.anchor = GridBagConstraints.EAST;
 	con.weightx = 0;      
+	gbl.setConstraints(searchManager, con);
+	getContentPane().add(searchManager);*/
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	//gbl.setConstraints(searchManager, con);
-	//getContentPane().add(searchManager);
-
 	con.weightx = 1;
 	con.weighty = 0;
 	con.fill = GridBagConstraints.BOTH;
@@ -511,7 +510,7 @@ public class JabRefFrame extends JFrame {
     private void createToolBar() {
 	tlb.setRollover(true);
 	
-	tlb.setBorderPainted(true);
+	//tlb.setBorderPainted(true);
 	tlb.setBackground(GUIGlobals.lightGray);
 	tlb.setForeground(GUIGlobals.lightGray);
 	tlb.setFloatable(false);
