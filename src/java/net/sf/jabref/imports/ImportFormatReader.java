@@ -1271,15 +1271,16 @@ public class ImportFormatReader
            String[] pages = new String[2];
            String country = null;
            String address = null;
-           String title = null;
+           String titleST = null;
+           String titleTI = null;
            Vector comments = new Vector();
            // add item
            Object[] l = lines.entrySet().toArray();
            for (int i = 0; i < l.length; ++i) {
              Map.Entry entry = (Map.Entry)l[i];
              if (entry.getKey().equals("AU")) hm.put("author",entry.getValue().toString());
-             else if (entry.getKey().equals("TI")) hm.put("title",entry.getValue().toString());
-             else if (entry.getKey().equals("ST")) title = entry.getValue().toString();
+             else if (entry.getKey().equals("TI")) titleTI = entry.getValue().toString();
+             else if (entry.getKey().equals("ST")) titleST = entry.getValue().toString();
              else if (entry.getKey().equals("YP")) hm.put("year",entry.getValue().toString());
              else if (entry.getKey().equals("VL")) hm.put("volume",entry.getValue().toString());
              else if (entry.getKey().equals("NB")) hm.put("number",entry.getValue().toString());
@@ -1349,6 +1350,7 @@ public class ImportFormatReader
             type[i] = type[i].toLowerCase();
             if (type[i].indexOf("article") >= 0) bibtexType = "article";
             else if (type[i].indexOf("journal") >= 0) bibtexType = "article";
+            else if (type[i].indexOf("book section") >= 0) bibtexType = "inbook";
             else if (type[i].indexOf("book") >= 0) bibtexType = "book";
             else if (type[i].indexOf("conference") >= 0) bibtexType = "inproceedings";
             else if (type[i].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
@@ -1358,12 +1360,16 @@ public class ImportFormatReader
             else if (type[i].indexOf("thesis") >= 0) bibtexType = "phdthesis";
            }
            
-           // depending on bibtexType, decide where to place the title ("RT")
-           if (title != null) {
-	           if (bibtexType.equals("article"))
-	           	hm.put("journal",title);
-	           else
-	           	hm.put("booktitle",title);
+           // depending on bibtexType, decide where to place the titleRT and titleTI
+           if (bibtexType.equals("article")) {
+           	if (titleST != null) hm.put("journal",titleST);
+           	if (titleTI != null) hm.put("title",titleTI);
+           } else if (bibtexType.equals("inbook")) {
+           	if (titleST != null) hm.put("booktitle",titleST);
+           	if (titleTI != null) hm.put("title",titleTI);
+           } else {
+           	if (titleST != null) hm.put("booktitle",titleST); // should not happen, I think
+           	if (titleTI != null) hm.put("title",titleTI);
            }
 
            // concatenate pages
