@@ -377,6 +377,7 @@ static {
 	// LANGUAGES contains mappings for supported languages.
 	LANGUAGES.put("English", "en");
 	LANGUAGES.put("Deutsch", "de");
+	LANGUAGES.put("French", "fr");
 	LANGUAGES.put("Norsk", "no");
 
 	FIELD_EXTRAS = new HashMap();

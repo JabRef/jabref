@@ -67,7 +67,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added customization of key generation.
+1.x:	- Added support for French language.
+	- Added customization of key generation.
 	- Improved HTML export.
 	- Added Replace string feature.	
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
