@@ -36,12 +36,17 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     public FieldTextField(String fieldName_, String content) {
 	super(content);
+
+        // Add the global focus listener, so a menu item can see if this field was focused when
+        // an action was called.
+        addFocusListener(Globals.focusListener);
+
 	fieldName = fieldName_;
 	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
 	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	label.setBorder(BorderFactory.createEtchedBorder
-			 (GUIGlobals.lightGray, Color.gray));	
+			 (GUIGlobals.lightGray, Color.gray));
 	label.setOpaque(true);
 	label.setBackground(GUIGlobals.lightGray);
 	if ((content != null) && (content.length() > 0))
@@ -61,12 +66,12 @@ public class FieldTextField extends JTextField implements FieldEditor {
     public JComponent getPane() { return this; }
 
   public void paintComponent(Graphics g) {
-	Graphics2D g2 = (Graphics2D)g;	
+	Graphics2D g2 = (Graphics2D)g;
 	RenderingHints rh = g2.getRenderingHints();
 	rh.put(RenderingHints.KEY_ANTIALIASING,
 	       RenderingHints.VALUE_ANTIALIAS_ON);
 	rh.put(RenderingHints.KEY_RENDERING,
-	       RenderingHints.VALUE_RENDER_QUALITY);	
+	       RenderingHints.VALUE_RENDER_QUALITY);
 	g2.setRenderingHints(rh);
 	super.paintComponent(g2);
   }

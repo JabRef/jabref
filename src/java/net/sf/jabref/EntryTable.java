@@ -51,8 +51,13 @@ public class EntryTable extends JTable {
 	super(tm_);
 	this.tableModel = tm_;
 
-	//renderingHints = g2.getRenderingHints();
-	//renderingHints.put(RenderingHints.KEY_ANTIALIASING,
+        // Add the global focus listener, so a menu item can see if this table was focused when
+        // an action was called.
+        addFocusListener(Globals.focusListener);
+
+
+  //renderingHints = g2.getRenderingHints();
+ 	//renderingHints.put(RenderingHints.KEY_ANTIALIASING,
 	//		   RenderingHints.VALUE_ANTIALIAS_ON);
 	//renderingHints.put(RenderingHints.KEY_RENDERING,
 	//		   RenderingHints.VALUE_RENDER_QUALITY);

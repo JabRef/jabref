@@ -566,6 +566,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	source.setEditable(true);//prefs.getBoolean("enableSourceEditing"));
 	source.setLineWrap(true);
 	source.setTabSize(GUIGlobals.INDENT);
+
+        // Add the global focus listener, so a menu item can see if this field was focused when
+        // an action was called.
+        source.addFocusListener(Globals.focusListener);
+
 	setupJTextComponent(source);
 	updateSource();
 

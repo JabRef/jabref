@@ -44,7 +44,7 @@ import java.util.regex.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
-
+import javax.swing.text.DefaultEditorKit;
 
 /**
  * The main window of the application.
@@ -113,18 +113,21 @@ public class JabRefFrame extends JFrame {
 	redo = new GeneralAction("redo", "Redo", "Redo",
 				 GUIGlobals.redoIconFile,
 				 prefs.getKey("Redo")),
-	cut = new GeneralAction("cut", "Cut", "Cut",
+	/*cut = new GeneralAction("cut", "Cut", "Cut",
 				GUIGlobals.cutIconFile,
-				prefs.getKey("Cut")),
+				prefs.getKey("Cut")),*/
 	delete = new GeneralAction("delete", "Delete", "Delete",
 				   GUIGlobals.removeIconFile,
 				   prefs.getKey("Delete")),
-	copy = new GeneralAction("copy", "Copy", "Copy",
-				 GUIGlobals.copyIconFile,
-				 prefs.getKey("Copy")),
-        paste = new GeneralAction("paste", "Paste", "Paste",
+        /*copy = new GeneralAction("copy", "Copy", "Copy",
+                                 GUIGlobals.copyIconFile,
+                                 prefs.getKey("Copy")),*/
+        copy = new EditAction("copy", GUIGlobals.copyIconFile),
+        paste = new EditAction("paste", GUIGlobals.pasteIconFile),
+        cut = new EditAction("cut", GUIGlobals.cutIconFile),
+        /*paste = new GeneralAction("paste", "Paste", "Paste",
                                  GUIGlobals.pasteIconFile,
-                                  prefs.getKey("Paste")),
+                                  prefs.getKey("Paste")),*/
 	saveSessionAction = new SaveSessionAction(),
 	loadSessionAction = new LoadSessionAction(),
 	incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -549,8 +552,9 @@ public class JabRefFrame extends JFrame {
 	edit.add(undo);
 	edit.add(redo);
 	edit.addSeparator();
-	edit.add(cut);
-	edit.add(copy);
+
+        edit.add(cut);
+        edit.add(copy);
 	edit.add(paste);
 	//edit.add(remove);
 	edit.add(delete);
@@ -1599,7 +1603,7 @@ public class JabRefFrame extends JFrame {
 	public ChangeTabAction(boolean next) {
 	    super(Globals.lang(next?"Next tab":"Previous tab"));
 	    this.next = next;
-	    putValue(ACCELERATOR_KEY,
+            putValue(ACCELERATOR_KEY,
 		     (next?prefs.getKey("Next tab"):prefs.getKey("Previous tab")));
 	}
 	public void actionPerformed(ActionEvent e) {
@@ -1611,5 +1615,28 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
-}
+    /**
+     * Class for handling general actions; cut, copy and paste. The focused component is
+     * kept track of by Globals.focusListener, and we call the action stored under the
+     * relevant name in its action map.
+     */
+    class EditAction extends AbstractAction {
+         private String command;
+         public EditAction(String command, URL icon) {
+             super(Globals.lang(Util.nCase(command)), new ImageIcon(icon));
+             this.command = command;
+             putValue(ACCELERATOR_KEY, prefs.getKey(Util.nCase(command)));
+             //putValue(ACCELERATOR_KEY,
+             //         (next?prefs.getKey("Next tab"):prefs.getKey("Previous tab")));
+         }
+         public void actionPerformed(ActionEvent e) {
 
+           //Util.pr(Globals.focusListener.getFocused().toString());
+           JComponent source = Globals.focusListener.getFocused();
+           source.getActionMap().get(command).actionPerformed
+               (new ActionEvent(source, 0, command));
+         }
+     }
+
+
+}

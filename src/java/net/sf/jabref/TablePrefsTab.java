@@ -19,6 +19,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextArea tableFields = new JTextArea();//"", 80, 5);
+    private JTextField secField, terField;
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private boolean tableChanged = false;
     private JTable colSetup;
@@ -67,6 +68,29 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	namesAsIs = new JCheckBox(Globals.lang("Show names unchanged"));
 	namesFf = new JCheckBox(Globals.lang("Show 'Firstname Lastname'"));
 	namesFl = new JCheckBox(Globals.lang("Show 'Lastname, Firstname'"));
+        secField = new JTextField(_prefs.get("secSort"), 10);
+        terField = new JTextField(_prefs.get("terSort"), 10);
+        secSort.insertItemAt(Globals.lang("<select>"), 0);
+        terSort.insertItemAt(Globals.lang("<select>"), 0);
+        secSort.setSelectedIndex(0);
+        terSort.setSelectedIndex(0);
+        secSort.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (secSort.getSelectedIndex() > 0) {
+              secField.setText(GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex() - 1]);
+              secSort.setSelectedIndex(0);
+            }
+          }
+        });
+        terSort.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (terSort.getSelectedIndex() > 0) {
+              terField.setText(GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex() - 1]);
+              terSort.setSelectedIndex(0);
+            }
+          }
+        });
+
 	ButtonGroup bg = new ButtonGroup();
 	bg.add(namesAsIs);
 	bg.add(namesFf);
@@ -213,14 +237,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 
 	// Set the correct value for the primary sort JComboBox.
-	String sec = prefs.get("secSort"),
+	/*String sec = prefs.get("secSort"),
 	    ter = prefs.get("terSort");
 	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
 	    if (sec.equals(GUIGlobals.ALL_FIELDS[i]))
 		secSort.setSelectedIndex(i);
 	    if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
 		terSort.setSelectedIndex(i);
-	}
+	}*/
 
 	lab = new JLabel(Globals.lang("Secondary sort criterion"));
 	con.gridwidth = 1;
@@ -230,6 +254,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	con.weightx = 1;
 	gbl.setConstraints(secSort, con);
 	sort.add(secSort);
+        gbl.setConstraints(secField, con);
+        sort.add(secField);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(secDesc, con);
 	sort.add(secDesc);
@@ -241,8 +267,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	sort.add(lab);
 	con.weightx = 0;
 	//con.insets = new Insets(0,5,0,0);
-	gbl.setConstraints(terSort, con);
-	sort.add(terSort);
+        gbl.setConstraints(terSort, con);
+        sort.add(terSort);
+        gbl.setConstraints(terField, con);
+        sort.add(terField);
 	con.weightx = 1;
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(terDesc, con);
@@ -478,8 +506,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		      JTable.AUTO_RESIZE_OFF);
 	_prefs.putBoolean("secDescending", secDesc.isSelected());
 	_prefs.putBoolean("terDescending", terDesc.isSelected());
-	_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
-	_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
+	//_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
+	//_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
+        _prefs.put("secSort", secField.getText().toLowerCase().trim());
+        _prefs.put("terSort", terField.getText().toLowerCase().trim());
 	// updatefont
 	_prefs.put("fontFamily", font.getFamily());
 	_prefs.putInt("fontStyle", font.getStyle());

@@ -364,17 +364,21 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    });
 
 	// The action for pasting entries or cell contents.
+        // Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 14-Apr-04:
+        //  - more robust detection of available content flavors (doesn't only look at first one offered)
+        //  - support for parsing string-flavor clipboard contents which are bibtex entries.
+        //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
+        //                       (b) copy and paste entries between multiple instances of JabRef (since
+        //         only the text representation seems to get as far as the X clipboard, at least on my system)
 	actions.put("paste", new BaseAction() {
 		public void action() {
-		    // We pick an object from the clipboard, check if
-		    // it exists, and if it is a set of entries.
+                    // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
 		    Transferable content = Toolkit.getDefaultToolkit()
 			.getSystemClipboard().getContents(null);
 		    if (content != null) {
-			DataFlavor[] flavor = content.getTransferDataFlavors();
-			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(TransferableBibtexEntry.entryFlavor)) {
+                        BibtexEntry[] bes = null;
+			if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
 			    // We have determined that the clipboard data is a set of entries.
-			    BibtexEntry[] bes = null;
 			    try {
 				bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
 			    } catch (UnsupportedFlavorException ex) {
@@ -382,69 +386,103 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    } catch (IOException ex) {
 				ex.printStackTrace();
 			    }
+			} else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                            // We have determined that no TransferableBibtexEntry is available, but
+                            // there is a string, which we will handle according to context:
+                            int[] rows = entryTable.getSelectedRows(),
+                                cols = entryTable.getSelectedColumns();
+                            Util.pr(rows.length+" x "+cols.length);
+                            if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
+                                && (rows != null) && (rows.length == 1)) {
+                                // A single cell is highlighted, so paste the string straight into it without parsing
+                                try {
+                                    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
+                                    refreshTable();
+                                    markBaseChanged();
+                                    output("Pasted cell contents");
+                                } catch (UnsupportedFlavorException ex) {
+                                    ex.printStackTrace();
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                } catch (IllegalArgumentException ex) {
+                                    output("Can't paste.");
+                                }
+                            } else {
+                              // no single cell is selected, so try parsing the clipboard contents as bibtex entries instead
+                              try {
+                                  BibtexParser bp = new BibtexParser
+                                      (new java.io.StringReader( (String) (content.getTransferData(
+                                      DataFlavor.stringFlavor))));
+                                  BibtexDatabase db = bp.parse().getDatabase();
+                                  Util.pr("Parsed " + db.getEntryCount() + " entries from clipboard text");
+                                  if(db.getEntryCount()>0) {
+                                      Set keySet = db.getKeySet();
+                                      if (keySet != null) {
+                                          // Copy references to the entries into a BibtexEntry array.
+                                          // Could import directly from db, but going via bes allows re-use
+                                          // of the same pasting code as used for TransferableBibtexEntries
+                                          bes = new BibtexEntry[db.getEntryCount()];
+                                          Iterator it = keySet.iterator();
+                                          for (int i=0; it.hasNext();i++) {
+                                              bes[i]=db.getEntryById((String) (it.next()));
+                                          }
+                                      }
+                                  } else {
+                                      output(Globals.lang("Unable to parse clipboard text as Bibtex entries."));
+                                  }
+                              } catch (UnsupportedFlavorException ex) {
+                                  ex.printStackTrace();
+                              } catch (Throwable ex) {
+                                  ex.printStackTrace();
+                              }
+                            }
+			}
 
-			    if ((bes != null) && (bes.length > 0)) {
-				NamedCompound ce = new NamedCompound
-				    (bes.length > 1 ? "paste entries" : "paste entry");
-				for (int i=0; i<bes.length; i++) {
-				    try {
-					BibtexEntry be = (BibtexEntry)(bes[i].clone());
-					// We have to clone the
-					// entries, since the pasted
-					// entries must exist
-					// independently of the copied
-					// ones.
-					be.setId(Util.createId(be.getType(), database));
-					database.insertEntry(be);
-					ce.addEdit(new UndoableInsertEntry
-						   (database, be, ths));
-				    } catch (KeyCollisionException ex) {
-					Util.pr("KeyCollisionException... this shouldn't happen.");
-				    }
-				}
-				ce.end();
-				undoManager.addEdit(ce);
-				tableModel.remap();
-				entryTable.clearSelection();
-				entryTable.revalidate();
-				output(Globals.lang("Pasted")+" "+
-				       (bes.length>1 ? bes.length+" "+
-					Globals.lang("entries") : "1 "+Globals.lang("entry"))
-				       +".");
-				refreshTable();
-				markBaseChanged();
-			    }
-			}
-			/*Util.pr(flavor.length+"");
-			Util.pr(flavor[0].toString());
-			Util.pr(flavor[1].toString());
-			Util.pr(flavor[2].toString());
-			Util.pr(flavor[3].toString());
-			Util.pr(flavor[4].toString());*/
-			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) {
-			    // We have determined that the clipboard data is a string.
-			    int[] rows = entryTable.getSelectedRows(),
-				cols = entryTable.getSelectedColumns();
-			    Util.pr(rows.length+" x "+cols.length);
-			    if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
-				&& (rows != null) && (rows.length == 1)) {
-				try {
-				    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
-				    refreshTable();
-				    markBaseChanged();
-				    output("Pasted cell contents");
-				} catch (UnsupportedFlavorException ex) {
-				    ex.printStackTrace();
-				} catch (IOException ex) {
-				    ex.printStackTrace();
-				} catch (IllegalArgumentException ex) {
-				    output("Can't paste.");
-				}
-			    }
-			}
-		    }
-		}
-	    });
+                        // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
+                        // or were parsed from a string
+                        if ((bes != null) && (bes.length > 0)) {
+                          NamedCompound ce = new NamedCompound
+                              (bes.length > 1 ? "paste entries" : "paste entry");
+                          for (int i=0; i<bes.length; i++) {
+                            try {
+                              BibtexEntry be = (BibtexEntry)(bes[i].clone());
+                              // We have to clone the
+                              // entries, since the pasted
+                              // entries must exist
+                              // independently of the copied
+                              // ones.
+                              be.setId(Util.createId(be.getType(), database));
+                              database.insertEntry(be);
+                              ce.addEdit(new UndoableInsertEntry
+                                         (database, be, ths));
+                            } catch (KeyCollisionException ex) {
+                              Util.pr("KeyCollisionException... this shouldn't happen.");
+                            }
+                          }
+                          ce.end();
+                          undoManager.addEdit(ce);
+                          tableModel.remap();
+                          entryTable.clearSelection();
+                          entryTable.revalidate();
+                          output(Globals.lang("Pasted")+" "+
+                                 (bes.length>1 ? bes.length+" "+
+                                  Globals.lang("entries") : "1 "+Globals.lang("entry"))
+                                 +".");
+                          refreshTable();
+                          markBaseChanged();
+                        }
+                      }
+                      /*Util.pr(flavor.length+"");
+                          Util.pr(flavor[0].toString());
+                          Util.pr(flavor[1].toString());
+                          Util.pr(flavor[2].toString());
+                          Util.pr(flavor[3].toString());
+                          Util.pr(flavor[4].toString());
+                       */
+
+                    }
+
+});
 
 	actions.put("selectAll", new BaseAction() {
 		public void action() {
@@ -872,7 +910,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
                     for (int j = i + 1; j < bes.length; j++) {
                       boolean eq = Util.isDuplicate(bes[i], bes[j],
                                                     Globals.duplicateThreshold);
-                      if (eq) {
+
+                      // Show the duplicate resolver dialog if they are deemed duplicates,
+                      // AND they both are still present in the database.
+                      if (eq && (database.getEntryById(bes[i].getId()) != null) &&
+                          (database.getEntryById(bes[j].getId()) != null)) {
                         if (drd == null)
                           drd = new DuplicateResolverDialog(frame, bes[i], bes[j]);
                         else
@@ -1011,12 +1053,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
     public void setupTable() {
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, frame.prefs);
-
 	entryTable.addMouseListener(this);
-	entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
-	entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
-	entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
-	entryTable.getActionMap().put("Cut", new AbstractAction() {
+        Util.pr("BasePanel:1053, removed key bindings");
+	//entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
+	//entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
+	//entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
+	entryTable.getActionMap().put("cut", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    try { runCommand("cut");
 		    } catch (Throwable ex) {
@@ -1024,7 +1066,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    }
 		}
 	    });
-	entryTable.getActionMap().put("Copy", new AbstractAction() {
+	entryTable.getActionMap().put("copy", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    try { runCommand("copy");
 		    } catch (Throwable ex) {
@@ -1032,7 +1074,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    }
 		}
 	    });
-	entryTable.getActionMap().put("Paste", new AbstractAction() {
+	entryTable.getActionMap().put("paste", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    try { runCommand("paste");
 		    } catch (Throwable ex) {

@@ -91,6 +91,11 @@ class SearchManager2 extends SidePaneComponent
 	increment.addItemListener(this);
 	reorder.addItemListener(this);
 
+        // Add the global focus listener, so a menu item can see if this field was focused when
+        // an action was called.
+        searchField.addFocusListener(Globals.focusListener);
+
+
 	if (searchAll.isSelected()) {
 	    searchReq.setEnabled(false);
 	    searchOpt.setEnabled(false);

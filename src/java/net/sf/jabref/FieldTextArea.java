@@ -42,6 +42,11 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 
     public FieldTextArea(String fieldName_, String content) {
 	super(content);
+
+        // Add the global focus listener, so a menu item can see if this field was focused when
+        // an action was called.
+        addFocusListener(Globals.focusListener);
+
 	sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	setLineWrap(true);
@@ -51,10 +56,10 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	//Util.pr(""+15*rows);
 	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
 	label.setBorder(BorderFactory.createEtchedBorder
-			 (GUIGlobals.lightGray, Color.gray));	
+			 (GUIGlobals.lightGray, Color.gray));
 	label.setOpaque(true);
 	label.setBackground(GUIGlobals.lightGray);
-	//label.setForeground(Color.gray);	
+	//label.setForeground(Color.gray);
 	setBackground(GUIGlobals.validFieldBackground);
 	if ((content != null) && (content.length() > 0))
 	    label.setForeground(GUIGlobals.validFieldColor);
@@ -63,10 +68,10 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	    label.setForeground(GUIGlobals.nullFieldColor);
 
     }
-    
+
     /*
     public void setAutoComplete(Completer completer) {
-	addKeyListener(new AutoCompListener(completer));       
+	addKeyListener(new AutoCompListener(completer));
     }
     */
 
@@ -79,12 +84,12 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     }
 
   public void paintComponent(Graphics g) {
-	Graphics2D g2 = (Graphics2D)g;	
+	Graphics2D g2 = (Graphics2D)g;
 	RenderingHints rh = g2.getRenderingHints();
 	rh.put(RenderingHints.KEY_ANTIALIASING,
 	       RenderingHints.VALUE_ANTIALIAS_ON);
 	rh.put(RenderingHints.KEY_RENDERING,
-	       RenderingHints.VALUE_RENDER_QUALITY);	
+	       RenderingHints.VALUE_RENDER_QUALITY);
 	g2.setRenderingHints(rh);
 	super.paintComponent(g2);
   }

@@ -46,6 +46,8 @@ public class Globals {
         DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
     public static float duplicateThreshold = 0.78f;
 
+    public static GlobalFocusListener focusListener = new GlobalFocusListener();
+
     public static String osName = System.getProperty("os.name", "def");
 
     public static void logger(String s){
