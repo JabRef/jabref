@@ -839,6 +839,16 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	}
     }
 
+    /**
+     * Selects a single entry, and scrolls the table to center it.
+     *
+     */
+    public void selectSingleEntry(int pos) {
+	entryTable.clearSelection();
+	entryTable.addRowSelectionInterval(pos, pos);
+	entryTable.scrollToCenter(pos, 0);
+    }
+
     public void stopShowingSearchResults() {
 	showingSearchResults = false;
 	entryTable.setShowingSearchResults(showingSearchResults,

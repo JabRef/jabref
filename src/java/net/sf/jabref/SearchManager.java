@@ -37,6 +37,9 @@ class SearchManager extends JPanel
     GridBagLayout gbl = new GridBagLayout() ; 
     GridBagConstraints con = new GridBagConstraints() ; 
 
+    IncrementalSearcher incSearcher;
+
+
     private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 30);
     private JLabel lab = //new JLabel(Globals.lang("Search")+":");
@@ -51,9 +54,14 @@ class SearchManager extends JPanel
     private ButtonGroup types = new ButtonGroup();
     private SearchManager ths = this;
 
+    private int incSearchPos = -1; // To keep track of where we are in
+				   // an incremental search. -1 means
+				   // that the search is inactive.
+
     public SearchManager(JabRefFrame frame, JabRefPreferences prefs_) {
 	this.frame = frame;
 	prefs = prefs_;
+	incSearcher = new IncrementalSearcher(prefs);
 
 	setBorder(BorderFactory.createEtchedBorder());
 
@@ -99,6 +107,17 @@ class SearchManager extends JPanel
 	settings.add(regExpSearch);
 
 	searchField.addActionListener(this);
+	searchField.addFocusListener(new FocusAdapter() {
+		public void focusLost(FocusEvent e) {
+		    incSearchPos = -1; // Reset incremental
+				       // search. This makes the
+				       // incremental search reset
+				       // once the user moves focus to
+				       // somewhere else.
+		    if (increment.isSelected())
+			searchField.setText("");
+		}
+	    });
 	escape.addActionListener(this);
 
 	openset.addActionListener(new ActionListener() {
@@ -154,6 +173,14 @@ class SearchManager extends JPanel
 	gbl.setConstraints(escape, con);
         add(escape); 
 
+	searchField.getInputMap().put(prefs.getKey("Repeat incremental search"),
+				      "repeat");
+	searchField.getActionMap().put("repeat", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    if (increment.isSelected())
+			repeatIncremental();
+		}
+	    });
     }
 
     protected void updatePrefs() {
@@ -230,16 +257,68 @@ class SearchManager extends JPanel
 	    }
 	}
     }
+
+    private void repeatIncremental() {
+	incSearchPos++;
+	if (frame.basePanel() != null)
+	    goIncremental();
+    }
    
     /**
      * Used for incremental search. Only activated when incremental
      * is selected.
+     *
+     * The variable incSearchPos keeps track of which entry was last
+     * checked.
      */
     public void keyTyped(KeyEvent e) {
+	if (e.isControlDown()) {
+	    return;
+	}
+	if (frame.basePanel() != null)
+	    goIncremental();
+    }
 
+    private void goIncremental() {
+	SwingUtilities.invokeLater(new Thread() {
+		public void run() { 
+		    String text = searchField.getText();
+		    BasePanel bp = frame.basePanel();
+
+		    if (incSearchPos >= bp.getDatabase().getEntryCount()) {
+			frame.output("'"+text+"' : "+Globals.lang
+				     ("Incremental search failed. Repeat to search from top.")+".");
+			incSearchPos = -1;
+			return;
+		    }
+
+		    if (searchField.getText().equals("")) return;   
+		    if (incSearchPos < 0)
+			incSearchPos = 0;
+		    BibtexEntry be = bp.getDatabase().getEntryById
+			(bp.tableModel.getNameFromNumber(incSearchPos));
+		    while (!incSearcher.search(text, be)) {
+			incSearchPos++;
+			if (incSearchPos < bp.getDatabase().getEntryCount())
+			    be = bp.getDatabase().getEntryById
+				(bp.tableModel.getNameFromNumber(incSearchPos));
+			else {
+			    frame.output("'"+text+"' : "+Globals.lang
+					 ("Incremental search failed. Repeat to search from top."));
+			    incSearchPos = -1;
+			    return;
+			}
+		    }
+		    if (incSearchPos >= 0) {
+			bp.selectSingleEntry(incSearchPos);
+			frame.output("'"+text+"' "+Globals.lang
+				     ("found")+".");
+		    }
+		}
+	    });
     }
 
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
-
+    
 }
