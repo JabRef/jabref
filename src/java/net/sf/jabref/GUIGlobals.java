@@ -54,6 +54,7 @@ public class GUIGlobals {
 	frameTitle = "JabRef",
 	stringsTitle = Globals.lang("Strings for database")+": ",
 	untitledStringsTitle = stringsTitle+Globals.lang("untitled"),
+	untitledTitle = Globals.lang("untitled"),
 	helpTitle = "JabRef help",
         TYPE_HEADER="entrytype";
 

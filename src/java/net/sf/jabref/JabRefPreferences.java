@@ -82,7 +82,7 @@ public class JabRefPreferences {
 	defaults.put("entryTypeFormHeightFactor", new Integer(1));
 	defaults.put("entryTypeFormWidth", new Integer(1));
 	defaults.put("backup", new Boolean(true));
-	defaults.put("openLastEdited", new Boolean(true));
+	defaults.put("openLastEdited", new Boolean(false));
 	defaults.put("lastEdited", (String)null);
 	defaults.put("stringsPosX", new Integer(0));
 	defaults.put("stringsPosY", new Integer(0));
@@ -330,6 +330,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Entry editor: next entry", "ctrl shift DOWN");
 	defKeyBinds.put("Entry editor: previous entry", "ctrl shift UP");
 	defKeyBinds.put("Entry editor: store field", "alt S");
+	defKeyBinds.put("Save session", "F11");
+	defKeyBinds.put("Load session", "F12");
     }
 
     private String getNextUnit(Reader data) throws IOException {

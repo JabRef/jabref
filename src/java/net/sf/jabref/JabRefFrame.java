@@ -32,6 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -114,6 +115,8 @@ public class JabRefFrame extends JFrame {
 	paste = new GeneralAction("paste", "Paste", "Paste",
 				 GUIGlobals.pasteIconFile,
 				  prefs.getKey("Paste")),
+	saveSessionAction = new SaveSessionAction(),
+	loadSessionAction = new LoadSessionAction(),
 	incrementalSearch = new GeneralAction("incSearch", "Incremental search",
 					      "Start incremental search",
 					      GUIGlobals.searchIconFile,
@@ -484,6 +487,9 @@ public class JabRefFrame extends JFrame {
 	file.add(saveAs);
 	file.add(fileHistory);
 	file.addSeparator();
+	file.add(loadSessionAction);
+	file.add(saveSessionAction);
+	file.addSeparator();
 	file.add(close);
 	//==============================
 	// NB: I added this because my frame borders are so tiny that I cannot click
@@ -802,10 +808,10 @@ public class JabRefFrame extends JFrame {
 
 						prefs.putStringArray("lastEdited", names);
 					}
-
-					fileHistory.storeHistory();
+					
 				}
 
+				fileHistory.storeHistory();
 				BibtexEntryType.saveCustomEntryTypes(prefs);
 
 				// Let the search interface store changes to prefs.
@@ -948,7 +954,7 @@ public class JabRefFrame extends JFrame {
 
 	    // Create a new, empty, database.
 	    BasePanel bp = new BasePanel(ths, prefs);
-	    tabbedPane.add(Globals.lang("untitled"), bp);
+	    tabbedPane.add(GUIGlobals.untitledTitle, bp);
 	    tabbedPane.setSelectedComponent(bp);
 	    if (tabbedPane.getTabCount() == 1)
 		setNonEmptyState();
@@ -1257,6 +1263,79 @@ public class JabRefFrame extends JFrame {
 			return selectedFile.getAbsolutePath();
 		}
 
+    class SaveSessionAction extends AbstractAction {
+	public SaveSessionAction() {
+	    super(Globals.lang("Save session"), new ImageIcon(GUIGlobals.saveIconFile));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Save session"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    // Here we store the names of allcurrent filea. If
+	    // there is no current file, we remove any
+	    // previously stored file name.
+	    Vector filenames = new Vector();
+	    if (tabbedPane.getTabCount() > 0) {
+		for (int i=0; i<tabbedPane.getTabCount(); i++) {
+		    if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
+			tabbedPane.setSelectedIndex(i);
+			int answer = JOptionPane.showConfirmDialog
+			    (ths, Globals.lang
+			     ("This untitled database must be saved first to be "
+			      +"included in the saved session. Save now?"),
+			     Globals.lang("Save database"),
+			     JOptionPane.YES_NO_OPTION);
+			if (answer == JOptionPane.YES_OPTION) {
+			    // The user wants to save.
+			    basePanel().runCommand("save");
+			}
+		    }
+		    if (baseAt(i).file != null)
+			filenames.add(baseAt(i).file.getPath());
+		}
+	    }
+	    
+	    if (filenames.size() == 0) {
+		output(Globals.lang("Cowardly refusing to save empty session."));
+		return;
+	    }
+	    else {
+		String[] names = new String[filenames.size()];
+		for (int i=0; i<filenames.size(); i++)
+		    names[i] = (String)filenames.elementAt(i);		
+		prefs.putStringArray("savedSession", names);
+		output(Globals.lang("Saved session."));
+	    }
+	    
+	}
+    }
+
+    class LoadSessionAction extends AbstractAction {
+	public LoadSessionAction() {
+	    super(Globals.lang("Load session"), new ImageIcon(GUIGlobals.openIconFile));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Load session"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    if (prefs.get("savedSession") == null) {
+		output(Globals.lang("No saved session found."));
+		return;
+	    }
+	    HashSet currentFiles = new HashSet();
+	    if (tabbedPane.getTabCount() > 0)
+		for (int i=0; i<tabbedPane.getTabCount(); i++)
+		    currentFiles.add(baseAt(i).file.getPath());
+	    int i0 = tabbedPane.getTabCount();
+	    String[] names = prefs.getStringArray("savedSession");
+	    for (int i=0; i<names.length; i++) 
+		if (!currentFiles.contains(names[i])) {	       
+		    fileToOpen = new File(names[i]);
+		    if (fileToOpen.exists()) {
+			//Util.pr("Opening last edited file:"
+			//+fileToOpen.getName());
+			openDatabaseAction.openIt(i == 0);
+		    }
+		}
+	    output(Globals.lang("Files opened")+": "+(tabbedPane.getTabCount()-i0));
+	}
+    }
 
 }
 
