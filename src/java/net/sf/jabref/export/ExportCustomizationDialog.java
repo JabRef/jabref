@@ -42,7 +42,7 @@ public class ExportCustomizationDialog extends JDialog {
        ecd.show();
        if (ecd.okPressed()) {
          String[] newFormat = new String[] {ecd.name(), ecd.layoutFile(), ecd.extension() };
-         frame.customExports.addFormat(newFormat);
+         Globals.prefs.customExports.addFormat(newFormat);
          table.revalidate();
          table.repaint();
          frame.setUpCustomExportMenu();
@@ -54,7 +54,7 @@ public class ExportCustomizationDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         int row = table.getSelectedRow();
         if (row == -1) return;
-       String[] old = frame.customExports.getElementAt(row);
+       String[] old = Globals.prefs.customExports.getElementAt(row);
        CustomExportDialog ecd = new CustomExportDialog(frame, old[0], old[1], old[2]);
        ecd.show();
        if (ecd.okPressed()) {
@@ -72,7 +72,7 @@ public class ExportCustomizationDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         int row = table.getSelectedRow();
         if (row == -1) return;
-        frame.customExports.remove(row);
+        Globals.prefs.customExports.remove(row);
         table.revalidate();
         table.repaint();
         frame.setUpCustomExportMenu();
@@ -101,6 +101,8 @@ public class ExportCustomizationDialog extends JDialog {
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.setPreferredScrollableViewportSize(
       new Dimension(500, 150));
+    if (table.getRowCount() > 0)
+      table.setRowSelectionInterval(0, 0);
 
     // Key bindings:
     ActionMap am = main.getActionMap();
@@ -128,7 +130,7 @@ public class ExportCustomizationDialog extends JDialog {
     }
 
     public int getRowCount() {
-      return frame.customExports.size();
+      return Globals.prefs.customExports.size();
     }
 
     public String getColumnName(int col) {
@@ -143,7 +145,7 @@ public class ExportCustomizationDialog extends JDialog {
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-      String[] s = frame.customExports.getElementAt(rowIndex);
+      String[] s = Globals.prefs.customExports.getElementAt(rowIndex);
       return s[columnIndex];
     }
 

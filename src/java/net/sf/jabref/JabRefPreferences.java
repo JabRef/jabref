@@ -32,7 +32,7 @@ import javax.swing.*;
 
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
-
+import net.sf.jabref.export.CustomExportList;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.util.prefs.*;
@@ -52,6 +52,10 @@ public class JabRefPreferences {
 	defKeyBinds = new HashMap();
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
+
+    // Object containing custom export formats:
+    public CustomExportList customExports;
+
 
     public JabRefPreferences() {
 
@@ -142,6 +146,7 @@ public class JabRefPreferences {
 
 	restoreKeyBindings();
 
+        customExports = new CustomExportList(this);
 	//defaults.put("oooWarning", new Boolean(true));
 
     }

@@ -56,7 +56,7 @@ public class JabRefFrame
     extends JFrame {
 
   JabRefFrame ths = this;
-  JabRefPreferences prefs = new JabRefPreferences();
+  JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
 
   JTabbedPane tabbedPane = new JTabbedPane();
   JToolBar tlb = new JToolBar();
@@ -74,8 +74,6 @@ public class JabRefFrame
   LabelMaker labelMaker;
   File fileToOpen = null;
 
-  // Object containing custom export formats:
-  public CustomExportList customExports = new CustomExportList();
 
   // The help window.
   public HelpDialog helpDiag = new HelpDialog(this);
@@ -423,7 +421,7 @@ public JabRefPreferences prefs() {
       }
 
       fileHistory.storeHistory();
-      customExports.store();
+      prefs.customExports.store();
       BibtexEntryType.saveCustomEntryTypes(prefs);
 
       // Let the search interface store changes to prefs.
@@ -1769,8 +1767,8 @@ public JabRefPreferences prefs() {
    */
   public void setUpCustomExportMenu() {
     customExportMenu.removeAll();
-    for (int i=0; i<customExports.size(); i++) {
-      String[] s = customExports.getElementAt(i);
+    for (int i=0; i<prefs.customExports.size(); i++) {
+      String[] s = prefs.customExports.getElementAt(i);
       customExportMenu.add(new CustomExportAction(s[0], s[2], s[1]));
     }
 

@@ -3,6 +3,7 @@ package net.sf.jabref.export;
 import java.util.TreeSet;
 import java.util.Comparator;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
 * This class handles user defined custom export formats. They are initially read from Preferences,
@@ -14,9 +15,11 @@ import net.sf.jabref.Globals;
 public class CustomExportList extends TreeSet {
 
   private Object[] array;
+  JabRefPreferences prefs;
 
-  public CustomExportList() {
+  public CustomExportList(JabRefPreferences prefs_) {
     super(new ExportComparator());
+    prefs = prefs_;
     readPrefs();
     sort();
   }
@@ -26,7 +29,7 @@ public class CustomExportList extends TreeSet {
   private void readPrefs() {
     int i=0;
     String[] s = null;
-    while ((s = Globals.prefs.getStringArray("customExportFormat"+i)) != null) {
+    while ((s = prefs.getStringArray("customExportFormat"+i)) != null) {
       super.add(s);
       i++;
     }
@@ -51,10 +54,12 @@ public class CustomExportList extends TreeSet {
   }
 
   public void store() {
+
     if (array.length == 0)
       purge(0);
     else {
       for (int i=0; i<array.length; i++) {
+        //System.out.println(i+"..");
         Globals.prefs.putStringArray("customExportFormat"+i, (String[])(array[i]));
       }
       purge(array.length);

@@ -246,16 +246,47 @@ public class JabRef {
             } else if (data.length == 2) {
               // This signals that the latest import should be stored in the given format to the given file.
               ParserResult pr = (ParserResult) loaded.elementAt(loaded.size() - 1);
-              try {
-                System.out.println(Globals.lang("Exporting")+": "+data[0]);
-                FileActions.exportDatabase(pr.getDatabase(), data[1],
-                                           new File(data[0]), prefs);
+
+              // We first try to find a matching custom export format.
+              boolean foundCustom = false;
+              for (int i = 0; i < prefs.customExports.size(); i++) {
+                String[] format = prefs.customExports.getElementAt(i);
+                if (format[0].toLowerCase().equals(data[1])) {
+                  // Found the correct export format here.
+                  //System.out.println(format[0]+" "+format[1]+" "+format[2]);
+                  try {
+                    File lfFile = new File(format[1]);
+                    //System.out.println(lfFile.getName());
+                    String fname = (lfFile.getName().split("\\."))[0];
+                    FileActions.exportDatabase
+                        (pr.getDatabase(), lfFile.getParent()+File.separator,
+                         fname, new File(data[0]), prefs);
+                    System.out.println(Globals.lang("Exporting") + ": " + data[0]);
+                  }
+                  catch (Exception ex) {
+                    //ex.printStackTrace();
+                    System.err.println(Globals.lang("Could not export file") + " '" +
+                                       data[0] + "': " + ex.getMessage());
+                  }
+                  foundCustom = true;
+                  break;
+                }
               }
-              catch (NullPointerException ex2) {
-                System.err.println(Globals.lang("Unknown export format")+": "+data[1]);
-              }
-              catch (Exception ex) {
-                System.err.println(Globals.lang("Could not export file")+" '"+ data[0]+"': "+ex.getMessage());
+
+              if (!foundCustom) {
+                try {
+                  System.out.println(Globals.lang("Exporting") + ": " + data[0]);
+                  FileActions.exportDatabase(pr.getDatabase(), data[1],
+                                             new File(data[0]), prefs);
+                }
+                catch (NullPointerException ex2) {
+                  System.err.println(Globals.lang("Unknown export format") + ": " +
+                                     data[1]);
+                }
+                catch (Exception ex) {
+                  System.err.println(Globals.lang("Could not export file") + " '" +
+                                     data[0] + "': " + ex.getMessage());
+                }
               }
             }
           } else System.err.println(Globals.lang("The output option depends on a valid import option."));
