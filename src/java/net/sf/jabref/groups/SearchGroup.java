@@ -7,6 +7,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.search.*;
+import net.sf.jabref.util.QuotedStringTokenizer;
 import antlr.RecognitionException;
 import antlr.collections.AST;
 

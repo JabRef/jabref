@@ -5,6 +5,7 @@ import java.util.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
+import net.sf.jabref.util.QuotedStringTokenizer;
 
 /**
  * @author zieren
