@@ -76,7 +76,11 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x	- Added automatic stripping of \url{} when opening url.
+1.3.x	- Added command line options for importing, exporting, and for suppressing GUI
+	  (using RitOpt for parsing options).
+	- Added automatic stripping of \url{} when opening url.
+        - Improved docbook and bibtexml exports.
+        - Fixed focus bug which sometimes interfered with cut/copy/paste.
 1.3.1:	- Bugfix.
 1.3:	- Added entry preview.
 	- Added detection of duplicate entries.

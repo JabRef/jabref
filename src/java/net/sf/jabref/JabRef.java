@@ -25,6 +25,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 package net.sf.jabref;
+import gnu.dtools.ritopt.*;
 import java.io.File;
 import java.awt.Font;
 import java.awt.Color;
@@ -39,11 +40,65 @@ import net.sf.jabref.export.*;
 
 public class JabRef {
 
+/*  class StringArrayOption extends ArrayOption {
+    public
+    public void modify(String value) {
+    }
+    public void modify(String[] value) {
+    }
+    public Object[] getObjectArray() {
+      return null;
+    }
+    public String getTypeName() {
+      return "Strings";
+    }
+    public String getStringValue() {
+      return "";
+    }
+    public Object getObject() {
+      return null;
+    }
+  }*/
+
     public static void main(String[] args) {
+
+      // ----------------------------------------------------------------
+      // First instantiate preferences and set language.
+      // ----------------------------------------------------------------
+      JabRefPreferences prefs = new JabRefPreferences();
+      BibtexEntryType.loadCustomEntryTypes(prefs);
+      Globals.setLanguage(prefs.get("language"), "");
+
+
+      // ----------------------------------------------------------------
+      // Option processing using RitOpt
+      // ----------------------------------------------------------------
+      Options options = new Options("JabRef "); // Create an options repository.
+      options.setVersion(GUIGlobals.version);
+      StringOption importFile = new StringOption("");
+      importFile.setDescription("imopoepuoeu");//Globals.lang);
+      StringOption exportFile = new StringOption("");
+      NotifyOption helpO = new NotifyOption("");
+      NotifyOption disableGui = new NotifyOption("");
+      exportFile.setHelpDescriptionSize(80);
+
+      options.register("nogui", 'n', Globals.lang("No GUI. Only process command line options."), disableGui);
+      options.register("import", 'i', Globals.lang("Imports file: [bibtexml|endnote|isi|ris,]filename"), importFile);
+      options.register("output", 'o', Globals.lang("Outputs or exports file: [bibtexml|docbook|html|simplehtml,]filename"), exportFile);
+      options.register("help", 'h', Globals.lang("Displays help on command line options"),helpO);
+      options.setUseMenu(false);
+
+      options.process(args);
+
+      if (helpO.isInvoked()) {
+        System.out.println(options.getHelp());
+        System.exit(0);
+      }
+
 
       // First we quickly scan the command line parameters for any that signal that the GUI
       // should not be opened. This is used to decide whether we should show the splash screen or not.
-      boolean openGui = true;
+      /*boolean openGui = true;
       if (args.length > 0) for (int i=0; i<args.length; i++) {
         if (args[i].startsWith("-o"))
           openGui = false;
@@ -51,19 +106,19 @@ public class JabRef {
           System.out.println("Help info goes here.");
           System.exit(0);
         }
-      }
+      }*/
 
-      SplashScreen ss = null;
-      if (openGui) {
-        ss = new SplashScreen();
-        ss.show();
-      } else
-        Util.pr("JabRef "+GUIGlobals.version);
+  SplashScreen ss = null;
+  if (!disableGui.isInvoked()) {
+    ss = new SplashScreen();
+    ss.show();
+  }
+        //Util.pr("JabRef "+GUIGlobals.version);
 
-	//Font fnt = new Font("plain", Font.PLAIN, 12);
-	Object fnt = new UIDefaults.ProxyLazyValue
-	    ("javax.swing.plaf.FontUIResource", null,
-	     new Object[] {"Arial", new Integer(Font.PLAIN), new Integer(12)});
+        //Font fnt = new Font("plain", Font.PLAIN, 12);
+        Object fnt = new UIDefaults.ProxyLazyValue
+            ("javax.swing.plaf.FontUIResource", null,
+             new Object[] {"Arial", new Integer(Font.PLAIN), new Integer(12)});
 
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
@@ -118,21 +173,80 @@ public class JabRef {
           } catch (UnsupportedLookAndFeelException ex) {}
         }
 
-	JabRefPreferences prefs = new JabRefPreferences();
-        /*if (!prefs.get("columnNames").substring(0,1).equals(GUIGlobals.NUMBER_COL)) {
-          prefs.put("columnNames", GUIGlobals.NUMBER_COL+";"+prefs.get("columnNames"));
-          prefs.put("columnWidths", GUIGlobals.NUMBER_COL_LENGTH+";"+prefs.get("columnWidths"));
-        }*/
-	BibtexEntryType.loadCustomEntryTypes(prefs);
-	Globals.setLanguage(prefs.get("language"), "");
 	GUIGlobals.CURRENTFONT = new Font
 	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
 	     prefs.getInt("fontSize"));
 
-
-        // Basic command line interpretation...
+        // Vector to put imported/loaded database(s) in.
         Vector loaded = new Vector();
 
+        if (importFile.isInvoked()) {
+          String[] data = importFile.getStringValue().split(",");
+          if (data.length == 1) {
+            // Load a bibtex file:
+            System.out.println(Globals.lang("Opening")+": " + data[0]);
+            try {
+              File file = new File(data[0]);
+              ParserResult pr = ImportFormatReader.loadDatabase(file);
+              pr.setFile(file);
+              loaded.add(pr);
+            } catch (IOException ex) {
+              System.err.println(Globals.lang("Error opening file")+" '"+ data[0]+"': "+ex.getMessage());
+            }
+
+          } else if (data.length == 2) {
+            // Import a database in a certain format.
+            try {
+              System.out.println(Globals.lang("Importing")+": " + data[0]);
+              BibtexDatabase base = ImportFormatReader.importFile(data[1],
+                  data[0].replaceAll("~", System.getProperty("user.home")));
+              ParserResult pr = new ParserResult(base, new HashMap());
+              pr.setFile(new File(data[0]));
+              loaded.add(pr);
+            } catch (IOException ex) {
+              System.err.println(Globals.lang("Error opening file")+" '"+ data[0]+"': "+ex.getMessage());
+            }
+          }
+        }
+
+        if (exportFile.isInvoked()) {
+          if (loaded.size() == 1) {
+            String[] data = exportFile.getStringValue().split(",");
+            if (data.length == 1) {
+              // This signals that the latest import should be stored in BibTeX format to the given file.
+              if (loaded.size() > 0) {
+                ParserResult pr = (ParserResult)loaded.elementAt(loaded.size()-1);
+                try {
+                  System.out.println(Globals.lang("Saving")+": "+data[0]);
+                  FileActions.saveDatabase(pr.getDatabase(),
+                                           new MetaData(pr.getMetaData()),
+                                           new File(data[0]),
+                                           prefs, false, false);
+                } catch (SaveException ex) {
+                  System.err.println(Globals.lang("Could not save file")+" '"+ data[0]+"': "+ex.getMessage());
+                }
+              } else System.err.println(Globals.lang("The output option depends on a valid import option."));
+
+            } else if (data.length == 2) {
+              // This signals that the latest import should be stored in the given format to the given file.
+              ParserResult pr = (ParserResult) loaded.elementAt(loaded.size() - 1);
+              try {
+                System.out.println(Globals.lang("Exporting")+": "+data[0]);
+                FileActions.exportDatabase(pr.getDatabase(), data[1],
+                                           new File(data[0]), prefs);
+              }
+              catch (IOException ex) {
+                System.err.println(Globals.lang("Could not export file")+" '"+ data[0]+"': "+ex.getMessage());
+              }
+              catch (NullPointerException ex2) {
+                System.err.println(Globals.lang("Unknown export format")+": "+data[1]);
+              }
+            }
+          } else System.err.println(Globals.lang("The output option depends on a valid import option."));
+        }
+
+
+        /*
 	if(args.length > 0) for (int i=0; i<args.length; i++) {
           if (!args[i].startsWith("-")) {
             // Load a bibtex file:
@@ -156,7 +270,7 @@ public class JabRef {
             }else{
               System.err.println("Error" + args[i] + " is not a valid file or is not readable");
               //JOptionPane...
-            }*/
+            }/
           } else {
             // A command line switch.
             if (args[i].startsWith("-i") && (args[i].length() > 3) && (args.length > i+1)) {
@@ -184,7 +298,7 @@ public class JabRef {
                                            new File(args[i+1]),
                                            prefs, false, false);
                 } catch (SaveException ex) {
-                  System.err.println(Globals.lang("Could not save file")+" '"+ args[i+1]+"': "+ex.getMessage());
+                  System.err.println(Globals.lang("Could   not save file")+" '"+ args[i+1]+"': "+ex.getMessage());
                 }
               } else System.err.println(Globals.lang("The -o option must be preceded by an import option."));
               i++;
@@ -213,20 +327,20 @@ public class JabRef {
 
 	}else{//no arguments (this will be for later and other command line switches)
 	    // ignore..
-	}
+	}*/
 
+      //openGui = false;
+     if (!disableGui.isInvoked()) {
+       JabRefFrame jrf = new JabRefFrame();
 
-        if (openGui) {
-          JabRefFrame jrf = new JabRefFrame();
+       if (loaded.size() > 0) for (int i=0; i<loaded.size(); i++) {
+         ParserResult pr = (ParserResult)loaded.elementAt(i);
+         jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i==0));
+       }
+       ss.dispose();
+       jrf.setVisible(true);
+     } else System.exit(0);
 
-          if (loaded.size() > 0) for (int i=0; i<loaded.size(); i++) {
-            ParserResult pr = (ParserResult)loaded.elementAt(i);
-            jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i==0));
-          }
-          ss.dispose();
-          jrf.setVisible(true);
-        } else System.exit(0);
-
-      }
+   }
 
 }
