@@ -233,8 +233,9 @@ public class GUIGlobals {
       splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
       completeTagIcon = GUIGlobals.class.getResource(pre +"completeItem.png"),
       wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png"),
-      clearInputArea = GUIGlobals.class.getResource(pre +"filenew.png")
-      ;
+      clearInputArea = GUIGlobals.class.getResource(pre +"filenew.png"),
+      markIcon = GUIGlobals.class.getResource(pre +"mark.png"),
+      unmarkIcon = GUIGlobals.class.getResource(pre +"unmark.png");
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
     static {
@@ -284,7 +285,7 @@ public class GUIGlobals {
       gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
       gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
       activeTabbed = Color.black,  // active Database (JTabbedPane)
-      inActiveTabbed = Color.gray  // inactive Database
+      inActiveTabbed = Color.gray.darker()  // inactive Database
       ;
 
   public static String META_FLAG = "jabref-meta: ";

@@ -174,8 +174,12 @@ public class JabRefFrame
       paste = new EditAction("paste", GUIGlobals.pasteIconFile),
       cut = new EditAction("cut", GUIGlobals.cutIconFile),
       mark = new GeneralAction("markEntries", "Mark entries",
+			       "Mark entries",
+			       GUIGlobals.markIcon,
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
+				  "Unmark entries",
+				  GUIGlobals.unmarkIcon,
                                   prefs.getKey("Unmark entries")),
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
@@ -964,6 +968,11 @@ public JabRefPreferences prefs() {
     tlb.addAction(editStrings);
     tlb.addAction(makeKeyAction);
 
+
+    tlb.addSeparator();
+    tlb.addAction(mark);
+    tlb.addAction(unmark);
+
     tlb.addSeparator();
     searchToggle = new JToggleButton(normalSearch);
     searchToggle.setText(null);
@@ -986,8 +995,8 @@ public JabRefPreferences prefs() {
     tlb.addAction(openFile);
     tlb.addAction(openUrl);
 
-    tlb.addSeparator();
-    tlb.addAction(showPrefs);
+    //tlb.addSeparator();
+    //tlb.addAction(showPrefs);
     tlb.add(Box.createHorizontalGlue());
     //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
 

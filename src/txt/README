@@ -92,6 +92,8 @@ Change log:
 	- When a single entry is selected, right-click menu now shows a checkbox menu for group
 	  memberships instead of the regular "Add to" and "Remove from" menus.
 	- Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+	- Added dialog box for conveniently setting the fields of an entry from a
+	  plain text description.
 	- Added formatter "ResolvePDF" to create correct PDF/PS links in HTML export when
 	  relative file names are used.
 	- Added Abstract panel in entry editor.
@@ -100,6 +102,9 @@ Change log:
 	- Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
 	- Added check for spaces in custom entry type names.
 	- Added several new key pattern markers.
+	- Added toolbar buttons for Mark/Unmark to improve discoverability.
+	- Fixed bug that interfered with author name formatting.
+	- Fixed various bugs in import filters.
 	- Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.
 	- Fixed bug that made the next entry be opened instead of the current, when pressing 
 	  Enter in table.
