@@ -54,6 +54,7 @@ import java.util.regex.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.export.ExportCustomizationDialog;
 import net.sf.jabref.export.CustomExportList;
 import javax.swing.text.DefaultEditorKit;
@@ -392,9 +393,13 @@ public class JabRefFrame
   // is selected from the application menu.
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
-    PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
-    Util.placeDialog(pd, ths);
-    pd.show();
+      (new Thread() {
+	      public void run() {
+		  PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
+		  Util.placeDialog(pd, ths);
+		  pd.show();
+	      }
+	  }).start();
   }
 
 public JabRefPreferences prefs() {
@@ -1766,6 +1771,7 @@ class FetchCiteSeerAction
       Iterator it = bibentries.iterator();
       while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();
+
         try {
           entry.setId(Util.createId(entry.getType(), database));
           database.insertEntry(entry);
@@ -1799,23 +1805,52 @@ class FetchCiteSeerAction
     }
     else {
       // Import into current database.
+      boolean checkForDuplicates = true; 
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
       NamedCompound ce = new NamedCompound("Import database");
       Iterator it = bibentries.iterator();
-      while (it.hasNext()) {
+      mainLoop: while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();
-        try {
-          entry.setId(Util.createId(entry.getType(), database));
-          database.insertEntry(entry);
-          ce.addEdit(new UndoableInsertEntry
-                     (database, entry, basePanel));
-        }
-        catch (KeyCollisionException ex) {
-          //ignore
-          System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-        }
+	boolean dupli = false;
+	// Check for duplicates among the current entries:
+	if (checkForDuplicates) {
+	    loop: for (Iterator i2=database.getKeySet().iterator();
+		 i2.hasNext();) {
+		BibtexEntry existingEntry = database.getEntryById((String)i2.next());
+		if (Util.isDuplicate(entry, existingEntry, 
+				     Globals.duplicateThreshold)) {
+		    DuplicateResolverDialog drd = new DuplicateResolverDialog
+			(ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+		    drd.show();
+		    int res = drd.getSelected();
+		    if (res == drd.KEEP_LOWER)
+			dupli = true;
+		    else if (res == drd.KEEP_UPPER) {
+			database.removeEntry(existingEntry.getId());
+			ce.addEdit(new UndoableRemoveEntry
+				   (database, existingEntry, basePanel));
+		    } else if (res == drd.BREAK) {
+			break mainLoop;
+		    }
+		    break loop;
+		}
+	    }
+	}
+	
+	if (!dupli) {
+	    try {
+		entry.setId(Util.createId(entry.getType(), database));
+		database.insertEntry(entry);
+		ce.addEdit(new UndoableInsertEntry
+			   (database, entry, basePanel));
+	    }
+	    catch (KeyCollisionException ex) {
+		//ignore
+		System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+	    }
+	}
       }
       ce.end();
       basePanel.undoManager.addEdit(ce);

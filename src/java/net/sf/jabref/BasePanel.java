@@ -657,14 +657,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       Thread pushThread = new Thread() {
                         public void run() {
                           String winEdt = prefs.get("winEdtPath");
-                          winEdt = "osascript";
+                          //winEdt = "osascript";
                           try {
-                            //StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
-                            StringBuffer toSend = new StringBuffer
-                                ("-e 'tell application \"iTeXMac\" to insert \"\\\\cite{");
-                            if (tmp)
-                              toSend = new StringBuffer
-                                  ("-e 'tell application \"TeXShop\" to set the selection of the front document to \"\\\\cite{");
+                            StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
+                            //StringBuffer toSend = new StringBuffer
+                            //    ("-e 'tell application \"iTeXMac\" to insert \"\\\\cite{");
+                            //if (tmp)
+			    //  toSend = new StringBuffer
+			    //    ("-e 'tell application \"TeXShop\" to set the selection of the front document to \"\\\\cite{");
                             String citeKey = "", message = "";
                             boolean first = true;
                             for (int i = 0; i < numSelected; i++) {
@@ -690,13 +690,13 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                             if (first)
                               output(Globals.lang("Please define BibTeX key first"));
                             else {
-                              //toSend.append("}');]\"");
-                              if (!tmp)
-                                toSend.append("}\" in the text of the front document'");
-                              else
-                                toSend.append("}\"'");
+                              toSend.append("}');]\"");
+                              //if (!tmp)
+                              //  toSend.append("}\" in the text of the front document'");
+                              //else
+                              //  toSend.append("}\"'");
 
-                              tmp = !tmp;
+                              //tmp = !tmp;
 
                               System.out.println("Running command: "+winEdt + " " + toSend.toString());
                               Runtime.getRuntime().exec(winEdt + " " + toSend.toString());

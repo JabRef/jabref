@@ -431,34 +431,69 @@ public class JabRef {
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-      // Set antialiasing on everywhere. This only works in JRE >= 1.5. Or... it doesn't work, period.
+      // Set antialiasing on everywhere. This only works in JRE >= 1.5. 
+      // Or... it doesn't work, period.      
       //System.setProperty("swing.aatext", "true");
 
-      int fontSizes = prefs.getInt("menuFontSize");
 
-      //String osName = System.getProperty("os.name", "def");
-      if (Globals.ON_WIN) {
-        try {
-          //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-            ExtWindowsLookAndFeel lnf = new ExtWindowsLookAndFeel();
-            lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-            UIManager.setLookAndFeel(lnf);
-        }
-        catch (UnsupportedLookAndFeelException ex) {}
-      }
-      else if (!Globals.ON_MAC) {
-        try {
-          //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-          PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
-          lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-          MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
+      // If we are not on Mac, deal with font sizes and LookAndFeels:
+      if (!Globals.ON_MAC) {
+	  int fontSizes = prefs.getInt("menuFontSize");
+	  String defaultLookAndFeel;
+	  if (Globals.ON_WIN)
+	      defaultLookAndFeel = GUIGlobals.windowsDefaultLookAndFeel;
+	  else
+	      defaultLookAndFeel = GUIGlobals.linuxDefaultLookAndFeel;
 
+	  String lookAndFeel = null;
+	  if (!prefs.getBoolean("useDefaultLookAndFeel"))
+	      lookAndFeel = prefs.get("lookAndFeel");
+	  else
+	      lookAndFeel = defaultLookAndFeel;
+
+     	  LookAndFeel lnf = null;
+	  
+	  //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
+	  //PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
+	  Object objLnf = null;
+	  //Util.pr(lookAndFeel);
+	  try {
+	      //lnf2 = Class.forName("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel").newInstance();
+	      if (lookAndFeel != null)
+		  objLnf = Class.forName(lookAndFeel).newInstance();
+	      else
+		  objLnf = Class.forName(defaultLookAndFeel).newInstance();
+	  }  catch (Exception ex) {
+	      ex.printStackTrace();
+	      try {
+		  objLnf = Class.forName(defaultLookAndFeel).newInstance();
+	      } catch (Exception ex2) {}
+	  }
+	  
+	  if (objLnf != null)
+	      lnf = (LookAndFeel)objLnf;
+	  
+	  // Set font sizes if we are using a JGoodies look and feel.
+	  if ((lnf != null) && (lnf instanceof PlasticLookAndFeel)) {
+	      PlasticLookAndFeel plLnf = (PlasticLookAndFeel)lnf;
+	      plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+	      MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
+	  }
+	  
+	  if (lnf != null) {
+	      try {
+		  UIManager.setLookAndFeel(lnf);
+	      } catch (UnsupportedLookAndFeelException ex) {
+		  ex.printStackTrace();
+	      }
+	      
+	      
           //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
           //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
           //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
-          UIManager.setLookAndFeel(lnf);
-        }
-        catch (UnsupportedLookAndFeelException ex) {}
+
+	      
+	  }
       }
 
       // If the option is enabled, open the last edited databases, if any.

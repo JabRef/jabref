@@ -166,7 +166,7 @@ class GroupDialog extends JDialog {
 	con.weightx = 0;
 	con.gridwidth = 1;
 	con.insets = new Insets(3, 5, 3, 5);
-	con.anchor = GridBagConstraints.EAST;
+	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.NONE;
 	con.gridx = 0;
 	con.gridy = 0;

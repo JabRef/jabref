@@ -72,13 +72,19 @@ public class JabRefPreferences {
           defaults.put("pdfviewer","cmd.exe /c start /b");
           defaults.put("psviewer","cmd.exe /c start /b");
           defaults.put("htmlviewer","cmd.exe /c start /b");
+	  defaults.put("lookAndFeel", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
+
+
         }
 
 	else {
 	    defaults.put("pdfviewer","acroread");
 	    defaults.put("psviewer","gv");
 	    defaults.put("htmlviewer","mozilla");
+	    defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+
 	}
+	defaults.put("useDefaultLookAndFeel", new Boolean(true));
 	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
 	defaults.put("posX", new Integer(0));
 	defaults.put("posY", new Integer(0));

@@ -60,7 +60,12 @@ public class GUIGlobals {
       helpTitle = "JabRef help",
       TYPE_HEADER = "entrytype",
       NUMBER_COL = "#",
-      encPrefix = "Encoding: "; // Part of the signature in written bib files.
+      encPrefix = "Encoding: ", // Part of the signature in written bib files.
+      linuxDefaultLookAndFeel = "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
+      //"com.shfarr.ui.plaf.fh.FhLookAndFeel",
+//"net.sourceforge.mlf.metouia.MetouiaLookAndFeel",
+//"org.compiere.plaf.CompiereLookAndFeel",
+      windowsDefaultLookAndFeel = "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel";
 
   public static Font CURRENTFONT,
       typeNameFont,
@@ -289,6 +294,7 @@ public class GUIGlobals {
       inActiveTabbed = Color.gray.darker(),  // inactive Database
       infoField = new Color(254, 255, 225) // color for an info field
       ;
+
 
   public static String META_FLAG = "jabref-meta: ";
   public static String META_FLAG_OLD = "bibkeeper-meta: ";

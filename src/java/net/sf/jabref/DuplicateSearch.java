@@ -101,7 +101,8 @@ public void run() {
            ( panel.database.getEntryById( be[1].getId() ) != null ) )
       {
 
-        drd = new DuplicateResolverDialog( panel.frame, be[0], be[1] ) ;
+        drd = new DuplicateResolverDialog( panel.frame, be[0], be[1],
+					   DuplicateResolverDialog.DUPLICATE_SEARCH) ;
         drd.show() ;
 
         duplicateCounter++ ;
