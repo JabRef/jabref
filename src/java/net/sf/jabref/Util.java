@@ -514,17 +514,18 @@ public class Util {
 	 */
 	public static void setDefaultOwner( ArrayList bibs, String defaultOwner )
 	{
+
 		// Iterate through all entries
 		for (int i = 0; i < bibs.size(); i++)
 		{
 			// Get current entry
 			BibtexEntry curEntry = (BibtexEntry)bibs.get(i);
 			// No or empty owner field?
-			if (curEntry.getField("owner") == null ||
-				((String)curEntry.getField("owner")).length() == 0)
+			if (curEntry.getField(Globals.OWNER) == null ||
+				((String)curEntry.getField(Globals.OWNER)).length() == 0)
 			{
 				// Set owner field to default value
-				curEntry.setField("owner", defaultOwner);
+				curEntry.setField(Globals.OWNER, defaultOwner);
 			}
 		}
 	}

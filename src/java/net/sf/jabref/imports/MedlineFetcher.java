@@ -157,7 +157,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
              m2 = p2.matcher( idList );
          if ( m1.matches() ) {
            fetchById();
-         }
+         }/*
          else if ( m2.matches() ) {
 
            // Fetch by author.
@@ -213,9 +213,11 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    } else
 		panel.output(Globals.lang("No Medline entries found."));
 
-	} else {
-	    JOptionPane.showMessageDialog(panel.frame(), Globals.lang("Please enter a semicolon or comma separated list of either Medline IDs (numbers), "+
-                "or author names to search for."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
+	}*/ else {
+                JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),
+                                              Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
+	    //JOptionPane.showMessageDialog(panel.frame(), Globals.lang("Please enter a semicolon or comma separated list of either Medline IDs (numbers), "+
+            //    "or author names to search for."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
 	}
 
     }

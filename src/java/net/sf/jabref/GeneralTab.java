@@ -12,7 +12,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
-		defSource, editSource,defSort, ctrlClick, disableOnMultiple;
+		defSource, editSource,defSort, ctrlClick, disableOnMultiple,
+                useOwner;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -46,6 +47,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("ctrlClick"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"),
                                   _prefs.getBoolean("disableOnMultipleSelection"));
+useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
+                         _prefs.getBoolean("useOwner"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
 	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
@@ -88,10 +91,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	//general.add(defSort);
 	// Default owner
 	con.gridwidth = 1;
-	JLabel lab = new JLabel(Globals.lang("Default owner")+":");
-        lab.setHorizontalAlignment(SwingConstants.LEFT);
-	gbl.setConstraints(lab, con);
-        general.add(lab);
+	//JLabel lab = new JLabel(Globals.lang("Default owner")+":");
+        //lab.setHorizontalAlignment(SwingConstants.LEFT);
+	gbl.setConstraints(useOwner, con);
+        general.add(useOwner);
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(defOwnerField, con);
         general.add(defOwnerField);
@@ -99,7 +102,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
         // Grouping field
         con.gridwidth = 1;
-        lab = new JLabel(Globals.lang("Default grouping field")+":");
+        JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
         lab.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         general.add(lab);
@@ -249,6 +252,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
         _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
+        _prefs.putBoolean("useOwner", useOwner.isSelected());
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());

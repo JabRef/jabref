@@ -295,7 +295,7 @@ public class JabRefFrame
          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     jp.setEditable(false);
     try {
-      jp.setPage(new URL("help/About.html"));//GUIGlobals.aboutPage);
+      jp.setPage(GUIGlobals.class.getResource("/help/About.html"));//GUIGlobals.aboutPage);
       // We need a hyperlink listener to be able to switch to the license
       // terms and back.
       jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
@@ -315,6 +315,7 @@ public class JabRefFrame
       about.setVisible(true);
     }
     catch (IOException ex) {
+      ex.printStackTrace();
       JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'",
                                     "Error", JOptionPane.ERROR_MESSAGE);
     }
@@ -831,7 +832,7 @@ public class JabRefFrame
      }
      });*/
 
-    options.add(selectKeys);
+    //options.add(selectKeys);
     mb.add(options);
 
     helpMenu.add(help);
@@ -1362,6 +1363,10 @@ public class JabRefFrame
 
   private void addBibEntries(ArrayList bibentries, String filename,
                              boolean intoNew) {
+    // Set owner field:
+    if (prefs.getBoolean("useOwner"))
+      Util.setDefaultOwner( bibentries, prefs.get("defaultOwner"));
+
     // check if bibentries is null
     if (bibentries == null) {
       output(Globals.lang("Ne entries imported."));
@@ -1448,7 +1453,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readEndnote(tempFilename); //MedlineParser.readMedline(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1461,7 +1466,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1475,7 +1480,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readISI(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1491,7 +1496,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1538,7 +1543,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1553,7 +1558,7 @@ public class JabRefFrame
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readReferenceManager10(
               tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1571,7 +1576,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readScifinder(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1585,7 +1590,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readSixpack(tempFilename);
-          Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1601,7 +1606,7 @@ public class JabRefFrame
         if( tempFilename != null )//filenm != null)
         {
           ArrayList bibs=ImportFormatReader.readBiblioscapeTagFile(tempFilename);
-          Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+
           addBibEntries( bibs, tempFilename, intoNew);
         }
       }

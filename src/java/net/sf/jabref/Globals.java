@@ -95,6 +95,7 @@ public class Globals {
 	SEARCH = "__search",
 	GROUPSEARCH = "__groupsearch",
         MARKED = "__markedentry",
+        OWNER = "owner",
 	// Using this when I have no database open when I read
 	// non bibtex file formats (used byte ImportFormatReader.java
 		DEFAULT_BIBTEXENTRY_ID="__ID";
