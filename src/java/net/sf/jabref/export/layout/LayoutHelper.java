@@ -78,7 +78,7 @@ public class LayoutHelper
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    public Layout getLayoutFromText() throws IOException
+    public Layout getLayoutFromText(String classPrefix) throws Exception
     {
         parse();
 
@@ -95,7 +95,7 @@ public class LayoutHelper
             }
         }
 
-        Layout layout = new Layout(parsedEntries);
+        Layout layout = new Layout(parsedEntries, classPrefix);
 
         return layout;
     }

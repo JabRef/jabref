@@ -46,7 +46,8 @@ class SearchManager2 extends SidePaneComponent
 	new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings")),
-	escape = new JButton(Globals.lang("Clear search"));
+	escape = new JButton(Globals.lang("Clear search")),
+        help = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
     private JabRefPreferences prefs;
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
@@ -136,6 +137,7 @@ class SearchManager2 extends SidePaneComponent
 		}
 	    });
 
+            help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, "Help"));
 	types.add(increment);
 	types.add(select);
 	types.add(reorder);
@@ -163,12 +165,15 @@ class SearchManager2 extends SidePaneComponent
         add(select);
 	gbl.setConstraints(reorder, con);
         add(reorder);
-	//con.gridwidth = 1;
+	con.gridwidth = 1;
         gbl.setConstraints(openset,con);
         add(openset);
 	//JPanel empt = new JPanel();
 	//con.insets = new Insets(0, 0, 2, 0);
-	//con.gridwidth = GridBagConstraints.REMAINDER;
+	con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(help,con);
+        add(help);
+        con.gridwidth = 2;
 	gbl.setConstraints(escape, con);
         add(escape);
 

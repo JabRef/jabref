@@ -1,12 +1,12 @@
 <font face="arial">
 <b><i>\bibtextype</i><a name="\bibtexkey"> (\bibtexkey)</a></b>
 <br>
-\begin{author} \format[net.sf.jabref.export.layout.format.FixAuthorLastFirst]{\author} \end{author}<BR>
-\begin{title} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title} \end{title}<BR>
-\begin{journal} <em>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\journal} </em>\end{journal}
+\begin{author} \format[FixAuthorLastFirst]{\author} \end{author}<BR>
+\begin{title} \format[ConvertSpecialCharactersForHTML]{\title} \end{title}<BR>
+\begin{journal} <em>\format[ConvertSpecialCharactersForHTML]{\journal} </em>\end{journal}
 \begin{year}, <b>\year </b>\end{year}
 \begin{volume}, <i>\volume </i>\end{volume}
-\begin{pages}, \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\pages} \end{pages}
+\begin{pages}, \format[ConvertSpecialCharactersForHTML]{\pages} \end{pages}
 </dd>
 <p></p>
 </font>

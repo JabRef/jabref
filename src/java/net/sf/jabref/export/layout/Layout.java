@@ -46,7 +46,7 @@ public class Layout
 
     //~ Constructors ///////////////////////////////////////////////////////////
 
-    public Layout(Vector parsedEntries)
+    public Layout(Vector parsedEntries, String classPrefix)  throws Exception
     {
         StringInt si;
         Vector tmpEntries = new Vector(parsedEntries.size());
@@ -77,7 +77,7 @@ public class Layout
                 if (blockStart.equals(si.s))
                 {
                     blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries);
+                    le = new LayoutEntry(blockEntries, classPrefix);
                     tmpEntries.add(le);
                     blockEntries = null;
                 }
@@ -96,7 +96,7 @@ public class Layout
             //			}
             if (blockEntries == null)
             {
-                tmpEntries.add(new LayoutEntry(si));
+                tmpEntries.add(new LayoutEntry(si, classPrefix));
             }
             else
             {

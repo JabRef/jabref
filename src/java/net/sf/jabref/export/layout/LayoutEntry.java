@@ -32,6 +32,7 @@ import wsi.ra.types.StringInt;
 import java.util.Vector;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 
 /**
@@ -48,12 +49,14 @@ public class LayoutEntry
     private String text;
     private LayoutEntry[] layoutEntries;
     private int type;
+    private String classPrefix;
 
     //~ Constructors ///////////////////////////////////////////////////////////
 
-    public LayoutEntry(StringInt si)
+    public LayoutEntry(StringInt si, String classPrefix_) throws Exception
     {
         type = si.i;
+        classPrefix = classPrefix_;
 
         if (si.i == LayoutHelper.IS_LAYOUT_TEXT)
         {
@@ -82,14 +85,14 @@ public class LayoutEntry
             {
                 text = ((String) v.get(0)).trim();
 
-                try
-                {
+                //try
+                //{
                     option = getOptionalLayout((String) v.get(1));
-                }
-                 catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                //}
+                // catch (Exception e)
+                //{
+                //    e.printStackTrace();
+                //}
             }
         }
 
@@ -98,8 +101,9 @@ public class LayoutEntry
         //		}
     }
 
-    public LayoutEntry(Vector parsedEntries)
+    public LayoutEntry(Vector parsedEntries, String classPrefix_) throws Exception
     {
+      classPrefix = classPrefix_;
         String blockStart = null;
         String blockEnd = null;
         StringInt si;
@@ -140,7 +144,7 @@ public class LayoutEntry
                 if (blockStart.equals(si.s))
                 {
                     blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries);
+                    le = new LayoutEntry(blockEntries, classPrefix);
                     tmpEntries.add(le);
                     blockEntries = null;
                 }
@@ -160,7 +164,7 @@ public class LayoutEntry
             if (blockEntries == null)
             {
                 //System.out.println("BLOCK ADD: "+si.s+"="+si.i);
-                tmpEntries.add(new LayoutEntry(si));
+                tmpEntries.add(new LayoutEntry(si, classPrefix));
             }
             else
             {
@@ -321,12 +325,17 @@ public class LayoutEntry
 
         try
         {
+          try {
+            formatter = (LayoutFormatter) Class.forName(classPrefix + formatterName)
+                .newInstance();
+          } catch (Throwable ex2) {
             formatter = (LayoutFormatter) Class.forName(formatterName)
-                                               .newInstance();
+                .newInstance();
+          }
         }
          catch (ClassNotFoundException ex)
         {
-            throw new Exception(formatterName + " not found.");
+            throw new Exception(Globals.lang("Formatter not found")+": "+formatterName);
         }
          catch (InstantiationException ex)
         {
@@ -339,7 +348,7 @@ public class LayoutEntry
 
         if (formatter == null)
         {
-            throw new Exception(formatterName + " not found.");
+            throw new Exception(Globals.lang("Formatter not found")+": "+formatterName);
         }
 
         return formatter;

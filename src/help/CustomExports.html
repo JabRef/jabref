@@ -24,6 +24,8 @@ export filter).
 
 <H2>Creating the export filter</H2>
 
+<H3>Layout files</H3>
+
 Let us assume that we are creating an HTML export filter.
 
 <P>While the export filter only needs to consist of a single <b>.layout</b> file, which in this case
@@ -47,7 +49,7 @@ named by inserting <b>.begin</b> and <b>.end</b>, respectively.
 <code>&lt;/BODY&gt;<br>
   &lt;/HTML&gt;</code>
 
-<P>The file <i>html.layout</i> provides the <i>default</i> template for exporting entries. If
+<P>The file <i>html.layout</i> provides the <i>default</i> template for exporting one single entry. If
 you want to use different templates for different entry types, you can do this by adding entry-specific
 <b>.layout</b> files. These must also reside in the same directory as the main layout file, and
 are named by inserting <b>.entrytype</b> into the name of the main layout file. The entry type name
@@ -56,5 +58,83 @@ would go into the file <i>html.book.layout</i>. For a PhD thesis we would add th
 <i>html.phdthesis.layout</i>, and so on. These files are similar to the default layout file, except that
 they will only be used for entries of the matching type. Note that the default file can easily be made
 general enough to cover most entry types in most export filters.
+
+<H3>The layout file format</H3>
+
+Layout files are created using a simple markup format where commands are identified by a preceding
+backslash. All text not identified as part of a command will be copied verbatim to the output file.
+
+<H3>Field commands</H3>
+
+<p>An arbitrary word preceded by a backslash, e.g. <code>\author</code>, <code>\editor</code>,
+<code>\title</code> or <code>\year</code>, will be interpreted as a reference to the corresponding field,
+which will be copied directly to the output.
+
+<H3>Field formatters</H3>
+
+<p>Often there will be a need for some preprocessing of the field contents before output. This is
+  done using a <i>field formatter</i> - a java class containing a single method that manipulates the
+  contents of a field.
+<p>A formatter is used by inserting the <code>\format</code> command followed by the formatter name in
+  square braces, and the field command in curly braces, e.g.:
+
+  <p><code>\format[ToLowerCase]{\author}</code>
+
+<p>JabRef provides the following set of formatters, some of which depend on the others:
+<ul>
+<li><code>ConvertSpecialCharactersForHTML</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
+  with their HTML representations.
+<li><code>ConvertSpecialCharactersForXML</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
+  with their XML representations.
+<li><code>CreateDocBookAuthors</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
+  the author field in DocBook style.
+<li><code>FixAuthorForHTML</code> : calls <code>ConvertSpecialCharactersForHTML</code>, and formats
+  author/editor fields with the first names first.
+<li><code>FixAuthorForXML</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
+  author/editor fields with the first names first.
+<li><code>FixAuthorLastFirstForHTML</code> : calls <code>ConvertSpecialCharactersForHTML</code>, and formats
+  author/editor fields with the last names first.
+<li><code>FixAuthorLastFirstForXML</code> : calls <code>ConvertSpecialCharactersForXML</code>, and formats
+  author/editor fields with the last names first.
+<li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
+<li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".
+<li><code>ToLowerCase</code> : turns all characters into lower case.
+</ul>
+
+<p>Note that you can only call one formatter per field - i.e. nested formatters are not allowed. If none
+  of the available formatters can do what you want to achieve, you can add your own by implementing
+  the <code>net.sf.jabref.export.layout.LayoutFormatter</code> interface. If you insert your class
+  into the <code>net.sf.jabref.export.layout.format</code> package, you can call the formatter by its
+  class name only, like with the standard formatters. Otherwise, you must call the formatter by its fully
+  qualified name (including package name). In any case, the formatter must be in your classpath when running
+  JabRef.
+
+<H3>Conditional output</H3>
+
+Some static output might only make sense if a specific field is set. For instance, say we want to follow
+the editor names with the text <code>(Ed.)</code>. This can be done with the following text:
+
+<p><code>\format[FixAuthorForHTML]{\editor} (Ed.)</code>
+
+<p>However, if the <code>editor</code> field has not been set - it might not even make sense for the entry
+  being exported - the <code>(Ed.)</code> would be left hanging. This can be prevented by instead using the
+<code>\begin</code> and <code>\end</code> commands:
+
+<p><code>\begin{editor}<br>\format[FixAuthorForHTML]{\editor} (Ed.)
+<br>\end{editor}</code>
+
+<p>The <code>\begin</code> and <code>\end</code> commands make sure the text in between is printed if and
+only if the field referred in the curly braces is defined for the ently being exported.
+
+<p><b>Note:</b> Use of the <code>\begin</code> and <code>\end</code> commands is a key to creating
+  layout files that work well with a variety of entry types.
+
+<H2>Sharing your work</H2>
+
+With external layout files, it's fairly simple to share custom export formats between users.
+If you write an export filter for a format not supported by JabRef, or an improvement over an
+existing one, we encourage you to post your work on our SourceForge.net page. The same goes for
+formatter classes that you write. We'd be happy to distribute a collection of submitted
+layout files, or to add to the selection of standard export filters and formatters.
 
 </HTML>

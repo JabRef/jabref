@@ -321,12 +321,14 @@ public class FileActions
             ps=new OutputStreamWriter(new FileOutputStream(outFile), "iso-8859-1");
 
 	    // Print header
-            reader = getReader(prefix+lfName+".begin.layout");
-            while ((c = reader.read()) != -1) {
-              ps.write((char)c);
-            }
-            reader.close();
-
+            try {
+              reader = getReader(prefix+lfName+".begin.layout");
+              while ((c = reader.read()) != -1) {
+                ps.write((char)c);
+              }
+              reader.close();
+            } catch (IOException ex) {}
+            // If an exception was cast, export filter doesn't have a begin file.
 
             // Write database entrie; entries will be sorted as they
             // appear on the screen.
@@ -344,7 +346,7 @@ public class FileActions
             //Util.pr(prefix+lfName+".layout");
 
 	    LayoutHelper layoutHelper = new LayoutHelper(reader);
-	    Layout defLayout = layoutHelper.getLayoutFromText();
+	    Layout defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
             reader.close();
 	    HashMap layouts = new HashMap();
 	    Layout layout;
@@ -365,7 +367,7 @@ public class FileActions
                   // We try to get a type-specific layout for this entry.
                   reader = getReader(prefix+lfName+"."+type+".layout");
                   layoutHelper = new LayoutHelper(reader);
-                  layout = layoutHelper.getLayoutFromText();
+                  layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
                   layouts.put(type, layout);
                   reader.close();
                 } catch (IOException ex) {
@@ -381,11 +383,14 @@ public class FileActions
           }
 
           // Print footer
-          reader = getReader(prefix+lfName+".end.layout");
-          while ((c = reader.read()) != -1) {
-            ps.write((char)c);
-          }
-          reader.close();
+          try {
+            reader = getReader(prefix+lfName+".end.layout");
+            while ((c = reader.read()) != -1) {
+              ps.write((char)c);
+            }
+            reader.close();
+          } catch (IOException ex) {}
+          // If an exception was cast, export filter doesn't have a end file.
 
           ps.flush();
           ps.close();

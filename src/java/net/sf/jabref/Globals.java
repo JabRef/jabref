@@ -52,7 +52,8 @@ public class Globals {
       LAYOUT_PREFIX = "/resource/layout/",
       MAC = "Mac OS X",
       DOI_LOOKUP_PREFIX = "http://dx.doi.org/",
-      NONE = "_non__";
+      NONE = "_non__",
+      FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
   public static float duplicateThreshold = 0.75f;
 
   public static GlobalFocusListener focusListener = new GlobalFocusListener();

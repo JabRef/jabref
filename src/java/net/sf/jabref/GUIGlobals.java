@@ -181,6 +181,7 @@ public class GUIGlobals {
       ownerHelp = "OwnerHelp.html",
       pdfHelp = "ExternalFiles.html",
       exportCustomizationHelp = "CustomExports.html",
+//      searchHelp = "SearchHelp.html",
       aboutPage = "About.html";
 
 

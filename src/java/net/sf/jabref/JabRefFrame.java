@@ -1873,8 +1873,8 @@ public JabRefPreferences prefs() {
             output(Globals.lang("Exported database to file") + " '" +
                    oFile.getPath() + "'.");
           }
-          catch (IOException ex) {
-            ex.printStackTrace();
+          catch (Exception ex) {
+            //ex.printStackTrace();
             JOptionPane.showMessageDialog(ths, ex.getMessage(), Globals.lang("Error"),
                                           JOptionPane.ERROR_MESSAGE);
           }

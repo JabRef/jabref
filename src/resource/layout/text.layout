@@ -1,6 +1,6 @@
 @\bibtextype{\bibtexkey,
 \begin{author}  author = {\author},\end{author}
-\begin{title}  title  = {\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}},\end{title}
+\begin{title}  title  = {\format[RemoveBrackets]{\title}},\end{title}
 \begin{journal}  journal = {\journal},\end{journal}
   year   = {\year},
   number = {\number},

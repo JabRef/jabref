@@ -114,7 +114,7 @@ public class LayoutTest
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader reader = new InputStreamReader(fis);
             LayoutHelper layoutHelper = new LayoutHelper(reader);
-            Layout layout = layoutHelper.getLayoutFromText();
+            Layout layout = layoutHelper.getLayoutFromText(net.sf.jabref.Globals.FORMATTER_PACKAGE);
 
             Object[] keys = bibtex.getKeySet().toArray();
             String key;

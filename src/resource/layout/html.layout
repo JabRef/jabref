@@ -28,19 +28,19 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title}
+			\format[ConvertSpecialCharactersForHTML]{\title}
 		</div>
 		\end{title}
 
 		\begin{author}
 		<div class="bibtex_author">
-			\format[net.sf.jabref.export.layout.format.FixAuthorForHTML]{\author}
+			\format[FixAuthorForHTML]{\author}
 		</div>
 		\end{author}
 
 		\begin{journal}
 		<div class="bibtex_journal">
-			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\journal}
+			\format[ConvertSpecialCharactersForHTML]{\journal}
 		</div>,
 		\end{journal}
 

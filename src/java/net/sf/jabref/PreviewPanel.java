@@ -36,8 +36,8 @@ public class PreviewPanel extends JEditorPane {
       String entryType = entry.getType().getName().toLowerCase();
       if (layouts.get(entryType) != null) {
 	  layout = (Layout)layouts.get(entryType);
-	  return; 
-      }   
+	  return;
+      }
 
       LayoutHelper layoutHelper = null;
       URL reso = JabRefFrame.class.getResource
@@ -51,7 +51,7 @@ public class PreviewPanel extends JEditorPane {
       }
       catch (IOException ex) {
       }
-      layout = layoutHelper.getLayoutFromText();
+      layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
 
       layouts.put(entryType, layout);
 
