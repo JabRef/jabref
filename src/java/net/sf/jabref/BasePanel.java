@@ -459,6 +459,45 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	else ((BaseAction)actions.get(command)).action();
     }
 
+    /**
+     * This method is called from JabRefFrame when the user wants to
+     * create a new entry. If the argument is null, the user is
+     * prompted for an entry type.
+     */
+    public void newEntry(BibtexEntryType type) {
+	if (type == null) {
+	    // Find out what type is wanted.
+	    EntryTypeDialog etd = new EntryTypeDialog(frame);	       
+	    // We want to center the dialog, to make it look nicer.
+	    Util.placeDialog(etd, frame);
+	    etd.setVisible(true);
+	    type = etd.getChoice();
+	}
+	if (type != null) { // Only if the dialog was not cancelled.
+	    String id = Util.createId(type, database);
+	    BibtexEntry be = new BibtexEntry(id, type);
+	    try {
+		database.insertEntry(be);
+		
+		// Create an UndoableInsertEntry object.
+		undoManager.addEdit(new UndoableInsertEntry(database, be, 
+							    entryTypeForms));							       
+		output("Added new "+type.getName().toLowerCase()+" entry.");
+		refreshTable();
+		markBaseChanged(); // The database just changed.
+		if (prefs.getBoolean("autoOpenForm")) {
+		    EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
+		    Util.placeDialog(etf, frame);
+		    etf.setVisible(true);
+		    entryTypeForms.put(id, etf);
+		}
+	    } catch (KeyCollisionException ex) {
+		Util.pr(ex.getMessage());
+	    }
+	}
+	
+    }
+
     public void setupMainPanel() {
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, frame.prefs);

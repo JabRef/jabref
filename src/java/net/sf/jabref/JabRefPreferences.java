@@ -156,14 +156,13 @@ public class JabRefPreferences {
      */
     public String[] getStringArray(String key) {
 	String names = get(key);
-	Util.pr(key+"\n"+names);
+	//Util.pr(key+"\n"+names);
 	StringReader rd = new StringReader(names);
 	Vector arr = new Vector();
 	String rs;
 	try {
 	    while ((rs = getNextUnit(rd)) != null) {
 		arr.add(rs);
-		Util.pr("::"+rs);
 	    }
 	} catch (IOException ex) {}
 	String[] res = new String[arr.size()];

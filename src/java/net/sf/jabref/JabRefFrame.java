@@ -96,9 +96,33 @@ public class JabRefFrame extends JFrame {
 	editStrings = new GeneralAction("editStrings", "Edit strings", 
 					"Edit strings",
 					GUIGlobals.stringsIconFile),
-	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups inteface", 
-					 "Toggle groups inteface",
+	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface", 
+					 "Toggle groups interface",
 					 GUIGlobals.groupsIconFile);	
+    // The action for adding a new entry of unspecified type.
+    NewEntryAction newEntryAction = new NewEntryAction(GUIGlobals.newEntryKeyStroke);
+    NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
+	new NewEntryAction(BibtexEntryType.ARTICLE,
+			   GUIGlobals.newArticleKeyStroke),
+	new NewEntryAction(BibtexEntryType.BOOK,
+			   GUIGlobals.newBookKeyStroke),
+	new NewEntryAction(BibtexEntryType.PHDTHESIS, 
+			   GUIGlobals.newPhdthesisKeyStroke),
+	new NewEntryAction(BibtexEntryType.INBOOK, 
+			   GUIGlobals.newInBookKeyStroke),
+	new NewEntryAction(BibtexEntryType.MASTERSTHESIS, 
+			   GUIGlobals.newMasterKeyStroke),
+	new NewEntryAction(BibtexEntryType.PROCEEDINGS, 
+			   GUIGlobals.newProcKeyStroke),
+	new NewEntryAction(BibtexEntryType.INPROCEEDINGS),
+	new NewEntryAction(BibtexEntryType.INCOLLECTION),
+	new NewEntryAction(BibtexEntryType.BOOKLET), 
+	new NewEntryAction(BibtexEntryType.MANUAL),
+	new NewEntryAction(BibtexEntryType.TECHREPORT),
+	new NewEntryAction(BibtexEntryType.UNPUBLISHED, 
+			   GUIGlobals.newUnpublKeyStroke),
+	new NewEntryAction(BibtexEntryType.MISC) 
+    };
 
     public JabRefFrame() {
 	//Globals.setLanguage("no", "");
@@ -248,69 +272,39 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
-    /** 
-     * The action concerned with closing the window.
-     */
-    class CloseAction extends AbstractAction {
-	public CloseAction() {
-	    super(Globals.lang("Quit"));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
+    class NewEntryAction extends AbstractAction {
+
+	BibtexEntryType type = null; // The type of item to create.
+	KeyStroke keyStroke = null;  // Used for the specific instances.
+
+	public NewEntryAction(KeyStroke key) {
+	    // This action leads to a dialog asking for entry type.
+	    super(Globals.lang("New entry"),  
+		  new ImageIcon(GUIGlobals.addIconFile));
+	    putValue(ACCELERATOR_KEY, key);
+	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX entry"));
 	}    
-	
+
+	public NewEntryAction(BibtexEntryType type_) { 
+	    // This action leads to the creation of a specific entry.
+	    super(type_.getName());
+	    type = type_;
+	}    
+
+	public NewEntryAction(BibtexEntryType type_, KeyStroke key) { 
+	    // This action leads to the creation of a specific entry.
+	    super(type_.getName());
+	    putValue(ACCELERATOR_KEY, key);
+	    type = type_;
+	}    
+
 	public void actionPerformed(ActionEvent e) {
-	    // Ask here if the user really wants to close, if the base
-	    // has not been saved since last save.
-	    boolean close = true;	    
-	    Vector filenames = new Vector();
-	    if (tabbedPane.getTabCount() > 0) {
-		for (int i=0; i<tabbedPane.getTabCount(); i++) {
-		    if (baseAt(i).baseChanged) {
-			tabbedPane.setSelectedIndex(i);
-			int answer = JOptionPane.showConfirmDialog
-			    (ths, Globals.lang
-			     ("Database has changed. Do you "
-			      +"want to save before closing?"),
-			     Globals.lang("Save before closing"),
-			     JOptionPane.YES_NO_CANCEL_OPTION);
-			
-			if ((answer == JOptionPane.CANCEL_OPTION) || 
-			    (answer == JOptionPane.CLOSED_OPTION))
-			    close = false; // The user has cancelled.
-			if (answer == JOptionPane.YES_OPTION) {
-			    // The user wants to save.
-			    basePanel().runCommand("save");
-			}
-		    }
-		    if (baseAt(i).file != null)
-			filenames.add(baseAt(i).file.getPath());
-		}
-	    }
-	    if (close) {
-		dispose();
-
-		
-
-		prefs.putInt("posX", ths.getLocation().x);
-		prefs.putInt("posY", ths.getLocation().y);
-		prefs.putInt("sizeX", ths.getSize().width);
-		prefs.putInt("sizeY", ths.getSize().height);
-		
-		if (prefs.getBoolean("openLastEdited")) {
-		  // Here we store the names of allcurrent filea. If
-		  // there is no current file, we remove any
-		  // previously stored file name.
-		    if (filenames.size() == 0)
-			prefs.remove("lastEdited");
-		    else {
-			String[] names = new String[filenames.size()];
-			for (int i=0; i<filenames.size(); i++)
-			    names[i] = (String)filenames.elementAt(i);
-			    
-			prefs.putStringArray("lastEdited", names);
-		    }
-		}
-		System.exit(0); // End program.
-	    }
+	    if (tabbedPane.getTabCount() > 0)
+		((BasePanel)(tabbedPane.getSelectedComponent()))
+		    .newEntry(type);
+	    else
+		Util.pr("Action 'New entry' must be disabled when no "
+			+"database is open.");	    
 	}
     }
 
@@ -333,9 +327,10 @@ public class JabRefFrame extends JFrame {
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
 	    edit = new JMenu(Globals.lang("Edit")),
-	    bibtex = new JMenu(Globals.lang("Bibtex")),
+	    bibtex = new JMenu(Globals.lang("BibTeX")),
 	    view = new JMenu(Globals.lang("View")),
-	    options = new JMenu(Globals.lang("Options"));
+	    options = new JMenu(Globals.lang("Options")),
+	    newSpec = new JMenu(Globals.lang("New entry..."));
 	file.add(newDatabaseAction);
 	file.add(open);
 	file.add(save);
@@ -357,6 +352,11 @@ public class JabRefFrame extends JFrame {
 	view.add(toggleGroups);
 	mb.add(view);
 
+	bibtex.add(newEntryAction);
+	for (int i=0; i<newSpecificEntryAction.length; i++)
+	    newSpec.add(newSpecificEntryAction[i]);
+	bibtex.add(newSpec);
+	bibtex.addSeparator();
 	bibtex.add(editPreamble);
 	bibtex.add(editStrings);
 	mb.add(bibtex);
@@ -512,6 +512,72 @@ public class JabRefFrame extends JFrame {
        	BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));	
 	ParserResult pr = bp.parse();
 	return pr;
+    }
+
+    /** 
+     * The action concerned with closing the window.
+     */
+    class CloseAction extends AbstractAction {
+	public CloseAction() {
+	    super(Globals.lang("Quit"));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
+	}    
+	
+	public void actionPerformed(ActionEvent e) {
+	    // Ask here if the user really wants to close, if the base
+	    // has not been saved since last save.
+	    boolean close = true;	    
+	    Vector filenames = new Vector();
+	    if (tabbedPane.getTabCount() > 0) {
+		for (int i=0; i<tabbedPane.getTabCount(); i++) {
+		    if (baseAt(i).baseChanged) {
+			tabbedPane.setSelectedIndex(i);
+			int answer = JOptionPane.showConfirmDialog
+			    (ths, Globals.lang
+			     ("Database has changed. Do you "
+			      +"want to save before closing?"),
+			     Globals.lang("Save before closing"),
+			     JOptionPane.YES_NO_CANCEL_OPTION);
+			
+			if ((answer == JOptionPane.CANCEL_OPTION) || 
+			    (answer == JOptionPane.CLOSED_OPTION))
+			    close = false; // The user has cancelled.
+			if (answer == JOptionPane.YES_OPTION) {
+			    // The user wants to save.
+			    basePanel().runCommand("save");
+			}
+		    }
+		    if (baseAt(i).file != null)
+			filenames.add(baseAt(i).file.getPath());
+		}
+	    }
+	    if (close) {
+		dispose();
+
+		
+
+		prefs.putInt("posX", ths.getLocation().x);
+		prefs.putInt("posY", ths.getLocation().y);
+		prefs.putInt("sizeX", ths.getSize().width);
+		prefs.putInt("sizeY", ths.getSize().height);
+		
+		if (prefs.getBoolean("openLastEdited")) {
+		  // Here we store the names of allcurrent filea. If
+		  // there is no current file, we remove any
+		  // previously stored file name.
+		    if (filenames.size() == 0)
+			prefs.remove("lastEdited");
+		    else {
+			String[] names = new String[filenames.size()];
+			for (int i=0; i<filenames.size(); i++)
+			    names[i] = (String)filenames.elementAt(i);
+			    
+			prefs.putStringArray("lastEdited", names);
+		    }
+		}
+		System.exit(0); // End program.
+	    }
+	}
     }
 
     // The action for closing the current database and leaving the window open.
