@@ -116,11 +116,42 @@ public class BibtexDatabase
     }
 
     /**
-     * Returns the entry with the given ID.
+     * Returns the entry with the given ID (-> entry_type + hashcode).
      */
     public synchronized BibtexEntry getEntryById(String id)
     {
         return (BibtexEntry) _entries.get(id);
+    }
+
+    /**
+     * Returns the entry with the given bibtex key.
+     */
+    public synchronized BibtexEntry getEntryByKey(String key)
+    {
+      BibtexEntry back = null ;
+
+      int keyHash = key.hashCode() ; // key hash for better performance
+
+      Set keySet = _entries.keySet();
+      if (keySet != null)
+      {
+          Iterator it = keySet.iterator();
+          boolean loop = it.hasNext() ;
+          while(loop)
+          {
+            String entrieID = (String) it.next() ;
+            BibtexEntry entry = getEntryById(entrieID) ;
+            if (entry != null)
+            {
+              if (keyHash == entry.getCiteKey().hashCode())
+              {
+                loop = false ;
+                back = entry ;
+              } else loop = it.hasNext() ;
+            }
+          }
+      }
+      return back ;
     }
 
     /**
