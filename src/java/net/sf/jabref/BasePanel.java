@@ -68,7 +68,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // autocomplete is active, and references to the autocompleter objects.
 
     // The undo manager.
-    public CountingUndoManager undoManager = new CountingUndoManager();
+    public CountingUndoManager undoManager = new CountingUndoManager(ths);
     UndoAction undoAction = new UndoAction();
     RedoAction redoAction = new RedoAction();
 

@@ -28,13 +28,17 @@ package net.sf.jabref.undo;
 
 import javax.swing.undo.*;
 
+import net.sf.jabref.BasePanel;
+
 public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint = 0,
 	current = 0;
+    private BasePanel panel = null;
 
-    public CountingUndoManager() {
+    public CountingUndoManager(BasePanel basePanel) {
 	super();
+	panel = basePanel;
     }
 
     public synchronized boolean addEdit(UndoableEdit edit) {
@@ -45,11 +49,13 @@ public class CountingUndoManager extends UndoManager {
     public synchronized void undo() throws CannotUndoException {
 	super.undo();
 	current--;
+	panel.updateWiewToSelected();
     }
 
     public synchronized void redo() throws CannotUndoException {
 	super.redo();
 	current++;
+	panel.updateWiewToSelected();
     }
 
     public synchronized void markUnchanged() {
