@@ -396,8 +396,12 @@ public class Util {
                   if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
-                  }
-                  else{
+                  } else if (Globals.ON_WIN) {
+                    cmdArray[0] = prefs.get("htmlviewer");
+                    cmdArray[1] = link;
+                    Process child = Runtime.getRuntime().exec(
+                    	cmdArray[0] + " " + cmdArray[1]);
+                  } else{
                     cmdArray[0] = prefs.get("htmlviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray);
@@ -419,8 +423,12 @@ public class Util {
                 if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("psviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
-                }
-                else{
+                } else if (Globals.ON_WIN) {
+                    cmdArray[0] = prefs.get("psviewer");
+                    cmdArray[1] = link;
+                    Process child = Runtime.getRuntime().exec(
+                       	cmdArray[0] + " " + cmdArray[1]);
+                } else {
                     cmdArray[0] = prefs.get("psviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray);
