@@ -1312,6 +1312,63 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                           csd.show();
                       }
                   });
+
+
+              actions.put("test", new BaseAction() {
+                public void action() {
+		    if (entryTable.getSelectedRowCount() == 0)
+			return;
+
+		    // Make a list of possible formats:
+		    Set formats = new HashSet();
+		    formats.add("bibtexml");
+		    formats.add("docbook");
+		    formats.add("html");
+		    formats.add("simplehtml");
+		    for (int i = 0; i < prefs.customExports.size(); i++) {
+			formats.add((prefs.customExports.getElementAt(i))[0]);
+		    }
+		    JList list = new JList(formats.toArray());
+		    list.setBorder(BorderFactory.createEtchedBorder());
+		    list.setSelectionInterval(0,0);
+		    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		    int answer = 
+			JOptionPane.showOptionDialog(frame, list, Globals.lang("Select the format to copy entries in"),
+						     JOptionPane.YES_NO_OPTION,
+						     JOptionPane.QUESTION_MESSAGE, null, 
+						     new String[] {Globals.lang("Ok"), Globals.lang("Cancel")}, 
+						     Globals.lang("Ok"));
+
+		    if (answer == JOptionPane.NO_OPTION)
+			return;
+		    
+		    String lfName = (String)(list.getSelectedValue());
+		    final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
+		    String dir = null;
+		    if (custom) {
+			int index = list.getSelectedIndex()-Globals.STANDARD_EXPORT_COUNT;
+			dir = (String)(prefs.customExports.getElementAt(index)[1]);
+			File f = new File(dir);
+			lfName = f.getName();
+			lfName = lfName.substring(0, lfName.indexOf("."));
+			// Remove file name - we want the directory only.
+			dir = f.getParent()+System.getProperty("file.separator");
+		    }
+		    final String format = lfName,
+			directory = dir;
+		      
+		    (new Thread() {
+			    public void run() {
+				try {
+				    BibtexEntry[] bes = entryTable.getSelectedEntries();
+				    FileActions.exportToClipboard(database, bes, format, custom, directory, prefs);
+				} catch (Exception ex) {
+				    ex.printStackTrace();
+				}
+			    }
+			}).start();
+                }
+              });
     }
 
     /**

@@ -37,6 +37,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.awt.datatransfer.*;
+import java.awt.Toolkit;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -177,7 +180,7 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-	    TreeSet sorter = getSortedEntries(database, true);
+	    TreeSet sorter = getSortedEntries(database, null, true);
 
             FieldFormatter ff = new LatexFieldFormatter();
 
@@ -334,93 +337,91 @@ public class FileActions
     throws Exception {
 
 	String encoding = prefs.get("defaultEncoding");//"iso-8859-1";
-	//System.out.println(encoding);
-	//PrintStream ps=null;
         OutputStreamWriter ps=null;
+	ps=new OutputStreamWriter(new FileOutputStream(outFile), encoding);
+	exportDatabase(database, null, prefix, lfName, ps, prefs);
+    }
 
-	//try {
-	    Object[] keys = database.getKeySet().toArray();
-	    String key, type;
-	    Reader reader;
-            int c;
+    public static void exportDatabase(BibtexDatabase database, Set entries, String prefix, String lfName,
+                                      Writer ps, JabRefPreferences prefs)
+    throws Exception {
 
-            // Trying to change the encoding:
-            //ps=new PrintStream(new FileOutputStream(outFile));
-            ps=new OutputStreamWriter(new FileOutputStream(outFile), encoding);
-            if (lfName.equals("mods")) {
-            	MODSDatabase md = new MODSDatabase(database);
-        		try {
-        	      	 DOMSource source = new DOMSource(md.getDOMrepresentation());
-        	      	 StreamResult result = new StreamResult(ps);
-        	      	 Transformer trans = TransformerFactory.newInstance().newTransformer();
-        	      	 trans.setOutputProperty(OutputKeys.INDENT, "yes");
-        	      	 trans.transform(source, result);
-        	      	}
-        	      	catch (Exception e) {
-        	      		throw new Error(e);
-        	      	}
-        	      ps.close();
-        	      return;
-            }
-
-	    // Print header
-            try {
-              reader = getReader(prefix+lfName+".begin.layout");
-              while ((c = reader.read()) != -1) {
+	Object[] keys = database.getKeySet().toArray();
+	String key, type;
+	Reader reader;
+	int c;
+	
+	if (lfName.equals("mods")) {
+	    MODSDatabase md = new MODSDatabase(database);
+	    try {
+		DOMSource source = new DOMSource(md.getDOMrepresentation());
+		StreamResult result = new StreamResult(ps);
+		Transformer trans = TransformerFactory.newInstance().newTransformer();
+		trans.setOutputProperty(OutputKeys.INDENT, "yes");
+		trans.transform(source, result);
+	    }
+	    catch (Exception e) {
+		throw new Error(e);
+	    }
+	    ps.close();
+	    return;
+	}
+	
+	// Print header
+	try {
+	    reader = getReader(prefix+lfName+".begin.layout");
+	    while ((c = reader.read()) != -1) {
                 ps.write((char)c);
-              }
-              reader.close();
-            } catch (IOException ex) {}
-            // If an exception was cast, export filter doesn't have a begin file.
+	    }
+	    reader.close();
+	} catch (IOException ex) {}
+	// If an exception was cast, export filter doesn't have a begin file.
+	
+	// Write database entrie; entries will be sorted as they
+	// appear on the screen, or sorted by author, depending on
+	// Preferences.
+	// We also supply the Set entries - if we are to export only certain entries,
+	// it will be non-null, and be used to choose entries. Otherwise, it will be
+	// null, and be ignored.
+	TreeSet sorted = getSortedEntries(database, entries, false);
 
-            // Write database entrie; entries will be sorted as they
-            // appear on the screen, or sorted by author, depending on
-	    // Preferences.
-	    TreeSet sorted = getSortedEntries(database, false);
-            /*String pri = prefs.get("priSort"),
-		sec = prefs.get("secSort"),
-		ter = prefs.get("terSort");
-            EntrySorter sorter = database.getSorter
-		(new EntryComparator(prefs.getBoolean("priDescending"),
-				     prefs.getBoolean("secDescending"),
-				     prefs.getBoolean("terDescending"),
-				     pri, sec, ter));
-	    */
-	    // Load default layout
-            reader = getReader(prefix+lfName+".layout");
-            //Util.pr(prefix+lfName+".layout");
 
-	    LayoutHelper layoutHelper = new LayoutHelper(reader);
-	    Layout defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-            reader.close();
-	    HashMap layouts = new HashMap();
-	    Layout layout;
-            for (Iterator i = sorted.iterator(); i.hasNext();) {
-		// Get the entry
-		BibtexEntry entry = (BibtexEntry) (i.next());
-
-              //System.out.println(entry.getType().getName());
-
-              // Get the layout
-              type = entry.getType().getName().toLowerCase();
-              if (layouts.containsKey(type))
+	// Load default layout
+	reader = getReader(prefix+lfName+".layout");
+	//Util.pr(prefix+lfName+".layout");
+	
+	LayoutHelper layoutHelper = new LayoutHelper(reader);
+	Layout defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+	reader.close();
+	HashMap layouts = new HashMap();
+	Layout layout;
+	Iterator i = sorted.iterator();
+	for (; i.hasNext();) {
+	    // Get the entry
+	    BibtexEntry entry = (BibtexEntry) (i.next());
+	    
+	    //System.out.println(entry.getType().getName());
+	    
+	    // Get the layout
+	    type = entry.getType().getName().toLowerCase();
+	    if (layouts.containsKey(type))
                 layout = (Layout)layouts.get(type);
-              else {
+	    else {
                 try {
-                  // We try to get a type-specific layout for this entry.
-                  reader = getReader(prefix+lfName+"."+type+".layout");
-                  layoutHelper = new LayoutHelper(reader);
-                  layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-                  layouts.put(type, layout);
-                  reader.close();
+		    // We try to get a type-specific layout for this entry.
+		    reader = getReader(prefix+lfName+"."+type+".layout");
+		    layoutHelper = new LayoutHelper(reader);
+		    layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+		    layouts.put(type, layout);
+		    reader.close();
                 } catch (IOException ex) {
-                  // The exception indicates that no type-specific layout exists, so we
-                  // go with the default one.
-                  layout = defLayout;
+		    // The exception indicates that no type-specific layout exists, so we
+		    // go with the default one.
+		    layout = defLayout;
                 }
             }
             //Layout layout = layoutHelper.getLayoutFromText();
-
+	    
             // Write the entry
             ps.write(layout.doLayout(entry, database));
           }
@@ -439,6 +440,28 @@ public class FileActions
           ps.close();
         }
 
+
+    public static void exportToClipboard(BibtexDatabase database, BibtexEntry[] bes, 
+					 String lfName, boolean custom, String directory, JabRefPreferences prefs)
+	throws Exception {
+
+	StringWriter sw = new StringWriter();
+	HashSet keys = new HashSet();
+	for (int i=0; i<bes.length; i++)
+	    keys.add(bes[i].getId());
+	exportDatabase(database, keys, (custom ? directory : Globals.LAYOUT_PREFIX), lfName, sw, prefs);
+	//System.out.println(sw.toString());
+
+	ClipboardOwner owner = new ClipboardOwner() {
+		public void lostOwnership(Clipboard clipboard, Transferable content) {}
+	    }; 
+
+	StringSelection ss = new StringSelection(sw.toString());
+	Toolkit.getDefaultToolkit().getSystemClipboard()
+	    .setContents(ss, owner);
+
+    }
+
     public static void exportToCSV(BibtexDatabase database, 
                                       File outFile, JabRefPreferences prefs)
         throws Exception {
@@ -450,7 +473,7 @@ public class FileActions
 	fieldFormatters.put("pdf", new ResolvePDF());
 	    
 	String SEPARATOR = "\t";
-	TreeSet sorted = getSortedEntries(database, true);
+	TreeSet sorted = getSortedEntries(database, null, true);
 	Set fields = new TreeSet();
 	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++)
 	    fields.add(GUIGlobals.ALL_FIELDS[i]);
@@ -480,6 +503,8 @@ public class FileActions
 	    
 	
     }
+
+
 
     private static void writeField(BibtexDatabase database, BibtexEntry entry, String field, 
 				   HashMap fieldFormatters, Writer out) 
@@ -541,7 +566,7 @@ public class FileActions
      * (such as the exportDatabase call), we do not wish to use the 
      * global preference of saving in standard order.
      */
-    protected static TreeSet getSortedEntries(BibtexDatabase database, boolean isSaveOperation) {
+    protected static TreeSet getSortedEntries(BibtexDatabase database, Set keySet, boolean isSaveOperation) {
 	String pri, sec, ter;
 	boolean priD, secD, terD;
 	if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
@@ -565,7 +590,8 @@ public class FileActions
 	}
 	TreeSet sorter = new TreeSet(new CrossRefEntryComparator
 				     (new EntryComparator(priD, secD, terD, pri, sec, ter)));
-	Set keySet = database.getKeySet();
+	if (keySet == null)
+	    keySet = database.getKeySet();
 	
 	if (keySet != null)
             {

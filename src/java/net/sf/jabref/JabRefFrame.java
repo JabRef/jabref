@@ -268,7 +268,8 @@ public class JabRefFrame
 
 
       customExpAction = new CustomizeExportsAction(),
-      exportCSV = new ExportCSV();
+      exportCSV = new ExportCSV(),
+    test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
@@ -835,6 +836,7 @@ public JabRefPreferences prefs() {
     file.add(saveSelectedAs);
     file.add(exportMenu);
     file.add(customExportMenu);
+    file.add(test);
     file.addSeparator();
     file.add(fileHistory);
     //file.addSeparator();

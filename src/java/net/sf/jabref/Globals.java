@@ -41,9 +41,9 @@ import net.sf.jabref.collab.FileUpdateMonitor;
 public class Globals {
 
   public static int SHORTCUT_MASK,// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-      FUTURE_YEAR = 2050; // Needs to give a year definitely in the future. Used for guessing the
+      FUTURE_YEAR = 2050, // Needs to give a year definitely in the future. Used for guessing the
                           // year field when parsing textual data.  :-)
-
+      STANDARD_EXPORT_COUNT = 4; // The number of standard export formats.
   private static String resourcePrefix = "resource/JabRef",
       menuResourcePrefix = "resource/Menu";
   private static String logfile = "jabref.log";
