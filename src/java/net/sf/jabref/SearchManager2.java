@@ -70,7 +70,8 @@ class SearchManager2 extends SidePaneComponent
 	prefs = prefs_;
 	incSearcher = new IncrementalSearcher(prefs);
 
-	//setBorder(BorderFactory.createEtchedBorder());
+	
+	//setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.magenta));
 
         searchReq = new JCheckBoxMenuItem
 	    (Globals.lang("Search required fields"),
@@ -183,7 +184,7 @@ settings.add(select);
 	    ("Search", GUIGlobals.searchIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.BOTH;
-        con.weightx = 0;
+        con.weightx = 1;
 	con.insets = new Insets(0, 0, 2,  0);
 	gbl.setConstraints(header, con);
 	add(header);

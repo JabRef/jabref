@@ -36,7 +36,7 @@ public class SidePaneComponent extends JPanel {
 
     public SidePaneComponent(SidePaneManager manager) {
 	this.manager = manager;
-	//setBorder(BorderFactory.createEtchedBorder());
+	setBorder(BorderFactory.createEtchedBorder());
 	//setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
 	//setPreferredSize(new java.awt.Dimension
 	//		  (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));

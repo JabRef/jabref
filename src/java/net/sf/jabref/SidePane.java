@@ -68,6 +68,7 @@ public class SidePane extends JPanel {
 	JPanel pan = new JPanel();
 	//pan.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.red));
 	//mainPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.yellow));
+	//setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.green));
 	//pan.setBackground(GUIGlobals.lightGray);
 	super.add(pan, BorderLayout.CENTER);
     }

@@ -62,7 +62,7 @@ public class SidePaneHeader extends JPanel implements ActionListener {
      //                              width, height, GUIGlobals.gradientBlue, false));
      g2.setPaint(new GradientPaint(ins.left, ins.top, GUIGlobals.gradientGray,
                                    width, height, GUIGlobals.gradientBlue, false));
-      g2.fillRect(ins.left, ins.top, width, height);
+      g2.fillRect(ins.left, ins.top, width-1, height);
       //g2.fillRect(0, 0, 100, 10);
       g2.setPaint(oldPaint);
       //super.paintComponent(g);
@@ -73,8 +73,8 @@ public class SidePaneHeader extends JPanel implements ActionListener {
     private void addPart(String name, URL image, SidePaneComponent parent_) {
 	parent = parent_;
 	setLayout(gbl);
-        setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
-        setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
+        //setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
+        //setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
 	//imageIcon = new JLabel(new ImageIcon(image));
 	nameLabel = new JLabel(Globals.lang(name), new ImageIcon(image),
 			       SwingConstants.LEFT);
@@ -104,7 +104,7 @@ public class SidePaneHeader extends JPanel implements ActionListener {
   close.addActionListener(this);
 
   //setBorder(BorderFactory.createEtchedBorder());
-  setBorder(BorderFactory.createMatteBorder(1,1,1,2,new Color(150,150,150)));
+  //setBorder(BorderFactory.createMatteBorder(1,1,1,2,new Color(150,150,150)));
 	//add(imageIcon, BorderLayout.WEST);
 	con.insets = new Insets(1, 1, 1, 1);
 	con.gridwidth = 1;
