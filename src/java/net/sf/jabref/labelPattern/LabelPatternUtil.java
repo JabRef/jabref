@@ -129,6 +129,12 @@ public class LabelPatternUtil {
 				else if(val.equals("editors")){
 				    _sb.append(allAuthors(_entry.getField("editor").toString()));
 				}
+				else if(val.equals("authorIni")){
+				    _sb.append(oneAuthorPlusIni(_entry.getField("author").toString()));
+				}
+				else if(val.equals("editorIni")){
+				    _sb.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
+				}
 				else if(val.equals("firstpage")){
 				    _sb.append(firstPage(_entry.getField("pages").toString()));
 				}
@@ -380,6 +386,31 @@ public class LabelPatternUtil {
 		}
 		return author;
 	}
+
+    /**
+     * Gets the first part of the last name of the first
+     * author/editor, and appends the last name initial of the
+     * remaining authors/editors.
+     * @param authorField a <code>String</code>
+     * @return the sur name of all authors/editors
+     */
+    private static String oneAuthorPlusIni(String authorField) {
+	authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+	String author = "" ;
+	// This code was part of 'ApplyRule' in 'ArticleLabelRule'
+	String[] tokens= authorField.split("\\band\\b");
+	int i=1;
+	if (tokens.length == 0) return author;
+	String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
+	author = firstAuthor[0];
+	while (tokens.length > i) {
+	    // convert lastname, firstname to firstname lastname
+	    author += tokens[i].trim().charAt(0);
+	    i++;
+	}
+	return author;
+	
+    }
 
 	/**
 	 * Split the pages field into two and return the first one

@@ -254,13 +254,14 @@ class KeyBindingsDialog
       listModel.addElement(s + " (" + bindHM.get(s) + ")");
     }
     table = new JTable(tableData, new String[] {Globals.lang("Action"),
-                       Globals.lang("Shortcut")});
+                       Globals.lang("Shortcut")}) {
+      public boolean isCellEditable(int row, int col) { return false; }
+    };
     table.setCellSelectionEnabled(false);
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(false);
-
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    //table.set
+
     //list.setModel(listModel);
 
     table.setRowSelectionInterval(0, 0); //select the first entry

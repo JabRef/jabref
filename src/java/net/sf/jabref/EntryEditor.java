@@ -95,9 +95,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
+    JPanel typeLabel;
     JabRefFrame frame;
     BasePanel panel;
     EntryEditor ths = this;
+    Font font = new Font("arial", Font.ITALIC+Font.BOLD, 24);
 
     boolean updateSource = true; // This can be set to false to stop the source
     // text area from gettin updated. This is used in cases where the source
@@ -179,7 +181,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     private void setupToolBar() {
 	JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
-	tlb.setMargin(new Insets(2,2,2,2));
+	//tlb.setMargin(new Insets(2,2,2,2));
+	tlb.setMargin(new Insets(0,0,0,2));
 	// The toolbar carries all the key bindings that are valid for the whole
 	// window.
 	//tlb.setBackground(GUIGlobals.lightGray);//Color.white);
@@ -210,6 +213,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	tlb.setFloatable(false);
 	tlb.add(closeAction);
+
+	setLabel();
+	tlb.add(typeLabel);
 	//tlb.addSeparator();
 	//tlb.add(copyKeyAction);
 	tlb.addSeparator();
@@ -224,11 +230,39 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tlb.addSeparator();
 	tlb.add(helpAction);
 
+
 	Component[] comps = tlb.getComponents();
 	for (int i=0; i<comps.length; i++)
 	    ((JComponent)comps[i]).setOpaque(false);
 	add(tlb, BorderLayout.WEST);
     }
+
+    private void setLabel() {
+	typeLabel = new TypeLabel(entry.getType().getName());
+    }
+
+    private class TypeLabel extends JPanel {
+	private String label;
+	public TypeLabel(String type) {
+	    label = type;
+	}
+	public void paint(Graphics g) {
+	    Graphics2D g2 = (Graphics2D)g;
+	    g2.setColor(GUIGlobals.nullFieldColor);		    
+	    g2.setFont(font); 
+	    FontMetrics fm = g2.getFontMetrics();
+	    int width = fm.stringWidth(label);
+	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+	    g2.rotate(-Math.PI/2, 0, 0);
+	    g2.drawString(label,-width-5,28);
+	    
+	}
+	/*	public Dimension getPreferredSize() {
+	    return new Dimension(22, 30);
+	    }*/
+    }
+    
 
     private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen) {
 
