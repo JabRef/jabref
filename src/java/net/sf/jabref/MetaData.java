@@ -58,10 +58,13 @@ public class MetaData {
             } catch (IOException ex) {
                 System.err.println("Weird error while parsing meta data.");
             }
-            if (key.equals("groupstree"))
+            if (key.equals("groupstree")) {
                 putGroups(orderedData,db);
-            else
+            } else if (key.equals("groups")) {
+            	groupsRoot = GroupTreeNode.importFlatGroups(orderedData);
+            } else {
                 putData(key, orderedData);
+            }
         }
     }
 
