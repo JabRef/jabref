@@ -69,15 +69,10 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         if (m_ast != null) { // do advanced search
             m_searchRule = this;
         } else { // do plaintext search
-            Globals.prefs.putBoolean("searchAll", m_searchAllFields);
-            Globals.prefs.putBoolean("searchReq", m_searchRequiredFields);
-            Globals.prefs.putBoolean("searchOpt", m_searchOptionalFields);
-            Globals.prefs.putBoolean("searchGen", m_searchGeneralFields);
-            Globals.prefs.putBoolean("caseSensitiveSearch", m_caseSensitive);
             if (m_regExp)
-                m_searchRule = new RegExpRule(Globals.prefs);
+                m_searchRule = new RegExpRule(m_caseSensitive,m_searchAllFields,m_searchRequiredFields,m_searchOptionalFields,m_searchGeneralFields);
             else
-                m_searchRule = new SimpleSearchRule(Globals.prefs);
+                m_searchRule = new SimpleSearchRule(m_caseSensitive,m_searchAllFields,m_searchRequiredFields,m_searchOptionalFields,m_searchGeneralFields);
         }
 
     }
