@@ -42,15 +42,25 @@ public class ConvertSpecialCharactersForHTML implements LayoutFormatter
 
     public String format(String fieldText)
     {
+	fieldText = firstFormat(fieldText);
+
 	if (!pattern.matcher(fieldText).matches())
-	    return fieldText;
-	//Util.pr(fieldText);
+	    return restFormat(fieldText);
+
 	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
 	    String s = (String)i.next();
 	    fieldText = fieldText.replaceAll(s, (String)Globals.HTML_CHARS.get(s));
 	}
 	//RemoveBrackets rb = new RemoveBrackets();
-	return fieldText.replaceAll("\\}","").replaceAll("\\{","");
+	return restFormat(fieldText);
+    }
+
+    private String firstFormat(String s) {
+	return s.replaceAll("&|\\\\&","&amp;");
+    }
+
+    private String restFormat(String s) {
+	return s.replaceAll("\\}","").replaceAll("\\{","");
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
