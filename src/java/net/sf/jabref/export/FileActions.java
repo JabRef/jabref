@@ -80,9 +80,9 @@ public class FileActions {
 	    for (int i=0; i<database.getStringCount(); i++) {
 		BibtexString bs = database.getString(i);
 		//fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
-		fw.write("@STRING{"+bs.getName()+" = ");
+		fw.write("@STRING{"+bs.getName()+" = ");		
 		fw.write((new LatexFieldFormatter()).format
-			 (bs.getContent()));
+			 (bs.getContent(), true));
 		//Util.writeField(bs.getName(), bs.getContent(), fw);
 		fw.write("}\n\n");
 	    }

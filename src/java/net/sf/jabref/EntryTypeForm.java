@@ -643,7 +643,8 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 		    // is not stored and the textarea turns red.
 
 		    if (toSet != null)
-			(new LatexFieldFormatter()).format(toSet);
+			(new LatexFieldFormatter()).format
+			    (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
 		    
 		    Object oldValue = entry.getField(fe.getFieldName());
 		    entry.setField(fe.getFieldName(), toSet);

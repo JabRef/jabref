@@ -38,7 +38,14 @@ public class LatexFieldFormatter implements FieldFormatter {
     int col; // First line usually starts about so much further to the right.
     final int STARTCOL = 4;
 
-    public String format(String text) throws IllegalArgumentException {
+    public String format(String text, boolean standardBibtex) 
+	throws IllegalArgumentException {
+
+	// If the field is non-standard, we will just append braces,
+	// wrap and write.
+	if (!standardBibtex) {
+	    return "{"+Util.wrap2(text, GUIGlobals.LINE_LENGTH)+"}";
+	}
 
 	sb = new StringBuffer();
 	int pivot = 0, pos1 = -1, pos2 = -1;

@@ -47,7 +47,7 @@ public class GUIGlobals {
     static int teller = 0;
 
     // HashMap containing refs to all open BibtexDatabases.
-    static HashMap frames = new HashMap();
+    //static HashMap frames = new HashMap();
 
     // Frame titles.
     static String 
@@ -270,6 +270,39 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	"search"
     };
 
+    // These are the fields that BibTex might want to treat, so these
+    // must conform to BibTex rules.
+    public static String[] BIBTEX_STANDARD_FIELDS = new String[] {
+	"author",
+	"editor",
+	"title",
+	"year",
+	"pages",
+	"month",
+	"note",
+	"publisher",
+	"journal",
+	"volume",
+	"edition",
+	"number",
+	"chapter",
+	"series",
+	"type",
+	"address",
+	"annote",
+	"booktitle",
+	"crossref",
+	"howpublished",
+	"institution",
+	"key",
+	"organization",
+	"school",
+	"bibtexkey",
+	"doi",
+	"eid",
+    };
+    
+
     public static String[] NON_WRITABLE_FIELDS = new String[] {
         "search"
     } ;
@@ -282,6 +315,22 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
         }
         return true ; 
     }
+
+    /**
+     * Returns true if the given field is a standard Bibtex field.
+     *
+     * @param field a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public static boolean isStandardField(String field){
+        for(int i =  0 ; i < BIBTEX_STANDARD_FIELDS.length ; i++){
+			if(BIBTEX_STANDARD_FIELDS[i].equals(field)){
+			    return true; 
+            }
+        }
+        return false;
+    }
+
 
 
     public static double DEFAULT_FIELD_WEIGHT = 1;

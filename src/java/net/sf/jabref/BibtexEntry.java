@@ -288,7 +288,8 @@ public class BibtexEntry
 	    out.write("  "+name+" = ");
 
 	    try {
-		out.write(ff.format(o.toString()));
+		out.write(ff.format(o.toString(),
+				    GUIGlobals.isStandardField(name)));
 	    } catch (Throwable ex) {
 		throw new IOException
 		    ("Error in field '"+name+"': "+ex.getMessage()); 

@@ -252,7 +252,8 @@ public class EntryTableModel extends AbstractTableModel {
 	}
 	if (set) try {
 	    if (toSet != null)
-		(new LatexFieldFormatter()).format(toSet);
+		(new LatexFieldFormatter()).format
+		    (toSet, GUIGlobals.isStandardField(fieldName));
 
 	    // Store this change in the UndoManager to facilitate undo.
 	    Object oldVal = be.getField(fieldName.toLowerCase());

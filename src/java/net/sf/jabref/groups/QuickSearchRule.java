@@ -44,7 +44,7 @@ public class QuickSearchRule implements SearchRule {
             searchString = ".*"+searchString+".*" ; 
         }
 	int flags = Pattern.CASE_INSENSITIVE;
-	pattern = Pattern.compile(searchString, flags);
+	pattern = Pattern.compile(searchString, flags);	
     }
 
     public int applyRule(Hashtable searchOptions, BibtexEntry bibtexEntry) {

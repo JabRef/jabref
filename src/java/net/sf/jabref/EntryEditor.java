@@ -213,7 +213,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tlb.setFloatable(false);
 	tlb.add(closeAction);
 	//tlb.addSeparator();
-	tlb.add(copyKeyAction);
+	//tlb.add(copyKeyAction);
+	tlb.addSeparator();
 	tlb.add(generateKeyAction);
 	tlb.addSeparator();
 	//tlb.add(undoAction);
@@ -660,7 +661,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    // is not stored and the textarea turns red.
 
 		    if (toSet != null)
-			(new LatexFieldFormatter()).format(toSet);
+			(new LatexFieldFormatter()).format
+			    (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
 		    
 		    Object oldValue = entry.getField(fe.getFieldName());
 		    entry.setField(fe.getFieldName(), toSet);

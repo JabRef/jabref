@@ -27,6 +27,7 @@ package net.sf.jabref.export;
 
 public interface FieldFormatter {
 
-    public String format(String s) throws IllegalArgumentException;
+    public String format(String s, boolean standardBibtex) 
+	throws IllegalArgumentException;
 
 }
