@@ -11,11 +11,11 @@ import net.sf.jabref.*;
  */
 public abstract class AbstractGroup {
     protected String m_name;
-    
+
     public AbstractGroup(String name) {
         m_name = name;
     }
-    
+
     /** Character used for quoting in the string representation. */
     protected static final char QUOTE_CHAR = '\\';
     /**
@@ -56,7 +56,7 @@ public abstract class AbstractGroup {
     public final String getName() {
         return m_name;
     }
-    
+
     /** Sets the group's name. */
     public final void setName(String name) {
         m_name = name;
@@ -93,7 +93,8 @@ public abstract class AbstractGroup {
     public abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
 
     /**
-     * @param searchOptions The search options to apply.
+     * @param searchOptions
+     *            The search options to apply.
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(Map searchOptions, BibtexEntry entry);
@@ -102,6 +103,28 @@ public abstract class AbstractGroup {
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(BibtexEntry entry);
+
+    /**
+     * @return true if this group contains any of the specified entries, false
+     *         otherwise.
+     */
+    public boolean containsAny(BibtexEntry[] entries) {
+        for (int i = 0; i < entries.length; ++i)
+            if (contains(entries[i]))
+                return true;
+        return false;
+    }
+
+    /**
+     * @return true if this group contains all of the specified entries, false
+     *         otherwise.
+     */
+    public boolean containsAll(BibtexEntry[] entries) {
+        for (int i = 0; i < entries.length; ++i)
+            if (!contains(entries[i]))
+                return false;
+        return true;
+    }
 
     /**
      * @return A deep copy of this object.
