@@ -27,19 +27,20 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import net.sf.jabref.imports.*;
-import net.sf.jabref.undo.*;
-import net.sf.jabref.export.*;
-import net.sf.jabref.groups.QuickSearchRule;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+
+import java.awt.*;
 import java.awt.datatransfer.*;
+import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.undo.*;
-import net.sf.jabref.groups.GroupSelector;
+
+import net.sf.jabref.export.*;
+import net.sf.jabref.groups.*;
+import net.sf.jabref.imports.*;
+import net.sf.jabref.labelPattern.*;
+import net.sf.jabref.undo.*;
 
 public class BasePanel extends JSplitPane implements ClipboardOwner {
 
@@ -101,7 +102,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // or from this class if merging groups from a different database.
 
     boolean showingSearchResults = false,
-	showingGroup = false;
+	showingGroup = false,
+        previewEnabled = true;
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
@@ -1146,6 +1148,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	*/
 
 	entryTable.addKeyListener(new KeyAdapter() {
+
 		public void keyPressed(KeyEvent e) {
 		    if (e.getKeyCode() == KeyEvent.VK_ENTER){
 			try { runCommand("edit");
@@ -1159,7 +1162,13 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			    ex.printStackTrace();
 			}
 		    }
-		}
+                    /*
+                    if (((e.getKeyCode() == KeyEvent.VK_DOWN) || (e.getKeyCode() == KeyEvent.VK_UP))
+                      && (e.getModifiers() == 0)) {
+
+                      Util.pr(entryTable.getSelectedRow()+"");
+                    }*/
+                  }
 	    });
 
 
@@ -1656,5 +1665,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     // Method pertaining to the ClipboardOwner interface.
     public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+
+  public boolean previewEnabled() {
+    return previewEnabled;
+  }
 
 }

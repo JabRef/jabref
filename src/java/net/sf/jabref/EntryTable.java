@@ -32,6 +32,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.io.*;
+import javax.swing.event.*;
 
 public class EntryTable extends JTable {
 
@@ -48,6 +49,8 @@ public class EntryTable extends JTable {
         ctrlClick = false;
     //RenderingHints renderingHints;
     private BasePanel panel;
+
+    private ListSelectionListener previewListener = null;
 
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
 	super(tm_);
@@ -93,10 +96,38 @@ public class EntryTable extends JTable {
             }
           }
         });
+
         addMouseListener(new TableClickListener()); // Add the listener that responds to clicks on the table.
+        if (panel.previewEnabled())
+          enablePreviewListener();
         setWidths();
         sp.getViewport().setBackground(GUIGlobals.tableBackground);
         updateFont();
+      }
+
+      /**
+       * A ListSelectionListener for updating the preview panel when the user selects an
+       * entry. Should only be active when preview is enabled.
+       */
+      public void enablePreviewListener() {
+        if (previewListener == null)
+          previewListener = new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+              if (!e.getValueIsAdjusting()) {
+                int row = getSelectedRow();//e.getFirstIndex();
+                panel.previewEntry(panel.database().getEntryById(tableModel.
+                    getNameFromNumber(row)));
+              }
+            }
+          };
+        getSelectionModel().addListSelectionListener(previewListener);
+      }
+
+      /**
+       * Remove the preview listener.
+       */
+      public void disablePreviewListener() {
+        getSelectionModel().removeListSelectionListener(previewListener);
       }
 
     public void setWidths() {
@@ -138,13 +169,6 @@ public class EntryTable extends JTable {
    */
   class TableClickListener extends MouseAdapter {
       public void mouseClicked(MouseEvent e) {
-
-        // Testing, testing
-        if (!panel.isShowingEditor() && (e.getClickCount() == 1)) {
-          int row = rowAtPoint(e.getPoint());
-        panel.previewEntry(panel.database().getEntryById(tableModel.
-            getNameFromNumber(row)));
-        }
 
         // First find the column on which the user has clicked.
         int col = columnAtPoint(e.getPoint());
