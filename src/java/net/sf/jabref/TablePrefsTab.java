@@ -5,6 +5,9 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.builder.*;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
@@ -12,42 +15,20 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	antialias, pdfColumn, urlColumn, citeseerColumn, allowEditing;
+	antialias, pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
-    private JTextArea tableFields = new JTextArea();//"", 80, 5);
     private JTextField secField, terField, fontSize;
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
     //menuFontButton = new JButton(Globals.lang("Set application font"));
     private boolean tableChanged = false;
-    private JTable colSetup;
-    private int rowCount = -1, ncWidth = -1;
-    private Vector tableRows = new Vector(10);
     private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
     private int oldMenuFontSize;
-
-    class TableRow {
-	String name;
-	int length;
-	public TableRow(String name) {
-	    this.name = name;
-	    length = GUIGlobals.DEFAULT_FIELD_LENGTH;
-	}
-	public TableRow(int length) {
-	    this.length = length;
-	    name = "";
-	}
-	public TableRow(String name, int length) {
-	    this.name = name;
-	    this.length = length;
-	}
-    }
-
 
     /**
      * Customization of external program paths.
@@ -57,7 +38,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
 	_prefs = prefs;
 	this.frame = frame;
-	setLayout(gbl);
+	setLayout(new BorderLayout());
 
 	menuFont = new Font
 	    (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
@@ -78,7 +59,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"), _prefs.getBoolean("pdfColumn"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"), _prefs.getBoolean("urlColumn"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"), _prefs.getBoolean("citeseerColumn"));
-        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
+
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
         //fontSize = new JFormattedTextField(java.text.NumberFormat.getIntegerInstance());
@@ -126,84 +107,42 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 				_prefs.getBoolean("secDescending"));
 	terDesc = new JCheckBox(Globals.lang("Descending"),
 				_prefs.getBoolean("terDescending"));
-	tableFields.setText(Util.stringArrayToDelimited
-			    (_prefs.getStringArray("columnNames"), ";"));
 
-	String[] names = _prefs.getStringArray("columnNames"),
-	    lengths = _prefs.getStringArray("columnWidths");
-	for (int i=0; i<names.length; i++) {
-	    if (i<lengths.length)
-		tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
-	    else
-		tableRows.add(new TableRow(names[i]));
-	}
-	rowCount = tableRows.size()+5;
-        ncWidth = prefs.getInt("numberColWidth");
-
-	TableModel tm = new AbstractTableModel() {
-		public int getRowCount() { return rowCount; }
-		public int getColumnCount() { return 2; }
-		public Object getValueAt(int row, int column) {
-                  if (row == 0)
-                    return (column==0 ? GUIGlobals.NUMBER_COL : ""+ncWidth);
-                  row--;
-                  if (row >= tableRows.size())
-                    return "";
-                  Object rowContent = tableRows.elementAt(row);
-                  if (rowContent == null)
-                    return "";
-                  TableRow tr = (TableRow)rowContent;
-                  switch (column) {
-                    case 0:
-                      return tr.name;
-                    case 1:
-                      return ((tr.length > 0) ? new Integer(tr.length).toString() : "");
-                  }
-                  return null; // Unreachable.
-                }
-
-		public String getColumnName(int col) {
-		    return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
-		}
-		public Class getColumnClass(int column) {
-		    if (column == 0) return String.class;
-		    else return Integer.class;
-		}
-		public boolean isCellEditable(int row, int col) {
-		    return !((row == 0) && (col == 0));
-		}
-		public void setValueAt(Object value, int row, int col) {
-		    tableChanged = true;
-		    // Make sure the vector is long enough.
-		    while (row >= tableRows.size())
-			tableRows.add(new TableRow("", -1));
-
-                        if ((row == 0) && (col == 1)) {
-                          ncWidth = Integer.parseInt(value.toString());
-                          return;
-                        }
-
-		    TableRow rowContent = (TableRow)tableRows.elementAt(row-1);
-
-		    if (col == 0) {
-			rowContent.name = value.toString();
-			if (((String)getValueAt(row, 1)).equals(""))
-			    setValueAt(""+GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
-		    }
-		    else {
-			if (value == null) rowContent.length = -1;
-			else rowContent.length = Integer.parseInt(value.toString());
-		    }
-		}
-
-	    };
-
-	colSetup = new JTable(tm);
-	TableColumnModel cm = colSetup.getColumnModel();
-	cm.getColumn(0).setPreferredWidth(140);
-	cm.getColumn(1).setPreferredWidth(80);
-
+	FormLayout layout = new FormLayout
+	    ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
+	     "");                
+	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 	JLabel lab;
+	JPanel pan = new JPanel();
+	builder.appendSeparator("Special table columns");
+	builder.nextLine();
+	builder.append(pan); builder.append(pdfColumn); builder.nextLine();
+	builder.append(pan); builder.append(urlColumn); builder.nextLine();
+	builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
+	builder.appendSeparator("Format of author and editor names");
+	builder.append(pan); builder.append(namesAsIs); builder.nextLine();
+	builder.append(pan); builder.append(namesFf); builder.nextLine();
+	builder.append(pan); builder.append(namesFl); builder.nextLine();
+	builder.appendSeparator("Sort options");
+	lab = new JLabel(Globals.lang("Secondary sort criterion"));
+	builder.append(pan); builder.append(lab);
+	builder.append(secSort);
+	builder.append(secField);
+	builder.append(secDesc);
+	builder.nextLine();
+	lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+	builder.append(pan); builder.append(lab);
+	builder.append(terSort);
+	builder.append(terField);
+	builder.append(terDesc);
+	builder.nextLine();
+	builder.appendSeparator("Table appearance");
+	builder.append(pan); builder.append(colorCodes); builder.nextLine();
+	builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
+	builder.append(pan); builder.append(antialias); builder.nextLine();
+	builder.append(pan); builder.append(fontButton); builder.nextLine();
+	//	builder.append(pan); builder.append(); builder.nextLine();
+
 	JPanel upper = new JPanel(),
 	    sort = new JPanel(),
 	    namesp = new JPanel(),
@@ -212,20 +151,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	sort.setLayout(gbl);
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
-
-	upper.setBorder(BorderFactory.createTitledBorder
-			(BorderFactory.createEtchedBorder(),
-			 Globals.lang("Miscellaneous")));
-	sort.setBorder(BorderFactory.createTitledBorder
-		       (BorderFactory.createEtchedBorder(),
-                        Globals.lang("Sort options")));
-        iconCol.setBorder(BorderFactory.createTitledBorder
-                         (BorderFactory.createEtchedBorder(),
-                          Globals.lang("Special table columns")));
-        namesp.setBorder(BorderFactory.createTitledBorder
-                         (BorderFactory.createEtchedBorder(),
-                          Globals.lang("Format of author and editor names")));
-
+	/*
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
 	con.anchor = GridBagConstraints.WEST;
@@ -235,8 +161,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	upper.add(autoResizeMode);
         gbl.setConstraints(antialias, con);
         upper.add(antialias);
-        gbl.setConstraints(allowEditing, con);
-        upper.add(allowEditing);
         con.gridwidth = 1;
 	lab = new JLabel(Globals.lang("Menu and label font size"));
 	gbl.setConstraints(lab, con);
@@ -261,7 +185,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         con.gridwidth = 1;
         con.gridheight = 2;
 	gbl.setConstraints(upper, con);
-	add(upper);
+	//add(upper);
         con.gridheight = 1;
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(pdfColumn, con);
@@ -286,7 +210,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	namesp.add(namesFl);
         con.fill = GridBagConstraints.BOTH;
         gbl.setConstraints(namesp, con);
-	add(namesp);
+	add(namesp);*/
 
 
 
@@ -298,7 +222,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		secSort.setSelectedIndex(i);
 	    if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
 		terSort.setSelectedIndex(i);
-	}*/
+	}
 
 	lab = new JLabel(Globals.lang("Secondary sort criterion"));
 	con.gridwidth = 1;
@@ -328,53 +252,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	con.weightx = 1;
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(terDesc, con);
-	sort.add(terDesc);
+	sort.add(terDesc);*/
 
-	con.insets = new Insets(0,0,0,0);
-	gbl.setConstraints(sort, con);
-	add(sort);
-
-	JPanel tabPanel = new JPanel();
-	gbl.setConstraints(tabPanel, con);
-	add(tabPanel);
-        tabPanel.setBorder(BorderFactory.createEtchedBorder());
-	tabPanel.setLayout(gbl);
-	//colSetup.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-	JScrollPane sp = new JScrollPane
-	    (colSetup, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-	     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	colSetup.setPreferredScrollableViewportSize(new Dimension(250,200));
-	sp.setMinimumSize(new Dimension(250,300));
-	con.gridwidth = 1;
-	con.weighty = 1;
-	con.weightx = 0;
-	con.fill = GridBagConstraints.BOTH;
-	con.anchor = GridBagConstraints.NORTHWEST;
-	gbl.setConstraints(sp, con);
-	tabPanel.add(sp);
-	tabPanel.setBorder(BorderFactory.createTitledBorder
-			      (BorderFactory.createEtchedBorder(),
-			       Globals.lang("Visible fields")));
-	JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
-	tlb.setFloatable(false);
-	//tlb.setRollover(true);
-        //tlb.setLayout(gbl);
-        AddRowAction ara = new AddRowAction();
-        DeleteRowAction dra = new DeleteRowAction();
-
-	tlb.add(ara);
-	tlb.add(dra);
-	tlb.addSeparator();
-	tlb.add(new UpdateWidthsAction());
-	gbl.setConstraints(tlb, con);
-	tabPanel.add(tlb);
-	//Component glue = Box.createHorizontalGlue();
-	//con.weightx = 1;
-	//con.gridwidth = GridBagConstraints.REMAINDER;
-	//gbl.setConstraints(glue, con);
-	//tabPanel.add(glue);
-
-	//colSetup.getInputMap
 
 	fontButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -397,116 +276,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			    menuFont = f;
 		}
 		});*/
+
+	pan = builder.getPanel();
+	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	add(pan, BorderLayout.CENTER);
     }
-
-    class DeleteRowAction extends AbstractAction {
-	public DeleteRowAction() {
-          //super(Globals.lang("Delete rows"));
-          super("Delete row", new ImageIcon(GUIGlobals.delRowIconFile));
-	  putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
-	}
-	public void actionPerformed(ActionEvent e) {
-          int[] rows = colSetup.getSelectedRows();
-          if (rows.length == 0)
-            return;
-          int offs = 0;
-          for (int i=0; i<rows.length; i++) {
-            if ((rows[i]-i < tableRows.size()) && (rows[i] != 0)) {
-              tableRows.remove(rows[i] -1 - offs);
-              offs++;
-            }
-          }
-          rowCount -= offs; //rows.length;
-          if (rows.length > 1) colSetup.clearSelection();
-          colSetup.revalidate();
-          colSetup.repaint();
-          tableChanged = true;
-        }
-      }
-
-    class AddRowAction extends AbstractAction {
-	public AddRowAction() {
-          //super(Globals.lang("Insert rows"));
-          super("Add row", new ImageIcon(GUIGlobals.addIconFile));
-	  putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
-	}
-	public void actionPerformed(ActionEvent e) {
-	    int[] rows = colSetup.getSelectedRows();
-	    if (rows.length == 0) {
-		// No rows selected, so we just add one at the end.
-		rowCount++;
-		colSetup.revalidate();
-		colSetup.repaint();
-		return;
-	    }
-	    for (int i=0; i<rows.length; i++) {
-		if (rows[i]+i < tableRows.size())
-		    tableRows.add(Math.max(1, rows[i]+i), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
-	    }
-	    rowCount += rows.length;
-	    if (rows.length > 1) colSetup.clearSelection();
-	    colSetup.revalidate();
-	    colSetup.repaint();
-	    tableChanged = true;
-	}
-    }
-
-    class UpdateWidthsAction extends AbstractAction {
-	public UpdateWidthsAction() {
-          //super(Globals.lang("Update to current column widths"));
-          super("Add row", new ImageIcon(GUIGlobals.sheetIcon));
-          putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
-	}
-	public void actionPerformed(ActionEvent e) {
-	    BasePanel panel = frame.basePanel();
-	    if (panel == null) return;
-	    TableColumnModel colMod = panel.entryTable.getColumnModel();
-            colSetup.setValueAt(""+colMod.getColumn(0).getWidth(), 0, 1);
-	    for (int i=1; i<colMod.getColumnCount(); i++) {
-	    try {
-		String name = panel.entryTable.getColumnName(i).toLowerCase();
-		int width = colMod.getColumn(i).getWidth();
-		//Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
-		//Util.pr("-"+name);
-		if ((i <= tableRows.size()) && (((String)colSetup.getValueAt(i, 0)).toLowerCase()).equals(name))
-		    colSetup.setValueAt(""+width, i, 1);
-		else { // Doesn't match; search for a matching col in our table
-		    for (int j=0; j<colSetup.getRowCount(); j++) {
-			if ((j < tableRows.size()) &&
-			    (((String)colSetup.getValueAt(j, 0)).toLowerCase()).equals(name)) {
-			    colSetup.setValueAt(""+width, j, 1);
-			    break;
-			}
-		    }
-		}
-	    } catch (Throwable ex) {
-		ex.printStackTrace();
-	    }
-	    colSetup.revalidate();
-	    colSetup.repaint();
-	}
-
-	}
-    }
-
-    private String[] getChoices() {
-
-	// First we count how many checkboxes the user has selected.
-	int count = 0;
-	for (int i=0; i<_sel.length; i++)
-	    if (_sel[i].booleanValue()) count++;
-
-	// Then we build the byte array.
-	String[] choices = new String[count];
-	count = 0;
-	for (int i=0; i<_sel.length; i++)
-	    if (_sel[i].booleanValue()) {
-		choices[count] = GUIGlobals.ALL_FIELDS[i];
-		count++;
-	    }
-	return choices;
-    }
-
 
     /**
      * Store changes to table preferences. This method is called when
@@ -515,51 +289,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public void storeSettings() {
 
-	if (colSetup.isEditing()) {
-	    int col = colSetup.getEditingColumn(),
-		row = colSetup.getEditingRow();
-	    colSetup.getCellEditor(row, col).stopCellEditing();
-	}
-
-
-	//_prefs.putStringArray("columnNames", getChoices());
-	/*String[] cols = tableFields.getText().replaceAll("\\s+","")
-	    .replaceAll("\\n+","").toLowerCase().split(";");
-	if (cols.length > 0) for (int i=0; i<cols.length; i++)
-	    cols[i] = cols[i].trim();
-	    else cols = null;*/
-
-	// Now we need to make sense of the contents the user has made to the
-	// table setup table.
-	if (tableChanged) {
-	    // First we remove all rows with empty names.
-	    int i=0;
-	    while (i < tableRows.size()) {
-		if (((TableRow)tableRows.elementAt(i)).name.equals(""))
-		    tableRows.removeElementAt(i);
-		else i++;
-	    }
-	    // Then we make arrays
-	    String[] names = new String[tableRows.size()],
-		widths = new String[tableRows.size()];
-	    int[] nWidths = new int[tableRows.size()];
-
-            _prefs.putInt("numberColWidth", ncWidth);
-	    for (i=0; i<tableRows.size(); i++) {
-		TableRow tr = (TableRow)tableRows.elementAt(i);
-		names[i] = tr.name;
-		nWidths[i] = tr.length;
-		widths[i] = ""+tr.length;
-		//Util.pr(names[i]+"   "+widths[i]);
-	    }
-
-	    // Finally, we store the new preferences.
-            _prefs.putStringArray("columnNames", names);
-	    _prefs.putStringArray("columnWidths", widths);
-	}
-
-	//_prefs.putStringArray("columnNames", cols);
-
 	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
 	_prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
 	_prefs.putBoolean("namesFf", namesFf.isSelected());
@@ -567,7 +296,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
         _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
-        _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?
 		      JTable.AUTO_RESIZE_ALL_COLUMNS :

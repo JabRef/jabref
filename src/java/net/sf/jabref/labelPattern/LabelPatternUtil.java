@@ -157,7 +157,11 @@ public class LabelPatternUtil {
                   else if (val.equals("authorIni")) {
                     _sbvalue.append(oneAuthorPlusIni(_entry.getField("author").toString()));
                   }
-                  else if (val.equals("auth.auth.ea")) {
+                  else if (val.matches("authIni[\\d]+")) {
+                    int num = Integer.parseInt(val.substring(7));
+					_sbvalue.append(authIniN(_entry.getField("author").toString(),num));
+                  }
+				  else if (val.equals("auth.auth.ea")) {
                     _sbvalue.append(authAuthEa(_entry.getField("author").toString()));
                   }
                   else if (val.matches("auth[\\d]+_[\\d]+")) {
@@ -190,6 +194,10 @@ public class LabelPatternUtil {
                   }
                   else if (val.equals("editorIni")) {
                       _sbvalue.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
+                  }
+                  else if (val.matches("edtrIni[\\d]+")) {
+                    int num = Integer.parseInt(val.substring(7));
+					_sbvalue.append(authIniN(_entry.getField("editor").toString(),num));
                   }
                   else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
@@ -511,6 +519,45 @@ public class LabelPatternUtil {
   }
 
 
+  /**
+   * authIniN format:
+   * Each author gets (N div #authors) chars, the remaining
+   * (N mod #authors) chars are equally distributed to the
+   * authors first in the row.
+   * If (N < #authors), only the fist N authors get mentioned.
+   * a) I. Newton and J. Maxwell and A. Einstein and N. Bohr (..)
+   * b) I. Newton and J. Maxwell and A. Einstein 
+   * c) I. Newton and J. Maxwell 
+   * d) I. Newton 
+   * E.g. authIni4 gives: a) NMEB, b) NeME, c) NeMa, d) Newt
+   */
+  private static String authIniN(String authorField, int n) {
+    authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+    StringBuffer author = new StringBuffer();
+    String[] tokens = authorField.split("\\band\\b");
+    int i = 0;
+    int charsAll = n / tokens.length;
+    
+    if (tokens.length == 0) {
+      return author.toString();
+    }
+
+    while (tokens.length > i) {
+      if ( i < (n % tokens.length) ) {
+        author.append(authN_M(authorField,charsAll+1,i));
+      } else {
+        author.append(authN_M(authorField,charsAll,i));
+      }
+      i++;
+    }
+
+    if (author.length() <= n)
+      return author.toString();
+    else
+      return author.toString().substring(0, n);
+  }
+
+	
   /**
    * Split the pages field into two and return the first one
    * @param pages a <code>String</code>

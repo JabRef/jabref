@@ -13,8 +13,9 @@ import com.jgoodies.forms.builder.*;
 public class GeneralTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, backup, openLast,
-		defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-                useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder;
+	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
+	useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder,
+	allowEditing;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -33,6 +34,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				     _prefs.getBoolean("autoOpenForm"));
 	openLast = new JCheckBox(Globals.lang
 				 ("Open last edited databases at startup"),_prefs.getBoolean("openLastEdited"));
+        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
 	backup = new JCheckBox(Globals.lang("Backup old file when saving"),
 			       _prefs.getBoolean("backup"));
 	defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"),
@@ -96,6 +98,7 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 	builder.append(pan); builder.append(defSource); builder.nextLine();
 	builder.append(pan); builder.append(disableOnMultiple); builder.nextLine();
 	builder.appendSeparator(Globals.lang("Miscellaneous"));
+	builder.append(pan); builder.append(allowEditing); builder.nextLine();
 	builder.append(pan); builder.append(ctrlClick); builder.nextLine();
 	builder.append(pan); builder.append(confirmDelete); builder.nextLine();
 	builder.append(pan); builder.append(keyWarningDialog); builder.nextLine();
@@ -121,7 +124,7 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 	builder.append(pan);
 	builder.append(builder2.getPanel());
 	builder.nextLine();
-	builder.appendSeparator();
+	//builder.appendSeparator();
 
 	pan = builder.getPanel();
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -140,7 +143,7 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
         _prefs.putBoolean("saveInStandardOrder", saveInStandardOrder.isSelected());
-
+        _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
 	_prefs.put("defaultOwner", defOwnerField.getText().trim());

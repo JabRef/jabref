@@ -70,7 +70,8 @@ public class PrefsDialog3 extends JDialog {
 	String
 	    GEN = Globals.lang("General"),
 	    EXT = Globals.lang("External programs"),
-	    APP = Globals.lang("Appearance"),
+	    APP = Globals.lang("Entry table"),
+	    COL = Globals.lang("Entry table columns"),
 	    KEY = Globals.lang("Key pattern"),
 	    PRE = Globals.lang("Entry preview"),
 	    ADV = Globals.lang("Advanced");
@@ -79,6 +80,7 @@ public class PrefsDialog3 extends JDialog {
 	al.add(GEN);
 	al.add(EXT);
 	al.add(APP);
+	al.add(COL);
 	al.add(KEY);
 	al.add(PRE);
 	
@@ -95,8 +97,10 @@ public class PrefsDialog3 extends JDialog {
 	
         main.add(new ExternalTab(frame, _prefs), EXT);
         main.add(new TablePrefsTab(_prefs, parent), APP);
+        main.add(new TableColumnsTab(_prefs, parent), COL);
 	main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
         main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
+
 
 	upper.setBorder(BorderFactory.createEtchedBorder());
 

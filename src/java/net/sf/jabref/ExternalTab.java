@@ -87,7 +87,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	browse = new BrowseAction(winEdt, false);
 	builder.append(new JButton(browse)); builder.nextLine();
 
-	builder.appendSeparator();
+	//builder.appendSeparator();
 
 	pan = builder.getPanel();
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
