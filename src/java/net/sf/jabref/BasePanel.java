@@ -463,8 +463,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    output("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
 		Object citekey;
 		// check if lyxpipe is defined
-		File lyxpipe = new File( System.getProperty("user.home")+File.separator+".lyx/lyxpipe" + ".in");
-		//File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+		//File lyxpipe = new File( System.getProperty("user.home")+File.separator+".lyx/lyxpipe" + ".in");
+		File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
 		if( !lyxpipe.exists() || !lyxpipe.canWrite()){
 		    output("ERROR: verify that LyX is running and that the lyxpipe is valid. [" + prefs.get("lyxpipe") +"]");
 		    return;
@@ -478,7 +478,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
 			    citekey= bes.getField(GUIGlobals.KEY_FIELD);
 			    // if the key is empty we give a warning and ignore this entry
-
+			    if(citekey==null || citekey.equals(""))
+				continue;
 			    citeStr += "," + citekey;
 			    message+= ", " + rows[i];
 			}
