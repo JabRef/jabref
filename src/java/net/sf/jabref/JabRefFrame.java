@@ -649,6 +649,7 @@ public class JabRefFrame extends JFrame {
 	normalSearch.setEnabled(false);
 	incrementalSearch.setEnabled(false);
 	importMenu.setEnabled(false);
+	fetchMedline.setEnabled(false);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
 	newEntryAction.setEnabled(false);
@@ -676,6 +677,7 @@ public class JabRefFrame extends JFrame {
 	normalSearch.setEnabled(true);
 	incrementalSearch.setEnabled(true);
 	importMenu.setEnabled(true);
+	fetchMedline.setEnabled(true);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
 	newEntryAction.setEnabled(true);

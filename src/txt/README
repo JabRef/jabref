@@ -8,15 +8,18 @@ Released January 3, 2004
 Introduction:
 
 JabRef is a graphical Java application for editing bibtex (.bib)
-databases.
-
-JabRef lets you organize your entries into overlapping logical groups,
-and with a single click limit your view to a single group or an
-intersection or union of several groups. You can customize the entry
-information shown in the main window, and sort by any of the standard
-Bibtex fields. JabRef can autogenerate bibtex keys for your
+databases. JabRef lets you organize your entries into overlapping
+logical groups, and with a single click limit your view to a single
+group or an intersection or union of several groups. You can customize
+the entry information shown in the main window, and sort by any of the
+standard Bibtex fields. JabRef can autogenerate bibtex keys for your
 entries, and autocomplete words or names in the field types of your
 choosing. Most operations can be done without using the mouse.
+
+Version 1.1 improves customization features significantly, allowing you
+to customize which fields to include as optional and required for each of
+the existing entry types, as well as define new entry types. The "General
+fields" tab can also be set to display any combination of fields.
 
 
 License:
@@ -57,7 +60,10 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.1:	- Added bibtex key uniqueness checking
+1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration
+	  from generating non-unique keys.
+	- Added command line option to load file on startup.
+	- Fixed problem with autogeneration creating invalid keys.
 	- Improved Refer/Endnote import.
 	- Added feature for importing entries and/or strings and/or group
           definitions from another BibTeX database.
