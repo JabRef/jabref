@@ -392,7 +392,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     public AbstractUndoableEdit addSelectionToGroup(BasePanel basePanel) {
         if (getGroup() == null)
             return null; // paranoia
-        AbstractUndoableEdit undo = getGroup().addSelection(basePanel);
+        AbstractUndoableEdit undo = getGroup().addSelection(basePanel.getSelectedEntries());
         if (undo instanceof UndoableChangeAssignment)
             ((UndoableChangeAssignment) undo).setEditedNode(this);
         return undo;
@@ -402,7 +402,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     public AbstractUndoableEdit removeSelectionFromGroup(BasePanel basePanel) {
         if (getGroup() == null)
             return null; // paranoia
-        AbstractUndoableEdit undo = getGroup().removeSelection(basePanel);
+        AbstractUndoableEdit undo = getGroup().removeSelection(basePanel.getSelectedEntries());
         if (undo instanceof UndoableChangeAssignment)
             ((UndoableChangeAssignment) undo).setEditedNode(this);
         return undo;
