@@ -816,13 +816,18 @@ public class Util {
     public static String unquote(String s, char quoteChar) {
     	StringBuffer sb = new StringBuffer();
     	char c;
+        boolean quoted = false;
     	for (int i = 0; i < s.length(); ++i) {
     		c = s.charAt(i);
-    		if (c != quoteChar)
+            if (quoted) { // append literally...
+                if (c != '\n') // ...unless newline
+                    sb.append(c);
+                quoted = false;
+            } else if (c != quoteChar) {
     			sb.append(c);
-            else if (i+1 < s.length() && s.charAt(i+1) == '\n')
-                ++i; // skip quoted newline
-                
+            } else { // quote char
+                quoted = true;
+            }
     	}
     	return sb.toString();
     }
