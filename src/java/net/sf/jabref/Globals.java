@@ -237,12 +237,20 @@ public class Globals {
     }
     fc.addChoosableFileFilter(off);
     fc.setDialogType(dialogType);
+    int dialogResult = JFileChooser.CANCEL_OPTION ;
     if (dialogType == JFileChooser.OPEN_DIALOG) {
-      fc.showOpenDialog(null);
+      dialogResult = fc.showOpenDialog(null);
     }
     else {
-      fc.showSaveDialog(null);
+      dialogResult = fc.showSaveDialog(null);
     }
+
+     // the getSelectedFile method returns a valid fileselection
+     // (if something is selected) indepentently from dialog return status
+    if (dialogResult != JFileChooser.APPROVE_OPTION)
+      return null ;
+
+    // okay button
     File selectedFile = fc.getSelectedFile();
     if (selectedFile == null) { // cancel
       return null;
@@ -294,7 +302,7 @@ public class Globals {
 
   public static String SPECIAL_COMMAND_CHARS = "\"`^~'";
   public static HashMap HTML_CHARS = new HashMap(),
-  	HTMLCHARS = new HashMap(),
+          HTMLCHARS = new HashMap(),
       XML_CHARS = new HashMap();
   static {
 
