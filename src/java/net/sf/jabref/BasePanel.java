@@ -900,7 +900,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     String encoding = Globals.prefs.get("defaultEncoding");
                     ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
                     BibtexDatabase db = pr.getDatabase();
-                    MetaData meta = new MetaData(pr.getMetaData());
+                    MetaData meta = new MetaData(pr.getMetaData(),database());
                     NamedCompound ce = new NamedCompound("Append database");
 
                     if (importEntries) { // Add entries
@@ -933,10 +933,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                           
                           // ensure that there is always only one AllEntriesGroup
                           if (newGroups.getGroup() instanceof AllEntriesGroup)
-                              newGroups.setGroup(new ExplicitGroup("Imported Groups"));
+                              newGroups.setGroup(new ExplicitGroup("Imported Groups",
+                                      database)); // dummy group
                           
-
+                        // groupsSelector is always created, even when no groups
+                        // have been defined. therefore, no check for null is
+                        // required here
                         groupSelector.addGroups(newGroups, ce);
+                        // JZTODO: this should handle ExplicitGroups!!!
                         groupSelector.revalidateGroups();
                       }
                     }
@@ -1708,7 +1712,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
      * @param meta Metadata to input.
      */
     public void parseMetaData(HashMap meta) {
-        metaData = new MetaData(meta);
+        metaData = new MetaData(meta,database());
 
     }
 
@@ -2256,6 +2260,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         } else return true;
 
     }
+    
+    public boolean showBibtexkeyConfirmationDialog(String message) {
+        JOptionPane.showConfirmDialog(frame, 
+                message, "Confirm new Bibtexkey",// JZTODO
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        return true;
+    }
 
     class UndoAction extends BaseAction {
         public void action() {
@@ -2351,5 +2363,9 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
   
   public BibtexEntry[] getSelectedEntries() {
     return entryTable.getSelectedEntries();
-      }
+  }
+  
+  public GroupSelector getGroupSelector() {
+      return groupSelector;
+  }
 }
