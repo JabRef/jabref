@@ -1271,6 +1271,7 @@ public class ImportFormatReader
            String[] pages = new String[2];
            String country = null;
            String address = null;
+           String title = null;
            Vector comments = new Vector();
            // add item
            Object[] l = lines.entrySet().toArray();
@@ -1278,7 +1279,7 @@ public class ImportFormatReader
              Map.Entry entry = (Map.Entry)l[i];
              if (entry.getKey().equals("AU")) hm.put("author",entry.getValue().toString());
              else if (entry.getKey().equals("TI")) hm.put("title",entry.getValue().toString());
-             else if (entry.getKey().equals("ST")) hm.put("booktitle",entry.getValue().toString());
+             else if (entry.getKey().equals("ST")) title = entry.getValue().toString();
              else if (entry.getKey().equals("YP")) hm.put("year",entry.getValue().toString());
              else if (entry.getKey().equals("VL")) hm.put("volume",entry.getValue().toString());
              else if (entry.getKey().equals("NB")) hm.put("number",entry.getValue().toString());
@@ -1341,26 +1342,28 @@ public class ImportFormatReader
            }
 
            String bibtexType = "misc";
-           if (type[1] != null) { // first check TW
-             type[1] = type[1].toLowerCase();
-             if (type[1].indexOf("article") >= 0) bibtexType = "article";
-             else if (type[1].indexOf("book") >= 0) bibtexType = "book";
-             else if (type[1].indexOf("conference") >= 0) bibtexType = "inproceedings";
-             else if (type[1].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
-             else if (type[1].indexOf("report") >= 0) bibtexType = "techreport";
-             else if (type[1].indexOf("thesis") >= 0
-                      && type[1].indexOf("master") >= 0) bibtexType = "mastersthesis";
-             else if (type[1].indexOf("thesis") >= 0) bibtexType = "phdthesis";
-           } else if (type[0] != null) { // check RT
-             type[0] = type[0].toLowerCase();
-             if (type[0].indexOf("article") >= 0) bibtexType = "article";
-             else if (type[0].indexOf("book") >= 0) bibtexType = "book";
-             else if (type[0].indexOf("conference") >= 0) bibtexType = "inproceedings";
-             else if (type[0].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
-             else if (type[0].indexOf("report") >= 0) bibtexType = "techreport";
-             else if (type[0].indexOf("thesis") >= 0
-                      && type[0].indexOf("master") >= 0) bibtexType = "mastersthesis";
-             else if (type[0].indexOf("thesis") >= 0) bibtexType = "phdthesis";
+           // to find type, first check TW, then RT
+           for (int i = 1; i >= 0 && bibtexType.equals("misc"); --i) {
+           	if (type[i] == null)
+           		continue;
+            type[i] = type[i].toLowerCase();
+            if (type[i].indexOf("article") >= 0) bibtexType = "article";
+            else if (type[i].indexOf("journal") >= 0) bibtexType = "article";
+            else if (type[i].indexOf("book") >= 0) bibtexType = "book";
+            else if (type[i].indexOf("conference") >= 0) bibtexType = "inproceedings";
+            else if (type[i].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
+            else if (type[i].indexOf("report") >= 0) bibtexType = "techreport";
+            else if (type[i].indexOf("thesis") >= 0
+                     && type[i].indexOf("master") >= 0) bibtexType = "mastersthesis";
+            else if (type[i].indexOf("thesis") >= 0) bibtexType = "phdthesis";
+           }
+           
+           // depending on bibtexType, decide where to place the title ("RT")
+           if (title != null) {
+	           if (bibtexType.equals("article"))
+	           	hm.put("journal",title);
+	           else
+	           	hm.put("booktitle",title);
            }
 
            // concatenate pages
