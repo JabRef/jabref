@@ -1872,8 +1872,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             highlightEntry(be);
         } else {
             // We must instantiate a new editor for this type.
-            form = new EntryEditor
-                (frame, ths, be, prefs);
+            form = new EntryEditor(frame, ths, be);
             if (visPan >= 0)
                 form.setVisiblePanel(visPan);
             splitPane.setBottomComponent(form);            

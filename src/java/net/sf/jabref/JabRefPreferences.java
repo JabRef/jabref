@@ -45,7 +45,9 @@ public class JabRefPreferences {
     final String
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
-        CUSTOM_TYPE_OPT = "customTypeOpt_";
+        CUSTOM_TYPE_OPT = "customTypeOpt_",
+	CUSTOM_TAB_NAME = "customTabName_",
+	CUSTOM_TAB_FIELDS = "customTabFields_";
 
     Preferences prefs;
     HashMap defaults = new HashMap(),
@@ -56,6 +58,9 @@ public class JabRefPreferences {
 
     // Object containing custom export formats:
     public CustomExportList customExports;
+
+    // Object containing info about customized entry editor tabs.
+    private EntryEditorTabList tabList = null;
 
     // The only instance of this class:
     private static JabRefPreferences INSTANCE = null;
@@ -152,10 +157,19 @@ public class JabRefPreferences {
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
-        //  defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
-        //	     "pdf;abstract;comment;owner");
+
+	// The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
                      "pdf;comment;owner");
+
+	// Entry editor tab 0:
+	defaults.put(CUSTOM_TAB_NAME+"0", Globals.lang("General"));
+        defaults.put(CUSTOM_TAB_FIELDS+"0", "crossref;keywords;doi;url;citeseerurl;"+
+                     "pdf;comment;owner");
+
+	// Entry editor tab 1:
+        defaults.put(CUSTOM_TAB_FIELDS+"1", "abstract");
+	defaults.put(CUSTOM_TAB_NAME+"1", Globals.lang("Abstract"));
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(5));
@@ -617,12 +631,38 @@ public class JabRefPreferences {
      * @param number or higher.
      */
     public void purgeCustomEntryTypes(int number) {
-        while (get(CUSTOM_TYPE_NAME+number) != null) {
+	purgeSeries(CUSTOM_TYPE_NAME, number);
+	purgeSeries(CUSTOM_TYPE_REQ, number);
+	purgeSeries(CUSTOM_TYPE_OPT, number);
+
+        /*while (get(CUSTOM_TYPE_NAME+number) != null) {
             remove(CUSTOM_TYPE_NAME+number);
             remove(CUSTOM_TYPE_REQ+number);
             remove(CUSTOM_TYPE_OPT+number);
             number++;
+	    }*/
+    }
+
+    /**
+     * Removes all entries keyed by prefix+number, where number
+     * is equal to or higher than the given number.
+     * @param number or higher.
+     */
+    public void purgeSeries(String prefix, int number) {
+        while (get(prefix+number) != null) {
+            remove(prefix+number);
+            number++;
         }
+    }
+
+    public EntryEditorTabList getEntryEditorTabList() {
+	if (tabList == null)
+	    updateEntryEditorTabList();
+	return tabList;
+    }
+
+    public void updateEntryEditorTabList() {
+	tabList = new EntryEditorTabList();
     }
 
     /**

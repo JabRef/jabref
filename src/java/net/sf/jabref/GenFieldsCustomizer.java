@@ -56,7 +56,10 @@ public class GenFieldsCustomizer extends JDialog {
     jPanel4.setBorder(BorderFactory.createEtchedBorder());
     jPanel4.setLayout(gridBagLayout1);
     jLabel2.setText(Globals.lang("General fields"));
-    fieldsArea.setText(parent.prefs.get("generalFields"));
+
+    //    fieldsArea.setText(parent.prefs.get("generalFields"));
+    setFieldsText();
+
     //jPanel3.setBackground(GUIGlobals.lightGray);
     revert.setText(Globals.lang("Default"));
     revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
@@ -89,15 +92,28 @@ public class GenFieldsCustomizer extends JDialog {
   }
 
   void ok_actionPerformed(ActionEvent e) {
+      String[] lines = fieldsArea.getText().split("\n");
+      int i=0;
+      for (; i<lines.length; i++) {
+	  String[] parts = lines[i].split(":");
+	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME+i), parts[0]);
+	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS+i), parts[1]);
+      }
+      Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_NAME, i);
+      Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_FIELDS, i);
+      Globals.prefs.updateEntryEditorTabList();
+      /*
     String delimStr = fieldsArea.getText().replaceAll("\\s+","")
         .replaceAll("\\n+","").trim();
     parent.prefs.putStringArray("generalFields", Util.delimToStringArray(delimStr, ";"));
-    for (int i=0; i<parent.tabbedPane.getTabCount(); i++) {
-      BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(i);
-      bp.entryEditors.clear();
-    }
-    dispose();
-    diag.requestFocus();
+      */
+
+      for (int j=0; j<parent.tabbedPane.getTabCount(); j++) {
+	  BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(j);
+	  bp.entryEditors.clear();
+      }
+      dispose();
+      diag.requestFocus();
   }
 
   void cancel_actionPerformed(ActionEvent e) {
@@ -105,8 +121,35 @@ public class GenFieldsCustomizer extends JDialog {
     diag.requestFocus();
   }
 
+    void setFieldsText() {
+	StringBuffer sb = new StringBuffer();
+	String name = null, fields = null;
+	int i=0;
+	while ((name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i)) != null) {
+	    sb.append(name);
+	    fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+i);
+	    sb.append(":");
+	    sb.append(fields);
+	    sb.append("\n");
+	    i++;
+	}
+	fieldsArea.setText(sb.toString());
+    }
+
   void revert_actionPerformed(ActionEvent e) {
-    fieldsArea.setText((String)parent.prefs.defaults.get("generalFields"));
+      StringBuffer sb = new StringBuffer();
+      String name = null, fields = null;
+      int i=0;
+      while ((name = (String)Globals.prefs.defaults.get(Globals.prefs.CUSTOM_TAB_NAME+i)) != null) {
+	  sb.append(name);
+	  fields = (String)Globals.prefs.defaults.get(Globals.prefs.CUSTOM_TAB_FIELDS+i);
+	  sb.append(":");
+	  sb.append(fields);
+	  sb.append("\n");
+	  i++;
+      }
+      fieldsArea.setText(sb.toString());
+      //    fieldsArea.setText((String)parent.prefs.defaults.get("generalFields"));
   }
 }
 

@@ -177,13 +177,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   UndoAction undoAction = new UndoAction();
   RedoAction redoAction = new RedoAction();
 
-  public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_,
-    JabRefPreferences prefs_) {
+  public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_) {
 
     frame = frame_;
     panel = panel_;
     entry = entry_;
-    prefs = prefs_;
+    prefs = Globals.prefs;
     type = entry.getType();
 
     entry.addPropertyChangeListener(this);
@@ -211,7 +210,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     private void setupFieldPanels() {
 	tabbed.removeAll();
 	tabs.clear();
-
+	
 	reqPan = new EntryEditorTab(java.util.Arrays.asList(entry.getRequiredFields()), this, true);
 	tabbed.addTab(Globals.lang("Required fields"),
 		      new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
@@ -225,7 +224,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			  Globals.lang("Show optional fields"));
 	    tabs.add(optPan);
 	}
-		
+	
+	EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+	for (int i=0; i<tabList.getTabCount(); i++) {
+	    EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i), this, false);
+	    tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
+	    tabs.add(newTab);
+	}
+	/*
 	if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1)) {
 	    
 	    genPan = new EntryEditorTab(java.util.Arrays.asList(entry.getGeneralFields()), this, false);
@@ -240,7 +246,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	absPan = new EntryEditorTab(java.util.Arrays.asList(absFields), this, false);	
 	tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
 		      absPan.getPane(), Globals.lang("Show abstract"));
-	tabs.add(absPan);
+		      tabs.add(absPan);*/
 	tabbed.addTab(Globals.lang("BibTeX source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
 		      Globals.lang("Show/edit BibTeX source"));

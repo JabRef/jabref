@@ -43,6 +43,7 @@ public class EntryEditorTab {
     private EntryEditor parent;
     private HashMap editors = new HashMap();
     private FieldEditor activeField = null;
+    private JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     //    private BibtexEntry entry;
 
     public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField) {
@@ -185,6 +186,7 @@ public class EntryEditorTab {
     }
 
     public Component getPane() {
+
 	return panel;
     }
 
