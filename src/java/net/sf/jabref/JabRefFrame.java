@@ -164,7 +164,7 @@ public class JabRefFrame extends JFrame {
 	makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
 					  "Autogenerate BibTeX keys",
 					  GUIGlobals.genKeyIconFile,
-					  prefs.getKey("Autgenerate BibTeX keys")),
+					  prefs.getKey("Autogenerate BibTeX keys")),
 	lyxPushAction = new GeneralAction("pushToLyX", "Insert selected citations into LyX",
 					  "push selection to lyx",
 					  GUIGlobals.lyxIconFile,

@@ -383,7 +383,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Edit preamble", "ctrl P");
 	defKeyBinds.put("Select all", "ctrl A");
 	defKeyBinds.put("Toggle groups", "ctrl shift G");
-	defKeyBinds.put("Autgenerate BibTeX keys", "ctrl G");
+	defKeyBinds.put("Autogenerate BibTeX keys", "ctrl G");
 	defKeyBinds.put("Search", "ctrl F");
 	defKeyBinds.put("Incremental search", "ctrl shift F");
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");

@@ -32,7 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
-// 
+//
 class KeyBindingsDialog extends JDialog
 {
     JList list=new JList();
@@ -59,8 +59,8 @@ class KeyBindingsDialog extends JDialog
 	Box buttonBox=new Box(BoxLayout.X_AXIS);
 	ok=new JButton(Globals.lang("Ok"));
 	cancel=new JButton(Globals.lang("Cancel"));
-	grabB=new JButton(Globals.lang("Grab"));	
-	defB=new JButton(Globals.lang("Default"));	
+	grabB=new JButton(Globals.lang("Grab"));
+	defB=new JButton(Globals.lang("Default"));
 	grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
 	buttonBox.add(grabB);
 	buttonBox.add(defB);
@@ -72,6 +72,13 @@ class KeyBindingsDialog extends JDialog
 	setButtons();
 	setList();
 	keyTF.setEditable(false);
+
+        addWindowListener(new WindowAdapter() {
+          public void windowClosing(WindowEvent e) {
+            clickedSave=false;
+            dispose();
+          }
+        });
     }
     void setTop(){
 	Box topBox=new Box(BoxLayout.X_AXIS);
@@ -92,7 +99,7 @@ class KeyBindingsDialog extends JDialog
 		return;
  	    String code=KeyEvent.getKeyText(evt.getKeyCode());
  	    String mod=KeyEvent.getKeyModifiersText(evt.getModifiers());
-	    // all key bindings must have a modifier: ctrl alt etc 
+	    // all key bindings must have a modifier: ctrl alt etc
 
 	    if(mod.equals("")) {
 		int kc = evt.getKeyCode();
@@ -100,23 +107,23 @@ class KeyBindingsDialog extends JDialog
 		    (kc != KeyEvent.VK_ESCAPE) && (kc != KeyEvent.VK_DELETE))
 		    return; // need a modifier except for function keys
 	    }
-	    // second key cannot be a modifiers 
+	    // second key cannot be a modifiers
 	    //if ( evt.isActionKey()) {
 	    //Util.pr(code);
-	    if (//code.equals("Escape") 
-		    code.equals("Tab") 
-		    || code.equals("Backspace") 
-		    || code.equals("Enter") 
+	    if (//code.equals("Escape")
+		    code.equals("Tab")
+		    || code.equals("Backspace")
+		    || code.equals("Enter")
 		    //|| code.equals("Delete")
-		    || code.equals("Space") 
-		    || code.equals("Ctrl") 
-		    || code.equals("Shift") 
-		    || code.equals("Alt") )    	
+		    || code.equals("Space")
+		    || code.equals("Ctrl")
+		    || code.equals("Shift")
+		    || code.equals("Alt") )
 		    return;
 		//}
 	    String newKey;
 	    if (!mod.equals(""))
-		newKey = mod.toLowerCase() + " " + code; 
+		newKey = mod.toLowerCase() + " " + code;
 	    else
 		newKey = code;
 	    keyTF.setText(newKey);
@@ -137,10 +144,10 @@ class KeyBindingsDialog extends JDialog
             // getValueIsAdjusting() becomes false
             if (!evt.getValueIsAdjusting()) {
                 JList list = (JList)evt.getSource();
-		
+
                 // Get all selected items
                 Object[] selected = list.getSelectedValues();
-		
+
                 // Iterate all selected items
                 for (int i=0; i<selected.length; i++) {
                     Object sel = selected[i];
@@ -153,44 +160,44 @@ class KeyBindingsDialog extends JDialog
 	  // This method is called when new items have been added to the list
 	  public void intervalAdded(ListDataEvent evt) {
 	      DefaultListModel model = (DefaultListModel)evt.getSource();
-	      
+
 	      // Get range of new  items
 	      int start = evt.getIndex0();
 	      int end = evt.getIndex1();
 	      int count = end-start+1;
-	      
+
 	      // Get new items
 	      for (int i=start; i<=end; i++) {
                 Object item = model.getElementAt(i);
             }
         }
-    
+
         // This method is called when items have been removed from the list
         public void intervalRemoved(ListDataEvent evt) {
             // Get range of removed items
             int start = evt.getIndex0();
             int end = evt.getIndex1();
             int count = end-start+1;
-    
+
             // The removed items are not available
         }
-    
-    
+
+
         // This method is called when items in the list are replaced
         public void contentsChanged(ListDataEvent evt) {
             DefaultListModel model = (DefaultListModel)evt.getSource();
-    
+
             // Get range of changed items
             int start = evt.getIndex0();
             int end = evt.getIndex1();
             int count = end-start+1;
-    
+
             // Get changed items
             for (int i=start; i<=end; i++) {
                 Object item = model.getElementAt(i);
             }
         }
-    }  
+    }
     //setup so that clicking on list will display the current binding
     void setList(){
 	list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -229,10 +236,10 @@ class KeyBindingsDialog extends JDialog
 			return;
 		    keyTF.setText(setToDefault((String)list.getSelectedValue()));
 		}});
-	
+
     }
 
-    String setToDefault(String name) 
+    String setToDefault(String name)
     {
 	String defKey = (String)defBinds.get(name);
 	bindHM.put(name, defKey);
@@ -245,11 +252,11 @@ class KeyBindingsDialog extends JDialog
 	HashMap h=new HashMap();
 	h.put("new-bibtex","ctrl N");
 	h.put("edit-bibtex","ctrl E");
-	h.put("exit-bibtex","ctrl Q");	
+	h.put("exit-bibtex","ctrl Q");
 	KeyBindingsDialog d= new KeyBindingsDialog(h);
 	d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	d.setSize(200,300);
 	d.setVisible(true);
-	
+
 	}*/
 }

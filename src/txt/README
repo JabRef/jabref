@@ -50,14 +50,14 @@ or  jar xf <path to jar> <list of files to extract>
 Unpacking the jar file is not necessary to run the program.
 
 
-Building JabRef from source: 
+Building JabRef from source:
 If you have downloaded the source for JabRef, we recommend that you
 build with Ant.  Ant is open source and freely available from
 http://ant.apache.org. The default build target builds JabRef and
-creates the executable jabref.jar in the directory build/lib. 
+creates the executable jabref.jar in the directory build/lib.
 
 
-Documentation: 
+Documentation:
 JabRef comes with an online help function, accessed by presing F1 or
 clicking on a question mark icon. The help files are probably not
 exhaustive enough to satisfy everyone yet, but they should help sort
@@ -67,11 +67,13 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added support for French language.
+1.x:	- Changed the icon set.
+	- Added support for French language.
 	- Added customization of shortcut keys.
 	- Added customization of key generation.
 	- Improved HTML export.
-	- Added Replace string feature.	
+	- Added Replace string feature.
+    	- Made a couple of adaptations for Mac OS X users.
 	- Added option in Table Preferences to set current column widths as default.
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
 	- Fixed bug that made selector words added in the dialog to be lowercased.

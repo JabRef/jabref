@@ -26,14 +26,14 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	con.weightx = 0;
 	con.insets = new Insets(10, 10, 10, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
-	
+
 	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"),
 				     _prefs.getBoolean("autoOpenForm"));
 	openLast = new JCheckBox(Globals.lang
 				 ("Open last edited databases at startup"),_prefs.getBoolean("openLastEdited"));
 	backup = new JCheckBox(Globals.lang("Backup old file when saving"),
 			       _prefs.getBoolean("backup"));
-	defSource = new JCheckBox(Globals.lang("Show source by default"),
+	defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"),
 				  _prefs.getBoolean("defaultShowSource"));
 	editSource = new JCheckBox(Globals.lang("Enable source editing"),
 				   _prefs.getBoolean("enableSourceEditing"));
@@ -71,7 +71,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	//gbl.setConstraints(defSort, con);
 	//general.add(defSort);
-	
+
 
         // Grouping field
         con.gridwidth = 1;
@@ -204,7 +204,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
 	//_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
-	
+
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 
 	// We should maybe do some checking on the validity of the contents?

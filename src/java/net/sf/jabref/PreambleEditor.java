@@ -51,7 +51,7 @@ public class PreambleEditor extends JDialog {
 
 
     public PreambleEditor(JabRefFrame baseFrame,
-			  BasePanel panel, BibtexDatabase base, 
+			  BasePanel panel, BibtexDatabase base,
 			  JabRefPreferences prefs) {
 	super(baseFrame);
 	this.baseFrame = baseFrame;
@@ -65,7 +65,7 @@ public class PreambleEditor extends JDialog {
 		}
 		public void windowOpened(WindowEvent e) {
 		    ed.requestFocus();
-		}	
+		}
 	    });
 	setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 		protected boolean accept(Component c) {
@@ -75,7 +75,7 @@ public class PreambleEditor extends JDialog {
 
 	int prefHeight = (int)(GUIGlobals.PE_HEIGHT*GUIGlobals.FORM_HEIGHT[prefs.getInt("entryTypeFormHeightFactor")]);
 	setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
-	
+
 	pan.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	con.weighty = 1;
@@ -83,8 +83,9 @@ public class PreambleEditor extends JDialog {
 
 	String content = base.getPreamble();
 
-	ed = new FieldTextArea("Preamble", ((content != null) ? content : ""));
+	ed = new FieldTextArea(Globals.lang("Preamble"), ((content != null) ? content : ""));
 	setupJTextComponent((FieldTextArea)ed);
+
 	gbl.setConstraints(ed.getLabel(), con);
 	pan.add(ed.getLabel());
 
@@ -92,11 +93,11 @@ public class PreambleEditor extends JDialog {
 
 	gbl.setConstraints(ed.getPane(), con);
 	pan.add(ed.getPane());
-	
+
 	//tlb.add(closeAction);
 	//conPane.add(tlb, BorderLayout.NORTH);
 	conPane.add(pan, BorderLayout.CENTER);
-	setTitle(Globals.lang("Edit preamble"));	
+	setTitle(Globals.lang("Edit preamble"));
     }
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
@@ -130,8 +131,8 @@ public class PreambleEditor extends JDialog {
 	   if (!e.isTemporary())
 	       storeFieldAction.actionPerformed(new ActionEvent(e.getSource(), 0, ""));
        }
-       
-   }    
+
+   }
 
     StoreFieldAction storeFieldAction = new StoreFieldAction();
     class StoreFieldAction extends AbstractAction {
@@ -170,7 +171,7 @@ public class PreambleEditor extends JDialog {
 		    ed.setLabelColor(GUIGlobals.nullFieldColor);
 		    ed.setBackground(GUIGlobals.validFieldBackground);
 		}
-		panel.markBaseChanged();		
+		panel.markBaseChanged();
 	    }
 
 	}
@@ -181,7 +182,7 @@ public class PreambleEditor extends JDialog {
 	public UndoAction() {
 	    super("Undo", new ImageIcon(GUIGlobals.undoIconFile));
 	    putValue(SHORT_DESCRIPTION, "Undo");
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("undo");
@@ -194,7 +195,7 @@ public class PreambleEditor extends JDialog {
 	public RedoAction() {
 	    super("Undo", new ImageIcon(GUIGlobals.redoIconFile));
 	    putValue(SHORT_DESCRIPTION, "Redo");
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("redo");
@@ -203,13 +204,13 @@ public class PreambleEditor extends JDialog {
     }
 
     // The action concerned with closing the window.
-    CloseAction closeAction = new CloseAction(); 
+    CloseAction closeAction = new CloseAction();
     class CloseAction extends AbstractAction {
 	public CloseAction() {
-	    super(Globals.lang("Close window")); 
+	    super(Globals.lang("Close window"));
 	    //, new ImageIcon(GUIGlobals.closeIconFile));
 	    //putValue(SHORT_DESCRIPTION, "Close window (Ctrl-Q)");
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    storeFieldAction.actionPerformed(null);
 	    panel.preambleEditorClosing();

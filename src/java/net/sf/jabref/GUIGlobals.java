@@ -96,7 +96,7 @@ public class GUIGlobals {
       pre = "/images/",
       helpPre = "/help/";
 
-    public static URL
+/*    public static URL
     //appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
      openIconFile = GUIGlobals.class.getResource(pre+"Open.gif"),
    saveIconFile = GUIGlobals.class.getResource(pre+"Save.gif"),
@@ -142,9 +142,9 @@ public class GUIGlobals {
      sheetIcon = GUIGlobals.class.getResource(pre+"Sheet.gif"),
      jabreflogo = GUIGlobals.class.getResource(pre+"JabRef-Logo.gif");
     //jabreflogo=new ImageIcon(getClass().getResource(pre+"JabRef-Logo.gif")));//.getImage());
-   /*
+   */
   public static URL
-      openIconFile = GUIGlobals.class.getResource(pre + "fileopen.png"),
+      openIconFile = GUIGlobals.class.getResource(pre + "fileopen2.png"),
 
       saveIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
       saveAsIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
@@ -153,7 +153,7 @@ public class GUIGlobals {
       newIconFile = GUIGlobals.class.getResource(pre + "filenew.png"),
       undoIconFile = GUIGlobals.class.getResource(pre + "undo.png"),
       redoIconFile = GUIGlobals.class.getResource(pre + "redo.png"),
-      preambleIconFile = GUIGlobals.class.getResource(pre + "Preamble.gif"),
+      preambleIconFile = GUIGlobals.class.getResource(pre + "preamble.png"),
       addIconFile = GUIGlobals.class.getResource(pre + "news_subscribe.png"),
       delRowIconFile = GUIGlobals.class.getResource(pre + "news_unsubscribe.png"),
       showReqIconFile = GUIGlobals.class.getResource(pre + "r_icon.gif"),
@@ -163,15 +163,15 @@ public class GUIGlobals {
       copyIconFile = GUIGlobals.class.getResource(pre + "editcopy.png"),
       cutIconFile = GUIGlobals.class.getResource(pre + "editcut.png"),
       copyKeyIconFile = GUIGlobals.class.getResource(pre + "editcopy.png"),
-      genKeyIconFile = GUIGlobals.class.getResource(pre + "GenKey.gif"),
-      lyxIconFile = GUIGlobals.class.getResource(pre + "LyX.gif"),
+      genKeyIconFile = GUIGlobals.class.getResource(pre + "wizard.png"),
+      lyxIconFile = GUIGlobals.class.getResource(pre + "lyx.png"),
       backIconFile = GUIGlobals.class.getResource(pre + "back.png"),
       forwardIconFile = GUIGlobals.class.getResource(pre + "forward.png"),
       contentsIconFile = GUIGlobals.class.getResource(pre + "contents2.png"),
       removeIconFile = GUIGlobals.class.getResource(pre + "editdelete.png"),
       upIconFile = GUIGlobals.class.getResource(pre + "up.png"),
       downIconFile = GUIGlobals.class.getResource(pre + "down.png"),
-      stringsIconFile = GUIGlobals.class.getResource(pre + "Strings.gif"),
+      stringsIconFile = GUIGlobals.class.getResource(pre + "strings.png"),
       groupsIconFile = GUIGlobals.class.getResource(pre + "queue.png"),
       closeIconFile = GUIGlobals.class.getResource(pre + "fileclose.png"),
       refreshSmallIconFile = GUIGlobals.class.getResource(pre + "reload.png"),
@@ -187,7 +187,7 @@ public class GUIGlobals {
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "www.png"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");
-*/
+
 // Help files (in HTML format):
   public static String
       baseFrameHelp = "BaseFrameHelp.html",
