@@ -6,8 +6,7 @@
  */
 package net.sf.jabref.imports;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -19,9 +18,10 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
-import org.xml.sax.AttributeList;
-import org.xml.sax.HandlerBase;
+
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author mspiegel
@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class CiteSeerUndoHandler extends HandlerBase {
+public class CiteSeerUndoHandler extends DefaultHandler {
 
     NamedCompound citeseerNamedCompound = null;
 
@@ -173,25 +173,25 @@ public class CiteSeerUndoHandler extends HandlerBase {
         return overwrite;
     }
 
-    public void startElement(String name, AttributeList attrs)
+    public void startElement(String name, String localName, String qName, Attributes attrs)
             throws SAXException {
-        if (name.equals("oai_citeseer:relation")) {
+        if (qName.equals("oai_citeseer:relation")) {
     			for (int i = 0; i < attrs.getLength(); i++) {
-    			   String attrName = attrs.getName(i);
+    			   String attrName = attrs.getQName(i);
     			   String attrValue = attrs.getValue(i);	   
     			   if (attrName.equals("type") && attrValue.equals("Is Referenced By")) {  	
     			   	citeseerCitationCount++;
     			   }
     			}
-        } else if (name.equals("oai_citeseer:author")) {        	
+        } else if (qName.equals("oai_citeseer:author")) {        	
             addAuthor(attrs.getValue("name"));
-        } else if (name.equals("dc:title")) {
+        } else if (qName.equals("dc:title")) {
             nextField = "title";
             nextAssign = true;
-        } else if (name.equals("dc:date")) {
+        } else if (qName.equals("dc:date")) {
             nextField = "year";
             nextAssign = true;
-        } else if (name.equals("dc:identifier")) {
+        } else if (qName.equals("dc:identifier")) {
             nextField = "citeseerurl";
             nextAssign = true;
         }

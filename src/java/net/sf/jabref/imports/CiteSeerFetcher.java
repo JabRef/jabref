@@ -10,6 +10,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
@@ -135,6 +137,22 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 * thread accessing the progress bar at any time.
 	 */
 
+	class ShowEmptyFetchSetDialog implements Runnable {
+	
+		public void run() {
+			JOptionPane.showMessageDialog(panel.frame(),
+				Globals.lang("The CiteSeer fetch operation returned zero results" 
+						+ "."),
+				"CiteSeer",
+				JOptionPane.INFORMATION_MESSAGE);
+			deactivateCitationFetcher();
+		}		
+	}
+
+	public ShowEmptyFetchSetDialog getEmptyFetchSetDialog() {
+		return(new ShowEmptyFetchSetDialog());
+	}
+	
 	class ShowNoConnectionDialog implements Runnable {
 		protected String targetURL = "";
 		ShowNoConnectionDialog(String URL) {
@@ -369,7 +387,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 * @param newDatabase
 	 * @param targetDatabase
 	 */
-	public void populate(BibtexDatabase newDatabase, BibtexDatabase targetDatabase) {
+	public int populate(BibtexDatabase newDatabase, BibtexDatabase targetDatabase) {
+		int errorCode = 0;
 		Iterator targetIterator = targetDatabase.getKeySet().iterator();
 		boolean abortOperation = false;
 		String currentKey;
@@ -395,6 +414,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			SwingUtilities.invokeLater(updateValue);
 		}
 		if (rejectedEntries.size() > 0) {
+			errorCode = -1;
 		    ShowBadIdentifiersDialog badIdentifiersDialog = new ShowBadIdentifiersDialog(rejectedEntries);
 		    SwingUtilities.invokeLater(badIdentifiersDialog);
 		}
@@ -407,7 +427,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		generateCitationList(citationHashTable, newDatabase);
 		newEntryEnum = citationHashTable.elements();
 		progressStatus = new UpdateProgressStatus(Globals.lang("Done"));
-		SwingUtilities.invokeLater(progressStatus);				
+		SwingUtilities.invokeLater(progressStatus);
+		if (abortOperation)
+			errorCode = -2;
+		return(errorCode);
 	}
 
 
@@ -525,7 +548,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		return(abortOperation);
 	}
 
-	  public boolean importCiteSeerEntries(int[] clickedOn, NamedCompound citeseerNamedCompound) {
+	public boolean importCiteSeerEntries(int[] clickedOn, NamedCompound citeseerNamedCompound) {
 	  	boolean newValues = false;
 	  	boolean abortOperation = false;
 	  	Vector clickedVector = new Vector();
@@ -575,9 +598,21 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append("&" + OAI_METADATAPREFIX);
 					citeseerURLString.append("&" + "identifier=" + identifier);
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-					int response = citeseerHttpClient.executeMethod(citeseerMethod);		
-					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), 
-							new CiteSeerUndoHandler(citeseerNC, be, panel, newValue, overwriteAll, overwriteNone));
+					int response = citeseerHttpClient.executeMethod(citeseerMethod);
+					InputStream inputStream  = citeseerMethod.getResponseBodyAsStream();
+					DefaultHandler handlerBase = new CiteSeerUndoHandler(citeseerNC, be, panel, newValue, overwriteAll, overwriteNone);
+
+					/*
+					 * Debugging: there must exist an easier way to do this.
+					 *
+					 *
+					InputStreamReader iReader = new InputStreamReader(inputStream);
+					int nextChar;
+					while ((nextChar = iReader.read()) != -1) {
+						System.out.print((char) nextChar);
+					}
+					*/
+					saxParser.parse(inputStream, handlerBase);
 					citeseerMethod.releaseConnection();
 				} else {
                     int row = panel.getTableModel().getNumberFromName(be.getId());

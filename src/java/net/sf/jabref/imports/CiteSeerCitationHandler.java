@@ -1,10 +1,12 @@
 package net.sf.jabref.imports;
-import java.util.Hashtable;
-import java.util.Vector;
 
-import org.xml.sax.AttributeList;
-import org.xml.sax.HandlerBase;
+
+
+import java.util.Hashtable;
+
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /*
  * Created on Jun 13, 2004
@@ -19,7 +21,7 @@ import org.xml.sax.SAXException;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class CiteSeerCitationHandler extends HandlerBase {
+public class CiteSeerCitationHandler extends DefaultHandler {
 
 	protected boolean correctDirection;
 	protected boolean getCitation;
@@ -48,10 +50,11 @@ public class CiteSeerCitationHandler extends HandlerBase {
 	}
 
 
-	public void startElement(String name, AttributeList attrs) throws SAXException {
-		if (name.equals("oai_citeseer:relation")) {
+	public void startElement(String name, String localName, String qName, Attributes attrs)
+			throws SAXException {
+		if (qName.equals("oai_citeseer:relation")) {
 			for (int i = 0; i < attrs.getLength(); i++) {
-			   String attrName = attrs.getName(i);
+			   String attrName = attrs.getQName(i);
 			   String attrValue = attrs.getValue(i);	   
 			   if (attrName.equals("type") && attrValue.equals("Is Referenced By")) {
 			   		correctDirection = true;
@@ -59,7 +62,7 @@ public class CiteSeerCitationHandler extends HandlerBase {
 			   		correctDirection = false;
 			   }
 			 }
-		} else if (name.equals("oai_citeseer:uri") && correctDirection) {
+		} else if (qName.equals("oai_citeseer:uri") && correctDirection) {
 			getCitation = true;
 		}
 	}
