@@ -19,6 +19,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
@@ -56,7 +57,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	boolean importFetcherActive;
 
 	BasePanel panel;
-	JProgressBar progressBar;
+	JProgressBar progressBar, progressBar2;
+	JLabel citeSeerProgress;
 	GridBagLayout gbl = new GridBagLayout();
 	GridBagConstraints con = new GridBagConstraints();
 	SidePaneManager sidePaneManager;
@@ -66,24 +68,33 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		panel = panel_;
 		sidePaneManager = p0;
 		progressBar = new JProgressBar();
+		progressBar2 = new JProgressBar();
+		citeSeerProgress = new JLabel();
 		progressBar.setValue(0);
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
 		progressBar.setStringPainted(true);
+		progressBar2.setValue(0);
+		progressBar2.setMinimum(0);
+		progressBar2.setMaximum(100);
+		progressBar2.setStringPainted(true);
 		setLayout(gbl);
 		SidePaneHeader header = new SidePaneHeader
 			("CiteSeer Transfer", GUIGlobals.wwwCiteSeerIcon, this);
-		con.gridwidth = GridBagConstraints.REMAINDER;
+		con.gridwidth = GridBagConstraints.REMAINDER;			
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 1;
 		con.insets = new Insets(0, 0, 2,  0);
 		gbl.setConstraints(header, con);
 		add(header);
-		con.gridwidth = 1;
 		con.insets = new Insets(0, 0, 0,  0);
-		con.fill = GridBagConstraints.HORIZONTAL;
+		con.fill = GridBagConstraints.HORIZONTAL;		
 		gbl.setConstraints(progressBar, con);
-		add(progressBar);
+		add(progressBar);		
+		gbl.setConstraints(progressBar2, con);
+		add(progressBar2);
+		gbl.setConstraints(citeSeerProgress, con);
+		add(citeSeerProgress);		
 		try {
 			citationFetcherActive = false;
 			importFetcherActive = false;
@@ -224,6 +235,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 	}
 
+	class UpdateProgressBarTwoMaximum implements Runnable {
+		protected int maximum;
+		UpdateProgressBarTwoMaximum(int newValue) {
+			maximum = newValue;
+		}
+		public void run() {
+			progressBar2.setMaximum(maximum);
+		}
+	}
+
 	class InitializeProgressBar implements Runnable {
 	    public void run() {
 			progressBar.setValue(0);
@@ -233,6 +254,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	    }
 	}
 
+	class InitializeProgressBarTwo implements Runnable {
+
+		public void run() {
+			progressBar2.setValue(0);
+	        progressBar2.setMinimum(0);
+			progressBar2.setMaximum(100);
+		    progressBar2.setString(null);
+	    }
+	}
+		
 	class UpdateProgressBarValue implements Runnable {
 		protected int counter;
 		UpdateProgressBarValue(int newValue) {
@@ -243,6 +274,26 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 	}
 
+	class UpdateProgressBarTwoValue implements Runnable {
+		protected int counter;
+		UpdateProgressBarTwoValue(int newValue) {
+			counter = newValue;
+		}
+		public void run() {
+			progressBar2.setValue(counter);
+		}		
+	}
+
+	class UpdateProgressStatus implements Runnable {
+		protected String status;
+		UpdateProgressStatus(String newStatus) {
+			status = newStatus;
+		}
+		public void run() {
+			citeSeerProgress.setText(status);
+		}
+	}
+	
 	/* End Inner Class Declarations */
 
 
@@ -275,6 +326,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	public void beginImportCiteSeerProgress() {
 	    progressBar.setIndeterminate(true);
 	    progressBar.setString("");
+	    progressBar2.setVisible(false);
+	    citeSeerProgress.setText("");
 	    sidePaneManager.ensureVisible("CiteSeerProgress");
 	}
 	public void endImportCiteSeerProgress() {
@@ -299,22 +352,36 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		Hashtable citationHashTable = new Hashtable();
 		Hashtable rejectedEntries = new Hashtable();
 		InitializeProgressBar initializeProgressBar = new InitializeProgressBar();
+		InitializeProgressBarTwo initializeProgressBarTwo = new InitializeProgressBarTwo();
+		UpdateProgressBarMaximum updateMaximum = new UpdateProgressBarMaximum(targetDatabase.getEntryCount());		
+	    progressBar2.setVisible(true);		
 		SwingUtilities.invokeLater(initializeProgressBar);
+		SwingUtilities.invokeLater(initializeProgressBarTwo);
+		SwingUtilities.invokeLater(updateMaximum);		
+		int identifierCounter = 0;
+		UpdateProgressStatus progressStatus = new UpdateProgressStatus(Globals.lang("Fetching Identifiers"));
+		SwingUtilities.invokeLater(progressStatus);
 		while (targetIterator.hasNext() && !abortOperation) {
 			currentKey = (String) targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);
 			abortOperation = generateIdentifierList(currentEntry, citationHashTable, rejectedEntries);
+			UpdateProgressBarValue updateValue = new UpdateProgressBarValue(++identifierCounter);			
+			SwingUtilities.invokeLater(updateValue);
 		}
 		if (rejectedEntries.size() > 0) {
 		    ShowBadIdentifiersDialog badIdentifiersDialog = new ShowBadIdentifiersDialog(rejectedEntries);
 		    SwingUtilities.invokeLater(badIdentifiersDialog);
 		}
 		if (citationHashTable.size() > 0) {
-			UpdateProgressBarMaximum updateMaximum = new UpdateProgressBarMaximum(citationHashTable.size());
-			SwingUtilities.invokeLater(updateMaximum);
+			UpdateProgressBarTwoMaximum update2Maximum = new UpdateProgressBarTwoMaximum(citationHashTable.size());
+			SwingUtilities.invokeLater(update2Maximum);
 		}
+		progressStatus = new UpdateProgressStatus(Globals.lang("Fetching Citations"));
+		SwingUtilities.invokeLater(progressStatus);		
 		generateCitationList(citationHashTable, newDatabase);
 		newEntryEnum = citationHashTable.elements();
+		progressStatus = new UpdateProgressStatus(Globals.lang("Done"));
+		SwingUtilities.invokeLater(progressStatus);				
 	}
 
 
@@ -340,7 +407,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				citeseerMethod.releaseConnection();
 				database.insertEntry(newEntry);
 				citationCounter++;
-				UpdateProgressBarValue updateValue = new UpdateProgressBarValue(citationCounter);
+				UpdateProgressBarTwoValue updateValue = new UpdateProgressBarTwoValue(citationCounter);
 				SwingUtilities.invokeLater(updateValue);
 			}
 		}

@@ -98,6 +98,12 @@ public class EntryComparator implements Comparator {
 	//    theirs = ((String)e2.getField(sortField)).toLowerCase();
 	if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
 		result = -(((Integer) f1).compareTo((Integer) f2));
+	} else if (f2 instanceof Integer) {
+		Integer f1AsInteger = new Integer(f1.toString());
+		result = -((f1AsInteger).compareTo((Integer) f2));
+	} else if (f1 instanceof Integer) {
+		Integer f2AsInteger = new Integer(f2.toString());
+		result = -(((Integer) f1).compareTo(f2AsInteger));
 	} else {
 		String ours = ((String) f1).toLowerCase(),
 	    	theirs = ((String) f2).toLowerCase();
