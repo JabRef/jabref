@@ -519,6 +519,9 @@ public class JabRefPreferences {
         defKeyBinds.put("Unmark entries", "ctrl shift M");
         defKeyBinds.put("Fetch Medline", "F5");
         defKeyBinds.put("New from plain text", "ctrl shift N");
+        defKeyBinds.put("Import fields from CiteSeer", "ctrl shift C");
+        defKeyBinds.put("Fetch citations from CiteSeer", "F7");
+
     }
 
     private String getNextUnit(Reader data) throws IOException {

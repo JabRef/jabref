@@ -1495,7 +1495,7 @@ class ImportCiteSeerAction
         super(Globals.lang("Import Fields from CiteSeer"),
                 new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
         putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
-
+	putValue(ACCELERATOR_KEY, prefs.getKey("Import fields from CiteSeer"));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -1572,6 +1572,7 @@ class FetchCiteSeerAction
                         super(Globals.lang("Fetch Citations from CiteSeer"),
                                 new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
                         putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
+			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
                 }
 
                 public void actionPerformed(ActionEvent e) {

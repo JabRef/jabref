@@ -311,6 +311,11 @@ public class JabRef {
     //openGui = false;
     if (!graphicFailure && !disableGui.isInvoked()) {
 
+	// Call the method performCompatibilityUpdate(), which does any
+	// necessary changes for users with a preference set from an older
+	// Jabref version.
+	Util.performCompatibilityUpdate();
+
 
       //Font fnt = new Font("plain", Font.PLAIN, 12);
 

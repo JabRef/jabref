@@ -165,10 +165,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
                 }
                 rowNumbers = rowNumbers + " and " + ((Integer)rowSet.first()).toString();            
                 JOptionPane.showMessageDialog(panel.frame(),
-                        Globals.lang("I couldn't parse the CiteSeer URL field of the following entries") + ':' + '\n' + 
+                        Globals.lang("Couldn't parse the 'citeseerurl' field of the following entries") + ':' + '\n' + 
                         rowNumbers + ".\n" + 
                         Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools" + '.'),
-                        Globals.lang("CiteSeer Warning"),
+                        Globals.lang("Warning"),
                         JOptionPane.WARNING_MESSAGE);
             }
         }
