@@ -42,8 +42,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
                 .createDefaultDragGestureRecognizer(this,
                         DnDConstants.ACTION_MOVE, this);
-        // Eliminates right mouse clicks as valid actions - useful especially if
-        // you implement a JPopupMenu for the JTree
+        // Eliminates right mouse clicks as valid actions
         dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
         DropTarget dropTarget = new DropTarget(this,this);
     }
