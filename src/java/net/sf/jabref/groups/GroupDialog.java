@@ -44,9 +44,9 @@ import net.sf.jabref.search.*;
  * containing group information.
  */
 class GroupDialog extends JDialog {
-    private static final int INDEX_KEYWORDGROUP = 0;
-    private static final int INDEX_SEARCHGROUP = 1;
-    private static final int INDEX_EXPLICITGROUP = 2;
+    private static final int INDEX_EXPLICITGROUP = 0;
+    private static final int INDEX_KEYWORDGROUP = 1;
+    private static final int INDEX_SEARCHGROUP = 2;
     private static final int TEXTFIELD_LENGTH = 30;
     // for all types
     private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
@@ -68,9 +68,12 @@ class GroupDialog extends JDialog {
     private JPanel m_searchGroupPanel;
     private JLabel m_searchType = new JLabel("Plaintext Search");
     private JCheckBox m_searchAllFields = new JCheckBox("Search All Fields");
-    private JCheckBox m_searchRequiredFields = new JCheckBox("Search Required Fields");
-    private JCheckBox m_searchOptionalFields = new JCheckBox("Search Optional Fields");
-    private JCheckBox m_searchGeneralFields = new JCheckBox("Search General Fields");
+    private JCheckBox m_searchRequiredFields = new JCheckBox(
+            "Search Required Fields");
+    private JCheckBox m_searchOptionalFields = new JCheckBox(
+            "Search Optional Fields");
+    private JCheckBox m_searchGeneralFields = new JCheckBox(
+            "Search General Fields");
     private SearchExpressionParser m_parser;
     // JZTODO: translations...
 
@@ -99,7 +102,8 @@ class GroupDialog extends JDialog {
      *            The group being edited, or null if a new group is to be
      *            created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel, AbstractGroup editedGroup) {
+    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
+            AbstractGroup editedGroup) {
         super(jabrefFrame, Globals.lang("Edit group"), true);
         m_basePanel = basePanel;
         m_parent = jabrefFrame;
@@ -109,9 +113,9 @@ class GroupDialog extends JDialog {
         m_searchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
 
         // configure elements
+        m_types.addElement("Explicit");
         m_types.addElement("Keywords");
         m_types.addElement("Search Expression");
-        m_types.addElement("Explicit");
         m_typeSelector.setModel(m_types);
 
         // create layout
@@ -209,21 +213,10 @@ class GroupDialog extends JDialog {
                         m_resultingGroup.setName(m_name.getText().trim());
                     } else {
                         m_resultingGroup = new ExplicitGroup(m_name.getText()
-                                .trim(),m_basePanel.database());
+                                .trim(), m_basePanel.database());
                         if (m_editedGroup == null)
                             break; // do not perform the below converion
-                        // JZTODO lyrics...
-                        int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
-                                "Assign all entries that matched the previous group to this group?",
-                                "Conversion to an Explicit Group",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE);
-                        BibtexEntry entry;
-                        for (Iterator it = m_basePanel.database().getEntries().iterator(); it.hasNext(); ) {
-                            entry = (BibtexEntry) it.next();
-                            if (m_editedGroup.contains(entry))
-                                ((ExplicitGroup) m_resultingGroup).addEntry(entry);
-                        }
+                        addPreviousEntries();
                     }
                     break;
                 case INDEX_KEYWORDGROUP:
@@ -373,16 +366,48 @@ class GroupDialog extends JDialog {
             } catch (Exception e) {
                 // advancedSearch remains false;
             }
-            m_searchType.setText(advancedSearch ? "Advanced Search":"Plaintext Search");
+            m_searchType.setText(advancedSearch ? "Advanced Search"
+                    : "Plaintext Search");
             m_searchAllFields.setEnabled(!advancedSearch);
-            m_searchRequiredFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
-            m_searchOptionalFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
-            m_searchGeneralFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
+            m_searchRequiredFields.setEnabled(!advancedSearch
+                    && !m_searchAllFields.isSelected());
+            m_searchOptionalFields.setEnabled(!advancedSearch
+                    && !m_searchAllFields.isSelected());
+            m_searchGeneralFields.setEnabled(!advancedSearch
+                    && !m_searchAllFields.isSelected());
             validate();
             break;
         case INDEX_EXPLICITGROUP:
             break;
         }
         m_ok.setEnabled(okEnabled);
+    }
+
+    /**
+     * This is used when a group is converted and the new group supports
+     * explicit adding of entries: All entries that match the previous group are
+     * added to the new group.
+     */
+    private void addPreviousEntries() {
+        // JZTODO in general, this should create undo information
+        // because it might affect the entries. currently, it is only
+        // used for ExplicitGroups; the undo information for this case is
+        // contained completely in the UndoableModifyGroup object. 
+        // JZTODO lyrics...
+        int i = JOptionPane
+                .showConfirmDialog(
+                        m_basePanel.frame(),
+                        "Assign all entries that matched the previous group to this group?",
+                        "Conversion to an Explicit Group",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (i == JOptionPane.NO_OPTION)
+            return;
+        BibtexEntry entry;
+        for (Iterator it = m_basePanel.database().getEntries().iterator(); it
+                .hasNext();) {
+            entry = (BibtexEntry) it.next();
+            if (m_editedGroup.contains(entry))
+                ((ExplicitGroup) m_resultingGroup).addEntry(entry);
+        }
     }
 }
