@@ -170,7 +170,11 @@ public class JabRefFrame
                                        "Toggle groups interface",
                                        GUIGlobals.groupsIconFile,
                                        prefs.getKey("Toggle groups interface")),
-      makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
+      togglePreview = new GeneralAction("togglePreview",
+
+                                        "Toggle entry preview",
+                                        prefs.getKey("Toggle entry preview")),
+       makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
                                         "Autogenerate BibTeX keys",
                                         GUIGlobals.genKeyIconFile,
                                         prefs.getKey("Autogenerate BibTeX keys")),
@@ -759,6 +763,7 @@ public class JabRefFrame
     view.add(nextTab);
     view.add(prevTab);
     view.addSeparator();
+    view.add(togglePreview);
     view.add(toggleGroups);
     mb.add(view);
 
@@ -962,6 +967,7 @@ public class JabRefFrame
     fetchMedline.setEnabled(false);
     openFile.setEnabled(false);
     openUrl.setEnabled(false);
+    togglePreview.setEnabled(false);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(false);
     }
@@ -1000,6 +1006,7 @@ public class JabRefFrame
     fetchMedline.setEnabled(true);
     openFile.setEnabled(true);
     openUrl.setEnabled(true);
+    togglePreview.setEnabled(true);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(true);
     }
@@ -1335,6 +1342,10 @@ public class JabRefFrame
   private void addBibEntries(ArrayList bibentries, String filename,
                              boolean intoNew) {
     // check if bibentries is null
+    if (bibentries == null) {
+      output(Globals.lang("Ne entries imported."));
+      return;
+    }
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.
       BibtexDatabase database = new BibtexDatabase();
@@ -1429,7 +1440,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1521,7 +1532,7 @@ public class JabRefFrame
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readReferenceManager10(
               tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));			  
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1539,7 +1550,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readScifinder(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1553,14 +1564,31 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readSixpack(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
     });
     importMenu.add(newSixpack_mItem);
 
+    //########################################
+    JMenuItem newBiblioscapeTagFile_mItem = new JMenuItem(Globals.lang("Biblioscape Tag File"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+    newBiblioscapeTagFile_mItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+      {
+        String tempFilename = getNewFile();
+        if( tempFilename != null )//filenm != null)
+        {
+          ArrayList bibs=ImportFormatReader.readBiblioscapeTagFile(tempFilename);
+          addBibEntries( bibs, tempFilename, intoNew);
+        }
+      }
+    });
+    importMenu.add(newBiblioscapeTagFile_mItem);
+
   }
+
+
 
   //
   // simply opens up a jfilechooser dialog and gets a filename

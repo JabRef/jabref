@@ -84,7 +84,7 @@ public class GUIGlobals {
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
       KEYBIND_COL_1 = 80, // Added to the font size when determining table
-      PREVIEW_HEIGHT = 100;
+      PREVIEW_HEIGHT = 125;
   // row height
   public static final double
       VERTICAL_DIVIDER_LOCATION = 0.4;
@@ -454,7 +454,7 @@ public class GUIGlobals {
 
   public static int DEFAULT_FIELD_LENGTH = 100,
       NUMBER_COL_LENGTH = 32,
-      WIDTH_ICON_COL = 20;
+      WIDTH_ICON_COL = 19;
   public static final Map FIELD_WEIGHT;
   public static final Map FIELD_EXTRAS, LANGUAGES;
   public static Map fieldLength = new HashMap();

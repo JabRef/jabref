@@ -63,6 +63,12 @@ public class JabRefPreferences {
 	    defaults.put("psviewer","open /Applications/Preview.app");
 	    defaults.put("htmlviewer","open /Applications/Safari.app");
 	}
+        else if (Globals.osName.toLowerCase().startsWith("windows")) {
+          defaults.put("pdfviewer","cmd.exe /c start /b");
+          defaults.put("psviewer","cmd.exe /c start /b");
+          defaults.put("htmlviewer","cmd.exe /c start /b");
+        }
+
 	else {
 	    defaults.put("pdfviewer","acroread");
 	    defaults.put("psviewer","gv");
@@ -435,6 +441,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Delete", "Delete");
         defKeyBinds.put("Open PDF or PS", "F4");
         defKeyBinds.put("Open URL or DOI", "F3");
+        defKeyBinds.put("Toggle entry preview", "F9");
 	//defKeyBinds.put("Edit entry", "ctrl E");
     }
 

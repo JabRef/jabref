@@ -1005,6 +1005,19 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                 }
               });
 
+              actions.put("togglePreview", new BaseAction() {
+                  public void action() {
+                    previewEnabled = !previewEnabled;
+                    if (!previewEnabled)
+                      hidePreview();
+                    else {
+                      BibtexEntry[] bes = entryTable.getSelectedEntries();
+                      if ((bes != null) && (bes.length > 0))
+                        updateWiewToSelected(bes[0]);
+                    }
+                  }
+                });
+
     }
 
     /**
@@ -1264,8 +1277,18 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    stringDialog.refreshTable();
     }
 
-    public void previewEntry(BibtexEntry be) {
-	if (isShowingEditor()) return;
+    public void updateWiewToSelected(BibtexEntry be) {
+      // First, if the entry editor is visible, we should update it to the selected entry.
+      if (showing != null) {
+        BibtexEntry[] bes = entryTable.getSelectedEntries();
+        if ((bes != null) && (bes.length > 0))
+          showEntry(bes[0]);
+        return;
+      }
+      // If no entry editor is visible we must either instantiate a new preview panel or update the one we have.
+      if (!previewEnabled)
+        return; // Do nothing if previews are disabled.
+
       if (previewPanel == null) {
         previewPanel = new PreviewPanel(be);
       } else
@@ -1273,6 +1296,17 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       splitPane.setBottomComponent(previewPanel);
       splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
       previewPanel.repaint();
+    }
+
+    /**
+     * Ensure that no preview is shown. Called when preview is turned off. Must chech if
+     * a preview is in fact visible before doing anything rash.
+     */
+    public void hidePreview() {
+      previewPanel = null;
+      Component c = splitPane.getBottomComponent();
+      if ((c != null) && (c instanceof PreviewPanel))
+        splitPane.setBottomComponent(null);
     }
 
     public boolean isShowingEditor() {

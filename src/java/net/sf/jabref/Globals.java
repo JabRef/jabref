@@ -50,7 +50,7 @@ public class Globals {
 	MAC = "Mac OS X",
         DOI_LOOKUP_PREFIX = "http://dx.doi.org/",
         NONE = "_non__";
-    public static float duplicateThreshold = 0.78f;
+    public static float duplicateThreshold = 0.75f;
 
     public static GlobalFocusListener focusListener = new GlobalFocusListener();
 

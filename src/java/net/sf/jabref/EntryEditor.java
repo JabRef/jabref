@@ -533,16 +533,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           if (chosenFile != null) {
             File newFile = new File(chosenFile);
             String position = newFile.getParent();
-            if (position.startsWith(pdfDir))
-						{
-							// Construct path relative to pdf base dir
-							String relPath = position.substring(pdfDir.length(), position.length()) + File.separator + newFile.getName();
-							// Remove leading path separator
-							if( relPath.startsWith( File.separator ) )
-								relPath = relPath.substring( File.separator.length(), relPath.length() );
-							// Set relative path as field value
+            if ((pdfDir != null) && position.startsWith(pdfDir))
+            {
+              // Construct path relative to pdf base dir
+              String relPath = position.substring(pdfDir.length(), position.length()) + File.separator + newFile.getName();
+              // Remove leading path separator
+              if( relPath.startsWith( File.separator ) )
+                relPath = relPath.substring( File.separator.length(), relPath.length() );
+                // Set relative path as field value
               ed.setText( relPath );
-						}
+            }
             else
               ed.setText(newFile.getPath());
             prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());
@@ -604,6 +604,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter());
 		String srcString = sw.getBuffer().toString();
 		source.setText(srcString);
+                lastSourceStringAccepted = srcString;
 	    } catch (IOException ex) {
 		source.setText("Error: "+ex.getMessage()+"\n\n"
 			       +"Correct the entry, and "
@@ -861,8 +862,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    // is not stored and the textarea turns red.
 
 		    if (toSet != null)
-			(new LatexFieldFormatter()).format
-			    (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
+                      (new LatexFieldFormatter()).format
+                          (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
 
 		    Object oldValue = entry.getField(fe.getFieldName());
 		    entry.setField(fe.getFieldName(), toSet);
@@ -883,7 +884,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    panel.markBaseChanged();
 
 		} catch (IllegalArgumentException ex) {
-		    frame.output("Invalid field format: "+ex.getMessage());
+                  JOptionPane.showMessageDialog
+                      (frame, "Error: "+ex.getMessage(), Globals.lang("Error setting field"),
+                       JOptionPane.ERROR_MESSAGE);
+		    //frame.output("Invalid field format: "+ex.getMessage());
 		    fe.setLabelColor(GUIGlobals.invalidFieldColor);
 		    fe.setBackground(GUIGlobals.invalidFieldBackground);
 		} /*catch (java.io.IOException ex2) {
@@ -932,7 +936,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		panel.markBaseChanged();
 
 	    } else if ((source.isEditable())
-		       && (source.getText() != lastSourceStringAccepted)) {
+		       && (!source.getText().equals(lastSourceStringAccepted))) {
 		// Store edited bibtex code.
 		BibtexParser bp = new BibtexParser
 		    (new java.io.StringReader(source.getText()));
@@ -972,13 +976,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			if (entry.getField(fields[i].toString()) !=
 			    nu.getField(fields[i].toString()))
 			    {
+                              String toSet = (String)nu.getField(fields[i].toString());
+
+                              // Test if the field is legally set.
+                              (new LatexFieldFormatter()).format
+                                  (toSet, GUIGlobals.isStandardField(fields[i].toString()));
+
 				compound.addEdit
 				    (new UndoableFieldChange
 				     (entry, fields[i].toString(),
 				      entry.getField(fields[i].toString()),
-				      nu.getField(fields[i].toString())));
+				      toSet));
 				entry.setField(fields[i].toString(),
-					       nu.getField(fields[i].toString()));
+					       toSet);
 				anyChanged = true;
 			    }
 		    compound.end();

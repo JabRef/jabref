@@ -940,5 +940,171 @@ public class ImportFormatReader
     //
     //==================================================
 
+    /**
+     * Imports a Biblioscape Tag File. The format is described on
+     * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm
+     * Several Biblioscape field types are ignored. Others are only included in the
+     * BibTeX field "comment".
+    */
+   public static ArrayList readBiblioscapeTagFile(String filename) {
+     ArrayList bibitems = new ArrayList();
+     File f = new File(filename);
+     if (!f.exists() || !f.canRead() || !f.isFile()) {
+       System.err.println("Error: " + filename + " is not a valid file and|or is not readable.");
+       return null;
+     }
+
+     try {
+       BufferedReader in = new BufferedReader(new FileReader(filename));
+       String line;
+       HashMap hm = new HashMap();
+       HashMap lines = new HashMap();
+       StringBuffer previousLine = null;
+       while ((line = in.readLine()) != null) {
+         // entry delimiter -> item complete
+         if (line.equals("------")) {
+           String[] type = new String[2];
+           String[] pages = new String[2];
+           String country = null;
+           String address = null;
+           Vector comments = new Vector();
+           // add item
+           Object[] l = lines.entrySet().toArray();
+           for (int i = 0; i < l.length; ++i) {
+             Map.Entry entry = (Map.Entry)l[i];
+             if (entry.getKey().equals("AU")) hm.put("author",entry.getValue().toString());
+             else if (entry.getKey().equals("TI")) hm.put("title",entry.getValue().toString());
+             else if (entry.getKey().equals("ST")) hm.put("booktitle",entry.getValue().toString());
+             else if (entry.getKey().equals("YP")) hm.put("year",entry.getValue().toString());
+             else if (entry.getKey().equals("VL")) hm.put("volume",entry.getValue().toString());
+             else if (entry.getKey().equals("NB")) hm.put("number",entry.getValue().toString());
+             else if (entry.getKey().equals("PS")) pages[0] = entry.getValue().toString();
+             else if (entry.getKey().equals("PE")) pages[1] = entry.getValue().toString();
+             else if (entry.getKey().equals("KW")) hm.put("keywords",entry.getValue().toString());
+             //else if (entry.getKey().equals("RM")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("RU")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("RT")) type[0] = entry.getValue().toString();
+             else if (entry.getKey().equals("SB")) comments.add("Subject: " + entry.getValue().toString());
+             else if (entry.getKey().equals("SA")) comments.add("Secondary Authors: " + entry.getValue().toString());
+             else if (entry.getKey().equals("NT")) hm.put("note",entry.getValue().toString());
+             //else if (entry.getKey().equals("PP")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("PB")) hm.put("publisher",entry.getValue().toString());
+             else if (entry.getKey().equals("TA")) comments.add("Tertiary Authors: " + entry.getValue().toString());
+             else if (entry.getKey().equals("TT")) comments.add("Tertiary Title: " + entry.getValue().toString());
+             else if (entry.getKey().equals("ED")) hm.put("edition",entry.getValue().toString());
+             //else if (entry.getKey().equals("DP")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("TW")) type[1] = entry.getValue().toString();
+             else if (entry.getKey().equals("QA")) comments.add("Quaternary Authors: " + entry.getValue().toString());
+             else if (entry.getKey().equals("QT")) comments.add("Quaternary Title: " + entry.getValue().toString());
+             else if (entry.getKey().equals("IS")) hm.put("isbn",entry.getValue().toString());
+             //else if (entry.getKey().equals("LA")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("AB")) hm.put("abstract",entry.getValue().toString());
+             //else if (entry.getKey().equals("DI")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("DM")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("AV")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("PR")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("LO")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("AD")) address = entry.getValue().toString();
+             else if (entry.getKey().equals("LG")) hm.put("language",entry.getValue().toString());
+             else if (entry.getKey().equals("CO")) country = entry.getValue().toString();
+             else if (entry.getKey().equals("UR") || entry.getKey().equals("AT")) {
+               String s = entry.getValue().toString().trim();
+               hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? "url" : "pdf",
+                      entry.getValue().toString());
+             }
+             else if (entry.getKey().equals("C1")) comments.add("Custom1: " + entry.getValue().toString());
+             else if (entry.getKey().equals("C2")) comments.add("Custom2: " + entry.getValue().toString());
+             else if (entry.getKey().equals("C3")) comments.add("Custom3: " + entry.getValue().toString());
+             else if (entry.getKey().equals("C4")) comments.add("Custom4: " + entry.getValue().toString());
+             //else if (entry.getKey().equals("RD")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("MB")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("C5")) comments.add("Custom5: " + entry.getValue().toString());
+             else if (entry.getKey().equals("C6")) comments.add("Custom6: " + entry.getValue().toString());
+             //else if (entry.getKey().equals("FA")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("CN")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("DE")) hm.put("annote",entry.getValue().toString());
+             //else if (entry.getKey().equals("RP")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("DF")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("RS")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("CA")) comments.add("Categories: " + entry.getValue().toString());
+             //else if (entry.getKey().equals("WP")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("TH")) comments.add("Short Title: " + entry.getValue().toString());
+             //else if (entry.getKey().equals("WR")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("EW")) hm.put("",entry.getValue().toString());
+             else if (entry.getKey().equals("SE")) hm.put("chapter",entry.getValue().toString());
+             //else if (entry.getKey().equals("AC")) hm.put("",entry.getValue().toString());
+             //else if (entry.getKey().equals("LP")) hm.put("",entry.getValue().toString());
+           }
+
+           String bibtexType = "misc";
+           if (type[1] != null) { // first check TW
+             type[1] = type[1].toLowerCase();
+             if (type[1].indexOf("article") >= 0) bibtexType = "article";
+             else if (type[1].indexOf("book") >= 0) bibtexType = "book";
+             else if (type[1].indexOf("conference") >= 0) bibtexType = "inproceedings";
+             else if (type[1].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
+             else if (type[1].indexOf("report") >= 0) bibtexType = "techreport";
+             else if (type[1].indexOf("thesis") >= 0
+                      && type[1].indexOf("master") >= 0) bibtexType = "mastersthesis";
+             else if (type[1].indexOf("thesis") >= 0) bibtexType = "phdthesis";
+           } else if (type[0] != null) { // check RT
+             type[0] = type[0].toLowerCase();
+             if (type[0].indexOf("article") >= 0) bibtexType = "article";
+             else if (type[0].indexOf("book") >= 0) bibtexType = "book";
+             else if (type[0].indexOf("conference") >= 0) bibtexType = "inproceedings";
+             else if (type[0].indexOf("proceedings") >= 0) bibtexType = "inproceedings";
+             else if (type[0].indexOf("report") >= 0) bibtexType = "techreport";
+             else if (type[0].indexOf("thesis") >= 0
+                      && type[0].indexOf("master") >= 0) bibtexType = "mastersthesis";
+             else if (type[0].indexOf("thesis") >= 0) bibtexType = "phdthesis";
+           }
+
+           // concatenate pages
+           if (pages[0] != null || pages[1] != null)
+             hm.put("pages",(pages[0] != null ? pages[0] : "")
+                    + (pages[1] != null ? "--" + pages[1] : ""));
+
+             // concatenate address and country
+           if (address != null)
+             hm.put("address",address + (country != null ? ", " + country : ""));
+
+           if (comments.size() > 0) { // set comment if present
+             StringBuffer s = new StringBuffer();
+             for (int i = 0; i < comments.size(); ++i)
+               s.append((i > 0 ? "; " : "")+ comments.elementAt(i).toString());
+             hm.put("comment",s.toString());
+           }
+           BibtexEntry b = new BibtexEntry(
+      Globals.DEFAULT_BIBTEXENTRY_ID,
+   Globals.getEntryType(bibtexType));
+     b.setField(hm);
+     bibitems.add(b);
+
+     hm.clear();
+     lines.clear();
+     previousLine = null;
+
+     continue;
+   }
+   // new key
+   if (line.startsWith("--") && line.length() >= 7 && line.substring(4,7).equals("-- ")) {
+     lines.put(line.substring(2,4),previousLine = new StringBuffer(line.substring(7)));
+     continue;
+   }
+   // continuation (folding) of previous line
+   if (previousLine == null) // sanity check; should never happen
+     return null;
+   previousLine.append(line.trim());
+ }
+  } catch (IOException e) {
+    return null;
+  }
+
+  return bibitems;
+}
+
+
+
+
 
 }

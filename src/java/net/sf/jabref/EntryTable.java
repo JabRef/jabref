@@ -98,8 +98,9 @@ public class EntryTable extends JTable {
         });
 
         addMouseListener(new TableClickListener()); // Add the listener that responds to clicks on the table.
-        if (panel.previewEnabled())
-          enablePreviewListener();
+
+        addSelectionListener(); // Add the listener that responds to new entry selection.
+        // (to update entry editor or preview)
         setWidths();
         sp.getViewport().setBackground(GUIGlobals.tableBackground);
         updateFont();
@@ -109,14 +110,15 @@ public class EntryTable extends JTable {
        * A ListSelectionListener for updating the preview panel when the user selects an
        * entry. Should only be active when preview is enabled.
        */
-      public void enablePreviewListener() {
+      public void addSelectionListener() {
         if (previewListener == null)
           previewListener = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
               if (!e.getValueIsAdjusting()) {
                 int row = getSelectedRow();//e.getFirstIndex();
-                panel.previewEntry(panel.database().getEntryById(tableModel.
-                    getNameFromNumber(row)));
+                if (row >= 0)
+                  panel.updateWiewToSelected(panel.database().getEntryById(tableModel.
+                      getNameFromNumber(row)));
               }
             }
           };
