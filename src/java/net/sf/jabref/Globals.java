@@ -44,9 +44,10 @@ public class Globals {
       FUTURE_YEAR = 2050; // Needs to give a year definitely in the future. Used for guessing the
                           // year field when parsing textual data.  :-)
 
-  private static String resourcePrefix = "resource/JabRef";
+  private static String resourcePrefix = "resource/JabRef",
+      menuResourcePrefix = "resource/Menu";
   private static String logfile = "jabref.log";
-  public static ResourceBundle messages;
+  public static ResourceBundle messages, menuTitles;
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
 
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
@@ -123,6 +124,7 @@ public class Globals {
   public static void setLanguage(String language, String country) {
     locale = new Locale(language, country);
     messages = ResourceBundle.getBundle(resourcePrefix, locale);
+    menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale);
     Locale.setDefault(locale);
     javax.swing.JComponent.setDefaultLocale(locale);
   }
@@ -132,6 +134,27 @@ public class Globals {
     try {
       if (Globals.messages != null) {
         translation = Globals.messages.getString(key.replaceAll(" ", "_"));
+      }
+    }
+    catch (MissingResourceException ex) {
+      translation = key;
+
+      //System.err.println("Warning: could not get translation for \""
+      //                   + key + "\"");
+    }
+    if ((translation != null) && (translation.length() != 0)) {
+      return translation.replaceAll("_", " ");
+    }
+    else {
+      return key;
+    }
+  }
+
+  public static String menuTitle(String key) {
+    String translation = null;
+    try {
+      if (Globals.messages != null) {
+        translation = Globals.menuTitles.getString(key.replaceAll(" ", "_"));
       }
     }
     catch (MissingResourceException ex) {

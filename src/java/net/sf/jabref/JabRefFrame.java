@@ -274,11 +274,11 @@ public class JabRefFrame
 
 
   // The menus for importing/appending other formats
-  JMenu importMenu = new JMenu(Globals.lang("Import and append")),
-      importNewMenu = new JMenu(Globals.lang("Import")),
-      exportMenu = new JMenu(Globals.lang("Export")),
-      customExportMenu = new JMenu(Globals.lang("Custom export")),
-      newDatabaseMenu = new JMenu( Globals.lang( "New database" ) ) ;
+  JMenu importMenu = subMenu("Import and append"),
+      importNewMenu = subMenu("Import"),
+      exportMenu = subMenu("Export"),
+      customExportMenu = subMenu("Custom export"),
+      newDatabaseMenu = subMenu("New database" );
 
 
   // The action for adding a new entry of unspecified type.
@@ -662,32 +662,34 @@ public JabRefPreferences prefs() {
   }
 
   class GeneralAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     private String command;
     public GeneralAction(String command, String text,
                          String description, URL icon) {
-      super(Globals.lang(text), new ImageIcon(icon));
+      super(new ImageIcon(icon));
       this.command = command;
+      putValue(NAME, text);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public GeneralAction(String command, String text,
                          String description, URL icon,
                          KeyStroke key) {
-      super(Globals.lang(text), new ImageIcon(icon));
+      super(new ImageIcon(icon));
       this.command = command;
+      putValue(NAME, text);
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
     public GeneralAction(String command, String text) {
-      super(Globals.lang(text));
+      putValue(NAME, text);
       this.command = command;
     }
 
-    public GeneralAction(String command, String text, KeyStroke key) {
-      super(Globals.lang(text));
+    public GeneralAction(String command, String text, KeyStroke key) { 
       this.command = command;
+      putValue(NAME, text);
       putValue(ACCELERATOR_KEY, key);
     }
 
@@ -735,30 +737,30 @@ public JabRefPreferences prefs() {
    */
 
   class NewEntryAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
 
     String type = null; // The type of item to create.
     KeyStroke keyStroke = null; // Used for the specific instances.
 
     public NewEntryAction(KeyStroke key) {
       // This action leads to a dialog asking for entry type.
-      super(Globals.lang("New entry"),
-            new ImageIcon(GUIGlobals.addIconFile));
+      super(new ImageIcon(GUIGlobals.addIconFile));
+      putValue(NAME, "New entry");
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX entry"));
     }
 
     public NewEntryAction(String type_) {
       // This action leads to the creation of a specific entry.
-      super(Util.nCase(type_));
+      putValue(NAME, Util.nCase(type_));
       type = type_;
     }
 
     public NewEntryAction(String type_, KeyStroke key) {
-      // This action leads to the creation of a specific entry.
-      super(Util.nCase(type_));
-      putValue(ACCELERATOR_KEY, key);
-      type = type_;
+	// This action leads to the creation of a specific entry.
+	putValue(NAME, Util.nCase(type_));
+	putValue(ACCELERATOR_KEY, key);
+	type = type_;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -803,14 +805,14 @@ public JabRefPreferences prefs() {
     }*/
 
   private void fillMenu() {
-    JMenu file = new JMenu(Globals.lang("File")),
-        edit = new JMenu(Globals.lang("Edit")),
-        bibtex = new JMenu(Globals.lang("BibTeX")),
-        view = new JMenu(Globals.lang("View")),
-        tools = new JMenu(Globals.lang("Tools")),
-        options = new JMenu(Globals.lang("Options")),
-        newSpec = new JMenu(Globals.lang("New entry...")),
-        helpMenu = new JMenu(Globals.lang("Help"));
+    JMenu file = subMenu("File"),
+        edit = subMenu("Edit"),
+        bibtex = subMenu("BibTeX"),
+        view = subMenu("View"),
+        tools = subMenu("Tools"),
+        options = subMenu("Options"),
+        newSpec = subMenu("New entry..."),
+        helpMenu = subMenu("Help");
 
     setUpImportMenu(importMenu, false);
     setUpImportMenu(importNewMenu, true);
@@ -949,6 +951,20 @@ public JabRefPreferences prefs() {
     helpMenu.add(about);
     mb.add(helpMenu);
   }
+
+    private JMenu subMenu(String name) {
+	name = Globals.menuTitle(name);
+	int i = name.indexOf('&');
+	JMenu res;
+	if (i >= 0) {
+	    res = new JMenu(name.substring(0, i)+name.substring(i+1));
+	    char mnemonic = Character.toUpperCase(name.charAt(i+1));
+	    res.setMnemonic((int)mnemonic);
+	}
+	else res = new JMenu(name);
+	
+	return res;
+    }
 
   private void createToolBar() {
 
@@ -1282,9 +1298,9 @@ public JabRefPreferences prefs() {
    * The action concerned with closing the window.
    */
   class CloseAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public CloseAction() {
-      super(Globals.lang("Quit"));
+      putValue(NAME, "Quit");
       putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
       putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
       //putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q,
@@ -1300,14 +1316,13 @@ public JabRefPreferences prefs() {
   // The action for closing the current database and leaving the window open.
   CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
   class CloseDatabaseAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public CloseDatabaseAction() {
-      super(Globals.lang("Close database"),
-            new ImageIcon(GUIGlobals.closeIconFile));
-
-      putValue(SHORT_DESCRIPTION,
-               Globals.lang("Close the current database"));
-      putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
+	super(new ImageIcon(GUIGlobals.closeIconFile));
+	putValue(NAME, "Close database");
+	putValue(SHORT_DESCRIPTION,
+		 Globals.lang("Close the current database"));
+	putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -1360,10 +1375,10 @@ public JabRefPreferences prefs() {
   // The action concerned with opening an existing database.
   OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
   class OpenDatabaseAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public OpenDatabaseAction() {
-      super(Globals.lang("Open database"),
-            new ImageIcon(GUIGlobals.openIconFile));
+      super(new ImageIcon(GUIGlobals.openIconFile));
+      putValue(NAME, "Open database");
       putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
     }
@@ -1472,13 +1487,12 @@ public JabRefPreferences prefs() {
 
   // The action concerned with opening a new database.
   class NewDatabaseAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public NewDatabaseAction() {
-      super(Globals.lang("New database"),
-
-            new ImageIcon(GUIGlobals.newIconFile));
-      putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
-      //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+	super(new ImageIcon(GUIGlobals.newIconFile));
+	putValue(NAME, "New database");
+	putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
+	//putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -2227,9 +2241,10 @@ class FetchCiteSeerAction
 
 
 class SaveSessionAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public SaveSessionAction() {
-      super(Globals.lang("Save session"), new ImageIcon(GUIGlobals.saveIconFile));
+      super(new ImageIcon(GUIGlobals.saveIconFile));
+      putValue(NAME, "Save session");
       putValue(ACCELERATOR_KEY, prefs.getKey("Save session"));
     }
 
@@ -2334,9 +2349,10 @@ class SaveSessionAction
   }
 
   class LoadSessionAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public LoadSessionAction() {
-      super(Globals.lang("Load session"), new ImageIcon(GUIGlobals.openIconFile));
+      super(new ImageIcon(GUIGlobals.openIconFile));
+      putValue(NAME, "Load session");
       putValue(ACCELERATOR_KEY, prefs.getKey("Load session"));
     }
 
@@ -2404,12 +2420,13 @@ class SaveSessionAction
    * relevant name in its action map.
    */
   class EditAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     private String command;
     public EditAction(String command, URL icon) {
-      super(Globals.lang(Util.nCase(command)), new ImageIcon(icon));
+      super(new ImageIcon(icon));
       this.command = command;
       String nName = Util.nCase(command);
+      putValue(NAME, nName);
       putValue(ACCELERATOR_KEY, prefs.getKey(nName));
       putValue(SHORT_DESCRIPTION, Globals.lang(nName));
       //putValue(ACCELERATOR_KEY,
@@ -2429,9 +2446,9 @@ class SaveSessionAction
     }
   }
 
-  class CustomizeExportsAction extends AbstractAction {
+  class CustomizeExportsAction extends MnemonicAwareAction {
     public CustomizeExportsAction() {
-      super(Globals.lang("Manage custom exports"));
+      putValue(NAME, "Manage custom exports");
     }
 
     public void actionPerformed(ActionEvent e) {
