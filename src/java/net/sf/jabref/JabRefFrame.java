@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 USA
 
 Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
+http://www.gnu.org/copyleft/gpl.ja.html0
 
 */
 package net.sf.jabref;
@@ -32,8 +32,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.io.*;
 import java.net.URL;
+import java.util.regex.Matcher;
 
 /**
  * The main window of the application.
@@ -139,21 +142,21 @@ public class JabRefFrame extends JFrame {
 
     public JabRefFrame() {
 
-	//Globals.setLanguage("no", "");
-	setTitle(GUIGlobals.frameTitle);
-	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e) {
+		//Globals.setLanguage("no", "");
+		setTitle(GUIGlobals.frameTitle);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
 		    (new CloseAction()).actionPerformed(null);
-		}	
-	    });
-	
-	initLabelMaker();
-	  
-	setupLayout();		
-	setSize(new Dimension(prefs.getInt("sizeX"),
-			      prefs.getInt("sizeY")));
-	setLocation(new Point(prefs.getInt("posX"),
+				}	
+			});
+		
+		initLabelMaker();
+		
+		setupLayout();		
+		setSize(new Dimension(prefs.getInt("sizeX"),
+							  prefs.getInt("sizeY")));
+		setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
 
 	// If the option is enabled, open the last edited databases, if any.
@@ -359,7 +362,7 @@ public class JabRefFrame extends JFrame {
 	//setNonEmptyState();	
 	Util.pr("JabRefFrame: Must set non-empty state.");
     }
-
+    
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
 	    edit = new JMenu(Globals.lang("Edit")),
@@ -368,13 +371,28 @@ public class JabRefFrame extends JFrame {
 	    tools = new JMenu(Globals.lang("Tools")),
 	    options = new JMenu(Globals.lang("Options")),
 	    newSpec = new JMenu(Globals.lang("New entry..."));
+	JMenu importMenu = new JMenu(Globals.lang("Import"));
+
+	setUpImportMenu(importMenu);
+	
 	file.add(newDatabaseAction);
-	file.add(open);
+	file.add(open);//opendatabaseaction
+	file.add(importMenu);
 	file.add(save);
 	file.add(saveAs);
 	file.add(new FileHistory(prefs));
 	file.addSeparator();
 	file.add(close);
+	//==============================
+	// NB: I added this because my frame borders are so tiny that I cannot click
+	// on the "x" close button. Anyways, I think it is good to have and "exit" button
+	// I was too lazy to make a new ExitAction
+	JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
+	exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
+	// above keybinding should be from user define
+	exit_mItem.addActionListener(new CloseAction() );
+	file.add( exit_mItem);
+	//=====================================
 	file.add(quit);
 	mb.add(file);
 
@@ -439,16 +457,16 @@ public class JabRefFrame extends JFrame {
 
 
     private JMenuItem mItem(AbstractAction a, KeyStroke ks) {
-	// Set up a menu item with action and accelerator key.
-	JMenuItem mi = new JMenuItem();
-	mi.setAction(a);
-	if (ks != null)
-	    mi.setAccelerator(ks);
-	return mi;
+		// Set up a menu item with action and accelerator key.
+		JMenuItem mi = new JMenuItem();
+		mi.setAction(a);
+		if (ks != null)
+			mi.setAccelerator(ks);
+		return mi;
     }
-
+	
     //private void setupMainPanel() {
-
+	
 
     /*public Completer getAutoCompleter(String field) {
 	return (Completer)autoCompleters.get(field);
@@ -521,260 +539,398 @@ public class JabRefFrame extends JFrame {
      * The action concerned with closing the window.
      */
     class CloseAction extends AbstractAction {
-	public CloseAction() {
-	    super(Globals.lang("Quit"));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
-	    putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
-	}    
-	
-	public void actionPerformed(ActionEvent e) {
-	    // Ask here if the user really wants to close, if the base
-	    // has not been saved since last save.
-	    boolean close = true;	    
-	    Vector filenames = new Vector();
-	    if (tabbedPane.getTabCount() > 0) {
-		for (int i=0; i<tabbedPane.getTabCount(); i++) {
-		    if (baseAt(i).baseChanged) {
-			tabbedPane.setSelectedIndex(i);
-			int answer = JOptionPane.showConfirmDialog
-			    (ths, Globals.lang
-			     ("Database has changed. Do you "
-			      +"want to save before closing?"),
-			     Globals.lang("Save before closing"),
-			     JOptionPane.YES_NO_CANCEL_OPTION);
-			
-			if ((answer == JOptionPane.CANCEL_OPTION) || 
-			    (answer == JOptionPane.CLOSED_OPTION))
-			    close = false; // The user has cancelled.
-			if (answer == JOptionPane.YES_OPTION) {
-			    // The user wants to save.
-			    basePanel().runCommand("save");
+		public CloseAction() {
+			super(Globals.lang("Quit"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
+			putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
+		}    
+		
+		public void actionPerformed(ActionEvent e) {
+			// Ask here if the user really wants to close, if the base
+			// has not been saved since last save.
+			boolean close = true;	    
+			Vector filenames = new Vector();
+			if (tabbedPane.getTabCount() > 0) {
+				for (int i=0; i<tabbedPane.getTabCount(); i++) {
+					if (baseAt(i).baseChanged) {
+						tabbedPane.setSelectedIndex(i);
+						int answer = JOptionPane.showConfirmDialog
+							(ths, Globals.lang
+							 ("Database has changed. Do you "
+							  +"want to save before closing?"),
+							 Globals.lang("Save before closing"),
+							 JOptionPane.YES_NO_CANCEL_OPTION);
+						
+						if ((answer == JOptionPane.CANCEL_OPTION) || 
+							(answer == JOptionPane.CLOSED_OPTION))
+							close = false; // The user has cancelled.
+						if (answer == JOptionPane.YES_OPTION) {
+							// The user wants to save.
+							basePanel().runCommand("save");
+						}
+					}
+					if (baseAt(i).file != null)
+						filenames.add(baseAt(i).file.getPath());
+				}
 			}
-		    }
-		    if (baseAt(i).file != null)
-			filenames.add(baseAt(i).file.getPath());
+			if (close) {
+				dispose();
+				
+				
+				
+				prefs.putInt("posX", ths.getLocation().x);
+				prefs.putInt("posY", ths.getLocation().y);
+				prefs.putInt("sizeX", ths.getSize().width);
+				prefs.putInt("sizeY", ths.getSize().height);
+				
+				if (prefs.getBoolean("openLastEdited")) {
+					// Here we store the names of allcurrent filea. If
+					// there is no current file, we remove any
+					// previously stored file name.
+					if (filenames.size() == 0)
+						prefs.remove("lastEdited");
+					else {
+						String[] names = new String[filenames.size()];
+						for (int i=0; i<filenames.size(); i++)
+							names[i] = (String)filenames.elementAt(i);
+						
+						prefs.putStringArray("lastEdited", names);
+					}
+				}
+				
+				// Let the search interface store changes to prefs.
+				searchManager.updatePrefs();
+				
+				System.exit(0); // End program.
+			}
 		}
-	    }
-	    if (close) {
-		dispose();
-
-		
-
-		prefs.putInt("posX", ths.getLocation().x);
-		prefs.putInt("posY", ths.getLocation().y);
-		prefs.putInt("sizeX", ths.getSize().width);
-		prefs.putInt("sizeY", ths.getSize().height);
-		
-		if (prefs.getBoolean("openLastEdited")) {
-		  // Here we store the names of allcurrent filea. If
-		  // there is no current file, we remove any
-		  // previously stored file name.
-		    if (filenames.size() == 0)
-			prefs.remove("lastEdited");
-		    else {
-			String[] names = new String[filenames.size()];
-			for (int i=0; i<filenames.size(); i++)
-			    names[i] = (String)filenames.elementAt(i);
-			    
-			prefs.putStringArray("lastEdited", names);
-		    }
-		}
-
-		// Let the search interface store changes to prefs.
-		searchManager.updatePrefs();
-
-		System.exit(0); // End program.
-	    }
-	}
     }
-
+	
     // The action for closing the current database and leaving the window open.
     CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
     class CloseDatabaseAction extends AbstractAction {
-	public CloseDatabaseAction() {
-	    super(Globals.lang("Close database")); 
+		public CloseDatabaseAction() {
+			super(Globals.lang("Close database")); 
 
-	    putValue(SHORT_DESCRIPTION, 
-		     Globals.lang("Close the current database"));
-	    putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
-	}    
-	public void actionPerformed(ActionEvent e) {
-	    // Ask here if the user really wants to close, if the base
-	    // has not been saved since last save.
-	    boolean close = true;	    
-	    if (basePanel().baseChanged) {
-		int answer = JOptionPane.showConfirmDialog
-		    (ths, Globals.lang("Database has changed. Do you want to save "+
-				       "before closing?"), 
-		     Globals.lang("Save before closing"), 
-		     JOptionPane.YES_NO_CANCEL_OPTION);
-		if ((answer == JOptionPane.CANCEL_OPTION) || 
-		    (answer == JOptionPane.CLOSED_OPTION))
-		    close = false; // The user has cancelled.
-		if (answer == JOptionPane.YES_OPTION) {
-		    // The user wants to save.
-		    basePanel().runCommand("save");
-		}
-	    }
-
-	    if (close) {
-		tabbedPane.remove(basePanel());
-		output("Closed database.");
-	    }
-	}
-    }
-
-
-
-    // The action concerned with opening an existing database.
-    OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
-    class OpenDatabaseAction extends AbstractAction {
-	public OpenDatabaseAction() {
-	    super(Globals.lang("Open database"), 
-		  new ImageIcon(GUIGlobals.openIconFile));
-	    putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-	}    
-	public void actionPerformed(ActionEvent e) {
-	    // Open a new database.
-	    if ((e.getActionCommand() == null) || 
-		(e.getActionCommand().equals("Open database"))) {
-		JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-		    new JFileChooser((File)null) :
-		    new JFileChooser(new File(prefs.get("workingDirectory")));
-		//chooser.setFileFilter(fileFilter);
-		Util.pr("JabRefFrame: must set file filter.");
-		int returnVal = chooser.showOpenDialog(ths);
-		if(returnVal == JFileChooser.APPROVE_OPTION) {
-		    fileToOpen = chooser.getSelectedFile();
-		}
-	    } else {
-		Util.pr(NAME);
-		Util.pr(e.getActionCommand());
-		fileToOpen = new File(Util.checkName(e.getActionCommand()));
-	    }
-	    openIt();
-	}
-	 
-	public void openIt() {
-	    if ((fileToOpen != null) && (fileToOpen.exists())) {
-		try {
-		    prefs.put("workingDirectory", fileToOpen.getPath());
-		    // Should this be done _after_ we know it was successfully opened?
-
-		    ParserResult pr = loadDatabase(fileToOpen);
-		    BibtexDatabase db = pr.getDatabase();
-		    HashMap meta = pr.getMetaData();
-
-		    BasePanel bp = new BasePanel(ths, db, fileToOpen,
-						 meta, prefs);
-		    /*
-		      if (prefs.getBoolean("autoComplete")) {
-		      db.setCompleters(autoCompleters);
-		      }
-		    */
-		    tabbedPane.add(fileToOpen.getName(), bp);
-		    tabbedPane.setSelectedComponent(bp);
-		    output("Opened database '"+fileToOpen.getPath()+"' with "+
-			   db.getEntryCount()+" entries.");
-
-		    fileToOpen = null;
-
-		} catch (Throwable ex) {
-		    JOptionPane.showMessageDialog
-			(ths, ex.getMessage(), 
-			 "Open database", JOptionPane.ERROR_MESSAGE);
-		}
-	    }
-	}
-    }
-
-    // The action concerned with opening a new database.
-    class NewDatabaseAction extends AbstractAction {
-	public NewDatabaseAction() {
-	    super(Globals.lang("New database"), 
-		  new ImageIcon(GUIGlobals.newIconFile));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
-	    //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);	    
-	}    
-	public void actionPerformed(ActionEvent e) {
-
-	    // Create a new, empty, database.
-	    BasePanel bp = new BasePanel(ths, prefs);
-	    tabbedPane.add(Globals.lang("untitled"), bp);
-	    tabbedPane.setSelectedComponent(bp);
-	    output(Globals.lang("New database created."));
-	    
-	    /*
-	    if (prefs.getBoolean("autoComplete"))
-	    db.setCompleters(autoCompleters);*/
-	}
-    }
-
-    // The action for opening the preferences dialog.
-    AbstractAction showPrefs = new ShowPrefsAction();
-    class ShowPrefsAction extends AbstractAction {
-	public ShowPrefsAction() {
-	    super(Globals.lang("Preferences"), 
-		  new ImageIcon(GUIGlobals.prefsIconFile));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
-	}    
-	public void actionPerformed(ActionEvent e) {	    
-		PrefsDialog.showPrefsDialog(ths, prefs);
-		// This action can be invoked without an open database, so
-		// we have to check if we have one before trying to invoke
-		// methods to execute changes in the preferences.
-
-		// We want to notify all tabs about the changes to 
-		// avoid problems when changing the column set.	       
-		for (int i=0; i<tabbedPane.getTabCount(); i++) {
-		    BasePanel bf = baseAt(i);
-		    if (bf.database != null) {
-			bf.setupMainPanel();
-		    }
-		}
-	    
-	}
-    }
-
-
-    AboutAction aboutAction = new AboutAction();
-    class AboutAction extends AbstractAction {
-	public AboutAction() {
-	    super(Globals.lang("About JabRef"));
-
-	}    
-	public void actionPerformed(ActionEvent e) {
-	    JDialog about = new JDialog(ths, Globals.lang("About JabRef"),
-					true);
-	    JEditorPane jp = new JEditorPane();
-	    JScrollPane sp = new JScrollPane
-		(jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-		 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	    jp.setEditable(false);
-	    try {
-		jp.setPage(GUIGlobals.aboutPage);
-		// We need a hyperlink listener to be able to switch to the license
-		// terms and back.
-		jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-			public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {    
-			    if (e.getEventType() 
-				== javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) 
-				try {
-				    ((JEditorPane)e.getSource()).setPage(e.getURL());
-				} catch (IOException ex) {}
+			putValue(SHORT_DESCRIPTION, 
+					 Globals.lang("Close the current database"));
+			putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));			
+		}    
+		public void actionPerformed(ActionEvent e) {
+			// Ask here if the user really wants to close, if the base
+			// has not been saved since last save.
+			boolean close = true;	    
+			if (basePanel().baseChanged) {
+				int answer = JOptionPane.showConfirmDialog
+					(ths, Globals.lang("Database has changed. Do you want to save "+
+									   "before closing?"), 
+					 Globals.lang("Save before closing"), 
+					 JOptionPane.YES_NO_CANCEL_OPTION);
+				if ((answer == JOptionPane.CANCEL_OPTION) || 
+					(answer == JOptionPane.CLOSED_OPTION))
+					close = false; // The user has cancelled.
+				if (answer == JOptionPane.YES_OPTION) {
+					// The user wants to save.
+					basePanel().runCommand("save");
+				}
 			}
-		    });
-		about.getContentPane().add(sp);
-		about.setSize(GUIGlobals.aboutSize);
-		Util.placeDialog(about, ths);
-		about.setVisible(true);
-	    } catch (IOException ex) {
-		JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'", "Error", JOptionPane.ERROR_MESSAGE); 
-	    }
-
+			
+			if (close) {
+				tabbedPane.remove(basePanel());
+				output("Closed database.");
+			}
+		}
 	}
-    }
+	
 
-
-}
+		
+		// The action concerned with opening an existing database.
+		OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
+		class OpenDatabaseAction extends AbstractAction {
+			public OpenDatabaseAction() {
+				super(Globals.lang("Open database"), 
+					  new ImageIcon(GUIGlobals.openIconFile));
+				putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
+				putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+			}    
+			public void actionPerformed(ActionEvent e) {
+				// Open a new database.
+				if ((e.getActionCommand() == null) || 
+					(e.getActionCommand().equals("Open database"))) {
+					JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+						new JFileChooser((File)null) :
+						new JFileChooser(new File(prefs.get("workingDirectory")));
+					//chooser.setFileFilter(fileFilter);
+					chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
+					
+					Util.pr("JabRefFrame: must set file filter.");
+					int returnVal = chooser.showOpenDialog(ths);
+					if(returnVal == JFileChooser.APPROVE_OPTION) {
+						fileToOpen = chooser.getSelectedFile();
+					}
+				} else {
+					Util.pr(NAME);
+					Util.pr(e.getActionCommand());
+					fileToOpen = new File(Util.checkName(e.getActionCommand()));
+				}
+				openIt();
+			}
+			
+			public void openIt() {
+				if ((fileToOpen != null) && (fileToOpen.exists())) {
+					try {
+						prefs.put("workingDirectory", fileToOpen.getPath());
+						// Should this be done _after_ we know it was successfully opened?
+						
+						ParserResult pr = loadDatabase(fileToOpen);
+						BibtexDatabase db = pr.getDatabase();
+						HashMap meta = pr.getMetaData();
+						
+						BasePanel bp = new BasePanel(ths, db, fileToOpen,
+													 meta, prefs);
+						/*
+						  if (prefs.getBoolean("autoComplete")) {
+						  db.setCompleters(autoCompleters);
+						  }
+						*/
+						tabbedPane.add(fileToOpen.getName(), bp);
+						tabbedPane.setSelectedComponent(bp);
+						output("Opened database '"+fileToOpen.getPath()+"' with "+
+							   db.getEntryCount()+" entries.");
+						
+						fileToOpen = null;
+						
+					} catch (Throwable ex) {
+						JOptionPane.showMessageDialog
+							(ths, ex.getMessage(), 
+							 "Open database", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		}
+		
+		// The action concerned with opening a new database.
+		class NewDatabaseAction extends AbstractAction {
+			public NewDatabaseAction() {
+				super(Globals.lang("New database"), 
+					  new ImageIcon(GUIGlobals.newIconFile));
+				putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
+				//putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);	    
+			}    
+			public void actionPerformed(ActionEvent e) {
+				
+				// Create a new, empty, database.
+				BasePanel bp = new BasePanel(ths, prefs);
+				tabbedPane.add(Globals.lang("untitled"), bp);
+				tabbedPane.setSelectedComponent(bp);
+				output(Globals.lang("New database created."));
+				
+				/*
+				  if (prefs.getBoolean("autoComplete"))
+				  db.setCompleters(autoCompleters);*/
+			}
+		}
+		
+		// The action for opening the preferences dialog.
+		AbstractAction showPrefs = new ShowPrefsAction();
+		
+		class ShowPrefsAction extends AbstractAction {
+			public ShowPrefsAction() {
+				super(Globals.lang("Preferences"), 
+					  new ImageIcon(GUIGlobals.prefsIconFile));
+				putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
+			}    
+			public void actionPerformed(ActionEvent e) {	    
+				PrefsDialog.showPrefsDialog(ths, prefs);
+				// This action can be invoked without an open database, so
+				// we have to check if we have one before trying to invoke
+				// methods to execute changes in the preferences.
+				
+				// We want to notify all tabs about the changes to 
+				// avoid problems when changing the column set.	       
+				for (int i=0; i<tabbedPane.getTabCount(); i++) {
+					BasePanel bf = baseAt(i);
+					if (bf.database != null) {
+						bf.setupMainPanel();
+					}
+				}
+				
+			}
+		}
+		
+		
+		AboutAction aboutAction = new AboutAction();
+		class AboutAction extends AbstractAction {
+			public AboutAction() {
+				super(Globals.lang("About JabRef"));
+				
+			}    
+			public void actionPerformed(ActionEvent e) {
+				JDialog about = new JDialog(ths, Globals.lang("About JabRef"),
+											true);
+				JEditorPane jp = new JEditorPane();
+				JScrollPane sp = new JScrollPane
+					(jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				jp.setEditable(false);
+				try {
+					jp.setPage(GUIGlobals.aboutPage);
+					// We need a hyperlink listener to be able to switch to the license
+					// terms and back.
+					jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
+							public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {    
+								if (e.getEventType() 
+									== javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) 
+									try {
+				    ((JEditorPane)e.getSource()).setPage(e.getURL());
+									} catch (IOException ex) {}
+							}
+						});
+					about.getContentPane().add(sp);
+					about.setSize(GUIGlobals.aboutSize);
+					Util.placeDialog(about, ths);
+					about.setVisible(true);
+				} catch (IOException ex) {
+					JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'", "Error", JOptionPane.ERROR_MESSAGE); 
+				}
+				
+			}
+		}
+		
+		private void addBibEntries(ArrayList bibentries, String filename){
+			// check if bibentries is null
+			BibtexDatabase database=new BibtexDatabase();
+			
+			Iterator it = bibentries.iterator();
+			while(it.hasNext()){
+				BibtexEntry entry = (BibtexEntry)it.next();
+				
+				try {
+					entry.setId(Util.createId(entry.getType(), database));				
+					database.insertEntry(entry);			
+				} catch (KeyCollisionException ex) {
+					//ignore
+					System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+					
+				}
+				
+			}
+			//give message loaded succesfully 
+		}
+		private void setUpImportMenu(JMenu importMenu){
+			//
+			// put in menu
+			//
+			//========================================
+			// medline
+			//========================================
+			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newMedlineFile_mItem.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						String tempFilename= getNewFile();
+						if(tempFilename != null){
+							ArrayList bibs = ImportFormatReader.readMedline(tempFilename);//MedlineParser.readMedline(tempFilename);
+							addBibEntries( bibs, tempFilename);	
+						}
+					}
+				});
+			importMenu.add(newMedlineFile_mItem);
+			
+			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("Import RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newRefMan_mItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						String tempFilename=getNewFile();
+						if(tempFilename != null){
+							ArrayList bibs = ImportFormatReader.readReferenceManager10(tempFilename);
+							addBibEntries( bibs, tempFilename);
+						}
+						
+					}
+				});
+			importMenu.add(newRefMan_mItem);
+			
+			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("Import ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newISIFile_mItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						String tempFilename=getNewFile();
+						if(tempFilename != null){
+							ArrayList bibs = ImportFormatReader.readISI(tempFilename);
+							addBibEntries( bibs, tempFilename);
+						}
+						
+					}
+				});
+			importMenu.add( newISIFile_mItem);
+			
+			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Import Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newOvidFile_mItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						String tempFilename=getNewFile();
+						if(tempFilename != null){
+							ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
+							addBibEntries( bibs, tempFilename);
+						}
+						
+					}
+				});
+			importMenu.add(newOvidFile_mItem);
+			
+			JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("Import INSPEC"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newINSPECFile_mItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						String tempFilename=getNewFile();
+						if(tempFilename != null){
+							ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
+							addBibEntries( bibs, tempFilename);
+						}
+						
+					}
+				});
+			importMenu.add(newINSPECFile_mItem);
+			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("Import SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
+			newSciFinderFile_mItem.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e)
+					{
+						String tempFilename = getNewFile();
+						if( tempFilename != null )//filenm != null)
+						{
+							//ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
+							ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
+							addBibEntries( bibs, tempFilename);
+						}
+					}
+				});
+			importMenu.add(newSciFinderFile_mItem);
+			
+		}
+		
+		//
+		// simply opens up a jfilechooser dialog and gets a filename
+		// returns null if user selects cancel
+		// it should also do a check perhaps to see if
+		// file exists and is readable?
+		//
+		
+		public String getNewFile(){
+			JFileChooser fc;
+			if( prefs.get("workingDirectory")== null )
+				fc = new JabRefFileChooser(new File( System.getProperty("user.home")));//cwd));
+			else{
+				fc = new JabRefFileChooser(new File( prefs.get("workingDirectory") ));//cwd));
+			}
+			
+			fc.addChoosableFileFilter( new OpenFileFilter() );
+			fc.setDialogType(JFileChooser.OPEN_DIALOG);
+			fc.showOpenDialog(null);
+			File selectedFile = fc.getSelectedFile();
+			if(selectedFile == null) // cancel
+				return null;
+			prefs.put("workingDirectory", selectedFile.getPath());		
+			return selectedFile.getAbsolutePath();
+		}
+		
+	}
+	
