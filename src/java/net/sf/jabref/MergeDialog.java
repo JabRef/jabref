@@ -24,6 +24,7 @@ public class MergeDialog extends JDialog {
   JCheckBox strings = new JCheckBox();
   GridBagLayout gridBagLayout1 = new GridBagLayout();
   JCheckBox groups = new JCheckBox();
+  JCheckBox selector = new JCheckBox();
 
   boolean okPressed = false;
 
@@ -43,20 +44,21 @@ public class MergeDialog extends JDialog {
   }
 
   private void jbInit() throws Exception {
-    titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),"Options");
+      titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
     panel1.setLayout(borderLayout1);
-    ok.setText("Ok");
+    ok.setText(Globals.lang("Ok"));
     ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
-    Cancel.setText("Cancel");
+    Cancel.setText(Globals.lang("Cancel"));
     Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
     jPanel1.setBorder(titledBorder1);
     jPanel1.setLayout(gridBagLayout1);
     entries.setToolTipText("");
     entries.setSelected(true);
-    entries.setText("Import entries");
+    entries.setText(Globals.lang("Import entries"));
     strings.setSelected(true);
-    strings.setText("Import strings");
-    groups.setText("Import group definitions");
+    strings.setText(Globals.lang("Import strings"));
+    groups.setText(Globals.lang("Import group definitions"));
+    selector.setText(Globals.lang("Import word selector definitions"));
     this.setModal(true);
     this.setResizable(false);
     this.setTitle("Import database");
@@ -70,6 +72,8 @@ public class MergeDialog extends JDialog {
     jPanel1.add(strings,     new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
     jPanel1.add(groups,  new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+    jPanel1.add(selector,  new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
     // Key bindings:
@@ -100,6 +104,7 @@ public class MergeDialog extends JDialog {
   public boolean importEntries() { return entries.isSelected(); }
   public boolean importGroups() { return groups.isSelected(); }
   public boolean importStrings() { return strings.isSelected(); }
+  public boolean importSelectorWords() { return selector.isSelected(); }
 }
 
 class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {

@@ -47,6 +47,9 @@ import javax.swing.*;
  * @version $Id$
  * <p>
  * $Log$
+ * Revision 1.3  2004/02/17 07:35:22  mortenalver
+ * Experimenting with antialiasing in table.
+ *
  * Revision 1.2  2003/12/14 23:48:02  mortenalver
  * .
  *
@@ -194,7 +197,32 @@ public class FontSelectorDialog extends JDialog {
 
 		content.add(BorderLayout.NORTH,listPanel);
 
-		preview = new JLabel("Font Preview");
+		//preview = new JLabel("Font Preview");
+		
+		/* --------------------------------------------------------
+		   |  Experimental addition by Morten Alver. I want to    |
+		   |  enable antialiasing in the preview field, since I'm |
+		   |  working on introducing this in the table view.      |
+		   -------------------------------------------------------- */
+		preview = new JLabel("Font Preview") {
+			public void paint(Graphics g) {
+			    Graphics2D g2 = (Graphics2D)g;
+			    Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
+			    g2.setColor(getBackground());
+			    g2.fill(g2.getClipBounds());
+			    g2.setColor(getForeground());
+			    //g2.setFont(f);
+			    RenderingHints rh = g2.getRenderingHints();
+			    rh.put(RenderingHints.KEY_ANTIALIASING,
+				   RenderingHints.VALUE_ANTIALIAS_ON);
+			    g2.setRenderingHints(rh);
+			    g2.drawString(getText(), 40, 15+f.getSize());
+			}
+
+		    };
+
+
+
 		preview.setBorder(new TitledBorder("Font Preview"));
 
 		updatePreview();

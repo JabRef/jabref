@@ -221,6 +221,8 @@ public class EntryTable extends JTable {
 	public Renderer(Color c) {
 	    super();
 	    setBackground(c);
+
+
 	    /*
 	    darker = new DefaultTableCellRenderer();
 	    double adj = 0.9;
@@ -233,6 +235,24 @@ public class EntryTable extends JTable {
 	    this(c);
 	    setForeground(fg);
 	}
+	
+    public void paint(Graphics g) {
+	//Util.pr("her");
+	
+	Graphics2D g2 = (Graphics2D)g;
+	Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
+	g2.setColor(getBackground());
+	g2.fill(g2.getClipBounds());
+	g2.setColor(getForeground());
+	//g2.setFont(f);
+	RenderingHints rh = g2.getRenderingHints();
+	rh.put(RenderingHints.KEY_ANTIALIASING,
+		RenderingHints.VALUE_ANTIALIAS_ON);
+	g2.setRenderingHints(rh);
+	g2.drawString(getText(), 3, f.getSize());
+	
+	}
+
 	//public DefaultTableCellRenderer darker() { return darker; }
     }
 

@@ -663,33 +663,36 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
           actions.put("mergeDatabase", new BaseAction() {
             public void action() {
-              JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-                  new JabRefFileChooser((File)null) :
-                  new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-              chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-               int returnVal = chooser.showOpenDialog(ths);
-              if(returnVal == JFileChooser.APPROVE_OPTION) {
-                fileToOpen = chooser.getSelectedFile();
 
                 final MergeDialog md = new MergeDialog(frame, Globals.lang("Append database"), true);
                 Util.placeDialog(md, ths);
                 md.setVisible(true);
+		if (md.okPressed) {
+		    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+			new JabRefFileChooser((File)null) :
+			new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+		    chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
+		    int returnVal = chooser.showOpenDialog(ths);
+		    if(returnVal != JFileChooser.APPROVE_OPTION)
+			return;
+		    fileToOpen = chooser.getSelectedFile();
 
-                // Run the actual open in a thread to prevent the program
-                // locking until the file is loaded.
-                if (fileToOpen != null) {
-                  (new Thread() {
-                    public void run() {
-                      openIt(md.importEntries(), md.importStrings(), md.importGroups());
-                    }
-                  }).start();
-                  frame.fileHistory.newFile(fileToOpen.getPath());
-                }
-              }
+		    // Run the actual open in a thread to prevent the program
+		    // locking until the file is loaded.
+		    if (fileToOpen != null) {
+			(new Thread() {
+				public void run() {
+				    openIt(md.importEntries(), md.importStrings(),
+					   md.importGroups(), md.importSelectorWords());
+				}
+			    }).start();
+			frame.fileHistory.newFile(fileToOpen.getPath());
+		    }
+		}
             }
 
            void openIt(boolean importEntries, boolean importStrings,
-                       boolean importGroups) {
+                       boolean importGroups, boolean importSelectorWords) {
              if ((fileToOpen != null) && (fileToOpen.exists())) {
                try {
                  prefs.put("workingDirectory", fileToOpen.getPath());
@@ -698,7 +701,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
                  ParserResult pr = frame.loadDatabase(fileToOpen);
                  BibtexDatabase db = pr.getDatabase();
                  MetaData meta = new MetaData(pr.getMetaData());
-                 NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
+                 NamedCompound ce = new NamedCompound("Append database");
 
                  if (importEntries) { // Add entries
                    Iterator i = db.getKeySet().iterator();
@@ -738,6 +741,16 @@ public class BasePanel extends JSplitPane implements MouseListener,
                      groupSelector.revalidateList();
                    }
                  }
+
+		 if (importSelectorWords) {
+		     Iterator i=meta.iterator();
+		     for (;i.hasNext();) {
+			 String s = (String)i.next();
+			 if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+			     metaData.putData(s, meta.getData(s));
+			 }
+		     }
+		 }
 
                  ce.end();
                  undoManager.addEdit(ce);
