@@ -84,6 +84,10 @@ public class MetaData {
 	return (Vector)metaData.get(key);
     }
 
+    public void remove(String key) {
+	metaData.remove(key);
+    }
+
     public void putData(String key, Vector orderedData) {
 	metaData.put(key, orderedData);
     }

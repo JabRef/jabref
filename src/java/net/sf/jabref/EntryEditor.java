@@ -97,7 +97,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     JToolBar tlb;
     JTabbedPane tabbed = new JTabbedPane();//JTabbedPane.RIGHT);
     GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    GridBagConstraints con;
     JLabel lab;
     TypeLabel typeLabel;
     JabRefFrame frame;
@@ -290,7 +290,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
     }
 
+    public void rebuildPanels() {
+	setupFieldPanels(reqPanel, optPanel, genPanel, absPanel);
+	revalidate();
+	repaint();
+    }
+
     private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen, FieldPanel abs) {
+
+	req.removeAll();
+	opt.removeAll();
+	gen.removeAll();
+	abs.removeAll();
+	con = new GridBagConstraints();
 
 	// First we ask the BibtexEntry which fields are optional and
 	// required.

@@ -1674,6 +1674,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 	}
     }
 
+    public void rebuildAllEntryEditors() {
+	for (Iterator i=entryEditors.keySet().iterator(); i.hasNext();) {
+	    EntryEditor ed = (EntryEditor)entryEditors.get(i.next());
+	    ed.rebuildPanels();
+	}
+
+    }
+
     public void markBaseChanged() {
         baseChanged = true;
 
@@ -2092,11 +2100,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
       if (saving)
         return; // We are just saving the file, so this message is most likely due
       // to bad timing. If not, we'll handle it on the next polling.
-      Util.pr("File '"+file.getPath()+"' has been modified.");
+      //Util.pr("File '"+file.getPath()+"' has been modified.");
       updatedExternally = true;
 
       // Adding the sidepane component is Swing work, so we must do this in the Swing
       // thread:
+      /*
       Thread t = new Thread() {
         public void run() {
           FileUpdatePanel pan = new FileUpdatePanel(frame, ths, sidePaneManager, Globals.prefs);
@@ -2104,7 +2113,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         }
       };
       SwingUtilities.invokeLater(t);
-
+      */
     }
 
       public void fileRemoved() {

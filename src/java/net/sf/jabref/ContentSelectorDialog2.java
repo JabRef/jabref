@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.ArrayList;
 
 public class ContentSelectorDialog2 extends JDialog {
 
@@ -48,7 +49,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	wPane = new JScrollPane(wordList);
 
     HashMap wordListModels = new HashMap();
-
+    ArrayList removedFields = new ArrayList();
 
     public ContentSelectorDialog2(JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
 				  String fieldName) {
@@ -169,6 +170,21 @@ public class ContentSelectorDialog2 extends JDialog {
 		}
 	    });
 
+	removeField.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    int index = fieldList.getSelectedIndex();
+		    if (index == -1)
+			return;
+		    String fieldName = (String)fieldListModel.get(index);
+		    removedFields.add(fieldName);
+		    fieldListModel.remove(index);
+		    wordListModels.remove(fieldName);
+		    fieldNameField.setText("");
+		    if (fieldListModel.size() > 0)
+			fieldList.setSelectedIndex(Math.min(index, wordListModel.size()-1));
+		}
+	    });
+
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    applyChanges();
@@ -198,10 +214,21 @@ public class ContentSelectorDialog2 extends JDialog {
 
 
     private void applyChanges() {
+	// First remove the mappings for fields that have been deleted.
+	// If these were re-added, they will be added below, so it doesn't
+	// cause any harm to remove them here.
+	for (Iterator i=removedFields.iterator(); i.hasNext();) {
+	    String fieldName = (String)i.next();
+	    metaData.remove(Globals.SELECTOR_META_PREFIX+fieldName);
+	}
+
 	// Cycle through all fields that we have created listmodels for:
+	boolean changedFieldSet = false;
 	loop: for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
 	    // For each field name, store the values:
 	    String fieldName = (String)i.next();
+	    if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
+		continue loop;
 	    DefaultListModel lm = (DefaultListModel)wordListModels.get(fieldName);
 	    int start = 0;
 	    // Avoid storing the <new word> marker if it is there:
@@ -213,7 +240,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	    if (data == null) {
 		newField = true;
 		data = new Vector();
-		System.out.println("TODO: rebuild all existing EntryEditor instances, so they contain selectors for the new field(s).");
+		changedFieldSet = true;
 
 	    } else
 		data.clear();
@@ -225,8 +252,14 @@ public class ContentSelectorDialog2 extends JDialog {
 		metaData.putData(Globals.SELECTOR_META_PREFIX+fieldName, data);
 	}
 
+	// System.out.println("TODO: remove metadata for removed selector field.");
+	panel.markNonUndoableBaseChanged();
+
 	// Update all selectors in the current BasePanel.
-	panel.updateAllContentSelectors();
+	if (!changedFieldSet)
+	    panel.updateAllContentSelectors();
+	else
+	    panel.rebuildAllEntryEditors();
     }
 
     /**
@@ -254,6 +287,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	    wordList.setModel(wordListModel);
 	} else {
 	    wordListModel = new DefaultListModel();
+	    wordList.setModel(wordListModel);
 	    wordListModels.put(currentField, wordListModel);
 	    wordListModel.clear();
 	    //wordListModel.addElement(WORD_FIRSTLINE_TEXT);

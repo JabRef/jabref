@@ -151,6 +151,7 @@ public class FileUpdateMonitor extends Thread {
     }
 
     public boolean copy() {
+	/*
       Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
       boolean res = false;
       try {
@@ -160,6 +161,8 @@ public class FileUpdateMonitor extends Thread {
       }
       Util.pr("</copy>");
       return res;
+	*/
+	return true;
     }
 
     /**

@@ -299,7 +299,7 @@ public class Globals {
   static {
 
     // Start the thread that monitors file time stamps.
-    Util.pr("Starting FileUpdateMonitor thread. Globals line 293.");
+    //Util.pr("Starting FileUpdateMonitor thread. Globals line 293.");
     fileUpdateMonitor.start();
 
     try {
