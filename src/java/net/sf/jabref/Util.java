@@ -29,6 +29,8 @@ package net.sf.jabref;
 
 import java.io.*;
 import java.util.*;
+
+import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.imports.ImportFormatReader;
 import java.awt.*;
 import java.util.regex.Pattern;
@@ -344,10 +346,15 @@ public class Util {
 		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
 		Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
 	    }
-	else if(fieldName.equals("url"))
+	else if(fieldName.equals("url") || fieldName.equals("citeseerurl"))
 	    { // html
 		try
                 {
+		    	 if (fieldName.equals("citeseerurl")) {
+		    	     String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
+		    	     if (canonicalLink != null)
+		    	         link = canonicalLink;
+		    	 }
                   // First check if the url is enclosed in \\url{}. If so, remove the wrapper.
                   if (link.startsWith("\\url{") && link.endsWith("}"))
                     link = link.substring(5, link.length()-1);

@@ -158,6 +158,7 @@ public class GUIGlobals {
       searchIconFile = GUIGlobals.class.getResource(pre + "find.png"),
       autoGroupIcon = GUIGlobals.class.getResource(pre + "run.png"),
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
+	  wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
 	  fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
@@ -245,6 +246,7 @@ public class GUIGlobals {
       "school",
       "abstract",
       "url",
+	  "citeseerurl",
       "pdf",
       "comment",
       "bibtexkey",
@@ -387,6 +389,7 @@ public class GUIGlobals {
     FIELD_EXTRAS.put("pdf", "browsePdf");
     FIELD_EXTRAS.put("ps", "browse");
     FIELD_EXTRAS.put("url", "external");
+    FIELD_EXTRAS.put("citeseerurl", "external");
     FIELD_EXTRAS.put("doi", "external");
     //FIELD_EXTRAS.put("keywords", "selector");
 
@@ -410,6 +413,7 @@ public class GUIGlobals {
     fieldWeight.put("pages", SMALL_W);
     fieldWeight.put("month", SMALL_W);
     fieldWeight.put("url", SMALL_W);
+    fieldWeight.put("citeseerurl", SMALL_W);
     fieldWeight.put("crossref", SMALL_W);
     fieldWeight.put("note", MEDIUM_W);
     fieldWeight.put("publisher", MEDIUM_W);
@@ -472,6 +476,9 @@ public class GUIGlobals {
     lab = new JLabel(new ImageIcon(wwwIcon));
     lab.setToolTipText(Globals.lang("Open")+" URL");
     tableIcons.put("url", lab);
+    lab = new JLabel(new ImageIcon(wwwCiteSeerIcon));
+    lab.setToolTipText(Globals.lang("Open")+" CiteSeer URL");
+    tableIcons.put("citeseerurl", lab);    
     lab = new JLabel(new ImageIcon(doiSmallIcon));
     lab.setToolTipText(Globals.lang("Open")+" DOI "+Globals.lang("web link"));
     tableIcons.put("doi", lab);

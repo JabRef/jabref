@@ -1395,7 +1395,8 @@ class ImportCiteSeerAction
 	extends AbstractAction {
 
     public ImportCiteSeerAction() {
-        super(Globals.lang("Import Data from CiteSeer"));
+        super(Globals.lang("Import Data from CiteSeer"),
+                new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
         putValue(SHORT_DESCRIPTION, Globals.lang("Import Data from CiteSeer Database"));
 
 	}
@@ -1476,7 +1477,8 @@ class FetchCiteSeerAction
 	extends AbstractAction {
 
 		public FetchCiteSeerAction() {
-			super(Globals.lang("Fetch Citations from CiteSeer"));
+			super(Globals.lang("Fetch Citations from CiteSeer"),
+			        new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
 			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
 		}
 

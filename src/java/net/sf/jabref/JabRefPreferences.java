@@ -131,7 +131,7 @@ public class JabRefPreferences {
 
         defaults.put("groupsVisibleRows", new Integer(8));
 	defaults.put("defaultOwner", System.getProperty("user.name"));
-  defaults.put("generalFields", "crossref;keywords;doi;url;"+
+  defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
 	     "pdf;abstract;comment;owner");
 
 	//defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
@@ -144,6 +144,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", new Boolean(false));
         defaults.put("pdfColumn", new Boolean(true));
         defaults.put("urlColumn", new Boolean(true));
+        defaults.put("citeseerColumn", new Boolean(true));        
         defaults.put("useOwner", new Boolean(true));
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));

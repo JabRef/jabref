@@ -626,7 +626,7 @@ public abstract class BibtexEntryType implements Comparable
     public String[] getGeneralFields() {
         return new String[]
 	    {"crossref", "keywords", "doi", "url",
-	     "pdf", "abstract", "comment"};
+	     "citeseerurl", "pdf", "abstract", "comment"};
     }
 
     public abstract String describeRequiredFields();

@@ -12,7 +12,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	antialias, pdfColumn, urlColumn, allowEditing;
+	antialias, pdfColumn, urlColumn, citeseerColumn, allowEditing;
     private JRadioButton namesAsIs, namesFf, namesFl;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
@@ -71,6 +71,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"), _prefs.getBoolean("pdfColumn"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"), _prefs.getBoolean("urlColumn"));
+        citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"), _prefs.getBoolean("citeseerColumn"));
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
@@ -239,6 +240,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         iconCol.add(pdfColumn);
         gbl.setConstraints(urlColumn, con);
         iconCol.add(urlColumn);
+        gbl.setConstraints(citeseerColumn, con);
+        iconCol.add(citeseerColumn);
         con.fill = GridBagConstraints.BOTH;
         gbl.setConstraints(iconCol, con);
 	add(iconCol);
@@ -525,6 +528,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
+        _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());        
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?

@@ -58,7 +58,8 @@ public class EntryTableModel
       ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
   public static final String[]
       PDF = {"pdf", "ps"},
-      URL_ = {"url", "doi"};
+      URL_ = {"url", "doi"},
+  	  CITESEER = {"citeseerurl"};
 
   public int padleft = -1; // padleft indicates how many columns (starting from left) are
   // special columns (number column or icon column).
@@ -251,6 +252,8 @@ public class EntryTableModel
       iconCols.put(new Integer(coln++), PDF);
     if (panel.prefs.getBoolean("urlColumn"))
       iconCols.put(new Integer(coln++), URL_);
+    if (panel.prefs.getBoolean("citeseerColumn"))
+        iconCols.put(new Integer(coln++), CITESEER);    
 
     // Add 1 to the number of icon columns to get padleft.
     padleft = 1+iconCols.size();

@@ -136,7 +136,7 @@ public class CiteSeerUndoHandler extends HandlerBase {
                     bibEntry.setField(nextField, String.valueOf(target
                             .substring(0, 4)));
                 }
-            } else if (nextField.equals("url")) {
+            } else if (nextField.equals("citeseerurl")) {
                 if (makeOverwriteChoice((String) bibEntry.getField(nextField),
                         target, nextField)) {
                     UndoableFieldChange fieldChange = new UndoableFieldChange(
@@ -193,7 +193,7 @@ public class CiteSeerUndoHandler extends HandlerBase {
             nextField = "year";
             nextAssign = true;
         } else if (name.equals("dc:identifier")) {
-            nextField = "url";
+            nextField = "citeseerurl";
             nextAssign = true;
         }
     }
