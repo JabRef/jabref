@@ -174,7 +174,10 @@ public class BibtexDatabase
 	if (!_entries.containsKey(id)) return false; // Entry doesn't exist!
 	BibtexEntry entry = getEntryById(id);
 	String oldKey = entry.getCiteKey();
-	entry.setField(Globals.KEY_FIELD, key);
+        if (key != null)
+          entry.setField(Globals.KEY_FIELD, key);
+        else
+          entry.clearField(Globals.KEY_FIELD);
 	return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
@@ -307,8 +310,8 @@ public class BibtexDatabase
 		}else // ignore, as there is no such key
 			;
     }
-	
-	
+
+
     /*
     public void setCompleters(Hashtable autoCompleters) {
 	_autoCompleters = autoCompleters;

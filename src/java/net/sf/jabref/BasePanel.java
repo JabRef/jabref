@@ -320,48 +320,58 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	actions.put("delete", new BaseAction() {
 		public void action() {
-		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-                    int row0 = entryTable.getSelectedRow();
-		    if ((bes != null) && (bes.length > 0)) {
-			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
+                  Util.pr("eeeeee");
+                  boolean cancelled = false;
+                  BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  int row0 = entryTable.getSelectedRow();
+                  if ((bes != null) && (bes.length > 0)) {
+                    //&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
+                    if (prefs.getBoolean("confirmDelete")) {
+                      String msg = Globals.lang("Really delete the selected")
+                          + " " + Globals.lang("entry") + "?",
+                          title = Globals.lang("Delete entry");
+                      if (bes.length > 1) {
+                        msg = Globals.lang("Really delete the selected")
+                            + " " + bes.length + " " + Globals.lang("entries") + "?";
+                        title = Globals.lang("Delete multiple entries");
+                      }
 
-			/*
-			   I have removed the confirmation dialog, since I converted
-			   the "remove" action to a "cut". That means the user can
-			   always paste the entries, in addition to pressing undo.
-			   So the confirmation seems redundant.
+                      CheckBoxMessage cb = new CheckBoxMessage
+                          (msg, Globals.lang("Disable this confirmation dialog"), false);
 
-			String msg = Globals.lang("Really delete the selected")
-			    +" "+Globals.lang("entry")+"?",
-			    title = Globals.lang("Delete entry");
-			if (rows.length > 1) {
-			    msg = Globals.lang("Really delete the selected")
-				+" "+rows.length+" "+Globals.lang("entries")+"?";
-			    title = Globals.lang("Delete multiple entries");
-			}
-			int answer = JOptionPane.showConfirmDialog(frame, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-			if (answer == JOptionPane.YES_OPTION) {*/
+                      int answer = JOptionPane.showConfirmDialog(frame, cb, title,
+                          JOptionPane.YES_NO_OPTION,
+                          JOptionPane.QUESTION_MESSAGE);
+                      if (answer == JOptionPane.NO_OPTION) {
+                        entryTable.clearSelection();
+                        cancelled = true;
+                      }
+                      if (cb.isSelected())
+                        prefs.putBoolean("confirmDelete", false);
+                    }
 
-			// Create a CompoundEdit to make the action undoable.
-			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? Globals.lang("delete entries")
-			     : Globals.lang("delete entry"));
-			// Loop through the array of entries, and delete them.
-			for (int i=0; i<bes.length; i++) {
-			    database.removeEntry(bes[i].getId());
-			    ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
-			}
-			frame.output(Globals.lang("Deleted")+" "+
-				     (bes.length>1 ? bes.length
-				      +" "+ Globals.lang("entries")
-				      : Globals.lang("entry"))+".");
-			ce.end();
-			undoManager.addEdit(ce);
-            entryTable.clearSelection();
-			refreshTable();
-			markBaseChanged();
+                    if (!cancelled) {
+                      // Create a CompoundEdit to make the action undoable.
+                      NamedCompound ce = new NamedCompound
+                          (bes.length > 1 ? Globals.lang("delete entries")
+                           : Globals.lang("delete entry"));
+                      // Loop through the array of entries, and delete them.
+                      for (int i = 0; i < bes.length; i++) {
+                        database.removeEntry(bes[i].getId());
+                        ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
+                      }
+                      frame.output(Globals.lang("Deleted") + " " +
+                                   (bes.length > 1 ? bes.length
+                                    + " " + Globals.lang("entries")
+                                    : Globals.lang("entry")) + ".");
+                      ce.end();
+                      undoManager.addEdit(ce);
+                      entryTable.clearSelection();
+                      refreshTable();
+                      markBaseChanged();
 
-		    }
+                    }
+                  }
 		}
 
 

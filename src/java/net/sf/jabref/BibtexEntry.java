@@ -225,6 +225,24 @@ public class BibtexEntry
 	_fields.put(name, value);
     }
 
+    /**
+     * Removes the mapping for the field name.
+     */
+    public void clearField(String name) {
+      if ("id".equals(name)) {
+           throw new IllegalArgumentException("The field name '" + name +
+                                              "' is reserved");
+       }
+
+       try {
+           firePropertyChangedEvent(name, _fields.get(name), null);
+       } catch (PropertyVetoException pve) {
+           throw new IllegalArgumentException("Change rejected: " + pve);
+       }
+
+	_fields.remove(name);
+    }
+
     protected boolean allFieldsPresent(String[] fields) {
         for (int i = 0; i < fields.length; i++) {
 	    if (getField(fields[i]) == null) {

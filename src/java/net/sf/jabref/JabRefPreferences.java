@@ -142,6 +142,9 @@ public class JabRefPreferences {
         defaults.put("urlColumn", new Boolean(true));
         defaults.put("useOwner", new Boolean(true));
         defaults.put("allowTableEditing", new Boolean(false));
+        defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
+        defaults.put("confirmDelete", new Boolean(true));
+
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 

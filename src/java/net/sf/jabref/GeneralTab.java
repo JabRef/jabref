@@ -13,7 +13,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
 		defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-                useOwner;
+                useOwner, keyWarningDialog;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -50,6 +50,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
                                   _prefs.getBoolean("disableOnMultipleSelection"));
 useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
                          _prefs.getBoolean("useOwner"));
+keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"),
+                                 _prefs.getBoolean("dialogWarningForDuplicateKey"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
 	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
@@ -75,6 +77,7 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
 	gbl.setConstraints(autoOpenForm, con);
 	general.add(autoOpenForm);
 
+        con.insets = new Insets(0, 10, 5, 10);
         con.gridwidth = 1;
         gbl.setConstraints(backup, con);
 	general.add(backup);
@@ -90,6 +93,11 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(ctrlClick, con);
         general.add(ctrlClick);
+
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(keyWarningDialog, con);
+        general.add(keyWarningDialog);
+
 
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	//gbl.setConstraints(defSort, con);
@@ -278,6 +286,7 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
         _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
+        _prefs.putBoolean("dialogWarningForDuplicateKey", keyWarningDialog.isSelected());
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());

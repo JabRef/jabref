@@ -59,10 +59,14 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     public void undo() {
 	super.undo();
-	
+
 	// Revert the change.
 	try {
-	    entry.setField(field, oldValue);
+          if (oldValue != null)
+            entry.setField(field, oldValue);
+          else
+            entry.clearField(field);
+
 	} catch (Throwable ex) {
 	    Util.pr(ex.getMessage());
 	}
@@ -73,7 +77,11 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
 	// Redo the change.
 	try {
-	    entry.setField(field, newValue);
+          if (newValue != null)
+            entry.setField(field, newValue);
+          else
+            entry.clearField(field);
+
 	} catch (Throwable ex) {
 	    Util.pr(ex.getMessage());
 	}

@@ -923,8 +923,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                           (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
 
 		    Object oldValue = entry.getField(fe.getFieldName());
-		    entry.setField(fe.getFieldName(), toSet);
-		    if ((toSet != null) && (toSet.length() > 0)) {
+                    if (toSet != null)
+                      entry.setField(fe.getFieldName(), toSet);
+                    else
+                      entry.clearField(fe.getFieldName());
+
+
+                    if ((toSet != null) && (toSet.length() > 0)) {
 			//fe.setLabelColor(GUIGlobals.validFieldColor);
 			fe.setBackground(GUIGlobals.validFieldBackground);
 		    } else {
@@ -960,18 +965,33 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		// Storage from bibtex key field.
 		FieldTextField fe = (FieldTextField)e.getSource();
 		String oldValue = entry.getCiteKey(),
-		    newValue = fe.getText();
+                    newValue = fe.getText();
+                if (newValue.equals(""))
+                  newValue = null;
 		if (((oldValue == null) && (newValue == null)) ||
 		    ((oldValue != null) && (newValue != null)
 		     && oldValue.equals(newValue)))
 		    return; // No change.
 		boolean isDuplicate = panel.database.setCiteKeyForEntry
 		    (entry.getId(), newValue);
-
-		if (isDuplicate)
-		    panel.output(Globals.lang("Warning")+": "+Globals.lang("duplicate bibtex key."));
-		else
-		    panel.output(Globals.lang("Bibtex key is unique."));
+                if (newValue != null) {
+                  if (isDuplicate) {
+                    panel.output(Globals.lang("Warning") + ": " +
+                                 Globals.lang("duplicate bibtex key."));
+                    if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+                      CheckBoxMessage jcb = new CheckBoxMessage
+                          (Globals.lang("Warning") + ": " +Globals.lang("duplicate bibtex key."),
+                           Globals.lang("Don't show this dialog again"), false);
+                      JOptionPane.showMessageDialog
+                          (frame, jcb, Globals.lang("Warning"),
+                           JOptionPane.WARNING_MESSAGE);
+                      if (jcb.isSelected())
+                        prefs.putBoolean("dialogWarningForDuplicateKey", false);
+                    }
+                  }
+                  else
+                    panel.output(Globals.lang("Bibtex key is unique."));
+                }
 		// Add an UndoableKeyChange to the baseframe's undoManager.
 		panel.undoManager.addEdit
 		    (new UndoableKeyChange(panel.database, entry.getId(),
@@ -1018,7 +1038,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 						 (entry, fields[i].toString(),
 						  entry.getField(fields[i].toString()),
 						  (Object)null));
-				entry.setField(fields[i].toString(), null);
+				entry.clearField(fields[i].toString());
 				anyChanged = true;
 			    }
 
