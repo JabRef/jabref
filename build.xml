@@ -317,7 +317,7 @@ Number (CCN)           maintenance
 		</taskdef>
 		<jalopy fileformat="unix" convention="${src.dir}/java/jalopy.format.convention.xml" history="file" historymethod="adler32" loglevel="error" threads="2" classpathref="classpath" backup="bak">
 			<fileset dir="${src.dir}">
-				<include name="**/*.java" />
+				<include name="java/net/sf/jabref/**/*.java" />
 			</fileset>
 		</jalopy>
 	</target>
