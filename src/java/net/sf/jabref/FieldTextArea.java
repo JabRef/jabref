@@ -51,12 +51,11 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	//Util.pr(""+15*rows);
 	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
 	label.setBorder(BorderFactory.createEtchedBorder
-			//			(EtchedBorder.LOWERED, 
 			 (Color.white, Color.gray));	
 	label.setOpaque(true);
 	label.setBackground(Color.white);
-	//label.setForeground(Color.gray)
-;	setBackground(GUIGlobals.validFieldBackground);
+	//label.setForeground(Color.gray);	
+	setBackground(GUIGlobals.validFieldBackground);
 	if ((content != null) && (content.length() > 0))
 	    label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.

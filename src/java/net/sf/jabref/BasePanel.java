@@ -756,8 +756,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      */
     public void hideEntryEditor() {
 	splitPane.setBottomComponent(null);
-	//entryTable.requestFocus();
-	splitPane.requestFocus();
+	new FocusRequester(entryTable);
 	showing = null;
     }
 

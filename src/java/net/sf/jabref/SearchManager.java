@@ -169,6 +169,12 @@ class SearchManager extends JPanel
 
     }
 
+    public void startIncrementalSearch() {
+	increment.setSelected(true);
+	searchField.setText("");
+	searchField.requestFocus();
+    }
+
     public void actionPerformed(ActionEvent e) {
 	if (e.getSource() == escape) {
 	    if (frame.basePanel() != null)

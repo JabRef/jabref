@@ -77,6 +77,7 @@ public class JabRefFrame extends JFrame {
 	close = new CloseDatabaseAction(),
 	quit = new CloseAction(),
 	selectKeys = new SelectKeysAction(),
+	incrementalSearch = new IncrementalSearchAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
@@ -127,7 +128,6 @@ public class JabRefFrame extends JFrame {
 					  "push selection to lyx",
 					  GUIGlobals.lyxIconFile,
 					  prefs.getKey("Push To LyX"));
-    
 
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -181,11 +181,15 @@ public class JabRefFrame extends JFrame {
 		    openDatabaseAction.openIt();
 		}
 	    }
-	    if (tabbedPane.getTabCount() > 0)
-		tabbedPane.setSelectedIndex(0);
 	}
 
 	setVisible(true);
+	if (tabbedPane.getTabCount() > 0) {
+	    tabbedPane.setSelectedIndex(0);
+	    new FocusRequester(((BasePanel)tabbedPane.getComponentAt(0))
+			       .entryTable);
+	}
+
     }
 
     private void setupLayout() {
@@ -319,6 +323,18 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
+    class IncrementalSearchAction extends AbstractAction {
+	public IncrementalSearchAction() {
+	    super("Incremental search", new ImageIcon(GUIGlobals.searchIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Start incremental search"));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Incremental search"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    if (tabbedPane.getTabCount() > 0)
+		searchManager.startIncrementalSearch();
+	}
+    }
+
     class NewEntryAction extends AbstractAction {
 
 	BibtexEntryType type = null; // The type of item to create.
@@ -427,7 +443,7 @@ public class JabRefFrame extends JFrame {
 	bibtex.add(editPreamble);
 	bibtex.add(editStrings);
 	mb.add(bibtex);
-
+	tools.add(incrementalSearch);
 	tools.add(makeKeyAction);
 	tools.add(lyxPushAction); 
 	mb.add(tools);

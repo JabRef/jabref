@@ -284,6 +284,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Select all", "ctrl A");
 	defKeyBinds.put("Toggle groups", "ctrl shift G");
 	defKeyBinds.put("Autgenerate BibTeX keys", "ctrl G");
+	defKeyBinds.put("Incremental search", "ctrl shift F");
     }
 
     private String getNextUnit(Reader data) throws IOException {
