@@ -29,15 +29,13 @@ package net.sf.jabref.groups;
 import java.awt.Container;
 import java.awt.event.*;
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.*;
 
-import antlr.*;
-
 import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.components.*;
 import net.sf.jabref.search.*;
 
@@ -212,6 +210,18 @@ class GroupDialog extends JDialog {
                     } else {
                         m_resultingGroup = new ExplicitGroup(m_name.getText()
                                 .trim(),m_basePanel.database());
+                        // JZTODO lyrics...
+                        int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
+                                "Assign all entries that matched the previous group to this group?",
+                                "Conversion to an Explicit Group",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                        BibtexEntry entry;
+                        for (Iterator it = m_basePanel.database().getEntries().iterator(); it.hasNext(); ) {
+                            entry = (BibtexEntry) it.next();
+                            if (m_editedGroup.contains(entry))
+                                ((ExplicitGroup) m_resultingGroup).addEntry(entry);
+                        }
                     }
                     break;
                 case INDEX_KEYWORDGROUP:
