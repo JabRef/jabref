@@ -146,6 +146,7 @@
 			<fileset dir="${txt.dir}">
 				<include name="gpl.txt" />
 				<include name="lesser.txt" />
+				<include name="apache-license.txt" />
 				<include name="README" />
 			</fileset>
 			<manifest>

@@ -24,6 +24,9 @@ JabRef is free open source software, distributed under the GNU General
 Public Licence. See the enclosed text file 'gpl.txt', or the About
 dialog, for details about the GPL.
 
+JabRef also uses libraries distributed by other porties; see the About
+box for details.
+
 
 Requirements:
 JabRef runs on any system equipped with the Java Virtual Machine
