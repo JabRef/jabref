@@ -57,7 +57,7 @@
 
   <!-- Build classpath -->
   <path id="classpath">
-    <pathelement path="${build.classes}"/>
+    <pathelement path="${build.classes}"/>    
     <fileset dir="${library.directory}">
       <include name="*.jar" />
     </fileset>

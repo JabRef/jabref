@@ -29,6 +29,7 @@ import java.io.File;
 import java.awt.Font;
 import javax.swing.UIManager;
 import javax.swing.UIDefaults;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class JabRef {
 
@@ -71,6 +72,9 @@ public class JabRef {
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
 
+	try {
+	    UIManager.setLookAndFeel(new com.incors.plaf.kunststoff.KunststoffLookAndFeel());
+	} catch (UnsupportedLookAndFeelException ex) {}
 
 	JabRefPreferences prefs = new JabRefPreferences();
 	BibtexEntryType.loadCustomEntryTypes(prefs);
