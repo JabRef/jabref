@@ -86,8 +86,8 @@ appear in your chosen languages.
 
 Change log:
 1.56:	- Added mnemonic keys to menus and menu items.
-	- Bibtex strings are now sorted automatically.
-	- Fixed PDF/PS view routine to remove problems with filenames
+        - Bibtex strings are now sorted automatically.
+        - Fixed PDF/PS view routine to remove problems with filenames
           containing spaces.
         - Fixed bug that interfered with Fetch Medline by ID, and fixed
           parsing problem with certain Medline entries.
@@ -96,6 +96,7 @@ Change log:
         - command line option for generating a sub-database from LaTex aux file
           entries
         - simple copy/paste menu in entry editor
+        - experimental: text-input-area with underlying infotext in plaintext import dialog
 1.55:	- Made method for opening PDF files robust with regard to file separators (/ and \),
           so bib files can easier be used across platforms.
         - Improved Medline fetcher. Can now fetch entries based on a search expression.

@@ -35,6 +35,8 @@
 //            - create several bibtex entries in dialog
 //
 // modified :
+//            04.11.2004
+//            - experimental: text-input-area with underlying infotext
 //            02.11.2004
 //            - integrity check, which reports errors and warnings for the fields
 //            22.10.2004
@@ -185,12 +187,17 @@ public class TextInputDialog extends JDialog
   // Panel with text import functionality
   private void initRawPanel()
   {
+
     rawPanel.setLayout( new BorderLayout() ) ;
+
     // Textarea
     textPane = new JTextPane() ;
     textPane.setEditable( false ) ;
+    textPane.setOpaque(false);
     doc = textPane.getStyledDocument() ;
     addStylesToDocument( doc ) ;
+
+    OverlayPanel testPanel = new OverlayPanel(textPane, "Text Input Area" ) ;
 
     try
     {
@@ -200,11 +207,17 @@ public class TextInputDialog extends JDialog
     {}
 
     // Scrollbar(s)
-    JScrollPane paneScrollPane = new JScrollPane( textPane ) ;
+    JScrollPane paneScrollPane = new JScrollPane( testPanel ) ;
+
     paneScrollPane.setVerticalScrollBarPolicy(
         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
     paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
+//    paneScrollPane.setBackground(Color.white);
+//    paneScrollPane.setForeground(Color.green);
+//    paneScrollPane.setOpaque(false);
+
+//    testPanel.add(paneScrollPane) ;
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
@@ -216,6 +229,7 @@ public class TextInputDialog extends JDialog
     //Add listener to components that can bring up popup menus.
     MouseListener popupListener = new PopupListener( inputMenu ) ;
     textPane.addMouseListener( popupListener ) ;
+    testPanel.addMouseListener( popupListener );
 
     // Toolbar
     JToolBar toolBar = new JToolBar() ;
@@ -228,6 +242,7 @@ public class TextInputDialog extends JDialog
     JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
     leftPanel.add( toolBar, BorderLayout.NORTH ) ;
+//    leftPanel.add( testPanel, BorderLayout.CENTER ) ;
     leftPanel.add( paneScrollPane, BorderLayout.CENTER ) ;
 
     // ----------------------------------------------------------------
