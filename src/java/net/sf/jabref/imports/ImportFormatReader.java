@@ -536,8 +536,6 @@ found:
     for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
       ImportFormat imFo = (ImportFormat) ((Map.Entry) i.next()).getValue();
 
-      // TODO: Here we should use the feature to check if the importer recognizes the
-      //       format, but none of the importers have implemented this yet.
       try {
         //System.out.println("Trying format: "+imFo.getFormatName());
         List entries = importFromFile(imFo, filename);
@@ -555,20 +553,25 @@ found:
           entryList = entries;
         }
       } catch (IOException ex) {
+	  //ex.printStackTrace();
         //System.out.println("Import failed");
       }
     }
 
     // Finally, if all else fails, see if it is a BibTeX file:	
     if (entryList == null) {
-      ParserResult pr =
-        loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
-
-      if ((pr.getDatabase().getEntryCount() > 0)
-          || (pr.getDatabase().getStringCount() > 0)) {
-        entryList = pr;
-        usedFormat = "BibTeX";
-      }
+	try {
+	    ParserResult pr =
+		loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
+	    if ((pr.getDatabase().getEntryCount() > 0)
+		|| (pr.getDatabase().getStringCount() > 0)) {
+		entryList = pr;
+		usedFormat = "BibTeX";
+	    }
+	} catch (Throwable ex) {
+	    //ex.printStackTrace();
+	}
+	
     }
 
     return new Object[] { usedFormat, entryList };

@@ -80,10 +80,9 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		}
 	    });
 
-	init();
     }
 
-    public void init() {
+    public void setValues() {
 	layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
 	layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
     }

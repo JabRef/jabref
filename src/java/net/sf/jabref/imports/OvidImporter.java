@@ -96,7 +96,7 @@ public class OvidImporter implements ImportFormat {
 		}else if (fields[j].indexOf("Title") == 0) h.put("title", fields[j]
 								 .substring(6, fields[j].length()).replaceAll("\\[.+\\]", ""));
 		else if (fields[j].indexOf("Source") == 0){
-		    System.out.println(fields[j]);
+		    //System.out.println(fields[j]);
 		    String s = fields[j];
 		    Matcher matcher = ovid_src_pat.matcher(s);
 		    boolean matchfound = matcher.find();

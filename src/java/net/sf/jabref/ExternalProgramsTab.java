@@ -105,6 +105,10 @@ class ExternalProgramsTab extends JPanel implements PrefsTab {
       }
     }
 
+    public void setValues() {
+
+    }
+
     /**
      * Store changes to table preferences. This method is called when
      * the user clicks Ok.

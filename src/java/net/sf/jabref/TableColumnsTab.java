@@ -50,17 +50,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         this.frame = frame;
         setLayout(new BorderLayout());
 
-        String[] names = _prefs.getStringArray("columnNames"),
-            lengths = _prefs.getStringArray("columnWidths");
-        for (int i=0; i<names.length; i++) {
-            if (i<lengths.length)
-                tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
-            else
-                tableRows.add(new TableRow(names[i]));
-        }
-        rowCount = tableRows.size()+5;
-        ncWidth = prefs.getInt("numberColWidth");
-
         TableModel tm = new AbstractTableModel() {
                 public int getRowCount() { return rowCount; }
                 public int getColumnCount() { return 2; }
@@ -168,6 +157,22 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         add(pan, BorderLayout.CENTER);
     }
+
+    public void setValues() {
+	tableRows.clear();
+	String[] names = _prefs.getStringArray("columnNames"),
+            lengths = _prefs.getStringArray("columnWidths");
+        for (int i=0; i<names.length; i++) {
+            if (i<lengths.length)
+                tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
+            else
+                tableRows.add(new TableRow(names[i]));
+        }
+        rowCount = tableRows.size()+5;
+        ncWidth = _prefs.getInt("numberColWidth");
+
+    }
+
 
     class DeleteRowAction extends AbstractAction {
         public DeleteRowAction() {

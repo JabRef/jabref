@@ -30,61 +30,29 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _frame = frame;
  	setLayout(new BorderLayout());
 
-	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"),
-				     _prefs.getBoolean("autoOpenForm"));
-	openLast = new JCheckBox(Globals.lang
-				 ("Open last edited databases at startup"),_prefs.getBoolean("openLastEdited"));
-        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
-	backup = new JCheckBox(Globals.lang("Backup old file when saving"),
-			       _prefs.getBoolean("backup"));
-	defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"),
-				  _prefs.getBoolean("defaultShowSource"));
-	editSource = new JCheckBox(Globals.lang("Enable source editing"),
-				   _prefs.getBoolean("enableSourceEditing"));
-        defSort = new JCheckBox(Globals.lang("Sort Automatically"),
-				  _prefs.getBoolean("defaultAutoSort"));
-          ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"),
-				  _prefs.getBoolean("ctrlClick"));
-        disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"),
-                                  _prefs.getBoolean("disableOnMultipleSelection"));
-useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
-                         _prefs.getBoolean("useOwner"));
-keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"),
-                                 _prefs.getBoolean("dialogWarningForDuplicateKey"));
-confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"),
-                              _prefs.getBoolean("confirmDelete"));
-saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"),
-				    _prefs.getBoolean("saveInStandardOrder"));
-JPanel general = new JPanel();
-defOwnerField = new JTextField(_prefs.get("defaultOwner"));
-        groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
-       ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
-                                  "Help", GUIGlobals.helpSmallIconFile);
+	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"));
+	openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
+        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
+	backup = new JCheckBox(Globals.lang("Backup old file when saving"));
+	defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"));
+	editSource = new JCheckBox(Globals.lang("Enable source editing"));
+        defSort = new JCheckBox(Globals.lang("Sort Automatically"));
+	ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
+        disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
+	useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":");
+	keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
+	confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
+	saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
 
-         String enc = prefs.get("defaultEncoding");
-         outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
-           if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
-             encodings.setSelectedIndex(i);
-             break outer;
-           }
-         }
+	JPanel general = new JPanel();
+	defOwnerField = new JTextField();
+        groupField = new JTextField(15);
+	ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
+				   "Help", GUIGlobals.helpSmallIconFile);
 
 	 // Font sizes:
-	 fontSize = new JTextField("");
-	 fontSize.setText(""+_prefs.getInt("menuFontSize"));
-	 oldMenuFontSize = _prefs.getInt("menuFontSize");
-
-
-	// Language choice
-        String oldLan = _prefs.get("language");
-        int ilk = 0;
-        for (Iterator i=GUIGlobals.LANGUAGES.keySet().iterator(); i.hasNext();) {
-          if (GUIGlobals.LANGUAGES.get(i.next()).equals(oldLan)) {
-            language.setSelectedIndex(ilk);
-          }
-          ilk++;
-        }
-
+	 fontSize = new JTextField();	 	
+        
 	FormLayout layout = new FormLayout
 	    ("1dlu, 8dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
 	     "");                	
@@ -137,6 +105,44 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 	pan = builder.getPanel();
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	add(pan, BorderLayout.CENTER);
+
+    }
+
+    public void setValues() {
+	autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
+	openLast.setSelected(_prefs.getBoolean("openLastEdited"));
+	allowEditing.setSelected( _prefs.getBoolean("allowTableEditing"));
+	backup.setSelected(_prefs.getBoolean("backup"));
+	defSource.setSelected( _prefs.getBoolean("defaultShowSource"));
+	editSource.setSelected(_prefs.getBoolean("enableSourceEditing"));
+	defSort.setSelected(_prefs.getBoolean("defaultAutoSort"));
+	ctrlClick.setSelected(_prefs.getBoolean("ctrlClick"));
+	disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
+	useOwner.setSelected(_prefs.getBoolean("useOwner"));
+	keyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
+	confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
+	saveInStandardOrder.setSelected(_prefs.getBoolean("saveInStandardOrder"));
+	defOwnerField.setText(_prefs.get("defaultOwner"));
+	groupField.setText(_prefs.get("groupsDefaultField"));
+	String enc = _prefs.get("defaultEncoding");
+	outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
+	    if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
+		encodings.setSelectedIndex(i);
+		break outer;
+	    }
+	}
+	fontSize.setText(""+_prefs.getInt("menuFontSize"));
+	oldMenuFontSize = _prefs.getInt("menuFontSize");
+	String oldLan = _prefs.get("language");
+
+	// Language choice
+        int ilk = 0;
+        for (Iterator i=GUIGlobals.LANGUAGES.keySet().iterator(); i.hasNext();) {
+          if (GUIGlobals.LANGUAGES.get(i.next()).equals(oldLan)) {
+            language.setSelectedIndex(ilk);
+          }
+          ilk++;
+        }
 
     }
 

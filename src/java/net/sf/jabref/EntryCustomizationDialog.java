@@ -26,6 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.*;
+import java.io.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -35,7 +36,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     BibtexEntryType type;
 
     JScrollPane reqSP, optSP;
-    JButton ok, cancel, helpButton, delete, genFields;
+    JButton ok, cancel, helpButton, delete, genFields, importTypes, exportTypes;
     JPanel panel=new JPanel(),
 	fieldPanel = new JPanel(),
 	typePanel = new JPanel();
@@ -147,7 +148,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
         // Key bindings:
         ActionMap am = panel.getActionMap();
         InputMap im = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(parent.prefs.getKey("Close dialog"), "close");
+        im.put(Globals.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
           public void actionPerformed(ActionEvent e) {
             dispose();
@@ -231,9 +232,15 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	cancel=new JButton(Globals.lang("Close"));
 	delete = new JButton(Globals.lang("Delete custom"));
         genFields = new JButton(Globals.lang("Set general fields"));
+	importTypes = new JButton(Globals.lang("Import"));
+	exportTypes = new JButton(Globals.lang("Export"));
         buttonPanel.add( ok );
 	buttonPanel.add(delete);
+        buttonPanel.add(Box.createHorizontalStrut(5));
         buttonPanel.add(genFields);
+	buttonPanel.add(importTypes);
+	buttonPanel.add(exportTypes);
+        buttonPanel.add(Box.createHorizontalStrut(5));
 	buttonPanel.add( cancel);
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -283,6 +290,85 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 			    (Globals.lang("Removed entry type."));
 		    }
 		}
+	    });
+
+	exportTypes.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    String filename = Globals.getNewFile
+			(parent, Globals.prefs, new File(System.getProperty("user.home")), 
+			 ".txt", JFileChooser.SAVE_DIALOG, false);
+		    if (filename == null) 
+			return;
+		    File file = new File(filename);
+		    if (!file.exists() ||  
+			(JOptionPane.showConfirmDialog
+                         (ths, "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                          Globals.lang("Export entry types"), JOptionPane.OK_CANCEL_OPTION)
+                         == JOptionPane.OK_OPTION)) {
+
+			try {
+			    FileWriter out = new FileWriter(file);
+			    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+			    while (i.hasNext()) {
+				Object o=BibtexEntryType.ALL_TYPES.get(i.next());
+				if (o instanceof CustomEntryType) {
+				    // Store this entry type.
+				    ((CustomEntryType)o).save(out);
+				}
+			    }
+			    out.close();
+			} catch (IOException ex) {
+			    JOptionPane.showMessageDialog
+				(ths, Globals.lang("Could not export entry types")+": "+ex.getMessage(), Globals.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
+			    //ex.printStackTrace();
+			}
+		    }
+
+		}
+	    });
+
+	importTypes.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    String filename = Globals.getNewFile
+			(parent, Globals.prefs, new File(System.getProperty("user.home")), 
+			 ".txt", JFileChooser.OPEN_DIALOG, false);
+		    if (filename == null) 
+			return;
+
+		    try {
+			BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
+			String line;
+			int count = 0;
+			while ((line = in.readLine()) != null) {
+			    line = line.trim();
+			    if ((line.length() > 9+GUIGlobals.ENTRYTYPE_FLAG.length())
+				&& line.substring(0, 9+GUIGlobals.ENTRYTYPE_FLAG.length()).equals("@comment{"+GUIGlobals.ENTRYTYPE_FLAG)
+				&& line.substring(line.length()-1).equals("}")) {
+				// Matches a @comment{jabref-entrytype: ...} section.
+				CustomEntryType type = CustomEntryType.parseEntryType(line.substring(9, line.length()-1));
+				if (type != null) {
+				    // Parsing succeeded.
+				    BibtexEntryType.ALL_TYPES.put(type.getName().toLowerCase(), type);
+				    count++;
+				}
+			    }
+
+			    if (count > 0) {
+				setTypeSelection();
+				req_ta.setText("");
+				opt_ta.setText("");
+				name.setText("");
+				messageLabel.setText(Globals.lang("Imported entry types")+": "+count);
+			    }
+			}
+		    } catch (IOException ex) {
+			JOptionPane.showMessageDialog
+			    (ths, Globals.lang("Could not import entry types")+": "+ex.getMessage(), Globals.lang("Import entry types"), JOptionPane.ERROR_MESSAGE);
+			//ex.printStackTrace();
+		    }
+		}
+
+		
 	    });
     }
 

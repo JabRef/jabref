@@ -40,7 +40,7 @@ public class IsiImporter implements ImportFormat {
     while ((str = in.readLine()) != null) {
       //Inspec and IEEE seem to have these strange " - " between key and value
       str = str.replace(" - ", "");
-      System.out.println(str);
+      //System.out.println(str);
 
       if (pat1.matcher(str).find())
         return true;

@@ -28,6 +28,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.*;
+import java.io.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
@@ -57,9 +58,12 @@ public class PrefsDialog3 extends JDialog {
 		    }
 		    };*/
     JList chooser;
+    JButton importPrefs = new JButton(Globals.lang("Import preferences")),
+	exportPrefs = new JButton(Globals.lang("Export preferences"));
     CardLayout cardLayout = new CardLayout();
     HashMap panels = new HashMap();
     JabRefFrame frame;
+    PrefsDialog3 ths = this;
 
     public PrefsDialog3(JabRefFrame parent, JabRefPreferences prefs) {
         super(parent, Globals.lang("JabRef preferences"), false);
@@ -129,8 +133,15 @@ public class PrefsDialog3 extends JDialog {
 		}
 	    });
 	
+	JPanel one = new JPanel(), two = new JPanel();
+	one.setLayout(new BorderLayout());
+	two.setLayout(new BorderLayout());
+	one.add(chooser, BorderLayout.CENTER);
+	one.add(importPrefs, BorderLayout.SOUTH);
+	two.add(one, BorderLayout.CENTER);
+	two.add(exportPrefs, BorderLayout.SOUTH);
 	upper.setLayout(new BorderLayout());
-	upper.add(chooser, BorderLayout.WEST);
+	upper.add(two, BorderLayout.WEST);
 	upper.add(main, BorderLayout.CENTER);
 	    
 	// Add all panels to main panel:
@@ -154,6 +165,58 @@ public class PrefsDialog3 extends JDialog {
         im.put(frame.prefs().getKey("Close dialog"), "close");
         am.put("close", cancelAction);
 
+	// Import and export actions:
+	exportPrefs.setToolTipText(Globals.lang("Export preferences to file"));
+	importPrefs.setToolTipText(Globals.lang("Import preferences from file"));
+	exportPrefs.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    String filename = Globals.getNewFile
+			(frame, _prefs, new File(System.getProperty("user.home")), 
+			 ".xml", JFileChooser.SAVE_DIALOG, false);
+		    if (filename == null) 
+			return;
+		    File file = new File(filename);
+		    if (!file.exists() ||  
+			(JOptionPane.showConfirmDialog
+                         (ths, "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                          Globals.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION)
+                         == JOptionPane.OK_OPTION)) {
+
+			try {
+			    _prefs.exportPreferences(filename);
+			} catch (IOException ex) {
+			    JOptionPane.showMessageDialog
+				(ths, Globals.lang("Could not export preferences")+": "+ex.getMessage(), Globals.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
+			    //ex.printStackTrace();
+			}
+		    }
+
+		}
+	    });
+
+	importPrefs.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    String filename = Globals.getNewFile
+			(frame, _prefs, new File(System.getProperty("user.home")), 
+			 ".xml", JFileChooser.OPEN_DIALOG, false);
+		    if (filename == null) 
+			return;
+
+		    try {
+			_prefs.importPreferences(filename);
+			setValues();
+		    } catch (IOException ex) {
+			JOptionPane.showMessageDialog
+			    (ths, Globals.lang("Could not import preferences")+": "+ex.getMessage(), Globals.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
+			//ex.printStackTrace();
+		    }
+		}
+
+		
+	    });
+	
+	setValues();
+	
         pack(); //setSize(440, 500);
     }
 
@@ -185,7 +248,7 @@ public class PrefsDialog3 extends JDialog {
 		    public void update() {
 			if (!ready)
 			    return;
-			dispose();
+			setVisible(false);
 			frame.setupAllTables();
 			frame.output(Globals.lang("Preferences recorded."));
 		    }
@@ -196,13 +259,22 @@ public class PrefsDialog3 extends JDialog {
         }
     }
 
+    public void setValues() {
+	// Update all field values in the tabs:
+	int count = main.getComponentCount();
+	Component[] comps = main.getComponents();
+	for (int i = 0; i < count; i++) {
+	    ((PrefsTab)comps[i]).setValues();
+	}
+    }
+
     class CancelAction extends AbstractAction {
         public CancelAction() {
             super("Cancel");
 
         }
         public void actionPerformed(ActionEvent e) {
-	    dispose();
+	    setVisible(false);
             // Just close dialog without recording changes.
             /*(new Thread() {
               public void run() {

@@ -74,7 +74,7 @@ public class JabRefFrame
 
   JabRefFrame ths = this;
   JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
-
+    PrefsDialog3 prefsDialog = null;
   private int lastTabbedPanelSelectionIndex = -1 ;
 
   JTabbedPane tabbedPane = new JTabbedPane();
@@ -407,14 +407,18 @@ public class JabRefFrame
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
       AbstractWorker worker = new AbstractWorker() {
-              PrefsDialog3 pd = null;
               public void run() {
                   output(Globals.lang("Opening preferences..."));
-                  pd = new PrefsDialog3(ths, prefs);
-                  Util.placeDialog(pd, ths);
+		  if (prefsDialog == null) {
+		      prefsDialog = new PrefsDialog3(ths, prefs);
+		      Util.placeDialog(prefsDialog, ths);
+		  }
+		  else
+		      prefsDialog.setValues();
+
               }
               public void update() {
-                  pd.show();
+                  prefsDialog.show();
                   output("");
               }
           };

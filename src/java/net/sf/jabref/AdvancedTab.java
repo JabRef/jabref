@@ -29,13 +29,10 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     public AdvancedTab(JabRefPreferences prefs, HelpDialog diag) {
         _prefs = prefs;
 
-	oldUseDef = prefs.getBoolean("useDefaultLookAndFeel");
-	oldLnf = prefs.get("lookAndFeel");
-	useDefault = new JCheckBox(Globals.lang("Use other look and feel"),
-				   !oldUseDef);
 
-	className = new JTextField(oldLnf, 50);
-	className.setEnabled(!oldUseDef);
+
+	useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
+	className = new JTextField(50);
 	final JTextField clName = className;
 	useDefault.addChangeListener(new ChangeListener() {
 		public void stateChanged(ChangeEvent e) {
@@ -79,12 +76,15 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	setLayout(new BorderLayout());
 	add(pan, BorderLayout.CENTER);
-	init();
 
     }
 
-    public void init() {
-
+    public void setValues() {
+	oldUseDef = _prefs.getBoolean("useDefaultLookAndFeel");
+	oldLnf = _prefs.get("lookAndFeel");
+	useDefault.setSelected(!oldUseDef);
+	className.setText(oldLnf);
+	className.setEnabled(!oldUseDef);
     }
 
     public void storeSettings() {

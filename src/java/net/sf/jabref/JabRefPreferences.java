@@ -57,8 +57,17 @@ public class JabRefPreferences {
     // Object containing custom export formats:
     public CustomExportList customExports;
 
+    // The only instance of this class:
+    private static JabRefPreferences INSTANCE = null;
 
-    public JabRefPreferences() {
+    public static JabRefPreferences getInstance() {
+	if (INSTANCE == null)
+	    INSTANCE = new JabRefPreferences();
+	return INSTANCE;
+    }
+
+    // The constructor is made private to enforce this as a singleton class:
+    private JabRefPreferences() {
 
         prefs = Preferences.userNodeForPackage(JabRef.class);
         //Util.pr(prefs.toString());

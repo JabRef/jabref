@@ -29,12 +29,12 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
 				 "Help", GUIGlobals.helpSmallIconFile);
 
-        pdfDir = new JTextField(_prefs.get("pdfDirectory"), 30);
-        pdf = new JTextField(_prefs.get("pdfviewer"), 30);
-	ps = new JTextField(_prefs.get("psviewer"), 30);
-	html = new JTextField(_prefs.get("htmlviewer"), 30);
-	lyx = new JTextField(_prefs.get("lyxpipe"), 30);
-        winEdt = new JTextField(_prefs.get("winEdtPath"), 30);
+        pdfDir = new JTextField(30);
+        pdf = new JTextField(30);
+	ps = new JTextField(30);
+	html = new JTextField(30);
+	lyx = new JTextField(30);
+        winEdt = new JTextField(30);
 
 	BrowseAction browse;
 
@@ -118,6 +118,15 @@ public class ExternalTab extends JPanel implements PrefsTab {
           comp.setText(newFile.getPath());
         }
       }
+    }
+
+    public void setValues() {
+       pdfDir.setText(_prefs.get("pdfDirectory"));
+       pdf.setText(_prefs.get("pdfviewer"));
+       ps.setText(_prefs.get("psviewer"));
+       html.setText(_prefs.get("htmlviewer"));
+       lyx.setText(_prefs.get("lyxpipe"));
+       winEdt.setText(_prefs.get("winEdtPath"));
     }
 
     public void storeSettings() {

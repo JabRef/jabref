@@ -132,7 +132,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	gbl.setConstraints( lab, con );
 	c.add( lab );
 	
-	JTextField tf = new JTextField(_keypatterns.getValue(name).get(0).toString());
+	JTextField tf = new JTextField();//_keypatterns.getValue(name).get(0).toString());
 	tf.setColumns( 15 );
 	con.gridx = 1;
 	con.fill = GridBagConstraints.HORIZONTAL;
@@ -156,6 +156,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	c.add( but );		
 
 	return tf;
+    }
+
+    private void setValue(JTextField tf, String fieldName) {
+	tf.setText(_keypatterns.getValue(fieldName).get(0).toString());
     }
 
 	/**
@@ -251,7 +255,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 * and <code>?</code> if an entry cannot be found. It really shouln't be
 	 * nessesary to catch those exceptions here... 
 	 */
-	private void fillTextfields(){
+    /*	private void fillTextfields(){
 		txtArticle.setText(_keypatterns.getValue("article").get(0).toString());
 		txtBook.setText(_keypatterns.getValue("book").get(0).toString());
 		txtBooklet.setText(_keypatterns.getValue("booklet").get(0).toString());
@@ -268,7 +272,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		txtUnpublished.setText(_keypatterns.getValue("unpublished").get(0).toString());
 	}
 
-	
+    */
 	/**
 	 * An inner class to handle button actions
 	 * @author Ulrik Stervbo (ulriks AT ruc.dk)
@@ -302,4 +306,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	return true;
     }
 
+    public void setValues() {
+	for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
+	    String name = (String)i.next();
+	    JTextField tf = (JTextField)textFields.get(name);
+	    setValue(tf, name);
+	}
+    }
 }

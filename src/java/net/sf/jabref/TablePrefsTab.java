@@ -40,36 +40,27 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	this.frame = frame;
 	setLayout(new BorderLayout());
 
-	menuFont = new Font
-	    (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
-	     prefs.getInt("menuFontSize"));
+
 
 	colorCodes = new JCheckBox(Globals.lang
-				   ("Color codes for required and optional fields")
-				   ,_prefs.getBoolean("tableColorCodesOn"));
+				   ("Color codes for required and optional fields"));
 	antialias = new JCheckBox(Globals.lang
-				  ("Use antialiasing font in table")
-				  ,_prefs.getBoolean("antialias"));
+				  ("Use antialiasing font in table"));
 	autoResizeMode = new JCheckBox(Globals.lang
-				       ("Fit table horizontally on screen"),
-				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
+				       ("Fit table horizontally on screen"));
 	namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
 	namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
         namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
-        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"), _prefs.getBoolean("pdfColumn"));
-        urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"), _prefs.getBoolean("urlColumn"));
-        citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"), _prefs.getBoolean("citeseerColumn"));
+        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
+        urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
+        citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
 
-        secField = new JTextField(_prefs.get("secSort"), 10);
-        terField = new JTextField(_prefs.get("terSort"), 10);
-
-
-	
+        secField = new JTextField(10);
+        terField = new JTextField(10);
 
         secSort.insertItemAt(Globals.lang("<select>"), 0);
         terSort.insertItemAt(Globals.lang("<select>"), 0);
-        secSort.setSelectedIndex(0);
-        terSort.setSelectedIndex(0);
+
         secSort.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (secSort.getSelectedIndex() > 0) {
@@ -91,19 +82,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	bg.add(namesAsIs);
 	bg.add(namesFf);
 	bg.add(namesFl);
-	if (_prefs.getBoolean("namesAsIs"))
-	    namesAsIs.setSelected(true);
-	else {
-	    if (_prefs.getBoolean("namesFf"))
-		namesFf.setSelected(true);
-	    else
-		namesFl.setSelected(true);
-	}
 
-	secDesc = new JCheckBox(Globals.lang("Descending"),
-				_prefs.getBoolean("secDescending"));
-	terDesc = new JCheckBox(Globals.lang("Descending"),
-				_prefs.getBoolean("terDescending"));
+	secDesc = new JCheckBox(Globals.lang("Descending"));
+	terDesc = new JCheckBox(Globals.lang("Descending"));
 
 	FormLayout layout = new FormLayout
 	    ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
@@ -284,6 +265,34 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	pan = builder.getPanel();
 	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	add(pan, BorderLayout.CENTER);
+    }
+
+    public void setValues() {
+	menuFont = new Font
+	    (_prefs.get("menuFontFamily"), _prefs.getInt("menuFontStyle"),
+	     _prefs.getInt("menuFontSize"));
+	colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
+	antialias.setSelected(_prefs.getBoolean("antialias"));
+	autoResizeMode.setSelected((_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
+	pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
+	urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
+	citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
+
+	secField.setText(_prefs.get("secSort"));
+	terField.setText(_prefs.get("terSort"));
+        secSort.setSelectedIndex(0);
+        terSort.setSelectedIndex(0);
+
+	if (_prefs.getBoolean("namesAsIs"))
+	    namesAsIs.setSelected(true);
+	else {
+	    if (_prefs.getBoolean("namesFf"))
+		namesFf.setSelected(true);
+	    else
+		namesFl.setSelected(true);
+	}
+	secDesc.setSelected(_prefs.getBoolean("secDescending"));
+	terDesc.setSelected(_prefs.getBoolean("terDescending"));
     }
 
     /**

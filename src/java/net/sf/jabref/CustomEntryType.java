@@ -91,6 +91,9 @@ public class CustomEntryType extends BibtexEntryType {
 
     public static CustomEntryType parseEntryType(String comment) { 
 	try {
+	    //if ((comment.length() < 9+GUIGlobals.ENTRYTYPE_FLAG.length())
+	    //	|| comment
+	    //System.out.println(">"+comment+"<");
 	    String rest;
 	    rest = comment.substring(GUIGlobals.ENTRYTYPE_FLAG.length());
 	    int nPos = rest.indexOf(':');
