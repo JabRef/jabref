@@ -717,6 +717,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	splitPane.setBottomComponent(null);
 	//entryTable.requestFocus();
 	splitPane.requestFocus();
+	showing = null;
     }
 
     /**
@@ -725,8 +726,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * @param be a <code>BibtexEntry</code> value
      */
     public void ensureNotShowing(BibtexEntry be) {
-	if (showing == be)
+	if (showing == be) {
 	    hideEntryEditor();      
+	    showing = null;
+	}
     }
 
     public void markBaseChanged() {

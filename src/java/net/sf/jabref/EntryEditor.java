@@ -838,7 +838,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     class NextEntryAction extends AbstractAction {
 	    public NextEntryAction() {
 		super(Globals.lang("Next entry"),
-		      new ImageIcon(GUIGlobals.forwardIconFile));
+		      new ImageIcon(GUIGlobals.downIconFile));
 
 		putValue(SHORT_DESCRIPTION, Globals.lang("Next entry"));
 	    }
@@ -866,7 +866,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     class PrevEntryAction extends AbstractAction {
 	    public PrevEntryAction() {
 		super(Globals.lang("Previous entry"),
-		      new ImageIcon(GUIGlobals.backIconFile));
+		      new ImageIcon(GUIGlobals.upIconFile));
 
 		putValue(SHORT_DESCRIPTION, Globals.lang("Previous entry"));
 		
