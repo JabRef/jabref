@@ -800,8 +800,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			  for (int i=0; i<bes.length; i++)
 			      counter += rsd.replace(bes[i], ce);
 		      }
-		      output(Globals.lang("Replaced")+": "+counter+" "+
-			     Globals.lang(counter==1?"occurence":"occurences"));
+		      output(Globals.lang("Replaced")+" "+counter+" "+
+			     Globals.lang(counter==1?"occurence":"occurences")+".");
 		      if (counter > 0) {
 			  ce.end();
 			  undoManager.addEdit(ce);

@@ -45,11 +45,11 @@ class AutoGroupDialog extends JDialog {
         remove = new JTextField(60),
 	field = new JTextField(60);
     JLabel
-	nr = new JLabel("Characters to ignore:"),
-	nf = new JLabel("Field to group by:");
+	nr = new JLabel(Globals.lang("Characters to ignore")+":"),
+	nf = new JLabel(Globals.lang("Field to group by")+":");
     JButton
-	ok = new JButton("Ok"),
-	cancel = new JButton("Cancel");
+	ok = new JButton(Globals.lang("Ok")),
+	cancel = new JButton(Globals.lang("Cancel"));
     JPanel
 	main = new JPanel(),
 	opt = new JPanel();
@@ -69,7 +69,7 @@ class AutoGroupDialog extends JDialog {
 			   Vector groups_,
 			   String defaultField, 
 			   String defaultRemove) {
-	super(frame_, "Automatically create groups", true);
+	super(frame_, Globals.lang("Automatically create groups"), true);
 	frame = frame_;
 	gs = gs_;
 	panel = panel_;
@@ -83,9 +83,9 @@ class AutoGroupDialog extends JDialog {
 		    // Check that there are no empty strings.
 		    if (field.getText().equals("")) {
 			JOptionPane.showMessageDialog
-			    (frame, "You must provide a field name "+
-			     "as basis for the group creation.",
-			     "Automatically create groups", 
+			    (frame, Globals.lang("You must provide a field name "+
+			     "as basis for the group creation."),
+			     Globals.lang("Automatically create groups"), 
 			     JOptionPane.ERROR_MESSAGE);
 			return;						      
 		    } 
@@ -97,7 +97,7 @@ class AutoGroupDialog extends JDialog {
 			(panel.getDatabase(), field().toLowerCase(),
 			 " "+remove());
 		    Vector added = new Vector(20, 20);
-		    NamedCompound ce = new NamedCompound("Autogenerate groups");
+		    NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
 		    //boolean any = false; // To see if _any_ groups were created.
 		    Iterator i = hs.iterator();
 		    while (i.hasNext()) {
@@ -193,7 +193,7 @@ class AutoGroupDialog extends JDialog {
 	opt.setLayout(gbl);
 	main.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
-			"Group properties"));
+			Globals.lang("Group properties")));
 
 	// Main panel:
 	con.weightx = 0;

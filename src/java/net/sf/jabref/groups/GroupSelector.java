@@ -112,13 +112,13 @@ public class GroupSelector extends SidePaneComponent
 	andCb.addActionListener(this);
 	orCb.addActionListener(this);
 	autoGroup.addActionListener(this);
-	newButton.setToolTipText("New group");
-	refresh.setToolTipText("Refresh view");
-	andCb.setToolTipText("Display only entries belonging to all selected"
-			     +" groups.");
-	orCb.setToolTipText("Display all entries belonging to one or more "
-			    +"of the selected groups.");
-	autoGroup.setToolTipText("Automatically create groups for database.");
+	newButton.setToolTipText(Globals.lang("New group"));
+	refresh.setToolTipText(Globals.lang("Refresh view"));
+	andCb.setToolTipText(Globals.lang("Display only entries belonging to all selected"
+			     +" groups."));
+	orCb.setToolTipText(Globals.lang("Display all entries belonging to one or more "
+			    +"of the selected groups."));
+	autoGroup.setToolTipText(Globals.lang("Automatically create groups for database."));
 	bgr.add(andCb);
 	bgr.add(orCb);
 
@@ -146,7 +146,7 @@ public class GroupSelector extends SidePaneComponent
 					       GUIGlobals.groupsHelp,
 					       "Help on groups");
 	helpButton.addActionListener(helpAction);
-	helpButton.setToolTipText("Help on groups");
+	helpButton.setToolTipText(Globals.lang("Help on groups"));
 	gbl.setConstraints(helpButton, con);
 	add(helpButton);
 
@@ -184,13 +184,13 @@ public class GroupSelector extends SidePaneComponent
 
 	gropt.add(modifyAction);
 
-	gropt.add(new AbstractAction("Remove") {
+	gropt.add(new AbstractAction(Globals.lang("Remove")) {
 		public void actionPerformed(ActionEvent e) {
 		    String gname = (String)groups.elementAt
 			(OFFSET+DIM*(list.getSelectedIndex()-1)+1);
 		    int conf = JOptionPane.showConfirmDialog
-			(frame, "Remove group '"+gname+"'?",
-			 "Remove group", JOptionPane.YES_NO_OPTION);
+			(frame, Globals.lang("Remove group")+" '"+gname+"'?",
+			 Globals.lang("Remove group"), JOptionPane.YES_NO_OPTION);
 		    if (conf == JOptionPane.YES_OPTION) {
 			try {
 
@@ -209,11 +209,11 @@ public class GroupSelector extends SidePaneComponent
 				 (ths, groups, index, false,
 				  field, name, regexp));
 			    panel.markBaseChanged();
-			    frame.output("Removed group '"
+			    frame.output(Globals.lang("Removed group")+" '"
 					     +name+"'.");
 			} catch (ArrayIndexOutOfBoundsException ex) {
-			    System.err.println("Unexpected error when "
-					       +"trying to remove group.");
+			    System.err.println(Globals.lang("Unexpected error when "
+					       +"trying to remove group."));
 			}
 		    }
 		}
@@ -318,7 +318,7 @@ public class GroupSelector extends SidePaneComponent
 		     (String)groups.elementAt(index+1),
 		     (String)groups.elementAt(index+2)));
 		panel.markBaseChanged();
-		frame.output("Created group '"
+		frame.output(Globals.lang("Created group")+" '"
 				 +gd.name()+"'.");
 
 	    }
@@ -349,7 +349,7 @@ public class GroupSelector extends SidePaneComponent
 	panel.stopShowingGroup();
     }
 
-    AbstractAction modifyAction = new AbstractAction("Modify") {
+    AbstractAction modifyAction = new AbstractAction(Globals.lang("Modify")) {
 	    public void actionPerformed(ActionEvent e) {
 		int index = OFFSET+DIM*(list.getSelectedIndex()-1),
 		    groupIndex = list.getSelectedIndex();
@@ -368,7 +368,7 @@ public class GroupSelector extends SidePaneComponent
 			  gd.oldField(), gd.oldName(), gd.oldRegexp()));
 
 		    panel.markBaseChanged();
-		    frame.output("Modified group '"+gd.name()+"'.");
+		    frame.output(Globals.lang("Modified group")+" '"+gd.name()+"'.");
 		}
 	    }
 	};
