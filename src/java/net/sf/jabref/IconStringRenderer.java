@@ -22,6 +22,12 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class IconStringRenderer extends DefaultTableCellRenderer {
 
+    String toolTip;
+
+    public IconStringRenderer(String toolTip) {
+	this.toolTip = toolTip;
+    }
+
 	  /*
 	   * @see TableCellRenderer#getTableCellRendererComponent(JTable, Object, boolean, boolean, int, int)
 	   */
@@ -32,6 +38,7 @@ public class IconStringRenderer extends DefaultTableCellRenderer {
 	  	if (value instanceof JLabel) {
 	  		retval.setText(((JLabel)value).getText());
 	  		retval.setIcon(((JLabel)value).getIcon());
+	  		retval.setToolTipText(toolTip);
 	  	}
 	    return retval;
 	  }

@@ -35,6 +35,9 @@ import net.sf.jabref.imports.*;
 import java.io.*;
 import java.util.*;
 import net.sf.jabref.export.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import com.jgoodies.plaf.FontSizeHints;
+import com.jgoodies.plaf.plastic.PlasticLookAndFeel;
 
 //import javax.swing.UIManager;
 //import javax.swing.UIDefaults;
@@ -364,6 +367,9 @@ public class JabRef {
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");
 
+      // Set antialiasing on everywhere. This only works in JRE >= 1.5.
+      System.setProperty("swing.aatext", "true");
+
       //String osName = System.getProperty("os.name", "def");
       if (Globals.ON_WIN) {
         try {
@@ -376,10 +382,12 @@ public class JabRef {
       else if (!Globals.ON_MAC) {
         try {
           //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-          LookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
-
+          PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
+	  MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
+	  int fontSizes = prefs.getInt("menuFontSize");
+	  lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
           //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
-          //LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+          //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
           //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
           UIManager.setLookAndFeel(lnf);
         }

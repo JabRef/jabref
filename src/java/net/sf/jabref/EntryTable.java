@@ -405,7 +405,7 @@ public class EntryTable extends JTable {
               //if (tableModel.hasCrossRef(row))
               //  renderer = maybeIncRenderer;
               //else
-              renderer = iconStringRenderer;
+              renderer = incompleteEntryRenderer;
             }
 
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
@@ -456,7 +456,8 @@ public class EntryTable extends JTable {
     // The following classes define the renderers used to render required
     // and optional fields in the table. The purpose of these renderers is
     // to visualize which fields are needed for each entry.
-    private 	IconStringRenderer iconStringRenderer = new IconStringRenderer();
+    private 	IconStringRenderer incompleteEntryRenderer = new IconStringRenderer
+	(Globals.lang("This entry is incomplete"));
     private Renderer defRenderer = new Renderer(GUIGlobals.tableBackground),
 	reqRenderer = new Renderer(GUIGlobals.tableReqFieldBackground),
 	optRenderer = new Renderer(GUIGlobals.tableOptFieldBackground),
@@ -643,6 +644,7 @@ public class EntryTable extends JTable {
     /**
      * Overrides paintComponent to NOT clone the Graphics
      * passed in and NOT validate the Component passed in.
+     * This is done for performance reasons.
      */
     private class CustomCellRendererPane extends CellRendererPane {
         private Rectangle tmpRect = new Rectangle();

@@ -860,12 +860,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		     Globals.lang("Delete entry"));
 	}
 	public void actionPerformed(ActionEvent e) {
-          panel.hideEntryEditor();
-          panel.database.removeEntry(entry.getId());
-          panel.markBaseChanged();
-          panel.refreshTable();
-          panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
-          panel.output(Globals.lang("Deleted")+" "+Globals.lang("entry"));
+	    // Show confirmation dialog if not disabled:
+	    boolean goOn = panel.showDeleteConfirmationDialog(1);
+	    if (!goOn)
+		return;
+	    panel.hideEntryEditor();
+	    panel.database.removeEntry(entry.getId());
+	    panel.markBaseChanged();
+	    panel.refreshTable();
+	    panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
+	    panel.output(Globals.lang("Deleted")+" "+Globals.lang("entry"));
 	}
     }
 

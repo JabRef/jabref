@@ -1139,16 +1139,30 @@ public class ImportFormatReader
 			frest=frest.trim();
 			if(frest.equals("Monograph"))
 			    Type="book";
-			else if(frest.equals("Contribution"))
-			    Type="incollection";
 			else if(frest.equals("Journal-Article"))
 			    Type="article";
+			else if(frest.equals("Contribution")) {
+			    Type="incollection";
+			    // This entry type contains page numbers and booktitle in the title field.
+			    // We assume the title field has been set already.
+			    String title = ((String)h.get("title")).trim();
+			    if (title != null) {
+				int inPos = title.indexOf("\" in ");
+				int pgPos = title.lastIndexOf(" ");
+				if (inPos > 1)
+				    h.put("title", title.substring(1, inPos));
+				if (pgPos > inPos)
+				    h.put("pages", title.substring(pgPos).replaceAll("-", "--"));
+				
+			    }
+			}
+
 			else
 			    Type=frest.replaceAll(" ","");
 		    }
 		}
 		BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
-									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
+					      Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 		b.setField( h);
 
 		bibitems.add( b  );

@@ -374,51 +374,33 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                   int row0 = entryTable.getSelectedRow();
                   if ((bes != null) && (bes.length > 0)) {
                     //&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
-                    if (prefs.getBoolean("confirmDelete")) {
-                      String msg = Globals.lang("Really delete the selected")
-                          + " " + Globals.lang("entry") + "?",
-                          title = Globals.lang("Delete entry");
-                      if (bes.length > 1) {
-                        msg = Globals.lang("Really delete the selected")
-                            + " " + bes.length + " " + Globals.lang("entries") + "?";
-                        title = Globals.lang("Delete multiple entries");
-                      }
-
-                      CheckBoxMessage cb = new CheckBoxMessage
-                          (msg, Globals.lang("Disable this confirmation dialog"), false);
-
-                      int answer = JOptionPane.showConfirmDialog(frame, cb, title,
-                          JOptionPane.YES_NO_OPTION,
-                          JOptionPane.QUESTION_MESSAGE);
-                      if (answer == JOptionPane.NO_OPTION) {
-                        entryTable.clearSelection();
-                        cancelled = true;
-                      }
-                      if (cb.isSelected())
-                        prefs.putBoolean("confirmDelete", false);
-                    }
-
-                    if (!cancelled) {
-                      // Create a CompoundEdit to make the action undoable.
-                      NamedCompound ce = new NamedCompound
-                          (bes.length > 1 ? Globals.lang("delete entries")
-                           : Globals.lang("delete entry"));
-                      // Loop through the array of entries, and delete them.
-                      for (int i = 0; i < bes.length; i++) {
-                        database.removeEntry(bes[i].getId());
-                        ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
-                      }
-                      frame.output(Globals.lang("Deleted") + " " +
-                                   (bes.length > 1 ? bes.length
-                                    + " " + Globals.lang("entries")
-                                    : Globals.lang("entry")) + ".");
-                      ce.end();
-                      undoManager.addEdit(ce);
-                      //entryTable.clearSelection();
-                      refreshTable();
-                      markBaseChanged();
-
-                    }
+		      boolean goOn = showDeleteConfirmationDialog(bes.length);
+		      if (!goOn) {
+			  // This is a hack to avoid the action being called twice,
+			  // feel free to fix it...
+			  entryTable.clearSelection();
+		      }
+		      else {
+			  // Create a CompoundEdit to make the action undoable.
+			  NamedCompound ce = new NamedCompound
+			      (bes.length > 1 ? Globals.lang("delete entries")
+			       : Globals.lang("delete entry"));
+			  // Loop through the array of entries, and delete them.
+			  for (int i = 0; i < bes.length; i++) {
+			      database.removeEntry(bes[i].getId());
+			      ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
+			  }
+			  frame.output(Globals.lang("Deleted") + " " +
+				       (bes.length > 1 ? bes.length
+					+ " " + Globals.lang("entries")
+					: Globals.lang("entry")) + ".");
+			  ce.end();
+			  undoManager.addEdit(ce);
+			  //entryTable.clearSelection();
+			  refreshTable();
+			  markBaseChanged();
+			  
+		      }
                   }
                 }
 
@@ -1991,6 +1973,30 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         refreshTable();
         markBaseChanged();
         updateEntryEditorIfShowing();
+    }
+
+    public boolean showDeleteConfirmationDialog(int numberOfEntries) {
+	if (prefs.getBoolean("confirmDelete")) {
+	    String msg = Globals.lang("Really delete the selected")
+		+ " " + Globals.lang("entry") + "?",
+		title = Globals.lang("Delete entry");
+	    if (numberOfEntries > 1) {
+		msg = Globals.lang("Really delete the selected")
+		    + " " + numberOfEntries + " " + Globals.lang("entries") + "?";
+		title = Globals.lang("Delete multiple entries");
+	    }
+	    
+	    CheckBoxMessage cb = new CheckBoxMessage
+		(msg, Globals.lang("Disable this confirmation dialog"), false);
+	    
+	    int answer = JOptionPane.showConfirmDialog(frame, cb, title,
+						       JOptionPane.YES_NO_OPTION,
+						       JOptionPane.QUESTION_MESSAGE);
+	    if (cb.isSelected())
+		prefs.putBoolean("confirmDelete", false);
+	    return (answer == JOptionPane.YES_OPTION);
+	} else return true;
+
     }
 
     class UndoAction extends BaseAction {

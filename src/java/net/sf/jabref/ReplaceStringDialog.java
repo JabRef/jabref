@@ -53,9 +53,10 @@ class ReplaceStringDialog extends JDialog {
 	main = new JPanel(),
 	opt = new JPanel();
     JCheckBox
-	allFi = new JCheckBox(Globals.lang("All fields"), true),
-	selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false),
-	field = new JCheckBox(Globals.lang("Limit to fields")+":", false);
+	selOnly = new JCheckBox(Globals.lang("Limit to selected entries"), false);
+    JRadioButton
+	allFi = new JRadioButton(Globals.lang("All fields"), true),
+	field = new JRadioButton(Globals.lang("Limit to fields")+":", false);
     ButtonGroup bg = new ButtonGroup();
     private boolean ok_pressed = false;
     private JabRefFrame parent;
@@ -126,19 +127,22 @@ class ReplaceStringDialog extends JDialog {
 	con.fill = GridBagConstraints.HORIZONTAL;
 	con.gridy = 0;
 	con.gridx = 0;
+	con.insets = new Insets(3, 5, 3, 5);
 	gbl.setConstraints(selOnly, con);
 	settings.add(selOnly);
 	con.gridy = 1;
+	con.insets = new Insets(13, 5, 3, 5);
 	gbl.setConstraints(allFi, con);
 	settings.add(allFi);
 	con.gridwidth = 1;
 	con.gridy = 2;
 	con.gridx = 0;
+	con.insets = new Insets(3, 5, 3, 5);
 	gbl.setConstraints(field, con);
 	settings.add(field);
 	con.gridx = 1;
 	con.weightx = 1;
-	con.insets = new Insets(3, 5, 3, 5);
+	//con.insets = new Insets(3, 5, 3, 5);
 	gbl.setConstraints(fields, con);
 	settings.add(fields);
 
