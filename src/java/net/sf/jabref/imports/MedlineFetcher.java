@@ -112,6 +112,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	//if(idList==null || idList.trim().equals(""))//if user pressed cancel
 	//  return;
 	Pattern p = Pattern.compile("\\d+[,\\d+]*");
+	//System.out.println(""+p+"\t"+idList);
 	Matcher m = p.matcher( idList );
 	if ( m.matches() ) {
 	    panel.frame().output(Globals.lang("Fetching Medline by ID..."));
@@ -180,7 +181,17 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
         SAXParser parser = parserFactory.newSAXParser();   //May throw exceptions
         MedlineHandler handler = new MedlineHandler();
         // Start the parser. It reads the file and calls methods of the handler.
+
         parser.parse( data.getInputStream(), handler);
+	/*FileOutputStream out = new FileOutputStream(new File("/home/alver/ut.txt"));
+	System.out.println("#####");
+	InputStream is = data.getInputStream();
+	int c;
+	while ((c = is.read()) != -1) {
+	    out.write((char)c);
+	}
+	System.out.println("#####");
+	out.close();*/
         // When you're done, report the results stored by your handler object
         bibItems = handler.getItems();
 
@@ -193,7 +204,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 
    public void run() {
 
-	String idList = tf.getText().replace(';', ',');
+	idList = tf.getText().replace(';', ',');
 
 	//if(idList==null || idList.trim().equals(""))//if user pressed cancel
 	//    return;
@@ -206,7 +217,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	     panel.frame().output(Globals.lang("Fetching Medline by id ..."));
 	     idList = tf.getText().replace(';', ',');
 	     fetchById();
-	     System.out.println("Fetch by id");
+	     //System.out.println("Fetch by id");
          }
          else if ( m2.matches() ) {
 	    panel.frame().output(Globals.lang("Fetching Medline by term ..."));
@@ -232,7 +243,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    for (int jj = 0; jj < count; jj+=PACING) {
 		// get the ids from entrez
 		result = getIds(searchTerm,jj,PACING);
-		System.out.println("fetching: " + result.ids); 
+		//System.out.println("fetching: " + result.ids); 
 		ArrayList bibs = fetchMedline(result.ids);
 		if ((bibs != null) && (bibs.size() > 0)) {
 		    tf.setText("");

@@ -452,7 +452,7 @@ public class GUIGlobals {
     // LANGUAGES contains mappings for supported languages.
     LANGUAGES.put("English", "en");
     LANGUAGES.put("Deutsch", "de");
-    LANGUAGES.put("Fran\uFFFDais", "fr");
+    LANGUAGES.put("Francais", "fr");
     LANGUAGES.put("Norsk", "no");
 
     FIELD_EXTRAS = new HashMap();

@@ -1,4 +1,4 @@
-
+ 
 JabRef 1.55
 -----------
 
@@ -24,10 +24,6 @@ JabRef is free open source software, distributed under the GNU General
 Public Licence. See the enclosed text file 'gpl.txt', or the About
 dialog, for details about the GPL.
 
-Kunststoff is licenced under the GNU Lesser General Public
-Licence. See the enclosed text file 'lesser.txt' for details about the
-LGPL.
-
 
 Requirements:
 JabRef runs on any system equipped with the Java Virtual Machine
@@ -38,7 +34,7 @@ Kit.
 
 
 Installing and running, Windows:
-JabRef 1.55 is available in Windows Installer (.msi) format. To install,
+JabRef is available in Windows Installer (.msi) format. To install,
 double-click the .msi file. A shortcut to JabRef will be added to your
 start menu.
 
@@ -55,6 +51,11 @@ If you are using the Java Development Kit:
 or, if you are using the Java Runtime Environment:
      jre -new -jar <path to jar> or
      jrew -new -jar <path to jar>
+
+We recommend running JabRef under the Java 5.0 JRE. If you do, you should add 
+the option "-Dswing.aatext=true" before the "-jar" option, to activate 
+antialiased text throughout the application.
+
 
 The jar file containing JabRef can be unpacked with the command:
     jar xf <path to jar>
@@ -87,6 +88,8 @@ Change log:
 1.55:	- Made method for opening PDF files robust with regard to file separators (/ and \),
 	  so bib files can easier be used across platforms.
 	- Improved Medline fetcher. Can now fetch entries based on a search expression.
+	- Added features for fetching fields and referring publications from the CiteSeer
+	  database.
 	- Added option to always save database ordered by author/editor/year, and made this
 	  the default setting.
 	- When a single entry is selected, right-click menu now shows a checkbox menu for group
@@ -103,6 +106,7 @@ Change log:
 	- Added check for spaces in custom entry type names.
 	- Added several new key pattern markers.
 	- Added toolbar buttons for Mark/Unmark to improve discoverability.
+	- Fixed bug that made export filters ignore the chosen character encoding.
 	- Fixed bug that interfered with author name formatting.
 	- Fixed various bugs in import filters.
 	- Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.

@@ -137,8 +137,8 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      System.err.println("Warning: could not get translation for \""
-                         + key + "\"");
+      //System.err.println("Warning: could not get translation for \""
+      //                   + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
       return translation.replaceAll("_", " ");
@@ -300,7 +300,7 @@ public class Globals {
   }
 
 
-  public static String SPECIAL_COMMAND_CHARS = "\"`^~'";
+  public static String SPECIAL_COMMAND_CHARS = "\"`^~'c";
   public static HashMap HTML_CHARS = new HashMap(),
           HTMLCHARS = new HashMap(),
       XML_CHARS = new HashMap();
@@ -406,6 +406,7 @@ public class Globals {
     HTMLCHARS.put("~N", "&Ntilde;");
     HTMLCHARS.put("~a", "&atilde;");
     HTMLCHARS.put("~A", "&Atilde;");
+    HTMLCHARS.put("cc", "&ccedil;");
 
     HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");

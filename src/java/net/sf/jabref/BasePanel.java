@@ -1256,7 +1256,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
               actions.put("manageSelectors", new BaseAction() {
                       public void action() {
                           ContentSelectorDialog2 csd = new ContentSelectorDialog2
-                              (frame, ths, true, metaData, null);
+                              (frame, ths, false, metaData, null);
                           Util.placeDialog(csd, frame);
                           csd.show();
                       }

@@ -36,6 +36,7 @@ public class HTMLChars implements LayoutFormatter {
           // Else we are in a command, and should not keep the letter.
         else {
           currentCommand.append( (char) c);
+
           testCharCom: if ((currentCommand.length() == 1)
               && (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
             // This indicates that we are in a command of the type \^o or \~{n}
@@ -57,6 +58,7 @@ public class HTMLChars implements LayoutFormatter {
               //System.out.println("... "+combody);
             }
             Object result = Globals.HTMLCHARS.get(command+combody);
+	    
             if (result != null)
               sb.append((String)result);
 

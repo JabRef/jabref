@@ -153,7 +153,10 @@ public class MedlineHandler extends DefaultHandler
 
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
-			if (!author.equals("")) b.setField("author",author);
+			if (!author.equals("")) { 
+			    b.setField("author",author);
+			    author = "";
+			}
 			if (!title.equals("")) b.setField("title",title);
 			if (!journal.equals("")) b.setField("journal",journal);
 			if (!year.equals("")) b.setField("year",year);
@@ -182,6 +185,7 @@ public class MedlineHandler extends DefaultHandler
 			doi=""; pii="";
 			year="";
 			forename="";
+			lastName="";
 			abstractText="";
 			pubmedid="";
 			month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
@@ -210,6 +214,9 @@ public class MedlineHandler extends DefaultHandler
 			//author = initials + " " + lastname;
 			authors.add(author);
 			inAuthor=false;
+			forename = "";
+			initials = "";
+			lastname = "";
 		}
 		else if(localName.equals("DescriptorName")) inDescriptorName=false;
 		else if(localName.equals("LastName")){inLastName=false;}
@@ -232,21 +239,21 @@ public class MedlineHandler extends DefaultHandler
     public void characters( char[] data, int start, int length ) {
 
 		// if stack is not ready, data is not content of recognized element
-		if( inTitle ){ title = new String( data, start, length);}
-		else if(inYear){ year=new String(data,start,length);}
-		else if(inJournal){journal = new String(data,start,length);}
-		else if(inMonth){month = new String(data,start,length);}
-		else if(inVolume){volume = new String(data,start,length);}
-		else if(inLastName){lastname = new String(data,start,length);}
-		else if(inInitials){initials = new String(data,start,length);}
-		else if(inIssue){number = new String(data,start,length);}
-		else if(inMedlinePgn){ page = new String(data,start,length);}
-		else if(inMedlineID){medlineID = new String(data,start,length);}
-		else if(inURL){url= new String(data,start,length);}
-		else if(inPubMedID){pubmedid= new String(data,start,length);}
+		if( inTitle ){ title += new String( data, start, length);}
+		else if(inYear){ year+=new String(data,start,length);}
+		else if(inJournal){journal += new String(data,start,length);}
+		else if(inMonth){month += new String(data,start,length);}
+		else if(inVolume){volume += new String(data,start,length);}
+		else if(inLastName){lastname += new String(data,start,length);}
+		else if(inInitials){initials += new String(data,start,length);}
+		else if(inIssue){number += new String(data,start,length);}
+		else if(inMedlinePgn){ page += new String(data,start,length);}
+		else if(inMedlineID){medlineID += new String(data,start,length);}
+		else if(inURL){url += new String(data,start,length);}
+		else if(inPubMedID){pubmedid = new String(data,start,length);}
 		else if(inDescriptorName) descriptorName += new String(data,start,length) + ", ";
 		else if(inForename){
-			forename = new String(data,start,length);
+			forename += new String(data,start,length);
 			//System.out.println("IN FORENAME: " + forename);
 		}
 		else if(inAbstractText){ abstractText += new String(data,start,length);}

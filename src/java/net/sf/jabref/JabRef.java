@@ -374,7 +374,7 @@ public class JabRef {
       System.setProperty("apple.laf.useScreenMenuBar", "true");
 
       // Set antialiasing on everywhere. This only works in JRE >= 1.5. Or... it doesn't work, period.
-      System.setProperty("swing.aatext", "true");
+      //System.setProperty("swing.aatext", "true");
 
       int fontSizes = prefs.getInt("menuFontSize");
 
@@ -393,7 +393,7 @@ public class JabRef {
           //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
           PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
           lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-          MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
+          MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
 
           //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
           //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();

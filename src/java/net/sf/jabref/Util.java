@@ -356,7 +356,8 @@ public class Util {
         }
 
         // Use the correct viewer even if pdf and ps are mixed up:
-        link = file.getPath();
+        link = file.getPath().replaceAll("\\s", "\\\\ ");
+	pr("rill '"+link+"'");
         String[] split = file.getName().split("\\.");
         if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("pdf")))
           fieldName = "pdf";
