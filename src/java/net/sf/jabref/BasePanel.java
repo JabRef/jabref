@@ -347,7 +347,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
 			    database.removeEntry(bes[i].getId());
-			    ensureNotShowing(bes[i]);
 			    ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
 			}
 			frame.output(Globals.lang("Deleted")+" "+
@@ -356,12 +355,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 				      : Globals.lang("entry"))+".");
 			ce.end();
 			undoManager.addEdit(ce);
+            entryTable.clearSelection();
 			refreshTable();
 			markBaseChanged();
-                        if (row0 < entryTable.getRowCount())
-                          entryTable.scrollTo(row0);
-                        else
-                          entryTable.clearSelection();
 
 		    }
 		}
@@ -1574,7 +1570,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	refreshTable();
     }
 
-    protected EntryTableModel getTableModel(){
+    public EntryTableModel getTableModel(){
 		return tableModel ;
     }
 
