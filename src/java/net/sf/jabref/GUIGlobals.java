@@ -307,6 +307,7 @@ public class GUIGlobals {
 
   public static String META_FLAG = "jabref-meta: ";
   public static String META_FLAG_OLD = "bibkeeper-meta: ";
+  public static String ENTRYTYPE_FLAG = "jabref-entrytype: ";
   public static String KEY_FIELD = "bibtexkey";
   public static String[] ALL_FIELDS = new String[] {
       "author",

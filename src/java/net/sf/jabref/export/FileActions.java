@@ -33,11 +33,7 @@ import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 import java.io.*;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.awt.datatransfer.*;
 import java.awt.Toolkit;
 import net.sf.jabref.export.layout.Layout;
@@ -160,6 +156,8 @@ public class FileActions
         boolean checkGroup, String encoding) throws SaveException
     {
         BibtexEntry be = null;
+	TreeMap types = new TreeMap(); // Map to collect entry type definitions
+	// that we must save along with entries using them.
         try
         {
 	    initFile(file, prefs.getBoolean("backup"));
@@ -187,6 +185,14 @@ public class FileActions
             for (Iterator i = sorter.iterator(); i.hasNext();) {
                 be = (BibtexEntry) (i.next());
 
+		// Check if we must write the type definition for this
+		// entry, as well. Our criterion is that all non-standard
+		// types (*not* customized standard types) must be written.
+		BibtexEntryType tp = be.getType();
+		if (BibtexEntryType.getStandardType(tp.getName()) == null) {
+		    types.put(tp.getName(), tp);
+		}
+
                 // Check if the entry should be written.
                 boolean write = true;
 
@@ -213,10 +219,21 @@ public class FileActions
                 metaData.writeMetaData(fw);
             }
 
+	    // Write type definitions, if any:
+	    if (types.size() > 0) {
+		for (Iterator i=types.keySet().iterator(); i.hasNext();) {
+		    CustomEntryType tp = (CustomEntryType)types.get(i.next());
+		    tp.save(fw);
+		    fw.write("\n");
+		}
+
+	    }
+
             fw.close();
         }
          catch (Throwable ex)
         {
+	    ex.printStackTrace();
 	    repairAfterError(file);
             throw new SaveException(ex.getMessage(), be);
 	}

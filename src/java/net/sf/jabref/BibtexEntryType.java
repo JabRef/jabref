@@ -29,6 +29,7 @@ Modified for use in JabRef.
 */
 package net.sf.jabref;
 
+import java.io.*;
 import java.util.*;
 
 public abstract class BibtexEntryType implements Comparable

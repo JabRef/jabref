@@ -32,8 +32,14 @@ public class SilverPlatterImporter implements ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+	String str;
+	while ((str = in.readLine()) != null){
+	    if ((str.length()>=5) && (str.substring(0, 5).equals("AU:  ")))
+		return true;
+	}
+	return false;
     }
 
     /**
@@ -43,6 +49,7 @@ public class SilverPlatterImporter implements ImportFormat {
     public List importEntries(InputStream stream) throws IOException {
 	ArrayList bibitems = new ArrayList();
 	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+	boolean isChapter = false;
 	String str;
 	StringBuffer sb = new StringBuffer();
 	while ((str = in.readLine()) != null){
@@ -117,21 +124,27 @@ public class SilverPlatterImporter implements ImportFormat {
 			Type = "incollection";
 			// This entry type contains page numbers and booktitle in the
 			// title field.
-			// We assume the title field has been set already.
-			String title = ((String) h.get("title")).trim();
-			if (title != null){
-			    int inPos = title.indexOf("\" in ");
-			    int pgPos = title.lastIndexOf(" ");
-			    if (inPos > 1) h.put("title", title.substring(1, inPos));
-			    if (pgPos > inPos) h.put("pages", title.substring(pgPos)
-						     .replaceAll("-", "--"));
-			    
-			}
+			isChapter = true;
 		    }
 		    
 		    else Type = frest.replaceAll(" ", "");
 		}
 	    }
+
+	    if (isChapter) {
+		Object titleO = h.get("title");
+		if (titleO != null) {
+		    String title = ((String)titleO).trim();
+		    int inPos = title.indexOf("\" in ");
+		    int pgPos = title.lastIndexOf(" ");
+		    if (inPos > 1) h.put("title", title.substring(1, inPos));
+		    if (pgPos > inPos) h.put("pages", title.substring(pgPos)
+					     .replaceAll("-", "--"));
+		    
+		}
+
+	    }
+
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType(Type)); // id assumes an existing database so don't
 	    // create one here

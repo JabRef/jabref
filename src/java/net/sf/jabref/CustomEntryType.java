@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import java.io.*;
+
 /**
  * This class is used to represent customized entry types.
  *
@@ -38,6 +40,7 @@ public class CustomEntryType extends BibtexEntryType {
 	return req;
     }
 
+    //    public boolean isTemporary
 
     public String describeRequiredFields() {
 	StringBuffer sb = new StringBuffer();
@@ -61,5 +64,52 @@ public class CustomEntryType extends BibtexEntryType {
 	for (int i=0; i<req.length; i++)
 	    if (entry.getField(req[i]) == null) return false;
 	return true;
+    }
+
+    public void save(Writer out) throws IOException {
+	out.write("@comment{");
+	out.write(GUIGlobals.ENTRYTYPE_FLAG);
+	out.write(getName());
+	out.write(": req[");
+	StringBuffer sb = new StringBuffer();
+	for (int i=0; i<req.length; i++) {
+	    sb.append(req[i]);
+	    if (i<req.length-1)
+		sb.append(";");
+	}
+	out.write(sb.toString());
+	out.write("] opt[");
+	sb = new StringBuffer();
+	for (int i=0; i<opt.length; i++) {
+	    sb.append(opt[i]);
+	    if (i<opt.length-1)
+		sb.append(";");
+	}
+	out.write(sb.toString());
+	out.write("]}\n");
+    }
+
+    public static CustomEntryType parseEntryType(String comment) { 
+	try {
+	    String rest;
+	    rest = comment.substring(GUIGlobals.ENTRYTYPE_FLAG.length());
+	    int nPos = rest.indexOf(':');
+	    String name = rest.substring(0, nPos);
+	    rest = rest.substring(nPos+2);
+
+	    int rPos = rest.indexOf(']');
+	    if (rPos < 4)
+		throw new IndexOutOfBoundsException();
+	    String reqFields = rest.substring(4, rPos);
+	    //System.out.println(name+"\nr '"+reqFields+"'");
+	    int oPos = rest.indexOf(']', rPos+1);
+	    String optFields = rest.substring(rPos+6, oPos);
+	    //System.out.println("o '"+optFields+"'");
+	    return new CustomEntryType(name, reqFields, optFields);
+	} catch (IndexOutOfBoundsException ex) {
+	    Globals.logger("Ill-formed entrytype comment in BibTeX file.");
+	    return null;
+	}
+
     }
 }

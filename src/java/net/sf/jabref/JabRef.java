@@ -115,7 +115,7 @@ public class JabRef {
         options.register("primp", 'p', Globals.lang("Import preferences from file"),
             importPrefs);
         options.register("aux", 'a',
-            Globals.lang("subdatabase_from_aux") + ": " + "file[.aux]" + ",new[.bib]",
+            Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
             auxImExport);
         options.setUseMenu(false);
 
@@ -329,13 +329,16 @@ public class JabRef {
             }
         }
 
-        if (importPrefs.isInvoked()) {
-            try {
-                prefs.importPreferences(importPrefs.getStringValue());
-            } catch (IOException ex) {
-                Util.pr(ex.getMessage());
-            }
-        }
+
+	if (importPrefs.isInvoked()) {
+	    try {
+		prefs.importPreferences(importPrefs.getStringValue());
+		BibtexEntryType.loadCustomEntryTypes(prefs);
+	    }
+	    catch (IOException ex) {
+		Util.pr(ex.getMessage());
+	    }
+	}
 
         if (auxImExport.isInvoked()) {
             boolean usageMsg = false;

@@ -206,7 +206,7 @@ public class JabRefFrame
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
-      fetchAuthorMedline = new FetchAuthorMedlineAction(),
+      //fetchAuthorMedline = new FetchAuthorMedlineAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
       //"Put a BibTeX reference to the selected entries on the clipboard",
       copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
@@ -1777,7 +1777,7 @@ class FetchCiteSeerAction
 
   }
 
-  class FetchAuthorMedlineAction
+    /*class FetchAuthorMedlineAction
       extends AbstractAction {
     public FetchAuthorMedlineAction() {
       super(Globals.lang("Fetch Medline by author"),
@@ -1795,7 +1795,7 @@ class FetchCiteSeerAction
       }
     }
 
-  }
+    }*/
 
   // The action for opening the preferences dialog.
 

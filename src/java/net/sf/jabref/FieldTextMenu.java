@@ -154,7 +154,7 @@ public class FieldTextMenu implements MouseListener
   {
     public PasteAction()
     {
-      super("Paste from clipboard", "Paste from clipboard", GUIGlobals.pasteIconFile);
+      super("Paste", "Paste from clipboard", GUIGlobals.pasteIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -179,7 +179,7 @@ public class FieldTextMenu implements MouseListener
   {
     public CopyAction()
     {
-      super("Copy to clipboard", "Copy to clipboard", GUIGlobals.copyIconFile);
+      super("Copy", "Copy to clipboard", GUIGlobals.copyIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
