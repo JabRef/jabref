@@ -40,14 +40,14 @@ public class RightClickMenu extends JPopupMenu
     BasePanel panel;
     MetaData metaData;
     JMenu groupMenu = new JMenu(Globals.lang("Add to group")),
-	groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
-	typeMenu = new JMenu(Globals.lang("Change entry type")),
+        groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
+        typeMenu = new JMenu(Globals.lang("Change entry type")),
         setGroups = new JMenu(Globals.lang("Groups"));
     boolean forOneEntryOnly = false;
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
-	panel = panel_;
-	metaData = metaData_;
+        panel = panel_;
+        metaData = metaData_;
 
         // Are multiple entries selected?
         boolean multiple = (panel.entryTable.getSelectedRowCount() > 1);
@@ -57,29 +57,29 @@ public class RightClickMenu extends JPopupMenu
         if (panel.entryTable.getSelectedRowCount() == 1)
           be = panel.entryTable.getSelectedEntries()[0];
 
-	addPopupMenuListener(this);
+        addPopupMenuListener(this);
 
-	add(new AbstractAction(Globals.lang("Copy")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("copy");
-		    } catch (Throwable ex) {}
-		}
-	    });
-	add(new AbstractAction(Globals.lang("Paste")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("paste");
-		    } catch (Throwable ex) {}
-		}
-	    });
-	add(new AbstractAction(Globals.lang("Cut")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("cut");
-		    } catch (Throwable ex) {}
-		}
-	    });
+        add(new AbstractAction(Globals.lang("Copy")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("copy");
+                    } catch (Throwable ex) {}
+                }
+            });
+        add(new AbstractAction(Globals.lang("Paste")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("paste");
+                    } catch (Throwable ex) {}
+                }
+            });
+        add(new AbstractAction(Globals.lang("Cut")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("cut");
+                    } catch (Throwable ex) {}
+                }
+            });
 
             addSeparator();
 
@@ -135,27 +135,37 @@ public class RightClickMenu extends JPopupMenu
               }
             });
 
-	add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("copyKey");
-		    } catch (Throwable ex) {}
-		}
-	    });
+        add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("copyKey");
+                    } catch (Throwable ex) {}
+                }
+            });
 
-	add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("copyCiteKey");
-		    } catch (Throwable ex) {}
-		}
-	    });
+        add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("copyCiteKey");
+                    } catch (Throwable ex) {}
+                }
+            });
 
-	addSeparator();
-	populateTypeMenu();
-	add(typeMenu);
-	addSeparator();
+        addSeparator();
+        populateTypeMenu();
 
+        add(typeMenu);
+        add(new AbstractAction("Import plain text") {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("importPlainText");
+                    } catch (Throwable ex) {}
+                }
+            });
+
+        addSeparator();
+//        add(groupMenu);
+//        add(groupRemoveMenu);
     }
 
     /**
@@ -247,18 +257,18 @@ public class RightClickMenu extends JPopupMenu
     }
 
     class RemoveFromGroupAction extends AbstractAction {
-	String grp, regexp, field;
-	public RemoveFromGroupAction
-	    (String grp, String regexp, String field) {
+        String grp, regexp, field;
+        public RemoveFromGroupAction
+            (String grp, String regexp, String field) {
 
-	    super(grp);
-	    this.grp = grp;
-	    this.regexp = regexp;
-	    this.field = field;
-	}
-	public void actionPerformed(ActionEvent evt) {
-	    panel.removeFromGroup(grp, regexp, field);
-	}
+            super(grp);
+            this.grp = grp;
+            this.regexp = regexp;
+            this.field = field;
+        }
+        public void actionPerformed(ActionEvent evt) {
+            panel.removeFromGroup(grp, regexp, field);
+        }
     }
 
     class ToggleGroupAction extends JCheckBoxMenuItem implements ActionListener {

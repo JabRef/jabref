@@ -223,7 +223,7 @@ public class JabRefFrame
       togglePreview = new GeneralAction("togglePreview",
                                         "Toggle entry preview",
                                         "Toggle entry preview",
-					GUIGlobals.previewIconFile,
+                                        GUIGlobals.previewIconFile,
                                         prefs.getKey("Toggle entry preview")),
       switchPreview = new GeneralAction("switchPreview",
                                         "Switch preview layout",
@@ -251,6 +251,9 @@ public class JabRefFrame
                                   GUIGlobals.wwwIcon,
                                   prefs.getKey("Open URL or DOI")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
+
+      plainTextImport = new GeneralAction("plainTextImport",
+                                          "New entry from plain text"),
 
 
       customExpAction = new CustomizeExportsAction();
@@ -328,9 +331,9 @@ public class JabRefFrame
         if (bp != null) {
           groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));
           searchToggle.setSelected(bp.sidePaneManager.isPanelVisible("search"));
-	  previewToggle.setSelected(bp.previewEnabled);
+          previewToggle.setSelected(bp.previewEnabled);
           Globals.focusListener.setFocused(bp.entryTable);
-	  new FocusRequester(bp.entryTable);
+          new FocusRequester(bp.entryTable);
         }
       }
 
@@ -847,6 +850,7 @@ public JabRefPreferences prefs() {
       newSpec.add(newSpecificEntryAction[i]);
     }
     bibtex.add(newSpec);
+    bibtex.add(plainTextImport);
     bibtex.addSeparator();
     bibtex.add(editEntry);
     bibtex.add(importCiteSeer);
@@ -1088,6 +1092,7 @@ public JabRefPreferences prefs() {
       newSpecificEntryAction[i].setEnabled(false);
     }
     newEntryAction.setEnabled(false);
+    plainTextImport.setEnabled(false);
     closeDatabaseAction.setEnabled(false);
   }
 
@@ -1136,6 +1141,7 @@ public JabRefPreferences prefs() {
       newSpecificEntryAction[i].setEnabled(true);
     }
     newEntryAction.setEnabled(true);
+    plainTextImport.setEnabled(true);
     closeDatabaseAction.setEnabled(true);
   }
 
@@ -1143,16 +1149,16 @@ public JabRefPreferences prefs() {
      * Disable actions that need more than one database open.
      */
     private void setOnlyOne() {
-	nextTab.setEnabled(false);
-	prevTab.setEnabled(false);
+        nextTab.setEnabled(false);
+        prevTab.setEnabled(false);
     }
 
     /**
      * Disable actions that need more than one database open.
      */
     private void setMultiple() {
-	nextTab.setEnabled(true);
-	prevTab.setEnabled(true);
+        nextTab.setEnabled(true);
+        prevTab.setEnabled(true);
     }
 
   /**

@@ -92,7 +92,7 @@ public class BibtexEntry
      * set for this particular entry.
      */
     public Object[] getAllFields() {
-	return _fields.keySet().toArray();
+        return _fields.keySet().toArray();
     }
 
     /**
@@ -145,13 +145,13 @@ public class BibtexEntry
      * BibtexEntryType.TYPELESS).
      */
     public boolean updateType() {
-	BibtexEntryType newType = BibtexEntryType.getType(_type.getName());
-	if (newType != null) {
-	    _type = newType;
-	    return true;
-	}
-	_type = BibtexEntryType.TYPELESS;
-	return false;
+        BibtexEntryType newType = BibtexEntryType.getType(_type.getName());
+        if (newType != null) {
+            _type = newType;
+            return true;
+        }
+        _type = BibtexEntryType.TYPELESS;
+        return false;
     }
 
     /**
@@ -160,10 +160,10 @@ public class BibtexEntry
      */
     public void setId(String id) throws KeyCollisionException {
 
-	if (id == null) {
-	    throw new
-		NullPointerException("Every BibtexEntry must have an ID");
-	}
+        if (id == null) {
+            throw new
+                NullPointerException("Every BibtexEntry must have an ID");
+        }
 
         try
         {
@@ -193,36 +193,37 @@ public class BibtexEntry
     }
 
     public String getCiteKey() {
-	return (_fields.containsKey(Globals.KEY_FIELD) ?
-		(String)_fields.get(Globals.KEY_FIELD) : null);
+        return (_fields.containsKey(Globals.KEY_FIELD) ?
+                (String)_fields.get(Globals.KEY_FIELD) : null);
     }
 
     /**
      * Sets the given field to the given value.
      */
     public void setField(HashMap fields){
-	_fields.putAll(fields); 	//_fields=fields.clone();
-	// clone slows up things but...
-	// if you don't clone then client has pointer to _field and can change it behind the scenes
+        _fields.putAll(fields); 	//_fields=fields.clone();
+        // clone slows up things but...
+        // if you don't clone then client has pointer to _field and can change it behind the scenes
     }
+
     public void setField(String name, Object value) {
 
         if ("id".equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
-					       "' is reserved");
+                                               "' is reserved");
         }
 
-	// This mechanism is probably not really necessary.
+        // This mechanism is probably not really necessary.
         //Object normalValue = FieldTypes.normalize(name, value);
 
-	try {
-	    firePropertyChangedEvent(name, _fields.get(name), value);
-	} catch (PropertyVetoException pve) {
+        try {
+            firePropertyChangedEvent(name, _fields.get(name), value);
+        } catch (PropertyVetoException pve) {
             throw new IllegalArgumentException("Change rejected: " + pve);
-	}
+        }
 
         //Object oldValue =
-	_fields.put(name, value);
+        _fields.put(name, value);
     }
 
     /**
@@ -241,12 +242,12 @@ public class BibtexEntry
            throw new IllegalArgumentException("Change rejected: " + pve);
        }
 
-	_fields.remove(name);
+        _fields.remove(name);
     }
 
     protected boolean allFieldsPresent(String[] fields) {
         for (int i = 0; i < fields.length; i++) {
-	    if (getField(fields[i]) == null) {
+            if (getField(fields[i]) == null) {
                 return false;
             }
         }
@@ -287,37 +288,37 @@ public class BibtexEntry
      * isDisplayableField(String).
      */
     public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
-	// Write header with type and bibtex-key.
-	out.write("@"+_type.getName().toUpperCase()+"{");
+        // Write header with type and bibtex-key.
+        out.write("@"+_type.getName().toUpperCase()+"{");
 
-	String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
-	out.write(((str == null) ? "" : str.toString())+",\n");
-	HashMap written = new HashMap();
-	written.put(GUIGlobals.KEY_FIELD, null);
-	// Write required fields first.
-	String[] s = getRequiredFields();
-	if (s != null) for (int i=0; i<s.length; i++) {
-	    writeField(s[i], out, ff);
-	    written.put(s[i], null);
-	}
-	// Then optional fields.
-	s = getOptionalFields();
-	if (s != null) for (int i=0; i<s.length; i++) {
-	    writeField(s[i], out, ff);
-	    written.put(s[i], null);
-	}
-	// Then write remaining fields, if any.
-	/*for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-	    if (!written.containsKey(GUIGlobals.ALL_FIELDS[i])
+        String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
+        out.write(((str == null) ? "" : str.toString())+",\n");
+        HashMap written = new HashMap();
+        written.put(GUIGlobals.KEY_FIELD, null);
+        // Write required fields first.
+        String[] s = getRequiredFields();
+        if (s != null) for (int i=0; i<s.length; i++) {
+            writeField(s[i], out, ff);
+            written.put(s[i], null);
+        }
+        // Then optional fields.
+        s = getOptionalFields();
+        if (s != null) for (int i=0; i<s.length; i++) {
+            writeField(s[i], out, ff);
+            written.put(s[i], null);
+        }
+        // Then write remaining fields, if any.
+        /*for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+            if (!written.containsKey(GUIGlobals.ALL_FIELDS[i])
             &&
               GUIGlobals.isWriteableField(GUIGlobals.ALL_FIELDS[i])
               )
         {
             writeField(GUIGlobals.ALL_FIELDS[i], out);
         }
-	}//*/
+        }//*/
 
-	for (java.util.Iterator i=_fields.keySet().iterator(); i.hasNext();) {
+        for (java.util.Iterator i=_fields.keySet().iterator(); i.hasNext();) {
             String key = (String)i.next();
             boolean writeIt = (write ? GUIGlobals.isWriteableField(key) :
                                GUIGlobals.isDisplayableField(key));
@@ -327,35 +328,35 @@ public class BibtexEntry
                 }
         }
 
-	// Finally, end the entry.
-	out.write("}\n");
+        // Finally, end the entry.
+        out.write("}\n");
     }
 
     private void writeField(String name, Writer out,
-			    FieldFormatter ff) throws IOException {
-	Object o = getField(name);
-	if (o != null) {
-	    out.write("  "+name+" = ");
+                            FieldFormatter ff) throws IOException {
+        Object o = getField(name);
+        if (o != null) {
+            out.write("  "+name+" = ");
 
-	    try {
-		out.write(ff.format(o.toString(),
-				    GUIGlobals.isStandardField(name)));
-	    } catch (Throwable ex) {
-		throw new IOException
-		    (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
-	    }
-	    //Util.writeField(name, o, out);
-	    out.write(",\n");
-	}
+            try {
+                out.write(ff.format(o.toString(),
+                                    GUIGlobals.isStandardField(name)));
+            } catch (Throwable ex) {
+                throw new IOException
+                    (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
+            }
+            //Util.writeField(name, o, out);
+            out.write(",\n");
+        }
     }
 
     /**
      * Returns a clone of this entry. Useful for copying.
      */
     public Object clone() {
-	BibtexEntry clone = new BibtexEntry(_id, _type);
-	clone._fields = (Map)((HashMap)_fields).clone();
-	return clone;
+        BibtexEntry clone = new BibtexEntry(_id, _type);
+        clone._fields = (Map)((HashMap)_fields).clone();
+        return clone;
     }
 
 }
