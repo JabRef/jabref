@@ -32,7 +32,7 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.*;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.aux.*;
+import net.sf.jabref.wizard.auximport.*;
 import java.io.*;
 import java.util.*;
 import net.sf.jabref.export.*;

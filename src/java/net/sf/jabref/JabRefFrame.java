@@ -35,8 +35,8 @@ package net.sf.jabref;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.aux.* ;
-import net.sf.jabref.wizard.aux.gui.*;
+import net.sf.jabref.wizard.auximport.* ;
+import net.sf.jabref.wizard.auximport.gui.*;
 
 import javax.swing.*;
 

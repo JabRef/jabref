@@ -30,7 +30,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 // modified :
 
 
-package net.sf.jabref.wizard.aux.gui ;
+package net.sf.jabref.wizard.auximport.gui ;
 
 import java.awt.* ;
 import javax.swing.* ;
@@ -40,7 +40,7 @@ import java.io.File;
 
 
 import net.sf.jabref.* ;
-import net.sf.jabref.wizard.aux.* ;
+import net.sf.jabref.wizard.auximport.* ;
 
 public class FromAuxDialog
     extends JDialog

@@ -29,7 +29,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 //
 // modified :
 
-package net.sf.jabref.wizard.aux ;
+package net.sf.jabref.wizard.auximport ;
 
 import java.io.* ;
 import java.util.regex.* ;

@@ -31,7 +31,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 //
 // modified :
 
-package net.sf.jabref.wizard.aux ;
+package net.sf.jabref.wizard.auximport ;
 
 import net.sf.jabref.* ;
 import java.util.*;
