@@ -10,9 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JToolBar;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ImageIcon;
 
 import net.sf.jabref.labelPattern.LabelPattern;
 
@@ -48,14 +50,16 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private JButton btnTechreportDefault, btnUnpublishedDefault;
 	private JButton btnDefaultAll;
 
+    private HelpAction help;
 	
 	/**
 	 * The constructor
 	 */
-	public TabLabelPattern(JabRefPreferences prefs) {
+	public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {
 		_prefs = prefs;
 		_keypatterns = _prefs.getKeyPattern();
-		
+		help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp,
+				      "Help on key patterns");
 		buildGUI();
 		fillTextfields();
 	}
@@ -632,6 +636,20 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( btnUnpublishedDefault, con );
 		btnUnpublishedDefault.addActionListener(new buttonHandler());
 		add( btnUnpublishedDefault );		
+		
+		// A help button
+		con.gridx = 1;
+		con.gridy = 15;
+		con.fill = GridBagConstraints.NONE;
+		con.weightx = 0;
+		con.weighty = 0;
+		con.anchor = GridBagConstraints.SOUTHEAST;
+		con.insets = new Insets( 0,5,0,5 );
+		JButton hlb = new JButton(new ImageIcon(GUIGlobals.helpSmallIconFile));
+		hlb.setToolTipText(Globals.lang("Help on key patterns"));
+		gbl.setConstraints( hlb, con );
+		add(hlb);
+		hlb.addActionListener(help);
 
 		// And finally a button to reset everything
 		btnDefaultAll = new JButton( "Reset All" );
@@ -645,6 +663,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( btnDefaultAll, con );
 		btnDefaultAll.addActionListener(new buttonHandler());
 		add( btnDefaultAll );		
+
 	}
 	
 	/**

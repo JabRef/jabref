@@ -17,24 +17,26 @@ consists of the field name enclosed in square braces,
 e.g. <b>[volume]</b>. If the field is undefined in an entry at the
 time of key generation, no text will be inserted by the field marker.
 <P>
-Several special field markers are offered, which extract only a specific part of a field. These are listed below. Feel free to suggest new special field markers!
+Several special field markers are offered, which extract only a specific part of a field. These are listed below. Feel free to suggest new special field markers.
 
 <P>
 Special field markers:
 <ul>
 <li><b>[auth]</b>: The last name of the first author<BR>
+<li><b>[authors]</b>: The last name of all authors<BR>
 <li><b>[edtr]</b>: The last name of the first editor<BR>
+<li><b>[editors]</b>: The last name of all editors<BR>
 <li><b>[firstpage]</b>: The number of the first page of the publication<BR>
 <li><b>[lastpage]</b>: The number of the last page of the publication<BR>
-<li><b>[shorttitle]</b>: The first <BR>
+<li><b>[shorttitle]</b>: The first 3 words of the title<BR>
 </ul>
 
 <P>
 The default key pattern is [auth]_[year], and this could produce
-keys like e.g. <code>Yared_1998<code> If the key is not unique in the
+keys like e.g. <code>Yared_1998</code> If the key is not unique in the
 current database, it is made unique by adding one of the letters a-z
 until a unique key is found. Thus, the labels might look like:
-<blockquote> <code>Yared_1998<code><BR> <code>Yared_1998a</code><BR>
+<blockquote> <code>Yared_1998</code><BR> <code>Yared_1998a</code><BR>
 <code>Yared_1998b</code> </blockquote>
 
 

@@ -148,6 +148,7 @@ public static String
 	groupsHelp = "GroupsHelp.html",
 	customEntriesHelp = "CustomEntriesHelp.html",
 	contentSelectorHelp = "ContentSelectorHelp.html",
+    labelPatternHelp = "LabelPatterns.html",
 	aboutPage = "About.html";
 
 

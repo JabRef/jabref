@@ -122,11 +122,28 @@ public class LabelPatternUtil {
 				else if(val.equals("edtr")){
 				    _sb.append(firstAuthor(_entry.getField("editor").toString()));
 				}
+				else if(val.equals("authors")){
+				    _sb.append(allAuthors(_entry.getField("author").toString()));
+				}
+				else if(val.equals("editors")){
+				    _sb.append(allAuthors(_entry.getField("editor").toString()));
+				}
 				else if(val.equals("firstpage")){
 				    _sb.append(firstPage(_entry.getField("pages").toString()));
 				}
 				else if(val.equals("lastpage")){
 				    _sb.append(lastPage(_entry.getField("pages").toString()));
+				}
+				else if(val.equals("shorttitle")){
+				    String ss = _entry.getField("title").toString();
+				    int piv=0, wrd = 0;
+				    while ((piv<ss.length()) && (wrd<3)) {
+					if (Character.isWhitespace(ss.charAt(piv)))
+					    wrd++;
+					else
+					    _sb.append(ss.charAt(piv));
+					piv++;
+				    }
 				}
 				// we havent seen any special demands
 				else{
@@ -316,6 +333,7 @@ public class LabelPatternUtil {
 		return _isUnique;
 
 	}
+
 	/**
 	 * Gets the last name of the first author/editor
 	 * @param authorField a <code>String</code>
@@ -334,6 +352,30 @@ public class LabelPatternUtil {
 
 		author += firstAuthor[ firstAuthor.length-1];
 
+		}		
+		return author;
+	}
+
+	/**
+	 * Gets the last name of all authors/editors
+	 * @param authorField a <code>String</code>
+	 * @return the sur name of all authors/editors
+	 */
+	private static String allAuthors(String authorField){
+		String author = "" ; 
+		// This code was part of 'ApplyRule' in 'ArticleLabelRule'
+		String[] tokens= authorField.split("\\band\\b");
+		int i=0;
+		while (tokens.length > i){
+		    // convert lastname, firstname to firstname lastname
+		    if(tokens[i].indexOf(",") > 0)
+			tokens[i] = ImportFormatReader.fixAuthor( tokens[i] ); 
+		    	    
+		    String[] firstAuthor = tokens[i].replaceAll("\\s+"," ").split(" ");
+		    // lastname, firstname
+
+		    author += firstAuthor[ firstAuthor.length-1];
+		    i++;
 		}		
 		return author;
 	}

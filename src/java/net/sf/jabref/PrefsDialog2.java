@@ -52,7 +52,7 @@ public class PrefsDialog2 extends JDialog {
     JabRefFrame frame;
 
     public PrefsDialog2(JabRefFrame parent, JabRefPreferences prefs) {
-	super(parent, Globals.lang("JabRef preferences"), true);
+	super(parent, Globals.lang("JabRef preferences"), false);
 	_prefs = prefs;
 	frame = parent;
 	getContentPane().setLayout(gbl);
@@ -76,7 +76,7 @@ public class PrefsDialog2 extends JDialog {
 	tabbed.addTab(Globals.lang("General"), new GeneralTab(_prefs));
 	tabbed.addTab(Globals.lang("Table"), new TablePrefsTab(_prefs));
 	//tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
-	tabbed.addTab(Globals.lang("Key Pattern"), new TabLabelPattern(_prefs));
+	tabbed.addTab(Globals.lang("Key Pattern"), new TabLabelPattern(_prefs, parent.helpDiag));
 
 	JButton
 	    ok = new JButton(Globals.lang("Ok")),
