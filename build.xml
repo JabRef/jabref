@@ -83,9 +83,20 @@
                 <java jar="${build.lib}/jabref.jar" fork="true" />
         </target>
 
+        <!-- a complete new build -->
+        <target name="rebuild"
+                depends="clean, unjarlib, jars, build"
+                description="compiles the complete project"/>
+
         <!-- Compiles project -->
         <target name="compile">
                 <mkdir dir="${build.classes}" />
+
+                <!-- dependences - delete old class files  -->
+               <depend srcdir="${java.dir}" destdir="${build.classes}"
+                       cache="${build.classes}/depcache"
+                       closure="yes"/>
+
                 <!--deprecation="on"-->
                 <javac debug="on" destdir="${build.classes}" source="1.4" target="1.4">
                         <src path="${java.dir}"/>
@@ -132,13 +143,14 @@
                 <copy file="${library.directory}/OSXAdapter.class" todir="${build.osx}" />
         </target>
 
-
         <!-- Jars up project -->
-        <target name="jars" depends="compile, unjarlib">
+        <target name="jars" depends="compile">
                 <mkdir dir="${build.lib}" />
 
                 <jar destfile="${build.lib}/jabref.jar">
-                        <fileset dir="${build.classes}" />
+                        <fileset dir="${build.classes}">
+                           <exclude name="**/depcache/**" />
+                        </fileset>
                         <fileset dir="${build.tmp}" />
                         <fileset dir="${src.dir}">
                                 <include name="images/**" />
@@ -163,15 +175,10 @@
 
         </target>
 
+        <!-- main build target : it should be fast, for a complete build please
+             use the rebuild target -->
         <target name="build" depends="jars" description="Build project">
                 <mkdir dir="${build.bin}" />
-                <!--
-    <copy todir="${build.bin}">
-      <fileset dir="${bin.dir}">
-        <include name="*" />
-      </fileset>
-    </copy>
--->
                 <mkdir dir="${build.resource}" />
                 <copy todir="${build.resource}">
                         <fileset dir="${resource.dir}">
