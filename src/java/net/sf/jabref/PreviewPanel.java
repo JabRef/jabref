@@ -3,6 +3,7 @@ package net.sf.jabref;
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
 import net.sf.jabref.export.layout.*;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,6 +18,7 @@ public class PreviewPanel extends JEditorPane {
   Layout layout;
   String prefix = "", postfix = "";
   Dimension DIM = new Dimension(650, 110);
+    HashMap layouts = new HashMap();
 
   public PreviewPanel(BibtexEntry be) {
     entry = be;
@@ -31,18 +33,27 @@ public class PreviewPanel extends JEditorPane {
   }
 
   public void readLayout() throws IOException {
-    LayoutHelper layoutHelper = null;
-    URL reso = JabRefFrame.class.getResource
-        (Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entry.getType().getName()+".layout");
-    try {
-      if (reso == null)
-        reso = JabRefFrame.class.getResource(Globals.LAYOUT_PREFIX+LAYOUT_FILE+".layout");
+      String entryType = entry.getType().getName().toLowerCase();
+      if (layouts.get(entryType) != null) {
+	  layout = (Layout)layouts.get(entryType);
+	  return; 
+      }   
 
-      layoutHelper = new LayoutHelper(new InputStreamReader(reso.openStream()));
-    }
-    catch (IOException ex) {
-    }
-    layout = layoutHelper.getLayoutFromText();
+      LayoutHelper layoutHelper = null;
+      URL reso = JabRefFrame.class.getResource
+	  (Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entryType+".layout");
+      //Util.pr(Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entryType+".layout");
+      try {
+	  if (reso == null)
+	      reso = JabRefFrame.class.getResource(Globals.LAYOUT_PREFIX+LAYOUT_FILE+".layout");
+
+	  layoutHelper = new LayoutHelper(new InputStreamReader(reso.openStream()));
+      }
+      catch (IOException ex) {
+      }
+      layout = layoutHelper.getLayoutFromText();
+
+      layouts.put(entryType, layout);
 
     reso = JabRefFrame.class.getResource
         (Globals.LAYOUT_PREFIX+LAYOUT_FILE+".begin.layout");
@@ -74,6 +85,11 @@ public class PreviewPanel extends JEditorPane {
 
   public void setEntry(BibtexEntry newEntry) {
     entry = newEntry;
+    try {
+      readLayout();
+    }
+    catch (IOException ex) {
+    }
     update();
   }
 

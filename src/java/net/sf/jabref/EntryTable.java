@@ -272,8 +272,8 @@ public class EntryTable extends JTable {
 	    }
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
-        else if (status == EntryTableModel.ICON_COL)
-          renderer = iconRenderer;
+        //else if (status == EntryTableModel.ICON_COL)
+        //  renderer = iconRenderer;
 	else if (status == EntryTableModel.REQUIRED)
 	    renderer = reqRenderer;
 	else if (status == EntryTableModel.OPTIONAL)
@@ -347,6 +347,17 @@ public class EntryTable extends JTable {
 	    setForeground(fg);
 	}
 
+	/* For enabling the renderer to handle icons. */
+        protected void setValue(Object value) {
+            if (value instanceof Icon) {
+                setIcon((Icon)value);
+                super.setValue(null);
+            } else {
+                setIcon(null);
+                super.setValue(value);
+            }
+	}
+
     public void paintComponent(Graphics g) {
 	//Util.pr("her");
 
@@ -371,7 +382,7 @@ public class EntryTable extends JTable {
 	//public DefaultTableCellRenderer darker() { return darker; }
     }
 
-    public TableCellRenderer iconRenderer = new IconCellRenderer();
+    /* public TableCellRenderer iconRenderer = new IconCellRenderer();
         //new JTableButtonRenderer(getDefaultRenderer(JButton.class));
     class IconCellRenderer extends DefaultTableCellRenderer {
         protected void setValue(Object value) {
@@ -386,7 +397,7 @@ public class EntryTable extends JTable {
     }
 
 
-/*    class JTableButtonRenderer implements TableCellRenderer {
+   class JTableButtonRenderer implements TableCellRenderer {
       private TableCellRenderer __defaultRenderer;
 
       public JTableButtonRenderer(TableCellRenderer renderer) {
