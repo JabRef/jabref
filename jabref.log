@@ -2,20 +2,9 @@
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
 <record>
-  <date>2005-01-26T12:04:36</date>
-  <millis>1106737476478</millis>
+  <date>2005-02-23T08:54:02</date>
+  <millis>1109145242487</millis>
   <sequence>0</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Subdatabase from aux"</message>
-</record>
-<record>
-  <date>2005-01-26T12:04:36</date>
-  <millis>1106737476512</millis>
-  <sequence>1</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
@@ -24,9 +13,9 @@
   <message>Warning: could not get translation for "file"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:36</date>
-  <millis>1106737476513</millis>
-  <sequence>2</sequence>
+  <date>2005-02-23T08:54:02</date>
+  <millis>1109145242528</millis>
+  <sequence>1</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
@@ -35,52 +24,63 @@
   <message>Warning: could not get translation for "new"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:37</date>
-  <millis>1106737477563</millis>
+  <date>2005-02-23T08:54:03</date>
+  <millis>1109145243614</millis>
+  <sequence>2</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>net.sf.jabref.Globals</class>
+  <method>logger</method>
+  <thread>10</thread>
+  <message>Warning: could not get translation for "MODS"</message>
+</record>
+<record>
+  <date>2005-02-23T08:54:03</date>
+  <millis>1109145243636</millis>
   <sequence>3</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
   <method>logger</method>
   <thread>10</thread>
-  <message>Warning: could not get translation for "MODS"</message>
+  <message>Warning: could not get translation for "Autodetect format"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:37</date>
-  <millis>1106737477597</millis>
+  <date>2005-02-23T08:54:03</date>
+  <millis>1109145243647</millis>
   <sequence>4</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
   <method>logger</method>
   <thread>10</thread>
-  <message>Warning: could not get translation for "MODS"</message>
+  <message>Warning: could not get translation for "Autodetect format"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:37</date>
-  <millis>1106737477619</millis>
+  <date>2005-02-23T08:54:04</date>
+  <millis>1109145244007</millis>
   <sequence>5</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
   <method>logger</method>
   <thread>10</thread>
-  <message>Warning: could not get translation for "Autodetect format"</message>
+  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:37</date>
-  <millis>1106737477625</millis>
+  <date>2005-02-23T08:54:04</date>
+  <millis>1109145244195</millis>
   <sequence>6</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
   <method>logger</method>
   <thread>10</thread>
-  <message>Warning: could not get translation for "Autodetect format"</message>
+  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
 </record>
 <record>
-  <date>2005-01-26T12:04:37</date>
-  <millis>1106737477974</millis>
+  <date>2005-02-23T08:54:04</date>
+  <millis>1109145244268</millis>
   <sequence>7</sequence>
   <logger>global</logger>
   <level>INFO</level>
@@ -88,49 +88,5 @@
   <method>logger</method>
   <thread>10</thread>
   <message>Warning: could not get translation for "Fetch CiteSeer"</message>
-</record>
-<record>
-  <date>2005-01-26T12:04:38</date>
-  <millis>1106737478168</millis>
-  <sequence>8</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
-</record>
-<record>
-  <date>2005-01-26T12:04:38</date>
-  <millis>1106737478236</millis>
-  <sequence>9</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
-</record>
-<record>
-  <date>2005-01-26T12:06:01</date>
-  <millis>1106737561279</millis>
-  <sequence>10</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>11</thread>
-  <message>Warning: could not get translation for "Download"</message>
-</record>
-<record>
-  <date>2005-01-26T12:06:19</date>
-  <millis>1106737579385</millis>
-  <sequence>11</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>11</thread>
-  <message>Warning: could not get translation for "Download"</message>
 </record>
 </log>

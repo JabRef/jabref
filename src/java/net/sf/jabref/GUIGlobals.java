@@ -272,7 +272,8 @@ public class GUIGlobals {
       generalFieldsHelp = "GeneralFields.html",
 //      searchHelp = "SearchHelp.html",
       aboutPage = "About.html",
-      shortPlainImport="ShortPlainImport.html";
+      shortPlainImport="ShortPlainImport.html",
+      shortIntegrityCheck="ShortIntegrityCheck.html";
 
 
 // Colors.

@@ -44,6 +44,9 @@ import java.awt.*;
 import javax.swing.*;
 import net.sf.jabref.*;
 import java.awt.event.*;
+import java.net.URL;
+import javax.swing.border.EtchedBorder;
+import java.io.IOException;
 
 public class IntegrityWizard
     extends JDialog
@@ -105,9 +108,40 @@ public class IntegrityWizard
     gbl.setConstraints( closeButton, con ) ;
     buttonPanel.add( closeButton ) ;
 
+    // ----------------------------------------------------------------------
+    // add a short info, if available
+
+    JEditorPane infoText = null ;
+
+    URL infoURL = JabRef.class.getResource(GUIGlobals.helpPre
+                                           +GUIGlobals.shortIntegrityCheck);
+    if (infoURL != null)
+      try
+      {
+        infoText = new JEditorPane() ;
+        infoText.setEditable(false);
+        infoText.setPage(infoURL);
+        infoText.setBackground(GUIGlobals.infoField);
+        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        infoText.setPreferredSize( new Dimension(220, 50));
+        infoText.setMinimumSize( new Dimension(180, 50));
+//        bottomPanel.add( infoText, BorderLayout.CENTER ) ;
+      }
+      catch (IOException e)
+      {
+        infoText = null ;
+      }
+
+    // -----------------------------------------------------------------------
+
     // content
     Container content = this.getContentPane() ;
     content.setLayout( new BorderLayout());
+
+    if (infoText != null) // only if some help available
+    {
+      content.add( infoText, BorderLayout.PAGE_START ) ;
+    }
     content.add(warnPanel, BorderLayout.CENTER) ;
     content.add(buttonPanel, BorderLayout.PAGE_END) ;
   }

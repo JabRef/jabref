@@ -186,10 +186,19 @@ public class TextInputDialog extends JDialog
     rawPanel.setLayout( new BorderLayout() ) ;
 
     // Textarea
-    textPane = new JTextPane() ;
+    textPane = new JTextPane()
+    {
+//    pane =  new JTextPane(){
+             public void setSize(Dimension d) {
+                if(d.width > 100) d.width = 100;
+                   super.setSize(d);
+             }
+             public boolean getScrollableTracksViewportWidth(){ return false; }
+      };
+
     textPane.setEditable( false ) ;
     textPane.setOpaque(false);
-//    textPane.setMaximumSize( new Dimension(100, 100) );
+    textPane.setMaximumSize( new Dimension(100, 100) );
 
     doc = textPane.getStyledDocument() ;
     addStylesToDocument( doc ) ;
@@ -207,11 +216,11 @@ public class TextInputDialog extends JDialog
     // Scrollbar(s)
     JScrollPane paneScrollPane = new JScrollPane( testPanel ) ;
 
-    paneScrollPane.setVerticalScrollBarPolicy(
-        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+//    paneScrollPane.setVerticalScrollBarPolicy(
+//        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+    paneScrollPane.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) ;
     paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
-//    paneScrollPane.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) ;
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
