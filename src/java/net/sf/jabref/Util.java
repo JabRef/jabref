@@ -759,6 +759,10 @@ public class Util {
         return back;
     }
     
+    public static String quote(String s, String specials, char quoteChar) {
+        return quote(s,specials,quoteChar,0);
+    }
+    
     /**
      * Quote special characters.
      * 
@@ -769,16 +773,32 @@ public class Util {
      *            character itself, which is automatically quoted.
      * @param quoteChar
      *            The quoting character.
+     * @param linewrap
+     *            The number of characters after which a linebreak is inserted
+     *            (this linebreak is undone by unquote()). Set to 0 to disable.
      * @return A String with every special character (including the quoting
      *         character itself) quoted.
      */
-    public static String quote(String s, String specials, char quoteChar) {
+    public static String quote(String s, String specials, char quoteChar,
+            int linewrap) {
     	StringBuffer sb = new StringBuffer();
     	char c;
+        int linelength = 0;
+        boolean isSpecial;
     	for (int i = 0; i < s.length(); ++i) {
-    		c = s.charAt(i);
-    		if (specials.indexOf(c) >= 0 || c == quoteChar)
+            c = s.charAt(i);
+            isSpecial = specials.indexOf(c) >= 0 || c == quoteChar;
+            // linebreak?
+            if (linewrap > 0
+                    && (++linelength >= linewrap || (isSpecial && linelength >= linewrap - 1))) {
+                sb.append(quoteChar);
+                sb.append('\n');
+                linelength = 0;
+            }
+    		if (isSpecial) {
     			sb.append(quoteChar);
+                ++linelength;
+            }
    			sb.append(c);
     	}
     	return sb.toString();
@@ -800,6 +820,9 @@ public class Util {
     		c = s.charAt(i);
     		if (c != quoteChar)
     			sb.append(c);
+            else if (i+1 < s.length() && s.charAt(i+1) == '\n')
+                ++i; // skip quoted newline
+                
     	}
     	return sb.toString();
     }
