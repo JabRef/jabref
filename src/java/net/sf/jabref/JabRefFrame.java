@@ -332,7 +332,6 @@ public class JabRefFrame
     setLocation(new Point(prefs.getInt("posX"),
                           prefs.getInt("posY")));
 
-    tabbedPane.setBorder(null);
     tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
     // The following state listener makes sure focus is registered with the correct database

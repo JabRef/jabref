@@ -86,7 +86,7 @@ public class SidePane extends JPanel {
         Component c = (Component)comps.elementAt(i);
         gbl.setConstraints(c, con);
         mainPanel.add(c);
-	System.out.println(c.getPreferredSize().toString());
+	//System.out.println(c.getPreferredSize().toString());
       }
       con.weighty = 1;
       Component bx = Box.createVerticalGlue();

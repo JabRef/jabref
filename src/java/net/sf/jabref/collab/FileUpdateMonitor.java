@@ -168,14 +168,14 @@ public class FileUpdateMonitor extends Thread {
 
     public boolean copy() {
 	
-      Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
+	//Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
       boolean res = false;
       try {
         res = Util.copyFile(file, tmpFile, true);
       } catch (IOException ex) {
         Globals.logger("Cannot copy to temporary file '"+tmpFile.getPath()+"'");
       }
-      Util.pr("</copy>");
+      //Util.pr("</copy>");
       return res;
 	
       //return true;
@@ -212,7 +212,7 @@ public class FileUpdateMonitor extends Thread {
     //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());
     try {
 	f = File.createTempFile("jabref", null);
-	System.out.println(f.getPath());
+	//System.out.println(f.getPath());
     } catch (IOException ex) {
 	ex.printStackTrace();
     }

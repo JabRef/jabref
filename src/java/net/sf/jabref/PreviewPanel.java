@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class PreviewPanel extends JEditorPane {
     entry = be;
     sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+    sp.setBorder(null);
     //Util.pr(layoutFile);
     init();
     this.layoutFile = layoutFile;
@@ -45,7 +46,7 @@ public class PreviewPanel extends JEditorPane {
     sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     this.layoutFile = layoutFile;
-
+    sp.setBorder(null);
 
     init();
     //setText("<HTML></HTML>");

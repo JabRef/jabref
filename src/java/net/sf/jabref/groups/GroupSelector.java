@@ -584,8 +584,6 @@ public class GroupSelector
     }
   }
 
-    public Dimension getMinimumSize() {
-	return getPreferredSize();
-    }
+
 
 }

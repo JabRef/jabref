@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import javax.swing.*;
+import java.awt.Dimension;
 
 public class SidePaneComponent extends JPanel {
 
@@ -78,4 +79,7 @@ public class SidePaneComponent extends JPanel {
 
     }
 
+    public Dimension getMinimumSize() {
+	return getPreferredSize();
+    }
 }

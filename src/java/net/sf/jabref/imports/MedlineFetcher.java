@@ -86,15 +86,16 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	con.weighty = 0;
 	gbl.setConstraints(header, con);
 	add(header);
+	con.weighty = 1;
 	con.insets = new Insets(0, 0, 0,  0);
 	//    pan.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	gbl.setConstraints(tf, con);
 	add(tf);
+	con.weighty = 0;
 	con.gridwidth = 1;
 	gbl.setConstraints(go, con);
 	add(go);
-	con.weightx = 0;
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(helpBut, con);
 	add(helpBut);
