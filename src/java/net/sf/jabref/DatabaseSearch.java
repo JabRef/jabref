@@ -92,7 +92,7 @@ public class DatabaseSearch extends Thread {
 
 	if ((searchValueField == null) 
 	    || (searchValueField == Globals.SEARCH))
-	    panel.output(Globals.lang("Searched database. Number of hits")
+	    panel.output(Globals.lang("Searched database. GLobal number of hits")
 			 +": "+hits);
     }
 

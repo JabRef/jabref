@@ -80,7 +80,7 @@ public abstract class BibtexEntryType
             {
                 return new String[]
                 {
-                    "volume", "number", "pages", "month", "note"
+                    "volume", "number", "pages", "month", "eid", "note"
                 };
             }
 
@@ -595,6 +595,12 @@ public abstract class BibtexEntryType
     public abstract String[] getOptionalFields();
 
     public abstract String[] getRequiredFields();
+
+    public String[] getGeneralFields() {
+        return new String[] 
+	    {"crossref", "keywords", "doi", "url", 
+	     "abstract", "comment"};
+    }
 
     public abstract String describeRequiredFields();
 

@@ -84,8 +84,7 @@ public class BibtexEntry
      * Returns an array describing general fields.
      */
     public String[] getGeneralFields() {
-        return new String[] 
-	    {"crossref", "url", "abstract", "keywords", "comment"}; // May change...
+        return _type.getGeneralFields();
     }
 
     /**

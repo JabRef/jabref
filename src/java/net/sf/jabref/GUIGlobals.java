@@ -260,6 +260,8 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	"comment",
 	"bibtexkey",
 	"keywords",
+	"doi",
+	"eid",
 	"search"
     };
 
@@ -322,6 +324,9 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	fieldWeight.put("journal", SMALL_W);
 	fieldWeight.put("volume", SMALL_W);
 	fieldWeight.put("edition", SMALL_W);
+	fieldWeight.put("keywords", SMALL_W);
+	fieldWeight.put("doi", SMALL_W);
+	fieldWeight.put("eid", SMALL_W);
 	fieldWeight.put("number", SMALL_W);
 	fieldWeight.put("chapter", SMALL_W);
 	fieldWeight.put("editor", MEDIUM_W);
