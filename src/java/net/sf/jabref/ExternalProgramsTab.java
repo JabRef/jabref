@@ -119,6 +119,11 @@ class ExternalProgramsTab extends JPanel implements PrefsTab {
 	_prefs.put("htmlviewer", html.getText());
 	_prefs.put("lyxpipe", lyx.getText());
     }
+
+    public boolean readyToClose() {
+	return true;
+    }
+
 }
 
 

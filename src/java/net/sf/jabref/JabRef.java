@@ -315,14 +315,14 @@ public class JabRef {
 
       /*Font fnt = new Font
           (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
-	  prefs.getInt("menuFontSize"));*/
+	  prefs.getInt("menuFontSize"));
 
       Object fnt = new UIDefaults.ProxyLazyValue
           ("javax.swing.plaf.FontUIResource", null,
            new Object[] { prefs.get("menuFontFamily"), new Integer(prefs.getInt("menuFontStyle")),
 			  new Integer(prefs.getInt("menuFontSize")) });
 
-      /*UIManager.put("MenuBar.font", fnt);
+      UIManager.put("MenuBar.font", fnt);
       UIManager.put("MenuItem.font", fnt);
       UIManager.put("RadioButtonMenuItem.font", fnt);
       UIManager.put("CheckBoxMenuItem.font", fnt);
@@ -367,7 +367,7 @@ public class JabRef {
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-      // Set antialiasing on everywhere. This only works in JRE >= 1.5.
+      // Set antialiasing on everywhere. This only works in JRE >= 1.5. Or... it doesn't work, period.
       System.setProperty("swing.aatext", "true");
 
       //String osName = System.getProperty("os.name", "def");

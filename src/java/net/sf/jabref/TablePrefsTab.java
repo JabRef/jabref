@@ -20,15 +20,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextArea tableFields = new JTextArea();//"", 80, 5);
-    private JTextField secField, terField;
-    private JButton fontButton = new JButton(Globals.lang("Set table font")),
-	menuFontButton = new JButton(Globals.lang("Set application font"));
+    private JTextField secField, terField, fontSize;
+    private JButton fontButton = new JButton(Globals.lang("Set table font"));
+    //menuFontButton = new JButton(Globals.lang("Set application font"));
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
     private Vector tableRows = new Vector(10);
     private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
+    private int oldMenuFontSize;
 
     class TableRow {
 	String name;
@@ -80,6 +81,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
+        //fontSize = new JFormattedTextField(java.text.NumberFormat.getIntegerInstance());
+        fontSize = new JTextField("");
+	fontSize.setPreferredSize(new Dimension(45, fontSize.getPreferredSize().height));
+	fontSize.setText(""+_prefs.getInt("menuFontSize"));
+	oldMenuFontSize = _prefs.getInt("menuFontSize");
+	
 
         secSort.insertItemAt(Globals.lang("<select>"), 0);
         terSort.insertItemAt(Globals.lang("<select>"), 0);
@@ -230,10 +237,19 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         upper.add(antialias);
         gbl.setConstraints(allowEditing, con);
         upper.add(allowEditing);
-	con.anchor = GridBagConstraints.EAST;
         con.gridwidth = 1;
-	gbl.setConstraints(menuFontButton, con);
-	upper.add(menuFontButton);
+	lab = new JLabel(Globals.lang("Menu and label font size"));
+	gbl.setConstraints(lab, con);
+	upper.add(lab);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+	Insets old = con.insets;
+	con.insets = new Insets(0, 10, 0, 0);
+	gbl.setConstraints(fontSize, con);
+	upper.add(fontSize);
+	con.insets = old;
+	//gbl.setConstraints(menuFontButton, con);
+	//upper.add(menuFontButton);
+	//con.anchor = GridBagConstraints.EAST;
         con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(fontButton, con);
 	upper.add(fontButton);
@@ -368,7 +384,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			    font = f;
 		}
 	    });
-	menuFontButton.addActionListener(new ActionListener() {
+	/*menuFontButton.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    Font f=new FontSelectorDialog
 				(null, menuFont).getSelectedFont();
@@ -377,7 +393,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			else
 			    menuFont = f;
 		}
-	    });
+		});*/
     }
 
     class DeleteRowAction extends AbstractAction {
@@ -563,10 +579,35 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.put("fontFamily", font.getFamily());
 	_prefs.putInt("fontStyle", font.getStyle());
 	_prefs.putInt("fontSize", font.getSize());
-	_prefs.put("menuFontFamily", menuFont.getFamily());
-	_prefs.putInt("menuFontStyle", menuFont.getStyle());
-	_prefs.putInt("menuFontSize", menuFont.getSize());
+	//_prefs.put("menuFontFamily", menuFont.getFamily());
+	//_prefs.putInt("menuFontStyle", menuFont.getStyle());
+	//_prefs.putInt("menuFontSize", menuFont.getSize());
+	try {
+	    int size = Integer.parseInt(fontSize.getText());	    
+	    if (size != oldMenuFontSize) {
+		_prefs.putInt("menuFontSize", size);
+		JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
+              +"You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
+					      JOptionPane.WARNING_MESSAGE);
+	    }
+
+	} catch (NumberFormatException ex) {
+	    ex.printStackTrace();
+	}
 	GUIGlobals.CURRENTFONT = font;
+    }
+
+    public boolean readyToClose() {
+	try {
+	    int size = Integer.parseInt(fontSize.getText());	    
+	    return true; // Ok, the number was legal.
+	} catch (NumberFormatException ex) {
+	    JOptionPane.showMessageDialog
+		(null, Globals.lang("You must enter an integer value in the text field for")+" '"+
+		 Globals.lang("Menu and label font size")+"'", Globals.lang("Changed font settings"),
+		 JOptionPane.ERROR_MESSAGE);
+	    return false;
+	}
     }
 
 }

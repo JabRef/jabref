@@ -147,7 +147,7 @@ public class JabRefPreferences {
         defaults.put("fontSize", new Integer(12));
         defaults.put("menuFontFamily", "Times");
         defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
-        defaults.put("menuFontSize", new Integer(14));
+        defaults.put("menuFontSize", new Integer(11));
         defaults.put("antialias", new Boolean(true));
         defaults.put("ctrlClick", new Boolean(false));
         defaults.put("disableOnMultipleSelection", new Boolean(false));

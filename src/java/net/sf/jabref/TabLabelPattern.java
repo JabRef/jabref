@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ImageIcon;
+import javax.swing.BorderFactory;
 
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -164,7 +165,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private void buildGUI(){
 
 	    JPanel pan = new JPanel();
-	    JScrollPane sp = new JScrollPane(pan);	    
+	    JScrollPane sp = new JScrollPane(pan);	
+	    sp.setBorder(BorderFactory.createEmptyBorder());
 	    pan.setLayout(gbl);
 	    setLayout(gbl);	    
 	    // The header - can be removed
@@ -295,5 +297,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		}
 	    
 	}
+
+    public boolean readyToClose() {
+	return true;
+    }
 
 }

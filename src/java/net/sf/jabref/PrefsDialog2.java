@@ -105,14 +105,22 @@ public class PrefsDialog2 extends JDialog {
           (new Thread() {
             public void run() {
               //setVisible(false);
-              for (int i = 0; i < tabbed.getTabCount(); i++) {
-                ( (PrefsTab) tabbed.getComponentAt(i)).storeSettings();
-              }
-              frame.setupAllTables();
-              frame.output(Globals.lang("Preferences recorded."));
-              dispose();
+
+		// First check that all tabs are ready to close:
+		for (int i = 0; i < tabbed.getTabCount(); i++) {
+		    if (!((PrefsTab)tabbed.getComponentAt(i)).readyToClose())
+			return; // If not, break off.
+		}
+
+		// Then store settings and close:
+		for (int i = 0; i < tabbed.getTabCount(); i++) {
+		    ( (PrefsTab) tabbed.getComponentAt(i)).storeSettings();
+		}
+		frame.setupAllTables();
+		frame.output(Globals.lang("Preferences recorded."));
+		dispose();
             }
-          }).start();
+	      }).start();
 	}
     }
 

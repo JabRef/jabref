@@ -360,4 +360,8 @@ saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered b
         }
     }
 
+    public boolean readyToClose() {
+	return true;
+    }
+
 }
