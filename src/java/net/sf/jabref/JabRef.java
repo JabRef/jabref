@@ -96,7 +96,8 @@ public class JabRef {
       options.register("primport", 'p', Globals.lang("Import preferences from file"), importPrefs);
       options.setUseMenu(false);
 
-      options.process(args);
+
+      String[] leftOver = options.process(args);
 
       if (helpO.isInvoked()) {
         System.out.println(options.getHelp());
@@ -187,22 +188,27 @@ public class JabRef {
 	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
 	     prefs.getInt("fontSize"));
 
+
+
         // Vector to put imported/loaded database(s) in.
         Vector loaded = new Vector();
+
+        if (leftOver.length > 0) {
+          for (int i=0; i<leftOver.length; i++) {
+            // Leftover arguments are interpreted as bib files to open.
+            ParserResult pr = openBibFile(leftOver[i]);
+            if (pr != null)
+              loaded.add(pr);
+          }
+        }
 
         if (importFile.isInvoked()) {
           String[] data = importFile.getStringValue().split(",");
           if (data.length == 1) {
             // Load a bibtex file:
-            System.out.println(Globals.lang("Opening")+": " + data[0]);
-            try {
-              File file = new File(data[0]);
-              ParserResult pr = ImportFormatReader.loadDatabase(file);
-              pr.setFile(file);
+            ParserResult pr = openBibFile(data[0]);
+            if (pr != null)
               loaded.add(pr);
-            } catch (IOException ex) {
-              System.err.println(Globals.lang("Error opening file")+" '"+ data[0]+"': "+ex.getMessage());
-            }
 
           } else if (data.length == 2) {
             // Import a database in a certain format.
@@ -371,6 +377,20 @@ public class JabRef {
        jrf.setVisible(true);
      } else System.exit(0);
 
+   }
+
+   public static ParserResult openBibFile(String name) {
+     System.out.println(Globals.lang("Opening")+": " + name);
+     try {
+       File file = new File(name);
+       ParserResult pr = ImportFormatReader.loadDatabase(file);
+       pr.setFile(file);
+       return pr;
+     } catch (IOException ex) {
+       //System.err.println(Globals.lang("Error opening file")+" '"+ name+"': "+ex.getMessage());
+       System.err.println(Globals.lang("Error opening file")+": "+ex.getMessage());
+     }
+     return null;
    }
 
 }

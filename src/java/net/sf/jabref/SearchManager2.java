@@ -151,7 +151,7 @@ class SearchManager2 extends SidePaneComponent
 	SidePaneHeader header = new SidePaneHeader
 	    ("Search", GUIGlobals.searchIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.HORIZONTAL;
+	con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
 	con.insets = new Insets(0, 0, 2,  0);
 	gbl.setConstraints(header, con);
@@ -249,7 +249,11 @@ class SearchManager2 extends SidePaneComponent
 		 && !increment.isSelected()
 		 && (frame.basePanel() != null)) {
 	    updatePrefs(); // Make sure the user's choices are recorded.
-
+            if (searchField.getText().equals("")) {
+              // An empty search field should cause the search to be cleared.
+              frame.stopShowingSearchResults();
+              return;
+            }
 	    // Setup search parameters common to both highlight and float.
 	    Hashtable searchOptions = new Hashtable();
 	    searchOptions.put("option",searchField.getText()) ;

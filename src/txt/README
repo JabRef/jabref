@@ -76,8 +76,11 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.3.x	- Added command line options for importing, exporting, and for suppressing GUI
-	  (using RitOpt for parsing options).
+1.x	- Added advanced search feature.
+	- Added facility for using custom export formats.
+	- Added command line options for importing/exporting files, importing/exporting
+	  user preferences, loading session and for suppressing the GUI (using RitOpt for
+          parsing options).
 	- Added automatic stripping of \url{} when opening url.
         - Improved docbook and bibtexml exports.
         - Fixed focus bug which sometimes interfered with cut/copy/paste.
