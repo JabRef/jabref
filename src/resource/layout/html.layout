@@ -11,6 +11,12 @@
 		</div>
 		\end{doi}
 
+		\begin{citeseerurl}
+		<div class="bibtex_citeseer">
+			<a href="http://citeseer.ist.psu.edu/\citeseerurl">cs</a>
+		</div>
+		\end{citeseerurl}
+
 		\begin{pdf}
 		<div class="bibtex_pdf">
 			<a href="\format[ResolvePDF]{\pdf}">pdf</a>
