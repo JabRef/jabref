@@ -215,11 +215,12 @@ public class Util {
      * characters make a key unusable by bibtex.
      */
     public static String checkLegalKey(String key) {
+	if (key == null) return null;
 	StringBuffer newKey = new StringBuffer();
 	for (int i=0; i<key.length(); i++) {
 	    char c = key.charAt(i);
 	    if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
-                && (c != '}') && (c != '~'))
+                && (c != '}') && (c != '~') && (c != ','))
 		newKey.append(c);
 	}
 	return newKey.toString();

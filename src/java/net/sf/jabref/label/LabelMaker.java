@@ -50,6 +50,7 @@ public class LabelMaker {
 
 	// Try new keys until we get a unique one:
 	if (base.setCiteKeyForEntry(newEntry.getId(), newKey)) {
+	    
 	    char c = 'b';
 	    String modKey = newKey+"a";
 	    while (base.setCiteKeyForEntry(newEntry.getId(), modKey))

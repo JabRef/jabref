@@ -1,13 +1,14 @@
 
-JabRef 1.0
+JabRef 1.1 
 ----------
+
+Released January 3, 2004
+
 
 Introduction:
 
 JabRef is a graphical Java application for editing bibtex (.bib)
 databases.
-
-JabRef is the
 
 JabRef lets you organize your entries into overlapping logical groups,
 and with a single click limit your view to a single group or an
@@ -31,7 +32,7 @@ http://java.sun.com.
 
 
 Installing and running:
-JabRef 1.0 is distributed as an executable .jar file. Run the
+JabRef 1.1 is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -56,8 +57,8 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.x:	- Added bibtex key uniqueness checking
-	- Fixed Refer import.
+1.1:	- Added bibtex key uniqueness checking
+	- Improved Refer/Endnote import.
 	- Added feature for importing entries and/or strings and/or group
           definitions from another BibTeX database.
 	- Added menu choices to import into open database.
@@ -70,6 +71,7 @@ Change log:
 	- Fixed bug in RIS import.
 	- Added options to copy key and copy "\cite{key}" to right-click menu.
 	- Fixed bug that caused some General fields not to get displayed.
+	- Enabled customization of General fields.
 	- Enabled customization of existing entry types, and definition of
 	  new types.
 1.0:	First release.

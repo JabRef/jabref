@@ -122,8 +122,8 @@ public class JabRefFrame extends JFrame {
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
        fetchMedline = new FetchMedlineAction(),
-       mergeDatabaseAction = new GeneralAction("mergeDatabase", "Import from database",
-                                               "Import contents from a BibTeX database into the currently viewed database",
+       mergeDatabaseAction = new GeneralAction("mergeDatabase", "Append database",
+                                               "Append contents from a BibTeX database into the currently viewed database",
                                                GUIGlobals.openIconFile,
                                                prefs.getKey("Open")),
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
@@ -150,6 +150,10 @@ public class JabRefFrame extends JFrame {
 					  "push selection to lyx",
 					  GUIGlobals.lyxIconFile,
 					  prefs.getKey("Push To LyX"));
+
+    // The menus for importing/appending other formats
+    JMenu importMenu = new JMenu(Globals.lang("Import and append")),
+	importNewMenu = new JMenu(Globals.lang("Import"));
 
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -466,8 +470,6 @@ public class JabRefFrame extends JFrame {
 	    options = new JMenu(Globals.lang("Options")),
 	    newSpec = new JMenu(Globals.lang("New entry...")),
 	    helpMenu = new JMenu(Globals.lang("Help"));
-	JMenu importMenu = new JMenu(Globals.lang("Import")),
-            importNewMenu = new JMenu(Globals.lang("Import into new"));
 
         setUpImportMenu(importMenu, false);
         setUpImportMenu(importNewMenu, true);
@@ -646,6 +648,7 @@ public class JabRefFrame extends JFrame {
 	lyxPushAction.setEnabled(false);
 	normalSearch.setEnabled(false);
 	incrementalSearch.setEnabled(false);
+	importMenu.setEnabled(false);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
 	newEntryAction.setEnabled(false);
@@ -672,6 +675,7 @@ public class JabRefFrame extends JFrame {
 	lyxPushAction.setEnabled(true);
 	normalSearch.setEnabled(true);
 	incrementalSearch.setEnabled(true);
+	importMenu.setEnabled(true);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
 	newEntryAction.setEnabled(true);
@@ -1080,7 +1084,7 @@ public class JabRefFrame extends JFrame {
 			// put in menu
 			//
 	    //########################################
-	    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Endnote"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+	    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Refer/Endnote"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newEndnoteFile_mItem.addActionListener(new ActionListener()
 			    {
 				public void actionPerformed(ActionEvent e)

@@ -30,13 +30,17 @@ import java.io.File;
 public class JabRef {
 
     public static void main(String[] args) {
+
+	Globals.turnOffLogging();
+
 		JabRefPreferences prefs = new JabRefPreferences();
 		BibtexEntryType.loadCustomEntryTypes(prefs);
 		Globals.setLanguage(prefs.get("language"), "");
 		JabRefFrame jrf = new JabRefFrame();
 
 		if(args.length > 0){
-			System.out.println("Opening: " + args[0]);			
+			System.out.println("Opening: " + args[0]);
+			jrf.output("Opening: " + args[0]);
 			//verify the file
 			File f = new File (args[0]);
 			

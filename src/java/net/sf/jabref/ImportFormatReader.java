@@ -431,15 +431,15 @@ public class ImportFormatReader
 	    boolean first = true;
 	    while ((str = in.readLine()) != null) {
 		str = str.trim();
-		if(str.equals(""))
-		    continue;
-		else if(str.indexOf("%0")==0){
-		    if (first)
+		// if(str.equals("")) continue;
+		if(str.indexOf("%0")==0){
+		    if (first) {
 			first = false;
+		    }
 		    else {
 			sb.append(ENDOFRECORD);
-			sb.append(str);
 		    }
+		    sb.append(str);
 		}else
 		    sb.append(str);
 		sb.append("\n");
@@ -450,7 +450,6 @@ public class ImportFormatReader
 	catch(IOException e){return null;}
 
 	String [] entries=sb.toString().split(ENDOFRECORD);
-
 	int rowNum=0;
 	HashMap hm=new HashMap();
 	String Author="",Type="",Editor="";
@@ -462,6 +461,30 @@ public class ImportFormatReader
 	    for(int j=0; j <fields.length; j++){
 		if(fields[j].length() < 3)
 		    continue;
+
+		/* Details of Refer format for Journal Article and Book:
+		   
+		  Generic            Ref     Journal Article   Book
+		  Code
+		  Author             %A      Author            Author
+		  Year               %D      Year              Year
+		  Title              %T      Title             Title
+		  Secondary Author   %E                        Series Editor
+		  Secondary Title    %B      Journal           Series Title
+		  Place Published    %C                        City
+		  Publisher          %I                        Publisher
+		  Volume             %V      Volume            Volume
+		  Number of Volumes  %6                        Number of Volumes
+		  Number             %N      Issue
+		  Pages              %P      Pages             Number of Pages
+		  Edition            %7                        Edition
+		  Subsidiary Author  %?                        Translator
+		  Alternate Title    %J      Alternate Journal
+		  Label              %F      Label             Label
+		  Keywords           %K      Keywords          Keywords
+		  Abstract           %X      Abstract          Abstract
+		  Notes              %O      Notes             Notes
+		*/
 
 		String prefix=fields[j].substring(0,1);
 		String val = fields[j].substring(2);
@@ -475,25 +498,40 @@ public class ImportFormatReader
 		    if( Editor.equals("")) Editor=val;
 		    else Editor += " and " + val;
 		}
-		else if(prefix.equals("T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
+		else if(prefix.equals("T")) hm.put("title", Globals.putBracesAroundCapitals(val));
 		else if(prefix.equals("0")){
 		    if(val.indexOf("Journal")==0)
 			Type="article";
-		    else if(val.indexOf("Book")==0)
+		    else if((val.indexOf("Book")==0) 
+			    || (val.indexOf("Edited Book")==0))
 			Type="book";
 		    else if( val.indexOf("Conference")==0)// Proceedings
 			Type="inproceedings";
+		    else if( val.indexOf("Report")==0) // Techreport
+			Type="techreport";
 		    else
 			Type = "misc"; //
 		}
 		else if(prefix.equals("7")) hm.put("edition",val);
+		else if(prefix.equals("C")) hm.put("address",val);
 		else if(prefix.equals("D")) hm.put("year",val);
                 else if(prefix.equals("8")) hm.put("date",val);
-		else if(prefix.equals("J")) hm.put("journal", val);
+		else if(prefix.equals("J")) {
+		    // "Alternate journal. Let's set it only if no journal
+		    // has been set with %B.
+		    if (hm.get("journal") == null)
+			hm.put("journal", val);
+		}
                 else if (prefix.equals("B")) {
-                  if (Type.equals("article")) hm.put("journal", val);
-
+		    // This prefix stands for "journal" in a journal entry, and
+		    // "series" in a book entry.
+		    if (Type.equals("article")) hm.put("journal", val);
+		    else if (Type.equals("book") || Type.equals("inbook"))
+			hm.put("series", val);
+		    else /* if (Type.equals("inproceedings"))*/
+			hm.put("booktitle", val);
                 }
+		else if(prefix.equals("I")) hm.put("publisher",val);
 		else if(prefix.equals("P")) hm.put("pages",val);
 		else if(prefix.equals("V")) hm.put("volume",val);
 		else if(prefix.equals("N")) hm.put("number",val);
@@ -501,6 +539,13 @@ public class ImportFormatReader
                 else if(prefix.equals("O")) hm.put("note",val);
                 else if(prefix.equals("K")) hm.put("keywords", val);
 		else if(prefix.equals("X")) hm.put("abstract",val);
+		else if(prefix.equals("9")) {
+		    //Util.pr(val);
+		    if (val.indexOf("Ph.D.")==0)
+			Type = "phdthesis";
+		}
+		else if(prefix.equals("F")) hm.put
+		    (Globals.KEY_FIELD,Util.checkLegalKey(val));
 	    }
 	    //fixauthorscomma
             if (!Author.equals(""))

@@ -216,8 +216,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		public void action() {
 		    JFileChooser chooser = new JFileChooser
 			(prefs.get("workingDirectory"));
-		    Util.pr("BasePanel: must set file filter");
-		    //chooser.setFileFilter(fileFilter);
+		    chooser.setFileFilter(new OpenFileFilter());
 		    int returnVal = chooser.showSaveDialog(frame);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
 			String name = chooser.getSelectedFile().getName(),
@@ -613,7 +612,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
               if(returnVal == JFileChooser.APPROVE_OPTION) {
                 fileToOpen = chooser.getSelectedFile();
 
-                final MergeDialog md = new MergeDialog(frame, Globals.lang("Merge database"), true);
+                final MergeDialog md = new MergeDialog(frame, Globals.lang("Append database"), true);
                 Util.placeDialog(md, ths);
                 md.setVisible(true);
 
@@ -640,7 +639,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
                  ParserResult pr = frame.loadDatabase(fileToOpen);
                  BibtexDatabase db = pr.getDatabase();
                  MetaData meta = new MetaData(pr.getMetaData());
-                 NamedCompound ce = new NamedCompound(Globals.lang("Import database"));
+                 NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
 
                  if (importEntries) { // Add entries
                    Iterator i = db.getKeySet().iterator();

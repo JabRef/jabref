@@ -6,10 +6,11 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter{
 	return (filenm.endsWith(".bib")
 		|| file.isDirectory()
 		|| filenm.endsWith(".txt")
+		|| filenm.endsWith(".ref") // refer/endnote format
 		|| filenm.endsWith(".fcgi") // default for pubmed
 		|| filenm.endsWith(".xml"));// windows puts ".txt" extentions and for scifinder
     }
     public String getDescription(){
-	return "*.bib or *.txt or *.xml or *.fcgi";
+	return "*.bib, *.txt, *.xml, *.ref or *.fcgi";
     }
 }

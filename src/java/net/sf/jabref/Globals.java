@@ -92,25 +92,30 @@ public class Globals {
 	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
 	}catch(MissingResourceException ex){
 	    translation= key;
-	    System.err.println("Warning: could not get translation for \""
-	    	       + key +"\"");
+	    //System.err.println("Warning: could not get translation for \""
+	    //	       + key +"\"");
 	}
 	return translation.replaceAll("_"," ");
     }
     //============================================================
-    // this is incomplete...i need to add all the types here
+    // Using the hashmap of entry types found in BibtexEntryType
     //============================================================    
     static BibtexEntryType getEntryType(String type){
 	// decide which entryType object to return
-	
+	Object o = BibtexEntryType.ALL_TYPES.get(type);
+	if (o != null)
+	    return (BibtexEntryType)o;
+	else {
+	    return BibtexEntryType.OTHER;	    
+	}
+	/*
 	if(type.equals("article"))
 	    return BibtexEntryType.ARTICLE;
 	else if(type.equals("book"))
 	    return BibtexEntryType.BOOK;
 	else if(type.equals("inproceedings"))
 	    return BibtexEntryType.INPROCEEDINGS;
-	else //if(type.equals("other"))
-	    return BibtexEntryType.OTHER;
+	*/
     }
 
     //========================================================
