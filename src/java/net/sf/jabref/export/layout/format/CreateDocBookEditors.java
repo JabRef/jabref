@@ -30,21 +30,18 @@ import net.sf.jabref.imports.*;
 
 
 /**
- * Create DocBook authors formatter.
+ * Create DocBook editors formatter.
  *
  * @author $author$
  * @version $Revision$
  */
-public class CreateDocBookAuthors implements LayoutFormatter
+public class CreateDocBookEditors extends CreateDocBookAuthors
 {
     //~ Methods ////////////////////////////////////////////////////////////////
 
     public String format(String fieldText)
     {
-        //		<author><firstname>L.</firstname><surname>Xue</surname></author>
-        //     <author><firstname>F.</firstname><othername role="mi">L.</othername><surname>Stahura</surname></author>
-        //     <author><firstname>J.</firstname><othername role="mi">W.</othername><surname>Godden</surname></author>
-        //     <author><firstname>J.</firstname><surname>Bajorath</surname></author>
+        //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
 
         int index = 0;
         int oldPos = 0;
@@ -54,80 +51,28 @@ public class CreateDocBookAuthors implements LayoutFormatter
 
         if (fieldText.indexOf(" and ") == -1)
         {
-          sb.append("<author>");
+          sb.append("<editor>");
           singleAuthor(sb, fieldText);
-          sb.append("</author>");
+          sb.append("</editor>");
         }
         else
         {
             String[] names = fieldText.split(" and ");
             for (int i=0; i<names.length; i++)
             {
-              sb.append("<author>");
+              sb.append("<editor>");
               singleAuthor(sb, names[i]);
-              sb.append("</author>");
+              sb.append("</editor>");
               if (i < names.length -1)
                 sb.append("\n       ");
             }
         }
-
-
 
         fieldText = sb.toString();
 
         return fieldText;
     }
 
-    /**
-     * @param sb
-     * @param fieldText
-     */
-    protected void singleAuthor(StringBuffer sb, String author)
-    {
-        // TODO: replace special characters
-        Vector v = new Vector();
-        String authorMod = ImportFormatReader.fixAuthor_firstNameFirst(author);
-
-        WSITools.tokenize(v, authorMod, " \n\r");
-
-        if (v.size() == 1)
-        {
-            sb.append("<surname>");
-            sb.append(v.get(0));
-            sb.append("</surname>");
-        }
-        else if (v.size() == 2)
-        {
-            sb.append("<firstname>");
-            sb.append(v.get(0));
-            sb.append("</firstname>");
-            sb.append("<surname>");
-            sb.append(v.get(1));
-            sb.append("</surname>");
-        }
-        else
-        {
-            sb.append("<firstname>");
-            sb.append(v.get(0));
-            sb.append("</firstname>");
-            sb.append("<othername role=\"mi\">");
-
-            for (int i = 1; i < (v.size() - 1); i++)
-            {
-                sb.append(v.get(i));
-
-                if (i < (v.size() - 2))
-                {
-                    sb.append(' ');
-                }
-            }
-
-            sb.append("</othername>");
-            sb.append("<surname>");
-            sb.append(v.get(v.size() - 1));
-            sb.append("</surname>");
-        }
-    }
 }
 ///////////////////////////////////////////////////////////////////////////////
 //  END OF FILE.

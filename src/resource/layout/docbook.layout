@@ -1,6 +1,7 @@
 <biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
    <authorgroup>
 \begin{author}       \format[XMLChars,CreateDocBookAuthors]{\author} \end{author}
+\begin{editor}       \format[XMLChars,CreateDocBookEditors]{\editor} \end{editor}
    </authorgroup>
 <citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
 \begin{journal}   <citetitle pubwork="journal">\format[XMLChars]{\journal}</citetitle>\end{journal}
@@ -15,4 +16,10 @@
       <para>\format[XMLChars,RemoveLatexCommands]{\abstract}
       </para>
    </abstract>\end{abstract}
+\begin{url}   <bibliomisc>
+      <ulink url="\format[XMLChars]{\url}"/>
+   </bibliomisc>\end{url}
+\begin{doi}   <bibliomisc>
+      <ulink url="http://dx.doi.org/{\doi}">{\doi}</ulink>
+   </bibliomisc>\end{doi}
 </biblioentry>
