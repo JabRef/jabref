@@ -34,6 +34,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.ExpandEndnoteFilters;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.wizard.auximport.* ;
 import net.sf.jabref.wizard.auximport.gui.*;
@@ -276,6 +277,7 @@ public class JabRefFrame
       customExpAction = new CustomizeExportsAction(),
       exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
+      expandEndnoteZip = new ExpandEndnoteFilters(this),
       test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -2023,6 +2025,9 @@ class FetchCiteSeerAction
     menu.add(endnoteItem);
 
     menu.add(exportCSV);
+    
+    menu.addSeparator();
+    menu.add(expandEndnoteZip);
 
   }
 

@@ -147,6 +147,9 @@
 				<include name="help/no/**" />
 				<include name="resource/**" />
 			</fileset>
+                        <fileset dir="${library.directory}">
+                            <include name="EndNote.zip" />
+                        </fileset>
 			<fileset dir="${txt.dir}">
 				<include name="gpl.txt" />
 				<include name="lesser.txt" />

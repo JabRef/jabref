@@ -235,11 +235,14 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    String searchTerm = setupTerm(idList); // fix the syntax
 	    SearchResult result = getIds(searchTerm ,0,1); // get the ids from entrez
 	    // prompt the user to number articles to retrieve
+            if (result.count == 0) {
+                JOptionPane.showMessageDialog(panel.frame(), Globals.lang("No references found"));
+                return;
+            }
 	    String question = 
-		new String("Found ")
-		+ Integer.toString(result.count)
-		+ new String(" references. Retrieve references")
-		+ new String(" from 1 through");
+		Globals.lang("References found")+": "
+		+ Integer.toString(result.count)+"  "
+		+ Globals.lang("Number of references to fetch?");
 	    String strCount = 
 		JOptionPane.showInputDialog(question, 
 					    Integer.toString(result.count));
