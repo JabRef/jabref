@@ -58,7 +58,17 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return false;
     }
 
+    public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
+        // not supported -> ignore
+        return null;
+    }
+
     public AbstractUndoableEdit addSelection(BasePanel basePanel) {
+        // not supported -> ignore
+        return null;
+    }
+
+    public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
         // not supported -> ignore
         return null;
     }

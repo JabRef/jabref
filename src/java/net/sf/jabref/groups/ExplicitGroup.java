@@ -75,32 +75,38 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return true;
     }
 
-    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
-        BibtexEntry[] bes = basePanel.getSelectedEntries();
-        if (bes.length == 0)
+    public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
+        if (entries.length == 0)
             return null; // nothing to do
 
         HashSet entriesBeforeEdit = new HashSet(m_entries);
-        for (int i = 0; i < bes.length; ++i)
-            m_entries.add(bes[i]);
+        for (int i = 0; i < entries.length; ++i)
+            m_entries.add(entries[i]);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
+    }
+    
+    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
+        return addSelection(basePanel.getSelectedEntries());
     }
     
     public boolean addEntry(BibtexEntry entry) {
         return m_entries.add(entry);
     }
 
-    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
-        BibtexEntry[] bes = basePanel.getSelectedEntries();
-        if (bes.length == 0)
+    public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
+        if (entries.length == 0)
             return null; // nothing to do
 
         HashSet entriesBeforeEdit = new HashSet(m_entries);
-        for (int i = 0; i < bes.length; ++i)
-            m_entries.remove(bes[i]);
+        for (int i = 0; i < entries.length; ++i)
+            m_entries.remove(entries[i]);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
+    }
+
+    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
+        return removeSelection(basePanel.getSelectedEntries());
     }
 
     public boolean removeEntry(BibtexEntry entry) {

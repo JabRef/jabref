@@ -98,7 +98,7 @@ public abstract class AbstractGroup {
 
     /**
      * Adds the selected entries to this group. This method is to be called
-     * by GroupTreeNode.
+     * by GroupTreeNode. The BasePanel instance is required for user feedback.
      * 
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
@@ -107,14 +107,32 @@ public abstract class AbstractGroup {
     abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
 
     /**
+     * Adds the selected entries to this group.
+     *  
+     * @return If this group or one or more entries was/were modified as a
+     *         result of this operation, an object is returned that allows to
+     *         undo this change. null is returned otherwise.
+     */
+    abstract AbstractUndoableEdit addSelection(BibtexEntry[] entries);
+
+    /**
      * Removes the selected entries from this group. This method is to be called
-     * by GroupTreeNode.
+     * by GroupTreeNode. The BasePanel instance is required for user feedback.
      * 
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
     abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
+
+    /**
+     * Removes the selected entries from this group.
+     * 
+     * @return If this group or one or more entries was/were modified as a
+     *         result of this operation, an object is returned that allows to
+     *         undo this change. null is returned otherwise.
+     */
+    abstract AbstractUndoableEdit removeSelection(BibtexEntry[] entries);
 
     /**
      * @param searchOptions

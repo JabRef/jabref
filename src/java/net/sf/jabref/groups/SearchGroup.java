@@ -168,7 +168,17 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         return null;
     }
 
+    public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
+        // nothing to do, add is not supported
+        return null;
+    }
+
     public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
+        // nothing to do, remove is not supported
+        return null;
+    }
+
+    public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
         // nothing to do, remove is not supported
         return null;
     }

@@ -144,21 +144,32 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     return null;
             }
         }
-
-        BibtexEntry[] bes = basePanel.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0)) {
+        
+        BibtexEntry[] entries = basePanel.getSelectedEntries();
+        AbstractUndoableEdit undo = addSelection(entries);
+        
+        if (entries.length > 0) // JZTODO: translation
+            basePanel.output("Appended '" + m_searchExpression + "' to the '"
+                    + m_searchField + "' field of " + entries.length + " entr"
+                    + (entries.length > 1 ? "ies." : "y."));
+        
+        return undo;
+    }
+    
+    public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
+        if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound("add to group");
             boolean modified = false;
-            for (int i = 0; i < bes.length; i++) {
-                if (applyRule(null, bes[i]) == 0) {
-                    String oldContent = (String) bes[i].getField(m_searchField), pre = " ", post = "";
+            for (int i = 0; i < entries.length; i++) {
+                if (applyRule(null, entries[i]) == 0) {
+                    String oldContent = (String) entries[i].getField(m_searchField), pre = " ", post = "";
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + m_searchExpression + post;
-                    bes[i].setField(m_searchField, newContent);
+                    entries[i].setField(m_searchField, newContent);
 
                     // Store undo information.
-                    ce.addEdit(new UndoableFieldChange(bes[i], m_searchField,
+                    ce.addEdit(new UndoableFieldChange(entries[i], m_searchField,
                             oldContent, newContent));
                     modified = true;
                 }
@@ -166,10 +177,6 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             if (modified)
                 ce.end();
  
-            basePanel.output("Appended '" + m_searchExpression + "' to the '"
-                    + m_searchField + "' field of " + bes.length + " entr"
-                    + (bes.length > 1 ? "ies." : "y."));
-            
             return modified ? ce : null;
         }
         
@@ -211,34 +218,39 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             }
         }
 
-        BibtexEntry[] selectedEntries = basePanel.getSelectedEntries();
-        if ((selectedEntries != null) && (selectedEntries.length > 0)) {
+        BibtexEntry[] entries = basePanel.getSelectedEntries();
+        AbstractUndoableEdit undo = removeSelection(entries);
+        if (entries.length > 0)
+            basePanel.output("Removed '" + m_searchExpression + "' from the '"
+                    + m_searchField + "' field of " + entries.length
+                    + " entr" + (entries.length > 1 ? "ies." : "y."));
+        return undo;
+    }
+    
+    public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
+        if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound("remove from group");
             boolean modified = false;
-            for (int i = 0; i < selectedEntries.length; ++i) {
-                if (applyRule(null, selectedEntries[i]) > 0) {
-                    String oldContent = (String) selectedEntries[i]
+            for (int i = 0; i < entries.length; ++i) {
+                if (applyRule(null, entries[i]) > 0) {
+                    String oldContent = (String) entries[i]
                             .getField(m_searchField);
-                    removeMatches(selectedEntries[i]);
+                    removeMatches(entries[i]);
                     // Store undo information.
-                    ce.addEdit(new UndoableFieldChange(selectedEntries[i],
-                            m_searchField, oldContent, selectedEntries[i]
+                    ce.addEdit(new UndoableFieldChange(entries[i],
+                            m_searchField, oldContent, entries[i]
                                     .getField(m_searchField)));
                     modified = true;
                 }
             }
             if (modified)
                 ce.end();
-
-            basePanel.output("Removed '" + m_searchExpression + "' from the '"
-                    + m_searchField + "' field of " + selectedEntries.length
-                    + " entr" + (selectedEntries.length > 1 ? "ies." : "y."));
             
             return modified ? ce : null;
         }
         
         return null;
-    }
+    }    
 
     public boolean equals(Object o) {
         if (!(o instanceof KeywordGroup))
