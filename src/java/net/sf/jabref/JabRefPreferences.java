@@ -59,9 +59,9 @@ public class JabRefPreferences {
 	//Util.pr(prefs.toString());
 
 	if (Globals.osName.equals(Globals.MAC)) {
-	    defaults.put("pdfviewer","open /Applications/Preview.app");
-	    defaults.put("psviewer","open /Applications/Preview.app");
-	    defaults.put("htmlviewer","open /Applications/Safari.app");
+	    defaults.put("pdfviewer","/Applications/Preview.app");
+	    defaults.put("psviewer","/Applications/Preview.app");
+	    defaults.put("htmlviewer","/Applications/Safari.app");
 	}
         else if (Globals.osName.toLowerCase().startsWith("windows")) {
           defaults.put("pdfviewer","cmd.exe /c start /b");

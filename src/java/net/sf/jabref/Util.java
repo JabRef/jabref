@@ -334,9 +334,15 @@ public class Util {
 		    {
 			System.err.println("Starting HTML browser: "
 					   + prefs.get("htmlviewer") + " " + link);
-			cmdArray[0] = prefs.get("htmlviewer");
-			cmdArray[1] = link;
-			Process child = Runtime.getRuntime().exec(cmdArray);
+                if(Globals.ON_MAC){
+                    String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"), link};
+                    Process child = Runtime.getRuntime().exec(cmd);
+                }
+                else{
+                    cmdArray[0] = prefs.get("htmlviewer");
+                    cmdArray[1] = link;
+                    Process child = Runtime.getRuntime().exec(cmdArray);
+                }
 		    }
 		catch (IOException e)
 		    {
@@ -350,9 +356,15 @@ public class Util {
 		    {
 			System.err.println("Starting external viewer: "
 					   + prefs.get("psviewer") + " " + link);
-			cmdArray[0] = prefs.get("psviewer");
-			cmdArray[1] = link;
-			Process child = Runtime.getRuntime().exec(cmdArray);
+                if(Globals.ON_MAC){
+                    String[] cmd = {"/usr/bin/open", "-a", prefs.get("psviewer"), link};
+                    Process child = Runtime.getRuntime().exec(cmd);
+                }
+                else{
+                    cmdArray[0] = prefs.get("psviewer");
+                    cmdArray[1] = link;
+                    Process child = Runtime.getRuntime().exec(cmdArray);
+                }
 		    }
 		catch (IOException e)
 		    {
@@ -375,14 +387,21 @@ public class Util {
 			    }
 			System.err.println("Starting external viewer: "
 					   + prefs.get("pdfviewer") + " " + link);
-			cmdArray[0] = prefs.get("pdfviewer");
-			cmdArray[1] = link;
-			Process child = Runtime.getRuntime().exec(cmdArray);
+            if(Globals.ON_MAC){
+                String[] cmd = {"/usr/bin/open", "-a", prefs.get("pdfviewer"), link};
+                Process child = Runtime.getRuntime().exec(cmd);
+            }
+            else{
+                cmdArray[0] = prefs.get("pdfviewer");
+                cmdArray[1] = link;
+                Process child = Runtime.getRuntime().exec(cmdArray);
+            }
 		    }
 		catch (IOException e)
 		    {
 			System.err.println("An error occured on the command: "
-					   + prefs.get("pdfviewer") + " " + link);
+					   + prefs.get("pdfviewer") + " #" + link);
+            System.err.println(e.getMessage());
 		    }
 	    }
 	else{
