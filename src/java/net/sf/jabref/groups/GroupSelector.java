@@ -65,11 +65,11 @@ public class GroupSelector extends SidePaneComponent implements
     JPopupMenu settings = new JPopupMenu();
     private JRadioButtonMenuItem hideNonHits, grayOut;
     JRadioButtonMenuItem groupModeUnion = new JRadioButtonMenuItem(Globals
-            .lang("Groups: Include Subgroups"), true);
+            .lang("Include subgroups"), true);
     JRadioButtonMenuItem groupModeIntersection = new JRadioButtonMenuItem(
-            Globals.lang("Groups: Intersection with Supergroups"), false);
+            Globals.lang("Intersection with supergroups"), false);
     JRadioButtonMenuItem groupModeIndependent = new JRadioButtonMenuItem(
-            Globals.lang("Groups: Independent"), false);
+            Globals.lang("Independent"), false);
     JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Globals
             .lang("Intersection"), true);
     JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
