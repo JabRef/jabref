@@ -97,22 +97,24 @@ public abstract class AbstractGroup {
     public abstract boolean supportsRemove();
 
     /**
-     * Adds the selected entries to this group.
+     * Adds the selected entries to this group. This method is to be called
+     * by GroupTreeNode.
      * 
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
+    abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
 
     /**
-     * Removes the selected entries from this group.
+     * Removes the selected entries from this group. This method is to be called
+     * by GroupTreeNode.
      * 
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
+    abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
 
     /**
      * @param searchOptions

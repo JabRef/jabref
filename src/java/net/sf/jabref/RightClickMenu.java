@@ -297,7 +297,7 @@ public class RightClickMenu extends JPopupMenu
                         return;
                 }
             }
-            AbstractUndoableEdit undo = m_node.getGroup().addSelection(panel);
+            AbstractUndoableEdit undo = m_node.addSelectionToGroup(panel);
             if (undo == null)
                 return; // no changed made
             
@@ -316,7 +316,7 @@ public class RightClickMenu extends JPopupMenu
             m_node = node;
         }
         public void actionPerformed(ActionEvent evt) {
-            AbstractUndoableEdit undo = m_node.getGroup().removeSelection(panel);
+            AbstractUndoableEdit undo = m_node.removeSelectionFromGroup(panel);
             if (undo == null)
                 return; // no changed made
             

@@ -152,4 +152,9 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         }
         return sb.toString();
     }
+    
+    /** Remove all assignments, resulting in an empty group. */
+    public void clearAssignments() {
+        m_entries.clear();
+    }
 }
