@@ -226,7 +226,9 @@ public class BibtexParser
 		    String cont = parseFieldContent();
 		    result.setField(ex.getMessage().trim().toLowerCase(), cont);
 		} else {
-		    key = ex.getMessage()+"=";
+		    if (key != null)
+			key = key+ex.getMessage()+"=";
+		    else key = ex.getMessage()+"=";
 		    doAgain = true;		  
 		}
 	    }
