@@ -1,12 +1,10 @@
 package net.sf.jabref.groups;
 
-import java.io.*;
-import javax.swing.*;
+import java.util.*;
+
 import javax.swing.tree.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.Util;
-import net.sf.jabref.groups.*;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -65,7 +63,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
      * @throws Exception
      *             When a group could not be recreated
      */
-    public static GroupTreeNode fromString(String s, BibtexDatabase db) throws Exception {
+    public static GroupTreeNode fromString(String s, BibtexDatabase db)
+            throws Exception {
         GroupTreeNode root = null;
         GroupTreeNode newNode;
         int i;
@@ -73,7 +72,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
         while (s.length() > 0) {
             if (s.startsWith("(")) {
                 String subtree = getSubtree(s);
-                newNode = fromString(subtree,db);
+                newNode = fromString(subtree, db);
                 // continue after this subtree by removing it
                 // and the leading/trailing braces, and
                 // the comma (that makes 3) that always trails it
@@ -88,7 +87,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
                 else
                     s = "";
                 newNode = new GroupTreeNode(AbstractGroup.fromString(Util
-                        .unquote(g, '\\'),db));
+                        .unquote(g, '\\'), db));
             }
             if (root == null) // first node will be root
                 root = newNode;
@@ -219,5 +218,24 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
                     .getSearchRule(searchMode));
         }
         return searchRule;
+    }
+
+    /**
+     * Scans the subtree rooted at this node.
+     * 
+     * @return All groups that contain the specified entry.
+     */
+    public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
+        Vector matchingGroups = new Vector();
+        Enumeration e = preorderEnumeration();
+        AbstractGroup group;
+        while (e.hasMoreElements()) {
+            group = ((GroupTreeNode) e.nextElement()).getGroup();
+            if (group.contains(null, entry)) // first argument is never used
+                matchingGroups.add(group);
+        }
+        AbstractGroup[] matchingGroupsArray = new AbstractGroup[matchingGroups
+                .size()];
+        return (AbstractGroup[]) matchingGroups.toArray(matchingGroupsArray);
     }
 }
