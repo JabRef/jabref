@@ -87,7 +87,7 @@ public class JabRef {
 	     prefs.getInt("fontSize"));
 	
 	JabRefFrame jrf = new JabRefFrame();
-	
+
 	if(args.length > 0){
 	    System.out.println("Opening: " + args[0]);
 	    jrf.output("Opening: " + args[0]);

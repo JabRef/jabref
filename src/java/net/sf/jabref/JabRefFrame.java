@@ -227,6 +227,7 @@ public class JabRefFrame extends JFrame {
 
 	//Globals.setLanguage("no", "");
 	setTitle(GUIGlobals.frameTitle);
+	setIconImage(new ImageIcon(GUIGlobals.jabreflogo).getImage());
 	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
