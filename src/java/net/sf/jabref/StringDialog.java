@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
 import net.sf.jabref.undo.*;
+import net.sf.jabref.export.LatexFieldFormatter;
 import javax.swing.undo.CompoundEdit;
 
 public class StringDialog extends JDialog {
@@ -243,6 +244,11 @@ public class StringDialog extends JDialog {
 		BibtexString subject = (BibtexString)strings[row];
 
 		if (!((String)value).equals(subject.getContent())) {
+                    try {
+                        (new LatexFieldFormatter()).format((String)value, true);
+                    } catch (IllegalArgumentException ex) {
+                        return;
+                    }
 		    // Store undo information.
 		    panel.undoManager.addEdit
 			(new UndoableStringChange

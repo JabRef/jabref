@@ -209,21 +209,25 @@ public class GroupSelector
 
     Dimension butDim = new Dimension(20, 20);
     Dimension butDim2 = new Dimension(40, 20);
-    newButton.setPreferredSize(butDim);
-    newButton.setMinimumSize(butDim);
-    refresh.setPreferredSize(butDim);
-    refresh.setMinimumSize(butDim);
-    helpButton.setPreferredSize(butDim);
-    helpButton.setMinimumSize(butDim);
-    autoGroup.setPreferredSize(butDim);
-    autoGroup.setMinimumSize(butDim);
+    //newButton.setPreferredSize(butDim);
+    //newButton.setMinimumSize(butDim);
+    //refresh.setPreferredSize(butDim);
+    //refresh.setMinimumSize(butDim);
+    //helpButton.setPreferredSize(butDim);
+    //helpButton.setMinimumSize(butDim);
+    //autoGroup.setPreferredSize(butDim);
+    //autoGroup.setMinimumSize(butDim);
     openset.setPreferredSize(butDim2);
-    openset.setMinimumSize(butDim2);
+    //openset.setMinimumSize(butDim2);
     expand.setPreferredSize(butDim);
-    expand.setMinimumSize(butDim);
+    //expand.setMinimumSize(butDim);
     reduce.setPreferredSize(butDim);
-    reduce.setMinimumSize(butDim);
-
+    //reduce.setMinimumSize(butDim);
+    Insets butIns = new Insets(0,0,0,0);
+   //helpButton.setMargin(butIns);
+   reduce.setMargin(butIns);
+   expand.setMargin(butIns);
+   openset.setMargin(butIns);
     newButton.addActionListener(this);
     refresh.addActionListener(this);
     andCb.addActionListener(this);
@@ -258,10 +262,10 @@ public class GroupSelector
     con.gridwidth = GridBagConstraints.REMAINDER;
     con.fill = GridBagConstraints.BOTH;
     con.insets = new Insets(0, 0, 2, 0);
+    con.weightx = 1;
     gbl.setConstraints(header, con);
     add(header);
-    con.gridwidth = 1;
-    con.weightx = 1;
+    con.gridwidth = 1;    
     con.insets = new Insets(0, 0, 0, 0);
     gbl.setConstraints(newButton, con);
     add(newButton);
@@ -278,7 +282,8 @@ public class GroupSelector
     helpButton.setToolTipText(Globals.lang("Help on groups"));
     gbl.setConstraints(helpButton, con);
     add(helpButton);
-
+    //header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
+    //helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
     list = new JList();
     revalidateList();
     //list.setSelectedIndex(0);
@@ -287,8 +292,8 @@ public class GroupSelector
     // The line above decides on the list's preferred width.
     list.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
     list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode(new String("All Entries"));
-    tree = new JTree(root);
+    //DefaultMutableTreeNode root = new DefaultMutableTreeNode(new String("All Entries"));
+    //tree = new JTree(root);
     
     sp = new JScrollPane
         (list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -314,7 +319,7 @@ public class GroupSelector
     con.weightx = 0;
     gb.setConstraints(expand, con);
     pan.add(expand);
-
+    con.gridwidth = GridBagConstraints.REMAINDER;
     gb.setConstraints(reduce, con);
     pan.add(reduce);
         add(pan);

@@ -333,7 +333,7 @@ public class JabRefFrame
                           prefs.getInt("sizeY")));
     setLocation(new Point(prefs.getInt("posX"),
                           prefs.getInt("posY")));
-
+    tabbedPane.setBorder(null);
     tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
     // The following state listener makes sure focus is registered with the correct database
@@ -914,13 +914,8 @@ public JabRefPreferences prefs() {
     mb.add(tools);
 
     options.add(showPrefs);
-    options.add(new AbstractAction(Globals.lang("Customize entry types")) {
-      public void actionPerformed(ActionEvent e) {
-        JDialog dl = new EntryCustomizationDialog(ths);
-        Util.placeDialog(dl, ths);
-        dl.show();
-      }
-    });
+    AbstractAction customizeAction = new CustomizeEntryTypeAction();
+    options.add(customizeAction);
     options.add(customExpAction);
 
     /*options.add(new AbstractAction("Font") {
@@ -1520,7 +1515,7 @@ class ImportCiteSeerAction
 
     public ImportCiteSeerAction() {
         super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
-	putValue(NAME, Globals.lang("Import fields from CiteSeer"));
+	putValue(NAME, "Import fields from CiteSeer");
         putValue(SHORT_DESCRIPTION, Globals.lang("Import fields from CiteSeer Database"));
         putValue(ACCELERATOR_KEY, prefs.getKey("Import fields from CiteSeer"));
         }
@@ -1597,7 +1592,7 @@ class FetchCiteSeerAction
 
                 public FetchCiteSeerAction() {
 		    super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
-		    putValue(NAME, Globals.lang("Fetch citations from CiteSeer"));
+		    putValue(NAME, "Fetch citations from CiteSeer");
 		    
 		    putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
 		    putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
@@ -1672,7 +1667,7 @@ class FetchCiteSeerAction
       public NewSubDatabaseAction()
       {
         super(new ImageIcon( GUIGlobals.newBibFile));
-	putValue(NAME, Globals.lang( "New subdatabase based on AUX file" ));
+	putValue(NAME, "New subdatabase based on AUX file" );
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
@@ -1784,10 +1779,10 @@ class FetchCiteSeerAction
   AbstractAction showPrefs = new ShowPrefsAction();
 
   class ShowPrefsAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public ShowPrefsAction() {
-      super(Globals.lang("Preferences"),
-            new ImageIcon(GUIGlobals.prefsIconFile));
+      super(new ImageIcon(GUIGlobals.prefsIconFile));
+      putValue(NAME, "Preferences");
       putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
     }
 
@@ -2434,10 +2429,10 @@ class SaveSessionAction
   }
 
   class ChangeTabAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     private boolean next;
     public ChangeTabAction(boolean next) {
-      super(Globals.lang(next ? "Next tab" : "Previous tab"));
+      putValue(NAME, next ? "Next tab" : "Previous tab");
       this.next = next;
       //Util.pr(""+prefs.getKey("Next tab"));
       putValue(ACCELERATOR_KEY,
@@ -2500,9 +2495,9 @@ class SaveSessionAction
     }
   }
 
-    class ExportCSV extends AbstractAction {
+    class ExportCSV extends MnemonicAwareAction {
         public ExportCSV() {
-            super(Globals.lang("Tab-separated file"));
+            putValue(NAME, "Tab-separated file");
         }
         public void actionPerformed(ActionEvent e) {
             String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".csv",
@@ -2519,4 +2514,14 @@ class SaveSessionAction
         }
     }
 
+    class CustomizeEntryTypeAction extends MnemonicAwareAction {
+        public CustomizeEntryTypeAction() {
+            putValue(NAME, "Customize entry types");
+        }
+        public void actionPerformed(ActionEvent e) {
+            JDialog dl = new EntryCustomizationDialog(ths);
+            Util.placeDialog(dl, ths);
+            dl.show();
+        }
+    }
 }
