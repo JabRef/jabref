@@ -64,14 +64,25 @@ public class EntryComparator implements Comparator {
 	Object f1 = e1.getField(sortField),
 	    f2 = e2.getField(sortField);
 
+	// If the field is author or editor, we rearrange names so they are
+	// sorted according to last name.
+	if (sortField.equals("author") || sortField.equals("editor")) {
+	    if (f1 != null)
+		f1 = ImportFormatReader.fixAuthor_lastnameFirst((String)f1);
+	    if (f2 != null)
+		f2 = ImportFormatReader.fixAuthor_lastnameFirst((String)f2);
+	}
+
 	if ((f1 == null) && (f2 == null)) return idCompare(e1, e2);
 	if ((f1 != null) && (f2 == null)) return -1;
 	if ((f1 == null) && (f2 != null)) return 1;
 
 	int result = 0;
 
-	String ours = ((String)e1.getField(sortField)).toLowerCase(),
-	    theirs = ((String)e2.getField(sortField)).toLowerCase();
+	//String ours = ((String)e1.getField(sortField)).toLowerCase(),
+	//    theirs = ((String)e2.getField(sortField)).toLowerCase();
+	String ours = ((String)f1).toLowerCase(),
+	    theirs = ((String)f2).toLowerCase();
 	int comp = ours.compareTo(theirs);
 	result = -comp;
 

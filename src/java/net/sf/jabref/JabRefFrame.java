@@ -876,6 +876,8 @@ public class JabRefFrame extends JFrame {
 	    BasePanel bp = new BasePanel(ths, prefs);
 	    tabbedPane.add(Globals.lang("untitled"), bp);
 	    tabbedPane.setSelectedComponent(bp);
+	    if (tabbedPane.getTabCount() == 1)
+		setNonEmptyState();
 	    output(Globals.lang("New database created."));
 	    
 	    /*

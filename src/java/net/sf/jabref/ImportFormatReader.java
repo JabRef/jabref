@@ -99,6 +99,39 @@ public class ImportFormatReader
 	}
 	return sb.toString();
     }
+
+    //========================================================
+    // rearranges the author names 
+    // input format string: LN, FN [and LN, FN]*
+    // output format string: LN, FN [and LN, FN]*
+    //========================================================
+    public static String fixAuthor_lastnameFirst(String in){
+	StringBuffer sb=new StringBuffer();
+
+	String[] authors = in.split(" and ");
+	for(int i=0; i<authors.length; i++){
+	    String[] t = authors[i].split(",");
+	    if(t.length < 2) {
+		// The name is without a comma, so it must be rearranged.
+		t = authors[i].split(" ");
+		sb.append(t[t.length - 1]+ ","); // Last name
+		if (t.length > 1) for (int j=0; j<t.length-1; j++) {
+		    sb.append(" "+t[j]);
+		}
+	    }
+	    else {
+		// The name is written with last name first, so it's ok.
+		sb.append(authors[i]);
+	    }
+		
+	    if(i !=authors.length-1)
+		sb.append(" and ");
+	    
+	}
+	//Util.pr(in+" -> "+sb.toString());
+	return sb.toString();
+    }
+
     //============================================================
     // given a filename, parses the file (assuming scifinder)
     // returns null if unable to find any entries or if the
