@@ -200,7 +200,10 @@ public class Globals {
 
         fc.addChoosableFileFilter(off);
         fc.setDialogType(dialogType);
-        fc.showOpenDialog(null);
+        if (dialogType == JFileChooser.OPEN_DIALOG)
+          fc.showOpenDialog(null);
+        else
+          fc.showSaveDialog(null);
         File selectedFile = fc.getSelectedFile();
         if (selectedFile == null) { // cancel
           return null;

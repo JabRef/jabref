@@ -56,7 +56,7 @@ public class GUIGlobals {
       version = "1.2",
       stringsTitle = Globals.lang("Strings for database") + ": ",
       untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
-      untitledTitle = Globals.lang("untitled"),
+      untitledTitle = "untitled",
       helpTitle = "JabRef help",
       TYPE_HEADER = "entrytype",
       NUMBER_COL = "#";
@@ -80,7 +80,7 @@ public class GUIGlobals {
   public static final int
       SPLIT_PANE_DIVIDER_SIZE = 2,
       SPLIT_PANE_DIVIDER_LOCATION = 145,
-      GROUPS_VISIBLE_ROWS = 8,
+      GROUPS_VISIBLE_ROWS = 10,
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
       KEYBIND_COL_1 = 80, // Added to the font size when determining table
@@ -327,9 +327,9 @@ public class GUIGlobals {
       tableIncompleteEntryBackground = new Color(250, 175, 175),
       maybeIncompleteEntryBackground = new Color(255, 255, 200),
       markedEntryBackground = new Color(255, 255, 180),
-      grayedOutBackground = new Color(210, 210, 210),
+      grayedOutBackground = new Color(225, 210, 210),
       grayedOutText = new Color(40, 40, 40),
-      veryGrayedOutBackground = new Color(180, 180, 180),
+      veryGrayedOutBackground = new Color(205, 180, 180),
       veryGrayedOutText = new Color(40, 40, 40);
 
   public static String META_FLAG = "jabref-meta: ";
@@ -403,20 +403,36 @@ public class GUIGlobals {
       "eid",
   };
 
+  // These fields will not be saved to the .bib file.
   public static String[] NON_WRITABLE_FIELDS = new String[] {
+      Globals.SEARCH,
+      Globals.GROUPSEARCH
+  };
+
+  // These fields will not be shown inside the source editor panel.
+  public static String[] NON_DISPLAYABLE_FIELDS = new String[] {
       Globals.MARKED,
       Globals.SEARCH,
       Globals.GROUPSEARCH
   };
 
-  public static boolean isWriteableField(String field) {
-    for (int i = 0; i < NON_WRITABLE_FIELDS.length; i++) {
-      if (NON_WRITABLE_FIELDS[i].equals(field)) {
-        return false;
-      }
-    }
-    return true;
-  }
+     public static boolean isWriteableField(String field) {
+       for (int i = 0; i < NON_WRITABLE_FIELDS.length; i++) {
+         if (NON_WRITABLE_FIELDS[i].equals(field)) {
+           return false;
+         }
+       }
+       return true;
+     }
+
+     public static boolean isDisplayableField(String field) {
+       for (int i = 0; i < NON_DISPLAYABLE_FIELDS.length; i++) {
+         if (NON_DISPLAYABLE_FIELDS[i].equals(field)) {
+           return false;
+         }
+       }
+       return true;
+     }
 
   /**
    * Returns true if the given field is a standard Bibtex field.

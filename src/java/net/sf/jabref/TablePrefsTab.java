@@ -12,7 +12,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	namesAsIs, namesFf, namesFl, antialias;
+	namesAsIs, namesFf, namesFl, antialias, pdfColumn, urlColumn;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -67,7 +67,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
 	namesAsIs = new JCheckBox(Globals.lang("Show names unchanged"));
 	namesFf = new JCheckBox(Globals.lang("Show 'Firstname Lastname'"));
-	namesFl = new JCheckBox(Globals.lang("Show 'Lastname, Firstname'"));
+        namesFl = new JCheckBox(Globals.lang("Show 'Lastname, Firstname'"));
+        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"), _prefs.getBoolean("pdfColumn"));
+        urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"), _prefs.getBoolean("urlColumn"));
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
         secSort.insertItemAt(Globals.lang("<select>"), 0);
@@ -210,8 +212,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	upper.add(colorCodes);
 	gbl.setConstraints(autoResizeMode, con);
 	upper.add(autoResizeMode);
-	gbl.setConstraints(antialias, con);
-	upper.add(antialias);
+        gbl.setConstraints(antialias, con);
+        upper.add(antialias);
+        gbl.setConstraints(pdfColumn, con);
+        upper.add(pdfColumn);
+        gbl.setConstraints(urlColumn, con);
+        upper.add(urlColumn);
 	con.anchor = GridBagConstraints.EAST;
 	gbl.setConstraints(fontButton, con);
 	upper.add(fontButton);
@@ -499,7 +505,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
 	_prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
 	_prefs.putBoolean("namesFf", namesFf.isSelected());
-	_prefs.putBoolean("antialias", antialias.isSelected());
+        _prefs.putBoolean("antialias", antialias.isSelected());
+        _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
+        _prefs.putBoolean("urlColumn", urlColumn.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?
 		      JTable.AUTO_RESIZE_ALL_COLUMNS :

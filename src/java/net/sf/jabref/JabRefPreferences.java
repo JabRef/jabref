@@ -134,6 +134,8 @@ public class JabRefPreferences {
         defaults.put("antialias", new Boolean(true));
         defaults.put("ctrlClick", new Boolean(false));
         defaults.put("disableOnMultipleSelection", new Boolean(true));
+        defaults.put("pdfColumn", new Boolean(true));
+        defaults.put("urlColumn", new Boolean(true));
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 

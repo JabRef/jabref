@@ -992,18 +992,50 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
               actions.put("markEntries", new BaseAction() {
                 public void action() {
+                  NamedCompound ce = new NamedCompound("Mark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
-                  for (int i=0; i<bes.length; i++)
+                  for (int i=0; i<bes.length; i++) {
+                    ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
+                                                       bes[i].getField(Globals.MARKED), "0"));
                     bes[i].setField(Globals.MARKED, "0");
+                  }
+                  ce.end();
+                  undoManager.addEdit(ce);
+                  markBaseChanged();
                   refreshTable();
                 }
               });
 
               actions.put("unmarkEntries", new BaseAction() {
                 public void action() {
+                  NamedCompound ce = new NamedCompound("Unmark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
-                  for (int i=0; i<bes.length; i++)
+                  for (int i=0; i<bes.length; i++) {
+                    ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
+                                                       bes[i].getField(Globals.MARKED), null));
                     bes[i].setField(Globals.MARKED, null);
+                  }
+                  ce.end();
+                  undoManager.addEdit(ce);
+                  markBaseChanged();
+                  refreshTable();
+                }
+              });
+
+              actions.put("unmarkAll", new BaseAction() {
+                public void action() {
+                  NamedCompound ce = new NamedCompound("Unmark all");
+                  Set keySet = database.getKeySet();
+                  for (Iterator i = keySet.iterator(); i.hasNext(); ) {
+                    BibtexEntry be = database.getEntryById( (String) i.next());
+                    ce.addEdit(new UndoableFieldChange(be, Globals.MARKED,
+                                                       be.getField(Globals.MARKED), null));
+                    be.setField(Globals.MARKED, null);
+
+                  }
+                  ce.end();
+                  undoManager.addEdit(ce);
+                  markBaseChanged();
                   refreshTable();
                 }
               });

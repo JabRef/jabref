@@ -68,7 +68,8 @@ appear in your chosen languages.
 Change log:
 1.x:	- Added entry preview.
 	- Added detection of duplicate entries.
-	- Added keyboard shortcut customization.
+      	- Added possibility to mark entries persistently.
+	[- Added keyboard shortcut customization.]
 	- Added import filter for Sixpack and Biblioscape Tag files.
       	- Added option to use a standard directory for PDFs.
 	- Added menu and toolbar actions for open pdf/ps and url/doi.

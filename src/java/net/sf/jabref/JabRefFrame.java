@@ -133,6 +133,8 @@ public class JabRefFrame
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   prefs.getKey("Unmark entries")),
+       unmarkAll = new GeneralAction("unmarkAll", "Unmark all",
+                                   prefs.getKey("Unmark all")),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -762,6 +764,10 @@ public class JabRefFrame
     edit.add(copyKey);
     edit.add(copyCiteKey);
     edit.addSeparator();
+    edit.add(mark);
+    edit.add(unmark);
+    edit.add(unmarkAll);
+    edit.addSeparator();
     edit.add(selectAll);
     mb.add(edit);
     view.add(nextTab);
@@ -776,9 +782,6 @@ public class JabRefFrame
       newSpec.add(newSpecificEntryAction[i]);
     }
     bibtex.add(newSpec);
-    bibtex.addSeparator();
-    bibtex.add(mark);
-    bibtex.add(unmark);
     bibtex.addSeparator();
     bibtex.add(editEntry);
     bibtex.add(editPreamble);
@@ -962,6 +965,7 @@ public class JabRefFrame
     paste.setEnabled(false);
     mark.setEnabled(false);
     unmark.setEnabled(false);
+    unmarkAll.setEnabled(false);
     editEntry.setEnabled(false);
     selectAll.setEnabled(false);
     copyKey.setEnabled(false);
@@ -1004,6 +1008,7 @@ public class JabRefFrame
     paste.setEnabled(true);
     mark.setEnabled(true);
     unmark.setEnabled(true);
+    unmarkAll.setEnabled(true);
     editEntry.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
@@ -1271,7 +1276,8 @@ public class JabRefFrame
 
       // Create a new, empty, database.
       BasePanel bp = new BasePanel(ths, prefs);
-      tabbedPane.add(GUIGlobals.untitledTitle, bp);
+      Util.pr(":"+GUIGlobals.untitledTitle);
+      tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), bp);
       tabbedPane.setSelectedComponent(bp);
       if (tabbedPane.getTabCount() == 1) {
         setNonEmptyState();

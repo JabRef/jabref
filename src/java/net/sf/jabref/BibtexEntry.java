@@ -221,7 +221,7 @@ public class BibtexEntry
             throw new IllegalArgumentException("Change rejected: " + pve);
 	}
 
-        //Object oldValue = 
+        //Object oldValue =
 	_fields.put(name, value);
     }
 
@@ -262,8 +262,12 @@ public class BibtexEntry
 
     /**
      * Write this entry to the given Writer, with the given FieldFormatter.
+     * @param write True if this is a write, false if it is a display. The write will
+     * not include non-writeable fields if it is a write, otherwise non-displayable fields
+     * will be ignored. Refer to GUIGlobals for isWriteableField(String) and
+     * isDisplayableField(String).
      */
-    public void write(Writer out, FieldFormatter ff) throws IOException {
+    public void write(Writer out, FieldFormatter ff, boolean write) throws IOException {
 	// Write header with type and bibtex-key.
 	out.write("@"+_type.getName().toUpperCase()+"{");
 
@@ -296,9 +300,9 @@ public class BibtexEntry
 
 	for (java.util.Iterator i=_fields.keySet().iterator(); i.hasNext();) {
             String key = (String)i.next();
-            if (!written.containsKey(key)
-                && GUIGlobals.isWriteableField(key))
-
+            boolean writeIt = (write ? GUIGlobals.isWriteableField(key) :
+                               GUIGlobals.isDisplayableField(key));
+            if (!written.containsKey(key) && writeIt)
                 {
                     writeField(key, out, ff);
                 }

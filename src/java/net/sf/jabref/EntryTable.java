@@ -87,6 +87,11 @@ public class EntryTable extends JTable {
             int col = getTableHeader().columnAtPoint(e.getPoint());
             if (col >= tableModel.padleft) { // A valid column, but not the first.
               String s = tableModel.getColumnName(col).toLowerCase();
+              if (s.equals("")) {
+                // The user has clicked a column with an empty header, such as the icon columns.
+                // We could add sorting for these columns, but currently we do nothing.
+                return;
+              }
               if (!s.equals(prefs.get("priSort")))
                 prefs.put("priSort", s);
                 // ... or change sort direction

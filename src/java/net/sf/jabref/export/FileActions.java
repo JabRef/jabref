@@ -198,7 +198,7 @@ public class FileActions
 
                 if (write)
                 {
-                    be.write(fw, ff);
+                    be.write(fw, ff, true);
                     fw.write("\n");
                 }
             }
@@ -268,7 +268,7 @@ public class FileActions
             for (Iterator i = sorter.iterator(); i.hasNext();)
             {
                 be = (BibtexEntry) (i.next());
-		be.write(fw, ff);
+		be.write(fw, ff, true);
 		fw.write("\n");
 	    }
 

@@ -226,10 +226,13 @@ public class EntryTableModel
   public void remap() {
 
     // Set the icon columns, indicating the number of special columns to the left.
-    // We currently assume one icon column plus the number column.
+    // We add those that are enabled in preferences.
     iconCols.clear();
-    iconCols.put(new Integer(1), PDF);
-    iconCols.put(new Integer(2), URL_);
+    int coln = 1;
+    if (panel.prefs.getBoolean("pdfColumn"))
+      iconCols.put(new Integer(coln++), PDF);
+    if (panel.prefs.getBoolean("urlColumn"))
+      iconCols.put(new Integer(coln++), URL_);
 
     // Add 1 to the number of icon columns to get padleft.
     padleft = 1+iconCols.size();

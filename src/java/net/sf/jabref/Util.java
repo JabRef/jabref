@@ -317,71 +317,71 @@ public class Util {
      * Open a http/pdf/ps viewer for the given link string.
      *
      */
-    public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException 
+    public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException
     {
 	String cmdArray[] = new String[2];
-	
+
 	// check html first since browser can invoke viewers
 	if (fieldName.equals("doi"))
 	    {
 		cmdArray[0] = prefs.get("htmlviewer");
-		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;  			
-		Process child = Runtime.getRuntime().exec(cmdArray);			 							   					
-	    }				
+		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
+		Process child = Runtime.getRuntime().exec(cmdArray);
+	    }
 	else if(fieldName.equals("url"))
 	    { // html
-		try 
+		try
 		    {
-			System.err.println("Starting HTML browser: " 
+			System.err.println("Starting HTML browser: "
 					   + prefs.get("htmlviewer") + " " + link);
 			cmdArray[0] = prefs.get("htmlviewer");
-			cmdArray[1] = link;  			
-			Process child = Runtime.getRuntime().exec(cmdArray);			 							   					
-		    } 
-		catch (IOException e) 
+			cmdArray[1] = link;
+			Process child = Runtime.getRuntime().exec(cmdArray);
+		    }
+		catch (IOException e)
 		    {
-			System.err.println("An error occured on the command: " 
+			System.err.println("An error occured on the command: "
 					   + prefs.get("htmlviewer") + " " + link);
 		    }
 	    }
-	else if(fieldName.equals("ps")) 
+	else if(fieldName.equals("ps"))
 	    {
-		try 
+		try
 		    {
-			System.err.println("Starting external viewer: " 
+			System.err.println("Starting external viewer: "
 					   + prefs.get("psviewer") + " " + link);
 			cmdArray[0] = prefs.get("psviewer");
-			cmdArray[1] = link;  			
-			Process child = Runtime.getRuntime().exec(cmdArray);			 							   
-		    } 
-		catch (IOException e) 
+			cmdArray[1] = link;
+			Process child = Runtime.getRuntime().exec(cmdArray);
+		    }
+		catch (IOException e)
 		    {
-			System.err.println("An error occured on the command: " 
+			System.err.println("An error occured on the command: "
 					   + prefs.get("psviewer") + " " + link);
 		    }
 	    }
-	else if(fieldName.equals("pdf")) 
+	else if(fieldName.equals("pdf"))
 	    {
-		try 
+		try
 		    {
 			File f = new File(link);
 			String dir = prefs.get("pdfDirectory");
-			if (!f.exists() && (dir != null)) 
+			if (!f.exists() && (dir != null))
 			    {
 				if (dir.endsWith(System.getProperty("file.separator")))
 				    link = dir + link;
 				else
 				    link = dir + System.getProperty("file.separator") + link;
 			    }
-			System.err.println("Starting external viewer: " 
+			System.err.println("Starting external viewer: "
 					   + prefs.get("pdfviewer") + " " + link);
 			cmdArray[0] = prefs.get("pdfviewer");
-			cmdArray[1] = link;  			
-			Process child = Runtime.getRuntime().exec(cmdArray);			 			
+			cmdArray[1] = link;
+			Process child = Runtime.getRuntime().exec(cmdArray);
 		    }
-		catch (IOException e) 
+		catch (IOException e)
 		    {
-			System.err.println("An error occured on the command: " 
+			System.err.println("An error occured on the command: "
 					   + prefs.get("pdfviewer") + " " + link);
 		    }
 	    }
@@ -391,8 +391,37 @@ public class Util {
 	}
     }
 
-    
+  /**
+   * Searches the given directory and subdirectories for a pdf file with name as given + ".pdf"
+   */
+  public static String findPdf(String key, String pdfDir) {
+      String filename = key+".pdf";
+      if (!pdfDir.endsWith(System.getProperty("file.separator")))
+        pdfDir += System.getProperty("file.separator");
+      String found = findInDir(filename, pdfDir);
+      if (found != null)
+        return found.substring(pdfDir.length());
+      else
+        return null;
+    }
 
+    private static String findInDir(String file, String dir) {
+      File f = new File(dir, file);
+      if (f.exists())
+        return f.getPath();
+      f = new File(dir);
+      File[] all = f.listFiles();
+      if (all == null)
+        return null; // An error occured. We may not have permission to list the files.
+      String found = null;
+      int i=0;
+      while ((i < all.length) && (found == null)) {
+        if (all[i].isDirectory())
+          found = findInDir(file, all[i].getPath());
+        i++;
+      }
+      return found;
+    }
 
   /**
    * Checks if the two entries represent the same publication.
@@ -488,7 +517,7 @@ public class Util {
 		// Iterate through all entries
 		for (int i = 0; i < bibs.size(); i++)
 		{
-			// Get current entry		
+			// Get current entry
 			BibtexEntry curEntry = (BibtexEntry)bibs.get(i);
 			// No or empty owner field?
 			if (curEntry.getField("owner") == null ||
@@ -499,5 +528,5 @@ public class Util {
 			}
 		}
 	}
-	
+
 }

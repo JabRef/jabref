@@ -66,7 +66,8 @@ public class GroupSelector extends SidePaneComponent
     String searchField;
     JPopupMenu gropt = new JPopupMenu();
     JCheckBox andCb = new JCheckBox(Globals.lang("Intersection"), true),
-	orCb = new JCheckBox(Globals.lang("Union"), false);
+        orCb = new JCheckBox(Globals.lang("Union"), false),
+        invCb = new JCheckBox(Globals.lang("Inverted"), false);
     ButtonGroup bgr = new ButtonGroup();
 
     SidePaneManager manager;
@@ -173,8 +174,10 @@ public class GroupSelector extends SidePaneComponent
 	con.anchor = GridBagConstraints.WEST;
 	gbl.setConstraints(andCb, con);
 	lower.add(andCb);
-	gbl.setConstraints(orCb, con);
-	lower.add(orCb);
+        gbl.setConstraints(orCb, con);
+        lower.add(orCb);
+        gbl.setConstraints(invCb, con);
+        lower.add(invCb);
 	gbl.setConstraints(lower, con);
 	add(lower);
 	definePopup();
@@ -259,9 +262,9 @@ public class GroupSelector extends SidePaneComponent
 		// the doSearch() method of SearchPane.
 
 		// We use a search rule set that takes care of multiple groups,
-		// in an AND or OR fashion.
+		// in an AND or OR fashion, and optionally inverts it.
 		AndOrSearchRuleSet searchRules =
-		    new AndOrSearchRuleSet(andCb.isSelected());
+		    new AndOrSearchRuleSet(andCb.isSelected(), invCb.isSelected());
 		for (int i=0; i<sel.length; i++) if (sel[i] > 0) {
 		    SearchRule rule = new QuickSearchRule
 			((String)groups.elementAt(sel[i]*DIM+OFFSET-3),

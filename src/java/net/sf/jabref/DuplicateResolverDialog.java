@@ -115,10 +115,10 @@ public class DuplicateResolverDialog extends JDialog {
   private void setSourceView(BibtexEntry one, BibtexEntry two) {
     try {
       StringWriter sw = new StringWriter();
-      one.write(sw, new LatexFieldFormatter());
+      one.write(sw, new LatexFieldFormatter(), false);
       ta1.setText(sw.getBuffer().toString());
       sw = new StringWriter();
-      two.write(sw, new LatexFieldFormatter());
+      two.write(sw, new LatexFieldFormatter(), false);
       ta2.setText(sw.getBuffer().toString());
     }
     catch (IOException ex) {

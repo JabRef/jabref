@@ -514,7 +514,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       return but;
     }
     else if ((s!=null) && s.equals("browsePdf")) {
-      JButton but = new JButton(Globals.lang("Browse"));
+      JPanel pan = new JPanel();
+      pan.setLayout(new GridLayout(2,1));
+      JButton but = new JButton(Globals.lang("Browse")),
+          auto = new JButton(Globals.lang("Auto"));
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
       but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
@@ -551,7 +554,31 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           }
         }
       });
-      return but;
+      auto.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Object o = entry.getField(Globals.KEY_FIELD);
+          if ((o == null) || (prefs.get("pdfDirectory") == null)) {
+            frame.output(Globals.lang("You must set both bibtex key and PDF directory")+".");
+            return;
+          }
+          panel.output(Globals.lang("Searching for PDF file")+" '"+o+".pdf'...");
+          (new Thread() {
+            public void run() {
+              Object o = entry.getField(Globals.KEY_FIELD);
+              String found = Util.findPdf( (String) o, prefs.get("pdfDirectory"));
+              if (found != null) {
+                ed.setText(found);
+                storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+                panel.output(Globals.lang("PDF field set")+".");
+              } else
+                panel.output(Globals.lang("No PDF found")+".");
+            }
+          }).start();
+        }
+      });
+      pan.add(but);
+      pan.add(auto);
+      return pan;
     }
 
     else
@@ -602,7 +629,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	if (updateSource) {
 	    StringWriter sw = new StringWriter(200);
 	    try {
-		entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter());
+		entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
 		String srcString = sw.getBuffer().toString();
 		source.setText(srcString);
                 lastSourceStringAccepted = srcString;

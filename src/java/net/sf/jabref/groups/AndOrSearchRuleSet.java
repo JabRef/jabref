@@ -35,29 +35,35 @@ import java.util.Enumeration;
  * eturning 0 or 1.
  */
 class AndOrSearchRuleSet extends SearchRuleSet {
-    
-    private boolean and;
 
-    public AndOrSearchRuleSet(boolean and) {
-	this.and = and;
+    private boolean and, invert;
+
+    public AndOrSearchRuleSet(boolean and, boolean invert) {
+      this.and = and;
+      this.invert = invert;
     }
 
     public int applyRules(Hashtable searchString,BibtexEntry bibtexEntry){
-        int score = 0 ; 
-        Enumeration e = ruleSet.elements() ; 
+        int score = 0 ;
+        Enumeration e = ruleSet.elements() ;
 
 	// We let each rule add a maximum of 1 to the score.
         while(e.hasMoreElements()){
             score += (((SearchRule) e.nextElement()).
-		      applyRule(searchString,bibtexEntry) > 0 ? 1 : 0);     
+		      applyRule(searchString,bibtexEntry) > 0 ? 1 : 0);
         }
-	
+
 	// Then an AND rule demands that score == number of rules, and
 	// an OR rule demands score > 0.
-	if (and)
-	    return ((score == ruleSet.size()) ? 1 : 0);
-	else
-	    return ((score > 0) ? 1 : 0);
+        boolean res;
+        if (and)
+          res = (score == ruleSet.size());
+        else
+          res = (score > 0);
 
+        if (invert)
+          return (res ? 0 : 1);
+        else
+          return (res ? 1 : 0);
     }
 }

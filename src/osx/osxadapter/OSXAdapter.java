@@ -75,7 +75,7 @@ public class OSXAdapter extends ApplicationAdapter {
   // functionality from the main app, as if it came over from another platform.
   public void handleAbout(ApplicationEvent ae) {
     if (mainApp != null) {
-      ae.setHandled(false);
+      ae.setHandled(true);
       mainApp.about();
     } else {
       throw new IllegalStateException("handleAbout: MyApp instance detached from listener");

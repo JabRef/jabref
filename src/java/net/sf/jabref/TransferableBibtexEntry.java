@@ -34,7 +34,7 @@ import javax.swing.JOptionPane;
 
 /*
  * A transferable object containing an array of BibtexEntry objects. Used
- * for copy-paste operations. 
+ * for copy-paste operations.
  */
 public class TransferableBibtexEntry implements Transferable {
 
@@ -51,7 +51,7 @@ public class TransferableBibtexEntry implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-	return (flavor.equals(entryFlavor) || 
+	return (flavor.equals(entryFlavor) ||
 		flavor.equals(DataFlavor.stringFlavor));
     }
 
@@ -64,11 +64,11 @@ public class TransferableBibtexEntry implements Transferable {
 		StringWriter sw = new StringWriter();
 		LatexFieldFormatter ff = new LatexFieldFormatter();
 		for (int i=0; i<data.length; i++)
-		    data[i].write(sw, ff);
+		    data[i].write(sw, ff, false);
 		return sw.toString();
 	    } catch (IOException ex) {
 		JOptionPane.showMessageDialog
-		    (null, "Could not paste entry as text:\n"+ex.getMessage(), 
+		    (null, "Could not paste entry as text:\n"+ex.getMessage(),
 		     "Clipboard", JOptionPane.ERROR_MESSAGE);
 		return "";
 	    }
