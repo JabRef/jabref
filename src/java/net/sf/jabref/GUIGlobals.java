@@ -375,7 +375,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
       // function to this field, for instance a "browse" button for the "pdf" field.
       FIELD_EXTRAS.put("pdf", "browse");
       FIELD_EXTRAS.put("ps", "browse");
-      FIELD_EXTRAS.put("keywords", "selector");
+      //FIELD_EXTRAS.put("keywords", "selector");
 
 	Map fieldLength = new HashMap();
 	fieldLength.put("author", new Integer(280));

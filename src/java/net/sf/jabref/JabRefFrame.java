@@ -157,6 +157,10 @@ public class JabRefFrame extends JFrame {
 					  "push selection to lyx",
 					  GUIGlobals.lyxIconFile,
 					  prefs.getKey("Push To LyX"));
+    /*setupSelector = new GeneralAction("setupSelector", "", "",
+					  GUIGlobals.pasteIconFile,
+					  prefs.getKey(")),*/
+
 
     // The menus for importing/appending other formats
     JMenu importMenu = new JMenu(Globals.lang("Import and append")),
@@ -1405,22 +1409,28 @@ public class JabRefFrame extends JFrame {
 		output(Globals.lang("No saved session found."));
 		return;
 	    }
-	    HashSet currentFiles = new HashSet();
-	    if (tabbedPane.getTabCount() > 0)
-		for (int i=0; i<tabbedPane.getTabCount(); i++)
-		    currentFiles.add(baseAt(i).file.getPath());
-	    int i0 = tabbedPane.getTabCount();
-	    String[] names = prefs.getStringArray("savedSession");
-	    for (int i=0; i<names.length; i++)
-		if (!currentFiles.contains(names[i])) {
-		    fileToOpen = new File(names[i]);
-		    if (fileToOpen.exists()) {
-			//Util.pr("Opening last edited file:"
-			//+fileToOpen.getName());
-			openDatabaseAction.openIt(i == 0);
-		    }
+	    output(Globals.lang("Loading session..."));
+	    (new Thread() {
+		public void run() {
+		    HashSet currentFiles = new HashSet();
+		    if (tabbedPane.getTabCount() > 0)
+			for (int i=0; i<tabbedPane.getTabCount(); i++)
+			    currentFiles.add(baseAt(i).file.getPath());
+		    int i0 = tabbedPane.getTabCount();
+		    String[] names = prefs.getStringArray("savedSession");
+		    for (int i=0; i<names.length; i++)
+			if (!currentFiles.contains(names[i])) {
+			    fileToOpen = new File(names[i]);
+			    if (fileToOpen.exists()) {
+				//Util.pr("Opening last edited file:"
+				//+fileToOpen.getName());
+				openDatabaseAction.openIt(i == 0);
+			    }
+			}
+		    output(Globals.lang("Files opened")+": "+(tabbedPane.getTabCount()-i0));
 		}
-	    output(Globals.lang("Files opened")+": "+(tabbedPane.getTabCount()-i0));
+		}).start();
+
 	}
     }
 

@@ -90,7 +90,8 @@ public class ContentSelectorDialog extends JDialog {
 	    String s = (String)i.next();
 	    if (s.startsWith(Globals.SELECTOR_META_PREFIX))
 		fieldSelector.addItem(s.substring(Globals.SELECTOR_META_PREFIX.length()));
-	}	
+	}
+	
     }
 
 
@@ -110,7 +111,7 @@ public class ContentSelectorDialog extends JDialog {
 	wordSelector.removeAllItems();
 	wordSelector.addItem(WORD_FIRSTLINE_TEXT);
 	Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+currentField);
-	if ((items != null) && (items.size() > 0)) {
+	if ((items != null)) { // && (items.size() > 0)) {
 	    wordSet = new TreeSet(items);
 	    for (Iterator i=wordSet.iterator(); i.hasNext();)
 		wordSelector.addItem(i.next());
@@ -129,7 +130,7 @@ public class ContentSelectorDialog extends JDialog {
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
 			     new Vector(wordSet));	    
 	    fillWordSelector();
-	    frame.basePanel().markBaseChanged();
+	    frame.basePanel().markNonUndoableBaseChanged();
 	    //wordTf.selectAll();
 	    wordTf.setText("");
 	    wordTf.requestFocus();
@@ -141,6 +142,7 @@ public class ContentSelectorDialog extends JDialog {
 	if (metaData.getData(Globals.SELECTOR_META_PREFIX+currentField) == null) {
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
 			     new Vector());	    
+	    frame.basePanel().markNonUndoableBaseChanged();
 	    setupFieldSelector();
 	    updateWordPanel();
 	}
@@ -154,7 +156,7 @@ public class ContentSelectorDialog extends JDialog {
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
 			     new Vector(wordSet));	    
 	    fillWordSelector();
-	    frame.basePanel().markBaseChanged();
+	    frame.basePanel().markNonUndoableBaseChanged();
 	    //wordTf.selectAll();
 	    wordTf.setText("");
 	    wordTf.requestFocus();
@@ -170,31 +172,31 @@ public class ContentSelectorDialog extends JDialog {
     }
 
     private void jbInit() throws Exception {
-	titledBorder1 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),"Selector enabled fields");
-	titledBorder2 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),"Item list for field");
+	titledBorder1 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),Globals.lang("Selector enabled fields"));
+	titledBorder2 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),Globals.lang("Item list for field"));
 	//jPanel1.setBackground(GUIGlobals.lightGray);
 	//jPanel2.setBackground(GUIGlobals.lightGray);
 	//panel1.setBackground(GUIGlobals.lightGray);
 	panel1.setLayout(gridBagLayout1);
-	Close.setText("Close");
+	Close.setText(Globals.lang("Close"));
 	Close.addActionListener(new ContentSelectorDialog_Close_actionAdapter(this));
 	lab.setRequestFocusEnabled(true);
-	lab.setText("Field name:");
+	lab.setText(Globals.lang("Field name")+":");
 	fieldTf.setSelectionEnd(8);
-	add.setText("Add");
-	remove.setText("Remove");
+	add.setText(Globals.lang("Add"));
+	remove.setText(Globals.lang("Remove"));
 	jPanel1.setLayout(gridBagLayout2);
 	jPanel1.setBorder(titledBorder1);
 	help.setText("help");
 	jPanel3.setBorder(titledBorder2);
 	jPanel3.setLayout(gridBagLayout4);
 	jPanel4.setLayout(gridBagLayout3);
-	jLabel1.setText("Word:");
+	jLabel1.setText(Globals.lang("Word")+":");
 	jPanel5.setLayout(gridBagLayout5);
-	addWord.setText("Add");
-	removeWord.setText("Remove");
+	addWord.setText(Globals.lang("Add"));
+	removeWord.setText(Globals.lang("Remove"));
 	jPanel6.setLayout(gridBagLayout6);
-	select.setText("Select");
+	select.setText(Globals.lang("Select"));
 	fieldSelector.addActionListener(new ContentSelectorDialog_fieldSelector_actionAdapter(this));
 	getContentPane().add(panel1);
 	this.getContentPane().add(jPanel2, BorderLayout.SOUTH);

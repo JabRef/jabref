@@ -64,7 +64,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     //ExampleFileFilter fileFilter;
     // File filter for .bib files.
 
-    boolean baseChanged = false;
+    boolean baseChanged = false, nonUndoableChange = false;
     // Used to track whether the base has changed since last save.
 
     EntryTableModel tableModel = null;
@@ -102,6 +102,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
+    HashMap fieldExtras = new HashMap();
     //## keep track of all keys for duplicate key warning and unique key generation
     private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
 
@@ -184,6 +185,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    // (Only) after a successful save the following
 			    // statement marks that the base is unchanged
 			    // since last save:
+			    nonUndoableChange = false;
 			    baseChanged = false;
 			    frame.setTabTitle(ths, file.getName());
 			    frame.output(Globals.lang("Saved database")+" '"
@@ -906,6 +908,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      */
     public void parseMetaData(HashMap meta) {
 	metaData = new MetaData(meta);
+
     }
 
     public void refreshTable() {
@@ -1019,12 +1022,17 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    frame.output(" ");
     }
 
+    public void markNonUndoableBaseChanged() {
+	nonUndoableChange = true;
+	markBaseChanged();
+    }
+
     public synchronized void markChangedOrUnChanged() {
 	if (undoManager.hasChanged()) {
 	    if (!baseChanged)
 		markBaseChanged();
 	}
-	else if (baseChanged) {
+	else if (baseChanged && !nonUndoableChange) {
 	    baseChanged = false;
 	    if (file != null)
 		frame.setTabTitle(ths, file.getName());

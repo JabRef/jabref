@@ -171,7 +171,8 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	getContentPane().add( panel, BorderLayout.CENTER);
 
 	messageLabel.setForeground(Color.black);
-	messageLabel.setText(Globals.lang("Delimit_1"));
+	messageLabel.setText(Globals.lang("Delimit fields with semicolon, ex.")
+			     +": author;title;journal");
 
 	types_cb.addItemListener(this);
     }

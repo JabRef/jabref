@@ -47,7 +47,8 @@ public class MetaData {
      * of a meta data Vector must simply make sure the appropriate 
      * changes are reflected in the Vector it has been passed.
      */
-    public MetaData(HashMap inData) {	
+    public MetaData(HashMap inData) {
+	this();
 	for (Iterator i=inData.keySet().iterator(); i.hasNext();) {
 	    String key = (String)i.next();
 	    data = new StringReader((String)inData.get(key));
@@ -70,6 +71,7 @@ public class MetaData {
      * The MetaData object can be constructed with no data in it.
      */
     public MetaData() {	
+	metaData.put(Globals.SELECTOR_META_PREFIX+"keywords", new Vector());
     }
 
     public Iterator iterator() {

@@ -159,9 +159,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    tabbed.addTab(Globals.lang("General fields"),
 			  new ImageIcon(GUIGlobals.showGenIconFile),
 			  genPanel.getPane(), Globals.lang("Show general fields"));
-	tabbed.addTab(Globals.lang("Bibtex source"),
+	tabbed.addTab(Globals.lang("BibTeX source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile),
-		      srcPanel, Globals.lang("Show/edit bibtex source"));
+		      srcPanel, Globals.lang("Show/edit BibTeX source"));
 	sourceIndex = tabbed.getTabCount()-1; // Set the sourceIndex variable.
 	tabbed.addChangeListener(new TabListener());
 
@@ -436,8 +436,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
       return null;
     }
-    else if (((s!=null) && s.equals("selector")) || 
-	     (panel.metaData.getData(Globals.SELECTOR_META_PREFIX+editor.getFieldName()) != null)) {
+    else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX+editor.getFieldName()) != null) {
 	FieldContentSelector ws = new FieldContentSelector
 	    (this, editor, panel.metaData);
 	return ws;
@@ -1149,11 +1148,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         JabRefFrame parent ;
         BibtexEntry selectedEntry ;
         public GenerateKeyAction(JabRefFrame parentFrame) {
-            super(Globals.lang("Generate Bibtexkey"),
+            super(Globals.lang("Generate BibTeX key"),
               new ImageIcon(GUIGlobals.genKeyIconFile));
             parent = parentFrame ;
 //            selectedEntry = newEntry ;
-            putValue(SHORT_DESCRIPTION, Globals.lang("Generate Bibtexkey"));
+            putValue(SHORT_DESCRIPTION, Globals.lang("Generate BibTeX key"));
     //        putValue(MNEMONIC_KEY, GUIGlobals.showGenKeyCode);
         }
 
