@@ -90,12 +90,12 @@ public class DatabaseSearch extends Thread {
 			|| (searchValueField == Globals.SEARCH))
 			panel.output(Globals.lang("Searched database. Global number of hits")
 				     +": "+outputHits);
-		    
+		    new FocusRequester(panel.entryTable);    
 		}
 	    });
 	/*if (select) { // Select matches.
           panel.selectResults(searchValueField);
-          new FocusRequester(panel.entryTable);
+          
         }*/
 
     }

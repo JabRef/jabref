@@ -37,14 +37,15 @@ import java.net.URL;
  * This Action keeps a reference to a URL. When activated, it shows the help
  * Dialog unless it is already visible, and shows the URL in it.
  */
-public class HelpAction extends AbstractAction {
+public class HelpAction extends MnemonicAwareAction {
 
     protected HelpDialog diag;
     protected URL helpfile;
     protected String helpFile;
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
-	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
+	super(new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(NAME, Globals.lang("Help"));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpFile = helpFile;
@@ -52,14 +53,16 @@ public class HelpAction extends AbstractAction {
 
     public HelpAction(HelpDialog diag, String helpFile, String tooltip,
 		      URL iconFile) {
-	super(Globals.lang("Help"), new ImageIcon(iconFile));
+	super(new ImageIcon(iconFile));
+	putValue(NAME, Globals.lang("Help"));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpFile = helpFile;
     }
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
-	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	super(new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(NAME, Globals.lang(title));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpFile = helpFile;
@@ -67,7 +70,8 @@ public class HelpAction extends AbstractAction {
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip,
 		      KeyStroke key) {
-	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	super(new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(NAME, Globals.lang(title));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	putValue(ACCELERATOR_KEY, key);
 	this.diag = diag;
@@ -76,7 +80,8 @@ public class HelpAction extends AbstractAction {
 
     public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip,
 		      URL iconFile) {
-	super(Globals.lang(title), new ImageIcon(iconFile));
+	super(new ImageIcon(iconFile));
+	putValue(NAME, Globals.lang(title));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpFile = helpFile;

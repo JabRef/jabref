@@ -1667,13 +1667,12 @@ class FetchCiteSeerAction
 
 
     // The action concerned with generate a new (sub-)database from latex aux file.
-    class NewSubDatabaseAction extends AbstractAction
+    class NewSubDatabaseAction extends MnemonicAwareAction
     {
       public NewSubDatabaseAction()
       {
-        super( Globals.lang( "New subdatabase based on AUX file" ),
-
-        new ImageIcon( GUIGlobals.newBibFile ) ) ;
+        super(new ImageIcon( GUIGlobals.newBibFile));
+	putValue(NAME, Globals.lang( "New subdatabase based on AUX file" ));
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
@@ -1740,10 +1739,10 @@ class FetchCiteSeerAction
 
 
   class FetchMedlineAction
-      extends AbstractAction {
+      extends MnemonicAwareAction {
     public FetchMedlineAction() {
-      super(Globals.lang("Fetch Medline"),
-            new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      putValue(NAME, Globals.lang("Fetch Medline"));
       putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
     }
