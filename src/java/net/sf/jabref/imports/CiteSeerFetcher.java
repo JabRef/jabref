@@ -115,26 +115,27 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 		public void run() {
 				JOptionPane.showMessageDialog(panel.frame(),
-				"I could not connect to host "+ targetURL +
-				".  Please check your network connection " +
-				"to this machine.",
-				"CiteSeer Connection Error",
+				Globals.lang("I could not connect to host ") + targetURL + ".  " +
+				Globals.lang("Please check your network connection to this machine."),
+				Globals.lang("CiteSeer Error"),
 				JOptionPane.ERROR_MESSAGE);	
 		}		
 	}
 		
 	class ShowBadURLDialog implements Runnable {
 		protected String badURL = "";
-		ShowBadURLDialog(String URL) {
+		protected int rowNumber;
+		
+		ShowBadURLDialog(String URL, int row) {
 			badURL = URL;			
+			rowNumber = row;
 		}
 		public void run() {
 			JOptionPane.showMessageDialog(panel.frame(),
-			"I couldn't parse the following URL: " + badURL + 
-			// How do I retrieve the index number? NOT the BibTex ID.
-			" on entry number XXX.  " + 
-			" Please refer to the JabRef help manual on using the CiteSeer tools.",
-			"CiteSeer Error",
+			Globals.lang("I couldn't parse the following URL") + ": \"" + badURL + '\"' +
+			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " + 
+			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
+			Globals.lang("CiteSeer Error"),
 			JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -216,17 +217,18 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 * @param targetDatabase
 	 */
 	public void populate(BibtexDatabase newDatabase, BibtexDatabase targetDatabase) {
-		Iterator targetIterator = targetDatabase.getKeySet().iterator();	
+		Iterator targetIterator = targetDatabase.getKeySet().iterator();
+		boolean abortOperation = false;
 		String currentKey;
 		BibtexEntry currentEntry;
 		Enumeration newEntryEnum;
 		Hashtable citationHashTable = new Hashtable();
 		InitializeProgressBar initializeProgressBar = new InitializeProgressBar();
 		SwingUtilities.invokeLater(initializeProgressBar);	
-		while (targetIterator.hasNext()) {
+		while (targetIterator.hasNext() && !abortOperation) {
 			currentKey = (String) targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);
-			generateIdentifierList(currentEntry, citationHashTable);
+			abortOperation = generateIdentifierList(currentEntry, citationHashTable);
 		}
 		if (citationHashTable.size() > 0) {
 			UpdateProgressBarMaximum updateMaximum = new UpdateProgressBarMaximum(citationHashTable.size());
@@ -239,6 +241,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				BibtexEntry nextEntry = (BibtexEntry) newEntryEnum.nextElement();
 				newDatabase.insertEntry(nextEntry);
 			} catch(KeyCollisionException ex) {
+				ex.printStackTrace();						    
 			}
 		}
 	}
@@ -281,8 +284,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		return citationHashTable;
 	}
 
-	private void generateIdentifierList(BibtexEntry currentEntry, Hashtable citationHashTable)
+	private boolean generateIdentifierList(BibtexEntry currentEntry, Hashtable citationHashTable)
 		{
+	    	boolean abortOperation = false;
 			String targetURL = (String) currentEntry.getField("url");
 		try {
 		if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
@@ -299,7 +303,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
 				citeseerMethod.releaseConnection();
 		} else {
-			ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL);
+		    int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
+			ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
 			SwingUtilities.invokeLater(dialog);
 		}
 		} catch(HttpException e) {
@@ -309,9 +314,12 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			System.out.println("SAXException: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (IOException e) {
-			ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
+			System.out.println("IOException: " + e.getLocalizedMessage());
+		    ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
+			abortOperation = true;
 			SwingUtilities.invokeLater(dialog);
 		}
+		return(abortOperation);
 	}
 
 	/**
@@ -339,7 +347,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerMethod.releaseConnection();				
 					newValue = true;
 				} else {	
-					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL);
+				    int row = panel.getTableModel().getNumberFromName(be.getId());
+					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);				    
 					dialog.run();
 				}	
 			} catch (HttpException e) {

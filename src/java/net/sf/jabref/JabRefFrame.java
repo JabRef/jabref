@@ -1385,13 +1385,12 @@ class ImportCiteSeerAction
 					public void run() {
 					    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
 						currentBp.refreshTable();
-						currentBp.updateEntryEditorIfShowing();
 						int row = currentBp.tableModel.getNumberFromName(id);
 						currentBp.entryTable.setRowSelectionInterval(row, row);
 						currentBp.entryTable.scrollTo(row);
 						currentBp.markBaseChanged(); // The database just changed.
 						currentBp.updateWiewToSelected();
-						output(Globals.lang("Fetched all citations from target database."));
+						output(Globals.lang("Completed citation import from CiteSeer."));
 						 }
 				};			    
 			    			    
@@ -1404,15 +1403,13 @@ class ImportCiteSeerAction
 						clickedOn = currentBp.entryTable.getSelectedRow();
 					} else if (rowCount > 1) {
 						JOptionPane.showMessageDialog(currentBp.frame(),
-						"The CiteSeer import functionality is currently " +
-						"supported for only one row at a time.",
-						"CiteSeer Import Error",
+				        Globals.lang("This operation cannot work on multiple rows."),
+				        Globals.lang("CiteSeer Import Error"),
 						JOptionPane.WARNING_MESSAGE);
 					} else {
 						JOptionPane.showMessageDialog(currentBp.frame(),
-						"You must select a row to perform the " +
-						"CiteSeer import operation.",
-						"CiteSeer Import Error",
+						Globals.lang("You must select a row to perform this operation."),
+						Globals.lang("CiteSeer Import Error"),
 						JOptionPane.WARNING_MESSAGE);
 					} 		
 					if (clickedOn >= 0) {
@@ -1430,6 +1427,7 @@ class ImportCiteSeerAction
 							SwingUtilities.invokeLater(updateComponent);							
 						} else {
 						    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+							output(Globals.lang("Citation import from CiteSeer failed."));
 						}
 					}
 					basePanel().citeSeerFetcher.deactivateImportFetcher();
@@ -1437,9 +1435,9 @@ class ImportCiteSeerAction
 			}).start();
 		} else {
 			JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
-					"A CiteSeer import operation is currently in progress. " +
-					"  Please wait until it has finished.",
-					"CiteSeer Import Error",
+					Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
+					Globals.lang("Please wait until it has finished."),
+					Globals.lang("CiteSeer Import Error"),
 					JOptionPane.WARNING_MESSAGE);		    
 		}
 	}
@@ -1450,7 +1448,7 @@ class FetchCiteSeerAction
 
 		public FetchCiteSeerAction() {
 			super(Globals.lang("Fetch Citations from CiteSeer"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -1488,7 +1486,11 @@ class FetchCiteSeerAction
 				  }
 				}).start();
 			} else {
-				System.out.println("Fetch Currently Active");
+			    JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
+						Globals.lang("A CiteSeer fetch operation is currently in progress.") + "  " +
+						Globals.lang("Please wait until it has finished."),
+						Globals.lang("CiteSeer Fetch Error"),
+						JOptionPane.WARNING_MESSAGE);		    			    
 			}
 		}
 	}
