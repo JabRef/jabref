@@ -36,6 +36,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
     private static final int dragScrollActivationMargin = 10;
     private static final int dragScrollDistance = 5;
+    private long lastDragAutoscroll = 0L;
+    private long minAutoscrollInterval = 50L;
     
     private GroupSelector groupSelector;
     private GroupTreeNode dragNode = null;
@@ -87,6 +89,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragOver(DropTargetDragEvent dtde) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastDragAutoscroll < minAutoscrollInterval)
+            return;
         Rectangle r = getVisibleRect();
         Point cursor = dtde.getLocation();
         boolean scrollUp = cursor.y - r.y < dragScrollActivationMargin;
@@ -102,6 +107,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         else if (scrollRight)
             r.translate(+dragScrollDistance,0);
         scrollRectToVisible(r);
+        lastDragAutoscroll = currentTime;
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {
