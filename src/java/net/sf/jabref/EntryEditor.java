@@ -70,6 +70,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -132,10 +134,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
   JPanel mainPanel = new JPanel();
   JPanel srcPanel = new JPanel();
-  FieldPanel reqPanel = new FieldPanel();
-  FieldPanel optPanel = new FieldPanel();
-  FieldPanel genPanel = new FieldPanel();
-  FieldPanel absPanel = new FieldPanel();
+    EntryEditorTab genPan, optPan, reqPan, absPan;
+
   JTextField bibtexKey;
   FieldTextField tf;
   JTextArea source;
@@ -152,6 +152,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   Logger logger = Logger.getLogger(EntryEditor.class.getName());
   boolean updateSource = true; // This can be set to false to stop the source
 
+    List tabs = new ArrayList();
+
   // text area from gettin updated. This is used in cases where the source
   // couldn't be parsed, and the user is given the option to edit it.
   boolean lastSourceAccepted = true; // This indicates whether the last
@@ -162,14 +164,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   // message about the source, whatever he or she chose to do about it.
   String lastSourceStringAccepted = null; // This is used to prevent double
 
-  // updates after editing source.
-  double optW = 0; // Variables for total weight of
-
-  // updates after editing source.
-  double reqW = 1; // Variables for total weight of
-
-  // updates after editing source.
-  double genW = 0; // Variables for total weight of
 
   // fields.
   // These values can be used to calculate the preferred height for the form.
@@ -185,66 +179,75 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_,
     JabRefPreferences prefs_) {
-    //super(frame_);
+
     frame = frame_;
     panel = panel_;
     entry = entry_;
     prefs = prefs_;
     type = entry.getType();
 
-    //setBackground(GUIGlobals.lightGray);//Color.white);
     entry.addPropertyChangeListener(this);
 
-    //setTitle(entry.getType().getName());
-    //setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
     closeAction = new CloseAction();
     copyKeyAction = new CopyKeyAction();
-
-    //    generateKeyAction = new GenerateKeyAction(baseFrame,entry);
     generateKeyAction = new GenerateKeyAction(frame);
     storeFieldAction = new StoreFieldAction();
 
     BorderLayout bl = new BorderLayout();
-
-    //bl.setVgap(5);
     setLayout(bl);
     setupToolBar();
-    setupFieldPanels(reqPanel, optPanel, genPanel, absPanel);
+    setupFieldPanels();
     setupSourcePanel();
-    tabbed.addTab(Globals.lang("Required fields"),
-      new ImageIcon(GUIGlobals.showReqIconFile), reqPanel.getPane(),
-      Globals.lang("Show required fields"));
-
-    if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1))
-      tabbed.addTab(Globals.lang("Optional fields"),
-        new ImageIcon(GUIGlobals.showOptIconFile), optPanel.getPane(),
-        Globals.lang("Show optional fields"));
-
-    if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1))
-      tabbed.addTab(Globals.lang("General fields"),
-        new ImageIcon(GUIGlobals.showGenIconFile), genPanel.getPane(),
-        Globals.lang("Show general fields"));
-
-    tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
-      absPanel.getPane(), Globals.lang("Show abstract"));
-    tabbed.addTab(Globals.lang("BibTeX source"),
-      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
-      Globals.lang("Show/edit BibTeX source"));
-    sourceIndex = tabbed.getTabCount() - 1; // Set the sourceIndex variable.
     tabbed.addChangeListener(new TabListener());
-
     add(tabbed, BorderLayout.CENTER);
-
-    //Util.pr("opt: "+optW+" req:"+reqW);
-    int prefHeight =
-      (int) (Math.max(genW, Math.max(optW, reqW)) * GUIGlobals.FORM_HEIGHT[prefs.getInt(
-        "entryTypeFormHeightFactor")]);
-    setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
 
     if (prefs.getBoolean("defaultShowSource"))
       tabbed.setSelectedIndex(sourceIndex);
+
+    updateAllFields();
   }
+
+    private void setupFieldPanels() {
+	tabbed.removeAll();
+	tabs.clear();
+
+	reqPan = new EntryEditorTab(java.util.Arrays.asList(entry.getRequiredFields()), this, true);
+	tabbed.addTab(Globals.lang("Required fields"),
+		      new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
+		      Globals.lang("Show required fields"));
+	tabs.add(reqPan);
+		
+	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
+	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this, false);
+	    tabbed.addTab(Globals.lang("Optional fields"),
+			  new ImageIcon(GUIGlobals.showOptIconFile), optPan.getPane(),
+			  Globals.lang("Show optional fields"));
+	    tabs.add(optPan);
+	}
+		
+	if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1)) {
+	    
+	    genPan = new EntryEditorTab(java.util.Arrays.asList(entry.getGeneralFields()), this, false);
+	    
+	    tabbed.addTab(Globals.lang("General fields"),
+			  new ImageIcon(GUIGlobals.showGenIconFile), genPan.getPane(),
+			  Globals.lang("Show general fields"));
+	    tabs.add(genPan);    
+	}
+	
+	String[] absFields = new String[] {"abstract", "annote"};
+	absPan = new EntryEditorTab(java.util.Arrays.asList(absFields), this, false);	
+	tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
+		      absPan.getPane(), Globals.lang("Show abstract"));
+	tabs.add(absPan);
+	tabbed.addTab(Globals.lang("BibTeX source"),
+		      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
+		      Globals.lang("Show/edit BibTeX source"));
+	tabs.add(srcPanel);
+	sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
+	
+    }
 
   public BibtexEntryType getType() {
     return type;
@@ -317,327 +320,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
   public void rebuildPanels() {
-    setupFieldPanels(reqPanel, optPanel, genPanel, absPanel);
+      setupFieldPanels();//reqPanel, optPanel, genPanel, absPanel);
     revalidate();
     repaint();
   }
 
-  private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen,
-    FieldPanel abs) {
-    req.removeAll();
-    opt.removeAll();
-    gen.removeAll();
-    abs.removeAll();
-    con = new GridBagConstraints();
-
-    // First we ask the BibtexEntry which fields are optional and
-    // required.
-    String[] reqFields = entry.getRequiredFields(); //entry.getGeneralFields()
-
-    // First we ask the BibtexEntry which fields are optional and
-    // required.
-    String[] optFields = entry.getOptionalFields(); //entry.getGeneralFields()
-
-    // First we ask the BibtexEntry which fields are optional and
-    // required.
-    String[] 
-    //        genFields = new String[] {"crossref", "url", "abstract", "comment"};
-    // // May change...
-    genFields = prefs.getStringArray("generalFields"); //entry.getGeneralFields()
-
-    // ;
-    if (reqFields == null)
-      reqFields = new String[0];
-
-    if (optFields == null)
-      optFields = new String[0];
-
-    if (genFields == null)
-      genFields = new String[0];
-
-    String[] absFields = new String[] { "abstract", "annote" };
-
-    int iter;
-    int rmax;
-    int omax;
-    int gmax;
-    int amax;
-
-    rmax = reqFields.length;
-    omax = optFields.length;
-    gmax = genFields.length;
-    amax = absFields.length;
-    iter = Math.max(rmax, Math.max(omax, gmax));
-
-    FieldTextArea ta1 = null;
-    FieldTextArea ta2 = null;
-    FieldTextArea ta3 = null;
-    FieldTextArea ta4 = null;
-    FieldTextArea firstR = null;
-    FieldTextArea firstO = null;
-    JComponent ex1 = null;
-    JComponent ex2 = null;
-    JComponent ex3 = null;
-    JComponent ex4 = null;
-    String stringContent;
-    Object content;
-
-    req.setLayout(gbl);
-    opt.setLayout(gbl);
-    gen.setLayout(gbl);
-    abs.setLayout(gbl);
-    con.insets = new Insets(5, 5, 0, 0);
-
-    con.anchor = GridBagConstraints.WEST;
-    con.fill = GridBagConstraints.BOTH;
-
-    //FieldTextArea firstReq = null, firstOpt = null, firstGen = null;
-    for (int i = 0; i < iter; i++) {
-      // Constraints for the labels.
-      con.gridwidth = 1;
-      con.weightx = 0;
-      con.weighty = 0;
-      con.anchor = GridBagConstraints.NORTH;
-      con.fill = GridBagConstraints.BOTH;
-
-      //con.fill = GridBagConstraints.BOTH;
-      if (i < rmax) {
-        if ((content = entry.getField(reqFields[i])) != null)
-          stringContent = content.toString();
-        else
-          stringContent = null;
-
-        ta1 = new FieldTextArea(reqFields[i], stringContent);
-        ex1 = getExtra(reqFields[i], ta1);
-
-        /*
-         * if (i == 0) firstReq = ta1; if ((i == rmax-1) && (firstReq != null))
-         * ta1.setNextFocusableComponent(firstReq);
-         */
-        setupJTextComponent(ta1);
-
-        if (i == 0) {
-          firstR = ta1;
-          req.setActive(ta1);
-        }
-      }
-
-      if (i < omax) {
-        if ((content = entry.getField(optFields[i])) != null)
-          stringContent = content.toString();
-        else
-          stringContent = null;
-
-        ta2 = new FieldTextArea(optFields[i], stringContent);
-        ex2 = getExtra(optFields[i], ta2);
-
-        /*
-         * if (i == 0) firstOpt = ta1; if (i == omax-1)
-         * ta1.setNextFocusableComponent(firstOpt);
-         */
-        setupJTextComponent(ta2);
-
-        if (i == 0) {
-          firstO = ta2;
-          opt.setActive(ta2);
-        }
-      }
-
-      if (i < gmax) {
-        if ((content = entry.getField(genFields[i])) != null)
-          stringContent = content.toString();
-        else
-          stringContent = null;
-
-        ta3 = new FieldTextArea(genFields[i], stringContent);
-        ex3 = getExtra(genFields[i], ta3);
-
-        /*
-         * if (i == 0) firstGen = ta1; if (i == gmax-1)
-         * ta1.setNextFocusableComponent(firstGen);
-         */
-        setupJTextComponent(ta3);
-
-        if (i == 0) {
-          firstO = ta3;
-          gen.setActive(ta3);
-        }
-      }
-
-      if (i < amax) {
-        if ((content = entry.getField(absFields[i])) != null)
-          stringContent = content.toString();
-        else
-          stringContent = null;
-
-        ta4 = new FieldTextArea(absFields[i], stringContent);
-        ex4 = getExtra(absFields[i], ta4);
-
-        /*
-         * if (i == 0) firstGen = ta1; if (i == gmax-1)
-         * ta1.setNextFocusableComponent(firstGen);
-         */
-        setupJTextComponent(ta4);
-
-        if (i == 0) {
-          firstO = ta4;
-          abs.setActive(ta4);
-        }
-      }
-
-      if (i < rmax) {
-        gbl.setConstraints(ta1.getLabel(), con);
-        req.add(ta1.getLabel());
-      }
-
-      if (i < omax) {
-        gbl.setConstraints(ta2.getLabel(), con);
-        opt.add(ta2.getLabel());
-      }
-
-      if (i < gmax) {
-        gbl.setConstraints(ta3.getLabel(), con);
-        gen.add(ta3.getLabel());
-      }
-
-      if (i < amax) {
-        gbl.setConstraints(ta4.getLabel(), con);
-        abs.add(ta4.getLabel());
-      }
-
-      // Constraints for the text fields.
-      con.gridwidth = GridBagConstraints.REMAINDER;
-      con.weightx = 1;
-
-      //con.fill = GridBagConstraints.NONE;
-      con.fill = GridBagConstraints.BOTH;
-
-      if (i < rmax) {
-        if (ex1 != null)
-          con.gridwidth = 1;
-        else
-          con.gridwidth = GridBagConstraints.REMAINDER;
-
-        con.weighty = GUIGlobals.getFieldWeight(reqFields[i]);
-        reqW += con.weighty;
-
-        //Util.pr(reqFields[i]+" "+con.weighty+"");
-        gbl.setConstraints(ta1.getPane(), con);
-        req.add(ta1.getPane());
-
-        if (ex1 != null) {
-          con.gridwidth = GridBagConstraints.REMAINDER;
-          con.anchor = GridBagConstraints.NORTH;
-          con.fill = GridBagConstraints.HORIZONTAL;
-          con.weightx = 0;
-          gbl.setConstraints(ex1, con);
-          req.add(ex1);
-        }
-      }
-
-      con.weightx = 1;
-
-      if (i < omax) {
-        if (ex2 != null)
-          con.gridwidth = 1;
-        else
-          con.gridwidth = GridBagConstraints.REMAINDER;
-
-        con.weighty = GUIGlobals.getFieldWeight(optFields[i]);
-        con.fill = GridBagConstraints.BOTH;
-        optW += con.weighty;
-        gbl.setConstraints(ta2.getPane(), con);
-        opt.add(ta2.getPane());
-
-        if (ex2 != null) {
-          con.gridwidth = GridBagConstraints.REMAINDER;
-          con.anchor = GridBagConstraints.NORTH;
-          con.fill = GridBagConstraints.HORIZONTAL;
-          con.weightx = 0;
-          gbl.setConstraints(ex2, con);
-          opt.add(ex2);
-        }
-      }
-
-      con.weightx = 1;
-
-      if (i < gmax) {
-        if (ex3 != null)
-          con.gridwidth = 1;
-        else
-          con.gridwidth = GridBagConstraints.REMAINDER;
-
-        con.fill = GridBagConstraints.BOTH;
-        con.weighty = GUIGlobals.getFieldWeight(genFields[i]);
-        genW += con.weighty;
-        gbl.setConstraints(ta3.getPane(), con);
-        gen.add(ta3.getPane());
-
-        if (ex3 != null) {
-          con.gridwidth = GridBagConstraints.REMAINDER;
-          con.weightx = 0;
-
-          //con.weighty = 1;
-          con.fill = GridBagConstraints.HORIZONTAL;
-          con.anchor = GridBagConstraints.NORTH;
-          gbl.setConstraints(ex3, con);
-          con.fill = GridBagConstraints.BOTH;
-          gen.add(ex3);
-          con.anchor = GridBagConstraints.CENTER;
-        }
-      }
-
-      con.weightx = 1;
-
-      if (i < amax) {
-        if (ex4 != null)
-          con.gridwidth = 1;
-        else
-          con.gridwidth = GridBagConstraints.REMAINDER;
-
-        con.fill = GridBagConstraints.BOTH;
-        con.weightx = 1;
-        con.weighty = GUIGlobals.getFieldWeight(absFields[i]);
-        genW += con.weighty;
-        gbl.setConstraints(ta4.getPane(), con);
-        abs.add(ta4.getPane());
-
-        if (ex4 != null) {
-          con.gridwidth = GridBagConstraints.REMAINDER;
-          con.weightx = 0;
-
-          //con.weighty = 1;
-          con.fill = GridBagConstraints.HORIZONTAL;
-          con.anchor = GridBagConstraints.NORTH;
-          gbl.setConstraints(ex4, con);
-          con.fill = GridBagConstraints.BOTH;
-          abs.add(ex4);
-          con.anchor = GridBagConstraints.CENTER;
-        }
-      }
-    }
-
-    // Add the edit field for Bibtex-key.
-    con.insets.top += 25;
-    con.insets.bottom = 10;
-    con.gridwidth = 1;
-    con.weighty = 0;
-    con.weightx = 0;
-    con.fill = GridBagConstraints.HORIZONTAL;
-    con.anchor = GridBagConstraints.SOUTHWEST;
-    tf = new FieldTextField(KEY_PROPERTY, (String) entry.getField(KEY_PROPERTY));
-    gbl.setConstraints(tf.getLabel(), con);
-    req.add(tf.getLabel());
-    con.gridwidth = GridBagConstraints.REMAINDER;
-
-    //	con.anchor = GridBagConstraints.WEST;
-    con.weightx = 1;
-
-    setupJTextComponent(tf);
-    gbl.setConstraints(tf, con);
-    req.add(tf);
-  }
-
+ 
   /**
    * getExtra checks the field name against GUIGlobals.FIELD_EXTRAS. If the name
    * has an entry, the proper component to be shown is created and returned.
@@ -648,7 +336,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    *          Field name
    * @return Component to show, or null if none.
    */
-  private JComponent getExtra(String string, FieldEditor editor) {
+  public JComponent getExtra(String string, FieldEditor editor) {
     final FieldEditor ed = editor;
     Object o = GUIGlobals.FIELD_EXTRAS.get(string);
     final String fieldName = editor.getFieldName();
@@ -882,8 +570,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
   }
 
-  private void setupJTextComponent(JTextComponent ta) {
-    // Activate autocompletion if it should be used for this field.
+  public void setupJTextComponent(JTextComponent ta) {
 
     /*
      * if ((ta instanceof FieldTextArea) && (prefs.getBoolean("autoComplete"))) {
@@ -928,11 +615,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
   public void requestFocus() {
-    if (tabbed.getSelectedComponent() instanceof FieldPanel)
-      ((FieldPanel) tabbed.getSelectedComponent()).activate();
-    else
-      source.requestFocus();
+      activateVisible();
   }
+
+    private void activateVisible() {
+	Object activeTab = tabs.get(tabbed.getSelectedIndex());
+	if (activeTab instanceof EntryEditorTab)
+	    ((EntryEditorTab)activeTab).activate();
+	else
+	    ((JComponent)activeTab).requestFocus();
+    }
 
   /**
    * Reports the enabled status of the editor, as set by setEnabled()
@@ -945,22 +637,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * Sets the enabled status of all text fields of the entry editor.
    */
   public void setEnabled(boolean enabled) {
-    FieldPanel[] panels = new FieldPanel[] { reqPanel, optPanel, genPanel };
+      for (Iterator i=tabs.iterator(); i.hasNext();) {
+	  Object o = i.next();
+	  if (o instanceof EntryEditorTab) {
+	      ((EntryEditorTab)o).setEnabled(enabled);
+	  }
+      }
+      source.setEnabled(enabled);
 
-    for (int i = 0; i < panels.length; i++) {
-      Vector fields = panels[i].getFields();
-
-      for (int j = 0; j < fields.size(); j++)
-        ((Component) fields.elementAt(j)).setEnabled(enabled);
-    }
-
-    source.setEnabled(enabled);
-
-    Component[] comps = tlb.getComponents();
-
-    for (int i = 1; i < comps.length; i++)
-      //if (comps[i] != closeAction)
-      comps[i].setEnabled(enabled);
   }
 
   /**
@@ -984,12 +668,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   private void switchTo(String id) {
     // Make sure the current edit is stored.
-    Component comp = tabbed.getSelectedComponent();
-
-    if (comp instanceof FieldPanel) {
-      if (((FieldPanel) comp).activeField != null)
-        //Util.pr(((FieldPanel)comp).getText());
-        updateField(((FieldPanel) comp).activeField);
+      Util.pr("frilp");
+    Object activeTab = tabs.get(tabbed.getSelectedIndex());
+    if (activeTab instanceof EntryEditorTab) {
+        updateField(((EntryEditorTab)activeTab).getActive());
     }
 
     BibtexEntry be = panel.database.getEntryById(id);
@@ -1043,9 +725,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     updateSource();
     panel.showing = be;
 
-    //if (tabbed.getSelectedComponent() instanceof FieldPanel)
-    //    ((FieldPanel)tabbed.getSelectedComponent()).activate();
-    //else ((JComponent)tabbed.getSelectedComponent()).requestFocus();
+    activateVisible();
   }
 
   /**
@@ -1057,8 +737,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     if (tabbed.getSelectedComponent() == srcPanel)
       storeSource(false);
 
-    //Util.pr(".."+tabbed.getSelectedComponent().toString());
-    //Util.pr("Sourceaccepted: "+lastSourceAccepted);
     return lastSourceAccepted;
   }
 
@@ -1180,88 +858,42 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
   }
 
-  public boolean setField(String fieldName, String newFieldData) {
-    // iterate through all tabs and fields within those tabs until we get
-    // the appropriate field name.
-    // Thanks to reflection, this shouldn't be too bad
-    // search each panel individually
-    try {
-      if (setFieldInPanel(reqPanel, fieldName, newFieldData))
-        return true;
 
-      if (setFieldInPanel(optPanel, fieldName, newFieldData))
-        return true;
-
-      if (setFieldInPanel(genPanel, fieldName, newFieldData))
-        return true;
-    } catch (ClassCastException cce) {
-      System.err.println("caught in setField: " + cce);
-
-      return false;
-    }
-
-    return false;
-  }
-
-  private boolean setFieldInPanel(FieldPanel pan, String fieldName, String newFieldData)
-    throws ClassCastException {
-    Vector fields = pan.getFields();
-
-    for (int i = 0; i < fields.size(); i++) {
-      if (((FieldEditor) fields.elementAt(i)).getFieldName().equals(fieldName)) {
-        FieldEditor ed = ((FieldEditor) fields.elementAt(i));
-        ed.setText(newFieldData);
-
-        /*
-         * ed.setLabelColor(((newFieldData == null) || newFieldData.equals("")) ?
-         * GUIGlobals.nullFieldColor : GUIGlobals.validFieldColor);
-         */
-        return true;
+  public void setField(String fieldName, String newFieldData) {
+      
+      for (Iterator i=tabs.iterator(); i.hasNext();) {
+	  Object o = i.next();
+	  if (o instanceof EntryEditorTab) {
+	      ((EntryEditorTab)o).updateField(fieldName, newFieldData);
+	  }
       }
-    }
-
-    return false; // Nothing found.
+      
   }
 
   /**
    * Sets all the text areas according to the shown entry.
    */
   public void updateAllFields() {
-    FieldPanel[] panels = new FieldPanel[] { reqPanel, optPanel, genPanel, absPanel };
 
-    for (int i = 0; i < panels.length; i++) {
-      Vector fields = panels[i].getFields();
-
-      for (int j = 0; j < fields.size(); j++) {
-        FieldEditor ed = (FieldEditor) fields.elementAt(j);
-        Object content = entry.getField(ed.getFieldName());
-        ed.setText((content == null) ? "" : content.toString());
-
-        /*
-         * ed.setLabelColor(content == null ? GUIGlobals.nullFieldColor :
-         * GUIGlobals.validFieldColor);
-         */
-
-        //if (ed.getFieldName().equals("year"))
-        //    Util.pr(content.toString());
+      for (Iterator i=tabs.iterator(); i.hasNext();) {
+	  Object o = i.next();
+	  if (o instanceof EntryEditorTab) {
+	      ((EntryEditorTab)o).setEntry(entry);
+	  }
       }
-    }
+
   }
 
   /**
    * Removes the "invalid field" color from all text areas.
    */
   public void validateAllFields() {
-    FieldPanel[] panels = new FieldPanel[] { reqPanel, optPanel, genPanel };
-
-    for (int i = 0; i < panels.length; i++) {
-      Vector fields = panels[i].getFields();
-
-      for (int j = 0; j < fields.size(); j++) {
-        JTextComponent ed = (JTextComponent) fields.elementAt(j);
-        ed.setBackground(GUIGlobals.validFieldBackground);
+      for (Iterator i=tabs.iterator(); i.hasNext();) {
+	  Object o = i.next();
+	  if (o instanceof EntryEditorTab) {
+	      ((EntryEditorTab)o).validateAllFields();
+	  }
       }
-    }
   }
 
   public void updateAllContentSelectors() {
@@ -1334,21 +966,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * focus.
      */
     public void focusGained(FocusEvent e) {
-      //Util.pr("Gained focus
-      // "+e.getSource().toString().substring(0,30));
-      if (e.getSource() instanceof FieldEditor) {
-        FieldEditor ta = (FieldEditor) e.getSource();
-        Component parent = ta.getParent();
-
-        while (!(parent instanceof FieldPanel))
-          parent = parent.getParent();
-
-        ((FieldPanel) parent).setActive(ta);
-      } else {
-        // The source panel must have been chosen. Update it.
-        //if (panel.baseChanged)
-        //  updateSource();
-      }
     }
 
     public void focusLost(FocusEvent e) {
@@ -1358,75 +975,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
   }
 
-  class FieldPanel extends JPanel {
-    FieldEditor activeField = null;
-    JScrollPane sp;
-
-    /*
-     * This extension to JPanel keeps a reference to its active field, on behalf
-     * of which it requests the focus when it is told to.
-     */
-    public FieldPanel() {
-      //setBackground(Color.white);
-    }
-
-    public JComponent getPane() {
-      return this; // Component to add. Return the scrollpane, if there is
-
-      // one.
-    }
-
-    public void setActive(FieldEditor c) {
-      activeField = c;
-    }
-
-    public Vector getFields() {
-      Vector textFields = new Vector();
-      Component[] components = this.getComponents();
-
-      try {
-        for (int i = 0; i < components.length; i++) {
-          if (components[i] instanceof FieldEditor)
-            textFields.add(components[i]);
-
-          //else if ((components[i] instanceof JScrollPane)) {
-          //    Util.pr(((JScrollPane)components[i]).getViewport().getComponent(0).toString().substring(0,50));
-          //}
-          else if (components[i] instanceof JScrollPane)
-            textFields.add(((JScrollPane) components[i]).getViewport().getComponent(0));
-        }
-
-        return textFields;
-      } catch (ClassCastException cce) {
-        System.err.println("caught in getFields: " + cce);
-      }
-
-      return null;
-    }
-
-    public void activate() {
-      if (activeField != null)
-        activeField.requestFocus();
-      else {
-        tf.requestFocus();
-
-        //
-      }
-    }
-  }
 
   class TabListener implements ChangeListener {
     public void stateChanged(ChangeEvent e) {
-      if (((JTabbedPane) e.getSource()).getSelectedIndex() != sourceIndex) {
-        FieldPanel fp =
-          (FieldPanel) (((JTabbedPane) e.getSource()).getSelectedComponent());
-        fp.activate();
-      } else
-        source.requestFocus();
+	activateVisible();
     }
   }
 
-  class DeleteAction extends AbstractAction {
+    class DeleteAction extends AbstractAction {
     public DeleteAction() {
       super(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile));
       putValue(SHORT_DESCRIPTION, Globals.lang("Delete entry"));
@@ -1639,10 +1195,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       int i = tabbed.getSelectedIndex();
       tabbed.setSelectedIndex(((i > 0) ? (i - 1) : (tabbed.getTabCount() - 1)));
 
-      if (tabbed.getSelectedComponent() instanceof FieldPanel)
-        ((FieldPanel) tabbed.getSelectedComponent()).activate();
-
-      // Set focus to the last used textfield.
+      activateVisible();
     }
   }
 
@@ -1654,11 +1207,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     public void actionPerformed(ActionEvent e) {
       int i = tabbed.getSelectedIndex();
       tabbed.setSelectedIndex((i < (tabbed.getTabCount() - 1)) ? (i + 1) : 0);
+      activateVisible();
 
-      if (tabbed.getSelectedComponent() instanceof FieldPanel)
-        ((FieldPanel) tabbed.getSelectedComponent()).activate();
-
-      // Set focus to the last used textfield.
     }
   }
 
@@ -1802,22 +1352,21 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       super("Save database");
     }
 
-    public void actionPerformed(ActionEvent e) {
-      Object comp = tabbed.getSelectedComponent();
-
-      if (comp instanceof FieldPanel) {
-        // Normal panel.
-        FieldPanel fp = (FieldPanel) comp;
-        updateField(fp.activeField);
-      } else
-        // Source panel.
-        updateField(comp);
-
-      try {
-        panel.runCommand("save");
-      } catch (Throwable ex) {
+      public void actionPerformed(ActionEvent e) {
+	  Object activeTab = tabs.get(tabbed.getSelectedIndex());
+	  if (activeTab instanceof EntryEditorTab) {
+	      // Normal panel.
+	      EntryEditorTab fp = (EntryEditorTab)activeTab;
+	      updateField(fp.getActive());
+	  } else
+	      // Source panel.
+	      updateField(activeTab);
+	  
+	  try {
+	      panel.runCommand("save");
+	  } catch (Throwable ex) {
+	  }
       }
-    }
   }
 
   class ExternalViewerListener extends MouseAdapter {

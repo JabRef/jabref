@@ -56,6 +56,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	this.parent = parent;
 	metaData = data;
 	list.setEditable(true);
+	list.setMaximumRowCount(20);
 	final MetaData metaData = data;
         final JabRefFrame frame = parent.frame;
 	final BasePanel panel = parent.panel;

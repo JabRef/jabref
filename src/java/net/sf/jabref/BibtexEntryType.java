@@ -99,7 +99,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return entry.allFieldsPresent(new String[]
                     {
-                        "author", "title", "journal", "year", "bibtexkey", "volume", "number", "pages"
+                        "author", "title", "journal", "year", "bibtexkey", "volume", "pages"
                     });
             }
         };

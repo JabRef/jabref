@@ -176,48 +176,58 @@ public class EntryTable extends JTable {
       public void addSelectionListener() {
         if (previewListener == null)
           previewListener = new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-              //Util.pr("Selection listener");
+            public void valueChanged(final ListSelectionEvent e) {
               if (!selectionListenerOn) return;
               if (!e.getValueIsAdjusting()) {
-                if (getSelectedRowCount() == 1) {
-                  int row = getSelectedRow(); //e.getFirstIndex();
-                  if (row >= 0) {
-                   //System.out.println(""+panel.validateEntryEditor());
-
-                   /*
-                    * Can't call validateEntryEditor, before the FocusLost beats us to it and
-                    * makes the entry editor store its source. So we need to find out if the
-                    * entry editor is happy. But can we prevent the selection?
-                   */
-                   panel.updateViewToSelected();
-
-
-                   //   setRowSelectionInterval(row, row);
-                   // }
-                   // else {
-                      // Oops, an error occured.
-                   // }
-                  //panel.database().getEntryById(
-                  //tableModel.getNameFromNumber(row)));
-                  }
-                } else {
-                  /* With a multiple selection, there are three alternative behaviours:
-                   1. Disable the entry editor. Do not update it.
-                   2. Do not disable the entry editor, and do not update it.
-                   3. Update the entry editor, and keep it enabled.
-
-                   We currently implement 1 and 2, and choose between them based on
-                   prefs.getBoolean("disableOnMultipleSelection");
-                   */
-                  if (prefs.getBoolean("disableOnMultipleSelection")) { // 1.
-                    panel.setEntryEditorEnabled(false);
-                  }
-                  // 2. Do nothing.
-                }
-              }
-            }
-          };
+		  // We must use invokeLater() to postpone the updating. This is because of
+		  // the situation where an EntryEditor has changes in one of the FieldEditors
+		  // that need to be stored. This storage is initiated by a focusLost() call,
+		  // and results in a call to refreshTable() in BasePanel, which messes
+		  // with the table selection. After that chain has finished, the selection
+		  // will have been reset correctly, so we make sure everything is ok by
+		  // putting the updating based on table selection behind it in the event queue.
+		  SwingUtilities.invokeLater(new Thread() {
+			  public void run() {
+			      if (getSelectedRowCount() == 1) {
+				  int row = getSelectedRow(); //e.getFirstIndex();
+				  if (row >= 0) {
+				      //System.out.println(""+panel.validateEntryEditor());
+				      
+				      /*
+				       * Can't call validateEntryEditor, before the FocusLost beats us to it and
+				       * makes the entry editor store its source. So we need to find out if the
+				       * entry editor is happy. But can we prevent the selection?
+				       */
+				      panel.updateViewToSelected();
+				      
+				      
+				      //   setRowSelectionInterval(row, row);
+				      // }
+				      // else {
+				      // Oops, an error occured.
+				      // }
+				      //panel.database().getEntryById(
+				      //tableModel.getNameFromNumber(row)));
+				  }
+			      } else {
+				  /* With a multiple selection, there are three alternative behaviours:
+				     1. Disable the entry editor. Do not update it.
+				     2. Do not disable the entry editor, and do not update it.
+				     3. Update the entry editor, and keep it enabled.
+				     
+				     We currently implement 1 and 2, and choose between them based on
+				     prefs.getBoolean("disableOnMultipleSelection");
+				  */
+				  if (prefs.getBoolean("disableOnMultipleSelection")) { // 1.
+				      panel.setEntryEditorEnabled(false);
+				  }
+				  // 2. Do nothing.
+			      }
+			  }
+		      });
+	      }
+	    }
+	      };
         getSelectionModel().addListSelectionListener(previewListener);
       }
 

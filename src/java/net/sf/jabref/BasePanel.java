@@ -1745,7 +1745,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     public void updateViewToSelected() {
       // First, if the entry editor is visible, we should update it to the selected entry.
-
       BibtexEntry be = null;
       BibtexEntry[] bes = entryTable.getSelectedEntries();
       if ((bes != null) && (bes.length > 0))
@@ -2055,18 +2054,28 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut, boolean select, int numberOfHits) {
         //entryTable.scrollTo(0);
 
-	lastSearchHits = numberOfHits;
-	hidingNonHits = !grayOut; // We either gray out, or hide, non-hits.
-
         entryTable.invalidate();
-        if (searchValueField == Globals.SEARCH) {
+	if (searchValueField == Globals.GROUPSEARCH) {
+	    sortingByGroup = reorder;
+	    coloringByGroup = grayOut;
+        }
+
+	// Workaround to compensate for not being able to hide non-hits
+	// properly while showing groups. The problem is that we don't
+	// know how many hits there are - the number reported includes
+	// hits outside of the current group selection.
+	if (sortingByGroup) {
+	    grayOut = true;
+	}
+	
+	if (searchValueField == Globals.SEARCH) {
           sortingBySearchResults = reorder;
           coloringBySearchResults = grayOut;
         }
-        else if (searchValueField == Globals.GROUPSEARCH) {
-          sortingByGroup = reorder;
-          coloringByGroup = grayOut;
-        }
+
+	lastSearchHits = numberOfHits;
+	hidingNonHits = reorder && !grayOut; 
+	// We either gray out, or hide, non-hits.
 
         //tableModel.remap();
         entryTable.clearSelection();

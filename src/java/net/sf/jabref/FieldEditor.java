@@ -43,7 +43,7 @@ public interface FieldEditor {
     public void append(String text);
     public java.awt.Container getParent();
     public void requestFocus();
-
+    public void setEnabled(boolean enabled);
     // paste text into component, it should also take some selected text into account
     public void paste(String textToInsert) ;
 
