@@ -27,13 +27,51 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 import java.io.File;
 import java.awt.Font;
+import javax.swing.UIManager;
 
 public class JabRef {
 
     public static void main(String[] args) {
 
-	//Globals.turnOffLogging();
+	Font fnt = new Font("plain", Font.PLAIN, 12);
+	UIManager.put("Button.font", fnt);
+	UIManager.put("ToggleButton.font", fnt);
+	UIManager.put("RadioButton.font", fnt);
+	UIManager.put("CheckBox.font", fnt);
+	UIManager.put("ColorChooser.font", fnt);
+	UIManager.put("ComboBox.font", fnt);
+	UIManager.put("Label.font", fnt);
+	UIManager.put("List.font", fnt);
+	UIManager.put("MenuBar.font", fnt);
+	UIManager.put("MenuItem.font", fnt);
+	UIManager.put("RadioButtonMenuItem.font", fnt);
+	UIManager.put("CheckBoxMenuItem.font", fnt);
+	UIManager.put("Menu.font", fnt);
+	UIManager.put("PopupMenu.font", fnt);
+	UIManager.put("OptionPane.font", fnt);
+	UIManager.put("Panel.font", fnt);
+	UIManager.put("ProgressBar.font", fnt);
+	UIManager.put("ScrollPane.font", fnt);
+	UIManager.put("Viewport.font", fnt);
+	UIManager.put("TabbedPane.font", fnt);
+	UIManager.put("Table.font", fnt);
+	UIManager.put("TableHeader.font", fnt);
+	UIManager.put("TextField.font", fnt);
+	UIManager.put("PasswordField.font", fnt);
+	UIManager.put("TextArea.font", fnt);
+	UIManager.put("TextPane.font", fnt);
+	UIManager.put("EditorPane.font", fnt);
+	UIManager.put("TitledBorder.font", fnt);
+	UIManager.put("ToolBar.font", fnt);
+	UIManager.put("ToolTip.font", fnt);
+	UIManager.put("Tree.font", fnt);
 
+
+	//Globals.turnOffLogging();
+	/*	try {
+	javax.swing.UIManager.setLookAndFeel(
+				 "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				 } catch (Throwable ex) {}*/
 		JabRefPreferences prefs = new JabRefPreferences();
 		BibtexEntryType.loadCustomEntryTypes(prefs);
 		Globals.setLanguage(prefs.get("language"), "");
