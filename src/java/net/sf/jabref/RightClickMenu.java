@@ -64,9 +64,10 @@ public class RightClickMenu extends JPopupMenu
 		}
 	    });
 
-	for (Iterator i=BibtexEntryType.ALL_TYPES.iterator();
+	for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
 	     i.hasNext();) {
-	    typeMenu.add(new ChangeTypeAction((BibtexEntryType)i.next()));
+	    typeMenu.add(new ChangeTypeAction
+			 (BibtexEntryType.getType((String)i.next())));
 	}
 
 	add(typeMenu);

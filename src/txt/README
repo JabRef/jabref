@@ -1,0 +1,79 @@
+
+JabRef 1.0
+----------
+
+Introduction: 
+
+JabRef is a graphical Java application for editing bibtex (.bib)
+databases.
+
+JabRef is the 
+
+JabRef lets you organize your entries into overlapping logical groups,
+and with a single click limit your view to a single group or an
+intersection or union of several groups. You can customize the entry
+information shown in the main window, and sort by any of the standard
+Bibtex fields. JabRef can autogenerate bibtex keys for your
+entries, and autocomplete words or names in the field types of your
+choosing. Most operations can be done without using the mouse.
+
+
+License: 
+JabRef is free software, distributed under the GNU General Public
+Licence. See the enclosed text file 'gpl.txt', or the About dialog,
+for details about the GPL.
+
+
+Requirements: 
+JabRef runs on any system equipped with the Java Virtual Machine (1.4
+or newer), which can be downloaded at no cost from
+http://java.sun.com.
+
+
+Installing and running:
+JabRef 1.0 is distributed as an executable .jar file. Run the
+program as follows:
+If you are using the Java Development Kit:
+     java -jar <path to jar>  
+or, if you are using the Java Runtime Environment:
+     jre -new -jar <path to jar> or
+     jrew -new -jar <path to jar>
+On a Windows system, you can probably run the program by
+double-clicking on the jar file.
+
+The jar file containing JabRef kan be unpacked with the command:
+    jar xf <path to jar>
+or  jar xf <path to jar> <list of files to extract>
+Unpacking the jar file is not necessary to run the program.
+
+
+Documentation:
+JabRef comes with an online help function, accessed by presing F1 or
+clicking on a question mark icon. The help files are probably not
+exhaustive enough to satisfy everyone yet, but they should help sort
+out the most important issues about using the program. The help files
+can also be viewed outside the program with a standard HTML browser.
+
+
+Bug reports, suggestions, other feedback:
+We are thankful for any bug reports or other feedback. If there are
+features you want included in JabRef, tell us!
+
+
+JabRef homepage: 
+http://jabref.sourceforge.net
+
+You can always get the very latest version of the program from our CVS
+repository; instructions for downloading are found on the
+homepage. Note that the CVS version may contain untested features, or
+have other stability issues. Unless you're feeling extremely lucky, go
+for the version in the HEAD branch of the module 'jabref'.
+
+
+Bug submission and Open Discussions and Help forums are found at:
+http://sourceforge.net/projects/jabref
+
+
+Corresponding authors:
+mortenalver _ sourceforge.net
+nbatada _ sourceforge.net

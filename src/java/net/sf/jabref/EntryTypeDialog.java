@@ -93,18 +93,11 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	con.fill = GridBagConstraints.HORIZONTAL;
 	con.insets = new Insets(4, 4, 4, 4);
 	int col = 0;
-	TreeSet buttons = new TreeSet();
-	Iterator iter = BibtexEntryType.ALL_TYPES.iterator();
+
+	Iterator iter = BibtexEntryType.ALL_TYPES.keySet().iterator();
 	for (;iter.hasNext();) {
-	    BibtexEntryType type = (BibtexEntryType)(iter.next());
-	    TypeButton b = new TypeButton(type.getName(), type);
-	    buttons.add(b);
-	}
-	// We added the buttons to a TreeSet, sorting them according to their names.
-	// The sort is based on the compareTo() method in TypeButton.
-	iter = buttons.iterator();
-	for (;iter.hasNext();) {
-	    TypeButton b = (TypeButton)(iter.next());
+	    BibtexEntryType tp = BibtexEntryType.getType((String)iter.next());
+	    TypeButton b = new TypeButton(tp.getName(), tp);
 	    b.setAlignmentX(SwingConstants.LEFT);
 	    b.addActionListener(this);
 	    // Check if we should finish the row.

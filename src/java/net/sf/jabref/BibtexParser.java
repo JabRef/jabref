@@ -42,8 +42,6 @@ public class BibtexParser
     private boolean _eof = false;
     private int line = 1;
 
-    protected HashMap types = new HashMap();
-
     public BibtexParser(Reader in)
     {
         if (in == null)
@@ -52,13 +50,6 @@ public class BibtexParser
         }
 
         _in = new PushbackReader(in);
-
-	// Set up the 'types' hashmap to contain the known entry types.
-	Iterator i = BibtexEntryType.ALL_TYPES.iterator();
-	for (;i.hasNext();) {
-	    BibtexEntryType tp = (BibtexEntryType)(i.next());	   
-	    types.put(tp.getName().toLowerCase(), tp);
-	}
 
     }
 
@@ -106,7 +97,7 @@ public class BibtexParser
 		skipWhitespace();
 		String entryType = parseTextToken();
 		BibtexEntryType tp = 
-		    (BibtexEntryType)types.get(entryType.toLowerCase()); 
+		    BibtexEntryType.getType(entryType); 
 		if (tp != null) 
                 {
 		    //Util.pr("Found: "+tp.getName());
@@ -212,7 +203,7 @@ public class BibtexParser
 	skipWhitespace();
 	consume('{','(');
 	skipWhitespace();
-	String key = parseTextToken(),
+	String key = parseKey(),//parseTextToken(),
 	    id = Util.createId(tp, _db);
 
 	BibtexEntry result = new BibtexEntry(id, tp); 
@@ -326,6 +317,10 @@ public class BibtexParser
 
     }
 
+    /**
+     * This method is used to parse string labels, field names, entry
+     * type and numbers outside brackets.
+     */
     private String parseTextToken() throws IOException
     {
         StringBuffer token = new StringBuffer(20);
@@ -341,9 +336,10 @@ public class BibtexParser
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) c) || (c == ':') || (c == '-')
+            if (Character.isLetterOrDigit((char) c) || 
+		(c == ':') || (c == '-')
 		|| (c == '_') || (c == '*') || (c == '+') || (c == '.')
-		|| (c == '/'))
+		|| (c == '/') || (c == '\''))
             {
                 token.append((char) c);
             }
@@ -354,6 +350,49 @@ public class BibtexParser
                 return token.toString();
             }
         }
+    }
+
+    /**
+     * This method is used to parse the bibtex key for an entry.
+     */
+    private String parseKey() throws IOException
+    {
+       StringBuffer token = new StringBuffer(20);
+
+        while (true)
+        {
+            int c = read();
+	    //Util.pr(".. "+c);
+            if (c == -1)
+            {
+                _eof = true;
+
+                return token.toString();
+            }
+
+	    // Ikke: #{}¤~¨
+	    //
+	    // Går:  $_*+.-\/?"^
+            if (Character.isLetterOrDigit((char) c) || 
+		((c != '#') && (c != '{') && (c != '}') && (c != '¤')
+		 && (c != '~') && (c != '¨') && (c != ',')))
+	    {
+                token.append((char) c);
+            }
+            else
+            {
+		if (c == ',') {
+		    unread(c);
+		    return token.toString();
+		} else
+		    throw new IOException("Error in line "+line+":"+
+					  "Character '"+(char)c+"' is not "+
+					  "allowed in bibtex keys.");
+		
+            }
+        }
+ 
+
     }
 
     private StringBuffer parseBracketedText() throws IOException

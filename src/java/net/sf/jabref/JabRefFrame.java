@@ -520,6 +520,12 @@ public class JabRefFrame extends JFrame {
 	tlb.setBackground(GUIGlobals.lightGray);
 	tlb.setForeground(GUIGlobals.lightGray);
 	tlb.setFloatable(false);
+	/*tlb.add(new AbstractAction("Form dialog") {
+		public void actionPerformed(ActionEvent e) {
+		    JDialog dl = new EntryCustomizationDialog(ths);
+		    dl.show();
+		}
+		});*/
 	tlb.add(newDatabaseAction);
 	tlb.add(open);
 	tlb.add(save);

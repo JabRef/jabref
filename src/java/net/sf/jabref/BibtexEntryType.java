@@ -32,9 +32,13 @@ package net.sf.jabref;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.TreeMap;
 import java.util.Set;
-public abstract class BibtexEntryType
+public abstract class BibtexEntryType implements Comparable
 {
+
+    public static TreeMap ALL_TYPES = new TreeMap();
+
     public static final BibtexEntryType OTHER =
         new BibtexEntryType()
         {
@@ -581,14 +585,39 @@ public abstract class BibtexEntryType
         };
 
 
-    public static final Set ALL_TYPES =
-        Collections.unmodifiableSet(new HashSet(Arrays.asList(
-                    new BibtexEntryType[] { ARTICLE, INBOOK, BOOK, BOOKLET,
-					    INCOLLECTION, INPROCEEDINGS, PROCEEDINGS,
-					    MANUAL, MASTERSTHESIS, PHDTHESIS, 
-					    TECHREPORT, UNPUBLISHED, MISC })));
+    static {
+	// Put the standard entry types into the type map.
+	ALL_TYPES.put("article", ARTICLE);
+	ALL_TYPES.put("inbook", INBOOK);
+	ALL_TYPES.put("book", BOOK);
+	ALL_TYPES.put("booklet", BOOKLET);
+	ALL_TYPES.put("incollection", INCOLLECTION);
+	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
+	ALL_TYPES.put("proceedings", PROCEEDINGS);
+	ALL_TYPES.put("manual", MANUAL);
+	ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
+	ALL_TYPES.put("phdthesis", PHDTHESIS);
+	ALL_TYPES.put("techreport", TECHREPORT);
+	ALL_TYPES.put("unpublished", UNPUBLISHED);
+	ALL_TYPES.put("misc", MISC);
+    }
+
+    /**
+     * This method returns the BibtexEntryType for the name of a type.
+     */
+    public static BibtexEntryType getType(String name) {
+	//Util.pr(name);
+	Object o = ALL_TYPES.get(name.toLowerCase());
+	if (o == null)
+	    return null;
+	else return (BibtexEntryType)o;
+    }
 
     public abstract String getName();
+
+    public int compareTo(Object o) {
+	return getName().compareTo(((BibtexEntryType)o).getName());
+    }
 
     public abstract String[] getOptionalFields();
 

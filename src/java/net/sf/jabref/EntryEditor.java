@@ -83,6 +83,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	optPanel = new FieldPanel(),
 	genPanel = new FieldPanel();
     JTextField bibtexKey;
+    FieldTextField tf;
     JTextArea source;
     JTabbedPane tabbed = new JTabbedPane();//JTabbedPane.RIGHT);
     GridBagLayout gbl = new GridBagLayout();
@@ -378,9 +379,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	con.weightx = 0;
 	con.anchor = GridBagConstraints.SOUTHWEST;
 	con.fill = GridBagConstraints.NONE;
-	FieldTextField tf = 
-	    new FieldTextField(KEY_PROPERTY,
-			       (String)entry.getField(KEY_PROPERTY));
+	tf = new FieldTextField(KEY_PROPERTY,
+				(String)entry.getField(KEY_PROPERTY));
 	gbl.setConstraints(tf.getLabel(),con);
 	req.add(tf.getLabel());
 	con.gridwidth = GridBagConstraints.REMAINDER;
@@ -570,6 +570,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	public void activate() {
 	    if (activeField != null)
 		activeField.requestFocus();
+	    else tf.requestFocus();
+	    //
+		
 	}
 
     }
