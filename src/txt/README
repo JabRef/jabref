@@ -1,5 +1,5 @@
 
-JabRef 1.4
+JabRef 1.5
 ----------
 
 
@@ -38,7 +38,7 @@ Kit.
 
 
 Installing and running, Windows:
-JabRef 1.4 is available in Windows Installer (.msi) format. To install,
+JabRef 1.5 is available in Windows Installer (.msi) format. To install,
 double-click the .msi file. A shortcut to JabRef will be added to your
 start menu.
 
@@ -48,7 +48,7 @@ Wix (tool for compiling MSI files from an XML specification), available at http:
 
 
 Installing and running, general:
-JabRef 1.4 can be downloaded as an executable .jar file. Run the
+JabRef 1.5 can be downloaded as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -80,17 +80,18 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x	- Added Highlight and select options to the group interface, and made it possible
+1.5:	- Added Highlight and select options to the group interface, and made it possible
   	  to change the number of visible lines in the list.
       	- Added option to allow or disallow direct table editing.
 	- Added optional confirmation dialog for deleting entries.
       	- Added optional warning dialog for duplicate BibTeX keys.
-	- Added CiteSeer support. (specify more)
 	- Added warnings to bibtex parser, and prevented failure to load files with
 	  duplicate string definitions.
-	- Significant performance improvements.
-	- Numerous interface improvements.
-	- Fixed RIS import bug caused by short lines
+      	- Added JStor import filter.
+	- Changed the look and feel to JGoodies Forms on non-Macintosh platforms.
+	- Optimized performance in several areas.
+	- Numerous usability improvements.
+	- Fixed RIS import bug caused by short lines.
       	- Fixed bug in SciFinder import.
       	- Fixed bug that made entire field get cleared when removing from group.
 1.4:	- Added advanced search feature.
