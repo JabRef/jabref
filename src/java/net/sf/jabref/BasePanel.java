@@ -42,6 +42,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 						     ClipboardOwner {
 
     BasePanel ths = this;
+    JSplitPane splitPane;
 
     JabRefFrame frame;
     BibtexDatabase database;
@@ -151,11 +152,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			// entry.
 			if (!entryTypeForms.containsKey(id)) {
 			    BibtexEntry be = database.getEntryById(id);
-			    EntryTypeForm form = new EntryTypeForm
-				(frame, ths, be, prefs);
-			    Util.placeDialog(form, frame); // We want to center the editor.
-			    form.setVisible(true);
-			    entryTypeForms.put(id, form);
+			    //EntryTypeForm form = new EntryTypeForm
+			    //(frame, ths, be, prefs);		    
+			    //Util.placeDialog(form, frame); // We want to center the editor.
+			    //form.setVisible(true);
+			    //entryTypeForms.put(id, form);
+
+			    showEntry(be);
 			} else {
 			    ((EntryTypeForm)(entryTypeForms.get(id))).setVisible(true);
 			}
@@ -603,6 +606,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
     public void setupMainPanel() {
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, frame.prefs);
+	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
 	entryTable.addMouseListener(this);
 	entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
 	entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
@@ -638,9 +643,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	// Set the right-click menu for the entry table.
 	RightClickMenu rcm = new RightClickMenu(this, metaData);
 	entryTable.setRightClickMenu(rcm);
-	//Util.pr("BasePanel: must add right click menu");
 
-	setRightComponent(entryTable.getPane());
+	//setRightComponent(entryTable.getPane());
+	splitPane.setTopComponent(entryTable.getPane());
+	splitPane.setBottomComponent(null);
+	setRightComponent(splitPane);
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
 	sidePaneManager.populatePanel();
@@ -690,7 +697,18 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    stringDialog.refreshTable();
 	*/
     }
+
+    public void showEntry(BibtexEntry be) {
+	EntryEditor form = new EntryEditor
+	    (frame, ths, be, prefs);
+	splitPane.setBottomComponent(form);
+	splitPane.setDividerLocation(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+    }
     
+    public void hideEntryEditor() {
+	splitPane.setBottomComponent(null);
+    }
+
     public void markBaseChanged() {
 	baseChanged = true;
 	

@@ -73,6 +73,8 @@ public class GUIGlobals {
 	SPLIT_PANE_DIVIDER_SIZE = 2,
 	SPLIT_PANE_DIVIDER_LOCATION = 80,
 	GROUPS_VISIBLE_ROWS = 8;
+    public static final double
+	VERTICAL_DIVIDER_LOCATION = 0.4;
     // File names.
     public static String //configFile = "preferences.dat",
 	backupExt = ".bak",
@@ -333,8 +335,9 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	fieldWeight.put("number", SMALL_W);
 	fieldWeight.put("chapter", SMALL_W);
 	fieldWeight.put("editor", MEDIUM_W);
-	fieldWeight.put("series", MEDIUM_W);
-	fieldWeight.put("type", MEDIUM_W);
+	fieldWeight.put("series", SMALL_W);
+	fieldWeight.put("type", SMALL_W);
+	fieldWeight.put("address", SMALL_W);
 	fieldWeight.put("howpublished", MEDIUM_W);
 	fieldWeight.put("institution", MEDIUM_W);
 	fieldWeight.put("organization", MEDIUM_W);
