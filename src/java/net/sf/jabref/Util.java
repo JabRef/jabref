@@ -93,7 +93,7 @@ public class Util {
 
     private static int idCounter = 0;
 
-    public static String createNeutralId() {
+    public synchronized static String createNeutralId() {
         return "" + (idCounter++);
     }
 

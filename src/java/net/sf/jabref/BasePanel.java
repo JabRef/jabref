@@ -86,7 +86,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     // Used to track whether the base has changed since last save.
 
     EntryTableModel tableModel = null;
-    EntryTable entryTable = null;
+    public EntryTable entryTable = null;
 
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
@@ -94,6 +94,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     SearchManager2 searchManager;
     MedlineFetcher medlineFetcher;
     CiteSeerFetcher citeSeerFetcher;
+    CiteSeerFetcherPanel citeSeerFetcherPanel;
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -203,6 +204,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         // The action for opening an entry editor.
         actions.put("edit", new BaseAction() {
                 public void action() {
+		    frame.block();
                   //(new Thread() {
                   //public void run() {
                   int clickedOn = -1;
@@ -218,6 +220,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     if (splitPane.getBottomComponent() != null)
                       new FocusRequester(splitPane.getBottomComponent());
                   }
+		  frame.unblock();
                 }
 
             });
@@ -1677,11 +1680,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
         citeSeerFetcher = new CiteSeerFetcher(this, sidePaneManager);
+        citeSeerFetcherPanel = new CiteSeerFetcherPanel(this, sidePaneManager, citeSeerFetcher);
+
         sidePaneManager.register("fetchMedline", medlineFetcher);
         //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
         //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
         searchManager = new SearchManager2(frame, prefs, sidePaneManager);
         sidePaneManager.add("search", searchManager);
+        sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.populatePanel();
         setLayout(new BorderLayout());
@@ -1717,6 +1723,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     }
 
     public void refreshTable() {
+	long tic = System.currentTimeMillis();
         // This method is called by EntryTypeForm when a field value is
         // stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
@@ -1725,11 +1732,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 	if (hidingNonHits)
 	    tableModel.remap(lastSearchHits);
 	else 
+	    //tableModel.TEST_TEST();
 	    tableModel.remap();
         if ((bes != null) && (bes.length > 0))
             highlightEntries(bes, 0);
         //entryTable.revalidate();r
         //entryTable.repaint();
+	long toc = System.currentTimeMillis();
+	Util.pr("Refresh took: "+(toc-tic)+" ms");
     }
 
     public void updatePreamble() {

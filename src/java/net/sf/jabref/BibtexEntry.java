@@ -349,4 +349,8 @@ public class BibtexEntry
         return clone;
     }
 
+    public String toString() {
+	return "Entry:"+getType().getName()+":"+getField(Globals.KEY_FIELD);
+    }
+
 }

@@ -116,7 +116,8 @@ public class EntryTable extends JTable {
               Point p = e.getPoint();
               int colindex = getTableHeader().columnAtPoint(p);
               if( colindex >= 0 ) {
-		  int xoffset = 3;
+		  final int initoffset = 3;
+		  int xoffset = initoffset;
 		  for (int i = 0; i < colindex; i++) {
 		      xoffset += getColumnModel().getColumn(i).getWidth();
 		  }
@@ -126,7 +127,8 @@ public class EntryTable extends JTable {
 		  
 		  Rectangle r = new Rectangle();
 
-		  r.setBounds(xoffset, 0/*offset*/, cw-2*xoffset, ch/*-2*offset*/);
+		  r.setBounds(xoffset, 0/*offset*/, cw-2*initoffset, ch/*-2*offset*/);
+
 		  if (!r.contains(p)) {
 		      return;
 		  }

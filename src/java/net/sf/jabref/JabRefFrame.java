@@ -204,6 +204,7 @@ public class JabRefFrame
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
+      citeSeerPanelAction = new CiteSeerPanelAction(),
       //fetchAuthorMedline = new FetchAuthorMedlineAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
       //"Put a BibTeX reference to the selected entries on the clipboard",
@@ -923,6 +924,7 @@ public JabRefPreferences prefs() {
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
     tools.add(fetchMedline);
+    tools.add(citeSeerPanelAction);
     tools.add(fetchCiteSeer);
     //tools.add(fetchAuthorMedline);
     tools.addSeparator();
@@ -1666,6 +1668,25 @@ class FetchCiteSeerAction
 
   }
 
+  class CiteSeerPanelAction
+      extends MnemonicAwareAction {
+    public CiteSeerPanelAction() {
+      super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      putValue(NAME, "Fetch CiteSeer");
+      putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      if (tabbedPane.getTabCount() > 0) {
+	  basePanel().sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
+	  if (basePanel().sidePaneManager.isPanelVisible("CiteSeerPanel"))
+          new FocusRequester(basePanel().medlineFetcher.getTextField());
+        //}
+      }
+    }
+
+  }
+
     /*class FetchAuthorMedlineAction
       extends AbstractAction {
     public FetchAuthorMedlineAction() {
@@ -2034,6 +2055,8 @@ class FetchCiteSeerAction
         getGlassPane().setVisible(false);
         //	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
     }
+
+    
 
 class SaveSessionAction
       extends MnemonicAwareAction {

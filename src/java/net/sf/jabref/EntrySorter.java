@@ -34,6 +34,8 @@ public class EntrySorter {
     TreeSet set;
     String[] idArray;
     BibtexEntry[] entryArray;
+    //static BibtexEntry[] DUMMY = new BibtexEntry[0];
+    private boolean outdated = false;
 
     public EntrySorter(Map entries, Comparator comp) {
 	set = new TreeSet(comp);
@@ -48,15 +50,26 @@ public class EntrySorter {
     }
 
     public void index() {
-	Object[] array = set.toArray();
+
+	//Object[] array = set.toArray();
         // Create aan array of IDs for quick access, since getIdAt() is called by
         // getValueAt() in EntryTableModel, which *has* to be efficient.
-        idArray = new String[array.length];
-        entryArray = new BibtexEntry[array.length];
-        for (int i=0; i<idArray.length; i++) {
-          idArray[i] = ( (BibtexEntry) (array[i])).getId();
-          entryArray[i] = (BibtexEntry)array[i];
+
+	int count = set.size();
+        idArray = new String[count];
+        entryArray = new BibtexEntry[count];
+	int piv = 0;
+	for (Iterator i=set.iterator(); i.hasNext();) {
+	    //        for (int i=0; i<idArray.length; i++) {
+	    BibtexEntry entry = (BibtexEntry)i.next();
+	    idArray[piv] = entry.getId();
+	    entryArray[piv] = entry;
+	    piv++;
         }
+    }
+
+    public boolean isOutdated() {
+	return outdated;
     }
 
     public String getIdAt(int pos) {

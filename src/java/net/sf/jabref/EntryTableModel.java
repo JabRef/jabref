@@ -361,6 +361,11 @@ public class EntryTableModel
 	fireTableDataChanged();
     }
 
+    public void TEST_TEST() {
+	sorter.index();
+	fireTableDataChanged();
+    }
+
   public boolean isCellEditable(int row, int col) {
     if (!Globals.prefs.getBoolean("allowTableEditing"))
       return false;
