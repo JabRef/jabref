@@ -309,8 +309,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	actions.put("delete", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-
-		    if (bes.length > 0) {
+                    int row0 = entryTable.getSelectedRow();
+		    if ((bes != null) && (bes.length > 0)) {
 			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
 
 			/*
@@ -340,7 +340,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			    ensureNotShowing(bes[i]);
 			    ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
 			}
-			entryTable.clearSelection();
 			frame.output(Globals.lang("Deleted")+" "+
 				     (bes.length>1 ? bes.length
 				      +" "+ Globals.lang("entries")
@@ -349,6 +348,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			undoManager.addEdit(ce);
 			refreshTable();
 			markBaseChanged();
+                        if (row0 < entryTable.getRowCount())
+                          entryTable.scrollTo(row0);
+                        else
+                          entryTable.clearSelection();
+
 		    }
 		}
 

@@ -203,7 +203,7 @@ public class JabRef {
                   System.err.println(Globals.lang("Could not export file")+" '"+ args[i+1]+"': "+ex.getMessage());
                 }
                 catch (NullPointerException ex2) {
-                  System.err.println(Globals.lang("Unknown export type")+": "+args[i].substring(3));
+                  System.err.println(Globals.lang("Unknown export format")+": "+args[i].substring(3));
                 }
 
               } else System.err.println(Globals.lang("The -o option must be preceded by an import option."));

@@ -20,4 +20,8 @@ public class GlobalFocusListener implements FocusListener {
   public JComponent getFocused() {
     return (JComponent)focused;
   }
+
+  public void setFocused(Component c) {
+    focused = c;
+  }
 }

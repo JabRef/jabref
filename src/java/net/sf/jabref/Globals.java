@@ -464,7 +464,7 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
     XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
 
-
+    //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }
 
 }

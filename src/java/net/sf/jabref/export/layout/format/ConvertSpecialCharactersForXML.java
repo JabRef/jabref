@@ -44,8 +44,8 @@ public class ConvertSpecialCharactersForXML implements LayoutFormatter
     {
 	fieldText = firstFormat(fieldText);
 
-	if (!pattern.matcher(fieldText).matches())
-	    return restFormat(fieldText);
+	//if (!pattern.matcher(fieldText).matches())
+	//    return restFormat(fieldText);
 
 	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
 	    String s = (String)i.next();

@@ -291,13 +291,19 @@ public class FileActions
 				      File outFile, JabRefPreferences prefs)
 	throws IOException {
 
-	PrintStream ps=null;
+	//PrintStream ps=null;
+        OutputStreamWriter ps=null;
 
 	try {
 	    Object[] keys = database.getKeySet().toArray();
 	    String key, type;
 	    InputStreamReader reader;
-	    ps=new PrintStream(new FileOutputStream(outFile));
+
+
+            // Trying to change the encoding:
+            //ps=new PrintStream(new FileOutputStream(outFile));
+            ps=new OutputStreamWriter(new FileOutputStream(outFile), "iso-8859-1");
+
 	    // Print header
 	    URL reso = JabRefFrame.class.getResource
 		(Globals.LAYOUT_PREFIX+lfName+".begin.layout");
@@ -352,7 +358,7 @@ public class FileActions
 		//Layout layout = layoutHelper.getLayoutFromText();
 
 		//System.out.println(layout.doLayout(entry));
-		ps.println(layout.doLayout(entry));
+                ps.write(layout.doLayout(entry));
 	    }
 
 	    // Print footer
@@ -365,6 +371,9 @@ public class FileActions
 		}
 		reader.close();
 	    }
+
+            ps.flush();
+            ps.close();
 	}
 	catch (IOException ex) {
 	    ex.printStackTrace();

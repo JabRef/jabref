@@ -45,6 +45,7 @@ import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
 import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
+import javax.swing.event.*;
 
 /**
  * The main window of the application.
@@ -282,6 +283,16 @@ public class JabRefFrame
                           prefs.getInt("sizeY")));
     setLocation(new Point(prefs.getInt("posX"),
                           prefs.getInt("posY")));
+
+    // The following state listener makes sure focus is registered with the correct database
+    // when the user switches tabs. Without this, cut/paste/copy operations would some times
+    // occur in the wrong tab.
+    tabbedPane.addChangeListener(new ChangeListener() {
+      public void stateChanged(ChangeEvent e) {
+        Globals.focusListener.setFocused(basePanel().entryTable);
+      }
+
+    });
   }
 
   // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
