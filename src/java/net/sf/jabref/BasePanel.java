@@ -1297,6 +1297,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     public void refreshTable() {
 	// This method is called by EntryTypeForm when a field value is
 	// stored. The table is scheduled for repaint.
+        entryTable.assureNotEditing();
 	tableModel.remap();
 	entryTable.revalidate();
 	entryTable.repaint();
@@ -1490,6 +1491,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	else if (searchValueField == Globals.GROUPSEARCH)
 	    showingGroup = true;
 
+
 	entryTable.setShowingSearchResults(showingSearchResults,
 					   showingGroup);
 	entryTable.clearSelection();
@@ -1530,6 +1532,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	showingSearchResults = false;
 	entryTable.setShowingSearchResults(showingSearchResults,
 					   showingGroup);
+        entryTable.clearSelection();
 	refreshTable();
 	entryTable.requestFocus();
     }
@@ -1538,6 +1541,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	showingGroup = false;
 	entryTable.setShowingSearchResults(showingSearchResults,
 					   showingGroup);
+        entryTable.clearSelection();
 	refreshTable();
     }
 

@@ -215,6 +215,29 @@ public class LabelPatternUtil {
 		    }
 		}
 
+		// authN.  First N chars of the first author's last name.
+		else if ( Pattern.matches("^auth\\d+$", val ) ) {
+			Pattern p = Pattern.compile("^auth(\\d+)$");
+			Matcher m = p.matcher( val );
+			m.matches(); // necessary
+			int num = Integer.parseInt(m.group(1));
+			String fa = firstAuthor(_entry.getField("author").toString());
+			if ( num > fa.length() )
+				num = fa.length();
+		    _sbvalue.append(fa.substring(0,num));
+		}
+
+		// edtrN.  First N chars of the first editor's last name.
+		else if ( Pattern.matches("^edtr\\d+$", val ) ) {
+			Pattern p = Pattern.compile("^edtr(\\d+)$");
+			Matcher m = p.matcher( val );
+			m.matches(); // necessary
+			int num = Integer.parseInt(m.group(1));
+			String fa = firstAuthor(_entry.getField("editor").toString());
+			if ( num > fa.length() )
+				num = fa.length();
+		    _sbvalue.append(fa.substring(0,num));
+		}
 
 		// we havent seen any special demands
 		else {

@@ -166,6 +166,18 @@ public class EntryTable extends JTable {
         selectionListenerOn = true;
       }
 
+      /**
+       * Turns off any cell editing going on.
+       */
+      protected void assureNotEditing() {
+        if (isEditing()) {
+          int col = getEditingColumn(),
+              row = getEditingRow();
+          getCellEditor(row, col).stopCellEditing();
+        }
+      }
+
+
     public void setWidths() {
 	// Setting column widths:
         int ncWidth = prefs.getInt("numberColWidth");
