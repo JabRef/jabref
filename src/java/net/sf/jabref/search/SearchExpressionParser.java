@@ -1,6 +1,7 @@
-// $ANTLR 2.7.4: "Parser.g" -> "SearchExpressionParser.java"$
+// $ANTLR 2.7.5 (20050128): "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
+import java.io.StringReader;
 
 import antlr.TokenBuffer;
 import antlr.TokenStreamException;
@@ -26,6 +27,22 @@ public class SearchExpressionParser extends antlr.LLkParser       implements Sea
 
 	public boolean caseSensitive = false;
     public boolean regex = true;
+	/** Creates a parser and lexer instance and tests the specified String.
+	  * Returns true if s is in valid syntax for advanced field search, false otherwise. */
+	public static boolean isValidSyntax(String s, boolean caseSensitive, boolean regex) {
+		// JZTODO: Is there some way to prevent instance creation here?
+		// How can a parser and/or lexer be reused?
+		SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(
+				new StringReader(s)));
+		parser.caseSensitive = caseSensitive;
+		parser.regex = regex;
+		try {
+			parser.searchExpression();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 protected SearchExpressionParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);

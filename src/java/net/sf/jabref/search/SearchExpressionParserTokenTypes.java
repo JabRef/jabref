@@ -1,6 +1,7 @@
-// $ANTLR 2.7.4: "Parser.g" -> "SearchExpressionParser.java"$
+// $ANTLR 2.7.5 (20050128): "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
+import java.io.StringReader;
 
 public interface SearchExpressionParserTokenTypes {
 	int EOF = 1;
