@@ -55,7 +55,7 @@ public class Globals {
 
 
     private final static Map tableCache = new WeakHashMap();
-    
+
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
   public static Locale locale;
   public static final String FILETYPE_PREFS_EXT = "_dir",
@@ -74,8 +74,8 @@ public class Globals {
   // String array that maps from month number to month string label:
   public static String[] MONTHS = new String[] {"jan", "feb", "mar", "apr", "may", "jun",
           "jul", "aug", "sep", "oct", "nov", "dec"};
-          
-  // Map that maps from month string labels to 
+
+  // Map that maps from month string labels to
   public static Map MONTH_STRINGS = new HashMap();
   static {
       MONTH_STRINGS.put("jan", "January");
@@ -91,7 +91,7 @@ public class Globals {
       MONTH_STRINGS.put("nov", "November");
       MONTH_STRINGS.put("dec", "December");
   }
-          
+
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
 
@@ -115,8 +115,8 @@ public class Globals {
 
   }
 
-  
-  
+
+
   public static void turnOnFileLogging() {
     Logger.global.setLevel(java.util.logging.Level.ALL);
     java.util.logging.Handler handler;
@@ -165,7 +165,7 @@ public class Globals {
       Object res = tableCache.get(text);
       return (String)res;
   }
-  
+
   /**
    * Caches a new value in the tableCache WeakHashMap.
    */
@@ -173,7 +173,7 @@ public class Globals {
       tableCache.put(text, textProcessed);
       //System.out.println(tableCache.size());
   }
-  
+
   public static String lang(String key) {
     String translation = null;
     try {
@@ -390,7 +390,7 @@ public class Globals {
     else {
       fc.setMode(FileDialog.SAVE);
     }
-    
+
     fc.show();
 
     if (fc.getFile() != null) {

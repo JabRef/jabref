@@ -83,7 +83,7 @@ public class IntegrityWizard
     this.setResizable( false ) ;
 
     // messages
-    this.setTitle( "Experimental feature - Integrity Check") ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
+    this.setTitle( Globals.lang("Integrity_check") ) ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
     warnPanel = new IntegrityMessagePanel() ;
 
     // ButtonPanel
@@ -113,18 +113,18 @@ public class IntegrityWizard
 
     JEditorPane infoText = null ;
 
-    URL infoURL = JabRef.class.getResource(GUIGlobals.helpPre
+    URL infoURL = JabRef.class.getResource(GUIGlobals.getLocaleHelpPath()
                                            +GUIGlobals.shortIntegrityCheck);
     if (infoURL != null)
       try
       {
         infoText = new JEditorPane() ;
         infoText.setEditable(false);
+        infoText.setPreferredSize( new Dimension(220, 60));
+        infoText.setMinimumSize( new Dimension(180, 50));
         infoText.setPage(infoURL);
         infoText.setBackground(GUIGlobals.infoField);
         infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        infoText.setPreferredSize( new Dimension(220, 50));
-        infoText.setMinimumSize( new Dimension(180, 50));
 //        bottomPanel.add( infoText, BorderLayout.CENTER ) ;
       }
       catch (IOException e)
