@@ -1077,6 +1077,7 @@ public JabRefPreferences prefs() {
      * Disable actions that demand an open database.
      */
   private void setEmptyState() {
+    manageSelectors.setEnabled(false);
     mergeDatabaseAction.setEnabled(false);
     newSubDatabaseAction.setEnabled(false);
     close.setEnabled(false);
@@ -1129,6 +1130,7 @@ public JabRefPreferences prefs() {
      * Enable actions that demand an open database.
      */
   private void setNonEmptyState() {
+    manageSelectors.setEnabled(true);
     mergeDatabaseAction.setEnabled(true);
     newSubDatabaseAction.setEnabled(true);
     close.setEnabled(true);

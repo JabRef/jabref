@@ -33,7 +33,8 @@ public interface FieldEditor {
     public javax.swing.JComponent getPane(); 
     // Returns the component to be added to a container. Might 
     // be a JScrollPane or the component itself.
-
+    public javax.swing.JComponent getTextComponent();
+    // Returns the text component itself.
     public javax.swing.JLabel getLabel();
     public void setLabelColor(java.awt.Color c);
     public void setBackground(java.awt.Color c);

@@ -166,45 +166,11 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-	    String pri, sec, ter;
-	    boolean priD, secD, terD;
-	    if (!prefs.getBoolean("saveInStandardOrder")) {
-		// The setting is to save according to the current table order.
-
-		pri = prefs.get("priSort");
-		sec = prefs.get("secSort");
-		// sorted as they appear on the screen.
-		ter = prefs.get("terSort");
-		priD = prefs.getBoolean("priDescending");
-		secD = prefs.getBoolean("secDescending");
-		terD = prefs.getBoolean("terDescending");
-	    } else {
-		// The setting is to save in standard order: author, editor, year
-		pri = "author";
-		sec = "editor";
-		ter = "year";
-		priD = false;
-		secD = false;
-		terD = true;
-	    }
-            TreeSet sorter = new TreeSet(new CrossRefEntryComparator
-					 (new EntryComparator(priD, secD, terD, pri, sec, ter)));
-            Set keySet = database.getKeySet();
-
-            if (keySet != null)
-            {
-                Iterator i = keySet.iterator();
-
-                for (; i.hasNext();)
-                {
-                    sorter.add(database.getEntryById((String) (i.next())));
-                }
-            }
+	    TreeSet sorter = getSortedEntries(database);
 
             FieldFormatter ff = new LatexFieldFormatter();
 
-            for (Iterator i = sorter.iterator(); i.hasNext();)
-            {
+            for (Iterator i = sorter.iterator(); i.hasNext();) {
                 be = (BibtexEntry) (i.next());
 
                 // Check if the entry should be written.
@@ -382,8 +348,10 @@ public class FileActions
             // If an exception was cast, export filter doesn't have a begin file.
 
             // Write database entrie; entries will be sorted as they
-            // appear on the screen.
-            String pri = prefs.get("priSort"),
+            // appear on the screen, or sorted by author, depending on
+	    // Preferences.
+	    TreeSet sorted = getSortedEntries(database);
+            /*String pri = prefs.get("priSort"),
 		sec = prefs.get("secSort"),
 		ter = prefs.get("terSort");
             EntrySorter sorter = database.getSorter
@@ -391,7 +359,7 @@ public class FileActions
 				     prefs.getBoolean("secDescending"),
 				     prefs.getBoolean("terDescending"),
 				     pri, sec, ter));
-
+	    */
 	    // Load default layout
             reader = getReader(prefix+lfName+".layout");
             //Util.pr(prefix+lfName+".layout");
@@ -401,11 +369,9 @@ public class FileActions
             reader.close();
 	    HashMap layouts = new HashMap();
 	    Layout layout;
-            for (int i=0; i<sorter.getEntryCount(); i++) {
-              // Get the entry
-
-              key = (String)sorter.getIdAt(i);
-              BibtexEntry entry = database.getEntryById(key);
+            for (Iterator i = sorted.iterator(); i.hasNext();) {
+		// Get the entry
+		BibtexEntry entry = (BibtexEntry) (i.next());
 
               //System.out.println(entry.getType().getName());
 
@@ -475,6 +441,44 @@ public class FileActions
       }
 
       return reader;
+    }
+    
+    protected static TreeSet getSortedEntries(BibtexDatabase database) {
+	String pri, sec, ter;
+	boolean priD, secD, terD;
+	if (!Globals.prefs.getBoolean("saveInStandardOrder")) {
+	    // The setting is to save according to the current table order.
+	    
+	    pri = Globals.prefs.get("priSort");
+	    sec = Globals.prefs.get("secSort");
+	    // sorted as they appear on the screen.
+	    ter = Globals.prefs.get("terSort");
+	    priD = Globals.prefs.getBoolean("priDescending");
+	    secD = Globals.prefs.getBoolean("secDescending");
+	    terD = Globals.prefs.getBoolean("terDescending");
+	} else {
+	    // The setting is to save in standard order: author, editor, year
+	    pri = "author";
+	    sec = "editor";
+	    ter = "year";
+	    priD = false;
+	    secD = false;
+	    terD = true;
+	}
+	TreeSet sorter = new TreeSet(new CrossRefEntryComparator
+				     (new EntryComparator(priD, secD, terD, pri, sec, ter)));
+	Set keySet = database.getKeySet();
+	
+	if (keySet != null)
+            {
+                Iterator i = keySet.iterator();
+		
+                for (; i.hasNext();)
+		    {
+			sorter.add(database.getEntryById((String) (i.next())));
+		    }
+            }
+	return sorter;
     }
 
     /** Returns true iff the entry has a nonzero value in its field.

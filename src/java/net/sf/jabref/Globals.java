@@ -364,6 +364,8 @@ public class Globals {
     HTMLCHARS.put("\"O", "&Ouml;");
     HTMLCHARS.put("\"u", "&uuml;");
     HTMLCHARS.put("\"U", "&Uuml;");
+    HTMLCHARS.put("`a", "&agrave;");
+    HTMLCHARS.put("`A", "&Agrave;");
     HTMLCHARS.put("`e", "&egrave;");
     HTMLCHARS.put("`E", "&Egrave;");
     HTMLCHARS.put("`i", "&igrave;");

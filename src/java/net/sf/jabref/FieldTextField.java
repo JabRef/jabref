@@ -66,6 +66,8 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     public JComponent getPane() { return this; }
 
+    public JComponent getTextComponent() { return this; }
+
   public void paintComponent(Graphics g) {
 	Graphics2D g2 = (Graphics2D)g;
 	RenderingHints rh = g2.getRenderingHints();

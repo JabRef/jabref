@@ -214,7 +214,9 @@ public class ContentSelectorDialog2 extends JDialog {
     }
 
     private void newWordAction() {
-	wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+	if ((wordListModel.size() == 0) || 
+	    !wordListModel.get(0).equals(WORD_FIRSTLINE_TEXT))
+	    wordListModel.add(0, WORD_FIRSTLINE_TEXT);
 	wordList.setSelectedIndex(0);
 	wPane.getVerticalScrollBar().setValue(0);
     }

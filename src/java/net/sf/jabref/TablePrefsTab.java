@@ -67,7 +67,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 				   ("Color codes for required and optional fields")
 				   ,_prefs.getBoolean("tableColorCodesOn"));
 	antialias = new JCheckBox(Globals.lang
-				  ("Use antialiasing font")
+				  ("Use antialiasing font in table")
 				  ,_prefs.getBoolean("antialias"));
 	autoResizeMode = new JCheckBox(Globals.lang
 				       ("Fit table horizontally on screen"),
@@ -215,7 +215,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	upper.setBorder(BorderFactory.createTitledBorder
 			(BorderFactory.createEtchedBorder(),
-			 Globals.lang("Table appearance")));
+			 Globals.lang("Miscellaneous")));
 	sort.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
                         Globals.lang("Sort options")));

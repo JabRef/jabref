@@ -99,5 +99,5 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     public JLabel getLabel() { return label; }
     public void setLabelColor(Color c) { label.setForeground(c); }
     public JComponent getPane() { return sp; }
-
+    public JComponent getTextComponent() { return this; }
 }

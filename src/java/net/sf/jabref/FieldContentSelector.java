@@ -122,6 +122,10 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	list.setSelectedIndex(0);
 	parent.storeFieldAction.actionPerformed
 	    (new ActionEvent(editor, 0, ""));
+
+	// Transfer focus to the editor.
+	editor.requestFocus();
+	//new FocusRequester(editor.getTextComponent());
     }
 
   /**
