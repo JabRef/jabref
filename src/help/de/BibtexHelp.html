@@ -1,0 +1,33 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Über <em>BibTeX</em></H1>
+
+JabRef hilft Ihnen bei der Arbeit mit Ihren <em>BibTeX</em>-Dateien, aber es müssen dennoch Regeln beachtet werden, wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden, dass <em>BibTeX</em> Ihre Datei richtig verarbeiten kann.
+
+<H2><em>BibTeX</em> Felder</H2>
+
+Es gibt viele unterschiedliche Felder in <em>BibTeX</em> und einige zusätzliche Felder, die Sie in JabRef einsetzen können.
+<P>
+Grundsätzlich können Sie LaTeX-Befehle in Feldern, die Text beinhalten, einsetzen. <em>BibTeX</em> wird Ihr Literaturverzeichnis automatisch formatieren und je nach <em>BibTeX</em> style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass einzelne Buchstaben groß bleiben, müssen Sie sie in Klammern einschließen, wie im Wort {B}elgien. <em>(Anm. d. Übers.: Die meisten deutschen <em>BibTeX</em>-Stile behalten die Großbuchstaben ohnehin bei.)</em>
+
+<P>
+Hinweise zu einigen Feldtypen:
+<ul>
+<li><em>Author:</em> Dieses Feld sollte alle Autoren Ihres Eintrags enthalten. Die Namen werden durch das Wort <em>and</em> getrennt, auch wenn es mehr als zwei Autoren gibt. Jeder Name kann in zwei gleichwertigen Formen notiert werden:<br>
+ Donald E. Knuth <em>oder</em> Knuth, Donald E.<br>
+ Eddie van Halen <em>oder</em> van Halen, Eddie<br>
+
+Die zweite Form sollte für Autoren mit zwei oder mehr Nachnamen benutzt werden, um zwischen dem mittleren und dem Nachnamen zu unterscheiden.
+
+<li><em>Editor:</em> Dieses Feld ist analog zu dem <em>author</em>-Feld.
+
+<li><em>Year:</em> Das Jahr der Publikation. Dieses Feld wird für die meisten Eintragstypen benötigt. JabRef akzeptiert in diesem Feld nur einen numerischen Wert.
+
+<li><em>Bibtexkey:</em> Eine eindeutige Bezeichnung,um sich in LaTeX-Dokumenten auf den Eintrag beziehen zu können. Beachten Sie, dass der Bibtexkey genau mit dem Verweis im LaTeX-Dokument übereinstimmen muss (auch die Groß-/Kleinschreibung).
+</ul>
+
+
+</HTML>
