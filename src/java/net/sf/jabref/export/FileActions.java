@@ -97,7 +97,7 @@ public class FileActions
             FileWriter fw = new FileWriter(file);
 
             // Write signature.
-            fw.write(Globals.lang(GUIGlobals.SIGNATURE));
+            fw.write(GUIGlobals.SIGNATURE);
 
             // Write preamble if there is one.
             String preamble = database.getPreamble();

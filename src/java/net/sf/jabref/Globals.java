@@ -166,6 +166,7 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&Ntilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
+
     }
 
 }
