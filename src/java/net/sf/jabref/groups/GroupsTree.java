@@ -34,7 +34,7 @@ import javax.swing.tree.*;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
-
+    private static final int dragScrollActivationMargin = 10;
     private GroupSelector groupSelector;
     private GroupTreeNode dragNode = null;
 
@@ -61,7 +61,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             return;
         }
         GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
-        if (dragNode.isNodeChild(target) || dragNode == target) {
+        if (target == null || dragNode.isNodeChild(target) || dragNode == target) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
@@ -85,18 +85,12 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragOver(DropTargetDragEvent dtde) {
-        // Point p = dtde.getLocation();
-        // TreePath path = getPathForLocation(p.x, p.y);
-        // if (path == null) {
-        // dtde.rejectDrag();
-        // return;
-        // }
-        // GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
-        // if (dragNode.isNodeChild(target)) {
-        // dtde.rejectDrag();
-        // return;
-        // }
-        // dtde.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
+        Rectangle r = new Rectangle(
+                dtde.getLocation().x - dragScrollActivationMargin,
+                dtde.getLocation().y - dragScrollActivationMargin, 
+                1 + 2 * dragScrollActivationMargin, 
+                1 + 2 * dragScrollActivationMargin);
+        scrollRectToVisible(r);
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {
