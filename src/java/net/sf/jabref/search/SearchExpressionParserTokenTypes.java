@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "Parser.g" -> "SearchExpressionParser.java"$
+// $ANTLR 2.7.4: "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
 

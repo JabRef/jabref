@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "TreeParser.g" -> "SearchExpressionTreeParser.java"$
+// $ANTLR 2.7.4: "TreeParser.g" -> "SearchExpressionTreeParser.java"$
 
 package net.sf.jabref.search;
 import java.util.*;
@@ -18,8 +18,7 @@ import antlr.ASTPair;
 import antlr.collections.impl.ASTArray;
 
 
-public class SearchExpressionTreeParser extends antlr.TreeParser
-       implements SearchExpressionTreeParserTokenTypes
+public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes
  {
 
 	private static final int MATCH_EXACT = 0;
@@ -45,7 +44,7 @@ public SearchExpressionTreeParser() {
 	public final boolean  tSearchExpression(AST _t) throws RecognitionException, PatternSyntaxException {
 		boolean ret = false;;
 		
-		AST tSearchExpression_AST_in = (AST)_t;
+		AST tSearchExpression_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		
 			boolean a = false, b = false;
 		
@@ -147,7 +146,7 @@ public SearchExpressionTreeParser() {
 	public final boolean  tExpressionSearch(AST _t) throws RecognitionException, PatternSyntaxException {
 		 boolean ret = false; ;
 		
-		AST tExpressionSearch_AST_in = (AST)_t;
+		AST tExpressionSearch_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		AST var_f = null;
 		AST var_v = null;
 		
@@ -205,7 +204,7 @@ public SearchExpressionTreeParser() {
 	public final int  tSearchType(AST _t) throws RecognitionException {
 		 int matchType = 0; ;
 		
-		AST tSearchType_AST_in = (AST)_t;
+		AST tSearchType_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;

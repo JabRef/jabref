@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "TreeParser.g" -> "SearchExpressionTreeParser.java"$
+// $ANTLR 2.7.4: "TreeParser.g" -> "SearchExpressionTreeParser.java"$
 
 package net.sf.jabref.search;
 import java.util.*;

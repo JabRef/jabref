@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "Lexer.g" -> "SearchExpressionLexer.java"$
+// $ANTLR 2.7.4: "Lexer.g" -> "SearchExpressionLexer.java"$
 
 package net.sf.jabref.search;
 
@@ -39,14 +39,14 @@ public SearchExpressionLexer(InputBuffer ib) {
 }
 public SearchExpressionLexer(LexerSharedInputState state) {
 	super(state);
+	caseSensitiveLiterals = false;
+	setCaseSensitive(false);
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
 	literals.put(new ANTLRHashString("contains", this), new Integer(7));
 	literals.put(new ANTLRHashString("equals", this), new Integer(8));
-caseSensitiveLiterals = false;
-setCaseSensitive(false);
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -106,7 +106,7 @@ tryAgain:
 					}
 				else {
 					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				}
 				if ( _returnToken==null ) continue tryAgain; // found SKIP token
@@ -148,7 +148,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -297,7 +297,7 @@ tryAgain:
 				mLETTER(false);
 			}
 			else {
-				if ( _cnt16>=1 ) { break _loop16; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+				if ( _cnt16>=1 ) { break _loop16; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
 			_cnt16++;
@@ -312,9 +312,19 @@ tryAgain:
 	}
 	
 	
-	private static final long _tokenSet_0_data_[] = { -2305846337813348872L, -1L, -1L, -1L, 0L, 0L, 0L, 0L };
-	public static final BitSet _tokenSet_0 = new BitSet(_tokenSet_0_data_);
-	private static final long _tokenSet_1_data_[] = { -17179869192L, -1L, -1L, -1L, 0L, 0L, 0L, 0L };
-	public static final BitSet _tokenSet_1 = new BitSet(_tokenSet_1_data_);
+	private static final long[] mk_tokenSet_0() {
+		long[] data = new long[8];
+		data[0]=-2305846337813348872L;
+		for (int i = 1; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
+	private static final long[] mk_tokenSet_1() {
+		long[] data = new long[8];
+		data[0]=-17179869192L;
+		for (int i = 1; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	
 	}

@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "Lexer.g" -> "SearchExpressionLexer.java"$
+// $ANTLR 2.7.4: "Lexer.g" -> "SearchExpressionLexer.java"$
 
 package net.sf.jabref.search;
 
