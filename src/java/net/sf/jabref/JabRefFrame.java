@@ -55,6 +55,11 @@ public class JabRefFrame extends JFrame {
     LabelMaker labelMaker;
     File fileToOpen = null;
 
+    // The help window.
+    public HelpDialog helpDiag = new HelpDialog(this);
+    
+
+
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
     // with a unique command string. This causes the appropriate
@@ -73,7 +78,10 @@ public class JabRefFrame extends JFrame {
 	undo = new GeneralAction("undo", "Undo", "Undo",
 				 GUIGlobals.undoIconFile),
 	redo = new GeneralAction("redo", "Redo", "Redo",
-				 GUIGlobals.redoIconFile);
+				 GUIGlobals.redoIconFile),
+	editPreamble = new GeneralAction("editPreamble", "Edit preamble", 
+					 "Edit preamble",
+					 GUIGlobals.preambleIconFile);
 	
 
     public JabRefFrame() {
@@ -279,7 +287,8 @@ public class JabRefFrame extends JFrame {
 
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
-	    edit = new JMenu(Globals.lang("Edit"));
+	    edit = new JMenu(Globals.lang("Edit")),
+	    bibtex = new JMenu(Globals.lang("Bibtex"));
 	file.add(newDatabaseAction);
 	file.add(open);
 	file.add(save);
@@ -291,6 +300,9 @@ public class JabRefFrame extends JFrame {
 	edit.add(undo);
 	edit.add(redo);
 	mb.add(edit);
+
+	bibtex.add(editPreamble);
+	mb.add(bibtex);
 
 	/*
 	file.add(mItem(newDatabaseAction, null));

@@ -71,14 +71,16 @@ public class BasePanel extends JSplitPane implements MouseListener {
     HashMap entryTypeForms = new HashMap();
     // Hashmap to keep track of which entries currently have open
     // EntryTypeForm dialogs.
+    
     PreambleEditor preambleEditor = null;
     // Keeps track of the preamble dialog if it is open.
-    //StringDialog stringDialog = null;
+
+    StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
-    //public HelpDialog helpDiag = new HelpDialog(this);
-    // The help window.
+
     //SearchPane searchDialog = null;
     // The search pane.
+
     boolean showingSearchResults = false, 
 	showingGroup = false;
 
@@ -89,9 +91,6 @@ public class BasePanel extends JSplitPane implements MouseListener {
 
     private HashMap actions = new HashMap();
    
-    protected final static String KEY_PROPERTY = "bibtexkey";
-    protected final static String SEARCH_PROPERTY = "search";
-
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
 	database = new BibtexDatabase();
 	metaData = new MetaData();
@@ -131,6 +130,34 @@ public class BasePanel extends JSplitPane implements MouseListener {
 
 	actions.put("undo", undoAction);
 	actions.put("redo", redoAction);
+
+	// The action for opening an entry editor.
+	actions.put("edit", new BaseAction() {
+		public void action() {
+		    int clickedOn = -1;
+		    // We demand that one and only one row is selected.
+		    if (entryTable.getSelectedRowCount() == 1) {
+			clickedOn = entryTable.getSelectedRow();		
+		    }
+		    if (clickedOn >= 0) {
+			String id =  tableModel.getNameFromNumber(clickedOn);
+			
+			// First we check that no editor is already open for this
+			// entry.
+			if (!entryTypeForms.containsKey(id)) {
+			    BibtexEntry be = database.getEntryById(id);
+			    EntryTypeForm form = new EntryTypeForm
+				(frame, ths, be, prefs);
+			    Util.placeDialog(form, frame); // We want to center the editor.
+			    form.setVisible(true);
+			    entryTypeForms.put(id, form);
+			} else {
+			    ((EntryTypeForm)(entryTypeForms.get(id))).setVisible(true);
+			}
+		    }
+		}
+	    	       
+	    });
 
 	// The action for saving a database.
 	actions.put("save", new BaseAction() {
@@ -202,6 +229,21 @@ public class BasePanel extends JSplitPane implements MouseListener {
 		}
 	    });
       
+	// The action for opening the preamble editor
+	actions.put("editPreamble", new BaseAction() {
+		public void action() {
+		    if (preambleEditor == null) {
+			PreambleEditor form = new PreambleEditor
+			    (frame, ths, database, prefs);
+			Util.placeDialog(form, frame);
+			form.setVisible(true);
+			preambleEditor = form;
+		    } else {
+			preambleEditor.setVisible(true);
+		    }
+	    
+		}
+	    });
     }
 
     /**
@@ -307,11 +349,10 @@ public class BasePanel extends JSplitPane implements MouseListener {
 	}
 	else if (baseChanged) {
 	    baseChanged = false;
-	    /*
 	    if (file != null)
-		setTitle(GUIGlobals.baseTitle+file.getName());
+		frame.setTabTitle(ths, file.getName());
 	    else
-	    setTitle(GUIGlobals.untitledTitle);*/
+		frame.setTabTitle(ths, Globals.lang("untitled"));
 	}
     }
 
@@ -354,14 +395,17 @@ public class BasePanel extends JSplitPane implements MouseListener {
 		return database ; 
     }
 
+    public void entryTypeFormClosing(String id) {
+	// Called by EntryTypeForm when closing.
+	entryTypeForms.remove(id);
+    }
+
     public void preambleEditorClosing() {
-	Util.pr("BasePanel: must set preambleEditor = null");
-	//preambleEditor = null;
+	preambleEditor = null;
     }
 
     public void stringsClosing() {
-	Util.pr("BasePanel: must set stringDialog = null");
-	//stringDialog = null;
+	stringDialog = null;
     }
 
 
@@ -486,7 +530,7 @@ public class BasePanel extends JSplitPane implements MouseListener {
 		refreshTable();
 		frame.output(name);
 	    } catch (CannotUndoException ex) {
-		frame.output(Globals.lang("Nothing to undo."));
+		frame.output(Globals.lang("Nothing to undo")+".");
 	    }
 	    // After everything, enable/disable the undo/redo actions
 	    // appropriately.
@@ -505,7 +549,7 @@ public class BasePanel extends JSplitPane implements MouseListener {
 		refreshTable();
 		frame.output(name);
 	    } catch (CannotRedoException ex) {
-		frame.output("Nothing to redo.");
+		frame.output(Globals.lang("Nothing to redo")+".");
 	    }
 	    // After everything, enable/disable the undo/redo actions
 	    // appropriately.
@@ -520,8 +564,7 @@ public class BasePanel extends JSplitPane implements MouseListener {
 	// Intercepts mouse clicks from the JTable showing the base contents.
 	// A double click on an entry should open the entry's editor.
 	if (e.getClickCount() == 2) {
-	    Util.pr("BasePanel: must call edit entry action.");
-	    //editEntryAction.actionPerformed(null);
+	    runCommand("edit");
 	}
 	
     }
