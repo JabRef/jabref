@@ -847,7 +847,9 @@ public class JabRefFrame extends JFrame {
 			output("Imported database '"+filename+"' with "+
 			       database.getEntryCount()+" entries.");
 		}
-		private void setUpImportMenu(JMenu importMenu){
+	
+
+	private void setUpImportMenu(JMenu importMenu){
 			//
 			// put in menu
 			//
@@ -919,6 +921,7 @@ public class JabRefFrame extends JFrame {
 					}
 				});
 			importMenu.add(newINSPECFile_mItem);
+			
 			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("Import SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
 			newSciFinderFile_mItem.addActionListener(new ActionListener(){

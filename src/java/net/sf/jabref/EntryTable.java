@@ -32,7 +32,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.Dimension;
 import java.io.*;
-
+import java.awt.Rectangle;
 public class EntryTable extends JTable {
 
     final int PREFERRED_WIDTH = 400, PREFERRED_HEIGHT = 30;
@@ -239,6 +239,42 @@ public class EntryTable extends JTable {
 	    setBackground(GUIGlobals.veryGrayedOutBackground);
 	    setForeground(GUIGlobals.veryGrayedOutText);
 	}
+    }
+
+	    public void scrollToCenter( int rowIndex, int vColIndex) {
+        if (!(this.getParent() instanceof JViewport)) {
+            return;
+        }
+        JViewport viewport = (JViewport)this.getParent();
+    
+        // This rectangle is relative to the table where the
+        // northwest corner of cell (0,0) is always (0,0).
+        Rectangle rect = this.getCellRect(rowIndex, vColIndex, true);
+    
+        // The location of the view relative to the table
+        Rectangle viewRect = viewport.getViewRect();
+    
+        // Translate the cell location so that it is relative
+        // to the view, assuming the northwest corner of the
+        // view is (0,0).
+        rect.setLocation(rect.x-viewRect.x, rect.y-viewRect.y);
+    
+        // Calculate location of rect if it were at the center of view
+        int centerX = (viewRect.width-rect.width)/2;
+        int centerY = (viewRect.height-rect.height)/2;
+    
+        // Fake the location of the cell so that scrollRectToVisible
+        // will move the cell to the center
+        if (rect.x < centerX) {
+            centerX = -centerX;
+        }
+        if (rect.y < centerY) {
+            centerY = -centerY;
+        }
+        rect.translate(centerX, centerY);
+    
+        // Scroll the area into view.
+        viewport.scrollRectToVisible(rect);
     }
 
 }
