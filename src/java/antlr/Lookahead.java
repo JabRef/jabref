@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -59,139 +59,160 @@ import antlr.collections.impl.Vector;
  * Here, LOOK(3,ref-to(b)) returns epsilon, but the depths are
  * {1, 2}; i.e., 3-(3-1) and 3-(3-2).  Those are the lookahead depths
  * past the rule ref needed for the local follow.
- * 
+ *
  * <p>
  * This is null unless an epsilon is created.
  *
  * @see antlr.Lookahead#combineWith(Lookahead)
  */
 public class Lookahead implements Cloneable {
-	/** actual bitset of the lookahead */
-	BitSet fset;
-	/** is this computation part of a computation cycle? */
-	String cycle;
-	/** What k values were being computed when end of rule hit? */
-	BitSet epsilonDepth;
-	/** Does this lookahead depth include Epsilon token type? This
-	 *  is used to avoid having a bit in the set for Epsilon as it
-	 *  conflicts with parsing binary files.
-	 */
-	boolean hasEpsilon = false;
-	public Lookahead() {
-		fset = new BitSet();
-	}
-	/** create a new lookahead set with the LL(1) set to the parameter */
-	public Lookahead(BitSet p) {
-		fset = p;
-	}
-	/** create an empty lookahead set, but with cycle */
-	public Lookahead(String c) {
-		this();
-		cycle = c;
-	}
-	/** Make a deep copy of everything in this object */
-	public Object clone() {
-		Lookahead p=null;
-		try {
-			p = (Lookahead)super.clone();
-			p.fset = (BitSet)fset.clone();
-			p.cycle = cycle; // strings are immutable
-			if ( epsilonDepth!=null ) {
-				p.epsilonDepth = (BitSet)epsilonDepth.clone();
-			}
-		}
-		catch (CloneNotSupportedException e) {
-			throw new InternalError();
-		}
-		return p;
-	}
-	public void combineWith(Lookahead q) {
-		if ( cycle==null ) {	// track at least one cycle
-			cycle = q.cycle;
-		}
-		
-		if ( q.containsEpsilon() ) {
-			hasEpsilon = true;
-		}
-			
-		// combine epsilon depths
-		if ( epsilonDepth!=null ) {
-			if ( q.epsilonDepth!=null ) {
-				epsilonDepth.orInPlace(q.epsilonDepth);
-			}
-		}
-		else if ( q.epsilonDepth!=null ) {
-			epsilonDepth = (BitSet)q.epsilonDepth.clone();
-		}
-		fset.orInPlace(q.fset);
-	}
-	public boolean containsEpsilon() { return hasEpsilon; }
-	/** What is the intersection of two lookahead depths?
-	 *  Only the Epsilon "bit" and bitset are considered.
-	 */
-	public Lookahead intersection(Lookahead q) {
-		Lookahead p = new Lookahead(fset.and(q.fset));
-		if ( this.hasEpsilon && q.hasEpsilon ) {
-			p.setEpsilon();
-		}
-		return p;
-	}
-	public boolean nil() {
-		return fset.nil() && !hasEpsilon;
-	}
-	public static Lookahead of(int el) {
-		Lookahead look = new Lookahead();
-		look.fset.add(el);
-		return look;
-	}
-	public void resetEpsilon() { hasEpsilon=false; }
-	public void setEpsilon() { hasEpsilon = true; }
-	public String toString() {
-		String e="",b,f="",d="";
-		b = fset.toString(",");
-		if ( containsEpsilon() ) {
-			e="+<epsilon>";
-		}
-		if ( cycle!=null ) {
-			f="; FOLLOW("+cycle+")";
-		}
-		if ( epsilonDepth != null ) {
-			d = "; depths="+epsilonDepth.toString(",");
-		}
-		return b+e+f+d;
+    /** actual bitset of the lookahead */
+    BitSet fset;
+    /** is this computation part of a computation cycle? */
+    String cycle;
+    /** What k values were being computed when end of rule hit? */
+    BitSet epsilonDepth;
+    /** Does this lookahead depth include Epsilon token type? This
+     *  is used to avoid having a bit in the set for Epsilon as it
+     *  conflicts with parsing binary files.
+     */
+    boolean hasEpsilon = false;
 
-	}
-	public String toString(String separator, CharFormatter formatter) {
-		String e="",b,f="",d="";
-		b = fset.toString(separator, formatter);
-		if ( containsEpsilon() ) {
-			e="+<epsilon>";
-		}
-		if ( cycle!=null ) {
-			f="; FOLLOW("+cycle+")";
-		}
-		if ( epsilonDepth != null ) {
-			d = "; depths="+epsilonDepth.toString(",");
-		}
-		return b+e+f+d;
-	}
-	public String toString(String separator, CharFormatter formatter, Grammar g) {
-		if (g instanceof LexerGrammar) {
-			return toString(separator, formatter);
-		}
-		else {
-			return toString(separator, g.tokenManager.getVocabulary());
-		}
-	}
-	public String toString(String separator, Vector vocab) {
-		String b,f="",d="";
-		b = fset.toString(separator, vocab);
-		if ( cycle!=null ) {
-			f="; FOLLOW("+cycle+")";
-		}
-		if ( epsilonDepth != null ) {
-			d = "; depths="+epsilonDepth.toString(",");
-		}
-		return b+f+d;
-	}
+    public Lookahead() {
+        fset = new BitSet();
+    }
+
+    /** create a new lookahead set with the LL(1) set to the parameter */
+    public Lookahead(BitSet p) {
+        fset = p;
+    }
+
+    /** create an empty lookahead set, but with cycle */
+    public Lookahead(String c) {
+        this();
+        cycle = c;
+    }
+
+    /** Make a deep copy of everything in this object */
+    public Object clone() {
+        Lookahead p = null;
+        try {
+            p = (Lookahead)super.clone();
+            p.fset = (BitSet)fset.clone();
+            p.cycle = cycle; // strings are immutable
+            if (epsilonDepth != null) {
+                p.epsilonDepth = (BitSet)epsilonDepth.clone();
+            }
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+        return p;
+    }
+
+    public void combineWith(Lookahead q) {
+        if (cycle == null) {	// track at least one cycle
+            cycle = q.cycle;
+        }
+
+        if (q.containsEpsilon()) {
+            hasEpsilon = true;
+        }
+
+        // combine epsilon depths
+        if (epsilonDepth != null) {
+            if (q.epsilonDepth != null) {
+                epsilonDepth.orInPlace(q.epsilonDepth);
+            }
+        }
+        else if (q.epsilonDepth != null) {
+            epsilonDepth = (BitSet)q.epsilonDepth.clone();
+        }
+        fset.orInPlace(q.fset);
+    }
+
+    public boolean containsEpsilon() {
+        return hasEpsilon;
+    }
+
+    /** What is the intersection of two lookahead depths?
+     *  Only the Epsilon "bit" and bitset are considered.
+     */
+    public Lookahead intersection(Lookahead q) {
+        Lookahead p = new Lookahead(fset.and(q.fset));
+        if (this.hasEpsilon && q.hasEpsilon) {
+            p.setEpsilon();
+        }
+        return p;
+    }
+
+    public boolean nil() {
+        return fset.nil() && !hasEpsilon;
+    }
+
+    public static Lookahead of(int el) {
+        Lookahead look = new Lookahead();
+        look.fset.add(el);
+        return look;
+    }
+
+    public void resetEpsilon() {
+        hasEpsilon = false;
+    }
+
+    public void setEpsilon() {
+        hasEpsilon = true;
+    }
+
+    public String toString() {
+        String e = "",b,f = "",d = "";
+        b = fset.toString(",");
+        if (containsEpsilon()) {
+            e = "+<epsilon>";
+        }
+        if (cycle != null) {
+            f = "; FOLLOW(" + cycle + ")";
+        }
+        if (epsilonDepth != null) {
+            d = "; depths=" + epsilonDepth.toString(",");
+        }
+        return b + e + f + d;
+
+    }
+
+    public String toString(String separator, CharFormatter formatter) {
+        String e = "",b,f = "",d = "";
+        b = fset.toString(separator, formatter);
+        if (containsEpsilon()) {
+            e = "+<epsilon>";
+        }
+        if (cycle != null) {
+            f = "; FOLLOW(" + cycle + ")";
+        }
+        if (epsilonDepth != null) {
+            d = "; depths=" + epsilonDepth.toString(",");
+        }
+        return b + e + f + d;
+    }
+
+    public String toString(String separator, CharFormatter formatter, Grammar g) {
+        if (g instanceof LexerGrammar) {
+            return toString(separator, formatter);
+        }
+        else {
+            return toString(separator, g.tokenManager.getVocabulary());
+        }
+    }
+
+    public String toString(String separator, Vector vocab) {
+        String b,f = "",d = "";
+        b = fset.toString(separator, vocab);
+        if (cycle != null) {
+            f = "; FOLLOW(" + cycle + ")";
+        }
+        if (epsilonDepth != null) {
+            d = "; depths=" + epsilonDepth.toString(",");
+        }
+        return b + f + d;
+    }
 }

@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -14,6 +14,6 @@ package antlr;
  *  trees.
  */
 public class TreeParserSharedInputState {
-	/** Are we guessing (guessing>0)? */
-	public int guessing = 0;
+    /** Are we guessing (guessing>0)? */
+    public int guessing = 0;
 }

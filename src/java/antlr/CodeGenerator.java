@@ -2,14 +2,15 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
 
-import java.io.PrintWriter; // SAS: for proper text i/o
+import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.FileWriter;  // SAS: for proper text i/o
+import java.io.FileWriter;
+
 import antlr.collections.impl.Vector;
 import antlr.collections.impl.BitSet;
 
@@ -47,20 +48,26 @@ import antlr.collections.impl.BitSet;
  * @see     antlr.Lookahead
  */
 public abstract class CodeGenerator {
+    protected antlr.Tool antlrTool;
+
     /** Current tab indentation for code output */
-    protected int tabs=0;
+    protected int tabs = 0;
+
     /** Current output Stream */
     transient protected PrintWriter currentOutput; // SAS: for proper text i/o
+
     /** The grammar for which we generate code */
     protected Grammar grammar = null;
+
     /** List of all bitsets that must be dumped.  These are Vectors of BitSet. */
     protected Vector bitsetsUsed;
-    /** The antlr Tool */
-    protected Tool tool;
+
     /** The grammar behavior */
     protected DefineGrammarSymbols behavior;
+
     /** The LLk analyzer */
     protected LLkGrammarAnalyzer analyzer;
+
     /** Object used to format characters in the target language.
      * subclass must initialize this to the language-specific formatter
      */
@@ -72,6 +79,11 @@ public abstract class CodeGenerator {
     /** Default values for code-generation thresholds */
     protected static final int DEFAULT_MAKE_SWITCH_THRESHOLD = 2;
     protected static final int DEFAULT_BITSET_TEST_THRESHOLD = 4;
+
+    /** If there are more than 8 long words to init in a bitset,
+     *  try to optimize it; e.g., detect runs of -1L and 0L.
+     */
+    protected static final int BITSET_OPTIMIZE_INIT_THRESHOLD = 8;
 
     /** This is a hint for the language-specific code generator.
      * A switch() or language-specific equivalent will be generated instead
@@ -88,23 +100,24 @@ public abstract class CodeGenerator {
      * This is modified by the grammar option "codeGenBitsetTestThreshold"
      */
     protected int bitsetTestThreshold = DEFAULT_BITSET_TEST_THRESHOLD;
-	
+
     private static boolean OLD_ACTION_TRANSLATOR = true;
 
     public static String TokenTypesFileSuffix = "TokenTypes";
     public static String TokenTypesFileExt = ".txt";
 
     /** Construct code generator base class */
-    public CodeGenerator() {}
+    public CodeGenerator() {
+    }
 
     /** Output a String to the currentOutput stream.
      * Ignored if string is null.
      * @param s The string to output
      */
     protected void _print(String s) {
-	if (s != null) {
-	    currentOutput.print(s);
-	}
+        if (s != null) {
+            currentOutput.print(s);
+        }
     }
 
     /** Print an action without leading tabs, attempting to
@@ -113,56 +126,52 @@ public abstract class CodeGenerator {
      * @param s The action string to output
      */
     protected void _printAction(String s) {
-	if (s == null) {
-	    return;
-	}
+        if (s == null) {
+            return;
+        }
 
-	// Skip leading newlines, tabs and spaces
-	int start = 0;
-	while (start < s.length() && Character.isSpaceChar(s.charAt(start)) )
-	    {
-		start++;
-	    }
+        // Skip leading newlines, tabs and spaces
+        int start = 0;
+        while (start < s.length() && Character.isSpaceChar(s.charAt(start))) {
+            start++;
+        }
 
-	// Skip leading newlines, tabs and spaces
-	int end = s.length()-1;
-	while ( end > start && Character.isSpaceChar(s.charAt(end)) ) 
-	    {
-		end--;
-	    }
+        // Skip leading newlines, tabs and spaces
+        int end = s.length() - 1;
+        while (end > start && Character.isSpaceChar(s.charAt(end))) {
+            end--;
+        }
 
-	char c=0;
-	for (int i = start; i <= end;)
-	    {
-		c = s.charAt(i);
-		i++;
-		boolean newline = false;
-		switch (c)
-		    {
-		    case '\n':
-			newline=true;
-			break;
-		    case '\r':
-			if ( i<=end && s.charAt(i)=='\n' ) {
-			    i++;
-			}
-			newline=true;
-			break;
-		    default: 
-			currentOutput.print(c); 
-			break;
-		    }
-		if ( newline ) {
-		    currentOutput.println(); 
-		    printTabs();
-				// Absorb leading whitespace
-		    while (i <= end && Character.isSpaceChar(s.charAt(i)) ) {
-			i++;
-		    }
-		    newline=false;
-		}
-	    }
-	currentOutput.println();
+        char c = 0;
+        for (int i = start; i <= end;) {
+            c = s.charAt(i);
+            i++;
+            boolean newline = false;
+            switch (c) {
+                case '\n':
+                    newline = true;
+                    break;
+                case '\r':
+                    if (i <= end && s.charAt(i) == '\n') {
+                        i++;
+                    }
+                    newline = true;
+                    break;
+                default:
+                    currentOutput.print(c);
+                    break;
+            }
+            if (newline) {
+                currentOutput.println();
+                printTabs();
+                // Absorb leading whitespace
+                while (i <= end && Character.isSpaceChar(s.charAt(i))) {
+                    i++;
+                }
+                newline = false;
+            }
+        }
+        currentOutput.println();
     }
 
     /** Output a String followed by newline, to the currentOutput stream.
@@ -170,9 +179,9 @@ public abstract class CodeGenerator {
      * @param s The string to output
      */
     protected void _println(String s) {
-	if (s != null) {
-	    currentOutput.println(s);
-	}
+        if (s != null) {
+            currentOutput.println(s);
+        }
     }
 
     /** Test if a set element array represents a contiguous range.
@@ -180,28 +189,28 @@ public abstract class CodeGenerator {
      * @return true if the elements are a contiguous range (with two or more).
      */
     public static boolean elementsAreRange(int[] elems) {
-	if (elems.length==0) {
-	    return false;
-	}
-	int begin = elems[0];
-	int end = elems[elems.length-1];
-	if ( elems.length<=2 ) {
-	    // Not enough elements for a range expression
-	    return false;
-	}
-	if ( end-begin+1 > elems.length ) {
-	    // The set does not represent a contiguous range
-	    return false;
-	}
-	int v = begin+1;
-	for (int i=1; i<elems.length-1; i++) {
-	    if ( v != elems[i] ) {
-				// The set does not represent a contiguous range
-		return false;
-	    }
-	    v++;
-	}
-	return true;
+        if (elems.length == 0) {
+            return false;
+        }
+        int begin = elems[0];
+        int end = elems[elems.length - 1];
+        if (elems.length <= 2) {
+            // Not enough elements for a range expression
+            return false;
+        }
+        if (end - begin + 1 > elems.length) {
+            // The set does not represent a contiguous range
+            return false;
+        }
+        int v = begin + 1;
+        for (int i = 1; i < elems.length - 1; i++) {
+            if (v != elems[i]) {
+                // The set does not represent a contiguous range
+                return false;
+            }
+            v++;
+        }
+        return true;
     }
 
     /** Get the identifier portion of an argument-action token.
@@ -212,7 +221,7 @@ public abstract class CodeGenerator {
      * @return A string containing the text of the identifier
      */
     protected String extractIdOfAction(Token t) {
-	return extractIdOfAction(t.getText(), t.getLine());
+        return extractIdOfAction(t.getText(), t.getLine(), t.getColumn());
     }
 
     /** Get the identifier portion of an argument-action.
@@ -221,25 +230,24 @@ public abstract class CodeGenerator {
      * if the language has unusual declaration syntax.
      * @param s The action text
      * @param line Line used for error reporting.
+     * @param column Line used for error reporting.
      * @return A string containing the text of the identifier
      */
-    protected String extractIdOfAction(String s, int line) {
-	s = removeAssignmentFromDeclaration(s);
-	// Search back from the end for a non alphanumeric.  That marks the
-	// beginning of the identifier
-	for (int i = s.length()-2; i >=0; i--)
-	    {
-		// TODO: make this work for language-independent identifiers?
-		if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i) != '_')
-		    {
-				// Found end of type part
-			return s.substring(i+1);
-		    }
-	    }
-	// Something is bogus, but we cannot parse the language-specific
-	// actions any better.  The compiler will have to catch the problem.
-	tool.warning("Ill-formed action", grammar.getFilename(), line);
-	return "";
+    protected String extractIdOfAction(String s, int line, int column) {
+        s = removeAssignmentFromDeclaration(s);
+        // Search back from the end for a non alphanumeric.  That marks the
+        // beginning of the identifier
+        for (int i = s.length() - 2; i >= 0; i--) {
+            // TODO: make this work for language-independent identifiers?
+            if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i) != '_') {
+                // Found end of type part
+                return s.substring(i + 1);
+            }
+        }
+        // Something is bogus, but we cannot parse the language-specific
+        // actions any better.  The compiler will have to catch the problem.
+        antlrTool.warning("Ill-formed action", grammar.getFilename(), line, column);
+        return "";
     }
 
     /** Get the type string out of an argument-action token.
@@ -250,7 +258,7 @@ public abstract class CodeGenerator {
      * @return A string containing the text of the type
      */
     protected String extractTypeOfAction(Token t) {
-	return extractTypeOfAction(t.getText(), t.getLine());
+        return extractTypeOfAction(t.getText(), t.getLine(), t.getColumn());
     }
 
     /** Get the type portion of an argument-action.
@@ -261,23 +269,21 @@ public abstract class CodeGenerator {
      * @param line Line used for error reporting.
      * @return A string containing the text of the type
      */
-    protected String extractTypeOfAction(String s, int line) {
-	s = removeAssignmentFromDeclaration(s);
-	// Search back from the end for a non alphanumeric.  That marks the
-	// beginning of the identifier
-	for (int i = s.length()-2; i >=0; i--)
-	    {
-		// TODO: make this work for language-independent identifiers?
-		if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i) != '_')
-		    {
-				// Found end of type part
-			return s.substring(0,i+1);
-		    }
-	    }
-	// Something is bogus, but we cannot parse the language-specific
-	// actions any better.  The compiler will have to catch the problem.
-	tool.warning("Ill-formed action", grammar.getFilename(), line);
-	return "";
+    protected String extractTypeOfAction(String s, int line, int column) {
+        s = removeAssignmentFromDeclaration(s);
+        // Search back from the end for a non alphanumeric.  That marks the
+        // beginning of the identifier
+        for (int i = s.length() - 2; i >= 0; i--) {
+            // TODO: make this work for language-independent identifiers?
+            if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i) != '_') {
+                // Found end of type part
+                return s.substring(0, i + 1);
+            }
+        }
+        // Something is bogus, but we cannot parse the language-specific
+        // actions any better.  The compiler will have to catch the problem.
+        antlrTool.warning("Ill-formed action", grammar.getFilename(), line, column);
+        return "";
     }
 
     /** Generate the code for all grammars
@@ -362,68 +368,68 @@ public abstract class CodeGenerator {
 
     /** Generate the token types as a text file for persistence across shared lexer/parser */
     protected void genTokenInterchange(TokenManager tm) throws IOException {
-	// Open the token output Java file and set the currentOutput stream
-	String fName = tm.getName() + TokenTypesFileSuffix+TokenTypesFileExt;
-	currentOutput = antlr.Tool.openOutputFile(fName);
+        // Open the token output Java file and set the currentOutput stream
+        String fName = tm.getName() + TokenTypesFileSuffix + TokenTypesFileExt;
+        currentOutput = antlrTool.openOutputFile(fName);
 
-	println("// $ANTLR "+Tool.version+": "+
-		Tool.fileMinusPath(tool.grammarFile)+
-		" -> "+
-		fName+
-		"$");
+        println("// $ANTLR " + antlrTool.version + ": " +
+                antlrTool.fileMinusPath(antlrTool.grammarFile) +
+                " -> " +
+                fName +
+                "$");
 
-	tabs = 0;
+        tabs = 0;
 
-	// Header
-	println(tm.getName() + "    // output token vocab name");
+        // Header
+        println(tm.getName() + "    // output token vocab name");
 
-	// Generate a definition for each token type
-	Vector v = tm.getVocabulary();
-	for (int i = Token.MIN_USER_TYPE; i < v.size(); i++) {
-	    String s = (String)v.elementAt(i);
-	    if ( DEBUG_CODE_GENERATOR ) {
-		System.out.println("gen persistence file entry for: "+s);
-	    }
-	    if (s != null && !s.startsWith("<") ) {
-				// if literal, find label
-		if ( s.startsWith("\"") ) {
-		    StringLiteralSymbol sl = (StringLiteralSymbol)tm.getTokenSymbol(s);
-		    if ( sl!=null && sl.label != null ) {
-			print(sl.label+"=");
-		    }	
-		    println(s + "=" + i);
-		}
-		else {
-		    print(s);
-		    // check for a paraphrase
-		    TokenSymbol ts = (TokenSymbol)tm.getTokenSymbol(s);
-		    if ( ts==null ) {
-			tool.warning("undefined token symbol: "+s);
-		    }
-		    else {
-			if ( ts.getParaphrase()!=null ) {
-			    print("("+ts.getParaphrase()+")");
-			}
-		    }	
-		    println("=" + i);
-		}		
-	    }
-	}
+        // Generate a definition for each token type
+        Vector v = tm.getVocabulary();
+        for (int i = Token.MIN_USER_TYPE; i < v.size(); i++) {
+            String s = (String)v.elementAt(i);
+            if (DEBUG_CODE_GENERATOR) {
+                System.out.println("gen persistence file entry for: " + s);
+            }
+            if (s != null && !s.startsWith("<")) {
+                // if literal, find label
+                if (s.startsWith("\"")) {
+                    StringLiteralSymbol sl = (StringLiteralSymbol)tm.getTokenSymbol(s);
+                    if (sl != null && sl.label != null) {
+                        print(sl.label + "=");
+                    }
+                    println(s + "=" + i);
+                }
+                else {
+                    print(s);
+                    // check for a paraphrase
+                    TokenSymbol ts = (TokenSymbol)tm.getTokenSymbol(s);
+                    if (ts == null) {
+                        antlrTool.warning("undefined token symbol: " + s);
+                    }
+                    else {
+                        if (ts.getParaphrase() != null) {
+                            print("(" + ts.getParaphrase() + ")");
+                        }
+                    }
+                    println("=" + i);
+                }
+            }
+        }
 
-	// Close the tokens output file
-	currentOutput.close();
-	currentOutput = null;
+        // Close the tokens output file
+        currentOutput.close();
+        currentOutput = null;
     }
 
-	/** Process a string for an simple expression for use in xx/action.g
-	 * it is used to cast simple tokens/references to the right type for
-	 * the generated language.
-	 * @param str A String.
-	 */
-	public String processStringForASTConstructor( String str )
-	{
-		return str;
-	}
+    /** Process a string for an simple expression for use in xx/action.g
+     * it is used to cast simple tokens/references to the right type for
+     * the generated language.
+     * @param str A String.
+     */
+    public String processStringForASTConstructor(String str) {
+        return str;
+    }
+
     /** Get a string for an expression to generate creation of an AST subtree.
      * @param v A Vector of String, where each element is an expression in the target language yielding an AST node.
      */
@@ -439,13 +445,19 @@ public abstract class CodeGenerator {
      * if the language does not allow '_' or numerals in identifiers.
      * @param index  The index of the bitset in the bitset list.
      */
-    protected String getBitsetName(int index)
-    {
-	return "_tokenSet_" + index;
+    protected String getBitsetName(int index) {
+        return "_tokenSet_" + index;
     }
 
-    public static String lexerRuleName(String id) {
-	return "m"+id;
+    public static String encodeLexerRuleName(String id) {
+        return "m" + id;
+    }
+
+    public static String decodeLexerRuleName(String id) {
+        if ( id==null ) {
+            return null;
+        }
+        return id.substring(1,id.length());
     }
 
     /** Map an identifier to it's corresponding tree-node variable.
@@ -461,38 +473,36 @@ public abstract class CodeGenerator {
      * if the bitset is already in the list, ignore the request.
      * Always adds the bitset to the end of the list, so the
      * caller can rely on the position of bitsets in the list.
-     * The returned position can be used to format the bitset 
+     * The returned position can be used to format the bitset
      * name, since it is invariant.
      * @param p Bit set to mark for code generation
      * @param forParser true if the bitset is used for the parser, false for the lexer
      * @return The position of the bitset in the list.
      */
     protected int markBitsetForGen(BitSet p) {
-	// Is the bitset (or an identical one) already marked for gen?
-	for (int i = 0; i < bitsetsUsed.size(); i++)
-	    {
-		BitSet set = (BitSet)bitsetsUsed.elementAt(i);
-		if (p.equals(set))
-		    {
-				// Use the identical one already stored
-			return i;
-		    }
-	    }
+        // Is the bitset (or an identical one) already marked for gen?
+        for (int i = 0; i < bitsetsUsed.size(); i++) {
+            BitSet set = (BitSet)bitsetsUsed.elementAt(i);
+            if (p.equals(set)) {
+                // Use the identical one already stored
+                return i;
+            }
+        }
 
-	// Add the new bitset
-	bitsetsUsed.appendElement(p.clone());
-	return bitsetsUsed.size()-1;
+        // Add the new bitset
+        bitsetsUsed.appendElement(p.clone());
+        return bitsetsUsed.size() - 1;
     }
 
     /** Output tab indent followed by a String, to the currentOutput stream.
      * Ignored if string is null.
-     * @param s The string to output.  
+     * @param s The string to output.
      */
     protected void print(String s) {
-	if (s != null) {
-	    printTabs();
-	    currentOutput.print(s);
-	}
+        if (s != null) {
+            printTabs();
+            currentOutput.print(s);
+        }
     }
 
     /** Print an action with leading tabs, attempting to
@@ -500,11 +510,11 @@ public abstract class CodeGenerator {
      * Ignored if string is null.
      * @param s The action string to output
      */
-    protected void printAction(String s) { 
-	if (s != null) {
-	    printTabs();
-	    _printAction(s);
-	}
+    protected void printAction(String s) {
+        if (s != null) {
+            printTabs();
+            _printAction(s);
+        }
     }
 
     /** Output tab indent followed by a String followed by newline,
@@ -512,60 +522,50 @@ public abstract class CodeGenerator {
      * @param s The string to output
      */
     protected void println(String s) {
-	if (s != null) {
-	    printTabs();
-	    currentOutput.println(s);
-	}
+        if (s != null) {
+            printTabs();
+            currentOutput.println(s);
+        }
     }
 
-    /** Output the current tab indentation.  This outputs the number of tabs 
+    /** Output the current tab indentation.  This outputs the number of tabs
      * indicated by the "tabs" variable to the currentOutput stream.
      */
     protected void printTabs() {
-	for (int i=1; i<=tabs; i++) {
-	    currentOutput.print("\t");
-	}
+        for (int i = 1; i <= tabs; i++) {
+            currentOutput.print("\t");
+        }
     }
 
-    /** Lexically process tree-specifiers in the action.
+    /** Lexically process $ and # references within the action.
      *  This will replace #id and #(...) with the appropriate
-     *  function calls and/or variables.
-     * 
-     *  This is the default Java action translator, but I have made
-     *  it work for C++ also.  
+     *  function calls and/or variables etc...
      */
-    protected String processActionForTreeSpecifiers(String actionStr, int line, RuleBlock currentRule, ActionTransInfo tInfo) {
-	if ( actionStr==null || actionStr.length()==0 ) return null;
-	// The action trans info tells us (at the moment) whether an
-	// assignment was done to the rule's tree root.
-	if (grammar==null) return actionStr;
-	if ( (grammar.buildAST && actionStr.indexOf('#') != -1) ||
-	     grammar instanceof TreeWalkerGrammar ||
-	     (grammar instanceof LexerGrammar && actionStr.indexOf('$') != -1) ) {
-	    // Create a lexer to read an action and return the translated version
-	    antlr.actions.java.ActionLexer lexer = new antlr.actions.java.ActionLexer(actionStr, currentRule, this, tInfo);
-	    lexer.setLineOffset(line);
-	    lexer.setTool(tool);
-	    try {
-		lexer.mACTION(true);
-		actionStr = lexer.getTokenObject().getText();
-				// System.out.println("action translated: "+actionStr);
-				// System.out.println("trans info is "+tInfo);
-	    }
-	    catch (RecognitionException ex) {
-		lexer.reportError(ex);
-		return actionStr;
-	    }
-	    catch (TokenStreamException tex) {
-		antlr.Tool.panic("Error reading action:"+actionStr);
-		return actionStr;
-	    }
-	    catch (CharStreamException io) {
-		antlr.Tool.panic("Error reading action:"+actionStr);
-		return actionStr;
-	    }
-	}
-	return actionStr;
+    protected abstract String processActionForSpecialSymbols(String actionStr,
+															 int line,
+															 RuleBlock currentRule,
+															 ActionTransInfo tInfo);
+
+	public String getFOLLOWBitSet(String ruleName, int k) {
+		GrammarSymbol rs = grammar.getSymbol(ruleName);
+		if ( !(rs instanceof RuleSymbol) ) {
+			return null;
+		}
+		RuleBlock blk = ((RuleSymbol)rs).getBlock();
+        Lookahead follow = grammar.theLLkAnalyzer.FOLLOW(k, blk.endNode);
+		String followSetName = getBitsetName(markBitsetForGen(follow.fset));
+		return followSetName;
+    }
+
+	public String getFIRSTBitSet(String ruleName, int k) {
+		GrammarSymbol rs = grammar.getSymbol(ruleName);
+		if ( !(rs instanceof RuleSymbol) ) {
+			return null;
+		}
+		RuleBlock blk = ((RuleSymbol)rs).getBlock();
+        Lookahead first = grammar.theLLkAnalyzer.look(k, blk);
+		String firstSetName = getBitsetName(markBitsetForGen(first.fset));
+		return firstSetName;
     }
 
     /**
@@ -574,85 +574,90 @@ public abstract class CodeGenerator {
      * @return the declaration without any assignment portion
      */
     protected String removeAssignmentFromDeclaration(String d) {
-	// If d contains an equal sign, then it's a declaration
-	// with an initialization.  Strip off the initialization part.
-	if (d.indexOf('=') >= 0) d = d.substring(0, d.indexOf('=')).trim();
-	return d;
-    } 
+        // If d contains an equal sign, then it's a declaration
+        // with an initialization.  Strip off the initialization part.
+        if (d.indexOf('=') >= 0) d = d.substring(0, d.indexOf('=')).trim();
+        return d;
+    }
 
     /** Set all fields back like one just created */
     private void reset() {
-	tabs = 0;
-	// Allocate list of bitsets tagged for code generation
-	bitsetsUsed = new Vector();
-	currentOutput = null;
-	grammar = null;
-	DEBUG_CODE_GENERATOR = false;
-	makeSwitchThreshold = DEFAULT_MAKE_SWITCH_THRESHOLD;
-	bitsetTestThreshold = DEFAULT_BITSET_TEST_THRESHOLD;
+        tabs = 0;
+        // Allocate list of bitsets tagged for code generation
+        bitsetsUsed = new Vector();
+        currentOutput = null;
+        grammar = null;
+        DEBUG_CODE_GENERATOR = false;
+        makeSwitchThreshold = DEFAULT_MAKE_SWITCH_THRESHOLD;
+        bitsetTestThreshold = DEFAULT_BITSET_TEST_THRESHOLD;
     }
 
     public static String reverseLexerRuleName(String id) {
-	return id.substring(1,id.length());
+        return id.substring(1, id.length());
     }
 
     public void setAnalyzer(LLkGrammarAnalyzer analyzer_) {
-	analyzer = analyzer_;
+        analyzer = analyzer_;
     }
 
-    public void setBehavior(DefineGrammarSymbols behavior_) { 
-	behavior = behavior_;
+    public void setBehavior(DefineGrammarSymbols behavior_) {
+        behavior = behavior_;
     }
 
     /** Set a grammar for the code generator to use */
     protected void setGrammar(Grammar g) {
-	reset();
-	grammar = g;
-	// Lookup make-switch threshold in the grammar generic options
-	if (grammar.hasOption("codeGenMakeSwitchThreshold")) {
-	    try {
-		makeSwitchThreshold = grammar.getIntegerOption("codeGenMakeSwitchThreshold");
-				//System.out.println("setting codeGenMakeSwitchThreshold to " + makeSwitchThreshold);
-	    } catch (NumberFormatException e) {
-		tool.error(
-			   "option 'codeGenMakeSwitchThreshold' must be an integer",
-			   grammar.getClassName(),
-			   grammar.getOption("codeGenMakeSwitchThreshold").getLine()
-			   );
-	    }
-	}
-		
-	// Lookup bitset-test threshold in the grammar generic options
-	if (grammar.hasOption("codeGenBitsetTestThreshold")) {
-	    try {
-		bitsetTestThreshold = grammar.getIntegerOption("codeGenBitsetTestThreshold");
-				//System.out.println("setting codeGenBitsetTestThreshold to " + bitsetTestThreshold);
-	    } catch (NumberFormatException e) {
-		tool.error(
-			   "option 'codeGenBitsetTestThreshold' must be an integer",
-			   grammar.getClassName(),
-			   grammar.getOption("codeGenBitsetTestThreshold").getLine()
-			   );
-	    }
-	}
-		
-	// Lookup debug code-gen in the grammar generic options
-	if (grammar.hasOption("codeGenDebug")) {
-	    Token t = grammar.getOption("codeGenDebug");
-	    if (t.getText().equals("true")) {
-				//System.out.println("setting code-generation debug ON");
-		DEBUG_CODE_GENERATOR = true;
-	    }
-	    else if (t.getText().equals("false")) {
-				//System.out.println("setting code-generation debug OFF");
-		DEBUG_CODE_GENERATOR = false;
-	    }
-	    else {
-		tool.error("option 'codeGenDebug' must be true or false", grammar.getClassName(), t.getLine());
-	    }
-	}
+        reset();
+        grammar = g;
+        // Lookup make-switch threshold in the grammar generic options
+        if (grammar.hasOption("codeGenMakeSwitchThreshold")) {
+            try {
+                makeSwitchThreshold = grammar.getIntegerOption("codeGenMakeSwitchThreshold");
+                //System.out.println("setting codeGenMakeSwitchThreshold to " + makeSwitchThreshold);
+            }
+            catch (NumberFormatException e) {
+                Token tok = grammar.getOption("codeGenMakeSwitchThreshold");
+                antlrTool.error(
+                    "option 'codeGenMakeSwitchThreshold' must be an integer",
+                    grammar.getClassName(),
+                    tok.getLine(), tok.getColumn()
+                );
+            }
+        }
+
+        // Lookup bitset-test threshold in the grammar generic options
+        if (grammar.hasOption("codeGenBitsetTestThreshold")) {
+            try {
+                bitsetTestThreshold = grammar.getIntegerOption("codeGenBitsetTestThreshold");
+                //System.out.println("setting codeGenBitsetTestThreshold to " + bitsetTestThreshold);
+            }
+            catch (NumberFormatException e) {
+                Token tok = grammar.getOption("codeGenBitsetTestThreshold");
+                antlrTool.error(
+                    "option 'codeGenBitsetTestThreshold' must be an integer",
+                    grammar.getClassName(),
+                    tok.getLine(), tok.getColumn()
+                );
+            }
+        }
+
+        // Lookup debug code-gen in the grammar generic options
+        if (grammar.hasOption("codeGenDebug")) {
+            Token t = grammar.getOption("codeGenDebug");
+            if (t.getText().equals("true")) {
+                //System.out.println("setting code-generation debug ON");
+                DEBUG_CODE_GENERATOR = true;
+            }
+            else if (t.getText().equals("false")) {
+                //System.out.println("setting code-generation debug OFF");
+                DEBUG_CODE_GENERATOR = false;
+            }
+            else {
+                antlrTool.error("option 'codeGenDebug' must be true or false", grammar.getClassName(), t.getLine(), t.getColumn());
+            }
+        }
     }
-    public void setTool(Tool tool_) {
-	tool = tool_;
+
+    public void setTool(Tool tool) {
+        antlrTool = tool;
     }
 }

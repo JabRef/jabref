@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -12,23 +12,27 @@ package antlr;
  */
 public class CommonASTWithHiddenTokens extends CommonAST {
     protected CommonHiddenStreamToken hiddenBefore, hiddenAfter; // references to hidden tokens
-    
+
     public CommonASTWithHiddenTokens() {
-	super();            
+        super();
     }
 
     public CommonASTWithHiddenTokens(Token tok) {
-	super(tok);
+        super(tok);
     }
 
-    public CommonHiddenStreamToken getHiddenAfter() { return hiddenAfter; }
+    public CommonHiddenStreamToken getHiddenAfter() {
+        return hiddenAfter;
+    }
 
-    public CommonHiddenStreamToken getHiddenBefore() { return hiddenBefore; }
+    public CommonHiddenStreamToken getHiddenBefore() {
+        return hiddenBefore;
+    }
 
     public void initialize(Token tok) {
-	CommonHiddenStreamToken t = (CommonHiddenStreamToken)tok;
-	super.initialize(t);
-	hiddenBefore = t.getHiddenBefore();
-	hiddenAfter  = t.getHiddenAfter();
+        CommonHiddenStreamToken t = (CommonHiddenStreamToken)tok;
+        super.initialize(t);
+        hiddenBefore = t.getHiddenBefore();
+        hiddenAfter = t.getHiddenAfter();
     }
 }

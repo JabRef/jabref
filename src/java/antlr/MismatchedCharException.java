@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -22,7 +22,7 @@ public class MismatchedCharException extends RecognitionException {
     public int mismatchType;
 
     // what was found on the input stream
-    public char foundChar;
+    public int foundChar;
 
     // For CHAR/NOT_CHAR and RANGE/NOT_RANGE
     public int expecting;
@@ -40,93 +40,107 @@ public class MismatchedCharException extends RecognitionException {
      * MismatchedCharException constructor comment.
      */
     public MismatchedCharException() {
-	super("Mismatched char");
+        super("Mismatched char");
     }
 
     // Expected range / not range
-    public MismatchedCharException(char c, char lower, char upper_, boolean matchNot, CharScanner scanner) {
-	super("Mismatched char");
-	foundChar = c;
-	expecting = lower;
-	upper = upper_;
-	// get instantaneous values of file/line/column
-	this.line = scanner.getLine();
-	this.fileName = scanner.getFilename();
-	this.column = scanner.getColumn();
-	this.scanner = scanner;
-	mismatchType = matchNot ? NOT_RANGE : RANGE;
+    public MismatchedCharException(char c, char lower, char upper_, boolean matchNot, CharScanner scanner_) {
+        super("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn());
+        mismatchType = matchNot ? NOT_RANGE : RANGE;
+        foundChar = c;
+        expecting = lower;
+        upper = upper_;
+        scanner = scanner_;
     }
 
     // Expected token / not token
-    public MismatchedCharException(char c, char expecting_, boolean matchNot, CharScanner scanner) {
-	super("Mismatched char");
-	foundChar = c;
-	expecting = expecting_;
-	// get instantaneous values of file/line/column
-	this.line = scanner.getLine();
-	this.fileName = scanner.getFilename();
-	this.column = scanner.getColumn();
-	this.scanner = scanner;
-	mismatchType = matchNot ? NOT_CHAR : CHAR;
+    public MismatchedCharException(char c, char expecting_, boolean matchNot, CharScanner scanner_) {
+        super("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn());
+        mismatchType = matchNot ? NOT_CHAR : CHAR;
+        foundChar = c;
+        expecting = expecting_;
+        scanner = scanner_;
     }
 
     // Expected BitSet / not BitSet
-    public MismatchedCharException(char c, BitSet set_, boolean matchNot, CharScanner scanner) {
-	super("Mismatched char");
-	foundChar = c;
-	set = set_;
-	// get instantaneous values of file/line/column
-	this.line = scanner.getLine();
-	this.fileName = scanner.getFilename();
-	this.column = scanner.getColumn();
-	this.scanner = scanner;
-	mismatchType = matchNot ? NOT_SET : SET;
+    public MismatchedCharException(char c, BitSet set_, boolean matchNot, CharScanner scanner_) {
+        super("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn());
+        mismatchType = matchNot ? NOT_SET : SET;
+        foundChar = c;
+        set = set_;
+        scanner = scanner_;
     }
 
     /**
-     * MismatchedCharException constructor comment.
-     * @param s java.lang.String
-     */
-    public MismatchedCharException(String s, int line) {
-	super(s);
-    }
-
-    /**
-     * Returns the error message that happened on the line/col given.
-     * Copied from toString().
+     * Returns a clean error message (no line number/column information)
      */
     public String getMessage() {
-	StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
-	switch (mismatchType) {
-	case CHAR :
-	    sb.append("expecting '" + (char)expecting + "', found '" + (char)foundChar + "'");
-	    break;
-	case NOT_CHAR :
-	    sb.append("expecting anything but '" + (char)expecting + "'; got it anyway");
-	    break;
-	case RANGE :
-	    sb.append("expecting token in range: '" + (char)expecting + "'..'" + (char)upper + "', found '" + (char)foundChar + "'");
-	    break;
-	case NOT_RANGE :
-	    sb.append("expecting token NOT in range: " + (char)expecting + "'..'" + (char)upper + "', found '" + (char)foundChar + "'");
-	    break;
-	case SET :
-	case NOT_SET :
-	    sb.append("expecting " + (mismatchType == NOT_SET ? "NOT " : "") + "one of (");
-	    int[] elems = set.toArray();
-	    for (int i = 0; i < elems.length; i++) {
-		sb.append(" '");
-		sb.append((char)elems[i]);
-		sb.append("'");
-	    }
-	    sb.append("), found '" + (char)foundChar + "'");
-	    break;
-	default :
-	    sb.append(super.getMessage());
-	    break;
-	}
+        switch (mismatchType) {
+            case CHAR:
+                sb.append("expecting ");   appendCharName(sb, expecting);
+                sb.append(", found ");     appendCharName(sb, foundChar);
+                break;
+            case NOT_CHAR:
+                sb.append("expecting anything but '");
+                appendCharName(sb, expecting);
+                sb.append("'; got it anyway");
+                break;
+            case RANGE:
+            case NOT_RANGE:
+                sb.append("expecting token ");
+                if (mismatchType == NOT_RANGE)
+                    sb.append("NOT ");
+                sb.append("in range: ");
+                appendCharName(sb, expecting);
+                sb.append("..");
+                appendCharName(sb, upper);
+                sb.append(", found ");
+                appendCharName(sb, foundChar);
+                break;
+            case SET:
+            case NOT_SET:
+                sb.append("expecting " + (mismatchType == NOT_SET ? "NOT " : "") + "one of (");
+                int[] elems = set.toArray();
+                for (int i = 0; i < elems.length; i++) {
+                    appendCharName(sb, elems[i]);
+                }
+                sb.append("), found ");
+                appendCharName(sb, foundChar);
+                break;
+            default :
+                sb.append(super.getMessage());
+                break;
+        }
 
-	return sb.toString();
+        return sb.toString();
+    }
+
+    /** Append a char to the msg buffer.  If special,
+	 *  then show escaped version
+	 */
+	private void appendCharName(StringBuffer sb, int c) {
+        switch (c) {
+		case 65535 :
+			// 65535 = (char) -1 = EOF
+            sb.append("'<EOF>'");
+			break;
+		case '\n' :
+			sb.append("'\\n'");
+			break;
+		case '\r' :
+			sb.append("'\\r'");
+			break;
+		case '\t' :
+			sb.append("'\\t'");
+			break;
+		default :
+            sb.append('\'');
+            sb.append((char) c);
+            sb.append('\'');
+			break;
+        }
     }
 }
+

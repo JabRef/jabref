@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -19,17 +19,17 @@ package antlr;
  * and here is where we do it.
  */
 class TreeBlockContext extends BlockContext {
-	protected boolean nextElementIsRoot = true;
+    protected boolean nextElementIsRoot = true;
 
 
-	public void addAlternativeElement(AlternativeElement e) {
-		TreeElement tree = (TreeElement)block;
-		if ( nextElementIsRoot ) {
-			tree.root = (GrammarAtom)e;
-			nextElementIsRoot = false;
-		}
-		else {
-			super.addAlternativeElement(e);
-		}
-	}
+    public void addAlternativeElement(AlternativeElement e) {
+        TreeElement tree = (TreeElement)block;
+        if (nextElementIsRoot) {
+            tree.root = (GrammarAtom)e;
+            nextElementIsRoot = false;
+        }
+        else {
+            super.addAlternativeElement(e);
+        }
+    }
 }

@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -21,4 +21,10 @@ public class ParserSharedInputState {
 
     /** What file (if known) caused the problem? */
     protected String filename;
+
+    public void reset() {
+         guessing = 0;
+         filename = null;
+         input.reset();
+     }
 }

@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -25,27 +25,29 @@ import java.io.IOException;
 
 // SAS: Move most functionality into InputBuffer -- just the file-specific
 //      stuff is in here
+
 public class CharBuffer extends InputBuffer {
     // char source
     transient Reader input;
 
     /** Create a character buffer */
     public CharBuffer(Reader input_) { // SAS: for proper text i/o
-	super();
-	input = input_;
+        super();
+        input = input_;
     }
 
     /** Ensure that the character buffer is sufficiently full */
     public void fill(int amount) throws CharStreamException {
-	try {
-	    syncConsume();
-	    // Fill the buffer sufficiently to hold needed characters
-	    while (queue.nbrEntries < amount + markerOffset) {
-		// Append the next character
-		queue.append((char) input.read());
-	    }
-	} catch (IOException io) {
-	    throw new CharStreamIOException(io);
-	}
+        try {
+            syncConsume();
+            // Fill the buffer sufficiently to hold needed characters
+            while (queue.nbrEntries < amount + markerOffset) {
+                // Append the next character
+                queue.append((char)input.read());
+            }
+        }
+        catch (IOException io) {
+            throw new CharStreamIOException(io);
+        }
     }
 }

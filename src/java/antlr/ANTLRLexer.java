@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "antlr.g" -> "ANTLRLexer.java"$
+// $ANTLR : "antlr.g" -> "ANTLRLexer.java"$
 
 package antlr;
 
@@ -81,7 +81,7 @@ public class ANTLRLexer extends antlr.CharScanner implements ANTLRTokenTypes, To
 			return 0;
 		}
 	}
-	
+
 	public static int tokenTypeForCharLiteral(String lit) {
 		if ( lit.length()>3 ) {  // does char contain escape?
 			return escapeCharValue(lit);
@@ -101,26 +101,26 @@ public ANTLRLexer(InputBuffer ib) {
 }
 public ANTLRLexer(LexerSharedInputState state) {
 	super(state);
+	caseSensitiveLiterals = true;
+	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("Parser", this), new Integer(30));
-	literals.put(new ANTLRHashString("catch", this), new Integer(41));
-	literals.put(new ANTLRHashString("Lexer", this), new Integer(12));
-	literals.put(new ANTLRHashString("exception", this), new Integer(40));
+	literals.put(new ANTLRHashString("public", this), new Integer(31));
 	literals.put(new ANTLRHashString("class", this), new Integer(10));
-	literals.put(new ANTLRHashString("lexclass", this), new Integer(9));
-	literals.put(new ANTLRHashString("public", this), new Integer(32));
 	literals.put(new ANTLRHashString("header", this), new Integer(5));
+	literals.put(new ANTLRHashString("throws", this), new Integer(37));
+	literals.put(new ANTLRHashString("lexclass", this), new Integer(9));
+	literals.put(new ANTLRHashString("catch", this), new Integer(40));
+	literals.put(new ANTLRHashString("private", this), new Integer(32));
 	literals.put(new ANTLRHashString("options", this), new Integer(51));
+	literals.put(new ANTLRHashString("extends", this), new Integer(11));
+	literals.put(new ANTLRHashString("protected", this), new Integer(30));
+	literals.put(new ANTLRHashString("TreeParser", this), new Integer(13));
+	literals.put(new ANTLRHashString("Parser", this), new Integer(29));
+	literals.put(new ANTLRHashString("Lexer", this), new Integer(12));
+	literals.put(new ANTLRHashString("returns", this), new Integer(35));
 	literals.put(new ANTLRHashString("charVocabulary", this), new Integer(18));
 	literals.put(new ANTLRHashString("tokens", this), new Integer(4));
-	literals.put(new ANTLRHashString("returns", this), new Integer(36));
-	literals.put(new ANTLRHashString("TreeParser", this), new Integer(13));
-	literals.put(new ANTLRHashString("private", this), new Integer(33));
-	literals.put(new ANTLRHashString("protected", this), new Integer(31));
-	literals.put(new ANTLRHashString("throws", this), new Integer(38));
-	literals.put(new ANTLRHashString("extends", this), new Integer(11));
-caseSensitiveLiterals = true;
-setCaseSensitive(true);
+	literals.put(new ANTLRHashString("exception", this), new Integer(39));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -316,7 +316,7 @@ tryAgain:
 					}
 				else {
 					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
-				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				}
 				if ( _returnToken==null ) continue tryAgain; // found SKIP token
@@ -359,33 +359,25 @@ tryAgain:
 		case '\n':
 		{
 			match('\n');
-			if ( inputState.guessing==0 ) {
-				newline();
-			}
+			newline();
 			break;
 		}
 		default:
 			if ((LA(1)=='\r') && (LA(2)=='\n')) {
 				match('\r');
 				match('\n');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 			}
 			else if ((LA(1)=='\r') && (true)) {
 				match('\r');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 			}
 		else {
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
-		if ( inputState.guessing==0 ) {
-			_ttype = Token.SKIP;
-		}
+		_ttype = Token.SKIP;
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -406,18 +398,14 @@ tryAgain:
 		else if ((LA(1)=='/') && (LA(2)=='*')) {
 			mML_COMMENT(true);
 			t=_returnToken;
-			if ( inputState.guessing==0 ) {
-				_ttype = t.getType();
-			}
+			_ttype = t.getType();
 		}
 		else {
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		
 		}
-		if ( inputState.guessing==0 ) {
-			if ( _ttype != DOC_COMMENT ) _ttype = Token.SKIP;
-		}
+		if ( _ttype != DOC_COMMENT ) _ttype = Token.SKIP;
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -457,13 +445,11 @@ tryAgain:
 			match('\n');
 		}
 		else {
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		
 		}
-		if ( inputState.guessing==0 ) {
-			newline();
-		}
+		newline();
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -478,16 +464,14 @@ tryAgain:
 		
 		match("/*");
 		{
-		if (((LA(1)=='*') && ((LA(2) >= '\u0003' && LA(2) <= '~')))&&( LA(2)!='/' )) {
+		if (((LA(1)=='*') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff')))&&( LA(2)!='/' )) {
 			match('*');
-			if ( inputState.guessing==0 ) {
-				_ttype = DOC_COMMENT;
-			}
+			_ttype = DOC_COMMENT;
 		}
-		else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+		else if (((LA(1) >= '\u0003' && LA(1) <= '\u00ff')) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 		}
 		else {
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		
 		}
@@ -499,26 +483,20 @@ tryAgain:
 			if ((LA(1)=='\r') && (LA(2)=='\n')) {
 				match('\r');
 				match('\n');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 			}
-			else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				match('\r');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 			}
-			else if ((_tokenSet_0.member(LA(1))) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			else if ((_tokenSet_0.member(LA(1))) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				{
 				match(_tokenSet_0);
 				}
 			}
 			else if ((LA(1)=='\n')) {
 				match('\n');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 			}
 			else {
 				break _loop159;
@@ -801,52 +779,16 @@ tryAgain:
 		
 		match('\'');
 		{
-		switch ( LA(1)) {
-		case '\\':
-		{
+		if ((LA(1)=='\\')) {
 			mESC(false);
-			break;
 		}
-		case '\u0003':  case '\u0004':  case '\u0005':  case '\u0006':
-		case '\u0007':  case '\u0008':  case '\t':  case '\n':
-		case '\u000b':  case '\u000c':  case '\r':  case '\u000e':
-		case '\u000f':  case '\u0010':  case '\u0011':  case '\u0012':
-		case '\u0013':  case '\u0014':  case '\u0015':  case '\u0016':
-		case '\u0017':  case '\u0018':  case '\u0019':  case '\u001a':
-		case '\u001b':  case '\u001c':  case '\u001d':  case '\u001e':
-		case '\u001f':  case ' ':  case '!':  case '"':
-		case '#':  case '$':  case '%':  case '&':
-		case '(':  case ')':  case '*':  case '+':
-		case ',':  case '-':  case '.':  case '/':
-		case '0':  case '1':  case '2':  case '3':
-		case '4':  case '5':  case '6':  case '7':
-		case '8':  case '9':  case ':':  case ';':
-		case '<':  case '=':  case '>':  case '?':
-		case '@':  case 'A':  case 'B':  case 'C':
-		case 'D':  case 'E':  case 'F':  case 'G':
-		case 'H':  case 'I':  case 'J':  case 'K':
-		case 'L':  case 'M':  case 'N':  case 'O':
-		case 'P':  case 'Q':  case 'R':  case 'S':
-		case 'T':  case 'U':  case 'V':  case 'W':
-		case 'X':  case 'Y':  case 'Z':  case '[':
-		case ']':  case '^':  case '_':  case '`':
-		case 'a':  case 'b':  case 'c':  case 'd':
-		case 'e':  case 'f':  case 'g':  case 'h':
-		case 'i':  case 'j':  case 'k':  case 'l':
-		case 'm':  case 'n':  case 'o':  case 'p':
-		case 'q':  case 'r':  case 's':  case 't':
-		case 'u':  case 'v':  case 'w':  case 'x':
-		case 'y':  case 'z':  case '{':  case '|':
-		case '}':  case '~':
-		{
+		else if ((_tokenSet_1.member(LA(1)))) {
 			matchNot('\'');
-			break;
 		}
-		default:
-		{
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+		else {
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
-		}
+		
 		}
 		match('\'');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -920,26 +862,24 @@ tryAgain:
 			matchRange('0','3');
 			}
 			{
-			if (((LA(1) >= '0' && LA(1) <= '9')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			if (((LA(1) >= '0' && LA(1) <= '7')) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
+				matchRange('0','7');
 				{
-				matchRange('0','9');
+				if (((LA(1) >= '0' && LA(1) <= '7')) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
+					matchRange('0','7');
 				}
-				{
-				if (((LA(1) >= '0' && LA(1) <= '9')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
-					matchRange('0','9');
-				}
-				else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
+				else if (((LA(1) >= '\u0003' && LA(1) <= '\u00ff')) && (true)) {
 				}
 				else {
-					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				
 				}
 			}
-			else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
+			else if (((LA(1) >= '\u0003' && LA(1) <= '\u00ff')) && (true)) {
 			}
 			else {
-				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			
 			}
@@ -951,15 +891,13 @@ tryAgain:
 			matchRange('4','7');
 			}
 			{
-			if (((LA(1) >= '0' && LA(1) <= '9')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
-				{
-				matchRange('0','9');
-				}
+			if (((LA(1) >= '0' && LA(1) <= '7')) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
+				matchRange('0','7');
 			}
-			else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && (true)) {
+			else if (((LA(1) >= '\u0003' && LA(1) <= '\u00ff')) && (true)) {
 			}
 			else {
-				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+				throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 			}
 			
 			}
@@ -976,7 +914,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		}
@@ -996,52 +934,16 @@ tryAgain:
 		{
 		_loop184:
 		do {
-			switch ( LA(1)) {
-			case '\\':
-			{
+			if ((LA(1)=='\\')) {
 				mESC(false);
-				break;
 			}
-			case '\u0003':  case '\u0004':  case '\u0005':  case '\u0006':
-			case '\u0007':  case '\u0008':  case '\t':  case '\n':
-			case '\u000b':  case '\u000c':  case '\r':  case '\u000e':
-			case '\u000f':  case '\u0010':  case '\u0011':  case '\u0012':
-			case '\u0013':  case '\u0014':  case '\u0015':  case '\u0016':
-			case '\u0017':  case '\u0018':  case '\u0019':  case '\u001a':
-			case '\u001b':  case '\u001c':  case '\u001d':  case '\u001e':
-			case '\u001f':  case ' ':  case '!':  case '#':
-			case '$':  case '%':  case '&':  case '\'':
-			case '(':  case ')':  case '*':  case '+':
-			case ',':  case '-':  case '.':  case '/':
-			case '0':  case '1':  case '2':  case '3':
-			case '4':  case '5':  case '6':  case '7':
-			case '8':  case '9':  case ':':  case ';':
-			case '<':  case '=':  case '>':  case '?':
-			case '@':  case 'A':  case 'B':  case 'C':
-			case 'D':  case 'E':  case 'F':  case 'G':
-			case 'H':  case 'I':  case 'J':  case 'K':
-			case 'L':  case 'M':  case 'N':  case 'O':
-			case 'P':  case 'Q':  case 'R':  case 'S':
-			case 'T':  case 'U':  case 'V':  case 'W':
-			case 'X':  case 'Y':  case 'Z':  case '[':
-			case ']':  case '^':  case '_':  case '`':
-			case 'a':  case 'b':  case 'c':  case 'd':
-			case 'e':  case 'f':  case 'g':  case 'h':
-			case 'i':  case 'j':  case 'k':  case 'l':
-			case 'm':  case 'n':  case 'o':  case 'p':
-			case 'q':  case 'r':  case 's':  case 't':
-			case 'u':  case 'v':  case 'w':  case 'x':
-			case 'y':  case 'z':  case '{':  case '|':
-			case '}':  case '~':
-			{
+			else if ((_tokenSet_2.member(LA(1)))) {
 				matchNot('"');
-				break;
 			}
-			default:
-			{
+			else {
 				break _loop184;
 			}
-			}
+			
 		} while (true);
 		}
 		match('"');
@@ -1079,7 +981,7 @@ tryAgain:
 		}
 		default:
 		{
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -1102,36 +1004,23 @@ tryAgain:
 		_returnToken = _token;
 	}
 	
-	protected final void mVOCAB(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
-		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = VOCAB;
-		int _saveIndex;
-		
-		matchRange('\3','\176');
-		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
-			_token = makeToken(_ttype);
-			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
-		}
-		_returnToken = _token;
-	}
-	
 	public final void mINT(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = INT;
 		int _saveIndex;
 		
 		{
-		int _cnt199=0;
-		_loop199:
+		int _cnt196=0;
+		_loop196:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt199>=1 ) { break _loop199; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());}
+				if ( _cnt196>=1 ) { break _loop196; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt199++;
+			_cnt196++;
 		} while (true);
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -1147,9 +1036,7 @@ tryAgain:
 		int _saveIndex;
 		
 		mNESTED_ARG_ACTION(false);
-		if ( inputState.guessing==0 ) {
-			setText(Tool.stripFrontBack(getText(), "[", "]"));
-		}
+		setText(StringUtils.stripFrontBack(getText(), "[", "]"));
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -1164,7 +1051,7 @@ tryAgain:
 		
 		match('[');
 		{
-		_loop203:
+		_loop200:
 		do {
 			switch ( LA(1)) {
 			case '[':
@@ -1175,9 +1062,7 @@ tryAgain:
 			case '\n':
 			{
 				match('\n');
-				if ( inputState.guessing==0 ) {
-					newline();
-				}
+				newline();
 				break;
 			}
 			case '\'':
@@ -1190,56 +1075,21 @@ tryAgain:
 				mSTRING_LITERAL(false);
 				break;
 			}
-			case '\u0003':  case '\u0004':  case '\u0005':  case '\u0006':
-			case '\u0007':  case '\u0008':  case '\t':  case '\u000b':
-			case '\u000c':  case '\u000e':  case '\u000f':  case '\u0010':
-			case '\u0011':  case '\u0012':  case '\u0013':  case '\u0014':
-			case '\u0015':  case '\u0016':  case '\u0017':  case '\u0018':
-			case '\u0019':  case '\u001a':  case '\u001b':  case '\u001c':
-			case '\u001d':  case '\u001e':  case '\u001f':  case ' ':
-			case '!':  case '#':  case '$':  case '%':
-			case '&':  case '(':  case ')':  case '*':
-			case '+':  case ',':  case '-':  case '.':
-			case '/':  case '0':  case '1':  case '2':
-			case '3':  case '4':  case '5':  case '6':
-			case '7':  case '8':  case '9':  case ':':
-			case ';':  case '<':  case '=':  case '>':
-			case '?':  case '@':  case 'A':  case 'B':
-			case 'C':  case 'D':  case 'E':  case 'F':
-			case 'G':  case 'H':  case 'I':  case 'J':
-			case 'K':  case 'L':  case 'M':  case 'N':
-			case 'O':  case 'P':  case 'Q':  case 'R':
-			case 'S':  case 'T':  case 'U':  case 'V':
-			case 'W':  case 'X':  case 'Y':  case 'Z':
-			case '\\':  case '^':  case '_':  case '`':
-			case 'a':  case 'b':  case 'c':  case 'd':
-			case 'e':  case 'f':  case 'g':  case 'h':
-			case 'i':  case 'j':  case 'k':  case 'l':
-			case 'm':  case 'n':  case 'o':  case 'p':
-			case 'q':  case 'r':  case 's':  case 't':
-			case 'u':  case 'v':  case 'w':  case 'x':
-			case 'y':  case 'z':  case '{':  case '|':
-			case '}':  case '~':
-			{
-				matchNot(']');
-				break;
-			}
 			default:
 				if ((LA(1)=='\r') && (LA(2)=='\n')) {
 					match('\r');
 					match('\n');
-					if ( inputState.guessing==0 ) {
-						newline();
-					}
+					newline();
 				}
-				else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+				else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 					match('\r');
-					if ( inputState.guessing==0 ) {
-						newline();
-					}
+					newline();
+				}
+				else if ((_tokenSet_3.member(LA(1)))) {
+					matchNot(']');
 				}
 			else {
-				break _loop203;
+				break _loop200;
 			}
 			}
 		} while (true);
@@ -1256,33 +1106,30 @@ tryAgain:
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = ACTION;
 		int _saveIndex;
-		int actionLine=getLine();
+		int actionLine=getLine(); int actionColumn = getColumn();
 		
 		mNESTED_ACTION(false);
 		{
 		if ((LA(1)=='?')) {
 			match('?');
-			if ( inputState.guessing==0 ) {
-				_ttype = SEMPRED;
-			}
+			_ttype = SEMPRED;
 		}
 		else {
 		}
 		
 		}
-		if ( inputState.guessing==0 ) {
-			
-						if ( _ttype==ACTION ) {
-							setText(Tool.stripFrontBack(getText(), "{", "}"));
-						}
-						else {
-							setText(Tool.stripFrontBack(getText(), "{", "}?"));
-						}
-						CommonToken t = new CommonToken(_ttype,new String(text.getBuffer(),_begin,text.length()-_begin));
-						t.setLine(actionLine);	// set action line to start
-						_token = t;
-					
-		}
+		
+					if ( _ttype==ACTION ) {
+						setText(StringUtils.stripFrontBack(getText(), "{", "}"));
+					}
+					else {
+						setText(StringUtils.stripFrontBack(getText(), "{", "}?"));
+					}
+					CommonToken t = new CommonToken(_ttype,new String(text.getBuffer(),_begin,text.length()-_begin));
+					t.setLine(actionLine);			// set action line to start
+					t.setColumn(actionColumn);
+					_token = t;
+				
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -1297,54 +1144,48 @@ tryAgain:
 		
 		match('{');
 		{
-		_loop209:
+		_loop206:
 		do {
 			// nongreedy exit test
-			if ((LA(1)=='}') && (true)) break _loop209;
-			if ((LA(1)=='\n'||LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			if ((LA(1)=='}') && (true)) break _loop206;
+			if ((LA(1)=='\n'||LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				{
 				if ((LA(1)=='\r') && (LA(2)=='\n')) {
 					match('\r');
 					match('\n');
-					if ( inputState.guessing==0 ) {
-						newline();
-					}
+					newline();
 				}
-				else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+				else if ((LA(1)=='\r') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 					match('\r');
-					if ( inputState.guessing==0 ) {
-						newline();
-					}
+					newline();
 				}
 				else if ((LA(1)=='\n')) {
 					match('\n');
-					if ( inputState.guessing==0 ) {
-						newline();
-					}
+					newline();
 				}
 				else {
-					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
+					throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 				}
 				
 				}
 			}
-			else if ((LA(1)=='{') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			else if ((LA(1)=='{') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				mNESTED_ACTION(false);
 			}
-			else if ((LA(1)=='\'') && (_tokenSet_1.member(LA(2)))) {
+			else if ((LA(1)=='\'') && (_tokenSet_4.member(LA(2)))) {
 				mCHAR_LITERAL(false);
 			}
 			else if ((LA(1)=='/') && (LA(2)=='*'||LA(2)=='/')) {
 				mCOMMENT(false);
 			}
-			else if ((LA(1)=='"') && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			else if ((LA(1)=='"') && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				mSTRING_LITERAL(false);
 			}
-			else if (((LA(1) >= '\u0003' && LA(1) <= '~')) && ((LA(2) >= '\u0003' && LA(2) <= '~'))) {
+			else if (((LA(1) >= '\u0003' && LA(1) <= '\u00ff')) && ((LA(2) >= '\u0003' && LA(2) <= '\u00ff'))) {
 				matchNot(EOF_CHAR);
 			}
 			else {
-				break _loop209;
+				break _loop206;
 			}
 			
 		} while (true);
@@ -1364,7 +1205,7 @@ tryAgain:
 		
 		matchRange('A','Z');
 		{
-		_loop212:
+		_loop209:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -1403,7 +1244,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop212;
+				break _loop209;
 			}
 			}
 		} while (true);
@@ -1425,32 +1266,26 @@ tryAgain:
 		
 		
 		t=mINTERNAL_RULE_REF(false);
-		if ( inputState.guessing==0 ) {
-			_ttype=t;
-		}
+		_ttype=t;
 		{
-		if (true&&(t==LITERAL_options)) {
+		if (( true )&&(t==LITERAL_options)) {
 			mWS_LOOP(false);
 			{
 			if ((LA(1)=='{')) {
 				match('{');
-				if ( inputState.guessing==0 ) {
-					_ttype = OPTIONS;
-				}
+				_ttype = OPTIONS;
 			}
 			else {
 			}
 			
 			}
 		}
-		else if (true&&(t==LITERAL_tokens)) {
+		else if (( true )&&(t==LITERAL_tokens)) {
 			mWS_LOOP(false);
 			{
 			if ((LA(1)=='{')) {
 				match('{');
-				if ( inputState.guessing==0 ) {
-					_ttype = TOKENS;
-				}
+				_ttype = TOKENS;
 			}
 			else {
 			}
@@ -1479,7 +1314,7 @@ tryAgain:
 		
 		matchRange('a','z');
 		{
-		_loop222:
+		_loop219:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -1518,14 +1353,12 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop222;
+				break _loop219;
 			}
 			}
 		} while (true);
 		}
-		if ( inputState.guessing==0 ) {
-			t = testLiteralsTable(t);
-		}
+		t = testLiteralsTable(t);
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -1540,7 +1373,7 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		_loop219:
+		_loop216:
 		do {
 			switch ( LA(1)) {
 			case '\t':  case '\n':  case '\r':  case ' ':
@@ -1555,7 +1388,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop219;
+				break _loop216;
 			}
 			}
 		} while (true);
@@ -1573,7 +1406,7 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		if ((_tokenSet_2.member(LA(1)))) {
+		if ((_tokenSet_5.member(LA(1)))) {
 			mWS(false);
 		}
 		else {
@@ -1587,50 +1420,49 @@ tryAgain:
 		_returnToken = _token;
 	}
 	
-	protected final void mNOT_USEFUL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
-		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = NOT_USEFUL;
-		int _saveIndex;
-		
-		boolean synPredMatched227 = false;
-		if (((LA(1)=='a') && (true))) {
-			int _m227 = mark();
-			synPredMatched227 = true;
-			inputState.guessing++;
-			try {
-				{
-				match('a');
-				}
-			}
-			catch (RecognitionException pe) {
-				synPredMatched227 = false;
-			}
-			rewind(_m227);
-			inputState.guessing--;
-		}
-		if ( synPredMatched227 ) {
-			match('a');
-		}
-		else if ((LA(1)=='a') && (true)) {
-			match('a');
-		}
-		else {
-			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine());
-		}
-		
-		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
-			_token = makeToken(_ttype);
-			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
-		}
-		_returnToken = _token;
+	
+	private static final long[] mk_tokenSet_0() {
+		long[] data = new long[8];
+		data[0]=-9224L;
+		for (int i = 1; i<=3; i++) { data[i]=-1L; }
+		return data;
 	}
-	
-	
-	private static final long _tokenSet_0_data_[] = { -9224L, 9223372036854775807L, 0L, 0L };
-	public static final BitSet _tokenSet_0 = new BitSet(_tokenSet_0_data_);
-	private static final long _tokenSet_1_data_[] = { -549755813896L, 9223372036854775807L, 0L, 0L };
-	public static final BitSet _tokenSet_1 = new BitSet(_tokenSet_1_data_);
-	private static final long _tokenSet_2_data_[] = { 4294977024L, 0L, 0L };
-	public static final BitSet _tokenSet_2 = new BitSet(_tokenSet_2_data_);
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
+	private static final long[] mk_tokenSet_1() {
+		long[] data = new long[8];
+		data[0]=-549755813896L;
+		data[1]=-268435457L;
+		for (int i = 2; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
+	private static final long[] mk_tokenSet_2() {
+		long[] data = new long[8];
+		data[0]=-17179869192L;
+		data[1]=-268435457L;
+		for (int i = 2; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
+	private static final long[] mk_tokenSet_3() {
+		long[] data = new long[8];
+		data[0]=-566935692296L;
+		data[1]=-671088641L;
+		for (int i = 2; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
+	private static final long[] mk_tokenSet_4() {
+		long[] data = new long[8];
+		data[0]=-549755813896L;
+		for (int i = 1; i<=3; i++) { data[i]=-1L; }
+		return data;
+	}
+	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
+	private static final long[] mk_tokenSet_5() {
+		long[] data = { 4294977024L, 0L, 0L, 0L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	
 	}

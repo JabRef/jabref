@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "antlr.g" -> "ANTLRParser.java"$
+// $ANTLR : "antlr.g" -> "ANTLRParser.java"$
 
 package antlr;
 
@@ -15,9 +15,6 @@ import antlr.MismatchedTokenException;
 import antlr.SemanticException;
 import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
-import antlr.collections.AST;
-import antlr.ASTPair;
-import antlr.collections.impl.ASTArray;
 
 import java.util.Enumeration;
 import java.io.DataInputStream;
@@ -25,26 +22,41 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class ANTLRParser extends antlr.LLkParser
-       implements ANTLRTokenTypes
+public class ANTLRParser extends antlr.LLkParser       implements ANTLRTokenTypes
  {
 
 	private static final boolean DEBUG_PARSER = false;
 
 	ANTLRGrammarParseBehavior behavior;
-	Tool tool;
+	Tool antlrTool;
 	protected int blockNesting= -1;
 
 	public ANTLRParser(
-		TokenBuffer tokenBuf, 
+		TokenBuffer tokenBuf,
 		ANTLRGrammarParseBehavior behavior_,
 		Tool tool_
 	) {
 		super(tokenBuf, 1);
 		tokenNames = _tokenNames;
 		behavior = behavior_;
-		tool = tool_;
+		antlrTool = tool_;
 	}
+
+        public void reportError(String s) {
+            antlrTool.error(s, getFilename(), -1, -1);
+        }
+
+        public void reportError(RecognitionException e) {
+            reportError(e, e.getErrorMessage());
+        }
+
+        public void reportError(RecognitionException e, String s) {
+            antlrTool.error(s, e.getFilename(), e.getLine(), e.getColumn());
+        }
+
+        public void reportWarning(String s) {
+            antlrTool.warning(s, getFilename(), -1, -1);
+        }
 
 	private boolean lastInRule() throws TokenStreamException {
 		if ( blockNesting==0 && (LA(1)==SEMI || LA(1)==LITERAL_exception || LA(1)==OR) ) {
@@ -55,7 +67,7 @@ public class ANTLRParser extends antlr.LLkParser
 
 	private void checkForMissingEndRule(Token label) {
 		if ( label.getColumn()==1 ) {
-			Tool.warning("did you forget to terminate previous rule?", getFilename(), label.getLine());
+			antlrTool.warning("did you forget to terminate previous rule?", getFilename(), label.getLine(), label.getColumn());
 		}
 	}
 
@@ -92,6 +104,12 @@ public ANTLRParser(ParserSharedInputState state) {
 			_loop4:
 			do {
 				if ((LA(1)==LITERAL_header)) {
+					if ( inputState.guessing==0 ) {
+						
+									n = null;	// RK: prevent certain orders of header actions
+													// overwriting eachother.
+								
+					}
 					match(LITERAL_header);
 					{
 					switch ( LA(1)) {
@@ -114,7 +132,11 @@ public ANTLRParser(ParserSharedInputState state) {
 					h = LT(1);
 					match(ACTION);
 					if ( inputState.guessing==0 ) {
-						behavior.refHeaderAction(n,h);
+						
+									// store the header action
+									// FIXME: 'n' should be checked for validity
+									behavior.refHeaderAction(n,h);
+								
 					}
 				}
 				else {
@@ -161,7 +183,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			if (inputState.guessing==0) {
 				
-						reportError("rule grammar trapped: "+ex.toString());
+				reportError(ex, "rule grammar trapped:\n"+ex.toString());
 						consumeUntil(EOF);
 					
 			} else {
@@ -327,15 +349,17 @@ public ANTLRParser(ParserSharedInputState state) {
 					
 							if ( ex instanceof NoViableAltException ) {
 								NoViableAltException e = (NoViableAltException)ex;
+								// RK: These probably generate inconsequent error messages...
+								// have to see how this comes out..
 								if ( e.token.getType()==DOC_COMMENT ) {
-									reportError("line "+ex.line+": JAVADOC comments may only prefix rules and grammars");
+									reportError(ex, "JAVADOC comments may only prefix rules and grammars");
 								}
 								else {
-									reportError("rule classDef trapped: "+ex.toString());
+									reportError(ex, "rule classDef trapped:\n"+ex.toString());
 								}
 							}
 							else {
-								reportError("rule classDef trapped: "+ex.toString());
+								reportError(ex, "rule classDef trapped:\n"+ex.toString());
 							}
 							behavior.abortGrammar();
 							boolean consuming = true;
@@ -410,7 +434,11 @@ public ANTLRParser(ParserSharedInputState state) {
 			match(LITERAL_lexclass);
 			idTok=id();
 			if ( inputState.guessing==0 ) {
-				System.out.println("warning: line " + lc.getLine() + ": 'lexclass' is deprecated; use 'class X extends Lexer'");
+				
+								antlrTool.warning("lexclass' is deprecated; use 'class X extends Lexer'",
+												 getFilename(), lc.getLine(), lc.getColumn());
+				//				System.out.println("warning: line " + lc.getLine() + ": 'lexclass' is deprecated; use 'class X extends Lexer'");
+							
 			}
 			break;
 		}
@@ -460,10 +488,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case DOC_COMMENT:
 		case TOKENS:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -486,10 +514,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case ACTION:
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -512,10 +540,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		}
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -573,10 +601,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case DOC_COMMENT:
 		case TOKENS:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -599,10 +627,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case ACTION:
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -625,10 +653,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		}
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -681,8 +709,9 @@ public ANTLRParser(ParserSharedInputState state) {
 		{
 			if ( inputState.guessing==0 ) {
 				
-							System.out.println("warning: line " +
-								idTok.getLine() + ": use 'class X extends Parser'");
+							antlrTool.warning("use 'class X extends Parser'", getFilename(), idTok.getLine(), idTok.getColumn());
+				//			System.out.println("warning: line " +
+				//				idTok.getLine() + ": use 'class X extends Parser'");
 							
 			}
 			break;
@@ -708,10 +737,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case DOC_COMMENT:
 		case TOKENS:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -734,10 +763,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case ACTION:
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -760,10 +789,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		}
 		case DOC_COMMENT:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -942,7 +971,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		 BitSet b ;
 		
 		
-			b = null; 
+			b = null;
 			BitSet tmpSet = null;
 		
 		
@@ -1041,14 +1070,14 @@ public ANTLRParser(ParserSharedInputState state) {
 		Token  c2 = null;
 		
 			b = null;
-			int rangeMin = 0; 
+			int rangeMin = 0;
 		
 		
 		c1 = LT(1);
 		match(CHAR_LITERAL);
 		if ( inputState.guessing==0 ) {
 			
-					rangeMin = ANTLRLexer.tokenTypeForCharLiteral(c1.getText()); 
+					rangeMin = ANTLRLexer.tokenTypeForCharLiteral(c1.getText());
 					b = BitSet.of(rangeMin);
 				
 		}
@@ -1061,9 +1090,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			match(CHAR_LITERAL);
 			if ( inputState.guessing==0 ) {
 				
-							int rangeMax = ANTLRLexer.tokenTypeForCharLiteral(c2.getText()); 
+							int rangeMax = ANTLRLexer.tokenTypeForCharLiteral(c2.getText());
 							if (rangeMax < rangeMin) {
-								tool.error("Malformed range line "+c1.getLine());
+								antlrTool.error("Malformed range line ", getFilename(), c1.getLine(), c1.getColumn());
 							}
 							for (int i = rangeMin+1; i <= rangeMax; i++) {
 								b.add(i);
@@ -1236,25 +1265,13 @@ public ANTLRParser(ParserSharedInputState state) {
 		
 		match(LPAREN);
 		if ( inputState.guessing==0 ) {
-			sup = LT(1).getText();
+			
+						sup = LT(1).getText();
+						sup = StringUtils.stripFrontBack(sup, "\"", "\"");
+						
 		}
 		{
-		switch ( LA(1)) {
-		case TOKEN_REF:
-		{
-			match(TOKEN_REF);
-			break;
-		}
-		case RULE_REF:
-		{
-			match(RULE_REF);
-			break;
-		}
-		default:
-		{
-			throw new NoViableAltException(LT(1), getFilename());
-		}
-		}
+		match(STRING_LITERAL);
 		}
 		match(RPAREN);
 		return sup;
@@ -1270,7 +1287,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		Token  rt = null;
 		Token  a = null;
 		
-			String access="public"; 
+			String access="public";
 			Token idTok;
 			String doc=null;
 			boolean ruleAutoGen = true;
@@ -1289,10 +1306,10 @@ public ANTLRParser(ParserSharedInputState state) {
 			break;
 		}
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -1497,10 +1514,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case LITERAL_lexclass:
 		case LITERAL_class:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -1645,9 +1662,9 @@ public ANTLRParser(ParserSharedInputState state) {
 		case OR:
 		case TOKEN_REF:
 		case LPAREN:
-		case RULE_REF:
 		case RPAREN:
 		case LITERAL_exception:
+		case RULE_REF:
 		case NOT_OP:
 		case SEMPRED:
 		case TREE_BEGIN:
@@ -1718,9 +1735,9 @@ public ANTLRParser(ParserSharedInputState state) {
 		case OR:
 		case TOKEN_REF:
 		case LPAREN:
-		case RULE_REF:
 		case RPAREN:
 		case LITERAL_exception:
+		case RULE_REF:
 		case NOT_OP:
 		case SEMPRED:
 		case TREE_BEGIN:
@@ -1783,12 +1800,12 @@ public ANTLRParser(ParserSharedInputState state) {
 		case LITERAL_lexclass:
 		case LITERAL_class:
 		case TOKEN_REF:
-		case RULE_REF:
 		case LITERAL_protected:
 		case LITERAL_public:
 		case LITERAL_private:
 		case LITERAL_exception:
 		case LITERAL_catch:
+		case RULE_REF:
 		{
 			break;
 		}
@@ -1845,9 +1862,9 @@ public ANTLRParser(ParserSharedInputState state) {
 		Token  a = null;
 		Token  p = null;
 		
-			Token label = null; 
-			Token assignId = null; 
-			Token args = null; 
+			Token label = null;
+			Token assignId = null;
+			Token args = null;
 			int autoGen = GrammarElement.AUTO_GEN_NONE;
 		
 		
@@ -1919,10 +1936,10 @@ public ANTLRParser(ParserSharedInputState state) {
 					case TOKEN_REF:
 					case OPEN_ELEMENT_OPTION:
 					case LPAREN:
-					case RULE_REF:
 					case RPAREN:
 					case BANG:
 					case LITERAL_exception:
+					case RULE_REF:
 					case NOT_OP:
 					case SEMPRED:
 					case TREE_BEGIN:
@@ -1954,9 +1971,9 @@ public ANTLRParser(ParserSharedInputState state) {
 					case TOKEN_REF:
 					case OPEN_ELEMENT_OPTION:
 					case LPAREN:
-					case RULE_REF:
 					case RPAREN:
 					case LITERAL_exception:
+					case RULE_REF:
 					case NOT_OP:
 					case SEMPRED:
 					case TREE_BEGIN:
@@ -1998,9 +2015,9 @@ public ANTLRParser(ParserSharedInputState state) {
 					case TOKEN_REF:
 					case OPEN_ELEMENT_OPTION:
 					case LPAREN:
-					case RULE_REF:
 					case RPAREN:
 					case LITERAL_exception:
+					case RULE_REF:
 					case NOT_OP:
 					case SEMPRED:
 					case TREE_BEGIN:
@@ -2067,10 +2084,10 @@ public ANTLRParser(ParserSharedInputState state) {
 					case TOKEN_REF:
 					case OPEN_ELEMENT_OPTION:
 					case LPAREN:
-					case RULE_REF:
 					case RPAREN:
 					case BANG:
 					case LITERAL_exception:
+					case RULE_REF:
 					case NOT_OP:
 					case SEMPRED:
 					case TREE_BEGIN:
@@ -2102,9 +2119,9 @@ public ANTLRParser(ParserSharedInputState state) {
 					case TOKEN_REF:
 					case OPEN_ELEMENT_OPTION:
 					case LPAREN:
-					case RULE_REF:
 					case RPAREN:
 					case LITERAL_exception:
+					case RULE_REF:
 					case NOT_OP:
 					case SEMPRED:
 					case TREE_BEGIN:
@@ -2247,9 +2264,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2374,9 +2391,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2419,9 +2436,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2498,9 +2515,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2547,7 +2564,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		lp = LT(1);
 		match(LPAREN);
 		if ( inputState.guessing==0 ) {
-			behavior.beginSubRule(label, lp.getLine(), not);
+			behavior.beginSubRule(label, lp, not);
 		}
 		{
 		if ((LA(1)==OPTIONS)) {
@@ -2602,10 +2619,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case TOKEN_REF:
 		case OPEN_ELEMENT_OPTION:
 		case LPAREN:
-		case RULE_REF:
 		case RPAREN:
 		case BANG:
 		case LITERAL_exception:
+		case RULE_REF:
 		case NOT_OP:
 		case SEMPRED:
 		case TREE_BEGIN:
@@ -2628,7 +2645,7 @@ public ANTLRParser(ParserSharedInputState state) {
 			{
 				match(STAR);
 				if ( inputState.guessing==0 ) {
-					behavior.zeroOrMoreSubRule();;
+					behavior.zeroOrMoreSubRule();
 				}
 				break;
 			}
@@ -2648,10 +2665,10 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case BANG:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2683,9 +2700,9 @@ public ANTLRParser(ParserSharedInputState state) {
 			case TOKEN_REF:
 			case OPEN_ELEMENT_OPTION:
 			case LPAREN:
-			case RULE_REF:
 			case RPAREN:
 			case LITERAL_exception:
+			case RULE_REF:
 			case NOT_OP:
 			case SEMPRED:
 			case TREE_BEGIN:
@@ -2727,7 +2744,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		lp = LT(1);
 		match(TREE_BEGIN);
 		if ( inputState.guessing==0 ) {
-			behavior.beginTree(lp.getLine());
+			behavior.beginTree(lp);
 		}
 		rootNode();
 		if ( inputState.guessing==0 ) {
@@ -2809,10 +2826,10 @@ public ANTLRParser(ParserSharedInputState state) {
 		case TOKEN_REF:
 		case OPEN_ELEMENT_OPTION:
 		case LPAREN:
-		case RULE_REF:
 		case RPAREN:
 		case ARG_ACTION:
 		case LITERAL_exception:
+		case RULE_REF:
 		case NOT_OP:
 		case SEMPRED:
 		case TREE_BEGIN:
@@ -2859,7 +2876,6 @@ public ANTLRParser(ParserSharedInputState state) {
 		"OPEN_ELEMENT_OPTION",
 		"CLOSE_ELEMENT_OPTION",
 		"LPAREN",
-		"RULE_REF",
 		"RPAREN",
 		"\"Parser\"",
 		"\"protected\"",
@@ -2873,6 +2889,7 @@ public ANTLRParser(ParserSharedInputState state) {
 		"COMMA",
 		"\"exception\"",
 		"\"catch\"",
+		"RULE_REF",
 		"NOT_OP",
 		"SEMPRED",
 		"TREE_BEGIN",
@@ -2890,38 +2907,72 @@ public ANTLRParser(ParserSharedInputState state) {
 		"ESC",
 		"DIGIT",
 		"XDIGIT",
-		"VOCAB",
 		"NESTED_ARG_ACTION",
 		"NESTED_ACTION",
 		"WS_LOOP",
 		"INTERNAL_RULE_REF",
-		"WS_OPT",
-		"NOT_USEFUL"
+		"WS_OPT"
 	};
 	
-	private static final long _tokenSet_0_data_[] = { 15317598464L, 0L };
-	public static final BitSet _tokenSet_0 = new BitSet(_tokenSet_0_data_);
-	private static final long _tokenSet_1_data_[] = { 547893559424L, 0L };
-	public static final BitSet _tokenSet_1 = new BitSet(_tokenSet_1_data_);
-	private static final long _tokenSet_2_data_[] = { 1156686652375232L, 0L };
-	public static final BitSet _tokenSet_2 = new BitSet(_tokenSet_2_data_);
-	private static final long _tokenSet_3_data_[] = { 1157838276198592L, 0L };
-	public static final BitSet _tokenSet_3 = new BitSet(_tokenSet_3_data_);
-	private static final long _tokenSet_4_data_[] = { 1130298373308480L, 0L };
-	public static final BitSet _tokenSet_4 = new BitSet(_tokenSet_4_data_);
-	private static final long _tokenSet_5_data_[] = { 1720925672784064L, 0L };
-	public static final BitSet _tokenSet_5 = new BitSet(_tokenSet_5_data_);
-	private static final long _tokenSet_6_data_[] = { 1720788233830592L, 0L };
-	public static final BitSet _tokenSet_6 = new BitSet(_tokenSet_6_data_);
-	private static final long _tokenSet_7_data_[] = { 1125899924144192L, 0L };
-	public static final BitSet _tokenSet_7 = new BitSet(_tokenSet_7_data_);
-	private static final long _tokenSet_8_data_[] = { 1720788229619904L, 0L };
-	public static final BitSet _tokenSet_8 = new BitSet(_tokenSet_8_data_);
-	private static final long _tokenSet_9_data_[] = { 1157803882840256L, 0L };
-	public static final BitSet _tokenSet_9 = new BitSet(_tokenSet_9_data_);
-	private static final long _tokenSet_10_data_[] = { 2250890277404864L, 0L };
-	public static final BitSet _tokenSet_10 = new BitSet(_tokenSet_10_data_);
-	private static final long _tokenSet_11_data_[] = { 1719688145404096L, 0L };
-	public static final BitSet _tokenSet_11 = new BitSet(_tokenSet_11_data_);
+	private static final long[] mk_tokenSet_0() {
+		long[] data = { 2206556225792L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
+	private static final long[] mk_tokenSet_1() {
+		long[] data = { 2472844214400L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
+	private static final long[] mk_tokenSet_2() {
+		long[] data = { 1158885407195328L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
+	private static final long[] mk_tokenSet_3() {
+		long[] data = { 1159461236965568L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
+	private static final long[] mk_tokenSet_4() {
+		long[] data = { 1132497128128576L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
+	private static final long[] mk_tokenSet_5() {
+		long[] data = { 1722479914074304L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
+	private static final long[] mk_tokenSet_6() {
+		long[] data = { 1722411194597568L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
+	private static final long[] mk_tokenSet_7() {
+		long[] data = { 1125899924144192L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
+	private static final long[] mk_tokenSet_8() {
+		long[] data = { 1722411190386880L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
+	private static final long[] mk_tokenSet_9() {
+		long[] data = { 1159444023476416L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
+	private static final long[] mk_tokenSet_10() {
+		long[] data = { 2251345007067328L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
+	private static final long[] mk_tokenSet_11() {
+		long[] data = { 1721861130420416L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
 	
 	}

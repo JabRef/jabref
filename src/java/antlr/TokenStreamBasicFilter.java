@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -21,20 +21,23 @@ public class TokenStreamBasicFilter implements TokenStream {
     protected TokenStream input;
 
     public TokenStreamBasicFilter(TokenStream input) {
-	this.input = input;
-	discardMask = new BitSet();
+        this.input = input;
+        discardMask = new BitSet();
     }
+
     public void discard(int ttype) {
-	discardMask.add(ttype);
+        discardMask.add(ttype);
     }
+
     public void discard(BitSet mask) {
-	discardMask = mask;
+        discardMask = mask;
     }
+
     public Token nextToken() throws TokenStreamException {
-	Token tok = input.nextToken();
-	while ( tok!=null && discardMask.member(tok.getType()) ) {
-	    tok = input.nextToken();
-	}
-	return tok;
+        Token tok = input.nextToken();
+        while (tok != null && discardMask.member(tok.getType())) {
+            tok = input.nextToken();
+        }
+        return tok;
     }
 }

@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -13,8 +13,13 @@ package antlr;
  */
 public class TokenStreamRecognitionException extends TokenStreamException {
     public RecognitionException recog;
+
     public TokenStreamRecognitionException(RecognitionException re) {
-	super(re.getMessage());
-	this.recog = re;
+        super(re.getMessage());
+        this.recog = re;
+    }
+
+    public String toString() {
+        return recog.toString();
     }
 }

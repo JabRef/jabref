@@ -1,4 +1,4 @@
-// $ANTLR 2.7.1: "antlr.g" -> "ANTLRLexer.java"$
+// $ANTLR : "antlr.g" -> "ANTLRLexer.java"$
 
 package antlr;
 
@@ -29,20 +29,20 @@ public interface ANTLRTokenTypes {
 	int OPEN_ELEMENT_OPTION = 25;
 	int CLOSE_ELEMENT_OPTION = 26;
 	int LPAREN = 27;
-	int RULE_REF = 28;
-	int RPAREN = 29;
-	int LITERAL_Parser = 30;
-	int LITERAL_protected = 31;
-	int LITERAL_public = 32;
-	int LITERAL_private = 33;
-	int BANG = 34;
-	int ARG_ACTION = 35;
-	int LITERAL_returns = 36;
-	int COLON = 37;
-	int LITERAL_throws = 38;
-	int COMMA = 39;
-	int LITERAL_exception = 40;
-	int LITERAL_catch = 41;
+	int RPAREN = 28;
+	int LITERAL_Parser = 29;
+	int LITERAL_protected = 30;
+	int LITERAL_public = 31;
+	int LITERAL_private = 32;
+	int BANG = 33;
+	int ARG_ACTION = 34;
+	int LITERAL_returns = 35;
+	int COLON = 36;
+	int LITERAL_throws = 37;
+	int COMMA = 38;
+	int LITERAL_exception = 39;
+	int LITERAL_catch = 40;
+	int RULE_REF = 41;
 	int NOT_OP = 42;
 	int SEMPRED = 43;
 	int TREE_BEGIN = 44;
@@ -60,11 +60,9 @@ public interface ANTLRTokenTypes {
 	int ESC = 56;
 	int DIGIT = 57;
 	int XDIGIT = 58;
-	int VOCAB = 59;
-	int NESTED_ARG_ACTION = 60;
-	int NESTED_ACTION = 61;
-	int WS_LOOP = 62;
-	int INTERNAL_RULE_REF = 63;
-	int WS_OPT = 64;
-	int NOT_USEFUL = 65;
+	int NESTED_ARG_ACTION = 59;
+	int NESTED_ACTION = 60;
+	int WS_LOOP = 61;
+	int INTERNAL_RULE_REF = 62;
+	int WS_OPT = 63;
 }

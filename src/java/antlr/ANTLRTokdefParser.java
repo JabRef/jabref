@@ -1,13 +1,9 @@
-package antlr;
-
-/*
- * ANTLR-generated file resulting from grammar tokdef.g
- * 
- * Terence Parr, MageLang Institute
- * ANTLR Version 2.7.0a2; 1989-1999
- */
-import antlr.TokenStreamException;
+// $ANTLR : "tokdef.g" -> "ANTLRTokdefParser.java"$
+ package antlr; 
 import antlr.TokenBuffer;
+import antlr.TokenStreamException;
+import antlr.TokenStreamIOException;
+import antlr.ANTLRException;
 import antlr.LLkParser;
 import antlr.Token;
 import antlr.TokenStream;
@@ -17,54 +13,99 @@ import antlr.MismatchedTokenException;
 import antlr.SemanticException;
 import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
-public class ANTLRTokdefParser extends antlr.LLkParser
-	   implements ANTLRTokdefParserTokenTypes
+
+/** Simple lexer/parser for reading token definition files
+  in support of the import/export vocab option for grammars.
+ */
+public class ANTLRTokdefParser extends antlr.LLkParser       implements ANTLRTokdefParserTokenTypes
  {
 
-	public static final String[] _tokenNames = {
-		"<0>",
-		"EOF",
-		"<2>",
-		"NULL_TREE_LOOKAHEAD",
-		"ID",
-		"STRING",
-		"ASSIGN",
-		"LPAREN",
-		"RPAREN",
-		"INT",
-		"WS",
-		"SL_COMMENT",
-		"ML_COMMENT",
-		"ESC",
-		"DIGIT",
-		"XDIGIT",
-		"VOCAB"
-	};
-	
-	private static final long _tokenSet_0_data_[] = { 2L, 0L };
-	public static final BitSet _tokenSet_0 = new BitSet(_tokenSet_0_data_);
-	private static final long _tokenSet_1_data_[] = { 50L, 0L };
-	public static final BitSet _tokenSet_1 = new BitSet(_tokenSet_1_data_);
-	
-	
-public ANTLRTokdefParser(ParserSharedInputState state) {
-  super(state,3);
-  tokenNames = _tokenNames;
-}
-public ANTLRTokdefParser(TokenBuffer tokenBuf) {
-  this(tokenBuf,3);
-}
+	// This chunk of error reporting code provided by Brian Smith
+
+    private antlr.Tool antlrTool;
+
+    /** In order to make it so existing subclasses don't break, we won't require
+     * that the antlr.Tool instance be passed as a constructor element. Instead,
+     * the antlr.Tool instance should register itself via {@link #initTool(antlr.Tool)}
+     * @throws IllegalStateException if a tool has already been registered
+     * @since 2.7.2
+     */
+    public void setTool(antlr.Tool tool) {
+        if (antlrTool == null) {
+            antlrTool = tool;
+		}
+        else {
+            throw new IllegalStateException("antlr.Tool already registered");
+		}
+    }
+
+    /** @since 2.7.2 */
+    protected antlr.Tool getTool() {
+        return antlrTool;
+    }
+
+    /** Delegates the error message to the tool if any was registered via
+     *  {@link #initTool(antlr.Tool)}
+     *  @since 2.7.2
+     */
+    public void reportError(String s) {
+        if (getTool() != null) {
+            getTool().error(s, getFilename(), -1, -1);
+		}
+        else {
+            super.reportError(s);
+		}
+    }
+
+    /** Delegates the error message to the tool if any was registered via
+     *  {@link #initTool(antlr.Tool)}
+     *  @since 2.7.2
+     */
+    public void reportError(RecognitionException e) {
+        if (getTool() != null) {
+            getTool().error(e.getErrorMessage(), e.getFilename(), e.getLine(), e.getColumn());
+		}
+        else {
+            super.reportError(e);
+		}
+    }
+
+    /** Delegates the warning message to the tool if any was registered via
+     *  {@link #initTool(antlr.Tool)}
+     *  @since 2.7.2
+     */
+    public void reportWarning(String s) {
+        if (getTool() != null) {
+            getTool().warning(s, getFilename(), -1, -1);
+		}
+        else {
+            super.reportWarning(s);
+		}
+    }
+
 protected ANTLRTokdefParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
   tokenNames = _tokenNames;
 }
-public ANTLRTokdefParser(TokenStream lexer) {
-  this(lexer,3);
+
+public ANTLRTokdefParser(TokenBuffer tokenBuf) {
+  this(tokenBuf,3);
 }
+
 protected ANTLRTokdefParser(TokenStream lexer, int k) {
   super(lexer,k);
   tokenNames = _tokenNames;
 }
+
+public ANTLRTokdefParser(TokenStream lexer) {
+  this(lexer,3);
+}
+
+public ANTLRTokdefParser(ParserSharedInputState state) {
+  super(state,3);
+  tokenNames = _tokenNames;
+}
+
 	public final void file(
 		ImportVocabTokenManager tm
 	) throws RecognitionException, TokenStreamException {
@@ -75,13 +116,13 @@ protected ANTLRTokdefParser(TokenStream lexer, int k) {
 			name = LT(1);
 			match(ID);
 			{
-			_loop3:
+			_loop225:
 			do {
 				if ((LA(1)==ID||LA(1)==STRING)) {
 					line(tm);
 				}
 				else {
-					break _loop3;
+					break _loop225;
 				}
 				
 			} while (true);
@@ -93,6 +134,7 @@ protected ANTLRTokdefParser(TokenStream lexer, int k) {
 			consumeUntil(_tokenSet_0);
 		}
 	}
+	
 	public final void line(
 		ImportVocabTokenManager tm
 	) throws RecognitionException, TokenStreamException {
@@ -175,4 +217,36 @@ protected ANTLRTokdefParser(TokenStream lexer, int k) {
 			consumeUntil(_tokenSet_1);
 		}
 	}
-}
+	
+	
+	public static final String[] _tokenNames = {
+		"<0>",
+		"EOF",
+		"<2>",
+		"NULL_TREE_LOOKAHEAD",
+		"ID",
+		"STRING",
+		"ASSIGN",
+		"LPAREN",
+		"RPAREN",
+		"INT",
+		"WS",
+		"SL_COMMENT",
+		"ML_COMMENT",
+		"ESC",
+		"DIGIT",
+		"XDIGIT"
+	};
+	
+	private static final long[] mk_tokenSet_0() {
+		long[] data = { 2L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
+	private static final long[] mk_tokenSet_1() {
+		long[] data = { 50L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
+	
+	}

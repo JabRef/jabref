@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -25,12 +25,12 @@ package antlr;
  * versus "does this specific k-sequence match?".
  */
 public interface GrammarAnalyzer {
-	/**The epsilon token type is an imaginary type used 
-	 * during analysis.  It indicates an incomplete look() computation.
-	 * Must be kept consistent with Token constants to be between
-	 * MIN_USER_TYPE and INVALID_TYPE.
-	 */
-	// public static final int EPSILON_TYPE = 2;
-	public static final int NONDETERMINISTIC = Integer.MAX_VALUE; // lookahead depth
-	public static final int LOOKAHEAD_DEPTH_INIT = -1;
+    /**The epsilon token type is an imaginary type used
+     * during analysis.  It indicates an incomplete look() computation.
+     * Must be kept consistent with Token constants to be between
+     * MIN_USER_TYPE and INVALID_TYPE.
+     */
+    // public static final int EPSILON_TYPE = 2;
+    public static final int NONDETERMINISTIC = Integer.MAX_VALUE; // lookahead depth
+    public static final int LOOKAHEAD_DEPTH_INIT = -1;
 }

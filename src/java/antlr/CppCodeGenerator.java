@@ -2,7 +2,7 @@ package antlr;
 
 /* ANTLR Translator Generator
  * Project led by Terence Parr at http://www.jGuru.com
- * Software rights: http://www.antlr.org/RIGHTS.html
+ * Software rights: http://www.antlr.org/license.html
  *
  * $Id$
  */
@@ -18,8 +18,11 @@ import java.io.PrintWriter; //SAS: changed for proper text file io
 import java.io.IOException;
 import java.io.FileWriter;
 
-/**Generate MyParser.cpp, MyParser.hpp, MyLexer.cpp, MyLexer.hpp and MyParserTokenTypes.hpp */
+/** Generate MyParser.cpp, MyParser.hpp, MyLexer.cpp, MyLexer.hpp
+ * and MyParserTokenTypes.hpp
+ */
 public class CppCodeGenerator extends CodeGenerator {
+	boolean DEBUG_CPP_CODE_GENERATOR = false;
 	// non-zero if inside syntactic predicate generation
 	protected int syntacticPredLevel = 0;
 
@@ -31,6 +34,9 @@ public class CppCodeGenerator extends CodeGenerator {
 
 	// Generate #line's
 	protected boolean genHashLines = true;
+	// Generate constructors or not
+	protected boolean noConstructors = false;
+
 	// Used to keep track of lineno in output
 	protected int outputLine;
 	protected String outputFile;
@@ -56,6 +62,12 @@ public class CppCodeGenerator extends CodeGenerator {
 	// Mapping between the ids used in the current alt, and the
 	// names of variables used to represent their AST values.
 	Hashtable treeVariableMap = new Hashtable();
+
+	/** Used to keep track of which AST variables have been defined in a rule
+	 * (except for the #rule_name and #rule_name_in var's
+	 */
+	Hashtable declaredASTVariables = new Hashtable();
+
 	// Count of unnamed generated variables
 	int astVarNumber = 1;
 	// Special value used to mark duplicate in treeVariableMap
@@ -64,6 +76,10 @@ public class CppCodeGenerator extends CodeGenerator {
 	public static final int caseSizeThreshold = 127; // ascii is max
 
 	private Vector semPreds;
+
+	// Used to keep track of which (heterogeneous AST types are used)
+	// which need to be set in the ASTFactory of the generated parser
+	private Vector astTypes;
 
 	private static String namespaceStd   = "ANTLR_USE_NAMESPACE(std)";
 	private static String namespaceAntlr = "ANTLR_USE_NAMESPACE(antlr)";
@@ -91,10 +107,11 @@ public class CppCodeGenerator extends CodeGenerator {
 		semPreds.appendElement(predicate);
 		return semPreds.size()-1;
 	}
-	public void exitIfError() {
-		if (tool.hasError) {
-			System.out.println("Exiting due to errors.");
-			System.exit(1);
+	public void exitIfError()
+	{
+		if (antlrTool.hasError())
+		{
+			antlrTool.fatalError("Exiting due to errors.");
 		}
 	}
 	protected int countLines( String s )
@@ -111,8 +128,10 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * Ignored if string is null.
 	 * @param s The string to output
 	 */
-	protected void _print(String s) {
-		if (s != null) {
+	protected void _print(String s)
+	{
+		if (s != null)
+		{
 			outputLine += countLines(s);
 			currentOutput.print(s);
 		}
@@ -122,29 +141,37 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * Ignored if string is null.
 	 * @param s The action string to output
 	 */
-	protected void _printAction(String s) {
-		if (s != null) {
+	protected void _printAction(String s)
+	{
+		if (s != null)
+		{
 			outputLine += countLines(s)+1;
 			super._printAction(s);
 		}
 	}
 	/** Print an action stored in a token surrounded by #line stuff */
-	public void printAction(Token t) {
-		if (t != null) {
+	public void printAction(Token t)
+	{
+		if (t != null)
+		{
 			genLineNo(t.getLine());
 			printTabs();
-			_printAction(t.getText());
+			_printAction(processActionForSpecialSymbols(t.getText(), t.getLine(),
+																null, null) );
 			genLineNo2();
 		}
 	}
-	/** Print a header action by #line stuff
-	* @param name The name of the header part
-	*/
-	public void printHeaderAction(String name) {
+	/** Print a header action by #line stuff also process any tree construction
+	 * @param name The name of the header part
+	 */
+	public void printHeaderAction(String name)
+	{
 		Token a = (antlr.Token)behavior.headerActions.get(name);
-		if (a != null) {
+		if (a != null)
+		{
 			genLineNo(a.getLine());
-			println(a.getText());
+			println(processActionForSpecialSymbols(a.getText(), a.getLine(),
+																null, null) );
 			genLineNo2();
 		}
 	}
@@ -172,13 +199,11 @@ public class CppCodeGenerator extends CodeGenerator {
 
 	/** Generate a #line or // line depending on options */
 	public void genLineNo(int line) {
-	    if ( line == 0 ) {
-		line++;
-	    }
-	    if( genHashLines )
-		_println("#line "+line+" \""+Tool.fileMinusPath(tool.grammarFile)+"\"");
-	    else
-		println("// line "+line+" \""+Tool.fileMinusPath(tool.grammarFile)+"\"");
+		if ( line == 0 ) {
+			line++;
+		}
+		if( genHashLines )
+			_println("#line "+line+" \""+antlrTool.fileMinusPath(antlrTool.grammarFile)+"\"");
 	}
 
 	/** Generate a #line or // line depending on options */
@@ -201,7 +226,173 @@ public class CppCodeGenerator extends CodeGenerator {
 			_println("#line "+(outputLine+1)+" \""+outputFile+"\"");
 		}
 	}
-	/**Generate the parser, lexer, treeparser, and token types in C++ */
+	/// Bound safe isDigit
+	private boolean charIsDigit( String s, int i )
+	{
+		return (i < s.length()) && Character.isDigit(s.charAt(i));
+	}
+	/** Normalize a string coming from antlr's lexer. E.g. translate java
+	 * escapes to values. Check their size (multibyte) bomb out if they are
+	 * multibyte (bit crude). Then reescape to C++ style things.
+	 * Used to generate strings for match() and matchRange()
+	 * @param lit the literal string
+	 * @param isCharLiteral if it's for a character literal
+	 *                       (enforced to be one length) and enclosed in '
+	 * FIXME: bombing out on mb chars. Should be done in Lexer.
+	 * FIXME: this is another horrible hack.
+	 * FIXME: life would be soooo much easier if the stuff from the lexer was
+	 * normalized in some way.
+	 */
+	private String convertJavaToCppString( String lit, boolean isCharLiteral )
+	{
+		// System.out.println("convertJavaToCppLiteral: "+lit);
+		String ret = new String();
+		String s = lit;
+
+		int i = 0;
+		int val = 0;
+
+		if( isCharLiteral )	// verify & strip off quotes
+		{
+			if( ! lit.startsWith("'") || ! lit.endsWith("'") )
+				antlrTool.error("Invalid character literal: '"+lit+"'");
+
+			s = lit.substring(1,lit.length()-1);
+		}
+
+		while ( i < s.length() )
+		{
+			if( s.charAt(i) == '\\' )
+			{
+				if( s.length() == i+1 )
+					antlrTool.error("Invalid escape in char literal: '"+lit+"' looking at '"+s.substring(i)+"'");
+
+				// deal with escaped junk
+				switch ( s.charAt(i+1) ) {
+				case 'a' :
+					val = 7;
+					i += 2;
+					break;
+				case 'b' :
+					val = 8;
+					i += 2;
+					break;
+				case 't' :
+					val = 9;
+					i += 2;
+					break;
+				case 'n' :
+					val = 10;
+					i += 2;
+					break;
+				case 'f' :
+					val = 12;
+					i += 2;
+					break;
+				case 'r' :
+					val = 13;
+					i += 2;
+					break;
+				case '"' :
+				case '\'' :
+				case '\\' :
+					val = s.charAt(i+1);
+					i += 2;
+					break;
+
+				case 'u' :
+					// Unicode char \u1234
+					if( i+5 < s.length() )
+					{
+						val = Character.digit(s.charAt(i+2), 16) * 16 * 16 * 16 +
+							Character.digit(s.charAt(i+3), 16) * 16 * 16 +
+							Character.digit(s.charAt(i+4), 16) * 16 +
+							Character.digit(s.charAt(i+5), 16);
+						i += 6;
+					}
+					else
+						antlrTool.error("Invalid escape in char literal: '"+lit+"' looking at '"+s.substring(i)+"'");
+					break;
+
+				case '0' :					// \123
+				case '1' :
+				case '2' :
+				case '3' :
+					if( charIsDigit(s, i+2) )
+					{
+						if( charIsDigit(s, i+3) )
+						{
+							val = (s.charAt(i+1)-'0')*8*8 + (s.charAt(i+2)-'0')*8 +
+								(s.charAt(i+3)-'0');
+							i += 4;
+						}
+						else
+						{
+							val = (s.charAt(i+1)-'0')*8 + (s.charAt(i+2)-'0');
+							i += 3;
+						}
+					}
+					else
+					{
+						val = s.charAt(i+1)-'0';
+						i += 2;
+					}
+					break;
+
+				case '4' :
+				case '5' :
+				case '6' :
+				case '7' :
+					if ( charIsDigit(s, i+2) )
+					{
+						val = (s.charAt(i+1)-'0')*8 + (s.charAt(i+2)-'0');
+						i += 3;
+					}
+					else
+					{
+						val = s.charAt(i+1)-'0';
+						i += 2;
+					}
+				default:
+					antlrTool.error("Unhandled escape in char literal: '"+lit+"' looking at '"+s.substring(i)+"'");
+					val = 0;
+				}
+			}
+			else
+				val = s.charAt(i++);
+
+			if( isCharLiteral )
+			{
+				// we should be at end of char literal here..
+				if( i != s.length() )
+					antlrTool.error("Invalid char literal: '"+lit+"'");
+
+//				if( val >= ' ' && val <= 126 )	// just concat if printable
+//					ret = "'"+(char)val+"'";
+//				else
+				if( val > 255 )					// abort if multibyte
+					antlrTool.error("Multibyte character found in char literal: '"+lit+"'");
+				else if ( val == 255 )
+					// the joys of sign extension in the support lib *cough*
+					ret = "static_cast<unsigned char>(255)";
+				else
+					ret = "'"+charFormatter.escapeChar(val,true)+"'";
+			}
+			else
+			{
+				if( val >= ' ' && val <= 126 )		// just concat if printable
+					ret += (char)val;
+				else if( val > 255 )						// abort if multibyte
+					antlrTool.error("Multibyte character found in string constant: '"+s+"'");
+				else
+					ret += charFormatter.escapeChar(val,true);
+			}
+		}
+		// System.out.println("convertJavaToCppLiteral: "+lit+" -> "+ret);
+		return ret;
+	}
+	/** Generate the parser, lexer, treeparser, and token types in C++
+	 */
 	public void gen() {
 		// Do the code generation
 		try {
@@ -209,6 +400,9 @@ public class CppCodeGenerator extends CodeGenerator {
 			Enumeration grammarIter = behavior.grammars.elements();
 			while (grammarIter.hasMoreElements()) {
 				Grammar g = (Grammar)grammarIter.nextElement();
+				if ( g.debuggingOutput ) {
+					antlrTool.error(g.getFilename()+": C++ mode does not support -debug");
+				}
 				// Connect all the components to each other
 				g.setGrammarAnalyzer(analyzer);
 				g.setCodeGenerator(this);
@@ -235,14 +429,14 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 		}
 		catch (IOException e) {
-			System.out.println(e.getMessage());
+			antlrTool.reportException(e, null);
 		}
 	}
 	/** Generate code for the given grammar element.
 	 * @param blk The {...} action to generate
 	 */
 	public void gen(ActionElement action) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genAction("+action+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genAction("+action+")");
 		if ( action.isSemPred ) {
 			genSemPred(action.actionText, action.line);
 		}
@@ -253,7 +447,9 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 
 			ActionTransInfo tInfo = new ActionTransInfo();
-			String actionStr = processActionForTreeSpecifiers(action.actionText, action.getLine(), currentRule, tInfo);
+			String actionStr = processActionForSpecialSymbols(action.actionText,
+																			  action.getLine(),
+																			  currentRule, tInfo);
 
 			if ( tInfo.refRuleRoot!=null ) {
 				// Somebody referenced "#rule", make sure translated var is valid
@@ -291,13 +487,15 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 		}
 	}
+
 	/** Generate code for the given grammar element.
 	 * @param blk The "x|y|z|..." block to generate
 	 */
 	public void gen(AlternativeBlock blk) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("gen("+blk+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("gen("+blk+")");
 		println("{");
 		genBlockPreamble(blk);
+		genBlockInitAction(blk);
 
 		// Tell AST generation to build subrule result
 		String saveCurrentASTResult = currentASTResult;
@@ -321,31 +519,66 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * the end of a block.
 	 */
 	public void gen(BlockEndElement end) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genRuleEnd("+end+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genRuleEnd("+end+")");
 	}
 	/** Generate code for the given grammar element.
+	 * Only called from lexer grammars.
 	 * @param blk The character literal reference to generate
 	 */
 	public void gen(CharLiteralElement atom) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genChar("+atom+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR )
+			System.out.println("genChar("+atom+")");
 
-		if ( atom.getLabel()!=null ) {
+		if ( ! (grammar instanceof LexerGrammar) )
+			antlrTool.error("cannot ref character literals in grammar: "+atom);
+
+		if ( atom.getLabel() != null ) {
 			println(atom.getLabel() + " = " + lt1Value + ";");
 		}
 
 		boolean oldsaveText = saveText;
-		saveText = saveText && atom.getAutoGenType()==GrammarElement.AUTO_GEN_NONE;
-		genMatch(atom);
+		saveText = saveText && atom.getAutoGenType() == GrammarElement.AUTO_GEN_NONE;
+
+		// if in lexer and ! on element, save buffer index to kill later
+		if ( !saveText||atom.getAutoGenType()==GrammarElement.AUTO_GEN_BANG )
+			println("_saveIndex = text.length();");
+
+		print(atom.not ? "matchNot(" : "match(");
+		_print(convertJavaToCppString( atom.atomText, true ));
+		_println(");");
+
+		if ( !saveText || atom.getAutoGenType() == GrammarElement.AUTO_GEN_BANG )
+			println("text.erase(_saveIndex);");      // kill text atom put in buffer
+
 		saveText = oldsaveText;
 	}
 	/** Generate code for the given grammar element.
+	 * Only called from lexer grammars.
 	 * @param blk The character-range reference to generate
 	 */
 	public void gen(CharRangeElement r) {
-		if ( r.getLabel()!=null  && syntacticPredLevel == 0) {
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR )
+			System.out.println("genCharRangeElement("+r.beginText+".."+r.endText+")");
+
+		if ( ! (grammar instanceof LexerGrammar) )
+			antlrTool.error("cannot ref character range in grammar: "+r);
+
+		if ( r.getLabel() != null && syntacticPredLevel == 0) {
 			println(r.getLabel() + " = " + lt1Value + ";");
 		}
-		println("matchRange("+textOrChar(r.beginText)+","+textOrChar(r.endText)+");");
+		// Correctly take care of saveIndex stuff...
+		boolean save = ( grammar instanceof LexerGrammar &&
+							  ( !saveText ||
+								 r.getAutoGenType() == GrammarElement.AUTO_GEN_BANG )
+						   );
+		if (save)
+         println("_saveIndex=text.length();");
+
+		println("matchRange("+convertJavaToCppString(r.beginText,true)+
+				  ","+convertJavaToCppString(r.endText,true)+");");
+
+		if (save)
+         println("text.setLength(_saveIndex);");
 	}
 	/** Generate the lexer C++ files */
 	public  void gen(LexerGrammar g) throws IOException {
@@ -353,9 +586,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (g.debuggingOutput)
 			semPreds = new Vector();
 
+		if( g.charVocabulary.size() > 256 )
+			antlrTool.warning(g.getFilename()+": C++ mode does not support more than 8 bit characters (vocabulary size now: "+g.charVocabulary.size()+")");
+
 		setGrammar(g);
 		if (!(grammar instanceof LexerGrammar)) {
-			tool.panic("Internal error generating lexer");
+			antlrTool.panic("Internal error generating lexer");
 		}
 
 		genBody(g);
@@ -365,10 +601,10 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * @param blk The (...)+ block to generate
 	 */
 	public void gen(OneOrMoreBlock blk) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("gen+("+blk+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("gen+("+blk+")");
 		String label;
 		String cnt;
-		println("{");
+		println("{ // ( ... )+");
 		genBlockPreamble(blk);
 		if ( blk.getLabel() != null ) {
 			cnt = "_cnt_"+blk.getLabel();
@@ -386,6 +622,9 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		println("for (;;) {");
 		tabs++;
+		// generate the init action for ()+ ()* inside the loop
+		// this allows us to do usefull EOF checking...
+		genBlockInitAction(blk);
 
 		// Tell AST generation to build subrule result
 		String saveCurrentASTResult = currentASTResult;
@@ -424,7 +663,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		// generate exit test if greedy set to false
 		// and an alt is ambiguous with exit branch
 		if ( generateNonGreedyExitPath ) {
-			if ( DEBUG_CODE_GENERATOR ) {
+			if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) {
 				System.out.println("nongreedy (...)+ loop; exit depth is "+
 								   blk.exitLookaheadDepth);
 			}
@@ -445,7 +684,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs--;
 		println("}");
 		println(label+":;");
-		println("}");
+		println("}  // ( ... )+");
 
 		// Restore previous AST generation
 		currentASTResult = saveCurrentASTResult;
@@ -460,7 +699,7 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		setGrammar(g);
 		if (!(grammar instanceof ParserGrammar)) {
-			tool.panic("Internal error generating parser");
+			antlrTool.panic("Internal error generating parser");
 		}
 
 		genBody(g);
@@ -469,19 +708,20 @@ public class CppCodeGenerator extends CodeGenerator {
 	/** Generate code for the given grammar element.
 	 * @param blk The rule-reference to generate
 	 */
-	public void gen(RuleRefElement rr) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genRR("+rr+")");
+	public void gen(RuleRefElement rr)
+	{
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genRR("+rr+")");
 		RuleSymbol rs = (RuleSymbol)grammar.getSymbol(rr.targetRule);
 		if (rs == null || !rs.isDefined())
 		{
 			// Is this redundant???
-			tool.error("Rule '" + rr.targetRule + "' is not defined", grammar.getFilename(), rr.getLine());
+			antlrTool.error("Rule '" + rr.targetRule + "' is not defined", grammar.getFilename(), rr.getLine(), rr.getColumn());
 			return;
 		}
 		if (!(rs instanceof RuleSymbol))
 		{
 			// Is this redundant???
-			tool.error("'" + rr.targetRule + "' does not name a grammar rule", grammar.getFilename(), rr.getLine());
+			antlrTool.error("'" + rr.targetRule + "' does not name a grammar rule", grammar.getFilename(), rr.getLine(), rr.getColumn());
 			return;
 		}
 
@@ -496,8 +736,10 @@ public class CppCodeGenerator extends CodeGenerator {
 			println(rr.getLabel() + " = (_t == ASTNULL) ? "+labeledElementASTInit+" : "+lt1Value+";");
 		}
 
-		// if in lexer and ! on rule ref or alt or rule, save buffer index to kill later
-		if ( grammar instanceof LexerGrammar && (!saveText||rr.getAutoGenType()==GrammarElement.AUTO_GEN_BANG) ) {
+		// if in lexer and ! on rule ref or alt or rule, save buffer index to
+		// kill later
+		if ( grammar instanceof LexerGrammar && (!saveText||rr.getAutoGenType()==GrammarElement.AUTO_GEN_BANG) )
+		{
 			println("_saveIndex = text.length();");
 		}
 
@@ -508,14 +750,14 @@ public class CppCodeGenerator extends CodeGenerator {
 			// Warn if the rule has no return type
 			if (rs.block.returnAction == null)
 			{
-				tool.warning("Rule '" + rr.targetRule + "' has no return type", grammar.getFilename(), rr.getLine());
+				antlrTool.warning("Rule '" + rr.targetRule + "' has no return type", grammar.getFilename(), rr.getLine(), rr.getColumn());
 			}
 			_print(rr.idAssign + "=");
 		} else {
 			// Warn about return value if any, but not inside syntactic predicate
 			if ( !(grammar instanceof LexerGrammar) && syntacticPredLevel == 0 && rs.block.returnAction != null)
 			{
-				tool.warning("Rule '" + rr.targetRule + "' returns a value", grammar.getFilename(), rr.getLine());
+				antlrTool.warning("Rule '" + rr.targetRule + "' returns a value", grammar.getFilename(), rr.getLine(), rr.getColumn());
 			}
 		}
 
@@ -528,7 +770,8 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// if not in a syntactic predicate
-		if (syntacticPredLevel == 0) {
+		if (syntacticPredLevel == 0)
+		{
 			boolean doNoGuessTest = (
 				grammar.hasSyntacticPredicate &&
 				(
@@ -536,24 +779,33 @@ public class CppCodeGenerator extends CodeGenerator {
 					(genAST && rr.getAutoGenType() == GrammarElement.AUTO_GEN_NONE)
 				)
 			);
+
 			if (doNoGuessTest) {
 				println("if (inputState->guessing==0) {");
 				tabs++;
 			}
 
-			if (grammar.buildAST && rr.getLabel() != null) {
+			if (grammar.buildAST && rr.getLabel() != null)
+			{
 				// always gen variable for rule return on labeled rules
-				// FIXME: maybe broken....
-				println(rr.getLabel() + "_AST = "+labeledElementASTType+"(returnAST);");
+				// RK: hmm do I know here if the returnAST needs a cast ?
+				println(rr.getLabel() + "_AST = returnAST;");
 			}
-			if (genAST) {
-				switch (rr.getAutoGenType()) {
+
+			if (genAST)
+			{
+				switch (rr.getAutoGenType())
+				{
 				case GrammarElement.AUTO_GEN_NONE:
-					// println("theASTFactory.addASTChild(currentAST, returnAST);");
-					println("astFactory.addASTChild(currentAST, "+namespaceAntlr+"RefAST(returnAST));");
+					if( usingCustomAST )
+						println("astFactory->addASTChild(currentAST, "+namespaceAntlr+"RefAST(returnAST));");
+					else
+						println("astFactory->addASTChild( currentAST, returnAST );");
 					break;
 				case GrammarElement.AUTO_GEN_CARET:
-					tool.error("Internal: encountered ^ after rule reference");
+					// FIXME: RK: I'm not so sure this should be an error..
+					// I think it might actually work and be usefull at times.
+					antlrTool.error("Internal: encountered ^ after rule reference");
 					break;
 				default:
 					break;
@@ -561,11 +813,13 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 
 			// if a lexer and labeled, Token label defined at rule level, just set it here
-			if ( grammar instanceof LexerGrammar && rr.getLabel() != null ) {
+			if ( grammar instanceof LexerGrammar && rr.getLabel() != null )
+			{
 				println(rr.getLabel()+"=_returnToken;");
 			}
 
-			if (doNoGuessTest) {
+			if (doNoGuessTest)
+			{
 				tabs--;
 				println("}");
 			}
@@ -576,7 +830,7 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * @param blk The string-literal reference to generate
 	 */
 	public void gen(StringLiteralElement atom) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genString("+atom+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genString("+atom+")");
 
 		// Variable declarations for labeled elements
 		if (atom.getLabel()!=null && syntacticPredLevel == 0) {
@@ -620,9 +874,9 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * @param blk The token-reference to generate
 	 */
 	public void gen(TokenRefElement atom) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genTokenRef("+atom+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genTokenRef("+atom+")");
 		if ( grammar instanceof LexerGrammar ) {
-			tool.panic("Token reference found in lexer");
+			antlrTool.panic("Token reference found in lexer");
 		}
 		genErrorTryForElement(atom);
 		// Assign Token value to token label variable
@@ -647,8 +901,19 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// If there is a label on the root, then assign that to the variable
 		if (t.root.getLabel() != null) {
-//			println(t.root.getLabel() + " = _t==ASTNULL ? "+namespaceAntlr+"nullAST :"+labeledElementASTType+"(_t);");
 			println(t.root.getLabel() + " = (_t == ASTNULL) ? "+labeledElementASTInit+" : _t;");
+		}
+
+		// check for invalid modifiers ! and ^ on tree element roots
+		if ( t.root.getAutoGenType() == GrammarElement.AUTO_GEN_BANG ) {
+			antlrTool.error("Suffixing a root node with '!' is not implemented",
+						  grammar.getFilename(), t.getLine(), t.getColumn());
+			t.root.setAutoGenType(GrammarElement.AUTO_GEN_NONE);
+		}
+		if ( t.root.getAutoGenType() == GrammarElement.AUTO_GEN_CARET ) {
+			antlrTool.warning("Suffixing a root node with '^' is redundant; already a root",
+							 grammar.getFilename(), t.getLine(), t.getColumn());
+			t.root.setAutoGenType(GrammarElement.AUTO_GEN_NONE);
 		}
 
 		// Generate AST variables
@@ -662,7 +927,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// match root
-		genMatch(t.root);
+		if ( t.root instanceof WildcardElement ) {
+			println("if ( _t == ASTNULL ) throw "+namespaceAntlr+"MismatchedTokenException();");
+		}
+		else {
+			genMatch(t.root);
+		}
 		// move to list of children
 		println("_t = _t->getFirstChild();");
 
@@ -690,7 +960,7 @@ public class CppCodeGenerator extends CodeGenerator {
 	public void gen(TreeWalkerGrammar g) throws IOException {
 		setGrammar(g);
 		if (!(grammar instanceof TreeWalkerGrammar)) {
-			tool.panic("Internal error generating tree-walker");
+			antlrTool.panic("Internal error generating tree-walker");
 		}
 
 		genBody(g);
@@ -735,8 +1005,8 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * @param blk The (...)* block to generate
 	 */
 	public void gen(ZeroOrMoreBlock blk) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("gen*("+blk+")");
-		println("{");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("gen*("+blk+")");
+		println("{ // ( ... )*");
 		genBlockPreamble(blk);
 		String label;
 		if ( blk.getLabel() != null ) {
@@ -747,6 +1017,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 		println("for (;;) {");
 		tabs++;
+		// generate the init action for ()+ ()* inside the loop
+		// this allows us to do usefull EOF checking...
+		genBlockInitAction(blk);
 
 		// Tell AST generation to build subrule result
 		String saveCurrentASTResult = currentASTResult;
@@ -782,7 +1055,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			generateNonGreedyExitPath = true;
 		}
 		if ( generateNonGreedyExitPath ) {
-			if ( DEBUG_CODE_GENERATOR ) {
+			if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) {
 				System.out.println("nongreedy (...)* loop; exit depth is "+
 								   blk.exitLookaheadDepth);
 			}
@@ -799,7 +1072,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs--;
 		println("}");
 		println(label+":;");
-		println("}");
+		println("} // ( ... )*");
 
 		// Restore previous AST generation
 		currentASTResult = saveCurrentASTResult;
@@ -808,7 +1081,8 @@ public class CppCodeGenerator extends CodeGenerator {
 	  * @param alt  The alternative to generate
 	  * @param blk The block to which the alternative belongs
 	  */
-	protected void genAlt(Alternative alt, AlternativeBlock blk) {
+	protected void genAlt(Alternative alt, AlternativeBlock blk)
+	{
 		// Save the AST generation state, and set it to that of the alt
 		boolean savegenAST = genAST;
 		genAST = genAST && alt.getAutoGen();
@@ -832,19 +1106,26 @@ public class CppCodeGenerator extends CodeGenerator {
 			elem = elem.next;
 		}
 
-		if ( genAST) {
-			if (blk instanceof RuleBlock) {
+		if ( genAST)
+		{
+			if (blk instanceof RuleBlock)
+			{
 				// Set the AST return value for the rule
 				RuleBlock rblk = (RuleBlock)blk;
-				println(rblk.getRuleName() + "_AST = "+labeledElementASTType+"(currentAST.root);");
+				if( usingCustomAST )
+					println(rblk.getRuleName() + "_AST = "+labeledElementASTType+"(currentAST.root);");
+				else
+					println(rblk.getRuleName() + "_AST = currentAST.root;");
 			}
 			else if (blk.getLabel() != null) {
 				// ### future: also set AST value for labeled subrules.
 				// println(blk.getLabel() + "_AST = "+labeledElementASTType+"(currentAST.root);");
+				antlrTool.warning("Labeled subrules are not implemented", grammar.getFilename(), blk.getLine(), blk.getColumn());
 			}
 		}
 
-		if (alt.exceptionSpec != null) {
+		if (alt.exceptionSpec != null)
+		{
 			// close try block
 			tabs--;
 			println("}");
@@ -858,28 +1139,34 @@ public class CppCodeGenerator extends CodeGenerator {
 	}
 	/** Generate all the bitsets to be used in the parser or lexer
 	 * Generate the raw bitset data like "long _tokenSet1_data[] = {...};"
-	 * and the BitSet object declarations like "BitSet _tokenSet1 = new BitSet(_tokenSet1_data);"
+	 * and the BitSet object declarations like
+	 * "BitSet _tokenSet1 = new BitSet(_tokenSet1_data);"
 	 * Note that most languages do not support object initialization inside a
 	 * class definition, so other code-generators may have to separate the
-	 * bitset declarations from the initializations (e.g., put the initializations
-	 * in the generated constructor instead).
+	 * bitset declarations from the initializations (e.g., put the
+	 * initializations in the generated constructor instead).
 	 * @param bitsetList The list of bitsets to generate.
-	 * @param maxVocabulary Ensure that each generated bitset can contain at least this value.
-	 * @param dumpSets Dump out the token definitions of the contents of the bitset
-	 * only for grammars/parsers.
+	 * @param maxVocabulary Ensure that each generated bitset can contain at
+	 *        least this value.
+	 * @param prefix string glued in from of bitset names used for namespace
+	 *        qualifications.
 	 */
 	protected void genBitsets(
 		Vector bitsetList,
 		int maxVocabulary,
-		String prefix,
-		boolean dumpSets
-	) {
+		String prefix
+	)
+	{
+		TokenManager tm = grammar.tokenManager;
+
 		println("");
+
 		for (int i = 0; i < bitsetList.size(); i++)
 		{
 			BitSet p = (BitSet)bitsetList.elementAt(i);
 			// Ensure that generated BitSet is large enough for vocabulary
 			p.growToInclude(maxVocabulary);
+
 			// initialization data
 			println(
 				"const unsigned long " + prefix + getBitsetName(i) + "_data_" + "[] = { " +
@@ -887,25 +1174,33 @@ public class CppCodeGenerator extends CodeGenerator {
 				" };"
 			);
 
-			if( dumpSets )
+			// Dump the contents of the bitset in readable format...
+			String t = "// ";
+
+			for( int j = 0; j < tm.getVocabulary().size(); j++ )
 			{
-				// Dump the contents of the bitset in readable format...
-				String t = "// ";
-				for( int j = 0; j < p.size(); j++ )
+				if ( p.member( j ) )
 				{
-					if ( p.member( j ) )
+					if ( (grammar instanceof LexerGrammar) )
 					{
-						t += grammar.tokenManager.getTokenStringAt(j)+" ";
-						if( t.length() > 70 )
-						{
-							println(t);
-							t = "// ";
-						}
+						// only dump out for pure printable ascii.
+						if( ( 0x20 <= j ) && ( j < 0x7F ) )
+							t += charFormatter.escapeChar(j,true)+" ";
+						else
+							t += "0x"+Integer.toString(j,16)+" ";
+					}
+					else
+						t += tm.getTokenStringAt(j)+" ";
+
+					if( t.length() > 70 )
+					{
+						println(t);
+						t = "// ";
 					}
 				}
-				if ( t != "// " )
-					println(t);
 			}
+			if ( t != "// " )
+				println(t);
 
 			// BitSet object
 			println(
@@ -957,9 +1252,23 @@ public class CppCodeGenerator extends CodeGenerator {
 			println(howToFinish.postscript);
 		}
 	}
+	/** Generate the initaction for a block, which may be a RuleBlock or a
+	 * plain AlternativeBLock.
+	 * @blk The block for which the preamble is to be generated.
+	 */
+	protected void genBlockInitAction( AlternativeBlock blk )
+	{
+		// dump out init action
+		if ( blk.initAction!=null ) {
+			genLineNo(blk);
+			printAction(processActionForSpecialSymbols(blk.initAction, blk.line,
+																	 currentRule, null) );
+			genLineNo2();
+		}
+	}
 	/** Generate the header for a block, which may be a RuleBlock or a
-	 * plain AlternativeBLock.  This generates any variable declarations,
-	 * init-actions, and syntactic-predicate-testing variables.
+	 * plain AlternativeBlock. This generates any variable declarations
+	 * and syntactic-predicate-testing variables.
 	 * @blk The block for which the preamble is to be generated.
 	 */
 	protected void genBlockPreamble(AlternativeBlock blk) {
@@ -979,62 +1288,66 @@ public class CppCodeGenerator extends CodeGenerator {
 						a instanceof RuleRefElement ||
 						a instanceof AlternativeBlock &&
 						!(a instanceof RuleBlock) &&
-						!(a instanceof SynPredBlock)
-					) {
-
-						if (
-							!(a instanceof RuleRefElement) &&
-							((AlternativeBlock)a).not &&
-							analyzer.subruleCanBeInverted(((AlternativeBlock)a), grammar instanceof LexerGrammar)
+						!(a instanceof SynPredBlock) )
+					{
+						if ( !(a instanceof RuleRefElement) &&
+							  ((AlternativeBlock)a).not &&
+							  analyzer.subruleCanBeInverted(((AlternativeBlock)a), grammar instanceof LexerGrammar)
 						) {
-							// Special case for inverted subrules that will be inlined.
-							// Treat these like token or char literal references
+							// Special case for inverted subrules that will be
+							// inlined. Treat these like token or char literal
+							// references
 							println(labeledElementType + " " + a.getLabel() + " = " + labeledElementInit + ";");
 							if (grammar.buildAST) {
-								println(labeledElementASTType+" " + a.getLabel() + "_AST = "+labeledElementASTInit+";");
+								genASTDeclaration( a );
 							}
 						}
-						else {
-							if (grammar.buildAST) {
-								// Always gen AST variables for labeled elements, even if the
-								// element itself is marked with !
-								println(labeledElementASTType+" " + a.getLabel() + "_AST = "+labeledElementASTInit+";");
+						else
+						{
+							if (grammar.buildAST)
+							{
+								// Always gen AST variables for labeled elements,
+								// even if the element itself is marked with !
+								genASTDeclaration( a );
 							}
-							if ( grammar instanceof LexerGrammar ) {
+							if ( grammar instanceof LexerGrammar )
 								println(namespaceAntlr+"RefToken "+a.getLabel()+";");
-							}
+
 							if (grammar instanceof TreeWalkerGrammar) {
 								// always generate rule-ref variables for tree walker
 								println(labeledElementType + " " + a.getLabel() + " = " + labeledElementInit + ";");
 							}
 						}
 					}
-					else {
+					else
+					{
 						// It is a token or literal reference.  Generate the
 						// correct variable type for this grammar
 						println(labeledElementType + " " + a.getLabel() + " = " + labeledElementInit + ";");
 						// In addition, generate *_AST variables if building ASTs
-						if (grammar.buildAST) {
-							println(labeledElementASTType+" " + a.getLabel() + "_AST = "+labeledElementASTInit+";");
+						if (grammar.buildAST)
+						{
+							if (a instanceof GrammarAtom &&
+								 ((GrammarAtom)a).getASTNodeType() != null )
+							{
+								GrammarAtom ga = (GrammarAtom)a;
+								genASTDeclaration( a, "Ref"+ga.getASTNodeType() );
+							}
+							else
+							{
+								genASTDeclaration( a );
+							}
 						}
 					}
 				}
 			}
 		}
-
-		// dump out init action
-		if ( blk.initAction!=null ) {
-			genLineNo(blk);
-			printAction(
-				processActionForTreeSpecifiers(blk.initAction, 0, currentRule, null)
-			);
-			genLineNo2();
-		}
 	}
-	public void genBody(LexerGrammar g) throws IOException {
+	public void genBody(LexerGrammar g) throws IOException
+	{
 		outputFile = grammar.getClassName() + ".cpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		genAST = false;	// no way to gen trees.
@@ -1048,15 +1361,15 @@ public class CppCodeGenerator extends CodeGenerator {
 		printHeaderAction(preIncludeCpp);
 		// Generate header specific to lexer C++ file
 		println("#include \"" + grammar.getClassName() + ".hpp\"");
-		println("#include \"antlr/CharBuffer.hpp\"");
-		println("#include \"antlr/TokenStreamException.hpp\"");
-		println("#include \"antlr/TokenStreamIOException.hpp\"");
-		println("#include \"antlr/TokenStreamRecognitionException.hpp\"");
-		println("#include \"antlr/CharStreamException.hpp\"");
-		println("#include \"antlr/CharStreamIOException.hpp\"");
-		println("#include \"antlr/NoViableAltForCharException.hpp\"");
+		println("#include <antlr/CharBuffer.hpp>");
+		println("#include <antlr/TokenStreamException.hpp>");
+		println("#include <antlr/TokenStreamIOException.hpp>");
+		println("#include <antlr/TokenStreamRecognitionException.hpp>");
+		println("#include <antlr/CharStreamException.hpp>");
+		println("#include <antlr/CharStreamIOException.hpp>");
+		println("#include <antlr/NoViableAltForCharException.hpp>");
 		if (grammar.debuggingOutput)
-			println("#include \"antlr/DebuggingInputBuffer.hpp\"");
+			println("#include <antlr/DebuggingInputBuffer.hpp>");
 		println("");
 		printHeaderAction(postIncludeCpp);
 
@@ -1078,6 +1391,11 @@ public class CppCodeGenerator extends CodeGenerator {
 			sup = namespaceAntlr + sup;
 		}
 
+		if( noConstructors )
+		{
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+		}
 		//
 		// Generate the constructor from InputStream
 		//
@@ -1085,9 +1403,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs++;
 		// if debugging, wrap the input buffer in a debugger
 		if (grammar.debuggingOutput)
-			println(": " + sup + "(new "+namespaceAntlr+"DebuggingInputBuffer(new "+namespaceAntlr+"CharBuffer(in)))");
+			println(": " + sup + "(new "+namespaceAntlr+"DebuggingInputBuffer(new "+namespaceAntlr+"CharBuffer(in)),"+g.caseSensitive+")");
 		else
-			println(": " + sup + "(new "+namespaceAntlr+"CharBuffer(in))");
+			println(": " + sup + "(new "+namespaceAntlr+"CharBuffer(in),"+g.caseSensitive+")");
 		tabs--;
 		println("{");
 		tabs++;
@@ -1100,7 +1418,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("setupDebugging();");
 		}
 
-		println("setCaseSensitive("+g.caseSensitive+");");
+//		println("setCaseSensitive("+g.caseSensitive+");");
 		println("initLiterals();");
 		tabs--;
 		println("}");
@@ -1111,9 +1429,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs++;
 		// if debugging, wrap the input buffer in a debugger
 		if (grammar.debuggingOutput)
-			println(": " + sup + "(new "+namespaceAntlr+"DebuggingInputBuffer(ib))");
+			println(": " + sup + "(new "+namespaceAntlr+"DebuggingInputBuffer(ib),"+g.caseSensitive+")");
 		else
-			println(": " + sup + "(ib)");
+			println(": " + sup + "(ib,"+g.caseSensitive+")");
 		tabs--;
 		println("{");
 		tabs++;
@@ -1126,7 +1444,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("setupDebugging();");
 		}
 
-		println("setCaseSensitive("+g.caseSensitive+");");
+//		println("setCaseSensitive("+g.caseSensitive+");");
 		println("initLiterals();");
 		tabs--;
 		println("}");
@@ -1135,7 +1453,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Generate the constructor from LexerSharedInputState
 		println(grammar.getClassName() + "::" + grammar.getClassName() + "(const "+namespaceAntlr+"LexerSharedInputState& state)");
 		tabs++;
-		println(": " + sup + "(state)");
+		println(": " + sup + "(state,"+g.caseSensitive+")");
 		tabs--;
 		println("{");
 		tabs++;
@@ -1148,11 +1466,17 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("setupDebugging();");
 		}
 
-		println("setCaseSensitive("+g.caseSensitive+");");
+//		println("setCaseSensitive("+g.caseSensitive+");");
 		println("initLiterals();");
 		tabs--;
 		println("}");
 		println("");
+
+		if( noConstructors )
+		{
+			println("// constructor creation turned of with 'noConstructor' option");
+			println("#endif");
+		}
 
 		println("void " + grammar.getClassName() + "::initLiterals()");
 		println("{");
@@ -1160,20 +1484,6 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Generate the initialization of the map
 		// containing the string literals used in the lexer
 		// The literals variable itself is in CharScanner
-		/* TJP: get keys now and check to make sure it's a literal not
-		 * a label to a literal; was dup'ing string literals before
-		 * change.
-		 *
-		Enumeration ids = grammar.tokenManager.getTokenSymbolElements();
-		while ( ids.hasMoreElements() ) {
-			TokenSymbol sym = (TokenSymbol)ids.nextElement();
-			if ( sym instanceof StringLiteralSymbol ) {
-				StringLiteralSymbol s = (StringLiteralSymbol)sym;
-				println("literals["+s.getId()+"] = "+s.getTokenType()+";");
-			}
-		}
-		*/
-		// TJP changed it to following loop.
 		Enumeration keys = grammar.tokenManager.getTokenSymbolKeys();
 		while ( keys.hasMoreElements() ) {
 			String key = (String)keys.nextElement();
@@ -1188,14 +1498,6 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// Generate the setting of various generated options.
-		tabs--;
-		println("}");
-
-		// Generate getCaseSensitiveLiterals() method
-		println("bool " + grammar.getClassName() + "::getCaseSensitiveLiterals() const");
-		println("{");
-		tabs++;
-		println("return "+g.caseSensitiveLiterals + ";");
 		tabs--;
 		println("}");
 
@@ -1239,7 +1541,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			genSemPredMap(grammar.getClassName() + "::");
 
 		// Generate the bitsets used throughout the lexer
-		genBitsets(bitsetsUsed, ((LexerGrammar)grammar).charVocabulary.size(), grammar.getClassName() + "::", false);
+		genBitsets(bitsetsUsed, ((LexerGrammar)grammar).charVocabulary.size(), grammar.getClassName() + "::" );
 
 		println("");
 		if (nameSpace != null)
@@ -1249,12 +1551,73 @@ public class CppCodeGenerator extends CodeGenerator {
 		currentOutput.close();
 		currentOutput = null;
 	}
-	public void genBody(ParserGrammar g) throws IOException {
+	public void genInitFactory( Grammar g )
+	{
+		// Generate the method to initialize an ASTFactory when we're
+		// building AST's
+		String param_name = "factory ";
+		if( ! g.buildAST )
+			param_name = "";
+
+		println("void "+ g.getClassName() + "::initializeASTFactory( "+namespaceAntlr+"ASTFactory& "+param_name+")");
+		println("{");
+		tabs++;
+
+		if( g.buildAST )
+		{
+			// sort out custom AST types... synchronize token manager with token
+			// specs on rules (and other stuff we were able to see from
+			// action.g) (imperfect of course)
+			TokenManager tm = grammar.tokenManager;
+			Enumeration tokens = tm.getTokenSymbolKeys();
+			while( tokens.hasMoreElements() )
+			{
+				String tok = (String)tokens.nextElement();
+				TokenSymbol ts = tm.getTokenSymbol(tok);
+				// if we have a custom type and there's not a more local override
+				// of the tokentype then mark this as the type for the tokentype
+				if( ts.getASTNodeType() != null )
+				{
+					// ensure capacity with this pseudo vector...
+					astTypes.ensureCapacity(ts.getTokenType());
+					String type = (String)astTypes.elementAt(ts.getTokenType());
+					if( type == null )
+						astTypes.setElementAt(ts.getASTNodeType(),ts.getTokenType());
+					else
+					{
+						// give a warning over action taken if the types are unequal
+						if( ! ts.getASTNodeType().equals(type) )
+						{
+							antlrTool.warning("Token "+tok+" taking most specific AST type",grammar.getFilename(),1,1);
+							antlrTool.warning("  using "+type+" ignoring "+ts.getASTNodeType(),grammar.getFilename(),1,1);
+						}
+					}
+				}
+			}
+			// now actually write out all the registered types. (except the default
+			// type.
+			for( int i = 0; i < astTypes.size(); i++ )
+			{
+				String type = (String)astTypes.elementAt(i);
+				if( type != null )
+				{
+					println("factory.registerFactory("+i
+						  +", \""+type+"\", "+type+"::factory);");
+				}
+			}
+			println("factory.setMaxNodeType("+grammar.tokenManager.maxTokenType()+");");
+		}
+		tabs--;
+		println("}");
+	}
+	// FIXME: and so why are we passing here a g param while inside
+	// we merrily use the global grammar.
+	public void genBody(ParserGrammar g) throws IOException
+	{
 		// Open the output stream for the parser and set the currentOutput
 		outputFile = grammar.getClassName() + ".cpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
-		//SAS: changed for proper text file io
+		currentOutput = antlrTool.openOutputFile(outputFile);
 
 		genAST = grammar.buildAST;
 
@@ -1267,8 +1630,9 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// Generate header for the parser
 		println("#include \"" + grammar.getClassName() + ".hpp\"");
-		println("#include \"antlr/NoViableAltException.hpp\"");
-		println("#include \"antlr/SemanticException.hpp\"");
+		println("#include <antlr/NoViableAltException.hpp>");
+		println("#include <antlr/SemanticException.hpp>");
+		println("#include <antlr/ASTFactory.hpp>");
 
 		printHeaderAction(postIncludeCpp);
 
@@ -1306,21 +1670,36 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("};");
 		}
 
+		// Generate _initialize function
+		// disabled since it isn't used anymore..
+
+//		println("void " + grammar.getClassName() + "::_initialize(void)");
+//		println("{");
+//		tabs++;
+
+		// if debugging, set up arrays and call the user-overridable
+		//   debugging setup method
+//		if ( grammar.debuggingOutput ) {
+//			println("setRuleNames(_ruleNames);");
+//			println("setSemPredNames(_semPredNames);");
+//			println("setupDebugging();");
+//		}
+//		tabs--;
+//		println("}");
+		if( noConstructors )
+		{
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+		}
+
 		// Generate parser class constructor from TokenBuffer
 		print(grammar.getClassName() + "::" + grammar.getClassName());
 		println("("+namespaceAntlr+"TokenBuffer& tokenBuf, int k)");
 		println(": " + sup + "(tokenBuf,k)");
 		println("{");
-		tabs++;
-		println("setTokenNames(_tokenNames);");
-		// if debugging, set up arrays and call the user-overridable
-		//   debugging setup method
-		if ( grammar.debuggingOutput ) {
-			println("setRuleNames(_ruleNames);");
-			println("setSemPredNames(_semPredNames);");
-			println("setupDebugging();");
-		}
-		tabs--;
+//		tabs++;
+//		println("_initialize();");
+//		tabs--;
 		println("}");
 		println("");
 
@@ -1328,16 +1707,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("("+namespaceAntlr+"TokenBuffer& tokenBuf)");
 		println(": " + sup + "(tokenBuf," + grammar.maxk + ")");
 		println("{");
-		tabs++;
-		println("setTokenNames(_tokenNames);");
-		// if debugging, set up arrays and call the user-overridable
-		//   debugging setup method
-		if ( grammar.debuggingOutput ) {
-			println("setRuleNames(_ruleNames);");
-			println("setSemPredNames(_semPredNames);");
-			println("setupDebugging();");
-		}
-		tabs--;
+//		tabs++;
+//		println("_initialize();");
+//		tabs--;
 		println("}");
 		println("");
 
@@ -1346,16 +1718,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("("+namespaceAntlr+"TokenStream& lexer, int k)");
 		println(": " + sup + "(lexer,k)");
 		println("{");
-		tabs++;
-		println("setTokenNames(_tokenNames);");
-		// if debugging, set up arrays and call the user-overridable
-		//   debugging setup method
-		if ( grammar.debuggingOutput ) {
-			println("setRuleNames(_ruleNames);");
-			println("setSemPredNames(_semPredNames);");
-			println("setupDebugging(&lexer);");
-		}
-		tabs--;
+//		tabs++;
+//		println("_initialize();");
+//		tabs--;
 		println("}");
 		println("");
 
@@ -1363,16 +1728,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("("+namespaceAntlr+"TokenStream& lexer)");
 		println(": " + sup + "(lexer," + grammar.maxk + ")");
 		println("{");
-		tabs++;
-		println("setTokenNames(_tokenNames);");
-		// if debugging, set up arrays and call the user-overridable
-		//   debugging setup method
-		if ( grammar.debuggingOutput ) {
-			println("setRuleNames(_ruleNames);");
-			println("setSemPredNames(_semPredNames);");
-			println("setupDebugging(&lexer);");
-		}
-		tabs--;
+//		tabs++;
+//		println("_initialize();");
+//		tabs--;
 		println("}");
 		println("");
 
@@ -1380,18 +1738,19 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("(const "+namespaceAntlr+"ParserSharedInputState& state)");
 		println(": " + sup + "(state," + grammar.maxk + ")");
 		println("{");
-		tabs++;
-		println("setTokenNames(_tokenNames);");
-		// if debugging, set up arrays and call the user-overridable
-		//   debugging setup method
-		if ( grammar.debuggingOutput ) {
-			println("setRuleNames(_ruleNames);");
-			println("setSemPredNames(_semPredNames);");
-			println("setupDebugging(&lexer);");
-		}
-		tabs--;
+//		tabs++;
+//		println("_initialize();");
+//		tabs--;
 		println("}");
 		println("");
+
+		if( noConstructors )
+		{
+			println("// constructor creation turned of with 'noConstructor' option");
+			println("#endif");
+		}
+
+		astTypes = new Vector();
 
 		// Generate code for each rule in the grammar
 		Enumeration ids = grammar.rules.elements();
@@ -1404,27 +1763,14 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 			exitIfError();
 		}
-		if ( usingCustomAST )
-		{
-//			println("void "+grammar.getClassName()+"::setASTNodeFactory("+labeledElementASTType+" (*factory)() )");
-//			println("{");
-//			println("}");
-//			println("");
 
-			// when we are using a custom ast override Parser::getAST to return the
-			// custom AST type
-			println(labeledElementASTType+" "+grammar.getClassName()+"::getAST()");
-			println("{");
-			println("\treturn returnAST;");
-			println("}");
-			println("");
-		}
+		genInitFactory( g );
 
 		// Generate the token names
 		genTokenStrings(grammar.getClassName() + "::");
 
 		// Generate the bitsets used throughout the grammar
-		genBitsets(bitsetsUsed, grammar.tokenManager.maxTokenType(), grammar.getClassName() + "::", true);
+		genBitsets(bitsetsUsed, grammar.tokenManager.maxTokenType(), grammar.getClassName() + "::" );
 
 		// Generate the semantic predicate map for debugging
 		if (grammar.debuggingOutput)
@@ -1440,11 +1786,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		currentOutput.close();
 		currentOutput = null;
 	}
-	public void genBody(TreeWalkerGrammar g) throws IOException {
+	public void genBody(TreeWalkerGrammar g) throws IOException
+	{
 		// Open the output stream for the parser and set the currentOutput
 		outputFile = grammar.getClassName() + ".cpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		genAST = grammar.buildAST;
@@ -1457,12 +1804,12 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// Generate header for the parser
 		println("#include \"" + grammar.getClassName() + ".hpp\"");
-		println("#include \"antlr/Token.hpp\"");
-		println("#include \"antlr/AST.hpp\"");
-		println("#include \"antlr/NoViableAltException.hpp\"");
-		println("#include \"antlr/MismatchedTokenException.hpp\"");
-		println("#include \"antlr/SemanticException.hpp\"");
-		println("#include \"antlr/BitSet.hpp\"");
+		println("#include <antlr/Token.hpp>");
+		println("#include <antlr/AST.hpp>");
+		println("#include <antlr/NoViableAltException.hpp>");
+		println("#include <antlr/MismatchedTokenException.hpp>");
+		println("#include <antlr/SemanticException.hpp>");
+		println("#include <antlr/BitSet.hpp>");
 
 		printHeaderAction(postIncludeCpp);
 
@@ -1473,7 +1820,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		printAction(grammar.preambleAction);
 
 		// Generate parser class definition
-		String sup=null;
+		String sup = null;
 		if ( grammar.superClass!=null ) {
 			sup = grammar.superClass;
 		}
@@ -1483,15 +1830,28 @@ public class CppCodeGenerator extends CodeGenerator {
 				sup = sup.substring(sup.lastIndexOf('.')+1);
 			sup = namespaceAntlr + sup;
 		}
+		if( noConstructors )
+		{
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+		}
 
 		// Generate default parser class constructor
 		println(grammar.getClassName() + "::" + grammar.getClassName() + "()");
 		println("\t: "+namespaceAntlr+"TreeParser() {");
 		tabs++;
-		println("setTokenNames(_tokenNames);");
+//		println("setTokenNames(_tokenNames);");
 		tabs--;
 		println("}");
+
+		if( noConstructors )
+		{
+			println("// constructor creation turned of with 'noConstructor' option");
+			println("#endif");
+		}
 		println("");
+
+		astTypes = new Vector();
 
 		// Generate code for each rule in the grammar
 		Enumeration ids = grammar.rules.elements();
@@ -1506,22 +1866,13 @@ public class CppCodeGenerator extends CodeGenerator {
 			exitIfError();
 		}
 
-		if ( usingCustomAST )
-		{
-			// when we are using a custom ast override Parser::getAST to return the
-			// custom AST type
-			println(labeledElementASTType+" "+grammar.getClassName()+"::getAST()");
-			println("{");
-			println("\treturn returnAST;");
-			println("}");
-			println("");
-		}
-
+		// Generate the ASTFactory initialization function
+		genInitFactory( grammar );
 		// Generate the token names
 		genTokenStrings(grammar.getClassName() + "::");
 
 		// Generate the bitsets used throughout the grammar
-		genBitsets(bitsetsUsed, grammar.tokenManager.maxTokenType(), grammar.getClassName() + "::", true);
+		genBitsets(bitsetsUsed, grammar.tokenManager.maxTokenType(), grammar.getClassName() + "::" );
 
 		// Close class definition
 		println("");
@@ -1538,7 +1889,7 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * @param p The Bitset for which cases are to be generated
 	 */
 	protected void genCases(BitSet p) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genCases("+p+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genCases("+p+")");
 		int[] elems;
 
 		elems = p.toArray();
@@ -1568,7 +1919,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			_println("");
 		}
 	}
-	/**Generate common code for a block of alternatives; return a postscript
+	/** Generate common code for a block of alternatives; return a postscript
 	 * that needs to be generated at the end of the block.  Other routines
 	 * may append else-clauses and such for error checking before the postfix
 	 * is generated.
@@ -1580,13 +1931,13 @@ public class CppCodeGenerator extends CodeGenerator {
 	 */
 	public CppBlockFinishingInfo genCommonBlock(
 		AlternativeBlock blk,
-		boolean noTestForSingle)
+		boolean noTestForSingle )
 	{
 		int nIF=0;
 		boolean createdLL1Switch = false;
 		int closingBracesOfIFSequence = 0;
 		CppBlockFinishingInfo finishingInfo = new CppBlockFinishingInfo();
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genCommonBlk("+blk+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genCommonBlk("+blk+")");
 
 		// Save the AST generation state, and set it to that of the block
 		boolean savegenAST = genAST;
@@ -1596,10 +1947,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		saveText = saveText && blk.getAutoGen();
 
 		// Is this block inverted?  If so, generate special-case code
-		if (
-			blk.not &&
-			analyzer.subruleCanBeInverted(blk, grammar instanceof LexerGrammar)
-		) {
+		if ( blk.not &&
+			analyzer.subruleCanBeInverted(blk, grammar instanceof LexerGrammar) )
+		{
 			Lookahead p = analyzer.look(1, blk);
 			// Variable assignment for labeled elements
 			if (blk.getLabel() != null && syntacticPredLevel == 0) {
@@ -1612,7 +1962,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			String astArgs="";
 			if (grammar instanceof TreeWalkerGrammar) {
 				if( usingCustomAST )
-					astArgs="static_cast<"+namespaceAntlr+"RefAST"+">(_t),";
+					astArgs=namespaceAntlr+"RefAST"+"(_t),";
 				else
 					astArgs="_t,";
 			}
@@ -1621,26 +1971,31 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("match(" + astArgs + getBitsetName(markBitsetForGen(p.fset)) + ");");
 
 			// tack on tree cursor motion if doing a tree walker
-			if (grammar instanceof TreeWalkerGrammar) {
+			if (grammar instanceof TreeWalkerGrammar)
+			{
 				println("_t = _t->getNextSibling();");
 			}
 			return finishingInfo;
 		}
 
 		// Special handling for single alt
-		if (blk.getAlternatives().size() == 1) {
+		if (blk.getAlternatives().size() == 1)
+		{
 			Alternative alt = blk.getAlternativeAt(0);
 			// Generate a warning if there is a synPred for single alt.
 			if (alt.synPred != null)
 			{
-				tool.warning(
-					"Syntactic predicate superfluous for single alternative",
-					grammar.getFilename(),
-					blk.getAlternativeAt(0).synPred.getLine()
+				antlrTool.warning(
+								 "Syntactic predicate superfluous for single alternative",
+								 grammar.getFilename(),
+								 blk.getAlternativeAt(0).synPred.getLine(),
+								 blk.getAlternativeAt(0).synPred.getColumn()
 				);
 			}
-			if (noTestForSingle) {
-				if (alt.semPred != null) {
+			if (noTestForSingle)
+			{
+				if (alt.semPred != null)
+				{
 					// Generate validating predicate
 					genSemPred(alt.semPred, blk.line);
 				}
@@ -1660,40 +2015,46 @@ public class CppCodeGenerator extends CodeGenerator {
 		// clause.
 
 		int nLL1 = 0;
-		for (int i=0; i<blk.getAlternatives().size(); i++) {
+		for (int i=0; i<blk.getAlternatives().size(); i++)
+		{
 			Alternative a = blk.getAlternativeAt(i);
-			if ( suitableForCaseExpression(a) ) {
+			if ( suitableForCaseExpression(a) )
 				nLL1++;
-			}
 		}
 
 		// do LL(1) cases
-		if ( nLL1 >= makeSwitchThreshold) {
+		if ( nLL1 >= makeSwitchThreshold )
+		{
 			// Determine the name of the item to be compared
 			String testExpr = lookaheadString(1);
 			createdLL1Switch = true;
 			// when parsing trees, convert null to valid tree node with NULL lookahead
-			if ( grammar instanceof TreeWalkerGrammar ) {
+			if ( grammar instanceof TreeWalkerGrammar )
+			{
 				println("if (_t == "+labeledElementASTInit+" )");
 				tabs++;
 				println("_t = ASTNULL;");
 				tabs--;
 			}
 			println("switch ( "+testExpr+") {");
-			for (int i=0; i<blk.alternatives.size(); i++) {
+			for (int i=0; i<blk.alternatives.size(); i++)
+			{
 				Alternative alt = blk.getAlternativeAt(i);
 				// ignore any non-LL(1) alts, predicated alts or end-of-token alts
 				// or end-of-token alts for case expressions
-				if ( !suitableForCaseExpression(alt) ) {
+				if ( !suitableForCaseExpression(alt) )
+				{
 					continue;
 				}
 				Lookahead p = alt.cache[1];
-				if (p.fset.degree() == 0 && !p.containsEpsilon()) {
-					tool.warning("Alternate omitted due to empty prediction set",
+				if (p.fset.degree() == 0 && !p.containsEpsilon())
+				{
+					antlrTool.warning("Alternate omitted due to empty prediction set",
 						grammar.getFilename(),
-						alt.head.getLine());
+						alt.head.getLine(), alt.head.getColumn());
 				}
-				else {
+				else
+				{
 					genCases(p.fset);
 					println("{");
 					tabs++;
@@ -1723,16 +2084,17 @@ public class CppCodeGenerator extends CodeGenerator {
 		// as default or else clauses.
 		int startDepth = (grammar instanceof LexerGrammar) ? grammar.maxk : 0;
 		for (int altDepth = startDepth; altDepth >= 0; altDepth--) {
-			if ( DEBUG_CODE_GENERATOR ) System.out.println("checking depth "+altDepth);
+			if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("checking depth "+altDepth);
 			for (int i=0; i<blk.alternatives.size(); i++) {
 				Alternative alt = blk.getAlternativeAt(i);
-				if ( DEBUG_CODE_GENERATOR ) System.out.println("genAlt: "+i);
+				if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genAlt: "+i);
 				// if we made a switch above, ignore what we already took care
 				// of.  Specifically, LL(1) alts with no preds
 				// that do not have end-of-token in their prediction set
 				if ( createdLL1Switch &&
-					 suitableForCaseExpression(alt) ) {
-					if ( DEBUG_CODE_GENERATOR )
+					 suitableForCaseExpression(alt) )
+				{
+					if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR )
 						System.out.println("ignoring alt because it was in the switch");
 					continue;
 				}
@@ -1744,7 +2106,8 @@ public class CppCodeGenerator extends CodeGenerator {
 					// Calculate the "effective depth" of the alt, which is the max
 					// depth at which cache[depth]!=end-of-token
 					int effectiveDepth = alt.lookaheadDepth;
-					if (effectiveDepth == GrammarAnalyzer.NONDETERMINISTIC) {
+					if (effectiveDepth == GrammarAnalyzer.NONDETERMINISTIC)
+					{
 						// use maximum lookahead
 						effectiveDepth = grammar.maxk;
 					}
@@ -1755,21 +2118,25 @@ public class CppCodeGenerator extends CodeGenerator {
 					}
 					// Ignore alts whose effective depth is other than the ones we
 					// are generating for this iteration.
-					if (effectiveDepth != altDepth) {
-						if ( DEBUG_CODE_GENERATOR )
+					if (effectiveDepth != altDepth)
+					{
+						if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR )
 							System.out.println("ignoring alt because effectiveDepth!=altDepth;"+effectiveDepth+"!="+altDepth);
 						continue;
 					}
 					unpredicted = lookaheadIsEmpty(alt, effectiveDepth);
 					e = getLookaheadTestExpression(alt, effectiveDepth);
-				} else {
+				}
+				else
+				{
 					unpredicted = lookaheadIsEmpty(alt, grammar.maxk);
 					e = getLookaheadTestExpression(alt, grammar.maxk);
 				}
 
 				// Was it a big unicode range that forced unsuitability
 				// for a case expression?
-				if ( alt.cache[1].fset.degree() > caseSizeThreshold )
+				if ( alt.cache[1].fset.degree() > caseSizeThreshold &&
+					  suitableForCaseExpression(alt))
 				{
 					if ( nIF==0 )
 					{
@@ -1811,14 +2178,17 @@ public class CppCodeGenerator extends CodeGenerator {
 						//
 						// translate $ and # references
 						ActionTransInfo tInfo = new ActionTransInfo();
-						String actionStr = processActionForTreeSpecifiers(alt.semPred,
+						String actionStr = processActionForSpecialSymbols(alt.semPred,
 																		  blk.line,
 																		  currentRule,
 																		  tInfo);
 						// ignore translation info...we don't need to do anything with it.
 
-						// call that will inform SemanticPredicateListeners of the result
-						if (((grammar instanceof ParserGrammar) || (grammar instanceof LexerGrammar)) && grammar.debuggingOutput)
+						// call that will inform SemanticPredicateListeners of the
+						// result
+						if ( grammar.debuggingOutput &&
+							  ((grammar instanceof ParserGrammar) || (grammar instanceof LexerGrammar))
+							 )
 							e = "("+e+"&& fireSemanticPredicateEvaluated(antlr.debug.SemanticPredicateEvent.PREDICTING,"+ //FIXME
 									addSemPred(charFormatter.escapeString(actionStr))+","+actionStr+"))";
 						else
@@ -1900,16 +2270,20 @@ public class CppCodeGenerator extends CodeGenerator {
 			a.cache[1].fset.degree()<=caseSizeThreshold;
 	}
 
-	/** Generate code to link an element reference into the AST */
+	/** Generate code to link an element reference into the AST
+	 */
 	private void genElementAST(AlternativeElement el) {
+
 		// handle case where you're not building trees, but are in tree walker.
 		// Just need to get labels set up.
-		if ( grammar instanceof TreeWalkerGrammar && !grammar.buildAST ) {
+		if ( grammar instanceof TreeWalkerGrammar && !grammar.buildAST )
+		{
 			String elementRef;
 			String astName;
 
 			// Generate names and declarations of the AST variable(s)
-			if (el.getLabel() == null) {
+			if (el.getLabel() == null)
+			{
 				elementRef = lt1Value;
 				// Generate AST variables for unlabeled stuff
 				astName = "tmp" + astVarNumber + "_AST";
@@ -1922,95 +2296,148 @@ public class CppCodeGenerator extends CodeGenerator {
 			return;
 		}
 
-		if (grammar.buildAST && syntacticPredLevel == 0) {
-			boolean doNoGuessTest = (
-				grammar.hasSyntacticPredicate &&
-				(
-					el.getLabel() != null ||
-					el.getAutoGenType() != GrammarElement.AUTO_GEN_BANG
-				)
-			);
+		if (grammar.buildAST && syntacticPredLevel == 0)
+		{
+			boolean needASTDecl =
+				( genAST && (el.getLabel() != null ||
+				  el.getAutoGenType() != GrammarElement.AUTO_GEN_BANG ));
+
+			// RK: if we have a grammar element always generate the decl
+			// since some guy can access it from an action and we can't
+			// peek ahead (well not without making a mess).
+			// I'd prefer taking this out.
+			if( el.getAutoGenType() != GrammarElement.AUTO_GEN_BANG &&
+				 (el instanceof TokenRefElement) )
+				needASTDecl = true;
+
+			boolean doNoGuessTest =
+				( grammar.hasSyntacticPredicate && needASTDecl );
 
 			String elementRef;
-			String astName;
+			String astNameBase;
 
 			// Generate names and declarations of the AST variable(s)
-			if (el.getLabel() != null) {
+			if (el.getLabel() != null)
+			{
+				// if the element is labeled use that name...
 				elementRef = el.getLabel();
-				astName = el.getLabel() + "_AST";
-			} else {
+				astNameBase = el.getLabel();
+			}
+			else
+			{
+				// else generate a temporary name...
 				elementRef = lt1Value;
 				// Generate AST variables for unlabeled stuff
-				astName = "tmp" + astVarNumber + "_AST";
+				astNameBase = "tmp" + astVarNumber;
 				astVarNumber++;
-				// Generate the declaration
-				if ( el instanceof GrammarAtom ) {
-					GrammarAtom ga = (GrammarAtom)el;
-					if ( ga.getASTNodeType()!=null ) {
-						println("Ref"+ga.getASTNodeType()+" " + astName + ";");
-					}
-					else {
-						println(labeledElementASTType+" " + astName + " = "+labeledElementASTInit+";");
-					}
-				}
-				else {
-					println(labeledElementASTType+" " + astName + " = "+labeledElementASTInit+";");
-				}
+			}
 
-				// Map the generated AST variable in the alternate
-				mapTreeVariable(el, astName);
-				if (grammar instanceof TreeWalkerGrammar) {
-					// Generate an "input" AST variable also
-					println(labeledElementASTType+" " + astName + "_in = "+labeledElementASTInit+";");
+			// Generate the declaration if required.
+			if ( needASTDecl )
+			{
+				if ( el instanceof GrammarAtom )
+				{
+					GrammarAtom ga = (GrammarAtom)el;
+					if ( ga.getASTNodeType()!=null )
+					{
+						genASTDeclaration( el, astNameBase, "Ref"+ga.getASTNodeType() );
+//						println("Ref"+ga.getASTNodeType()+" " + astName + ";");
+					}
+					else
+					{
+						genASTDeclaration( el, astNameBase, labeledElementASTType );
+//						println(labeledElementASTType+" " + astName + " = "+labeledElementASTInit+";");
+					}
 				}
+				else
+				{
+					genASTDeclaration( el, astNameBase, labeledElementASTType );
+//					println(labeledElementASTType+" " + astName + " = "+labeledElementASTInit+";");
+				}
+			}
+
+			// for convenience..
+			String astName = astNameBase + "_AST";
+
+			// Map the generated AST variable in the alternate
+			mapTreeVariable(el, astName);
+			if (grammar instanceof TreeWalkerGrammar)
+			{
+				// Generate an "input" AST variable also
+				println(labeledElementASTType+" " + astName + "_in = "+labeledElementASTInit+";");
 			}
 
 			// Enclose actions with !guessing
 			if (doNoGuessTest) {
-				println("if (inputState->guessing==0) {");
+				println("if ( inputState->guessing == 0 ) {");
 				tabs++;
 			}
 
-			if (el.getLabel() != null) {
-				if ( el instanceof GrammarAtom ) {
+			// if something has a label assume it will be used
+			// so we must initialize the RefAST
+			if (el.getLabel() != null)
+			{
+				if ( el instanceof GrammarAtom )
+				{
 					println(astName + " = "+
-							getASTCreateString((GrammarAtom)el,elementRef) + ";");
+							  getASTCreateString((GrammarAtom)el,elementRef) + ";");
 				}
-				else {
+				else
+				{
 					println(astName + " = "+
-							getASTCreateString(elementRef) + ";");
+							  getASTCreateString(elementRef) + ";");
 				}
-			} else {
+			}
+
+			// if it has no label but a declaration exists initialize it.
+			if( el.getLabel() == null && needASTDecl )
+			{
 				elementRef = lt1Value;
-				if ( el instanceof GrammarAtom ) {
+				if ( el instanceof GrammarAtom )
+				{
 					println(astName + " = "+
-							getASTCreateString((GrammarAtom)el,elementRef) + ";");
+							  getASTCreateString((GrammarAtom)el,elementRef) + ";");
 				}
-				else {
+				else
+				{
 					println(astName + " = "+
-							getASTCreateString(elementRef) + ";");
+							  getASTCreateString(elementRef) + ";");
 				}
 				// Map the generated AST variable in the alternate
-				if (grammar instanceof TreeWalkerGrammar) {
+				if (grammar instanceof TreeWalkerGrammar)
+				{
 					// set "input" AST variable also
 					println(astName + "_in = " + elementRef + ";");
 				}
 			}
 
-			if (genAST) {
-				switch (el.getAutoGenType()) {
+			if (genAST)
+			{
+				switch (el.getAutoGenType())
+				{
 				case GrammarElement.AUTO_GEN_NONE:
-					println("astFactory.addASTChild(currentAST, "+namespaceAntlr+"RefAST(" + astName + "));");
+					if( usingCustomAST ||
+						 (el instanceof GrammarAtom &&
+						  ((GrammarAtom)el).getASTNodeType() != null) )
+						println("astFactory->addASTChild(currentAST, "+namespaceAntlr+"RefAST("+ astName + "));");
+					else
+						println("astFactory->addASTChild(currentAST, "+ astName + ");");
+					//						println("astFactory.addASTChild(currentAST, "+namespaceAntlr+"RefAST(" + astName + "));");
 					break;
 				case GrammarElement.AUTO_GEN_CARET:
-//					println("astFactory.makeASTRoot(currentAST, " + astName + ");");
-					println("astFactory.makeASTRoot(currentAST, "+namespaceAntlr+"RefAST(" + astName + "));");
+					if( usingCustomAST ||
+						 (el instanceof GrammarAtom &&
+						 ((GrammarAtom)el).getASTNodeType() != null) )
+						println("astFactory->makeASTRoot(currentAST, "+namespaceAntlr+"RefAST(" + astName + "));");
+					else
+						println("astFactory->makeASTRoot(currentAST, " + astName + ");");
 					break;
 				default:
 					break;
 				}
 			}
-			if (doNoGuessTest) {
+			if (doNoGuessTest)
+			{
 				tabs--;
 				println("}");
 			}
@@ -2023,11 +2450,11 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (el.getLabel() == null) return;
 		String r = el.enclosingRuleName;
 		if ( grammar instanceof LexerGrammar ) {
-			r = CodeGenerator.lexerRuleName(el.enclosingRuleName);
+			r = CodeGenerator.encodeLexerRuleName(el.enclosingRuleName);
 		}
 		RuleSymbol rs = (RuleSymbol)grammar.getSymbol(r);
 		if (rs == null) {
-			tool.panic("Enclosing rule not found!");
+			antlrTool.panic("Enclosing rule not found!");
 		}
 		ExceptionSpec ex = rs.block.findExceptionSpec(el.getLabel());
 		if (ex != null) {
@@ -2037,7 +2464,8 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 	}
 	/** Generate the catch phrases for a user-specified error handler */
-	private void genErrorHandler(ExceptionSpec ex) {
+	private void genErrorHandler(ExceptionSpec ex)
+	{
 		// Each ExceptionHandler in the ExceptionSpec is a separate catch
 		for (int i = 0; i < ex.handlers.size(); i++)
 		{
@@ -2051,22 +2479,22 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 
 			// When not guessing, execute user handler action
+			ActionTransInfo tInfo = new ActionTransInfo();
 			genLineNo(handler.action);
 			printAction(
-				processActionForTreeSpecifiers(handler.action.getText(), 0, currentRule, null)
+				processActionForSpecialSymbols( handler.action.getText(),
+														 handler.action.getLine(),
+														 currentRule, tInfo )
 			);
 			genLineNo2();
 
-			if (grammar.hasSyntacticPredicate) {
+			if (grammar.hasSyntacticPredicate)
+			{
 				tabs--;
 				println("} else {");
 				tabs++;
 				// When guessing, rethrow exception
-				println(
-					"throw " +
-					extractIdOfAction(handler.exceptionTypeAndName) +
-					";"
-				);
+				println("throw;");
 				tabs--;
 				println("}");
 			}
@@ -2080,11 +2508,11 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (el.getLabel() == null) return;
 		String r = el.enclosingRuleName;
 		if ( grammar instanceof LexerGrammar ) {
-			r = CodeGenerator.lexerRuleName(el.enclosingRuleName);
+			r = CodeGenerator.encodeLexerRuleName(el.enclosingRuleName);
 		}
 		RuleSymbol rs = (RuleSymbol)grammar.getSymbol(r);
 		if (rs == null) {
-			tool.panic("Enclosing rule not found!");
+			antlrTool.panic("Enclosing rule not found!");
 		}
 		ExceptionSpec ex = rs.block.findExceptionSpec(el.getLabel());
 		if (ex != null) {
@@ -2095,17 +2523,18 @@ public class CppCodeGenerator extends CodeGenerator {
 	/** Generate a header that is common to all C++ files */
 	protected void genHeader(String fileName)
 	{
-		println("/* $ANTLR "+Tool.version+": "+
-				"\""+Tool.fileMinusPath(tool.grammarFile)+"\""+
+		println("/* $ANTLR "+antlrTool.version+": "+
+				"\""+antlrTool.fileMinusPath(antlrTool.grammarFile)+"\""+
 				" -> "+
 				"\""+fileName+"\"$ */");
 	}
-	// these are unique to C++ mode
 
-	public void genInclude(LexerGrammar g) throws IOException {
+	// these are unique to C++ mode
+	public void genInclude(LexerGrammar g) throws IOException
+	{
 		outputFile = grammar.getClassName() + ".hpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		genAST = false;	// no way to gen trees.
@@ -2120,28 +2549,36 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		printHeaderAction(preIncludeHpp);
 
-		println("#include \"antlr/config.hpp\"");
+		println("#include <antlr/config.hpp>");
 
 		// Generate header common to all C++ output files
 		genHeader(outputFile);
 
 		// Generate header specific to lexer header file
-		println("#include \"antlr/CommonToken.hpp\"");
-		println("#include \"antlr/InputBuffer.hpp\"");
-		println("#include \"antlr/BitSet.hpp\"");
+		println("#include <antlr/CommonToken.hpp>");
+		println("#include <antlr/InputBuffer.hpp>");
+		println("#include <antlr/BitSet.hpp>");
 		println("#include \"" + grammar.tokenManager.getName() + TokenTypesFileSuffix+".hpp\"");
 
 		// Find the name of the super class
 		String sup=null;
 		if ( grammar.superClass!=null ) {
 			sup = grammar.superClass;
-			println("#include \""+sup+".hpp\"");
+
+			println("\n// Include correct superclass header with a header statement for example:");
+			println("// header \"post_include_hpp\" {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }");
+			println("// Or....");
+			println("// header {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }\n");
 		}
 		else {
 			sup = grammar.getSuperClass();
 			if (sup.lastIndexOf('.') != -1)
 				sup = sup.substring(sup.lastIndexOf('.')+1);
-			println("#include \"antlr/"+sup+".hpp\"");
+			println("#include <antlr/"+sup+".hpp>");
 			sup = namespaceAntlr + sup;
 		}
 
@@ -2159,23 +2596,25 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// Generate lexer class definition
-		print("class " + grammar.getClassName() + " : public " + sup);
+		print("class CUSTOM_API " + grammar.getClassName() + " : public " + sup);
 		println(", public " + grammar.tokenManager.getName() + TokenTypesFileSuffix);
 
 		Token tsuffix = (Token)grammar.options.get("classHeaderSuffix");
 		if ( tsuffix != null ) {
-			String suffix = Tool.stripFrontBack(tsuffix.getText(),"\"","\"");
+			String suffix = StringUtils.stripFrontBack(tsuffix.getText(),"\"","\"");
 			if ( suffix != null ) {
 				print(", "+suffix);  // must be an interface name for Java
 			}
 		}
-		println(" {");
+		println("{");
 
 		// Generate user-defined lexer class members
 		if (grammar.classMemberAction != null) {
 			genLineNo(grammar.classMemberAction);
 			print(
-				processActionForTreeSpecifiers(grammar.classMemberAction.getText(), 0, currentRule, null)
+				processActionForSpecialSymbols(grammar.classMemberAction.getText(),
+														 grammar.classMemberAction.getLine(),
+														 currentRule, null)
 			);
 			genLineNo2();
 		}
@@ -2190,12 +2629,25 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs=0;
 		println("public:");
 		tabs=1;
-		println("bool getCaseSensitiveLiterals() const;");
+		println("bool getCaseSensitiveLiterals() const");
+		println("{");
+		tabs++;
+		println("return "+g.caseSensitiveLiterals + ";");
+		tabs--;
+		println("}");
 
 		// Make constructors public
 		tabs=0;
 		println("public:");
 		tabs=1;
+
+		if( noConstructors )
+		{
+			tabs = 0;
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+			tabs = 1;
+		}
 
 		// Generate the constructor from std::istream
 		println(grammar.getClassName() + "(" + namespaceStd + "istream& in);");
@@ -2204,6 +2656,13 @@ public class CppCodeGenerator extends CodeGenerator {
 		println(grammar.getClassName() + "("+namespaceAntlr+"InputBuffer& ib);");
 
 		println(grammar.getClassName() + "(const "+namespaceAntlr+"LexerSharedInputState& state);");
+		if( noConstructors )
+		{
+			tabs = 0;
+			println("// constructor creation turned of with 'noConstructor' option");
+			println("#endif");
+			tabs = 1;
+		}
 
 		// Generate nextToken() rule.
 		// nextToken() is a synthetic lexer rule that is the implicit OR of all
@@ -2251,11 +2710,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		currentOutput.close();
 		currentOutput = null;
 	}
-	public void genInclude(ParserGrammar g) throws IOException {
+	public void genInclude(ParserGrammar g) throws IOException
+	{
 		// Open the output stream for the parser and set the currentOutput
 		outputFile = grammar.getClassName() + ".hpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		genAST = grammar.buildAST;
@@ -2267,27 +2727,34 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("#define INC_"+grammar.getClassName()+"_hpp_");
 		println("");
 		printHeaderAction(preIncludeHpp);
-		println("#include \"antlr/config.hpp\"");
+		println("#include <antlr/config.hpp>");
 
 		// Generate the header common to all output files.
 		genHeader(outputFile);
 
 		// Generate header for the parser
-		println("#include \"antlr/TokenStream.hpp\"");
-		println("#include \"antlr/TokenBuffer.hpp\"");
+		println("#include <antlr/TokenStream.hpp>");
+		println("#include <antlr/TokenBuffer.hpp>");
 		println("#include \"" + grammar.tokenManager.getName() + TokenTypesFileSuffix+".hpp\"");
 
 		// Generate parser class definition
 		String sup=null;
 		if ( grammar.superClass!=null ) {
 			sup = grammar.superClass;
-			println("#include \""+sup+".hpp\"");
+			println("\n// Include correct superclass header with a header statement for example:");
+			println("// header \"post_include_hpp\" {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }");
+			println("// Or....");
+			println("// header {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }\n");
 		}
 		else {
 			sup = grammar.getSuperClass();
 			if (sup.lastIndexOf('.') != -1)
 				sup = sup.substring(sup.lastIndexOf('.')+1);
-			println("#include \"antlr/"+sup+".hpp\"");
+			println("#include <antlr/"+sup+".hpp>");
 			sup = namespaceAntlr + sup;
 		}
 		println("");
@@ -2306,34 +2773,45 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// generate the actual class definition
-		print("class " + grammar.getClassName() + " : public " + sup);
+		print("class CUSTOM_API " + grammar.getClassName() + " : public " + sup);
 		println(", public " + grammar.tokenManager.getName() + TokenTypesFileSuffix);
 
 		Token tsuffix = (Token)grammar.options.get("classHeaderSuffix");
 		if ( tsuffix != null ) {
-			String suffix = Tool.stripFrontBack(tsuffix.getText(),"\"","\"");
+			String suffix = StringUtils.stripFrontBack(tsuffix.getText(),"\"","\"");
 			if ( suffix != null )
 				print(", "+suffix);  // must be an interface name for Java
 		}
-		println(" {");
+		println("{");
 
 		// set up an array of all the rule names so the debugger can
 		// keep track of them only by number -- less to store in tree...
 		if (grammar.debuggingOutput) {
 			println("public: static const char* _ruleNames[];");
 		}
-
 		// Generate user-defined parser class members
 		if (grammar.classMemberAction != null) {
 			genLineNo(grammar.classMemberAction.getLine());
 			print(
-				processActionForTreeSpecifiers(grammar.classMemberAction.getText(), 0, currentRule, null)
+				processActionForSpecialSymbols(grammar.classMemberAction.getText(),
+														 grammar.classMemberAction.getLine(),
+														 currentRule, null)
 			);
 			genLineNo2();
 		}
+		println("public:");
+		tabs = 1;
+		println("void initializeASTFactory( "+namespaceAntlr+"ASTFactory& factory );");
+//		println("// called from constructors");
+//		println("void _initialize( void );");
 
 		// Generate parser class constructor from TokenBuffer
 		tabs=0;
+		if( noConstructors )
+		{
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+		}
 		println("protected:");
 		tabs=1;
 		println(grammar.getClassName() + "("+namespaceAntlr+"TokenBuffer& tokenBuf, int k);");
@@ -2353,6 +2831,27 @@ public class CppCodeGenerator extends CodeGenerator {
 		println(grammar.getClassName()+"("+namespaceAntlr+"TokenStream& lexer);");
 
 		println(grammar.getClassName()+"(const "+namespaceAntlr+"ParserSharedInputState& state);");
+		if( noConstructors )
+		{
+			tabs = 0;
+			println("// constructor creation turned of with 'noConstructor' option");
+			println("#endif");
+			tabs = 1;
+		}
+
+		println("int getNumTokens() const");
+		println("{"); tabs++;
+		println("return "+grammar.getClassName()+"::NUM_TOKENS;");
+		tabs--; println("}");
+		println("const char* getTokenName( int type ) const");
+		println("{"); tabs++;
+		println("if( type > getNumTokens() ) return 0;");
+		println("return "+grammar.getClassName()+"::tokenNames[type];");
+		tabs--; println("}");
+		println("const char* const* getTokenNames() const");
+		println("{"); tabs++;
+		println("return "+grammar.getClassName()+"::tokenNames;");
+		tabs--; println("}");
 
 		// Generate code for each rule in the grammar
 		Enumeration ids = grammar.rules.elements();
@@ -2365,16 +2864,31 @@ public class CppCodeGenerator extends CodeGenerator {
 			exitIfError();
 		}
 
-		if ( usingCustomAST )
+		// RK: when we are using a custom ast override Parser::getAST to return
+		// the custom AST type. Ok, this does not work anymore with newer
+		// compilers gcc 3.2.x and up. The reference counter is probably
+		// getting in the way.
+		// So now we just patch the return type back to RefAST
+		tabs = 0; println("public:"); tabs = 1;
+		println(namespaceAntlr+"RefAST getAST()");
+		println("{");
+		if( usingCustomAST )
 		{
-			// when we are using a custom ast override Parser::getAST to return the
-			// custom AST type
-			tabs=0; println("public:"); tabs=1;
-			println(labeledElementASTType+" getAST();");
-			println("");
-			tabs=0; println("protected:"); tabs=1;
-			println(labeledElementASTType+" returnAST;");
+			tabs++;
+			println("return "+namespaceAntlr+"RefAST(returnAST);");
+			tabs--;
 		}
+		else
+		{
+			tabs++;
+			println("return returnAST;");
+			tabs--;
+		}
+		println("}");
+		println("");
+
+		tabs=0; println("protected:"); tabs=1;
+		println(labeledElementASTType+" returnAST;");
 
 		// Make the rest private
 		tabs=0;
@@ -2382,7 +2896,15 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs=1;
 
 		// Generate the token names
-		println("static const char* _tokenNames[];");
+		println("static const char* tokenNames[];");
+		// and how many there are of them
+		_println("#ifndef NO_STATIC_CONSTS");
+		println("static const int NUM_TOKENS = "+grammar.tokenManager.getVocabulary().size()+";");
+		_println("#else");
+		println("enum {");
+		println("\tNUM_TOKENS = "+grammar.tokenManager.getVocabulary().size());
+		println("};");
+		_println("#endif");
 
 		// Generate the bitsets used throughout the grammar
 		genBitsetsHeader(bitsetsUsed, grammar.tokenManager.maxTokenType());
@@ -2405,11 +2927,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		currentOutput.close();
 		currentOutput = null;
 	}
-	public void genInclude(TreeWalkerGrammar g) throws IOException {
+	public void genInclude(TreeWalkerGrammar g) throws IOException
+	{
 		// Open the output stream for the parser and set the currentOutput
 		outputFile = grammar.getClassName() + ".hpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		genAST = grammar.buildAST;
@@ -2420,7 +2943,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("#define INC_"+grammar.getClassName()+"_hpp_");
 		println("");
 		printHeaderAction(preIncludeHpp);
-		println("#include \"antlr/config.hpp\"");
+		println("#include <antlr/config.hpp>");
 		println("#include \"" + grammar.tokenManager.getName() + TokenTypesFileSuffix+".hpp\"");
 
 		// Generate the header common to all output files.
@@ -2430,19 +2953,26 @@ public class CppCodeGenerator extends CodeGenerator {
 		String sup=null;
 		if ( grammar.superClass!=null ) {
 			sup = grammar.superClass;
-			println("#include \""+sup+".hpp\"");
+			println("\n// Include correct superclass header with a header statement for example:");
+			println("// header \"post_include_hpp\" {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }");
+			println("// Or....");
+			println("// header {");
+			println("// #include \""+sup+".hpp\"");
+			println("// }\n");
 		}
 		else {
 			sup = grammar.getSuperClass();
 			if (sup.lastIndexOf('.') != -1)
 				sup = sup.substring(sup.lastIndexOf('.')+1);
-			println("#include \"antlr/"+sup+".hpp\"");
+			println("#include <antlr/"+sup+".hpp>");
 			sup = namespaceAntlr + sup;
 		}
 		println("");
 
 		// Generate header for the parser
-
+		//
 		// Do not use printAction because we assume tabs==0
 		printHeaderAction(postIncludeHpp);
 
@@ -2457,32 +2987,63 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// Generate parser class definition
-		print("class " + grammar.getClassName() + " : public "+sup);
+		print("class CUSTOM_API " + grammar.getClassName() + " : public "+sup);
 		println(", public " + grammar.tokenManager.getName() + TokenTypesFileSuffix);
 
 		Token tsuffix = (Token)grammar.options.get("classHeaderSuffix");
 		if ( tsuffix != null ) {
-			String suffix = Tool.stripFrontBack(tsuffix.getText(),"\"","\"");
+			String suffix = StringUtils.stripFrontBack(tsuffix.getText(),"\"","\"");
 			if ( suffix != null ) {
 				print(", "+suffix);  // must be an interface name for Java
 			}
 		}
-		println(" {");
+		println("{");
 
 		// Generate user-defined parser class members
 		if (grammar.classMemberAction != null) {
 			genLineNo(grammar.classMemberAction.getLine());
 			print(
-				processActionForTreeSpecifiers(grammar.classMemberAction.getText(), 0, currentRule, null)
-			);
+					processActionForSpecialSymbols(grammar.classMemberAction.getText(),
+															 grammar.classMemberAction.getLine(),
+															 currentRule, null)
+					);
 			genLineNo2();
 		}
 
 		// Generate default parser class constructor
 		tabs=0;
 		println("public:");
+
+		if( noConstructors )
+		{
+			println("#if 0");
+			println("// constructor creation turned of with 'noConstructor' option");
+		}
 		tabs=1;
 		println(grammar.getClassName() + "();");
+		if( noConstructors )
+		{
+			tabs = 0;
+			println("#endif");
+			tabs = 1;
+		}
+
+		// Generate declaration for the initializeFactory method
+		println("static void initializeASTFactory( "+namespaceAntlr+"ASTFactory& factory );");
+
+		println("int getNumTokens() const");
+		println("{"); tabs++;
+		println("return "+grammar.getClassName()+"::NUM_TOKENS;");
+		tabs--; println("}");
+		println("const char* getTokenName( int type ) const");
+		println("{"); tabs++;
+		println("if( type > getNumTokens() ) return 0;");
+		println("return "+grammar.getClassName()+"::tokenNames[type];");
+		tabs--; println("}");
+		println("const char* const* getTokenNames() const");
+		println("{"); tabs++;
+		println("return "+grammar.getClassName()+"::tokenNames;");
+		tabs--; println("}");
 
 		// Generate code for each rule in the grammar
 		Enumeration ids = grammar.rules.elements();
@@ -2495,17 +3056,27 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 			exitIfError();
 		}
-		if ( usingCustomAST )
+		tabs = 0; println("public:"); tabs = 1;
+		println(namespaceAntlr+"RefAST getAST()");
+		println("{");
+		if( usingCustomAST )
 		{
-			// when we are using a custom ast override TreeParser::getAST to return the
-			// custom AST type
-			tabs=0; println("public:"); tabs=1;
-			println(labeledElementASTType+" getAST();");
-			println("");
-			tabs=0; println("protected:"); tabs=1;
-			println(labeledElementASTType+" returnAST;");
-			println(labeledElementASTType+" _retTree;");
+			tabs++;
+			println("return "+namespaceAntlr+"RefAST(returnAST);");
+			tabs--;
 		}
+		else
+		{
+			tabs++;
+			println("return returnAST;");
+			tabs--;
+		}
+		println("}");
+		println("");
+
+		tabs=0; println("protected:"); tabs=1;
+		println(labeledElementASTType+" returnAST;");
+		println(labeledElementASTType+" _retTree;");
 
 		// Make the rest private
 		tabs=0;
@@ -2513,7 +3084,15 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs=1;
 
 		// Generate the token names
-		println("static const char* _tokenNames[];");
+		println("static const char* tokenNames[];");
+		// and how many there are of them
+		_println("#ifndef NO_STATIC_CONSTS");
+		println("static const int NUM_TOKENS = "+grammar.tokenManager.getVocabulary().size()+";");
+		_println("#else");
+		println("enum {");
+		println("\tNUM_TOKENS = "+grammar.tokenManager.getVocabulary().size());
+		println("};");
+		_println("#endif");
 
 		// Generate the bitsets used throughout the grammar
 		genBitsetsHeader(bitsetsUsed, grammar.tokenManager.maxTokenType());
@@ -2531,6 +3110,32 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Close the parser output stream
 		currentOutput.close();
 		currentOutput = null;
+	}
+	/// for convenience
+	protected void genASTDeclaration( AlternativeElement el ) {
+		genASTDeclaration( el, labeledElementASTType );
+	}
+	/// for convenience
+	protected void genASTDeclaration( AlternativeElement el, String node_type ) {
+		genASTDeclaration( el, el.getLabel(), node_type );
+	}
+	/// Generate (if not already done) a declaration for the AST for el.
+	protected void genASTDeclaration( AlternativeElement el, String var_name, String node_type ) {
+		// already declared?
+		if( declaredASTVariables.contains(el) )
+			return;
+
+		String init = labeledElementASTInit;
+
+		if (el instanceof GrammarAtom &&
+			 ((GrammarAtom)el).getASTNodeType() != null )
+			init = "Ref"+((GrammarAtom)el).getASTNodeType()+"("+labeledElementASTInit+")";
+
+		// emit code
+		println(node_type+" " + var_name + "_AST = "+init+";");
+
+		// mark as declared
+		declaredASTVariables.put(el, el);
 	}
 	private void genLiteralsTest() {
 		println("_ttype = testLiteralsTable(_ttype);");
@@ -2550,15 +3155,13 @@ public class CppCodeGenerator extends CodeGenerator {
 			}
 		}
 		else if ( atom instanceof CharLiteralElement ) {
-			if ( grammar instanceof LexerGrammar ) {
-				genMatchUsingAtomText(atom);
-			}
-			else {
-				tool.error("cannot ref character literals in grammar: "+atom);
-			}
+			// Lexer case is handled in the gen( CharLiteralElement x )
+			antlrTool.error("cannot ref character literals in grammar: "+atom);
 		}
 		else if ( atom instanceof TokenRefElement ) {
-			genMatchUsingAtomText(atom);
+			genMatchUsingAtomTokenType(atom);
+		} else if (atom instanceof WildcardElement) {
+			gen((WildcardElement)atom);
 		}
 	}
 	protected void genMatchUsingAtomText(GrammarAtom atom) {
@@ -2566,14 +3169,14 @@ public class CppCodeGenerator extends CodeGenerator {
 		String astArgs="";
 		if (grammar instanceof TreeWalkerGrammar) {
 			if( usingCustomAST )
-				astArgs="static_cast<"+namespaceAntlr+"RefAST"+">(_t),";
+				astArgs=namespaceAntlr+"RefAST"+"(_t),";
 			else
 				astArgs="_t,";
 		}
 
 		// if in lexer and ! on element, save buffer index to kill later
 		if ( grammar instanceof LexerGrammar && (!saveText||atom.getAutoGenType()==GrammarElement.AUTO_GEN_BANG) ) {
-			println("_saveIndex=text.length();");
+			println("_saveIndex = text.length();");
 		}
 
 		print(atom.not ? "matchNot(" : "match(");
@@ -2584,9 +3187,17 @@ public class CppCodeGenerator extends CodeGenerator {
 			// horrible hack to handle EOF case
 			_print(namespaceAntlr+"Token::EOF_TYPE");
 		}
-		else {
-			_print(textOrChar(atom.atomText));
+		else
+		{
+			if( grammar instanceof LexerGrammar )	// lexer needs special handling
+			{
+				String cppstring = convertJavaToCppString( atom.atomText, false );
+				_print(cppstring);
+			}
+			else
+				_print(atom.atomText);
 		}
+
 		_println(");");
 
 		if ( grammar instanceof LexerGrammar && (!saveText||atom.getAutoGenType()==GrammarElement.AUTO_GEN_BANG) ) {
@@ -2598,13 +3209,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		String astArgs="";
 		if (grammar instanceof TreeWalkerGrammar) {
 			if( usingCustomAST )
-				astArgs="static_cast<"+namespaceAntlr+"RefAST"+">(_t),";
+				astArgs=namespaceAntlr+"RefAST"+"(_t),";
 			else
 				astArgs="_t,";
 		}
 
 		// If the literal can be mangled, generate the symbolic constant instead
-		String mangledName = null;
 		String s = astArgs + getValueString(atom.getType());
 
 		// matching
@@ -2663,16 +3273,16 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("setCommitToPath(false);");
 			if ( filterRule!=null ) {
 				// Here's a good place to ensure that the filter rule actually exists
-				if ( !grammar.isDefined(CodeGenerator.lexerRuleName(filterRule)) ) {
-					grammar.tool.error("Filter rule "+filterRule+" does not exist in this lexer");
+				if ( !grammar.isDefined(CodeGenerator.encodeLexerRuleName(filterRule)) ) {
+					grammar.antlrTool.error("Filter rule "+filterRule+" does not exist in this lexer");
 				}
 				else {
-					RuleSymbol rs = (RuleSymbol)grammar.getSymbol(CodeGenerator.lexerRuleName(filterRule));
+					RuleSymbol rs = (RuleSymbol)grammar.getSymbol(CodeGenerator.encodeLexerRuleName(filterRule));
 					if ( !rs.isDefined() ) {
-						grammar.tool.error("Filter rule "+filterRule+" does not exist in this lexer");
+						grammar.antlrTool.error("Filter rule "+filterRule+" does not exist in this lexer");
 					}
 					else if ( rs.access.equals("public") ) {
-						grammar.tool.error("Filter rule "+filterRule+" must be protected");
+						grammar.antlrTool.error("Filter rule "+filterRule+" must be protected");
 					}
 				}
 				println("int _m;");
@@ -2681,25 +3291,25 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 		println("resetText();");
 
-		println("try {   // for char stream error handling");
-		tabs++;
-
 		// Generate try around whole thing to trap scanner errors
-		println("try {   // for lexical error handling");
+		println("try {   // for lexical and char stream error handling");
 		tabs++;
 
 		// Test for public lexical rules with empty paths
 		for (int i=0; i<nextTokenBlk.getAlternatives().size(); i++) {
 			Alternative a = nextTokenBlk.getAlternativeAt(i);
 			if ( a.cache[1].containsEpsilon() ) {
-				tool.warning("found optional path in nextToken()");
+				antlrTool.warning("found optional path in nextToken()");
 			}
 		}
 
 		// Generate the block
 		String newline = System.getProperty("line.separator");
 		CppBlockFinishingInfo howToFinish = genCommonBlock(nextTokenBlk, false);
-		String errFinish = "if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken("+namespaceAntlr+"Token::EOF_TYPE);}";
+		String errFinish = "if (LA(1)==EOF_CHAR)"+newline+
+			"\t\t\t\t{"+newline+"\t\t\t\t\tuponEOF();"+newline+
+			"\t\t\t\t\t_returnToken = makeToken("+namespaceAntlr+"Token::EOF_TYPE);"+
+			newline+"\t\t\t\t}";
 		errFinish += newline+"\t\t\t\t";
 		if ( ((LexerGrammar)grammar).filterMode ) {
 			if ( filterRule==null ) {
@@ -2731,7 +3341,8 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Generate literals test if desired
 		// make sure _ttype is set first; note _returnToken must be
 		// non-null as the rule was required to create it.
-		println("if ( !_returnToken ) goto tryAgain; // found SKIP token");
+		println("if ( !_returnToken )"+newline+
+				  "\t\t\t\tgoto tryAgain; // found SKIP token"+newline);
 		println("_ttype = _returnToken->getType();");
 		if ( ((LexerGrammar)grammar).getTestLiterals()) {
 			genLiteralsTest();
@@ -2748,7 +3359,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		tabs++;
 		if ( ((LexerGrammar)grammar).filterMode ) {
 			if ( filterRule==null ) {
-				println("if ( !getCommitToPath() ) {consume(); goto tryAgain;}");
+				println("if ( !getCommitToPath() ) {");
+				tabs++;
+				println("consume();");
+				println("goto tryAgain;");
+				tabs--;
+				println("}");
 			}
 			else {
 				println("if ( !getCommitToPath() ) {");
@@ -2761,30 +3377,35 @@ public class CppCodeGenerator extends CodeGenerator {
 				println("	reportError(ee);");
 				println("	consume();");
 				println("}");
-				println("goto tryAgain;");
+				// println("goto tryAgain;");
 				tabs--;
 				println("}");
+				println("else");
 			}
 		}
 		if ( nextTokenBlk.getDefaultErrorHandler() ) {
+			println("{");
+			tabs++;
 			println("reportError(e);");
 			println("consume();");
+			tabs--;
+			println("}");
 		}
 		else {
 		    // pass on to invoking routine
+          tabs++;
 		    println("throw "+namespaceAntlr+"TokenStreamRecognitionException(e);");
+			 tabs--;
 		}
-		tabs--;
-		println("}");
 
 		// close CharStreamException try
 		tabs--;
 		println("}");
 		println("catch ("+namespaceAntlr+"CharStreamIOException& csie) {");
-		println("   throw "+namespaceAntlr+"TokenStreamIOException(csie.io);");
+		println("\tthrow "+namespaceAntlr+"TokenStreamIOException(csie.io);");
 		println("}");
 		println("catch ("+namespaceAntlr+"CharStreamException& cse) {");
-		println("   throw "+namespaceAntlr+"TokenStreamException(cse.getMessage());");
+		println("\tthrow "+namespaceAntlr+"TokenStreamException(cse.getMessage());");
 		println("}");
 
 		// close for-loop
@@ -2815,16 +3436,20 @@ public class CppCodeGenerator extends CodeGenerator {
 	*/
 	public void genRule(RuleSymbol s, boolean startSymbol, int ruleNum, String prefix) {
 //		tabs=1; // JavaCodeGenerator needs this
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genRule("+ s.getId() +")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genRule("+ s.getId() +")");
 		if ( !s.isDefined() ) {
-			tool.error("undefined rule: "+ s.getId());
+			antlrTool.error("undefined rule: "+ s.getId());
 			return;
 		}
 
 		// Generate rule return type, name, arguments
 		RuleBlock rblk = s.getBlock();
+
 		currentRule = rblk;
 		currentASTResult = s.getId();
+
+		// clear list of declared ast variables..
+		declaredASTVariables.clear();
 
 		// Save the AST generation state, and set it to that of the rule
 		boolean savegenAST = genAST;
@@ -2838,14 +3463,11 @@ public class CppCodeGenerator extends CodeGenerator {
 			_println(s.comment);
 		}
 
-		// Gen method access and final qualifier
-//		print(s.access + " final ");
-
 		// Gen method return type (note lexer return action set at rule creation)
 		if (rblk.returnAction != null)
 		{
 			// Has specified return value
-			_print(extractTypeOfAction(rblk.returnAction, rblk.getLine()) + " ");
+			_print(extractTypeOfAction(rblk.returnAction, rblk.getLine(), rblk.getColumn()) + " ");
 		} else {
 			// No specified return value
 			_print("void ");
@@ -2868,22 +3490,63 @@ public class CppCodeGenerator extends CodeGenerator {
 // FIXME: make argAction also a token? Hmmmmm
 //			genLineNo(rblk);
 			tabs++;
-			println(rblk.argAction);
+
+			// Process arguments for default arguments
+			// newer gcc's don't accept these in two places (header/cpp)
+			//
+			// Old appraoch with StringBuffer gave trouble with gcj.
+			//
+			// RK: Actually this breaks with string default arguments containing
+			// a comma's or equal signs. Then again the old StringBuffer method
+			// suffered from the same.
+			String oldarg = rblk.argAction;
+			String newarg = "";
+
+			String comma = "";
+			int eqpos = oldarg.indexOf( '=' );
+			if( eqpos != -1 )
+			{
+				int cmpos = 0;
+				while( cmpos != -1 )
+				{
+					newarg = newarg + comma + oldarg.substring( 0, eqpos ).trim();
+					comma = ", ";
+					cmpos = oldarg.indexOf( ',', eqpos );
+					if( cmpos != -1 )
+					{
+						// cut off part we just handled
+						oldarg = oldarg.substring( cmpos+1 ).trim();
+						eqpos = oldarg.indexOf( '=' );
+					}
+				}
+			}
+			else
+				newarg = oldarg;
+
+			println( newarg );
+
+//			println(rblk.argAction);
 			tabs--;
-			print(")");
+			print(") ");
 //			genLineNo2();	// gcc gives error on the brace... hope it works for the others too
 		} else {
 			// No specified arguments
-			_print(")");
+			_print(") ");
 		}
-
-		// Gen throws clause and open curly
-//		_print(" throws " + exceptionThrown);
-//		if ( !(grammar instanceof TreeWalkerGrammar) ) {
-//			_print(", IOException");
-//		}
-		_println(" {");
+		_println("{");
 		tabs++;
+
+		if (grammar.traceRules) {
+			if ( grammar instanceof TreeWalkerGrammar ) {
+				if ( usingCustomAST )
+					println("Tracer traceInOut(this,\""+ s.getId() +"\","+namespaceAntlr+"RefAST"+"(_t));");
+				else
+					println("Tracer traceInOut(this,\""+ s.getId() +"\",_t);");
+			}
+			else {
+				println("Tracer traceInOut(this, \""+ s.getId() +"\");");
+			}
+		}
 
 		// Convert return action to variable declaration
 		if (rblk.returnAction != null)
@@ -2897,19 +3560,9 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (!commonLocalVars.equals(""))
 			println(commonLocalVars);
 
-		if (grammar.traceRules) {
-			if ( grammar instanceof TreeWalkerGrammar ) {
-				if ( usingCustomAST )
-					println("Tracer traceInOut(this,\""+ s.getId() +"\",static_cast<"+namespaceAntlr+"RefAST"+">(_t));");
-				else
-					println("Tracer traceInOut(this,\""+ s.getId() +"\",_t);");
-			}
-			else {
-				println("Tracer traceInOut(this, \""+ s.getId() +"\");");
-			}
-		}
-
 		if ( grammar instanceof LexerGrammar ) {
+			// RK: why is this here? It seems not supported in the rest of the
+			// tool.
 			// lexer rule default return value is the rule's token name
 			// This is a horrible hack to support the built-in EOF lexer rule.
 			if (s.getId().equals("mEOF"))
@@ -2942,7 +3595,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (grammar instanceof TreeWalkerGrammar) {
 			// "Input" value for rule
 //			println(labeledElementASTType+" " + s.getId() + "_AST_in = "+labeledElementASTType+"(_t);");
-			println(labeledElementASTType+" " + s.getId() + "_AST_in = _t;");
+			println(labeledElementASTType+" " + s.getId() + "_AST_in = (_t == ASTNULL) ? "+labeledElementASTInit+" : _t;");
 		}
 		if (grammar.buildAST) {
 			// Parser member used to pass AST returns from rule invocations
@@ -2954,6 +3607,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		genBlockPreamble(rblk);
+		genBlockInitAction(rblk);
 		println("");
 
 		// Search for an unlabeled exception specification attached to the rule
@@ -2966,22 +3620,25 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// Generate the alternatives
-		if ( rblk.alternatives.size()==1 ) {
+		if ( rblk.alternatives.size()==1 )
+		{
 			// One alternative -- use simple form
 			Alternative alt = rblk.getAlternativeAt(0);
 			String pred = alt.semPred;
 			if ( pred!=null )
 				genSemPred(pred, currentRule.line);
 			if (alt.synPred != null) {
-				tool.warning(
+				antlrTool.warning(
 					"Syntactic predicate ignored for single alternative",
 					grammar.getFilename(),
-					alt.synPred.getLine()
+					alt.synPred.getLine(),
+					alt.synPred.getColumn()
 				);
 			}
 			genAlt(alt, rblk);
 		}
-		else {
+		else
+		{
 			// Multiple alternatives -- generate complex form
 			boolean ok = grammar.theLLkAnalyzer.deterministic(rblk);
 
@@ -2997,10 +3654,12 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 
 		// Generate user-defined or default catch phrases
-		if (unlabeledUserSpec != null) {
+		if (unlabeledUserSpec != null)
+		{
 			genErrorHandler(unlabeledUserSpec);
 		}
-		else if (rblk.getDefaultErrorHandler()) {
+		else if (rblk.getDefaultErrorHandler())
+		{
 			// Generate default catch phrase
 			println("catch (" + exceptionThrown + "& ex) {");
 			tabs++;
@@ -3010,25 +3669,29 @@ public class CppCodeGenerator extends CodeGenerator {
 				tabs++;
 			}
 			println("reportError(ex);");
-			if ( !(grammar instanceof TreeWalkerGrammar) ) {
+			if ( !(grammar instanceof TreeWalkerGrammar) )
+			{
 				// Generate code to consume until token in k==1 follow set
 				Lookahead follow = grammar.theLLkAnalyzer.FOLLOW(1, rblk.endNode);
 				String followSetName = getBitsetName(markBitsetForGen(follow.fset));
 				println("consume();");
 				println("consumeUntil(" + followSetName + ");");
-			} else {
+			}
+			else
+			{
 				// Just consume one token
 				println("if ( _t != "+labeledElementASTInit+" )");
 				tabs++;
 				println("_t = _t->getNextSibling();");
 				tabs--;
 			}
-			if (grammar.hasSyntacticPredicate) {
+			if (grammar.hasSyntacticPredicate)
+			{
 				tabs--;
 				// When guessing, rethrow exception
 				println("} else {");
 				tabs++;
-				println("throw ex;");
+				println("throw;");
 				tabs--;
 				println("}");
 			}
@@ -3071,7 +3734,7 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// Gen the return statement if there is one (lexer has hard-wired return action)
 		if (rblk.returnAction != null) {
-			println("return " + extractIdOfAction(rblk.returnAction, rblk.getLine()) + ";");
+			println("return " + extractIdOfAction(rblk.returnAction, rblk.getLine(), rblk.getColumn()) + ";");
 		}
 
 //		if ( grammar.debuggingOutput || grammar.traceRules) {
@@ -3111,9 +3774,9 @@ public class CppCodeGenerator extends CodeGenerator {
 	}
 	public void genRuleHeader(RuleSymbol s, boolean startSymbol) {
 		tabs=1;
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genRuleHeader("+ s.getId() +")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genRuleHeader("+ s.getId() +")");
 		if ( !s.isDefined() ) {
-			tool.error("undefined rule: "+ s.getId());
+			antlrTool.error("undefined rule: "+ s.getId());
 			return;
 		}
 
@@ -3136,7 +3799,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		if (rblk.returnAction != null)
 		{
 			// Has specified return value
-			_print(extractTypeOfAction(rblk.returnAction, rblk.getLine()) + " ");
+			_print(extractTypeOfAction(rblk.returnAction, rblk.getLine(), rblk.getColumn()) + " ");
 		} else {
 			// No specified return value
 			_print("void ");
@@ -3204,9 +3867,13 @@ public class CppCodeGenerator extends CodeGenerator {
 		{
 			// When not guessing, execute user arg action
 			ActionTransInfo tInfo = new ActionTransInfo();
-			String args = processActionForTreeSpecifiers(rr.args, 0, currentRule, tInfo);
-			if ( tInfo.assignToRoot || tInfo.refRuleRoot!=null ) {
-				tool.error("Arguments of rule reference '" + rr.targetRule + "' cannot set or ref #"+
+			// FIXME: fix line number passed to processActionForTreeSpecifiers here..
+			// this one might be a bit off..
+			String args = processActionForSpecialSymbols(rr.args, rr.line,
+																		currentRule, tInfo);
+			if ( tInfo.assignToRoot || tInfo.refRuleRoot!=null )
+			{
+				antlrTool.error("Arguments of rule reference '" + rr.targetRule + "' cannot set or ref #"+
 					currentRule.getRuleName()+" on line "+rr.getLine());
 			}
 			_print(args);
@@ -3214,11 +3881,13 @@ public class CppCodeGenerator extends CodeGenerator {
 			// Warn if the rule accepts no arguments
 			if (rs.block.argAction == null)
 			{
-				tool.warning("Rule '" + rr.targetRule + "' accepts no arguments",
+				antlrTool.warning("Rule '" + rr.targetRule + "' accepts no arguments",
 					grammar.getFilename(),
-					rr.getLine());
+					rr.getLine(), rr.getColumn());
 			}
-		} else {
+		}
+		else
+		{
 			// For C++, no warning if rule has parameters, because there may be default
 			// values for all of the parameters
 			//if (rs.block.argAction != null) {
@@ -3235,7 +3904,7 @@ public class CppCodeGenerator extends CodeGenerator {
 	protected void genSemPred(String pred, int line) {
 		// translate $ and # references
 		ActionTransInfo tInfo = new ActionTransInfo();
-		pred = processActionForTreeSpecifiers(pred, line, currentRule, tInfo);
+		pred = processActionForSpecialSymbols(pred, line, currentRule, tInfo);
 		// ignore translation info...we don't need to do anything with it.
 		String escapedPred = charFormatter.escapeString(pred);
 
@@ -3264,7 +3933,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		println("};");
 	}
 	protected void genSynPred(SynPredBlock blk, String lookaheadExpr) {
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("gen=>("+blk+")");
+		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("gen=>("+blk+")");
 
 		// Dump synpred result variable
 		println("bool synPredMatched" + blk.ID + " = false;");
@@ -3344,7 +4013,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Generate a string for each token.  This creates a static
 		// array of Strings indexed by token type.
 //		println("");
-		println("const char* " + prefix + "_tokenNames[] = {");
+		println("const char* " + prefix + "tokenNames[] = {");
 		tabs++;
 
 		// Walk the token vocabulary and generate a Vector of strings
@@ -3360,7 +4029,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			if ( !s.startsWith("\"") && !s.startsWith("<") ) {
 				TokenSymbol ts = (TokenSymbol)grammar.tokenManager.getTokenSymbol(s);
 				if ( ts!=null && ts.getParaphrase()!=null ) {
-					s = antlr.Tool.stripFrontBack(ts.getParaphrase(), "\"", "\"");
+					s = StringUtils.stripFrontBack(ts.getParaphrase(), "\"", "\"");
 				}
 			}
 			print(charFormatter.literalString(s));
@@ -3377,7 +4046,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		// Open the token output header file and set the currentOutput stream
 		outputFile = tm.getName() + TokenTypesFileSuffix+".hpp";
 		outputLine = 1;
-		currentOutput = antlr.Tool.openOutputFile(outputFile);
+		currentOutput = antlrTool.openOutputFile(outputFile);
 		//SAS: changed for proper text file io
 
 		tabs = 0;
@@ -3395,7 +4064,16 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// Encapsulate the definitions in an interface.  This can be done
 		// because they are all constants.
-		println("struct " + tm.getName() + TokenTypesFileSuffix+" {");
+		println("");
+		println("#ifndef CUSTOM_API");
+		println("# define CUSTOM_API");
+		println("#endif");
+		println("");
+		// In the case that the .hpp is included from C source (flexLexer!)
+		// we just turn things into a plain enum
+		println("#ifdef __cplusplus");
+		println("struct CUSTOM_API " + tm.getName() + TokenTypesFileSuffix+" {");
+		println("#endif");
 		tabs++;
 		println("enum {");
 		tabs++;
@@ -3416,7 +4094,7 @@ public class CppCodeGenerator extends CodeGenerator {
 					// a string literal
 					StringLiteralSymbol sl = (StringLiteralSymbol)tm.getTokenSymbol(s);
 					if ( sl==null ) {
-						antlr.Tool.panic("String literal "+s+" not in symbol table");
+						antlrTool.panic("String literal "+s+" not in symbol table");
 					}
 					else if ( sl.label != null ) {
 						println(sl.label + " = " + i + ",");
@@ -3449,7 +4127,9 @@ public class CppCodeGenerator extends CodeGenerator {
 
 		// Close the interface
 		tabs--;
+		println("#ifdef __cplusplus");
 		println("};");
+		println("#endif");
 
 		if (nameSpace != null)
 			nameSpace.emitClosures(currentOutput);
@@ -3476,7 +4156,7 @@ public class CppCodeGenerator extends CodeGenerator {
 			!(grammar.tokenManager.tokenDefined(str) ) )
 		{
 //			System.out.println("processStringForASTConstructor: "+str+" with cast");
-			return "static_cast<"+namespaceAntlr+"RefAST>("+str+")";
+			return namespaceAntlr+"RefAST("+str+")";
 		}
 		else
 		{
@@ -3485,7 +4165,8 @@ public class CppCodeGenerator extends CodeGenerator {
 		}
 	}
 	/** Get a string for an expression to generate creation of an AST subtree.
-	  * @param v A Vector of String, where each element is an expression in the target language yielding an AST node.
+	  * @param v A Vector of String, where each element is an expression
+	  * in the target language yielding an AST node.
 	  */
 	public String getASTCreateString(Vector v) {
 		if (v.size() == 0) {
@@ -3495,7 +4176,7 @@ public class CppCodeGenerator extends CodeGenerator {
 		// the labeledElementASTType here can probably be a cast or nothing
 		// in the case of ! usingCustomAST
 		buf.append(labeledElementASTType+
-					"(astFactory.make((new "+namespaceAntlr+
+					"(astFactory->make((new "+namespaceAntlr+
 					  "ASTArray("+v.size()+"))");
 		for (int i = 0; i < v.size(); i++) {
 			buf.append("->add("+ v.elementAt(i) + ")");
@@ -3504,17 +4185,26 @@ public class CppCodeGenerator extends CodeGenerator {
 		return buf.toString();
 	}
 	/** Get a string for an expression to generate creating of an AST node
-	  * @param str The arguments to the AST constructor
-	  */
+	 * @param str The arguments to the AST constructor
+	 */
 	public String getASTCreateString(GrammarAtom atom, String str) {
 		if ( atom!=null && atom.getASTNodeType() != null ) {
-			// RK: I guess this is heterogeneous ast stuff...
-			return "Ref"+atom.getASTNodeType()+"(new "+atom.getASTNodeType()+"("+str+"))";
+
+			// this atom is using a heterogeneous AST type. (and maybe a local
+			// override we can't see at the TokenManager level)
+			// make note of the factory needed to generate it..
+			// later this is inserted into the initializeFactory method.
+			astTypes.ensureCapacity(atom.getType());
+			astTypes.setElementAt(atom.getASTNodeType(),atom.getType());
+			// after above init the factory knows what to generate...
+			return "astFactory->create("+str+")";
 		}
 		else
 		{
-			// This is *SO* ugly... but it will have to do for now... 2.7.2 will
-			// have better.
+			// FIXME: This is *SO* ugly! but it will have to do for now...
+			// 2.7.2 will have better I hope
+			// this is due to the usage of getASTCreateString from inside
+			// actions/cpp/action.g
 			boolean is_constructor = false;
 			if( str.indexOf(',') != -1 )
 				is_constructor = grammar.tokenManager.tokenDefined(str.substring(0,str.indexOf(',')));
@@ -3524,9 +4214,9 @@ public class CppCodeGenerator extends CodeGenerator {
 			   (grammar instanceof TreeWalkerGrammar) &&
 				!(grammar.tokenManager.tokenDefined(str) ) &&
 				! is_constructor )
-				return "astFactory.create(static_cast<"+namespaceAntlr+"RefAST>("+str+"))";
+				return "astFactory->create("+namespaceAntlr+"RefAST("+str+"))";
 			else
-				return "astFactory.create("+str+")";
+				return "astFactory->create("+str+")";
 		}
 	}
 
@@ -3536,9 +4226,9 @@ public class CppCodeGenerator extends CodeGenerator {
 	public String getASTCreateString(String str) {
 //		System.out.println("getAstCreateString(str): "+str+" "+grammar.tokenManager.tokenDefined(str));
 		if( usingCustomAST )
-			return "static_cast<"+labeledElementASTType+">(astFactory.create(static_cast<"+namespaceAntlr+"RefAST>( /*ss*/ "+str+")))";
+			return labeledElementASTType+"(astFactory->create("+namespaceAntlr+"RefAST("+str+")))";
 		else
-			return "astFactory.create("+str+")";
+			return "astFactory->create("+str+")";
 	}
 
 	protected String getLookaheadTestExpression(Lookahead[] look, int k) {
@@ -3646,9 +4336,9 @@ boolean first = true;
 			String cs = getValueString(elems[i]);
 
 			// Generate the element comparison
-			if ( i>0 ) e.append("||");
+			if( i > 0 ) e.append(" || ");
 			e.append(ts);
-			e.append("==");
+			e.append(" == ");
 			e.append(cs);
 		}
 		return e.toString();
@@ -3660,13 +4350,13 @@ boolean first = true;
 	 */
 	public String getRangeExpression(int k, int[] elems) {
 		if (!elementsAreRange(elems)) {
-			tool.panic("getRangeExpression called with non-range");
+			antlrTool.panic("getRangeExpression called with non-range");
 		}
 		int begin = elems[0];
 		int end = elems[elems.length-1];
 		return
 			"(" + lookaheadString(k) + " >= " + getValueString(begin) + " && " +
-			lookaheadString(k) + " <= " + getValueString(end) + ")";
+			  lookaheadString(k) + " <= " + getValueString(end) + ")";
 	}
 	/** getValueString: get a string representation of a token or char value
 	 * @param value The token or char value
@@ -3676,7 +4366,8 @@ boolean first = true;
 		if ( grammar instanceof LexerGrammar ) {
 			cs = charFormatter.literalChar(value);
 		}
-		else {
+		else
+		{
 			TokenSymbol ts = grammar.tokenManager.getTokenSymbolAt(value);
 			if ( ts == null ) {
 				return ""+value; // return token type as string
@@ -3735,7 +4426,7 @@ boolean first = true;
 	  * @return A string representing the mangled literal, or null if not possible.
 	  */
 	private String mangleLiteral(String s) {
-		String mangled = antlr.Tool.literalsPrefix;
+		String mangled = antlrTool.literalsPrefix;
 		for (int i = 1; i < s.length()-1; i++) {
 			if (!Character.isLetter(s.charAt(i)) &&
 				 s.charAt(i) != '_') {
@@ -3743,7 +4434,7 @@ boolean first = true;
 			}
 			mangled += s.charAt(i);
 		}
-		if ( antlr.Tool.upperCaseMangledLiterals ) {
+		if ( antlrTool.upperCaseMangledLiterals ) {
 			mangled = mangled.toUpperCase();
 		}
 		return mangled;
@@ -3757,17 +4448,24 @@ boolean first = true;
 	public String mapTreeId(String idParam, ActionTransInfo transInfo) {
 		// if not in an action of a rule, nothing to map.
 		if ( currentRule==null ) return idParam;
-//		System.out.print("mapTreeId: "+idParam+" ");
+//		System.out.print("mapTreeId: "+idParam+" "+currentRule.getRuleName()+" ");
 
 		boolean in_var = false;
 		String id = idParam;
-		if (grammar instanceof TreeWalkerGrammar) {
-			if ( !grammar.buildAST ) {
+		if (grammar instanceof TreeWalkerGrammar)
+		{
+//			RK: hmmm this seems odd. If buildAST is false it translates
+//			#rulename_in to 'rulename_in' else to 'rulename_AST_in' which indeed
+//			exists. disabling for now.. and hope it doesn't blow up somewhere.
+			if ( !grammar.buildAST )
+			{
 				in_var = true;
 //				System.out.println("in_var1");
 			}
 			// If the id ends with "_in", then map it to the input variable
-			else if (id.length() > 3 && id.lastIndexOf("_in") == id.length()-3) {
+//			else
+			if (id.length() > 3 && id.lastIndexOf("_in") == id.length()-3)
+			{
 				// Strip off the "_in"
 				id = id.substring(0, id.length()-3);
 				in_var = true;
@@ -3778,9 +4476,11 @@ boolean first = true;
 
 		// Check the rule labels.  If id is a label, then the output
 		// variable is label_AST, and the input variable is plain label.
-		for (int i = 0; i < currentRule.labeledElements.size(); i++) {
+		for (int i = 0; i < currentRule.labeledElements.size(); i++)
+		{
 			AlternativeElement elt = (AlternativeElement)currentRule.labeledElements.elementAt(i);
-			if (elt.getLabel().equals(id)) {
+			if (elt.getLabel().equals(id))
+			{
 //				if( in_var )
 //					System.out.println("returning (vec) "+(in_var ? id : id + "_AST"));
 				return in_var ? id : id + "_AST";
@@ -3791,28 +4491,40 @@ boolean first = true;
 		// If the id is in the map, then output variable is the name in the
 		// map, and input variable is name_in
 		String s = (String)treeVariableMap.get(id);
-		if (s != null) {
-			if (s == NONUNIQUE) {
+		if (s != null)
+		{
+			if (s == NONUNIQUE)
+			{
 //				if( in_var )
 //					System.out.println("returning null (nonunique)");
 				// There is more than one element with this id
+				antlrTool.error("Ambiguous reference to AST element "+id+
+								" in rule "+currentRule.getRuleName());
 				return null;
-			} else if (s.equals(currentRule.getRuleName())) {
+			}
+			else if (s.equals(currentRule.getRuleName()))
+			{
 				// a recursive call to the enclosing rule is
 				// ambiguous with the rule itself.
 //				if( in_var )
 //					System.out.println("returning null (rulename)");
+				antlrTool.error("Ambiguous reference to AST element "+id+
+								" in rule "+currentRule.getRuleName());
 				return null;
-			} else {
+			}
+			else
+			{
 //				if( in_var )
 //				System.out.println("returning "+(in_var?s+"_in":s));
 				return in_var ? s + "_in" : s;
 			}
 		}
 
+//		System.out.println("Last check: "+id+" == "+currentRule.getRuleName());
 		// Failing that, check the rule name itself.  Output variable
 		// is rule_AST; input variable is rule_AST_in (treeparsers).
-		if (id.equals(currentRule.getRuleName())) {
+		if( id.equals(currentRule.getRuleName()) )
+		{
 			String r = in_var ? id + "_AST_in" : id + "_AST";
 			if ( transInfo!=null ) {
 				if ( !in_var ) {
@@ -3822,7 +4534,9 @@ boolean first = true;
 //			if( in_var )
 //				System.out.println("returning (r) "+r);
 			return r;
-		} else {
+		}
+		else
+		{
 //			if( in_var )
 //			System.out.println("returning (last) "+id);
 			// id does not map to anything -- return itself.
@@ -3868,10 +4582,14 @@ boolean first = true;
 	}
 
 	/** Lexically process tree-specifiers in the action.
-	 *  This will replace #id and #(...) with the appropriate
-	 *  function calls and/or variables.
+	 * This will replace #id and #(...) with the appropriate
+	 * function calls and/or variables.
 	 */
-	protected String processActionForTreeSpecifiers(String actionStr, int line, RuleBlock currentRule, ActionTransInfo tInfo) {
+	protected String processActionForSpecialSymbols(String actionStr,
+																	int line,
+																	RuleBlock currentRule,
+																	ActionTransInfo tInfo)
+	{
 		if ( actionStr==null || actionStr.length()==0 )
 			return null;
 
@@ -3880,15 +4598,18 @@ boolean first = true;
 		if (grammar==null)
 			return actionStr;
 
-		if ( (grammar.buildAST && actionStr.indexOf('#') != -1) ||
+		if ((grammar.buildAST && actionStr.indexOf('#') != -1) ||
 			 grammar instanceof TreeWalkerGrammar ||
-			 (grammar instanceof LexerGrammar && actionStr.indexOf('$') != -1) ) {
+			 ((grammar instanceof LexerGrammar ||
+				grammar instanceof ParserGrammar)
+			  	&& actionStr.indexOf('$') != -1) )
+		{
 			// Create a lexer to read an action and return the translated version
 			antlr.actions.cpp.ActionLexer lexer =
-				new antlr.actions.cpp.ActionLexer(actionStr, currentRule,
-															 this, tInfo);
+				new antlr.actions.cpp.ActionLexer(actionStr, currentRule, this, tInfo);
 			lexer.setLineOffset(line);
-			lexer.setTool(tool);
+			lexer.setFilename(grammar.getFilename());
+			lexer.setTool(antlrTool);
 
 			try {
 				lexer.mACTION(true);
@@ -3901,11 +4622,11 @@ boolean first = true;
 				return actionStr;
 			}
 			catch (TokenStreamException tex) {
-				antlr.Tool.panic("Error reading action:"+actionStr);
+				antlrTool.panic("Error reading action:"+actionStr);
 				return actionStr;
 			}
 			catch (CharStreamException io) {
-				antlr.Tool.panic("Error reading action:"+actionStr);
+				antlrTool.panic("Error reading action:"+actionStr);
 				return actionStr;
 			}
 		}
@@ -3914,7 +4635,7 @@ boolean first = true;
 
 	private String fixNameSpaceOption( String ns )
 	{
-		ns = Tool.stripFrontBack(ns,"\"","\"");
+		ns = StringUtils.stripFrontBack(ns,"\"","\"");
 		if( ns.length() > 2 &&
 			 !ns.substring(ns.length()-2, ns.length()).equals("::") )
 		ns += "::";
@@ -3929,18 +4650,19 @@ boolean first = true;
 		{
 			/* RK: options also have to be added to Grammar.java and for options
 			 * on the file level entries have to be defined in
-			 * DefineGrammarSymbols.java and passed around via 'globals' in Tool.java
+			 * DefineGrammarSymbols.java and passed around via 'globals' in
+			 * antlrTool.java
 			 */
-			if( Tool.nameSpace != null )
-				nameSpace = Tool.nameSpace;
+			if( antlrTool.nameSpace != null )
+				nameSpace = antlrTool.nameSpace;
 
-			if( Tool.namespaceStd != null )
-				namespaceStd = fixNameSpaceOption(Tool.namespaceStd);
+			if( antlrTool.namespaceStd != null )
+				namespaceStd = fixNameSpaceOption(antlrTool.namespaceStd);
 
-			if( Tool.namespaceAntlr != null )
-				namespaceAntlr = fixNameSpaceOption(Tool.namespaceAntlr);
+			if( antlrTool.namespaceAntlr != null )
+				namespaceAntlr = fixNameSpaceOption(antlrTool.namespaceAntlr);
 
-			genHashLines = Tool.genHashLines;
+			genHashLines = antlrTool.genHashLines;
 
 			/* let grammar level options override filelevel ones...
 			 */
@@ -3953,7 +4675,7 @@ boolean first = true;
 			if( g.hasOption("namespaceAntlr") ) {
 				Token t = g.getOption("namespaceAntlr");
 				if( t != null ) {
-					String ns = Tool.stripFrontBack(t.getText(),"\"","\"");
+					String ns = StringUtils.stripFrontBack(t.getText(),"\"","\"");
 					if ( ns != null ) {
 						if( ns.length() > 2 &&
 							 !ns.substring(ns.length()-2, ns.length()).equals("::") )
@@ -3965,7 +4687,7 @@ boolean first = true;
 			if( g.hasOption("namespaceStd") ) {
 				Token t = g.getOption("namespaceStd");
 				if( t != null ) {
-					String ns = Tool.stripFrontBack(t.getText(),"\"","\"");
+					String ns = StringUtils.stripFrontBack(t.getText(),"\"","\"");
 					if ( ns != null ) {
 						if( ns.length() > 2 &&
 							 !ns.substring(ns.length()-2, ns.length()).equals("::") )
@@ -3977,9 +4699,16 @@ boolean first = true;
 			if( g.hasOption("genHashLines") ) {
 				Token t = g.getOption("genHashLines");
 				if( t != null ) {
-					String val = Tool.stripFrontBack(t.getText(),"\"","\"");
+					String val = StringUtils.stripFrontBack(t.getText(),"\"","\"");
 					genHashLines = val.equals("true");
 				}
+			}
+			noConstructors = antlrTool.noConstructors;	// get the default
+			if( g.hasOption("noConstructors") ) {
+				Token t = g.getOption("noConstructors");
+				if( (t != null) && !(t.getText().equals("true") || t.getText().equals("false")))
+					antlrTool.error("noConstructors option must be true or false", antlrTool.getGrammarFile(), t.getLine(), t.getColumn());
+				noConstructors = t.getText().equals("true");
 			}
 		}
 		if (g instanceof ParserGrammar) {
@@ -3988,11 +4717,11 @@ boolean first = true;
 			if ( g.hasOption("ASTLabelType") ) {
 				Token tsuffix = g.getOption("ASTLabelType");
 				if ( tsuffix != null ) {
-					String suffix = Tool.stripFrontBack(tsuffix.getText(),"\"","\"");
+					String suffix = StringUtils.stripFrontBack(tsuffix.getText(),"\"","\"");
 					if ( suffix != null ) {
 						usingCustomAST = true;
 						labeledElementASTType = suffix;
-						labeledElementASTInit = "static_cast<"+suffix+">("+namespaceAntlr+"nullAST)";
+						labeledElementASTInit = suffix+"("+namespaceAntlr+"nullAST)";
 					}
 				}
 			}
@@ -4013,7 +4742,7 @@ boolean first = true;
 			commonLocalVars = "int _ttype; "+namespaceAntlr+"RefToken _token; int _begin=text.length();";
 			lt1Value = "LA(1)";
 			exceptionThrown = namespaceAntlr+"RecognitionException";
-			throwNoViable = "throw "+namespaceAntlr+"NoViableAltForCharException(LA(1), getFilename(), getLine());";
+			throwNoViable = "throw "+namespaceAntlr+"NoViableAltForCharException(LA(1), getFilename(), getLine(), getColumn());";
 		}
 		else if (g instanceof TreeWalkerGrammar) {
 			labeledElementInit = namespaceAntlr+"nullAST";
@@ -4026,15 +4755,15 @@ boolean first = true;
 			if ( g.hasOption("ASTLabelType") ) {
 				Token tsuffix = g.getOption("ASTLabelType");
 				if ( tsuffix != null ) {
-					String suffix = Tool.stripFrontBack(tsuffix.getText(),"\"","\"");
+					String suffix = StringUtils.stripFrontBack(tsuffix.getText(),"\"","\"");
 					if ( suffix != null ) {
 						usingCustomAST = true;
 						labeledElementASTType = suffix;
 						labeledElementType = suffix;
-						labeledElementInit = "static_cast<"+suffix+">("+namespaceAntlr+"nullAST)";
+						labeledElementInit = suffix+"("+namespaceAntlr+"nullAST)";
 						labeledElementASTInit = labeledElementInit;
 						commonExtraParams = suffix+" _t";
-						throwNoViable = "throw "+namespaceAntlr+"NoViableAltException(static_cast<"+namespaceAntlr+"RefAST>(_t));";
+						throwNoViable = "throw "+namespaceAntlr+"NoViableAltException("+namespaceAntlr+"RefAST(_t));";
 						lt1Value = "_t";
 					}
 				}
@@ -4047,16 +4776,7 @@ boolean first = true;
 			exceptionThrown = namespaceAntlr+"RecognitionException";
 		}
 		else {
-			tool.panic("Unknown grammar type");
+			antlrTool.panic("Unknown grammar type");
 		}
-	}
-	private String textOrChar(String text) {
-		// check to see if the text is a single character
-		if (text.startsWith("'")) {
-			// assume it also ends with '
-			return charFormatter.literalChar(ANTLRLexer.tokenTypeForCharLiteral(text));
-		}
-		else
-			return text;
 	}
 }

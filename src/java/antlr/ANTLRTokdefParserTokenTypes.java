@@ -1,12 +1,6 @@
-package antlr;
-
-/*
- * ANTLR-generated file resulting from grammar tokdef.g
- * 
- * Terence Parr, MageLang Institute
- * ANTLR Version 2.7.0a2; 1989-1999
- */
- public interface ANTLRTokdefParserTokenTypes {
+// $ANTLR : "tokdef.g" -> "ANTLRTokdefParser.java"$
+ package antlr; 
+public interface ANTLRTokdefParserTokenTypes {
 	int EOF = 1;
 	int NULL_TREE_LOOKAHEAD = 3;
 	int ID = 4;
@@ -21,5 +15,4 @@ package antlr;
 	int ESC = 13;
 	int DIGIT = 14;
 	int XDIGIT = 15;
-	int VOCAB = 16;
 }
