@@ -34,7 +34,7 @@ Preferences dialog relate to this panel.
 <ul>
 <li>If <strong>Enable source editing</strong> is checked, you can edit
 the source directly in this panel. When you move to a different panel,
-press CTRL-S or close the entry editor, Bibkeeper will try to parse
+press CTRL-S or close the entry editor, JabRef will try to parse
 the contents of the source panel. If there are problems, you will be
 notified, and given the option to edit your entry further, or to
 revert to the former contents.
@@ -46,19 +46,19 @@ panels, you should check this option.
 </ul>
 
 <P><strong>Tip:</strong> If your database contains fields unknown to
-Bibkeeper, these will be visible in the source panel. Also, if you
+JabRef, these will be visible in the source panel. Also, if you
 want to add your own custom fields, you can do this in the source
 panel once source editing is turned on.
 
 <H2>Field consistency checking</H2>
-When the contents of a field is changed, Bibkeeper checks if the new contents
+When the contents of a field is changed, JabRef checks if the new contents
 are compatible with the field type. For instance, the <em>year</em> field must
 contain a number. The contents are also checked with respect to the use of the
 '#' character. The hash symbol is <em>only</em> to be used in pairs, wrapping
-the name of a <em>bibtex</em> string that is referenced. Note that Bibkeeper
+the name of a <em>bibtex</em> string that is referenced. Note that JabRef
 does not check if the referenced string actually exists (this is not possible,
 since the <em>bibtex</em> style you use can define an arbitrary set of strings 
-unknown to Bibkeeper).
+unknown to JabRef).
 <P>
 If the contents are not accepted, the field will turn red,
 indicating an error. In this case the change will not be stored.
@@ -67,7 +67,7 @@ indicating an error. In this case the change will not be stored.
 The entry editor offers autocompletion of words. In the Preferences dialog
 you can enable or disable autocompletion, and choose for which fields
 autocompletion is active.
-<P>With autocompletion, Bibkeeper records all words that appear in
+<P>With autocompletion, JabRef records all words that appear in
 each of the chosen fields throughout your database. Whenever you write
 the beginning of one of these words, it will be suggested visually. To
 ignore the suggestion, simply write on. To accept the suggestion,
