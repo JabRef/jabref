@@ -78,7 +78,7 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 					case PSEUDOFIELD_TYPE:
 						if (!fieldSpec.matcher("entrytype").matches())
 							continue;
-						content = bibtexEntry.getType().getName().toLowerCase();
+						content = bibtexEntry.getType().getName();
 						break;
 					default: // regular field
 						content = bibtexEntry.getField(searchKeys[i].toString()).toString();
