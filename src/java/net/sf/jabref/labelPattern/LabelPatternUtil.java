@@ -26,7 +26,8 @@ public class LabelPatternUtil {
 	//this is SO crappy, but i have no idea of converting unicode into a String
 	// the content of the AL is build with the buildLetters()
 	private static ArrayList letters = builtLetters();
-	
+    public static ArrayList DEFAULT_LABELPATTERN = split("[auth]_[year]");
+    
 	private static BibtexDatabase _db;
 
 	/**

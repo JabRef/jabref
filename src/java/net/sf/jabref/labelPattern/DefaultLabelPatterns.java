@@ -35,8 +35,14 @@ package net.sf.jabref.labelPattern;
 public class DefaultLabelPatterns extends LabelPattern{
 	
     public DefaultLabelPatterns(){
-	addLabelPattern("article", "[auth]_[year]");
-	addLabelPattern("book",	"[auth]_[year]");
+
+	/**
+	 * There's no need to set all defaults; only those that should differ
+	 * from the global default in LabelPatternUtil.DEFAULT_LABELPATTERN.
+	 */
+
+	addLabelPattern("article", "[auth]_eeee_[year]");
+	/*addLabelPattern("book",	"[auth]_[year]");
 	addLabelPattern("booklet", "[auth]_[year]");
 	addLabelPattern("conference", "[auth]_[year]");
 	addLabelPattern("inbook", "[auth]_[year]");
@@ -48,6 +54,6 @@ public class DefaultLabelPatterns extends LabelPattern{
 	addLabelPattern("phdthesis", "[auth]_[year]");
 	addLabelPattern("proceedings","[auth]_[year]");
 	addLabelPattern("techreport", "[auth]_[year]");
-	addLabelPattern("unpublished", "[auth]_[year]");
+	addLabelPattern("unpublished", "[auth]_[year]");*/
     }
 }

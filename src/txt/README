@@ -68,9 +68,11 @@ appear in your chosen languages.
 
 Change log:
 1.x:	- Added support for French language.
+	- Added customization of shortcut keys.
 	- Added customization of key generation.
 	- Improved HTML export.
 	- Added Replace string feature.	
+	- Added option in Table Preferences to set current column widths as default.
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
 	- Fixed bug that made selector words added in the dialog to be lowercased.
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.

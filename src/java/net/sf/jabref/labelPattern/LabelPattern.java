@@ -82,10 +82,8 @@ public class LabelPattern extends Hashtable{
 				_obj = parent.getValue(key);
 			}
 			if(_obj == null){
-				//TODO Throw some error
-				System.err.println("Warning: I could not find the label \'"
-						   + key + "\' and gave up");
-				return null;
+			    // Not found - return the default value
+			    return LabelPatternUtil.DEFAULT_LABELPATTERN;
 			}
 		}
 

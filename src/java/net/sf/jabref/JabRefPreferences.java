@@ -314,6 +314,12 @@ public class JabRefPreferences {
 	    // Store overridden definitions to Preferences.	    
 	    Preferences pre = Preferences.userNodeForPackage
 		(net.sf.jabref.labelPattern.LabelPattern.class);
+	    try {
+		pre.clear(); // We remove all old entries.
+	    } catch (BackingStoreException ex) {
+		Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
+	    }
+
 	    Iterator i = pattern.keySet().iterator();
 	    while (i.hasNext()) {
 		String s = (String)i.next();

@@ -3,10 +3,13 @@
  */
 package net.sf.jabref;
 
+import java.util.Iterator;
+import java.util.HashMap;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Font;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,6 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.ImageIcon;
 
 import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 
 /**
  * This is the panel for the key pattern definition tab in 'Preferences'. So far
@@ -29,6 +33,11 @@ import net.sf.jabref.labelPattern.LabelPattern;
  */
 public class TabLabelPattern extends JPanel implements PrefsTab{
 	
+    private String def = Globals.lang("Default");
+    private GridBagLayout gbl = new GridBagLayout();
+    private GridBagConstraints con = new GridBagConstraints();
+    private HashMap textFields = new HashMap();
+
 	private JabRefPreferences _prefs;
 	private LabelPattern _keypatterns;
 	
@@ -62,7 +71,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp,
 				      "Help on key patterns");
 		buildGUI();
-		fillTextfields();
+		//fillTextfields();
 	}
 
 	/**
@@ -71,14 +80,23 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 *
 	 */
 	public void storeSettings() {
-		// I'm not too frilled about doing this, but its easy :-)
-		// first we erase everything!
-		LabelPattern defKeyPattern = _keypatterns.getParent();
-		_keypatterns = new LabelPattern(defKeyPattern);
-		
-		// then we rebuild... tons of redundant data I know
-		// I originally thought of just adding changes patterns, but the
-		// checks one has to do... this is SO much faster
+	    // first we erase everything!
+	    LabelPattern defKeyPattern = _keypatterns.getParent();
+	    _keypatterns = new LabelPattern(defKeyPattern);
+	    
+	    // then we rebuild... 
+	    Iterator i=textFields.keySet().iterator();
+	    String defa = (String)LabelPatternUtil.DEFAULT_LABELPATTERN.get(0);
+	    while (i.hasNext()) {
+		String s = (String)i.next(),
+		    text = ((JTextField)textFields.get(s)).getText();
+		if (!defa.equals(text))
+		    _keypatterns.addLabelPattern(s, text);
+	    }
+
+	    _prefs.putKeyPattern(_keypatterns);
+
+		/*
 		_keypatterns.addLabelPattern("article", 			txtArticle.getText());
 		_keypatterns.addLabelPattern("book", 					txtBook.getText());
 		_keypatterns.addLabelPattern("booklet", 			txtBooklet.getText());
@@ -93,46 +111,93 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		_keypatterns.addLabelPattern("proceedings", 	txtProceedings.getText());
 		_keypatterns.addLabelPattern("techreport", 		txtTechreport.getText());
 		_keypatterns.addLabelPattern("unpublished", 	txtUnpublished.getText());
-		
-		_prefs.putKeyPattern(_keypatterns);		
+		*/		
+
 	}
 	
+    private  JTextField addEntryType(Container c, String name, int y) { 
+
+	JLabel lab = new JLabel(Util.nCase(name));
+	name = name.toLowerCase();
+	con.gridx = 0;
+	con.gridy = y;
+	con.fill = GridBagConstraints.BOTH;
+	con.weightx = 0;
+	con.weighty = 0;
+	con.anchor = GridBagConstraints.WEST;
+	con.insets = new Insets( 0,5,0,5 );
+	gbl.setConstraints( lab, con );
+	c.add( lab );
+	
+	JTextField tf = new JTextField(_keypatterns.getValue(name).get(0).toString());
+	tf.setColumns( 15 );
+	con.gridx = 1;
+	con.fill = GridBagConstraints.HORIZONTAL;
+	con.weightx = 1;
+	con.weighty = 0;
+	con.anchor = GridBagConstraints.CENTER;
+	con.insets = new Insets( 0,5,0,5 );
+	gbl.setConstraints( tf, con );
+	c.add( tf );	
+	
+	JButton but = new JButton( def );
+	con.gridx = 2;
+	con.fill = GridBagConstraints.BOTH;
+	con.weightx = 0;
+	con.weighty = 0;
+	con.anchor = GridBagConstraints.CENTER;
+	con.insets = new Insets( 0,5,0,5 );
+	gbl.setConstraints( but, con );
+	but.setActionCommand(name);
+        but.addActionListener(new buttonHandler());
+	c.add( but );		
+
+	return tf;
+    }
+
 	/**
 	 * Method to build GUI
 	 *
 	 */
 	private void buildGUI(){
-	    String def = Globals.lang("Default");
-		GridBagLayout gbl = new GridBagLayout();
-		GridBagConstraints con = new GridBagConstraints();
-		setLayout(gbl);
-		
-		// The header - can be removed
-		lblEntryType = new JLabel(Globals.lang("Entry type"));
-		Font f = new Font("plain", Font.BOLD, 12);
-		lblEntryType.setFont(f);
-		con.gridx = 0;
-		con.gridy = 0;
-		con.gridwidth = 1;
-		con.gridheight = 1;
-		con.fill = GridBagConstraints.VERTICAL;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,10,0 );
-		gbl.setConstraints( lblEntryType, con );
-		add( lblEntryType );
 
-		lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
-		lblKeyPattern.setFont(f);
-		con.gridx = 1;
-		con.gridy = 0;
-		//con.gridwidth = 2;
-		con.gridheight = 1;
-		con.fill = GridBagConstraints.BOTH;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,10,0 );
-		gbl.setConstraints( lblKeyPattern, con );
-		add( lblKeyPattern );
+
+	    // The header - can be removed
+	    lblEntryType = new JLabel(Globals.lang("Entry type"));
+	    Font f = new Font("plain", Font.BOLD, 12);
+	    lblEntryType.setFont(f);
+	    con.gridx = 0;
+	    con.gridy = 0;
+	    con.gridwidth = 1;
+	    con.gridheight = 1;
+	    con.fill = GridBagConstraints.VERTICAL;
+	    con.anchor = GridBagConstraints.WEST;
+	    con.insets = new Insets( 0,5,10,0 );
+	    gbl.setConstraints( lblEntryType, con );
+	    add( lblEntryType );
+	    
+	    lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
+	    lblKeyPattern.setFont(f);
+	    con.gridx = 1;
+	    con.gridy = 0;
+	    //con.gridwidth = 2;
+	    con.gridheight = 1;
+	    con.fill = GridBagConstraints.BOTH;
+	    con.anchor = GridBagConstraints.WEST;
+	    con.insets = new Insets( 0,5,10,0 );
+	    gbl.setConstraints( lblKeyPattern, con );
+	    add( lblKeyPattern );
+
+	    int y = 1;
+	    setLayout(gbl);
+	    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+	    while (i.hasNext()) {
+		String s = (String)i.next();
+		textFields.put(s, addEntryType(this, s, y));
+		y++;
+	    }
 		
+		/*
 		//Here's the textfields for the key pattern
 		// They're of the form: label - text field - reset button
 		// The first one is for article 
@@ -641,10 +706,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( btnUnpublishedDefault, con );
 		btnUnpublishedDefault.addActionListener(new buttonHandler());
 		add( btnUnpublishedDefault );		
-		
+		*/
 		// A help button
 		con.gridx = 1;
-		con.gridy = 15;
+		con.gridy = y;
 		con.fill = GridBagConstraints.NONE;
 		con.weightx = 0;
 		con.weighty = 0;
@@ -659,7 +724,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		// And finally a button to reset everything
 		btnDefaultAll = new JButton(Globals.lang("Reset all"));
 		con.gridx = 2;
-		con.gridy = 15;
+		con.gridy = y;
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 1;
 		con.weighty = 0;
@@ -702,9 +767,13 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 */
 	class buttonHandler implements ActionListener{
 		public void actionPerformed(ActionEvent evt){
+
+		    _keypatterns.removeLabelPattern(evt.getActionCommand());
+		    JTextField tf = (JTextField)textFields.get(evt.getActionCommand());
+		    tf.setText(_keypatterns.getValue(evt.getActionCommand()).get(0).toString());
 			// we know its a button, so casting is quite OK
-			JButton button = (JButton)evt.getSource();
-			
+			//JButton button = (JButton)evt.getSource();			
+			/*
 			// is the calling button the 'btnArticleDefault'?
 			if(button.equals(btnArticleDefault)){
 				// because of the structure or KeyPatterns with a default as a very parent
@@ -764,7 +833,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 										" in \'TabLabelPattern\' - I think a line is missing");
 			}
 			fillTextfields();
-			
+			*/
 		}
 		
 	}
