@@ -93,7 +93,7 @@ public class JabRefPreferences {
 	defaults.put("columnNames", "entrytype;author;title;year;journal;owner;bibtexkey");
 	defaults.put("columnWidths","75;280;400;60;100;100;100");
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
-	defaults.put("workingDirectory", (String)null);
+	defaults.put("workingDirectory", System.getProperty("user.home"));
 
 	defaults.put("autoOpenForm", new Boolean(true));
 	defaults.put("entryTypeFormHeightFactor", new Integer(1));

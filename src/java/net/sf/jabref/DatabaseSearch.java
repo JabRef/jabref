@@ -26,71 +26,66 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import javax.swing.* ; 
-import java.awt.* ; 
-import java.util.* ; 
+import javax.swing.* ;
+import java.awt.* ;
+import java.util.* ;
 
 public class DatabaseSearch extends Thread {
 
-    BasePanel panel = null ; 
-    BibtexDatabase thisDatabase = null ; 
-    SearchRuleSet thisRuleSet = null ; 
-	Hashtable thisSearchOptions = null ; 
-    EntryTableModel thisTableModel = null ; 
+    BasePanel panel = null ;
+    BibtexDatabase thisDatabase = null ;
+    SearchRuleSet thisRuleSet = null ;
+	Hashtable thisSearchOptions = null ;
+    EntryTableModel thisTableModel = null ;
     String searchValueField = null;
     boolean reorder;
 
-    public static String
-	SEARCH = "search",
-	GROUPSEARCH = "groupsearch";
-
-    
     public DatabaseSearch(Hashtable searchOptions,SearchRuleSet searchRules,
 			  BasePanel panel, String searchValueField,
 			  boolean reorder) {
-        this.panel = panel; 
-	thisDatabase = panel.getDatabase() ; 
-        thisTableModel = panel.getTableModel() ; 
-        thisSearchOptions = searchOptions; 
-        thisRuleSet = searchRules ; 
+        this.panel = panel;
+	thisDatabase = panel.getDatabase() ;
+        thisTableModel = panel.getTableModel() ;
+        thisSearchOptions = searchOptions;
+        thisRuleSet = searchRules ;
 	this.searchValueField = searchValueField;
 	this.reorder = reorder;
     }
 
     public void run() {
-        String searchString =  null ; 
-        Enumeration strings = thisSearchOptions.elements() ; 
-        searchString = (String) strings.nextElement() ; 
-        int searchScore = 0 ; 
+        String searchString =  null ;
+        Enumeration strings = thisSearchOptions.elements() ;
+        searchString = (String) strings.nextElement() ;
+        int searchScore = 0 ;
 
 
         BibtexEntry bes = null ;
-//        System.out.println("doing search using this regular expr: "+searchString) ; 
+//        System.out.println("doing search using this regular expr: "+searchString) ;
         // 0. for each field in the database
         int numRows = thisDatabase.getEntryCount(),
 	    hits = 0;
 
 	for(int row = 0 ; row < numRows ; row++){
 	    // 1. search all required fields using searchString
-	    
+
 	    bes = thisDatabase.getEntryById
 		(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit
-	    searchScore = thisRuleSet.applyRules(thisSearchOptions,bes) ; 
-	    // 2.1 set score to search field               
-	    bes.setField(searchValueField, String.valueOf(searchScore)) ; 
-                
+	    searchScore = thisRuleSet.applyRules(thisSearchOptions,bes) ;
+	    // 2.1 set score to search field
+            bes.setField(searchValueField, String.valueOf(searchScore)) ;
+
 	    if (searchScore > 0)
 		hits++;
 	}
-	 
+
 	if (reorder) // Float search.
 	    panel.showSearchResults(searchValueField);
 	else // Highlight search.
 	    panel.selectSearchResults();
 
-	if ((searchValueField == null) 
+	if ((searchValueField == null)
 	    || (searchValueField == Globals.SEARCH))
 	    panel.output(Globals.lang("Searched database. Global number of hits")
 			 +": "+hits);

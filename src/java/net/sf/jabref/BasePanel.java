@@ -1323,9 +1323,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
         return;
       }
       // If no entry editor is visible we must either instantiate a new preview panel or update the one we have.
-      if (!previewEnabled)
+      if (!previewEnabled) {
+        splitPane.setBottomComponent(null);
         return; // Do nothing if previews are disabled.
-
+      }
       if (previewPanel == null) {
         previewPanel = new PreviewPanel(be);
       } else
@@ -1411,9 +1412,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     public void hideEntryEditor() {
       BibtexEntry be = showing;
       showing = null;
-      if (be != null)
+      if (be != null) {
         updateWiewToSelected(be);
-
+      }
       new FocusRequester(entryTable);
 	/*splitPane.setBottomComponent(previewPanel);
         if (previewPanel != null)

@@ -259,14 +259,14 @@ class SearchManager2 extends SidePaneComponent
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions,searchRules, frame.basePanel(),
-		     DatabaseSearch.SEARCH, true);
+		     Globals.SEARCH, true);
 		search.start() ;
 	    }
 	    else if (select.isSelected()) {
 		// Highlight search.
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions,searchRules, frame.basePanel(),
-		     DatabaseSearch.SEARCH, false);
+		     Globals.SEARCH, false);
 		search.start() ;
 	    }
 
