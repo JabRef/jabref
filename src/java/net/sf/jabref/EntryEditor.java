@@ -993,7 +993,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * @param i an <code>int</code> value
      */
     public void setVisiblePanel(int i) {
-	tabbed.setSelectedIndex(i);
+	if (i < tabbed.getTabCount())
+		tabbed.setSelectedIndex(i);
+	else {
+		while (i >= tabbed.getTabCount())
+			i--;
+		tabbed.setSelectedIndex(i);
+	}
     }
 	   
     /**

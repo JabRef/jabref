@@ -8,9 +8,58 @@
     <basefont size="4" color="#2F4958" face="arial">
 
     <h1>Customizing entry types</h1>
+    <p>
+    When customizing an entry type, you both define how its entry editor should look, and what
+    it takes for JabRef to consider an entry complete. You can both make changes to the existing
+    entry types, and define new ones.
+    <p>
+    <h2>Using the entry customization dialog</h2> 
 
+In the dialog's upper left is a combo box where you can select one of
+the current entry types.  All custom types, either new types or
+redefined standard ones, are displayed with an asterisk (*) behind
+their names.
 
+<p>Selecting an entry type merely updates the dialog to show its set
+of required and optional fields, to give you a template for
+customization. You can then proceed to change both the definition and
+the name of the entry type before storing. If the name written in the
+<em>Name</em> text field is different from the selected item in the
+combo box, the <em>Name</em> field takes precedence when you click
+<em>Store</em> or <em>Delete</em>
 
-    <hr>
+<p>You can delete a customized entry type by selecting it and clicking
+the <em>Delete</em> button; if the deleted definition redefined a
+standard type, the standard definition will be restored. You are not
+allowed to delete standard entry types.
+
+<p>Note that there is no undo when creating, changing and deleting
+entry type definitions.
+
+<p>When selecting one of the standard types from the combo box, the
+syntax for defining required and optional fields should become
+obvious; the field names are simply written in your preferred order,
+separated by semicolons. Either of the <em>Required fields</em> and
+<em>Optional fields</em> text boxes can be empty, if no fields fit
+into the category. The fields listed do not have to be standard fields
+known by JabRef.
+
+<h2>Redefining standard entry types</h2>
+    
+If you store an entry definition with an identical name to one of the
+standard types, the custom type will override the standard one. You
+can use this to redefine the order in which fields appear in the editor,
+add new fields that you use, remove fields you have no interest in, and
+even move all fields into the <em>Required fields</em> panel to avoid having
+to switch when editing entries.
+
+There is one limitation to customizing entry types; certain types have
+an and/or condition in their required fields. For instance, a <em>book</em>
+entry is complete with either the <em>author</em> or the <em>editor</em>
+field, or both. This type of condition cannot be represented in a customized
+entry.
+
+If you delete a customized version of a standard entry type, the standard 
+definition will be reinstated.
   </body>
 </html>

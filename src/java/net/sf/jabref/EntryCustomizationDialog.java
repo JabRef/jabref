@@ -63,7 +63,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	// templateName will be used to put on the dialog frame
 	// create 10 default entries
 	// return an array
-	super(parent,Globals.lang("Customize entry types"),true);
+	super(parent,Globals.lang("Customize entry types"), false);
 	this.parent = parent;
 	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
 			      "Help", GUIGlobals.helpSmallIconFile);
@@ -153,8 +153,6 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     }
 
     void initialize(){
-	setModal(true);
-	//setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		
 	getContentPane().setLayout(new BorderLayout());
 	getContentPane().add( buttonPanel, BorderLayout.SOUTH);
