@@ -69,7 +69,7 @@ Change log:
 1.x:	- Added detection of duplicate entries.
 	- Added keyboard shortcut customization.
 	- Added import filter for Sixpack files.
-      	- Added option to use a standard directory for PDFs
+      	- Added option to use a standard directory for PDFs.
 	- Added menu and toolbar actions for open pdf/ps and url/doi.
 	- Added web lookup of DOI.
 	- Added several new special field markers to the key autogenerator.

@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import java.io.*;
 
 public class EntryTable extends JTable {
 
@@ -67,6 +68,7 @@ public class EntryTable extends JTable {
         antialiasing = prefs.getBoolean("antialias");
         ctrlClick = prefs.getBoolean("ctrlClick");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
+        setGridColor(GUIGlobals.gridColor);
 	setShowVerticalLines(true);
 	setShowHorizontalLines(true);
 	//setColumnSelectionAllowed(true);
@@ -76,45 +78,38 @@ public class EntryTable extends JTable {
 	DefaultCellEditor dce = new DefaultCellEditor(new JTextField());
 	dce.setClickCountToStart(2);
 	setDefaultEditor(String.class, dce);
-	getTableHeader().addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
-		    int col = getTableHeader().columnAtPoint(e.getPoint());
-		    if (col > 0) { // A valid column, but not the first.
-			String s = tableModel.getColumnName(col).toLowerCase();
-                         if (!s.equals(prefs.get("priSort")))
-                          prefs.put("priSort", s);
-                          // ... or change sort direction
-                        else prefs.putBoolean("priDescending",
-                                              !prefs.getBoolean("priDescending"));
-                        tableModel.remap();
-			repaint();
-		    }
-		}
-	    });
-	addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if ((e.getButton() == MouseEvent.BUTTON3)
-                                    || (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-                                  rightClickMenu = new RightClickMenu(panel, panel.metaData);
-                                  rightClickMenu.show(ths, e.getX(), e.getY());
-				}
-
-			}
-	    });
-	setWidths();
-	sp.getViewport().setBackground(GUIGlobals.tableBackground);
-	updateFont();
-    }
+        getTableHeader().addMouseListener(new MouseAdapter() {
+          public void mouseClicked(MouseEvent e) {
+            int col = getTableHeader().columnAtPoint(e.getPoint());
+            if (col >= tableModel.padleft) { // A valid column, but not the first.
+              String s = tableModel.getColumnName(col).toLowerCase();
+              if (!s.equals(prefs.get("priSort")))
+                prefs.put("priSort", s);
+                // ... or change sort direction
+              else prefs.putBoolean("priDescending",
+                                    !prefs.getBoolean("priDescending"));
+              tableModel.remap();
+              repaint();
+            }
+          }
+        });
+        addMouseListener(new TableClickListener()); // Add the listener that responds to clicks on the table.
+        setWidths();
+        sp.getViewport().setBackground(GUIGlobals.tableBackground);
+        updateFont();
+      }
 
     public void setWidths() {
 	// Setting column widths:
         int ncWidth = prefs.getInt("numberColWidth");
 	String[] widths = prefs.getStringArray("columnWidths");
         TableColumnModel cm = getColumnModel();
-	cm.getColumn(0).setPreferredWidth(ncWidth);
-	for (int i=1; i<getModel().getColumnCount(); i++) {
+        cm.getColumn(0).setPreferredWidth(ncWidth);
+        for (int i=1; i<tableModel.padleft; i++)
+          cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+	for (int i=tableModel.padleft; i<getModel().getColumnCount(); i++) {
 	    try {
-		cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i-1]));
+		cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i-tableModel.padleft]));
 	    } catch (Throwable ex) {
 		Globals.logger("Exception while setting column widths. Choosing default.");
 		cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
@@ -137,17 +132,79 @@ public class EntryTable extends JTable {
 	rightClickMenu = rcm;
     }
 
+  /**
+   * This class handles clicks on the EntryTable that should trigger specific
+   * events, like opening an entry editor, the context menu or a pdf file.
+   */
+  class TableClickListener extends MouseAdapter {
+      public void mouseClicked(MouseEvent e) {
+
+        // First find the column on which the user has clicked.
+        int col = columnAtPoint(e.getPoint());
+
+	// A double click on an entry should open the entry's editor.
+        if ((col == 0) && (e.getClickCount() == 2)) {
+          try{ panel.runCommand("edit");
+          } catch (Throwable ex) {
+            ex.printStackTrace();
+          }
+        }
+
+        // Check if the user has right-clicked. If so, open the right-click menu.
+        if ( (e.getButton() == MouseEvent.BUTTON3) ||
+             (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+          rightClickMenu = new RightClickMenu(panel, panel.metaData);
+          rightClickMenu.show(ths, e.getX(), e.getY());
+        }
+
+        // Check if the user has clicked on an icon cell to open url or pdf.
+        if (tableModel.getCellStatus(0, col) == EntryTableModel.ICON_COL) {
+          // Get the row number also:
+          final int row = rowAtPoint(e.getPoint());
+          if (getValueAt(row, col) == null) return; // No icon here, so we do nothing.
+
+          // Get the icon type. Corresponds to the field name.
+          final String iconType = tableModel.getIconTypeForColumn(col);
+
+          // Open it now. We do this in a thread, so the program won't freeze during the wait.
+          (new Thread() {
+            public void run() {
+              panel.output(Globals.lang("External viewer called") + ".");
+              BibtexEntry be = panel.database().getEntryById(tableModel.
+                  getNameFromNumber(row));
+              if (be == null) {
+                Globals.logger("Error: could not find entry.");
+                return;
+              }
+
+              Object link = be.getField(iconType);
+              if (iconType == null) {
+                Globals.logger("Error: no link to " + iconType + ".");
+                return; // There is an icon, but the field is not set.
+              }
+
+              try {
+                Util.openExternalViewer( (String) link, iconType, prefs);
+              }
+              catch (IOException ex) {}
+            }
+
+          }).start();
+        }
+      }
+    }
+
     public TableCellRenderer getCellRenderer(int row, int column) {
 	// This method asks the table model whether the given cell represents a
 	// required or optional field, and returns the appropriate renderer.
 	int score = -3;
-	Renderer renderer;
+	TableCellRenderer renderer;
 
 	int status;
 	try { // This try clause is here to contain a bug.
-	    status = tableModel.getCellStatus(row, column);
+          status = tableModel.getCellStatus(row, column);
 	} catch (ArrayIndexOutOfBoundsException ex) {
-	    Globals.logger("Error happened in getCellRenderer method of EntryTable.");
+	    Globals.logger("Error happened in getCellRenderer method of EntryTable, for cell ("+row+","+column+").");
 	    return defRenderer; // This should not occur.
 	}
 
@@ -174,6 +231,7 @@ public class EntryTable extends JTable {
 	    renderer = defRenderer;
 	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
+
 	    if (tableModel.isComplete(row))
 		renderer = defRenderer;
 	    else {
@@ -184,13 +242,14 @@ public class EntryTable extends JTable {
 	    }
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
-
+        else if (status == EntryTableModel.ICON_COL)
+          renderer = iconRenderer;
 	else if (status == EntryTableModel.REQUIRED)
 	    renderer = reqRenderer;
 	else if (status == EntryTableModel.OPTIONAL)
 	    renderer = optRenderer;
 	else renderer = defRenderer;
-
+        //Util.pr("("+row+","+column+"). "+status+" "+renderer.toString());
 	return renderer;
 
 	/*
@@ -245,7 +304,6 @@ public class EntryTable extends JTable {
 	    super();
 	    setBackground(c);
 
-
 	    /*
 	    darker = new DefaultTableCellRenderer();
 	    double adj = 0.9;
@@ -282,6 +340,21 @@ public class EntryTable extends JTable {
 
 	//public DefaultTableCellRenderer darker() { return darker; }
     }
+
+    public TableCellRenderer iconRenderer = new IconCellRenderer();
+    class IconCellRenderer extends DefaultTableCellRenderer {
+        protected void setValue(Object value) {
+            if (value instanceof Icon) {
+                setIcon((Icon)value);
+                super.setValue(null);
+            } else {
+                setIcon(null);
+                super.setValue(value);
+            }
+        }
+    }
+
+
 
     public void ensureVisible(int row) {
 	JScrollBar vert = sp.getVerticalScrollBar();

@@ -36,6 +36,7 @@ import java.awt.*;
 import javax.swing.KeyStroke;
 import java.util.*;
 import java.net.URL;
+import javax.swing.*;
 
 public class GUIGlobals {
 
@@ -101,6 +102,17 @@ public class GUIGlobals {
       ex = imageSize + extension,
       pre = "/images/",
       helpPre = "/help/";
+
+    static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
+    // further below.
+
+    public static ImageIcon getTableIcon(String fieldType) {
+	Object o = tableIcons.get(fieldType);
+	if (o == null) {
+	    Globals.logger("Error: no table icon defined for type '"+fieldType+"'.");
+	    return null;
+	} else return (ImageIcon)o;
+    }
 
 /*    public static URL
     //appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
@@ -193,6 +205,7 @@ public class GUIGlobals {
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
+      pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");
 
@@ -296,6 +309,7 @@ public class GUIGlobals {
 
 // Colors.
   public static Color
+      gridColor = new Color(210, 210, 210),
       lightGray = new Color(230, 230, 230), // Light gray background
       nullFieldColor = new Color(100, 100, 150), // Empty field, blue.
       validFieldColor = new Color(75, 130, 75), // Valid field, green.
@@ -435,7 +449,8 @@ public class GUIGlobals {
       LINE_LENGTH = 65; // Maximum
 
   public static int DEFAULT_FIELD_LENGTH = 100,
-      NUMBER_COL_LENGTH = 32;
+      NUMBER_COL_LENGTH = 32,
+      WIDTH_ICON_COL = 20;
   public static final Map FIELD_WEIGHT;
   public static final Map FIELD_EXTRAS, LANGUAGES;
   public static Map fieldLength = new HashMap();
@@ -456,6 +471,9 @@ public class GUIGlobals {
     FIELD_EXTRAS.put("url", "external");
     FIELD_EXTRAS.put("doi", "external");
     //FIELD_EXTRAS.put("keywords", "selector");
+
+    tableIcons.put("pdf", new ImageIcon(pdfIcon));
+    tableIcons.put("url", new ImageIcon(wwwIcon));
 
     fieldLength.put("author", new Integer(280));
     fieldLength.put("editor", new Integer(280));

@@ -41,8 +41,7 @@ import java.awt.datatransfer.*;
 import javax.swing.undo.*;
 import net.sf.jabref.groups.GroupSelector;
 
-public class BasePanel extends JSplitPane implements MouseListener,
-						     ClipboardOwner {
+public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     BasePanel ths = this;
     JSplitPane splitPane;
@@ -1101,7 +1100,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
     public void setupTable() {
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, ths, frame.prefs);
-	entryTable.addMouseListener(this);
 	entryTable.getActionMap().put("cut", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    try { runCommand("cut");
@@ -1628,22 +1626,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    markChangedOrUnChanged();
 	}
     }
-
-    public void mouseClicked(MouseEvent e) {
-	// Intercepts mouse clicks from the JTable showing the base contents.
-	// A double click on an entry should open the entry's editor.
-	if (e.getClickCount() == 2) {
-	    try{ runCommand("edit");
-	    } catch (Throwable ex) {
-		ex.printStackTrace();
-	    }
-	}
-    }
-
-    public void mouseEntered(MouseEvent e) {}
-    public void mouseExited(MouseEvent e) {}
-    public void mousePressed(MouseEvent e) {}
-    public void mouseReleased(MouseEvent e) {}
 
     // Method pertaining to the ClipboardOwner interface.
     public void lostOwnership(Clipboard clipboard, Transferable contents) {}
