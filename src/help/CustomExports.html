@@ -99,6 +99,7 @@ which will be copied directly to the output.
   with their XML representations.
 <li><code>CreateDocBookAuthors</code> : formats the author field in DocBook style.
 <li><code>AuthorFirstFirst</code> : formats author/editor fields with the first names first.
+<li><code>AuthorFirstFirstCommas</code> : formats author/editor fields with the first names first, and deliminated by commas.
 <li><code>AuthorLastFirst</code> : formats author/editor fields with the last names first.
 <li><code>FormatPagesForHTML</code> : replaces "--" with "-".
   <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
@@ -134,6 +135,18 @@ only if the field referred in the curly braces is defined for the ently being ex
 
 <p><b>Note:</b> Use of the <code>\begin</code> and <code>\end</code> commands is a key to creating
   layout files that work well with a variety of entry types.
+
+<H3>Grouped output</H3>
+
+If you wish to separate your entries into groups based on a certain field, use the grouped output commands.
+Grouped output is very similar to conditional output, except that the text in between is printed only if the
+field referred in the curly braces has changed value.
+
+<p>For example, let's assume I wish to group by keyword.  Before exporting the file, make sure you have sorted
+your entries based on keyword.  Now use the following commands to group by keyword:
+
+<p><code>\begingroup{keywords}New Category: \format[HTMLChars]{\keywords}
+<br>	\endgroup{keywords}</code>
 
 <H2>Sharing your work</H2>
 

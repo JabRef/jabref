@@ -78,7 +78,7 @@ public class Layout
                 if (blockStart.equals(si.s))
                 {
                     blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries, classPrefix);
+                    le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
                     tmpEntries.add(le);
                     blockEntries = null;
                 }
@@ -87,6 +87,25 @@ public class Layout
                     System.err.println(
                         "Nested field entries are not implemented !!!");
                 }
+            }
+            else if (si.i == LayoutHelper.IS_GROUP_START)
+            {
+                blockEntries = new Vector();
+                blockStart = si.s;
+            }
+            else if (si.i == LayoutHelper.IS_GROUP_END)
+            {
+                if (blockStart.equals(si.s))
+                {
+                    blockEntries.add(si);
+                    le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                    tmpEntries.add(le);
+                    blockEntries = null;
+                } else
+                {
+                    System.err.println(
+                    "Nested field entries are not implemented !!!");                    
+                }                
             }
             else if (si.i == LayoutHelper.IS_OPTION_FIELD)
             {

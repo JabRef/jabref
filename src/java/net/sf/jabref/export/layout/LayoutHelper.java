@@ -53,7 +53,10 @@ public class LayoutHelper
     public static final int IS_FIELD_START = 3;
     public static final int IS_FIELD_END = 4;
     public static final int IS_OPTION_FIELD = 5;
-
+    public static final int IS_GROUP_START = 6;
+    public static final int IS_GROUP_END = 7;
+    private static String currentGroup = null;
+    
     //~ Instance fields ////////////////////////////////////////////////////////
 
     //public static final int IS_OPTION_FIELD_PARAM = 6;
@@ -89,7 +92,8 @@ public class LayoutHelper
             si = (StringInt) parsedEntries.get(i);
 
             if ((si.i == IS_SIMPLE_FIELD) || (si.i == IS_FIELD_START) ||
-                    (si.i == IS_FIELD_END))
+                    (si.i == IS_FIELD_END) || (si.i == IS_GROUP_START) ||
+                    (si.i == IS_GROUP_END))
             {
                 si.s = si.s.trim().toLowerCase();
             }
@@ -100,6 +104,15 @@ public class LayoutHelper
         return layout;
     }
 
+    
+    public static String getCurrentGroup() {
+        return currentGroup;
+    }
+    
+    public static void setCurrentGroup(String newGroup) {
+        currentGroup = newGroup;
+    }
+    
     /**
      *
      */
@@ -378,6 +391,12 @@ public class LayoutHelper
 
                         return;
                     }
+                    else if (name.equalsIgnoreCase("begingroup"))
+                    {
+                        // get field name
+                        getBracketedField(IS_GROUP_START);
+                        return;                    
+                    }
                 }
                 else if (name.charAt(0) == 'f')
                 {
@@ -406,11 +425,16 @@ public class LayoutHelper
                     {
                         // get field name
                         getBracketedField(IS_FIELD_END);
-
+                        
                         return;
                     }
+                    else if (name.equalsIgnoreCase("endgroup"))
+                    {
+                        // get field name
+                        getBracketedField(IS_GROUP_END);                        
+                    }                                        
                 }
-
+                
                 // for all other cases
                 parsedEntries.add(new StringInt(name, IS_SIMPLE_FIELD));
 

@@ -100,8 +100,8 @@ public class LayoutEntry
         //		{
         //		}
     }
-
-    public LayoutEntry(Vector parsedEntries, String classPrefix_) throws Exception
+   
+    public LayoutEntry(Vector parsedEntries, String classPrefix_, int layoutType) throws Exception
     {
       classPrefix = classPrefix_;
         String blockStart = null;
@@ -120,7 +120,7 @@ public class LayoutEntry
             System.err.println("Field start and end entry must be equal.");
         }
 
-        type = LayoutHelper.IS_FIELD_START;
+        type = layoutType;
         text = si.s;
 
         for (int i = 1; i < (parsedEntries.size() - 1); i++)
@@ -134,17 +134,22 @@ public class LayoutEntry
             else if (si.i == LayoutHelper.IS_SIMPLE_FIELD)
             {
             }
-            else if (si.i == LayoutHelper.IS_FIELD_START)
+            else if ((si.i == LayoutHelper.IS_FIELD_START) ||
+                    	(si.i == LayoutHelper.IS_GROUP_START))
             {
                 blockEntries = new Vector();
                 blockStart = si.s;
             }
-            else if (si.i == LayoutHelper.IS_FIELD_END)
+            else if ((si.i == LayoutHelper.IS_FIELD_END) ||
+                    	(si.i == LayoutHelper.IS_GROUP_END))
             {
                 if (blockStart.equals(si.s))
                 {
                     blockEntries.add(si);
-                    le = new LayoutEntry(blockEntries, classPrefix);
+                    if (si.i == LayoutHelper.IS_GROUP_END)
+                    	le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                    else
+                    	le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);                        
                     tmpEntries.add(le);
                     blockEntries = null;
                 }
@@ -181,7 +186,7 @@ public class LayoutEntry
             //System.out.println(layoutEntries[i].text);
         }
     }
-
+    
     //~ Methods ////////////////////////////////////////////////////////////////
 
     public String doLayout(BibtexEntry bibtex)
@@ -208,16 +213,21 @@ public class LayoutEntry
                 return field;
             }
         }
-        else if (type == LayoutHelper.IS_FIELD_START)
+        else if ((type == LayoutHelper.IS_FIELD_START) ||
+                	(type == LayoutHelper.IS_GROUP_START))
         {
             String field = (String) bibtex.getField(text);
 
-            if (field == null)
+            if ((field == null) || ((type == LayoutHelper.IS_GROUP_START) &&
+                    					(field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))))
             {
                 return null;
             }
             else
             {
+                if (type == LayoutHelper.IS_GROUP_START) {
+                    LayoutHelper.setCurrentGroup(field);
+                }
                 StringBuffer sb = new StringBuffer(100);
                 String fieldText;
                 boolean previousSkipped = false;
@@ -274,7 +284,7 @@ public class LayoutEntry
                 return sb.toString();
             }
         }
-        else if (type == LayoutHelper.IS_FIELD_END)
+        else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END))
         {
         }
         else if (type == LayoutHelper.IS_OPTION_FIELD)

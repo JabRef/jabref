@@ -92,6 +92,14 @@ public class ImportFormatReader
       return fixed;
     }
 
+    //========================================================
+    // rearranges the author names
+    // input format string: LN, FN [and LN, FN]*
+    // output format string: FN LN [, FN LN]+ [and FN LN]
+    //========================================================    
+    public static String fixAuthor_commas(String in) {
+        return(fixAuthor(in, false));        
+    }
 
     //========================================================
     // rearranges the author names
@@ -99,12 +107,22 @@ public class ImportFormatReader
     // output format string: FN LN [and FN LN]*
     //========================================================
 
-    public static String fixAuthor(String in){
+    public static String fixAuthor(String in) {
+        return(fixAuthor(in, true));
+    }
+    
+    public static String fixAuthor(String in, boolean includeAnds){
 
       // Check if we have cached this particular name string before:
-      Object old = Globals.nameCache.get(in);
-      if (old != null)
-        return (String)old;
+      if (includeAnds) {
+          Object old = Globals.nameCache.get(in);
+          if (old != null)
+              return (String)old;
+      } else {
+          Object old = Globals.nameCache_commas.get(in);
+          if (old != null)
+              return (String)old;          
+      }
 
 	//Util.pr("firstnamefirst");
 	StringBuffer sb=new StringBuffer();
@@ -114,10 +132,19 @@ public class ImportFormatReader
 	for(int i=0; i<authors.length; i++){
 	    String[] t = authors[i].split(",");
 	    if(t.length < 2)
-		return in; // something went wrong or there is no ","
-	    sb.append( t[1].trim() + " " + t[0].trim());
-	    if(i != authors.length-1 ) // put back the " and "
-		sb.append(" and ");
+	        // there is no comma, assume we have FN LN order
+	     sb.append(authors[i].trim());
+	    else
+	        sb.append( t[1].trim() + " " + t[0].trim());
+	    if (includeAnds) {
+	        if(i != authors.length-1 ) // put back the " and "
+	            sb.append(" and ");
+	    } else {
+	        if (i == authors.length - 2)
+	            sb.append(" and ");
+	        else if (i != (authors.length - 1))
+	            sb.append(", ");
+	    }
 	}
 
         String fixed = sb.toString();

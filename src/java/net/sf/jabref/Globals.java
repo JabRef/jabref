@@ -67,6 +67,7 @@ public class Globals {
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
   public static NameCache nameCache_lastFirst = new NameCache(1000);
+  public static NameCache nameCache_commas = new NameCache(1000);
   public static NameCache nameCache = new NameCache(1000);
 
   public static String osName = System.getProperty("os.name", "def");
