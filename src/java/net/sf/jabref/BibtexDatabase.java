@@ -174,7 +174,9 @@ public class BibtexDatabase
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
 	if (!_entries.containsKey(id)) return false; // Entry doesn't exist!
 	BibtexEntry entry = getEntryById(id);
+	String oldKey = entry.getCiteKey();
 	entry.setField(Globals.KEY_FIELD, key);
+	removeKeyFromSet(oldKey);
 	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
 

@@ -203,8 +203,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	
 	im.put(GUIGlobals.exitDialog, "close");
 	am.put("close", closeAction);
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.storeFieldKey), "store");
-	am.put("copyKey", copyKeyAction);
+	im.put(prefs.getKey("Entry editor: store field"), "store");
+	am.put("store", storeFieldAction);
 	im.put(GUIGlobals.generateKeyStroke, "generateKey");
 	am.put("generateKey", generateKeyAction);
 	im.put(prefs.getKey("Entry editor: previous panel"), "left");
@@ -471,7 +471,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	ActionMap am = ta.getActionMap();
 	//im.put(KeyStroke.getKeyStroke(GUIGlobals.closeKey), "close");
 	//am.put("close", closeAction);
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.storeFieldKey), "store");
+	im.put(prefs.getKey("Entry editor: store field"), "store");
 	am.put("store", storeFieldAction);
 	im.put(GUIGlobals.switchPanelLeft, "left");
 	am.put("left", switchLeftAction);
@@ -656,7 +656,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    putValue(SHORT_DESCRIPTION, "Store field value");
 	}
 	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() instanceof FieldEditor) {
+	    if (e.getSource() instanceof FieldTextArea) {
 		String toSet = null, fieldName = null;
 		FieldEditor fe = (FieldEditor)e.getSource();
 		boolean set;
@@ -715,6 +715,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    fe.setLabelColor(GUIGlobals.invalidFieldColor);
 		    fe.setBackground(GUIGlobals.invalidFieldBackground);		
 		    }*/
+
 		else {
 		    // set == false
 		    // We set the field and label color.
@@ -723,7 +724,37 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 				     GUIGlobals.nullFieldColor :
 				     GUIGlobals.validFieldColor);
 		}
-			    
+	    }
+	    else if (e.getSource() instanceof FieldTextField) {
+		// Storage from bibtex key field.
+		FieldTextField fe = (FieldTextField)e.getSource();
+		String oldValue = entry.getCiteKey(),
+		    newValue = fe.getText();
+		if (((oldValue == null) && (newValue == null)) ||
+		    ((oldValue != null) && (newValue != null) 
+		     && oldValue.equals(newValue)))
+		    return; // No change.
+		boolean isDuplicate = panel.database.setCiteKeyForEntry
+		    (entry.getId(), newValue);
+		
+		if (isDuplicate)
+		    panel.output("Warning: bibtexkey is already used!");
+
+		// Add an UndoableKeyChange to the baseframe's undoManager.
+		panel.undoManager.addEdit
+		    (new UndoableKeyChange(panel.database, entry.getId(),
+					   oldValue, newValue));
+
+		if ((newValue != null) && (newValue.length() > 0)) {
+		    fe.setLabelColor(GUIGlobals.validFieldColor);
+		    fe.setBackground(GUIGlobals.validFieldBackground);
+		} else {
+		    fe.setLabelColor(GUIGlobals.nullFieldColor);
+		    fe.setBackground(GUIGlobals.validFieldBackground);
+		}		
+		panel.refreshTable();
+		panel.markBaseChanged();
+			    			    
 	    } else if ((source.isEditable()) 
 		       && (source.getText() != lastSourceStringAccepted)) {
 		// Store edited bibtex code.

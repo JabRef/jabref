@@ -306,7 +306,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Entry editor: previous panel", "ctrl shift LEFT");
 	defKeyBinds.put("Entry editor: next entry", "ctrl shift DOWN");
 	defKeyBinds.put("Entry editor: previous entry", "ctrl shift UP");
-
+	defKeyBinds.put("Entry editor: store field", "alt S");
     }
 
     private String getNextUnit(Reader data) throws IOException {
