@@ -357,8 +357,17 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		int width = colMod.getColumn(i).getWidth();
 		//Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
 		//Util.pr("-"+name);
-		if ((i < tableRows.size()) && (((String)colSetup.getValueAt(i-1, 0)).toLowerCase()).equals(name))
+		if ((i <= tableRows.size()) && (((String)colSetup.getValueAt(i-1, 0)).toLowerCase()).equals(name))
 		    colSetup.setValueAt(""+width, i-1, 1);
+		else { // Doesn't match; search for a matching col in our table
+		    for (int j=0; j<colSetup.getRowCount(); j++) {
+			if ((j < tableRows.size()) && 
+			    (((String)colSetup.getValueAt(j, 0)).toLowerCase()).equals(name)) {
+			    colSetup.setValueAt(""+width, j, 1);
+			    break;
+			}
+		    }
+		}
 	    } catch (Throwable ex) {
 		ex.printStackTrace();
 	    }
