@@ -109,7 +109,7 @@ public class JabRefFrame
   // for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
-  JToggleButton groupToggle, searchToggle;
+  public JToggleButton groupToggle, searchToggle;
 
   AbstractAction
       open = new OpenDatabaseAction(),
@@ -271,32 +271,7 @@ public class JabRefFrame
 
   public JabRefFrame() {
     init();
-
-    // If the option is enabled, open the last edited databases, if any.
-    if (prefs.getBoolean("openLastEdited")
-        && (prefs.get("lastEdited") != null)) {
-
-      // How to handle errors in the databases to open?
-      String[] names = prefs.getStringArray("lastEdited");
-      for (int i = 0; i < names.length; i++) {
-        fileToOpen = new File(names[i]);
-        if (fileToOpen.exists()) {
-          //Util.pr("Opening last edited file:"
-          //+fileToOpen.getName());
-          openDatabaseAction.openIt(i == 0);
-        }
-      }
-      output(Globals.lang("Files opened") + ": " + tabbedPane.getTabCount());
-    }
-    //setVisible(true);
-    if (tabbedPane.getTabCount() > 0) {
-      tabbedPane.setSelectedIndex(0);
-      new FocusRequester( ( (BasePanel) tabbedPane.getComponentAt(0))
-                         .entryTable);
-    }
-    else {
-      setEmptyState();
-    }
+    setEmptyState();
   }
 
   private void init() {
@@ -1366,7 +1341,7 @@ public JabRefPreferences prefs() {
 
         }
         catch (Throwable ex) {
-            ex.printStackTrace();
+          //  ex.printStackTrace();
           JOptionPane.showMessageDialog
               (ths, ex.getMessage(),
                Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);

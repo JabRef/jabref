@@ -196,13 +196,15 @@ public class JabRef {
 	//String osName = System.getProperty("os.name", "def");
         if (Globals.ON_WIN) {
           try {
-            UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+            //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
+            UIManager.setLookAndFeel(new com.jgoodies.plaf.windows.ExtWindowsLookAndFeel());
           } catch (UnsupportedLookAndFeelException ex) {}
         }
 	else if (!Globals.ON_MAC) {
            try {
             //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
             LookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
+
             //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
             //LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
             //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
@@ -414,6 +416,29 @@ public class JabRef {
       //openGui = false;
      if (!graphicFailure && !disableGui.isInvoked()) {
 
+       // If the option is enabled, open the last edited databases, if any.
+       if (prefs.getBoolean("openLastEdited")
+           && (prefs.get("lastEdited") != null)) {
+
+         // How to handle errors in the databases to open?
+         String[] names = prefs.getStringArray("lastEdited");
+         lastEdLoop: for (int i = 0; i < names.length; i++) {
+           File fileToOpen = new File(names[i]);
+           for (int j=0; j<loaded.size(); j++) {
+             ParserResult pr = (ParserResult)loaded.elementAt(j);
+             if (pr.getFile().equals(fileToOpen))
+               continue lastEdLoop;
+           }
+           if (fileToOpen.exists()) {
+             ParserResult pr = openBibFile(names[i]);
+             if (pr != null)
+               loaded.add(pr);
+           }
+         }
+       }
+
+
+
        GUIGlobals.init();
        GUIGlobals.CURRENTFONT = new Font
            (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
@@ -436,6 +461,12 @@ public class JabRef {
 
        ss.dispose();
        jrf.setVisible(true);
+       if (loaded.size() > 0) {
+         jrf.tabbedPane.setSelectedIndex(0);
+         new FocusRequester( ( (BasePanel) jrf.tabbedPane.getComponentAt(0))
+                             .entryTable);
+    }
+
      } else System.exit(0);
 
    }

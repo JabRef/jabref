@@ -652,7 +652,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                               output(Globals.lang("Please define BibTeX key first"));
                             else {
                               toSend.append("}');]\"");
-                              Util.pr(toSend.toString());
                               Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
                               output(
                                   Globals.lang("Pushed the citations for the following rows to")+"WinEdt: " +
@@ -663,7 +662,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                           catch (IOException excep) {
                             output(Globals.lang("Error")+": "+Globals.lang("Could not call executable")+" '"
                                    +winEdt+"'.");
-                            excep.printStackTrace();
+                            //excep.printStackTrace();
                           }
                         }
                       };
@@ -731,10 +730,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	actions.put("search", new BaseAction() {
 		public void action() {
-		    sidePaneManager.togglePanel("search");
-                    boolean on = sidePaneManager.isPanelVisible("search");
-                    frame.searchToggle.setSelected(on);
-                    if (on)
+		    //sidePaneManager.togglePanel("search");
+                    sidePaneManager.ensureVisible("search");
+                    //boolean on = sidePaneManager.isPanelVisible("search");
+                    frame.searchToggle.setSelected(true);
+                    if (true)
                       searchManager.startSearch();
 		}
 	    });

@@ -420,6 +420,7 @@ settings.add(select);
 
     public void componentClosing() {
 	BasePanel bp = frame.basePanel();
+        frame.searchToggle.setSelected(false);
 	if (bp != null)
 	    bp.stopShowingSearchResults();
     }

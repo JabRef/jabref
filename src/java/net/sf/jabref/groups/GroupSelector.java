@@ -453,6 +453,7 @@ public class GroupSelector
 
   public void componentClosing() {
     panel.stopShowingGroup();
+    frame.groupToggle.setSelected(false);
   }
 
   AbstractAction modifyAction = new AbstractAction(Globals.lang("Modify")) {
