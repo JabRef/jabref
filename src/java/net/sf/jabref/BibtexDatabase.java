@@ -36,12 +36,12 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
-
+import java.beans.*;
 import java.util.*;
+
 import javax.swing.JOptionPane;
+
+import net.sf.jabref.groups.GroupSelector;
 
 public class BibtexDatabase
 {
@@ -169,6 +169,18 @@ public class BibtexDatabase
       }
       return back ;
     }
+    
+    public synchronized BibtexEntry[] getEntriesByKey(String key) {
+        Vector entries = new Vector();
+        BibtexEntry entry;
+        for (Iterator it = _entries.entrySet().iterator(); it.hasNext(); ) {
+            entry = (BibtexEntry)((Map.Entry)it.next()).getValue();
+            if (key.equals(entry.getCiteKey()))
+                entries.add(entry);
+        }
+        BibtexEntry[] entryArray = new BibtexEntry[entries.size()];
+        return (BibtexEntry[]) entries.toArray(entryArray);
+    }    
 
     /**
      * Inserts the entry, given that its ID is not already in use.
@@ -460,5 +472,4 @@ public class BibtexDatabase
             Util.updateCompletersForEntry(autoCompleters, be);
         }
         }*/
-
 }
