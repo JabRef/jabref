@@ -32,7 +32,14 @@ import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Iterator;
 import java.util.Hashtable;
+import java.util.HashSet;
 
+/**
+ * Describe class <code>Util</code> here.
+ *
+ * @author <a href="mailto:"></a>
+ * @version 1.0
+ */
 public class Util {
 
     // Colors are defined here.
@@ -227,6 +234,31 @@ public class Util {
         return out.toString();
      }
 
+
+    /**
+     * Returns a HashMap containing all words used in the database in the
+     * given field type. Characters in @param remove are not included.
+     * @param db a <code>BibtexDatabase</code> value
+     * @param field a <code>String</code> value
+     * @param remove a <code>String</code> value
+     * @return a <code>HashSet</code> value
+     */
+    public static HashSet findAllWordsInField(BibtexDatabase db,
+					      String field, String remove) {
+	HashSet res = new HashSet();
+	StringTokenizer tok;
+	Iterator i = db.getKeySet().iterator();
+	while (i.hasNext()) {
+	    BibtexEntry be = db.getEntryById(i.next().toString());
+	    Object o = be.getField(field);
+	    if (o != null) {
+		tok = new StringTokenizer(o.toString(), remove, false);
+		while (tok.hasMoreTokens())
+		    res.add(tok.nextToken());
+	    }
+	}
+	return res;
+    }
 
 
     /**

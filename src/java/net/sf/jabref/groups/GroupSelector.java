@@ -48,7 +48,10 @@ public class GroupSelector extends SidePaneComponent
 	helpButton = new JButton
 	(new ImageIcon(GUIGlobals.helpSmallIconFile)),
 	refresh = new JButton
-    	(new ImageIcon(GUIGlobals.refreshSmallIconFile));
+    	(new ImageIcon(GUIGlobals.refreshSmallIconFile)),
+	autoGroup = new JButton
+    	(new ImageIcon(GUIGlobals.autoGroupIcon));
+
 
     Color bgColor = Color.white;
     JList list;
@@ -92,24 +95,29 @@ public class GroupSelector extends SidePaneComponent
 	    // in trouble, so we must remove one or two elements.
 	}
 
-	Dimension butDim = new Dimension(24, 24);
+	Dimension butDim = new Dimension(20, 20);
 	newButton.setPreferredSize(butDim);
 	newButton.setMinimumSize(butDim);
 	refresh.setPreferredSize(butDim);
 	refresh.setMinimumSize(butDim);
 	helpButton.setPreferredSize(butDim);
 	helpButton.setMinimumSize(butDim);
+	autoGroup.setPreferredSize(butDim);
+	autoGroup.setMinimumSize(butDim);
+
 
 	newButton.addActionListener(this);
 	refresh.addActionListener(this);
 	andCb.addActionListener(this);
 	orCb.addActionListener(this);
+	autoGroup.addActionListener(this);
 	newButton.setToolTipText("New group");
 	refresh.setToolTipText("Refresh view");
 	andCb.setToolTipText("Display only entries belonging to all selected"
 			     +" groups.");
 	orCb.setToolTipText("Display all entries belonging to one or more "
 			    +"of the selected groups.");
+	autoGroup.setToolTipText("Automatically create groups for database.");
 	bgr.add(andCb);
 	bgr.add(orCb);
 
@@ -127,6 +135,8 @@ public class GroupSelector extends SidePaneComponent
 	add(newButton);
 	gbl.setConstraints(refresh, con);
 	add(refresh);
+	gbl.setConstraints(autoGroup, con);
+	add(autoGroup);
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	HelpAction helpAction = new HelpAction(frame.helpDiag,
@@ -311,6 +321,17 @@ public class GroupSelector extends SidePaneComponent
 	    }
 	    
 	}
+
+	if (e.getSource() == autoGroup) {
+	    AutoGroupDialog gd = new AutoGroupDialog
+		(frame, panel, this, groups,
+		 prefs.get("groupsDefaultField"), ".,");
+	    gd.show();	    
+	    if (gd.okPressed()) {
+
+	    }
+	}
+
 	else if (e.getSource() instanceof JCheckBox) {
 	    valueChanged(new ListSelectionEvent(list, 1, 2, false));
 	}

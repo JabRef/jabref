@@ -36,6 +36,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     private boolean addition;
     private String name, regexp, field;
     private GroupSelector gs;
+    private boolean revalidate = true;
 
     public UndoableAddOrRemoveGroup
 	(GroupSelector gs, Vector groups, int index, boolean addition,
@@ -69,6 +70,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     }
 
     private void doOperation(boolean add) {
+	//System.out.println(name);
+	
 	if (add) {
 	    groups.add(index, regexp);
 	    groups.add(index, name);
@@ -77,7 +80,18 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 	    for (int i=0; i<GroupSelector.DIM; i++)
 		groups.removeElementAt(index);
 	}
-	gs.revalidateList();
+
+	if (revalidate)
+	    gs.revalidateList();
     }
 
+    /**
+     * Call this method to decide if the group list should be immediately
+     * revalidated by this operation. Default is true.
+     *
+     * @param val a <code>boolean</code> value
+     */
+    public void setRevalidate(boolean val) {
+	revalidate = val;
+    }
 }

@@ -124,7 +124,8 @@ public class GUIGlobals {
 	newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
 	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste.gif"),
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
-	searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif");
+	searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif"),
+	autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif");
 	
     // Help files (in HTML format):
     public static URL

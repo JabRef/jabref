@@ -900,8 +900,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		return tableModel ; 
     }
 
-    protected BibtexDatabase getDatabase(){
-		return database ; 
+    public BibtexDatabase getDatabase(){
+	return database ; 
     }
 
     public void entryTypeFormClosing(String id) {
