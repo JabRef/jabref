@@ -237,7 +237,11 @@
         <jarbundler dir="${build.lib}"
                     name="JabRef"
                     mainclass="net.sf.jabref.JabRef"
-                    jars="${build.lib}/jabref.jar" />
+                    jars="${build.lib}/jabref.jar" 
+		    icon="${images.dir}/JabRef-Logo.icns"
+		    version="1.6"
+		    jvmversion="1.4+"
+		  stubfile="${library.directory}/JavaApplicationStub" />
 		    
 	</target>
 

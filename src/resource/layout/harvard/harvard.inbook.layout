@@ -1,13 +1,13 @@
 \begin{author}
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author}
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author}
 \end{author}
  (\year), 
-}{\\i \format[RemoveBrackets]{\title}}{
+}{\\i \format[RTFChars,RemoveBrackets]{\title}}{
 \begin{publisher}
-, \format[RemoveBrackets]{\publisher}
+, \format[RTFChars,RemoveBrackets]{\publisher}
 \end{publisher}
 \begin{address}
-, \format[RemoveBrackets]{\address}
+, \format[RTFChars,RemoveBrackets]{\address}
 \end{address}
 \begin{chapter}
 , chapter \chapter

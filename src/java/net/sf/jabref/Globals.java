@@ -1,5 +1,4 @@
-/*
- Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+/* (C) 2003 Nizar N. Batada, Morten O. Alver
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -364,7 +363,8 @@ public class Globals {
   public static HashMap HTML_CHARS = new HashMap(),
           HTMLCHARS = new HashMap(),
       XML_CHARS = new HashMap(),
-      UNICODE_CHARS = new HashMap();
+      UNICODE_CHARS = new HashMap(),
+      RTFCHARS = new HashMap();
   static {
 
     // Start the thread that monitors file time stamps.
@@ -717,7 +717,47 @@ public class Globals {
     UNICODE_CHARS.put("\u012D", "i");
     //UNICODE_CHARS.put("\u0100", "");
 
-
+    RTFCHARS.put("`a", "\\'e0");
+    RTFCHARS.put("`e", "\\'e8");
+    RTFCHARS.put("`i", "\\'ec");
+    RTFCHARS.put("`o", "\\'f2");
+    RTFCHARS.put("`u", "\\'f9");
+    RTFCHARS.put("´a", "\\'e1");
+    RTFCHARS.put("´e", "\\'e9");
+    RTFCHARS.put("´i", "\\'ed");
+    RTFCHARS.put("´o", "\\'f3");
+    RTFCHARS.put("´u", "\\'fa");
+    RTFCHARS.put("^a", "\\'e2");
+    RTFCHARS.put("^e", "\\'ea");
+    RTFCHARS.put("^i", "\\'ee");
+    RTFCHARS.put("^o", "\\'f4");
+    RTFCHARS.put("^u", "\\'fa");
+    RTFCHARS.put("\"a", "\\'e4");
+    RTFCHARS.put("\"e", "\\'eb");
+    RTFCHARS.put("\"i", "\\'ef");
+    RTFCHARS.put("\"o", "\\'f6");
+    RTFCHARS.put("\"u", "\\'fc");
+    RTFCHARS.put("~n", "\\'f1");
+    RTFCHARS.put("`A", "\\'c0");
+    RTFCHARS.put("`E", "\\'c8");
+    RTFCHARS.put("`I", "\\'cc");
+    RTFCHARS.put("`O", "\\'d2");
+    RTFCHARS.put("`U", "\\'d9");
+    RTFCHARS.put("´A", "\\'c1");
+    RTFCHARS.put("´E", "\\'c9");
+    RTFCHARS.put("´I", "\\'cd");
+    RTFCHARS.put("´O", "\\'d3");
+    RTFCHARS.put("´U", "\\'da");
+    RTFCHARS.put("^A", "\\'c2");
+    RTFCHARS.put("^E", "\\'ca");
+    RTFCHARS.put("^I", "\\'ce");
+    RTFCHARS.put("^O", "\\'d4");
+    RTFCHARS.put("^U", "\\'db");
+    RTFCHARS.put("\"A", "\\'c4");
+    RTFCHARS.put("\"E", "\\'cb");
+    RTFCHARS.put("\"I", "\\'cf");
+    RTFCHARS.put("\"O", "\\'d6");
+    RTFCHARS.put("\"U", "\\'dc");
 
     //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }

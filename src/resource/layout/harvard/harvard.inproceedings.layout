@@ -1,14 +1,14 @@
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
-\format[RemoveBrackets]{\title}
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+\format[RTFChars,RemoveBrackets]{\title}
 , }{\\i in }{
 \begin{editor}
-\format[AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
+\format[RTFChars,AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
 \end{editor}
 \begin{booktitle}
-'\format[RemoveBrackets]{\booktitle}'
+'\format[RTFChars,RemoveBrackets]{\booktitle}'
 \end{booktitle}
 \begin{publisher}
-, \format[RemoveBrackets]{\publisher}, \format[RemoveBrackets]{\address}
+, \format[RTFChars,RemoveBrackets]{\publisher}, \format[RTFChars,RemoveBrackets]{\address}
 \end{publisher}
 \begin{pages}
 , pp. \pages

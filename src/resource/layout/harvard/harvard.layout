@@ -1,16 +1,16 @@
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
-'\format[RemoveBrackets]{\title}'
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+'\format[RTFChars,RemoveBrackets]{\title}'
 \begin{journal}
-, }{\\i \format[RemoveBrackets]{\journal}} {\\b \volume}{
+, }{\\i \format[RTFChars,RemoveBrackets]{\journal}} {\\b \volume}{
 \end{journal}
 \begin{number}
 (\number)
 \end{number}
 \begin{editor}
-, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
+, }{\\i in }{\format[RTFChars,AuthorFirstFirst,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed., 
 \end{editor}
 \begin{booktitle}
-'\format[RemoveBrackets]{\booktitle}'
+'\format[RTFChars,RemoveBrackets]{\booktitle}'
 \end{booktitle}
 \begin{organization}
 , \organization
@@ -19,13 +19,13 @@
 , Technical report, \institution
 \end{institution}
 \begin{publisher}
-, \format[RemoveBrackets]{\publisher}
+, \format[RTFChars,RemoveBrackets]{\publisher}
 \end{publisher}
 \begin{howpublished}
 , \howpublished
 \end{howpublished}
 \begin{address}
-, \format[RemoveBrackets]{\address}
+, \format[RTFChars,RemoveBrackets]{\address}
 \end{address}
 \begin{note}
 , \note

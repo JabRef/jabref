@@ -1,5 +1,5 @@
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
-'\format[RemoveBrackets]{\title}', }{\\i \format[RemoveBrackets]{\journal}}{
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+'\format[RTFChars,RemoveBrackets]{\title}', }{\\i \format[RemoveBrackets]{\journal}}{
 \begin{volume}
  }{\\b \volume}{
 \end{volume}

@@ -1,19 +1,19 @@
 \begin{author}
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author}
+\format[ARTFChars,uthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author}
 \end{author}
 \begin{editor}
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed.
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\editor}, ed.
 \end{editor}
  (\year), 
-}{\\i \format[RemoveBrackets]{\title}}{
+}{\\i \format[RTFChars,RemoveBrackets]{\title}}{
 \begin{volume}
 , Vol. \volume
 \end{volume}
 \begin{publisher}
-, \format[RemoveBrackets]{\publisher}
+, \format[RTFChars,RemoveBrackets]{\publisher}
 \end{publisher}
 \begin{address}
-, \format[RemoveBrackets]{\address}
+, \format[RTFChars,RemoveBrackets]{\address}
 \end{address}.
 \\par
 \\par

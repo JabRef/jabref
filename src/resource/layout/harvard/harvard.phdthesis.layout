@@ -1,5 +1,5 @@
-\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
-'\format[RemoveBrackets]{\title}'
+\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer,RemoveBrackets]{\author} (\year), 
+'\format[RTFChars,RemoveBrackets]{\title}'
 \begin{school}
 , PhD thesis, \school
 \end{school}.
