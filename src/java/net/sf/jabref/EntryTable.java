@@ -236,7 +236,7 @@ public class EntryTable extends JTable {
 	    setForeground(fg);
 	}
 	
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
 	//Util.pr("her");
 	
 	Graphics2D g2 = (Graphics2D)g;
@@ -249,10 +249,12 @@ public class EntryTable extends JTable {
 	    RenderingHints rh = g2.getRenderingHints();
 	    rh.put(RenderingHints.KEY_ANTIALIASING,
 		   RenderingHints.VALUE_ANTIALIAS_ON);
+	    rh.put(RenderingHints.KEY_RENDERING,
+		   RenderingHints.VALUE_RENDER_QUALITY);	
 	    g2.setRenderingHints(rh);
 	}
 	//g2.drawString(getText(), 3, f.getSize());
-	super.paint(g2);
+	super.paintComponent(g2);
 	}
 
 	//public DefaultTableCellRenderer darker() { return darker; }
