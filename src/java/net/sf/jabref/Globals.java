@@ -46,9 +46,10 @@ public class Globals {
                           // year field when parsing textual data.  :-)
       STANDARD_EXPORT_COUNT = 4; // The number of standard export formats.
   private static String resourcePrefix = "resource/JabRef",
-      menuResourcePrefix = "resource/Menu";
+                        menuResourcePrefix = "resource/Menu",
+                        integrityResourcePrefix = "resource/IntegrityMessage";
   private static String logfile = "jabref.log";
-  public static ResourceBundle messages, menuTitles;
+  public static ResourceBundle messages, menuTitles, intMessages ;
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
     public static ImportFormatReader importFormatReader = new ImportFormatReader();
 
@@ -128,6 +129,7 @@ public class Globals {
     locale = new Locale(language, country);
     messages = ResourceBundle.getBundle(resourcePrefix, locale);
     menuTitles = ResourceBundle.getBundle(menuResourcePrefix, locale);
+    intMessages = ResourceBundle.getBundle(integrityResourcePrefix, locale);
     Locale.setDefault(locale);
     javax.swing.JComponent.setDefaultLocale(locale);
   }
@@ -142,8 +144,8 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      //System.err.println("Warning: could not get translation for \""
-      //                   + key + "\"");
+      System.err.println("Warning: could not get translation for \""
+                         + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
       return translation.replaceAll("_", " ");
@@ -163,9 +165,9 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      //System.err.println("Warning: could not get menu item translation for \""
-      //                   + key + "\"");
-    
+//      System.err.println("Warning: could not get menu item translation for \""
+//                         + key + "\"");
+
     }
     if ((translation != null) && (translation.length() != 0)) {
       return translation.replaceAll("_", " ");
@@ -174,6 +176,29 @@ public class Globals {
       return key;
     }
   }
+
+  public static String getIntegrityMessage(String key)
+  {
+    String translation = null;
+    try {
+      if (Globals.intMessages != null) {
+        translation = Globals.intMessages.getString(key);
+      }
+    }
+    catch (MissingResourceException ex) {
+      translation = key;
+
+//      System.err.println("Warning: could not get menu item translation for \""
+//                         + key + "\"");
+    }
+    if ((translation != null) && (translation.length() != 0)) {
+      return translation ;
+    }
+    else {
+      return key;
+    }
+  }
+
 
   //============================================================
   // Using the hashmap of entry types found in BibtexEntryType
@@ -257,15 +282,15 @@ public class Globals {
 
     JFileChooser fc = null;
     try {
-	fc = new JabRefFileChooser(directory);
+        fc = new JabRefFileChooser(directory);
     } catch (InternalError errl) {
-	// This try/catch clause was added because a user reported an
-	// InternalError getting thrown on WinNT, presumably because of a
-	// bug in JGoodies Windows PLAF. This clause can be removed if the
-	// bug is fixed, but for now we just resort to the native file
-	// dialog, using the same method as is always used on Mac:
-	return getNewFileForMac(owner, prefs, directory, extension, dialogType,
-				updateWorkingDirectory, dirOnly, off);
+        // This try/catch clause was added because a user reported an
+        // InternalError getting thrown on WinNT, presumably because of a
+        // bug in JGoodies Windows PLAF. This clause can be removed if the
+        // bug is fixed, but for now we just resort to the native file
+        // dialog, using the same method as is always used on Mac:
+        return getNewFileForMac(owner, prefs, directory, extension, dialogType,
+                                updateWorkingDirectory, dirOnly, off);
     }
 
     if (dirOnly) {
@@ -694,7 +719,7 @@ public class Globals {
     UNICODE_CHARS.put("\u012D", "i");
     //UNICODE_CHARS.put("\u0100", "");
 
-    
+
 
     //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }

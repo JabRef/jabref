@@ -243,7 +243,10 @@ public class GUIGlobals {
       markIcon = GUIGlobals.class.getResource(pre +"mark.png"),
       unmarkIcon = GUIGlobals.class.getResource(pre +"unmark.png"),
       newBibFile = GUIGlobals.class.getResource(pre +"newBibFile.png"),
-      integrityCheck = GUIGlobals.class.getResource(pre +"integrity.png")
+      integrityCheck = GUIGlobals.class.getResource(pre +"integrity.png"),
+      integrityInfo = GUIGlobals.class.getResource(pre +"messageInfo.png"),
+      integrityWarn = GUIGlobals.class.getResource(pre +"messageWarn.png"),
+      integrityFail = GUIGlobals.class.getResource(pre +"messageFail.png")
       ;
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);

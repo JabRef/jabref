@@ -130,7 +130,7 @@ public class JabRefFrame
 
   OpenDatabaseAction
       open = new OpenDatabaseAction(true);
-  AbstractAction  
+  AbstractAction
       close = new CloseDatabaseAction(),
       quit = new CloseAction(),
       selectKeys = new SelectKeysAction(),
@@ -403,17 +403,17 @@ public class JabRefFrame
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
       AbstractWorker worker = new AbstractWorker() {
-	      PrefsDialog3 pd = null;
+              PrefsDialog3 pd = null;
               public void run() {
-		  output(Globals.lang("Opening preferences..."));
+                  output(Globals.lang("Opening preferences..."));
                   pd = new PrefsDialog3(ths, prefs);
                   Util.placeDialog(pd, ths);
               }
-	      public void update() {
+              public void update() {
                   pd.show();
-		  output("");
-	      }
-	  };
+                  output("");
+              }
+          };
       worker.getWorker().run();
       worker.getCallBack().update();
   }
@@ -1103,11 +1103,11 @@ public JabRefPreferences prefs() {
    }*/
 
  public void output(final String s) {
-     
+
       SwingUtilities.invokeLater(new Runnable() {
           public void run() {
               statusLine.setText(s);
-              statusLine.repaint();              
+              statusLine.repaint();
           }
       });
   }
@@ -1277,7 +1277,7 @@ public JabRefPreferences prefs() {
   public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
       BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
       tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
-		     bp);
+                     bp);
     if (raisePanel) {
       tabbedPane.setSelectedComponent(bp);
     }
@@ -1399,11 +1399,11 @@ public JabRefPreferences prefs() {
       extends MnemonicAwareAction {
       boolean showDialog;
       public OpenDatabaseAction(boolean showDialog) {
-	  super(new ImageIcon(GUIGlobals.openIconFile));
-	  this.showDialog = showDialog;
-	  putValue(NAME, "Open database");
-	  putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
-	  putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+          super(new ImageIcon(GUIGlobals.openIconFile));
+          this.showDialog = showDialog;
+          putValue(NAME, "Open database");
+          putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
+          putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
       }
 
     public void actionPerformed(ActionEvent e) {
@@ -1438,12 +1438,12 @@ public JabRefPreferences prefs() {
     class openItSwingHelper implements Runnable{
         BasePanel bp;
         boolean raisePanel;
-        
+
         openItSwingHelper(BasePanel bp, boolean raisePanel) {
             this.bp = bp;
             this.raisePanel = raisePanel;
         }
-        
+
         public void run() {
             tabbedPane.add(fileToOpen.getName(), bp);
             if (raisePanel) {
@@ -1452,12 +1452,12 @@ public JabRefPreferences prefs() {
             if (tabbedPane.getTabCount() == 1) {
                 setNonEmptyState();
             } else if (tabbedPane.getTabCount() == 2) {
-		setMultiple();
-	    }
+                setMultiple();
+            }
             fileToOpen = null;
         }
     }
-    
+
     public void openIt(boolean raisePanel) {
       if ( (fileToOpen != null) && (fileToOpen.exists())) {
         try {
@@ -1493,7 +1493,7 @@ public JabRefPreferences prefs() {
             db.setCompleters(autoCompleters);
             }
            */
-          
+
           // fileToOpen is set to null inside the EventDispatcherThread
           SwingUtilities.invokeLater(new openItSwingHelper(bp, raisePanel));
 
@@ -1523,10 +1523,10 @@ public JabRefPreferences prefs() {
     }
 
     public void actionPerformed(ActionEvent e) {
-	// Create a new, empty, database.
-	BibtexDatabase database = new BibtexDatabase();
-	addTab(database, null, new HashMap(), true);
-	output(Globals.lang("New database created."));
+        // Create a new, empty, database.
+        BibtexDatabase database = new BibtexDatabase();
+        addTab(database, null, new HashMap(), true);
+        output(Globals.lang("New database created."));
     }
   }
 
@@ -1535,9 +1535,9 @@ class ImportCiteSeerAction
 
     public ImportCiteSeerAction() {
         super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
-	putValue(NAME, "Import fields from CiteSeer");
-        putValue(SHORT_DESCRIPTION, Globals.lang("Import fields from CiteSeer Database"));
-        putValue(ACCELERATOR_KEY, prefs.getKey("Import fields from CiteSeer"));
+        putValue(NAME, "Import Fields from CiteSeer");
+        putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
+        putValue(ACCELERATOR_KEY, prefs.getKey("Import Fields from CiteSeer")); // Key defined in MenuTitles!
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -1613,11 +1613,11 @@ class FetchCiteSeerAction
         extends MnemonicAwareAction {
 
                 public FetchCiteSeerAction() {
-		    super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
-		    putValue(NAME, "Fetch citations from CiteSeer");
-		    
-		    putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
-		    putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
+                    super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
+                    putValue(NAME, "Fetch citations from CiteSeer");
+
+                    putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
+                    putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
                 }
 
                 public void actionPerformed(ActionEvent e) {
@@ -1652,18 +1652,18 @@ class FetchCiteSeerAction
 
                                   public void run() {
                                         try {
-                                        	newBp = new BasePanel(ths, prefs);
-                                        	int errorCode;
-                                        	targetBp = (BasePanel) tabbedPane.getSelectedComponent();
-                                        	newDatabase = newBp.getDatabase();
-                                        	targetDatabase = targetBp.getDatabase();
-                                        	errorCode = basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
-                                        	if (newDatabase.getEntryCount() > 0) {
-                                        		SwingUtilities.invokeLater(updateComponent);
-                                        	} else if(errorCode == 0) {
-                                        		SwingUtilities.invokeLater(basePanel().citeSeerFetcher.getEmptyFetchSetDialog());
+                                                newBp = new BasePanel(ths, prefs);
+                                                int errorCode;
+                                                targetBp = (BasePanel) tabbedPane.getSelectedComponent();
+                                                newDatabase = newBp.getDatabase();
+                                                targetDatabase = targetBp.getDatabase();
+                                                errorCode = basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
+                                                if (newDatabase.getEntryCount() > 0) {
+                                                        SwingUtilities.invokeLater(updateComponent);
+                                                } else if(errorCode == 0) {
+                                                        SwingUtilities.invokeLater(basePanel().citeSeerFetcher.getEmptyFetchSetDialog());
                                             } else {
-                                            	targetBp.citeSeerFetcher.deactivateCitationFetcher();
+                                                    targetBp.citeSeerFetcher.deactivateCitationFetcher();
                                             }
                                         }
                                         catch (Exception ex) {
@@ -1689,7 +1689,7 @@ class FetchCiteSeerAction
       public NewSubDatabaseAction()
       {
         super(new ImageIcon( GUIGlobals.newBibFile));
-	putValue(NAME, "New subdatabase based on AUX file" );
+        putValue(NAME, "New subdatabase based on AUX file" );
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
@@ -1729,7 +1729,7 @@ class FetchCiteSeerAction
       {
         super( "Integrity Check", //Globals.lang( "" ),
                new ImageIcon( GUIGlobals.integrityCheck ) ) ;
-               putValue( SHORT_DESCRIPTION, Globals.lang( "integrity" ) ) ;
+               putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
 
@@ -1752,8 +1752,6 @@ class FetchCiteSeerAction
 
       }
     }
-
-
 
   class FetchMedlineAction
       extends MnemonicAwareAction {
@@ -1838,7 +1836,7 @@ class FetchCiteSeerAction
      */
   public void addBibEntries(java.util.List bibentries, String filename,
                              boolean intoNew) {
-  	if (bibentries == null || bibentries.size() == 0) {
+          if (bibentries == null || bibentries.size() == 0) {
       // No entries found. We need a message for this.
       JOptionPane.showMessageDialog(ths, Globals.lang("No entries found. Please make sure you are "
                                                       +"using the correct import filter."), Globals.lang("Import failed"),
@@ -1957,7 +1955,7 @@ class FetchCiteSeerAction
 
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
       final boolean intoNew = intoNew_;
-      
+
       // Add a menu item for autodetecting import format:
       importMenu.add(new ImportUnknownMenuItem(ths, intoNew));
 
@@ -1965,8 +1963,8 @@ class FetchCiteSeerAction
 
       // Put in all formatters registered in ImportFormatReader:
       for (Iterator i=Globals.importFormatReader.getImportFormats().iterator(); i.hasNext();) {
-	  ImportFormat imFo = (ImportFormat)((Map.Entry)i.next()).getValue();
-	  importMenu.add(new ImportMenuItem(ths, imFo, intoNew));
+          ImportFormat imFo = (ImportFormat)((Map.Entry)i.next()).getValue();
+          importMenu.add(new ImportMenuItem(ths, imFo, intoNew));
       }
   }
 
@@ -2113,16 +2111,16 @@ class FetchCiteSeerAction
      * This method shows a wait cursor and blocks all input to the JFrame's contents.
      */
     public void block() {
-	getGlassPane().setVisible(true);
-	//getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        getGlassPane().setVisible(true);
+        //getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
     /**
      * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents.
      */
     public void unblock() {
-	getGlassPane().setVisible(false);
-	//	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
+        getGlassPane().setVisible(false);
+        //	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
     }
 
 class SaveSessionAction
@@ -2378,9 +2376,9 @@ class SaveSessionAction
       addKeyListener(new KeyAdapter() { });
       addMouseListener(new MouseAdapter() { });
       super.setCursor(
-	Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
       // Override isOpaque() to prevent the glasspane from hiding the window contents:
       public boolean isOpaque() { return false; }
-  }     
+  }
 }

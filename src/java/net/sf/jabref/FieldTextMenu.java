@@ -102,27 +102,33 @@ public class FieldTextMenu implements MouseListener
 
 
 // ---------------------------------------------------------------------------
-  abstract class BasicAction extends AbstractAction
+  abstract class BasicMenuAction extends AbstractAction
   {
-    public BasicAction(String text, String description, URL icon)
+    public BasicMenuAction(String text, String description, URL icon)
     {
       super(Globals.lang(text), new ImageIcon(icon));
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
-    public BasicAction(String text, String description, URL icon, KeyStroke key)
+    public BasicMenuAction(String text, String description, URL icon, KeyStroke key)
     {
       super(Globals.lang(text), new ImageIcon(icon));
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
-    public BasicAction(String text)
+    public BasicMenuAction(String text, String extensionText)
+    {
+      super(Globals.lang(text) + " - " +extensionText);
+    }
+
+    public BasicMenuAction(String text)
     {
       super(Globals.lang(text));
     }
 
-    public BasicAction(String text, KeyStroke key)
+
+    public BasicMenuAction(String text, KeyStroke key)
     {
       super(Globals.lang(text));
       putValue(ACCELERATOR_KEY, key);
@@ -131,11 +137,11 @@ public class FieldTextMenu implements MouseListener
     public abstract void actionPerformed(ActionEvent e) ;
   }
 //---------------------------------------------------------------
-  class MenuHeaderAction extends BasicAction
+  class MenuHeaderAction extends BasicMenuAction
   {
     public MenuHeaderAction(String comment)
     {
-      super("Edit -" +comment);
+      super("Edit", comment);
       this.setEnabled(false);
     }
 
@@ -144,7 +150,7 @@ public class FieldTextMenu implements MouseListener
 
 
 // ---------------------------------------------------------------------------
-  class PasteAction extends BasicAction
+  class PasteAction extends BasicMenuAction
   {
     public PasteAction()
     {
@@ -169,7 +175,7 @@ public class FieldTextMenu implements MouseListener
     }
   }
 // ---------------------------------------------------------------------------
-  class CopyAction extends BasicAction
+  class CopyAction extends BasicMenuAction
   {
     public CopyAction()
     {

@@ -27,7 +27,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 // created by : r.nagel 27.10.2004
 //
-// function : check all bibtex items and report errors, inconsistencies and others
+// function : check all bibtex items and report errors, inconsistencies,
+//            warnings, hints and ....
 //
 //     todo : find equal authors: e.g.: D. Knuth = Donald Knuth = Donald E. Knuth
 //            and try to give all items an identically look
@@ -43,13 +44,16 @@ import java.util.*;
 
 public class IntegrityCheck
 {
+  private Vector messages ;
+
   public IntegrityCheck()
   {
+    messages = new Vector() ;
   }
 
   public Vector checkBibtexDatabase(BibtexDatabase base)
   {
-    Vector back = new Vector() ;
+    messages.clear();
     if (base != null)
     {
       Collection col = base.getEntries() ;
@@ -58,46 +62,58 @@ public class IntegrityCheck
         Object dat = myIt.next() ;
         if (dat != null)
         {
-          BibtexEntry item = ( BibtexEntry ) dat ;
-
-          Vector result = checkBibtexEntry(item) ;
-
-          if (result != null)
-            back.addAll(result);
+          checkSingleEntry(( BibtexEntry ) dat) ;
         }
       }
-
-    }
-
-    return back ;
+   }
+   return (Vector) messages.clone() ;
   }
 
   public Vector checkBibtexEntry(BibtexEntry entry)
   {
-    if (entry == null)
-      return null ;
-
-    Vector back = new Vector() ;
-
-    Object name = entry.getField("author") ;
-    if (name != null)
-      back.addAll( authorCheck( name.toString())) ;
-
-    return back ;
+    messages.clear();
+    checkSingleEntry(entry) ;
+    return (Vector) messages.clone() ;
+//    return messages ;
   }
 
-  private Vector authorCheck(String authors)
+  public void checkSingleEntry(BibtexEntry entry)
   {
-    Vector back = new Vector() ;
+    if (entry == null)
+      return ;
 
+    Object data = entry.getField("author") ;
+    if (data != null)
+      authorNameCheck( data.toString(), "author", entry) ;
+
+    data = entry.getField("editor") ;
+    if (data != null)
+      authorNameCheck( data.toString(), "editor", entry) ;
+
+    data = entry.getField("title") ;
+    if (data != null)
+      titleCheck( data.toString(), "title", entry) ;
+
+    data = entry.getField("year") ;
+    if (data != null)
+      yearCheck( data.toString(), "year", entry) ;
+  }
+
+ /** fills the class Vector (of IntegrityMessage Objects) which did inform about
+  *  failures, hints....
+  *  The Authors or Editors field could be invalid -> try to detect it!
+  *  Knuth, Donald E. and Kurt Cobain and A. Einstein = N,NNaNNaNN
+  */
+  private void authorNameCheck(String names, String fieldName, BibtexEntry entry)
+  {
     // try to extract the structure of author tag
     // N = name, ","= seperator, "a" = and
     StringBuffer structure = new StringBuffer() ;
-    int len = authors.length() ;
+    int len = names.length() ;
     int mode = -1 ;
     for (int t = 0 ; t < len ; t++)
     {
-      char ch = authors.charAt(t) ;
+      char ch = names.charAt(t) ;
       switch (ch)
       {
         case ',' :
@@ -149,27 +165,119 @@ public class IntegrityCheck
 
       if (structure.charAt(0) != 'N')  // must start by name
       {
-        back.add("beginning of author field");
+        messages.add( new IntegrityMessage( IntegrityMessage.NAME_START_WARNING,
+                                            entry, fieldName, null))  ;
+//        back.add("beginning of " +fieldName +" field");
         failed = true ;
       }
 
       if (structure.charAt( structure.length() -1) != 'N')  // end without seperator
       {
-        back.add("bad end (author field)");
+        messages.add( new IntegrityMessage( IntegrityMessage.NAME_END_WARNING,
+                                            entry, fieldName, null))  ;
+//        back.add("bad end (" +fieldName +" field)");
         failed = true ;
       }
       if (structure.indexOf("NN,NN") > -1)
       {
-        back.add("something could be wrong in author field") ;
+        messages.add( new IntegrityMessage( IntegrityMessage.NAME_SEMANTIC_WARNING,
+                                            entry, fieldName, null))  ;
+//        back.add("something could be wrong in " +fieldName +" field") ;
         failed = true ;
       }
 
 //      if (failed)
 //        System.out.println(authors +" #" +structure.toString() +"#") ;
     }
+//    messages.add( new IntegrityMessage( IntegrityMessage.NAME_END_WARNING,
+//                                        entry, fieldName, null))  ;
 
-    return back ;
   }
 
 
+
+  private void titleCheck(String title, String fieldName, BibtexEntry entry)
+  {
+    int len = title.length() ;
+    int mode = 0 ;
+    int upLowCounter = 0 ;
+//    boolean lastWasSpace = false ;
+    for (int t = 0 ; t < len ; t++)
+    {
+      char ch = title.charAt( t ) ;
+      switch (ch)
+      {
+        case '}' : // end of Sequence
+          if (mode == 0)
+          {
+            // closing brace '}' without an opening
+            messages.add( new IntegrityMessage( IntegrityMessage.UNEXPECTED_CLOSING_BRACE_FAILURE,
+                                            entry, fieldName, null))  ;
+          }
+          else  // mode == 1
+          {
+            mode-- ;
+//            lastWasSpace = true ;
+          }
+          break ;
+
+        case '{' :  // open {
+          mode++ ;
+          break ;
+
+        case ' ' :
+//          lastWasSpace = true ;
+          break ;
+
+        default :
+          if (mode == 0) // out of {}
+          {
+            if ( Character.isUpperCase(ch) && (t > 1))
+            {
+              upLowCounter++ ;
+            }
+          }
+      }
+    }
+    if (upLowCounter > 0)
+    {
+        messages.add( new IntegrityMessage( IntegrityMessage.UPPER_AND_LOWER_HINT,
+                                        entry, fieldName, null))  ;
+
+    }
+  }
+
+  /** Checks, if the number String contains a four digit year */
+  private void yearCheck(String number, String fieldName, BibtexEntry entry)
+  {
+    int len = number.length() ;
+    int digitCounter = 0 ;
+    boolean fourDigitsBlock = false ;
+    boolean containsFourDigits = false ;
+
+    for (int t = 0 ; t < len ; t++)
+    {
+      char ch = number.charAt( t ) ;
+      if ( Character.isDigit(ch))
+      {
+        digitCounter++ ;
+        if (digitCounter == 4)
+          fourDigitsBlock = true ;
+        else
+          fourDigitsBlock = false ;
+      } else
+      {
+        if (fourDigitsBlock)
+          containsFourDigits = true ;
+
+        digitCounter = 0 ;
+      }
+    }
+
+    if ((!containsFourDigits) && (!fourDigitsBlock))
+    {
+      messages.add( new IntegrityMessage( IntegrityMessage.FOUR_DIGITS_HINT,
+                                      entry, fieldName, null))  ;
+    }
+  }
 }

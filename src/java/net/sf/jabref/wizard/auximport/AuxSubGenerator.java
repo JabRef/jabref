@@ -135,15 +135,28 @@ public class AuxSubGenerator
 
         while ( matcher.find() )
         {
-          // extract the bibtex-key XXX from \citation{XXX} string
+          // extract the bibtex-key(s) XXX from \citation{XXX} string
           int len = matcher.end() - matcher.start() ;
           if ( len > 11 )
           {
             String str = matcher.group().substring( matcher.start() + 10,
                                                     matcher.end() - 1 ) ;
-            // save key into an set
-            mySet.add( str ) ;
-//            System.out.println("found " +str +" in AUX") ;
+            // could be an comma separated list of keys
+            String keys[] = str.split(",") ;
+            if (keys != null)
+            {
+              int keyCount = keys.length ;
+              for ( int t = 0 ; t < keyCount ; t++ )
+              {
+                String dummyStr = keys[t] ;
+                if (dummyStr != null)
+                {
+                  // delete all unnecessary blanks and save key into an set
+                  mySet.add( dummyStr.trim() ) ;
+//                System.out.println("found " +str +" in AUX") ;
+                }
+              }
+            }
           }
         }
       }

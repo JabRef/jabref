@@ -155,7 +155,8 @@ public class RightClickMenu extends JPopupMenu
         populateTypeMenu();
 
         add(typeMenu);
-        add(new AbstractAction("Import plain text") {
+        add(new AbstractAction(Globals.lang("Plain text import"))
+        {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("importPlainText");
