@@ -24,36 +24,47 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-
 package net.sf.jabref.export;
 
 import net.sf.jabref.BibtexEntry;
+
 
 /**
  * Exception thrown if saving goes wrong. If caused by a specific
  * entry, keeps track of which entry caused the problem.
  */
-public class SaveException extends Throwable {
+public class SaveException extends Throwable
+{
+    //~ Instance fields ////////////////////////////////////////////////////////
 
     private BibtexEntry entry;
 
-    public SaveException(String message) {
-	super(message);
-	entry = null;
+    //~ Constructors ///////////////////////////////////////////////////////////
+
+    public SaveException(String message)
+    {
+        super(message);
+        entry = null;
     }
 
-    public SaveException(String message, BibtexEntry entry) {
-	super(message);
-	this.entry = entry;
+    public SaveException(String message, BibtexEntry entry)
+    {
+        super(message);
+        this.entry = entry;
     }
 
-    public boolean specificEntry() {
-	return (entry != null);
+    //~ Methods ////////////////////////////////////////////////////////////////
+
+    public BibtexEntry getEntry()
+    {
+        return entry;
     }
 
-    public BibtexEntry getEntry() {
-	return entry;
+    public boolean specificEntry()
+    {
+        return (entry != null);
     }
-
-
 }
+///////////////////////////////////////////////////////////////////////////////
+//  END OF FILE.
+///////////////////////////////////////////////////////////////////////////////

@@ -23,7 +23,7 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref.export;
+package net.sf.jabref.export.layout;
 
 /**
  * DOCUMENT ME!
@@ -31,12 +31,11 @@ package net.sf.jabref.export;
  * @author $author$
  * @version $Revision$
  */
-public interface FieldFormatter
+public interface LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    public String format(String s, boolean standardBibtex)
-        throws IllegalArgumentException;
+    public String format(String fieldText);
 }
 ///////////////////////////////////////////////////////////////////////////////
 //  END OF FILE.

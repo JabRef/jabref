@@ -1,4 +1,31 @@
 <?xml version="1.0"?>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   Filename: $RCSfile$
+   Purpose:  Ant build file for Jabref.
+
+             Ant-Download: http://jakarta.apache.org/ant
+             Ant-Manual:   http://jakarta.apache.org/ant/manual/index.html
+
+             Jabref-Homepage:    http://jabref.sourceforge.net
+             Jabref@SourceForge: http://sourceforge.net/projects/jabref
+             Jabref@FreshMeat:   http://freshmeat.net
+	     Jabref-CVSRoot:     :pserver:anonymous@cvs.jabref.sourceforge.net:/cvsroot/jabref
+
+             Further questions:
+               help mailing list:      must be inserted
+
+   Precondition: 1. Ant should be installed.
+                 2. JAVA_HOME environment variable contains the path to JDK1.4 or higher
+                 3. ANT_HOME environment variable contains the path to ant's home directory
+
+   Language: XML
+   Compiler: Ant
+   Authors:  Joerg K. Wegner, wegnerj@informatik.uni-tuebingen.de
+             Morten O. Alver
+   Version:  $Revision$
+             $Date$
+             $Author$
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 <project name="JabRef" default="build" basedir=".">
 
@@ -25,9 +52,15 @@
   <property name="images.dir" value="${src.dir}/images"/>
   <property name="help.dir" value="${src.dir}/help"/>
 
+  <!-- Set the properties for library directories -->
+  <property name="library.directory"              value="lib" />
+
   <!-- Build classpath -->
   <path id="classpath">
     <pathelement path="${build.classes}"/>
+    <fileset dir="${library.directory}">
+      <include name="*.jar" />
+    </fileset>
   </path>
 
   <!-- Compiles project -->
@@ -35,6 +68,7 @@
     <mkdir dir="${build.classes}"/>
 
     <javac srcdir="${java.dir}"
+           debug="on"
            destdir="${build.classes}"
            target="1.4">
     </javac>
@@ -64,7 +98,7 @@
 
      </target>
 
-  <target name="build" depends="jars">
+  <target name="build" depends="jars" description="Build project">
     <mkdir dir="${build.bin}"/>
 <!-- Uncomment when we actually have scripts.
     <copy todir="${build.bin}">
@@ -97,7 +131,7 @@
 
 
   <!-- Creates all docs -->
-  <target name="docs" depends="javadocs" description="generates all the documentation"/>
+  <target name="docs" depends="javadocs" description="Generates all the documentation"/>
 
   <!-- Creates javadocs -->
   <target name="javadocs" depends="compile" description="Generates the javadocs">
@@ -117,7 +151,123 @@
     </javadoc>
   </target>
 
-  <target name="clean">
+  <target name="clean" description="Clean project">
     <delete dir="${build.dir}" />
   </target>
+
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        What's about the software design ?!;-)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+  <target name="pmd" description="SOFTWAREDESIGN: Project Mess Detector !;-)">
+      <echo>Checking Project Mess Detection (PMD) rulesets.</echo>
+      <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+        <classpath>
+          <pathelement path="${classpath}" />
+          <fileset dir="${library.directory}">
+            <include name="*.jar" />
+          </fileset>
+        </classpath>
+      </taskdef>
+      <!-- allowed Pretty Much Done rulsets -->
+      <!-- rulesets/basic.xml -->
+      <!-- rulesets/braces.xml -->
+      <!-- rulesets/codesize.xml-->
+      <!-- rulesets/controversial.xml-->
+      <!-- rulesets/coupling.xml-->
+      <!-- rulesets/design.xml -->
+      <!-- rulesets/experimental.xml -->
+      <!-- rulesets/favorites.xml -->
+      <!-- rulesets/imports.xml -->
+      <!-- rulesets/naming.xml -->
+      <!-- rulesets/javabean.xml -->
+      <!-- rulesets/junit.xml -->
+      <!-- rulesets/scratchpad.xml -->
+      <!-- rulesets/strictexception.xml -->
+      <!-- rulesets/strings.xml -->
+      <!-- rulesets/unusedcode.xml -->
+
+      <pmd rulesetfiles="rulesets/unusedcode.xml,rulesets/basic.xml" failonerror="no">
+          <formatter type="html" toFile="${build.dir}/pmd_report.html"/>
+          <fileset dir="${src.dir}">
+              <include name="**/*.java"/>
+          </fileset>
+      </pmd>
+
+      <!-- check for duplicated code -->
+      <echo>WARNING: use environment variable: ANT_OPTS=-Xmx512m or this task will fail.</echo>
+      <echo>Checking for duplicated code using the Copy/Paste Detector (CPD).</echo>
+      <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" >
+        <classpath>
+          <pathelement path="${classpath}" />
+          <fileset dir="${library.directory}">
+            <include name="*.jar" />
+          </fileset>
+        </classpath>
+      </taskdef>
+      <cpd format="text" minimumTokenCount="100" outputFile="${build.dir}/duplicated_code_report.txt">
+        <fileset dir="${src.dir}">
+            <include name="**/*.java"/>
+        </fileset>
+      </cpd>
+  </target>
+
+
+  <target name="javancss" description="SOFTWAREDESIGN: Determining the NCSS and CCN code metrics for JOELib.">
+    <taskdef name="javancss" classname="javancss.JavancssAntTask">
+      <classpath>
+          <pathelement path="${classpath}" />
+          <fileset dir="${library.directory}">
+            <include name="*.jar" />
+          </fileset>
+        </classpath>
+    </taskdef>
+    <echo>Cyclomatic
+Complexity             Ease of       Risk
+Number (CCN)           maintenance
+(McCabe metric)
+---------------------------------------------
+1-10, simple           easy          minimum
+11-20, complex         moderate      moderate
+21-50, more complex    hard          high
+>50, unstable          very hard     very high
+
+</echo>
+     <javancss srcdir="${src.dir}"
+            includes="**/*.java"
+            excludes="jama/**/*.java, jmat/**/*.java, cformat/**/*.java"
+            abortOnFail="false"
+            ccnPerFuncMax="30"
+            generateReport="true"
+            outputfile="${build.dir}/javancss_report.plain"
+            format="plain"
+            packageMetrics="true"
+            classMetrics="false"
+            functionMetrics="false"
+            />
+  </target>
+
+  <target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
+    <taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <fileset dir="${library.directory}">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+    </taskdef>
+    <jalopy fileformat="unix"
+            convention="${src.dir}/java/jalopy.format.convention.xml"
+            history="file"
+            historymethod="adler32"
+            loglevel="error"
+            threads="2"
+            classpathref="classpath"
+            backup="bak">
+      <fileset dir="${src.dir}">
+        <include name="**/*.java"/>
+      </fileset>
+    </jalopy>
+  </target>
+
 </project>
