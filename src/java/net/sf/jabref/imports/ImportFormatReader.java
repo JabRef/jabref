@@ -1263,6 +1263,8 @@ public class ImportFormatReader
        HashMap lines = new HashMap();
        StringBuffer previousLine = null;
        while ((line = in.readLine()) != null) {
+       	if (line.length() == 0)
+       		continue; // ignore empty lines, e.g. at file end
          // entry delimiter -> item complete
          if (line.equals("------")) {
            String[] type = new String[2];
