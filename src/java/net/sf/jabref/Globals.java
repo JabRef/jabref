@@ -156,18 +156,92 @@ public class Globals {
 
     public static HashMap HTML_CHARS = new HashMap();
     static {
+
+	HTML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&auml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&Auml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&euml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{E\\}\\}", "&Euml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{i\\}\\}", "&iuml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{I\\}\\}", "&Iuml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{o\\}\\}", "&ouml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{O\\}\\}", "&Ouml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{u\\}\\}", "&uuml;");
+	HTML_CHARS.put("\\{\\\\\\\"\\{U\\}\\}", "&Uuml;");
+
+	HTML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&egrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&Egrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&igrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&Igrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&ograve;");
+	HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
+	HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
+	HTML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&eacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&Eacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&iacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&Iacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&oacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Oacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&uacute;");
+	HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Uacute;");
+
 	HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&ucirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{U\\}\\}", "&Ucirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{e\\}\\}", "&ecirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{E\\}\\}", "&Ecirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{i\\}\\}", "&icirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{I\\}\\}", "&Icirc;");
 	HTML_CHARS.put("\\{\\\\\\~\\{o\\}\\}", "&otilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{O\\}\\}", "&Otilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{n\\}\\}", "&ntilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&Ntilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
 	HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
+
+	HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
+	HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
+	HTML_CHARS.put("\\{\\\\\\\"e\\}", "&euml;");
+	HTML_CHARS.put("\\{\\\\\\\"E\\}", "&Euml;");
+	HTML_CHARS.put("\\{\\\\\\\"i\\}", "&iuml;");
+	HTML_CHARS.put("\\{\\\\\\\"I\\}", "&Iuml;");
+	HTML_CHARS.put("\\{\\\\\\\"o\\}", "&ouml;");
+	HTML_CHARS.put("\\{\\\\\\\"O\\}", "&Ouml;");
+	HTML_CHARS.put("\\{\\\\\\\"u\\}", "&uuml;");
+	HTML_CHARS.put("\\{\\\\\\\"U\\}", "&Uuml;");
+
+	HTML_CHARS.put("\\{\\\\\\`e\\}", "&egrave;");
+	HTML_CHARS.put("\\{\\\\\\`E\\}", "&Egrave;");
+	HTML_CHARS.put("\\{\\\\\\`i\\}", "&igrave;");
+	HTML_CHARS.put("\\{\\\\\\`I\\}", "&Igrave;");
+	HTML_CHARS.put("\\{\\\\\\`o\\}", "&ograve;");
+	HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
+	HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
+	HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
+	HTML_CHARS.put("\\{\\\\\\`e\\}", "&eacute;");
+	HTML_CHARS.put("\\{\\\\\\`E\\}", "&Eacute;");
+	HTML_CHARS.put("\\{\\\\\\`i\\}", "&iacute;");
+	HTML_CHARS.put("\\{\\\\\\`I\\}", "&Iacute;");
+	HTML_CHARS.put("\\{\\\\\\`o\\}", "&oacute;");
+	HTML_CHARS.put("\\{\\\\\\`O\\}", "&Oacute;");
+	HTML_CHARS.put("\\{\\\\\\`u\\}", "&uacute;");
+	HTML_CHARS.put("\\{\\\\\\`U\\}", "&Uacute;");
+
+	HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
+	HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");
+	HTML_CHARS.put("\\{\\\\\\^u\\}", "&ucirc;");
+	HTML_CHARS.put("\\{\\\\\\^U\\}", "&Ucirc;");
+	HTML_CHARS.put("\\{\\\\\\^e\\}", "&ecirc;");
+	HTML_CHARS.put("\\{\\\\\\^E\\}", "&Ecirc;");
+	HTML_CHARS.put("\\{\\\\\\^i\\}", "&icirc;");
+	HTML_CHARS.put("\\{\\\\\\^I\\}", "&Icirc;");
+	HTML_CHARS.put("\\{\\\\\\~o\\}", "&otilde;");
+	HTML_CHARS.put("\\{\\\\\\~O\\}", "&Otilde;");
+	HTML_CHARS.put("\\{\\\\\\~n\\}", "&ntilde;");
+	HTML_CHARS.put("\\{\\\\\\~N\\}", "&Ntilde;");
+	HTML_CHARS.put("\\{\\\\\\~a\\}", "&atilde;");
+	HTML_CHARS.put("\\{\\\\\\~A\\}", "&Atilde;");
 
     }
 
