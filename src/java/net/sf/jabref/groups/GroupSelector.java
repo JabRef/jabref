@@ -64,19 +64,29 @@ public class GroupSelector extends SidePaneComponent implements
     String searchField;
     JPopupMenu groupsContextMenu = new JPopupMenu();
     JPopupMenu settings = new JPopupMenu();
-    // JCheckBoxMenuItem
+    JRadioButtonMenuItem groupModeUnion = new JRadioButtonMenuItem(
+            Globals.lang("Groups: Include Subgroups"), true);
+    JRadioButtonMenuItem groupModeIntersection = new JRadioButtonMenuItem(
+            Globals.lang("Groups: Intersection with Supergroups"), false);
+    JRadioButtonMenuItem groupModeIndependent = new JRadioButtonMenuItem(
+            Globals.lang("Groups: Independent"), false);
     JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Globals
-            .lang("Intersection"), true), orCb = new JRadioButtonMenuItem(
-            Globals.lang("Union"), false), floatCb = new JRadioButtonMenuItem(
-            Globals.lang("Float"), true), highlCb = new JRadioButtonMenuItem(
-            Globals.lang("Highlight"), false);
+            .lang("Intersection"), true);
+    JRadioButtonMenuItem orCb = new JRadioButtonMenuItem(Globals.lang("Union"),
+            false);
+    JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Globals
+            .lang("Float"), true);
+    JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Globals
+            .lang("Highlight"), false);
     JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Globals.lang("Inverted"),
             false), select = new JCheckBoxMenuItem(Globals
             .lang("Select matches"), false);
     // JMenu
     // moreRow = new JMenuItem(Globals.lang("Size of groups interface (rows)"));
     // lessRow = new JMenuItem(Globals.lang("Show one less rows"));
-    ButtonGroup bgr = new ButtonGroup(), visMode = new ButtonGroup();
+    ButtonGroup groupModeGroup = new ButtonGroup();
+    ButtonGroup bgr = new ButtonGroup();
+    ButtonGroup visMode = new ButtonGroup();
     JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
             reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
     SidePaneManager manager;
@@ -138,6 +148,10 @@ public class GroupSelector extends SidePaneComponent implements
         invCb.setSelected(prefs.getBoolean("groupInvertSelections"));
         select.setSelected(prefs.getBoolean("groupSelectMatches"));
         openset.setMargin(new Insets(0, 0, 0, 0));
+        settings.add(groupModeUnion);
+        settings.add(groupModeIntersection);
+        settings.add(groupModeIndependent);
+        settings.addSeparator();
         settings.add(andCb);
         settings.add(orCb);
         settings.addSeparator();
@@ -234,6 +248,9 @@ public class GroupSelector extends SidePaneComponent implements
                         .lang("Select entries in group selection"));
         expand.setToolTipText(Globals.lang("Show one more row"));
         reduce.setToolTipText(Globals.lang("Show one less rows"));
+        groupModeGroup.add(groupModeUnion);
+        groupModeGroup.add(groupModeIntersection);
+        groupModeGroup.add(groupModeIndependent);
         bgr.add(andCb);
         bgr.add(orCb);
         visMode.add(floatCb);
@@ -388,7 +405,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     public void valueChanged(TreeSelectionEvent e) {
-        TreePath[] selection = groupsTree.getSelectionPaths();
+        final TreePath[] selection = groupsTree.getSelectionPaths();
         if (selection == null
                 || selection.length == 0
                 || (selection.length == 1 && ((GroupTreeNode) selection[0]
@@ -397,13 +414,19 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output(Globals.lang("Displaying no groups") + ".");
             return;
         }
-        AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb
+        final AndOrSearchRuleSet searchRules = new AndOrSearchRuleSet(andCb
                 .isSelected(), invCb.isSelected());
-        AbstractGroup group;
+        int groupMode;
+        if (groupModeUnion.isSelected())
+            groupMode = GroupTreeNode.GROUP_UNION_CHILDREN;
+        else if (groupModeIntersection.isSelected())
+            groupMode = GroupTreeNode.GROUP_INTERSECTION_PARENT;
+        else
+            groupMode = GroupTreeNode.GROUP_ITSELF;
+
         for (int i = 0; i < selection.length; ++i) {
-            group = ((GroupTreeNode) selection[i].getLastPathComponent())
-                    .getGroup();
-            searchRules.addRule(group.getSearchRule());
+            searchRules.addRule(((GroupTreeNode) selection[i]
+                    .getLastPathComponent()).getSearchRule(groupMode));
         }
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
