@@ -399,7 +399,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	con.weightx = 1;
 	con.weighty = 1;
 	srcPanel.setLayout(gbl);
-	source.setEditable(prefs.getBoolean("enableSourceEditing"));
+	source.setEditable(true);//prefs.getBoolean("enableSourceEditing"));
 	source.setLineWrap(true);
 	source.setTabSize(GUIGlobals.INDENT);
 	setupJTextComponent(source);

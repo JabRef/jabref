@@ -49,8 +49,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
-	gbl.setConstraints(editSource, con);
-	general.add(editSource);
+	//gbl.setConstraints(editSource, con);
+	//general.add(editSource);
 
 	gbl.setConstraints(general, con);
 	add(general);

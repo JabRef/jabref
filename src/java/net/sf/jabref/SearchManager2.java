@@ -199,6 +199,7 @@ class SearchManager2 extends SidePaneComponent
 	prefs.putBoolean("searchAll", searchAll.isSelected());
 	prefs.putBoolean("incrementS", increment.isSelected());
 	prefs.putBoolean("selectS", select.isSelected());
+	Util.pr(select.isSelected()+"");
 	prefs.putBoolean("caseSensitiveSearch", 
 			 caseSensitive.isSelected());
 	prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
@@ -352,6 +353,13 @@ class SearchManager2 extends SidePaneComponent
 		}
 	    });
     }
+
+    public void componentClosing() {
+	BasePanel bp = frame.basePanel();
+	if (bp != null)
+	    bp.stopShowingSearchResults();
+    }
+
 
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}

@@ -5,30 +5,55 @@
 
 <H1>Searching in JabRef</H1>
 
-<em>CTRL-F</em> opens the search dialog.</em>
+There are three different search modes in JabRef.
 
-<P>You enter your search string into the text field in the search
-dialog, and press enter or click "Search". The <em>Settings</em>
-button opens a menu showing the settings for your search. Settings
-include limiting which fields are searched, deciding whether your
-search string should be interpreted as a regular expression, and
-deciding whether the search should be case-sensitive.
+<p>
+<em>CTRL-F</em> opens or focuses the search interface. Pressing
+<em>CTRL-F</em> several times toggles search mode. When searching
+incrementally, pressing <em>CTRL-F</em> makes the program search for
+the next occurence of the search string.
+<p>
+<em>CTRL-SHIFT-F</em> opens or focuses the search interface, and
+selects incremental search. When searching incrementally,
+<em>CTRL-SHIFT-F</em> also finds the next occurence of the search
+string.
 
-<P>Once the search finishes, the entry table in the main window will
-change to show the results. Entries are sorted according to search
-score (you can see the score if you have checked the "Search" field in
-the Preferences dialog), and any entry in which the search string was
-not found, will be grayed out. The table changes to its normal state
-once you close the search dialog.
+<H2>Incremental search</H2>
 
-<p>While a search is active, it will only display hits contained in
-your currently shown <em>group</em>. Searching and displaying groups
-are separate actions, and the table will always display the appropriate
-subset of entries decided by your active search and/or group.
+When searching incrementally, the program searches immediately each
+time you press a letter. The status line informs you about the success
+of the search. Pressing the search shortcut keys causes the program to
+find the next occurence of the current search string. If no further
+occurences can be found, the status line will notify you about
+this. Repeating the search again causes the search to restart at the
+top. The search order always follows the current sorting of your
+database. To escape an incremental search, press ESC or click "Clear
+search".
 
+<H2>Highlight search</H2>
+
+In highlight search, the program searches your database for all occurences of your search string, once you press ENTER. All entries that match, are selected.
+
+<H2>Float search</H2>
+
+Float search is similar to highlight search, except that the entries
+that match will not be selected, but instead will be moved to the top
+of the table. Entries which do not match will end up below the ones
+that do, and in addition will be displayed in gray. To stop displaying
+the search results, press ESC or click "Clear search".
+
+<H2>Search settings</H2>
+
+ The <em>Settings</em> button opens a menu showing the settings for
+ your search. Settings include limiting which fields are searched,
+ deciding whether your search string should be interpreted as a
+ regular expression, and deciding whether the search should be
+ case-sensitive.
+
+<!--
 <p>You can at any time export a <em>bibtex</em> database containing
 only the entries in your currently shown group and/or search, by
-choosing <em>File -> Save special</em> in the menu.
+choosing <em>File -> Save special</em> in the menu. -->
 
 </BODY>
 </HTML>

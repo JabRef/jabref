@@ -55,7 +55,7 @@ public class JabRefFrame extends JFrame {
     JLabel statusLine = new JLabel("", SwingConstants.LEFT),
 	statusLabel = new JLabel(Globals.lang("Status")+":",
 				 SwingConstants.LEFT);
-    SearchManager searchManager  = new SearchManager(ths, prefs);
+    //SearchManager searchManager  = new SearchManager(ths, prefs);
 
     FileHistory fileHistory = new FileHistory(prefs, this);
 
@@ -357,6 +357,7 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
+    /** This got removed when we introduced SearchManager2.
     class IncrementalSearchAction extends AbstractAction {
 	public IncrementalSearchAction() {
 	    super("Incremental search", new ImageIcon(GUIGlobals.searchIconFile));
@@ -380,6 +381,7 @@ public class JabRefFrame extends JFrame {
 		searchManager.startSearch();
 	}
     }
+    */
 
     class NewEntryAction extends AbstractAction {
 
@@ -721,9 +723,7 @@ public class JabRefFrame extends JFrame {
 			}
 			if (close) {
 				dispose();
-				
-				
-				
+							       
 				prefs.putInt("posX", ths.getLocation().x);
 				prefs.putInt("posY", ths.getLocation().y);
 				prefs.putInt("sizeX", ths.getSize().width);
@@ -747,7 +747,9 @@ public class JabRefFrame extends JFrame {
 				}
 				
 				// Let the search interface store changes to prefs.
-				searchManager.updatePrefs();
+				// But which one? Let's use the one that is visible.
+				if (basePanel() != null)
+				    basePanel().searchManager.updatePrefs();
 				
 				System.exit(0); // End program.
 			}

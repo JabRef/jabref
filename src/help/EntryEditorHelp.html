@@ -6,9 +6,9 @@
 <H1>The entry editor</H1>
 
 <em>Opened from main window by double-clicking on the leftmost column of an entry, or
-by pressing CTRL-D</em>.
+by pressing ENTER. The panel is closed by pressing ESC.</em>.
 <P>
-In this window you can specify all relevant information on a single entry.
+In this panel you can specify all relevant information on a single entry.
 The entry editor checks the type of your entry, and lists all the fields that
 are required, and the ones that are optional, for referring the entry
 with <em>bibtex</em>. In addition, there are several fields termed <em>General
@@ -28,42 +28,39 @@ to switch focus between the text fields.
 the left or right by pressing CTRL-SHIFT-LEFT or CTRL-SHIFT-RIGHT.
 
 <P>The <em>bibtex source</em> panel shows how the entry will appear
-when the database is saved in <em>bibtex</em> format. Two items in the
-Preferences dialog relate to this panel.
+when the database is saved in <em>bibtex</em> format.  If you wish,
+you can edit the <em>bibtex</em> source directly in this panel. When
+you move to a different panel, press CTRL-S or close the entry editor,
+JabRef will try to parse the contents of the source panel. If there
+are problems, you will be notified, and given the option to edit your
+entry further, or to revert to the former contents.
 
-<ul>
-<li>If <strong>Enable source editing</strong> is checked, you can edit
-the source directly in this panel. When you move to a different panel,
-press CTRL-S or close the entry editor, JabRef will try to parse
-the contents of the source panel. If there are problems, you will be
-notified, and given the option to edit your entry further, or to
-revert to the former contents.
-
-<li>If <strong>Show source by default</strong> is checked, the source
-panel will be the one shown each time you open the entry editor. If
-you prefer editing the source rather than using the other three
-panels, you should check this option.
-</ul>
+If <strong>Show source by default</strong> is checked in the
+<strong>General options</strong> tab of the
+<strong>Preferences</strong> dialog, the source panel will be the one
+shown each time you open the entry editor. If you prefer editing the
+source rather than using the other three panels, you should check this
+option.
 
 <P><strong>Tip:</strong> If your database contains fields unknown to
 JabRef, these will be visible in the source panel. Also, if you
 want to add your own custom fields, you can do this in the source
-panel once source editing is turned on.
+panel.
 
-<H2>Field consistency checking</H2>
-When the contents of a field is changed, JabRef checks if the new contents
-are compatible with the field type. For instance, the <em>year</em> field must
-contain a number. The contents are also checked with respect to the use of the
-'#' character. The hash symbol is <em>only</em> to be used in pairs, wrapping
-the name of a <em>bibtex</em> string that is referenced. Note that JabRef
-does not check if the referenced string actually exists (this is not possible,
-since the <em>bibtex</em> style you use can define an arbitrary set of strings 
-unknown to JabRef).
+<H2>Field consistency checking</H2> 
+When the contents of a field is changed, JabRef checks if the new
+contents are acceptable. For field types that are used by
+<em>bibtex</em>, the contents are checked with respect to the use of
+the '#' character. The hash symbol is <em>only</em> to be used in
+pairs, wrapping the name of a <em>bibtex</em> string that is
+referenced. Note that JabRef does not check if the referenced string
+actually exists (this is not trivial, since the <em>bibtex</em> style
+you use can define an arbitrary set of strings unknown to JabRef).
 <P>
 If the contents are not accepted, the field will turn red,
 indicating an error. In this case the change will not be stored.
 
-<H2>Word/name autocompletion</H2>
+<!--<H2>Word/name autocompletion</H2>
 The entry editor offers autocompletion of words. In the Preferences dialog
 you can enable or disable autocompletion, and choose for which fields
 autocompletion is active.
@@ -81,7 +78,7 @@ it should have been implemented differently, we'd like to hear your suggestions!
 <H2>Copy <em>bibtex</em> key</H2>
 Pressing CTRL-K or the 'key' button causes the <em>bibtex</em> key for your entry
 to be copied to the clipboard.
-
+-->
 <H2>Autogenerate <em>bibtex</em> key</H2>
 Press CTRL-G or the 'gen key' button to autogenerate a <em>bibtex</em> key for your entry
 based on the contents of its required fields.
