@@ -249,9 +249,17 @@ public class GUIGlobals {
       "keywords",
       "doi",
       "eid",
-      "search"
+      "search",
+	  "citeseerCitationCount"
   };
 
+  public static final Map FIELD_DISPLAYS;
+  static {
+  	FIELD_DISPLAYS = new HashMap();
+  	FIELD_DISPLAYS.put("citeseerCitationCount","Popularity");
+  }
+  
+  
 // These are the fields that BibTex might want to treat, so these
 // must conform to BibTex rules.
   public static String[] BIBTEX_STANDARD_FIELDS = new String[] {
@@ -391,6 +399,7 @@ public class GUIGlobals {
     fieldLength.put("number", new Integer(60));
     fieldLength.put("entrytype", new Integer(75));
     fieldLength.put("search", new Integer(75));
+    fieldLength.put("citeseerCitationCount", new Integer(75));
     fieldLength.put(NUMBER_COL, new Integer(32));
 
     Map fieldWeight = new HashMap();
@@ -421,7 +430,8 @@ public class GUIGlobals {
     fieldWeight.put("school", MEDIUM_W);
     fieldWeight.put("comment", MEDIUM_W);
     fieldWeight.put("abstract", LARGE_W);
-
+    fieldWeight.put("citeseerCitationCount", SMALL_W);
+    
     FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
   };
 

@@ -49,6 +49,8 @@ public class CiteSeerUndoHandler extends HandlerBase {
     
     String newAuthors = null;
 
+    int citeseerCitationCount = 0;
+    
     /*
      * Woe unto those who call this function from anywhere but
      * makeOverwriteChoice(). You will seriously f*&k things up.
@@ -114,7 +116,7 @@ public class CiteSeerUndoHandler extends HandlerBase {
 
     public void characters(char[] ch, int start, int length) {
         if (nextAssign == true) {
-            String target = new String(ch, start, length);
+            String target = new String(ch, start, length);        
             if (nextField.equals("title")) {
                 if (makeOverwriteChoice((String) bibEntry.getField(nextField),
                         target, nextField)) {
@@ -174,7 +176,15 @@ public class CiteSeerUndoHandler extends HandlerBase {
             throws SAXException {
         if(name.equals("record")) {
             recordFound.setValue(true);
-        } else if (name.equals("oai_citeseer:author")) {
+        } else if (name.equals("oai_citeseer:relation")) {
+    			for (int i = 0; i < attrs.getLength(); i++) {
+    			   String attrName = attrs.getName(i);
+    			   String attrValue = attrs.getValue(i);	   
+    			   if (attrName.equals("type") && attrValue.equals("Is Referenced By")) {  	
+    			   	citeseerCitationCount++;
+    			   }
+    			}
+        } else if (name.equals("oai_citeseer:author")) {        	
             addAuthor(attrs.getValue("name"));
         } else if (name.equals("dc:title")) {
             nextField = "title";
@@ -198,6 +208,13 @@ public class CiteSeerUndoHandler extends HandlerBase {
                 bibEntry.setField("author", newAuthors);
             }
         }
+        Integer newCount = new Integer(citeseerCitationCount);
+        UndoableFieldChange fieldChange = new UndoableFieldChange(
+                bibEntry, "citeseerCitationCount", 
+				bibEntry.getField("citeseerCitationCount"), 
+				newCount);
+        citeseerNamedCompound.addEdit(fieldChange);
+        bibEntry.setField("citeseerCitationCount", newCount);
     }
 
     /**

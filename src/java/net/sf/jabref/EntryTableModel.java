@@ -83,16 +83,30 @@ public class EntryTableModel
     remap();
   }
 
-  public String getColumnName(int col) {
+  /* This is the old getColumnName().
+   * This function now returns the field name
+   * with the original lower/upper case of the field name */
+  public String getFieldName(int col) {
     if (col == 0) {
       return GUIGlobals.NUMBER_COL;
     }
     else if (getIconTypeForColumn(col) != null) {
       return "";
     }
-//	else {
+    return columns[col - padleft];
+  }
+        
+  public String getColumnName(int col) {
+  	if (col == 0) {
+      return GUIGlobals.NUMBER_COL;
+    }
+    else if (getIconTypeForColumn(col) != null) {
+      return "";
+    }
+    else if(GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]) != null) {
+    	return((String) GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]));
+    }
     return Util.nCase(columns[col - padleft]);
-    //}
   }
 
   public int getRowCount() {
@@ -319,7 +333,7 @@ public class EntryTableModel
     // getColumnClass will throw a NullPointerException if there is no
     // entry in FieldTypes.GLOBAL_FIELD_TYPES for the column.
     try {
-      if (!getColumnName(col).toLowerCase().equals(GUIGlobals.TYPE_HEADER)) {
+      if (!getFieldName(col).equals(GUIGlobals.TYPE_HEADER)) {
 
 //	    getColumnClass(col);
         return true;
@@ -340,20 +354,20 @@ public class EntryTableModel
     BibtexEntry be = db.getEntryById(getNameFromNumber(row));
     boolean set = false;
     String toSet = null,
-        fieldName = getColumnName(col),
+        fieldName = getFieldName(col),
         text;
     if (value != null) {
       text = value.toString();
       if (text.length() > 0) {
         toSet = text;
         Object o;
-        if ( ( (o = be.getField(fieldName.toLowerCase())) == null)
+        if ( ( (o = be.getField(fieldName)) == null)
             || ( (o != null)
                 && !o.toString().equals(toSet))) {
           set = true;
         }
       }
-      else if (be.getField(fieldName.toLowerCase()) != null) {
+      else if (be.getField(fieldName) != null) {
         set = true;
       }
     }
@@ -365,13 +379,13 @@ public class EntryTableModel
         }
 
         // Store this change in the UndoManager to facilitate undo.
-        Object oldVal = be.getField(fieldName.toLowerCase());
+        Object oldVal = be.getField(fieldName);
         panel.undoManager.addEdit
             (new net.sf.jabref.undo.UndoableFieldChange
              (be, fieldName.toLowerCase(), oldVal, toSet));
         // .. ok.
 
-        be.setField(fieldName.toLowerCase(), toSet);
+        be.setField(fieldName, toSet);
         panel.markBaseChanged();
         panel.updateWiewToSelected();
         //panel.updateEntryEditorIfShowing();

@@ -1467,7 +1467,22 @@ class FetchCiteSeerAction
 					BibtexDatabase targetDatabase;
 
 					Runnable updateComponent = new Runnable() {
+
+						/* TODO: This should probably be selectable on/off
+						 * in the preferences window, but for now all
+						 * Citation fetcher operations will sort by citation count.
+						 */						
+						private void setSortingByCitationCount() {
+							newBp.frame.prefs.put("priSort", "citeseerCitationCount");
+							newBp.frame.prefs.put("secSort", "year");
+							newBp.frame.prefs.put("terSort", "author");
+							newBp.frame.prefs.putBoolean("priDescending", true);
+							newBp.frame.prefs.putBoolean("secDescending", true);
+							newBp.frame.prefs.putBoolean("terDescending", true);														
+						}
+						
 						public void run() {
+							setSortingByCitationCount();
 							tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
 							tabbedPane.setSelectedComponent(newBp);
 							newBp.refreshTable();
