@@ -36,11 +36,10 @@ public class EntrySorter {
 
     public EntrySorter(Map entries, Comparator comp) {
 	set = new TreeSet(comp);
-	BibtexEntry be;
 	Set keySet = entries.keySet();
 	if (keySet != null) {
 	    Iterator i = keySet.iterator();
-	    for (;i.hasNext();) {
+	    while (i.hasNext()) {
 		set.add(entries.get(i.next()));
 	    }
 	    index();

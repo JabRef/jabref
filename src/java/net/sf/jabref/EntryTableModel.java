@@ -38,9 +38,6 @@ import java.util.StringTokenizer;
 
 public class EntryTableModel extends AbstractTableModel {
 
-
-    private final String TYPE = "entrytype";
-
     BibtexDatabase db;
     BasePanel panel;
     JabRefFrame frame;

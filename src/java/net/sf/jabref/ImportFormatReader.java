@@ -163,7 +163,6 @@ public class ImportFormatReader
 		}
 		catch(IOException e){return null;}
 		String [] entries=sb.toString().split("START_RECORD");
-		int rowNum=0;
 		HashMap hm=new HashMap();
 		for(int i=1; i<entries.length; i++){
 			String[] fields = entries[i].split("FIELD ");
@@ -254,7 +253,6 @@ public class ImportFormatReader
 	String[] entries = sb.toString().split("::");
 	// skip the first entry as it is either empty or has document header
 
-	int rowNum = 0;
 	HashMap hm=new HashMap();
 	for(int i=1; i<entries.length; i++){
 	    String[] fields = entries[i].split(" ## ");
@@ -338,8 +336,6 @@ public class ImportFormatReader
 	    }
 	    in.close();
 	    String items[]=sb.toString().split("<[0-9]+>");
-	    String key="";
-	    String BibManKey="";
 
 	    for(int i =1; i<items.length; i++){
 		HashMap h=new HashMap();
@@ -455,7 +451,6 @@ public class ImportFormatReader
 	catch(IOException e){return null;}
 
 	String [] entries=sb.toString().split(ENDOFRECORD);
-	int rowNum=0;
 	HashMap hm=new HashMap();
 	String Author="",Type="",Editor="";
 	for(int i=0; i<entries.length; i++){
@@ -596,7 +591,6 @@ public class ImportFormatReader
 
 	String [] entries=sb.toString().split("ER  -");
 
-	int rowNum=0;
 	HashMap hm=new HashMap();
 	for(int i=0; i<entries.length-1; i++){
 	    String Type="",Author="",StartPage="",EndPage="";
@@ -753,7 +747,6 @@ public class ImportFormatReader
 	    in.close();
 	    String[] entries = sb.toString().split("__::__");
 	    String Type="";
-	    int rowNum=0;
 	    HashMap h=new HashMap();
 	    for(int i=0; i<entries.length; i++){
 		if(entries[i].indexOf("Record") != 0)

@@ -96,7 +96,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	int col = 0;
 
 	Iterator iter = BibtexEntryType.ALL_TYPES.keySet().iterator();
-	for (;iter.hasNext();) {
+	while (iter.hasNext()) {
 	    BibtexEntryType tp = BibtexEntryType.getType((String)iter.next());
 	    TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
 	    b.setAlignmentX(SwingConstants.LEFT);

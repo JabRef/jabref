@@ -17,7 +17,6 @@ public class IncrementalSearcher {
 
     public boolean search(String pattern, BibtexEntry bibtexEntry) {
 	hitInField = null;
-	int flags = 0;
 	//if (!prefs.getBoolean("caseSensitiveSearch"))
 	//    flags = Pattern.CASE_INSENSITIVE;
 	//Pattern pattern = Pattern.compile(searchString, flags);

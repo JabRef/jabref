@@ -47,6 +47,9 @@ import javax.swing.*;
  * @version $Id$
  * <p>
  * $Log$
+ * Revision 1.6  2004/02/27 23:28:41  mortenalver
+ * Some code tidying, no effect on behaviour (hopefully)
+ *
  * Revision 1.5  2004/02/24 23:30:18  mortenalver
  * Added more translations, and started work on a Replace string feature
  *
@@ -213,16 +216,9 @@ public class FontSelectorDialog extends JDialog {
 		preview = new JLabel(Globals.lang("Font Preview")) {
 			public void paint(Graphics g) {
 			    Graphics2D g2 = (Graphics2D)g;
-			    Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
-			    g2.setColor(getBackground());
-			    g2.fill(g2.getClipBounds());
-			    g2.setColor(getForeground());
-			    //g2.setFont(f);
-			    RenderingHints rh = g2.getRenderingHints();
-			    rh.put(RenderingHints.KEY_ANTIALIASING,
-				   RenderingHints.VALUE_ANTIALIAS_ON);
-			    g2.setRenderingHints(rh);
-			    //g2.drawString(getText(), 40, 15+f.getSize());
+			    g2.setRenderingHint
+				(RenderingHints.KEY_ANTIALIASING,
+				 RenderingHints.VALUE_ANTIALIAS_ON);
 			    super.paint(g2);
 			}
 
@@ -414,10 +410,10 @@ public class FontSelectorDialog extends JDialog {
 			updatePreview();
 		}
 	}
-    public static void main(String args[])
+    /*public static void main(String args[])
 	{
 	    Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
 
 	}
-
+    */
 }

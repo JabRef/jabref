@@ -221,7 +221,8 @@ public class BibtexEntry
             throw new IllegalArgumentException("Change rejected: " + pve);
 	}
 
-        Object oldValue = _fields.put(name, value);
+        //Object oldValue = 
+	_fields.put(name, value);
     }
 
     protected boolean allFieldsPresent(String[] fields) {

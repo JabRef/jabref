@@ -104,7 +104,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     MetaData metaData;
     HashMap fieldExtras = new HashMap();
     //## keep track of all keys for duplicate key warning and unique key generation
-    private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
+    //private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
 
     private boolean suppressOutput = false;
 
@@ -239,8 +239,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			}
 			else
 			    file = null;
-		    } else {
-			// Cancelled.
 		    }
 		}
 	    });
@@ -371,7 +369,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    try {
 				bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
 			    } catch (UnsupportedFlavorException ex) {
-			    } catch (IOException ex) {}
+				ex.printStackTrace();
+			    } catch (IOException ex) {
+				ex.printStackTrace();
+			    }
 
 			    if ((bes != null) && (bes.length > 0)) {
 				NamedCompound ce = new NamedCompound
@@ -424,7 +425,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				    markBaseChanged();
 				    output("Pasted cell contents");
 				} catch (UnsupportedFlavorException ex) {
+				    ex.printStackTrace();
 				} catch (IOException ex) {
+				    ex.printStackTrace();
 				} catch (IllegalArgumentException ex) {
 				    output("Can't paste.");
 				}
@@ -530,8 +533,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int numSelected = rows.length ;
 		    BibtexEntry bes = null ;
 		    
-		    if (numSelected > 0) {
-			/*
+		    /*if (numSelected > 0) {			
 			int answer = JOptionPane.showConfirmDialog
 			    (frame, "Generate bibtex key"+
 			     (numSelected>1 ? "s for the selected "
@@ -544,7 +546,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			
 			    }
 			*/
-		    } else { // None selected. Inform the user to select entries first.
+		    if (numSelected == 0) { // None selected. Inform the user to select entries first.
 			JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
 						      Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
 			return ;
@@ -729,7 +731,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
                  if (importGroups) {
                    Vector newGroups = meta.getData("groups");
                    if (newGroups != null) {
-                     Vector groups = metaData.getData("groups");
                      if (groupSelector == null) {
                        // The current database has no group selector defined, so we must instantiate one.
                        groupSelector = new GroupSelector
@@ -744,7 +745,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 		 if (importSelectorWords) {
 		     Iterator i=meta.iterator();
-		     for (;i.hasNext();) {
+		     while (i.hasNext()) {
 			 String s = (String)i.next();
 			 if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
 			     metaData.putData(s, meta.getData(s));

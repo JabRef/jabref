@@ -52,15 +52,9 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 	content = new HelpContent(bf.prefs);
 	content.addHyperlinkListener(this);
 	setSize(GUIGlobals.helpSize);
-	Dimension ds = GUIGlobals.helpSize,
-	    df = bf.getSize();
-	Point pf = bf.getLocation();
-	//setLocation(new Point(Math.max(0,(pf.x+(df.width-ds.width)/2)),
-	//Math.max(0,(pf.y+(df.height-ds.height)/2))));
 
 	/* There is probably no need for a window listener now, so
 	 * it's commented out.
-
 	diag.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    open = null;

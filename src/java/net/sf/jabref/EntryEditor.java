@@ -113,7 +113,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     private int sourceIndex = -1; // The index the source panel has in tabbed.
 
-    private final int REQ=0, OPT=1, GEN=2, FIELD_WIDTH=40, FIELD_HEIGHT=2;
+    //private final int REQ=0, OPT=1, GEN=2, FIELD_WIDTH=40, FIELD_HEIGHT=2;
     private final String KEY_PROPERTY = "bibtexkey";
     JabRefPreferences prefs;
     HelpAction helpAction;
@@ -261,7 +261,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.BOTH;
-	FieldTextArea firstReq = null, firstOpt = null, firstGen = null;
+	//FieldTextArea firstReq = null, firstOpt = null, firstGen = null;
 
 	for (int i=0; i<iter; i++) {
 
@@ -554,7 +554,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         am.put("save", saveDatabaseAction);
 
 	try{
-	    int i = 0 ;
 	    HashSet keys =  new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS)) ;
 	    keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB")) ;
 	    ta.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys) ;
@@ -745,7 +744,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	}
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() instanceof FieldTextArea) {
-		String toSet = null, fieldName = null;
+		String toSet = null;
 		FieldEditor fe = (FieldEditor)e.getSource();
 		boolean set;
 		if (fe.getText().length() > 0)
@@ -858,7 +857,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    BibtexEntry nu = db.getEntryById
 			((String)db.getKeySet().iterator().next());
 		    String id = entry.getId(),
-			oldKey = entry.getCiteKey(),
+			//oldKey = entry.getCiteKey(),
 			newKey = nu.getCiteKey();
 		    boolean anyChanged = false, duplicateWarning = false;
 
@@ -933,9 +932,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			 "Problem with parsing entry",
 			 JOptionPane.YES_NO_OPTION,
 			 JOptionPane.ERROR_MESSAGE,null, options,options[0]);
-		    if (answer == 0) {
-			//updateSource = true;
-		    } else {
+		    if (answer != 0) {
 			updateSource = true;
 			updateSource();
 		    }

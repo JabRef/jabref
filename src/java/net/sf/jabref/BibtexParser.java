@@ -207,8 +207,6 @@ public class BibtexParser
 
     public String parsePreamble() throws IOException
     {
-	int brackets = 0;
-
 	return parseBracketedText().toString();
     }
 
@@ -427,7 +425,7 @@ public class BibtexParser
 		if (c == ',') {
 		    unread(c);
 		    return token.toString();
-		} else if (Character.isWhitespace((char)c)) {
+		    //} else if (Character.isWhitespace((char)c)) {
 		    //throw new NoLabelException(token.toString());
 		} else if (c == '=') {
 		    // If we find a '=' sign, it is either an error, or

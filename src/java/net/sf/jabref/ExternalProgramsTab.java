@@ -26,8 +26,6 @@ class ExternalProgramsTab extends JPanel implements PrefsTab {
 		  (BorderFactory.createEtchedBorder(),
 		  Globals.lang("Paths to external programs")));*/
 	JLabel lab;
-        BrowseAction ba;
-        //JToolBar tlb;
 	setLayout(gbl);
 	con.weightx = 0;
 	con.insets = new Insets(10, 10, 10, 10);

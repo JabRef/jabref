@@ -105,7 +105,7 @@ public class HelpContent extends JEditorPane {
     }
 
     public void setPage(URL url) {
-	String lang = prefs.get("language");
+	//String lang = prefs.get("language");
 	URL old = getPage();
 	setPageOnly(url);        
 	forw.removeAllElements();
