@@ -1,5 +1,7 @@
 package net.sf.jabref.imports;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
@@ -29,11 +31,22 @@ public class RisImporter implements ImportFormat {
 	return "RIS";
     }
 
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+	// Our strategy is to look for the "AU  - *" line.
+	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+	Pattern pat1 = Pattern
+	    .compile("AU  - .*");
+	String str;
+	while ((str = in.readLine()) != null){
+	    if (pat1.matcher(str).find())
+		return true;
+	}
+	return false;
     }
 
     /**

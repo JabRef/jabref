@@ -87,8 +87,11 @@ public class ImportFormatReader {
 	if (o == null)
 	    throw new IllegalArgumentException("Unknown import format: "+format);
 	ImportFormat importer = (ImportFormat)o;
-	
-	return importer.importEntries(in);
+	List res = importer.importEntries(in);
+	// Remove all empty entries
+	if (res != null)
+	    purgeEmptyEntries(res);
+	return res;
     }
 
     public List importFromFile(String format, String filename) throws IOException {
@@ -96,6 +99,7 @@ public class ImportFormatReader {
 	if (o == null)
 	    throw new IllegalArgumentException("Unknown import format: "+format);
 	ImportFormat importer = (ImportFormat)o;
+	//System.out.println(importer.getFormatName());
 	return importFromFile(importer, filename);
     }
 
@@ -103,9 +107,26 @@ public class ImportFormatReader {
 	File file = new File(filename);
 	InputStream stream = new FileInputStream(file);
 	if (!importer.isRecognizedFormat(stream))
-	    return null;
+	    throw new IOException(Globals.lang("Wrong file format"));
 	stream = new FileInputStream(file);
 	return importer.importEntries(stream);
+    }
+
+    public static BibtexDatabase createDatabase(List bibentries) {
+	purgeEmptyEntries(bibentries);
+	BibtexDatabase database = new BibtexDatabase();
+	for (Iterator i=bibentries.iterator(); i.hasNext();) {
+	    BibtexEntry entry = (BibtexEntry)i.next();
+	    try {
+		entry.setId(Util.createId(entry.getType(), database));
+		database.insertEntry(entry);
+	    }
+	    catch (KeyCollisionException ex) {
+		//ignore
+		System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+	    }
+	}
+	return database;
     }
 
     public Set getImportFormats() {
@@ -386,7 +407,7 @@ public class ImportFormatReader {
       return reader;
   }
 
-  public static BibtexDatabase importFile(String format, String filename)
+    public static BibtexDatabase import_File(String format, String filename)
       throws IOException {
     BibtexDatabase database = null;
     List bibentries = null;

@@ -1,5 +1,8 @@
 package net.sf.jabref.imports;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -29,8 +32,18 @@ public class BibteXMLImporter implements ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+	// Our strategy is to look for the "<bibtex:file *" line.
+	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+	Pattern pat1 = Pattern
+	    .compile("<bibtex:file .*");
+	String str;
+	while ((str = in.readLine()) != null){
+	    if (pat1.matcher(str).find())
+		return true;
+	}
+	return false;
     }
 
     /**
@@ -39,15 +52,17 @@ public class BibteXMLImporter implements ImportFormat {
      */
     public List importEntries(InputStream stream) throws IOException {
 
+	ArrayList bibItems = new ArrayList();
+
 	// Obtain a factory object for creating SAX parsers
 	SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	// Configure the factory object to specify attributes of the parsers it
 	// creates
 	// parserFactory.setValidating(true);
-	parserFactory.setNamespaceAware(true);
-	
+	parserFactory.setNamespaceAware(true);	
 	// Now create a SAXParser object
-	ArrayList bibItems = new ArrayList();
+
+
 	try{
 	    SAXParser parser = parserFactory.newSAXParser(); //May throw exceptions
 	    BibTeXMLHandler handler = new BibTeXMLHandler();
@@ -57,8 +72,11 @@ public class BibteXMLImporter implements ImportFormat {
 	    bibItems = handler.getItems();
 	    
 	}catch (javax.xml.parsers.ParserConfigurationException e1){
+	    e1.printStackTrace();
 	}catch (org.xml.sax.SAXException e2){
+	    e2.printStackTrace();
 	}catch (java.io.IOException e3){
+	    e3.printStackTrace();
 	}
 	return bibItems;
 	

@@ -203,12 +203,29 @@ public class JabRef {
       else if (data.length == 2) {
         // Import a database in a certain format.
         try {
-          System.out.println(Globals.lang("Importing") + ": " + data[0]);
-          BibtexDatabase base = ImportFormatReader.importFile(data[1],
-              data[0].replaceAll("~", System.getProperty("user.home")));
-          ParserResult pr = new ParserResult(base, new HashMap());
-          pr.setFile(new File(data[0]));
-          loaded.add(pr);
+	  List entries;
+	  if (!"*".equals(data[1])) {
+	      System.out.println(Globals.lang("Importing") + ": " + data[0]);
+	      entries = Globals.importFormatReader.importFromFile
+		  (data[1], data[0].replaceAll("~", System.getProperty("user.home")));
+	  } else {
+	      // * means "guess the format":
+	      System.out.println(Globals.lang("Importing in unknown format") + ": " + data[0]);
+	      Object[] o = Globals.importFormatReader.importUnknownFormat
+		  (data[0].replaceAll("~", System.getProperty("user.home")));
+	      String formatName = (String)o[0];
+	      entries = (java.util.List)o[1];
+	      if (entries != null)
+		  System.out.println(Globals.lang("Format used") + ": " + formatName);
+	      else
+		  System.out.println(Globals.lang("Could not find a suitable import format."));
+	  }
+	  if (entries != null) {
+	      BibtexDatabase base = ImportFormatReader.createDatabase(entries);
+	      ParserResult pr = new ParserResult(base, new HashMap());
+	      pr.setFile(new File(data[0]));
+	      loaded.add(pr);
+	  }
         }
         catch (IOException ex) {
           System.err.println(Globals.lang("Error opening file") + " '" + data[0] +

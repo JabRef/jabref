@@ -1,5 +1,7 @@
 package net.sf.jabref.imports;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
@@ -25,8 +27,18 @@ public class IsiImporter implements ImportFormat {
     /**
      * Check whether the source is in the correct format for this importer.
      */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+
+	// Our strategy is to look for the "%A  <author>" line.
+	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+	Pattern pat1 = Pattern
+	    .compile("PY \\\\d{4}?");
+	String str;
+	while ((str = in.readLine()) != null){
+	    if (pat1.matcher(str).find())
+		return true;
+	}
+	return false;
     }
 
     /**
@@ -119,8 +131,8 @@ public class IsiImporter implements ImportFormat {
 		else if (beg.equals("CR")) //cited references
 		    hm.put("CitedReferences", value.replaceAll("EOLEOL", " ; ").trim());
 	    }
-	    
-	    hm.put("pages", pages);
+	    if (!"".equals(pages))
+		hm.put("pages", pages);
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType(Type)); // id assumes an existing database so don't
 	    // create one here
