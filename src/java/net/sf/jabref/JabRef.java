@@ -32,6 +32,7 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.*;
 import net.sf.jabref.imports.*;
+import net.sf.jabref.wizard.aux.*;
 import java.io.*;
 import java.util.*;
 import net.sf.jabref.export.*;
@@ -98,6 +99,7 @@ public class JabRef {
     BooleanOption loadSess = new BooleanOption();
     StringOption exportPrefs = new StringOption("jabref_prefs.xml");
     StringOption importPrefs = new StringOption("jabref_prefs.xml");
+    StringOption auxImExport = new StringOption("") ;
 
     options.register("nogui", 'n',
                      Globals.lang("No GUI. Only process command line options."),
@@ -116,11 +118,14 @@ public class JabRef {
                      exportPrefs);
     options.register("primp", 'p', Globals.lang("Import preferences from file"),
                      importPrefs);
+    options.register("aux", 'a', Globals.lang("subdatabase_from_aux") + ": " +
+                     "file[.aux]" + ",new[.bib]", auxImExport);
     options.setUseMenu(false);
 
     String[] leftOver = options.process(args);
 
     if (helpO.isInvoked()) {
+      System.out.println("jabref [options] [bibtex-file]\n") ;
       System.out.println(options.getHelp());
       System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor, silverplatter.");
 
@@ -308,13 +313,66 @@ public class JabRef {
       }
     }
 
+    if (auxImExport.isInvoked())
+    {
+      boolean usageMsg = false ;
+
+      if (loaded.size() > 0)   // bibtex file loaded
+      {
+        String[] data = auxImExport.getStringValue().split( "," ) ;
+        if ( data.length == 2 )
+        {
+          ParserResult pr = (ParserResult) loaded.firstElement() ;
+          AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase()) ;
+          BibtexDatabase newBase = acl.perform();
+
+          boolean notSavedMsg = false ;
+          // write an output, if something could be resolved
+          if (newBase != null)
+            if (newBase.getEntryCount() > 0)
+            {
+              String subName = Util.getCorrectFileName(data[1], "bib") ;
+
+              try
+              {
+                System.out.println( Globals.lang( "Saving" ) + ": " +subName ) ;
+                FileActions.saveDatabase( newBase,
+                                          new MetaData(), // no Metadata
+                                          new File( subName ),
+                                          prefs, false, false,
+                                          prefs.get( "defaultEncoding" ) ) ;
+              }
+              catch ( SaveException ex )
+              {
+                System.err.println( Globals.lang( "Could not save file" ) +
+                                    " '" +
+                                    subName + "': " + ex.getMessage() ) ;
+              }
+              notSavedMsg = true ;
+            }
+
+          if (!notSavedMsg)
+            System.out.println(Globals.lang("no database generated")) ;
+        }
+        else usageMsg = true ;
+      }
+      else usageMsg = true ;
+
+      if (usageMsg)
+      {
+        System.out.println( Globals.lang("no base-bibtex-file specified") ) ;
+        System.out.println( Globals.lang("usage") +" :") ;
+        System.out.println( "jabref --aux infile[.aux],outfile[.bib] base-bibtex-file" ) ;
+      }
+    }
+
     //openGui = false;
     if (!graphicFailure && !disableGui.isInvoked()) {
 
-	// Call the method performCompatibilityUpdate(), which does any
-	// necessary changes for users with a preference set from an older
-	// Jabref version.
-	Util.performCompatibilityUpdate();
+        // Call the method performCompatibilityUpdate(), which does any
+        // necessary changes for users with a preference set from an older
+        // Jabref version.
+        Util.performCompatibilityUpdate();
 
 
       //Font fnt = new Font("plain", Font.PLAIN, 12);

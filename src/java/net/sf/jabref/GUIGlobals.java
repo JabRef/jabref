@@ -258,7 +258,8 @@ public class GUIGlobals {
       exportCustomizationHelp = "CustomExports.html",
       medlineHelp = "MedlineHelp.html",
 //      searchHelp = "SearchHelp.html",
-      aboutPage = "About.html";
+      aboutPage = "About.html",
+      shortPlainImport="ShortPlainImport.html";
 
 
 // Colors.
@@ -285,7 +286,8 @@ public class GUIGlobals {
       gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
       gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
       activeTabbed = Color.black,  // active Database (JTabbedPane)
-      inActiveTabbed = Color.gray.darker()  // inactive Database
+      inActiveTabbed = Color.gray.darker(),  // inactive Database
+      infoField = new Color(254, 255, 225) // color for an info field
       ;
 
   public static String META_FLAG = "jabref-meta: ";

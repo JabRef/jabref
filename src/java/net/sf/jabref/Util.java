@@ -483,13 +483,13 @@ public class Util {
         else
           name = dir + System.getProperty("file.separator") + name;
         file = new File(name);
-	if (file.exists())
-	    return file;
-	// Ok, try to fix / and \ problems:
-	if (Globals.ON_WIN)
-	    name = name.replaceAll("/", "\\");
-	else
-	    name = name.replaceAll("\\\\", "/");
+        if (file.exists())
+            return file;
+        // Ok, try to fix / and \ problems:
+        if (Globals.ON_WIN)
+            name = name.replaceAll("/", "\\");
+        else
+            name = name.replaceAll("\\\\", "/");
         file = new File(name);
         return (file.exists() ? file : null);
       }
@@ -536,10 +536,10 @@ public class Util {
     fields = one.getType().getOptionalFields();
 
     if (fields != null) {
-	float opt = compareFieldSet(fields, one, two);
-	return (2*req + opt)/3 >= threshold;
+        float opt = compareFieldSet(fields, one, two);
+        return (2*req + opt)/3 >= threshold;
     } else {
-	return (req >= threshold);
+        return (req >= threshold);
     }
   }
 
@@ -718,27 +718,44 @@ public class Util {
      */
     public static void performCompatibilityUpdate() {
 
-	// Make sure "abstract" is not in General fields, because
-	// Jabref 1.55 moves the abstract to its own tab.
-	String genFields = Globals.prefs.get("generalFields");
-	//pr(genFields+"\t"+genFields.indexOf("abstract"));
-	if (genFields.indexOf("abstract") >= 0) {
-	    //pr(genFields+"\t"+genFields.indexOf("abstract"));
-	    String newGen = null;
-	    if (genFields.equals("abstract"))
-		newGen = "";
-	    else if (genFields.indexOf(";abstract;") >= 0) {
-		newGen = genFields.replaceAll(";abstract;", ";");
-	    } else if (genFields.indexOf("abstract;") == 0) {
-		newGen = genFields.replaceAll("abstract;", "");		
-	    } else if (genFields.indexOf(";abstract") == genFields.length()-9) {
-		newGen = genFields.replaceAll(";abstract", "");		
-	    }
-	    else
-		newGen = genFields;
-	    //pr(newGen);
-	    Globals.prefs.put("generalFields", newGen);
-	}
-	
+        // Make sure "abstract" is not in General fields, because
+        // Jabref 1.55 moves the abstract to its own tab.
+        String genFields = Globals.prefs.get("generalFields");
+        //pr(genFields+"\t"+genFields.indexOf("abstract"));
+        if (genFields.indexOf("abstract") >= 0) {
+            //pr(genFields+"\t"+genFields.indexOf("abstract"));
+            String newGen = null;
+            if (genFields.equals("abstract"))
+                newGen = "";
+            else if (genFields.indexOf(";abstract;") >= 0) {
+                newGen = genFields.replaceAll(";abstract;", ";");
+            } else if (genFields.indexOf("abstract;") == 0) {
+                newGen = genFields.replaceAll("abstract;", "");
+            } else if (genFields.indexOf(";abstract") == genFields.length()-9) {
+                newGen = genFields.replaceAll(";abstract", "");
+            }
+            else
+                newGen = genFields;
+            //pr(newGen);
+            Globals.prefs.put("generalFields", newGen);
+        }
+
     }
+
+// -------------------------------------------------------------------------------
+
+    /** extend the filename with defaultExtension, if no Extension could be found */
+    public static String getCorrectFileName(String orgName, String defaultExtension)
+    {
+      if (orgName == null)
+        return "" ;
+
+      String back = orgName ;
+      int t = orgName.indexOf(".", 1) ;  // hidden files (?)
+      if (t < 1)
+        back = back +"." +defaultExtension ;
+
+      return back ;
+    }
+
 }

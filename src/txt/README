@@ -1,4 +1,4 @@
- 
+
 JabRef 1.55
 -----------
 
@@ -52,8 +52,8 @@ or, if you are using the Java Runtime Environment:
      jre -new -jar <path to jar> or
      jrew -new -jar <path to jar>
 
-We recommend running JabRef under the Java 5.0 JRE. If you do, you should add 
-the option "-Dswing.aatext=true" before the "-jar" option, to activate 
+We recommend running JabRef under the Java 5.0 JRE. If you do, you should add
+the option "-Dswing.aatext=true" before the "-jar" option, to activate
 antialiased text throughout the application.
 
 
@@ -85,130 +85,132 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.55+X: - command line option for generating a sub-database from LaTex aux file
+          entries
 1.55:	- Made method for opening PDF files robust with regard to file separators (/ and \),
-	  so bib files can easier be used across platforms.
-	- Improved Medline fetcher. Can now fetch entries based on a search expression.
-	- Added features for fetching fields and referring publications from the CiteSeer
-	  database.
-	- Added option to always save database ordered by author/editor/year, and made this
-	  the default setting.
-	- When a single entry is selected, right-click menu now shows a checkbox menu for group
-	  memberships instead of the regular "Add to" and "Remove from" menus.
-	- Improved [shorttitle] and [veryshorttitle] special key pattern fields.
-	- Added dialog box for conveniently setting the fields of an entry from a
-	  plain text description.
-	- Added formatter "ResolvePDF" to create correct PDF/PS links in HTML export when
-	  relative file names are used.
-	- Added Abstract panel in entry editor.
-	- Added alternate preview with abstract, and made both previews configurable.
-	- Added the option to create a subset of a database based on an .aux file.
-	- Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
-	- Added check for spaces in custom entry type names.
-	- Added several new key pattern markers.
-	- Added toolbar buttons for Mark/Unmark to improve discoverability.
-	- Fixed bug that made export filters ignore the chosen character encoding.
-	- Fixed bug that interfered with author name formatting.
-	- Fixed various bugs in import filters.
-	- Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.
-	- Fixed bug that made the next entry be opened instead of the current, when pressing 
-	  Enter in table.
+          so bib files can easier be used across platforms.
+        - Improved Medline fetcher. Can now fetch entries based on a search expression.
+        - Added features for fetching fields and referring publications from the CiteSeer
+          database.
+        - Added option to always save database ordered by author/editor/year, and made this
+          the default setting.
+        - When a single entry is selected, right-click menu now shows a checkbox menu for group
+          memberships instead of the regular "Add to" and "Remove from" menus.
+        - Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+        - Added dialog box for conveniently setting the fields of an entry from a
+          plain text description.
+        - Added formatter "ResolvePDF" to create correct PDF/PS links in HTML export when
+          relative file names are used.
+        - Added Abstract panel in entry editor.
+        - Added alternate preview with abstract, and made both previews configurable.
+        - Added the option to create a subset of a database based on an .aux file.
+        - Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
+        - Added check for spaces in custom entry type names.
+        - Added several new key pattern markers.
+        - Added toolbar buttons for Mark/Unmark to improve discoverability.
+        - Fixed bug that made export filters ignore the chosen character encoding.
+        - Fixed bug that interfered with author name formatting.
+        - Fixed various bugs in import filters.
+        - Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.
+        - Fixed bug that made the next entry be opened instead of the current, when pressing
+          Enter in table.
         - Fixed bug that made it possible to leave a source edit when the source didn't validate
           properly. Also made it impossible to change table selection until source validates.
 1.5:	- Enabled selection of default encoding, and started storing encoding information in
-	  saved .bib files, which is used when reopening.
-	- Added Highlight and select options to the group interface, and made it possible
-  	  to change the number of visible lines in the list.
-      	- Added option to allow or disallow direct table editing.
-	- Added optional confirmation dialog for deleting entries.
-      	- Added optional warning dialog for duplicate BibTeX keys.
-	- Added warnings to bibtex parser, and prevented failure to load files with
-	  duplicate string definitions.
-      	- Added JStor import filter.
-	- Changed the look and feel to JGoodies Forms on non-Macintosh platforms.
-	- Optimized performance in several areas.
-	- Numerous usability improvements.
-	- Fixed RIS import bug caused by short lines.
-      	- Fixed bug in SciFinder import.
-      	- Fixed bug that made entire field get cleared when removing from group.
+          saved .bib files, which is used when reopening.
+        - Added Highlight and select options to the group interface, and made it possible
+            to change the number of visible lines in the list.
+              - Added option to allow or disallow direct table editing.
+        - Added optional confirmation dialog for deleting entries.
+              - Added optional warning dialog for duplicate BibTeX keys.
+        - Added warnings to bibtex parser, and prevented failure to load files with
+          duplicate string definitions.
+              - Added JStor import filter.
+        - Changed the look and feel to JGoodies Forms on non-Macintosh platforms.
+        - Optimized performance in several areas.
+        - Numerous usability improvements.
+        - Fixed RIS import bug caused by short lines.
+              - Fixed bug in SciFinder import.
+              - Fixed bug that made entire field get cleared when removing from group.
 1.4:	- Added advanced search feature.
-	- Added facility for using custom export formats.
-	- Added command line options for importing/exporting files, importing/exporting
-	  user preferences, loading session and for suppressing the GUI (using RitOpt for
+        - Added facility for using custom export formats.
+        - Added command line options for importing/exporting files, importing/exporting
+          user preferences, loading session and for suppressing the GUI (using RitOpt for
           parsing options).
-	- Added automatic stripping of \url{} when opening url.
+        - Added automatic stripping of \url{} when opening url.
         - Improved export filters.
         - Fixed focus bug which sometimes interfered with cut/copy/paste.
 1.3.1:	- Bugfix.
 1.3:	- Added entry preview.
-	- Added detection of duplicate entries.
-      	- Added possibility to mark entries persistently.
-	- Added import filter for Sixpack and Biblioscape Tag files.
-      	- Added option to use a standard directory for PDFs. PDFs placed in or below this directory
+        - Added detection of duplicate entries.
+              - Added possibility to mark entries persistently.
+        - Added import filter for Sixpack and Biblioscape Tag files.
+              - Added option to use a standard directory for PDFs. PDFs placed in or below this directory
           and named after an entry's BibTeX key can be automatically found.
-    	- Added optional columns showing clickable icons for pdf/ps and url/doi links.
-	- Added menu and toolbar actions for open pdf/ps and url/doi.
-	- Added web lookup of DOI.
-	- Added several new special field markers to the key autogenerator.
-      	- Added BibTeXML and simple HTML export.
-      	- Changed browsing of entries. Entry editor now shows the selected entry.
-      	- Improved HTML export for several entry types.
-      	- Improved compatibility with Mac OS X.
-	- Made it possible to set custom secondary and tertiary sort fields.
-	- Made the entry number column width customizable.
-      	- Fixed bug that caused database to always be marked as changed after viewing source.
-       	- Fixed bug in selector word removal.
-       	- Fixed	bug that made the file chooser unable to interpret Mac OS X aliases.
+            - Added optional columns showing clickable icons for pdf/ps and url/doi links.
+        - Added menu and toolbar actions for open pdf/ps and url/doi.
+        - Added web lookup of DOI.
+        - Added several new special field markers to the key autogenerator.
+              - Added BibTeXML and simple HTML export.
+              - Changed browsing of entries. Entry editor now shows the selected entry.
+              - Improved HTML export for several entry types.
+              - Improved compatibility with Mac OS X.
+        - Made it possible to set custom secondary and tertiary sort fields.
+        - Made the entry number column width customizable.
+              - Fixed bug that caused database to always be marked as changed after viewing source.
+               - Fixed bug in selector word removal.
+               - Fixed	bug that made the file chooser unable to interpret Mac OS X aliases.
 1.2:	- Replaced the icon set.
-	- Added support for French language.
-	- Added customization of key generation.
-	- Improved HTML export.
-	- Added Replace string feature.
-    	- Made a couple of adaptations for Mac OS X users.
-	- Added option in Table Preferences to set current column widths as default.
-    	- Added import filter for BibTeXML.
-	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
-	- Fixed bug that made selector words added in the dialog to be lowercased.
-	- Fixed bug relating to translated help files.
+        - Added support for French language.
+        - Added customization of key generation.
+        - Improved HTML export.
+        - Added Replace string feature.
+            - Made a couple of adaptations for Mac OS X users.
+        - Added option in Table Preferences to set current column widths as default.
+            - Added import filter for BibTeXML.
+        - Fixed bug that allowed non-lowercase grouping field, leading to problems.
+        - Fixed bug that made selector words added in the dialog to be lowercased.
+        - Fixed bug relating to translated help files.
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.
-	- Added options to display names in harmonised format in the main table.
-	- Added Docbook and (experimental) HTML export.
-	- Enabled 'doi' and 'pii' fields for Medline import.
-	- Enabled antialiasing fonts.
-	- Added the Kunststoff look&feel to give a more pleasant user interface.
-	- Added font selector for the main table.
-	- Improved table column customization.
-	- Added word selector feature for selected fields (keywords, journal).
-	- Added support for German and Norwegian language.
-	- Generalized copy cite key features for multiple entries.
-	- Added quick load/save session feature.
-	- Fixed issue/number bug in ISI import.
-	- Added "Open pdf/ps" item in right-click menu.
-	- Fixed bug causing external viewer to only work in General fields.
-	- Added functionality for using Browse buttons for file-related fields
-	  (ps, pdf, etc.).
-	- Added Browse buttons to External programs tab in Preferences.
-	- Fixed bug related to Save database and Source field which caused changes
-	  to disappear.
+        - Added options to display names in harmonised format in the main table.
+        - Added Docbook and (experimental) HTML export.
+        - Enabled 'doi' and 'pii' fields for Medline import.
+        - Enabled antialiasing fonts.
+        - Added the Kunststoff look&feel to give a more pleasant user interface.
+        - Added font selector for the main table.
+        - Improved table column customization.
+        - Added word selector feature for selected fields (keywords, journal).
+        - Added support for German and Norwegian language.
+        - Generalized copy cite key features for multiple entries.
+        - Added quick load/save session feature.
+        - Fixed issue/number bug in ISI import.
+        - Added "Open pdf/ps" item in right-click menu.
+        - Fixed bug causing external viewer to only work in General fields.
+        - Added functionality for using Browse buttons for file-related fields
+          (ps, pdf, etc.).
+        - Added Browse buttons to External programs tab in Preferences.
+        - Fixed bug related to Save database and Source field which caused changes
+          to disappear.
 1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration
-	  from generating non-unique keys.
-	- Added command line option to load file on startup.
-	- Fixed problem with autogeneration creating invalid keys.
-	- Improved Refer/Endnote import.
-	- Added feature for importing entries and/or strings and/or group
+          from generating non-unique keys.
+        - Added command line option to load file on startup.
+        - Fixed problem with autogeneration creating invalid keys.
+        - Improved Refer/Endnote import.
+        - Added feature for importing entries and/or strings and/or group
           definitions from another BibTeX database.
-	- Added menu choices to import into open database.
-      	- Added toolbar button for closing current database.
-      	- Fixed shortcut key for "Store field" in entry editor, and fixed
-      	  problem that made shortcut for "Save database" unavailable from
-	  entry editor.
-	- Added option to fetch Medline entries automatically by
-	  ID, based on a patch submitted by Mike Smoot.
-	- Fixed bug in RIS import.
-	- Added options to copy key and copy "\cite{key}" to right-click menu.
-	- Fixed bug that caused some General fields not to get displayed.
-	- Enabled customization of General fields.
-	- Enabled customization of existing entry types, and definition of
-	  new types.
+        - Added menu choices to import into open database.
+              - Added toolbar button for closing current database.
+              - Fixed shortcut key for "Store field" in entry editor, and fixed
+                problem that made shortcut for "Save database" unavailable from
+          entry editor.
+        - Added option to fetch Medline entries automatically by
+          ID, based on a patch submitted by Mike Smoot.
+        - Fixed bug in RIS import.
+        - Added options to copy key and copy "\cite{key}" to right-click menu.
+        - Fixed bug that caused some General fields not to get displayed.
+        - Enabled customization of General fields.
+        - Enabled customization of existing entry types, and definition of
+          new types.
 1.0:	First release.
 
 
