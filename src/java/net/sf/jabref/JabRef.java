@@ -112,8 +112,24 @@ public class JabRef {
 	}else{//no arguments (this will be for later and other command line switches)
 	    // ignore..
 	}
+      /*
+      BibtexEntry b1 = new BibtexEntry("ee", BibtexEntryType.ARTICLE);
+      BibtexEntry b2 = new BibtexEntry("eee", BibtexEntryType.ARTICLE);
+      BibtexEntry b3 = new BibtexEntry("eeee", BibtexEntryType.ARTICLE);
 
+      b1.setField("author", "M. O. Alver");
+      b2.setField("author", "Alver, Morten");
+      b3.setField("author", "Morten Alver and Fredrik Skagen");
 
-    }
+      b1.setField("title", "Ole Brumm");
+      b2.setField("title", "Ole Brumm");
+      b2.setField("journal", "Ole Brumm");
+      b3.setField("title", "Ole Brumm er i skagen");
+      float threshold = 0.8f;
+      Util.pr(""+Util.isDuplicate(b1, b2, threshold)+
+              "\n"+Util.isDuplicate(b1, b3, threshold)+
+              "\n"+Util.isDuplicate(b2, b3, threshold));
+      */
+      }
 
 }

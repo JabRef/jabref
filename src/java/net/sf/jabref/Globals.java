@@ -43,7 +43,7 @@ public class Globals {
 	SELECTOR_META_PREFIX = "selector_",
 	LAYOUT_PREFIX = "/resource/layout/",
 	MAC = "Mac OS X";
-
+    public static float duplicateThreshold = 0.78f;
 
     public static String osName = System.getProperty("os.name", "def");
 

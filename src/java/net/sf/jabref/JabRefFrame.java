@@ -176,10 +176,11 @@ public class JabRefFrame extends JFrame {
                                           "Open pdf or ps",
                                           GUIGlobals.pdfIcon,
                                           prefs.getKey("Open pdf or ps")),
-         openUrl = new GeneralAction("openUrl", "Open url",
-                                            "Open url",
-                                            GUIGlobals.wwwIcon,
-                                          prefs.getKey("Open url"));
+             openUrl = new GeneralAction("openUrl", "Open url",
+                                                "Open url",
+                                                GUIGlobals.wwwIcon,
+                                          prefs.getKey("Open url")),
+          dupliCheck = new GeneralAction("dupliCheck", "Find duplicates");
              /*setupSelector = new GeneralAction("setupSelector", "", "",
 					  GUIGlobals.pasteIconFile,
 					  prefs.getKey(")),*/
@@ -575,6 +576,7 @@ public class JabRefFrame extends JFrame {
 	tools.add(normalSearch);
 	tools.add(incrementalSearch);
         tools.add(replaceAll);
+        tools.add(dupliCheck);
         tools.addSeparator();
 	tools.add(makeKeyAction);
         tools.add(lyxPushAction);

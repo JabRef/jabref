@@ -850,6 +850,27 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		      }
 		  }
 	      });
+
+              actions.put("dupliCheck", new BaseAction() {
+                public void action() {
+                  int dupl = 0;
+                  output(Globals.lang("Searching for duplicates..."));
+                  BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  for (int i=0; i<bes.length-1; i++)
+                    for (int j=i+1; j<bes.length; j++) {
+                      boolean eq = Util.isDuplicate(bes[i], bes[j], Globals.duplicateThreshold);
+                      if (eq) {
+                        dupl++;
+                        Util.pr("---------------------------------------------------");
+                        Util.pr("--> "+i+" and "+j+" ...");
+                        Util.pr("---------------------------------------------------");
+                      }
+                    }
+
+                  output(Globals.lang("Duplicate pairs found")+": "+dupl);
+                }
+
+              });
     }
 
     /**

@@ -27,12 +27,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.*;
 import java.io.*;
-import java.util.StringTokenizer;
-import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.HashSet;
+import java.util.*;
+import net.sf.jabref.imports.ImportFormatReader;
+import java.awt.*;
 
 /**
  * Describe class <code>Util</code> here.
@@ -44,6 +42,13 @@ public class Util {
 
     // Colors are defined here.
     public static Color fieldsCol = new Color(180,180,200);
+
+  // Integer values for indicating result of duplicate check (for entries):
+    final static int TYPE_MISMATCH = -1,
+        NOT_EQUAL = 0,
+        EQUAL = 1,
+        EMPTY_IN_ONE = 2,
+        EMPTY_IN_TWO = 3;
 
     public static void bool(boolean b) {
 	if (b) System.out.println("true");
@@ -363,7 +368,74 @@ public class Util {
 	}
     }
 
-    /**
+  /**
+   * Checks if the two entries represent the same publication.
+   *
+   * @param one BibtexEntry
+   * @param two BibtexEntry
+   * @return boolean
+   */
+  public static boolean isDuplicate(BibtexEntry one, BibtexEntry two, float threshold) {
+
+    // First check if they are of the same type - a necessary condition:
+    if (one.getType() != two.getType()) return false;
+
+    // The check if they have the same required fields:
+    String[] fields = one.getType().getRequiredFields();
+    float req = compareFieldSet(fields, one, two);
+    fields = one.getType().getOptionalFields();
+    float opt = compareFieldSet(fields, one, two);
+    return (2*req + opt)/3 >= threshold;
+  }
+
+  private static float compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+    int res = 0;
+    for (int i=0; i<fields.length; i++) {
+
+      //Util.pr(":"+compareSingleField(fields[i], one, two));
+      if (compareSingleField(fields[i], one, two) == EQUAL) {
+        res++;
+        //Util.pr(fields[i]);
+      }
+    }
+    return ((float)res) / ((float)fields.length);
+  }
+
+  private static int compareSingleField(String field, BibtexEntry one, BibtexEntry two) {
+    String s1 = (String)one.getField(field),
+        s2 = (String)two.getField(field);
+    if (s1 == null) {
+      if (s2 == null) return EQUAL;
+      else return EMPTY_IN_ONE;
+    }
+    else if (s2 == null) return EMPTY_IN_TWO;
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+    //Util.pr(field+": '"+s1+"' vs '"+s2+"'");
+    if (field.equals("author") || field.equals("editor")) {
+      // Specific for name fields.
+      // Harmonise case:
+      String[] aus1 = ImportFormatReader.fixAuthor_lastnameFirst(s1).split(" and "),
+          aus2 = ImportFormatReader.fixAuthor_lastnameFirst(s2).split(" and "),
+          au1 = aus1[0].split(","),
+          au2 = aus2[0].split(",");
+
+      // Can check number of authors, all authors or only the first.
+      if ((aus1.length > 0) && (aus1.length == aus2.length) && au1[0].trim().equals(au2[0].trim()))
+        return EQUAL;
+      else return NOT_EQUAL;
+    }
+    else {
+      if (s1.trim().equals(s2.trim()))
+        return EQUAL;
+      else return NOT_EQUAL;
+    }
+
+  }
+
+
+
+  /**
      * This methods assures all words in the given entry are recorded
      * in their respective Completers, if any.
      */
