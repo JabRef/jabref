@@ -327,10 +327,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
         ToolTipManager.sharedInstance().registerComponent(groupsTree);
-        
-        // JZPUWIL: drag and drop...
-        // ...see GroupsTree
-        
+        // drag'n'drop is enabled in GroupsTree.java
         groupsTree.setShowsRootHandles(false);
         // groupsTree.setPrototypeCellValue("Suitable length");
         // // The line above decides on the list's preferred width.
