@@ -60,7 +60,7 @@ public class ConvertSpecialCharactersForXML implements LayoutFormatter
     }
 
     private String restFormat(String s) {
-	return s.replaceAll("\\}","").replaceAll("\\{","");
+	return s.replaceAll("\\}","").replaceAll("\\{","").replaceAll("<", "&#x3c;");
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

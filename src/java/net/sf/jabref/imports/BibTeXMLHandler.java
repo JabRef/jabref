@@ -103,6 +103,7 @@ public class BibTeXMLHandler extends DefaultHandler {
             bibitems.add( b  );
         } else if (name.startsWith("bibtex:")) {
             b.setField(local, currentChars);
+            // Util.pr(local+ " "+currentChars);
         }
         currentChars = "";
     }
