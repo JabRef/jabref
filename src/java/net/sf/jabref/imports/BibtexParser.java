@@ -113,7 +113,7 @@ public class BibtexParser
 		else if (entryType.toLowerCase().equals("string")) {
                   BibtexString bs = parseString();
                   try {
-                    _db.addString(bs, _db.getStringCount());
+                    _db.addString(bs);
                   } catch (KeyCollisionException ex) {
                     _pr.addWarning(Globals.lang("Duplicate string name")+": "+bs.getName());
                     //ex.printStackTrace();
@@ -214,7 +214,8 @@ public class BibtexParser
 	//Util.pr("Now I'm going to consume a }");
 	consume('}',')');
 	//Util.pr("Finished string parsing.");
-	return new BibtexString(name, content);
+	String id = Util.createNeutralId();
+	return new BibtexString(id, name, content);
     }
 
     public String parsePreamble() throws IOException

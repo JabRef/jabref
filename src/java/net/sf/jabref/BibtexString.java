@@ -29,11 +29,20 @@ package net.sf.jabref;
 
 public class BibtexString {
 
-    String _name, _content;
+    String _name, _content, _id;
 
-    public BibtexString(String name, String content) {
+    public BibtexString(String id, String name, String content) {
+	_id = id;
 	_name = name;
 	_content = content;
+    }
+
+    public String getId() {
+	return _id;
+    }
+
+    public void setId(String id) {
+	_id = id;
     }
 
     public String getName() {
@@ -53,7 +62,7 @@ public class BibtexString {
     }
 
     public Object clone() {
-      return new BibtexString(_name, _content);
+      return new BibtexString(_id, _name, _content);
     }
 
 }

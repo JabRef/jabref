@@ -35,11 +35,11 @@ public class StringNameChange extends Change {
                                                 disk));
     } else {
       // The string was removed or renamed locally. We guess that it was removed.
-      BibtexString bs = new BibtexString(disk, content);
+	String newId = Util.createNeutralId();
+	BibtexString bs = new BibtexString(newId, disk, content);
       try {
-        int pos = panel.database().getStringCount();
-        panel.database().addString(bs, pos);
-        undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs, pos));
+        panel.database().addString(bs);
+        undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
       } catch (KeyCollisionException ex) {
         Globals.logger("Error: could not add string '"+bs.getName()+"': "+ex.getMessage());
       }

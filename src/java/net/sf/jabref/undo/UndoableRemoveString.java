@@ -33,15 +33,12 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 
     private BibtexDatabase base;
     private BibtexString string;
-    private int pos;
     private BasePanel panel;
 
     public UndoableRemoveString(BasePanel panel,
-				BibtexDatabase base, BibtexString string, 
-				int pos) {
+				BibtexDatabase base, BibtexString string) {
 	this.base = base;
 	this.string = string;
-	this.pos = pos;
 	this.panel = panel;
     }
 
@@ -58,7 +55,7 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 	
 	// Revert the change.
 	try {
-	    base.addString(string, pos);
+	    base.addString(string);
 	} catch (KeyCollisionException ex) {
 	    ex.printStackTrace();
 	}
@@ -70,7 +67,7 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 	super.redo();
 
 	// Redo the change.
-	base.removeString(pos);
+	base.removeString(string.getId());
 
 	panel.updateStringDialog();
     }

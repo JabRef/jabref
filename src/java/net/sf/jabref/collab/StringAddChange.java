@@ -9,15 +9,13 @@ import net.sf.jabref.undo.UndoableStringChange;
 public class StringAddChange extends Change {
 
   BibtexString string;
-  int pos;
 
   InfoPane tp = new InfoPane();
   JScrollPane sp = new JScrollPane(tp);
 
-  public StringAddChange(BibtexString string, int pos) {
+  public StringAddChange(BibtexString string) {
     name = Globals.lang("Added string")+": '"+string.getName()+"'";
     this.string = string;
-    this.pos = pos;
 
     StringBuffer sb = new StringBuffer();
     sb.append("<HTML><H2>");
@@ -42,9 +40,8 @@ public class StringAddChange extends Change {
     }
 
     try {
-      int goodPos = Math.min(pos, panel.database().getStringCount());
-      panel.database().addString(string, goodPos);
-      undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string, goodPos));
+      panel.database().addString(string);
+      undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
     } catch (KeyCollisionException ex) {
       Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
     }

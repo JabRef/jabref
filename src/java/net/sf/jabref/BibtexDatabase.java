@@ -47,7 +47,8 @@ public class BibtexDatabase
 {
     Map _entries = new HashMap();
     String _preamble = null;
-    Vector _strings = new Vector();
+    HashMap _strings = new HashMap();
+    Vector _strings_ = new Vector();
     Hashtable _autoCompleters = null;
 
     private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
@@ -242,28 +243,40 @@ public class BibtexDatabase
     /**
      * Inserts a Bibtex String at the given index.
      */
-    public synchronized void addString(BibtexString string, int index)
+    public synchronized void addString(BibtexString string)
         throws KeyCollisionException
     {
-        for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
-            if (((BibtexString)i.next()).getName().equals(string.getName()))
+        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
+            if (((BibtexString)_strings.get(i.next())).getName().equals(string.getName()))
                 throw new KeyCollisionException("A string with this label already exists,");
         }
-        _strings.insertElementAt(string, index);
+	
+	if (_strings.containsKey(string.getId()))
+	    throw new KeyCollisionException("Duplicate BibtexString id.");
+	
+        _strings.put(string.getId(), string);
     }
 
     /**
      * Removes the string at the given index.
      */
-    public synchronized void removeString(int index) {
-        _strings.removeElementAt(index);
+    public synchronized void removeString(String id) {
+        _strings.remove(id);
+    }
+
+    /**
+     * Returns a Set of keys to all BibtexString objects in the database.
+     * These are in no sorted order.
+     */
+    public Set getStringKeySet() {
+	return _strings.keySet();
     }
 
     /**
      * Returns the string at the given index.
      */
-    public synchronized BibtexString getString(int index) {
-        return (BibtexString)(_strings.elementAt(index));
+    public synchronized BibtexString getString(Object o) {
+        return (BibtexString)(_strings.get(o));
     }
 
     /**
@@ -277,8 +290,8 @@ public class BibtexDatabase
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
-            if (((BibtexString)i.next()).getName().equals(label))
+        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
+            if (((BibtexString)_strings.get(i.next())).getName().equals(label))
                 return true;
         }
         return false;

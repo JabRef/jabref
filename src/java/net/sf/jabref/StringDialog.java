@@ -42,6 +42,8 @@ public class StringDialog extends JDialog {
     JabRefFrame frame;
     BasePanel panel;
     JabRefPreferences prefs;
+    TreeSet stringsSet; // Our locally sorted set of strings.
+    Object[] strings;
 
     // Layout objects.
     GridBagLayout gbl = new GridBagLayout();
@@ -60,6 +62,8 @@ public class StringDialog extends JDialog {
 	this.panel = panel;
 	this.base = base;
 	this.prefs = prefs;
+
+	sortStrings();
 
 	helpAction = new HelpAction
 	    (frame.helpDiag, GUIGlobals.stringEditorHelp, "Help");
@@ -86,6 +90,7 @@ public class StringDialog extends JDialog {
 	con.fill = GridBagConstraints.BOTH;
 	con.weighty = 1;
 	con.weightx = 1;
+
 	StringTableModel stm = new StringTableModel(this, base);
 	table = new StringTable(stm);
 	if (base.getStringCount() > 0)
@@ -100,10 +105,10 @@ public class StringDialog extends JDialog {
 	am.put("add", newStringAction);
 	im.put(prefs.getKey("String dialog, remove string"), "remove");
 	am.put("remove", removeStringAction);
-	im.put(prefs.getKey("String dialog, move string up"), "up");
-	am.put("up", stringUpAction);
-	im.put(prefs.getKey("String dialog, move string down"), "down");
-	am.put("down", stringDownAction);
+	//im.put(prefs.getKey("String dialog, move string up"), "up");
+	//am.put("up", stringUpAction);
+	//im.put(prefs.getKey("String dialog, move string down"), "down");
+	//am.put("down", stringDownAction);
 	im.put(prefs.getKey("Close dialog"), "close");
 	am.put("close", closeAction);
 	im.put(prefs.getKey("Help"), "help");
@@ -118,8 +123,8 @@ public class StringDialog extends JDialog {
 	tlb.add(newStringAction);
 	tlb.add(removeStringAction);
 	tlb.addSeparator();
-	tlb.add(stringUpAction);
-	tlb.add(stringDownAction);
+	//tlb.add(stringUpAction);
+	//tlb.add(stringDownAction);
 	tlb.addSeparator();
 	tlb.add(helpAction);
 	conPane.add(tlb, BorderLayout.NORTH);
@@ -160,7 +165,18 @@ public class StringDialog extends JDialog {
 
     }
 
+    private void sortStrings() {
+	// Rebuild our sorted set of strings:
+	stringsSet = new TreeSet(new BibtexStringComparator(false));
+	Iterator i = base.getStringKeySet().iterator();
+	for (;i.hasNext();) {
+	    stringsSet.add(base.getString(i.next()));
+	}
+	strings = stringsSet.toArray();
+    }
+
     public void refreshTable() {
+	sortStrings();
 	table.revalidate();
 	table.clearSelection();
 	table.repaint();
@@ -178,8 +194,8 @@ public class StringDialog extends JDialog {
 
 	public Object getValueAt(int row, int col) {
 	    return ((col == 0) ?
-		    base.getString(row).getName() :
-		    base.getString(row).getContent());
+		    ((BibtexString)strings[row]).getName() :
+		    ((BibtexString)strings[row]).getContent());
 	}
 
 	public void setValueAt(Object value, int row, int col) {
@@ -189,7 +205,7 @@ public class StringDialog extends JDialog {
 	                // which might now be outside
 	    if (col == 0) {
 		// Change name of string.
-		if (!((String)value).equals(base.getString(row).getName())) {
+		if (!((String)value).equals(((BibtexString)strings[row]).getName())) {
 		    if (base.hasStringLabel((String)value))
 			JOptionPane.showMessageDialog(parent,
 						      Globals.lang("A string with that label "
@@ -212,24 +228,28 @@ public class StringDialog extends JDialog {
 		    }
 		    else {
 			// Store undo information.
+			BibtexString subject = (BibtexString)strings[row];
 			panel.undoManager.addEdit
 			    (new UndoableStringChange
-			     (panel, base.getString(row), true,
-			      base.getString(row).getName(), (String)value));
-			base.getString(row).setName((String)value);
+			     (panel, subject, true,
+			      subject.getName(), (String)value));
+			subject.setName((String)value);
 			panel.markBaseChanged();
+			refreshTable();
 		    }
 		}
 	    } else {
 		// Change content of string.
-		if (!((String)value).equals(base.getString(row).getContent())) {
+		BibtexString subject = (BibtexString)strings[row];
+
+		if (!((String)value).equals(subject.getContent())) {
 		    // Store undo information.
 		    panel.undoManager.addEdit
 			(new UndoableStringChange
-			 (panel, base.getString(row), false,
-			  base.getString(row).getContent(), (String)value));
+			 (panel, subject, false,
+			  subject.getContent(), (String)value));
 
-		    base.getString(row).setContent((String)value);
+		    subject.setContent((String)value);
 		    panel.markBaseChanged();
 		}
 	    }
@@ -240,7 +260,7 @@ public class StringDialog extends JDialog {
 	}
 
 	public int getRowCount() {
-	    return base.getStringCount();
+	    return strings.length; //base.getStringCount();
 	}
 
 	public String getColumnName(int col) {
@@ -327,15 +347,17 @@ public class StringDialog extends JDialog {
              return;
            }
 	    try {
-		BibtexString bs = new BibtexString(name, "");
+		String newId = Util.createNeutralId();
+		BibtexString bs = new BibtexString(newId, name, "");
 
 		// Store undo information:
 		panel.undoManager.addEdit
 		    (new UndoableInsertString
-		     (panel, panel.database, bs, base.getStringCount()));
+		     (panel, panel.database, bs));
 
-		base.addString(bs, base.getStringCount());
-		table.revalidate();
+		base.addString(bs);
+		refreshTable();
+		//		table.revalidate();
 		panel.markBaseChanged();
 	    } catch (KeyCollisionException ex) {
 		JOptionPane.showMessageDialog(parent,
@@ -388,12 +410,14 @@ public class StringDialog extends JDialog {
 		    for (int i=sel.length-1; i>=0; i--) {
 			// Delete the strings backwards to avoid moving indexes.
 
+			BibtexString subject = (BibtexString)strings[sel[i]];
+
 			// Store undo information:
 			ce.addEdit(new UndoableRemoveString
 				   (panel, base,
-				    base.getString(sel[i]), sel[i]));
+				    subject));
 
-			base.removeString(sel[i]);
+			base.removeString(subject.getId());
 		    }
 		    ce.end();
 		    panel.undoManager.addEdit(ce);
@@ -408,7 +432,7 @@ public class StringDialog extends JDialog {
 	}
     }
 
-    StringUpAction stringUpAction = new StringUpAction();
+    /*    StringUpAction stringUpAction = new StringUpAction();
     class StringUpAction extends AbstractAction {
 	public StringUpAction() {
 	    super("Move string up",
@@ -422,10 +446,6 @@ public class StringDialog extends JDialog {
 		// Make sure no cell is being edited, as caused by the
 		// keystroke. This makes the content hang on the screen.
 		assureNotEditing();
-		/*		int col = table.getEditingColumn(),
-		    row = table.getEditingRow();
-		    table.getCellEditor(row, col).stopCellEditing();*/
-
 		// Store undo information:
 		panel.undoManager.addEdit(new UndoableMoveString
 					      (panel, base, sel[0], true));
@@ -458,9 +478,6 @@ public class StringDialog extends JDialog {
 		// keystroke. This makes the content hang on the screen.
 		assureNotEditing();
 
-		/*int col = table.getEditingColumn(),
-		    row = table.getEditingRow();
-		    table.getCellEditor(row, col).stopCellEditing();*/
 
 		// Store undo information:
 		panel.undoManager.addEdit(new UndoableMoveString
@@ -479,7 +496,7 @@ public class StringDialog extends JDialog {
 	    }
 
 	}
-    }
+    }*/
 
     UndoAction undoAction = new UndoAction();
     class UndoAction extends AbstractAction {

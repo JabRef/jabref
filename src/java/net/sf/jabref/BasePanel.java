@@ -924,12 +924,13 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                     if (importStrings) {
                       BibtexString bs;
                       int pos = 0;
-                      for (int i=0; i<db.getStringCount(); i++) {
-                        bs = (BibtexString)(db.getString(i).clone());
+		      Iterator i = db.getStringKeySet().iterator();
+                      for (; i.hasNext();) {
+                        bs = (BibtexString)(db.getString(i.next()).clone());
                         if (!database.hasStringLabel(bs.getName())) {
-                          pos = database.getStringCount();
-                          database.addString(bs, pos);
-                          ce.addEdit(new UndoableInsertString(ths, database, bs, pos));
+			    //pos = database.getStringCount();
+			    database.addString(bs);
+			    ce.addEdit(new UndoableInsertString(ths, database, bs));
                         }
                       }
                     }

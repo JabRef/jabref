@@ -50,14 +50,14 @@ public class StringChange extends Change {
       undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
     } else {
       // The string was removed or renamed locally. We guess that it was removed.
-      BibtexString bs = new BibtexString(label, disk);
-      try {
-        int pos = panel.database().getStringCount();
-        panel.database().addString(bs, pos);
-        undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs, pos));
-      } catch (KeyCollisionException ex) {
-        Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
-      }
+	String newId = Util.createNeutralId();
+	BibtexString bs = new BibtexString(newId, label, disk);
+	try {
+	    panel.database().addString(bs);
+	    undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
+	} catch (KeyCollisionException ex) {
+	    Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
+	}
     }
   }
 

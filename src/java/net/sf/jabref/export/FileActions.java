@@ -89,8 +89,13 @@ public class FileActions
     }
 
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
-	for (int i = 0; i < database.getStringCount(); i++) {
-	    BibtexString bs = database.getString(i);
+	TreeSet strings = new TreeSet(new BibtexStringComparator(true));
+	for (Iterator i=database.getStringKeySet().iterator(); i.hasNext();) {
+	    strings.add(database.getString(i.next()));
+	}
+
+	for (Iterator i=strings.iterator(); i.hasNext();) {
+	    BibtexString bs = (BibtexString)i.next();
 
 	    //fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
 	    fw.write("@STRING{" + bs.getName() + " = ");

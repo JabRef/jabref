@@ -34,14 +34,12 @@ public class UndoableInsertString extends AbstractUndoableEdit {
     private BibtexDatabase base;
     private BasePanel panel;
     private BibtexString string;
-    private int pos;
 
     public UndoableInsertString(BasePanel panel, BibtexDatabase base,
-				BibtexString string, int pos) {
+				BibtexString string) {
 	this.base = base;
 	this.panel = panel;
 	this.string = string;
-	this.pos = pos;
     }
 
     public String getUndoPresentationName() {
@@ -56,7 +54,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 	super.undo();
 	
 	// Revert the change.
-	base.removeString(pos);
+	base.removeString(string.getId());
 	panel.updateStringDialog();
     }
 
@@ -65,7 +63,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
 
 	// Redo the change.
 	try {
-	    base.addString(string, pos);
+	    base.addString(string);
 	} catch (KeyCollisionException ex) {
 	    ex.printStackTrace();
 	}
