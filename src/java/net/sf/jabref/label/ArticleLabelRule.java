@@ -37,25 +37,34 @@ public class ArticleLabelRule extends DefaultLabelRule {
         String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
         String newLabel = "" ; 
 
+	String author="";
 
-        StringTokenizer authorTokens = null ; 
-        // use the author token
-        try{ 
-            authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ; 
-            newLabel += authorTokens.nextToken().toLowerCase().replaceAll(" ","").replaceAll("\\.","")   ; 
+	//## to be done: i need to check if the key is unique else need to make another one with suffix
+	try{ 
+	    author=(String)oldEntry.getField("author");
+	    String[] tokens= author.split("\\band\\b");
+	    if( tokens.length > 0){ // if author is empty
+		String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
+		newLabel += firstAuthor[ firstAuthor.length-1];
+	    }
         }catch(Throwable t){
-			System.out.println("error getting author: "+t) ; 
+	    System.out.println("error getting author: "+t) ; 
         }
-
+	
         // use the year token
         try{
-            if( oldEntry.getField("year")!= null){
-                newLabel += String.valueOf( oldEntry.getField("year")) ;  
-            }
+	    if( ! newLabel.equals("")){
+		if( oldEntry.getField("year")!= null){
+		    newLabel += String.valueOf( oldEntry.getField("year")) ;  
+		}
+	    }else
+		newLabel=oldLabel; // don't make a key since there is no author
         }catch(Throwable t){
-			System.out.println("error getting year: "+t) ; 
+	    System.out.println("error getting year: "+t) ; 
         }
+	
 
+	/*
         // use the journal name
         // return the first token 4 wrds or longer, that's not journal
         // , society, or the like (using the Keyword class)
@@ -87,9 +96,10 @@ public class ArticleLabelRule extends DefaultLabelRule {
           }
         }
         catch(Throwable t){  System.err.println(t) ; }
-
-		oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-		return oldEntry ; 
+	*/
+	
+	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
+	return oldEntry ; 
     }
 
 
