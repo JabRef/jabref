@@ -17,11 +17,13 @@ import java.io.*;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class MODSEntry {
+	protected String entryType = "mods"; // could also be relatedItem
 	protected String id;
 	protected List authors = null;
 	protected List editors = null;
 	// should really be handled with an enum
 	protected String issuance = "monographic";
+	protected PageNumbers pages = null;
 	
 	protected String publisher = null;
 	protected String date = null;
@@ -31,7 +33,6 @@ public class MODSEntry {
 	// should really be handled with an enum
 	protected String type = "text";
 	
-	protected String pages;
 	protected String number;
 	protected String volume;
 	protected String genre = null;
@@ -43,12 +44,13 @@ public class MODSEntry {
 	public static String BIBTEX = "bibtex_";
 	
 	public MODSEntry() {
-		
+		extensionFields = new HashMap();
+		handledExtensions = new HashSet();
+	
 	}
 	
 	public MODSEntry(BibtexEntry bibtex) {
-		extensionFields = new HashMap();
-		handledExtensions = new HashSet();
+		this();
 		handledExtensions.add(BIBTEX + "publisher");
 		handledExtensions.add(BIBTEX + "title");
 		handledExtensions.add(BIBTEX + "bibtexkey");
@@ -71,15 +73,19 @@ public class MODSEntry {
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
 			authors = getAuthors(bibtex.getField("author").toString());
-		if (bibtex.getType() == BibtexEntryType.ARTICLE)
+		if (bibtex.getType() == BibtexEntryType.ARTICLE || 
+			bibtex.getType() == BibtexEntryType.INPROCEEDINGS)
 		{
 			host = new MODSEntry();
+			host.entryType = "relatedItem";
 			host.title = (String) bibtex.getField("booktitle");
 			host.publisher = (String) bibtex.getField("publisher");
-			host.pages = (String) bibtex.getField("pages");
 			host.number = (String) bibtex.getField("number");
-			host.volume = (String) bibtex.getField("volume");
+			if (bibtex.getField("pages") != null)
+				host.volume = (String) bibtex.getField("volume");
 			host.issuance = "continuing";
+			if (bibtex.getField("pages") != null)
+				host.pages = new PageNumbers((String) bibtex.getField("pages"));
 		}
 		
 		populateExtensionFields(bibtex);
@@ -148,19 +154,20 @@ public class MODSEntry {
 	}
 		
 	
-	public Node getDOMrepresentation(Document d) {
+	public Element getDOMrepresentation(Document d) {
 		Node result = null;
 	   	try {
-	   		Element mods = d.createElement("mods");
+	   		Element mods = d.createElement(entryType);
 	   		mods.setAttribute("version", "3.0");
 	   		// mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
-	   		mods.setAttribute("ID", id);
 	   		// title
-			Element titleInfo = d.createElement("titleInfo");
-	   		Element mainTitle = d.createElement("title");
-	   		mainTitle.setNodeValue(title);
-	   		titleInfo.appendChild(mainTitle);
-	   		mods.appendChild(titleInfo);
+	   		if(title != null) {
+	   			Element titleInfo = d.createElement("titleInfo");
+	   			Element mainTitle = d.createElement("title");
+	   			mainTitle.appendChild(d.createTextNode(title));
+	   			titleInfo.appendChild(mainTitle);
+		   		mods.appendChild(titleInfo);
+	   		}
 	   		if (authors != null) {
 	   			for(Iterator iter = authors.iterator(); iter.hasNext();) {
 	   				PersonName name = (PersonName) iter.next();
@@ -169,19 +176,19 @@ public class MODSEntry {
 	   				if (name.getSurname() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "family");
-	   					namePart.setNodeValue(name.getSurname());
+	   					namePart.appendChild(d.createTextNode(name.getSurname()));
 	   					modsName.appendChild(namePart);
 	   				}
 	   				if (name.getGivenNames() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "given");
-	   					namePart.setNodeValue(name.getGivenNames());
+	   					namePart.appendChild(d.createTextNode(name.getGivenNames()));
 	   					modsName.appendChild(namePart);
 	   				}
 	   				Element role = d.createElement("role");
 	   				Element roleTerm = d.createElement("roleTerm");
 	   				roleTerm.setAttribute("type", "text");
-	   				roleTerm.setNodeValue("author");
+	   				roleTerm.appendChild(d.createTextNode("author"));
 	   				role.appendChild(roleTerm);
 	   				modsName.appendChild(role);
 	   				mods.appendChild(modsName);
@@ -192,39 +199,43 @@ public class MODSEntry {
 	   		mods.appendChild(originInfo);
 	   		if (this.publisher != null) {
 	   			Element publisher = d.createElement("publisher");
-				publisher.setNodeValue(this.publisher);
+				publisher.appendChild(d.createTextNode(this.publisher));
 	   			originInfo.appendChild(publisher);
 	   		}
 	   		if (date != null) {
 	   			Element dateIssued = d.createElement("dateIssued");
-	   			dateIssued.setNodeValue(date);
+	   			dateIssued.appendChild(d.createTextNode(date));
 	   			originInfo.appendChild(dateIssued);
 	   		}
 	   		Element issuance = d.createElement("issuance");
-	   		issuance.setNodeValue(this.issuance);
+	   		issuance.appendChild(d.createTextNode(this.issuance));
 	   		originInfo.appendChild(issuance);
 	   		
-	   		Element idref = d.createElement("identifier");
-	   		idref.setNodeValue(id);
-	   		mods.appendChild(idref);
-	   		
+	   		if (id != null) {
+	   			Element idref = d.createElement("identifier");
+	   			idref.appendChild(d.createTextNode(id));
+	   			mods.appendChild(idref);
+	   			mods.setAttribute("ID", id);
+		   		
+	   		}
 	   		Element typeOfResource = d.createElement("typeOfResource");
-	   		typeOfResource.setNodeValue(type);
+	   		typeOfResource.appendChild(d.createTextNode(type));
 	   		mods.appendChild(typeOfResource);
 	   		
 	   		if (genre != null) {
 	   			Element genreElement = d.createElement("genre");
 	   			genreElement.setAttribute("authority", "marc");
-	   			genreElement.setNodeValue(genre);
+	   			genreElement.appendChild(d.createTextNode(genre));
 	   			mods.appendChild(genreElement);
 	   		}
 	   		
 	   		if (host != null) {
-	   			//Element relatedItem = (Element) host.getDOMrepresentation(d);	   			
-	   			// d.renameNode(relatedItem, "", "relatedItem");
-	   			//relatedItem.setAttribute("type","host");
-	   			
-	   			//mods.appendChild(relatedItem);
+	   			Element relatedItem = host.getDOMrepresentation(d);	   			
+	   			relatedItem.setAttribute("type","host");	   			
+	   			mods.appendChild(relatedItem);
+	   		}
+	   		if (pages != null) {
+	   			mods.appendChild(pages.getDOMrepresentation(d));
 	   		}
 	   		
 	   		/* now generate extension fields for unhandled data */
@@ -236,7 +247,7 @@ public class MODSEntry {
 	   			if (handledExtensions.contains(field))
 	   				continue;
 	   			Element theData = d.createElement(field);
-	   			theData.setNodeValue(value);
+	   			theData.appendChild(d.createTextNode(value));
 	   			extension.appendChild(theData);
 	   			mods.appendChild(extension);
 	   		}
@@ -246,8 +257,9 @@ public class MODSEntry {
 		{
 	   		System.out.println("Exception caught..." + e);
 	   		e.printStackTrace();
+	   		throw new Error(e);
 		}
-	   	return result;
+	   	// return result;
 	   }
 	
 	/*
