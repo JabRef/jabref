@@ -5,97 +5,98 @@
 
 <H1>Recherche dans JabRef</H1>
 
-Il y a trois modes différents de recherche dans JabRef.
+Il y a trois modes diff&eacute;rents de recherche dans JabRef.
 
 <p>
 <em>CTRL-F</em> ouvre ou active l'interface de recherche. Appuyer 
 sur <em>CTRL-F</em> plusieurs fois modifie le mode de recherche.
-En recherche incrémentale, <em>CTRL-F</em> affiche
-l'occurrence suivante de la chaîne à rechercher.
+En recherche incr&eacute;mentale, <em>CTRL-F</em> affiche
+l'occurrence suivante de la cha&icirc;ne &agrave; rechercher.
 <p>
 <em>CTRL-SHIFT-F</em> ouvre ou active l'interface de recherche, et
-sélectionne la recherche incrémentale. En recherche incrémentale, appuyer
-sur  <em>CTRL-SHIFT-F</em> affiche aussi l'occurrence suivante de la chaîne
-à rechercher.
+s&eacute;lectionne la recherche incr&eacute;mentale. En recherche incr&eacute;mentale, appuyer
+sur  <em>CTRL-SHIFT-F</em> affiche aussi l'occurrence suivante de la cha&icirc;ne
+&agrave; rechercher.
 
 
-<H2>Recherche incrémentale</H2>
+<H2>Recherche incr&eacute;mentale</H2>
 
-En recherche incrémentale, le programme effectue une recherche chaque
-fois qu'une lettre est tapée. La ligne de statut vous informe
-du résultat de cette recherche. Entrer le raccourci clavier
-de la recherche affiche l'occurrence suivante de la chaîne à rechercher.
-Si aucune autre occurrence ne peut être trouvée, la ligne de statut vous
-en informe. Répéter alors la recherche fera redémarrer la recherche
-au début. L'ordre de recherche se fait toujours selon l'ordre de tri
-actuel de votre base de données. Pour quitter la recherche incrémentale,
-appuyer sur ESC ou cliquer sur "Vider".
+En recherche incr&eacute;mentale, le programme effectue une recherche chaque
+fois qu'une lettre est tap&eacute;e. La ligne de statut vous informe
+du r&eacute;sultat de cette recherche. Entrez le raccourci clavier
+de la recherche affiche l'occurrence suivante de la cha&icirc;ne &agrave; rechercher.
+Si aucune autre occurrence ne peut &ecirc;tre trouv&eacute;e, la ligne de statut vous
+en informe. R&eacute;p&eacute;tez alors la recherche fera red&eacute;marrer la recherche
+au d&eacute;but. L'ordre de recherche se fait toujours selon l'ordre de tri
+actuel de votre base de donn&eacute;es. Pour quitter la recherche incr&eacute;mentale,
+appuyez sur ESC ou cliquez sur "Vider".
 
-<H2>Recherche surlignée</H2>
+<H2>Recherche surlign&eacute;e</H2>
 
-En recherche surlignée, le programme se met à rechercher dans votre
-base de données toutes les occurrences de votre chaîne de
-recherche à partir du moment où vous appuyez sur ENTER.
-Toutes les entrées qui correspondent sont sélectionnées.
+En recherche surlign&eacute;e, le programme se met &agrave; rechercher dans votre
+base de donn&eacute;es toutes les occurrences de votre cha&icirc;ne de
+recherche &agrave; partir du moment o&ugrave; vous appuyez sur ENTER.
+Toutes les entr&eacute;es qui correspondent sont s&eacute;lectionn&eacute;es.
 
 
 <H2>Recherche flottante</H2>
 
-La recherche flottante est similaire à la recherche surlignée,
-excepté que les entrées qui correspondent ne sont pas sélectionnées,
-mais sont déplacées en haut du tableau. Les entrées qui ne
+La recherche flottante est similaire &agrave; la recherche surlign&eacute;e,
+except&eacute; que les entr&eacute;es qui correspondent ne sont pas s&eacute;lectionn&eacute;es,
+mais sont d&eacute;plac&eacute;es en haut du tableau. Les entr&eacute;es qui ne
 correspondent pas se retrouvent alors en dessous de celles qui
-correspondent, et, de plus, seront affichés en grisé. Pour arréter
-l'affichage des résultats de la recherche, appuyer sur ESC ou
-cliquer sur "Vider".
+correspondent, et, de plus, seront affich&eacute;s en gris&eacute;. Pour arr&eacute;ter
+l'affichage des r&eacute;sultats de la recherche, appuyez sur ESC ou
+cliquez sur "Vider".
 
 
-<H2>Spécification des champs, opérateurs logiques</H2>
+<H2>Sp&eacute;cification des champs, op&eacute;rateurs logiques</H2>
 
-Afin de rechercher uniquement des champs spécifiques et/ou
-d'inclure des opérateurs logiques dans l'expression à rechercher,
-une syntaxe particulière est disponible. Par exemple, pour 
-rechercher les entrées dont l'auteur est "Miller", entrer (excepté
-en mode de recherche incrémentale)&nbsp;:
+Afin de rechercher uniquement des champs sp&eacute;cifiques et/ou
+d'inclure des op&eacute;rateurs logiques dans l'expression &agrave; rechercher,
+une syntaxe particuli&egrave;re est disponible. Par exemple, pour 
+rechercher les entr&eacute;es dont l'auteur est "Miller", entrez (except&eacute;
+en mode de recherche incr&eacute;mentale)&nbsp;:
 <p>
 author = miller
 <p>
-A la fois la spécification du champ et le terme à rechercher
-peuvent être des expressions régulières. Si un terme à rechercher
+A la fois la sp&eacute;cification du champ et le terme &agrave; rechercher
+peuvent &ecirc;tre des expressions r&eacute;guli&egrave;res. Si un terme &agrave; rechercher
 contient des espaces, le mettre entre guillemets. Il ne faut
-<i>jamais</i> utiliser d'espace dans la spécification du champ&nbsp;!
+<i>jamais</i> utiliser d'espace dans la sp&eacute;cification du champ&nbsp;!
 
-Par exemple, pour rechercher les entrées à propos de traitement
+Par exemple, pour rechercher les entr&eacute;es &agrave; propos de traitement
 d'images, entrez&nbsp;:
 <p>
 title|keywords = "traitement d'images"
 <p>
-Vous pouvez utiliser "and", "or", "not", et les parenthèses
-de la façon habituelle&nbsp;:
+Vous pouvez utiliser "and", "or", "not", et les parenth&egrave;ses
+de la fa&ccedil;on habituelle&nbsp;:
 <p>
 (author = miller or title|keywords = "traitement d'images") and not author = brown
 <p>
 En fait, le signe "=" signifie "contient". La recherche d'une correspondance exacte
-est possible en utilisant "matches" or "==". Utiliser "!=" pour tester si le terme à
-rechercher n'est <i>pas</i> contenu dans le champ (un équivalent de "not ...
+est possible en utilisant "matches" ou "==". Utilisez "!=" pour tester si le terme &agrave;
+rechercher n'est <i>pas</i> contenu dans le champ (un &eacute;quivalent de "not ...
 contains ..."). 
-Le choix des types de champs à rechercher (required, optional, all), est
-toujours annulé par la spécification du champ dans l'expression
-à rechercher [NdT: ça veut dire quoi?]. Pour chercher des entrées d'un certain type,
-un pseudo-champ nommé "entrytype" est disponible&nbsp;:
+
+Si vous sp&eacute;cifiez un type de champ dans l'expression &agrave; rechercher, la s&eacute;lection des types de champs (requis, optionels, g&eacute;n&eacute;raux)
+appara&icirc;ssant dans les param&egrave;tres de recherche n'est pas prise en compte.
+Pour chercher des entr&eacute;es d'un certain type,
+un pseudo-champ nomm&eacute; "entrytype" est disponible&nbsp;:
 <p>
 entrytype = thesis
 <p>
-recherchera les entrées dont le type (tel qu'affiché dans la colonne "Entrytype")
+recherchera les entr&eacute;es dont le type (tel qu'affich&eacute; dans la colonne "Entrytype")
 contient le mot "thesis" (et qui sera donc "phdthesis" ou "mastersthesis"). 
 
-<H2>Paramètres de recherche</H2>
+<H2>Param&egrave;tres de recherche</H2>
 
- Le bouton <em>Paramètres</em> ouvre un menu montrant les paramètres de votre
- recherche. Les paramètres permettent de limiter les champs utilisés dans
- la recherche, de décider si votre chaîne de recherche doit être interprétée
- comme une expression régulière, et de décider si votre recherche doit
- être sensible à la casse (majuscules/minuscules).
+ Le bouton <em>Param&egrave;tres</em> ouvre un menu montrant les param&egrave;tres de votre
+ recherche. Les param&egrave;tres permettent de limiter les champs utilis&eacute;s dans
+ la recherche, de d&eacute;cider si votre cha&icirc;ne de recherche doit &ecirc;tre interpr&eacute;t&eacute;e
+ comme une expression r&eacute;guli&egrave;re, et de d&eacute;cider si votre recherche doit
+ &ecirc;tre sensible &agrave; la casse (majuscules/minuscules).
  
 <!--
 <p>You can at any time export a <em>bibtex</em> database containing
