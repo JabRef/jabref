@@ -6,7 +6,6 @@
  */
 package net.sf.jabref.imports;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,6 +28,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.xml.sax.SAXException;
 
 import net.sf.jabref.*;
+import net.sf.jabref.undo.NamedCompound;
 
 /**
  * @author mspiegel
@@ -37,7 +37,7 @@ import net.sf.jabref.*;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class CiteSeerFetcher extends SidePaneComponent {
-
+	
 	final String PREFIX_URL = "http://citeseer.ist.psu.edu/";
 	final String PREFIX_IDENTIFIER = "oai:CiteSeerPSU:";
 	final String OAI_HOST = "http://cs1.ist.psu.edu/";
@@ -46,7 +46,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	final String OAI_METADATAPREFIX ="metadataPrefix=oai_citeseer";
 	protected SAXParserFactory parserFactory;
 	protected SAXParser saxParser;
-	protected HttpURLConnection citeseerCon;
+	protected HttpURLConnection citeseerCon; 
 	protected HttpClient citeseerHttpClient;
 	boolean fetcherActive;
 
@@ -55,19 +55,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	GridBagLayout gbl = new GridBagLayout();
 	GridBagConstraints con = new GridBagConstraints();
 	SidePaneManager sidePaneManager;
-
+		
 	public CiteSeerFetcher(BasePanel panel_, SidePaneManager p0)  {
 		super(p0);
 		panel = panel_;
-		sidePaneManager = p0;
+		sidePaneManager = p0;		
 		progressBar = new JProgressBar();
-		progressBar.setMinimumSize(new Dimension(1,1));
 		progressBar.setValue(0);
 		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);
 		progressBar.setStringPainted(true);
-//		I can't make this panel re-appear!
-//      See comment "Ensure visible does not appear to be working" in JabRefFrame.java
-//		sidePaneManager.hideAway(this);
 		setLayout(gbl);
 		SidePaneHeader header = new SidePaneHeader
 			("CiteSeer Transfer", GUIGlobals.fetchHourglassIcon, this);
@@ -81,9 +78,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		con.insets = new Insets(0, 0, 0,  0);
 		con.fill = GridBagConstraints.HORIZONTAL;
 		gbl.setConstraints(progressBar, con);
-		add(progressBar);
+		add(progressBar);		
 		try {
-			fetcherActive = false;
+			fetcherActive = false;			
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
 			citeseerHttpClient = new HttpClient();
@@ -100,10 +97,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	/* The inner classes are used to modify components, when not in the
 	 * event-dispatching thread.  These are used to follow the "single-threaded
 	 * rule", as defined here: http://java.sun.com/products/jfc/tsc/articles/threads/threads1.html
-	 *
-	 *
+	 * 
+	 * 
 	 * I'm pretty sure the Dialog box invokers should remain as inner classes,
-	 * but I can't decide whether or not to break the one-thread rule for the
+	 * but I can't decide whether or not to break the one-thread rule for the 
 	 * progress bar classes.  Because the search contains a locking-mechanism,
 	 * activateFetcher() and deactivateFetcher(), there should only be at-most-one
 	 * thread accessing the progress bar at any time.
@@ -112,7 +109,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	class ShowNoConnectionDialog implements Runnable {
 		protected String targetURL = "";
 		ShowNoConnectionDialog(String URL) {
-				targetURL = URL;
+				targetURL = URL;	
 		}
 		public void run() {
 				JOptionPane.showMessageDialog(panel.frame(),
@@ -120,20 +117,20 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				".  Please check your network connection " +
 				"to this machine.",
 				"CiteSeer Connection Error",
-				JOptionPane.ERROR_MESSAGE);
-		}
+				JOptionPane.ERROR_MESSAGE);	
+		}		
 	}
-
+		
 	class ShowBadURLDialog implements Runnable {
 		protected String badURL = "";
 		ShowBadURLDialog(String URL) {
-			badURL = URL;
+			badURL = URL;			
 		}
 		public void run() {
 			JOptionPane.showMessageDialog(panel.frame(),
-			"I couldn't parse the following URL: " + badURL +
+			"I couldn't parse the following URL: " + badURL + 
 			// How do I retrieve the index number? NOT the BibTex ID.
-			" on entry number XXX.  " +
+			" on entry number XXX.  " + 
 			" Please refer to the JabRef help manual on using the CiteSeer tools.",
 			"CiteSeer Error",
 			JOptionPane.ERROR_MESSAGE);
@@ -143,32 +140,32 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	class UpdateProgressBarMaximum implements Runnable {
 		protected int maximum;
 		UpdateProgressBarMaximum(int newValue) {
-			maximum = newValue;
-		}
+			maximum = newValue;			
+		}		
 		public void run() {
 			progressBar.setMaximum(maximum);
-		}
+		}		
 	}
 
 	class UpdateProgressBarValue implements Runnable {
 		protected int counter;
 		UpdateProgressBarValue(int newValue) {
-			counter = newValue;
+			counter = newValue;			
 		}
 		public void run() {
 			progressBar.setValue(counter);
 		}
 	}
-
+			
 	/* End Inner Class Declarations */
 	/***********************************/
-
+	
 	synchronized public boolean activateFetcher() {
 		if (fetcherActive == true) {
-			return(false);
+			return(false);	
 		}	else {
 			fetcherActive = true;
-			return(true);
+			return(true);	
 		}
 	}
 
@@ -183,13 +180,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 * @param targetDatabase
 	 */
 	public void populate(BibtexDatabase newDatabase, BibtexDatabase targetDatabase) {
-		Iterator targetIterator = targetDatabase.getKeySet().iterator();
+		Iterator targetIterator = targetDatabase.getKeySet().iterator();	
 		String currentKey;
 		BibtexEntry currentEntry;
 		Enumeration newEntryEnum;
 		Hashtable citationHashTable = new Hashtable();
 		UpdateProgressBarValue updateValue = new UpdateProgressBarValue(0);
-		SwingUtilities.invokeLater(updateValue);
+		SwingUtilities.invokeLater(updateValue);		
 		while (targetIterator.hasNext()) {
 			currentKey = (String) targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);
@@ -200,9 +197,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			SwingUtilities.invokeLater(updateMaximum);
 		}
 		generateCitationList(citationHashTable, newDatabase);
-		newEntryEnum = citationHashTable.elements();
+		newEntryEnum = citationHashTable.elements();	
 		while (newEntryEnum.hasMoreElements()) {
-			try {
+			try {				
 				BibtexEntry nextEntry = (BibtexEntry) newEntryEnum.nextElement();
 				newDatabase.insertEntry(nextEntry);
 			} catch(KeyCollisionException ex) {
@@ -211,7 +208,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	}
 
 
-	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database)
+	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database) 
 	 {
 		try {
 		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
@@ -236,8 +233,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			}
 		}
 		} catch (HttpException e) {
-			System.out.println("HttpException: " + e.getReason());
-			e.printStackTrace();
+			System.out.println("HttpException: " + e.getReason());			
+			e.printStackTrace();			
 			} catch (SAXException e) {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
@@ -253,7 +250,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			String targetURL = (String) currentEntry.getField("url");
 		try {
 		if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
-			(targetURL.length() > (PREFIX_URL.length() + 5))) {
+			(targetURL.length() > (PREFIX_URL.length() + 5))) {			
 				String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
 				String identifier = PREFIX_IDENTIFIER + id;
 				StringBuffer citeseerURLString = new StringBuffer();
@@ -262,7 +259,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				citeseerURLString.append("&" + OAI_METADATAPREFIX);
 				citeseerURLString.append("&" + "identifier=" + identifier);
 				GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-				citeseerHttpClient.executeMethod(citeseerMethod);
+				citeseerHttpClient.executeMethod(citeseerMethod);				
 				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
 				citeseerMethod.releaseConnection();
 		} else {
@@ -270,8 +267,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			SwingUtilities.invokeLater(dialog);
 		}
 		} catch(HttpException e) {
-			System.out.println("HttpException: " + e.getReason());
-			e.printStackTrace();
+			System.out.println("HttpException: " + e.getReason());			
+			e.printStackTrace();			
 		} catch (SAXException e) {
 			System.out.println("SAXException: " + e.getLocalizedMessage());
 			e.printStackTrace();
@@ -283,16 +280,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	/**
 	 * @param be
-	 *
+	 * 
 	 * Reminder: this method runs in the EventDispatcher thread
 	 */
-	public boolean importCiteSeerEntry(BibtexEntry be) {
+	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC) {
 		boolean newValue = false;
-		SAXParserFactory factory = SAXParserFactory.newInstance();
+		SAXParserFactory factory = SAXParserFactory.newInstance();				
 			String targetURL = (String) be.getField("url");
-		try {
+		try {			
 			if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
-				(targetURL.length() > (PREFIX_URL.length() + 5))) {
+				(targetURL.length() > (PREFIX_URL.length() + 5))) {			
 					String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
 					String identifier = PREFIX_IDENTIFIER + id;
 					StringBuffer citeseerURLString = new StringBuffer();
@@ -302,13 +299,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append("&" + "identifier=" + identifier);
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 					int response = citeseerHttpClient.executeMethod(citeseerMethod);
-					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerImportHandler(be));
-					citeseerMethod.releaseConnection();
+					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be));
+					citeseerMethod.releaseConnection();				
 					newValue = true;
-				} else {
+				} else {	
 					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL);
 					dialog.run();
-				}
+				}	
 			} catch (HttpException e) {
 				System.out.println("HttpException: " + e.getReason());
 				e.printStackTrace();
@@ -319,6 +316,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
-			return newValue;
+			return newValue;			
 		}
+
+
+
 }

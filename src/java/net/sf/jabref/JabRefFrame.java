@@ -1048,7 +1048,7 @@ public JabRefPreferences prefs() {
     unmark.setEnabled(true);
     unmarkAll.setEnabled(true);
     editEntry.setEnabled(true);
-	importCiteSeer.setEnabled(true);
+	importCiteSeer.setEnabled(true);    
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
     copyCiteKey.setEnabled(true);
@@ -1349,51 +1349,51 @@ public JabRefPreferences prefs() {
 
 class FetchCiteSeerAction
 	extends AbstractAction {
-
+		
 		public FetchCiteSeerAction() {
 			super(Globals.lang("Fetch Citations from CiteSeer"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));					
 		}
 
 		public void actionPerformed(ActionEvent e) {
 
 			if(basePanel().citeSeerFetcher.activateFetcher()) {
-                          basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");
-                          (new Thread() {
-                            BasePanel newBp;
-                            BasePanel targetBp;
-                            BibtexDatabase newDatabase;
-                            BibtexDatabase targetDatabase;
+				basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");				
+				(new Thread() {
+					BasePanel newBp;
+					BasePanel targetBp;				
+					BibtexDatabase newDatabase;
+					BibtexDatabase targetDatabase;
 
-                            Runnable updateComponent = new Runnable() {
-                              public void run() {
-                                tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
-                                tabbedPane.setSelectedComponent(newBp);
-                                newBp.refreshTable();
-                                output(Globals.lang("Fetched all citations from target database."));
-                                targetBp.citeSeerFetcher.deactivateFetcher();
-                              }
-                            };
+					Runnable updateComponent = new Runnable() {
+						public void run() { 
+							tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
+							tabbedPane.setSelectedComponent(newBp);
+							newBp.refreshTable();
+							output(Globals.lang("Fetched all citations from target database."));
+							targetBp.citeSeerFetcher.deactivateFetcher();
+							 }
+					};
 
-                            public void run() {
-                              try {
-                                newBp = new BasePanel(ths, prefs);
-                                targetBp = (BasePanel) tabbedPane.getSelectedComponent();
-                                newDatabase = newBp.getDatabase();
-                                targetDatabase = targetBp.getDatabase();
-                                basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
-                                SwingUtilities.invokeLater(updateComponent);
-                              }
-                              catch (Exception ex) {
-                                ex.printStackTrace();
-                              }
-                            }
-                          }).start();
-                        } else {
-                          System.out.println("Fetch Currently Active");
-                        }
-                      }
-                    }
+				  public void run() {
+					try {
+					newBp = new BasePanel(ths, prefs);
+						targetBp = (BasePanel) tabbedPane.getSelectedComponent();
+						newDatabase = newBp.getDatabase();
+						targetDatabase = targetBp.getDatabase();
+						basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
+						SwingUtilities.invokeLater(updateComponent);
+					}
+					catch (Exception ex) {
+					  ex.printStackTrace();
+					}
+				  }
+				}).start();
+			} else {
+				System.out.println("Fetch Currently Active");			
+			}
+		}
+	}
 
   class FetchMedlineAction
       extends AbstractAction {
