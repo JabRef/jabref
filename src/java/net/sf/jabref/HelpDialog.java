@@ -48,14 +48,16 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     // Initializes, but does not show the help dialog.
     public HelpDialog(JabRefFrame bf) {
 	super(bf, GUIGlobals.helpTitle, false);
+	frame = bf;
 	content = new HelpContent();
 	content.addHyperlinkListener(this);
 	setSize(GUIGlobals.helpSize);
 	Dimension ds = GUIGlobals.helpSize, 
 	    df = bf.getSize();
 	Point pf = bf.getLocation();
-	setLocation(new Point(Math.max(0,(pf.x+(df.width-ds.width)/2)),
-	Math.max(0,(pf.y+(df.height-ds.height)/2))));
+	//setLocation(new Point(Math.max(0,(pf.x+(df.width-ds.width)/2)),
+	//Math.max(0,(pf.y+(df.height-ds.height)/2))));
+
 	/* There is probably no need for a window listener now, so
 	 * it's commented out.
 
@@ -100,6 +102,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 
     public void showPage(URL url) {
 	if (!isVisible()) {
+	    Util.placeDialog(this, frame);
 	    setVisible(true);
 	    content.reset();
 	    forward.setEnabled(false);

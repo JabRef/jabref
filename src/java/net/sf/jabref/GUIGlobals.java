@@ -128,7 +128,7 @@ public class GUIGlobals {
 	
     // Help files (in HTML format):
     public static URL
-	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"GUIGlobalsHelp.html"),
+	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"BaseFrameHelp.html"),
 	entryEditorHelp = GUIGlobals.class.getResource(helpPre+"EntryEditorHelp.html"),
 	stringEditorHelp = GUIGlobals.class.getResource(helpPre+"StringEditorHelp.html"),
 	helpContents = GUIGlobals.class.getResource(helpPre+"Contents.html"),
