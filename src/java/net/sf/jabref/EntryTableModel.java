@@ -267,12 +267,12 @@ public class EntryTableModel
     fields.add(Globals.MARKED);
     directions.add(new Boolean(true));
 
-    if (panel.showingGroup) {
+    if (panel.sortingByGroup) {
       // Group search has the highest priority if active.
       fields.add(Globals.GROUPSEARCH);
       directions.add(new Boolean(true));
     }
-    if (panel.showingSearchResults) {
+    if (panel.sortingBySearchResults) {
       // Normal search has priority over regular sorting.
       fields.add(Globals.SEARCH);
       directions.add(new Boolean(true));

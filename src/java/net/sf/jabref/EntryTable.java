@@ -204,12 +204,12 @@ public class EntryTable extends JTable {
 		return sp;
     }
 
-    public void setShowingSearchResults(boolean search,
+    /*public void setShowingSearchResults(boolean search,
 					boolean group) {
 	showingSearchResults = search;
 	showingGroup = group;
     }
-
+*/
     public void setRightClickMenu(JPopupMenu rcm) {
 	rightClickMenu = rcm;
     }
@@ -318,10 +318,10 @@ public class EntryTable extends JTable {
           return markedRenderer;
         }
 
-	if (!showingSearchResults ||
+	if (!panel.coloringBySearchResults ||
 	    tableModel.nonZeroField(row, Globals.SEARCH))
 	    score++;
-	if (!showingGroup ||
+	if (!panel.coloringByGroup ||
 	    tableModel.nonZeroField(row, Globals.GROUPSEARCH))
 	    score+=2;
 

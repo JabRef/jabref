@@ -194,6 +194,12 @@
                 <delete dir="${build.dir}" />
             </target>
 
+<!-- Unpacks jar needed jar files from lib directory into build directory. -->
+	<target name="unjarlib" description="Unpacks jars from library">
+        	<unjar src="${library.directory}/commons-httpclient-2.0.jar" dest="${build.classes}" />
+                <unjar src="${library.directory}/commons-logging.jar" dest="${build.classes}" />
+	</target>
+
 <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         What's about the software design ?!;-)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->

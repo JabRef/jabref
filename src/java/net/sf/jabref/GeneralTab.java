@@ -13,7 +13,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
 		defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-                useOwner, keyWarningDialog;
+                useOwner, keyWarningDialog, confirmDelete;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -29,7 +29,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
  	setLayout(gbl);
 	con.weightx = 0;
         //con.insets = new Insets(10, 10, 10, 10);
-        con.insets = new Insets(5, 10, 5, 10);
+        con.insets = new Insets(5, 10, 0, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
 
 	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"),
@@ -52,6 +52,8 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
                          _prefs.getBoolean("useOwner"));
 keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"),
                                  _prefs.getBoolean("dialogWarningForDuplicateKey"));
+confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"),
+                              _prefs.getBoolean("confirmDelete"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
 	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
@@ -77,7 +79,7 @@ keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplic
 	gbl.setConstraints(autoOpenForm, con);
 	general.add(autoOpenForm);
 
-        con.insets = new Insets(0, 10, 5, 10);
+        con.insets = new Insets(0, 10, 0, 10);
         con.gridwidth = 1;
         gbl.setConstraints(backup, con);
 	general.add(backup);
@@ -95,6 +97,9 @@ keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplic
         general.add(ctrlClick);
 
         con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(confirmDelete, con);
+        general.add(confirmDelete);
+
         gbl.setConstraints(keyWarningDialog, con);
         general.add(keyWarningDialog);
 
@@ -287,6 +292,7 @@ keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplic
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyWarningDialog.isSelected());
+        _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());

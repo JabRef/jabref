@@ -110,8 +110,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // or from this class if merging groups from a different database.
 
 
-    boolean showingSearchResults = false,
-	showingGroup = false,
+    boolean sortingBySearchResults = false,
+        coloringBySearchResults = false,
+	sortingByGroup = false,
+        coloringByGroup = false,
         previewEnabled = true;
 
     // MetaData parses, keeps and writes meta data.
@@ -320,7 +322,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	actions.put("delete", new BaseAction() {
 		public void action() {
-                  Util.pr("eeeeee");
                   boolean cancelled = false;
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   int row0 = entryTable.getSelectedRow();
@@ -1325,8 +1326,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	// This method is called by EntryTypeForm when a field value is
 	// stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
+        entryTable.invalidate();
 	tableModel.remap();
-	entryTable.revalidate();
+        entryTable.revalidate();
 	entryTable.repaint();
     }
 
@@ -1526,17 +1528,20 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      * Globals.GROUPSEARCH.
      *
      */
-    public void showSearchResults(String searchValueField) {
+    public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut) {
 	//entryTable.scrollTo(0);
 
-	if (searchValueField == Globals.SEARCH)
-	    showingSearchResults = true;
-	else if (searchValueField == Globals.GROUPSEARCH)
-	    showingGroup = true;
+	if (searchValueField == Globals.SEARCH) {
+          sortingBySearchResults = reorder;
+          coloringBySearchResults = grayOut;
+        }
+	else if (searchValueField == Globals.GROUPSEARCH) {
+          sortingByGroup = reorder;
+          coloringByGroup = grayOut;
+        }
 
-
-	entryTable.setShowingSearchResults(showingSearchResults,
-					   showingGroup);
+	/*entryTable.setShowingSearchResults(showingSearchResults,
+					   showingGroup);*/
 	entryTable.clearSelection();
 	entryTable.scrollTo(0);
 	refreshTable();
@@ -1549,14 +1554,30 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      */
     public void selectSearchResults() {
 
-	entryTable.clearSelection();
-	for (int i=0; i<entryTable.getRowCount(); i++) {
-	    String value = (String)(database.getEntryById
-				    (tableModel.getNameFromNumber(i)))
-		.getField(Globals.SEARCH);
-	    if ((value != null) && !value.equals("0"))
-		entryTable.addRowSelectionInterval(i, i);
-	}
+        entryTable.clearSelection();
+        for (int i=0; i<entryTable.getRowCount(); i++) {
+            String value = (String)(database.getEntryById
+                                    (tableModel.getNameFromNumber(i)))
+                .getField(Globals.SEARCH);
+            if ((value != null) && !value.equals("0"))
+                entryTable.addRowSelectionInterval(i, i);
+        }
+
+    }
+
+    /**
+     * Selects all entries with a non-zero value in the field
+     * @param <code>String</code> field name.
+     */
+    public void selectResults(String field) {
+        entryTable.clearSelection();
+        for (int i=0; i<entryTable.getRowCount(); i++) {
+            String value = (String)(database.getEntryById
+                                    (tableModel.getNameFromNumber(i)))
+                .getField(field);
+            if ((value != null) && !value.equals("0"))
+                entryTable.addRowSelectionInterval(i, i);
+        }
     }
 
     /**
@@ -1572,20 +1593,24 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     }
 
     public void stopShowingSearchResults() {
-	showingSearchResults = false;
-	entryTable.setShowingSearchResults(showingSearchResults,
-					   showingGroup);
-        entryTable.clearSelection();
-	refreshTable();
-	entryTable.requestFocus();
+      sortingBySearchResults = false;
+      coloringBySearchResults = false;
+      /* entryTable.setShowingSearchResults(showingSearchResults,
+        showingGroup);
+       */
+      entryTable.clearSelection();
+      refreshTable();
+      entryTable.requestFocus();
     }
 
     public void stopShowingGroup() {
-	showingGroup = false;
-	entryTable.setShowingSearchResults(showingSearchResults,
-					   showingGroup);
-        entryTable.clearSelection();
-	refreshTable();
+      sortingByGroup = false;
+      coloringByGroup = false;
+/*
+      entryTable.setShowingSearchResults(showingSearchResults,
+                                         showingGroup);*/
+      entryTable.clearSelection();
+      refreshTable();
     }
 
     public EntryTableModel getTableModel(){

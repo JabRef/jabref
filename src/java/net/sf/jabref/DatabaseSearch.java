@@ -38,11 +38,11 @@ public class DatabaseSearch extends Thread {
 	Hashtable thisSearchOptions = null ;
     EntryTableModel thisTableModel = null ;
     String searchValueField = null;
-    boolean reorder;
+    boolean reorder, select, grayOut;
 
     public DatabaseSearch(Hashtable searchOptions,SearchRuleSet searchRules,
 			  BasePanel panel, String searchValueField,
-			  boolean reorder) {
+			  boolean reorder, boolean grayOut, boolean select) {
         this.panel = panel;
 	thisDatabase = panel.getDatabase() ;
         thisTableModel = panel.getTableModel() ;
@@ -50,6 +50,8 @@ public class DatabaseSearch extends Thread {
         thisRuleSet = searchRules ;
 	this.searchValueField = searchValueField;
 	this.reorder = reorder;
+        this.select = select;
+        this.grayOut = grayOut;
     }
 
     public void run() {
@@ -79,11 +81,12 @@ public class DatabaseSearch extends Thread {
 	    if (searchScore > 0)
 		hits++;
 	}
-
-	if (reorder) // Float search.
-	    panel.showSearchResults(searchValueField);
-	else // Highlight search.
-	    panel.selectSearchResults();
+        panel.entryTable.invalidate();
+        panel.showSearchResults(searchValueField, reorder, grayOut);
+	if (select) { // Select matches.
+          panel.selectResults(searchValueField);
+          new FocusRequester(panel.entryTable);
+        }
 
 	if ((searchValueField == null)
 	    || (searchValueField == Globals.SEARCH))
