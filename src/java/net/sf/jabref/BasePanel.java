@@ -1371,7 +1371,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 			      ex.printStackTrace();
 			  }
 
-			  getCallBack().update();
 		      }
 		      
 		      public void update() {
@@ -1382,11 +1381,12 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
               actions.put("test", new AbstractWorker() {
 		      public void run() {
+			  output("starting");
 			  try {
 			      Thread.sleep(4000);
 			  } catch (InterruptedException ex) {
 			  }
-			  getCallBack().update();
+			  //getCallBack().update();
 		      }
 		      public void update() {
 			  output("done");
@@ -1414,9 +1414,21 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 		try {
 		    if (o instanceof BaseAction)
 			((BaseAction)o).action();
-		    else
-			((AbstractWorker)o).getWorker().run();
-
+		    else {
+			// This part uses Spin's features:
+			Worker wrk = ((AbstractWorker)o).getWorker();
+			// The Worker returned by getWorker() has been wrapped
+			// by Spin.off(), which makes its methods be run in
+			// a different thread from the EDT.
+			CallBack clb = ((AbstractWorker)o).getCallBack();
+			// The CallBack returned by getCallBack() has been wrapped
+			// by Spin.over(), which makes its methods be run on
+			// the EDT.			
+			wrk.run(); // Runs the potentially time-consuming action
+			// without freezing the GUI. The magic is that THIS line
+			// of execution will not continue until run() is finished.
+			clb.update(); // Runs the update() method on the EDT.
+		    }
 		} catch (Throwable ex) {
 		    ex.printStackTrace();
 		}

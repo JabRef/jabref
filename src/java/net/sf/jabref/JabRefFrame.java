@@ -399,13 +399,20 @@ public class JabRefFrame
   // is selected from the application menu.
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
-      (new Thread() {
+      AbstractWorker worker = new AbstractWorker() {
+	      PrefsDialog2 pd = null;
               public void run() {
-                  PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
+		  output(Globals.lang("Opening preferences..."));
+                  pd = new PrefsDialog2(ths, prefs);
                   Util.placeDialog(pd, ths);
-                  pd.show();
               }
-          }).start();
+	      public void update() {
+                  pd.show();
+		  output("");
+	      }
+	  };
+      worker.getWorker().run();
+      worker.getCallBack().update();
   }
 
 public JabRefPreferences prefs() {
