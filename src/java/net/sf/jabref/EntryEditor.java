@@ -474,7 +474,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
   private void setupSourcePanel() {
-	source = new JTextArea();
+      source = new JTextArea() {
+	      public void paintComponent(Graphics g) {
+		  Graphics2D g2 = (Graphics2D)g;	
+		  RenderingHints rh = g2.getRenderingHints();
+		  rh.put(RenderingHints.KEY_ANTIALIASING,
+			 RenderingHints.VALUE_ANTIALIAS_ON);
+		  rh.put(RenderingHints.KEY_RENDERING,
+			 RenderingHints.VALUE_RENDER_QUALITY);	
+		  g2.setRenderingHints(rh);
+		  super.paintComponent(g2);
+	      }
+	  };
 	con = new GridBagConstraints();
 	con.insets = new Insets(10,10,10,10);
 	con.fill = GridBagConstraints.BOTH;
@@ -816,7 +827,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    (entry.getId(), newValue);
 
 		if (isDuplicate)
-		    panel.output(Globals.lang("Warning: duplicate bibtex key."));
+		    panel.output(Globals.lang("Warning")+": "+Globals.lang("duplicate bibtex key."));
 		else
 		    panel.output(Globals.lang("Bibtex key is unique."));
 		// Add an UndoableKeyChange to the baseframe's undoManager.

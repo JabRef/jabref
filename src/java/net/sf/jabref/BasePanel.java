@@ -405,12 +405,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				markBaseChanged();
 			    }
 			}
-			Util.pr(flavor.length+"");
+			/*Util.pr(flavor.length+"");
 			Util.pr(flavor[0].toString());
 			Util.pr(flavor[1].toString());
 			Util.pr(flavor[2].toString());
 			Util.pr(flavor[3].toString());
-			Util.pr(flavor[4].toString());
+			Util.pr(flavor[4].toString());*/
 			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) {
 			    // We have determined that the clipboard data is a string.
 			    int[] rows = entryTable.getSelectedRows(),

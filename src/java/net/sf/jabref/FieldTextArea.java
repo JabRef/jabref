@@ -79,8 +79,6 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     }
 
   public void paintComponent(Graphics g) {
-	//Util.pr("her");
-	
 	Graphics2D g2 = (Graphics2D)g;	
 	RenderingHints rh = g2.getRenderingHints();
 	rh.put(RenderingHints.KEY_ANTIALIASING,

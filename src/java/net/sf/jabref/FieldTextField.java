@@ -27,7 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import javax.swing.*;
-import java.awt.Color;
+import java.awt.*;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
@@ -60,5 +60,15 @@ public class FieldTextField extends JTextField implements FieldEditor {
     public void setLabelColor(Color c) { label.setForeground(c); }
     public JComponent getPane() { return this; }
 
+  public void paintComponent(Graphics g) {
+	Graphics2D g2 = (Graphics2D)g;	
+	RenderingHints rh = g2.getRenderingHints();
+	rh.put(RenderingHints.KEY_ANTIALIASING,
+	       RenderingHints.VALUE_ANTIALIAS_ON);
+	rh.put(RenderingHints.KEY_RENDERING,
+	       RenderingHints.VALUE_RENDER_QUALITY);	
+	g2.setRenderingHints(rh);
+	super.paintComponent(g2);
+  }
 
 }
