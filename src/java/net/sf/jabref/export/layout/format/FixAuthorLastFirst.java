@@ -23,10 +23,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import java.util.regex.*;
-import java.util.Iterator;
-import net.sf.jabref.Util;
-import net.sf.jabref.Globals;
+import net.sf.jabref.ImportFormatReader;
 
 /**
  * Changes {\^o} or {\^{o}} to ô
@@ -34,23 +31,13 @@ import net.sf.jabref.Globals;
  * @author $author$
  * @version $Revision$
  */
-public class ConvertSpecialCharactersForHTML implements LayoutFormatter
+public class FixAuthorLastFirst implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
-    //Pattern pattern = Pattern.compile(".*\\{..[a-zA-Z].\\}.*");
-    Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
-
     public String format(String fieldText)
     {
-	if (!pattern.matcher(fieldText).matches())
-	    return fieldText;
-	//Util.pr(fieldText);
-	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
-	    String s = (String)i.next();
-	    fieldText = fieldText.replaceAll(s, (String)Globals.HTML_CHARS.get(s));
-	}
-	//RemoveBrackets rb = new RemoveBrackets();
-	return fieldText.replaceAll("\\}","").replaceAll("\\{","");
+	ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
+	return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@
 		
 		\begin{author}
 		<div class="bibtex_author">
-			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author}
+			\format[net.sf.jabref.export.layout.format.FixAuthorFirstLast]{\author}
 		</div>
 		\end{author}
 		
