@@ -343,7 +343,7 @@ settings.add(select);
 
 	    // Afterwards, select all text in the search field.
 	    searchField.select(0,searchField.getText().length()) ;
-           new FocusRequester(frame.basePanel().entryTable);
+	    //new FocusRequester(frame.basePanel().entryTable);
 	}
     }
 

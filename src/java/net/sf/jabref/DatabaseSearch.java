@@ -81,17 +81,23 @@ public class DatabaseSearch extends Thread {
 	    if (searchScore > 0)
 		hits++;
 	}
-        panel.entryTable.invalidate();
-        panel.showSearchResults(searchValueField, reorder, grayOut, select);
+	final int outputHits = hits;
+	SwingUtilities.invokeLater(new Thread() {
+		public void run() {
+		    panel.entryTable.invalidate();
+		    panel.showSearchResults(searchValueField, reorder, grayOut, select);
+		    if ((searchValueField == null)
+			|| (searchValueField == Globals.SEARCH))
+			panel.output(Globals.lang("Searched database. Global number of hits")
+				     +": "+outputHits);
+		    
+		}
+	    });
 	/*if (select) { // Select matches.
           panel.selectResults(searchValueField);
           new FocusRequester(panel.entryTable);
         }*/
 
-	if ((searchValueField == null)
-	    || (searchValueField == Globals.SEARCH))
-	    panel.output(Globals.lang("Searched database. Global number of hits")
-			 +": "+hits);
     }
 
 }
