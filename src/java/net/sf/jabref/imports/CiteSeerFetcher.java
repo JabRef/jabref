@@ -152,18 +152,32 @@ public class CiteSeerFetcher extends SidePaneComponent {
             if (rejectedEntries.size() == 1) {
                 
             } else if (rejectedEntries.size() > 1) {
+            	int i;
                 String rowNumbers = new String("");
+                String oneRowOfNumbers = new String("");
                 TreeSet rowSet = new TreeSet(rejectedEntries.keySet());
                 int rowSize = rowSet.size();
-                for(int i=0; i < rowSize - 1; i++) {
+                for(i=0; (i < rowSize - 1) && (i < 100); i++) {
                     Integer next = (Integer) rowSet.first();
-                    if (rowNumbers.equals(""))
-                        rowNumbers = next.toString();
-                    else
-                        rowNumbers = rowNumbers + ", " + next.toString();
+                    if (oneRowOfNumbers.equals(""))
+                        oneRowOfNumbers = next.toString();
+                    else {
+                        oneRowOfNumbers = oneRowOfNumbers + ", ";
+                        if (oneRowOfNumbers.length() > 50) {
+                        	oneRowOfNumbers = oneRowOfNumbers + "\n";
+                        	rowNumbers = rowNumbers + oneRowOfNumbers;
+                        	oneRowOfNumbers = "";
+                        }
+                        oneRowOfNumbers = oneRowOfNumbers + next.toString();
+                    }
                     rowSet.remove(next);
                 }
-                rowNumbers = rowNumbers + " and " + ((Integer)rowSet.first()).toString();            
+            	rowNumbers = rowNumbers + oneRowOfNumbers;
+            	if (i == 100) {
+            		rowNumbers = rowNumbers + "..";
+            	} else {
+            		rowNumbers = rowNumbers + " and " + ((Integer)rowSet.first()).toString();
+            	}
                 JOptionPane.showMessageDialog(panel.frame(),
                         Globals.lang("Couldn't parse the 'citeseerurl' field of the following entries") + ':' + '\n' + 
                         rowNumbers + ".\n" + 
