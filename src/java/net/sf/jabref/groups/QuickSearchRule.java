@@ -38,7 +38,7 @@ public class QuickSearchRule implements SearchRule {
     Pattern pattern;
 
     public QuickSearchRule(String field, String searchString) {
-	this.field = field;
+	this.field = field.toLowerCase();
 
         if(!searchString.matches("\\.\\*")){
             searchString = ".*"+searchString+".*" ; 
