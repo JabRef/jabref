@@ -977,11 +977,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 if (newValue != null) {
                   if (isDuplicate) {
                     panel.output(Globals.lang("Warning") + ": " +
-                                 Globals.lang("duplicate bibtex key."));
+                                 Globals.lang("duplicate BibTeX key."));
                     if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
                       CheckBoxMessage jcb = new CheckBoxMessage
-                          (Globals.lang("Warning") + ": " +Globals.lang("duplicate bibtex key."),
-                           Globals.lang("Don't show this dialog again"), false);
+                          (Globals.lang("Warning") + ": " +Globals.lang("duplicate BibTeX key."),
+                           Globals.lang("Disable this warning dialog"), false);
                       JOptionPane.showMessageDialog
                           (frame, jcb, Globals.lang("Warning"),
                            JOptionPane.WARNING_MESSAGE);
@@ -990,7 +990,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                     }
                   }
                   else
-                    panel.output(Globals.lang("Bibtex key is unique."));
+                    panel.output(Globals.lang("BibTeX key is unique."));
                 }
 		// Add an UndoableKeyChange to the baseframe's undoManager.
 		panel.undoManager.addEdit

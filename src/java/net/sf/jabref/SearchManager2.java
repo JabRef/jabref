@@ -53,7 +53,7 @@ class SearchManager2 extends SidePaneComponent
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
     private JRadioButton increment, highlight, reorder;
-    private JCheckBox select;
+    private JCheckBoxMenuItem select;
     private ButtonGroup types = new ButtonGroup();
     private SearchManager2 ths = this;
     private boolean incSearch = false;
@@ -89,7 +89,7 @@ class SearchManager2 extends SidePaneComponent
 	increment = new JRadioButton(Globals.lang("Incremental"), false);
 	highlight = new JRadioButton(Globals.lang("Highlight"), true);
 	reorder = new JRadioButton(Globals.lang("Float"), false);
-        select = new JCheckBox(Globals.lang("Select matches"), false);
+        select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
         highlight.setToolTipText(Globals.lang("Gray out non-matching entries"));
         reorder.setToolTipText(Globals.lang("Move matching entries to the top"));
@@ -111,14 +111,17 @@ class SearchManager2 extends SidePaneComponent
 	}
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
 				      prefs.getBoolean("caseSensitiveSearch"));
-	settings.add(caseSensitive);
-	settings.addSeparator();
+settings.add(select);
+
+
+        settings.addSeparator();
 	settings.add(searchReq);
 	settings.add(searchOpt);
 	settings.add(searchGen);
 	settings.addSeparator();
 	settings.add(searchAll);
 	settings.addSeparator();
+        settings.add(caseSensitive);
 	settings.add(regExpSearch);
 
 	searchField.addActionListener(this);
@@ -150,6 +153,9 @@ class SearchManager2 extends SidePaneComponent
 		}
 	    });
 
+            Insets margin = new Insets(0, 0, 0, 0);
+            openset.setMargin(margin);
+            help.setMargin(margin);
             help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.searchHelp, "Help"));
 	types.add(increment);
 	types.add(highlight);
@@ -184,11 +190,11 @@ class SearchManager2 extends SidePaneComponent
         add(highlight);
 	gbl.setConstraints(reorder, con);
         add(reorder);
-        JSeparator js = new JSeparator(JSeparator.HORIZONTAL);
+/*        JSeparator js = new JSeparator(JSeparator.HORIZONTAL);
         gbl.setConstraints(js, con);
         add(js);
         gbl.setConstraints(select, con);
-        add(select);
+        add(select);*/
 	con.gridwidth = 1;
         gbl.setConstraints(openset,con);
         add(openset);

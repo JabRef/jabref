@@ -209,4 +209,9 @@ public class SidePaneManager {
       else
         panel.remove(sidep);
     }
+
+    public void revalidate() {
+      sidep.revalidate();
+      sidep.repaint();
+    }
 }

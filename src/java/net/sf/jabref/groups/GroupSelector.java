@@ -76,7 +76,8 @@ public class GroupSelector
       select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
   ButtonGroup bgr = new ButtonGroup(),
       visMode = new ButtonGroup();
-
+  JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
+      reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
   SidePaneManager manager;
   JabRefPreferences prefs;
   GroupSelector ths;
@@ -91,6 +92,8 @@ public class GroupSelector
     super(manager);
     ths = this;
     this.prefs = prefs;
+    final JabRefPreferences _prefs = prefs;
+    final BasePanel _panel = panel;
     groups = groupData;
     this.manager = manager;
     this.frame = frame;
@@ -102,7 +105,7 @@ public class GroupSelector
       // If the number of elements is not divisible by DIM, we're
       // in trouble, so we must remove one or two elements.
     }
-
+    openset.setMargin(new Insets(0, 0, 0, 0));
     settings.add(andCb);
     settings.add(orCb);
     settings.addSeparator();
@@ -125,8 +128,37 @@ public class GroupSelector
       }
     });
 
+    expand.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+
+        int i = _prefs.getInt("groupsVisibleRows")+1;
+        list.setVisibleRowCount(i);
+        list.revalidate();
+        list.repaint();
+        ths.revalidate();
+        //_panel.sidePaneManager.revalidate();
+        ths.repaint();
+        _prefs.putInt("groupsVisibleRows", i);
+      }
+    });
+
+    reduce.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        int i = _prefs.getInt("groupsVisibleRows")-1;
+        if (i<1)
+          i=1;
+        list.setVisibleRowCount(i);
+        list.revalidate();
+        list.repaint();
+        ths.revalidate();
+        //_panel.sidePaneManager.revalidate();
+        ths.repaint();
+        _prefs.putInt("groupsVisibleRows", i);
+      }
+    });
 
     Dimension butDim = new Dimension(20, 20);
+    Dimension butDim2 = new Dimension(40, 20);
     newButton.setPreferredSize(butDim);
     newButton.setMinimumSize(butDim);
     refresh.setPreferredSize(butDim);
@@ -135,6 +167,12 @@ public class GroupSelector
     helpButton.setMinimumSize(butDim);
     autoGroup.setPreferredSize(butDim);
     autoGroup.setMinimumSize(butDim);
+    openset.setPreferredSize(butDim2);
+    openset.setMinimumSize(butDim2);
+    expand.setPreferredSize(butDim);
+    expand.setMinimumSize(butDim);
+    reduce.setPreferredSize(butDim);
+    reduce.setMinimumSize(butDim);
 
     newButton.addActionListener(this);
     refresh.addActionListener(this);
@@ -152,10 +190,13 @@ public class GroupSelector
         + "of the selected groups."));
     autoGroup.setToolTipText(Globals.lang(
         "Automatically create groups for database."));
-      invCb.setToolTipText(Globals.lang("Show entries not in group selection"));
+      invCb.setToolTipText(Globals.lang("Show entries *not* in group selection"));
       floatCb.setToolTipText(Globals.lang("Move entries in group selection to the top"));
       highlCb.setToolTipText(Globals.lang("Gray out entries not in group selection"));
       select.setToolTipText(Globals.lang("Select entries in group selection"));
+      expand.setToolTipText(Globals.lang("Show one more row"));
+      reduce.setToolTipText(Globals.lang("Show one less rows"));
+
     bgr.add(andCb);
     bgr.add(orCb);
     visMode.add(floatCb);
@@ -194,7 +235,7 @@ public class GroupSelector
     list.addListSelectionListener(this);
     list.setPrototypeCellValue("Suitable length");
     // The line above decides on the list's preferred width.
-    list.setVisibleRowCount(GUIGlobals.GROUPS_VISIBLE_ROWS);
+    list.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
     list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     sp = new JScrollPane
         (list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -204,8 +245,15 @@ public class GroupSelector
     gbl.setConstraints(sp, con);
     add(sp);
 
+    con.gridwidth = 2;
     gbl.setConstraints(openset, con);
     add(openset);
+    con.gridwidth = 1;
+    gbl.setConstraints(expand, con);
+    add(expand);
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    gbl.setConstraints(reduce, con);
+    add(reduce);
     /*
     JPanel lower = new JPanel();
     lower.setLayout(gbl);

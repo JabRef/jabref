@@ -125,7 +125,9 @@ public class JabRefPreferences {
 	defaults.put("autoComplete", new Boolean(true));
 	defaults.put("autoCompFields", new byte[] {0, 1, 28});
 	defaults.put("groupSelectorVisible", new Boolean(true));
-	defaults.put("groupsDefaultField", "keywords");
+        defaults.put("groupsDefaultField", "keywords");
+
+        defaults.put("groupsVisibleRows", new Integer(8));
 	defaults.put("defaultOwner", System.getProperty("user.name"));
   defaults.put("generalFields", "crossref;keywords;doi;url;"+
 	     "pdf;abstract;comment;owner");

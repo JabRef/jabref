@@ -37,7 +37,7 @@ import net.sf.jabref.undo.NamedCompound;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class CiteSeerFetcher extends SidePaneComponent {
-	
+
 	final String PREFIX_URL = "http://citeseer.ist.psu.edu/";
 	final String PREFIX_IDENTIFIER = "oai:CiteSeerPSU:";
 	final String OAI_HOST = "http://cs1.ist.psu.edu/";
@@ -46,7 +46,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	final String OAI_METADATAPREFIX ="metadataPrefix=oai_citeseer";
 	protected SAXParserFactory parserFactory;
 	protected SAXParser saxParser;
-	protected HttpURLConnection citeseerCon; 
+	protected HttpURLConnection citeseerCon;
 	protected HttpClient citeseerHttpClient;
 	boolean citationFetcherActive;
 	boolean importFetcherActive;
@@ -56,11 +56,11 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	GridBagLayout gbl = new GridBagLayout();
 	GridBagConstraints con = new GridBagConstraints();
 	SidePaneManager sidePaneManager;
-		
+
 	public CiteSeerFetcher(BasePanel panel_, SidePaneManager p0)  {
 		super(p0);
 		panel = panel_;
-		sidePaneManager = p0;		
+		sidePaneManager = p0;
 		progressBar = new JProgressBar();
 		progressBar.setValue(0);
 		progressBar.setMinimum(0);
@@ -79,7 +79,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		con.insets = new Insets(0, 0, 0,  0);
 		con.fill = GridBagConstraints.HORIZONTAL;
 		gbl.setConstraints(progressBar, con);
-		add(progressBar);		
+		add(progressBar);
 		try {
 			citationFetcherActive = false;
 			importFetcherActive = false;
@@ -99,10 +99,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	/* The inner classes are used to modify components, when not in the
 	 * event-dispatching thread.  These are used to follow the "single-threaded
 	 * rule", as defined here: http://java.sun.com/products/jfc/tsc/articles/threads/threads1.html
-	 * 
-	 * 
+	 *
+	 *
 	 * I'm pretty sure the Dialog box invokers should remain as inner classes,
-	 * but I can't decide whether or not to break the one-thread rule for the 
+	 * but I can't decide whether or not to break the one-thread rule for the
 	 * progress bar classes.  Because the search contains a locking-mechanism,
 	 * activateFetcher() and deactivateFetcher(), there should only be at-most-one
 	 * thread accessing the progress bar at any time.
@@ -111,29 +111,29 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	class ShowNoConnectionDialog implements Runnable {
 		protected String targetURL = "";
 		ShowNoConnectionDialog(String URL) {
-				targetURL = URL;	
+				targetURL = URL;
 		}
 		public void run() {
 				JOptionPane.showMessageDialog(panel.frame(),
 				Globals.lang("I could not connect to host ") + targetURL + ".  " +
 				Globals.lang("Please check your network connection to this machine."),
 				Globals.lang("CiteSeer Error"),
-				JOptionPane.ERROR_MESSAGE);	
-		}		
+				JOptionPane.ERROR_MESSAGE);
+		}
 	}
-		
+
 	class ShowBadURLDialog implements Runnable {
 		protected String badURL = "";
 		protected int rowNumber;
-		
+
 		ShowBadURLDialog(String URL, int row) {
-			badURL = URL;			
+			badURL = URL;
 			rowNumber = row;
 		}
 		public void run() {
 			JOptionPane.showMessageDialog(panel.frame(),
 			Globals.lang("I couldn't parse the following URL") + ": \"" + badURL + '\"' +
-			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " + 
+			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " +
 			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
 			Globals.lang("CiteSeer Error"),
 			JOptionPane.ERROR_MESSAGE);
@@ -143,43 +143,43 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	class UpdateProgressBarMaximum implements Runnable {
 		protected int maximum;
 		UpdateProgressBarMaximum(int newValue) {
-			maximum = newValue;			
-		}		
+			maximum = newValue;
+		}
 		public void run() {
 			progressBar.setMaximum(maximum);
-		}		
+		}
 	}
 
-	class InitializeProgressBar implements Runnable {	    
+	class InitializeProgressBar implements Runnable {
 	    public void run() {
-			progressBar.setValue(0);		
+			progressBar.setValue(0);
 	        progressBar.setMinimum(0);
-			progressBar.setMaximum(100);	    
-		    progressBar.setString(null);		        
-	    }	    
+			progressBar.setMaximum(100);
+		    progressBar.setString(null);
+	    }
 	}
-	
+
 	class UpdateProgressBarValue implements Runnable {
 		protected int counter;
 		UpdateProgressBarValue(int newValue) {
-			counter = newValue;			
+			counter = newValue;
 		}
 		public void run() {
 			progressBar.setValue(counter);
 		}
 	}
-			
+
 	/* End Inner Class Declarations */
-	
-	
+
+
 	/***********************************/
-	
+
 	synchronized public boolean activateCitationFetcher() {
 		if (citationFetcherActive == true) {
-			return(false);	
+			return(false);
 		}	else {
 			citationFetcherActive = true;
-			return(true);	
+			return(true);
 		}
 	}
 	synchronized public void deactivateCitationFetcher() {
@@ -188,29 +188,29 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	synchronized public boolean activateImportFetcher() {
 		if (importFetcherActive == true) {
-			return(false);	
+			return(false);
 		}	else {
 			importFetcherActive = true;
-			return(true);	
+			return(true);
 		}
-	}	
+	}
 	synchronized public void deactivateImportFetcher() {
 		importFetcherActive = false;
 	}
-	
+
 	public void beginImportCiteSeerProgress() {
 	    progressBar.setIndeterminate(true);
 	    progressBar.setString("");
-	    sidePaneManager.ensureVisible("CiteSeerProgress");		
+	    sidePaneManager.ensureVisible("CiteSeerProgress");
 	}
 	public void endImportCiteSeerProgress() {
 	    progressBar.setIndeterminate(false);
 		progressBar.setMinimum(0);
-		progressBar.setMaximum(100);	    
-		progressBar.setValue(100);		
-//	    progressBar.setString(null);	
+		progressBar.setMaximum(100);
+		progressBar.setValue(100);
+//	    progressBar.setString(null);
 	}
-	
+
 
 	/**
 	 * @param newDatabase
@@ -224,7 +224,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		Enumeration newEntryEnum;
 		Hashtable citationHashTable = new Hashtable();
 		InitializeProgressBar initializeProgressBar = new InitializeProgressBar();
-		SwingUtilities.invokeLater(initializeProgressBar);	
+		SwingUtilities.invokeLater(initializeProgressBar);
 		while (targetIterator.hasNext() && !abortOperation) {
 			currentKey = (String) targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);
@@ -235,14 +235,14 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			SwingUtilities.invokeLater(updateMaximum);
 		}
 		generateCitationList(citationHashTable, newDatabase);
-		newEntryEnum = citationHashTable.elements();	
+		newEntryEnum = citationHashTable.elements();
 	}
 
 
-	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database) 
+	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database)
 	 {
 		try {
-			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");		    
+			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");
 		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			int citationCounter=0;
 			for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
@@ -265,8 +265,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			}
 		}
 		} catch (HttpException e) {
-			System.out.println("HttpException: " + e.getReason());			
-			e.printStackTrace();			
+			System.out.println("HttpException: " + e.getReason());
+			e.printStackTrace();
 			} catch (SAXException e) {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
@@ -282,30 +282,33 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	private boolean generateIdentifierList(BibtexEntry currentEntry, Hashtable citationHashTable)
 		{
-	    	boolean abortOperation = false;
-			String targetURL = (String) currentEntry.getField("url");
-		try {
-		if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
-			(targetURL.length() > (PREFIX_URL.length() + 5))) {			
-				String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
-				String identifier = PREFIX_IDENTIFIER + id;
-				StringBuffer citeseerURLString = new StringBuffer();
-				citeseerURLString.append(OAI_URL);
-				citeseerURLString.append(OAI_ACTION);
-				citeseerURLString.append("&" + OAI_METADATAPREFIX);
-				citeseerURLString.append("&" + "identifier=" + identifier);
-				GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-				citeseerHttpClient.executeMethod(citeseerMethod);				
-				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
-				citeseerMethod.releaseConnection();
-		} else {
-		    int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
-			ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
-			SwingUtilities.invokeLater(dialog);
+                  boolean abortOperation = false;
+                  Object o = currentEntry.getField("url");
+                  String targetURL = (String)o;
+                  try {
+                    if ((o != null) && targetURL.startsWith(PREFIX_URL) &&
+                        (targetURL.length() > (PREFIX_URL.length() + 5))) {
+
+                      Util.pr("targetUrl: "+targetURL);
+                      String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
+                      String identifier = PREFIX_IDENTIFIER + id;
+                      StringBuffer citeseerURLString = new StringBuffer();
+                      citeseerURLString.append(OAI_URL);
+                      citeseerURLString.append(OAI_ACTION);
+                      citeseerURLString.append("&" + OAI_METADATAPREFIX);
+                      citeseerURLString.append("&" + "identifier=" + identifier);
+                      GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
+                      citeseerHttpClient.executeMethod(citeseerMethod);
+                      saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
+                      citeseerMethod.releaseConnection();
+                    } else if (o != null) {
+                      int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
+                      ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
+                      SwingUtilities.invokeLater(dialog);
 		}
 		} catch(HttpException e) {
-			System.out.println("HttpException: " + e.getReason());			
-			e.printStackTrace();			
+			System.out.println("HttpException: " + e.getReason());
+			e.printStackTrace();
 		} catch (SAXException e) {
 			System.out.println("SAXException: " + e.getLocalizedMessage());
 			e.printStackTrace();
@@ -320,16 +323,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	/**
 	 * @param be
-	 * 
+	 *
 	 * Reminder: this method runs in the EventDispatcher thread
 	 */
 	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC) {
 		boolean newValue = false;
-		SAXParserFactory factory = SAXParserFactory.newInstance();				
+		SAXParserFactory factory = SAXParserFactory.newInstance();
 			String targetURL = (String) be.getField("url");
-		try {			
+		try {
 			if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
-				(targetURL.length() > (PREFIX_URL.length() + 5))) {			
+				(targetURL.length() > (PREFIX_URL.length() + 5))) {
 					String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
 					String identifier = PREFIX_IDENTIFIER + id;
 					StringBuffer citeseerURLString = new StringBuffer();
@@ -340,13 +343,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 					int response = citeseerHttpClient.executeMethod(citeseerMethod);
 					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be, panel));
-					citeseerMethod.releaseConnection();				
+					citeseerMethod.releaseConnection();
 					newValue = true;
-				} else {	
+				} else {
 				    int row = panel.getTableModel().getNumberFromName(be.getId());
-					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);				    
+					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
 					dialog.run();
-				}	
+				}
 			} catch (HttpException e) {
 				System.out.println("HttpException: " + e.getReason());
 				e.printStackTrace();
@@ -357,7 +360,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
-			return newValue;			
+			return newValue;
 		}
 
 

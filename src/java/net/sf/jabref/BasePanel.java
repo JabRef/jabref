@@ -82,7 +82,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     EntryTable entryTable = null;
 
     // The sidepane manager takes care of populating the sidepane.
-    SidePaneManager sidePaneManager;
+    public SidePaneManager sidePaneManager;
 
     SearchManager2 searchManager;
     MedlineFetcher medlineFetcher;

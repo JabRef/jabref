@@ -931,8 +931,9 @@ public JabRefPreferences prefs() {
     //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
 
     tlb.add(closeDatabaseAction);
+    //Insets margin = new Insets(0, 0, 0, 0);
     //for (int i=0; i<tlb.getComponentCount(); i++)
-    //    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
+    //  ((JButton)tlb.getComponentAtIndex(i)).setMargin(margin);
 
   }
 
