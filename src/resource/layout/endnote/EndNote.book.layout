@@ -1,5 +1,6 @@
+%0 \endnotereftype
 %0 Book
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%A \format[AuthorLastFirst,RemoveBrackets]{\author},
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E \editor
@@ -19,7 +20,7 @@
 %? 
 %! \shorttitle
 %Z 
-%@ 
+%@ \isbn
 %( 
 %)
 %* 
