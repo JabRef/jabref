@@ -37,6 +37,8 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class CreateDocBookAuthors implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
+    FixAuthorFirstFirst authorFormatter = new FixAuthorFirstFirst();
+
 
     public String format(String fieldText)
     {
@@ -48,26 +50,28 @@ public class CreateDocBookAuthors implements LayoutFormatter
         int oldPos = 0;
         String author;
         StringBuffer sb = new StringBuffer(100);
-        sb.append("<author>");
+
 
         if (fieldText.indexOf(" and ") == -1)
         {
-            singleAuthor(sb, fieldText);
+          sb.append("<author>");
+          singleAuthor(sb, fieldText);
+          sb.append("</author>");
         }
         else
         {
-            while ((index = fieldText.indexOf(" and ", index + 1)) != -1)
+            String[] names = fieldText.split(" and ");
+            for (int i=0; i<names.length; i++)
             {
-                author = fieldText.substring(oldPos, index);
-
-                //System.out.println(author);
-                singleAuthor(sb, author);
-                sb.append("\n");
-                oldPos = index + 4;
+              sb.append("<author>");
+              singleAuthor(sb, names[i]);
+              sb.append("</author>");
+              if (i < names.length -1)
+                sb.append("\n       ");
             }
         }
 
-        sb.append("</author>");
+
 
         fieldText = sb.toString();
 
@@ -82,7 +86,8 @@ public class CreateDocBookAuthors implements LayoutFormatter
     {
         // TODO: replace special characters
         Vector v = new Vector();
-        WSITools.tokenize(v, author, " \n\r");
+        String authorMod = authorFormatter.format(author);
+        WSITools.tokenize(v, authorMod, " \n\r");
 
         if (v.size() == 1)
         {

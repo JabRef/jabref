@@ -31,7 +31,7 @@ import net.sf.jabref.imports.ImportFormatReader;
  * @author $author$
  * @version $Revision$
  */
-public class FixAuthorFirstLast implements LayoutFormatter
+public class FixAuthorFirstFirst implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
     public String format(String fieldText)

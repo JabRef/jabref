@@ -6,7 +6,7 @@
 \begin{journal} <em>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\journal} </em>\end{journal}
 \begin{year}, <b>\year </b>\end{year}
 \begin{volume}, <i>\volume </i>\end{volume}
-\begin{pages}, \pages \end{pages}
+\begin{pages}, \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\pages} \end{pages}
 </dd>
 <p></p>
 </font>

@@ -5,6 +5,6 @@
    <citetitle pubwork="article">\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}</citetitle>
 \begin{journal}   <citetitle pubwork="journal">\journal</citetitle>\end{journal}
 \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
-\begin{pages}   <artpagenums>\pages</artpagenums> \end{pages}
+\begin{pages}   <artpagenums>\format[net.sf.jabref.export.layout.format.CreateDocBookPages]{\pages}</artpagenums> \end{pages}
 \begin{year}   <pubdate>\year</pubdate>  \end{year}
 </biblioentry>

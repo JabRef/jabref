@@ -56,7 +56,7 @@ public class ConvertSpecialCharactersForHTML implements LayoutFormatter
     }
 
     private String firstFormat(String s) {
-	return s.replaceAll("&|\\\\&","&amp;");
+	return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
     }
 
     private String restFormat(String s) {

@@ -39,13 +39,30 @@ public class LatexFieldFormatter implements FieldFormatter {
     int col; // First line usually starts about so much further to the right.
     final int STARTCOL = 4;
 
-    public String format(String text, boolean standardBibtex) 
+    public String format(String text, boolean standardBibtex)
 	throws IllegalArgumentException {
 
 	// If the field is non-standard, we will just append braces,
 	// wrap and write.
 	if (!standardBibtex) {
-	    return "{"+Util.wrap2(text, GUIGlobals.LINE_LENGTH)+"}";
+          int brc = 0;
+          boolean ok = true;
+          for (int i=0; i<text.length(); i++) {
+            char c = text.charAt(i);
+            //Util.pr(""+c);
+            if (c == '{') brc++;
+            if (c == '}') brc--;
+            if (brc < 0) {
+              ok = false;
+              break;
+            }
+          }
+          if (brc > 0)
+            ok = false;
+          if (!ok)
+            throw new IllegalArgumentException("Curly braces { and } must be balanced.");
+
+          return "{"+Util.wrap2(text, GUIGlobals.LINE_LENGTH)+"}";
 	}
 
 	sb = new StringBuffer();
@@ -62,7 +79,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 	    int goFrom = pivot;
 	    pos1 = pivot;
 	    while (goFrom == pos1) {
-		pos1 = text.indexOf('#',goFrom);		
+		pos1 = text.indexOf('#',goFrom);
 		if ((pos1 > 0) && (text.charAt(pos1-1) == '\\')) {
 		    goFrom = pos1+1;
 		    pos1++;
@@ -82,7 +99,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 			 Globals.lang("In JabRef, use pairs of # characters to indicate "
 				      +"a string.")+"\n"+
 			 Globals.lang("Note that the entry causing the problem has been selected."));
-		}		    
+		}
 	    }
 
 	    if (pos1 > pivot)
@@ -93,16 +110,16 @@ public class LatexFieldFormatter implements FieldFormatter {
 		// cause an error message?
 		writeStringLabel(text, pos1+1, pos2, (pos1 == pivot),
 				 (pos2+1 == text.length()));
-	    
+
 	    if (pos2 > -1) pivot = pos2+1;
 	    else pivot = pos1+1;
 	    //if (tell++ > 10) System.exit(0);
 	}
 
 	return sb.toString();
-    }   
+    }
 
-    private void writeText(String text, int start_pos, 
+    private void writeText(String text, int start_pos,
 				  int end_pos) {
 	/*sb.append("{");
 	sb.append(text.substring(start_pos, end_pos));
@@ -117,8 +134,8 @@ public class LatexFieldFormatter implements FieldFormatter {
 	    else
 		sb.append(c);
 	    if (c == '\\') escape = true;
-	    else escape = false;	    
-	}	
+	    else escape = false;
+	}
 	sb.append('}');
     }
 
@@ -144,15 +161,15 @@ public class LatexFieldFormatter implements FieldFormatter {
 	char c = it.first();
 	String toSetIn = "";
 	while (cont) {
-	    toSetIn = "";	    
-	    if ((Character.isWhitespace(c))) { /* || 
-		((col > GUIGlobals.LINE_LENGTH) 
+	    toSetIn = "";
+	    if ((Character.isWhitespace(c))) { /* ||
+		((col > GUIGlobals.LINE_LENGTH)
 		&& (it.getIndex() == it.getEndIndex()-1))) {*/
 		if (!whitesp) {
 		    whitesp = true;
 		    if ((col >= GUIGlobals.LINE_LENGTH)
 			&& (lastWhCol > GUIGlobals.LINE_LENGTH)) {
-			
+
 			//if ((it.getIndex() - lastWh) >= GUIGlobals.LINE_LENGTH)
 			if (sb.charAt(sb.length()-it.getIndex()+lastWh-1) != '\n') {
 			    // This IF clause prevents us from going back if the last word
@@ -168,7 +185,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 		    } else {
 			lastWh = it.getIndex();
 			lastWhCol = col;
-			toSetIn = " ";			
+			toSetIn = " ";
 			col++;
 		    }
 		} else {
@@ -179,13 +196,13 @@ public class LatexFieldFormatter implements FieldFormatter {
 		whitesp = false;
 		col++;
 	    }
-	    
+
 	    sb.append(toSetIn);
 
 	    /*if (last)
 	      cont = false;*/
-	    if (it.getIndex() < it.getEndIndex()-1) {		
-		c = it.next();	    
+	    if (it.getIndex() < it.getEndIndex()-1) {
+		c = it.next();
 		Util.pr("'"+c+"'");
 	    }
 	    else {
@@ -208,7 +225,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 	    left.add(new Integer(current));
 	while ((current = text.indexOf('}', current+1)) != -1)
 	    right.add(new Integer(current));
-	   	
+
 	// Then we throw an exception if the error criteria are met.
 	if ((right.size() > 0) && (left.size() == 0))
 	    throw new IllegalArgumentException
