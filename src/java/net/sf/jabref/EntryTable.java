@@ -352,7 +352,8 @@ public class EntryTable extends JTable {
         }
 
         // Check if the user has right-clicked. If so, open the right-click menu.
-        if ( (e.getButton() == MouseEvent.BUTTON3) ||
+	//if (e.isPopupTrigger()) {
+	if ( (e.getButton() == MouseEvent.BUTTON3) ||
              (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
           int selRow = getSelectedRow();
           if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))

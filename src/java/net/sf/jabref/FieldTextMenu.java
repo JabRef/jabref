@@ -53,8 +53,8 @@ public class FieldTextMenu implements MouseListener
     myFieldName = fieldComponent ;
 
     // copy/paste Menu
-    inputMenu.add( new MenuHeaderAction(myFieldName.getFieldName()) ) ;
-    inputMenu.addSeparator() ;
+    //inputMenu.add( new MenuHeaderAction(myFieldName.getFieldName()) ) ;
+    //inputMenu.addSeparator() ;
     inputMenu.add( pasteAct ) ;
     inputMenu.add( copyAct ) ;
   }

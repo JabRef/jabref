@@ -113,7 +113,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
-
+    
     /**
      * The group selector component for this database. Instantiated by the
      * SidePaneManager if necessary, or from this class if merging groups from a
