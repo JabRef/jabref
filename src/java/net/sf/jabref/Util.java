@@ -242,17 +242,57 @@ public class Util {
 	return s;
     }
 
-    static public String wrap2(String in, int wrapAmount){
-        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\n\\r]+"," "));
+    static public String _wrap2(String in, int wrapAmount){
+        // The following line cuts out all whitespace and replaces them with single
+        // spaces:
+        //in = in.replaceAll("[ ]+"," ").replaceAll("[\\t]+"," ");
+        //StringBuffer out = new StringBuffer(in);
+        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+"," "));
+
 
         int p = in.length() - wrapAmount;
+        int lastInserted = -1;
         while (p > 0){
             p = out.lastIndexOf(" ", p);
             if (p <= 0 || p <= 20) break;
-            else{
-                out.insert(p, "\n\t");
+            int lbreak = out.indexOf("\n", p);
+            System.out.println(lbreak+" "+lastInserted);
+            if ((lbreak > p) && ((lastInserted >= 0) && (lbreak < lastInserted))) {
+                p = lbreak-wrapAmount;
             }
-            p -= wrapAmount;
+            else {
+                out.insert(p, "\n\t");
+                lastInserted = p;
+                p -= wrapAmount;
+            }
+        }
+        return out.toString();
+    }
+
+        static public String wrap2(String in, int wrapAmount){
+        // The following line cuts out all whitespace except line breaks, and replaces
+        // with single spaces. Line breaks are padded with a tab character:
+        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+"," ")
+            .replaceAll("\n", "\n\t"));
+
+
+        int p = 0;
+        //int lastInserted = -1;
+        while (p < out.length()){
+            int q = out.indexOf(" ", p+wrapAmount);
+            if ((q < 0) || (q >= out.length()))
+                break;
+            int lbreak = out.indexOf("\n", p);
+            //System.out.println(lbreak);
+            if ((lbreak > p) && (lbreak < q)) {
+                p = lbreak+1;
+            }
+            else {
+                //System.out.println(q+" "+out.length());
+                out.deleteCharAt(q);
+                out.insert(q, "\n\t");
+                p = q+1;
+            }
         }
         return out.toString();
     }

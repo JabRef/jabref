@@ -271,7 +271,7 @@ public class EntryEditorTab {
 	}
 	
 	public void focusLost(FocusEvent e) {
-	    if (!e.isTemporary())
+  	    if (!e.isTemporary())
 		parent.updateField(fe);
 	}
     }

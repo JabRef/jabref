@@ -71,6 +71,8 @@ public class DatabaseSearch extends Thread {
 	    // 1. search all required fields using searchString
 
 	    bes = thisDatabase.getEntryById((String)i.next());
+        if (bes == null)
+            continue;
 		//(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit

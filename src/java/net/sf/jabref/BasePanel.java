@@ -1366,9 +1366,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   ClipboardOwner owner = new ClipboardOwner() {
 		            public void lostOwnership(Clipboard clipboard, Transferable content) {}
 	              };
-	              StringSelection ss = new StringSelection(sw.toString());
+	              //StringSelection ss = new StringSelection(sw.toString());
+                  RtfSelection rs = new RtfSelection(sw.toString());
  	                Toolkit.getDefaultToolkit().getSystemClipboard()
-	                    .setContents(ss, owner);
+	                    .setContents(rs, owner);
 			      message = Globals.lang("Entries exported to clipboard")+": "+bes.length;
 			  } catch (Exception ex) {
 			      ex.printStackTrace();
@@ -1989,7 +1990,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void selectEntries(final BibtexEntry[] bes, final int toScrollTo) {
-	//Util.pr("highlighting...");
+
         SwingUtilities.invokeLater(new Thread() {
              public void run() {    
                  int rowToScrollTo = 0;
@@ -2006,8 +2007,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                  }
                  entryTable.ensureVisible(rowToScrollTo);
                  Component comp = splitPane.getBottomComponent();
-                 if (comp instanceof EntryEditor)
-                     comp.requestFocus();
+                 //if (comp instanceof EntryEditor)
+                 //    comp.requestFocus();
              }
         });
     }

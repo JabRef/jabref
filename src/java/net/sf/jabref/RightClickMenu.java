@@ -90,7 +90,7 @@ public class RightClickMenu extends JPopupMenu
             });
             addSeparator();
 
-        /*add(new AbstractAction(Globals.lang("Export to clipboard")) {
+        add(new AbstractAction(Globals.lang("Export to clipboard")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("exportToClipboard");
@@ -98,7 +98,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
             addSeparator();
-          */
+         
         if (multiple) {
           add(new AbstractAction(Globals.lang("Mark entries"), new ImageIcon(GUIGlobals.markIcon)) {
             public void actionPerformed(ActionEvent e) {

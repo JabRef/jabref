@@ -19,7 +19,7 @@ public class FieldEditorFocusListener implements FocusListener {
     }
 
     public void focusGained(FocusEvent event) {
-       ((Component)event.getSource()).setBackground(GUIGlobals.activeEditor);
+        ((Component)event.getSource()).setBackground(GUIGlobals.activeEditor);
     }
 
 

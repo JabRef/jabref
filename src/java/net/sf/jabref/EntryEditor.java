@@ -1052,12 +1052,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-      /*
+     /*
        * Thread t = new Thread() { public void run() { panel.hideEntryEditor(); } };
        */
       if (tabbed.getSelectedComponent() == srcPanel) {
         updateField(source);
-
         if (lastSourceAccepted)
           //SwingUtilities.invokeLater(t);
           panel.hideEntryEditor();
@@ -1213,8 +1212,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if (accepted) {
         }
       }
-    }
 
+    }
   }
 
   class SwitchLeftAction extends AbstractAction {
