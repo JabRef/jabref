@@ -10,6 +10,7 @@ import antlr.RecognitionException;
 import antlr.TokenStreamException;
 import antlr.collections.AST;
 import java.io.StringReader;
+import java.util.*;
 import java.util.Hashtable;
 import java.util.regex.PatternSyntaxException;
 import net.sf.jabref.BibtexEntry;
@@ -32,7 +33,7 @@ public class SearchExpression implements SearchRule {
 		parser.searchExpression(); // this is the "global" rule
 		ast = parser.getAST(); // remember abstract syntax tree
 	}
-	public int applyRule(Hashtable searchStrings, BibtexEntry bibtexEntry) {
+	public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
 		try {
 			return treeParser.apply(ast,bibtexEntry);
 		} catch (RecognitionException e) {
