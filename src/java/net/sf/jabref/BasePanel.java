@@ -645,8 +645,23 @@ public class BasePanel extends JSplitPane implements MouseListener,
     }
 
     public void setupMainPanel() {
+
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+
+	// We replace the default FocusTraversalPolicy with a subclass
+	// that only allows FieldEditor components to gain keyboard focus,
+	// if there is an entry editor open.
+	/*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
+		protected boolean accept(Component c) {
+		    Util.pr("jaa");
+		    if (showing == null)
+			return super.accept(c);
+		    else
+			return (super.accept(c) && 
+				(c instanceof FieldEditor));
+		}
+		});*/
 
 	setupTable();
 	// If an entry is currently being shown, make sure it stays shown,

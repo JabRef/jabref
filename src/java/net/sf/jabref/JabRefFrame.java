@@ -78,6 +78,7 @@ public class JabRefFrame extends JFrame {
 	quit = new CloseAction(),
 	selectKeys = new SelectKeysAction(),
 	incrementalSearch = new IncrementalSearchAction(),
+	normalSearch = new SearchAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
@@ -150,23 +151,23 @@ public class JabRefFrame extends JFrame {
 
     public JabRefFrame() {
 
-		//Globals.setLanguage("no", "");
-		setTitle(GUIGlobals.frameTitle);	       
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
+	//Globals.setLanguage("no", "");
+	setTitle(GUIGlobals.frameTitle);	       
+	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+	addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e) {
 		    (new CloseAction()).actionPerformed(null);
-				}	
-			});
-		
-		initLabelMaker();
-				
-		setupLayout();		
-		setSize(new Dimension(prefs.getInt("sizeX"),
-							  prefs.getInt("sizeY")));
-		setLocation(new Point(prefs.getInt("posX"),
+		}	
+	    });
+	
+	initLabelMaker();
+	
+	setupLayout();		
+	setSize(new Dimension(prefs.getInt("sizeX"),
+			      prefs.getInt("sizeY")));
+	setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
-
+	
 	// If the option is enabled, open the last edited databases, if any.
 	if (prefs.getBoolean("openLastEdited") 
 	    && (prefs.get("lastEdited") != null)) {
@@ -182,13 +183,14 @@ public class JabRefFrame extends JFrame {
 		}
 	    }
 	}
-
+	
 	setVisible(true);
 	if (tabbedPane.getTabCount() > 0) {
 	    tabbedPane.setSelectedIndex(0);
 	    new FocusRequester(((BasePanel)tabbedPane.getComponentAt(0))
 			       .entryTable);
-	}
+	} else
+	    setEmptyState();
 
     }
 
@@ -350,6 +352,18 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
+    class SearchAction extends AbstractAction {
+	public SearchAction() {
+	    super("Search", new ImageIcon(GUIGlobals.searchIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Start search"));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Search"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    if (tabbedPane.getTabCount() > 0)
+		searchManager.startSearch();
+	}
+    }
+
     class NewEntryAction extends AbstractAction {
 
 	BibtexEntryType type = null; // The type of item to create.
@@ -386,21 +400,22 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
+    /*
     private void setupDatabaseLayout() {
 	// This method is called whenever this frame has been provided
 	// with a database, and completes the layout.
 
-	/*
+	
 	if (file != null)
 	    setTitle(GUIGlobals.baseTitle+file.getName());
 	else
-	setTitle(GUIGlobals.untitledTitle);*/
+	setTitle(GUIGlobals.untitledTitle);
 
 	//DragNDropManager dndm = new DragNDropManager(this);
 
 	//setNonEmptyState();	
 	Util.pr("JabRefFrame: Must set non-empty state.");
-    }
+	}*/
     
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
@@ -458,6 +473,7 @@ public class JabRefFrame extends JFrame {
 	bibtex.add(editPreamble);
 	bibtex.add(editStrings);
 	mb.add(bibtex);
+	tools.add(normalSearch);
 	tools.add(incrementalSearch);
 	tools.add(makeKeyAction);
 	tools.add(lyxPushAction); 
@@ -557,6 +573,55 @@ public class JabRefFrame extends JFrame {
 	for (int i=0; i<tabbedPane.getTabCount(); i++)
 	    baseAt(i).stopShowingSearchResults();
     }
+
+    private void setEmptyState() {
+	// Disable actions that demand an open database.	
+	close.setEnabled(false);
+	save.setEnabled(false);
+	saveAs.setEnabled(false);
+	undo.setEnabled(false);
+	redo.setEnabled(false);
+	cut.setEnabled(false);
+	delete.setEnabled(false);	
+	copy.setEnabled(false);
+	paste.setEnabled(false);
+	selectAll.setEnabled(false);
+	editPreamble.setEnabled(false);
+	editStrings.setEnabled(false);
+	toggleGroups.setEnabled(false);
+	makeKeyAction.setEnabled(false);
+	lyxPushAction.setEnabled(false);
+	normalSearch.setEnabled(false);
+	incrementalSearch.setEnabled(false);
+	for (int i=0; i<newSpecificEntryAction.length; i++)
+	    newSpecificEntryAction[i].setEnabled(false);
+	newEntryAction.setEnabled(false);
+    }
+
+    private void setNonEmptyState() {
+	// Enable actions that demand an open database.
+	close.setEnabled(true);
+	save.setEnabled(true);
+	saveAs.setEnabled(true);
+	undo.setEnabled(true);
+	redo.setEnabled(true);
+	cut.setEnabled(true);
+	delete.setEnabled(true);	
+	copy.setEnabled(true);
+	paste.setEnabled(true);
+	selectAll.setEnabled(true);
+	editPreamble.setEnabled(true);
+	editStrings.setEnabled(true);
+	toggleGroups.setEnabled(true);
+	makeKeyAction.setEnabled(true);
+	lyxPushAction.setEnabled(true);
+	normalSearch.setEnabled(true);
+	incrementalSearch.setEnabled(true);
+	for (int i=0; i<newSpecificEntryAction.length; i++)
+	    newSpecificEntryAction[i].setEnabled(true);
+	newEntryAction.setEnabled(true);
+    }
+
 
     protected ParserResult loadDatabase(File fileToOpen) throws IOException {
 	// Temporary (old method):	
@@ -698,6 +763,8 @@ public class JabRefFrame extends JFrame {
 			
 			if (close) {
 				tabbedPane.remove(basePanel());
+				if (tabbedPane.getTabCount() == 0)
+				    setEmptyState();
 				output("Closed database.");
 			}
 		}
@@ -763,6 +830,8 @@ public class JabRefFrame extends JFrame {
 		    */
 		    tabbedPane.add(fileToOpen.getName(), bp);
 		    tabbedPane.setSelectedComponent(bp);
+		    if (tabbedPane.getTabCount() == 1)
+			setNonEmptyState();
 		    output("Opened database '"+fileToOpen.getPath()+"' with "+
 			   db.getEntryCount()+" entries.");
 		    

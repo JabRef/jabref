@@ -175,14 +175,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	add(tabbed, BorderLayout.CENTER);
 
-	// We replace the default FocusTraversalPolicy with a subclass
-	// that only allows FieldEditor components to gain keyboard focus.	
-	setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
-		protected boolean accept(Component c) {
-		    return (super.accept(c) && (c instanceof JTextComponent));
-		}
-	    });
-
 	//Util.pr("opt: "+optW+"  req:"+reqW);
 	int prefHeight = (int)(Math.max(genW, Math.max(optW, reqW))*GUIGlobals.FORM_HEIGHT[prefs.getInt("entryTypeFormHeightFactor")]);
 	setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
@@ -270,7 +262,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.BOTH;
-
+	FieldTextArea firstReq = null, firstOpt = null, firstGen = null;
 	for (int i=0; i<iter; i++) {
 
 	    // Constraints for the labels.
@@ -285,7 +277,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 	    		
 		ta1 = new FieldTextArea(reqFields[i], stringContent);
-
+		/*if (i == 0)
+		    firstReq = ta1;
+		if ((i == rmax-1) && (firstReq != null))
+		ta1.setNextFocusableComponent(firstReq);*/
 		setupJTextComponent(ta1);
 		if (i==0) {
 		    firstR = ta1;
@@ -299,6 +294,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 
 		ta2 = new FieldTextArea(optFields[i], stringContent);
+		/*if (i == 0)
+		    firstOpt = ta1;
+		if (i == omax-1)
+		ta1.setNextFocusableComponent(firstOpt);*/
 		setupJTextComponent(ta2);
 		if (i==0) { 
 		    firstO = ta2;
@@ -312,6 +311,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 
 		ta3 = new FieldTextArea(genFields[i], stringContent);
+		/*if (i == 0)
+		    firstGen = ta1;
+		if (i == gmax-1)
+		ta1.setNextFocusableComponent(firstGen);*/
 		setupJTextComponent(ta3);
 
 		// Add external viewer listener for "pdf" and "url" fields.

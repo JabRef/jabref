@@ -202,6 +202,24 @@ class SearchManager extends JPanel
 	searchField.requestFocus();
     }
 
+    /**
+     * Clears and focuses the search field if it is not
+     * focused. Otherwise, cycles to the next search type.     
+     */
+    public void startSearch() {
+	if (!searchField.hasFocus()) {
+	    searchField.setText("");
+	    searchField.requestFocus();
+	} else {
+	    if (increment.isSelected())
+		select.setSelected(true);
+	    else if (select.isSelected())
+		reorder.setSelected(true);
+	    else
+		increment.setSelected(true);
+	}
+    }
+
     public void actionPerformed(ActionEvent e) {
 	if (e.getSource() == escape) {
 	    if (frame.basePanel() != null)
