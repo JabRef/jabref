@@ -302,7 +302,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
         ToolTipManager.sharedInstance().registerComponent(groupsTree);
-        // JZTODO JZPUWIL: drag and drop...
+        // JZPUWIL: drag and drop...
         DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
                 groupsTree, DnDConstants.ACTION_MOVE,
                 new DragGestureListener() {
@@ -474,7 +474,7 @@ public class GroupSelector extends SidePaneComponent implements
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
-            valueChanged(null); // JZTODO: null OK?
+            valueChanged(null);
         } else if (e.getSource() == newButton) {
             GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.show();
@@ -498,12 +498,12 @@ public class GroupSelector extends SidePaneComponent implements
             gd.show();
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {
-            valueChanged(null); // JZTODO: null OK?
+            valueChanged(null);
         }
     }
 
     public void componentOpening() {
-        valueChanged(null); // JZTODO: null OK?
+        valueChanged(null);
     }
 
     public void componentClosing() {
