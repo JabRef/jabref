@@ -184,9 +184,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 	this.encoding = encoding;
     }
 
-    public BibtexEntry[] getSelectedEntries() {
-	return entryTable.getSelectedEntries();
-    }
+  
 
     public void output(String s) {
 	//Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
