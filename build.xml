@@ -82,6 +82,7 @@
 	                <pathelement path="${build.classes}"/>
         	        <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
                 	 <pathelement location="${library.directory}/commons-logging.jar" />
+                       	 <pathelement location="${library.directory}/antlr.jar" />
                        	 <pathelement location="${library.directory}/plastic-1.2.1.jar" />
                 </classpath>
                 </javac>
