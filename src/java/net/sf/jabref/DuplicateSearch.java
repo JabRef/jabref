@@ -49,7 +49,7 @@ public class DuplicateSearch extends Thread {
 
 public void run() {
   NamedCompound ce = null;
-  int dupl = 0;
+  int duplicateCounter = 0;
   panel.output(Globals.lang("Searching for duplicates..."));
   Object[] keys = panel.database.getKeySet().toArray();
   if ((keys == null) || (keys.length < 2))
@@ -63,7 +63,6 @@ public void run() {
   st.start();
   int current = 0;
   DuplicateResolverDialog drd = null;
-  boolean cancelled = false;
 
 /*
   loop: while (!st.finished() || (current < duplicates.size()))
@@ -105,6 +104,7 @@ public void run() {
         drd = new DuplicateResolverDialog( panel.frame, be[0], be[1] ) ;
         drd.show() ;
 
+        duplicateCounter++ ;
         int answer = drd.getSelected() ;
         if ( answer == DuplicateResolverDialog.KEEP_UPPER )
         {
@@ -126,8 +126,8 @@ public void run() {
         {
           st.setFinished() ; // thread killing
           current = Integer.MAX_VALUE ;
+          duplicateCounter-- ; // correct counter
         }
-        dupl++ ;
         drd.dispose();
       }
     }
@@ -135,7 +135,9 @@ public void run() {
 
   if (drd != null)
     drd.dispose();
-  panel.output(Globals.lang("Duplicate pairs found") + ": " + dupl);
+
+  panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
+               +" " +Globals.lang("pairs processed") +": " +duplicateCounter );
 
   if (ce != null)
   {
