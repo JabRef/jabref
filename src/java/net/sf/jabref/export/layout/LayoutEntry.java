@@ -61,7 +61,7 @@ public class LayoutEntry
         }
         else if (si.i == LayoutHelper.IS_SIMPLE_FIELD)
         {
-            text = si.s;
+            text = si.s.trim();
         }
         else if (si.i == LayoutHelper.IS_FIELD_START)
         {
@@ -80,7 +80,7 @@ public class LayoutEntry
             }
             else
             {
-                text = (String) v.get(0);
+                text = ((String) v.get(0)).trim();
 
                 try
                 {
@@ -275,13 +275,14 @@ public class LayoutEntry
         }
         else if (type == LayoutHelper.IS_OPTION_FIELD)
         {
+	    //System.out.println("doLayout IS_OPTION_FIELD '"+text+"'");
             String fieldEntry;
 
             if (text.equals("bibtextype"))
             {
                 fieldEntry = bibtex.getType().getName();
             }
-
+            else{
             String field = (String) bibtex.getField(text);
 
             if (field == null)
@@ -291,6 +292,7 @@ public class LayoutEntry
             else
             {
                 fieldEntry = field;
+            }
             }
 
             //System.out.println("OPTION: "+option);
