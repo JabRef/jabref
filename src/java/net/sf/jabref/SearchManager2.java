@@ -265,11 +265,10 @@ class SearchManager2 extends SidePaneComponent
 		rule1 = new SimpleSearchRule(prefs);
 
 		try {
-			rule1 = new SearchExpression(prefs,searchOptions);
-		} catch (Exception ex) {
-                  ex.printStackTrace();
 			// JZ: for testing; this does the new search if the
 			// search text is in correct syntax, and the regular search otherwise
+			rule1 = new SearchExpression(prefs,searchOptions);
+		} catch (Exception ex) {
 		}
 //		} catch (PatternSyntaxException ex) {
 //			System.out.println(ex);
