@@ -38,7 +38,7 @@ import java.util.*;
 import java.awt.datatransfer.*;
 import javax.swing.undo.*;
 
-public class BasePanel extends JSplitPane implements MouseListener, 
+public class BasePanel extends JSplitPane implements MouseListener,
 						     ClipboardOwner {
 
     BasePanel ths = this;
@@ -48,11 +48,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
     BibtexDatabase database;
     JabRefPreferences prefs;
     // The database shown in this panel.
-    File file = null, 
+    File file = null,
 	fileToOpen = null; // The filename of the database.
 
     //Hashtable autoCompleters = new Hashtable();
-    // Hashtable that holds as keys the names of the fields where 
+    // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
     // The undo manager.
@@ -80,14 +80,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
     //HashMap entryTypeForms = new HashMap();
     // Hashmap to keep track of which entries currently have open
     // EntryTypeForm dialogs.
-    
+
     PreambleEditor preambleEditor = null;
     // Keeps track of the preamble dialog if it is open.
 
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
 
-    boolean showingSearchResults = false, 
+    boolean showingSearchResults = false,
 	showingGroup = false;
 
     // The sidepane manager takes care of populating the sidepane.
@@ -101,7 +101,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     private boolean suppressOutput = false;
 
     private HashMap actions = new HashMap();
-   
+
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
 	database = new BibtexDatabase();
 	metaData = new MetaData();
@@ -153,15 +153,15 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int clickedOn = -1;
 		    // We demand that one and only one row is selected.
 		    if (entryTable.getSelectedRowCount() == 1) {
-			clickedOn = entryTable.getSelectedRow();		
+			clickedOn = entryTable.getSelectedRow();
 		    }
 		    if (clickedOn >= 0) {
 			String id =  tableModel.getNameFromNumber(clickedOn);
 			BibtexEntry be = database.getEntryById(id);
-			showEntry(be);		       
+			showEntry(be);
 		    }
 		}
-	    	       
+
 	    });
 
 	// The action for saving a database.
@@ -197,11 +197,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			    ex.printStackTrace();
 			    JOptionPane.showMessageDialog
 				(frame, Globals.lang("Could not save file")
-				 +".\n"+ex.getMessage(), 
+				 +".\n"+ex.getMessage(),
 				 Globals.lang("Save database"),
 				 JOptionPane.ERROR_MESSAGE);
-			}		
-		    }	
+			}
+		    }
 		}
 	    });
 
@@ -218,10 +218,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			if (!name.endsWith(".bib"))
 			    name = name+".bib";
 			file = new File(path, name);
-			if (!file.exists() || 
+			if (!file.exists() ||
 			    (JOptionPane.showConfirmDialog
 			     (frame, "File '"+name+"' exists. Overwrite?",
-			      "Save database", JOptionPane.OK_CANCEL_OPTION) 
+			      "Save database", JOptionPane.OK_CANCEL_OPTION)
 			     == JOptionPane.OK_OPTION)) {
 			    runCommand("save");
 			    prefs.put("workingDirectory", path);
@@ -238,13 +238,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("copy", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    
+
 		    if ((bes != null) && (bes.length > 0)) {
-			TransferableBibtexEntry trbe 
+			TransferableBibtexEntry trbe
 			    = new TransferableBibtexEntry(bes);
 			Toolkit.getDefaultToolkit().getSystemClipboard()
 			    .setContents(trbe, ths);
-			output("Copied "+(bes.length>1 ? bes.length+" entries." 
+			output("Copied "+(bes.length>1 ? bes.length+" entries."
 					  : "1 entry."));
 		    } else {
 			// The user maybe selected a single cell.
@@ -264,7 +264,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    }
 		}
 	    });
-		
+
 	actions.put("cut", new BaseAction() {
 		public void action() {
 		    runCommand("copy");
@@ -272,7 +272,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    if ((bes != null) && (bes.length > 0)) {
 			// Create a CompoundEdit to make the action undoable.
 			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? Globals.lang("cut entries") 
+			    (bes.length > 1 ? Globals.lang("cut entries")
 			     : Globals.lang("cut entry"));
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
@@ -284,13 +284,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			entryTable.clearSelection();
 			frame.output(Globals.lang("Cut")+" "+
 				     (bes.length>1 ? bes.length
-				      +" "+ Globals.lang("entries") 
+				      +" "+ Globals.lang("entries")
 				      : Globals.lang("entry"))+".");
 			ce.end();
-			undoManager.addEdit(ce);		    
+			undoManager.addEdit(ce);
 			refreshTable();
 			markBaseChanged();
-		    }	       		
+		    }
 		}
 	    });
 
@@ -300,13 +300,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 		    if (bes.length > 0) {
 			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
-			
-			/* 
+
+			/*
 			   I have removed the confirmation dialog, since I converted
 			   the "remove" action to a "cut". That means the user can
 			   always paste the entries, in addition to pressing undo.
 			   So the confirmation seems redundant.
-			  
+
 			String msg = Globals.lang("Really delete the selected")
 			    +" "+Globals.lang("entry")+"?",
 			    title = Globals.lang("Delete entry");
@@ -320,7 +320,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 			// Create a CompoundEdit to make the action undoable.
 			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? Globals.lang("delete entries") 
+			    (bes.length > 1 ? Globals.lang("delete entries")
 			     : Globals.lang("delete entry"));
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
@@ -331,13 +331,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			entryTable.clearSelection();
 			frame.output(Globals.lang("Deleted")+" "+
 				     (bes.length>1 ? bes.length
-				      +" "+ Globals.lang("entries") 
+				      +" "+ Globals.lang("entries")
 				      : Globals.lang("entry"))+".");
 			ce.end();
-			undoManager.addEdit(ce);		    
+			undoManager.addEdit(ce);
 			refreshTable();
 			markBaseChanged();
-		    }	       
+		    }
 		}
 
 
@@ -360,12 +360,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
 			    } catch (UnsupportedFlavorException ex) {
 			    } catch (IOException ex) {}
-			    
+
 			    if ((bes != null) && (bes.length > 0)) {
 				NamedCompound ce = new NamedCompound
 				    (bes.length > 1 ? "paste entries" : "paste entry");
 				for (int i=0; i<bes.length; i++) {
-				    try { 
+				    try {
 					BibtexEntry be = (BibtexEntry)(bes[i].clone());
 					// We have to clone the
 					// entries, since the pasted
@@ -390,7 +390,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				markBaseChanged();
 			    }
 			}
-			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) { 
+			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) {
 			    // We have determined that the clipboard data is a string.
 			    int[] rows = entryTable.getSelectedRows(),
 				cols = entryTable.getSelectedColumns();
@@ -399,7 +399,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				try {
 				    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
 				    refreshTable();
-				    markBaseChanged();			   
+				    markBaseChanged();
 				    output("Pasted cell contents");
 				} catch (UnsupportedFlavorException ex) {
 				} catch (IOException ex) {
@@ -410,13 +410,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			}
 		    }
 		}
-	    });	   
+	    });
 
 	actions.put("selectAll", new BaseAction() {
 		public void action() {
 		    entryTable.selectAll();
 		}
-	    });      
+	    });
 
 	// The action for opening the preamble editor
 	actions.put("editPreamble", new BaseAction() {
@@ -430,7 +430,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    } else {
 			preambleEditor.setVisible(true);
 		    }
-	    
+
 		}
 	    });
 
@@ -446,7 +446,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    } else {
 			stringDialog.setVisible(true);
 		    }
-	    
+
 		}
 	    });
 
@@ -505,42 +505,42 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("makeKey", new BaseAction() {
 		public void action() {
 		    int[] rows = entryTable.getSelectedRows() ;
-		    int numSelected = rows.length ; 
+		    int numSelected = rows.length ;
 		    BibtexEntry bes = null ;
 		    if (numSelected > 0) {
 			int answer = JOptionPane.showConfirmDialog
 			    (frame, "Generate bibtex key"+
 			     (numSelected>1 ? "s for the selected "
 			      +numSelected+" entries?" :
-			      " for the selected entry?"), 
-			     "Autogenerate Bibtexkey", 
+			      " for the selected entry?"),
+			     "Autogenerate Bibtexkey",
 			     JOptionPane.YES_NO_CANCEL_OPTION);
 			if (answer != JOptionPane.YES_OPTION) {
-			    return ; 
+			    return ;
 			}
 		    } else { // None selected. Inform the user to select entries first.
 			JOptionPane.showMessageDialog(frame, "First select the entries you want keys to be generated for.",
 						      "Autogenerate Bibtexkey", JOptionPane.INFORMATION_MESSAGE);
 			return ;
 		    }
-		    
+
 		    output("Generating Bibtexkey for "+numSelected+(numSelected>1 ? " entries" : "entry"));
-		    
+
 		    NamedCompound ce = new NamedCompound("autogenerate keys");
 		    //BibtexEntry be;
 		    Object oldValue;
 		    for(int i = 0 ; i < numSelected ; i++){
 			bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
 			oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-			bes = frame.labelMaker.applyRule(bes) ; 
+			bes = frame.labelMaker.applyRule(bes) ;
 			ce.addEdit(new UndoableFieldChange
 				   (bes, GUIGlobals.KEY_FIELD, oldValue,
 				    bes.getField(GUIGlobals.KEY_FIELD)));
 		    }
 		    ce.end();
 		    undoManager.addEdit(ce);
-		    markBaseChanged() ; 
-		    refreshTable() ; 
+		    markBaseChanged() ;
+		    refreshTable() ;
 		}
 	    });
 
@@ -562,7 +562,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("copyKey", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    
+
 		    if ((bes != null) && (bes.length == 1)) {
 			Object o = bes[0].getField(Globals.KEY_FIELD);
 			if (o != null) {
@@ -580,7 +580,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("copyCiteKey", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    
+
 		    if ((bes != null) && (bes.length == 1)) {
 			Object o = bes[0].getField(Globals.KEY_FIELD);
 			if (o != null) {
@@ -595,8 +595,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
-    }			    
-		    
+    }
+
 
     /**
      * This method is called from JabRefFrame is a database specific
@@ -604,7 +604,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * defined, or prints an error message to the standard error
      * stream.
     */
-    public void runCommand(String command) { 
+    public void runCommand(String command) {
 	if (actions.get(command) == null)
 	    Util.pr("No action defined for'"+command+"'");
 	else ((BaseAction)actions.get(command)).action();
@@ -618,7 +618,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     public void newEntry(BibtexEntryType type) {
 	if (type == null) {
 	    // Find out what type is wanted.
-	    EntryTypeDialog etd = new EntryTypeDialog(frame);	       
+	    EntryTypeDialog etd = new EntryTypeDialog(frame);
 	    // We want to center the dialog, to make it look nicer.
 	    Util.placeDialog(etd, frame);
 	    etd.setVisible(true);
@@ -629,7 +629,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    BibtexEntry be = new BibtexEntry(id, type);
 	    try {
 		database.insertEntry(be);
-		
+
 		// Create an UndoableInsertEntry object.
 		undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
 		output("Added new "+type.getName().toLowerCase()+" entry.");
@@ -646,7 +646,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		Util.pr(ex.getMessage());
 	    }
 	}
-	
+
     }
 
     public void validateMainPanel() {
@@ -675,7 +675,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    runCommand("paste");
 		}
 	    });
-	
+
 	entryTable.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER){
@@ -711,7 +711,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    if (showing == null)
 			return super.accept(c);
 		    else
-			return (super.accept(c) && 
+			return (super.accept(c) &&
 				(c instanceof FieldEditor));
 		}
 		});*/
@@ -727,7 +727,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	setRightComponent(splitPane);
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
-	//sidePaneManager.register("search", new SearchManager2(frame, prefs, this));
+	sidePaneManager.register("fetchMedline", new MedlineFetcher(this, sidePaneManager));
 	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
 	sidePaneManager.add("search", searchManager);
 	sidePaneManager.populatePanel();
@@ -745,7 +745,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * In this method, the meta data are input to their respective
      * handlers.
      */
-    public void parseMetaData(HashMap meta) {       
+    public void parseMetaData(HashMap meta) {
 	metaData = new MetaData(meta);
     }
 
@@ -761,15 +761,15 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	if (preambleEditor != null)
 	    preambleEditor.updatePreamble();
     }
-    
-    public void assureStringDialogNotEditing() {	
+
+    public void assureStringDialogNotEditing() {
 	if (stringDialog != null)
-	    stringDialog.assureNotEditing();	
+	    stringDialog.assureNotEditing();
     }
 
     public void updateStringDialog() {
 	if (stringDialog != null)
-	    stringDialog.refreshTable(); 
+	    stringDialog.refreshTable();
     }
 
     public void showEntry(BibtexEntry be) {
@@ -785,15 +785,15 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    }
 	    return;
 	}
-	
+
 	EntryEditor form;
 	int divLoc = -1, visPan = -1;
 	if (showing != null)
 	    visPan = ((EntryEditor)splitPane.getBottomComponent()).
 		getVisiblePanel();
 	if (showing != null)
-	    divLoc = splitPane.getDividerLocation();	
-    
+	    divLoc = splitPane.getDividerLocation();
+
 	if (entryEditors.containsKey(be.getType().getName())) {
 	    // We already have an editor for this entry type.
 	    form = (EntryEditor)entryEditors.get
@@ -815,13 +815,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    splitPane.setDividerLocation(divLoc);
 	else
 	    splitPane.setDividerLocation
-		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);	
+		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
 	new FocusRequester(form);
 	//form.requestFocus();
 
 	showing = be;
     }
-    
+
     /**
      * Closes the entry editor.
      *
@@ -839,14 +839,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
      */
     public void ensureNotShowing(BibtexEntry be) {
 	if (showing == be) {
-	    hideEntryEditor();      
+	    hideEntryEditor();
 	    showing = null;
 	}
     }
 
     public void markBaseChanged() {
 	baseChanged = true;
-	
+
 	// Put an asterix behind the file name to indicate the
 	// database has changed.
 	String oldTitle = frame.getTabTitle(this);
@@ -881,18 +881,18 @@ public class BasePanel extends JSplitPane implements MouseListener,
      */
     public void showSearchResults(String searchValueField) {
 	//entryTable.scrollTo(0);
-	
+
 	if (searchValueField == Globals.SEARCH)
-	    showingSearchResults = true;	           
+	    showingSearchResults = true;
 	else if (searchValueField == Globals.GROUPSEARCH)
 	    showingGroup = true;
-	
+
 	entryTable.setShowingSearchResults(showingSearchResults,
 					   showingGroup);
 	entryTable.clearSelection();
 	entryTable.scrollTo(0);
 	refreshTable();
-	
+
     }
 
     /**
@@ -907,7 +907,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				    (tableModel.getNameFromNumber(i)))
 		.getField(Globals.SEARCH);
 	    if ((value != null) && !value.equals("0"))
-		entryTable.addRowSelectionInterval(i, i);	    
+		entryTable.addRowSelectionInterval(i, i);
 	}
     }
 
@@ -937,11 +937,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
     }
 
     protected EntryTableModel getTableModel(){
-		return tableModel ; 
+		return tableModel ;
     }
 
     public BibtexDatabase getDatabase(){
-	return database ; 
+	return database ;
     }
 
     public void entryTypeFormClosing(String id) {
@@ -958,14 +958,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
     }
 
     public void addToGroup(String groupName, String regexp, String field) {
-	
+
 	boolean giveWarning = false;
 	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
 	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
 		&& !field.equals("keywords")) {
 		giveWarning = true;
 		break;
-	    }	       
+	    }
 	}
 	if (giveWarning) {
 	    String message = "This action will modify the '"+field+"' field "
@@ -976,12 +976,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    int choice = JOptionPane.showConfirmDialog
 		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
 		 JOptionPane.WARNING_MESSAGE);
-	    
+
 	    if (choice == JOptionPane.NO_OPTION)
 		return;
 	}
-	
-	BibtexEntry[] bes = entryTable.getSelectedEntries();	    
+
+	BibtexEntry[] bes = entryTable.getSelectedEntries();
 	if ((bes != null) && (bes.length > 0)) {
 	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
 	    NamedCompound ce = new NamedCompound("add to group");
@@ -991,12 +991,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    String oldContent = (String)bes[i].getField(field),
 			pre = " ",
 			post = "";
-		    String newContent = 
+		    String newContent =
 			(oldContent==null ? "" : oldContent+pre)
 			+regexp+post;
 		    bes[i].setField
 			(field, newContent);
-		    
+
 		    // Store undo information.
 		    ce.addEdit(new UndoableFieldChange
 			       (bes[i], field, oldContent, newContent));
@@ -1008,24 +1008,24 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
-	    }		    
+	    }
 
 	    output("Appended '"+regexp+"' to the '"
 		   +field+"' field of "+bes.length+" entr"+
 		   (bes.length > 1 ? "ies." : "y."));
-	}       
+	}
     }
 
     public void removeFromGroup
 	(String groupName, String regexp, String field) {
-	
+
 	boolean giveWarning = false;
 	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
 	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
 		&& !field.equals("keywords")) {
 		giveWarning = true;
 		break;
-	    }	       
+	    }
 	}
 	if (giveWarning) {
 	    String message = "This action will modify the '"+field+"' field "
@@ -1036,12 +1036,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    int choice = JOptionPane.showConfirmDialog
 		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
 		 JOptionPane.WARNING_MESSAGE);
-	    
+
 	    if (choice == JOptionPane.NO_OPTION)
 		return;
 	}
-	
-	BibtexEntry[] bes = entryTable.getSelectedEntries();	    
+
+	BibtexEntry[] bes = entryTable.getSelectedEntries();
 	if ((bes != null) && (bes.length > 0)) {
 	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
 	    NamedCompound ce = new NamedCompound("remove from group");
@@ -1062,13 +1062,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
-	    }	    
-	    
+	    }
+
 	    output("Removed '"+regexp+"' from the '"
 		   +field+"' field of "+bes.length+" entr"+
 		   (bes.length > 1 ? "ies." : "y."));
 	}
-	
+
     }
 
     public void changeType(BibtexEntryType type) {
@@ -1137,7 +1137,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    // After everything, enable/disable the undo/redo actions
 	    // appropriately.
 	    //updateRedoState();
-	    //undoAction.updateUndoState();	   
+	    //undoAction.updateUndoState();
 	    markChangedOrUnChanged();
 	}
     }
@@ -1149,7 +1149,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	if (e.getClickCount() == 2) {
 	    runCommand("edit");
 	}
-	
+
     }
 
     public void mouseEntered(MouseEvent e) {}

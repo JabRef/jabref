@@ -39,7 +39,7 @@ import java.net.URL;
 
 public class GUIGlobals {
 
-    /* 
+    /*
      * Static variables for graphics files and keyboard shortcuts.
      */
 
@@ -50,7 +50,7 @@ public class GUIGlobals {
     //static HashMap frames = new HashMap();
 
     // Frame titles.
-    static String 
+    static String
 	frameTitle = "JabRef",
 	stringsTitle = Globals.lang("Strings for database")+": ",
 	untitledStringsTitle = stringsTitle+Globals.lang("untitled"),
@@ -69,7 +69,7 @@ public class GUIGlobals {
 	searchFieldSize = new Dimension(215, 25);
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
-    public static final int 
+    public static final int
 	SPLIT_PANE_DIVIDER_SIZE = 2,
 	SPLIT_PANE_DIVIDER_LOCATION = 80,
 	GROUPS_VISIBLE_ROWS = 8;
@@ -82,14 +82,14 @@ public class GUIGlobals {
 	defaultDir = ".";
 
     // Image paths.
-    public static String 	
+    public static String
 	imageSize = "24",
 	extension = ".gif",
 	ex = imageSize+extension,
 	pre = "/images/",
 	helpPre = "/help/";
 
-    public static URL 
+    public static URL
 	//appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
 	openIconFile = GUIGlobals.class.getResource(pre+"Open.gif"),
 	saveIconFile = GUIGlobals.class.getResource(pre+"Save.gif"),
@@ -108,7 +108,7 @@ public class GUIGlobals {
 	cutIconFile = GUIGlobals.class.getResource(pre+"Cut.gif"),
 	copyKeyIconFile = GUIGlobals.class.getResource(pre+"CopyKey.gif"),
 	genKeyIconFile = GUIGlobals.class.getResource(pre+"GenKey.gif"),
-	lyxIconFile = GUIGlobals.class.getResource(pre+"LyX.gif"),	
+	lyxIconFile = GUIGlobals.class.getResource(pre+"LyX.gif"),
 	backIconFile = GUIGlobals.class.getResource(pre+"VCRBack.gif"),
 	forwardIconFile = GUIGlobals.class.getResource(pre+"VCRForward.gif"),
 	contentsIconFile = GUIGlobals.class.getResource(pre+"Contents.gif"),
@@ -125,8 +125,9 @@ public class GUIGlobals {
 	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste.gif"),
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
 	searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif"),
-	autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif");
-	
+	autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif"),
+        fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
+
     // Help files (in HTML format):
     public static URL
 	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"BaseFrameHelp.html"),
@@ -140,7 +141,7 @@ public class GUIGlobals {
 
 
     // Keystrokes for Entry editor.
-    public static String 
+    public static String
  	openKey = "control O",
  	closeKey = "control Q",
  	storeFieldKey = "control S",
@@ -154,7 +155,7 @@ public class GUIGlobals {
 	downKey = "control DOWN";
 
     // The following defines the mnemonic keys for menu items.
-    public static Integer 
+    public static Integer
 	openKeyCode = new Integer(KeyEvent.VK_O),
 	//	newKeyCode = new Integer(KeyEvent.VK_N),
 	saveKeyCode = new Integer(KeyEvent.VK_S),
@@ -172,10 +173,10 @@ public class GUIGlobals {
 	newProcKeyCode = new Integer(KeyEvent.VK_P);
     //    	newInProcKeyCode = new Integer(KeyEvent.VK_M);
 
-    
+
     // The following defines the accelerator keys for menu items,
     // corresponding to the letters for mnemonics.
-    public static KeyStroke 
+    public static KeyStroke
 	generateKeyStroke = KeyStroke.getKeyStroke("control G"),
 	exitDialog = KeyStroke.getKeyStroke("ESCAPE"),
 	copyStroke = KeyStroke.getKeyStroke("control C"),
@@ -212,14 +213,14 @@ public class GUIGlobals {
 	newUnpublKeyStroke = KeyStroke.getKeyStroke("control shift U"),
 	switchPanelLeft = KeyStroke.getKeyStroke("control shift LEFT"),
 	switchPanelRight = KeyStroke.getKeyStroke("control shift RIGHT");
-   
+
 
     // Colors.
     public static Color
 	lightGray = new Color(230, 230, 230),      // Light gray background
 	nullFieldColor = new Color(100, 100, 150), // Empty field, blue.
 	validFieldColor = new Color(75, 130, 75), // Valid field, green.
-	invalidFieldColor = new Color(141,0,61), // Invalid field, red.	
+	invalidFieldColor = new Color(141,0,61), // Invalid field, red.
 //	invalidFieldColor = new Color(210, 70, 70), // Invalid field, red.
 	validFieldBackground = Color.white, // Valid field backgnd.
 	//invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
@@ -303,7 +304,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	"doi",
 	"eid",
     };
-    
+
 
     public static String[] NON_WRITABLE_FIELDS = new String[] {
         "search"
@@ -312,10 +313,10 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
     public static boolean isWriteableField(String field){
         for(int i =  0 ; i < NON_WRITABLE_FIELDS.length ; i++){
 			if(NON_WRITABLE_FIELDS[i].equals(field)){
-				return false ; 
+				return false ;
             }
         }
-        return true ; 
+        return true ;
     }
 
     /**
@@ -327,7 +328,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
     public static boolean isStandardField(String field){
         for(int i =  0 ; i < BIBTEX_STANDARD_FIELDS.length ; i++){
 			if(BIBTEX_STANDARD_FIELDS[i].equals(field)){
-			    return true; 
+			    return true;
             }
         }
         return false;
@@ -336,7 +337,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 
 
     public static double DEFAULT_FIELD_WEIGHT = 1;
-    public static Double 
+    public static Double
 	SMALL_W = new Double(0.30),
 	MEDIUM_W = new Double(0.5),
 	LARGE_W = new Double(1.5);

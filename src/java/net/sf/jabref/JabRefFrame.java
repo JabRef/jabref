@@ -64,7 +64,7 @@ public class JabRefFrame extends JFrame {
 
     // The help window.
     public HelpDialog helpDiag = new HelpDialog(this);
-    
+
 
 
     // Here we instantiate menu/toolbar actions. Actions regarding
@@ -79,21 +79,21 @@ public class JabRefFrame extends JFrame {
 	quit = new CloseAction(),
     //selectKeys = new SelectKeysAction(),
 	newDatabaseAction = new NewDatabaseAction(),
-	help = new HelpAction("JabRef help", helpDiag, 
+	help = new HelpAction("JabRef help", helpDiag,
 			      GUIGlobals.baseFrameHelp, "JabRef help",
 			      prefs.getKey("Help")),
-	contents = new HelpAction("Help contents", helpDiag, 
+	contents = new HelpAction("Help contents", helpDiag,
 				  GUIGlobals.helpContents, "Help contents"),
-	about = new HelpAction("About JabRef", helpDiag, 
+	about = new HelpAction("About JabRef", helpDiag,
 			       GUIGlobals.aboutPage, "About JabRef"),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
 				 prefs.getKey("Save")),
 	saveAs = new GeneralAction("saveAs", "Save database as ...",
-				 "Save database as ...", 
+				 "Save database as ...",
 				   GUIGlobals.saveAsIconFile),
 	undo = new GeneralAction("undo", "Undo", "Undo",
-				 GUIGlobals.undoIconFile, 
+				 GUIGlobals.undoIconFile,
 				 prefs.getKey("Undo")),
 	redo = new GeneralAction("redo", "Redo", "Redo",
 				 GUIGlobals.redoIconFile,
@@ -110,27 +110,29 @@ public class JabRefFrame extends JFrame {
 	paste = new GeneralAction("paste", "Paste", "Paste",
 				 GUIGlobals.pasteIconFile,
 				  prefs.getKey("Paste")),
-	incrementalSearch = new GeneralAction("incSearch", "Incremental search", 
+	incrementalSearch = new GeneralAction("incSearch", "Incremental search",
 					      "Start incremental search",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Incremental search")),
 	normalSearch = new GeneralAction("search", "Search", "Start",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
+       fetchMedline = new FetchMedlineAction(),
+
 
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
 	  GUIGlobals.removeIconFile),*/
 	selectAll = new GeneralAction("selectAll", "Select all",
 				      prefs.getKey("Select all")),
-	editPreamble = new GeneralAction("editPreamble", "Edit preamble", 
+	editPreamble = new GeneralAction("editPreamble", "Edit preamble",
 					 "Edit preamble",
 					 GUIGlobals.preambleIconFile,
 					 prefs.getKey("Edit preamble")),
-	editStrings = new GeneralAction("editStrings", "Edit strings", 
+	editStrings = new GeneralAction("editStrings", "Edit strings",
 					"Edit strings",
 					GUIGlobals.stringsIconFile,
 					prefs.getKey("Edit strings")),
-	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface", 
+	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface",
 					 "Toggle groups interface",
 					 GUIGlobals.groupsIconFile,
 					 prefs.getKey("Toggle groups")),
@@ -154,12 +156,12 @@ public class JabRefFrame extends JFrame {
 	new NewEntryAction("proceedings", prefs.getKey("New proceedings")),
 	new NewEntryAction("inproceedings"),
 	new NewEntryAction("incollection"),
-	new NewEntryAction("booklet"), 
+	new NewEntryAction("booklet"),
 	new NewEntryAction("manual"),
 	new NewEntryAction("techreport"),
 	new NewEntryAction("unpublished",
 			   prefs.getKey("New unpublished")),
-	new NewEntryAction("misc") 
+	new NewEntryAction("misc")
     };
 
     public JabRefFrame() {
@@ -169,26 +171,26 @@ public class JabRefFrame extends JFrame {
 	    } catch (Exception e) { e.printStackTrace();}*/
 
 	//Globals.setLanguage("no", "");
-	setTitle(GUIGlobals.frameTitle);	       
+	setTitle(GUIGlobals.frameTitle);
 	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    (new CloseAction()).actionPerformed(null);
-		}	
+		}
 	    });
-	
+
 	initLabelMaker();
-	
-	setupLayout();		
+
+	setupLayout();
 	setSize(new Dimension(prefs.getInt("sizeX"),
 			      prefs.getInt("sizeY")));
 	setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
-	
+
 	// If the option is enabled, open the last edited databases, if any.
-	if (prefs.getBoolean("openLastEdited") 
+	if (prefs.getBoolean("openLastEdited")
 	    && (prefs.get("lastEdited") != null)) {
-	    
+
 	    // How to handle errors in the databases to open?
 	    String[] names = prefs.getStringArray("lastEdited");
 	    for (int i=0; i<names.length; i++) {
@@ -201,10 +203,10 @@ public class JabRefFrame extends JFrame {
 	    }
 	    output("");
 	}
-	//JFrame.setDefaultLookAndFeelDecorated(true); 
-	try { 
-	    UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName()); 
-	} catch (Exception e) { } 
+	//JFrame.setDefaultLookAndFeelDecorated(true);
+	try {
+	    UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName());
+	} catch (Exception e) { }
 	setVisible(true);
 	if (tabbedPane.getTabCount() > 0) {
 	    tabbedPane.setSelectedIndex(0);
@@ -216,7 +218,7 @@ public class JabRefFrame extends JFrame {
     }
 
     private void setupLayout() {
-	fillMenu();	
+	fillMenu();
 	createToolBar();
 	getContentPane().setLayout(gbl);
 	getContentPane().setBackground(GUIGlobals.lightGray);
@@ -232,7 +234,7 @@ public class JabRefFrame extends JFrame {
 	con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
 	gbl.setConstraints(tlb, con);
 	getContentPane().add(tlb);
-	
+
 	Component lim = Box.createGlue();
 	gbl.setConstraints(lim, con);
 	getContentPane().add(lim);
@@ -240,11 +242,11 @@ public class JabRefFrame extends JFrame {
 	JPanel empt = new JPanel();
 	empt.setBackground(GUIGlobals.lightGray);
 	gbl.setConstraints(empt, con);
-        getContentPane().add(empt); 
-	
+        getContentPane().add(empt);
+
 	con.insets = new Insets(1,0,1,1);
 	con.anchor = GridBagConstraints.EAST;
-	con.weightx = 0;      
+	con.weightx = 0;
 	gbl.setConstraints(searchManager, con);
 	getContentPane().add(searchManager);*/
 	con.gridwidth = GridBagConstraints.REMAINDER;
@@ -281,18 +283,18 @@ public class JabRefFrame extends JFrame {
 
     }
 
-    
+
     private void initLabelMaker() {
 	// initialize the labelMaker
-	labelMaker = new LabelMaker() ; 
+	labelMaker = new LabelMaker() ;
 	labelMaker.addRule(new ArticleLabelRule(),
-			   BibtexEntryType.ARTICLE); 
+			   BibtexEntryType.ARTICLE);
 	labelMaker.addRule(new BookLabelRule(),
-			   BibtexEntryType.BOOK); 
+			   BibtexEntryType.BOOK);
 	labelMaker.addRule(new IncollectionLabelRule(),
-			   BibtexEntryType.INCOLLECTION); 
+			   BibtexEntryType.INCOLLECTION);
 	labelMaker.addRule(new InproceedingsLabelRule(),
-			   BibtexEntryType.INPROCEEDINGS); 
+			   BibtexEntryType.INPROCEEDINGS);
     }
 
     /**
@@ -393,24 +395,24 @@ public class JabRefFrame extends JFrame {
 
 	public NewEntryAction(KeyStroke key) {
 	    // This action leads to a dialog asking for entry type.
-	    super(Globals.lang("New entry"),  
+	    super(Globals.lang("New entry"),
 		  new ImageIcon(GUIGlobals.addIconFile));
 	    putValue(ACCELERATOR_KEY, key);
 	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX entry"));
-	}    
+	}
 
-	public NewEntryAction(String type_) { 
+	public NewEntryAction(String type_) {
 	    // This action leads to the creation of a specific entry.
 	    super(Util.nCase(type_));
 	    type = type_;
-	}    
+	}
 
-	public NewEntryAction(String type_, KeyStroke key) { 
+	public NewEntryAction(String type_, KeyStroke key) {
 	    // This action leads to the creation of a specific entry.
 	    super(Util.nCase(type_));
 	    putValue(ACCELERATOR_KEY, key);
 	    type = type_;
-	}    
+	}
 
 	public void actionPerformed(ActionEvent e) {
 	    String thisType = type;
@@ -428,7 +430,7 @@ public class JabRefFrame extends JFrame {
 		    .newEntry(BibtexEntryType.getType(thisType));
 	    else
 		Util.pr("Action 'New entry' must be disabled when no "
-			+"database is open.");	    
+			+"database is open.");
 	}
     }
 
@@ -437,7 +439,7 @@ public class JabRefFrame extends JFrame {
 	// This method is called whenever this frame has been provided
 	// with a database, and completes the layout.
 
-	
+
 	if (file != null)
 	    setTitle(GUIGlobals.baseTitle+file.getName());
 	else
@@ -445,10 +447,10 @@ public class JabRefFrame extends JFrame {
 
 	//DragNDropManager dndm = new DragNDropManager(this);
 
-	//setNonEmptyState();	
+	//setNonEmptyState();
 	Util.pr("JabRefFrame: Must set non-empty state.");
 	}*/
-    
+
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
 	    edit = new JMenu(Globals.lang("Edit")),
@@ -461,7 +463,7 @@ public class JabRefFrame extends JFrame {
 	JMenu importMenu = new JMenu(Globals.lang("Import"));
 
 	setUpImportMenu(importMenu);
-	
+
 	file.add(newDatabaseAction);
 	file.add(open);//opendatabaseaction
 	file.add(importMenu);
@@ -509,7 +511,8 @@ public class JabRefFrame extends JFrame {
 	tools.add(normalSearch);
 	tools.add(incrementalSearch);
 	tools.add(makeKeyAction);
-	tools.add(lyxPushAction); 
+        tools.add(fetchMedline);
+	tools.add(lyxPushAction);
 	mb.add(tools);
 
 	options.add(showPrefs);
@@ -532,7 +535,7 @@ public class JabRefFrame extends JFrame {
 
     private void createToolBar() {
 	tlb.setRollover(true);
-	
+
 	//tlb.setBorderPainted(true);
 	tlb.setBackground(GUIGlobals.lightGray);
 	tlb.setForeground(GUIGlobals.lightGray);
@@ -540,7 +543,7 @@ public class JabRefFrame extends JFrame {
 	tlb.add(newDatabaseAction);
 	tlb.add(open);
 	tlb.add(save);
-	tlb.addSeparator();       
+	tlb.addSeparator();
 	tlb.add(cut);
 	tlb.add(copy);
 	tlb.add(paste);
@@ -581,7 +584,7 @@ public class JabRefFrame extends JFrame {
 	tlb.add(new HelpAction(helpDiag,GUIGlobals.baseFrameHelp, "Help"));
 	*/
     }
-	
+
 
 
     private JMenuItem mItem(AbstractAction a, KeyStroke ks) {
@@ -592,15 +595,15 @@ public class JabRefFrame extends JFrame {
 			mi.setAccelerator(ks);
 		return mi;
     }
-	
+
     //private void setupMainPanel() {
-	
+
 
     /*public Completer getAutoCompleter(String field) {
 	return (Completer)autoCompleters.get(field);
 	}
 
-    
+
     public void assignAutoCompleters() {
 	// Set up which fields should have autocompletion. This should
 	// probably be made customizable. Existing Completer objects are
@@ -610,9 +613,9 @@ public class JabRefFrame extends JFrame {
 	for (int i=0; i<fields.length; i++) {
 	    autoCompleters.put(GUIGlobals.ALL_FIELDS[fields[i]], new Completer());
 	}
-	
-    }   
-    
+
+    }
+
     public void updateAutoCompleters() {
 	if (database != null)
 	    database.setCompleters(autoCompleters);
@@ -630,14 +633,14 @@ public class JabRefFrame extends JFrame {
     }
 
     private void setEmptyState() {
-	// Disable actions that demand an open database.	
+	// Disable actions that demand an open database.
 	close.setEnabled(false);
 	save.setEnabled(false);
 	saveAs.setEnabled(false);
 	undo.setEnabled(false);
 	redo.setEnabled(false);
 	cut.setEnabled(false);
-	delete.setEnabled(false);	
+	delete.setEnabled(false);
 	copy.setEnabled(false);
 	paste.setEnabled(false);
 	selectAll.setEnabled(false);
@@ -661,7 +664,7 @@ public class JabRefFrame extends JFrame {
 	undo.setEnabled(true);
 	redo.setEnabled(true);
 	cut.setEnabled(true);
-	delete.setEnabled(true);	
+	delete.setEnabled(true);
 	copy.setEnabled(true);
 	paste.setEnabled(true);
 	selectAll.setEnabled(true);
@@ -679,18 +682,18 @@ public class JabRefFrame extends JFrame {
 
 
     protected ParserResult loadDatabase(File fileToOpen) throws IOException {
-	// Temporary (old method):	
+	// Temporary (old method):
 	//FileLoader fl = new FileLoader();
 	//BibtexDatabase db = fl.load(fileToOpen.getPath());
 
-       	BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));	
+       	BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));
 	ParserResult pr = bp.parse();
 	return pr;
     }
 
     class SelectKeysAction extends AbstractAction {
 	public SelectKeysAction() {
-	    super(Globals.lang("Customize key bindings"));	    
+	    super(Globals.lang("Customize key bindings"));
 	}
 	public void actionPerformed(ActionEvent e) {
 	    KeyBindingsDialog d= new KeyBindingsDialog
@@ -702,7 +705,7 @@ public class JabRefFrame extends JFrame {
 	    if (d.getAction()) {
 		prefs.setNewKeyBindings(d.getNewKeyBindings());
 		JOptionPane.showMessageDialog
-		    (ths, 
+		    (ths,
 		     Globals.lang("Your new key bindings have been stored.\n"
 				  +"You must restart JabRef for the new key "
 				  +"bindings to work properly."),
@@ -712,7 +715,7 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
-    /** 
+    /**
      * The action concerned with closing the window.
      */
     class CloseAction extends AbstractAction {
@@ -720,12 +723,12 @@ public class JabRefFrame extends JFrame {
 			super(Globals.lang("Quit"));
 			putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
 			putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
-		}    
-		
+		}
+
 		public void actionPerformed(ActionEvent e) {
 			// Ask here if the user really wants to close, if the base
 			// has not been saved since last save.
-			boolean close = true;	    
+			boolean close = true;
 			Vector filenames = new Vector();
 			if (tabbedPane.getTabCount() > 0) {
 				for (int i=0; i<tabbedPane.getTabCount(); i++) {
@@ -737,8 +740,8 @@ public class JabRefFrame extends JFrame {
 							  +"want to save before closing?"),
 							 Globals.lang("Save before closing"),
 							 JOptionPane.YES_NO_CANCEL_OPTION);
-						
-						if ((answer == JOptionPane.CANCEL_OPTION) || 
+
+						if ((answer == JOptionPane.CANCEL_OPTION) ||
 							(answer == JOptionPane.CLOSED_OPTION))
 							close = false; // The user has cancelled.
 						if (answer == JOptionPane.YES_OPTION) {
@@ -752,12 +755,12 @@ public class JabRefFrame extends JFrame {
 			}
 			if (close) {
 				dispose();
-							       
+
 				prefs.putInt("posX", ths.getLocation().x);
 				prefs.putInt("posY", ths.getLocation().y);
 				prefs.putInt("sizeX", ths.getSize().width);
 				prefs.putInt("sizeY", ths.getSize().height);
-				
+
 				if (prefs.getBoolean("openLastEdited")) {
 					// Here we store the names of allcurrent filea. If
 					// there is no current file, we remove any
@@ -768,7 +771,7 @@ public class JabRefFrame extends JFrame {
 						String[] names = new String[filenames.size()];
 						for (int i=0; i<filenames.size(); i++)
 							names[i] = (String)filenames.elementAt(i);
-						
+
 						prefs.putStringArray("lastEdited", names);
 					}
 
@@ -776,27 +779,27 @@ public class JabRefFrame extends JFrame {
 				}
 
 				BibtexEntryType.saveCustomEntryTypes(prefs);
-				
+
 				// Let the search interface store changes to prefs.
 				// But which one? Let's use the one that is visible.
 				if (basePanel() != null)
 				    basePanel().searchManager.updatePrefs();
-				
+
 				System.exit(0); // End program.
 			}
 		}
     }
-	
+
     // The action for closing the current database and leaving the window open.
     CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
     class CloseDatabaseAction extends AbstractAction {
 		public CloseDatabaseAction() {
-			super(Globals.lang("Close database")); 
+			super(Globals.lang("Close database"));
 
-			putValue(SHORT_DESCRIPTION, 
+			putValue(SHORT_DESCRIPTION,
 					 Globals.lang("Close the current database"));
-			putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));			
-		}    
+			putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
+		}
 		public void actionPerformed(ActionEvent e) {
 			// Ask here if the user really wants to close, if the base
 			// has not been saved since last save.
@@ -806,10 +809,10 @@ public class JabRefFrame extends JFrame {
 			if (basePanel().baseChanged) {
 				int answer = JOptionPane.showConfirmDialog
 					(ths, Globals.lang("Database has changed. Do you want to save "+
-									   "before closing?"), 
-					 Globals.lang("Save before closing"), 
+									   "before closing?"),
+					 Globals.lang("Save before closing"),
 					 JOptionPane.YES_NO_CANCEL_OPTION);
-				if ((answer == JOptionPane.CANCEL_OPTION) || 
+				if ((answer == JOptionPane.CANCEL_OPTION) ||
 					(answer == JOptionPane.CLOSED_OPTION))
 					close = false; // The user has cancelled.
 				if (answer == JOptionPane.YES_OPTION) {
@@ -817,7 +820,7 @@ public class JabRefFrame extends JFrame {
 					basePanel().runCommand("save");
 				}
 			}
-			
+
 			if (close) {
 				tabbedPane.remove(basePanel());
 				if (tabbedPane.getTabCount() == 0)
@@ -826,36 +829,36 @@ public class JabRefFrame extends JFrame {
 			}
 		}
 	}
-	
 
-		
+
+
     // The action concerned with opening an existing database.
     OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
     class OpenDatabaseAction extends AbstractAction {
 	public OpenDatabaseAction() {
-	    super(Globals.lang("Open database"), 
+	    super(Globals.lang("Open database"),
 		  new ImageIcon(GUIGlobals.openIconFile));
 	    putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    // Open a new database.
-	    if ((e.getActionCommand() == null) || 
+	    if ((e.getActionCommand() == null) ||
 		(e.getActionCommand().equals("Open database"))) {
 		JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
 		    new JabRefFileChooser((File)null) :
 		    new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2       
+		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
 		int returnVal = chooser.showOpenDialog(ths);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 		    fileToOpen = chooser.getSelectedFile();
 		}
-	    } else {				
+	    } else {
 		Util.pr(NAME);
 		Util.pr(e.getActionCommand());
 		fileToOpen = new File(Util.checkName(e.getActionCommand()));
 	    }
-	    
+
 	    // Run the actual open in a thread to prevent the program
 	    // locking until the file is loaded.
 	    if (fileToOpen != null) {
@@ -867,17 +870,17 @@ public class JabRefFrame extends JFrame {
 		fileHistory.newFile(fileToOpen.getPath());
 	    }
 	}
-	
+
 	public void openIt(boolean raisePanel) {
 	    if ((fileToOpen != null) && (fileToOpen.exists())) {
 		try {
 		    prefs.put("workingDirectory", fileToOpen.getPath());
 		    // Should this be done _after_ we know it was successfully opened?
-		    
+
 		    ParserResult pr = loadDatabase(fileToOpen);
 		    BibtexDatabase db = pr.getDatabase();
 		    HashMap meta = pr.getMetaData();
-		    
+
 		    BasePanel bp = new BasePanel(ths, db, fileToOpen,
 						 meta, prefs);
 		    /*
@@ -892,29 +895,29 @@ public class JabRefFrame extends JFrame {
 			setNonEmptyState();
 		    output("Opened database '"+fileToOpen.getPath()+"' with "+
 			   db.getEntryCount()+" entries.");
-		    
+
 		    fileToOpen = null;
-		    
+
 		} catch (Throwable ex) {
 		    JOptionPane.showMessageDialog
-			(ths, ex.getMessage(), 
+			(ths, ex.getMessage(),
 			 "Open database", JOptionPane.ERROR_MESSAGE);
 		}
 	    }
 	}
     }
-		
+
     // The action concerned with opening a new database.
     class NewDatabaseAction extends AbstractAction {
 	public NewDatabaseAction() {
-	    super(Globals.lang("New database"), 
-		  
+	    super(Globals.lang("New database"),
+
 		  new ImageIcon(GUIGlobals.newIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
-	    //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);	    
-	}    
+	    //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
+	}
 	public void actionPerformed(ActionEvent e) {
-	    
+
 	    // Create a new, empty, database.
 	    BasePanel bp = new BasePanel(ths, prefs);
 	    tabbedPane.add(Globals.lang("untitled"), bp);
@@ -922,54 +925,67 @@ public class JabRefFrame extends JFrame {
 	    if (tabbedPane.getTabCount() == 1)
 		setNonEmptyState();
 	    output(Globals.lang("New database created."));
-	    
+
 	    /*
 	      if (prefs.getBoolean("autoComplete"))
 	      db.setCompleters(autoCompleters);*/
 	}
     }
-		
 
+  class FetchMedlineAction extends AbstractAction {
+    public FetchMedlineAction() {
+      super(Globals.lang("Fetch Medline"), new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      if (tabbedPane.getTabCount() > 0)
+        for (int i=0; i<tabbedPane.getTabCount(); i++) {
+          ((BasePanel)tabbedPane.getComponentAt(i)).sidePaneManager.ensureVisible("fetchMedline");
+        }
+    }
+
+  }
 
 		// The action for opening the preferences dialog.
 
 		AbstractAction showPrefs = new ShowPrefsAction();
-		
+
 		class ShowPrefsAction extends AbstractAction {
 			public ShowPrefsAction() {
-				super(Globals.lang("Preferences"), 
+				super(Globals.lang("Preferences"),
 					  new ImageIcon(GUIGlobals.prefsIconFile));
 				putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
-			}    
-			public void actionPerformed(ActionEvent e) {	    
+			}
+			public void actionPerformed(ActionEvent e) {
 			    //PrefsDialog.showPrefsDialog(ths, prefs);
 			    PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
 			    Util.placeDialog(pd, ths);
 			    pd.show();
-				
+
 				// This action can be invoked without an open database, so
 				// we have to check if we have one before trying to invoke
 				// methods to execute changes in the preferences.
-				
-				// We want to notify all tabs about the changes to 
-				// avoid problems when changing the column set.	    
+
+				// We want to notify all tabs about the changes to
+				// avoid problems when changing the column set.
 				for (int i=0; i<tabbedPane.getTabCount(); i++) {
 					BasePanel bf = baseAt(i);
 					if (bf.database != null) {
 					    bf.setupTable();
 					}
 				}
-				
+
 			}
 		}
-		
-		
+
+
 		AboutAction aboutAction = new AboutAction();
 		class AboutAction extends AbstractAction {
 			public AboutAction() {
 				super(Globals.lang("About JabRef"));
-				
-			}    
+
+			}
 			public void actionPerformed(ActionEvent e) {
 				JDialog about = new JDialog(ths, Globals.lang("About JabRef"),
 											true);
@@ -983,9 +999,9 @@ public class JabRefFrame extends JFrame {
 					// We need a hyperlink listener to be able to switch to the license
 					// terms and back.
 					jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {
-							public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {    
-								if (e.getEventType() 
-									== javax.swing.event.HyperlinkEvent.EventType.ACTIVATED) 
+							public void hyperlinkUpdate(javax.swing.event.HyperlinkEvent e) {
+								if (e.getEventType()
+									== javax.swing.event.HyperlinkEvent.EventType.ACTIVATED)
 									try {
 				    ((JEditorPane)e.getSource()).setPage(e.getURL());
 									} catch (IOException ex) {}
@@ -996,33 +1012,33 @@ public class JabRefFrame extends JFrame {
 					Util.placeDialog(about, ths);
 					about.setVisible(true);
 				} catch (IOException ex) {
-					JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'", "Error", JOptionPane.ERROR_MESSAGE); 
+					JOptionPane.showMessageDialog(ths, "Could not load file 'About.html'", "Error", JOptionPane.ERROR_MESSAGE);
 				}
-				
+
 			}
 		}
-		
+
 		private void addBibEntries(ArrayList bibentries, String filename){
 			// check if bibentries is null
 			BibtexDatabase database=new BibtexDatabase();
-			
+
 			Iterator it = bibentries.iterator();
 			while(it.hasNext()){
 				BibtexEntry entry = (BibtexEntry)it.next();
-				
+
 				try {
-					entry.setId(Util.createId(entry.getType(), database));				
-					database.insertEntry(entry);			
+					entry.setId(Util.createId(entry.getType(), database));
+					database.insertEntry(entry);
 				} catch (KeyCollisionException ex) {
 					//ignore
 					System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-					
+
 				}
-				
+
 			}
-			HashMap meta = new HashMap();		    
+			HashMap meta = new HashMap();
 			// Metadata are only put in bibtex files, so we will not find it
-			// in imported files. Instead we pass an empty HashMap.	
+			// in imported files. Instead we pass an empty HashMap.
 			BasePanel bp = new BasePanel(ths, database, null,
 						     meta, prefs);
 			/*
@@ -1037,7 +1053,7 @@ public class JabRefFrame extends JFrame {
 			output("Imported database '"+filename+"' with "+
 			       database.getEntryCount()+" entries.");
 		}
-	
+
 
 	private void setUpImportMenu(JMenu importMenu){
 			//
@@ -1052,12 +1068,12 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename= getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readEndnote(tempFilename);//MedlineParser.readMedline(tempFilename);
-					addBibEntries( bibs, tempFilename);	
+					addBibEntries( bibs, tempFilename);
 				    }
 				}
 			    });
 			importMenu.add(newEndnoteFile_mItem);
-			//########################################			
+			//########################################
 			JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("INSPEC"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newINSPECFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1066,11 +1082,11 @@ public class JabRefFrame extends JFrame {
 						    ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
 						    addBibEntries( bibs, tempFilename);
 						}
-						
+
 				}
 			    });
 			importMenu.add(newINSPECFile_mItem);
-	    //########################################			
+	    //########################################
 			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newISIFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1079,12 +1095,12 @@ public class JabRefFrame extends JFrame {
 					ArrayList bibs = ImportFormatReader.readISI(tempFilename);
 					addBibEntries( bibs, tempFilename);
 				    }
-				    
+
 				}
 			    });
 			importMenu.add( newISIFile_mItem);
-			
-	    //########################################			
+
+	    //########################################
 			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML File"));
 			newMedlineFile_mItem.addActionListener(new ActionListener()
 			    {
@@ -1093,7 +1109,7 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename= getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
-					addBibEntries( bibs, tempFilename);	
+					addBibEntries( bibs, tempFilename);
 				    }
 				}
 			    });
@@ -1111,15 +1127,15 @@ public class JabRefFrame extends JFrame {
  		    		    Matcher m = p.matcher( idList );
  				    if ( m.matches() ) {
  				        ArrayList bibs = ImportFormatReader.fetchMedline(idList);
- 				        addBibEntries( bibs, idList );	
+ 				        addBibEntries( bibs, idList );
  				    } else {
 					JOptionPane.showMessageDialog(ths,"Sorry, I was expecting a comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
 				    }
  				}
  			    });
  			importMenu.add(newMedlineId_mItem);
-			
-	    //########################################			
+
+	    //########################################
 			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newOvidFile_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1128,11 +1144,11 @@ public class JabRefFrame extends JFrame {
 					ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
 					addBibEntries( bibs, tempFilename);
 				    }
-				    
+
 				}
 			    });
 			importMenu.add(newOvidFile_mItem);
-	    //########################################			
+	    //########################################
 			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newRefMan_mItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1141,13 +1157,13 @@ public class JabRefFrame extends JFrame {
 					ArrayList bibs = ImportFormatReader.readReferenceManager10(tempFilename);
 					addBibEntries( bibs, tempFilename);
 				    }
-				    
+
 				}
 			    });
 			importMenu.add(newRefMan_mItem);
-			
-	    //########################################			
-			
+
+	    //########################################
+
 			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
 			newSciFinderFile_mItem.addActionListener(new ActionListener(){
@@ -1163,9 +1179,9 @@ public class JabRefFrame extends JFrame {
 				}
 			    });
 			importMenu.add(newSciFinderFile_mItem);
-			
+
 	}
-		
+
 		//
 		// simply opens up a jfilechooser dialog and gets a filename
 		// returns null if user selects cancel
@@ -1180,17 +1196,17 @@ public class JabRefFrame extends JFrame {
 			else{
 				fc = new JabRefFileChooser(new File( prefs.get("workingDirectory") ));//cwd));
 			}
-			
+
 			fc.addChoosableFileFilter( new OpenFileFilter() );
 			fc.setDialogType(JFileChooser.OPEN_DIALOG);
 			fc.showOpenDialog(null);
 			File selectedFile = fc.getSelectedFile();
 			if(selectedFile == null) // cancel
 				return null;
-			prefs.put("workingDirectory", selectedFile.getPath());		
+			prefs.put("workingDirectory", selectedFile.getPath());
 			return selectedFile.getAbsolutePath();
 		}
-		
+
 
 }
-	
+

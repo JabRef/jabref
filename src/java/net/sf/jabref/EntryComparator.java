@@ -40,15 +40,15 @@ public class EntryComparator implements Comparator {
 	next = new EntryComparator(secDesc, terDesc, sec, ter); // Secondary sort field.
 	descending = priDesc;
 	sortField = pri;
-    }  
+    }
 
-  
+
     public EntryComparator(boolean priDesc, boolean secDesc, String pri, String sec) {
 	// This constructor creates a two-layered sort rule.
 	next = new EntryComparator(secDesc, sec); // Secondary sort field.
 	descending = priDesc;
 	sortField = pri;
-    }  
+    }
 
     public EntryComparator(boolean priDesc, String pri) {
 	descending = priDesc;
@@ -57,7 +57,7 @@ public class EntryComparator implements Comparator {
 
     public int compare(Object o1, Object o2) throws ClassCastException {
 	if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
-	   throw new ClassCastException("Trouble comparing objects. This shouldn't happen.");
+	   throw new ClassCastException("Trouble comparing objects: "+o1.toString()+"\n\n"+o2.toString());
 	BibtexEntry e1 = (BibtexEntry)o1,
 	    e2 = (BibtexEntry)o2;
 

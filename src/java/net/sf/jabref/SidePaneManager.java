@@ -49,7 +49,7 @@ public class SidePaneManager {
 	this.frame = frame;
 	sidep = new SidePane(panel);
     }
-	
+
     public void populatePanel() {
 
 	// Groups
@@ -60,7 +60,7 @@ public class SidePaneManager {
 		(frame, panel, metaData.getData("groups"), this, prefs);
 	    add("groups", gs);
 	}
-	    
+
 	if (components.size() > 0) {
 	    panel.setLeftComponent(sidep);
 	} else
@@ -96,7 +96,7 @@ public class SidePaneManager {
 	Object o = components.get(name);
 	if ((o == null) || ((SidePaneComponent)o).hasVisibility())
 	    return;
-	togglePanel(name);	    
+	togglePanel(name);
     }
 
     public synchronized void add(String name, SidePaneComponent comp) {
@@ -110,7 +110,9 @@ public class SidePaneManager {
     }
 
     public synchronized void register(String name, SidePaneComponent comp) {
-	components.put(name, comp);
+      comp.setVisible(false);
+      sidep.add(comp);
+      components.put(name, comp);
     }
 
     public synchronized void hideAway(SidePaneComponent comp) {
@@ -120,6 +122,6 @@ public class SidePaneManager {
 	visibleComponents--;
 	if (visibleComponents == 0)
 	    panel.remove(sidep);
-	
+
     }
 }
