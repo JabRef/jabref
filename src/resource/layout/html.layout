@@ -40,7 +40,7 @@
 
 		\begin{author}
 		<div class="bibtex_author">
-			\format[HTMLChars,AuthorFirstFirst]{\author}
+			\format[HTMLChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer]{\author}
 		</div>
 		\end{author}
 
@@ -56,7 +56,7 @@
 		</div>,
 		\end{volume}
 
-		\begin{pages}
+		\begin{pages}
 		<div class="bibtex_pages">
 			pp. \format[FormatPagesForHTML]{\pages}
 		</div>,

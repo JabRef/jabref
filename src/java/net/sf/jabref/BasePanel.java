@@ -764,6 +764,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     for(int i = 0 ; i < numSelected ; i++){
                         bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
                         oldValue = bes.getField(GUIGlobals.KEY_FIELD);
+                        database.setCiteKeyForEntry(bes.getId(), null);
+                        ce.addEdit(new UndoableKeyChange
+                                   (database, bes.getId(), (String)oldValue, null));
+                    }
+                    
+                    for(int i = 0 ; i < numSelected ; i++){
+                        bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
+                        oldValue = bes.getField(GUIGlobals.KEY_FIELD);
                         //bes = frame.labelMaker.applyRule(bes, database) ;
                         bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
                         ce.addEdit(new UndoableKeyChange

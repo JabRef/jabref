@@ -1,5 +1,5 @@
 
-JabRef 1.55
+JabRef 1.6b
 -----------
 
 
@@ -85,8 +85,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.56:	- Added mnemonic keys to menus and menu items.
+1.6b:	- Added mnemonic keys to menus and menu items.
         - Bibtex strings are now sorted automatically.
+        - Bibtex strings are now resolved when exporting database.
         - Fixed PDF/PS view routine to remove problems with filenames
           containing spaces.
         - Fixed bug that interfered with Fetch Medline by ID, and fixed

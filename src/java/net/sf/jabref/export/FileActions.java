@@ -466,10 +466,10 @@ public class FileActions
 
 	for (Iterator i=sorted.iterator(); i.hasNext();) {
 	    BibtexEntry entry = (BibtexEntry)i.next();
-	    writeField(entry, (String)o[0], fieldFormatters, out);
+	    writeField(database, entry, (String)o[0], fieldFormatters, out);
 	    for (int j=1; j<o.length; j++) {
 		out.write(SEPARATOR);
-		writeField(entry, (String)o[j], fieldFormatters, out);
+		writeField(database, entry, (String)o[j], fieldFormatters, out);
 	    }
 	    out.write("\n");
 	}
@@ -481,7 +481,7 @@ public class FileActions
 	
     }
 
-    private static void writeField(BibtexEntry entry, String field, 
+    private static void writeField(BibtexDatabase database, BibtexEntry entry, String field, 
 				   HashMap fieldFormatters, Writer out) 
 	throws IOException {
 
@@ -489,6 +489,7 @@ public class FileActions
 	if (s == null) {
 	    return;
 	}
+        s = database.resolveForStrings(s);
 	Object form = fieldFormatters.get(field);
 	if (form == null)
 	    form = fieldFormatters.get("default");

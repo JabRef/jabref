@@ -74,8 +74,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	panel = panel_;
 	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
 	helpBut.addActionListener(help);
-	helpBut.setMargin(new Insets(0,0,0,0));
-	tf.setMinimumSize(new Dimension(1,1));
+	helpBut.setMargin(new Insets(0,0,0,0));        
+	//tf.setMinimumSize(new Dimension(1,1));
 	//add(hd, BorderLayout.NORTH);
 	//ok.setToolTipText(Globals.lang("Fetch Medline"));
 	setLayout(gbl);
@@ -107,6 +107,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	
 	go.addActionListener(listener);
 	tf.addActionListener(listener);
+    }
+    
+    public JTextField getTextField() {
+        return tf;
     }
     
     public void fetchById() {
@@ -406,4 +410,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	//   result.append("\tAuthor: "+matcher.group(1));
 	return result.toString();
     }
+    
+ 
 }

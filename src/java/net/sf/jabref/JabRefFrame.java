@@ -1744,11 +1744,12 @@ class FetchCiteSeerAction
 
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-          ( (BasePanel) tabbedPane.getComponentAt(i)).sidePaneManager.
-              ensureVisible("fetchMedline");
-          new FocusRequester(basePanel().medlineFetcher);
-        }
+        //for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+        //  ( (BasePanel) tabbedPane.getComponentAt(i)).sidePaneManager.
+        basePanel().sidePaneManager.togglePanel("fetchMedline");// ensureVisible("fetchMedline");
+        if (basePanel().sidePaneManager.isPanelVisible("fetchMedline"))
+          new FocusRequester(basePanel().medlineFetcher.getTextField());
+        //}
       }
     }
 

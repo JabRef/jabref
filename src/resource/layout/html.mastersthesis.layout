@@ -28,7 +28,7 @@
 
 		\begin{author}
 		<div class="bibtex_author">
-			\format[HTMLChars,AuthorFirstFirst]{\author}
+			\format[HTMLChars,AuthorLastFirst]{\author}
 		</div>
 		\end{author}
 

@@ -220,6 +220,13 @@ public class StringDialog extends JDialog {
                              Globals.lang("Label"),
                              JOptionPane.ERROR_MESSAGE);
                       }
+                      else if (((String)value).indexOf("#") >= 0) {
+                        JOptionPane.showMessageDialog
+                            (parent,
+                            Globals.lang("The label of the string can not contain the '#' character."),
+                            Globals.lang("Label"),
+                            JOptionPane.ERROR_MESSAGE);
+                      }   
                       else if ((value != null) && isNumber((String)value)) {
                           JOptionPane.showMessageDialog
                               (parent,
@@ -344,6 +351,14 @@ public class StringDialog extends JDialog {
 		     JOptionPane.ERROR_MESSAGE);
 		return;
 	    }
+            if (name.indexOf("#") >= 0) {
+             JOptionPane.showMessageDialog
+                 (parent,
+                  Globals.lang("The label of the string can not contain the '#' character."),
+                  Globals.lang("Label"),
+                  JOptionPane.ERROR_MESSAGE);
+             return;
+           }           
            if (name.indexOf(" ") >= 0) {
              JOptionPane.showMessageDialog
                  (parent,

@@ -62,7 +62,7 @@ public class SidePaneHeader extends JPanel implements ActionListener {
      //                              width, height, GUIGlobals.gradientBlue, false));
      g2.setPaint(new GradientPaint(ins.left, ins.top, GUIGlobals.gradientGray,
                                    width, height, GUIGlobals.gradientBlue, false));
-      g2.fillRect(ins.left, ins.top, width, height);
+      g2.fillRect(ins.left, ins.top, width-1, height);
       //g2.fillRect(0, 0, 100, 10);
       g2.setPaint(oldPaint);
       //super.paintComponent(g);

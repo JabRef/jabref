@@ -1,8 +1,8 @@
 <font face="arial">
 <b><i>\bibtextype</i><a name="\bibtexkey">\begin{bibtexkey} (\bibtexkey)</a>\end{bibtexkey}</b>
 <br>
-\begin{author} \format[HTMLChars,AuthorLastFirst]{\author}<BR>\end{author}
-\begin{editor} \format[HTMLChars,AuthorLastFirst]{\editor} <i>(ed.)</i><BR>\end{editor}
+\begin{author} \format[HTMLChars,AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsReplacer]{\author}<BR>\end{author}
+\begin{editor} \format[HTMLChars,AuthorLastFirst,AuthorAndsReplacer]{\editor} <i>(ed.)</i><BR>\end{editor}
 \begin{title} \format[HTMLChars]{\title} \end{title}<BR>
 \begin{chapter} \format[HTMLChars]{\chapter}<BR>\end{chapter}
 \begin{journal} <em>\format[HTMLChars]{\journal}, </em>\end{journal}
