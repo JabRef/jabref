@@ -90,7 +90,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
 
-    private boolean suppressOutput = true;
+    private boolean suppressOutput = false;
 
     private HashMap actions = new HashMap();
    
@@ -502,11 +502,24 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	tableModel = new EntryTableModel(frame, this, database);
 	entryTable = new EntryTable(tableModel, frame.prefs);
 	entryTable.addMouseListener(this);
-	entryTable.getInputMap().put(GUIGlobals.copyStroke, "copy");
-	entryTable.getInputMap().put(GUIGlobals.pasteStroke, "paste");
-	//entryTable.getActionMap().put("copy", copyAction);
-	//entryTable.getActionMap().put("paste", pasteAction);
-	Util.pr("BasePanel: must set bindings for copy and paste.");
+	entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
+	entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
+	entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
+	entryTable.getActionMap().put("Cut", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    runCommand("cut");
+		}
+	    });
+	entryTable.getActionMap().put("Copy", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    runCommand("copy");
+		}
+	    });
+	entryTable.getActionMap().put("Paste", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    runCommand("paste");
+		}
+	    });
 
 	// Set the right-click menu for the entry table.
 	//RightClickMenu rcm = new RightClickMenu(this, metaData);

@@ -70,57 +70,62 @@ public class JabRefFrame extends JFrame {
     AbstractAction
 	open = new OpenDatabaseAction(),
 	close = new CloseDatabaseAction(),
+	selectKeys = new SelectKeysAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	save = new GeneralAction("save", "Save database",
-				 "Save database", GUIGlobals.saveIconFile),
+				 "Save database", GUIGlobals.saveIconFile,
+				 prefs.getKey("Save")),
 	saveAs = new GeneralAction("saveAs", "Save database as ...",
 				 "Save database as ...", 
 				   GUIGlobals.saveAsIconFile),
 	undo = new GeneralAction("undo", "Undo", "Undo",
-				 GUIGlobals.undoIconFile),
+				 GUIGlobals.undoIconFile, 
+				 prefs.getKey("Undo")),
 	redo = new GeneralAction("redo", "Redo", "Redo",
-				 GUIGlobals.redoIconFile),
+				 GUIGlobals.redoIconFile,
+				 prefs.getKey("Redo")),
 	cut = new GeneralAction("cut", "Cut", "Cut",
-				 GUIGlobals.cutIconFile),
+				GUIGlobals.cutIconFile,
+				prefs.getKey("Cut")),
 	copy = new GeneralAction("copy", "Copy", "Copy",
-				 GUIGlobals.copyIconFile),
+				 GUIGlobals.copyIconFile,
+				 prefs.getKey("Copy")),
 	paste = new GeneralAction("paste", "Paste", "Paste",
-				 GUIGlobals.pasteIconFile),
+				 GUIGlobals.pasteIconFile,
+				  prefs.getKey("Paste")),
 
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
 	  GUIGlobals.removeIconFile),*/
-	selectAll = new GeneralAction("selectAll", "Select all"),
+	selectAll = new GeneralAction("selectAll", "Select all",
+				      prefs.getKey("Select all")),
 	editPreamble = new GeneralAction("editPreamble", "Edit preamble", 
 					 "Edit preamble",
-					 GUIGlobals.preambleIconFile),
+					 GUIGlobals.preambleIconFile,
+					 prefs.getKey("Edit preamble")),
 	editStrings = new GeneralAction("editStrings", "Edit strings", 
 					"Edit strings",
-					GUIGlobals.stringsIconFile),
+					GUIGlobals.stringsIconFile,
+					prefs.getKey("Edit strings")),
 	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface", 
 					 "Toggle groups interface",
-					 GUIGlobals.groupsIconFile);	
+					 GUIGlobals.groupsIconFile,
+					 prefs.getKey("Toggle groups"));  
     // The action for adding a new entry of unspecified type.
-    NewEntryAction newEntryAction = new NewEntryAction(GUIGlobals.newEntryKeyStroke);
+    NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
     NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
-	new NewEntryAction(BibtexEntryType.ARTICLE,
-			   GUIGlobals.newArticleKeyStroke),
-	new NewEntryAction(BibtexEntryType.BOOK,
-			   GUIGlobals.newBookKeyStroke),
-	new NewEntryAction(BibtexEntryType.PHDTHESIS, 
-			   GUIGlobals.newPhdthesisKeyStroke),
-	new NewEntryAction(BibtexEntryType.INBOOK, 
-			   GUIGlobals.newInBookKeyStroke),
-	new NewEntryAction(BibtexEntryType.MASTERSTHESIS, 
-			   GUIGlobals.newMasterKeyStroke),
-	new NewEntryAction(BibtexEntryType.PROCEEDINGS, 
-			   GUIGlobals.newProcKeyStroke),
+	new NewEntryAction(BibtexEntryType.ARTICLE, prefs.getKey("New article")),
+	new NewEntryAction(BibtexEntryType.BOOK, prefs.getKey("New book")),
+	new NewEntryAction(BibtexEntryType.PHDTHESIS, prefs.getKey("New phdthesis")),
+	new NewEntryAction(BibtexEntryType.INBOOK, prefs.getKey("New inbook")),
+	new NewEntryAction(BibtexEntryType.MASTERSTHESIS, prefs.getKey("New mastersthesis")),
+	new NewEntryAction(BibtexEntryType.PROCEEDINGS, prefs.getKey("New proceedings")),
 	new NewEntryAction(BibtexEntryType.INPROCEEDINGS),
 	new NewEntryAction(BibtexEntryType.INCOLLECTION),
 	new NewEntryAction(BibtexEntryType.BOOKLET), 
 	new NewEntryAction(BibtexEntryType.MANUAL),
 	new NewEntryAction(BibtexEntryType.TECHREPORT),
-	new NewEntryAction(BibtexEntryType.UNPUBLISHED, 
-			   GUIGlobals.newUnpublKeyStroke),
+	new NewEntryAction(BibtexEntryType.UNPUBLISHED,
+			   prefs.getKey("New unpublished")),
 	new NewEntryAction(BibtexEntryType.MISC) 
     };
 
@@ -156,6 +161,8 @@ public class JabRefFrame extends JFrame {
 		    openDatabaseAction.openIt();
 		}
 	    }
+	    if (tabbedPane.getTabCount() > 0)
+		tabbedPane.setSelectedIndex(0);
 	}
 
 	setVisible(true);
@@ -257,9 +264,22 @@ public class JabRefFrame extends JFrame {
 	    this.command = command;
 	    putValue(SHORT_DESCRIPTION, Globals.lang(description));
 	}
+	public GeneralAction(String command, String text,
+			     String description, URL icon,
+			     KeyStroke key) {
+	    super(Globals.lang(text), new ImageIcon(icon));
+	    this.command = command;
+	    putValue(ACCELERATOR_KEY, key);
+	    putValue(SHORT_DESCRIPTION, Globals.lang(description));
+	}
 	public GeneralAction(String command, String text) {
 	    super(Globals.lang(text));
 	    this.command = command;
+	}
+	public GeneralAction(String command, String text, KeyStroke key) {
+	    super(Globals.lang(text));
+	    this.command = command;
+	    putValue(ACCELERATOR_KEY, key);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -362,76 +382,8 @@ public class JabRefFrame extends JFrame {
 	mb.add(bibtex);
 
 	options.add(showPrefs);
+	options.add(selectKeys);
 	mb.add(options);
-
-	/*
-	file.add(mItem(newDatabaseAction, null));
-	file.add(mItem(openDatabaseAction, GUIGlobals.openKeyStroke));
-	file.add(mItem(saveDatabaseAction, GUIGlobals.saveKeyStroke));
-	file.add(mItem(saveAsDatabaseAction, null));
-	file.add(mItem(saveSpecialAction, null));
-	file.addSeparator();
-	file.add(mItem(mergeDatabaseAction, null));
-	file.addSeparator();
-	file.add(mItem(closeDatabaseAction, null));
-	file.add(mItem(closeAction, GUIGlobals.closeKeyStroke));
-	mb.add(file);
-
-	JMenu view = new JMenu("View"), 
-	    entry = new JMenu("Edit"),
-	    entryType = new JMenu("New ..."),
-	    bibtex = new JMenu("Bibtex");
-	for (int i=0; i<newSpecificEntryAction.length; i++)
-	    entryType.add(mItem(newSpecificEntryAction[i], 
-				newSpecificEntryAction[i].keyStroke));
-	entry.add(mItem(undoAction, GUIGlobals.undoStroke));
-	entry.add(mItem(redoAction, GUIGlobals.redoStroke));
-	entry.addSeparator();
-	entry.add(mItem(removeEntryAction, GUIGlobals.removeEntryKeyStroke));
-	entry.add(mItem(copyAction, GUIGlobals.copyStroke));
-	entry.add(mItem(pasteAction, GUIGlobals.pasteStroke));
-	entry.addSeparator();
-	entry.add(mItem(selectAllAction, GUIGlobals.selectAllKeyStroke));
-
-	view.add(mItem(showGroupsAction, GUIGlobals.showGroupsKeyStroke));
-
-	bibtex.add(entryType);
-	bibtex.add(mItem(newEntryAction, GUIGlobals.newEntryKeyStroke));
-	bibtex.addSeparator();
-	bibtex.add(mItem(copyKeyAction, GUIGlobals.copyKeyStroke));
-	bibtex.add(mItem(editPreambleAction, GUIGlobals.editPreambleKeyStroke));
-	bibtex.add(mItem(editStringsAction, GUIGlobals.editStringsKeyStroke));
-	bibtex.add(mItem(editEntryAction, GUIGlobals.editEntryKeyStroke));
-
-
-	mb.add(entry);
-	mb.add(view);
-	mb.add(bibtex);
-
-	JMenu tools = new JMenu("Tools");
-	tools.add(mItem(searchPaneAction, GUIGlobals.simpleSearchKeyStroke));
-	JMenu autoGenerateMenu = new JMenu("Autogenerate Bibtexkey") ; 
-	tools.add(mItem(makeLabelAction, GUIGlobals.generateKeyStroke));
-	tools.add(mItem(checkUniqueLabelAction, null));
-	//tools.add(autoGenerateMenu) ; 
-	mb.add(tools);
-
-	JMenu options = new JMenu("Options");
-	//options.add(mItem(setupTableAction, GUIGlobals.setupTableKeyStroke));
-	options.add(setupTableAction);
-	mb.add(options);
-
-	JMenu help = new JMenu("Help");
-	help.add(mItem(new HelpAction(helpDiag, GUIGlobals.baseFrameHelp, "Help"),
-		       GUIGlobals.helpKeyStroke));
-	help.add(new HelpAction("Help contents", helpDiag, 
-				GUIGlobals.helpContents, "Help contents"));
-	help.addSeparator();
-	help.add(mItem(aboutAction, null));
-	mb.add(help);
-
-	return mb;
-	*/
     }
 
     private void createToolBar() {
@@ -512,6 +464,30 @@ public class JabRefFrame extends JFrame {
        	BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));	
 	ParserResult pr = bp.parse();
 	return pr;
+    }
+
+    class SelectKeysAction extends AbstractAction {
+	public SelectKeysAction() {
+	    super(Globals.lang("Customize key bindings"));	    
+	}
+	public void actionPerformed(ActionEvent e) {
+	    KeyBindingsDialog d= new KeyBindingsDialog
+		((HashMap)prefs.getKeyBindings().clone());
+	    d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    d.setSize(300,500);
+	    Util.placeDialog(d, ths);
+	    d.setVisible(true);
+	    if (d.getAction()) {
+		prefs.setNewKeyBindings(d.getNewKeyBindings());
+		JOptionPane.showMessageDialog
+		    (ths, 
+		     Globals.lang("Your new key bindings have been stored.\n"
+				  +"You must restart JabRef for the new key "
+				  +"bindings to work properly."),
+		     Globals.lang("Key bindings changed"),
+		     JOptionPane.INFORMATION_MESSAGE);
+	    }
+	}
     }
 
     /** 
@@ -623,6 +599,7 @@ public class JabRefFrame extends JFrame {
 	public OpenDatabaseAction() {
 	    super(Globals.lang("Open database"), 
 		  new ImageIcon(GUIGlobals.openIconFile));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
 	}    
 	public void actionPerformed(ActionEvent e) {

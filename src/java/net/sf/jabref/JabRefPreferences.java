@@ -37,7 +37,9 @@ import java.util.*;
 public class JabRefPreferences {
     
     Preferences prefs;
-    HashMap defaults = new HashMap();
+    HashMap defaults = new HashMap(),
+	keyBinds = new HashMap(),
+	defKeyBinds = new HashMap();
 
     public JabRefPreferences() {
 
@@ -86,6 +88,7 @@ public class JabRefPreferences {
 	defaults.put("groupSelectorVisible", new Boolean(true));
 	defaults.put("groupsDefaultField", "keywords");
 	
+	restoreKeyBindings();
 
 	//defaults.put("oooWarning", new Boolean(true));
     }
@@ -156,6 +159,8 @@ public class JabRefPreferences {
      */
     public String[] getStringArray(String key) {
 	String names = get(key);
+	if (names == null)
+	    return null;
 	//Util.pr(key+"\n"+names);
 	StringReader rd = new StringReader(names);
 	Vector arr = new Vector();
@@ -172,6 +177,99 @@ public class JabRefPreferences {
 	return res;
     }
 
+    /**
+     * Returns the KeyStroke for this binding, as defined by the
+     * defaults, or in the Preferences.
+     */
+    public KeyStroke getKey(String bindName) {
+	//Util.pr(bindName+" "+(String)keyBinds.get(bindName));
+	String s = (String)keyBinds.get(bindName);
+
+	// If the current key bindings don't contain the one asked for,
+	// we fall back on the default. This should only happen when a
+	// user has his own set in Preferences, and has upgraded to a
+	// new version where new bindings have been introduced.
+	if (s == null)
+	    s = (String)defKeyBinds.get(bindName);
+
+	return KeyStroke.getKeyStroke(s);
+    }
+
+    /**
+     * Returns the HashMap containing all key bindings.
+     */
+    public HashMap getKeyBindings() {
+	return keyBinds;
+    }
+
+    /**
+     * Stores new key bindings into Preferences, provided they
+     * actually differ from the old ones.
+     */
+    public void setNewKeyBindings(HashMap newBindings) {
+	if (!newBindings.equals(keyBinds)) {
+	    // This confirms that the bindings have actually changed.
+	    String[] bindNames = new String[newBindings.size()],
+		bindings = new String[newBindings.size()];
+	    int index = 0;
+	    for (Iterator i=newBindings.keySet().iterator();
+		 i.hasNext();) {
+		String nm = (String)i.next();
+		String bnd = (String)newBindings.get(nm);
+		bindNames[index] = nm;
+		bindings[index] = bnd;
+		index++;
+	    }
+	    putStringArray("bindNames", bindNames);
+	    putStringArray("bindings", bindings);
+	}
+    }
+
+    private void restoreKeyBindings() {
+	// Define default keybindings.
+	defineDefaultKeyBindings();
+
+	// First read the bindings, and their names.
+	String[] bindNames = getStringArray("bindNames"),
+	    bindings = getStringArray("bindings");
+
+	// Then set up the key bindings HashMap.
+	if ((bindNames == null) || (bindings == null)
+	    || (bindNames.length != bindings.length)) {
+	    // Nothing defined in Preferences, or something is wrong.
+	    setDefaultKeyBindings();
+	    return;
+	}
+
+	for (int i=0; i<bindNames.length; i++)
+	    keyBinds.put(bindNames[i], bindings[i]);
+    }
+
+    private void setDefaultKeyBindings() {
+	keyBinds = defKeyBinds;
+    }
+
+    private void defineDefaultKeyBindings() {
+	defKeyBinds.put("Open", "ctrl O");
+	defKeyBinds.put("Save", "ctrl S");
+	defKeyBinds.put("New entry", "ctrl N");
+	defKeyBinds.put("Cut", "ctrl X");
+	defKeyBinds.put("Copy", "ctrl C");
+	defKeyBinds.put("Paste", "ctrl V");
+	defKeyBinds.put("Undo", "ctrl Z");
+	defKeyBinds.put("Redo", "ctrl Y");
+	defKeyBinds.put("New article", "ctrl shift A");
+	defKeyBinds.put("New book", "ctrl shift B");
+	defKeyBinds.put("New phdthesis", "ctrl shift T");
+	defKeyBinds.put("New inbook", "ctrl shift I");
+	defKeyBinds.put("New mastersthesis", "ctrl shift M");
+	defKeyBinds.put("New proceedings", "ctrl shift P");
+	defKeyBinds.put("New unpublished", "ctrl shift U");
+	defKeyBinds.put("Edit strings", "ctrl shift S");
+	defKeyBinds.put("Edit preamble", "ctrl P");
+	defKeyBinds.put("Select all", "ctrl A");
+	defKeyBinds.put("Toggle groups", "ctrl shift G");
+    }
 
     private String getNextUnit(Reader data) throws IOException {
 	int c;

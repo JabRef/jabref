@@ -167,10 +167,10 @@ public class GUIGlobals {
 	newProcKeyCode = new Integer(KeyEvent.VK_P);
     //    	newInProcKeyCode = new Integer(KeyEvent.VK_M);
 
+    
     // The following defines the accelerator keys for menu items,
     // corresponding to the letters for mnemonics.
     public static KeyStroke 
-	copyKeyStroke = KeyStroke.getKeyStroke(copyKeyCode.intValue(), ActionEvent.CTRL_MASK),
 	generateKeyStroke = KeyStroke.getKeyStroke("control G"),
 	exitDialog = KeyStroke.getKeyStroke("ESCAPE"),
 	copyStroke = KeyStroke.getKeyStroke("control C"),
@@ -207,6 +207,7 @@ public class GUIGlobals {
 	newUnpublKeyStroke = KeyStroke.getKeyStroke("control shift U"),
 	switchPanelLeft = KeyStroke.getKeyStroke("control shift LEFT"),
 	switchPanelRight = KeyStroke.getKeyStroke("control shift RIGHT");
+   
 
     // Colors.
     public static Color

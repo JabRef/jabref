@@ -30,8 +30,8 @@ public class JabRef {
 
     public static void main(String[] args) {
 
-	Globals.setLanguage((new JabRefPreferences()).get("language"), "");
-
+	JabRefPreferences prefs = new JabRefPreferences();
+	Globals.setLanguage(prefs.get("language"), "");
 	JabRefFrame jrf = new JabRefFrame();
     }
 

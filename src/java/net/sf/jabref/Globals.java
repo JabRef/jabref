@@ -33,6 +33,7 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     public static ResourceBundle messages;
 
+
     /**
      * String constants.
      */
@@ -60,4 +61,8 @@ public class Globals {
 	return translation.replaceAll("_"," ");
     }
 
+    /*    public static void setupKeyBindings(JabRefPreferences prefs) {
+
+
+    }*/
 }
