@@ -29,10 +29,17 @@ public class CiteSeerUndoHandler extends HandlerBase {
 	
 	/**
 	 * @param be
+	 * 
+	 * We must remember to clobber the author field,
+	 * because of the current implementation of addAuthor()
 	 */
 	public CiteSeerUndoHandler(NamedCompound newCompound, BibtexEntry be) {
 		citeseerNamedCompound = newCompound;
 		bibEntry = be;		
+		UndoableFieldChange fieldChange = new UndoableFieldChange(bibEntry, "author",
+				bibEntry.getField("author"), null);				
+		citeseerNamedCompound.addEdit(fieldChange);	
+		bibEntry.setField("author", null);		
 	}
 	
 	public void characters(char[] ch, int start, int length) {

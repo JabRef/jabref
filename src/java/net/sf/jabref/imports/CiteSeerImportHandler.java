@@ -26,9 +26,13 @@ public class CiteSeerImportHandler extends HandlerBase {
 	
 	/**
 	 * @param be
+	 * 
+	 * We must remember to clobber the author field,
+	 * because of the current implementation of addAuthor()
 	 */
 	public CiteSeerImportHandler(BibtexEntry be) {
 		bibEntry = be;		
+		bibEntry.setField("author", null);
 	}
 	
 	public void characters(char[] ch, int start, int length) {
