@@ -5,7 +5,7 @@ import java.util.regex.*;
 import net.sf.jabref.*;
 }
 
-class SearchTreeParser extends TreeParser;
+class SearchExpressionTreeParser extends TreeParser;
 
 options {
 	importVocab = SearchExpressionParser;
