@@ -35,8 +35,8 @@ import java.io.PrintStream;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexParser;
-import net.sf.jabref.ParserResult;
+import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.imports.ParserResult;
 
 
 /*==========================================================================*

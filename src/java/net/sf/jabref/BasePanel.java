@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
+import net.sf.jabref.imports.*;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.QuickSearchRule;
@@ -76,6 +77,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     SearchManager2 searchManager;
     MedlineFetcher medlineFetcher;
+    MedlineAuthorFetcher medlineAuthorFetcher;
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -137,7 +139,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     }
 
-    void output(String s) {
+    public BibtexDatabase database() { return database; }
+    public JabRefFrame frame() { return frame; }
+
+    public void output(String s) {
 	if (!suppressOutput)
 	    frame.output(s);
     }
@@ -1043,7 +1048,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
-	sidePaneManager.register("fetchMedline", medlineFetcher);
+        sidePaneManager.register("fetchMedline", medlineFetcher);
+        medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
+        sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
 	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
 	sidePaneManager.add("search", searchManager);
 	sidePaneManager.populatePanel();

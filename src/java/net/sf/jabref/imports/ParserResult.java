@@ -24,9 +24,10 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref;
+package net.sf.jabref.imports;
 
 import java.util.HashMap;
+import net.sf.jabref.*;
 
 public class ParserResult {
 

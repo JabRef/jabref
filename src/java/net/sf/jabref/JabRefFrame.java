@@ -29,6 +29,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
+import net.sf.jabref.imports.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -43,6 +44,7 @@ import java.util.regex.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
+
 
 /**
  * The main window of the application.
@@ -132,7 +134,8 @@ public class JabRefFrame extends JFrame {
 	normalSearch = new GeneralAction("search", "Search", "Start",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
-	fetchMedline = new FetchMedlineAction(),
+       fetchMedline = new FetchMedlineAction(),
+       fetchAuthorMedline = new FetchAuthorMedlineAction(),
 	copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
 				    //"Put a BibTeX reference to the selected entries on the clipboard",
 	copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
@@ -576,6 +579,7 @@ public class JabRefFrame extends JFrame {
 	tools.add(makeKeyAction);
         tools.add(lyxPushAction);
         tools.add(fetchMedline);
+        tools.add(fetchAuthorMedline);
         tools.add(openFile);
         tools.add(openUrl);
 
@@ -1069,21 +1073,37 @@ public class JabRefFrame extends JFrame {
 	}
     }
 
-  class FetchMedlineAction extends AbstractAction {
-    public FetchMedlineAction() {
-      super(Globals.lang("Fetch Medline"), new ImageIcon(GUIGlobals.fetchMedlineIcon));
-      putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
+    class FetchMedlineAction extends AbstractAction {
+      public FetchMedlineAction() {
+        super(Globals.lang("Fetch Medline"), new ImageIcon(GUIGlobals.fetchMedlineIcon));
+        putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
+      }
+
+      public void actionPerformed(ActionEvent e) {
+        if (tabbedPane.getTabCount() > 0)
+          for (int i=0; i<tabbedPane.getTabCount(); i++) {
+            ((BasePanel)tabbedPane.getComponentAt(i)).sidePaneManager.ensureVisible("fetchMedline");
+            new FocusRequester(basePanel().medlineFetcher);
+          }
+      }
+
     }
 
-    public void actionPerformed(ActionEvent e) {
-      if (tabbedPane.getTabCount() > 0)
-        for (int i=0; i<tabbedPane.getTabCount(); i++) {
-          ((BasePanel)tabbedPane.getComponentAt(i)).sidePaneManager.ensureVisible("fetchMedline");
-          new FocusRequester(basePanel().medlineFetcher);
-        }
-    }
+    class FetchAuthorMedlineAction extends AbstractAction {
+      public FetchAuthorMedlineAction() {
+        super(Globals.lang("Fetch Medline by author"), new ImageIcon(GUIGlobals.fetchMedlineIcon));
+        putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by author"));
+      }
 
-  }
+      public void actionPerformed(ActionEvent e) {
+        if (tabbedPane.getTabCount() > 0)
+          for (int i=0; i<tabbedPane.getTabCount(); i++) {
+            ((BasePanel)tabbedPane.getComponentAt(i)).sidePaneManager.ensureVisible("fetchAuthorMedline");
+            new FocusRequester(basePanel().medlineFetcher);
+          }
+      }
+
+    }
 
 		// The action for opening the preferences dialog.
 

@@ -23,7 +23,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.ImportFormatReader;
+import net.sf.jabref.imports.ImportFormatReader;
 
 /**
  * Changes {\^o} or {\^{o}} to ô

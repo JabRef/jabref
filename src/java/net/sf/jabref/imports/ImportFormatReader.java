@@ -25,7 +25,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 
-package net.sf.jabref;
+package net.sf.jabref.imports;
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -34,6 +34,8 @@ import org.xml.sax.*; // for medline
 import org.xml.sax.helpers.*;  //for medline
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
+import net.sf.jabref.*;
+
 /*
   // int jabrefframe
 BibtexDatabase database=new BibtexDatabase();
@@ -62,7 +64,7 @@ public class ImportFormatReader
      // input format string: LN FN [and LN, FN]*
      // output format string: FN LN [and FN LN]*
      */
-    static String fixAuthor_nocomma(String in){
+    public static String fixAuthor_nocomma(String in){
 	StringBuffer sb=new StringBuffer();
 	String[] authors = in.split(" and ");
 	for(int i=0; i<authors.length; i++){
@@ -141,7 +143,7 @@ public class ImportFormatReader
     // returns null if unable to find any entries or if the
     // file is not in scifinder format
     //============================================================
-    static ArrayList readScifinder( String filename)
+    public static ArrayList readScifinder( String filename)
     {
 		ArrayList bibitems=new ArrayList();
 		File f = new File(filename);
@@ -206,7 +208,7 @@ public class ImportFormatReader
     //
     //==================================================
 
-    static ArrayList readISI( String filename) //jbm for new Bibitem
+    public static ArrayList readISI( String filename) //jbm for new Bibitem
     {
 	ArrayList bibitems=new ArrayList();
 	File f = new File(filename);
@@ -314,10 +316,10 @@ public class ImportFormatReader
     //==================================================
     //
     //==================================================
-    static Pattern ovid_src_pat= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
-    static Pattern ovid_src_pat_no_issue= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    public static Pattern ovid_src_pat= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    public static Pattern ovid_src_pat_no_issue= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
-    static ArrayList readOvid( String filename){
+    public static ArrayList readOvid( String filename){
 	ArrayList bibitems = new ArrayList();
 	File f=new File(filename);
 	int rowNum=0;
@@ -407,6 +409,7 @@ public class ImportFormatReader
 	}
 	return bibitems;
     }
+
     static File checkAndCreateFile(String filename){
 	File f = new File(filename);
 	if(!f.exists() && !f.canRead() && !f.isFile()){
@@ -419,7 +422,7 @@ public class ImportFormatReader
     }
     // check here for details on the format
     // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
-    static ArrayList readEndnote(String filename){
+    public static ArrayList readEndnote(String filename){
 	String ENDOFRECORD="__EOREOR__";
 	ArrayList bibitems = new ArrayList();
 	File f = checkAndCreateFile( filename );// will return null if file is not readable
@@ -463,7 +466,7 @@ public class ImportFormatReader
 		    continue;
 
 		/* Details of Refer format for Journal Article and Book:
-		   
+
 		  Generic            Ref     Journal Article   Book
 		  Code
 		  Author             %A      Author            Author
@@ -502,7 +505,7 @@ public class ImportFormatReader
 		else if(prefix.equals("0")){
 		    if(val.indexOf("Journal")==0)
 			Type="article";
-		    else if((val.indexOf("Book")==0) 
+		    else if((val.indexOf("Book")==0)
 			    || (val.indexOf("Edited Book")==0))
 			Type="book";
 		    else if( val.indexOf("Conference")==0)// Proceedings
@@ -565,7 +568,7 @@ public class ImportFormatReader
     //========================================================
     //
     //========================================================
-    static ArrayList readReferenceManager10(String filename)
+    public static ArrayList readReferenceManager10(String filename)
     {
 	ArrayList bibitems=new ArrayList();
 	File f = new File(filename);
@@ -655,7 +658,7 @@ public class ImportFormatReader
     //==================================================
     //
     //==================================================
-    static ArrayList readMedline(String filename)
+    public static ArrayList readMedline(String filename)
     {
 	File f = new File(filename);
 	if(!f.exists() && !f.canRead() && !f.isFile()){
@@ -686,20 +689,20 @@ public class ImportFormatReader
 	return bibItems;
     }
 
-    static ArrayList readBibTeXML(String filename)
+    public static ArrayList readBibTeXML(String filename)
     {
         File f = new File(filename);
         if(!f.exists() && !f.canRead() && !f.isFile()){
             System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
             return null;
         }
-        
+
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         // Configure the factory object to specify attributes of the parsers it creates
         parserFactory.setValidating(true);
         parserFactory.setNamespaceAware(true);
-        
+
         // Now create a SAXParser object
         ArrayList bibItems=null;
         try{
@@ -709,7 +712,7 @@ public class ImportFormatReader
             parser.parse(new File(filename), handler);
             // When you're done, report the results stored by your handler object
             bibItems = handler.getItems();
-            
+
         }
         catch(javax.xml.parsers.ParserConfigurationException e1){}
         catch(org.xml.sax.SAXException e2){}
@@ -720,7 +723,7 @@ public class ImportFormatReader
     //==================================================
     //
     //==================================================
-    static ArrayList fetchMedline(String id)
+    public static ArrayList fetchMedline(String id)
     {
 
 	ArrayList bibItems=null;
@@ -755,7 +758,7 @@ public class ImportFormatReader
     //========================================================
     //
     //========================================================
-    static ArrayList readINSPEC( String filename)
+    public static ArrayList readINSPEC( String filename)
     {
 	ArrayList bibitems = new ArrayList();
 	File f = new File(filename);

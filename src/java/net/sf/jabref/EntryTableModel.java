@@ -34,6 +34,7 @@ import java.beans.PropertyChangeEvent;
 import net.sf.jabref.export.LatexFieldFormatter;
 import java.util.Vector;
 import java.util.StringTokenizer;
+import net.sf.jabref.imports.ImportFormatReader;
 
 
 public class EntryTableModel extends AbstractTableModel {
@@ -139,7 +140,7 @@ public class EntryTableModel extends AbstractTableModel {
 	      }
 	  }
 	}
-	
+
 	return o;
     }
 
@@ -172,7 +173,7 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public void remap() {
-	// Set up the int[] nameCols, to mark which columns should be 
+	// Set up the int[] nameCols, to mark which columns should be
 	// treated as lists of names. This is to provide a correct presentation
 	// of names as efficiently as possible.
 	Vector tmp = new Vector(2,1);

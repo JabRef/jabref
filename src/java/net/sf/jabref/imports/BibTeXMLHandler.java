@@ -1,12 +1,12 @@
-package net.sf.jabref;
+package net.sf.jabref.imports;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import java.util.*;
-
+import net.sf.jabref.*;
 /*
   Copyright (C) 2000-2004 E.L. Willighagen <egonw@sci.kun.nl>
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or (at
@@ -35,7 +35,7 @@ public class BibTeXMLHandler extends DefaultHandler {
     private ArrayList bibitems;
 
     private BibtexEntry b; // the entry being read
-    
+
     // XML parsing stuff
     private String name; // the current element name
     private String currentChars;
@@ -47,7 +47,7 @@ public class BibTeXMLHandler extends DefaultHandler {
     public ArrayList getItems(){ return bibitems;}
 
     // SAX parsing methods
-    
+
     public void doctypeDecl(String name, String publicId,
         String systemId) throws Exception {};
 

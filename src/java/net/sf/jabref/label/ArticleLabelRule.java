@@ -26,21 +26,22 @@
 */
 package net.sf.jabref.label;
 
-import java.util.StringTokenizer ; 
+import java.util.StringTokenizer ;
 import net.sf.jabref.*;
+import net.sf.jabref.imports.ImportFormatReader;
 
 public class ArticleLabelRule extends DefaultLabelRule {
 
 	// this is the rule used handle articles
 	// we try (first author last name)/(year)/(first unique journal word)
 	public String applyRule(BibtexEntry oldEntry){
-		String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
-		String newLabel = "" ; 
+		String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ;
+		String newLabel = "" ;
 
 		String author="";
 
 		//## to be done: i need to check if the key is unique else need to make another one with suffix
-		try{ 
+		try{
 			author=(String)oldEntry.getField("author");
 			String[] tokens= author.split("\\band\\b");
 			if( tokens.length > 0){ // if author is empty
@@ -48,82 +49,82 @@ public class ArticleLabelRule extends DefaultLabelRule {
 					tokens[0] = ImportFormatReader.fixAuthor( tokens[0] ); // convert lastname, firstname to firstname lastname
 				String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
 				// lastname, firstname
-		
+
 				newLabel += firstAuthor[ firstAuthor.length-1];
 			}
 		}catch(Throwable t){
-			System.out.println("error getting author: "+t) ; 
+			System.out.println("error getting author: "+t) ;
 		}
-	
+
 		// use the year token
 		try{
 			if( ! newLabel.equals("")){
 				if( oldEntry.getField("year")!= null){
-					newLabel += String.valueOf( oldEntry.getField("year")) ;  
+					newLabel += String.valueOf( oldEntry.getField("year")) ;
 				}
 			}else
 				newLabel=oldLabel; // don't make a key since there is no author
 		}catch(Throwable t){
-			System.out.println("error getting year: "+t) ; 
+			System.out.println("error getting year: "+t) ;
 		}
 
 // now check for uniqueness
 // i need access to basepanes: checkForDuplicateKey
-	
-//oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-		return newLabel ; 
-	
+
+//oldEntry.setField(Globals.KEY_FIELD,newLabel) ;
+		return newLabel ;
+
 
 /*
 // use the journal name
 // return the first token 4 wrds or longer, that's not journal
 // , society, or the like (using the Keyword class)
 try{
-           
+
 if(oldEntry.getField("journal") != null) {
-authorTokens = new StringTokenizer( ((String) oldEntry.getField("journal")).replaceAll(","," ").replaceAll("/"," ")) ; 
-String tempString = authorTokens.nextToken() ; 
-tempString = tempString.replaceAll(",","") ; 
-boolean done = false ; 
+authorTokens = new StringTokenizer( ((String) oldEntry.getField("journal")).replaceAll(","," ").replaceAll("/"," ")) ;
+String tempString = authorTokens.nextToken() ;
+tempString = tempString.replaceAll(",","") ;
+boolean done = false ;
 while(tempString!=null && !done ){
-tempString = tempString.replaceAll(",","").trim() ; 
+tempString = tempString.replaceAll(",","").trim() ;
 if(tempString.trim().length() > 3 && !KeyWord.isKeyWord(tempString))  {
-done = true ; 
+done = true ;
 }
 else{
 
 if(authorTokens.hasMoreTokens()){
-tempString = authorTokens.nextToken() ; 
+tempString = authorTokens.nextToken() ;
 }else{
-done = true ; 
+done = true ;
 }
 }
 }
 
 if(tempString!=null && (tempString.indexOf("null")<0) ){
-newLabel += String.valueOf( tempString.toLowerCase()) ;  
+newLabel += String.valueOf( tempString.toLowerCase()) ;
 }
 }
 }
 catch(Throwable t){  System.err.println(t) ; }
 */
-	
+
 	}
 
 
 //    public static void main(String args[]){
-//        
-//        System.out.println(args[0]) ; 
-//        BibtexEntry entry = new BibtexEntry("1",BibtexEntryType.ARTICLE) ; 
-//        entry.setField("journal",args[0]) ; 
-//        entry.setField("author","jones, b") ; 
-//        entry.setField("year","1984") ; 
-//        ArticleLabelRule rule = new ArticleLabelRule() ; 
-//        entry = rule.applyRule(entry) ; 
-//        System.out.println(entry.getField(BibtexBaseFrame.KEY_PROPERTY) ); 
+//
+//        System.out.println(args[0]) ;
+//        BibtexEntry entry = new BibtexEntry("1",BibtexEntryType.ARTICLE) ;
+//        entry.setField("journal",args[0]) ;
+//        entry.setField("author","jones, b") ;
+//        entry.setField("year","1984") ;
+//        ArticleLabelRule rule = new ArticleLabelRule() ;
+//        entry = rule.applyRule(entry) ;
+//        System.out.println(entry.getField(BibtexBaseFrame.KEY_PROPERTY) );
 //
 //    }
-    
+
 }
 
 

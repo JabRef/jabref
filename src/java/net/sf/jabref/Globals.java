@@ -113,7 +113,7 @@ public class Globals {
     //============================================================
     // Using the hashmap of entry types found in BibtexEntryType
     //============================================================
-    static BibtexEntryType getEntryType(String type){
+    public static BibtexEntryType getEntryType(String type){
 	// decide which entryType object to return
 	Object o = BibtexEntryType.ALL_TYPES.get(type);
 	if (o != null)
@@ -137,7 +137,7 @@ public class Globals {
     //========================================================
     static Pattern titleCapitalPattern=Pattern.compile("[A-Z]+");
 
-  static String putBracesAroundCapitals(String title){
+  public static String putBracesAroundCapitals(String title){
 		StringBuffer buf = new StringBuffer();
 
 		Matcher mcr=Globals.titleCapitalPattern.matcher(title.substring(1));

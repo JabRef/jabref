@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.ImportFormatReader;
+import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.Util;
 
 /**
@@ -395,21 +395,22 @@ public class LabelPatternUtil {
      * @return the sur name of all authors/editors
      */
     private static String oneAuthorPlusIni(String authorField) {
-	authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
-	String author = "" ;
-	// This code was part of 'ApplyRule' in 'ArticleLabelRule'
-	String[] tokens= authorField.split("\\band\\b");
-	int i=1;
-	if (tokens.length == 0) return author;
-	String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
-	author = firstAuthor[0];
-	while (tokens.length > i) {
-	    // convert lastname, firstname to firstname lastname
-	    author += tokens[i].trim().charAt(0);
-	    i++;
-	}
-	return author;
-	
+      final int CHARS_OF_FIRST = 5;
+      authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+      String author = "" ;
+      // This code was part of 'ApplyRule' in 'ArticleLabelRule'
+      String[] tokens= authorField.split("\\band\\b");
+      int i=1;
+      if (tokens.length == 0) return author;
+      String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
+      author = firstAuthor[0].substring(0, (int)Math.min(CHARS_OF_FIRST, firstAuthor[0].length()));
+      while (tokens.length > i) {
+        // convert lastname, firstname to firstname lastname
+        author += tokens[i].trim().charAt(0);
+        i++;
+      }
+      return author;
+
     }
 
 	/**

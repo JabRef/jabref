@@ -40,6 +40,7 @@ import javax.swing.text.*;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.undo.*;
+import net.sf.jabref.imports.BibtexParser;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
 
@@ -255,7 +256,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 	    g2.rotate(-Math.PI/2, 0, 0);
-	    g2.drawString(label,-width-5,28);
+	    g2.drawString(label,-width-7,28);
 
 	}
 	/*	public Dimension getPreferredSize() {
@@ -585,7 +586,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	am.put("right", switchRightAction);
 	im.put(GUIGlobals.helpKeyStroke, "help");
 	am.put("help", helpAction);
-        im.put(prefs.getKey("Save"), "save");
+        im.put(prefs.getKey("Save database"), "save");
         am.put("save", saveDatabaseAction);
 
 	try{

@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.imports;
 
 import java.util.ArrayList;
 import java.net.*;
@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 
@@ -74,7 +75,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     Pattern p = Pattern.compile("\\d+[,\\d+]*");
     Matcher m = p.matcher( idList );
     if ( m.matches() ) {
-      panel.frame.output(Globals.lang("Fetching Medline..."));
+      panel.frame().output(Globals.lang("Fetching Medline..."));
       ArrayList bibs = fetchMedline(idList);
       if ((bibs != null) && (bibs.size() > 0)) {
         tf.setText("");
@@ -83,10 +84,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
         while (i.hasNext()) {
           try {
             BibtexEntry be = (BibtexEntry) i.next();
-            String id = Util.createId(be.getType(), panel.database);
+            String id = Util.createId(be.getType(), panel.database());
             be.setId(id);
-            panel.database.insertEntry(be);
-            ce.addEdit(new UndoableInsertEntry(panel.database, be, panel));
+            panel.database().insertEntry(be);
+            ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
           }
           catch (KeyCollisionException ex) {
           }
@@ -99,7 +100,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
       } else
         panel.output(Globals.lang("No Medline entries found."));
     } else {
-	JOptionPane.showMessageDialog(panel.frame,Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
+	JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
     }
   }
 

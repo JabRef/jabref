@@ -28,6 +28,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Comparator;
+import net.sf.jabref.imports.ImportFormatReader;
 
 public class EntryComparator implements Comparator {
 

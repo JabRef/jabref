@@ -1,9 +1,11 @@
-package net.sf.jabref;
+package net.sf.jabref.imports;
 import java.util.regex.*;
 import javax.xml.parsers.*;
 import java.util.ArrayList;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+import net.sf.jabref.*;
+
 
 /*
   Copyright (C) 2002-2003 Morten O. Alver & Nizar N. Batada
@@ -98,10 +100,10 @@ public class MedlineHandler extends DefaultHandler
 					inDoi=true;
 				else if(value.equals("pii"))
 					inPii=true;
-						
+
 			}
 		}
-			
+
 
 
 		return;
@@ -167,7 +169,7 @@ public class MedlineHandler extends DefaultHandler
 			    b.setField("url","http://dx.doi.org/"+doi);
 			}
 			if(!pii.equals(""))
-			    b.setField("pii",pii);			
+			    b.setField("pii",pii);
 
 			bibitems.add( b  );
 
@@ -249,6 +251,6 @@ public class MedlineHandler extends DefaultHandler
 		else if(inAbstractText){ abstractText += new String(data,start,length);}
 		else if(inMedlineDate){ MedlineDate += new String(data,start,length);}
 		else if(inDoi){ doi=new String(data,start,length);}
-		else if(inPii){ pii=new String(data,start,length);}		
+		else if(inPii){ pii=new String(data,start,length);}
     }
 }

@@ -25,7 +25,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 
-package net.sf.jabref;
+package net.sf.jabref.imports;
 
 import java.io.IOException;
 import java.io.PushbackReader;
@@ -33,6 +33,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import net.sf.jabref.*;
 
 public class BibtexParser
 {
