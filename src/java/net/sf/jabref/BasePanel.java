@@ -45,6 +45,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     BasePanel ths = this;
     JSplitPane splitPane;
+    PreviewPanel previewPanel = null;
 
     JabRefFrame frame;
     BibtexDatabase database;
@@ -1186,8 +1187,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	setupTable();
 	// If an entry is currently being shown, make sure it stays shown,
 	// otherwise set the bottom component to null.
-	if (showing == null)
-	    splitPane.setBottomComponent(null);
+	if (showing == null) {
+          splitPane.setBottomComponent(previewPanel);
+          if (previewPanel != null)
+            splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
+        }
 	else
 	    showEntry(showing);
 
@@ -1245,6 +1249,21 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    stringDialog.refreshTable();
     }
 
+    public void previewEntry(BibtexEntry be) {
+      if (previewPanel == null) {
+        previewPanel = new PreviewPanel(be);
+      } else
+        previewPanel.setEntry(be);
+      splitPane.setBottomComponent(previewPanel);
+      splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
+      previewPanel.repaint();
+    }
+
+    public boolean isShowingEditor() {
+      return ((splitPane.getBottomComponent() != null)
+              && (splitPane.getBottomComponent() instanceof EntryEditor));
+    }
+
     public void showEntry(BibtexEntry be) {
 	if (showing == be) {
 	    if (splitPane.getBottomComponent() == null) {
@@ -1300,7 +1319,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      *
      */
     public void hideEntryEditor() {
-	splitPane.setBottomComponent(null);
+	splitPane.setBottomComponent(previewPanel);
+        if (previewPanel != null)
+          splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
 	new FocusRequester(entryTable);
 	showing = null;
     }

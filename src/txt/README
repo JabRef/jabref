@@ -66,7 +66,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added detection of duplicate entries.
+1.x:	- Added entry preview.
+	- Added detection of duplicate entries.
 	- Added keyboard shortcut customization.
 	- Added import filter for Sixpack files.
       	- Added option to use a standard directory for PDFs.

@@ -83,8 +83,8 @@ public class GUIGlobals {
       GROUPS_VISIBLE_ROWS = 8,
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
-      KEYBIND_COL_1 = 80; // Added to the font size when determining table
-
+      KEYBIND_COL_1 = 80, // Added to the font size when determining table
+      PREVIEW_HEIGHT = 100;
   // row height
   public static final double
       VERTICAL_DIVIDER_LOCATION = 0.4;
@@ -207,7 +207,11 @@ public class GUIGlobals {
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
       pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
+      doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
+      doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
+      psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");
+
 
 // Help files (in HTML format):
   public static String
@@ -474,6 +478,8 @@ public class GUIGlobals {
 
     tableIcons.put("pdf", new ImageIcon(pdfIcon));
     tableIcons.put("url", new ImageIcon(wwwIcon));
+    tableIcons.put("doi", new ImageIcon(doiSmallIcon));
+    tableIcons.put("ps", new ImageIcon(psIcon));
 
     fieldLength.put("author", new Integer(280));
     fieldLength.put("editor", new Integer(280));

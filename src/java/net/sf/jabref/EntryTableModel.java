@@ -56,9 +56,9 @@ public class EntryTableModel
       OTHER = 3,
       //PDF_COL = 1, // The column displaying icons for linked pdfs.
       ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
-  public static final String
-      PDF = "pdf",
-      URL_ = "url";
+  public static final String[]
+      PDF = {"pdf", "ps"},
+      URL_ = {"url", "doi"};
 
   public int padleft = -1; // padleft indicates how many columns (starting from left) are
   // special columns (number column or icon column).
@@ -105,7 +105,8 @@ public class EntryTableModel
   }
 
   public Class getColumnClass(int column) {
-    return (getIconTypeForColumn(column) != null ? Icon.class : String.class);
+    //return (getIconTypeForColumn(column) != null ? Icon.class : String.class);
+    return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
   }
 
   public Object getValueAt(int row, int col) {
@@ -113,17 +114,21 @@ public class EntryTableModel
     // corresponding to the row.
     Object o;
     BibtexEntry be = db.getEntryById(getNameFromNumber(row));
-    String iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
+    String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
     if (col == 0) {
       o = "" + (row + 1);
 
     }
     else if (iconType != null) {
-      if (!hasField(row, iconType))
+      int hasField = -1;
+      for (int i=iconType.length-1; i>= 0; i--)
+        if (hasField(row, iconType[i]))
+          hasField = i;
+      if (hasField < 0)
         return null;
 
       // Ok, so we are going to display an icon. Find out which one, and return it:
-      return GUIGlobals.getTableIcon(iconType);
+      return GUIGlobals.getTableIcon(iconType[hasField]);
     }
     //  if (col == 1)
     //  o = be.getType().getName();
@@ -161,14 +166,14 @@ public class EntryTableModel
   }
 
   /**
-   * This method returns a string indicating the type of icons to be displayed in the given column.
+   * This method returns a string array indicating the types of icons to be displayed in the given column.
    * It returns null if the column is not an icon column, and thereby also serves to identify icon
    * columns.
    */
-  public String getIconTypeForColumn(int col) {
+  public String[] getIconTypeForColumn(int col) {
     Object o = iconCols.get(new Integer(col));
     if (o != null)
-      return (String)o;
+      return (String[])o;
     else
       return null;
   }

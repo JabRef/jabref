@@ -374,7 +374,7 @@ public class Util {
 	}
 
 	else{
-	    System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+	    //System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
 	    //ignore
 	}
   }

@@ -139,6 +139,13 @@ public class EntryTable extends JTable {
   class TableClickListener extends MouseAdapter {
       public void mouseClicked(MouseEvent e) {
 
+        // Testing, testing
+        if (!panel.isShowingEditor() && (e.getClickCount() == 1)) {
+          int row = rowAtPoint(e.getPoint());
+        panel.previewEntry(panel.database().getEntryById(tableModel.
+            getNameFromNumber(row)));
+        }
+
         // First find the column on which the user has clicked.
         int col = columnAtPoint(e.getPoint());
 
@@ -159,12 +166,35 @@ public class EntryTable extends JTable {
 
         // Check if the user has clicked on an icon cell to open url or pdf.
         if (tableModel.getCellStatus(0, col) == EntryTableModel.ICON_COL) {
+
           // Get the row number also:
           final int row = rowAtPoint(e.getPoint());
-          if (getValueAt(row, col) == null) return; // No icon here, so we do nothing.
+          Object value = getValueAt(row, col);
+          if (value == null) return; // No icon here, so we do nothing.
+          /*Util.pr("eouaeou");
+          JButton button = (JButton)value;
+
+          MouseEvent buttonEvent =
+              (MouseEvent)SwingUtilities.convertMouseEvent(ths, e, button);
+          button.dispatchEvent(buttonEvent);
+          // This is necessary so that when a button is pressed and released
+          // it gets rendered properly.  Otherwise, the button may still appear
+          // pressed down when it has been released.
+          ths.repaint();
+
+          */
+
+
 
           // Get the icon type. Corresponds to the field name.
-          final String iconType = tableModel.getIconTypeForColumn(col);
+          final String[] iconType = tableModel.getIconTypeForColumn(col);
+          int hasField = -1;
+          for (int i=iconType.length-1; i>= 0; i--)
+            if (tableModel.hasField(row, iconType[i]))
+              hasField = i;
+          if (hasField == -1)
+            return;
+          final String fieldName = iconType[hasField];
 
           // Open it now. We do this in a thread, so the program won't freeze during the wait.
           (new Thread() {
@@ -177,14 +207,14 @@ public class EntryTable extends JTable {
                 return;
               }
 
-              Object link = be.getField(iconType);
+              Object link = be.getField(fieldName);
               if (iconType == null) {
-                Globals.logger("Error: no link to " + iconType + ".");
+                Globals.logger("Error: no link to " + fieldName + ".");
                 return; // There is an icon, but the field is not set.
               }
 
               try {
-                Util.openExternalViewer( (String) link, iconType, prefs);
+                Util.openExternalViewer( (String) link, fieldName, prefs);
               }
               catch (IOException ex) {}
             }
@@ -342,6 +372,7 @@ public class EntryTable extends JTable {
     }
 
     public TableCellRenderer iconRenderer = new IconCellRenderer();
+        //new JTableButtonRenderer(getDefaultRenderer(JButton.class));
     class IconCellRenderer extends DefaultTableCellRenderer {
         protected void setValue(Object value) {
             if (value instanceof Icon) {
@@ -354,6 +385,25 @@ public class EntryTable extends JTable {
         }
     }
 
+
+/*    class JTableButtonRenderer implements TableCellRenderer {
+      private TableCellRenderer __defaultRenderer;
+
+      public JTableButtonRenderer(TableCellRenderer renderer) {
+        __defaultRenderer = renderer;
+      }
+
+      public Component getTableCellRendererComponent(JTable table, Object value,
+                                                     boolean isSelected,
+                                                     boolean hasFocus,
+                                                     int row, int column)
+      {
+        if(value instanceof Component)
+          return (Component)value;
+        return __defaultRenderer.getTableCellRendererComponent(
+      table, value, isSelected, hasFocus, row, column);
+      }
+    }*/
 
 
     public void ensureVisible(int row) {
