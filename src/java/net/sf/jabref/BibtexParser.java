@@ -184,6 +184,7 @@ public class BibtexParser
 	//Util.pr("Parsed string name");
 	skipWhitespace();
 	//Util.pr("Now the contents");
+        consume('=');
 	String content = parseFieldContent();
 	//Util.pr("Now I'm going to consume a }");
 	consume('}',')');
@@ -200,13 +201,37 @@ public class BibtexParser
 
     public BibtexEntry parseEntry(BibtexEntryType tp) throws IOException
     {
+	String id = Util.createId(tp, _db);
+	BibtexEntry result = new BibtexEntry(id, tp); 
+
 	skipWhitespace();
 	consume('{','(');
 	skipWhitespace();
-	String key = parseKey(),//parseTextToken(),
-	    id = Util.createId(tp, _db);
+	String key = null;
+	boolean doAgain = true;
+	while (doAgain) {
+	    doAgain = false;
+	    try {
+		if (key != null)
+		    key = key+parseKey();//parseTextToken(),
+		else key = parseKey();
+	    } catch (NoLabelException ex) {
+		// This exception will be thrown if the entry lacks a key
+		// altogether, like in "@article{ author = { ...". 
+		// It will also be thrown if a key contains =.
+	        char c = (char)peek();	    
+		if (Character.isWhitespace(c) || (c == '{')
+		    || (c == '\"')) {
 
-	BibtexEntry result = new BibtexEntry(id, tp); 
+		    String cont = parseFieldContent();
+		    result.setField(ex.getMessage().trim().toLowerCase(), cont);
+		} else {
+		    key = ex.getMessage()+"=";
+		    doAgain = true;		  
+		}
+	    }
+	}
+
 	result.setField(GUIGlobals.KEY_FIELD, key);
 
 	skipWhitespace();
@@ -219,6 +244,7 @@ public class BibtexParser
 		break;
 	    }
 
+	    //if (key != null)
 	    consume(',');
 
 	    skipWhitespace();
@@ -239,6 +265,8 @@ public class BibtexParser
     {
         String key = parseTextToken().toLowerCase();
 	//Util.pr("_"+key+"_");
+        skipWhitespace();
+        consume('=');
 	String content = parseFieldContent();
 	if (content.length() > 0)
 	    entry.setField(key, content);
@@ -246,8 +274,6 @@ public class BibtexParser
 
     private String parseFieldContent() throws IOException
     {
-        skipWhitespace();
-        consume('=');
         skipWhitespace();
 	StringBuffer value = new StringBuffer();
         int c,j='.';
@@ -355,7 +381,7 @@ public class BibtexParser
     /**
      * This method is used to parse the bibtex key for an entry.
      */
-    private String parseKey() throws IOException
+    private String parseKey() throws IOException, NoLabelException
     {
        StringBuffer token = new StringBuffer(20);
 
@@ -375,7 +401,8 @@ public class BibtexParser
 	    // Går:  $_*+.-\/?"^
             if (Character.isLetterOrDigit((char) c) || 
 		((c != '#') && (c != '{') && (c != '}') && (c != '¤')
-		 && (c != '~') && (c != '¨') && (c != ',')))
+		 && (c != '~') && (c != '¨') && (c != ',') && (c != '=')
+		 ))
 	    {
                 token.append((char) c);
             }
@@ -384,6 +411,13 @@ public class BibtexParser
 		if (c == ',') {
 		    unread(c);
 		    return token.toString();
+		} else if (Character.isWhitespace((char)c)) {
+		    //throw new NoLabelException(token.toString());
+		} else if (c == '=') {
+		    // If we find a '=' sign, it is either an error, or
+		    // the entry lacked a comma signifying the end of the key.
+		    //unread(c);
+		    throw new NoLabelException(token.toString());
 		} else
 		    throw new IOException("Error in line "+line+":"+
 					  "Character '"+(char)c+"' is not "+
@@ -393,6 +427,12 @@ public class BibtexParser
         }
  
 
+    }
+
+    private class NoLabelException extends Exception {
+	public NoLabelException(String hasRead) {
+	    super(hasRead);
+	}
     }
 
     private StringBuffer parseBracketedText() throws IOException
