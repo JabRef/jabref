@@ -36,7 +36,7 @@ import java.util.Hashtable ;
  */
 public class LabelMaker {
 
-    public BibtexEntry applyRule(BibtexEntry newEntry){
+    public BibtexEntry applyRule(BibtexEntry newEntry, BibtexDatabase base){
 	String newKey = "";
         if(ruleTable.containsKey(newEntry.getType().getName())){
             newKey = ((LabelRule)ruleTable.get(newEntry.getType().getName())).applyRule(newEntry) ;
@@ -47,7 +47,16 @@ public class LabelMaker {
 
 	// Remove all illegal characters from the key.
 	newKey = Util.checkLegalKey(newKey);
-	newEntry.setField(Globals.KEY_FIELD, newKey);
+
+	// Try new keys until we get a unique one:
+	if (base.setCiteKeyForEntry(newEntry.getId(), newKey)) {
+	    char c = 'b';
+	    String modKey = newKey+"a";
+	    while (base.setCiteKeyForEntry(newEntry.getId(), modKey))
+		modKey = newKey+((char)(c++));	    
+	}
+
+	//newEntry.setField(Globals.KEY_FIELD, newKey);
 	// ...
 
 		return newEntry ;

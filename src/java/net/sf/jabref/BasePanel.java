@@ -540,7 +540,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    for(int i = 0 ; i < numSelected ; i++){
 			bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
 			oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-			bes = frame.labelMaker.applyRule(bes) ;
+			bes = frame.labelMaker.applyRule(bes, database) ;
 			ce.addEdit(new UndoableFieldChange
 				   (bes, GUIGlobals.KEY_FIELD, oldValue,
 				    bes.getField(GUIGlobals.KEY_FIELD)));

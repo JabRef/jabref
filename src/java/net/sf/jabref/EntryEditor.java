@@ -1089,7 +1089,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    try {
                // this updates the table automatically, on close, but not within the tab
 	       Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
-	       entry = frame.labelMaker.applyRule(entry) ;
+	       entry = frame.labelMaker.applyRule(entry, panel.database) ;
 
 	       // Store undo information:
 	       panel.undoManager.addEdit(new UndoableFieldChange
