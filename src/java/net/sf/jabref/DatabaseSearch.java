@@ -74,7 +74,7 @@ public class DatabaseSearch extends Thread {
 		(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit
-	    searchScore = thisRuleSet.applyRules(thisSearchOptions,bes) ;
+	    searchScore = thisRuleSet.applyRule(thisSearchOptions,bes) ;
             
             // When using float search, it messes up the sort order if we retain
             // graded search scores, because the table is sorted by the score.
