@@ -735,18 +735,20 @@ public class GroupSelector extends SidePaneComponent implements
      * @return true if move was successful, false if not.
      */
     public boolean moveNodeUp(GroupTreeNode node) {
+        if (groupsTree.getSelectionCount() != 1) {
+            // JZTODO: translations
+            frame.output(Globals.lang("Please select exactly one group to move."));
+            return false; // not possible
+        }
         AbstractUndoableEdit undo = null;
-        TreePath[] selectionPaths = groupsTree.getSelectionPaths();
-        Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '" // JZTODO: translation...
                     + node.getGroup().getName() + "' " + Globals.lang("up."));
             return false; // not possible
         }
-        // JZTODO really?:
-//        revalidateGroups(groupsTree.getSelectionPaths(),
-//                getExpandedPaths());
-        revalidateGroups(selectionPaths,expandedPaths);
+        // update of selection/expansion state not required
+        // when moving amongst siblings (no path is invalidated)
+        revalidateGroups();
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -759,15 +761,20 @@ public class GroupSelector extends SidePaneComponent implements
      * @return true if move was successful, false if not.
      */
     public boolean moveNodeDown(GroupTreeNode node) {
+        if (groupsTree.getSelectionCount() != 1) {
+            // JZTODO: translations
+            frame.output(Globals.lang("Please select exactly one group to move."));
+            return false; // not possible
+        }
         AbstractUndoableEdit undo = null;
         if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '"
                     + node.getGroup().getName() + "' down.");
             return false; // not possible
         }
-        // JZTODO really?:
-        revalidateGroups(groupsTree.getSelectionPaths(),
-                getExpandedPaths());
+        // update of selection/expansion state not required
+        // when moving amongst siblings (no path is invalidated)
+        revalidateGroups();
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -780,15 +787,33 @@ public class GroupSelector extends SidePaneComponent implements
      * @return true if move was successful, false if not.
      */
     public boolean moveNodeLeft(GroupTreeNode node) {
+        if (groupsTree.getSelectionCount() != 1) {
+            // JZTODO: translations
+            frame.output(Globals.lang("Please select exactly one group to move."));
+            return false; // not possible
+        }
         AbstractUndoableEdit undo = null;
+        TreePath selectionPath = getSelectionPath();
+        Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '"
                     + node.getGroup().getName() + "' left.");
             return false; // not possible
         }
-        // JZTODO really?:
-        revalidateGroups(groupsTree.getSelectionPaths(),
-                getExpandedPaths());
+        // update selection/expansion state:
+        // in all paths that contain the moved node, the previous node
+        // (i.e. the previous parent) is removed
+        // first update selection
+        selectionPath = new TreePath(removeParent(selectionPath.getPath(),node));
+        // then update expanded paths
+        Vector newExpandedPaths = new Vector();
+        while (expandedPaths.hasMoreElements()) {
+            TreePath path = (TreePath) expandedPaths.nextElement();
+            newExpandedPaths.add(new TreePath(removeParent(path.getPath(),node)));
+        }
+        expandedPaths = newExpandedPaths.elements();
+        // ...that's it! now revalidate:
+        revalidateGroups(new TreePath[]{selectionPath}, expandedPaths);
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -801,15 +826,34 @@ public class GroupSelector extends SidePaneComponent implements
      * @return true if move was successful, false if not.
      */
     public boolean moveNodeRight(GroupTreeNode node) {
+        if (groupsTree.getSelectionCount() != 1) {
+            // JZTODO: translations
+            frame.output(Globals.lang("Please select exactly one group to move."));
+            return false; // not possible
+        }
         AbstractUndoableEdit undo = null;
+        TreePath selectionPath = getSelectionPath();
+        Enumeration expandedPaths = getExpandedPaths();
+        Object newParent = node.getPreviousSibling();
         if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '"
                     + node.getGroup().getName() + "' right.");
             return false; // not possible
         }
-        // JZTODO really?:
-        revalidateGroups(groupsTree.getSelectionPaths(),
-                getExpandedPaths());
+        // update selection/expansion state:
+        // in all paths that contain the moved node, the new father (former
+        // sibling) is inserted
+        // first update selection, which is always required
+        selectionPath = new TreePath(addParent(selectionPath.getPath(),node,newParent));
+        // then update expanded paths
+        Vector newExpandedPaths = new Vector();
+        while (expandedPaths.hasMoreElements()) {
+            TreePath path = (TreePath) expandedPaths.nextElement();
+            newExpandedPaths.add(new TreePath(addParent(path.getPath(),node,newParent)));
+        }
+        expandedPaths = newExpandedPaths.elements();
+        // ...that's it! now revalidate:
+        revalidateGroups(new TreePath[]{selectionPath}, expandedPaths);
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -841,5 +885,42 @@ public class GroupSelector extends SidePaneComponent implements
          }
         validateTree();
     }
+    
+    /** 
+     * Removes the parent of the specified node from the specified path
+     * and returns a new path, which contains one less node. If node is not
+     * contained in path, the original array is returned. 
+     */
+    private Object[] removeParent(Object[] path, Object node) {
+        Object[] newPath = new Object[path.length - 1];
+        for (int oldIdx = path.length - 1, newIdx = newPath
+                .length - 1; oldIdx >= 0; --oldIdx, --newIdx) {
+            if (newIdx < 0) // node not contained in path
+                return path;
+            newPath[newIdx] = path[oldIdx];
+            if (path[oldIdx] == node) // skip the previous parent
+                --oldIdx;
+        }
+        return newPath;
     }
+    
+    /** 
+     * Adds the specified newParent to the specified path as a new parent of
+     * (i.e. exactly before) the specified node. If node is not
+     * contained in path, the original array is returned. 
+     */
+    private Object[] addParent(Object[] path, Object node, Object newParent) {
+        Object[] newPath = new Object[path.length + 1];
+        int newIdx = newPath.length - 1;
+        int oldIdx = path.length - 1;
+        for (; oldIdx >= 0; --oldIdx, --newIdx) {
+            newPath[newIdx] = path[oldIdx];
+            if (path[oldIdx] == node) { // add the new parent
+                newPath[--newIdx] = newParent;
+            }
+        }
+        // if both indexes have not met, the node was not found
+        return newIdx != oldIdx ? path : newPath;
+    }
+}
 
