@@ -34,10 +34,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.undo.*;
-
-import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
@@ -226,13 +223,36 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     if (file == null)
                         runCommand("saveAs");
                     else {
-
-                      if (Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
-                        int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
+                        
+                      if (updatedExternally || Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
+                          String[] opts = new String[] {Globals.lang("Review changes"), Globals.lang("Save"),
+                            Globals.lang("Cancel") };
+                          int answer = JOptionPane.showOptionDialog(frame, Globals.lang("File has been updated externally. "
+                          +"What do you want to do?"), Globals.lang("File updated externally"),
+                          JOptionPane.YES_NO_CANCEL_OPTION,  JOptionPane.QUESTION_MESSAGE,
+                          null, opts, opts[0]);
+                         /*  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
                             +"Are you sure you want to save?"), Globals.lang("File updated externally"),
-                                                                   JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                        if (choice == JOptionPane.NO_OPTION)
-                          return;
+                                                                   JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
+                        if (answer == JOptionPane.CANCEL_OPTION)
+                            return;
+                        else if (answer == JOptionPane.YES_OPTION) {
+                            ChangeScanner scanner = new ChangeScanner(frame, ths); //, panel.database(), panel.metaData());
+                            try {
+                                scanner.changeScan(file());
+                                setUpdatedExternally(false);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        sidePaneManager.hideAway("fileUpdate");
+                                    }
+                                });
+
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                            
+                            return;
+                        }
                       }
 
                       saving = true;

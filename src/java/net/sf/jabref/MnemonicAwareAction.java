@@ -39,11 +39,13 @@ import javax.swing.*;
 public abstract class MnemonicAwareAction extends AbstractAction {
 
     public MnemonicAwareAction() {
-	super("");
+	//super("");
     }
 
     public MnemonicAwareAction(ImageIcon icon) {
-	super("", icon);
+	//super(icon);
+        
+        putValue(SMALL_ICON, icon);
     }
 
     public void putValue(String key, Object value) {

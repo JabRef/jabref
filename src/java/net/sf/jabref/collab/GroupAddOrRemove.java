@@ -23,7 +23,8 @@ public class GroupAddOrRemove
 
   String field, gName, regexp;
   boolean add;
-
+  InfoPane tp = new InfoPane();
+  
   public GroupAddOrRemove(String field, String gName, String regexp, boolean add) {
     super();
     if (add)
@@ -34,6 +35,19 @@ public class GroupAddOrRemove
     this.gName = gName;
     this.regexp = regexp;
     this.add = add;
+    
+    StringBuffer text = new StringBuffer();
+    text.append("<FONT SIZE=10>");
+    text.append("<H2>"+
+        (add ? Globals.lang("Added group") : Globals.lang("Removed group")));
+    text.append("<H3>"+Globals.lang("Name")+":</H3>"
+                +" "+gName);
+    text.append("<H3>"+Globals.lang("Field")+":</H3>"
+                 +" "+field);
+    text.append("<H3>"+Globals.lang("Regexp")+":</H3>"
+                +" "+regexp);
+    tp.setContentType("text/html");
+    tp.setText(text.toString());
   }
 
   public void makeChange(BasePanel panel, NamedCompound undoEdit) {
@@ -63,7 +77,7 @@ public class GroupAddOrRemove
   }
 
   JComponent description() {
-    return new JLabel(name);
+      return tp;
   }
 
 

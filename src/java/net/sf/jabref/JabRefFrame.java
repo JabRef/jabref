@@ -1746,7 +1746,7 @@ class FetchCiteSeerAction
       extends MnemonicAwareAction {
     public FetchMedlineAction() {
       super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
-      putValue(NAME, Globals.lang("Fetch Medline"));
+      putValue(NAME, "Fetch Medline");
       putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
     }
