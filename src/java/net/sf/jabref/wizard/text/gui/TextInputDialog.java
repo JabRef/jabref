@@ -30,6 +30,8 @@
 // function : import from plain text => simple mark/copy/paste into bibtex entry
 //
 // todo     : - change colors and fonts
+//            - delete selected text
+//            - make textarea editable
 //
 // modified :
 
@@ -172,6 +174,8 @@ public class TextInputDialog extends JDialog
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
     JMenuItem pasteMI = new JMenuItem(pasteAction) ;
+    inputMenu.add( new MenuHeaderAction()) ;
+    inputMenu.addSeparator();
     inputMenu.add(pasteMI) ;
 
     //Add listener to components that can bring up popup menus.
@@ -180,10 +184,11 @@ public class TextInputDialog extends JDialog
 
     // Toolbar
     JToolBar toolBar = new JToolBar() ;
+    toolBar.add( new ClearAction() ) ;
     toolBar.setBorderPainted(false);
+    toolBar.addSeparator();
     toolBar.add(pasteAction) ;
     toolBar.add( new LoadAction() ) ;
-    toolBar.addSeparator();
 
     JPanel leftPanel = new JPanel(new BorderLayout() ) ;
 
@@ -230,12 +235,10 @@ public class TextInputDialog extends JDialog
     // Radio buttons
     appRadio = new JRadioButton(Globals.lang("append"));
     appRadio.setMnemonic(KeyEvent.VK_A);
-//    appRadio.setActionCommand("append");
     appRadio.setSelected(true);
 
     overRadio = new JRadioButton(Globals.lang("override"));
     overRadio.setMnemonic(KeyEvent.VK_O);
-//    overRadio.setActionCommand("override");
     overRadio.setSelected(false);
 
      //Group the radio buttons.
@@ -247,16 +250,6 @@ public class TextInputDialog extends JDialog
      radioPanel.add(appRadio);
      radioPanel.add(overRadio);
 
-        //Register a listener for the radio buttons.
-//        rabbitButton.addActionListener(this);
-//        pigButton.addActionListener(this);
-/*
-    public void actionPerformed(ActionEvent e) {
-        picture.setIcon(new ImageIcon("images/"
-                                      + e.getActionCommand()
-                                      + ".gif"));
-    }
-*/
     // insert sub components
     JLabel label1 = new JLabel(Globals.lang("available fields")) ;
     con.gridwidth = GridBagConstraints.REMAINDER ;
@@ -267,12 +260,7 @@ public class TextInputDialog extends JDialog
     con.gridheight = 8 ;
     gbl.setConstraints(fieldScroller, con);
     inputPanel.add(fieldScroller) ;
-/*
-    con.gridwidth = 4 ;
-    box = new JComboBox(getAllFields() ) ;
-    gbl.setConstraints( box, con ) ;
-    inputPanel.add(box) ;
-*/
+
     con.gridwidth = 2 ;
     gbl.setConstraints( radioPanel, con ) ;
     inputPanel.add(radioPanel);
@@ -556,6 +544,32 @@ public class TextInputDialog extends JDialog
       }
       catch (Exception ex) {}
     }
+  }
+
+// ---------------------------------------------------------------------------
+  class ClearAction extends BasicAction
+  {
+    public ClearAction()
+    {
+      super("Clear", "clear_inputarea", GUIGlobals.clearInputArea);
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+      textPane.setText("");
+    }
+  }
+
+// ---------------------------------------------------------------------------
+  class MenuHeaderAction extends BasicAction
+  {
+    public MenuHeaderAction()
+    {
+      super("plain_right_menu");
+      this.setEnabled(false);
+    }
+
+    public void actionPerformed(ActionEvent e) { }
   }
 
 // ---------------------------------------------------------------------------

@@ -70,6 +70,8 @@ public class JabRefFrame
   JabRefFrame ths = this;
   JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
 
+  private int lastTabbedPanelSelectionIndex = -1 ;
+
   JTabbedPane tabbedPane = new JTabbedPane();
   final Insets marg = new Insets(0,0,0,0);
   class ToolBar extends JToolBar {
@@ -322,20 +324,15 @@ public class JabRefFrame
     setLocation(new Point(prefs.getInt("posX"),
                           prefs.getInt("posY")));
 
+    tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
+
     // The following state listener makes sure focus is registered with the correct database
     // when the user switches tabs. Without this, cut/paste/copy operations would some times
     // occur in the wrong tab.
     tabbedPane.addChangeListener(new ChangeListener() {
-      private int lastSelectionIndex = -1 ;
       public void stateChanged(ChangeEvent e)
       {
-
-        int now = tabbedPane.getSelectedIndex() ;
-        if (lastSelectionIndex > -1)
-          tabbedPane.setForegroundAt(lastSelectionIndex, GUIGlobals.inActiveTabbed);
-        if (now > -1)
-          tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
-        lastSelectionIndex = now ;
+        markActiveBasePanel() ;
 
         BasePanel bp = basePanel();
         if (bp != null) {
@@ -346,10 +343,8 @@ public class JabRefFrame
           new FocusRequester(bp.entryTable);
         }
       }
-
     });
   }
-
   // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
   // is selected from the application menu.
   public void about() {
@@ -621,6 +616,20 @@ public JabRefPreferences prefs() {
    */
   BasePanel basePanel() {
     return (BasePanel) tabbedPane.getSelectedComponent();
+  }
+
+  /**
+   * handle the color of active and inactive JTabbedPane tabs
+   */
+  private void markActiveBasePanel()
+  {
+    int now = tabbedPane.getSelectedIndex() ;
+    int len = tabbedPane.getTabCount() ;
+    if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len))
+      tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.inActiveTabbed);
+    if ( (now > -1) &&  (now < len))
+      tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
+    lastTabbedPanelSelectionIndex = now ;
   }
 
   private int getTabIndex(JComponent comp) {
@@ -1104,6 +1113,7 @@ public JabRefPreferences prefs() {
     newEntryAction.setEnabled(false);
     plainTextImport.setEnabled(false);
     closeDatabaseAction.setEnabled(false);
+    switchPreview.setEnabled(false);
   }
 
     /**
@@ -1153,6 +1163,7 @@ public JabRefPreferences prefs() {
     newEntryAction.setEnabled(true);
     plainTextImport.setEnabled(true);
     closeDatabaseAction.setEnabled(true);
+    switchPreview.setEnabled(true);
   }
 
     /**
@@ -1284,6 +1295,7 @@ public JabRefPreferences prefs() {
       if (basePanel() == null) { // when it is initially empty
         return; //nbatada nov 7
       }
+
       if (basePanel().baseChanged) {
         int answer = JOptionPane.showConfirmDialog
             (ths, Globals.lang("Database has changed. Do you want to save " +
@@ -1313,8 +1325,10 @@ public JabRefPreferences prefs() {
         tabbedPane.remove(basePanel());
         if (tabbedPane.getTabCount() == 0) {
           setEmptyState();
-        } else if (tabbedPane.getTabCount() == 1) {
-          setOnlyOne();
+        } else
+        {
+          markActiveBasePanel() ;
+          if (tabbedPane.getTabCount() == 1) { setOnlyOne() ; }
         }
         output(Globals.lang("Closed database") + ".");
       }

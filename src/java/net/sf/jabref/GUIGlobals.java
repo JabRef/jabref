@@ -232,7 +232,8 @@ public class GUIGlobals {
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
       splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
       completeTagIcon = GUIGlobals.class.getResource(pre +"completeItem.png"),
-      wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png")
+      wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png"),
+      clearInputArea = GUIGlobals.class.getResource(pre +"filenew.png")
       ;
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
