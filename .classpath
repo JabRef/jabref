@@ -17,11 +17,14 @@
 	<classpathentry kind="lib" path="lib/looks-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/oro-2.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/plastic-1.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/pmd-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/sax-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/saxpath-1.0-fcs.jar"/>
 	<classpathentry kind="lib" path="lib/vizant.jar"/>
 	<classpathentry kind="lib" path="lib/spin.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="lib" path="lib/pmd-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/forms-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="output" path="out"/>
 </classpath>
