@@ -1383,9 +1383,9 @@ class ImportCiteSeerAction
 	extends AbstractAction {
 
     public ImportCiteSeerAction() {
-        super(Globals.lang("Import Data from CiteSeer"),
+        super(Globals.lang("Import Fields from CiteSeer"),
                 new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
-        putValue(SHORT_DESCRIPTION, Globals.lang("Import Data from CiteSeer Database"));
+        putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
 
 	}
 
@@ -1415,7 +1415,7 @@ class ImportCiteSeerAction
 						for(int i=0; i < clickedOn.length; i++)
 							currentBp.entryTable.addRowSelectionInterval(i,i);
 						currentBp.updateViewToSelected();
-						output(Globals.lang("Completed citation import from CiteSeer."));
+						output(Globals.lang("Completed Import Fields from CiteSeer."));
 						 }
 				};
 
@@ -1442,8 +1442,8 @@ class ImportCiteSeerAction
 						}
 						UpdateComponent updateComponent = new UpdateComponent(newValues);
 						SwingUtilities.invokeLater(updateComponent);
-						basePanel().citeSeerFetcher.deactivateImportFetcher();
 					}
+					basePanel().citeSeerFetcher.deactivateImportFetcher();
 			    }
 			}).start();
 		} else {

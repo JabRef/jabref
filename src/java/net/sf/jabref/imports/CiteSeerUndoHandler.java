@@ -168,14 +168,14 @@ public class CiteSeerUndoHandler extends HandlerBase {
             overwrite = false;
         else
             overwrite = overwriteDialog(oldValue, newValue, fieldName);
+        if (overwrite)
+            recordFound.setValue(true);
         return overwrite;
     }
 
     public void startElement(String name, AttributeList attrs)
             throws SAXException {
-        if(name.equals("record")) {
-            recordFound.setValue(true);
-        } else if (name.equals("oai_citeseer:relation")) {
+        if (name.equals("oai_citeseer:relation")) {
     			for (int i = 0; i < attrs.getLength(); i++) {
     			   String attrName = attrs.getName(i);
     			   String attrValue = attrs.getValue(i);	   

@@ -72,7 +72,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		progressBar.setStringPainted(true);
 		setLayout(gbl);
 		SidePaneHeader header = new SidePaneHeader
-			("CiteSeer Transfer", GUIGlobals.fetchHourglassIcon, this);
+			("CiteSeer Transfer", GUIGlobals.wwwCiteSeerIcon, this);
 		con.gridwidth = GridBagConstraints.REMAINDER;
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 1;
