@@ -1,5 +1,5 @@
 
-JabRef 1.5
+JabRef 1.X
 ----------
 
 
@@ -84,12 +84,17 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- When a single entry is selected, right-click menu now shows a checkbox menu for group
+1.x:	
+	- When a single entry is selected, right-click menu now shows a checkbox menu for group
 	  memberships instead of the regular "Add to" and "Remove from" menus.
 	- Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+	- Added alternate preview with abstract, and made both previews configurable.
+	- Added the option to create a subset of a database based on an .aux file.
 	- Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
 	- Added check for spaces in custom entry type names.
 	- Added several new key pattern markers.
+	- Fixed bug that made the next entry be opened instead of the current, when pressing 
+	  Enter in table.
         - Fixed bug that made it possible to leave a source edit when the source didn't validate
           properly. Also made it impossible to change table selection until source validates.
 1.5:	- Enabled selection of default encoding, and started storing encoding information in

@@ -112,7 +112,7 @@ public class DuplicateResolverDialog extends JDialog {
 
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        //status = KEEP_BOTH;
+        status = BREAK;
         block = false;
         dispose();
       }

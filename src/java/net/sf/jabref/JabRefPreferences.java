@@ -154,36 +154,37 @@ public class JabRefPreferences {
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
         defaults.put("confirmDelete", new Boolean(true));
+
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                     +"\\end{bibtexkey}</b><br>\n"
-                     +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}\n"
-                     +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}\n"
-                     +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
-                     +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
-                     +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
-                     +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
-                     +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
-                     +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
+                     +"\\end{bibtexkey}</b><br>__NEWLINE__"
+                     +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}__NEWLINE__"
+                     +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
+                     +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                     +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                     +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                     +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                     +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                     +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
                      +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
                      +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
-                     +"</dd>\n<p></p></font>");
+                     +"</dd>__NEWLINE__<p></p></font>");
 
         defaults.put("preview1", "<font face=\"arial\">"
                        +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                       +"\\end{bibtexkey}</b><br>\n"
-                       +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}\n"
-                       +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}\n"
-                       +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
-                       +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
-                       +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
-                       +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
-                       +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
-                       +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
+                       +"\\end{bibtexkey}</b><br>__NEWLINE__"
+                       +"\\begin{author} \\format[HTMLChars,AuthorLastFirst]{\\author}<BR>\\end{author}__NEWLINE__"
+                       +"\\begin{editor} \\format[HTMLChars,AuthorLastFirst]{\\editor} <i>(ed.)</i><BR>\\end{editor}__NEWLINE__"
+                       +"\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                       +"\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                       +"\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                       +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                       +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                       +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
                        +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
-                       +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n"
+                       +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
                        +"\\begin{abstract}<BR><BR><B>Abstract:</B> <I>\\format[HTMLChars]{\\abstract}</I>\\end{abstract}"
-                       +"</dd>\n<p></p></font>");
+                       +"</dd>__NEWLINE__<p></p></font>");
 
 
         defaults.put("tempDir", "/tmp/");
