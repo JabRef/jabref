@@ -25,7 +25,7 @@ for details about the GPL.
 
 
 Requirements:
-JabRef runs on any system equipped with the Java Virtual Machine (1.4
+JabRef runs on any system equipped with the Java Virtual Machine (1.4.2
 or newer), which can be downloaded at no cost from
 http://java.sun.com.
 
@@ -57,6 +57,7 @@ can also be viewed outside the program with a standard HTML browser.
 
 Change log:
 1.x:	- Added bibtex key uniqueness checking
+	- Fixed Refer import.
 	- Added feature for importing entries and/or strings and/or group
           definitions from another BibTeX database.
 	- Added menu choices to import into open database.
