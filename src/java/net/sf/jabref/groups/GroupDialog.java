@@ -88,6 +88,7 @@ class GroupDialog extends JDialog {
     private final JabRefFrame m_parent;
     private final BasePanel m_basePanel;
     private AbstractGroup m_resultingGroup;
+    private final AbstractGroup m_editedGroup;
 
     /**
      * Shows a group add/edit dialog.
@@ -104,6 +105,7 @@ class GroupDialog extends JDialog {
         super(jabrefFrame, Globals.lang("Edit group"), true);
         m_basePanel = basePanel;
         m_parent = jabrefFrame;
+        m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
         m_searchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
@@ -203,8 +205,14 @@ class GroupDialog extends JDialog {
                 m_okPressed = true;
                 switch (m_typeSelector.getSelectedIndex()) {
                 case INDEX_EXPLICITGROUP:
-                    m_resultingGroup = new ExplicitGroup(m_name.getText()
-                            .trim(),m_basePanel.database());
+                    if (m_editedGroup instanceof ExplicitGroup) {
+                        // keep assignments from possible previous ExplicitGroup
+                        m_resultingGroup = m_editedGroup.deepCopy();
+                        m_resultingGroup.setName(m_name.getText().trim());
+                    } else {
+                        m_resultingGroup = new ExplicitGroup(m_name.getText()
+                                .trim(),m_basePanel.database());
+                    }
                     break;
                 case INDEX_KEYWORDGROUP:
                     // regex is correct, otherwise OK would have been disabled
