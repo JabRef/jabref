@@ -38,7 +38,8 @@ import java.util.*;
 import net.sf.jabref.export.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import com.jgoodies.plaf.FontSizeHints;
-import com.jgoodies.plaf.plastic.PlasticLookAndFeel;
+//import com.jgoodies.plaf.plastic.PlasticLookAndFeel;
+import com.jgoodies.plaf.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.plaf.windows.ExtWindowsLookAndFeel;
 
 //import javax.swing.UIManager;
@@ -475,13 +476,20 @@ public class JabRef {
 	      lnf = (LookAndFeel)objLnf;
 	  
 	  // Set font sizes if we are using a JGoodies look and feel.
-	  if ((lnf != null) && (lnf instanceof PlasticLookAndFeel)) {
+	  if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
               
-	      PlasticLookAndFeel plLnf = (PlasticLookAndFeel)lnf;
-	      plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-	      MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
+              //MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
+              Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel)lnf;
+              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+	      
 	  }
-	  
+          else if ((lnf != null) && (lnf instanceof ExtWindowsLookAndFeel)) {
+              //System.out.println("ttt");
+              ExtWindowsLookAndFeel plLnf = (ExtWindowsLookAndFeel)lnf;
+              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));     
+	  }	  
+          
+          
 	  if (lnf != null) {
 	      try {
 		  UIManager.setLookAndFeel(lnf);
@@ -526,11 +534,7 @@ public class JabRef {
           (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
            prefs.getInt("fontSize"));
 
-      //SwingUtilities.invokeLater(new Runnable() {
-      //  public void run() {
       jrf = new JabRefFrame();
-      //  }
-      //});
 
       if (loaded.size() > 0) {
         for (int i = 0; i < loaded.size(); i++) {
@@ -568,7 +572,7 @@ public class JabRef {
       pr.setFile(file);
       return pr;
     }
-    catch (IOException ex) {
+    catch (Throwable ex) {
       //System.err.println(Globals.lang("Error opening file")+" '"+ name+"': "+ex.getMessage());
       System.err.println(Globals.lang("Error opening file") + ": " +
                          ex.getMessage());

@@ -208,6 +208,13 @@ public class EntryTable extends JTable {
         selectionListenerOn = oldState;
       }
 
+      public void addRowSelectionIntervalQuietly(int row1, int row2) {
+          boolean oldState = selectionListenerOn;
+          selectionListenerOn = false;
+          super.addRowSelectionInterval(row1, row2);
+          selectionListenerOn = oldState;
+      }
+      
     /*public boolean surrendersFocusOnKeystroke() {
 	return true;
 	}*/
@@ -373,6 +380,7 @@ public class EntryTable extends JTable {
     }
 
     public TableCellRenderer getCellRenderer(int row, int column) {
+
 	// This method asks the table model whether the given cell represents a
 	// required or optional field, and returns the appropriate renderer.
 	int score = -3;
@@ -416,17 +424,17 @@ public class EntryTable extends JTable {
               //if (tableModel.hasCrossRef(row))
               //  renderer = maybeIncRenderer;
               //else
-              renderer = incompleteEntryRenderer;
+              renderer = incRenderer;//incompleteEntryRenderer;
             }
 
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
-        //else if (status == EntryTableModel.ICON_COL)
-        //  renderer = iconRenderer;
 	else if (status == EntryTableModel.REQUIRED)
 	    renderer = reqRenderer;
 	else if (status == EntryTableModel.OPTIONAL)
 	    renderer = optRenderer;
+        else if (status == EntryTableModel.BOOLEAN)
+          renderer = getDefaultRenderer(Boolean.class);
 	else renderer = defRenderer;
         //Util.pr("("+row+","+column+"). "+status+" "+renderer.toString());
 	return renderer;
@@ -472,7 +480,8 @@ public class EntryTable extends JTable {
     private Renderer defRenderer = new Renderer(GUIGlobals.tableBackground),
 	reqRenderer = new Renderer(GUIGlobals.tableReqFieldBackground),
 	optRenderer = new Renderer(GUIGlobals.tableOptFieldBackground),
-	incRenderer = new Renderer(GUIGlobals.tableIncompleteEntryBackground),
+	incRenderer = new IncompleteRenderer(),//new Renderer(GUIGlobals.tableIncompleteEntryBackground),
+            //Globals.lang("This entry is incomplete")),
 	grayedOutRenderer = new Renderer(GUIGlobals.grayedOutBackground,
 					 GUIGlobals.grayedOutText),
 	veryGrayedOutRenderer = new Renderer(GUIGlobals.veryGrayedOutBackground,
@@ -485,24 +494,14 @@ public class EntryTable extends JTable {
 	public Renderer(Color c) {
 	    super();
 	    setBackground(c);
-
-	    /*
-	    darker = new DefaultTableCellRenderer();
-	    double adj = 0.9;
-	    darker.setBackground(new Color((int)((double)c.getRed()*adj),
-					   (int)((double)c.getGreen()*adj),
-					   (int)((double)c.getBlue()*adj)));
-	    */
 	}
 	public Renderer(Color c, Color fg) {
 	    this(c);
 	    setForeground(fg);
 	}
-
-        public void firePropertyChange(String propertyName, boolean old, boolean newV) {
-        }
-        public void firePropertyChange(String propertyName, Object old, Object newV) {
-        }
+        
+        public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
+        public void firePropertyChange(String propertyName, Object old, Object newV) {}
 
 	/* For enabling the renderer to handle icons. */
         protected void setValue(Object value) {
@@ -513,24 +512,17 @@ public class EntryTable extends JTable {
               JLabel lab = (JLabel)value;
               super.setIcon(lab.getIcon());
               super.setToolTipText(lab.getToolTipText());
-              super.setText(null);
+              if (lab.getIcon() != null)
+                super.setText(null);
             } else {
                 setIcon(null);
                 super.setToolTipText(null);
                 super.setValue(value);
             }
 	}
-
-    //public void paintComponent(Graphics g) {
+    
     public void paint(Graphics g) {
-	//Util.pr("her");
-
 	Graphics2D g2 = (Graphics2D)g;
-	//Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
-	//g2.setColor(getBackground());
-	//g2.fill(g2.getClipBounds());
-	//g2.setColor(getForeground());
-	//g2.setFont(f);
 	if (antialiasing) {
 	    RenderingHints rh = g2.getRenderingHints();
 	    rh.put(RenderingHints.KEY_ANTIALIASING,
@@ -539,15 +531,21 @@ public class EntryTable extends JTable {
 		   RenderingHints.VALUE_RENDER_QUALITY);
 	    g2.setRenderingHints(rh);
 	}
-
         ui.update(g2, this);
-
-	//super.paintComponent(g2);
       }
-
-	//public DefaultTableCellRenderer darker() { return darker; }
     }
 
+    class IncompleteRenderer extends Renderer {
+        public IncompleteRenderer() {
+            super(GUIGlobals.tableIncompleteEntryBackground);
+        }
+        protected void setValue(Object value) {
+            String txt = (String)value;
+            super.setText(txt);
+            super.setToolTipText(Globals.lang("This entry is incomplete"));
+        }
+    }
+    
     /* public TableCellRenderer iconRenderer = new IconCellRenderer();
         //new JTableButtonRenderer(getDefaultRenderer(JButton.class));
     class IconCellRenderer extends DefaultTableCellRenderer {

@@ -54,6 +54,7 @@ public class EntryTableModel
       REQ_NUMBER = 2,
       OPT_STRING = 3,
       OTHER = 3,
+      BOOLEAN = 4,
       //PDF_COL = 1, // The column displaying icons for linked pdfs.
       ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
   public static final String[]
@@ -122,7 +123,10 @@ public class EntryTableModel
 
   public Class getColumnClass(int column) {
     //return (getIconTypeForColumn(column) != null ? Icon.class : String.class);
-    return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
+      if (column == 0)
+	  return Boolean.class;
+      else
+	  return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
   }
 
   public Object getValueAt(int row, int col) {
@@ -132,14 +136,16 @@ public class EntryTableModel
     BibtexEntry be = sorter.getEntryAt(row);
     String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
     if (col == 0) {
-      if (!isComplete(row)) {
-      	JLabel incomplete = new JLabel("" + (row + 1),GUIGlobals.incompleteLabel.getIcon(), JLabel.RIGHT);
-//      	JLabel incomplete = new JLabel("" + (row + 1));
-        return incomplete;
-      } else
         o = "" + (row + 1);
-
     }
+/*      if (!isComplete(row)) {
+      	//JLabel incomplete = new JLabel("" + (row + 1),GUIGlobals.incompleteLabel.getIcon(), JLabel.RIGHT);
+        //JLabel incomplete = new JLabel("" + (row + 1));
+        //incomplete.setToolTipText(Globals.lang("This entry is incomplete"));
+        //return incomplete;        
+      } else
+*/
+
     else if (iconType != null) {
       int hasField = -1;
       for (int i=iconType.length-1; i>= 0; i--)
@@ -202,7 +208,7 @@ public class EntryTableModel
   public int getCellStatus(int row, int col) {
     //if ((col == 0)  || (col == 1)) return OTHER;
     if (col == 0) {
-      return OTHER;
+      return BOOLEAN;
     }
     if (getIconTypeForColumn(col) != null) {
       return ICON_COL;
@@ -338,6 +344,7 @@ public class EntryTableModel
   public boolean isCellEditable(int row, int col) {
     if (!Globals.prefs.getBoolean("allowTableEditing"))
       return false;
+
     if (col < padleft) {
       return false;
     }

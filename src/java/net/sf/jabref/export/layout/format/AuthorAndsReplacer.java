@@ -18,6 +18,7 @@ public class AuthorAndsReplacer implements LayoutFormatter {
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
 	public String format(String fieldText) {
+  
 		String[] authors = fieldText.split(" and ");
 		String s;
 	
@@ -42,5 +43,6 @@ public class AuthorAndsReplacer implements LayoutFormatter {
 		}
 		
 		return s;
+ 
 	}
 }

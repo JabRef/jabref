@@ -238,7 +238,7 @@ public class BibtexParser
 	    try {
 		if (key != null)
 		    key = key+parseKey();//parseTextToken(),
-		else key = parseKey();
+		else key = parseKey();                
 	    } catch (NoLabelException ex) {
 		// This exception will be thrown if the entry lacks a key
 		// altogether, like in "@article{ author = { ...".
@@ -246,7 +246,6 @@ public class BibtexParser
 	        char c = (char)peek();
 		if (Character.isWhitespace(c) || (c == '{')
 		    || (c == '\"')) {
-
 		    String cont = parseFieldContent();
 		    result.setField(ex.getMessage().trim().toLowerCase(), cont);
 		} else {
@@ -257,10 +256,11 @@ public class BibtexParser
 		}
 	    }
 	}
-	if (key.equals(""))
+ 
+	if ((key != null) && key.equals(""))
 	    key = null;
 	if(result!=null)result.setField(GUIGlobals.KEY_FIELD, key);
-
+//System.out.println(key+"");
 	skipWhitespace();
 
 	while (true)
@@ -271,8 +271,8 @@ public class BibtexParser
 		break;
 	    }
 
-	    //if (key != null)
-	    consume(',');
+	    if (c == ',')
+                consume(',');
 
 	    skipWhitespace();
 
@@ -426,7 +426,7 @@ public class BibtexParser
         while (true)
         {
             int c = read();
-	    //Util.pr(".. "+c);
+	    //Util.pr(".. '"+(char)c+"'\t"+c);
             if (c == -1)
             {
                 _eof = true;
@@ -437,25 +437,34 @@ public class BibtexParser
 	    // Ikke: #{}\uFFFD~\uFFFD
 	    //
 	    // G\uFFFDr:  $_*+.-\/?"^
-            if (Character.isLetterOrDigit((char) c) ||
+            if (!Character.isWhitespace((char)c) && (Character.isLetterOrDigit((char) c) ||
 		((c != '#') && (c != '{') && (c != '}') && (c != '\uFFFD')
 		 && (c != '~') && (c != '\uFFFD') && (c != ',') && (c != '=')
-		 ))
+		 )))
 	    {
                 token.append((char) c);
             }
             else
             {
-		if (c == ',') {
-		    unread(c);
+                
+                if (Character.isWhitespace((char)c)) {
+                    // We have encountered white space instead of the comma at the end of
+                    // the key. Possibly the comma is missing, so we try to return what we
+                    // have found, as the key.
+                    return token.toString();
+                }
+                else if (c == ',') {
+		    unread(c);        
 		    return token.toString();
 		    //} else if (Character.isWhitespace((char)c)) {
 		    //throw new NoLabelException(token.toString());
 		} else if (c == '=') {
 		    // If we find a '=' sign, it is either an error, or
 		    // the entry lacked a comma signifying the end of the key.
-		    //unread(c);
-		    throw new NoLabelException(token.toString());
+
+                    return token.toString();
+		    //throw new NoLabelException(token.toString());
+                    
 		} else
 		    throw new IOException("Error in line "+line+":"+
 					  "Character '"+(char)c+"' is not "+

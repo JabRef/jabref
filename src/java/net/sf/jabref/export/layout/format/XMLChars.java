@@ -29,7 +29,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.Globals;
 
 /**
- * Changes {\^o} or {\^{o}} to ô
+ * Changes {\^o} or {\^{o}} to ?
  *
  * @author $author$
  * @version $Revision$
@@ -42,14 +42,17 @@ public class XMLChars implements LayoutFormatter
 
     public String format(String fieldText)
     {
+ 
 	fieldText = firstFormat(fieldText);
 
 	//if (!pattern.matcher(fieldText).matches())
 	//    return restFormat(fieldText);
-
+        
 	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
-	    String s = (String)i.next();
-	    fieldText = fieldText.replaceAll(s, (String)Globals.XML_CHARS.get(s));
+	    String s = (String)i.next();         
+            String repl = (String)Globals.XML_CHARS.get(s);
+            if (repl != null)
+                fieldText = fieldText.replaceAll(s, repl);
 	}
 	//RemoveBrackets rb = new RemoveBrackets();
 	return restFormat(fieldText);

@@ -22,9 +22,12 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	 */
 	public String format(String fieldText) 
 	{
+
 		String[] authors = fieldText.split(" and ");
-		
-		return getAbbreviations(authors);
+
+		String abbrev = getAbbreviations(authors);
+		return (abbrev==null ? "" : abbrev);
+
 	}
 				
 	/**
@@ -65,8 +68,9 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		}
 		catch(Exception e)
 		{
-			System.out.println(e);
-			System.exit(-1);
+                    e.printStackTrace();
+                    //	System.out.println(e);
+			//System.exit(-1);
 		}
 		
 		return s;
@@ -84,10 +88,13 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		
 		for(i=0; i<authors.length; i++)
 		{
-			//If the name does not have the comma it is not in the appropriate format.
-			if(authors[i].lastIndexOf(',')==-1)
+			//If the name contains a space, but does not have the comma it is not in the 
+                        // appropriate format.
+			if((authors[i].indexOf(' ') >= 0) && (authors[i].lastIndexOf(',')==-1))
 			{
-				throw new Exception("Error: names must be rearranged in Last, First format before formatted with AuthorLastFirstAbbreviator");
+                            Exception e = new Exception("Error: names must be rearranged in Last, First format before formatted with AuthorLastFirstAbbreviator");
+                            e.printStackTrace();
+                            throw e;
 			}
 		}
 	}
@@ -101,7 +108,11 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	 */
 	private String getAbbreviation(String string) {
 		String[] author = string.split(", ");
-		
+                
+                // If there is no comma in the name, we return it as it is:
+		if (author.length < 2)
+                    return string;
+                
 		char c;
 		String s;
 		//Gets the name:

@@ -540,6 +540,7 @@ public class EntryEditor
           req.add( ex1 ) ;
         }
       }
+      con.weightx = 1 ;
       if ( i < omax )
       {
         if ( ex2 != null )
@@ -565,6 +566,7 @@ public class EntryEditor
           opt.add( ex2 ) ;
         }
       }
+      con.weightx = 1 ;
       if ( i < gmax )
       {
         if ( ex3 != null )
@@ -593,6 +595,7 @@ public class EntryEditor
           con.anchor = GridBagConstraints.CENTER ;
         }
       }
+      con.weightx = 1 ;
       if ( i < amax )
       {
         if ( ex4 != null )
@@ -884,7 +887,7 @@ public class EntryEditor
 
   private void setupJTextComponent( JTextComponent ta )
   {
-
+    
     // Activate autocompletion if it should be used for this field.
     /*
       if ((ta instanceof FieldTextArea) &&
@@ -1321,6 +1324,7 @@ public class EntryEditor
       }
       else if ( e.getSource() instanceof FieldTextField )
       {
+          
         // Storage from bibtex key field.
         FieldTextField fe = ( FieldTextField ) e.getSource() ;
         String oldValue = entry.getCiteKey(),
@@ -1378,6 +1382,7 @@ public class EntryEditor
           //fe.setLabelColor(GUIGlobals.nullFieldColor);
           fe.setBackground( GUIGlobals.validFieldBackground ) ;
         }
+        updateSource();
         panel.refreshTable() ;
         panel.markBaseChanged() ;
 
@@ -1661,6 +1666,7 @@ public class EntryEditor
             ( Globals.KEY_FIELD ) ;
         // set the field named for "bibtexkey"
         setField( Globals.KEY_FIELD, bibtexKeyData ) ;
+        updateSource() ;
         panel.markBaseChanged() ;
         panel.refreshTable() ;
       }
@@ -2015,7 +2021,8 @@ public class EntryEditor
   // Update the JTextArea when a field has changed.
   public void vetoableChange( PropertyChangeEvent e )
   {
-    setField( e.getPropertyName(), e.getNewValue().toString() ) ;
+    String newValue = (e.getNewValue() != null ? e.getNewValue().toString() : "");
+    setField( e.getPropertyName(), newValue) ;
     //Util.pr(e.getPropertyName());
   }
 

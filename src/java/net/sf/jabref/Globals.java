@@ -431,6 +431,7 @@ public class Globals {
     HTMLCHARS.put("~a", "&atilde;");
     HTMLCHARS.put("~A", "&Atilde;");
     HTMLCHARS.put("cc", "&ccedil;");
+    HTMLCHARS.put("cC", "&Ccedil;");
 
     HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
@@ -546,16 +547,16 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\`O\\}", "&#x00D2;");
     XML_CHARS.put("\\{\\\\\\`u\\}", "&#x00F9;");
     XML_CHARS.put("\\{\\\\\\`U\\}", "&#x00D9;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDe\\}", "&#x00E9;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDE\\}", "&#x00C9;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDi\\}", "&#x00ED;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDI\\}", "&#x00CD;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDo\\}", "&#x00F3;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDO\\}", "&#x00D3;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDu\\}", "&#x00FA;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDU\\}", "&#x00DA;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDa\\}", "&#x00E1;");
-    XML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&#x00C1;");
+    XML_CHARS.put("\\{\\\\\\'e\\}", "&#x00E9;");
+    XML_CHARS.put("\\{\\\\\\'E\\}", "&#x00C9;");
+    XML_CHARS.put("\\{\\\\\\'i\\}", "&#x00ED;");
+    XML_CHARS.put("\\{\\\\\\'I\\}", "&#x00CD;");
+    XML_CHARS.put("\\{\\\\\\'o\\}", "&#x00F3;");
+    XML_CHARS.put("\\{\\\\\\'O\\}", "&#x00D3;");
+    XML_CHARS.put("\\{\\\\\\'u\\}", "&#x00FA;");
+    XML_CHARS.put("\\{\\\\\\'U\\}", "&#x00DA;");
+    XML_CHARS.put("\\{\\\\\\'a\\}", "&#x00E1;");
+    XML_CHARS.put("\\{\\\\\\'A\\}", "&#x00C1;");
 
     XML_CHARS.put("\\{\\\\\\^o\\}", "&#x00F4;");
     XML_CHARS.put("\\{\\\\\\^O\\}", "&#x00D4;");

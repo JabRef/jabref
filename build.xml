@@ -83,7 +83,7 @@
                 <mkdir dir="${build.classes}"/>
 			<!--deprecation="on"-->
                 <javac srcdir="${java.dir}"
-                        debug="on"
+                        debug="off"
 			destdir="${build.classes}"
 			source="1.4"
                         target="1.4">

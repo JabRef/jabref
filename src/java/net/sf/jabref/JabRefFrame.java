@@ -1554,7 +1554,8 @@ class ImportCiteSeerAction
                         (new Thread() {
 
                                 BasePanel currentBp;
-                                String id;
+                                BibtexEntry toShow;
+                                //String id;
                                 int[] clickedOn = null;
 
                                 class UpdateComponent implements Runnable {
@@ -1569,11 +1570,11 @@ class ImportCiteSeerAction
                                             if (changesMade)
                                                     currentBp.markBaseChanged();
                                                 currentBp.refreshTable();
-                                                for(int i=0; i < clickedOn.length; i++)
-                                                        currentBp.entryTable.addRowSelectionInterval(i,i);
-                                                currentBp.updateViewToSelected();
+                                                //for(int i=0; i < clickedOn.length; i++)
+                                                //        currentBp.entryTable.addRowSelectionInterval(i,i);
+                                                //currentBp.showEntry(toShow);
                                                 output(Globals.lang("Completed Import Fields from CiteSeer."));
-                                                 }
+                                        }
                                 };
 
                             public void run() {
@@ -1588,6 +1589,7 @@ class ImportCiteSeerAction
                                                 Globals.lang("CiteSeer Import Error"),
                                                 JOptionPane.WARNING_MESSAGE);
                                         }
+                                        toShow = currentBp.database().getEntryById(currentBp.getTableModel().getNameFromNumber(clickedOn[0]));
                                         if (clickedOn != null) {
                                                 basePanel().citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =

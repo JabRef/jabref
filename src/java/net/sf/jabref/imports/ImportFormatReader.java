@@ -852,10 +852,7 @@ public class ImportFormatReader
 	    }
 	    // fix authors
 	    Author = fixAuthor_lastnameFirst(Author);
-	    if(Author.endsWith("."))
-		hm.put("author", Author.substring(0,Author.length()-1));
-	    else
-		hm.put("author", Author);
+            hm.put("author", Author);
 
 	    hm.put("pages",StartPage+"--"+EndPage);
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
@@ -1149,9 +1146,9 @@ public class ImportFormatReader
 			frest=frest.trim();
 			if(frest.equals("Monograph"))
 			    Type="book";
-			else if(frest.equals("Journal-Article"))
+			else if(frest.toLowerCase().indexOf("journal") >= 0)
 			    Type="article";
-			else if(frest.equals("Contribution")) {
+			else if(frest.equals("Contribution") || frest.equals("Chapter")) {
 			    Type="incollection";
 			    // This entry type contains page numbers and booktitle in the title field.
 			    // We assume the title field has been set already.
@@ -1207,7 +1204,7 @@ public class ImportFormatReader
       try {
         BufferedReader in = new BufferedReader(new FileReader(filename));
 
-        while (!s.startsWith("Item Type"))
+        while ((s != null) && !s.startsWith("Item Type"))
           s = in.readLine();
 
         mainloop: while ((s = in.readLine()) != null) {

@@ -26,6 +26,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
 	if (!specific)
 	    return (filenm.endsWith(".bib")
 		    || file.isDirectory()
+                    || filenm.endsWith(".dat") // silverplatter ending
 		    || filenm.endsWith(".txt")
 		    || filenm.endsWith(".ref") // refer/endnote format
 		    || filenm.endsWith(".fcgi") // default for pubmed
@@ -37,7 +38,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
     }
     public String getDescription(){
 	if (!specific)
-	    return "*.bib, *.bibx, *.txt, *.xml, *.ref or *.fcgi";
+	    return "*.bib, *.bibx, *.dat, *.txt, *.xml, *.ref or *.fcgi";
 	else
 	    return "*"+filetype;
     }

@@ -77,7 +77,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "volume", "number", "pages", "month", "eid", "note"
+                    "month", "eid", "note"
                 };
             }
 
@@ -85,7 +85,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "journal", "year"
+                    "author", "title", "journal", "year", "volume", "number", "pages"
                 };
             }
 
@@ -98,7 +98,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return entry.allFieldsPresent(new String[]
                     {
-                        "author", "title", "journal", "year", "bibtexkey"
+                        "author", "title", "journal", "year", "bibtexkey", "volume", "number", "pages"
                     });
             }
         };
@@ -115,7 +115,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "howpublished", "address", "month", "year", "note"
+                    "author", "howpublished", "lastchecked", "address", "month", "year", "note"
                 };
             }
 

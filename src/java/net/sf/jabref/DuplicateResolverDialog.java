@@ -30,7 +30,7 @@ public class DuplicateResolverDialog extends JDialog {
 	DUPLICATE_SEARCH = 1,
 	IMPORT_CHECK = 2;
 
-    final Dimension DIM = new Dimension(650, 450);
+    final Dimension DIM = new Dimension(650, 600);
     
     PreviewPanel p1, p2;
     JTextArea ta1, ta2;
@@ -66,7 +66,10 @@ public class DuplicateResolverDialog extends JDialog {
     ta2 = new JTextArea();
     ta1.setEditable(false);
     ta2.setEditable(false);
-
+    
+    //ta1.setPreferredSize(dim); 
+    //ta2.setPreferredSize(dim);
+    
     setSourceView(one, two);
 
     //getContentPane().setLayout();
@@ -146,7 +149,16 @@ public class DuplicateResolverDialog extends JDialog {
     getContentPane().add(tabbed, BorderLayout.CENTER);
     getContentPane().add(options, BorderLayout.SOUTH);
     pack();
-    //setSize(DIM);
+    
+    
+    if (getHeight() > DIM.height) {
+        setSize(new Dimension(getWidth(), DIM.height));
+    }
+    if (getWidth() > DIM.width) {
+        setSize(new Dimension(DIM.width, getHeight()));
+    }
+    
+    
     both.requestFocus();
     Util.placeDialog(this, frame);
   }

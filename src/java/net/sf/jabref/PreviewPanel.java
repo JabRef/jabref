@@ -132,11 +132,12 @@ public class PreviewPanel extends JEditorPane {
     entry = newEntry;
     try {
       readLayout();
+      update();
     }
     catch (Exception ex) {
+        ex.printStackTrace();
     }
-    update();
-    //Util.pr("to");
+    
   }
 
   public void update() {

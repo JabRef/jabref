@@ -1219,6 +1219,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
               actions.put("markEntries", new BaseAction() {
                 public void action() {
+
                   NamedCompound ce = new NamedCompound("Mark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   for (int i=0; i<bes.length; i++) {
@@ -1230,11 +1231,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                   undoManager.addEdit(ce);
                   markBaseChanged();
                   refreshTable();
+                  output(Globals.lang("Marked selected")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+
                 }
               });
 
               actions.put("unmarkEntries", new BaseAction() {
                 public void action() {
+                    try {
                   NamedCompound ce = new NamedCompound("Unmark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   for (int i=0; i<bes.length; i++) {
@@ -1246,6 +1250,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                   undoManager.addEdit(ce);
                   markBaseChanged();
                   refreshTable();
+                  output(Globals.lang("Unmarked selected")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                    } catch (Throwable ex) { ex.printStackTrace(); }
                 }
               });
 
@@ -1395,13 +1401,22 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                 output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
                        +Globals.lang("entry")+".");
                 refreshTable();
-                int row = tableModel.getNumberFromName(id);
+                final int row = tableModel.getNumberFromName(id);
                 //Util.pr(""+row);
-                entryTable.clearSelection();
-                entryTable.scrollTo(row);
+                entryTable.clearSelection();                
                 markBaseChanged(); // The database just changed.
                 if (prefs.getBoolean("autoOpenForm")) {
                     showEntry(be);
+                    /*
+                    SwingUtilities.invokeLater(new Thread() {
+                        public void run() {
+                            entryTable.revalidate();
+                            entryTable.setRowSelectionInterval(row, row);
+                            entryTable.scrollTo(row);        
+                        }
+                    });*/
+                    
+                    
                     //EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
                     //Util.placeDialog(etf, frame);
                     //etf.setVisible(true);
@@ -1617,9 +1632,11 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         // stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
         //entryTable.invalidate();
+        BibtexEntry[] bes = entryTable.getSelectedEntries();
         tableModel.remap();
-
-        //entryTable.revalidate();
+        if ((bes != null) && (bes.length > 0))
+            highlightEntries(bes, 0);
+        //entryTable.revalidate();r
         //entryTable.repaint();
     }
 
@@ -1729,7 +1746,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
               && (splitPane.getBottomComponent() instanceof EntryEditor));
     }
 
-    public void showEntry(BibtexEntry be) {
+    public void showEntry(final BibtexEntry be) {
         if (showing == be) {
             if (splitPane.getBottomComponent() == null) {
                 // This is the special occasion when showing is set to an
@@ -1765,17 +1782,16 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             if (visPan >= 0)
               form.setVisiblePanel(visPan);
             splitPane.setBottomComponent(form);
-            //splitPane.revalidate();
-            //entryTable.ensureVisible(entryTable.getSelectedRow());
+            highlightEntry(be);
         } else {
             // We must instantiate a new editor for this type.
             form = new EntryEditor
                 (frame, ths, be, prefs);
             if (visPan >= 0)
                 form.setVisiblePanel(visPan);
-            splitPane.setBottomComponent(form);
-            //splitPane.revalidate();
-            //entryTable.ensureVisible(entryTable.getSelectedRow());
+            splitPane.setBottomComponent(form);            
+            
+            highlightEntry(be);
             entryEditors.put(be.getType().getName(), form);
            
         }
@@ -1814,6 +1830,48 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 */
     }
 
+    /**
+     * This method selects the given entry, and scrolls it into view in the table.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightEntry(final BibtexEntry be) {
+        SwingUtilities.invokeLater(new Thread() {
+             public void run() {                                          
+                 entryTable.revalidate();
+                 int row = tableModel.getNumberFromName(be.getId());
+                 //System.out.println("eee:"+row);
+                 entryTable.setRowSelectionInterval(row, row);
+                 entryTable.ensureVisible(row);
+                 Component comp = splitPane.getBottomComponent();
+                 if (comp instanceof EntryEditor)
+                     comp.requestFocus();
+             }
+        });
+    }
+    
+    /**
+     * This method selects the given enties.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightEntries(final BibtexEntry[] bes, final int toScrollTo) {
+        SwingUtilities.invokeLater(new Thread() {
+             public void run() {    
+                 int rowToScrollTo = 0;
+                 entryTable.revalidate();
+                 for (int i=0; i<bes.length; i++) {                     
+                    int row = tableModel.getNumberFromName(bes[i].getId());                    
+                    if (i==toScrollTo)
+                        rowToScrollTo = row;
+                    entryTable.addRowSelectionIntervalQuietly(row, row);
+                 }
+                 entryTable.ensureVisible(rowToScrollTo);
+                 Component comp = splitPane.getBottomComponent();
+                 if (comp instanceof EntryEditor)
+                     comp.requestFocus();
+             }
+        });
+    }
+    
     /**
      * Closes the entry editor if it is showing the given entry.
      *

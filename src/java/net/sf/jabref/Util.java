@@ -368,11 +368,17 @@ public class Util {
         // check html first since browser can invoke viewers
         if (fieldName.equals("doi"))
             {
-                cmdArray[0] = prefs.get("htmlviewer");
-                cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
-                Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+                //cmdArray[0] = prefs.get("htmlviewer");
+                //cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
+                //Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+                fieldName = "url";
+                link = Globals.DOI_LOOKUP_PREFIX+link;
+                //String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"), 
+                //                Globals.DOI_LOOKUP_PREFIX+link};
+                //Process child = Runtime.getRuntime().exec(cmd);
             }
-        else if(fieldName.equals("url") || fieldName.equals("citeseerurl"))
+        
+        if(fieldName.equals("url") || fieldName.equals("citeseerurl"))
             { // html
                 try
                 {
