@@ -62,7 +62,8 @@ public class EntryTableModel extends AbstractTableModel {
 	frame = frame_;
 	db = db_;
 
-	readColumnNames(); // This must be done again if the column
+	columns = panel.prefs
+	    .getStringArray("columnNames"); // This must be done again if the column
 	                   // preferences get changed.
 						      
 	remap();
@@ -278,15 +279,4 @@ public class EntryTableModel extends AbstractTableModel {
 	return res;
     }
 
-    private void readColumnNames() {
-	String names = frame.prefs.get("columnNames");
-	StringTokenizer tok = new StringTokenizer(names, ":", false);
-	columns = new String[tok.countTokens()];
-	int i=0;
-	while (tok.hasMoreTokens()) {
-	    columns[i] = tok.nextToken();
-	    i++;
-	}
-	    
-    }
 }

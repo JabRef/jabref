@@ -97,8 +97,7 @@ public class JabRefFrame extends JFrame {
 					GUIGlobals.stringsIconFile),
 	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups inteface", 
 					 "Toggle groups inteface",
-					 GUIGlobals.groupsIconFile);
-	
+					 GUIGlobals.groupsIconFile);	
 
     public JabRefFrame() {
 	//Globals.setLanguage("no", "");
@@ -315,7 +314,8 @@ public class JabRefFrame extends JFrame {
 	JMenu file = new JMenu(Globals.lang("File")),
 	    edit = new JMenu(Globals.lang("Edit")),
 	    bibtex = new JMenu(Globals.lang("Bibtex")),
-	    view = new JMenu(Globals.lang("View"));
+	    view = new JMenu(Globals.lang("View")),
+	    options = new JMenu(Globals.lang("Options"));
 	file.add(newDatabaseAction);
 	file.add(open);
 	file.add(save);
@@ -340,6 +340,9 @@ public class JabRefFrame extends JFrame {
 	bibtex.add(editPreamble);
 	bibtex.add(editStrings);
 	mb.add(bibtex);
+
+	options.add(showPrefs);
+	mb.add(options);
 
 	/*
 	file.add(mItem(newDatabaseAction, null));
@@ -614,32 +617,28 @@ public class JabRefFrame extends JFrame {
 
 
     // The action for opening the preferences dialog.
-    SetupTableAction setupTableAction = new SetupTableAction();
-    class SetupTableAction extends AbstractAction {
-	public SetupTableAction() {
+    AbstractAction showPrefs = new ShowPrefsAction();
+    class ShowPrefsAction extends AbstractAction {
+	public ShowPrefsAction() {
 	    super(Globals.lang("Preferences"), 
 		  new ImageIcon(GUIGlobals.prefsIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
 	}    
-	public void actionPerformed(ActionEvent e) {
-	    Util.pr("JabRefFrame: must show preferences dialog.");
-	    /*
+	public void actionPerformed(ActionEvent e) {	    
 		PrefsDialog.showPrefsDialog(ths, prefs);
 		// This action can be invoked without an open database, so
 		// we have to check if we have one before trying to invoke
 		// methods to execute changes in the preferences.
 
-		// We want to notify all frames about the changes to 
-		// avoid problems when changing the column set.
-		java.util.Iterator i = GUIGlobals.frames.keySet().iterator();
-		for (; i.hasNext();) {
-		    BibtexBaseFrame bf = (BibtexBaseFrame)
-			(GUIGlobals.frames.get(i.next()));
+		// We want to notify all tabs about the changes to 
+		// avoid problems when changing the column set.	       
+		for (int i=0; i<tabbedPane.getTabCount(); i++) {
+		    BasePanel bf = baseAt(i);
 		    if (bf.database != null) {
 			bf.setupMainPanel();
 		    }
 		}
-	    */
+	    
 	}
     }
 

@@ -58,7 +58,7 @@ public class JabRefPreferences {
 	defaults.put("terSort", "author");
 	defaults.put("terDescending", new Boolean(false));
 	defaults.put("columnNames",
-		     "author:title:year:journal:bibtexkey");
+		     "author;title;year;journal;bibtexkey");
 	defaults.put("workingDirectory", (String)null);
 	
 	defaults.put("autoOpenForm", new Boolean(true));
@@ -133,4 +133,87 @@ public class JabRefPreferences {
     public void remove(String key) {
 	prefs.remove(key);
     }
+
+    /**
+     * Puts a string array into the Preferences, by linking its elements
+     * with ';' into a single string. Escape characters make the process
+     * transparent even if strings contain ';'.
+     */
+    public void putStringArray(String key, String[] value) {
+	StringBuffer linked = new StringBuffer();
+	if (value.length > 0) {
+	    for (int i=0; i<value.length-1; i++) {
+		linked.append(makeEscape(value[i]));
+		linked.append(";");
+	    }
+	}
+	linked.append(makeEscape(value[value.length-1]));
+	put(key, linked.toString());
+    }
+
+    /**
+     * Returns a String[] containing the chosen columns.
+     */
+    public String[] getStringArray(String key) {
+	String names = get(key);
+	Util.pr(key+"\n"+names);
+	StringReader rd = new StringReader(names);
+	Vector arr = new Vector();
+	String rs;
+	try {
+	    while ((rs = getNextUnit(rd)) != null) {
+		arr.add(rs);
+		Util.pr("::"+rs);
+	    }
+	} catch (IOException ex) {}
+	String[] res = new String[arr.size()];
+	for (int i=0; i<res.length; i++)
+	    res[i] = (String)arr.elementAt(i);
+
+	return res;
+    }
+
+
+    private String getNextUnit(Reader data) throws IOException {
+	int c;
+	boolean escape = false, done = false;
+	StringBuffer res = new StringBuffer();
+	while (!done && ((c = data.read()) != -1)) {
+	    if (c == '\\') {
+		if (!escape)
+		    escape = true;
+		else {
+		    escape = false;
+		    res.append('\\');
+		}
+	    } else {
+		if (c == ';') {
+		    if (!escape)
+			done = true;
+		    else
+			res.append(';');
+		} else {
+		    res.append((char)c);
+		}
+		escape = false;
+	    }
+	}
+	if (res.length() > 0)
+	    return res.toString();
+	else 
+	    return null;
+    }
+
+    private String makeEscape(String s) {
+        StringBuffer sb = new StringBuffer();
+	int c;
+	for (int i=0; i<s.length(); i++) {
+	    c = s.charAt(i);
+	    if ((c == '\\') || (c == ';'))
+		sb.append('\\');
+	    sb.append((char)c);
+	}
+	return sb.toString();
+    }
+
 }
