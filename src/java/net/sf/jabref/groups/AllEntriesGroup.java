@@ -65,4 +65,8 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     public String toString() {
         return ID;
     }
+
+    public boolean contains(BibtexEntry entry) {
+        return true;
+    }
 }

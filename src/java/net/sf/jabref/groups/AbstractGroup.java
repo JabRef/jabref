@@ -93,9 +93,15 @@ public abstract class AbstractGroup {
     public abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
 
     /**
+     * @param searchOptions The search options to apply.
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(Map searchOptions, BibtexEntry entry);
+
+    /**
+     * @return true if this group contains the specified entry, false otherwise.
+     */
+    public abstract boolean contains(BibtexEntry entry);
 
     /**
      * @return A deep copy of this object.

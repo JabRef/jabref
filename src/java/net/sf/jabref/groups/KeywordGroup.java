@@ -236,6 +236,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      *      net.sf.jabref.BibtexEntry)
      */
     public boolean contains(Map searchOptions, BibtexEntry entry) {
+        return contains(entry);
+    }
+
+    public boolean contains(BibtexEntry entry) {
         String content = (String) entry.getField(m_searchField);
         if ((content != null) && (m_pattern.matcher(content).find()))
             return true;

@@ -65,6 +65,10 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }
+    
+    public boolean addEntry(BibtexEntry entry) {
+        return m_entries.add(entry);
+    }
 
     public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
         BibtexEntry[] bes = basePanel.getSelectedEntries();
@@ -78,8 +82,16 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }
 
-    public boolean contains(Map searchOptions, BibtexEntry entry) {
+    public boolean removeEntry(BibtexEntry entry) {
+        return m_entries.remove(entry);
+    }
+
+    public boolean contains(BibtexEntry entry) {
         return m_entries.contains(entry);
+    }
+
+    public boolean contains(Map searchOptions, BibtexEntry entry) {
+        return contains(entry);
     }
 
     public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {

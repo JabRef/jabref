@@ -1,7 +1,7 @@
 package net.sf.jabref.groups;
 
 import java.io.StringReader;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -172,6 +172,11 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      */
     public boolean contains(Map searchOptions, BibtexEntry entry) {
         return m_searchRule.applyRule(searchOptions,entry) == 0 ? false : true;
+    }
+
+    public boolean contains(BibtexEntry entry) {
+        // use dummy map
+        return contains(new HashMap(), entry);
     }
     
     public int applyRule(Map searchOptions, BibtexEntry entry) {
