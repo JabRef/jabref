@@ -26,11 +26,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import java.util.Hashtable; 
+import java.util.Map;
 
 public interface SearchRule{
 
-    public int applyRule(Hashtable searchStrings,BibtexEntry bibtexEntry) ;
+    public int applyRule(Map searchStrings,BibtexEntry bibtexEntry) ;
 
 }
 

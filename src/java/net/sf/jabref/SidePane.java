@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import javax.swing.*;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;

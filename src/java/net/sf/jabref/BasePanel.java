@@ -27,22 +27,22 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
-
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.undo.*;
+import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.external.*;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.labelPattern.*;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
-import net.sf.jabref.collab.*;
-import net.sf.jabref.wizard.text.gui.*;
+import net.sf.jabref.wizard.text.gui.TextInputDialog;
 
 public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -112,10 +112,12 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
 
+    /**
+     * The group selector component for this database. Instantiated by the
+     * SidePaneManager if necessary, or from this class if merging groups from a
+     * different database.
+     */
     GroupSelector groupSelector;
-    // The group selector component for this database. Instantiated by the SidePaneManager if necessary,
-    // or from this class if merging groups from a different database.
-
 
     boolean sortingBySearchResults = false,
         coloringBySearchResults = false,
@@ -608,11 +610,11 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
         // The action for toggling the groups interface
         actions.put("toggleGroups", new BaseAction() {
-                public void action() {
-                  sidePaneManager.togglePanel("groups");
-                  frame.groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
-                }
-            });
+            public void action() {
+              sidePaneManager.togglePanel("groups");
+              frame.groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
+            }
+        });
 
 	// The action for pushing citations to an open Lyx/Kile instance:
         actions.put("pushToLyX", new PushToLyx(ths));
@@ -925,17 +927,16 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     }
 
                     if (importGroups) {
-                      Vector newGroups = meta.getData("groups");
+                      GroupTreeNode newGroups = meta.getGroups();
                       if (newGroups != null) {
-                        /*if (groupSelector == null) {
-                          // The current database has no group selector defined, so we must instantiate one.
-                          groupSelector = new GroupSelector
-                              (frame, ths, new Vector(), sidePaneManager, prefs);
-                          sidePaneManager.register("groups", groupSelector);
-                        }*/
+                          
+                          // ensure that there is always only one AllEntriesGroup
+                          if (newGroups.getGroup() instanceof AllEntriesGroup)
+                              newGroups.setGroup(new ExplicitGroup("Imported Groups"));
+                          
 
                         groupSelector.addGroups(newGroups, ce);
-                        groupSelector.revalidateList();
+                        groupSelector.revalidateGroups();
                       }
                     }
 
@@ -2151,6 +2152,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public EntryTableModel getTableModel(){
                 return tableModel ;
     }
+    
+    public BibtexEntry[] getSelectedEntries() {
+        return entryTable.getSelectedEntries();
+    }
+
+    public boolean isEntriesSelected() {
+        return entryTable.getSelectedRows().length > 0;
+    }
 
     public BibtexDatabase getDatabase(){
         return database ;
@@ -2162,124 +2171,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     public void stringsClosing() {
         stringDialog = null;
-    }
-
-    public void addToGroup(String groupName, String regexp, String field) {
-
-        boolean giveWarning = false;
-        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-            if (field.equals(GUIGlobals.ALL_FIELDS[i])
-                && !field.equals("keywords")) {
-                giveWarning = true;
-                break;
-            }
-        }
-        if (giveWarning) {
-            String message = "This action will modify the '"+field+"' field "
-                +"of your entries.\nThis could cause undesired changes to "
-                +"your entries, so it\nis recommended that you change the field "
-                +"in your group\ndefinition to 'keywords' or a non-standard name."
-                +"\n\nDo you still want to continue?";
-            int choice = JOptionPane.showConfirmDialog
-                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE);
-
-            if (choice == JOptionPane.NO_OPTION)
-                return;
-        }
-
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0)) {
-            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-            NamedCompound ce = new NamedCompound("add to group");
-            boolean hasEdits = false;
-            for (int i=0; i<bes.length; i++) {
-                if (qsr.applyRule(null, bes[i]) == 0) {
-                    String oldContent = (String)bes[i].getField(field),
-                        pre = " ",
-                        post = "";
-                    String newContent =
-                        (oldContent==null ? "" : oldContent+pre)
-                        +regexp+post;
-                    bes[i].setField
-                        (field, newContent);
-
-                    // Store undo information.
-                    ce.addEdit(new UndoableFieldChange
-                               (bes[i], field, oldContent, newContent));
-                    hasEdits = true;
-                }
-            }
-            if (hasEdits) {
-                ce.end();
-                undoManager.addEdit(ce);
-                refreshTable();
-                markBaseChanged();
-                updateEntryEditorIfShowing();
-                updateViewToSelected();
-            }
-
-            output("Appended '"+regexp+"' to the '"
-                   +field+"' field of "+bes.length+" entr"+
-                   (bes.length > 1 ? "ies." : "y."));
-        }
-    }
-
-    public void removeFromGroup
-        (String groupName, String regexp, String field) {
-
-        boolean giveWarning = false;
-        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-            if (field.equals(GUIGlobals.ALL_FIELDS[i])
-                && !field.equals("keywords")) {
-                giveWarning = true;
-                break;
-            }
-        }
-        if (giveWarning) {
-            String message = "This action will modify the '"+field+"' field "
-                +"of your entries.\nThis could cause undesired changes to "
-                +"your entries, so it\nis recommended that you change the field "
-                +"in your group\ndefinition to 'keywords' or a non-standard name."
-                +"\n\nDo you still want to continue?";
-            int choice = JOptionPane.showConfirmDialog
-                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
-                 JOptionPane.WARNING_MESSAGE);
-
-            if (choice == JOptionPane.NO_OPTION)
-                return;
-        }
-
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0)) {
-            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-            NamedCompound ce = new NamedCompound("remove from group");
-            boolean hasEdits = false;
-            for (int i=0; i<bes.length; i++) {
-                if (qsr.applyRule(null, bes[i]) > 0) {
-                    String oldContent = (String)bes[i].getField(field);
-                    qsr.removeMatches(bes[i]);
-                                        // Store undo information.
-                    ce.addEdit(new UndoableFieldChange
-                               (bes[i], field, oldContent,
-                                bes[i].getField(field)));
-                    hasEdits = true;
-                }
-            }
-            if (hasEdits) {
-                ce.end();
-                undoManager.addEdit(ce);
-                refreshTable();
-                markBaseChanged();
-                updateEntryEditorIfShowing();
-                updateViewToSelected();
-            }
-
-            output("Removed '"+regexp+"' from the '"
-                   +field+"' field of "+bes.length+" entr"+
-                   (bes.length > 1 ? "ies." : "y."));
-        }
-
     }
 
     public void changeType(BibtexEntry entry, BibtexEntryType type) {
@@ -2436,5 +2327,9 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
   public void setUpdatedExternally(boolean b) {
     updatedExternally = b;
+  }
+  
+  public void addEntryTableSelectionListener(ListSelectionListener listener) {
+      entryTable.getSelectionModel().addListSelectionListener(listener);
   }
 }

@@ -26,8 +26,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import java.util.Hashtable; 
-import java.util.Enumeration ; 
+import java.util.*;
+import java.util.Enumeration ;
 
 public class SimpleSearchRule implements SearchRule{
 
@@ -38,17 +38,18 @@ public class SimpleSearchRule implements SearchRule{
     }
 
 
-    public int applyRule(Hashtable searchStrings,BibtexEntry bibtexEntry) {
+    public int applyRule(Map searchStrings,BibtexEntry bibtexEntry) {
 
         int score = 0 ; 
         int counter = 0 ;
 
-        Enumeration e = searchStrings.elements() ; 
+        Iterator e = searchStrings.values().iterator(); 
 
-        String searchString = (String) e.nextElement() ; 
+        String searchString = (String) e.next(); 
         String upperString = null ; 
         try{
-            upperString = searchString.substring(0,1).toUpperCase() + searchString.substring(1).toLowerCase() ;  
+            upperString = searchString.substring(0,1).toUpperCase() 
+            + searchString.substring(1).toLowerCase() ;  
         }catch(Throwable t){
 			System.err.println(t) ; 
             upperString = searchString ; 

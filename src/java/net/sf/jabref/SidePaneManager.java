@@ -26,11 +26,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import javax.swing.*;
-import java.util.LinkedHashMap;
-import java.util.Vector;
-import net.sf.jabref.groups.GroupSelector;
-import java.util.Iterator;
+import java.util.*;
+
+import net.sf.jabref.groups.*;
 
 public class SidePaneManager {
 
@@ -58,32 +56,31 @@ public class SidePaneManager {
 
     public void populatePanel() {
 
-	// Groups
-        if (metaData.getData("groups") != null) {
-          panel.groupSelector = new GroupSelector
-              (frame, panel, metaData.getData("groups"), this, prefs);
-          register("groups", panel.groupSelector);
-          if (prefs.getBoolean("groupSelectorVisible"))
-            ensureVisible("groups");
+        // Groups
+        if (metaData.getGroups() != null) {
+            panel.groupSelector = new GroupSelector(frame, panel, metaData
+                    .getGroups(), this, prefs);
+            register("groups", panel.groupSelector);
+            if (prefs.getBoolean("groupSelectorVisible"))
+                ensureVisible("groups");
         } else {
-          Vector v = new Vector();
-          metaData.putData("groups", v);
-          panel.groupSelector = new GroupSelector
-              (frame, panel, v, this, prefs);
-          register("groups", panel.groupSelector);
-	}
-	/*
-	if (components.size() > 0) {
-	    panel.setLeftComponent(sidep);
-	} else
-	    panel.setLeftComponent(null);
-	*/
-	updateView();
+            GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
+            metaData.setGroups(newGroupsRoot);
+            panel.groupSelector = new GroupSelector(frame, panel,
+                    newGroupsRoot, this, prefs);
+            register("groups", panel.groupSelector);
+        }
+        
+        /*
+         * if (components.size() > 0) { panel.setLeftComponent(sidep); } else
+         * panel.setLeftComponent(null);
+         */
+        updateView();
 
-	if (components.size() > 0) {
-	    sidep.setVisible(true);
-	} else
-	    sidep.setVisible(false);
+        if (components.size() > 0)
+            sidep.setVisible(true);
+        else
+            sidep.setVisible(false);
     }
 
     public boolean isPanelVisible(String name) {
@@ -112,29 +109,6 @@ public class SidePaneManager {
         }
 
       } else System.err.println("Side pane component '"+name+"' unknown.");
-      /*
-	if (components.get(name) != null) {
-	    if (!((SidePaneComponent)components.get(name)).isVisible()) {
-		visibleComponents++;
-		((SidePaneComponent)components.get(name)).setVisible(true);
-		if (visibleComponents == 1)
-		    panel.setLeftComponent(sidep);
-
-		((SidePaneComponent)components.get(name)).componentOpening();
-		((SidePaneComponent)components.get(name)).setVisibility(true);
-	    } else {
-		hideAway((SidePaneComponent)components.get(name));
-	    }
-	    return; // Component already there.
-	}
-	if (name.equals("groups")) {
-	    if (metaData.getData("groups") == null)
-		metaData.putData("groups", new Vector());
-	    panel.groupSelector = new GroupSelector
-		(frame, panel, metaData.getData("groups"), this, prefs);
-	    add("groups", panel.groupSelector);
-	}
-       */
     }
 
     public synchronized void ensureVisible(String name) {

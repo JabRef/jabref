@@ -26,7 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import java.util.Hashtable; 
+import java.util.*;
 import java.util.Enumeration ; 
 import java.util.regex.Pattern;
 
@@ -38,12 +38,12 @@ public class RegExpRule implements SearchRule{
 	this.prefs = prefs;
     }
 
-    public int applyRule(Hashtable searchStrings,BibtexEntry bibtexEntry) {
+    public int applyRule(Map searchStrings,BibtexEntry bibtexEntry) {
 
         int score =0 ; 
-        Enumeration e = searchStrings.elements() ; 
+        Iterator e = searchStrings.values().iterator(); 
 
-        String searchString = (String) e.nextElement() ; 
+        String searchString = (String) e.next() ; 
         if(!searchString.matches("\\.\\*")){
             searchString = ".*"+searchString+".*" ; 
         }

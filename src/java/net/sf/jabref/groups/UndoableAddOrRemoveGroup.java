@@ -1,97 +1,175 @@
 /*
-Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
+ Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
-All programs in this directory and
-subdirectories are published under the GNU General Public License as
-described below.
+ All programs in this directory and
+ subdirectories are published under the GNU General Public License as
+ described below.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
-your option) any later version.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or (at
+ your option) any later version.
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-USA
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ USA
 
-Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
+ Further information about the GNU GPL is available at:
+ http://www.gnu.org/copyleft/gpl.ja.html
 
-*/
+ */
 package net.sf.jabref.groups;
 
-import javax.swing.undo.*;
-import java.util.Vector;
+import javax.swing.undo.AbstractUndoableEdit;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
+    /** The root of the global groups tree */
+    private final GroupTreeNode m_groupsRootHandle;
+    /** The subtree that was added or removed */
+    private final GroupTreeNode m_subtreeBackup;
+    /**
+     * In case of removing a node but keeping all of its children, the number of
+     * children has to be stored.
+     */
+    private final int m_subtreeRootChildCount;
+    /** The path to the edited subtree's root node */
+    private final int[] m_pathToNode;
+    /**
+     * The type of the editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
+     * REMOVE_NODE_AND_CHILDREN)
+     */
+    private final int m_editType;
+    private final GroupSelector m_groupSelector;
+    private boolean m_revalidate = true;
+    /** Adding of a single node (group). */
+    public static final int ADD_NODE = 0;
+    /** Removal of a single node. Children, if any, are kept. */
+    public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
+    /** Removal of a node and all of its children. */
+    public static final int REMOVE_NODE_AND_CHILDREN = 2;
 
-    private Vector groups;
-    private int index;
-    private boolean addition;
-    private String name, regexp, field;
-    private GroupSelector gs;
-    private boolean revalidate = true;
-
-    public UndoableAddOrRemoveGroup
-	(GroupSelector gs, Vector groups, int index, boolean addition,
-	 String field, String name, String regexp) {
-
-	this.gs = gs;
-	this.addition = addition;
-	this.groups = groups;
-	this.index = index;
-	this.name = name;
-	this.regexp = regexp;
-	this.field = field;
+    /**
+     * Creates an object that can undo/redo an edit event.
+     * 
+     * @param groupsRoot
+     *            The global groups root.
+     * @param editType
+     *            The type of editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
+     *            REMOVE_NODE_AND_CHILDREN)
+     * @param editedNode
+     *            The edited node (which was added or will be removed). The node
+     *            must be a descendant of node <b>groupsRoot</b>! This means
+     *            that, in case of adding, you first have to add it to the tree,
+     *            then call this constructor. When removing, you first have to
+     *            call this constructor, then remove the node.
+     */
+    public UndoableAddOrRemoveGroup(GroupSelector gs, GroupTreeNode groupsRoot,
+            GroupTreeNode editedNode, int editType) {
+        m_groupSelector = gs;
+        m_groupsRootHandle = groupsRoot;
+        m_editType = editType;
+        m_subtreeRootChildCount = editedNode.getChildCount();
+        // storing a backup of the whole subtree is not required when children
+        // are kept
+        m_subtreeBackup = editType != REMOVE_NODE_KEEP_CHILDREN ? editedNode
+                .deepCopy() : new GroupTreeNode(editedNode.getGroup());
+        // remember path to edited node. this cannot be stored as a reference,
+        // because the reference itself might change. the method below is more
+        // robust.
+        m_pathToNode = editedNode.getIndexedPath();
     }
 
     public String getUndoPresentationName() {
-	return "Undo: "+(addition ? "add group" : "remove group");
+        return "Undo: " + getName();
+    }
+
+    public String getName() {
+        switch (m_editType) {
+        case ADD_NODE:
+            return "add group";
+        case REMOVE_NODE_KEEP_CHILDREN:
+            return "remove group (keep subgroups)";
+        case REMOVE_NODE_AND_CHILDREN:
+            return "remove group and subgroups";
+        }
+        return "? (unknown edit)";
     }
 
     public String getRedoPresentationName() {
-	return "Redo: "+(addition ? "add group" : "remove group");
+        return "Redo: " + getName();
     }
 
     public void undo() {
-	super.undo();
-	doOperation(!addition);
+        super.undo();
+        doOperation(true);
     }
 
     public void redo() {
-	super.redo();
-	doOperation(addition);
+        super.redo();
+        doOperation(false);
     }
 
-    private void doOperation(boolean add) {
-	//System.out.println(name);
-	
-	if (add) {
-	    groups.add(index, regexp);
-	    groups.add(index, name);
-	    groups.add(index, field);
-	} else { // Remove
-	    for (int i=0; i<GroupSelector.DIM; i++)
-		groups.removeElementAt(index);
-	}
-
-	if (revalidate)
-	    gs.revalidateList();
+    private void doOperation(boolean undo) {
+        GroupTreeNode cursor = m_groupsRootHandle;
+        final int childIndex = m_pathToNode[m_pathToNode.length - 1];
+        // traverse path up to butlast element
+        for (int i = 0; i < m_pathToNode.length - 1; ++i)
+            cursor = (GroupTreeNode) cursor.getChildAt(m_pathToNode[i]);
+        if (undo) {
+            switch (m_editType) {
+            case ADD_NODE:
+                cursor.remove(childIndex);
+                break;
+            case REMOVE_NODE_KEEP_CHILDREN:
+                // move all children to newNode, then add newNode
+                GroupTreeNode newNode = m_subtreeBackup.deepCopy();
+                for (int i = childIndex; i < childIndex
+                        + m_subtreeRootChildCount; ++i) {
+                    newNode.add((GroupTreeNode) cursor.getChildAt(i));
+                }
+                cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
+                break;
+            case REMOVE_NODE_AND_CHILDREN:
+                cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
+                break;
+            }
+        } else { // redo
+            switch (m_editType) {
+            case ADD_NODE:
+                cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
+                break;
+            case REMOVE_NODE_KEEP_CHILDREN:
+                // remove node, then insert all children
+                GroupTreeNode removedNode = (GroupTreeNode) cursor
+                        .getChildAt(childIndex);
+                cursor.remove(childIndex);
+                while (removedNode.getChildCount() > 0)
+                    cursor.insert((GroupTreeNode) removedNode.getFirstChild(),
+                            childIndex);
+                break;
+            case REMOVE_NODE_AND_CHILDREN:
+                cursor.remove(childIndex);
+                break;
+            }
+        }
+        if (m_revalidate)
+            m_groupSelector.revalidateGroups();
     }
 
     /**
      * Call this method to decide if the group list should be immediately
      * revalidated by this operation. Default is true.
-     *
-     * @param val a <code>boolean</code> value
+     * 
+     * @param val
+     *            a <code>boolean</code> value
      */
     public void setRevalidate(boolean val) {
-	revalidate = val;
+        m_revalidate = val;
     }
 }

@@ -1,231 +1,366 @@
 /*
-Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
+ Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
-All programs in this directory and
-subdirectories are published under the GNU General Public License as
-described below.
+ All programs in this directory and
+ subdirectories are published under the GNU General Public License as
+ described below.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
-your option) any later version.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or (at
+ your option) any later version.
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-USA
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ USA
 
-Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
+ Further information about the GNU GPL is available at:
+ http://www.gnu.org/copyleft/gpl.ja.html
 
-*/
+ */
 package net.sf.jabref.groups;
 
-import java.awt.*;
+import java.awt.Container;
 import java.awt.event.*;
+import java.io.StringReader;
+import java.util.regex.Pattern;
+
 import javax.swing.*;
-import java.util.Vector;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
-import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
+import javax.swing.event.*;
+
+import antlr.*;
+
+import net.sf.jabref.*;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.components.*;
+import net.sf.jabref.search.*;
 
 /**
- * Dialog for creating or modifying groups. Operates directly on the
- * Vector containing group information.
+ * Dialog for creating or modifying groups. Operates directly on the Vector
+ * containing group information.
  */
 class GroupDialog extends JDialog {
+    private static final int INDEX_KEYWORDGROUP = 0;
+    private static final int INDEX_SEARCHGROUP = 1;
+    private static final int INDEX_EXPLICITGROUP = 2;
+    private static final int TEXTFIELD_LENGTH = 30;
+    // for all types
+    private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
+    private JLabel m_nameLabel = new JLabel(Globals.lang("Group name") + ":");
+    // for KeywordGroup
+    private JTextField m_kgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
+    private JTextField m_searchField = new JTextField(TEXTFIELD_LENGTH);
+    private JLabel m_keywordLabel = new JLabel(Globals.lang("Search term")
+            + ":");
+    private JLabel m_searchFieldLabel = new JLabel(Globals
+            .lang("Field to search")
+            + ":");
+    private JPanel m_keywordGroupPanel;
+    // for SearchGroup
+    private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
+    private JCheckBox m_caseSensitive = new JCheckBox("Case sensitive");
+    private JCheckBox m_isRegExp = new JCheckBox("Regular Expression");
+    private JLabel m_searchExpressionLabel = new JLabel("Search expression:");
+    private JPanel m_searchGroupPanel;
+    private JLabel m_searchType = new JLabel("Plaintext Search");
+    private JCheckBox m_searchAllFields = new JCheckBox("Search All Fields");
+    private JCheckBox m_searchRequiredFields = new JCheckBox("Search Required Fields");
+    private JCheckBox m_searchOptionalFields = new JCheckBox("Search Optional Fields");
+    private JCheckBox m_searchGeneralFields = new JCheckBox("Search General Fields");
+    private SearchExpressionParser m_parser;
+    // JZTODO: translations...
 
-    JTextField
-	name = new JTextField(60),
-	regexp = new JTextField(60),
-	field = new JTextField(60);
-    JLabel
-	nl = new JLabel(Globals.lang("Group name")+":"),
-	nr = new JLabel(Globals.lang("Search term")+":"),
-	nf = new JLabel(Globals.lang("Field to search")+":");
-    JButton
-	ok = new JButton(Globals.lang("Ok")),
-	cancel = new JButton(Globals.lang("Cancel"));
-    JPanel
-	main = new JPanel(),
-	opt = new JPanel();
-    private boolean ok_pressed = false;
-    private Vector groups;
-    private int index;
-    private JabRefFrame parent;
+    // for all types
+    private DefaultComboBoxModel m_types = new DefaultComboBoxModel();
+    private JLabel m_typeLabel = new JLabel("Assign entries based on:");
+    private JComboBox m_typeSelector = new JComboBox();
+    private JButton m_ok = new JButton(Globals.lang("Ok"));
+    private JButton m_cancel = new JButton(Globals.lang("Cancel"));
+    private JPanel m_mainPanel;
 
-    private String /*name, regexp, field,*/ oldName, oldRegexp, oldField;
+    private boolean m_okPressed = false;
+    private JabRefFrame m_parent;
+    private AbstractGroup m_resultingGroup;
 
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
+    /**
+     * Shows a group add/edit dialog.
+     * 
+     * @param jabrefFrame
+     *            The parent frame.
+     * @param defaultField
+     *            The default grouping field.
+     * @param editedGroup
+     *            The group being edited, or null if a new group is to be
+     *            created.
+     */
+    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
+        super(jabrefFrame, Globals.lang("Edit group"), true);
+        m_parent = jabrefFrame;
 
-    public GroupDialog(JabRefFrame parent_, Vector groups_,
-		       int index_, String defaultField) {
-	super(parent_, Globals.lang("Edit group"), true);
-	parent = parent_;
-	groups = groups_;
-	index = index_;
-	if (index >= 0) {
-	    // Group entry already exists.
-	    try {
-		oldField = (String)groups.elementAt(index);
-		field.setText(oldField);
-		oldName = (String)groups.elementAt(index+1);
-		name.setText(oldName);
-		oldRegexp = (String)groups.elementAt(index+2);
-		regexp.setText(oldRegexp);
+        // set default values (overwritten if editedGroup != null)
+        m_searchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
 
-		// We disable these text fields, since changing field
-		// or regexp would leave the entries added to the
-		// group hanging.
-		field.setEnabled(false);
-		regexp.setEnabled(false);
-	    } catch (ArrayIndexOutOfBoundsException ex) {
-	    }
-	} else
-	    field.setText(defaultField);
+        // configure elements
+        m_types.addElement("Keywords");
+        m_types.addElement("Search Expression");
+        m_types.addElement("Explicit");
+        m_typeSelector.setModel(m_types);
 
-	ActionListener okListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+        // create layout
+        m_mainPanel = new JPanelYBoxPreferredWidth();
+        JPanel namePanel = new JPanelXBoxPreferredHeight();
+        namePanel.add(m_nameLabel);
+        namePanel.add(Box.createHorizontalGlue());
+        namePanel.add(new JPanelXBoxPreferredSize(m_name));
+        JPanel typePanel = new JPanelXBoxPreferredHeight();
+        typePanel.add(m_typeLabel);
+        typePanel.add(Box.createHorizontalGlue());
+        typePanel.add(new JPanelXBoxPreferredSize(m_typeSelector));
 
-		    // Check that there are no empty strings.
-		    if ((field.getText().equals("")) ||
-			(name.getText().equals("")) ||
-			(regexp.getText().equals(""))) {
-			JOptionPane.showMessageDialog
-			    (parent, Globals.lang("You must provide a name, a search "
-						  +"string and a field name for this group."),
-						  Globals.lang("Create group"),
-			     JOptionPane.ERROR_MESSAGE);
-			return;
-		    }
+        // ...for keyword group
+        m_keywordGroupPanel = new JPanelYBox();
+        JPanel kgField = new JPanelXBoxPreferredHeight();
+        kgField.add(m_searchFieldLabel);
+        kgField.add(Box.createHorizontalGlue());
+        kgField.add(new JPanelXBoxPreferredSize(m_searchField));
+        JPanel kgExpression = new JPanelXBoxPreferredHeight();
+        kgExpression.add(m_keywordLabel);
+        kgExpression.add(Box.createHorizontalGlue());
+        kgExpression.add(new JPanelXBoxPreferredSize(m_kgSearchExpression));
+        m_keywordGroupPanel.add(kgField);
+        m_keywordGroupPanel.add(kgExpression);
+        m_keywordGroupPanel.add(Box.createVerticalGlue());
 
-		    // Handling of : and ; must also be done.
+        // ...for search group
+        m_searchGroupPanel = new JPanelYBox();
+        JPanel sgExpression = new JPanelXBoxPreferredHeight();
+        sgExpression.add(m_searchExpressionLabel);
+        sgExpression.add(Box.createHorizontalGlue());
+        sgExpression.add(new JPanelXBoxPreferredSize(m_sgSearchExpression));
+        JPanel sgSearchType = new JPanelXBoxPreferredHeight(m_searchType);
+        sgSearchType.add(Box.createHorizontalGlue());
+        JPanel sgCaseSensitive = new JPanelXBoxPreferredHeight(m_caseSensitive);
+        JPanel sgRegExp = new JPanelXBoxPreferredHeight(m_isRegExp);
+        JPanel sgAll = new JPanelXBoxPreferredHeight(m_searchAllFields);
+        JPanel sgReq = new JPanelXBoxPreferredHeight(m_searchRequiredFields);
+        JPanel sgOpt = new JPanelXBoxPreferredHeight(m_searchOptionalFields);
+        JPanel sgGen = new JPanelXBoxPreferredHeight(m_searchGeneralFields);
+        sgCaseSensitive.add(Box.createHorizontalGlue());
+        sgRegExp.add(Box.createHorizontalGlue());
+        sgAll.add(Box.createHorizontalGlue());
+        sgReq.add(Box.createHorizontalGlue());
+        sgOpt.add(Box.createHorizontalGlue());
+        sgGen.add(Box.createHorizontalGlue());
+        m_searchGroupPanel.add(sgExpression);
+        m_searchGroupPanel.add(sgSearchType);
+        m_searchGroupPanel.add(sgCaseSensitive);
+        m_searchGroupPanel.add(sgRegExp);
+        m_searchGroupPanel.add(sgAll);
+        m_searchGroupPanel.add(sgReq);
+        m_searchGroupPanel.add(sgOpt);
+        m_searchGroupPanel.add(sgGen);
+        m_searchGroupPanel.add(Box.createVerticalGlue());
 
-		    ok_pressed = true;
+        m_mainPanel.add(namePanel);
+        m_mainPanel.add(typePanel);
 
-		    if (index < 0) {
-			// New group.
-			index = GroupSelector.findPos(groups, name.getText());
-                        groups.add(index, regexp.getText());
-                        groups.add(index, name.getText());
-			groups.add(index, field.getText().toLowerCase());
-		    } else if (index < groups.size()) {
-			// Change group.
-			for (int i=0; i<GroupSelector.DIM; i++)
-			    groups.removeElementAt(index);
-			index = GroupSelector.findPos(groups, name.getText());
-			groups.add(index, regexp.getText());
-			groups.add(index, name.getText());
-			groups.add(index, field.getText().toLowerCase());
-		    }
+        JPanel buttons = new JPanelXBoxPreferredHeight();
+        buttons.add(m_ok);
+        buttons.add(Box.createHorizontalStrut(5));
+        buttons.add(m_cancel);
 
-		    dispose();
-		}
-	    };
-	ok.addActionListener(okListener);
-	name.addActionListener(okListener);
-	regexp.addActionListener(okListener);
-	field.addActionListener(okListener);
+        Container cp = getContentPane();
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-	/*cancel.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    dispose();
-		}
-		});*/
+        cp.add(m_mainPanel);
+        cp.add(Box.createVerticalGlue());
+        cp.add(buttons);
 
-	AbstractAction cancelAction = new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    dispose();
-		}
-	    };
+        // add listeners
+        m_typeSelector.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                setLayoutForGroup(m_typeSelector.getSelectedIndex());
+                updateComponents();
+            }
+        });
 
-	cancel.addActionListener(cancelAction);
+        m_cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
 
-	// Key bindings:
-	ActionMap am = main.getActionMap();
-	InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	im.put(parent.prefs().getKey("Close dialog"), "close");
-	am.put("close", cancelAction);
+        m_ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                m_okPressed = true;
+                switch (m_typeSelector.getSelectedIndex()) {
+                case INDEX_EXPLICITGROUP:
+                    m_resultingGroup = new ExplicitGroup(m_name.getText()
+                            .trim());
+                    break;
+                case INDEX_KEYWORDGROUP:
+                    // regex is correct, otherwise OK would have been disabled
+                    // therefore I don't catch anything here
+                    m_resultingGroup = new KeywordGroup(
+                            m_name.getText().trim(), m_searchField.getText()
+                                    .trim(), m_kgSearchExpression.getText()
+                                    .trim());
+                    break;
+                case INDEX_SEARCHGROUP:
+                    try {
+                        // regex is correct, otherwise OK would have been
+                        // disabled
+                        // therefore I don't catch anything here
+                        m_resultingGroup = new SearchGroup(m_name.getText()
+                                .trim(), m_sgSearchExpression.getText().trim(),
+                                m_caseSensitive.isSelected(), m_isRegExp
+                                        .isSelected(), m_searchAllFields
+                                        .isSelected(), m_searchRequiredFields
+                                        .isSelected(), m_searchOptionalFields
+                                        .isSelected(), m_searchGeneralFields
+                                        .isSelected());
+                    } catch (Exception e1) {
+                        // should never happen
+                    }
+                    break;
+                }
+                dispose();
+            }
+        });
 
+        CaretListener caretListener = new CaretListener() {
+            public void caretUpdate(CaretEvent e) {
+                updateComponents();
+            }
+        };
 
-	// Layout starts here.
-	main.setLayout(gbl);
-	opt.setLayout(gbl);
-	main.setBorder(BorderFactory.createTitledBorder
-		       (BorderFactory.createEtchedBorder(),
-			Globals.lang("Group properties")));
+        ItemListener itemListener = new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                updateComponents();
+            }
+        };
 
-	// Main panel:
-	con.weightx = 0;
-	con.gridwidth = 1;
-	con.insets = new Insets(3, 5, 3, 5);
-	con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.NONE;
-	con.gridx = 0;
-	con.gridy = 0;
-	gbl.setConstraints(nl, con);
-	main.add(nl);
-	con.gridy = 1;
-	gbl.setConstraints(nr, con);
-	main.add(nr);
-	con.gridy = 2;
-	gbl.setConstraints(nf, con);
-	main.add(nf);
+        m_name.addCaretListener(caretListener);
+        m_searchField.addCaretListener(caretListener);
+        m_kgSearchExpression.addCaretListener(caretListener);
+        m_sgSearchExpression.addCaretListener(caretListener);
+        m_isRegExp.addItemListener(itemListener);
+        m_caseSensitive.addItemListener(itemListener);
+        m_searchAllFields.addItemListener(itemListener);
+        m_searchRequiredFields.addItemListener(itemListener);
+        m_searchOptionalFields.addItemListener(itemListener);
+        m_searchGeneralFields.addItemListener(itemListener);
 
-	con.weightx = 1;
-	con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridy = 0;
-	con.gridx = 1;
-	gbl.setConstraints(name, con);
-	main.add(name);
-	con.gridy = 1;
-	gbl.setConstraints(regexp, con);
-	main.add(regexp);
-	con.gridy = 2;
-	gbl.setConstraints(field, con);
-	main.add(field);
+        // configure for current type
+        if (editedGroup instanceof KeywordGroup) {
+            KeywordGroup group = (KeywordGroup) editedGroup;
+            m_name.setText(group.getName());
+            m_searchField.setText(group.getSearchField());
+            m_kgSearchExpression.setText(group.getSearchExpression());
+            m_typeSelector.setSelectedIndex(INDEX_KEYWORDGROUP);
+        } else if (editedGroup instanceof SearchGroup) {
+            SearchGroup group = (SearchGroup) editedGroup;
+            m_name.setText(group.getName());
+            m_sgSearchExpression.setText(group.getSearchExpression());
+            m_caseSensitive.setSelected(group.isCaseSensitive());
+            m_isRegExp.setSelected(group.isRegExp());
+            m_searchAllFields.setSelected(group.searchAllFields());
+            m_searchRequiredFields.setSelected(group.searchRequiredFields());
+            m_searchOptionalFields.setSelected(group.searchOptionalFields());
+            m_searchGeneralFields.setSelected(group.searchGeneralFields());
+            m_typeSelector.setSelectedIndex(INDEX_SEARCHGROUP);
+        } else if (editedGroup instanceof ExplicitGroup) {
+            m_name.setText(editedGroup.getName());
+            m_typeSelector.setSelectedIndex(INDEX_EXPLICITGROUP);
+        }
 
-       	// Option buttons:
-	con.gridx = GridBagConstraints.RELATIVE;
-	con.gridy = GridBagConstraints.RELATIVE;
-	con.weightx = 1;
-	con.gridwidth = 1;
-	con.anchor = GridBagConstraints.EAST;
-	con.fill = GridBagConstraints.NONE;
-	gbl.setConstraints(ok, con);
-	opt.add(ok);
-	con.anchor = GridBagConstraints.WEST;
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(cancel, con);
-	opt.add(cancel);
+        pack();
+        setSize(350, 300);
+        setResizable(false);
 
-	getContentPane().add(main, BorderLayout.CENTER);
-	getContentPane().add(opt, BorderLayout.SOUTH);
+        updateComponents();
+        setLayoutForGroup(m_typeSelector.getSelectedIndex());
 
-	//pack();
-	setSize(400, 170);
-
-	Util.placeDialog(this, parent);
+        Util.placeDialog(this, m_parent);
     }
 
     public boolean okPressed() {
-	return ok_pressed;
+        return m_okPressed;
     }
 
-    public int index() { return index; }
-    public String oldField() { return oldField; }
-    public String oldName() { return oldName; }
-    public String oldRegexp() { return oldRegexp; }
-    public String field() { return field.getText(); }
-    public String name() { return name.getText(); }
-    public String regexp() { return regexp.getText(); }
+    public AbstractGroup getResultingGroup() {
+        return m_resultingGroup;
+    }
 
+    private void setLayoutForGroup(int index) {
+        switch (index) {
+        case INDEX_KEYWORDGROUP:
+            m_mainPanel.remove(m_searchGroupPanel);
+            m_mainPanel.add(m_keywordGroupPanel);
+            validate();
+            repaint();
+            break;
+        case INDEX_SEARCHGROUP:
+            m_mainPanel.remove(m_keywordGroupPanel);
+            m_mainPanel.add(m_searchGroupPanel);
+            validate();
+            repaint();
+            break;
+        case INDEX_EXPLICITGROUP:
+            m_mainPanel.remove(m_searchGroupPanel);
+            m_mainPanel.remove(m_keywordGroupPanel);
+            validate();
+            repaint();
+            break;
+        }
+    }
+
+    private void updateComponents() {
+        // all groups need a name
+        boolean okEnabled = m_name.getText().trim().length() > 0;
+        String s;
+        switch (m_typeSelector.getSelectedIndex()) {
+        case INDEX_KEYWORDGROUP:
+            s = m_searchField.getText().trim();
+            okEnabled = okEnabled && s.length() > 0 && s.indexOf(' ') < 0;
+            s = m_kgSearchExpression.getText().trim();
+            okEnabled = okEnabled && s.length() > 0;
+            try {
+                Pattern.compile(s);
+            } catch (Exception e) {
+                okEnabled = false;
+            }
+            break;
+        case INDEX_SEARCHGROUP:
+            s = m_sgSearchExpression.getText().trim();
+            okEnabled = okEnabled & s.length() > 0;
+            m_parser = new SearchExpressionParser(new SearchExpressionLexer(
+                    new StringReader(s)));
+            m_parser.caseSensitive = m_caseSensitive.isSelected();
+            m_parser.regex = m_isRegExp.isSelected();
+            boolean advancedSearch = false;
+            try {
+                m_parser.searchExpression();
+                advancedSearch = true;
+            } catch (Exception e) {
+                // advancedSearch remains false;
+            }
+            m_searchType.setText(advancedSearch ? "Advanced Search":"Plaintext Search");
+            m_searchAllFields.setEnabled(!advancedSearch);
+            m_searchRequiredFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
+            m_searchOptionalFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
+            m_searchGeneralFields.setEnabled(!advancedSearch && !m_searchAllFields.isSelected());
+            validate();
+            break;
+        case INDEX_EXPLICITGROUP:
+            break;
+        }
+        m_ok.setEnabled(okEnabled);
+    }
 }

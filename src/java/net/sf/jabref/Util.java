@@ -27,30 +27,16 @@
 
 package net.sf.jabref;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
+import java.awt.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 import java.util.List;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 import net.sf.ext.BrowserLauncher;
 import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.imports.CiteSeerFetcher;
-import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.groups.*;
+import net.sf.jabref.imports.*;
 
 /**
  * Describe class <code>Util</code> here.
@@ -730,24 +716,6 @@ public class Util {
     }
 
     /**
-     * Look for a group name in a groups vector
-     * 
-     * @param nameToFind
-     *            String The group name to search for.
-     * @param v
-     *            Vector The vector to search in.
-     * @return int The group number where the name was found, or -1 if not
-     *         found.
-     */
-    public static int findGroup(String nameToFind, Vector v) {
-        for (int i = GroupSelector.OFFSET; (i + 2) < v.size(); i += GroupSelector.DIM){
-            String name = (String) v.elementAt(i + 1);
-            if (name.equals(nameToFind)) return i;
-        }
-        return -1;
-    }
-
-    /**
      * This method is called at startup, and makes necessary adaptations to
      * preferences for users from an earlier version of Jabref.
      */
@@ -789,6 +757,67 @@ public class Util {
         if (t < 1) back = back + "." + defaultExtension;
 
         return back;
+    }
+    
+    /**
+     * Quote special characters.
+     * 
+     * @param s
+     *            The String which may contain special characters.
+     * @param specials
+     *            A String containing all special characters except the quoting
+     *            character itself, which is automatically quoted.
+     * @param quoteChar
+     *            The quoting character.
+     * @return A String with every special character (including the quoting
+     *         character itself) quoted.
+     */
+    public static String quote(String s, String specials, char quoteChar) {
+    	StringBuffer sb = new StringBuffer();
+    	char c;
+    	for (int i = 0; i < s.length(); ++i) {
+    		c = s.charAt(i);
+    		if (specials.indexOf(c) >= 0 || c == quoteChar)
+    			sb.append(quoteChar);
+   			sb.append(c);
+    	}
+    	return sb.toString();
+    }
+    
+    /**
+	 * Unquote special characters.
+	 * 
+	 * @param s
+	 *            The String which may contain quoted special characters.
+	 * @param quoteChar
+	 *            The quoting character.
+	 * @return A String with all quoted characters unquoted.
+	 */
+    public static String unquote(String s, char quoteChar) {
+    	StringBuffer sb = new StringBuffer();
+    	char c;
+    	for (int i = 0; i < s.length(); ++i) {
+    		c = s.charAt(i);
+    		if (c != quoteChar)
+    			sb.append(c);
+    	}
+    	return sb.toString();
+    }
+    
+    /** 
+     * Quote all regular expression meta characters in s, in order to
+     * search for s literally.
+     */
+    public static String quoteMeta(String s) {
+        // work around a bug: trailing backslashes have to be quoted individually
+        int i = s.length()-1;
+        StringBuffer bs = new StringBuffer("");
+        while ((i >= 0) && (s.charAt(i) == '\\')) {
+            --i;
+            bs.append("\\\\");
+        }
+        s = s.substring(0,i+1);
+        return "\\Q"+s.replaceAll("\\\\E","\\\\E\\\\\\\\E\\\\Q")+"\\E"+bs.toString();
     }
 
 }

@@ -26,24 +26,21 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import net.sf.jabref.groups.GroupSelector;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.awt.event.*;
-import java.util.Vector;
-import java.util.Iterator;
-import net.sf.jabref.groups.QuickSearchRule;
+import net.sf.jabref.groups.*;
+import net.sf.jabref.groups.AbstractGroup;
 
 public class RightClickMenu extends JPopupMenu
     implements PopupMenuListener {
 
     BasePanel panel;
     MetaData metaData;
-    JMenu groupMenu = new JMenu(Globals.lang("Add to group")),
+    JMenu groupAddMenu = new JMenu(Globals.lang("Add to group")),
         groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
-        typeMenu = new JMenu(Globals.lang("Change entry type")),
-        setGroups = new JMenu(Globals.lang("Groups"));
-    boolean forOneEntryOnly = false;
+        typeMenu = new JMenu(Globals.lang("Change entry type"));
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
@@ -187,109 +184,105 @@ public class RightClickMenu extends JPopupMenu
      */
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
       BibtexEntry[] bes = panel.entryTable.getSelectedEntries();
-      Vector groups = metaData.getData("groups");
-      if ((groups == null) || (groups.size() == 0)) {
-        groupMenu.setEnabled(false);
+      GroupTreeNode groups = metaData.getGroups();
+      if (groups == null) {
+        groupAddMenu.setEnabled(false);
         groupRemoveMenu.setEnabled(false);
         return;
       } else {
-        groupMenu.setEnabled(true);
+        groupAddMenu.setEnabled(true);
         groupRemoveMenu.setEnabled(true);
       }
-      groupMenu.removeAll();
+      groupAddMenu.removeAll();
       groupRemoveMenu.removeAll();
-      setGroups.removeAll();
+      
+      // JZ: I think having a special menu for only one selected entry
+      // is rather non-intuitive because the user cannot see wheter a
+      // certain menu item will add or remove the entry to/from
+      // that group. IMHO, it is more consistent when the menu is always
+      // the same.
+      
       if (bes == null)
         return;
-      else if (bes.length < 2) {
-        forOneEntryOnly = true;
-        add(setGroups);
-      }
-      else {
-        forOneEntryOnly = false;
-        add(groupMenu);
-        add(groupRemoveMenu);
-      }
+      add(groupAddMenu);
+      add(groupRemoveMenu);
 
-      for (int i=GroupSelector.OFFSET; i<groups.size()-2;
-           i+=GroupSelector.DIM) {
-        String name = (String)groups.elementAt(i+1),
-            regexp = (String)groups.elementAt(i+2),
-            field = (String)groups.elementAt(i);
-
-        if (forOneEntryOnly) {
-          // Only bes[0] is selected, so we can build specialized menus for it.
-          QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-          int score = qsr.applyRule(null, bes[0]);
-          //groupMenu.add(new JCheckBoxMenuItem(name, (score == 0)));
-          ToggleGroupAction item = new ToggleGroupAction(name, regexp, field, (score > 0));
-          setGroups.add(item);
+      insertNodes(groupAddMenu,metaData.getGroups(),true);
+      insertNodes(groupRemoveMenu,metaData.getGroups(),false);
+    }
+    
+    private void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
+        AbstractAction action = getAction(node,add);
+        
+        if (node.getChildCount() == 0) {
+            menu.add(action);
+            return;
         }
-        else {
-          groupMenu.add(new AddToGroupAction(name, regexp, field));
-          groupRemoveMenu.add
-              (new RemoveFromGroupAction(name, regexp, field));
+        
+        JMenu submenu = new JMenu("["+node.getGroup().getName()+"]");
+        submenu.add(action);
+        submenu.add(new Separator());
+        for (int i = 0; i < node.getChildCount(); ++i) {
+            insertNodes(submenu,(GroupTreeNode) node.getChildAt(i),add);
         }
-
-      }
+        menu.add(submenu);
+    }
+    
+    private AbstractAction getAction(GroupTreeNode node, boolean add) {
+        AbstractGroup group = node.getGroup();
+        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(group)
+                : (AbstractAction) new RemoveFromGroupAction(group);
+        action.setEnabled(add ? group.supportsAdd() : group.supportsRemove());
+        return action;
     }
 
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-      remove(groupMenu);
+      remove(groupAddMenu);
       remove(groupRemoveMenu);
-      remove(setGroups);
     }
 
     public void popupMenuCanceled(PopupMenuEvent e) {
-
+        // nothing to do
     }
 
     class AddToGroupAction extends AbstractAction {
-        String grp, regexp, field;
-        public AddToGroupAction(String grp, String regexp, String field) {
-            super(grp);
-            this.grp = grp;
-            this.regexp = regexp;
-            this.field = field;
+        AbstractGroup m_group;
+        public AddToGroupAction(AbstractGroup group) {
+            super(group.getName());
+            m_group = group;
         }
         public void actionPerformed(ActionEvent evt) {
-            panel.addToGroup(grp, regexp, field);
+            m_group.addSelection(panel);
         }
     }
-
+    
     class RemoveFromGroupAction extends AbstractAction {
-        String grp, regexp, field;
-        public RemoveFromGroupAction
-            (String grp, String regexp, String field) {
-
-            super(grp);
-            this.grp = grp;
-            this.regexp = regexp;
-            this.field = field;
+        AbstractGroup m_group;
+        public RemoveFromGroupAction(AbstractGroup group) {
+            super(group.getName());
+            m_group = group;
         }
         public void actionPerformed(ActionEvent evt) {
-            panel.removeFromGroup(grp, regexp, field);
+            ((AbstractGroup)m_group).removeSelection(panel);
         }
     }
 
-    class ToggleGroupAction extends JCheckBoxMenuItem implements ActionListener {
-        String grp, regexp, field;
-        boolean isIn;
-        public ToggleGroupAction(String name, String regexp, String field, boolean isIn) {
-            super(name, isIn);
-            this.isIn = isIn;
-            this.grp = grp;
-            this.regexp = regexp;
-            this.field = field;
-            addActionListener(this);
+    class ToggleGroupAction extends AbstractAction {
+        AbstractGroup m_group;
+        boolean m_isIn;
+        public ToggleGroupAction(AbstractGroup group, boolean isIn) {
+            super(group.getName());
+            m_group = group;
+            m_isIn = isIn;
         }
         public void actionPerformed(ActionEvent evt) {
-          if (isIn)
-            panel.removeFromGroup(grp, regexp, field);
-          else
-            panel.addToGroup(grp, regexp, field);
+            if (!m_isIn)
+                ((AbstractGroup)m_group).addSelection(panel);
+            else
+                ((AbstractGroup)m_group).removeSelection(panel);
         }
-  }
+    }
+
 
     class ChangeTypeAction extends AbstractAction {
       BibtexEntryType type;
