@@ -79,6 +79,16 @@ public class JabRefFrame extends JFrame {
 				 GUIGlobals.undoIconFile),
 	redo = new GeneralAction("redo", "Redo", "Redo",
 				 GUIGlobals.redoIconFile),
+	cut = new GeneralAction("cut", "Cut", "Cut",
+				 GUIGlobals.cutIconFile),
+	copy = new GeneralAction("copy", "Copy", "Copy",
+				 GUIGlobals.copyIconFile),
+	paste = new GeneralAction("paste", "Paste", "Paste",
+				 GUIGlobals.pasteIconFile),
+
+	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
+	  GUIGlobals.removeIconFile),*/
+	selectAll = new GeneralAction("selectAll", "Select all"),
 	editPreamble = new GeneralAction("editPreamble", "Edit preamble", 
 					 "Edit preamble",
 					 GUIGlobals.preambleIconFile),
@@ -316,6 +326,12 @@ public class JabRefFrame extends JFrame {
 
 	edit.add(undo);
 	edit.add(redo);
+	edit.addSeparator();
+	edit.add(cut);
+	edit.add(copy);
+	edit.add(paste);
+	//edit.add(remove);
+	edit.add(selectAll);
 	mb.add(edit);
 
 	view.add(toggleGroups);
@@ -401,6 +417,8 @@ public class JabRefFrame extends JFrame {
 	tlb.add(open);
 	tlb.add(save);
 	tlb.addSeparator();
+	tlb.add(editPreamble);
+	tlb.add(editStrings);
 	//tb.add(closeDatabaseAction);
 	//tb.addSeparator();
 	/*tlb.add(copyKeyAction);

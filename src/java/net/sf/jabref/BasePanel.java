@@ -38,8 +38,8 @@ import java.util.*;
 import java.awt.datatransfer.*;
 import javax.swing.undo.*;
 
-public class BasePanel extends JSplitPane implements MouseListener {
-    //, ClipboardOwner {
+public class BasePanel extends JSplitPane implements MouseListener, 
+						     ClipboardOwner {
 
     BasePanel ths = this;
 
@@ -90,6 +90,8 @@ public class BasePanel extends JSplitPane implements MouseListener {
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
 
+    private boolean suppressOutput = true;
+
     private HashMap actions = new HashMap();
    
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
@@ -116,6 +118,11 @@ public class BasePanel extends JSplitPane implements MouseListener {
 
         this.file = file;
 
+    }
+
+    private void output(String s) {
+	if (!suppressOutput)
+	    frame.output(s);
     }
 
     /**
@@ -229,7 +236,177 @@ public class BasePanel extends JSplitPane implements MouseListener {
 		    }
 		}
 	    });
-      
+
+	// The action for copying selected entries.
+	actions.put("copy", new BaseAction() {
+		public void action() {
+		    BibtexEntry[] bes = entryTable.getSelectedEntries();
+		    
+		    // Entries are copied if only the first or multiple
+		    // columns are selected.
+		    if ((bes != null) && (bes.length > 0)) {
+			TransferableBibtexEntry trbe 
+			    = new TransferableBibtexEntry(bes);
+			Toolkit.getDefaultToolkit().getSystemClipboard()
+			    .setContents(trbe, ths);
+			output("Copied "+(bes.length>1 ? bes.length+" entries." 
+					  : "1 entry."));
+		    } else {
+			// The user maybe selected a single cell.
+			int[] rows = entryTable.getSelectedRows(),
+			    cols = entryTable.getSelectedColumns();
+			if ((cols.length == 1) && (rows.length == 1)) {
+			    // Copy single value.
+			    Object o = tableModel.getValueAt(rows[0], cols[0]);
+			    if (o != null) {
+				StringSelection ss = new StringSelection(o.toString());
+				Toolkit.getDefaultToolkit().getSystemClipboard()
+				    .setContents(ss, ths);
+
+				output(Globals.lang("Copied cell contents")+".");
+			    }
+			}
+		    }
+		}
+	    });
+		
+	actions.put("cut", new BaseAction() {
+		public void action() {
+		    runCommand("copy");
+		    int[] 
+			rows = entryTable.getSelectedRows(),
+			cols = entryTable.getSelectedColumns();
+
+		    // Only works if the first column, or all columns, is selected.
+		    if ((((cols.length == 1) && (cols[0] == 0)) 
+			 || (cols.length == tableModel.getColumnCount()))
+			&& (rows.length > 0)) {
+			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
+			
+
+			/* 
+			   I have removed the confirmation dialog, since I converted
+			   the "remove" action to a "cut". That means the user can
+			   always paste the entries, in addition to pressing undo.
+			   So the confirmation seems redundant.
+			  
+			String msg = Globals.lang("Really delete the selected")
+			    +" "+Globals.lang("entry")+"?",
+			    title = Globals.lang("Delete entry");
+			if (rows.length > 1) {
+			    msg = Globals.lang("Really delete the selected")
+				+" "+rows.length+" "+Globals.lang("entries")+"?";
+			    title = Globals.lang("Delete multiple entries");
+			}
+			int answer = JOptionPane.showConfirmDialog(frame, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if (answer == JOptionPane.YES_OPTION) {*/
+
+			// Create a CompoundEdit to make the action undoable.
+			NamedCompound ce = new NamedCompound
+			    (rows.length > 1 ? Globals.lang("delete entries") 
+			     : Globals.lang("delete entry"));
+			// Loop through the array of entries, and delete them.
+			for (int i=0; i<rows.length; i++) {
+			    String id = tableModel.getNameFromNumber(rows[i]);
+			    BibtexEntry entry = database.getEntryById(id);
+			    database.removeEntry(id);
+			    Object o = entryTypeForms.get(id);
+			    if (o != null) {
+				((EntryTypeForm)o).dispose();
+			    }
+			    ce.addEdit(new UndoableRemoveEntry(database, entry,
+							       entryTypeForms));
+			}
+			entryTable.clearSelection();
+			frame.output(Globals.lang("Cut")+" "+
+				     (rows.length>1 ? rows.length
+				      +" "+ Globals.lang("entries") 
+				      : Globals.lang("entry"))+".");
+			ce.end();
+			undoManager.addEdit(ce);		    
+			refreshTable();
+			markBaseChanged();
+		    }	       
+		}
+
+
+
+	    });
+
+	// The action for pasting entries or cell contents.
+	actions.put("paste", new BaseAction() {
+		public void action() {
+		    // We pick an object from the clipboard, check if
+		    // it exists, and if it is a set of entries.
+		    Transferable content = Toolkit.getDefaultToolkit()
+			.getSystemClipboard().getContents(null);
+		    if (content != null) {
+			DataFlavor[] flavor = content.getTransferDataFlavors();
+			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(TransferableBibtexEntry.entryFlavor)) {
+			    // We have determined that the clipboard data is a set of entries.
+			    BibtexEntry[] bes = null;
+			    try {
+				bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
+			    } catch (UnsupportedFlavorException ex) {
+			    } catch (IOException ex) {}
+			    
+			    if ((bes != null) && (bes.length > 0)) {
+				NamedCompound ce = new NamedCompound
+				    (bes.length > 1 ? "paste entries" : "paste entry");
+				for (int i=0; i<bes.length; i++) {
+				    try { 
+					BibtexEntry be = (BibtexEntry)(bes[i].clone());
+					// We have to clone the
+					// entries, since the pasted
+					// entries must exist
+					// independently of the copied
+					// ones.
+					be.setId(Util.createId(be.getType(), database));
+					database.insertEntry(be);
+					ce.addEdit(new UndoableInsertEntry
+						   (database, be, entryTypeForms));
+				    } catch (KeyCollisionException ex) {
+					Util.pr("KeyCollisionException... this shouldn't happen.");
+				    }
+				}
+				ce.end();
+				undoManager.addEdit(ce);
+				tableModel.remap();
+				entryTable.clearSelection();
+				entryTable.revalidate();
+				output("Pasted "+(bes.length>1 ? bes.length+" entries." : "1 entry."));
+				refreshTable();
+				markBaseChanged();
+			    }
+			}
+			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) { 
+			    // We have determined that the clipboard data is a string.
+			    int[] rows = entryTable.getSelectedRows(),
+				cols = entryTable.getSelectedColumns();
+			    if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
+				&& (rows != null) && (rows.length == 1)) {
+				try {
+				    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
+				    refreshTable();
+				    markBaseChanged();			   
+				    output("Pasted cell contents");
+				} catch (UnsupportedFlavorException ex) {
+				} catch (IOException ex) {
+				} catch (IllegalArgumentException ex) {
+				    output("Can't paste.");
+				}
+			    }
+			}
+		    }
+		}
+	    });	   
+
+	actions.put("selectAll", new BaseAction() {
+		public void action() {
+		    entryTable.selectAll();
+		}
+	    });      
+
 	// The action for opening the preamble editor
 	actions.put("editPreamble", new BaseAction() {
 		public void action() {
@@ -429,118 +606,6 @@ public class BasePanel extends JSplitPane implements MouseListener {
     public void stringsClosing() {
 	stringDialog = null;
     }
-
-
-    // The action for copying selected entries.
-    /*
-    CopyAction copyAction = new CopyAction(this);
-    class CopyAction extends AbstractAction {
-	BibtexBaseFrame parent;
-	public CopyAction(BibtexBaseFrame parent_) {
-	    super("Copy",
-		  new ImageIcon(GUIGlobals.copyIconFile));
-	    putValue(SHORT_DESCRIPTION, "Copy");
-	    parent = parent_;
-	}
-   
-	public void actionPerformed(ActionEvent e) {
-	    BibtexEntry[] bes = entryTable.getSelectedEntries();
-
-	    // Entries are copied if only the first or multiple
-	    // columns are selected.
-	    if ((bes != null) && (bes.length > 0)) {
-		TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trbe, parent);
-		output("Copied "+(bes.length>1 ? bes.length+" entries." : "1 entry."));
-	    } else {
-		// The user maybe selected a single cell.
-		int[] rows = entryTable.getSelectedRows(),
-		    cols = entryTable.getSelectedColumns();
-		if ((cols.length == 1) && (rows.length == 1)) {
-		    // Copy single value.
-		    Object o = tableModel.getValueAt(rows[0], cols[0]);
-		    if (o != null) {
-			StringSelection ss = new StringSelection(o.toString());
-			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, parent);
-			output("Copied cell contents.");
-		    }
-		}
-	    }
-	}
-    }
-
-    // The action for pasting entries.
-    PasteAction pasteAction = new PasteAction();
-    class PasteAction extends AbstractAction {
-	public PasteAction() {
-	    super("Paste",
-		  new ImageIcon(GUIGlobals.pasteIconFile));
-	    putValue(SHORT_DESCRIPTION, "Paste");
-	}
-   
-	public void actionPerformed(ActionEvent e) {
-	    // We pick an object from the clipboard, check if it exists, and if it is a set of entries.
-	    Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-	    if (content != null) {
-		DataFlavor[] flavor = content.getTransferDataFlavors();
-		if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(TransferableBibtexEntry.entryFlavor)) {
-		    // We have determined that the clipboard data is a set of entries.
-		    BibtexEntry[] bes = null;
-		    try {
-			bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
-		    } catch (UnsupportedFlavorException ex) {
-		    } catch (IOException ex) {}
-
-		    if ((bes != null) && (bes.length > 0)) {
-			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? "paste entries" : "paste entry");
-			for (int i=0; i<bes.length; i++) {
-			    try { 
-				BibtexEntry be = (BibtexEntry)(bes[i].clone());
-				// We have to clone the entries, since the pasted
-				// entries must exist independently of the copied
-				// ones.
-				be.setId(Util.createID(be.getType(), database));
-				database.insertEntry(be);
-				ce.addEdit(new UndoableInsertEntry
-					   (database, be, entryTypeForms));
-			    } catch (KeyCollisionException ex) {
-				Util.pr("KeyCollisionException... this shouldn't happen.");
-			    }
-			}
-			ce.end();
-			undoManager.addEdit(ce);
-			tableModel.remap();
-			entryTable.clearSelection();
-			entryTable.revalidate();
-			output("Pasted "+(bes.length>1 ? bes.length+" entries." : "1 entry."));
-			refreshTable();
-			markBaseChanged();
-		    }
-		}
-		if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) { 
-		    // We have determined that the clipboard data is a string.
-		    int[] rows = entryTable.getSelectedRows(),
-			cols = entryTable.getSelectedColumns();
-		    if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
-			&& (rows != null) && (rows.length == 1)) {
-			try {
-			    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
-			    refreshTable();
-			    markBaseChanged();			   
-			    output("Pasted cell contents");
-			} catch (UnsupportedFlavorException ex) {
-			} catch (IOException ex) {
-			} catch (IllegalArgumentException ex) {
-			    output("Can't paste.");
-			}
-		    }
-		}
-	    }
-	}
-    }
-
-*/
 
 
     class UndoAction extends BaseAction {
