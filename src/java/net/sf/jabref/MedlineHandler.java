@@ -79,7 +79,9 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("Author")){inAuthor=true;author="";}
 		else if(localName.equals("PMID")){inPubMedID=true;pubmedid="";}
 		else if(localName.equals("LastName")){inLastName=true; lastName="";}
-		else if(localName.equals("ForeName")){inForename=true; forename="";}
+		else if(localName.equals("ForeName") || localName.equals("FirstName")) {
+			inForename=true; forename="";
+		}
 		else if(localName.equals("Issue")){inIssue=true;}
 		else if(localName.equals("MedlinePgn")){inMedlinePgn=true;
 		}//pagenumber
@@ -206,7 +208,7 @@ public class MedlineHandler extends DefaultHandler
 		}
 		else if(localName.equals("DescriptorName")) inDescriptorName=false;
 		else if(localName.equals("LastName")){inLastName=false;}
-		else if(localName.equals("ForeName")){ inForename=false;}
+		else if(localName.equals("ForeName")||localName.equals("FirstName")){ inForename=false;}
 		else if(localName.equals("Issue")){ inIssue = false;}
 		else if(localName.equals("MedlinePgn")){inMedlinePgn=false;}//pagenumber
 		else if(localName.equals("URL")){ inUrl=false;}
