@@ -1451,12 +1451,14 @@ public JabRefPreferences prefs() {
             if (tabbedPane.getTabCount() == 1) {
                 setNonEmptyState();
             }
+            fileToOpen = null;
         }
     }
     
     public void openIt(boolean raisePanel) {
       if ( (fileToOpen != null) && (fileToOpen.exists())) {
         try {
+          String fileName = fileToOpen.getPath();
           prefs.put("workingDirectory", fileToOpen.getPath());
           // Should this be done _after_ we know it was successfully opened?
           String encoding = Globals.prefs.get("defaultEncoding");
@@ -1488,13 +1490,13 @@ public JabRefPreferences prefs() {
             db.setCompleters(autoCompleters);
             }
            */
+          
+          // fileToOpen is set to null inside the EventDispatcherThread
           SwingUtilities.invokeLater(new openItSwingHelper(bp, raisePanel));
 
-          output(Globals.lang("Opened database") + " '" + fileToOpen.getPath() +
+          output(Globals.lang("Opened database") + " '" + fileName +
                  "' " + Globals.lang("with") + " " +
                  db.getEntryCount() + " " + Globals.lang("entries") + ".");
-
-          fileToOpen = null;
 
         }
         catch (Throwable ex) {
