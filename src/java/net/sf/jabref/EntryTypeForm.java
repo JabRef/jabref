@@ -309,6 +309,11 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 
 		ta3 = new FieldTextArea(genFields[i], stringContent);
 		setupJTextComponent(ta3);
+
+		// Add external viewer listener for "pdf" and "url" fields.
+		if (genFields[i].equals("pdf") || genFields[i].equals("url"))
+		    ta3.addMouseListener(new ExternalViewerListener());
+
 		if (i==0) { 
 		    firstO = ta3;
 		    gen.setActive(ta3);
@@ -840,13 +845,20 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 		int thisRow = panel.tableModel
 		    .getNumberFromName(entry.getId());
 		String id = null;
+		int newRow = -1;
 		if (thisRow+1 < panel.database.getEntryCount())
-		    id = panel.tableModel
-			.getNameFromNumber(thisRow+1);
+		    newRow = thisRow+1;
 		else if (thisRow > 0)
-		    id = panel.tableModel
-			.getNameFromNumber(0);
+		    newRow = 0;
+
+		id = panel.tableModel.getNameFromNumber(newRow);
 		switchTo(id);
+		final int nr = newRow;
+		(new Thread() {
+			public void run() {
+			    scrollTo(nr);
+			}
+		    }).start();      
 	    }
     }
 
@@ -862,16 +874,45 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 		int thisRow = panel.tableModel
 		    .getNumberFromName(entry.getId());
 		String id = null;
+		int newRow = -1;
 		if (thisRow-1 >= 0)
-		    id = panel.tableModel
-			.getNameFromNumber(thisRow-1);
+		    newRow = thisRow-1;
 		else if (thisRow != panel.database.getEntryCount()-1)
-		    id = panel.tableModel
-			.getNameFromNumber(panel.database.getEntryCount()-1);
+		    newRow = panel.database.getEntryCount()-1;
+
+		id = panel.tableModel
+		    .getNameFromNumber(newRow);
+
 		switchTo(id);
+		final int nr = newRow;
+		(new Thread() {
+			public void run() {
+			    scrollTo(nr);
+			}
+		    }).start();       
 	    }
 	};
+
+    /**
+     * Centers the given row, and highlights it.
+     *
+     * @param row an <code>int</code> value
+     */
+    private void scrollTo(int row) {
+	panel.entryTable.scrollToCenter(row, 0);
+	panel.entryTable.setRowSelectionInterval(row, row);
+	panel.entryTable.setColumnSelectionInterval
+	    (0, panel.entryTable.getColumnCount()-1);
+    }
     
+    /**
+     * Switches the entry for this editor to the one with the given
+     * id. If the target entry is of the same type as the current,
+     * field values are simply updated. Otherwise, a new Dialog is
+     * created and this one closed.
+     *
+     * @param id a <code>String</code> value
+     */
     private void switchTo(String id) {
 	if (id != null) {
 	    if (!panel.entryTypeForms.containsKey(id)) {
@@ -1028,47 +1069,64 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 	//Util.pr(e.getPropertyName());
     }
 	
-	class ExternalViewerListener extends MouseAdapter {
-		public void mouseClicked(MouseEvent evt) {
-			if (evt.getClickCount() == 2) {
-				JTextField tf = (JTextField)evt.getSource();
-				tf.selectAll();
-				String link = tf.getText(); // get selected ?  String 	getSelectedText() 
-				// check html first since browser can invoke viewers
-				if(link.substring(0,7).equals("http://")){ // hml
-					try {
-						System.err.println("Message: Opening url (" + link + ") with the HTML viewer (" + prefs.get("htmlviewer") +")");						
-						Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer") + " " + link);
-					} catch (IOException e) {
-						System.err.println("Warning: Unable to open url " + link + " with the HTML viewer (" + prefs.get("htmlviewer") +")");			
-					}
-				}
-				else if(link.endsWith(".ps")){
-					try {
-						System.err.println("Message: Opening file " + link + " with the ps viewer (" + prefs.get("psviewer") +")");									
-						Process child = Runtime.getRuntime().exec(prefs.get("psviewer") + " " + link);
-					} catch (IOException e) {
-						System.err.println("Warning: Unable to open file (" + link + ") with the postscipt viewer (" + prefs.get("psviewer") +")");
-					}
-					
-				}else if(link.endsWith(".pdf")){
-					try {
-						System.err.println("Message: Opening file (" + link + ") with the pdf viewer (" + prefs.get("pdfviewer") +")");						
-						Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer") + " " + link);
-					} catch (IOException e) {
-						System.err.println("Warning: Unable to open file " + link + " with the pdf viewer (" + prefs.get("pdfviewer") +")");			
-					}
-				}
-				
-				else{
-					System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
-					//ignore
-				}
-
-			}
-			
+    class ExternalViewerListener extends MouseAdapter {
+	public void mouseClicked(MouseEvent evt) {
+	    if (evt.getClickCount() == 2) {
+		JTextComponent tf = (JTextComponent)evt.getSource();
+		if (tf.getText().equals(""))
+		    return;
+		tf.selectAll();
+		String link = tf.getText(); // get selected ?  String 	getSelectedText() 
+		// check html first since browser can invoke viewers
+		if(link.substring(0,7).equals("http://")){ // hml
+		    try {
+			System.err.println("Message: Opening url (" + link
+					   + ") with the HTML viewer ("
+					   + prefs.get("htmlviewer") +")");
+			Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
+								  + " " + link);
+		    } catch (IOException e) {
+			System.err.println("Warning: Unable to open url " 
+					   + link + " with the HTML viewer (" 
+					   + prefs.get("htmlviewer") +")");			
+		    }
 		}
+		else if(link.endsWith(".ps")){
+		    try {
+			System.err.println("Message: Opening file " + link 
+					   + " with the ps viewer (" 
+					   + prefs.get("psviewer") +")");
+			Process child = Runtime.getRuntime().exec(prefs.get("psviewer")
+								  + " " + link);
+		    } catch (IOException e) {
+			System.err.println("Warning: Unable to open file (" 
+					   + link + ") with the postscipt viewer (" 
+					   + prefs.get("psviewer") +")");
+		    }
+		    
+		}else if(link.endsWith(".pdf")){
+		    try {
+			System.err.println("Message: Opening file (" + link 
+					   + ") with the pdf viewer (" 
+					   + prefs.get("pdfviewer") +")");
+			Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer")
+								  + " " + link);
+		    } catch (IOException e) {
+			System.err.println("Warning: Unable to open file " + link
+					   + " with the pdf viewer ("
+					   + prefs.get("pdfviewer") +")");
+		    }
+		}
+		
+		else{
+		    System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
+		    //ignore
+		}
+		
+	    }
+	    
+	}
     }
- 
+    
 
 }

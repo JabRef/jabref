@@ -76,7 +76,7 @@ public class JabRefPreferences {
 	defaults.put("stringsSizeX", new Integer(600));
 	defaults.put("stringsSizeY", new Integer(400));
 	defaults.put("defaultShowSource", new Boolean(false));
-	defaults.put("enableSourceEditing", new Boolean(false));
+	defaults.put("enableSourceEditing", new Boolean(true));
 	defaults.put("caseSensitiveSearch", new Boolean(false));
 	defaults.put("searchReq", new Boolean(true));
 	defaults.put("searchOpt", new Boolean(true));

@@ -257,6 +257,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	"school",
 	"abstract",
 	"url",
+	"pdf",
 	"comment",
 	"bibtexkey",
 	"keywords",
@@ -327,6 +328,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	fieldWeight.put("keywords", SMALL_W);
 	fieldWeight.put("doi", SMALL_W);
 	fieldWeight.put("eid", SMALL_W);
+	fieldWeight.put("pdf", SMALL_W);
 	fieldWeight.put("number", SMALL_W);
 	fieldWeight.put("chapter", SMALL_W);
 	fieldWeight.put("editor", MEDIUM_W);

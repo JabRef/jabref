@@ -597,7 +597,7 @@ public abstract class BibtexEntryType
     public String[] getGeneralFields() {
         return new String[] 
 	    {"crossref", "keywords", "doi", "url", 
-	     "abstract", "comment"};
+	     "pdf", "abstract", "comment"};
     }
 
     public abstract String describeRequiredFields();

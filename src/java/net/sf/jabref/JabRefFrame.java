@@ -93,6 +93,9 @@ public class JabRefFrame extends JFrame {
 	cut = new GeneralAction("cut", "Cut", "Cut",
 				GUIGlobals.cutIconFile,
 				prefs.getKey("Cut")),
+	delete = new GeneralAction("delete", "Delete", "Delete",
+				   GUIGlobals.removeIconFile,
+				   prefs.getKey("Delete")),
 	copy = new GeneralAction("copy", "Copy", "Copy",
 				 GUIGlobals.copyIconFile,
 				 prefs.getKey("Copy")),
@@ -404,6 +407,8 @@ public class JabRefFrame extends JFrame {
 	edit.add(copy);
 	edit.add(paste);
 	//edit.add(remove);
+	edit.add(delete);
+	edit.addSeparator();
 	edit.add(selectAll);
 	mb.add(edit);
 
