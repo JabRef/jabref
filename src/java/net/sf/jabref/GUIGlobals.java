@@ -132,7 +132,8 @@ public class GUIGlobals {
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
 	searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif"),
 	autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif"),
-        fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
+    //fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
+	fetchMedlineIcon = GUIGlobals.class.getResource(pre+"World2.gif");
 
     // Help files (in HTML format):
     public static String
