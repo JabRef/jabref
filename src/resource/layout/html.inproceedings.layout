@@ -13,7 +13,7 @@
 
 		\begin{pdf}
 		<div class="bibtex_pdf">
-			<a href="\pdf">pdf</a>
+			<a href="\format[ResolvePDF]{\pdf}">pdf</a>
 		</div>
 		\end{pdf}
 

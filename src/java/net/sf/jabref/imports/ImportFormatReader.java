@@ -266,11 +266,13 @@ public class ImportFormatReader {
       String[] fieldDef = in.readLine().split(",");
       String s = null;
       BibtexEntry entry = null;
-      while ((s = in.readLine()) != null){
+      lines: while ((s = in.readLine()) != null){
         try{
           s = s.replaceAll("<par>", ""); // What is <par> ????
           String[] fields = s.split(SEPARATOR);
           // Check type and create entry:
+	  if (fields.length < 2)
+	      continue lines; // Avoid ArrayIndexOutOfBoundsException
           BibtexEntryType typ = BibtexEntryType
               .getType(fields[1].toLowerCase());
           if (typ == null){
@@ -1548,6 +1550,9 @@ public class ImportFormatReader {
 
     if (bibentries == null) throw new IOException(Globals.lang("Import failed"));
 
+    // Remove all empty entries:
+    purgeEmptyEntries(bibentries);
+
     // Add entries to database.
     database = new BibtexDatabase();
     Iterator it = bibentries.iterator();
@@ -1564,5 +1569,54 @@ public class ImportFormatReader {
 
     return database;
   }
+
+    /**
+     * Receives an ArrayList of BibtexEntry instances, iterates through them, and
+     * removes all entries that have no fields set. This is useful for rooting out
+     * an unsucessful import (wrong format) that returns a number of empty entries.
+     */
+    public static void purgeEmptyEntries(ArrayList entries) {
+	for (Iterator i=entries.iterator(); i.hasNext();) {
+	    BibtexEntry entry = (BibtexEntry)i.next();
+	    // Get all fields of the entry:
+	    Object[] o = entry.getAllFields();
+	    // If there are no fields, remove the entry:
+	    if (o.length == 0)
+		i.remove();
+	}
+    }
+
+    /**
+     * Tries to import a file by iterating through the available import filters,
+     * and keeping the import that seems most promising. Returns an Object array
+     * with two elements, 0: the name of the format used, 1: the database.
+     */
+    public static Object[] importUnknownFormat(String filename) throws IOException {
+	BibtexDatabase database = null;
+	String usedFormat = null;
+	int bestResult = 0;
+	String[] formats = new String[] {
+	    "endnote", "medline", "biblioscape", "bibtexml", "inspec", "isi", "ovid", "ris", 
+	    "scifinder", "jstor", "silverplatter", "sixpack" };
+
+	for (int i=0; i<formats.length; i++) {
+	    //System.out.println("Trying format: "+formats[i]);
+	    try {
+		BibtexDatabase base = importFile(formats[i], filename);
+		int entries = (base != null ? base.getEntryCount() : 0);
+		//System.out.println("Entries: "+entries);
+		if (entries > bestResult) {
+		    bestResult = entries;
+		    usedFormat = formats[i];
+		    database = base;
+		}
+	    } catch (IOException ex) {
+		//System.out.println("Import failed");
+	    }
+
+	}
+	return new Object[] {usedFormat, database};
+    }
+
 
 }

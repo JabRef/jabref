@@ -77,7 +77,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "month", "eid", "note"
+                    "number", "month", "eid", "note"
                 };
             }
 
@@ -85,7 +85,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "journal", "year", "volume", "number", "pages"
+                    "author", "title", "journal", "year", "volume", "pages"
                 };
             }
 

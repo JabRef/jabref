@@ -1379,20 +1379,38 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 		  });
 
               actions.put("test", new AbstractWorker() {
+		      String filename = null, formatName = null;
+		      BibtexDatabase base = null;
 		      public void init() {
-			  output("blocking");
+			  output("importing");
+			  
+			  filename = Globals.getNewFile(frame,  prefs,
+							null, null,
+							JFileChooser.OPEN_DIALOG,
+							false);
 			  frame.block();
 		      }
 		      public void run() {
-			  output("starting");
-			  try {
-			      Thread.sleep(4000);
-			  } catch (InterruptedException ex) {
+			  if ((filename != null) && !(new File(filename)).exists()) {
+			      System.out.println("File not found");
+			      return;
 			  }
-			  throw new RuntimeException();
+			  try {
+			      Object[] o = ImportFormatReader.importUnknownFormat(filename);
+			      formatName = (String)o[0];
+			      base = (BibtexDatabase)o[1];
+			  } catch (IOException ex) {
+			      ex.printStackTrace();
+			  }
 		      }
 		      public void update() {
-			  output("unblocking");
+			  if (base != null) {
+			      BasePanel newBp = frame.addTab(base, null, new HashMap(), true);
+			      newBp.markBaseChanged();
+			      output(Globals.lang("Imported entries")+": "+base.getEntryCount()
+				     +"  "+Globals.lang("Format used")+": "+formatName);
+			  } else
+			      output(Globals.lang("Could not find a suitable import format."));
 			  frame.unblock();
 		      }
 		  });

@@ -1271,9 +1271,10 @@ public JabRefPreferences prefs() {
     }
   }
 
-  public void addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
-    BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
-    tabbedPane.add(file.getName(), bp);
+  public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
+      BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
+      tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
+		     bp);
     if (raisePanel) {
       tabbedPane.setSelectedComponent(bp);
     }
@@ -1282,6 +1283,7 @@ public JabRefPreferences prefs() {
     } else if (tabbedPane.getTabCount() == 2) {
       setMultiple();
     }
+    return bp;
   }
 
   class SelectKeysAction
