@@ -38,9 +38,9 @@ public class RightClickMenu extends JPopupMenu
     
     BasePanel panel;
     MetaData metaData;
-    JMenu groupMenu = new JMenu("Add to group"),
-	groupRemoveMenu = new JMenu("Remove from group"),
-	typeMenu = new JMenu("Change entry type");
+    JMenu groupMenu = new JMenu(Globals.lang("Add to group")),
+	groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
+	typeMenu = new JMenu(Globals.lang("Change entry type"));
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
 	panel = panel_;
@@ -66,7 +66,7 @@ public class RightClickMenu extends JPopupMenu
 
 	addSeparator();
 
-	add(new AbstractAction(Globals.lang("Open pdf/ps")) {
+	add(new AbstractAction(Globals.lang("Open pdf or ps")) {
 		public void actionPerformed(ActionEvent e) {
 		    panel.runCommand("openFile");
 		}
