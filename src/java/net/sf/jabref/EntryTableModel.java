@@ -188,7 +188,7 @@ public class EntryTableModel
           }
           else {
             if (namesFf) {
-              return ImportFormatReader.fixAuthor_nocomma( (String) o);
+              return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
             }
             else {
               return ImportFormatReader.fixAuthor_lastnameFirst( (String) o);

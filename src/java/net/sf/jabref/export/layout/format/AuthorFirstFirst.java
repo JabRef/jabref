@@ -38,7 +38,7 @@ public class AuthorFirstFirst implements LayoutFormatter
     {
 	//ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
 	//return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
-        return ImportFormatReader.fixAuthor_nocomma(fieldText);
+        return ImportFormatReader.fixAuthor_firstNameFirst(fieldText);
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -46,7 +46,7 @@ public class ArticleLabelRule extends DefaultLabelRule {
 			String[] tokens= author.split("\\band\\b");
 			if( tokens.length > 0){ // if author is empty
 				if(tokens[0].indexOf(",") > 0)
-					tokens[0] = ImportFormatReader.fixAuthor_nocomma( tokens[0] ); // convert lastname, firstname to firstname lastname
+					tokens[0] = ImportFormatReader.fixAuthor_firstNameFirst( tokens[0] ); // convert lastname, firstname to firstname lastname
 				String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
 				// lastname, firstname
 

@@ -46,6 +46,7 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,12 @@ public class ImportFormatReader {
     private final static Pattern bracketsPattern = Pattern.compile("\\{.*\\}"),
 	spaceMarkerPattern = Pattern.compile(SPACE_MARKER);
 
+    /* Use a WeakHashMAp for storing cached names, so the cached mapping will not prevent
+     * an obsoleted name string from being garbage collected.
+     */
+
+    private final static Map nameCacheLastFirst = new WeakHashMap();
+    private final static Map nameCacheFirstFirst = new WeakHashMap();
 
   private TreeMap formats = new TreeMap();
 
@@ -90,6 +97,12 @@ public class ImportFormatReader {
     formats.put("jstor", new JstorImporter());
     formats.put("silverplatter", new SilverPlatterImporter());
   }
+
+    public static void clearNameCache() {
+	nameCacheLastFirst.clear();
+	nameCacheFirstFirst.clear();
+    }
+
 
   public List importFromStream(String format, InputStream in)
     throws IOException {
@@ -189,89 +202,57 @@ public class ImportFormatReader {
    * @return a <code>String</code> value // input format string: LN FN [and
    *         LN, FN]* // output format string: FN LN [and FN LN]*
    */
-  public static String fixAuthor_nocomma(String in) {
-    return fixAuthor(in);
+    public static String fixAuthor_firstNameFirst(final String inOrig) {
 
-    /*
-     * // Check if we have cached this particular name string before: Object old =
-     * Globals.nameCache.get(in); if (old != null) return (String)old;
-     *
-     * StringBuffer sb=new StringBuffer(); String[] authors = in.split(" and ");
-     * for(int i=0; i <authors.length; i++){ //System.out.println(authors[i]);
-     * authors[i]=authors[i].trim(); String[] t = authors[i].split(" "); if
-     * (t.length > 1) { sb.append(t[t.length-1].trim()); for (int cnt=0; cnt
-     * <=t.length-2; cnt++) sb.append(" " + t[cnt].trim()); } else
-     * sb.append(t[0].trim()); if(i==authors.length-1) sb.append("."); else
-     * sb.append(" and ");
-     *  }
-     *
-     * String fixed = sb.toString();
-     *  // Add the fixed name string to the cache. Globals.nameCache.put(in,
-     * fixed);
-     *
-     * return fixed;
-     */
-  }
+	String in = inOrig;
 
-  //========================================================
-  // rearranges the author names
-  // input format string: LN, FN [and LN, FN]*
-  // output format string: FN LN [, FN LN]+ [and FN LN]
-  //========================================================
-  public static String fixAuthor_commas(String in) {
-    return (fixAuthor(in, false));
-  }
+	// Check if we have cached this particular name string before: 
+	Object old = nameCacheFirstFirst.get(in); if (old != null) return (String)old;
 
-  //========================================================
-  // rearranges the author names
-  // input format string: LN, FN [and LN, FN]*
-  // output format string: FN LN [and FN LN]*
-  //========================================================
-  public static String fixAuthor(String in) {
-    return (fixAuthor(in, true));
-  }
+	StringBuffer sb = new StringBuffer();
 
-  public static String fixAuthor(String in, boolean includeAnds) {
-    //Util.pr("firstnamefirst");
-    StringBuffer sb = new StringBuffer();
+	//System.out.println("FIX AUTHOR: in= " + in);
+	String[] authors = in.split(" and ");
+	
+	for (int i = 0; i < authors.length; i++) {
+	    authors[i] = authors[i].trim();
+	    
+	    String[] t = authors[i].split(",");
+	    
+	    if (t.length < 2)
+		// there is no comma, assume we have FN LN order
+		sb.append(authors[i].trim());
+	    else
+		sb.append(t[1].trim() + " " + t[0].trim());
+	    
+	    if (i != (authors.length - 1)) // put back the " and "
+		sb.append(" and ");
 
-    //System.out.println("FIX AUTHOR: in= " + in);
-    String[] authors = in.split(" and ");
+	    //	    if (i == (authors.length - 2))
+	    //		sb.append(" and ");
+	    //	    else if (i != (authors.length - 1))
+	    //		sb.append(", ");
+	}
+	
+	String fixed = sb.toString();
+	
+	// Cache this transformation so we don't have to repeat it unnecessarily:
+	nameCacheFirstFirst.put(inOrig, fixed);
 
-    for (int i = 0; i < authors.length; i++) {
-      authors[i] = authors[i].trim();
-
-      String[] t = authors[i].split(",");
-
-      if (t.length < 2)
-
-        // there is no comma, assume we have FN LN order
-        sb.append(authors[i].trim());
-      else
-        sb.append(t[1].trim() + " " + t[0].trim());
-
-      if (includeAnds) {
-        if (i != (authors.length - 1)) // put back the " and "
-          sb.append(" and ");
-      } else {
-        if (i == (authors.length - 2))
-          sb.append(" and ");
-        else if (i != (authors.length - 1))
-          sb.append(", ");
-      }
+	return fixed;
     }
-
-    String fixed = sb.toString();
-
-    return fixed;
-  }
 
   //========================================================
   // rearranges the author names
   // input format string: LN, FN [and LN, FN]*
   // output format string: LN, FN [and LN, FN]*
   //========================================================
-  public static String fixAuthor_lastnameFirst(String in) {
+  public static String fixAuthor_lastnameFirst(final String inOrig) {
+
+      String in = inOrig;
+
+      // Check if we have cached this particular name string before: 
+      Object old = nameCacheLastFirst.get(in); if (old != null) return (String)old;
 
       if (in.indexOf("{") > 0) {
 	  StringBuffer tmp = new StringBuffer();
@@ -290,7 +271,6 @@ public class ImportFormatReader {
 
       }
 
-    //Util.pr("lastnamefirst: in");
     StringBuffer sb = new StringBuffer();
 
     String[] authors = in.split(" and ");
@@ -353,9 +333,12 @@ test:
     String fixed = sb.toString();
 
     if (spaceMarkerPattern.matcher(fixed).find())
-	return fixed.replaceAll(SPACE_MARKER, " ");
-    else
-	return fixed;
+	fixed = fixed.replaceAll(SPACE_MARKER, " ");
+
+    // Cache this transformation so we don't have to repeat it unnecessarily:
+    nameCacheLastFirst.put(inOrig, fixed);
+
+    return fixed;
   }
 
   static File checkAndCreateFile(String filename) {

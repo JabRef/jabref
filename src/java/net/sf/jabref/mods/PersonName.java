@@ -29,7 +29,7 @@ public class PersonName {
 	protected void parseName(String author) {
 			// TODO: replace special characters
 			Vector v = new Vector();
-		    String authorMod = ImportFormatReader.fixAuthor_nocomma(author);
+		    String authorMod = ImportFormatReader.fixAuthor_firstNameFirst(author);
 
 		    WSITools.tokenize(v, authorMod, " \n\r");
 
