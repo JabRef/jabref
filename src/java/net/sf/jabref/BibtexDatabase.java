@@ -45,7 +45,7 @@ import javax.swing.JOptionPane;
 
 public class BibtexDatabase
 {
-    Map _entries = new HashMap();
+    Map _entries = new Hashtable();
     String _preamble = null;
     HashMap _strings = new HashMap();
     Vector _strings_ = new Vector();
