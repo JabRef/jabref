@@ -26,8 +26,8 @@ public aspect DetectSwingSingleThreadRuleViolations {
 		: guiUpdates(component) && !safeGuiCalls();
     
     before(Component component) : unsafeGuiCalls(component) 
-    	&& if (!EventQueue.isDispatchThread() && component.isDisplayable() &&
-    	        	!Thread.currentThread().getName().equals("main")) {
+    	&& if (!EventQueue.isDispatchThread() && (component != null) &&
+    	        	component.isDisplayable() && !Thread.currentThread().getName().equals("main")) {
             System.err.println(	
                     "Violation: Swing component method called from nonAWT thread"
                     + "\nCalled method: " + thisJoinPointStaticPart.getSignature()
