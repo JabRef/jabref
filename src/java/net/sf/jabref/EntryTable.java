@@ -102,6 +102,37 @@ public class EntryTable extends JTable {
                 // We could add sorting for these columns, but currently we do nothing.
                 return;
               }
+
+              /*
+               * If the user adjusts the header size the sort event is
+               * always triggered.
+               * To avoid this behaviour we check if the mouse is
+               * inside the label's bounds and has a certain distance (offset)
+               * to the label border.
+               *
+               * Sascha Hunold <hunoldinho@users.sourceforge.net>
+               */
+	      
+              Point p = e.getPoint();
+              int colindex = getTableHeader().columnAtPoint(p);
+              if( colindex >= 0 ) {
+		  int xoffset = 0;
+		  for (int i = 0; i < colindex; i++) {
+		      xoffset += getColumnModel().getColumn(i).getWidth();
+		  }
+		  TableColumn column = getColumnModel().getColumn(col);
+		  int cw = column.getWidth();
+		  int ch = getTableHeader().getHeight();
+		  
+		  Rectangle r = new Rectangle();
+		  int offset  = 3;
+		  r.setBounds(offset+xoffset, 0/*offset*/, cw-2*offset, ch/*-2*offset*/);
+		  if (!r.contains(p)) {
+		      return;
+		  }
+              }
+	      
+
               if (!s.equals(prefs.get("priSort")))
                 prefs.put("priSort", s);
                 // ... or change sort direction

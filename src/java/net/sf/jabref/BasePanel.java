@@ -177,6 +177,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public JabRefPreferences prefs() { return prefs; }
 
     public void output(String s) {
+	//Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
         if (!suppressOutput)
             frame.output(s);
     }
@@ -1314,61 +1315,84 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                   });
 
 
-              actions.put("test", new BaseAction() {
-                public void action() {
-		    if (entryTable.getSelectedRowCount() == 0)
-			return;
+              actions.put("exportToClipboard", new AbstractWorker() {
+		      String message = null;
+		      public void run() {
+			  if (entryTable.getSelectedRowCount() == 0) {
+			      message = Globals.lang("No entries selected")+".";
+			      getCallBack().update();
+			      return;
+			  }
 
-		    // Make a list of possible formats:
-		    Set formats = new HashSet();
-		    formats.add("bibtexml");
-		    formats.add("docbook");
-		    formats.add("html");
-		    formats.add("simplehtml");
-		    for (int i = 0; i < prefs.customExports.size(); i++) {
-			formats.add((prefs.customExports.getElementAt(i))[0]);
-		    }
-		    JList list = new JList(formats.toArray());
-		    list.setBorder(BorderFactory.createEtchedBorder());
-		    list.setSelectionInterval(0,0);
-		    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		    int answer = 
-			JOptionPane.showOptionDialog(frame, list, Globals.lang("Select the format to copy entries in"),
-						     JOptionPane.YES_NO_OPTION,
-						     JOptionPane.QUESTION_MESSAGE, null, 
-						     new String[] {Globals.lang("Ok"), Globals.lang("Cancel")}, 
-						     Globals.lang("Ok"));
+			  // Make a list of possible formats:
+			  Set formats = new HashSet();
+			  formats.add("bibtexml");
+			  formats.add("docbook");
+			  formats.add("html");
+			  formats.add("simplehtml");
+			  for (int i = 0; i < prefs.customExports.size(); i++) {
+			      formats.add((prefs.customExports.getElementAt(i))[0]);
+			  }
+			  JList list = new JList(formats.toArray());
+			  list.setBorder(BorderFactory.createEtchedBorder());
+			  list.setSelectionInterval(0,0);
+			  list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			  int answer = 
+			      JOptionPane.showOptionDialog(frame, list, Globals.lang("Select the format to copy entries in"),
+							   JOptionPane.YES_NO_OPTION,
+							   JOptionPane.QUESTION_MESSAGE, null, 
+							   new String[] {Globals.lang("Ok"), Globals.lang("Cancel")}, 
+							   Globals.lang("Ok"));
+			  
+			  if (answer == JOptionPane.NO_OPTION)
+			      return;
+			  
+			  String lfName = (String)(list.getSelectedValue());
+			  final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
+			  String dir = null;
+			  if (custom) {
+			      int index = list.getSelectedIndex()-Globals.STANDARD_EXPORT_COUNT;
+			      dir = (String)(prefs.customExports.getElementAt(index)[1]);
+			      File f = new File(dir);
+			      lfName = f.getName();
+			      lfName = lfName.substring(0, lfName.indexOf("."));
+			      // Remove file name - we want the directory only.
+			      dir = f.getParent()+System.getProperty("file.separator");
+			  }
+			  final String format = lfName,
+			      directory = dir;
+			  
+			  try {
+			      BibtexEntry[] bes = entryTable.getSelectedEntries();
+			      FileActions.exportToClipboard(database, bes, format, custom, directory, prefs);
+			      message = Globals.lang("Entries exported to clipboard")+": "+bes.length;
+			      
+			  } catch (Exception ex) {
+			      ex.printStackTrace();
+			  }
 
-		    if (answer == JOptionPane.NO_OPTION)
-			return;
-		    
-		    String lfName = (String)(list.getSelectedValue());
-		    final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
-		    String dir = null;
-		    if (custom) {
-			int index = list.getSelectedIndex()-Globals.STANDARD_EXPORT_COUNT;
-			dir = (String)(prefs.customExports.getElementAt(index)[1]);
-			File f = new File(dir);
-			lfName = f.getName();
-			lfName = lfName.substring(0, lfName.indexOf("."));
-			// Remove file name - we want the directory only.
-			dir = f.getParent()+System.getProperty("file.separator");
-		    }
-		    final String format = lfName,
-			directory = dir;
+			  getCallBack().update();
+		      }
 		      
-		    (new Thread() {
-			    public void run() {
-				try {
-				    BibtexEntry[] bes = entryTable.getSelectedEntries();
-				    FileActions.exportToClipboard(database, bes, format, custom, directory, prefs);
-				} catch (Exception ex) {
-				    ex.printStackTrace();
-				}
-			    }
-			}).start();
-                }
-              });
+		      public void update() {
+			  output(message);
+		      }
+		     
+		  });
+
+              actions.put("test", new AbstractWorker() {
+		      public void run() {
+			  try {
+			      Thread.sleep(4000);
+			  } catch (InterruptedException ex) {
+			  }
+			  getCallBack().update();
+		      }
+		      public void update() {
+			  output("done");
+		      }
+		  });
+
     }
 
     /**
@@ -1385,11 +1409,18 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
       //  public void run() {
           if (actions.get(command) == null)
             Util.pr("No action defined for'" + command + "'");
-            else try {
-              ( (BaseAction) actions.get(command)).action();
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
+            else {
+		Object o = actions.get(command);
+		try {
+		    if (o instanceof BaseAction)
+			((BaseAction)o).action();
+		    else
+			((AbstractWorker)o).getWorker().run();
+
+		} catch (Throwable ex) {
+		    ex.printStackTrace();
+		}
+	    }
       //  }
       //}).start();
     }
