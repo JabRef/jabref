@@ -38,6 +38,7 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
+    public static Locale locale;
     public static final String FILETYPE_PREFS_EXT = "_dir",
 	SELECTOR_META_PREFIX = "selector_";
 
@@ -83,10 +84,10 @@ public class Globals {
 		DEFAULT_BIBTEXENTRY_ID="__ID";
 
     public static void setLanguage(String language, String country) {
-	messages = ResourceBundle.getBundle(resourcePrefix,
-					    new Locale(language,
-						       country));
-
+	locale = new Locale(language, country);
+	messages = ResourceBundle.getBundle(resourcePrefix, locale);
+	Locale.setDefault(locale);
+	javax.swing.JComponent.setDefaultLocale(locale);
     }
 
     public static String lang(String key){
