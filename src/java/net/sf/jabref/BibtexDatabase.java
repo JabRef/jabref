@@ -149,10 +149,15 @@ public class BibtexDatabase
             BibtexEntry entry = getEntryById(entrieID) ;
             if ((entry != null) && (entry.getCiteKey() != null))
             {
-              if (keyHash == entry.getCiteKey().hashCode())
+              String citeKey = entry.getCiteKey() ;
+              if (citeKey != null)
               {
-                loop = false ;
-                back = entry ;
+                if (keyHash == citeKey.hashCode() )
+                {
+                  loop = false ;
+                  back = entry ;
+                }
+                else loop = it.hasNext() ;
               } else loop = it.hasNext() ;
             }
           }
