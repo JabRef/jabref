@@ -30,12 +30,21 @@ public class MODSEntry {
 	protected String title = null;
 	// should really be handled with an enum
 	protected String type = "text";
+	
+	protected String pages;
+	protected String number;
+	protected String volume;
 	protected String genre = null;
 	protected Set handledExtensions;
+	
+	protected MODSEntry host;
 	Map extensionFields;
 	
 	public static String BIBTEX = "bibtex_";
 	
+	public MODSEntry() {
+		
+	}
 	
 	public MODSEntry(BibtexEntry bibtex) {
 		extensionFields = new HashMap();
@@ -62,7 +71,19 @@ public class MODSEntry {
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
 			authors = getAuthors(bibtex.getField("author").toString());
+		if (bibtex.getType() == BibtexEntryType.ARTICLE)
+		{
+			host = new MODSEntry();
+			host.title = (String) bibtex.getField("booktitle");
+			host.publisher = (String) bibtex.getField("publisher");
+			host.pages = (String) bibtex.getField("pages");
+			host.number = (String) bibtex.getField("number");
+			host.volume = (String) bibtex.getField("volume");
+			host.issuance = "continuing";
+		}
+		
 		populateExtensionFields(bibtex);
+		
 	}
 	
 	protected void populateExtensionFields(BibtexEntry e) {
@@ -137,7 +158,7 @@ public class MODSEntry {
 	   		// title
 			Element titleInfo = d.createElement("titleInfo");
 	   		Element mainTitle = d.createElement("title");
-	   		mainTitle.setTextContent(title);
+	   		mainTitle.setNodeValue(title);
 	   		titleInfo.appendChild(mainTitle);
 	   		mods.appendChild(titleInfo);
 	   		if (authors != null) {
@@ -148,19 +169,19 @@ public class MODSEntry {
 	   				if (name.getSurname() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "family");
-	   					namePart.setTextContent(name.getSurname());
+	   					namePart.setNodeValue(name.getSurname());
 	   					modsName.appendChild(namePart);
 	   				}
 	   				if (name.getGivenNames() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "given");
-	   					namePart.setTextContent(name.getGivenNames());
+	   					namePart.setNodeValue(name.getGivenNames());
 	   					modsName.appendChild(namePart);
 	   				}
 	   				Element role = d.createElement("role");
 	   				Element roleTerm = d.createElement("roleTerm");
 	   				roleTerm.setAttribute("type", "text");
-	   				roleTerm.setTextContent("author");
+	   				roleTerm.setNodeValue("author");
 	   				role.appendChild(roleTerm);
 	   				modsName.appendChild(role);
 	   				mods.appendChild(modsName);
@@ -171,32 +192,41 @@ public class MODSEntry {
 	   		mods.appendChild(originInfo);
 	   		if (this.publisher != null) {
 	   			Element publisher = d.createElement("publisher");
-				publisher.setTextContent(this.publisher);
+				publisher.setNodeValue(this.publisher);
 	   			originInfo.appendChild(publisher);
 	   		}
 	   		if (date != null) {
 	   			Element dateIssued = d.createElement("dateIssued");
-	   			dateIssued.setTextContent(date);
+	   			dateIssued.setNodeValue(date);
 	   			originInfo.appendChild(dateIssued);
 	   		}
 	   		Element issuance = d.createElement("issuance");
-	   		issuance.setTextContent(this.issuance);
+	   		issuance.setNodeValue(this.issuance);
 	   		originInfo.appendChild(issuance);
 	   		
 	   		Element idref = d.createElement("identifier");
-	   		idref.setTextContent(id);
+	   		idref.setNodeValue(id);
 	   		mods.appendChild(idref);
 	   		
 	   		Element typeOfResource = d.createElement("typeOfResource");
-	   		typeOfResource.setTextContent(type);
+	   		typeOfResource.setNodeValue(type);
 	   		mods.appendChild(typeOfResource);
 	   		
 	   		if (genre != null) {
 	   			Element genreElement = d.createElement("genre");
 	   			genreElement.setAttribute("authority", "marc");
-	   			genreElement.setTextContent(genre);
+	   			genreElement.setNodeValue(genre);
 	   			mods.appendChild(genreElement);
 	   		}
+	   		
+	   		if (host != null) {
+	   			//Element relatedItem = (Element) host.getDOMrepresentation(d);	   			
+	   			// d.renameNode(relatedItem, "", "relatedItem");
+	   			//relatedItem.setAttribute("type","host");
+	   			
+	   			//mods.appendChild(relatedItem);
+	   		}
+	   		
 	   		/* now generate extension fields for unhandled data */
 	   		for(Iterator iter = extensionFields.entrySet().iterator(); iter.hasNext(); ) {
 	   			Element extension = d.createElement("extension");
@@ -206,7 +236,7 @@ public class MODSEntry {
 	   			if (handledExtensions.contains(field))
 	   				continue;
 	   			Element theData = d.createElement(field);
-	   			theData.setTextContent(value);
+	   			theData.setNodeValue(value);
 	   			extension.appendChild(theData);
 	   			mods.appendChild(extension);
 	   		}
