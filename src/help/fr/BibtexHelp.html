@@ -1,0 +1,53 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>A propos de <em>BibTeX</em></H1>
+
+JabRef vous aide à travailler avec vos bases de données <em>BibTeX</em>,
+mais certaines règles doivent être gardées à l'esprit lorsque vous
+éditez vos entrées afin d'assurer que votre base de données soit 
+traitée correctement par le programme <em>BibTeX</em>.
+
+<H2>Les champs <em>BibTeX</em></H2>
+
+Il y a un grand nombre de champs possibles dans <em>BibTeX</em>, et
+quelques champs en plus que vous pouvez paramétrer dans JabRef.
+
+<P>
+Généralement, vous pouvez utiliser des commandes LaTeX à l'intérieur
+de champs contenant du texte. <em>BibTeX</em> formatera automatiquement
+vos listes de références et les champs qui sont inclus dans ces
+listes seront (dé)capitalisés selon votre style bibliographique. Pour
+être certain que certains caractères restent capitalisés, encadrez-les
+par des accolades, comme dans le mot {B}elgique.
+
+<P>
+Notes à propos de certains types de champs&nbsp;:
+<ul>
+<li><em>Author</em>&nbsp;: Ce champ doit contenir la liste complète
+des auteurs de votre entrée. Les noms sont séparés par le mot
+<em>and</em> même s'il y a plus de deux auteurs. Chaque nom peut
+être écrit indifféremment selon une des deux formes suivantes&nbsp;:<br>
+ Donald E. Knuth <em>ou</em> Knuth, Donald E.<br>
+ Eddie van Halen <em>ou</em> van Halen, Eddie<br>
+
+La seconde forme doit être utilisée pour les auteurs qui ont des noms
+composés (afin de différencier entre prénoms et noms).
+ 
+<li><em>Editor</em>&nbsp;: Ce champ est analogue au champ <em>author</em>.
+
+<li><em>Year</em>&nbsp;: Année de la publication. Ce champ est requis pour
+la plupart des types d'entrées. JabRef accepte uniquement des valeurs
+numériques dans ce champ. [NdT: ça semble faut : on peut y mettre des lettres !]
+
+<li><em>Bibtexkey</em>&nbsp;: C'est une chaîne unique utilisée pour référencer
+l'entrée dans les documents LaTeX. Notez que lorsque vous référencez une entrée
+dans LaTeX, la clef doit respecter la casse (majuscules/minuscules) de la chaîne
+de référence.
+
+</ul>
+
+
+</HTML>

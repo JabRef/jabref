@@ -1,0 +1,106 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Recherche dans JabRef</H1>
+
+Il y a trois modes différents de recherche dans JabRef.
+
+<p>
+<em>CTRL-F</em> ouvre ou active l'interface de recherche. Appuyer 
+sur <em>CTRL-F</em> plusieurs fois modifie le mode de recherche.
+En recherche incrémentale, <em>CTRL-F</em> affiche
+l'occurrence suivante de la chaîne à rechercher.
+<p>
+<em>CTRL-SHIFT-F</em> ouvre ou active l'interface de recherche, et
+sélectionne la recherche incrémentale. En recherche incrémentale, appuyer
+sur  <em>CTRL-SHIFT-F</em> affiche aussi l'occurrence suivante de la chaîne
+à rechercher.
+
+
+<H2>Recherche incrémentale</H2>
+
+En recherche incrémentale, le programme effectue une recherche chaque
+fois qu'une lettre est tapée. La ligne de statut vous informe
+du résultat de cette recherche. Entrer le raccourci clavier
+de la recherche affiche l'occurrence suivante de la chaîne à rechercher.
+Si aucune autre occurrence ne peut être trouvée, la ligne de statut vous
+en informe. Répéter alors la recherche fera redémarrer la recherche
+au début. L'ordre de recherche se fait toujours selon l'ordre de tri
+actuel de votre base de données. Pour quitter la recherche incrémentale,
+appuyer sur ESC ou cliquer sur "Vider".
+
+<H2>Recherche surlignée</H2>
+
+En recherche surlignée, le programme se met à rechercher dans votre
+base de données toutes les occurrences de votre chaîne de
+recherche à partir du moment où vous appuyez sur ENTER.
+Toutes les entrées qui correspondent sont sélectionnées.
+
+
+<H2>Recherche flottante</H2>
+
+La recherche flottante est similaire à la recherche surlignée,
+excepté que les entrées qui correspondent ne sont pas sélectionnées,
+mais sont déplacées en haut du tableau. Les entrées qui ne
+correspondent pas se retrouvent alors en dessous de celles qui
+correspondent, et, de plus, seront affichés en grisé. Pour arréter
+l'affichage des résultats de la recherche, appuyer sur ESC ou
+cliquer sur "Vider".
+
+
+<H2>Spécification des champs, opérateurs logiques</H2>
+
+Afin de rechercher uniquement des champs spécifiques et/ou
+d'inclure des opérateurs logiques dans l'expression à rechercher,
+une syntaxe particulière est disponible. Par exemple, pour 
+rechercher les entrées dont l'auteur est "Miller", entrer (excepté
+en mode de recherche incrémentale)&nbsp;:
+<p>
+author = miller
+<p>
+A la fois la spécification du champ et le terme à rechercher
+peuvent être des expressions régulières. Si un terme à rechercher
+contient des espaces, le mettre entre guillemets. Il ne faut
+<i>jamais</i> utiliser d'espace dans la spécification du champ&nbsp;!
+
+Par exemple, pour rechercher les entrées à propos de traitement
+d'images, entrez&nbsp;:
+<p>
+title|keywords = "traitement d'images"
+<p>
+Vous pouvez utiliser "and", "or", "not", et les parenthèses
+de la façon habituelle&nbsp;:
+<p>
+(author = miller or title|keywords = "traitement d'images") and not author = brown
+<p>
+En fait, le signe "=" signifie "contient". La recherche d'une correspondance exacte
+est possible en utilisant "matches" or "==". Utiliser "!=" pour tester si le terme à
+rechercher n'est <i>pas</i> contenu dans le champ (un équivalent de "not ...
+contains ..."). 
+Le choix des types de champs à rechercher (required, optional, all), est
+toujours annulé par la spécification du champ dans l'expression
+à rechercher [NdT: ça veut dire quoi?]. Pour chercher des entrées d'un certain type,
+un pseudo-champ nommé "entrytype" est disponible&nbsp;:
+<p>
+entrytype = thesis
+<p>
+recherchera les entrées dont le type (tel qu'affiché dans la colonne "Entrytype")
+contient le mot "thesis" (et qui sera donc "phdthesis" ou "mastersthesis"). 
+
+<H2>Paramètres de recherche</H2>
+
+ Le bouton <em>Paramètres</em> ouvre un menu montrant les paramètres de votre
+ recherche. Les paramètres permettent de limiter les champs utilisés dans
+ la recherche, de décider si votre chaîne de recherche doit être interprétée
+ comme une expression régulière, et de décider si votre recherche doit
+ être sensible à la casse (majuscules/minuscules).
+ 
+<!--
+<p>You can at any time export a <em>bibtex</em> database containing
+only the entries in your currently shown group and/or search, by
+choosing <em>File -> Save special</em> in the menu. -->
+
+</BODY>
+</HTML> 

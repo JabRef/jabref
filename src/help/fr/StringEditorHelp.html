@@ -1,0 +1,41 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>L'éditeur de chaîne</H1>
+<em>On l'ouvre à partir de la fenêtre principale par le menu <em>BibTeX/ Editer les chaînes</em>
+en appuyant sur le bouton '@s' [NdT: c'est quoi ce bouton?].
+Le raccourci clavier est CTRL-T.</em>
+<P>
+Les <em>chaînes</em> sont l'équivalent <em>BibTeX</em> des constantes dans 
+un language de programmation. Chaque chaîne est définie par un <em>nom</em> 
+unique et un <em>contenu</em>. Dans votre base de données, ce nom peut être
+utilisé pour représenter ce contenu.
+
+<P>
+Par exemple, si beaucoup d'entrées sont d'un journal dont l'abréviation
+est difficile à mémoriser, tel que 'J. Theor. Biol.' (Journal of
+Theroretical Biology), une chaîne nommée JTB peut être définie pour
+représenter le nom de ce journal. Au lieu de taper le nom exact du journal
+dans chaque entrée, les caractères '#JTB#' sont entrés [NdT: sans les guillemets]
+dans le champ <em>journal</em> de chaque entrée, assurant ainsi que le nom
+du journal est écrit de la même façon à chaque fois.
+
+<P>
+Une telle chaîne peut apparaître n'importe où, dans n'importe quel
+champ, en incluant le nom de la chaîne entre une paire de caractères '#'.
+Cette syntaxe est spécifique à JabRef et diffère légèrement de la notation
+<em>BibTeX</em> qui est utilisée quand vous sauvez votre base de données.
+
+<P>
+Une chaîne peut être incluse dans le contenu d'une autre chaîne (chaîne
+incluante), à la condition que la chaîne incluse soit définie
+<em>avant</em> la chaîne incluante. Dans ce cas, l'ordre des chaînes devient
+important. JabRef ne vérifie pas l'ordre des chaînes, mais l'éditeur
+de chaîne vous permet de changer cet ordre en utilisant les boutons
+<em>haut</em> et <em>bas</em>  (CTRL-UP et CTRL-DOWN) une fois la chaîne
+sélectionnée [NdT: cela n'a pas l'air de marcher... Où sont les boutons ?].
+
+</BODY>
+</HTML>

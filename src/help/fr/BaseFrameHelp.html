@@ -1,0 +1,99 @@
+<HTML>
+
+<BODY text="#275856">
+
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>La fenêtre principale de JabRef</H1>
+
+<em>Note&nbsp;:</em> La plupart des menus dont il est question dans les
+paragraphes suivants ont des raccourcis claviers, et beaucoup sont accessibles
+depuis la barre d'outils. Les raccourcis clavier sont affichés dans les menus
+déroulants.
+
+<p>
+Ceci est la fenêtre principale à partir de laquelle vous travaillez avec vos
+bases de données. En dessous de la barre de menus et de la barre d'outils se
+trouve un panneau à onglets contenant un onglets pour chacune de vos
+bases de données actuellement ouvertes. Quand vous sélectionnez un de ces
+onglets, un tableau apparaît, listant toutes les entrées de la base de
+données, ainsi qu'une sélection configurable de leurs champs.
+<ul>
+<li>Vous décidez des champs affichés dans ce tableau en cochant les
+champs que vous voulez voir dans la fenêtre de dialogue <strong>Préférences</strong>.</li>
+<li>Les champs peuvent être édités directement dans le tableau, en cliquant
+simplement dans la cellule et en tapant le contenu [NdT&nbsp;: à la condition que 
+"Autoriser l'édition dans les cellules du tableau" soit cochée
+dans la fenêtre de dialogue <strong>Préférences</strong>].
+Double-cliquez dans la cellule pour utiliser un mode d'édition plus puissant. Vous pouvez naviguer
+dans le tableau en utilisant les flèches du clavier.</li>
+<li>Le tableau est trié selon le champ de votre choix. Cliquez simplement
+sur l'entête d'une colonne pour trier les entrées selon le champ correspondant
+à cette colonne.
+Cliquez une nouvelle fois sur l'entête de cette colonne pour inverser
+l'ordre de tri. Les entrées ayant des contenus identiques dans le champ
+sélectionné sont triées selon le champ de tri secondaire (et éventuellement
+tertiaire), ce qui peut être configuré dans la fenêtre de dialogue
+<strong>Préférences</strong>.</li>
+<li>Vous pouvez ajuster la largeur des colonnes en faisant glisser les limites
+entre les entêtes.</li>
+<li>Dans la fenêtre de dialogue <strong>Préférences</strong>, choisissez si le tableau
+doit être redimensionné pour s'ajuster à la fenêtre. Sélectionner cette option
+pour toujours voir l'ensemble du tableau, et désélectionner là pour permettre
+l'affichage de plus d'informations.</li>
+<li>Les codes de couleurs vous aident à visualiser l'état
+de votre base de données. Les cellules sont colorées de la
+façon suivante&nbsp;:
+  <ul>
+  <li>Une cellule <font color="red">rouge</font> dans la colonne
+  la plus à gauche signale une entrée incomplète.</li>
+  <li>Une cellule <font color="#909000">jaune</font> dans la colonne
+  là plus à gauche signale une entrée qui ne définie pas par elle-même
+  l'ensemble des champs requis, mais qui contient un renvoi.</li>
+  <li>Une cellule <font color="blue">bleue</font> correspond à un champ requis.</li>
+  <li>Une cellule <font color="green">verte</font> correspond à un champ optionnel.</li>
+  <li>Une cellule sans couleur correspond à un champ qui n'est pas utilisé
+  par le programme <em>BibTeX</em> pour ce type d'entrée. Le champ peut cependant
+  être édité dans JabRef.</li>
+  </ul>
+</li>
+Les codes de couleurs peuvent être modifiés dans la fenêtre de dialogue
+<strong>Préférences</strong>. 
+
+</ul>
+
+<H2>Ajouter une nouvelle entrée</H2>
+Il y a plusieurs façons d'ajouter une nouvelle entrée. L'activation du menu
+<strong>BibTeX/ Nouvelle entrée</strong> affiche une fenêtre de dialogue où vous pouvez
+choisir le type d'entrée à partir d'une liste. Pour éviter cette fenêtre
+de dialogue, vous pouvez utilisez le menu <strong>BibTeX/ Nouvelle entrée...</strong>
+ainsi que des raccourcis clavier pour les types les plus courants.
+
+<P>Lorqu'une nouvelle entrée est ajoutée, par défaut, une 
+<a href="EntryEditorHelp.html">fenêtre d'édition</a> s'ouvre. Ce comportement
+peut être modifié dans la fenêtre de dialogue <strong>Préférences</strong>.
+<P><em>Note&nbsp;:</em> Nous vous recommandons fortement d'apprendre les
+raccourcis clavier des types d'entrées que vous utilisez le plus souvent,
+tel que CTRL-SHIFT-A pour l'ajout d'une entrée <em>article</em>.
+
+<H2>Editer une entrée</H2> Pour ouvrir la <a
+href="EntryEditorHelp.html">fenêtre d'édition</a> sur une entrée existante, 
+double-cliquez simplement dans la colonne la plus à gauche sur le ligne
+correspondant à l'entrée, ou sélectionner l'entrée et appuyez sur ENTER [NdT&nbsp;: Notez que si
+"Autoriser l'édition dans les cellules du tableau" est coché
+dans la fenêtre de dialogue <strong>Préférences</strong>, un double-clic n'importe
+où sur la ligne correspondant à l'entrée ouvrira la fenêtre d'édition].
+
+<H2>Référencer une chaîne <em>BibTeX</em> dans un champ</H2>
+Dans JabRef vous écrivez le contenu de tous les champs de la même 
+façon que dans un éditeur de texte, à une exception près&nbsp;: pour
+référencer une chaîne, entourer le nom de la chaîne avec le caractère #,
+tel que dans&nbsp;:<BR>
+&nbsp;&nbsp;'#jan# 1997',<BR>
+ce qui sera interprété comme la chaîne nommée 'jan' suivie de '1997'.
+<P>Voir aussi: <a href="StringEditorHelp.html">Editeur de chaîne</a>.
+
+</font>
+
+</BODY>
+</HTML>
