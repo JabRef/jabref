@@ -37,6 +37,7 @@ import java.io.*;
 import java.util.*;
 import java.awt.datatransfer.*;
 import javax.swing.undo.*;
+import net.sf.jabref.groups.GroupSelector;
 
 public class BasePanel extends JSplitPane implements MouseListener,
 						     ClipboardOwner {
@@ -91,6 +92,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
+
+    GroupSelector groupSelector;
+    // The group selector component for this database. Instantiated by the SidePaneManager if necessary,
+    // or from this class if merging groups from a different database.
 
     boolean showingSearchResults = false,
 	showingGroup = false;
@@ -227,6 +232,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			     == JOptionPane.OK_OPTION)) {
 			    runCommand("save");
 			    prefs.put("workingDirectory", path);
+                            frame.fileHistory.newFile(file.getPath());
 			}
 			else
 			    file = null;
@@ -597,14 +603,110 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
-    }
+          actions.put("mergeDatabase", new BaseAction() {
+            public void action() {
+              JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                  new JabRefFileChooser((File)null) :
+                  new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+              chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
+              int returnVal = chooser.showOpenDialog(ths);
+              if(returnVal == JFileChooser.APPROVE_OPTION) {
+                fileToOpen = chooser.getSelectedFile();
 
+                final MergeDialog md = new MergeDialog(frame, Globals.lang("Merge database"), true);
+                Util.placeDialog(md, ths);
+                md.setVisible(true);
+
+                // Run the actual open in a thread to prevent the program
+                // locking until the file is loaded.
+                if (fileToOpen != null) {
+                  (new Thread() {
+                    public void run() {
+                      openIt(md.importEntries(), md.importStrings(), md.importGroups());
+                    }
+                  }).start();
+                  frame.fileHistory.newFile(fileToOpen.getPath());
+                }
+              }
+            }
+
+           void openIt(boolean importEntries, boolean importStrings,
+                       boolean importGroups) {
+             if ((fileToOpen != null) && (fileToOpen.exists())) {
+               try {
+                 prefs.put("workingDirectory", fileToOpen.getPath());
+                 // Should this be done _after_ we know it was successfully opened?
+
+                 ParserResult pr = frame.loadDatabase(fileToOpen);
+                 BibtexDatabase db = pr.getDatabase();
+                 MetaData meta = new MetaData(pr.getMetaData());
+                 NamedCompound ce = new NamedCompound(Globals.lang("Import database"));
+
+                 if (importEntries) { // Add entries
+                   Iterator i = db.getKeySet().iterator();
+                   while (i.hasNext()) {
+                     BibtexEntry be = (BibtexEntry)(db.getEntryById((String)i.next()).clone());
+                     be.setId(Util.createNeutralId());
+                     database.insertEntry(be);
+                     ce.addEdit(new UndoableInsertEntry(database, be, ths));
+                   }
+                 }
+
+                 if (importStrings) {
+                   BibtexString bs;
+                   int pos = 0;
+                   for (int i=0; i<db.getStringCount(); i++) {
+                     bs = (BibtexString)(db.getString(i).clone());
+                     if (!database.hasStringLabel(bs.getName())) {
+                       pos = database.getStringCount();
+                       database.addString(bs, pos);
+                       ce.addEdit(new UndoableInsertString(database, bs, pos));
+                     }
+                   }
+                 }
+
+                 if (importGroups) {
+                   Vector newGroups = meta.getData("groups");
+                   if (newGroups != null) {
+                     Vector groups = metaData.getData("groups");
+                     if (groupSelector == null) {
+                       // The current database has no group selector defined, so we must instantiate one.
+                       groupSelector = new GroupSelector
+                           (frame, ths, new Vector(), sidePaneManager, prefs);
+                       sidePaneManager.register("groups", groupSelector);
+                     }
+
+                     groupSelector.addGroups(newGroups, ce);
+                     groupSelector.revalidateList();
+                   }
+                 }
+
+                 ce.end();
+                 undoManager.addEdit(ce);
+                 markBaseChanged();
+                 refreshTable();
+                 output("Imported from database '"+fileToOpen.getPath()+"':");
+                 fileToOpen = null;
+               } catch (Throwable ex) {
+                 ex.printStackTrace();
+                 JOptionPane.showMessageDialog
+                     (ths, ex.getMessage(),
+                      "Open database", JOptionPane.ERROR_MESSAGE);
+               }
+             }
+           }
+         });
+
+
+    }
 
     /**
      * This method is called from JabRefFrame is a database specific
      * action is requested by the user. Runs the command if it is
      * defined, or prints an error message to the standard error
      * stream.
+     *
+     * @param command The name of the command to run.
     */
     public void runCommand(String command) {
 	if (actions.get(command) == null)
@@ -616,6 +718,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * This method is called from JabRefFrame when the user wants to
      * create a new entry. If the argument is null, the user is
      * prompted for an entry type.
+     *
+     * @param type The type of the entry to create.
      */
     public void newEntry(BibtexEntryType type) {
 	if (type == null) {
@@ -703,7 +807,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-
 	// We replace the default FocusTraversalPolicy with a subclass
 	// that only allows FieldEditor components to gain keyboard focus,
 	// if there is an entry editor open.
@@ -747,6 +850,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * that started with the meta flag (GUIGlobals.META_FLAG).
      * In this method, the meta data are input to their respective
      * handlers.
+     *
+     * @param meta Metadata to input.
      */
     public void parseMetaData(HashMap meta) {
 	metaData = new MetaData(meta);
@@ -881,6 +986,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * Shows either normal search results or group search, depending
      * on the searchValueField. This is done by reordering entries and
      * graying out non-hits.
+     *
+     * @param searchValueField Which field to show search for: Globals.SEARCH or
+     * Globals.GROUPSEARCH.
+     *
      */
     public void showSearchResults(String searchValueField) {
 	//entryTable.scrollTo(0);
@@ -916,6 +1025,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     /**
      * Selects a single entry, and scrolls the table to center it.
+     *
+     * @param pos Current position of entry to select.
      *
      */
     public void selectSingleEntry(int pos) {

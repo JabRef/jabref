@@ -37,6 +37,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
   public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
     super(p0);
     panel = panel_;
+    tf.setMinimumSize(new Dimension(1,1));
     //add(hd, BorderLayout.NORTH);
     ok.setToolTipText(Globals.lang("Fetch Medline"));
     setLayout(gbl);
@@ -75,7 +76,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     if ( m.matches() ) {
       panel.frame.output(Globals.lang("Fetching Medline..."));
       ArrayList bibs = fetchMedline(idList);
-      if (bibs.size() > 0) {
+      if ((bibs != null) && (bibs.size() > 0)) {
         tf.setText("");
         NamedCompound ce = new NamedCompound(Globals.lang("Fetch Medline"));
         Iterator i = bibs.iterator();

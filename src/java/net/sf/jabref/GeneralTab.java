@@ -75,7 +75,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
-        _prefs.put("groupsDefaultField", groupField.getText());
+        _prefs.put("groupsDefaultField", groupField.getText().trim());
     }
 
 }

@@ -26,19 +26,20 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.groups;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
+import java.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
-import net.sf.jabref.*;
-import java.util.Vector;
-import java.util.Hashtable;
+import javax.swing.*;
+import javax.swing.event.*;
 
-public class GroupSelector extends SidePaneComponent 
+import net.sf.jabref.*;
+import javax.swing.undo.CompoundEdit;
+
+public class GroupSelector extends SidePaneComponent
     implements ListSelectionListener, ActionListener {
 
-    public static final int 
+    public static final int
 	DIM = 3,  // The number of vector elements for each group.
 	OFFSET = 0; // The number of vector elements before first group.
 
@@ -71,7 +72,7 @@ public class GroupSelector extends SidePaneComponent
     SidePaneManager manager;
     JabRefPreferences prefs;
     GroupSelector ths;
-    
+
 
     /**
      * The first element for each group defines which field to
@@ -91,7 +92,7 @@ public class GroupSelector extends SidePaneComponent
 	while ((n>0) && (n/DIM != Math.floor(n/DIM))) {
 	    groups.removeElementAt(groups.size()-1);
 	    n = (double)(groups.size() - OFFSET);
-	    // If the number of elements is not divisible by DIM, we're 
+	    // If the number of elements is not divisible by DIM, we're
 	    // in trouble, so we must remove one or two elements.
 	}
 
@@ -124,13 +125,15 @@ public class GroupSelector extends SidePaneComponent
 	setLayout(gbl);
 
 	SidePaneHeader header = new SidePaneHeader
-	    ("Groups", GUIGlobals.groupsIconFile, this);		   
+	    ("Groups", GUIGlobals.groupsIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.BOTH;
+        con.insets = new Insets(0, 0, 2,  0);
 	gbl.setConstraints(header, con);
 	add(header);
 	con.gridwidth = 1;
 	con.weightx = 1;
+        con.insets = new Insets(0, 0, 0,  0);
 	gbl.setConstraints(newButton, con);
 	add(newButton);
 	gbl.setConstraints(refresh, con);
@@ -178,7 +181,7 @@ public class GroupSelector extends SidePaneComponent
     }
 
     public void definePopup() {
-	
+
 	gropt.add(modifyAction);
 
 	gropt.add(new AbstractAction("Remove") {
@@ -196,7 +199,7 @@ public class GroupSelector extends SidePaneComponent
 				name = (String)groups.elementAt(index+1),
 				regexp = (String)groups.elementAt(index+2);
 			    for (int i=0; i<DIM; i++)
-				groups.removeElementAt(index);	   
+				groups.removeElementAt(index);
 
 			    revalidateList();
 
@@ -219,7 +222,7 @@ public class GroupSelector extends SidePaneComponent
 	list.addMouseListener(new MouseAdapter() {
 		public void mousePressed(MouseEvent e) {
 		    int index = list.locationToIndex(e.getPoint());
-		    if (index == 0) 
+		    if (index == 0)
 			list.setSelectedIndex(0);
 		}
 		public void mouseClicked(MouseEvent e) {
@@ -243,7 +246,7 @@ public class GroupSelector extends SidePaneComponent
 
     }
 
-    public void valueChanged(ListSelectionEvent e) {	
+    public void valueChanged(ListSelectionEvent e) {
 	if (!e.getValueIsAdjusting() && !list.isSelectionEmpty()) {
 	    int[] sel = list.getSelectedIndices();
 	    if ((sel.length == 1) && (sel[0] == 0)) {
@@ -257,20 +260,20 @@ public class GroupSelector extends SidePaneComponent
 
 		// We use a search rule set that takes care of multiple groups,
 		// in an AND or OR fashion.
-		AndOrSearchRuleSet searchRules = 
-		    new AndOrSearchRuleSet(andCb.isSelected()); 
+		AndOrSearchRuleSet searchRules =
+		    new AndOrSearchRuleSet(andCb.isSelected());
 		for (int i=0; i<sel.length; i++) if (sel[i] > 0) {
 		    SearchRule rule = new QuickSearchRule
 			((String)groups.elementAt(sel[i]*DIM+OFFSET-3),
 			 (String)groups.elementAt(sel[i]*DIM+OFFSET-1));
-		    searchRules.addRule(rule) ; 
+		    searchRules.addRule(rule) ;
 		}
 		Hashtable searchOptions = new Hashtable();
-		searchOptions.put("option", "dummy");		
+		searchOptions.put("option", "dummy");
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions, searchRules, panel,
-		     DatabaseSearch.GROUPSEARCH, true); 
-		search.start(); 
+		     DatabaseSearch.GROUPSEARCH, true);
+		search.start();
 		frame.output(Globals.lang("Updated group selection")+".");
 		//groups.elementAt(sel*DIM+OFFSET-DIM+1)+"'.");
 
@@ -319,14 +322,14 @@ public class GroupSelector extends SidePaneComponent
 				 +gd.name()+"'.");
 
 	    }
-	    
+
 	}
 
 	if (e.getSource() == autoGroup) {
 	    AutoGroupDialog gd = new AutoGroupDialog
 		(frame, panel, this, groups,
 		 prefs.get("groupsDefaultField"), ".,");
-	    gd.show();	    
+	    gd.show();
 	    if (gd.okPressed()) {
 
 	    }
@@ -351,19 +354,19 @@ public class GroupSelector extends SidePaneComponent
 		int index = OFFSET+DIM*(list.getSelectedIndex()-1),
 		    groupIndex = list.getSelectedIndex();
 		GroupDialog gd = new GroupDialog
-		    (frame, groups, index, 
+		    (frame, groups, index,
 		     prefs.get("groupsDefaultField"));
 		gd.show();
 		if (gd.okPressed()) {
 		    revalidateList((gd.index()-OFFSET)/DIM +1);
-		    
+
 		    // Store undo information.
-		    panel.undoManager.addEdit
-			(new UndoableModifyGroup
-			 (ths, groups, gd.index(),
-			  gd.field(), gd.name(), gd.regexp(),
+                    panel.undoManager.addEdit
+                        (new UndoableModifyGroup
+                         (ths, groups, gd.index(),
+                          gd.field(), gd.name(), gd.regexp(),
 			  gd.oldField(), gd.oldName(), gd.oldRegexp()));
-		    
+
 		    panel.markBaseChanged();
 		    frame.output("Modified group '"+gd.name()+"'.");
 		}
@@ -383,4 +386,35 @@ public class GroupSelector extends SidePaneComponent
 	    index = groups.size();
 	return index;
     }
+
+  /**
+   * addGroups
+   *
+   * @param newGroups Vector of group information to insert.
+   */
+  public void addGroups(Vector newGroups, CompoundEdit ce) {
+    double n = (double)(newGroups.size() - OFFSET);
+    while ((n>0) && (n/DIM != Math.floor(n/DIM))) {
+      newGroups.removeElementAt(groups.size()-1);
+      n = (double)(groups.size() - OFFSET);
+      // If the number of elements is not divisible by DIM, we're
+      // in trouble, so we must remove one or two elements.
+    }
+
+    for (int i=0; i<(newGroups.size()-OFFSET)/DIM; i++) {
+      int pos = OFFSET+ i*DIM;
+      int index = findPos(groups, (String)newGroups.elementAt(pos+1));
+      String regexp = (String)newGroups.elementAt(pos+2),
+          name = (String)newGroups.elementAt(pos+1),
+          field = (String)newGroups.elementAt(pos);
+      groups.add(index, regexp);
+      groups.add(index, name);
+      groups.add(index, field);
+      ce.addEdit
+          (new UndoableAddOrRemoveGroup
+           (this, groups, index, true,
+            field, name, regexp));
+
+    }
+  }
 }

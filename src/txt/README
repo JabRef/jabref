@@ -2,12 +2,12 @@
 JabRef 1.0
 ----------
 
-Introduction: 
+Introduction:
 
 JabRef is a graphical Java application for editing bibtex (.bib)
 databases.
 
-JabRef is the 
+JabRef is the
 
 JabRef lets you organize your entries into overlapping logical groups,
 and with a single click limit your view to a single group or an
@@ -18,13 +18,13 @@ entries, and autocomplete words or names in the field types of your
 choosing. Most operations can be done without using the mouse.
 
 
-License: 
+License:
 JabRef is free software, distributed under the GNU General Public
 Licence. See the enclosed text file 'gpl.txt', or the About dialog,
 for details about the GPL.
 
 
-Requirements: 
+Requirements:
 JabRef runs on any system equipped with the Java Virtual Machine (1.4
 or newer), which can be downloaded at no cost from
 http://java.sun.com.
@@ -34,7 +34,7 @@ Installing and running:
 JabRef 1.0 is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
-     java -jar <path to jar>  
+     java -jar <path to jar>
 or, if you are using the Java Runtime Environment:
      jre -new -jar <path to jar> or
      jrew -new -jar <path to jar>
@@ -57,11 +57,15 @@ can also be viewed outside the program with a standard HTML browser.
 
 Change log:
 1.x:	- Added bibtex key uniqueness checking
-        - Fixed shortcut key for "Store field" in entry editor, and fixed
-	  problem that made shortcut for "Save database" unavailable from
+	- Added feature for importing entries and/or strings and/or group
+          definitions from another BibTeX database.
+	- Added menu choices to import into open database.
+      	- Added toolbar button for closing current database.
+      	- Fixed shortcut key for "Store field" in entry editor, and fixed
+      	  problem that made shortcut for "Save database" unavailable from
 	  entry editor.
 	- Added option to fetch Medline entries automatically by
-	  ID; patch submitted by Mike Smoot.
+	  ID, based on a patch submitted by Mike Smoot.
 	- Fixed bug in RIS import.
 	- Added options to copy key and copy "\cite{key}" to right-click menu.
 	- Fixed bug that caused some General fields not to get displayed.
@@ -74,7 +78,7 @@ We are thankful for any bug reports or other feedback. If there are
 features you want included in JabRef, tell us!
 
 
-JabRef homepage: 
+JabRef homepage:
 http://jabref.sourceforge.net
 
 You can always get the very latest version of the program from our CVS

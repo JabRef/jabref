@@ -175,7 +175,6 @@ public class BibtexDatabase
 	BibtexEntry entry = getEntryById(id);
 	String oldKey = entry.getCiteKey();
 	entry.setField(Globals.KEY_FIELD, key);
-	//removeKeyFromSet(oldKey);
 	return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
@@ -247,7 +246,7 @@ public class BibtexDatabase
         // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
-	Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+      Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
 	boolean duplicate=false;
 	if(oldKey==null){// this is a new entry so don't bother removing oldKey

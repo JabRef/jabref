@@ -109,7 +109,11 @@ public class PrefsDialog2 extends JDialog {
 	}
 	public void actionPerformed(ActionEvent e) {
 	    // Just close dialog without recording changes.
-	    dispose();
+            (new Thread() {
+              public void run() {
+                dispose();
+              }
+            }).start();
 	}
     }
 

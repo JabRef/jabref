@@ -12,7 +12,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
-    private JComboBox 
+    private JComboBox
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextArea tableFields = new JTextArea();//"", 80, 5);
@@ -47,7 +47,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	sort.setLayout(gbl);
 
 	upper.setBorder(BorderFactory.createTitledBorder
-			(BorderFactory.createEtchedBorder(), 
+			(BorderFactory.createEtchedBorder(),
 			 Globals.lang("Table appearance")));
 	sort.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(), "Sort options"));
@@ -114,8 +114,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	for (int i=0; i<_choices.length; i++) {
 	    found = false;
 	    for (int j=0; j<columns.length; j++)
-		if (columns[j].equals(_choices[i])) 
-		    found = true;	    
+		if (columns[j].equals(_choices[i]))
+		    found = true;
 	    if (found)
 		sel[i] = new Boolean(true);
 	    else
@@ -180,7 +180,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//con.gridwidth = 1;
 	//gbl.setConstraints(tablePanel, con);
 	//add(tablePanel);
-
+        tableFields.setBorder(BorderFactory.createEtchedBorder());
 	JScrollPane sp = new JScrollPane
 	    (tableFields, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 	     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -191,7 +191,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	con.weighty = 1;
 	gbl.setConstraints(sp, con);
 	add(sp);
-	
+
     }
 
     private String[] getChoices() {
@@ -200,7 +200,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	int count = 0;
 	for (int i=0; i<_sel.length; i++)
 	    if (_sel[i].booleanValue()) count++;
-	
+
 	// Then we build the byte array.
 	String[] choices = new String[count];
 	count = 0;
@@ -208,7 +208,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    if (_sel[i].booleanValue()) {
 		choices[count] = GUIGlobals.ALL_FIELDS[i];
 		count++;
-	    }	
+	    }
 	return choices;
     }
 
@@ -237,6 +237,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("terDescending", terDesc.isSelected());
 	_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
 	_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
-	
+
     }
 }

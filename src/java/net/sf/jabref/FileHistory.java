@@ -60,20 +60,20 @@ class FileHistory extends JMenu implements ActionListener {
 	    add((JMenuItem)i.next());
 	}
     }
-    
+
     public void storeHistory() {
 	if (history.size() > 0) {
 	    String[] names = new String[history.size()];
 	    for (int i=0; i<names.length; i++)
-		names[i] = ((JMenuItem)history.get(i)).getText();	    
+		names[i] = ((JMenuItem)history.get(i)).getText();
 	    prefs.putStringArray("recentFiles", names);
 	}
     }
 
     public void setFileHistory() {
-	
+
     }
-    
+
     public void actionPerformed(ActionEvent e) {
 	String name = ((JMenuItem)e.getSource()).getText();
 	frame.fileToOpen = new File(name);

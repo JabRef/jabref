@@ -37,6 +37,9 @@ import java.util.Iterator;
 import java.io.*;
 import java.net.URL;
 import java.util.regex.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.undo.UndoableInsertString;
 
 /**
  * The main window of the application.
@@ -118,8 +121,10 @@ public class JabRefFrame extends JFrame {
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
        fetchMedline = new FetchMedlineAction(),
-
-
+       mergeDatabaseAction = new GeneralAction("mergeDatabase", "Import from database",
+                                               "Import contents from a BibTeX database into the currently viewed database",
+                                               GUIGlobals.openIconFile,
+                                               prefs.getKey("Open")),
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
 	  GUIGlobals.removeIconFile),*/
 	selectAll = new GeneralAction("selectAll", "Select all",
@@ -165,6 +170,34 @@ public class JabRefFrame extends JFrame {
     };
 
     public JabRefFrame() {
+      init();
+
+      // If the option is enabled, open the last edited databases, if any.
+      if (prefs.getBoolean("openLastEdited")
+          && (prefs.get("lastEdited") != null)) {
+
+          // How to handle errors in the databases to open?
+          String[] names = prefs.getStringArray("lastEdited");
+          for (int i=0; i<names.length; i++) {
+              fileToOpen = new File(names[i]);
+              if (fileToOpen.exists()) {
+                  //Util.pr("Opening last edited file:"
+                  //+fileToOpen.getName());
+                  openDatabaseAction.openIt(i == 0);
+              }
+          }
+          output(Globals.lang("Files opened: "+tabbedPane.getTabCount()));
+      }
+      setVisible(true);
+      if (tabbedPane.getTabCount() > 0) {
+          tabbedPane.setSelectedIndex(0);
+          new FocusRequester(((BasePanel)tabbedPane.getComponentAt(0))
+                             .entryTable);
+      } else
+          setEmptyState();
+    }
+
+    private void init() {
 	/*try {
 	    //UIManager.setLookAndFeel("com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
 	    UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
@@ -186,35 +219,6 @@ public class JabRefFrame extends JFrame {
 			      prefs.getInt("sizeY")));
 	setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
-
-	// If the option is enabled, open the last edited databases, if any.
-	if (prefs.getBoolean("openLastEdited")
-	    && (prefs.get("lastEdited") != null)) {
-
-	    // How to handle errors in the databases to open?
-	    String[] names = prefs.getStringArray("lastEdited");
-	    for (int i=0; i<names.length; i++) {
-		fileToOpen = new File(names[i]);
-		if (fileToOpen.exists()) {
-		    //Util.pr("Opening last edited file:"
-		    //+fileToOpen.getName());
-		    openDatabaseAction.openIt(i == 0);
-		}
-	    }
-	    output("");
-	}
-	//JFrame.setDefaultLookAndFeelDecorated(true);
-	try {
-	    UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName());
-	} catch (Exception e) { }
-	setVisible(true);
-	if (tabbedPane.getTabCount() > 0) {
-	    tabbedPane.setSelectedIndex(0);
-	    new FocusRequester(((BasePanel)tabbedPane.getComponentAt(0))
-			       .entryTable);
-	} else
-	    setEmptyState();
-
     }
 
     private void setupLayout() {
@@ -231,13 +235,13 @@ public class JabRefFrame extends JFrame {
 	gbl.setConstraints(mb, con);
 	getContentPane().add(mb);
 	con.anchor = GridBagConstraints.NORTH;
-	con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
+	//con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
 	gbl.setConstraints(tlb, con);
 	getContentPane().add(tlb);
 
 	Component lim = Box.createGlue();
 	gbl.setConstraints(lim, con);
-	getContentPane().add(lim);
+	//getContentPane().add(lim);
 	/*
 	JPanel empt = new JPanel();
 	empt.setBackground(GUIGlobals.lightGray);
@@ -298,7 +302,8 @@ public class JabRefFrame extends JFrame {
     }
 
     /**
-     * Returns the BasePanel at tab no. i
+     * Returns the indexed BasePanel.
+     * @param i Index of base
      */
     BasePanel baseAt(int i) {
 	return (BasePanel)tabbedPane.getComponentAt(i);
@@ -460,14 +465,19 @@ public class JabRefFrame extends JFrame {
 	    options = new JMenu(Globals.lang("Options")),
 	    newSpec = new JMenu(Globals.lang("New entry...")),
 	    helpMenu = new JMenu(Globals.lang("Help"));
-	JMenu importMenu = new JMenu(Globals.lang("Import"));
+	JMenu importMenu = new JMenu(Globals.lang("Import")),
+            importNewMenu = new JMenu(Globals.lang("Import into new"));
 
-	setUpImportMenu(importMenu);
+        setUpImportMenu(importMenu, false);
+        setUpImportMenu(importNewMenu, true);
 
 	file.add(newDatabaseAction);
 	file.add(open);//opendatabaseaction
-	file.add(importMenu);
-	file.add(save);
+        file.add(mergeDatabaseAction);
+        file.add(importMenu);
+        file.add(importMenu);
+        file.add(importNewMenu);
+        file.add(save);
 	file.add(saveAs);
 	file.add(fileHistory);
 	file.addSeparator();
@@ -561,28 +571,11 @@ public class JabRefFrame extends JFrame {
 	tlb.add(toggleGroups);
 	tlb.addSeparator();
 	tlb.add(showPrefs);
-
+        tlb.add(Box.createHorizontalGlue());
+        tlb.add(closeDatabaseAction);
 	for (int i=0; i<tlb.getComponentCount(); i++)
 	    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
 
-	//tb.add(closeDatabaseAction);
-	//tb.addSeparator();
-	/*tlb.add(copyKeyAction);
-	tlb.add(makeLabelAction);
-	tlb.addSeparator();
-	tlb.add(editPreambleAction);
-	tlb.add(editStringsAction);
-	tlb.add(newEntryAction);
-	tlb.add(editEntryAction);
-	tlb.add(removeEntryAction);
-	tlb.add(copyAction);
-	tlb.add(pasteAction);
-	tlb.add(searchPaneAction);
-	tlb.addSeparator();
-	tlb.add(setupTableAction);
-	tlb.addSeparator();
-	tlb.add(new HelpAction(helpDiag,GUIGlobals.baseFrameHelp, "Help"));
-	*/
     }
 
 
@@ -634,6 +627,7 @@ public class JabRefFrame extends JFrame {
 
     private void setEmptyState() {
 	// Disable actions that demand an open database.
+        mergeDatabaseAction.setEnabled(false);
 	close.setEnabled(false);
 	save.setEnabled(false);
 	saveAs.setEnabled(false);
@@ -654,10 +648,12 @@ public class JabRefFrame extends JFrame {
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
 	newEntryAction.setEnabled(false);
+        closeDatabaseAction.setEnabled(false);
     }
 
     private void setNonEmptyState() {
 	// Enable actions that demand an open database.
+        mergeDatabaseAction.setEnabled(true);
 	close.setEnabled(true);
 	save.setEnabled(true);
 	saveAs.setEnabled(true);
@@ -678,6 +674,7 @@ public class JabRefFrame extends JFrame {
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
 	newEntryAction.setEnabled(true);
+        closeDatabaseAction.setEnabled(true);
     }
 
 
@@ -794,7 +791,7 @@ public class JabRefFrame extends JFrame {
     CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
     class CloseDatabaseAction extends AbstractAction {
 		public CloseDatabaseAction() {
-			super(Globals.lang("Close database"));
+			super(Globals.lang("Close database"), new ImageIcon(GUIGlobals.closeIconFile));
 
 			putValue(SHORT_DESCRIPTION,
 					 Globals.lang("Close the current database"));
@@ -832,80 +829,80 @@ public class JabRefFrame extends JFrame {
 
 
 
-    // The action concerned with opening an existing database.
-    OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
-    class OpenDatabaseAction extends AbstractAction {
-	public OpenDatabaseAction() {
-	    super(Globals.lang("Open database"),
-		  new ImageIcon(GUIGlobals.openIconFile));
-	    putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-	}
-	public void actionPerformed(ActionEvent e) {
-	    // Open a new database.
-	    if ((e.getActionCommand() == null) ||
-		(e.getActionCommand().equals("Open database"))) {
-		JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-		    new JabRefFileChooser((File)null) :
-		    new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-		int returnVal = chooser.showOpenDialog(ths);
-		if(returnVal == JFileChooser.APPROVE_OPTION) {
-		    fileToOpen = chooser.getSelectedFile();
-		}
-	    } else {
-		Util.pr(NAME);
-		Util.pr(e.getActionCommand());
-		fileToOpen = new File(Util.checkName(e.getActionCommand()));
-	    }
+        // The action concerned with opening an existing database.
+        OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
+        class OpenDatabaseAction extends AbstractAction {
+            public OpenDatabaseAction() {
+                super(Globals.lang("Open database"),
+                      new ImageIcon(GUIGlobals.openIconFile));
+                putValue(ACCELERATOR_KEY, prefs.getKey("Open"));
+                putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+            }
+            public void actionPerformed(ActionEvent e) {
+                // Open a new database.
+                if ((e.getActionCommand() == null) ||
+                    (e.getActionCommand().equals("Open database"))) {
+                    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                        new JabRefFileChooser((File)null) :
+                        new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+                    chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
+                    int returnVal = chooser.showOpenDialog(ths);
+                    if(returnVal == JFileChooser.APPROVE_OPTION) {
+                        fileToOpen = chooser.getSelectedFile();
+                    }
+                } else {
+                    Util.pr(NAME);
+                    Util.pr(e.getActionCommand());
+                    fileToOpen = new File(Util.checkName(e.getActionCommand()));
+                }
 
-	    // Run the actual open in a thread to prevent the program
-	    // locking until the file is loaded.
-	    if (fileToOpen != null) {
-		(new Thread() {
-			public void run() {
-			    openIt(true);
-			}
-		    }).start();
-		fileHistory.newFile(fileToOpen.getPath());
-	    }
-	}
+                // Run the actual open in a thread to prevent the program
+                // locking until the file is loaded.
+                if (fileToOpen != null) {
+                    (new Thread() {
+                            public void run() {
+                                openIt(true);
+                            }
+                        }).start();
+                    fileHistory.newFile(fileToOpen.getPath());
+                }
+            }
 
-	public void openIt(boolean raisePanel) {
-	    if ((fileToOpen != null) && (fileToOpen.exists())) {
-		try {
-		    prefs.put("workingDirectory", fileToOpen.getPath());
-		    // Should this be done _after_ we know it was successfully opened?
+            public void openIt(boolean raisePanel) {
+                if ((fileToOpen != null) && (fileToOpen.exists())) {
+                    try {
+                        prefs.put("workingDirectory", fileToOpen.getPath());
+                        // Should this be done _after_ we know it was successfully opened?
 
-		    ParserResult pr = loadDatabase(fileToOpen);
-		    BibtexDatabase db = pr.getDatabase();
-		    HashMap meta = pr.getMetaData();
+                        ParserResult pr = loadDatabase(fileToOpen);
+                        BibtexDatabase db = pr.getDatabase();
+                        HashMap meta = pr.getMetaData();
 
-		    BasePanel bp = new BasePanel(ths, db, fileToOpen,
-						 meta, prefs);
-		    /*
-		      if (prefs.getBoolean("autoComplete")) {
-		      db.setCompleters(autoCompleters);
-		      }
-		    */
-		    tabbedPane.add(fileToOpen.getName(), bp);
-		    if (raisePanel)
-			tabbedPane.setSelectedComponent(bp);
-		    if (tabbedPane.getTabCount() == 1)
-			setNonEmptyState();
-		    output("Opened database '"+fileToOpen.getPath()+"' with "+
-			   db.getEntryCount()+" entries.");
+                        BasePanel bp = new BasePanel(ths, db, fileToOpen,
+                                                     meta, prefs);
+                        /*
+                          if (prefs.getBoolean("autoComplete")) {
+                          db.setCompleters(autoCompleters);
+                          }
+                        */
+                        tabbedPane.add(fileToOpen.getName(), bp);
+                        if (raisePanel)
+                            tabbedPane.setSelectedComponent(bp);
+                        if (tabbedPane.getTabCount() == 1)
+                            setNonEmptyState();
+                        output("Opened database '"+fileToOpen.getPath()+"' with "+
+                               db.getEntryCount()+" entries.");
 
-		    fileToOpen = null;
+                        fileToOpen = null;
 
-		} catch (Throwable ex) {
-		    JOptionPane.showMessageDialog
-			(ths, ex.getMessage(),
-			 "Open database", JOptionPane.ERROR_MESSAGE);
-		}
-	    }
-	}
-    }
+                    } catch (Throwable ex) {
+                        JOptionPane.showMessageDialog
+                            (ths, ex.getMessage(),
+                             "Open database", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        }
 
     // The action concerned with opening a new database.
     class NewDatabaseAction extends AbstractAction {
@@ -1019,44 +1016,65 @@ public class JabRefFrame extends JFrame {
 			}
 		}
 
-		private void addBibEntries(ArrayList bibentries, String filename){
-			// check if bibentries is null
-			BibtexDatabase database=new BibtexDatabase();
+		private void addBibEntries(ArrayList bibentries, String filename, boolean intoNew){
+                  // check if bibentries is null
+                  if (intoNew || (tabbedPane.getTabCount() == 0)) {
+                    // Import into new database.
+                    BibtexDatabase database = new BibtexDatabase();
+                    Iterator it = bibentries.iterator();
+                    while (it.hasNext()) {
+                      BibtexEntry entry = (BibtexEntry) it.next();
+                      try {
+                        entry.setId(Util.createId(entry.getType(), database));
+                        database.insertEntry(entry);
+                      }
+                      catch (KeyCollisionException ex) {
+                        //ignore
+                        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+                      }
+                    }
+                    HashMap meta = new HashMap();
+                    // Metadata are only put in bibtex files, so we will not find it
+                    // in imported files. Instead we pass an empty HashMap.
+                    BasePanel bp = new BasePanel(ths, database, null,
+                                                 meta, prefs);
+                    /*
+                          if (prefs.getBoolean("autoComplete")) {
+                          db.setCompleters(autoCompleters);
+                          }
+                     */
+                    tabbedPane.add(Globals.lang("untitled"), bp);
+                    tabbedPane.setSelectedComponent(bp);
+                    if (tabbedPane.getTabCount() == 1)
+                      setNonEmptyState();
+                    output("Imported database '" + filename + "' with " +
+                           database.getEntryCount() + " entries into new database.");
+                  }
+                  else {
+                    // Import into current database.
+                    BibtexDatabase database = basePanel().database;
+                    Iterator it = bibentries.iterator();
+                    while (it.hasNext()) {
+                      BibtexEntry entry = (BibtexEntry) it.next();
+                      try {
+                        entry.setId(Util.createId(entry.getType(), database));
+                        database.insertEntry(entry);
+                      }
+                      catch (KeyCollisionException ex) {
+                        //ignore
+                        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+                      }
+                      basePanel().markBaseChanged();
+                      basePanel().refreshTable();
+                      output("Imported database '" + filename + "' with " +
+                             database.getEntryCount() + " entries.");
+                    }
+                  }
+                }
 
-			Iterator it = bibentries.iterator();
-			while(it.hasNext()){
-				BibtexEntry entry = (BibtexEntry)it.next();
 
-				try {
-					entry.setId(Util.createId(entry.getType(), database));
-					database.insertEntry(entry);
-				} catch (KeyCollisionException ex) {
-					//ignore
-					System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-
-				}
-
-			}
-			HashMap meta = new HashMap();
-			// Metadata are only put in bibtex files, so we will not find it
-			// in imported files. Instead we pass an empty HashMap.
-			BasePanel bp = new BasePanel(ths, database, null,
-						     meta, prefs);
-			/*
-			  if (prefs.getBoolean("autoComplete")) {
-			  db.setCompleters(autoCompleters);
-			  }
-			*/
-			tabbedPane.add(Globals.lang("untitled"), bp);
-			tabbedPane.setSelectedComponent(bp);
-			if (tabbedPane.getTabCount() == 1)
-			    setNonEmptyState();
-			output("Imported database '"+filename+"' with "+
-			       database.getEntryCount()+" entries.");
-		}
-
-
-	private void setUpImportMenu(JMenu importMenu){
+	private void setUpImportMenu(JMenu importMenu, boolean intoNew_){
+          final boolean intoNew = intoNew_;
 			//
 			// put in menu
 			//
@@ -1069,7 +1087,7 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename= getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readEndnote(tempFilename);//MedlineParser.readMedline(tempFilename);
-					addBibEntries( bibs, tempFilename);
+					addBibEntries( bibs, tempFilename, intoNew);
 				    }
 				}
 			    });
@@ -1081,7 +1099,7 @@ public class JabRefFrame extends JFrame {
 						String tempFilename=getNewFile();
 						if(tempFilename != null){
 						    ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
-						    addBibEntries( bibs, tempFilename);
+						    addBibEntries( bibs, tempFilename, intoNew);
 						}
 
 				}
@@ -1094,7 +1112,7 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename=getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readISI(tempFilename);
-					addBibEntries( bibs, tempFilename);
+					addBibEntries( bibs, tempFilename, intoNew);
 				    }
 
 				}
@@ -1110,13 +1128,13 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename= getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
-					addBibEntries( bibs, tempFilename);
+					addBibEntries( bibs, tempFilename, intoNew);
 				    }
 				}
 			    });
 			importMenu.add(newMedlineFile_mItem);
 			//##############################
- 			JMenuItem newMedlineId_mItem = new JMenuItem(Globals.lang("Medline Fetch By ID"));
+ 			/*JMenuItem newMedlineId_mItem = new JMenuItem(Globals.lang("Medline Fetch By ID"));
  			newMedlineId_mItem.addActionListener(new ActionListener()
  			    {
  				public void actionPerformed(ActionEvent e)
@@ -1128,13 +1146,13 @@ public class JabRefFrame extends JFrame {
  		    		    Matcher m = p.matcher( idList );
  				    if ( m.matches() ) {
  				        ArrayList bibs = ImportFormatReader.fetchMedline(idList);
- 				        addBibEntries( bibs, idList );
+ 				        addBibEntries( bibs, idList, intoNew);
  				    } else {
 					JOptionPane.showMessageDialog(ths,"Sorry, I was expecting a comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
 				    }
  				}
  			    });
- 			importMenu.add(newMedlineId_mItem);
+ 			importMenu.add(newMedlineId_mItem);*/
 
 	    //########################################
 			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
@@ -1143,7 +1161,7 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename=getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
-					addBibEntries( bibs, tempFilename);
+					addBibEntries( bibs, tempFilename, intoNew);
 				    }
 
 				}
@@ -1156,7 +1174,7 @@ public class JabRefFrame extends JFrame {
 				    String tempFilename=getNewFile();
 				    if(tempFilename != null){
 					ArrayList bibs = ImportFormatReader.readReferenceManager10(tempFilename);
-					addBibEntries( bibs, tempFilename);
+					addBibEntries( bibs, tempFilename, intoNew);
 				    }
 
 				}
@@ -1175,7 +1193,7 @@ public class JabRefFrame extends JFrame {
 					{
 					    //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
 					    ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
-					    addBibEntries( bibs, tempFilename);
+					    addBibEntries( bibs, tempFilename, intoNew);
 					}
 				}
 			    });

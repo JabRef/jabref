@@ -34,7 +34,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.GUIGlobals;
 
 /**
- * Dialog for creating or modifying groups. Operates directly on the 
+ * Dialog for creating or modifying groups. Operates directly on the
  * Vector containing group information.
  */
 class GroupDialog extends JDialog {
@@ -62,7 +62,7 @@ class GroupDialog extends JDialog {
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
-    
+
     public GroupDialog(JFrame parent_, Vector groups_,
 		       int index_, String defaultField) {
 	super(parent_, "Edit group", true);
@@ -88,10 +88,10 @@ class GroupDialog extends JDialog {
 	    }
 	} else
 	    field.setText(defaultField);
-		
+
 	ActionListener okListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    
+
 		    // Check that there are no empty strings.
 		    if ((field.getText().equals("")) ||
 			(name.getText().equals("")) ||
@@ -100,8 +100,8 @@ class GroupDialog extends JDialog {
 			    (parent, "You must provide a name, a search "
 			     +"string and a field name for this group.",
 			     "Create group", JOptionPane.ERROR_MESSAGE);
-			return;						      
-		    } 
+			return;
+		    }
 
 		    // Handling of : and ; must also be done.
 
@@ -110,8 +110,8 @@ class GroupDialog extends JDialog {
 		    if (index < 0) {
 			// New group.
 			index = GroupSelector.findPos(groups, name.getText());
-			groups.add(index, regexp.getText());
-			groups.add(index, name.getText());
+                        groups.add(index, regexp.getText());
+                        groups.add(index, name.getText());
 			groups.add(index, field.getText());
 		    } else if (index < groups.size()) {
 			// Change group.
@@ -168,10 +168,10 @@ class GroupDialog extends JDialog {
 	con.gridx = 0;
 	con.gridy = 0;
 	gbl.setConstraints(nl, con);
-	main.add(nl); 
+	main.add(nl);
 	con.gridy = 1;
 	gbl.setConstraints(nr, con);
-	main.add(nr); 
+	main.add(nr);
 	con.gridy = 2;
 	gbl.setConstraints(nf, con);
 	main.add(nf);
@@ -179,17 +179,17 @@ class GroupDialog extends JDialog {
 	con.weightx = 1;
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridy = 0; 
+	con.gridy = 0;
 	con.gridx = 1;
 	gbl.setConstraints(name, con);
-	main.add(name); 
+	main.add(name);
 	con.gridy = 1;
 	gbl.setConstraints(regexp, con);
-	main.add(regexp); 
+	main.add(regexp);
 	con.gridy = 2;
 	gbl.setConstraints(field, con);
-	main.add(field); 
-	
+	main.add(field);
+
        	// Option buttons:
 	con.gridx = GridBagConstraints.RELATIVE;
 	con.gridy = GridBagConstraints.RELATIVE;

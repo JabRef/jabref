@@ -33,11 +33,11 @@ import javax.swing.*;
 
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener {
-    
-    GridBagLayout gbl = new GridBagLayout() ; 
-    GridBagConstraints con = new GridBagConstraints() ; 
 
-    IncrementalSearcher incSearcher;   
+    GridBagLayout gbl = new GridBagLayout() ;
+    GridBagConstraints con = new GridBagConstraints() ;
+
+    IncrementalSearcher incSearcher;
 
     private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
@@ -47,7 +47,7 @@ class SearchManager2 extends SidePaneComponent
     private JButton openset = new JButton(Globals.lang("Settings")),
 	escape = new JButton(Globals.lang("Clear search"));
     private JabRefPreferences prefs;
-    private JCheckBoxMenuItem searchReq, searchOpt, searchGen, 
+    private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
     private JCheckBox increment, select, reorder;
     private ButtonGroup types = new ButtonGroup();
@@ -58,7 +58,7 @@ class SearchManager2 extends SidePaneComponent
 				   // an incremental search. -1 means
 				   // that the search is inactive.
 
-    public SearchManager2(JabRefFrame frame, JabRefPreferences prefs_, 
+    public SearchManager2(JabRefFrame frame, JabRefPreferences prefs_,
 			 SidePaneManager manager) {
 	super(manager);
 	this.frame = frame;
@@ -97,7 +97,7 @@ class SearchManager2 extends SidePaneComponent
 	    searchGen.setEnabled(false);
 	}
         caseSensitive = new JCheckBoxMenuItem("Case sensitive",
-				      prefs.getBoolean("caseSensitiveSearch")); 
+				      prefs.getBoolean("caseSensitiveSearch"));
 	settings.add(caseSensitive);
 	settings.addSeparator();
 	settings.add(searchReq);
@@ -137,43 +137,34 @@ class SearchManager2 extends SidePaneComponent
 	    increment.setSelected(true);
 	else if (!prefs.getBoolean("selectS"))
 	    reorder.setSelected(true);
-	
+
 
 	setLayout(gbl);
 	SidePaneHeader header = new SidePaneHeader
-	    ("Search", GUIGlobals.searchIconFile, this);		   
+	    ("Search", GUIGlobals.searchIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.BOTH;
+	con.fill = GridBagConstraints.HORIZONTAL;
+        con.weightx = 1;
 	con.insets = new Insets(0, 0, 2,  0);
 	gbl.setConstraints(header, con);
 	add(header);
-	con.insets = new Insets(0, 0, 0,  0);
-	/*
-        con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridwidth = 1;
-
-        gbl.setConstraints(lab, con);
-        add(lab); 
-	con.gridwidth = 3;*/
+        con.insets = new Insets(0, 0, 0,  0);
         gbl.setConstraints(searchField,con);
-        add(searchField) ; 
-	//gbl.setConstraints(empt, con);
-        //add(empt); 
+        add(searchField) ;
 	gbl.setConstraints(increment, con);
-        add(increment); 
+        add(increment);
 	gbl.setConstraints(select, con);
-        add(select); 
+        add(select);
 	gbl.setConstraints(reorder, con);
-        add(reorder); 
+        add(reorder);
 	//con.gridwidth = 1;
         gbl.setConstraints(openset,con);
-        add(openset); 
-	JPanel empt = new JPanel();
+        add(openset);
+	//JPanel empt = new JPanel();
 	//con.insets = new Insets(0, 0, 2, 0);
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(escape, con);
-        add(escape); 
+        add(escape);
 
 	searchField.getInputMap().put(prefs.getKey("Repeat incremental search"),
 				      "repeat");
@@ -199,7 +190,7 @@ class SearchManager2 extends SidePaneComponent
 	prefs.putBoolean("searchAll", searchAll.isSelected());
 	prefs.putBoolean("incrementS", increment.isSelected());
 	prefs.putBoolean("selectS", select.isSelected());
-	prefs.putBoolean("caseSensitiveSearch", 
+	prefs.putBoolean("caseSensitiveSearch",
 			 caseSensitive.isSelected());
 	prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
 
@@ -213,7 +204,7 @@ class SearchManager2 extends SidePaneComponent
 
     /**
      * Clears and focuses the search field if it is not
-     * focused. Otherwise, cycles to the next search type.     
+     * focused. Otherwise, cycles to the next search type.
      */
     public void startSearch() {
 	if (increment.isSelected() && incSearch) {
@@ -225,7 +216,7 @@ class SearchManager2 extends SidePaneComponent
 	    searchField.requestFocus();
 	} else {
 	    if (increment.isSelected())
-		select.setSelected(true);	    
+		select.setSelected(true);
 	    else if (select.isSelected())
 		reorder.setSelected(true);
 	    else {
@@ -243,39 +234,39 @@ class SearchManager2 extends SidePaneComponent
 	    if (frame.basePanel() != null)
 		frame.basePanel().stopShowingSearchResults();
 	}
-	else if ((e.getSource() == searchField) 
+	else if ((e.getSource() == searchField)
 		 && !increment.isSelected()
 		 && (frame.basePanel() != null)) {
 	    updatePrefs(); // Make sure the user's choices are recorded.
 
 	    // Setup search parameters common to both highlight and float.
 	    Hashtable searchOptions = new Hashtable();
-	    searchOptions.put("option",searchField.getText()) ; 
-	    SearchRuleSet searchRules = new SearchRuleSet() ; 
+	    searchOptions.put("option",searchField.getText()) ;
+	    SearchRuleSet searchRules = new SearchRuleSet() ;
 	    SearchRule rule1;
 	    if (prefs.getBoolean("regExpSearch"))
 		rule1 = new RegExpRule(prefs);
 	    else
-		rule1 = new SimpleSearchRule(prefs);	    
-	    searchRules.addRule(rule1) ; 
+		rule1 = new SimpleSearchRule(prefs);
+	    searchRules.addRule(rule1) ;
 
 	    if (reorder.isSelected()) {
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions,searchRules, frame.basePanel(),
-		     DatabaseSearch.SEARCH, true); 
-		search.start() ; 
+		     DatabaseSearch.SEARCH, true);
+		search.start() ;
 	    }
 	    else if (select.isSelected()) {
 		// Highlight search.
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions,searchRules, frame.basePanel(),
-		     DatabaseSearch.SEARCH, false); 
-		search.start() ; 
+		     DatabaseSearch.SEARCH, false);
+		search.start() ;
 	    }
 
 	    // Afterwards, select all text in the search field.
-	    searchField.select(0,searchField.getText().length()) ; 
+	    searchField.select(0,searchField.getText().length()) ;
 	}
     }
 
@@ -289,7 +280,7 @@ class SearchManager2 extends SidePaneComponent
 	    // If this search type is disabled, remove reordering from
 	    // all databases.
 	    if (!reorder.isSelected()) {
-		frame.stopShowingSearchResults();		
+		frame.stopShowingSearchResults();
 	    }
 	}
     }
@@ -299,7 +290,7 @@ class SearchManager2 extends SidePaneComponent
 	if (frame.basePanel() != null)
 	    goIncremental();
     }
-   
+
     /**
      * Used for incremental search. Only activated when incremental
      * is selected.
@@ -318,7 +309,7 @@ class SearchManager2 extends SidePaneComponent
     private void goIncremental() {
 	incSearch = true;
 	SwingUtilities.invokeLater(new Thread() {
-		public void run() { 
+		public void run() {
 		    String text = searchField.getText();
 		    BasePanel bp = frame.basePanel();
 
@@ -329,7 +320,7 @@ class SearchManager2 extends SidePaneComponent
 			return;
 		    }
 
-		    if (searchField.getText().equals("")) return;   
+		    if (searchField.getText().equals("")) return;
 		    if (incSearchPos < 0)
 			incSearchPos = 0;
 		    BibtexEntry be = bp.getDatabase().getEntryById
@@ -364,5 +355,5 @@ class SearchManager2 extends SidePaneComponent
 
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
-    
+
 }

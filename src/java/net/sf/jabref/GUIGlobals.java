@@ -71,7 +71,7 @@ public class GUIGlobals {
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     public static final int
 	SPLIT_PANE_DIVIDER_SIZE = 2,
-	SPLIT_PANE_DIVIDER_LOCATION = 80,
+	SPLIT_PANE_DIVIDER_LOCATION = 145,
 	GROUPS_VISIBLE_ROWS = 8;
     public static final double
 	VERTICAL_DIVIDER_LOCATION = 0.4;
@@ -117,7 +117,7 @@ public class GUIGlobals {
 	downIconFile = GUIGlobals.class.getResource(pre+"Down.gif"),
 	stringsIconFile = GUIGlobals.class.getResource(pre+"Strings.gif"),
 	groupsIconFile = GUIGlobals.class.getResource(pre+"Groups.gif"),
-	closeIconFile = GUIGlobals.class.getResource(pre+"Close.gif"),
+        closeIconFile = GUIGlobals.class.getResource(pre+"Close.gif"),
 	refreshSmallIconFile = GUIGlobals.class.getResource(pre+"GreenFlag.gif"),
 	helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
 	helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),

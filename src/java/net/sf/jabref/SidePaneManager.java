@@ -56,9 +56,9 @@ public class SidePaneManager {
 	if (prefs.getBoolean("groupSelectorVisible")
 	    && (metaData.getData("groups") != null)) {
 
-	    GroupSelector gs = new GroupSelector
+	    panel.groupSelector = new GroupSelector
 		(frame, panel, metaData.getData("groups"), this, prefs);
-	    add("groups", gs);
+	    add("groups", panel.groupSelector);
 	}
 
 	if (components.size() > 0) {
@@ -85,9 +85,9 @@ public class SidePaneManager {
 	if (name.equals("groups")) {
 	    if (metaData.getData("groups") == null)
 		metaData.putData("groups", new Vector());
-	    GroupSelector gs = new GroupSelector
+	    panel.groupSelector = new GroupSelector
 		(frame, panel, metaData.getData("groups"), this, prefs);
-	    add("groups", gs);
+	    add("groups", panel.groupSelector);
 	}
 
     }

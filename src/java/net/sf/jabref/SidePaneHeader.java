@@ -31,11 +31,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import javax.swing.JToolBar;
 
 public class SidePaneHeader extends JPanel implements ActionListener {
 
-    private JButton close = new JButton(new ImageIcon
-					(GUIGlobals.closeIconFile));
+  private JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
     private JLabel nameLabel, imageIcon;
     private SidePaneComponent parent;
     private GridBagLayout gbl = new GridBagLayout();
@@ -44,25 +44,37 @@ public class SidePaneHeader extends JPanel implements ActionListener {
     /*
     public SidePaneHeader(String name, URL image, JButton button,
 			  JComponent parent_) {
-       
+
 			  }*/
 
     public SidePaneHeader(String name, URL image, SidePaneComponent parent_) {
 	addPart(name, image, parent_);
-	gbl.setConstraints(close, con);
-	add(close);
     }
 
     private void addPart(String name, URL image, SidePaneComponent parent_) {
 	parent = parent_;
 	setLayout(gbl);
+        setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 20));
+        setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 20));
 	//imageIcon = new JLabel(new ImageIcon(image));
 	nameLabel = new JLabel(name, new ImageIcon(image),
 			       SwingConstants.LEFT);
 	//nameLabel.setPreferredSize(new Dimension(70, 24));
-	close.addActionListener(this);
-	close.setToolTipText("Close");
-	close.setPreferredSize(new Dimension(20, 20));
+        /*AbstractAction close = new AbstractAction("Close", new ImageIcon(GUIGlobals.closeIconFile)) {
+          public void actionPerformed(ActionEvent e) {
+            parent.hideAway();
+          }
+        };
+	close.putValue(close.SHORT_DESCRIPTION, "Close");
+        JToolBar tlb = new JToolBar();
+        tlb.setFloatable(false);
+        tlb.setMargin(new Insets(0,0,0,0));
+        tlb.setSize(20, 20);
+        tlb.add(close);*/
+  close.setPreferredSize(new Dimension(20, 20));
+  close.setMaximumSize(new Dimension(20, 20));
+  close.setMinimumSize(new Dimension(20, 20));
+  close.addActionListener(this);
 
 	//setBorder(BorderFactory.createEtchedBorder());
 	//add(imageIcon, BorderLayout.WEST);
@@ -80,6 +92,8 @@ public class SidePaneHeader extends JPanel implements ActionListener {
 	con.weightx = 0;
 	con.fill = GridBagConstraints.NONE;
 	con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(close, con);
+	add(close);
     }
 
     public void actionPerformed(ActionEvent e) {

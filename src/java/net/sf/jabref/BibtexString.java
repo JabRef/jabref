@@ -51,4 +51,9 @@ public class BibtexString {
     public void setContent(String content) {
 	_content = content;
     }
+
+    public Object clone() {
+      return new BibtexString(_name, _content);
+    }
+
 }

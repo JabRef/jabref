@@ -41,7 +41,7 @@ public class SidePane extends JPanel {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JScrollPane sp;
-    JButton close = new JButton("X");
+    //JButton close = new JButton("X");
     JSplitPane parent;
     JPanel mainPanel = new JPanel(),
 	pan = new JPanel();
