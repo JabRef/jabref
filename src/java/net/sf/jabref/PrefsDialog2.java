@@ -73,14 +73,14 @@ public class PrefsDialog2 extends JDialog {
 	// ----------------------------------------------------------------
 	// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
 	// ----------------------------------------------------------------
-	tabbed.addTab("General", new GeneralTab(_prefs));
-	tabbed.addTab("Table", new TablePrefsTab(_prefs));
-	tabbed.addTab("External programs", new ExternalProgramsTab(_prefs));
+	tabbed.addTab(Globals.lang("General"), new GeneralTab(_prefs));
+	tabbed.addTab(Globals.lang("Table"), new TablePrefsTab(_prefs));
+	tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
 	//tabbed.addTab("Label Pattern", new TabLabelPattern(_prefs));
 
 	JButton
-	    ok = new JButton("Ok"),
-	    cancel = new JButton("Cancel");
+	    ok = new JButton(Globals.lang("Ok")),
+	    cancel = new JButton(Globals.lang("Cancel"));
 	ok.addActionListener(new OkAction());
 	cancel.addActionListener(new CancelAction());
 	lower.add(ok);

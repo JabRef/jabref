@@ -51,7 +51,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	general.add(defSource);
 
         con.gridwidth = 1;
-        JLabel lab = new JLabel(Globals.lang("Default grouping field:"));
+        JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
         lab.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         general.add(lab);

@@ -93,8 +93,8 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	fieldPanel.setBorder(BorderFactory.createEtchedBorder());
 	typePanel.setBorder(BorderFactory.createEtchedBorder());
 
-	JLabel lab = new JLabel(Globals.lang("Type: ")),
-	    lab2 = new JLabel(Globals.lang("Name: "));
+	JLabel lab = new JLabel(Globals.lang("Type")+": "),
+	    lab2 = new JLabel(Globals.lang("Name")+": ");
 	con.insets = new Insets(5, 5, 5, 5);
 	gbl.setConstraints(lab, con);
 	gbl.setConstraints(lab2, con);
@@ -171,7 +171,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	getContentPane().add( panel, BorderLayout.CENTER);
 
 	messageLabel.setForeground(Color.black);
-	messageLabel.setText(Globals.lang("Delimit fields with semicolon, ex.: author;title;journal"));
+	messageLabel.setText(Globals.lang("Delimit_1"));
 
 	types_cb.addItemListener(this);
     }

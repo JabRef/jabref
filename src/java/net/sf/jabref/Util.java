@@ -61,9 +61,12 @@ public class Util {
     public static String nCase(String s) {
 	// Make first character of String uppercase, and the
 	// rest lowercase.
-	String res = s.substring(0,1).toUpperCase()
-	    + s.substring(1,s.length()).toLowerCase();
-	return res;
+        if (s.length() > 1)
+          return s.substring(0,1).toUpperCase()
+              + s.substring(1,s.length()).toLowerCase();
+        else
+          return s.toUpperCase();
+
     }
 
     public static String checkName(String s) {

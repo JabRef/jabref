@@ -524,7 +524,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    } else {
 		// The source panel must have been chosen. Update it.
 		if (panel.baseChanged)
-		    updateSource();
+                  updateSource();
 	    }
 	}
 
@@ -707,7 +707,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    panel.undoManager.addEdit
 			(new UndoableFieldChange(entry, fe.getFieldName(),
 						 oldValue, toSet));
-
+                    updateSource();
 		    panel.refreshTable();
 		    panel.markBaseChanged();
 

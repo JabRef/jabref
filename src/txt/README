@@ -1,8 +1,6 @@
 
-JabRef 1.1 
+JabRef 1.x
 ----------
-
-Released January 3, 2004
 
 
 Introduction:
@@ -60,6 +58,8 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
+1.x:	- Fixed bug related to Save database and Source field, which caused changes
+	  to disappear.
 1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration
 	  from generating non-unique keys.
 	- Added command line option to load file on startup.

@@ -529,7 +529,7 @@ public class JabRefFrame extends JFrame {
 	mb.add(tools);
 
 	options.add(showPrefs);
-	options.add(new AbstractAction("Customize entry types") {
+	options.add(new AbstractAction(Globals.lang("Customize entry types")) {
 		public void actionPerformed(ActionEvent e) {
 		    JDialog dl = new EntryCustomizationDialog(ths);
 		    Util.placeDialog(dl, ths);

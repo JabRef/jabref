@@ -51,7 +51,7 @@ public class GenFieldsCustomizer extends JDialog {
     cancel.setText("Cancel");
     cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
     jPanel2.setBackground(GUIGlobals.lightGray);
-    jLabel1.setText(Globals.lang("Delimit fields with semicolon, ex.: url;pdf;note"));
+    jLabel1.setText(Globals.lang("Delimit_2"));
     jPanel3.setLayout(gridBagLayout2);
     jPanel4.setBorder(BorderFactory.createEtchedBorder());
     jPanel4.setLayout(gridBagLayout1);

@@ -50,7 +50,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			(BorderFactory.createEtchedBorder(),
 			 Globals.lang("Table appearance")));
 	sort.setBorder(BorderFactory.createTitledBorder
-		       (BorderFactory.createEtchedBorder(), "Sort options"));
+		       (BorderFactory.createEtchedBorder(),
+                        Globals.lang("Sort options")));
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
@@ -73,7 +74,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		terSort.setSelectedIndex(i);
 	}
 
-	lab = new JLabel("Secondary sort criterion");
+	lab = new JLabel(Globals.lang("Secondary sort criterion"));
 	con.gridwidth = 1;
 	con.insets = new Insets(0,5,0,0);
 	gbl.setConstraints(lab, con);
@@ -90,7 +91,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//	con.weightx = 0;
 	//con.insets = new Insets(0,0,0,0);
 	//	con.weightx = 1;
- 	lab = new JLabel("Tertiary sort criterion");
+ 	lab = new JLabel(Globals.lang("Tertiary sort criterion"));
 	gbl.setConstraints(lab, con);
 	sort.add(lab);
 	con.weightx = 0;
