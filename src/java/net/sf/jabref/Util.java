@@ -326,7 +326,7 @@ public class Util {
 	    {
 		cmdArray[0] = prefs.get("htmlviewer");
 		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
-		Process child = Runtime.getRuntime().exec(cmdArray);
+		Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
 	    }
 	else if(fieldName.equals("url"))
 	    { // html
@@ -345,7 +345,7 @@ public class Util {
                   else{
                     cmdArray[0] = prefs.get("htmlviewer");
                     cmdArray[1] = link;
-                    Process child = Runtime.getRuntime().exec(cmdArray);
+                    Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
                   }
 
                 }
@@ -368,7 +368,7 @@ public class Util {
                 else{
                     cmdArray[0] = prefs.get("psviewer");
                     cmdArray[1] = link;
-                    Process child = Runtime.getRuntime().exec(cmdArray);
+                    Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
                 }
 		    }
 		catch (IOException e)
@@ -399,7 +399,7 @@ public class Util {
             else{
                 cmdArray[0] = prefs.get("pdfviewer");
                 cmdArray[1] = link;
-                Process child = Runtime.getRuntime().exec(cmdArray);
+                Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
             }
 		    }
 		catch (IOException e)
