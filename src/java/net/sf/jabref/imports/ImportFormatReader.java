@@ -695,7 +695,7 @@ public class ImportFormatReader
 
 	    String[] fields = entries[i].split("\n");
 	    for(int j=0; j <fields.length; j++){
-		if(fields[j].length() < 2)
+		if(fields[j].length() < 6)
 		    continue;
 		else{
 		    String lab = fields[j].substring(0,2);
@@ -725,9 +725,16 @@ public class ImportFormatReader
 		    else if(lab.equals("IS")) hm.put("number",val);
 		    else if(lab.equals("N2") || lab.equals("AB")) hm.put("abstract",val);
 		    else if(lab.equals("UR")) hm.put("url",val);
-		    else if((lab.equals("Y1")||lab.equals("PY"))&& val.length()>=4)
-			hm.put("year",val.substring(0,4));
-
+                    else if((lab.equals("Y1")||lab.equals("PY"))&& val.length()>=4)
+                      hm.put("year",val.substring(0,4));
+                    else if(lab.equals("KW")) {
+                      if (!hm.containsKey("keywords"))
+                        hm.put("keywords", val);
+                      else {
+                        String kw = (String)hm.get("keywords");
+                        hm.put("keywords", kw+", "+val);
+                      }
+                    }
 		}
 	    }
 	    // fix authors

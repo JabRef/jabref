@@ -39,7 +39,7 @@ import javax.swing.*;
 
 public class Globals {
 
-  static int SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+  static int SHORTCUT_MASK;// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
   private static String resourcePrefix = "resource/JabRef";
   private static String logfile = "jabref.log";
@@ -280,6 +280,12 @@ public class Globals {
   public static HashMap HTML_CHARS = new HashMap(),
       XML_CHARS = new HashMap();
   static {
+
+    try {
+      SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    } catch (Throwable t) {
+
+    }
 
     HTML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&Auml;");

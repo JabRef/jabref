@@ -297,7 +297,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	    BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(i);
 	    boolean anyChanges = false;
 	    bp.entryEditors.remove(typeName);
-	    bp.rcm.populateTypeMenu(); // Update type menu for change type.
+	    //bp.rcm.populateTypeMenu(); // Update type menu for change type.
 	    base = bp.database;
 	    iter = base.getKeySet().iterator();
 	    while (iter.hasNext()) {

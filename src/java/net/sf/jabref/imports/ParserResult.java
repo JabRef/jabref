@@ -29,12 +29,14 @@ package net.sf.jabref.imports;
 import java.util.HashMap;
 import java.io.File;
 import net.sf.jabref.*;
+import java.util.Vector;
 
 public class ParserResult {
 
     private BibtexDatabase base;
     private HashMap metaData;
     private File file = null;
+    private Vector warnings = new Vector();
 
     public ParserResult(BibtexDatabase base, HashMap metaData) {
 	this.base = base;
@@ -55,6 +57,26 @@ public class ParserResult {
 
     public void setFile(File f) {
       file = f;
+    }
+
+    /**
+     * Add a parser warning.
+     *
+     * @param s String Warning text. Must be pretranslated.
+     */
+    public void addWarning(String s) {
+      warnings.add(s);
+    }
+
+    public boolean hasWarnings() {
+      return (warnings.size() > 0);
+    }
+
+    public String[] warnings() {
+      String[] s = new String[warnings.size()];
+      for (int i=0; i<warnings.size(); i++)
+        s[i] = (String)warnings.elementAt(i);
+      return s;
     }
 
 }

@@ -62,6 +62,8 @@ public class JabRef {
 
     public static void main(String[] args) {
 
+      boolean graphicFailure = false;
+
       // ----------------------------------------------------------------
       // First instantiate preferences and set language.
       // ----------------------------------------------------------------
@@ -135,10 +137,16 @@ public class JabRef {
         }
       }*/
 
+
   SplashScreen ss = null;
   if (!disableGui.isInvoked()) {
-    ss = new SplashScreen();
-    ss.show();
+    try {
+      ss = new SplashScreen();
+      ss.show();
+    } catch (Throwable ex) {
+      graphicFailure = true;
+      System.err.println(Globals.lang("Unable to create graphical interface")+".");
+    }
   }
         //Util.pr("JabRef "+GUIGlobals.version);
 
@@ -199,12 +207,6 @@ public class JabRef {
             UIManager.setLookAndFeel(lnf);
           } catch (UnsupportedLookAndFeelException ex) {}
         }
-
-	GUIGlobals.CURRENTFONT = new Font
-	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
-	     prefs.getInt("fontSize"));
-
-
 
         // Vector to put imported/loaded database(s) in.
         Vector loaded = new Vector();
@@ -408,7 +410,13 @@ public class JabRef {
 	}*/
 
       //openGui = false;
-     if (!disableGui.isInvoked()) {
+     if (!graphicFailure && !disableGui.isInvoked()) {
+
+       GUIGlobals.init();
+       GUIGlobals.CURRENTFONT = new Font
+           (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
+	     prefs.getInt("fontSize"));
+
        JabRefFrame jrf = new JabRefFrame();
 
        if (loaded.size() > 0) for (int i=0; i<loaded.size(); i++) {

@@ -62,8 +62,8 @@ public class GUIGlobals {
       NUMBER_COL = "#";
 
   public static Font CURRENTFONT,
-      typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24),
-      jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
+      typeNameFont,
+      jabRefFont;
 
   // Signature written at the top of the .bib file.
   public static final String SIGNATURE =
@@ -195,7 +195,7 @@ public class GUIGlobals {
 //	invalidFieldColor = new Color(210, 70, 70), // Invalid field, red.
       validFieldBackground = Color.white, // Valid field backgnd.
 //invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
-      invalidFieldBackground = new Color(141, 0, 61), // Invalid field backgnd.
+      invalidFieldBackground = new Color(241, 20, 41), // Invalid field backgnd.
       tableBackground = Color.white, // Background color for the entry table.
       tableReqFieldBackground = new Color(235, 235, 255),
       tableOptFieldBackground = new Color(230, 255, 230),
@@ -374,10 +374,6 @@ public class GUIGlobals {
     FIELD_EXTRAS.put("doi", "external");
     //FIELD_EXTRAS.put("keywords", "selector");
 
-    tableIcons.put("pdf", new ImageIcon(pdfIcon));
-    tableIcons.put("url", new ImageIcon(wwwIcon));
-    tableIcons.put("doi", new ImageIcon(doiSmallIcon));
-    tableIcons.put("ps", new ImageIcon(psIcon));
 
     fieldLength.put("author", new Integer(280));
     fieldLength.put("editor", new Integer(280));
@@ -439,6 +435,21 @@ public class GUIGlobals {
       l = ( (Double) o).doubleValue();
     }
     return l;
+  }
+
+  /**
+   * Perform initializations that are only used in graphical mode. This is to prevent
+   * the "Xlib: connection to ":0.0" refused by server" error when access to the X server
+   * on Un*x is unavailable.
+   */
+  public static void init() {
+    typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
+    tableIcons.put("pdf", new ImageIcon(pdfIcon));
+    tableIcons.put("url", new ImageIcon(wwwIcon));
+    tableIcons.put("doi", new ImageIcon(doiSmallIcon));
+    tableIcons.put("ps", new ImageIcon(psIcon));
+
+    //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
   }
 
 }

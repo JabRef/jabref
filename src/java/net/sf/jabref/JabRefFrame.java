@@ -1263,6 +1263,22 @@ public JabRefPreferences prefs() {
           BibtexDatabase db = pr.getDatabase();
           HashMap meta = pr.getMetaData();
 
+          if (pr.hasWarnings()) {
+            final String[] wrns = pr.warnings();
+            (new Thread() {
+              public void run() {
+                StringBuffer wrn = new StringBuffer();
+                for (int i = 0; i < wrns.length; i++)
+                  wrn.append( (i + 1) + ". " + wrns[i] + "\n");
+                if (wrn.length() > 0)
+                  wrn.deleteCharAt(wrn.length() - 1);
+                JOptionPane.showMessageDialog(ths, wrn.toString(),
+                                              Globals.lang("Warnings"),
+                                              JOptionPane.WARNING_MESSAGE);
+              }
+            }).start();
+          }
+
           BasePanel bp = new BasePanel(ths, db, fileToOpen,
                                        meta, prefs);
           /*

@@ -86,7 +86,7 @@ public class BibtexParser
 
         _db = new BibtexDatabase(); // Bibtex related contents.
 	_meta = new HashMap();      // Metadata in comments for Bibkeeper.
-
+        ParserResult _pr = new ParserResult(_db, _meta);
         skipWhitespace();
 
         try
@@ -108,7 +108,14 @@ public class BibtexParser
 		    _db.setPreamble(parsePreamble());
 		}
 		else if (entryType.toLowerCase().equals("string")) {
-		    _db.addString(parseString(), _db.getStringCount());
+                  BibtexString bs = parseString();
+                  try {
+                    _db.addString(bs, _db.getStringCount());
+                  } catch (KeyCollisionException ex) {
+                    _pr.addWarning(Globals.lang("Duplicate string name")+": "+bs.getName());
+                    //ex.printStackTrace();
+                  }
+
 		}
 		else if (entryType.toLowerCase().equals("comment")) {
 		    StringBuffer comment = parseBracketedText();
@@ -154,10 +161,11 @@ public class BibtexParser
                 skipWhitespace();
             }
 
-            return new ParserResult(_db, _meta);
+            return _pr;
         }
         catch (KeyCollisionException kce)
         {
+          //kce.printStackTrace();
             throw new IOException("Duplicate ID in bibtex file: " +
                 kce.toString());
         }
