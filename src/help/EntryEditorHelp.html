@@ -1,0 +1,90 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>The entry editor</H1>
+
+<em>Opened from main window by double-clicking on the leftmost column of an entry, or
+by pressing CTRL-D</em>.
+<P>
+In this window you can specify all relevant information on a single entry.
+The entry editor checks the type of your entry, and lists all the fields that
+are required, and the ones that are optional, for referring the entry
+with <em>bibtex</em>. In addition, there are several fields termed <em>General
+fields</em>, that are common to all entry types. The general fields are ignored
+by <em>bibtex</em>, but may be useful to you for other reasons.
+
+<P>For information about how the fields should be filled out, see <a href="BibtexHelp.html">Bibtex help</a>.
+
+<H2>The entry editor's panels</H2> 
+
+The entry editor contains four panels, <em>required fields</em>,
+<em>optional fields</em>, <em>general fields</em> and <em>bibtex
+source</em>. Inside the three first panels, TAB and SHIFT-TAB are used
+to switch focus between the text fields.
+
+<P>Switch panels by clicking on the tabs, or navigate to the panel to
+the left or right by pressing CTRL-SHIFT-LEFT or CTRL-SHIFT-RIGHT.
+
+<P>The <em>bibtex source</em> panel shows how the entry will appear
+when the database is saved in <em>bibtex</em> format. Two items in the
+Preferences dialog relate to this panel.
+
+<ul>
+<li>If <strong>Enable source editing</strong> is checked, you can edit
+the source directly in this panel. When you move to a different panel,
+press CTRL-S or close the entry editor, Bibkeeper will try to parse
+the contents of the source panel. If there are problems, you will be
+notified, and given the option to edit your entry further, or to
+revert to the former contents.
+
+<li>If <strong>Show source by default</strong> is checked, the source
+panel will be the one shown each time you open the entry editor. If
+you prefer editing the source rather than using the other three
+panels, you should check this option.
+</ul>
+
+<P><strong>Tip:</strong> If your database contains fields unknown to
+Bibkeeper, these will be visible in the source panel. Also, if you
+want to add your own custom fields, you can do this in the source
+panel once source editing is turned on.
+
+<H2>Field consistency checking</H2>
+When the contents of a field is changed, Bibkeeper checks if the new contents
+are compatible with the field type. For instance, the <em>year</em> field must
+contain a number. The contents are also checked with respect to the use of the
+'#' character. The hash symbol is <em>only</em> to be used in pairs, wrapping
+the name of a <em>bibtex</em> string that is referenced. Note that Bibkeeper
+does not check if the referenced string actually exists (this is not possible,
+since the <em>bibtex</em> style you use can define an arbitrary set of strings 
+unknown to Bibkeeper).
+<P>
+If the contents are not accepted, the field will turn red,
+indicating an error. In this case the change will not be stored.
+
+<H2>Word/name autocompletion</H2>
+The entry editor offers autocompletion of words. In the Preferences dialog
+you can enable or disable autocompletion, and choose for which fields
+autocompletion is active.
+<P>With autocompletion, Bibkeeper records all words that appear in
+each of the chosen fields throughout your database. Whenever you write
+the beginning of one of these words, it will be suggested visually. To
+ignore the suggestion, simply write on. To accept the suggestion,
+either press <em>ENTER</em> or use your arrow keys or other keys to
+remove the selection box around the suggested characters.
+<P><em>Note:</em> the words considered for suggestion are only the ones
+appearing in the same field in entries of the same database as the one you
+are editing. There are many ways to realise this kind of feature, and if you feel 
+it should have been implemented differently, we'd like to hear your suggestions!
+
+<H2>Copy <em>bibtex</em> key</H2>
+Pressing CTRL-K or the 'key' button causes the <em>bibtex</em> key for your entry
+to be copied to the clipboard.
+
+<H2>Autogenerate <em>bibtex</em> key</H2>
+Press CTRL-G or the 'gen key' button to autogenerate a <em>bibtex</em> key for your entry
+based on the contents of its required fields.
+
+</BODY>
+</HTML>

@@ -1,0 +1,78 @@
+<HTML>
+
+<BODY text="#275856">
+
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>The Bibkeeper main window</H1>
+
+<em>Note:</em> most menu actions referred in the following have keyboard shortcuts,
+and many are available from the toolbar. The keyboard shortcuts are found in the
+pull-down menus.
+<p>
+This is the main window from where you work with your databases. Below the menubar
+and the toolbar, the window contains a table listing all the database's entries, as
+well as a selection of their fields.
+<ul>
+<li>You decide which fields are shown in the table, by checking the fields you want
+to see in the <strong>Preferences</strong> dialog.</li>
+<li>Fields can be edited directly in the table, by simply clicking on a cell and
+typing the contents. Double-click a cell to enter a more powerful edit mode.
+You can navigate the table with the arrow keys.</li>
+<li>The table is sorted according to a field of your choosing. Simply press the header
+of a column to sort entries according to the column's field. Press the column again
+to toggle the sort direction. Entries with equal content in the selected field are
+sorted according to the secondary (and possibly the tertiary) sort field, which
+can be set in the <strong>Preferences</strong> dialog.</li>
+<li>Adjust the width of each column by dragging the borders between 
+their headers.</li>
+<li>In the <strong>Preferences</strong> dialog, toggle whether the table should be
+resized to fit the window. Enable this to ensure visibility of the whole table,
+and disable it to make room for displaying more information.</li>
+<li>Color codes can be toggled in the <strong>Preferences</strong> dialog, and 
+they help you visualize the completeness of your database by coloring cells as 
+follows:
+  <ul>
+  <li>A <font color="red">red</font> cell in the leftmost column denotes an 
+  incomplete entry.</li>
+  <li>A <font color="#909000">yellow</font> cell in the leftmost column denotes an entry
+  that doesn't define all required fields by itself, but that contains a 
+  cross-reference.</li>
+  <li>A <font color="blue">blue</font> cell denotes a required field.</li>
+  <li>A <font color="green">green</font> cell denotes an optional field.</li>
+  <li>An uncolored cell denotes a field which is not used by the <em>bibtex</em>
+  program for this type of entry. The field can still be edited in Bibkeeper.</li>
+  </ul>
+</li>
+
+</ul>
+
+<H2>Adding a new entry</H2>
+There are several ways to add a new entry. The <strong>New entry</strong> menu
+action shows a dialog where you can choose the type of the entry from a list. To
+bypass this dialog, there are also separate menu actions for each entry type, and
+keyboard shortcuts for the most common types. 
+<P>When a new entry is added, by default an 
+<a href="EntryEditorHelp.html">editor dialog</a> for the entry will be
+opened. This behaviour can be toggled in the <strong>Preferences</strong> dialog.
+<P><em>Note:</em> We strongly recommend learning the shortcuts for 
+the entry types you use most often, e.g. CTRL-SHIFT-A for adding an 
+<em>article</em> entry.
+
+<H2>Editing an entry</H2>
+To open en <a href="EntryEditorHelp.html">editor dialog</a> for an existing entry, 
+simply double-click in the leftmost
+column of the appropriate line. Alternatively, select an entry in the table and use
+the menu action <strong>Edit entry</strong>.
+
+<H2>Referencing a <em>bibtex</em> string in a field</H2>
+In Bibkeeper you write the contents of all fields the same way as you
+would in a text editor, with one exception: to reference a string,
+enclose the name of the string in a set of # characters, e.g.:<BR>
+&nbsp;&nbsp;'#jan# 1997',<BR>
+which will be interpreted as the string named 'jan' followed by ' 1997'.
+<P>See also: <a href="StringEditorHelp.html">string editor</a>.
+
+</font>
+</BODY>
+</HTML>

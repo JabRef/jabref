@@ -1,0 +1,118 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Help on using <em>Groups</em></H1>
+<em>Accessed from the Groups interface in the side pane. The Groups
+interface can be enabled and disabled by pressing SHIFT-CTRL-G.</em>
+
+<p><em>Groups</em> is a feature that allows you to organize your
+<em>bibtex</em> database into logical groups. Groups are very simply
+implemented; once you select one or more groups, Bibkeeper checks a
+single field per group (defined by the groups' definition) if it
+contains the group's regular expression, and shows you either the
+entries belonging to all selected groups (intersection of groups), or
+the entries belonging to any of the selected groups (union of groups).
+
+<p>The choice <em>All entries</em> will always top the group
+list. Click on this choice to deselect other groups. Your selected
+groups will also be deselected if you close the groups interface.
+
+<p>Since your group definitions will be database specific, they are
+saved in your .bib file. This information will be contained in a
+bibtex @COMMENT block, which is ignored by the <em>bibtex</em>
+program. Changing the contents of this block manually may (of course)
+cause your group definitions to be lost or changed.
+
+<H2>Different ways of using <em>groups</em></H2>
+
+<p>Grouping might seem a little confusing at first. It is made the way
+it is to ensure as much flexibility as possible:
+
+<p>If you want your grouping to be transparent, you can define your
+groups using a non-standard field name such as 'supersnill' or
+anything else, and just use the <em>Add to group</em> and <em>Remove
+from group</em> functions to assign entries to groups.
+
+<p>However, if your database already has suitable keywords defined,
+you might want to define some groups using the 'keywords' field, and
+your database might already be grouped for you.
+
+<p>A third option is to define some groups with ordinary fields - for
+instance to define quick searches for specific authors that are
+important to your work. If you do this, you should avoid using the
+<em>Add to group</em> and <em>Remove from group</em> functions, since
+you presumably don't want the field to get modified. You will get a
+warning if you try this.
+
+<H2>Viewing and searching in groups</H2>
+
+<p>To view the entries in a group, click the group name. When the
+groups interface has keyboard focus, you can switch between groups
+using arrow keys UP and DOWN. Using SHIFT and CONTROL, you can select
+several groups at the same time. The checkboxes <em>Intersection</em>
+and <em>Union</em> determine how a selection of multiple groups is
+handled.
+
+<p>Note that showing a group is in fact an action similar to a
+search. This means that if you add new entries to a group, you'll have
+to repeat the search before the entries can be displayed as part of
+the group. E.g. you need to reselect your current groups, or click the
+<em>Refresh</em> button.
+
+<p>Grouping can be combined with ordinary searches; all searches will
+be restricted to the entries determined by your group selection. While
+a search is active, you can switch groups or show all entries, and the
+table will update to show the matches within the current group
+selection.
+
+<p>You can at any time export a <em>bibtex</em> database containing
+only the entries in your currently shown groups and/or search, by
+choosing <em>File -> Save special</em> in the menu.
+
+<H2>Creating a new group</H2>
+
+<p>To define a group, press the <em>New group</em> button in the groups
+interface. A dialog will appear, where you can fill in a group name,
+a regular expression, and a field name. The field name will be set to a
+default value that can be changed in the <em>Preferences</em> dialog.
+To finish the creation of your new group, press ENTER in one of the text
+fields, or click <em>Ok</em>. To exit without creating the group, press
+ESCAPE or click <em>Cancel</em>.
+
+<H2>Modifying an existing group definition</H2>
+
+<p>To modify an existing group definition, double-click the group name
+in the groups interface, or right-click it and choose
+<em>Modify</em>. The same dialog used to create new groups will
+appear, allowing you to modify the group's name. The field name and
+regular expression cannot be changed after the group has been created
+(this restriction will probably be lifted once we get around to
+implementing a method that can update the group's entries for you, to
+avoid the entries falling out of the modified group).
+
+<H2>Adding entries to a group</H2>
+
+<p>An entry's membership in a group is decided by whether there is a
+match to the group's regular expression in the specified field of the
+entry. So, to add an entry to a group, you must simply make sure this
+is the case.
+
+<p>Instead of editing the field manually, you can select the entries
+  you wish to add, and right-click to bring up the context menu. In
+  the menu choose <em>Add to group</em> and then the correct group,
+  and the entries not already in the group will be edited for you.
+
+<H2>Removing entries from a group</H2>
+
+<p>The same principle as for adding entries applies to removing
+them. Remove any matches for the group's regular expression from the
+specified field, or use the <em>Remove from group</em> function.
+
+<H2>Removing a group</H2>
+
+<p>To remove a group, right-click it and choose <em>Remove</em>. You will
+be asked to confirm this action.
+
+</HTML>

@@ -1,0 +1,50 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>About <em>bibtex</em></H1>
+
+Bibkeeper helps you work with your <em>bibtex</em> databases, but
+there are still rules to keep in mind when editing your entries, to
+ensure that your database is treated properly by the <em>bibtex</em>
+program.
+
+<H2><em>Bibtex</em> fields</H2>
+
+There is a lot of different fields in <em>bibtex</em>, and some
+additional fields that you can set in Bibkeeper. 
+<P>
+Generally, you can use LaTeX commands inside of fields containing
+text. <em>Bibtex</em> will automatically format your reference lists,
+and those fields that are included in the lists will be
+(de)capitalized according to your bibliography style. To ensure that
+certain characters remain capitalized, enclose them in braces, like in
+the word {B}elgium.
+
+<P>
+Notes about some of the field types:
+<ul>
+<li><em>Author:</em> This field should contain the complete author
+list for your entry. The names are separated by the word <em>and</em>,
+even if there are more than two authors. Each name can be written
+in two equivalent forms:<br>
+ Donald E. Knuth <em>or</em> Knuth, Donald E.<br>
+ Eddie van Halen <em>or</em> van Halen, Eddie<br>
+
+The second form should be used for authors with more than two names,
+to differentiate between middle names and last names.
+
+<li><em>Editor:</em> This field is analogue to the <em>author</em> field.
+
+<li><em>Year:</em> The year of the publication. This field is required
+for most entry types. Bibkeeper will only accept a purely numerical
+value for this field.
+
+<li><em>Bibtexkey:</em> A unique string used to refer to the entry in
+LaTeX documents. The key can be anything, except it is not allowed to contain the characters <strong>
+
+</ul>
+
+
+</HTML>

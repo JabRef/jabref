@@ -1,0 +1,40 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>The string editor</H1>
+<em>Opened from the main window by <em>Edit strings</em> or pressing the
+'@s' button.</em>
+<P>
+<em>Strings</em> are the <em>bibtex</em> equivalent to constants in a
+programming language.  Each string is defined with a unique
+<em>name</em> and a <em>content</em>. Elsewhere in the database, the
+name can be used to represent the content.
+
+<P>
+For instance, if many entries are from a journal with an abbreviation
+that may be hard to remember, such as 'J. Theor. Biol.' (Journal of
+Theroretical Biology), a string named JTB could be defined to
+represent the journal's name. Instead of repeating the exact journal
+name in each entry, the characters '#JTB#' are put into the
+<em>journal</em> field of each, ensuring the journal name is written
+identically each time.
+
+<P>
+A string reference can appear anywhere in any field, always by enclosing
+the string's name in a pair of '#' characters. This syntax is specific for
+Bibkeeper, and differs slightly from the <em>bibtex</em> notation that
+is produced when you save your database.
+
+<P>
+A string may in the same way be referred in the content of another
+string, provided the referred string is defined <em>before</em> the
+referring one. In this case the order of the strings becomes
+significant. Bibkeeper does not check the strings' order, but the
+string editor lets you change the order of strings using the
+<em>up</em> and <em>down</em> buttons (CTRL-UP and CTRL-DOWN) after
+selecting a string.
+
+</BODY>
+</HTML>
