@@ -749,10 +749,7 @@ public class GroupSelector extends SidePaneComponent implements
         // update of selection/expansion state not required
         // when moving amongst siblings (no path is invalidated)
         revalidateGroups();
-        panel.undoManager.addEdit(undo);
-        panel.markBaseChanged();
-        frame.output(Globals.lang("Moved group") + " '"
-                + node.getGroup().getName() + "'.");
+        concludeMoveGroup(undo, node);
         return true;
     }
     
@@ -775,10 +772,7 @@ public class GroupSelector extends SidePaneComponent implements
         // update of selection/expansion state not required
         // when moving amongst siblings (no path is invalidated)
         revalidateGroups();
-        panel.undoManager.addEdit(undo);
-        panel.markBaseChanged();
-        frame.output(Globals.lang("Moved group") + " '"
-                + node.getGroup().getName() + "'.");
+        concludeMoveGroup(undo, node);
         return true;
     }
     
@@ -793,32 +787,16 @@ public class GroupSelector extends SidePaneComponent implements
             return false; // not possible
         }
         AbstractUndoableEdit undo = null;
-        TreePath selectionPath = getSelectionPath();
         Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '"
                     + node.getGroup().getName() + "' left.");
             return false; // not possible
         }
-        // update selection/expansion state:
-        // in all paths that contain the moved node, the previous node
-        // (i.e. the previous parent) is removed
-        // first update selection
-        selectionPath = new TreePath(node.getPath());
-        // then update expanded paths
-        Vector newExpandedPaths = new Vector();
-        while (expandedPaths.hasMoreElements()) {
-            TreePath path = (TreePath) expandedPaths.nextElement();
-            newExpandedPaths.add(new TreePath(
-                    ((DefaultMutableTreeNode)path.getLastPathComponent()).getPath()));
-        }
-        expandedPaths = newExpandedPaths.elements();
-        // ...that's it! now revalidate:
-        revalidateGroups(new TreePath[]{selectionPath}, expandedPaths);
-        panel.undoManager.addEdit(undo);
-        panel.markBaseChanged();
-        frame.output(Globals.lang("Moved group") + " '"
-                + node.getGroup().getName() + "'.");
+        // update selection/expansion state
+        revalidateGroups(new TreePath[]{new TreePath(node.getPath())},
+                groupsTree.refreshPaths(expandedPaths));
+        concludeMoveGroup(undo, node);
         return true;
     }
     
@@ -833,34 +811,30 @@ public class GroupSelector extends SidePaneComponent implements
             return false; // not possible
         }
         AbstractUndoableEdit undo = null;
-        TreePath selectionPath = getSelectionPath();
         Enumeration expandedPaths = getExpandedPaths();
-        Object newParent = node.getPreviousSibling();
         if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
             frame.output(Globals.lang("Cannot move group") + " '"
                     + node.getGroup().getName() + "' right.");
             return false; // not possible
         }
-        // update selection/expansion state:
-        // in all paths that contain the moved node, the new father (former
-        // sibling) is inserted
-        // first update selection, which is always required
-        selectionPath = new TreePath(node.getPath());
-        // then update expanded paths
-        Vector newExpandedPaths = new Vector();
-        while (expandedPaths.hasMoreElements()) {
-            TreePath path = (TreePath) expandedPaths.nextElement();
-            newExpandedPaths.add(new TreePath(
-                    ((DefaultMutableTreeNode)path.getLastPathComponent()).getPath()));
-        }
-        expandedPaths = newExpandedPaths.elements();
-        // ...that's it! now revalidate:
-        revalidateGroups(new TreePath[]{selectionPath}, expandedPaths);
+        // update selection/expansion state
+        revalidateGroups(new TreePath[]{new TreePath(node.getPath())},
+                groupsTree.refreshPaths(expandedPaths));
+        concludeMoveGroup(undo, node);
+        return true;
+    }
+    
+    /**
+     * Concludes the moving of a group tree node by storing the specified
+     * undo information, marking the change, and setting the status line.
+     * @param undo Undo information for the move operation. 
+     * @param node The node that has been moved.
+     */
+    public void concludeMoveGroup(AbstractUndoableEdit undo, GroupTreeNode node) {
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
                 + node.getGroup().getName() + "'.");
-        return true;
     }
     
     JMenu moveSubmenu = new JMenu("Move");
@@ -869,7 +843,7 @@ public class GroupSelector extends SidePaneComponent implements
         return groupsRoot;
     }
     
-    private Enumeration getExpandedPaths() {
+    public Enumeration getExpandedPaths() {
         return groupsTree.getExpandedDescendants(
                 new TreePath(groupsRoot.getPath()));
     }

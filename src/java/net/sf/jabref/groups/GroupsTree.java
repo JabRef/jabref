@@ -27,9 +27,10 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
+import java.util.*;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -44,7 +45,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                         DnDConstants.ACTION_MOVE, this);
         // Eliminates right mouse clicks as valid actions
         dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
-        DropTarget dropTarget = new DropTarget(this,this);
+        DropTarget dropTarget = new DropTarget(this, this);
     }
 
     public void dragEnter(DragSourceDragEvent dsde) {
@@ -53,7 +54,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     public void dragOver(DragSourceDragEvent dsde) {
         Point p = dsde.getLocation(); // screen coordinates!
-        SwingUtilities.convertPointFromScreen(p,this);
+        SwingUtilities.convertPointFromScreen(p, this);
         TreePath path = getPathForLocation(p.x, p.y);
         if (path == null) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
@@ -84,18 +85,18 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragOver(DropTargetDragEvent dtde) {
-//        Point p = dtde.getLocation();
-//        TreePath path = getPathForLocation(p.x, p.y);
-//        if (path == null) {
-//            dtde.rejectDrag();
-//            return;
-//        }
-//        GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
-//        if (dragNode.isNodeChild(target)) {
-//            dtde.rejectDrag();
-//            return;
-//        }
-//        dtde.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
+        // Point p = dtde.getLocation();
+        // TreePath path = getPathForLocation(p.x, p.y);
+        // if (path == null) {
+        // dtde.rejectDrag();
+        // return;
+        // }
+        // GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
+        // if (dragNode.isNodeChild(target)) {
+        // dtde.rejectDrag();
+        // return;
+        // }
+        // dtde.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {
@@ -127,11 +128,16 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // JZTODO invokeLater: error message; e.g. status line
                 return;
             }
-            // JZTODO: the actual moving should be done by the GroupSelector
+            Enumeration expandedPaths = groupSelector.getExpandedPaths(); 
+            UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
+                    groupSelector.getGroupTreeRoot(), source, target, target
+                            .getChildCount());
             target.add(source);
             dtde.getDropTargetContext().dropComplete(true);
-            groupSelector.revalidateGroups(); // JZTODO : layout has
-            // changed...
+            // update selection/expansion state
+            groupSelector.revalidateGroups(new TreePath[]{new TreePath(source.getPath())},
+                    refreshPaths(expandedPaths));
+            groupSelector.concludeMoveGroup(undo, source);
         } catch (IOException ioe) {
             // ignore
         } catch (UnsupportedFlavorException e) {
@@ -158,5 +164,21 @@ public class GroupsTree extends JTree implements DragSourceListener,
         TreePath selectionPath = getSelectionPath();
         return selectionPath != null ? (GroupTreeNode) selectionPath
                 .getLastPathComponent() : null;
+    }
+
+    /** Refresh paths that may have become invalid due to node movements
+     * within the tree. This method creates new paths to the last path
+     * components (which must still exist) of the specified paths.
+     * @param paths Paths that may have become invalid.
+     * @return Refreshed paths that are all valid.
+     */
+    public Enumeration refreshPaths(Enumeration paths) {
+        Vector freshPaths = new Vector();
+        while (paths.hasMoreElements()) {
+            freshPaths.add(new TreePath(
+                    ((DefaultMutableTreeNode) ((TreePath) paths.nextElement())
+                            .getLastPathComponent()).getPath()));
+        }
+        return freshPaths.elements();
     }
 }
