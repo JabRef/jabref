@@ -40,6 +40,8 @@ import net.sf.jabref.export.*;
 
 public class JabRef {
 
+  static JabRefFrame jrf;
+
 /*  class StringArrayOption extends ArrayOption {
     public
     public void modify(String value) {
@@ -417,7 +419,11 @@ public class JabRef {
            (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
 	     prefs.getInt("fontSize"));
 
-       JabRefFrame jrf = new JabRefFrame();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            jrf = new JabRefFrame();
+          }
+        });
 
        if (loaded.size() > 0) for (int i=0; i<loaded.size(); i++) {
          ParserResult pr = (ParserResult)loaded.elementAt(i);

@@ -449,7 +449,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                                   } else {
                                     String cont = (String)(content.getTransferData(DataFlavor.stringFlavor));
                                     Util.pr("----------------\n"+cont+"\n---------------------");
-                                    Util.guessBibtexFields(cont);
+                                    TextAnalyzer ta = new TextAnalyzer(cont);
                                       output(Globals.lang("Unable to parse clipboard text as Bibtex entries."));
                                   }
                               } catch (UnsupportedFlavorException ex) {
@@ -1310,10 +1310,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	// This method is called by EntryTypeForm when a field value is
 	// stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
-        entryTable.invalidate();
+        //entryTable.invalidate();
 	tableModel.remap();
-        entryTable.revalidate();
-	entryTable.repaint();
+
+        //entryTable.revalidate();
+	//entryTable.repaint();
     }
 
     public void updatePreamble() {
@@ -1627,11 +1628,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	return database ;
     }
 
-    public void entryTypeFormClosing(String id) {
-	// Called by EntryTypeForm when closing.
-	// Deprecated, since EntryEditor has replaced EntryTypeForm.
-    }
-
     public void preambleEditorClosing() {
 	preambleEditor = null;
     }
@@ -1848,7 +1844,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       super(timeout, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           toStop.stop();
-          stop();
+          //stop();
           //output(message);
         }
       });

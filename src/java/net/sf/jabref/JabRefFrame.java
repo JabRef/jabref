@@ -61,13 +61,13 @@ public class JabRefFrame
   JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
 
   JTabbedPane tabbedPane = new JTabbedPane();
-
+  final Insets marg = new Insets(0,0,0,0);
   class ToolBar extends JToolBar {
-    Insets marg = new Insets(0,0,0,0);
     void addAction(Action a) {
       JButton b = new JButton(a);
+      b.setText(null);
       b.setMargin(marg);
-      add(a);
+      add(b);
     }
   }
   ToolBar tlb = new ToolBar();
@@ -910,7 +910,7 @@ public JabRefPreferences prefs() {
   }
 
   private void createToolBar() {
-    //tlb.setRollover(true);
+    tlb.setRollover(true);
 
     //tlb.setBorderPainted(true);
     //tlb.setBackground(GUIGlobals.lightGray);
@@ -922,38 +922,40 @@ public JabRefPreferences prefs() {
 
     tlb.addSeparator();
     tlb.addAction(cut);
-    tlb.add(copy);
-    tlb.add(paste);
-    tlb.add(undo);
-    tlb.add(redo);
+    tlb.addAction(copy);
+    tlb.addAction(paste);
+    tlb.addAction(undo);
+    tlb.addAction(redo);
 
     tlb.addSeparator();
-    tlb.add(newEntryAction);
-    tlb.add(editEntry);
-    tlb.add(editPreamble);
-    tlb.add(editStrings);
-    tlb.add(makeKeyAction);
+    tlb.addAction(newEntryAction);
+    tlb.addAction(editEntry);
+    tlb.addAction(editPreamble);
+    tlb.addAction(editStrings);
+    tlb.addAction(makeKeyAction);
 
     tlb.addSeparator();
     searchToggle = new JToggleButton(normalSearch);
     searchToggle.setText(null);
+    searchToggle.setMargin(marg);
     tlb.add(searchToggle);
 
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
+    groupToggle.setMargin(marg);
     tlb.add(groupToggle);
 
     tlb.addSeparator();
-    tlb.add(lyxPushAction);
-    tlb.add(openFile);
-    tlb.add(openUrl);
+    tlb.addAction(lyxPushAction);
+    tlb.addAction(openFile);
+    tlb.addAction(openUrl);
 
     tlb.addSeparator();
-    tlb.add(showPrefs);
+    tlb.addAction(showPrefs);
     tlb.add(Box.createHorizontalGlue());
     //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
 
-    tlb.add(closeDatabaseAction);
+    tlb.addAction(closeDatabaseAction);
     //Insets margin = new Insets(0, 0, 0, 0);
     //for (int i=0; i<tlb.getComponentCount(); i++)
     //  ((JButton)tlb.getComponentAtIndex(i)).setMargin(margin);

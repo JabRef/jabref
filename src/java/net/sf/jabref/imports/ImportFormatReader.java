@@ -115,7 +115,39 @@ public class ImportFormatReader
 
 	String[] authors = in.split(" and ");
 	for(int i=0; i<authors.length; i++){
-	    String[] t = authors[i].split(",");
+          int comma = authors[i].indexOf(',');
+          test:if (comma >= 0) {
+            // There is a comma, so we assume it's ok.
+            sb.append(authors[i]);
+          }
+          else {
+            // The name is without a comma, so it must be rearranged.
+            int pos = authors[i].lastIndexOf(' ');
+            if (pos == -1) {
+              // No spaces. Give up and just add the name.
+              sb.append(authors[i]);
+              break test;
+            }
+            String surname = authors[i].substring(pos+1);
+            if (surname.equalsIgnoreCase("jr.")) {
+              pos = authors[i].lastIndexOf(' ', pos - 1);
+              if (pos == -1) {
+                // Only last name and jr?
+                sb.append(authors[i]);
+                break test;
+              }
+              else
+                surname = authors[i].substring(pos+1);
+            }
+            // Ok, we've isolated the last name. Put together the rearranged name:
+            sb.append(surname + ", ");
+            sb.append(authors[i].substring(0, pos));
+
+          }
+          if (i != authors.length - 1)
+            sb.append(" and ");
+        }
+	    /*String[] t = authors[i].split(",");
 	    if(t.length < 2) {
 		// The name is without a comma, so it must be rearranged.
 		t = authors[i].split(" ");
@@ -131,10 +163,10 @@ public class ImportFormatReader
 		sb.append(authors[i]);
 	    }
 
-	    if(i !=authors.length-1)
+            if(i !=authors.length-1)
 		sb.append(" and ");
 
-	}
+	}*/
 	//Util.pr(in+" -> "+sb.toString());
 	return sb.toString();
     }

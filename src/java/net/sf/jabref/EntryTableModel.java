@@ -253,7 +253,7 @@ public class EntryTableModel
     if (panel.prefs.getBoolean("urlColumn"))
       iconCols.put(new Integer(coln++), URL_);
     if (panel.prefs.getBoolean("citeseerColumn"))
-        iconCols.put(new Integer(coln++), CITESEER);    
+        iconCols.put(new Integer(coln++), CITESEER);
 
     // Add 1 to the number of icon columns to get padleft.
     padleft = 1+iconCols.size();
@@ -325,6 +325,8 @@ public class EntryTableModel
           (String) fields.elementAt(3)));
 
     }
+    //Util.pr("remap");
+    fireTableDataChanged();
   }
 
   public boolean isCellEditable(int row, int col) {
