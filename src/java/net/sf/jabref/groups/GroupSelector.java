@@ -108,6 +108,42 @@ public class GroupSelector
       // If the number of elements is not divisible by DIM, we're
       // in trouble, so we must remove one or two elements.
     }
+    floatCb.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent event) {
+            _prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
+        } 
+    });
+    andCb.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent event) {
+            _prefs.putBoolean("groupIntersectSelections", andCb.isSelected());
+        } 
+    });    
+    invCb.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent event) {
+            _prefs.putBoolean("groupInvertSelections", invCb.isSelected());
+        } 
+    });
+    select.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent event) {
+            _prefs.putBoolean("groupSelectMatches", select.isSelected());
+        } 
+    });
+    if (prefs.getBoolean("groupFloatSelections")) {
+        floatCb.setSelected(true);
+        highlCb.setSelected(false);
+    } else {
+        highlCb.setSelected(true); 
+        floatCb.setSelected(false);
+    }
+    if (prefs.getBoolean("groupIntersectSelections")) {
+        andCb.setSelected(true);
+        orCb.setSelected(false);
+    } else {
+        orCb.setSelected(true);
+        andCb.setSelected(false);
+    }
+    invCb.setSelected(prefs.getBoolean("groupInvertSelections"));
+    select.setSelected(prefs.getBoolean("groupSelectMatches"));
     openset.setMargin(new Insets(0, 0, 0, 0));
     settings.add(andCb);
     settings.add(orCb);

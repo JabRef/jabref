@@ -125,6 +125,10 @@ public class JabRefPreferences {
 	defaults.put("autoComplete", new Boolean(true));
 	defaults.put("autoCompFields", new byte[] {0, 1, 28});
 	defaults.put("groupSelectorVisible", new Boolean(true));
+	defaults.put("groupFloatSelections", new Boolean(true));
+	defaults.put("groupIntersectSelections", new Boolean(true));
+	defaults.put("groupInvertSelections", new Boolean(false));
+	defaults.put("groupSelectMatches", new Boolean(false));
         defaults.put("groupsDefaultField", "keywords");
 
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
