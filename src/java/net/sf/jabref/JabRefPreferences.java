@@ -408,8 +408,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Previous tab", "ctrl Left");
 	defKeyBinds.put("Replace string", "ctrl R");
         defKeyBinds.put("Delete", "Delete");
-        defKeyBinds.put("Open pdf or ps", "F4");
-        defKeyBinds.put("Open url", "F3");
+        defKeyBinds.put("Open PDF or PS", "F4");
+        defKeyBinds.put("Open URL or DOI", "F3");
 	//defKeyBinds.put("Edit entry", "ctrl E");
     }
 

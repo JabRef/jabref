@@ -53,15 +53,15 @@ public class FileActions
 	String name = file.getName();
 	String path = file.getParent();
 	File temp = new File(path, name + GUIGlobals.tempExt);
-	
+
 	if (backup)
         {
 	    File back = new File(path, name + GUIGlobals.backupExt);
-	    
+
 	    if (back.exists()) {
 		back.renameTo(temp);
 	    }
-	    
+
 	    if (file.exists())
             {
 		file.renameTo(back);
@@ -97,7 +97,7 @@ public class FileActions
 		fw.write((new LatexFieldFormatter()).format(bs.getContent(),
 							    true));
 	    else fw.write("{}");
-	    
+
 	    //Util.writeField(bs.getName(), bs.getContent(), fw) ;
 	    fw.write("}\n\n");
 	}
@@ -106,12 +106,12 @@ public class FileActions
     public static void repairAfterError(File file) {
 	// Repair the file with our temp file since saving failed.
 	String name = file.getName();
-	
+
 	// Repair the file with our temp file since saving failed.
 	String path = file.getParent();
 	File temp = new File(path, name + GUIGlobals.tempExt);
 	File back = new File(path, name + GUIGlobals.backupExt);
-	
+
 	if (file.exists()) {
 	    file.delete();
 	}
@@ -257,12 +257,12 @@ public class FileActions
                         new EntryComparator(prefs.getBoolean("priDescending"),
                             prefs.getBoolean("secDescending"),
                             prefs.getBoolean("terDescending"), pri, sec, ter)));
-	    
+
 	    if ((bes != null) && (bes.length > 0))
 		for (int i=0; i<bes.length; i++) {
 		    sorter.add(bes[i]);
-		}	
-	    
+		}
+
             FieldFormatter ff = new LatexFieldFormatter();
 
             for (Iterator i = sorter.iterator(); i.hasNext();)
@@ -288,12 +288,12 @@ public class FileActions
 
     }
 
-    public static void exportDatabase(BibtexDatabase database, String lfName, 
-				      File outFile, JabRefPreferences prefs) 
+    public static void exportDatabase(BibtexDatabase database, String lfName,
+				      File outFile, JabRefPreferences prefs)
 	throws IOException {
-	
+
 	PrintStream ps=null;
-	        
+
 	try {
 	    Object[] keys = database.getKeySet().toArray();
 	    String key, type;
@@ -302,15 +302,15 @@ public class FileActions
 	    // Print header
 	    URL reso = JabRefFrame.class.getResource
 		(Globals.LAYOUT_PREFIX+lfName+".begin.layout");
-	    int c;
-	    if (reso != null) {
-		reader = new InputStreamReader(reso.openStream());
-		while ((c = reader.read()) != -1) {
-		    ps.write((char)c);
-		}
-		reader.close();
+            int c;
+            if (reso != null) {
+                reader = new InputStreamReader(reso.openStream());
+                while ((c = reader.read()) != -1) {
+                    ps.write((char)c);
+                }
+                reader.close();
 	    }
-	
+
             // Write database entrie; entries will be sorted as they
             // appear on the screen.
             String pri = prefs.get("priSort"),
@@ -319,12 +319,12 @@ public class FileActions
             EntrySorter sorter = database.getSorter
 		(new EntryComparator(prefs.getBoolean("priDescending"),
 				     prefs.getBoolean("secDescending"),
-				     prefs.getBoolean("terDescending"), 
-				     pri, sec, ter));	   
+				     prefs.getBoolean("terDescending"),
+				     pri, sec, ter));
 
 	    // Load default layout
 	    reso = JabRefFrame.class.getResource
-		(Globals.LAYOUT_PREFIX+lfName+".layout");    
+		(Globals.LAYOUT_PREFIX+lfName+".layout");
 	    reader = new InputStreamReader(reso.openStream());
 	    LayoutHelper layoutHelper = new LayoutHelper(reader);
 	    Layout defLayout = layoutHelper.getLayoutFromText();
@@ -370,10 +370,10 @@ public class FileActions
 	catch (IOException ex) {
 	    ex.printStackTrace();
 	}
-	
-	
+
+
     }
-    
+
 
     /** Returns true iff the entry has a nonzero value in its field.
      */

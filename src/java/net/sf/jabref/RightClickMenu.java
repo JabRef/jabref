@@ -72,7 +72,7 @@ public class RightClickMenu extends JPopupMenu
 
 	addSeparator();
 
-        add(new AbstractAction(Globals.lang("Open pdf or ps")) {
+        add(new AbstractAction(Globals.lang("Open PDF or PS")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("openFile");
@@ -80,7 +80,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-            add(new AbstractAction(Globals.lang("Open url")) {
+            add(new AbstractAction(Globals.lang("Open URL or DOI")) {
               public void actionPerformed(ActionEvent e) {
                 try {
                   panel.runCommand("openUrl");

@@ -320,6 +320,10 @@ public class Util {
     public static void openExternalViewer(String link, JabRefPreferences prefs) throws
       IOException {
 	// check html first since browser can invoke viewers
+        if (link.startsWith("doi")) {
+          link = Globals.DOI_LOOKUP_PREFIX+link;
+        }
+
 	if(link.substring(0,7).equals("http://")){ // hml
 	    try {
 		/*System.err.println("Message: Opening url (" + link

@@ -66,7 +66,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added menu and toolbar actions for open pdf/ps and url.
+1.x:	- Added detection of duplicate entries.
+	- Added menu and toolbar actions for open pdf/ps and url/doi.
+	- Added web lookup of DOI.
 1.2:	- Replaced the icon set.
 	- Added support for French language.
 	- Added customization of key generation.

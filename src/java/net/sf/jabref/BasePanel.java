@@ -806,7 +806,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
                       public void action() {
                           BibtexEntry[] bes = entryTable.getSelectedEntries();
                           if ((bes != null) && (bes.length == 1)) {
-                              Object link = bes[0].getField("url");
+                              Object link = bes[0].getField("doi");
+                              if (bes[0].getField("url") != null)
+                                link = bes[0].getField("url");
                               if (link != null) {
                                 //output(Globals.lang("Calling external viewer..."));
                                 try {
@@ -853,23 +855,44 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
               actions.put("dupliCheck", new BaseAction() {
                 public void action() {
+                  NamedCompound ce = null;
                   int dupl = 0;
                   output(Globals.lang("Searching for duplicates..."));
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
-                  for (int i=0; i<bes.length-1; i++)
-                    for (int j=i+1; j<bes.length; j++) {
-                      boolean eq = Util.isDuplicate(bes[i], bes[j], Globals.duplicateThreshold);
+                  for (int i = 0; i < bes.length - 1; i++)
+                    for (int j = i + 1; j < bes.length; j++) {
+                      boolean eq = Util.isDuplicate(bes[i], bes[j],
+                                                    Globals.duplicateThreshold);
                       if (eq) {
+                        int answer = DuplicateResolverDialog.resolveDuplicate(frame,
+                            bes[i], bes[j]);
+                        if (answer == DuplicateResolverDialog.KEEP_UPPER) {
+                          if (ce == null) ce = new NamedCompound("duplicate removal");
+                          database.removeEntry(bes[j].getId());
+                          ce.addEdit(new UndoableRemoveEntry(database, bes[j], ths));
+                        }
+                        else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                          if (ce == null) ce = new NamedCompound("duplicate removal");
+                          database.removeEntry(bes[i].getId());
+                          ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
+                        }
                         dupl++;
-                        Util.pr("---------------------------------------------------");
-                        Util.pr("--> "+i+" and "+j+" ...");
-                        Util.pr("---------------------------------------------------");
+                        //Util.pr("---------------------------------------------------");
+                        //Util.pr("--> "+i+" and "+j+" ...");
+                        //Util.pr("---------------------------------------------------");
                       }
                     }
 
-                  output(Globals.lang("Duplicate pairs found")+": "+dupl);
-                }
+                  output(Globals.lang("Duplicate pairs found") + ": " + dupl);
 
+                  if (ce != null) {
+                    ce.end();
+                    //Util.pr("ox");
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    refreshTable();
+                  }
+                }
               });
     }
 

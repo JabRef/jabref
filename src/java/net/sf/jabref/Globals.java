@@ -42,7 +42,8 @@ public class Globals {
     public static final String FILETYPE_PREFS_EXT = "_dir",
 	SELECTOR_META_PREFIX = "selector_",
 	LAYOUT_PREFIX = "/resource/layout/",
-	MAC = "Mac OS X";
+	MAC = "Mac OS X",
+        DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
     public static float duplicateThreshold = 0.78f;
 
     public static String osName = System.getProperty("os.name", "def");
