@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.log4j.PropertyConfigurator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -103,6 +104,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			importFetcherActive = false;
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
+			PropertyConfigurator.configure("src/resource/log4j.properties");
 			citeseerHttpClient = new HttpClient();
 			if (System.getProperty("proxySet") != null) {
 				String proxyHost;
