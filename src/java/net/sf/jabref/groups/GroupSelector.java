@@ -306,12 +306,12 @@ public class GroupSelector extends SidePaneComponent implements
         DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
                 groupsTree, DnDConstants.ACTION_MOVE,
                 new DragGestureListener() {
-
                     public void dragGestureRecognized(DragGestureEvent dge) {
                         // TODO Auto-generated method stub
                         System.out.println(dge);
                     }
                 });
+        groupsTree.setShowsRootHandles(false);
         // groupsTree.setPrototypeCellValue("Suitable length");
         // // The line above decides on the list's preferred width.
         groupsTree.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
