@@ -105,6 +105,7 @@ public class GUIGlobals {
 	redoIconFile = GUIGlobals.class.getResource(pre+"Redo.gif"),
 	preambleIconFile = GUIGlobals.class.getResource(pre+"Preamble.gif"),
 	addIconFile = GUIGlobals.class.getResource(pre+"UpdateRow.gif"),
+	delRowIconFile = GUIGlobals.class.getResource(pre+"DeleteRow.gif"),
 	showReqIconFile = GUIGlobals.class.getResource(pre+"r_icon.gif"),
 	showOptIconFile = GUIGlobals.class.getResource(pre+"o_icon.gif"),
 	showGenIconFile = GUIGlobals.class.getResource(pre+"g_icon.gif"),

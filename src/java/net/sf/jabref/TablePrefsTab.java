@@ -4,6 +4,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.*;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
@@ -125,8 +126,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	colSetup = new JTable(tm);	
 	TableColumnModel cm = colSetup.getColumnModel();
-	cm.getColumn(0).setPreferredWidth(90);
-	cm.getColumn(1).setPreferredWidth(30);
+	cm.getColumn(0).setPreferredWidth(140);
+	cm.getColumn(1).setPreferredWidth(80);
 
 	JLabel lab;
 	JPanel upper = new JPanel(),
@@ -192,21 +193,90 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(sort, con);
 	add(sort);
 
-        tableFields.setBorder(BorderFactory.createEtchedBorder());
+	JPanel tabPanel = new JPanel();
+	gbl.setConstraints(tabPanel, con);
+	add(tabPanel);
+        tabPanel.setBorder(BorderFactory.createEtchedBorder());
+	tabPanel.setLayout(gbl);
+	//colSetup.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	JScrollPane sp = new JScrollPane
 	    (colSetup, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 	     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	sp.setMinimumSize(new Dimension(200,300));
-	sp.setBorder(BorderFactory.createTitledBorder
-		     (BorderFactory.createEtchedBorder(),
-		      Globals.lang("Visible fields")));
+	colSetup.setPreferredScrollableViewportSize(new Dimension(250,200));
+	sp.setMinimumSize(new Dimension(250,300));
+	con.gridwidth = 1;
 	con.weighty = 1;
 	con.weightx = 0;
-	con.fill = GridBagConstraints.NONE;
+	con.fill = GridBagConstraints.BOTH;
+	con.anchor = GridBagConstraints.NORTHWEST;
 	gbl.setConstraints(sp, con);
-	add(sp);
+	tabPanel.add(sp);
+	tabPanel.setBorder(BorderFactory.createTitledBorder
+			      (BorderFactory.createEtchedBorder(),
+			       Globals.lang("Visible fields")));
+	JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
+	tlb.setFloatable(false);
+	tlb.setRollover(true);
+	tlb.add(new AddRowAction());
+	tlb.add(new DeleteRowAction());
+	gbl.setConstraints(tlb, con);
+	tabPanel.add(tlb);
+	//Component glue = Box.createHorizontalGlue();
+	//con.weightx = 1;
+	//con.gridwidth = GridBagConstraints.REMAINDER;
+	//gbl.setConstraints(glue, con);
+	//tabPanel.add(glue);
 
+	//colSetup.getInputMap
     }
+
+    class DeleteRowAction extends AbstractAction {
+	public DeleteRowAction() {
+	    super("Delete row", new ImageIcon(GUIGlobals.delRowIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    int[] rows = colSetup.getSelectedRows();
+	    if (rows.length == 0) 
+		return;	    
+	    for (int i=0; i<rows.length; i++) {
+		if (rows[i]-i < tableRows.size())
+		    tableRows.remove(rows[i]-i);
+	    }
+	    rowCount -= rows.length;
+	    if (rows.length > 1) colSetup.clearSelection();
+	    colSetup.revalidate();
+	    colSetup.repaint();
+	    tableChanged = true;
+	}
+    }
+
+    class AddRowAction extends AbstractAction {
+	public AddRowAction() {
+	    super("Add row", new ImageIcon(GUIGlobals.addIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    int[] rows = colSetup.getSelectedRows();
+	    if (rows.length == 0) {
+		// No rows selected, so we just add one at the end.
+		rowCount++;
+		colSetup.revalidate();
+		colSetup.repaint();
+		return;
+	    }
+	    for (int i=0; i<rows.length; i++) {
+		if (rows[i]+i < tableRows.size())
+		    tableRows.add(rows[i]+i, new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+	    }
+	    rowCount += rows.length;
+	    if (rows.length > 1) colSetup.clearSelection();
+	    colSetup.revalidate();
+	    colSetup.repaint();
+	    tableChanged = true;
+	}
+    }
+    
 
     private String[] getChoices() {
 
