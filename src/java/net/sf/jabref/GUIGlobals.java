@@ -243,6 +243,7 @@ public class GUIGlobals {
       ownerHelp = "OwnerHelp.html",
       pdfHelp = "ExternalFiles.html",
       exportCustomizationHelp = "CustomExports.html",
+      medlineHelp = "MedlineHelp.html",
 //      searchHelp = "SearchHelp.html",
       aboutPage = "About.html";
 

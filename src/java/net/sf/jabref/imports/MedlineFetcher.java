@@ -15,6 +15,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import java.io.*;
+import net.sf.jabref.HelpAction;
 
 /**
  * <p>Title: </p>
@@ -34,14 +35,19 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
   JPanel pan = new JPanel();
   GridBagLayout gbl = new GridBagLayout();
   GridBagConstraints con = new GridBagConstraints();
-  JButton ok = new JButton(new ImageIcon(GUIGlobals.fetchMedlineIcon));
   MedlineFetcher ths = this;
   AuthorDialog authorDialog;
   JFrame jFrame; // invisible dialog holder
+  JButton go = new JButton(Globals.lang("Fetch")),
+      helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+  HelpAction help;
 
   public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
     super(p0);
     panel = panel_;
+    help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
+    helpBut.addActionListener(help);
+    helpBut.setMargin(new Insets(0,0,0,0));
     tf.setMinimumSize(new Dimension(1,1));
     //add(hd, BorderLayout.NORTH);
     //ok.setToolTipText(Globals.lang("Fetch Medline"));
@@ -50,25 +56,28 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     con.insets = new Insets(0, 0, 2,  0);
     con.gridwidth = GridBagConstraints.REMAINDER;
     con.weightx = 1;
-    con.weighty = 1;
+    con.weighty = 0;
     gbl.setConstraints(header, con);
     add(header);
-    con.gridwidth = 1;
     con.insets = new Insets(0, 0, 0,  0);
 //    pan.setLayout(gbl);
-    con.fill = GridBagConstraints.HORIZONTAL;
+    con.fill = GridBagConstraints.BOTH;
     gbl.setConstraints(tf, con);
     add(tf);
-    con.weightx = 0;
-    gbl.setConstraints(ok, con);
-    //add(ok);
+    con.gridwidth = 1;
+    gbl.setConstraints(go, con);
+    add(go);
+    //con.weightx = 0;
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    gbl.setConstraints(helpBut, con);
+    add(helpBut);
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         (new Thread(ths)).start(); // Run fetch in thread.
       }
     };
 
-    ok.addActionListener(listener);
+    go.addActionListener(listener);
     tf.addActionListener(listener);
   }
 
