@@ -83,10 +83,9 @@ public class JabRefPreferences {
 	defaults.put("secDescending", new Boolean(true));
 	defaults.put("terSort", "author");
 	defaults.put("terDescending", new Boolean(false));
-	defaults.put("columnNames",
-		     "entrytype;author;title;year;journal;bibtexkey");
-	defaults.put("columnWidths",
-		     "75;280;400;60;100;100");
+	defaults.put("columnNames", "entrytype;author;title;year;journal;bibtexkey");
+	defaults.put("columnWidths","75;280;400;60;100;100");
+        defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
 	defaults.put("workingDirectory", (String)null);
 
 	defaults.put("autoOpenForm", new Boolean(true));

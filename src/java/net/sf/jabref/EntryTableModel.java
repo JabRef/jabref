@@ -83,9 +83,9 @@ public class EntryTableModel extends AbstractTableModel {
 	    return GUIGlobals.NUMBER_COL;
 //	else if (col == 1)
 //	    return Util.nCase(TYPE);
-	else {
-	    return Util.nCase(columns[col-PADLEFT]);
-	}
+//	else {
+      return Util.nCase(columns[col-PADLEFT]);
+	//}
     }
 
     public int getRowCount() {
@@ -121,11 +121,14 @@ public class EntryTableModel extends AbstractTableModel {
             //else
     //  if (col == 1)
     //  o = be.getType().getName();
-	else {
-          if (columns[col-PADLEFT].equals(GUIGlobals.TYPE_HEADER)) {
-            o = be.getType().getName();
-          }
-          else {
+	//else {
+        else if (columns[col-PADLEFT].equals(GUIGlobals.TYPE_HEADER)) {
+          o = be.getType().getName();
+        }
+        //else if (columns[col-PADLEFT].equals(GUIGlobals.NUMBER_COL)) {
+        //  o = ""+(row+1);
+        //}
+        else {
 	      o = be.getField(columns[col-PADLEFT]);
 	      for (int i=0; i<nameCols.length; i++) if (col-PADLEFT == nameCols[i]) {
 		  if (o == null) return null;
@@ -139,13 +142,14 @@ public class EntryTableModel extends AbstractTableModel {
 		  }
 	      }
 	  }
-	}
+	//}
 
 	return o;
     }
 
     public int getCellStatus(int row, int col) {
-	if ((col == 0)  || (col == 1)) return OTHER;
+      //if ((col == 0)  || (col == 1)) return OTHER;
+      if (col == 0) return OTHER;
 	BibtexEntryType type = (db.getEntryById(getNameFromNumber(row)))
 	    .getType();
 	if (columns[col-1].equals(GUIGlobals.KEY_FIELD)

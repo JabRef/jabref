@@ -101,9 +101,10 @@ public class EntryTable extends JTable {
 
     public void setWidths() {
 	// Setting column widths:
+        int ncWidth = prefs.getInt("numberColWidth");
 	String[] widths = prefs.getStringArray("columnWidths");
         TableColumnModel cm = getColumnModel();
-	cm.getColumn(0).setPreferredWidth(GUIGlobals.NUMBER_COL_LANGTH);
+	cm.getColumn(0).setPreferredWidth(ncWidth);
 	for (int i=1; i<getModel().getColumnCount(); i++) {
 	    try {
 		cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i-1]));

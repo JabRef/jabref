@@ -22,7 +22,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private boolean tableChanged = false;
     private JTable colSetup;
-    private int rowCount = -1;
+    private int rowCount = -1, ncWidth = -1;
     private Vector tableRows = new Vector(10);
     private Font font = GUIGlobals.CURRENTFONT;
     private JabRefFrame frame;
@@ -96,25 +96,29 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		tableRows.add(new TableRow(names[i]));
 	}
 	rowCount = tableRows.size()+5;
+        ncWidth = prefs.getInt("numberColWidth");
 
 	TableModel tm = new AbstractTableModel() {
 		public int getRowCount() { return rowCount; }
 		public int getColumnCount() { return 2; }
 		public Object getValueAt(int row, int column) {
-		    if (row >= tableRows.size())
-			return "";
-		    Object rowContent = tableRows.elementAt(row);
-		    if (rowContent == null)
-			return "";
-		    TableRow tr = (TableRow)rowContent;
-		    switch (column) {
-		    case 0:
-			return tr.name;
-		    case 1:
-			return ((tr.length > 0) ? new Integer(tr.length).toString() : "");
-		    }
-		    return null; // Unreachable.
-		}
+                  if (row == 0)
+                    return (column==0 ? GUIGlobals.NUMBER_COL : ""+ncWidth);
+                  row--;
+                  if (row >= tableRows.size())
+                    return "";
+                  Object rowContent = tableRows.elementAt(row);
+                  if (rowContent == null)
+                    return "";
+                  TableRow tr = (TableRow)rowContent;
+                  switch (column) {
+                    case 0:
+                      return tr.name;
+                    case 1:
+                      return ((tr.length > 0) ? new Integer(tr.length).toString() : "");
+                  }
+                  return null; // Unreachable.
+                }
 
 		public String getColumnName(int col) {
 		    return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
@@ -124,7 +128,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		    else return Integer.class;
 		}
 		public boolean isCellEditable(int row, int col) {
-		    return true;
+		    return !((row == 0) && (col == 0));
 		}
 		public void setValueAt(Object value, int row, int col) {
 		    tableChanged = true;
@@ -132,7 +136,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		    while (row >= tableRows.size())
 			tableRows.add(new TableRow("", -1));
 
-		    TableRow rowContent = (TableRow)tableRows.elementAt(row);
+                        if ((row == 0) && (col == 1)) {
+                          ncWidth = Integer.parseInt(value.toString());
+                          return;
+                        }
+
+		    TableRow rowContent = (TableRow)tableRows.elementAt(row-1);
 
 		    if (col == 0) {
 			rowContent.name = value.toString();
@@ -305,20 +314,23 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	  putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
 	}
 	public void actionPerformed(ActionEvent e) {
-	    int[] rows = colSetup.getSelectedRows();
-	    if (rows.length == 0)
-		return;
-	    for (int i=0; i<rows.length; i++) {
-		if (rows[i]-i < tableRows.size())
-		    tableRows.remove(rows[i]-i);
-	    }
-	    rowCount -= rows.length;
-	    if (rows.length > 1) colSetup.clearSelection();
-	    colSetup.revalidate();
-	    colSetup.repaint();
-	    tableChanged = true;
-	}
-    }
+          int[] rows = colSetup.getSelectedRows();
+          if (rows.length == 0)
+            return;
+          int offs = 0;
+          for (int i=0; i<rows.length; i++) {
+            if ((rows[i]-i < tableRows.size()) && (rows[i] != 0)) {
+              tableRows.remove(rows[i] -1 - offs);
+              offs++;
+            }
+          }
+          rowCount -= offs; //rows.length;
+          if (rows.length > 1) colSetup.clearSelection();
+          colSetup.revalidate();
+          colSetup.repaint();
+          tableChanged = true;
+        }
+      }
 
     class AddRowAction extends AbstractAction {
 	public AddRowAction() {
@@ -337,7 +349,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    }
 	    for (int i=0; i<rows.length; i++) {
 		if (rows[i]+i < tableRows.size())
-		    tableRows.add(rows[i]+i, new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+		    tableRows.add(Math.max(1, rows[i]+i), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
 	    }
 	    rowCount += rows.length;
 	    if (rows.length > 1) colSetup.clearSelection();
@@ -357,15 +369,15 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    BasePanel panel = frame.basePanel();
 	    if (panel == null) return;
 	    TableColumnModel colMod = panel.entryTable.getColumnModel();
-
+            colSetup.setValueAt(""+colMod.getColumn(0).getWidth(), 0, 1);
 	    for (int i=1; i<colMod.getColumnCount(); i++) {
 	    try {
 		String name = panel.entryTable.getColumnName(i).toLowerCase();
 		int width = colMod.getColumn(i).getWidth();
 		//Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
 		//Util.pr("-"+name);
-		if ((i <= tableRows.size()) && (((String)colSetup.getValueAt(i-1, 0)).toLowerCase()).equals(name))
-		    colSetup.setValueAt(""+width, i-1, 1);
+		if ((i <= tableRows.size()) && (((String)colSetup.getValueAt(i, 0)).toLowerCase()).equals(name))
+		    colSetup.setValueAt(""+width, i, 1);
 		else { // Doesn't match; search for a matching col in our table
 		    for (int j=0; j<colSetup.getRowCount(); j++) {
 			if ((j < tableRows.size()) &&
@@ -439,6 +451,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    String[] names = new String[tableRows.size()],
 		widths = new String[tableRows.size()];
 	    int[] nWidths = new int[tableRows.size()];
+
+            _prefs.putInt("numberColWidth", ncWidth);
 	    for (i=0; i<tableRows.size(); i++) {
 		TableRow tr = (TableRow)tableRows.elementAt(i);
 		names[i] = tr.name;
@@ -448,7 +462,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    }
 
 	    // Finally, we store the new preferences.
-	    _prefs.putStringArray("columnNames", names);
+            _prefs.putStringArray("columnNames", names);
 	    _prefs.putStringArray("columnWidths", widths);
 	}
 

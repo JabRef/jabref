@@ -57,7 +57,8 @@ public class GUIGlobals {
       untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = Globals.lang("untitled"),
       helpTitle = "JabRef help",
-      TYPE_HEADER = "entrytype";
+      TYPE_HEADER = "entrytype",
+      NUMBER_COL = "#";
 
   public static Font CURRENTFONT,
       typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24),
@@ -430,9 +431,8 @@ public class GUIGlobals {
       INDENT = 4,
       LINE_LENGTH = 65; // Maximum
 
-  public static String NUMBER_COL = "#";
   public static int DEFAULT_FIELD_LENGTH = 100,
-      NUMBER_COL_LANGTH = 32;
+      NUMBER_COL_LENGTH = 32;
   public static final Map FIELD_WEIGHT;
   public static final Map FIELD_EXTRAS, LANGUAGES;
   public static Map fieldLength = new HashMap();
