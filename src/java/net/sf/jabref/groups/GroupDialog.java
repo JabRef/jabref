@@ -114,7 +114,7 @@ class GroupDialog extends JDialog {
 			index = GroupSelector.findPos(groups, name.getText());
                         groups.add(index, regexp.getText());
                         groups.add(index, name.getText());
-			groups.add(index, field.getText());
+			groups.add(index, field.getText().toLowerCase());
 		    } else if (index < groups.size()) {
 			// Change group.
 			for (int i=0; i<GroupSelector.DIM; i++)
@@ -122,7 +122,7 @@ class GroupDialog extends JDialog {
 			index = GroupSelector.findPos(groups, name.getText());
 			groups.add(index, regexp.getText());
 			groups.add(index, name.getText());
-			groups.add(index, field.getText());
+			groups.add(index, field.getText().toLowerCase());
 		    }
 
 		    dispose();
