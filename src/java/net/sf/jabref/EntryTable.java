@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
+
 public class EntryTable extends JTable {
 
     final int PREFERRED_WIDTH = 400, PREFERRED_HEIGHT = 30;
@@ -121,6 +122,17 @@ public class EntryTable extends JTable {
 	// This method asks the table model whether the given cell represents a
 	// required or optional field, and returns the appropriate renderer.
 	int score = -3;
+	Renderer renderer;
+
+	int status;
+	try { // This try clause is here to contain a bug.
+	    status = tableModel.getCellStatus(row, column);
+	} catch (ArrayIndexOutOfBoundsException ex) {
+	    Globals.logger("Error happened in getCellRenderer method of EntryTable.");
+	    return defRenderer; // This should not occur.
+	}
+
+
 	if (!showingSearchResults ||
 	    tableModel.nonZeroField(row, Globals.SEARCH))
 	    score++;
@@ -131,38 +143,40 @@ public class EntryTable extends JTable {
 	// Now, a grayed out renderer is for entries with -1, and
 	// a very grayed out one for entries with -2
 	if (score < -1)
-	    return veryGrayedOutRenderer;
-	if (score == -1)
-	    return grayedOutRenderer;
+	    renderer = veryGrayedOutRenderer;
+	else if (score == -1)
+	    renderer = grayedOutRenderer;
 
-	if (!prefs.getBoolean("tableColorCodesOn"))
-	    return defRenderer;
-	if (column == 0) {
+	else if (!prefs.getBoolean("tableColorCodesOn"))
+	    renderer = defRenderer;
+	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
 	    if (tableModel.isComplete(row))
-		return defRenderer;
+		renderer = defRenderer;
 	    else {
 		if (tableModel.hasCrossRef(row))
-		    return maybeIncRenderer;
+		    renderer = maybeIncRenderer;
 		else
-		    return incRenderer;
+		    renderer = incRenderer;
 	    }
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
-	int status;
-	try { // This try clause is here to contain a bug.
-	    status = tableModel.getCellStatus(row, column);
-	} catch (ArrayIndexOutOfBoundsException ex) {
-	    return defRenderer; // This should not occur.
-	}
 
-	//if (column == 1)
-	//    Util.pr(""+status);
-	if (status == EntryTableModel.REQUIRED)
-	    return reqRenderer;
+	else if (status == EntryTableModel.REQUIRED)
+	    renderer = reqRenderer;
 	else if (status == EntryTableModel.OPTIONAL)
-	    return optRenderer;
-	else return defRenderer;
+	    renderer = optRenderer;
+	else renderer = defRenderer;
+       
+	return renderer;
+	
+	/*
+	int test = row - 4*(row/4);	
+	if (test <= 1)
+	    return renderer;
+	else {
+	    return renderer.darker();
+	    }*/
     }
 
     public void scrollTo(int y) {
@@ -192,56 +206,36 @@ public class EntryTable extends JTable {
     // The following classes define the renderers used to render required
     // and optional fields in the table. The purpose of these renderers is
     // to visualize which fields are needed for each entry.
-    private DefaultTableCellRenderer defRenderer = new DefaultTableCellRenderer();
-    private RequiredRenderer reqRenderer = new RequiredRenderer();
-    private OptionalRenderer optRenderer = new OptionalRenderer();
-    private IncompleteEntryRenderer incRenderer = new IncompleteEntryRenderer();
-    private GrayedOutRenderer grayedOutRenderer = new GrayedOutRenderer();
-    private VeryGrayedOutRenderer veryGrayedOutRenderer
-	= new VeryGrayedOutRenderer();
-    private MaybeIncompleteEntryRenderer
-	maybeIncRenderer = new MaybeIncompleteEntryRenderer();
+    private Renderer defRenderer = new Renderer(GUIGlobals.tableBackground),
+	reqRenderer = new Renderer(GUIGlobals.tableReqFieldBackground),
+	optRenderer = new Renderer(GUIGlobals.tableOptFieldBackground),
+	incRenderer = new Renderer(GUIGlobals.tableIncompleteEntryBackground),
+	grayedOutRenderer = new Renderer(GUIGlobals.grayedOutBackground,
+					 GUIGlobals.grayedOutText),
+	veryGrayedOutRenderer = new Renderer(GUIGlobals.veryGrayedOutBackground,
+					     GUIGlobals.veryGrayedOutText),
+	maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground);
 
-    public class RequiredRenderer extends DefaultTableCellRenderer {
-	public RequiredRenderer() {
+    private class Renderer extends DefaultTableCellRenderer {
+	//private DefaultTableCellRenderer darker;
+	public Renderer(Color c) {
 	    super();
-	    setBackground(GUIGlobals.tableReqFieldBackground);
+	    setBackground(c);
+	    /*
+	    darker = new DefaultTableCellRenderer();
+	    double adj = 0.9;
+	    darker.setBackground(new Color((int)((double)c.getRed()*adj),
+					   (int)((double)c.getGreen()*adj),
+					   (int)((double)c.getBlue()*adj)));
+	    */
 	}
-    }
-    public class OptionalRenderer extends DefaultTableCellRenderer {
-	public OptionalRenderer() {
-	    super();
-	    setBackground(GUIGlobals.tableOptFieldBackground);
+	public Renderer(Color c, Color fg) {
+	    this(c);
+	    setForeground(fg);
 	}
-    }
-    public class IncompleteEntryRenderer extends DefaultTableCellRenderer {
-	public IncompleteEntryRenderer() {
-	    super();
-	    setBackground(GUIGlobals.tableIncompleteEntryBackground);
-	}
-    }
-    public class MaybeIncompleteEntryRenderer extends DefaultTableCellRenderer {
-	public MaybeIncompleteEntryRenderer() {
-	    super();
-	    setBackground(GUIGlobals.maybeIncompleteEntryBackground);
-	}
+	//public DefaultTableCellRenderer darker() { return darker; }
     }
 
-    public class GrayedOutRenderer extends DefaultTableCellRenderer {
-	public GrayedOutRenderer() {
-	    super();
-	    setBackground(GUIGlobals.grayedOutBackground);
-	    setForeground(GUIGlobals.grayedOutText);
-	}
-    }
-
-    public class VeryGrayedOutRenderer extends DefaultTableCellRenderer {
-	public VeryGrayedOutRenderer() {
-	    super();
-	    setBackground(GUIGlobals.veryGrayedOutBackground);
-	    setForeground(GUIGlobals.veryGrayedOutText);
-	}
-    }
 
 	public void scrollToCenter( int rowIndex, int vColIndex) {
         if (!(this.getParent() instanceof JViewport)) {

@@ -129,7 +129,7 @@ public class GUIGlobals {
 	helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
 	helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),
 	newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
-	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste.gif"),
+	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste2.gif"),
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
 	searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif"),
 	autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif"),
