@@ -45,6 +45,8 @@ public class MetaData {
      */
     public MetaData(HashMap inData, BibtexDatabase db) {
         this();
+        boolean groupsTreePresent = false;
+        Vector flatGroupsData = null;
         for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
             data = new StringReader((String) inData.get(key));
@@ -60,12 +62,15 @@ public class MetaData {
             }
             if (key.equals("groupstree")) {
                 putGroups(orderedData,db);
+                groupsTreePresent = true;
             } else if (key.equals("groups")) {
-            	groupsRoot = GroupTreeNode.importFlatGroups(orderedData);
+                flatGroupsData = orderedData;
             } else {
                 putData(key, orderedData);
             }
         }
+        if (!groupsTreePresent && flatGroupsData != null)
+            groupsRoot = GroupTreeNode.importFlatGroups(flatGroupsData);
     }
 
     /**
