@@ -175,12 +175,12 @@ public class JabRefFrame
       paste = new EditAction("paste", GUIGlobals.pasteIconFile),
       cut = new EditAction("cut", GUIGlobals.cutIconFile),
       mark = new GeneralAction("markEntries", "Mark entries",
-			       "Mark entries",
-			       GUIGlobals.markIcon,
+                               "Mark entries",
+                               GUIGlobals.markIcon,
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
-				  "Unmark entries",
-				  GUIGlobals.unmarkIcon,
+                                  "Unmark entries",
+                                  GUIGlobals.unmarkIcon,
                                   prefs.getKey("Unmark entries")),
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
@@ -261,7 +261,7 @@ public class JabRefFrame
 
       plainTextImport = new GeneralAction("plainTextImport",
                                           "New entry from plain text",
-					  prefs.getKey("New from plain text")),
+                                          prefs.getKey("New from plain text")),
 
 
       customExpAction = new CustomizeExportsAction();
@@ -394,12 +394,12 @@ public class JabRefFrame
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
       (new Thread() {
-	      public void run() {
-		  PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
-		  Util.placeDialog(pd, ths);
-		  pd.show();
-	      }
-	  }).start();
+              public void run() {
+                  PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
+                  Util.placeDialog(pd, ths);
+                  pd.show();
+              }
+          }).start();
   }
 
 public JabRefPreferences prefs() {
@@ -1500,7 +1500,7 @@ class ImportCiteSeerAction
         super(Globals.lang("Import Fields from CiteSeer"),
                 new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
         putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
-	putValue(ACCELERATOR_KEY, prefs.getKey("Import fields from CiteSeer"));
+        putValue(ACCELERATOR_KEY, prefs.getKey("Import fields from CiteSeer"));
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -1577,7 +1577,7 @@ class FetchCiteSeerAction
                         super(Globals.lang("Fetch Citations from CiteSeer"),
                                 new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
                         putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
-			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
+                        putValue(ACCELERATOR_KEY, prefs.getKey("Fetch citations from CiteSeer"));
                 }
 
                 public void actionPerformed(ActionEvent e) {
@@ -1652,7 +1652,7 @@ class FetchCiteSeerAction
       {
         // Create a new, empty, database.
 
-        FromAuxDialog dialog = new FromAuxDialog(ths, "test", true, ths.tabbedPane) ;
+        FromAuxDialog dialog = new FromAuxDialog(ths, "", true, ths.tabbedPane) ;
 
         Util.placeDialog(dialog, ths);
         dialog.show() ;
@@ -1808,14 +1808,14 @@ class FetchCiteSeerAction
         setNonEmptyState();
       }
       if (filename != null)
-	  output(Globals.lang("Imported database") + " '" + filename + "' " +
-		 Globals.lang("with") + " " +
-		 database.getEntryCount() + " " +
-		 Globals.lang("entries into new database") + ".");
+          output(Globals.lang("Imported database") + " '" + filename + "' " +
+                 Globals.lang("with") + " " +
+                 database.getEntryCount() + " " +
+                 Globals.lang("entries into new database") + ".");
     }
     else {
       // Import into current database.
-      boolean checkForDuplicates = true; 
+      boolean checkForDuplicates = true;
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
@@ -1823,54 +1823,54 @@ class FetchCiteSeerAction
       Iterator it = bibentries.iterator();
       mainLoop: while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();
-	boolean dupli = false;
-	// Check for duplicates among the current entries:
-	if (checkForDuplicates) {
-	    loop: for (Iterator i2=database.getKeySet().iterator();
-		 i2.hasNext();) {
-		BibtexEntry existingEntry = database.getEntryById((String)i2.next());
-		if (Util.isDuplicate(entry, existingEntry, 
-				     Globals.duplicateThreshold)) {
-		    DuplicateResolverDialog drd = new DuplicateResolverDialog
-			(ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
-		    drd.show();
-		    int res = drd.getSelected();
-		    if (res == drd.KEEP_LOWER)
-			dupli = true;
-		    else if (res == drd.KEEP_UPPER) {
-			database.removeEntry(existingEntry.getId());
-			ce.addEdit(new UndoableRemoveEntry
-				   (database, existingEntry, basePanel));
-		    } else if (res == drd.BREAK) {
-			break mainLoop;
-		    }
-		    break loop;
-		}
-	    }
-	}
-	
-	if (!dupli) {
-	    try {
-		entry.setId(Util.createId(entry.getType(), database));
-		database.insertEntry(entry);
-		ce.addEdit(new UndoableInsertEntry
-			   (database, entry, basePanel));
-	    }
-	    catch (KeyCollisionException ex) {
-		//ignore
-		System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-	    }
-	}
+        boolean dupli = false;
+        // Check for duplicates among the current entries:
+        if (checkForDuplicates) {
+            loop: for (Iterator i2=database.getKeySet().iterator();
+                 i2.hasNext();) {
+                BibtexEntry existingEntry = database.getEntryById((String)i2.next());
+                if (Util.isDuplicate(entry, existingEntry,
+                                     Globals.duplicateThreshold)) {
+                    DuplicateResolverDialog drd = new DuplicateResolverDialog
+                        (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
+                    drd.show();
+                    int res = drd.getSelected();
+                    if (res == drd.KEEP_LOWER)
+                        dupli = true;
+                    else if (res == drd.KEEP_UPPER) {
+                        database.removeEntry(existingEntry.getId());
+                        ce.addEdit(new UndoableRemoveEntry
+                                   (database, existingEntry, basePanel));
+                    } else if (res == drd.BREAK) {
+                        break mainLoop;
+                    }
+                    break loop;
+                }
+            }
+        }
+
+        if (!dupli) {
+            try {
+                entry.setId(Util.createId(entry.getType(), database));
+                database.insertEntry(entry);
+                ce.addEdit(new UndoableInsertEntry
+                           (database, entry, basePanel));
+            }
+            catch (KeyCollisionException ex) {
+                //ignore
+                System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+            }
+        }
       }
       ce.end();
       basePanel.undoManager.addEdit(ce);
       basePanel.markBaseChanged();
       basePanel.refreshTable();
-      if (filename != null) 
-	  output(Globals.lang("Imported database") + " '" + filename + "' " +
-		 Globals.lang("with") + " " +
-		 (database.getEntryCount() - oldCount) + " " +
-		 Globals.lang("entries into new database") + ".");
+      if (filename != null)
+          output(Globals.lang("Imported database") + " '" + filename + "' " +
+                 Globals.lang("with") + " " +
+                 (database.getEntryCount() - oldCount) + " " +
+                 Globals.lang("entries into new database") + ".");
 
     }
   }

@@ -317,6 +317,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                     if ((bes != null) && (bes.length > 0)) {
                         TransferableBibtexEntry trbe
                             = new TransferableBibtexEntry(bes);
+                        // ! look at ClipBoardManager
                         Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, ths);
                         output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
