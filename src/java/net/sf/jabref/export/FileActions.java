@@ -110,7 +110,6 @@ public class FileActions {
 	    FieldFormatter ff = new LatexFieldFormatter();
 	    for (Iterator i=sorter.iterator(); i.hasNext();) {
 		be = (BibtexEntry)(i.next());
-
 		// Check if the entry should be written.
 		boolean write = true;
 		if (checkSearch &&

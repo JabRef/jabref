@@ -31,7 +31,7 @@ import java.io.*;
 import java.text.StringCharacterIterator;
 import net.sf.jabref.GUIGlobals;
 import java.util.Vector;
-
+import net.sf.jabref.Util;
 public class LatexFieldFormatter implements FieldFormatter {
 
     StringBuffer sb;
@@ -39,6 +39,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     final int STARTCOL = 4;
 
     public String format(String text) throws IllegalArgumentException {
+
 	sb = new StringBuffer();
 	int pivot = 0, pos1 = -1, pos2 = -1;
 	int tell = 0;
@@ -47,11 +48,9 @@ public class LatexFieldFormatter implements FieldFormatter {
 	// #jan# - #feb#
 	// ...which will be written to the file like this:
 	// jan # { - } # feb
-	
 	checkBraces(text);
 
 	while (pivot < text.length()) {
-
 	    int goFrom = pivot;
 	    pos1 = pivot;
 	    while (goFrom == pos1) {
@@ -63,7 +62,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 		    goFrom = pos1-1; // Ends the loop.
 	    }
 
-	    //System.out.println("pos1:"+pos1);
 	    if (pos1 == -1) {
 		pos1 = text.length(); // No more occurences found.
 		pos2 = -1;
@@ -76,7 +74,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 		    //break; // Where does 'break' take us?
 		}		    
 	    }
-	    
+
 	    if (pos1 > pivot)
 		writeText(text, pivot, pos1);
 	    if ((pos1 < text.length()) && (pos2-1 > pos1))
@@ -88,7 +86,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 	    
 	    if (pos2 > -1) pivot = pos2+1;
 	    else pivot = pos1+1;
-	    
 	    //if (tell++ > 10) System.exit(0);
 	}
 
@@ -97,7 +94,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     private void writeText(String text, int start_pos, 
 				  int end_pos) {
-
 	/*sb.append("{");
 	sb.append(text.substring(start_pos, end_pos));
 	sb.append("}");*/
@@ -106,13 +102,19 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
 					 boolean first, boolean last) {
-	
+	//sb.append(Util.wrap2((first ? "" : " # ") + text.substring(start_pos, end_pos)
+	//		     + (last ? "" : " # "), GUIGlobals.LINE_LENGTH));
 	putIn((first ? "" : " # ") + text.substring(start_pos, end_pos)
 		  + (last ? "" : " # "));
-						       
     }
 
     private void putIn(String s) {
+	sb.append(Util.wrap2(s, GUIGlobals.LINE_LENGTH));
+    }
+
+    private void oldwrap(String s) {
+	// the old wrap algorithm. It doesn't correctly handle long
+	// words. Util.wrap2() is used instead.
 	boolean whitesp = false, last = false, cont = true;
 	int lastWh = -1,
 	    lastWhCol = -1;
@@ -120,8 +122,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 	char c = it.first();
 	String toSetIn = "";
 	while (cont) {
-	    toSetIn = "";
-
+	    toSetIn = "";	    
 	    if ((Character.isWhitespace(c))) { /* || 
 		((col > GUIGlobals.LINE_LENGTH) 
 		&& (it.getIndex() == it.getEndIndex()-1))) {*/
@@ -130,11 +131,18 @@ public class LatexFieldFormatter implements FieldFormatter {
 		    if ((col >= GUIGlobals.LINE_LENGTH)
 			&& (lastWhCol > GUIGlobals.LINE_LENGTH)) {
 			
-			sb.delete(sb.length()-it.getIndex()+lastWh,
-				  sb.length());
-			it.setIndex(lastWh);
+			//if ((it.getIndex() - lastWh) >= GUIGlobals.LINE_LENGTH)
+			if (sb.charAt(sb.length()-it.getIndex()+lastWh-1) != '\n') {
+			    // This IF clause prevents us from going back if the last word
+			    // is also the first in this line. Going back in this situation
+			    // leads the algorithm into an endless loop.
+			    sb.delete(sb.length()-it.getIndex()+lastWh,
+				      sb.length());
+			    it.setIndex(lastWh);
+			}
 			col = 0;
 			toSetIn = "\n\t";
+
 		    } else {
 			lastWh = it.getIndex();
 			lastWhCol = col;
@@ -154,8 +162,10 @@ public class LatexFieldFormatter implements FieldFormatter {
 
 	    /*if (last)
 	      cont = false;*/
-	    if (it.getIndex() < it.getEndIndex()-1)
+	    if (it.getIndex() < it.getEndIndex()-1) {		
 		c = it.next();	    
+		Util.pr("'"+c+"'");
+	    }
 	    else {
 		//c = ' ';
 		cont = false;

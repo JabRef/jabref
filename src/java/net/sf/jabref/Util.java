@@ -211,6 +211,23 @@ public class Util {
 	} 
 	return newKey.toString();
     }
+    
+    static public String wrap2(String in, int wrapAmount){
+        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\n\\r]+"," "));
+        int p = in.length() - wrapAmount;
+        while( p > 0 ){
+            p = out.lastIndexOf(" ", p);
+            if(p <= 0 || p <= 20)
+                break;
+            else{
+                out.insert(p, "\n\t");
+            }
+            p -= wrapAmount;
+        }
+        return out.toString();
+     }
+
+
 
     /**
      * This methods assures all words in the given entry are recorded
