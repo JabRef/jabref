@@ -70,6 +70,7 @@ public class PrefsDialog2 extends JDialog {
 	// ----------------------------------------------------------------
 	// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
 	// ----------------------------------------------------------------
+	tabbed.addTab("General", new GeneralTab(_prefs));
 	tabbed.addTab("Table", new TablePrefsTab(_prefs));
 	tabbed.addTab("External programs", new ExternalProgramsTab(_prefs));
 

@@ -682,20 +682,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    preambleEditor.updatePreamble();
     }
     
-    public void assureStringDialogNotEditing() {
-	Util.pr("BasePanel: there is no stringDialog.");
-	/*
+    public void assureStringDialogNotEditing() {	
 	if (stringDialog != null)
-	    stringDialog.assureNotEditing();
-	*/
+	    stringDialog.assureNotEditing();	
     }
 
     public void updateStringDialog() {
-	Util.pr("BasePanel: there is no stringDialog.");
-	/*
 	if (stringDialog != null)
-	    stringDialog.refreshTable();
-	*/
+	    stringDialog.refreshTable(); 
     }
 
     public void showEntry(BibtexEntry be) {
@@ -703,10 +697,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    (frame, ths, be, prefs);
 	splitPane.setBottomComponent(form);
 	splitPane.setDividerLocation(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+	form.requestFocus();
     }
     
     public void hideEntryEditor() {
 	splitPane.setBottomComponent(null);
+	//entryTable.requestFocus();
+	splitPane.requestFocus();
     }
 
     public void markBaseChanged() {

@@ -213,7 +213,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	am.put("help", helpAction);
 
 	tlb.setFloatable(false);
-	//tlb.add(closeAction);
+	tlb.add(closeAction);
 	//tlb.addSeparator();
 	tlb.add(copyKeyAction);
 	tlb.add(generateKeyAction);
@@ -260,7 +260,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	req.setLayout(gbl);
 	opt.setLayout(gbl);
 	gen.setLayout(gbl);
-	con.insets = new Insets(10,5,0,5);
+	con.insets = new Insets(5,5,0,5);
 	//con.fill = GridBagConstraints.HORIZONTAL;
 
 	con.anchor = GridBagConstraints.WEST;
@@ -464,6 +464,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	ta.addFocusListener(new FieldListener());
     }
 
+    public void requestFocus() {
+	((FieldPanel)tabbed.getSelectedComponent()).activate();
+    }
+
     class FieldListener extends FocusAdapter {
 	/*
 	 * Focus listener that fires the storeFieldAction when a FieldTextArea
@@ -564,20 +568,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     class CloseAction extends AbstractAction {
 	public CloseAction() {
-	    super("Close window");
-	    //, new ImageIcon(GUIGlobals.closeIconFile));
-	    putValue(SHORT_DESCRIPTION, "Close window (Ctrl-Q)");
+	    super(Globals.lang("Close window"), 
+			       new ImageIcon(GUIGlobals.closeIconFile));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Close window"));
 	}    
 	public void actionPerformed(ActionEvent e) {
 	    if (tabbed.getSelectedComponent() == srcPanel) {
 		storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
 		if (lastSourceAccepted) {
 		    panel.entryTypeFormClosing(entry.getId());
-		    //dispose();
+		    panel.hideEntryEditor();
 		}
 	    } else {
 		panel.entryTypeFormClosing(entry.getId());
-		//dispose();
+		panel.hideEntryEditor();
 	    }
 	}
     }
