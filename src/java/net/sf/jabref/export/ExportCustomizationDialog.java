@@ -88,7 +88,7 @@ public class ExportCustomizationDialog extends JDialog {
     close.addActionListener(closeAction);
 
     help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
-                                          Globals.lang("Help")));
+                                          "Help"));
 
     ExportTableModel tableModel = new ExportTableModel();
     table = new JTable(tableModel);

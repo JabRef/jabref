@@ -82,17 +82,21 @@ public class JabRef {
       NotifyOption helpO = new NotifyOption("");
       NotifyOption disableGui = new NotifyOption("");
       exportFile.setHelpDescriptionSize(80);
+      NotifyOption loadSess = new NotifyOption("");
 
       options.register("nogui", 'n', Globals.lang("No GUI. Only process command line options."), disableGui);
-      options.register("import", 'i', Globals.lang("Imports file: filename[,bibtexml|endnote|isi|ris]"), importFile);
-      options.register("output", 'o', Globals.lang("Outputs or exports file: filename[,bibtexml|docbook|html|simplehtml]"), exportFile);
-      options.register("help", 'h', Globals.lang("Displays help on command line options"),helpO);
+      options.register("import", 'i', Globals.lang("Import file")+": "+Globals.lang("filename")+"[,import format]", importFile);
+      options.register("output", 'o', Globals.lang("Output or export file")+": "+Globals.lang("filename")+"[,export format]", exportFile);
+      options.register("help", 'h', Globals.lang("Display help on command line options"),helpO);
+      options.register("loadsession", 'l', Globals.lang("Load session"), loadSess);
       options.setUseMenu(false);
 
       options.process(args);
 
       if (helpO.isInvoked()) {
         System.out.println(options.getHelp());
+        System.out.println(Globals.lang("Available import formats")+": biblioscape, bibtexml, endnote, inspec, isi, medline, ovid, ris, scifinder, sixpack.");
+        System.out.println(Globals.lang("Available export formats")+": bibtexml, docbook, html, simplehtml.\n");
         System.exit(0);
       }
 
@@ -338,6 +342,11 @@ public class JabRef {
          ParserResult pr = (ParserResult)loaded.elementAt(i);
          jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i==0));
        }
+
+       if (loadSess.isInvoked()) {
+         jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(jrf, 0, ""));
+       }
+
        ss.dispose();
        jrf.setVisible(true);
      } else System.exit(0);

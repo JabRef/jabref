@@ -1137,7 +1137,7 @@ public static BibtexDatabase importFile(String format, String filename) throws I
     bibentries = readISI(filename);
   else if (format.equals("ovid"))
     bibentries = readOvid(filename);
-  else if (format.equals("refmanager"))
+  else if (format.equals("ris"))
     bibentries = readReferenceManager10(filename);
   else if (format.equals("scifinder"))
     bibentries = readScifinder(filename);
