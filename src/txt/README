@@ -88,7 +88,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	
+1.x:	- Changed routine for rearranging author names (Lastname, Firstname) so bracketed
+  	  expressions are treated as units.
 	- Added automatic import format chooser for import (same as wildcard import below).
 	- Added wildcard (*) option for command-line import, to try to automatically
 	  determine the correct format.

@@ -1,0 +1,41 @@
+%0 \endnotereftype
+%0 Computer Program
+%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%D \year
+%T \format[RemoveLatexCommands]{\title}
+%E \organization
+%B 
+%C \address
+%I
+%V 
+%6
+%N 
+%P 
+%& 
+%Y 
+%S 
+%7 \edition
+%8 \month
+%9
+%? 
+%! \shorttitle
+%Z 
+%@ \isbn
+%(
+%)
+%*
+%L
+%M
+%1 \pdf
+%2 \comment
+%3 manual
+%4 \crossref
+%# \owner
+%$ \key
+%F \bibtexkey
+%K \keywords
+%X \abstract
+%Z \note
+%U \url
+%+
+%^
