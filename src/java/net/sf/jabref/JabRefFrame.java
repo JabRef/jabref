@@ -1345,17 +1345,21 @@ public class JabRefFrame extends JFrame {
 			    outFile = new File(outFile.getPath()+extension);		    }
 		    else return;
 
-		    //InputStreamReader reader = null;
-		    try {
-			//URL reso = JabRefFrame.class.getResource
-			//    ("/resource/layout/"+lfFileName+".layout");
-			//reader = new InputStreamReader(reso.openStream());
+		    final String lfName = lfFileName;
+		    final File oFile = outFile;
 
-			FileActions.exportDatabase(basePanel().database, 
-						   lfFileName, outFile, prefs);
-		    } catch (IOException ex) {
-			ex.printStackTrace();
-		    }
+		    (new Thread() {
+			    public void run() {
+				try {
+				    FileActions.exportDatabase
+					(basePanel().database, 
+					 lfName, oFile, prefs);
+				    output(Globals.lang("Exported database to file") +" '"+oFile.getPath()+"'.");
+				} catch (IOException ex) {
+				    ex.printStackTrace();
+				}
+			    }
+			}).start();
 
 		    
 		}
