@@ -110,7 +110,10 @@ public class IsiImporter implements ImportFormat {
         if (fields[j].length() <= 2)
           continue;
 
-        fields[j] = fields[j].replace(" - ", "");
+        // this is Java 1.5.0 code: 
+        // fields[j] = fields[j].replace(" - ", "");
+        // TODO: switch to 1.5.0 some day; until then, use 1.4.2 code:
+        fields[j] = fields[j].replaceAll(" - ", "");
 
         String beg = fields[j].substring(0, 2);
         String value = fields[j].substring(2);
