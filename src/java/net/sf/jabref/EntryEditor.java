@@ -146,22 +146,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	setupToolBar();
 	setupFieldPanels(reqPanel, optPanel, genPanel);
 	setupSourcePanel();
-	tabbed.addTab("Required fields",
+	tabbed.addTab(Globals.lang("Required fields"),
 		      new ImageIcon(GUIGlobals.showReqIconFile),
-		      reqPanel.getPane(), "Show required fields");
+		      reqPanel.getPane(), Globals.lang("Show required fields"));
 	if ((entry.getOptionalFields() != null) &&
 	    (entry.getOptionalFields().length >= 1))
-	    tabbed.addTab("Optional fields",
+	    tabbed.addTab(Globals.lang("Optional fields"),
 			  new ImageIcon(GUIGlobals.showOptIconFile),
-			  optPanel.getPane(), "Show optional fields");
+			  optPanel.getPane(), Globals.lang("Show optional fields"));
 	if ((entry.getGeneralFields() != null) &&
 	    (entry.getGeneralFields().length >= 1))
-	    tabbed.addTab("General fields",
+	    tabbed.addTab(Globals.lang("General fields"),
 			  new ImageIcon(GUIGlobals.showGenIconFile),
-			  genPanel.getPane(), "Show general fields");
-	tabbed.addTab("Bibtex source",
+			  genPanel.getPane(), Globals.lang("Show general fields"));
+	tabbed.addTab(Globals.lang("Bibtex source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile),
-		      srcPanel, "Show/edit bibtex source");
+		      srcPanel, Globals.lang("Show/edit bibtex source"));
 	sourceIndex = tabbed.getTabCount()-1; // Set the sourceIndex variable.
 	tabbed.addChangeListener(new TabListener());
 
@@ -317,10 +317,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		ta1.setNextFocusableComponent(firstGen);*/
 		setupJTextComponent(ta3);
 
-		// Add external viewer listener for "pdf" and "url" fields.
-		if (genFields[i].equals("pdf") || genFields[i].equals("url"))
-		    ta3.addMouseListener(new ExternalViewerListener());
-
 		if (i==0) {
 		    firstO = ta3;
 		    gen.setActive(ta3);
@@ -421,6 +417,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * getExtra checks the field name against GUIGlobals.FIELD_EXTRAS. If the name
    * has an entry, the proper component to be shown is created and returned.
    * Otherwise, null is returned.
+   * In addition, e.g. listeners can be added to the field editor, even if no
+   * component is returned.
    *
    * @param string Field name
    * @return Component to show, or null if none.
@@ -428,20 +426,34 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   private JComponent getExtra(String string, FieldEditor editor) {
     final FieldEditor ed = editor;
     Object o = GUIGlobals.FIELD_EXTRAS.get(string);
+    final String fieldName = editor.getFieldName();
     if (o == null)
       return null;
-    if (((String)o).equals("browse")) {
+    String s = (String)o;
+
+    if (s.equals("external")) {
+      // Add external viewer listener for "pdf" and "url" fields.
+      ((JComponent)editor).addMouseListener(new ExternalViewerListener());
+      return null;
+    }
+
+    else if (s.equals("browse")) {
       JButton but = new JButton(Globals.lang("Browse"));
       but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           JabRefFileChooser chooser = new JabRefFileChooser
               (new File(ed.getText()));
+          if (ed.getText().equals("")) {
+            chooser.setCurrentDirectory(new File(prefs.get(fieldName +
+                Globals.FILETYPE_PREFS_EXT, "")));
+          }
           //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
           int returnVal = chooser.showOpenDialog(null);
           if (returnVal == JFileChooser.APPROVE_OPTION) {
             File newFile = chooser.getSelectedFile();
             ed.setText(newFile.getPath());
+            prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());
             storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
           }
         }

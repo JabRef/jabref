@@ -48,7 +48,7 @@
     	<fileset dir="${build.classes}"/>
     	<fileset dir="${src.dir}">
 			<include name="images/**"/>
-			<include name="help"/>
+			<include name="help/**"/>
 			<include name="resource/**"/>
         </fileset>
 	<fileset dir="${txt.dir}">

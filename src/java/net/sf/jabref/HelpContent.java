@@ -78,12 +78,24 @@ public class HelpContent extends JEditorPane {
     }
 
     public void setPage(URL url) {
+	String lang = prefs.get("language");
+	//	if (!url.getPath
 	URL old = getPage();
+	//System.out.println(url.toString());
         File f = new File(url.getPath());
         File directory = new File(f.getParent());
-        File translatedFile = new File(directory.getPath()+"/"+prefs.get("language")
-                                       +"/"+f.getName());
 
+	/*
+	// Search 
+	File[] listing = directory.listFiles();
+	for (int i=0; i<listing.length(); i++) {
+	    if (
+	}
+	*/
+
+        File translatedFile = new File(directory.getPath()+"/"+lang
+                                       +"/"+f.getName());
+	//System.out.println(translatedFile.getPath());
         if (translatedFile.exists()) {
           try {
             Util.pr("file:"+translatedFile.getPath());
@@ -92,7 +104,7 @@ public class HelpContent extends JEditorPane {
 
           } catch (Throwable ex) {ex.printStackTrace();}//(MalformedURLException ex) {}
         }
-        else {
+        else {	 	    
           setPageOnly(url);
         }
 	forw.removeAllElements();

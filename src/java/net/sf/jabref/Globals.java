@@ -38,6 +38,7 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
+    public static final String FILETYPE_PREFS_EXT = "_dir";
 
     public static void logger(String s){
 		Logger.global.info(s);
@@ -125,7 +126,7 @@ public class Globals {
     //========================================================
     static Pattern titleCapitalPattern=Pattern.compile("[A-Z]+");
 
-    static String putBracesAroundCapitals(String title){
+  static String putBracesAroundCapitals(String title){
 		StringBuffer buf = new StringBuffer();
 
 		Matcher mcr=Globals.titleCapitalPattern.matcher(title.substring(1));
