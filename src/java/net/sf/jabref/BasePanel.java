@@ -557,6 +557,44 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    searchManager.startIncrementalSearch();
 		}
 	    });
+
+	// The action for copying the selected entry's key.
+	actions.put("copyKey", new BaseAction() {
+		public void action() {
+		    BibtexEntry[] bes = entryTable.getSelectedEntries();
+		    
+		    if ((bes != null) && (bes.length == 1)) {
+			Object o = bes[0].getField(Globals.KEY_FIELD);
+			if (o != null) {
+			    StringSelection ss = new StringSelection(o.toString());
+			    Toolkit.getDefaultToolkit().getSystemClipboard()
+				.setContents(ss, ths);
+
+			    output(Globals.lang("Copied key.")+".");
+			}
+		    }
+		}
+	    });
+
+	// The action for copying a cite for the selected entry.
+	actions.put("copyCiteKey", new BaseAction() {
+		public void action() {
+		    BibtexEntry[] bes = entryTable.getSelectedEntries();
+		    
+		    if ((bes != null) && (bes.length == 1)) {
+			Object o = bes[0].getField(Globals.KEY_FIELD);
+			if (o != null) {
+			    StringSelection ss = new StringSelection
+				("\\cite{"+o.toString()+"}");
+			    Toolkit.getDefaultToolkit().getSystemClipboard()
+				.setContents(ss, ths);
+
+			    output(Globals.lang("Copied key.")+".");
+			}
+		    }
+		}
+	    });
+
     }			    
 		    
 

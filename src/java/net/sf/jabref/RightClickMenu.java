@@ -64,6 +64,21 @@ public class RightClickMenu extends JPopupMenu
 		}
 	    });
 
+	addSeparator();
+
+	add(new AbstractAction("Copy BibTeX key") {
+		public void actionPerformed(ActionEvent e) {
+		    panel.runCommand("copyKey");
+		}
+	    });
+
+	add(new AbstractAction("Copy \\cite{BibTeX key}") {
+		public void actionPerformed(ActionEvent e) {
+		    panel.runCommand("copyCiteKey");
+		}
+	    });
+
+	addSeparator();
 	populateTypeMenu();
 	add(typeMenu);
 	addSeparator();

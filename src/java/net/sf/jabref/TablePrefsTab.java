@@ -15,7 +15,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private JComboBox 
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
-
+    private JTextArea tableFields = new JTextArea();
 
     /**
      * Customization of external program paths.
@@ -178,8 +178,17 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	cm.getColumn(2).setPreferredWidth(90);
 	cm.getColumn(3).setPreferredWidth(25);
 
+	con.gridwidth = 1;
 	gbl.setConstraints(tablePanel, con);
 	add(tablePanel);
+
+	JScrollPane sp = new JScrollPane
+	    (tableFields, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+	     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+	//gbl.setConstraints(sp, con);
+	//add(sp);
+	
     }
 
     private String[] getChoices() {
