@@ -124,6 +124,10 @@ public class JabRefPreferences {
 	return prefs.get(key, (String)defaults.get(key));
     }
 
+    public String get(String key, String def) {
+	return prefs.get(key, def);
+    }
+
     public boolean getBoolean(String key) {
 	return prefs.getBoolean(key, ((Boolean)defaults.get(key)).booleanValue());
     }

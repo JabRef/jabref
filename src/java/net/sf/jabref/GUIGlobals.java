@@ -134,15 +134,15 @@ public class GUIGlobals {
         fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
 
     // Help files (in HTML format):
-    public static URL
-	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"BaseFrameHelp.html"),
-	entryEditorHelp = GUIGlobals.class.getResource(helpPre+"EntryEditorHelp.html"),
-	stringEditorHelp = GUIGlobals.class.getResource(helpPre+"StringEditorHelp.html"),
-	helpContents = GUIGlobals.class.getResource(helpPre+"Contents.html"),
-	searchHelp = GUIGlobals.class.getResource(helpPre+"SearchHelp.html"),
-	groupsHelp = GUIGlobals.class.getResource(helpPre+"GroupsHelp.html"),
-	customEntriesHelp = GUIGlobals.class.getResource(helpPre+"CustomEntriesHelp.html"),
-	aboutPage = GUIGlobals.class.getResource(helpPre+"About.html");
+    public static String
+	baseFrameHelp = "BaseFrameHelp.html",
+	entryEditorHelp = "EntryEditorHelp.html",
+	stringEditorHelp = "StringEditorHelp.html",
+	helpContents = "Contents.html",
+	searchHelp = "SearchHelp.html",
+	groupsHelp = "GroupsHelp.html",
+	customEntriesHelp = "CustomEntriesHelp.html",
+	aboutPage = "About.html";
 
 
     // Keystrokes for Entry editor.

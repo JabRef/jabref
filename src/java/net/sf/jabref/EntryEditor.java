@@ -666,7 +666,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    super(Globals.lang("Delete"),
 		  new ImageIcon(GUIGlobals.removeIconFile));
 	    putValue(SHORT_DESCRIPTION,
-		     Globals.lang("Delete")+" "+Globals.lang("entry"));
+		     Globals.lang("Delete entry"));
 	}
 	public void actionPerformed(ActionEvent e) {
           panel.hideEntryEditor();
@@ -1144,11 +1144,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         JabRefFrame parent ;
         BibtexEntry selectedEntry ;
         public GenerateKeyAction(JabRefFrame parentFrame) {
-            super("Generate Bibtexkey",
+            super(Globals.lang("Generate Bibtexkey"),
               new ImageIcon(GUIGlobals.genKeyIconFile));
             parent = parentFrame ;
 //            selectedEntry = newEntry ;
-            putValue(SHORT_DESCRIPTION, "Generate Bibtexkey (Ctrl-G)");
+            putValue(SHORT_DESCRIPTION, Globals.lang("Generate Bibtexkey"));
     //        putValue(MNEMONIC_KEY, GUIGlobals.showGenKeyCode);
         }
 
@@ -1288,53 +1288,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    return;
 		tf.selectAll();
 		String link = tf.getText(); // get selected ?  String 	getSelectedText()
-		// check html first since browser can invoke viewers
-		if(link.substring(0,7).equals("http://")){ // hml
-		    try {
-			System.err.println("Message: Opening url (" + link
-					   + ") with the HTML viewer ("
-					   + prefs.get("htmlviewer") +")");
-			Process child = Runtime.getRuntime()
-			    .exec(prefs.get("htmlviewer")
-				  + " " + link.replaceAll(" ","\\ "));
-		    } catch (IOException e) {
-			System.err.println("Warning: Unable to open url "
-					   + link + " with the HTML viewer ("
-					   + prefs.get("htmlviewer") +")");
-		    }
-		}
-		else if(link.endsWith(".ps")){
-		    try {
-			System.err.println("Message: Opening file " + link
-					   + " with the ps viewer ("
-					   + prefs.get("psviewer") +")");
-			Process child = Runtime.getRuntime().exec(prefs.get("psviewer")
-								  + " " + link);
-		    } catch (IOException e) {
-			System.err.println("Warning: Unable to open file ("
-					   + link + ") with the postscipt viewer ("
-					   + prefs.get("psviewer") +")");
-		    }
-
-		}else if(link.endsWith(".pdf")){
-		    try {
-			System.err.println("Message: Opening file (" + link
-					   + ") with the pdf viewer ("
-					   + prefs.get("pdfviewer") +")");
-			Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer")
-								  + " " + link);
-		    } catch (IOException e) {
-			System.err.println("Warning: Unable to open file " + link
-					   + " with the pdf viewer ("
-					   + prefs.get("pdfviewer") +")");
-		    }
-		}
-
-		else{
-		    System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
-		    //ignore
-		}
-
+		Util.openExternalViewer(link, prefs);
 	    }
 
 	}

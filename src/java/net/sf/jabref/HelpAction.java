@@ -41,6 +41,38 @@ public class HelpAction extends AbstractAction {
 
     protected HelpDialog diag;
     protected URL helpfile;
+    protected String helpFile;
+
+    public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
+	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
+
+    public HelpAction(HelpDialog diag, String helpfile, String tooltip,
+		      URL iconFile) {
+	super(Globals.lang("Help"), new ImageIcon(iconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
+
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip) {
+	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
+
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip,
+		      KeyStroke key) {
+	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	putValue(ACCELERATOR_KEY, key);
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
 
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip) {
 	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
@@ -75,7 +107,7 @@ public class HelpAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
       //Util.pr(helpfile.getPath());
-	diag.showPage(helpfile);
+	diag.showPage(helpFile);
     }
 
 }

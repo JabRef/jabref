@@ -21,15 +21,17 @@ fields" tab can also be set to display any combination of fields.
 
 
 License:
-JabRef is free software, distributed under the GNU General Public
-Licence. See the enclosed text file 'gpl.txt', or the About dialog,
-for details about the GPL.
+JabRef is free open source software, distributed under the GNU General
+Public Licence. See the enclosed text file 'gpl.txt', or the About
+dialog, for details about the GPL.
 
 
 Requirements:
-JabRef runs on any system equipped with the Java Virtual Machine (1.4.2
-or newer), which can be downloaded at no cost from
-http://java.sun.com.
+JabRef runs on any system equipped with the Java Virtual Machine
+(1.4.2 or newer), which can be downloaded at no cost from
+http://java.sun.com. If you do not plan to compile JabRef, the Java
+Runtime Environment may be a better choice than the Java Development
+Kit.
 
 
 Installing and running:
@@ -49,6 +51,13 @@ or  jar xf <path to jar> <list of files to extract>
 Unpacking the jar file is not necessary to run the program.
 
 
+Building JabRef from source: 
+If you have downloaded the source for JabRef, we recommend that you
+build with Ant.  Ant is open source and freely available from
+http://ant.apache.org. The default build target builds JabRef and
+creates the executable jabref.jar in the directory build/lib. 
+
+
 Documentation:
 JabRef comes with an online help function, accessed by presing F1 or
 clicking on a question mark icon. The help files are probably not
@@ -58,8 +67,10 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.x:	- Added quick load/save session feature.
+1.x:	- Generalized copy cite key features for multiple entries.
+	- Added quick load/save session feature.
 	- Fixed issue/number bug in ISI import.
+	- Added "Open pdf/ps" item in right-click menu.
 	- Fixed bug causing external viewer to only work in General fields.
 	- Added functionality for using Browse buttons for file-related fields
 	  (ps, pdf, etc.).
@@ -88,6 +99,7 @@ Change log:
 	  new types.
 1.0:	First release.
 
+
 Bug reports, suggestions, other feedback:
 We are thankful for any bug reports or other feedback. If there are
 features you want included in JabRef, tell us!
@@ -108,5 +120,5 @@ http://sourceforge.net/projects/jabref
 
 
 Corresponding authors:
-mortenalver _ sourceforge.net
-nbatada _ sourceforge.net
+mortenalver _ users.sourceforge.net
+nbatada _ users.sourceforge.net

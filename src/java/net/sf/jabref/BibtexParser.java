@@ -233,7 +233,8 @@ public class BibtexParser
 		}
 	    }
 	}
-
+	if (key.equals(""))
+	    key = null;
 	result.setField(GUIGlobals.KEY_FIELD, key);
 
 	skipWhitespace();

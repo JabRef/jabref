@@ -77,41 +77,42 @@ public class HelpContent extends JEditorPane {
 	history.removeAllElements();
     }
 
+    public void setPage(String filename) {
+	String middle = prefs.get("language")+"/";
+	if (middle.equals("en/")) middle = ""; // english in base help dir.
+	URL old = getPage(),
+	    translatedFile = JabRef.class.getResource
+	    (GUIGlobals.helpPre+middle+filename);
+	try {
+	    super.setPage(translatedFile);
+	} catch (IOException ex) {
+	    System.err.println("Could not load '"+prefs.get("language")
+			       +"' translated version of "+filename+".");
+
+	    URL file = /*GUIGlobals.class.*/HelpContent.class.getResource
+		(GUIGlobals.helpPre+filename);
+	    setPageOnly(file);
+	    forw.removeAllElements();
+	    if (old != null)
+		history.push(old);
+	    return;
+	}
+
+	forw.removeAllElements();
+	if (old != null)
+	    history.push(old);
+
+    }
+
     public void setPage(URL url) {
 	String lang = prefs.get("language");
-	//	if (!url.getPath
 	URL old = getPage();
-	//System.out.println(url.toString());
-        File f = new File(url.getPath());
-        File directory = new File(f.getParent());
-
-	/*
-	// Search 
-	File[] listing = directory.listFiles();
-	for (int i=0; i<listing.length(); i++) {
-	    if (
-	}
-	*/
-
-        File translatedFile = new File(directory.getPath()+"/"+lang
-                                       +"/"+f.getName());
-	//System.out.println(translatedFile.getPath());
-        if (translatedFile.exists()) {
-          try {
-            Util.pr("file:"+translatedFile.getPath());
-            URL translatedURL = new URL("file:"+translatedFile.getPath());
-            setPageOnly(translatedURL);
-
-          } catch (Throwable ex) {ex.printStackTrace();}//(MalformedURLException ex) {}
-        }
-        else {	 	    
-          setPageOnly(url);
-        }
+	setPageOnly(url);        
 	forw.removeAllElements();
 	if (old != null)
 	    history.push(old);
     }
-
+    
     private void setPageOnly(URL url) {
 	try {
 	    super.setPage(url);

@@ -307,6 +307,59 @@ public class Util {
 	return names.split(delimiter);
     }
 
+
+    /**
+     * Open a http/pdf/ps viewer for the given link string.
+     *
+     */
+    public static void openExternalViewer(String link, JabRefPreferences prefs) {
+	// check html first since browser can invoke viewers
+	if(link.substring(0,7).equals("http://")){ // hml
+	    try {
+		System.err.println("Message: Opening url (" + link
+				   + ") with the HTML viewer ("
+				   + prefs.get("htmlviewer") +")");
+		Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
+							  + " " + link);
+	    } catch (IOException e) {
+		System.err.println("Warning: Unable to open url "
+				   + link + " with the HTML viewer ("
+				   + prefs.get("htmlviewer") +")");
+	    }
+	}
+	else if(link.endsWith(".ps")){
+	    try {
+		System.err.println("Message: Opening file " + link
+				   + " with the ps viewer ("
+				   + prefs.get("psviewer") +")");
+		Process child = Runtime.getRuntime().exec(prefs.get("psviewer")
+							  + " " + link);
+	    } catch (IOException e) {
+		System.err.println("Warning: Unable to open file ("
+				   + link + ") with the postscipt viewer ("
+				   + prefs.get("psviewer") +")");
+	    }
+	    
+	}else if(link.endsWith(".pdf")){
+	    try {
+		System.err.println("Message: Opening file (" + link
+				   + ") with the pdf viewer ("
+				   + prefs.get("pdfviewer") +")");
+		Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer")
+							  + " " + link);
+	    } catch (IOException e) {
+		System.err.println("Warning: Unable to open file " + link
+				   + " with the pdf viewer ("
+				   + prefs.get("pdfviewer") +")");
+	    }
+	}
+	
+	else{
+	    System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
+	    //ignore
+	}
+    }
+
     /**
      * This methods assures all words in the given entry are recorded
      * in their respective Completers, if any.

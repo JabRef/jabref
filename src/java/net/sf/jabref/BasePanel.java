@@ -569,16 +569,35 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("copyKey", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-
-		    if ((bes != null) && (bes.length == 1)) {
-			Object o = bes[0].getField(Globals.KEY_FIELD);
-			if (o != null) {
-			    StringSelection ss = new StringSelection(o.toString());
-			    Toolkit.getDefaultToolkit().getSystemClipboard()
-				.setContents(ss, ths);
-
-			    output(Globals.lang("Copied key.")+".");
+		    if ((bes != null) && (bes.length > 0)) {
+			//String[] keys = new String[bes.length];
+			Vector keys = new Vector();
+			// Collect all non-null keys.
+			for (int i=0; i<bes.length; i++)
+			    if (bes[i].getField(Globals.KEY_FIELD) != null)
+				keys.add(bes[i].getField(Globals.KEY_FIELD));
+			if (keys.size() == 0) {
+			    output("None of the selected entries have BibTeX keys.");
+			    return;
+			}			
+			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+			for (int i=1; i<keys.size(); i++) {
+			    sb.append(',');
+			    sb.append((String)keys.elementAt(i));
 			}
+
+			StringSelection ss = new StringSelection(sb.toString());
+			Toolkit.getDefaultToolkit().getSystemClipboard()
+			    .setContents(ss, ths);
+
+			if (keys.size() == bes.length)
+			    // All entries had keys.
+			    output(Globals.lang((bes.length > 1) ? "Copied keys"
+						: "Copied key")+".");
+			else
+			    output(Globals.lang("Warning")+": "+(bes.length-keys.size())
+				   +" "+Globals.lang("out of")+" "+bes.length+" "+
+				   Globals.lang("entries have undefined BibTeX key")+".");
 		    }
 		}
 	    });
@@ -587,17 +606,36 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("copyCiteKey", new BaseAction() {
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-
-		    if ((bes != null) && (bes.length == 1)) {
-			Object o = bes[0].getField(Globals.KEY_FIELD);
-			if (o != null) {
-			    StringSelection ss = new StringSelection
-				("\\cite{"+o.toString()+"}");
-			    Toolkit.getDefaultToolkit().getSystemClipboard()
-				.setContents(ss, ths);
-
-			    output(Globals.lang("Copied key.")+".");
+		    if ((bes != null) && (bes.length > 0)) {
+			//String[] keys = new String[bes.length];
+			Vector keys = new Vector();
+			// Collect all non-null keys.
+			for (int i=0; i<bes.length; i++)
+			    if (bes[i].getField(Globals.KEY_FIELD) != null)
+				keys.add(bes[i].getField(Globals.KEY_FIELD));
+			if (keys.size() == 0) {
+			    output("None of the selected entries have BibTeX keys.");
+			    return;
+			}			
+			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+			for (int i=1; i<keys.size(); i++) {
+			    sb.append(',');
+			    sb.append((String)keys.elementAt(i));
 			}
+
+			StringSelection ss = new StringSelection
+			    ("\\cite{"+sb.toString()+"}");
+			Toolkit.getDefaultToolkit().getSystemClipboard()
+			    .setContents(ss, ths);
+
+			if (keys.size() == bes.length)
+			    // All entries had keys.
+			    output(Globals.lang((bes.length > 1) ? "Copied keys"
+						: "Copied key")+".");
+			else
+			    output(Globals.lang("Warning")+": "+(bes.length-keys.size())
+				   +" "+Globals.lang("out of")+" "+bes.length+" "+
+				   Globals.lang("entries have undefined BibTeX key")+".");
 		    }
 		}
 	    });
@@ -696,7 +734,20 @@ public class BasePanel extends JSplitPane implements MouseListener,
            }
          });
 
-
+	  actions.put("openFile", new BaseAction() {
+		  public void action() {
+		      BibtexEntry[] bes = entryTable.getSelectedEntries();
+		      if ((bes != null) && (bes.length == 1)) {
+			  Object link = bes[0].getField("ps");
+			  if (bes[0].getField("pdf") != null)
+			      link = bes[0].getField("pdf");
+			  if (link != null)
+			      Util.openExternalViewer(link.toString(), prefs);
+			  else
+			      output("No pdf or ps defined.");
+		      }
+		  }
+	      });
     }
 
     /**
@@ -1209,8 +1260,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    bes[i].setType(type);
 	}
 
-	output("Changed type to '"+type.getName()+"' for "+bes.length
-	       +" entries.");
+	output(Globals.lang("Changed type to")+" '"+type.getName()+"' "
+	       +Globals.lang("for")+" "+bes.length
+	       +" "+Globals.lang("entries")+".");
 	ce.end();
 	undoManager.addEdit(ce);
 	refreshTable();
