@@ -404,6 +404,7 @@ public class Util {
 		    }
 		catch (IOException e)
 		    {
+			e.printStackTrace();
 			System.err.println("An error occured on the command: "
 					   + prefs.get("pdfviewer") + " #" + link);
             System.err.println(e.getMessage());
