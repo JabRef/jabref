@@ -53,7 +53,7 @@ public class GUIGlobals {
   // Frame titles.
   static String
       frameTitle = "JabRef",
-      version = "1.2",
+      version = "1.3",
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
@@ -84,7 +84,7 @@ public class GUIGlobals {
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
       KEYBIND_COL_1 = 80, // Added to the font size when determining table
-      PREVIEW_HEIGHT = 125;
+      PREVIEW_HEIGHT = 115;
   // row height
   public static final double
       VERTICAL_DIVIDER_LOCATION = 0.4;
