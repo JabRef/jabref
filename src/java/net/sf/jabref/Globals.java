@@ -90,15 +90,18 @@ public class Globals {
     }
 
     public static String lang(String key){
-	String translation;
+	String translation=null;
 	try{
+	    if(Globals.messages!=null)
 	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
 	}catch(MissingResourceException ex){
 	    translation= key;
 	    System.err.println("Warning: could not get translation for \""
 	    	       + key +"\"");
 	}
+	if(translation!=null)
 	return translation.replaceAll("_"," ");
+	else return null;
     }
     //============================================================
     // Using the hashmap of entry types found in BibtexEntryType
