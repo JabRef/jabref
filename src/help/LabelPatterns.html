@@ -4,29 +4,39 @@
 
 <basefont size="4" color="#2F4958" face="arial">
 
-<H1>Setting the the BibTeX labels</H1>
+<H1>Customizing the BibTeX key generator</H1>
 
-In the 'Label Pattern' tab in Preferences, one can set the fields used in auto 
+In the 'Key pattern' tab in Preferences, one can set the fields used in auto 
 generation of BibTex labels. The pattern can be set for each of the standard entry 
 types.
+<P>
+The pattern can contain any text you wish, in addition to field
+markers that indicate that a specific field of the entry should be
+inserted at that position of the key. A field marker generally
+consists of the field name enclosed in square braces,
+e.g. <b>[volume]</b>. If the field is undefined in an entry at the
+time of key generation, no text will be inserted by the field marker.
+<P>
+Several special field markers are offered, which extract only a specific part of a field. These are listed below. Feel free to suggest new special field markers!
 
-The pattern is of the form: <code>[field1]separator[field2]separator[field3]...<code>,
-where 'field#' is one of the (required) fields of a given entry type. The square 
-brackets are quite important. They're used to recognize which part of the string is 
-a field, and which part is a separator. This way one is not restricted to use 
-underscore as a separator.
+<P>
+Special field markers:
+<ul>
+<li><b>[auth]</b>: The last name of the first author<BR>
+<li><b>[edtr]</b>: The last name of the first editor<BR>
+<li><b>[firstpage]</b>: The number of the first page of the publication<BR>
+<li><b>[lastpage]</b>: The number of the last page of the publication<BR>
+<li><b>[shorttitle]</b>: The first <BR>
+</ul>
 
-The label can contain the first or last page by using the fields firstpage and lastpage 
-(non BibTeX fields).
+<P>
+The default key pattern is [auth]_[year], and this could produce
+keys like e.g. <code>Yared_1998<code> If the key is not unique in the
+current database, it is made unique by adding one of the letters a-z
+until a unique key is found. Thus, the labels might look like:
+<blockquote> <code>Yared_1998<code><BR> <code>Yared_1998a</code><BR>
+<code>Yared_1998b</code> </blockquote>
 
-The default is [author]_[year], and since this is not a unique key, it's made unique by
-adding one of the letters a-z until a unique key is found, so the labels might look like:
-
-<blockquote>
-	<code>Yared_1998<code>
-	<code>Yared_1998a</code>
-	<code>Yared_1998b</code>
-</blockquote>
 
 </font>
 </BODY>

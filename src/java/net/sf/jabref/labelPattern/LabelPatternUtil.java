@@ -115,14 +115,11 @@ public class LabelPatternUtil {
 			if (val.equals("[")) field = true;
 			else if (val.equals("]")) field = false;
 			else if (field) {
-			    if (_entry.getField(val) == null) {
-				Globals.logger("Key generator warning: field '"+val+"' empty.");
-			    }
-			    else {
-				if(val.equals("author")){
+			    try {				
+				if(val.equals("auth")){
 				    _sb.append(firstAuthor(_entry.getField("author").toString()));
 				}
-				else if(val.equals("editor")){
+				else if(val.equals("edtr")){
 				    _sb.append(firstAuthor(_entry.getField("editor").toString()));
 				}
 				else if(val.equals("firstpage")){
@@ -134,7 +131,9 @@ public class LabelPatternUtil {
 				// we havent seen any special demands
 				else{
 				    _sb.append(_entry.getField(val).toString());
-				}
+				}			    
+			    } catch (Exception ex) {
+				Globals.logger("Key generator warning: field '"+val+"' empty.");
 			    }
 			} else {
 			    _sb.append(val);			    
@@ -143,7 +142,7 @@ public class LabelPatternUtil {
 		}
 					
 		catch (Exception e) {
-				System.err.println(e);
+		    System.err.println(e);
 		}
 		
 		/**
@@ -204,10 +203,10 @@ public class LabelPatternUtil {
 				//TODO deal with different format for the fields :-)
 				String _field = _al.get(i).toString();
 
-				if(_field.equals("author")){
+				if(_field.equals("auth")){
 					_sb.append(firstAuthor(_entry.getField("author").toString()));
 				}
-				else if(_field.equals("editor")){
+				else if(_field.equals("edtr")){
 					_sb.append(firstAuthor(_entry.getField("editor").toString()));
 				}
 				else if(_field.equals("firstpage")){
@@ -216,6 +215,7 @@ public class LabelPatternUtil {
 				else if(_field.equals("lastpage")){
 					_sb.append(lastPage(_entry.getField("pages").toString()));
 				}
+				//else if(_field.equals("title
 				// we havent seen any special demands
 				else{
 					_sb.append(_entry.getField(_al.get(i).toString()).toString());

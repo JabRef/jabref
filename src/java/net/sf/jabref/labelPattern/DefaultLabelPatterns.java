@@ -35,19 +35,19 @@ package net.sf.jabref.labelPattern;
 public class DefaultLabelPatterns extends LabelPattern{
 	
     public DefaultLabelPatterns(){
-	addLabelPattern("article", "[author]_[year]");
-	addLabelPattern("book",	"[author]_[year]");
-	addLabelPattern("booklet", "[author]_[year]");
-	addLabelPattern("conference", "[author]_[year]");
-	addLabelPattern("inbook", "[author]_[year]");
-	addLabelPattern("incollection", "[author]_[year]");
-	addLabelPattern("inproceedings", "[author]_[year]");
-	addLabelPattern("manual", "[author]_[year]");
-	addLabelPattern("mastersthesis", "[author]_[year]");
-	addLabelPattern("misc",	"[author]_[year]");
-	addLabelPattern("phdthesis", "[author]_[year]");
-	addLabelPattern("proceedings","[author]_[year]");
-	addLabelPattern("techreport", "[author]_[year]");
-	addLabelPattern("unpublished", "[author]_[year]");
+	addLabelPattern("article", "[auth]_[year]");
+	addLabelPattern("book",	"[auth]_[year]");
+	addLabelPattern("booklet", "[auth]_[year]");
+	addLabelPattern("conference", "[auth]_[year]");
+	addLabelPattern("inbook", "[auth]_[year]");
+	addLabelPattern("incollection", "[auth]_[year]");
+	addLabelPattern("inproceedings", "[auth]_[year]");
+	addLabelPattern("manual", "[auth]_[year]");
+	addLabelPattern("mastersthesis", "[auth]_[year]");
+	addLabelPattern("misc",	"[auth]_[year]");
+	addLabelPattern("phdthesis", "[auth]_[year]");
+	addLabelPattern("proceedings","[auth]_[year]");
+	addLabelPattern("techreport", "[auth]_[year]");
+	addLabelPattern("unpublished", "[auth]_[year]");
     }
 }
