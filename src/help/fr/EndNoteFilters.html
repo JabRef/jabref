@@ -1,0 +1,127 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<h1>Filtre d'exportation EndNote</h1>
+
+<h2>Exportation à partir de JabRef</h2>
+
+JabRef peut exporter des bases de données dans des fichiers
+lisibles par Endnote. Pour utiliser cette fonction,
+choisissez <b>Fichier -> Exporter -> EndNote</b>, et
+spécifiez le nom du fichier d'exportation.
+
+<h2>Importer dans EndNote</h2>
+
+Le fichier par défaut d'importation d'Endnote ne traite
+pas proprement les auteurs ou les éditeurs multiples. 
+Il y a deux façons pour contourner cela&nbsp;:
+
+<ol>
+
+<li>Utiliser le filtre interne et corriger ensuite le fichier.
+Pour ouvrir le fichier dans EndNote, créez une nouvelle base de
+données ou ouvrez une ancienne base de données dans EndNote.
+Ensuite, sélectionnez <b>Fichier -> Importer</b>, cliquer
+sur <b>Choisir le filtre</b>, puis sélectionnez le fichier
+exporté et cliquez sur <b>Choisir</b>. Cliquer sur 
+<b>Options d'importation</b> et sélectionner
+<b>Importation EndNote</b>.  Cliquez sur <b>Importer</b> pour
+démarrer l'importation. Après l'importation, sélectionnez
+<b>Edition-> Changer le texte</b>. Changez <b>N'importe
+quel champ</b> en <b>Author</b>. Entrez " and " à l'intérieur
+du champ de recherche (sans les guillemets). Entrez un 
+retour chariot dans le champ Remplacer
+(option-return pour Mac OS X, ctrl-return pour Windows
+XP). Cliquez sur <b>Remplacer</b>. Répétez avec le champ
+<b>Secondary Author</b>. [NdT: difficile à traduire sans
+avoir Endnote...]
+
+<li>Installez le <i>filtre d'importation d'EndNote depuis
+JabRef</i> dans le <i>EndNote Extras</i>. Suivez les instructions
+dans la section <i>Utilisation avancée</i> ci-dessous.
+Pour ouvrir le fichier dans Endnote, créez une nouvelle base
+de données ou ouvrez une ancienne base de données dans Endnote.
+Ensuite, sélectionnez <b>Fichier -> Importer</b>, cliquez
+sur <b>Choisir le filtre</b>, puis sélectionnez le fichier
+exporté et cliquez sur <b>Choisir</b>. Cliquez sur 
+<b>Options d'importation</b> et sélectionnez
+<b>Filtre d'importation d'EndNote depuis
+JabRef</b> (s'il n'est pas présent, sélectionner Autres
+filtres. S'il n'apparaît toujours pas, il n'a pas été installé
+correctement). Cliquer sur <b>Importer</b> pour démarrer
+l'importation.
+
+</ol>
+
+<h2>Notes</h2>
+
+Le filtre d'exportation EndNote fait correspondre les types
+d'entrées BibTeX avec les types de référence d'EndNote de la
+façon suivante&nbsp;:
+
+<pre>
+Type d'entrée BibTeX -> Type de référence d'Endnote
+---------------------------------------------------
+misc, other -> Generic
+unpublished -> Manuscript
+manual -> Computer Program
+article -> Journal Article
+book -> Book
+booklet -> Personal Communication
+inbook,incollection -> Book Section
+inproceedings -> Conference Proceedings
+techreport -> Report
+mastersthesis, phdthesis -> Thesis
+</pre>
+
+<h2>Auteurs collectifs</h2>
+
+Par défaut, le filtre d'exportation suppose que le contenu 
+des champs author ou editor qui sont dans des accolades
+sont des auteurs collectifs et remplace les accolades par
+une virgule. Cependant, cela signifie que les champs qui
+contiennent du code LaTeX entre accolades seront supposées
+être des auteurs collectifs et seront donc improprement
+formattés.
+
+<H2>Utilisation avancée&nbsp;: Suppléments EndNote</h2>
+
+<h3>Installation du filtre d'importation d'EndNote depuis JabRef</h3>
+
+Le filtre par défaut d'importation d'Endnote ne traîte pas 
+correctement les auteurs. Le filtre d'importaion d'EndNote depuis
+JabRef le fait proprement. De plus, ce filtre reconnaîtra 
+un champ endnotereftype qui supplantera la table des correspondances
+par défaut. Pour installer ce filtre, extraire les suppléments
+pour EndNote (<b>Fichier ->  Exporter - > Décompacter la série de
+filtres Endnote</b>) et suivez les instructions du fichier
+readme.txt.<p>
+
+<h3>Modification des types de référence d'EndNote</h3>
+
+Plusieurs champs utilisés par BibTeX ne font pas partie
+des Types de Référence par défaut d'Endnote. Alors que
+l'importation depuis JabRef et l'exportation à partir
+de JabRef fonctionneront correctement sans modifier
+les types de références, les noms de champs ne seront
+pas affichés correctement dans EndNote (par exemple,
+une fenêtre d'entrée appelera le champ PDF
+<i>"Custom 1"</i> au lieu de <i>"pdf"</i>. De plus,
+puisque ces champs n'apparaîtront pas dans la fenêtre
+d'édition, ces champs ne pourront pas être ajoutés à
+de nouvelles entrées dans EndNote. Pour modifier les
+Types de Références d'EndNote, extrayez les Suppléments
+EndNote et suivez les instructions du fichier readme.txt.<p>
+
+<h3>Exportation vers JabRef</h3> 
+
+Endnote est fourni avec un style d'exportation BibTeX. 
+Cependant, il ne prend pas en compte pas tous les types et les champs BibTeX
+et ne prend pas non plus en compte les Champs Généraux additionnels supportés
+par JabRef (<i>pdf, owner, key,</i> etc.). Si vous souhaitez
+que ces champs soient pris en compte, extrayez les Suppléments EndNote
+et suivez les instructions du fichier readme.txt.<p>
+
+</HTML>
