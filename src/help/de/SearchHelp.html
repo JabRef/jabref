@@ -1,0 +1,59 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Suchfunktionen in JabRef</H1>
+
+Es gibt drei verschiedene Suchmethoden in JabRef.
+
+<p>
+<em>STRG-F</em> öffnet oder aktiviert den Suchdialog. Drückt man mehrmals auf <em>STRG-F</em>, so werden die verschiedenen Suchmodi ausgewählt. Bei der direkten Suche springt man mit <em>STRG-F</em> zum nächsten Treffer.
+<p>
+<em>STRG-SHIFT-F</em> öffnet oder aktiviert den Suchdialog und wählt die direkte Suche aus. Bei der direkten Suche springt man mit <em>STRG-SHIFT-F</em> ebenfalls zum nächsten Treffer.
+
+<H2>Direkte Suche</H2>
+
+Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg. Mit den Tastaturkürzeln wird das Programm dazu veranlasst, nach dem nächsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie darüber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken Sie ESC oder klicken Sie auf &bdquo;Zurücksetzen&ldquo;.
+
+<H2>Suche mit Markierung</H2>
+
+Wenn Sie die Suchoption &bdquo;Markieren&ldquo; wählen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER drücken. Alle Treffer werden ausgewählt.
+
+<H2>Float-Suche</H2>
+
+Die Suche mit der Option &bdquo;Float&ldquo; ist ähnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgewählt, sondern an den Anfang der Tabelle sortiert werden. Einträge, die nicht mit dem Suchbegriff übereinstimmen, werden unter den Treffern aufgelistet und zusätzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, drücken Sie ESC oder klicken auf &bdquo;Zurücksetzen&ldquo;.
+
+<H2>Feldbezeichner und logische Operatoren</H2>
+
+Um nur einige bestimmte Felder zu durchsuchen und/oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach Einträgen mit dem Autor &bdquo;Miller&ldquo; zu suchen, geben Sie
+<p>
+author = miller
+<p>
+in das Suchfeld ein (Achtung! Das funktioniert nicht bei der direkten Suche!). Falls der Suchbegriff Leerzeichen enthält, schließen Sie ihn in Anführungszeichen ein. Benutzen Sie <i>nie</i> Leerzeichen in dem Feldbezeichner. Um beispielsweise nach Einträgen über Karl den Großen zu suchen, geben Sie folgendes ein:
+<p>
+title|keywords = "Karl der Große"
+<p>
+Sie können &bdquo;and&ldquo;, &bdquo;or&ldquo;, &bdquo;not&ldquo; und Klammern verwenden:
+<p>
+(author = miller or title|keywords = "Karl der Große") and not author = brown
+<p>
+... sucht nach Einträgen, in denen entweder der Autor &bdquo;Miller&ldquo; heißt oder im title- oder keywords-Feld der Begriff &bdquo;Karl der Große&ldquo; steht; gleichzeitig werden die Einträge mit dem Autor &bdquo;Brown&ldquo; nicht angezeigt.
+<p>
+Das &bdquo;=&ldquo;-Zeichen ist eigentlich eine Abkürzung für &bdquo;enthält&ldquo; (&ldquo;contains&rdquo;). Wenn man nach genauen Treffern suchen möchte, muss man &bdquo;==&ldquo; oder &ldquo;matches&rdquo; (&bdquo;übereinstimmen&ldquo;) eingeben. &bdquo;!=&ldquo; sucht nach Einträgen, bei denen der Suchbegriff <i>nicht</i> enthalten ist. Die Auswahl von Feldern, die durchsucht werden sollen (benötigte, optionale, allgemeine Felder), wird ignoriert, wenn man im Suchausdruck Feldbezeichner verwendet. Um nach Einträgen eines bestimmten Typs zu suchen, gibt es ein Pseudofeld namens &bdquo;entrytype&ldquo;:
+<p>
+entrytype = thesis
+<p>
+&hellip; findet z.B. Einträge, deren Typ (wie in der Spalte &bdquo;Entrytype&ldquo; dargestellt) das Wort &bdquo;thesis&ldquo; enthält (z.B. &bdquo;phdthesis&ldquo; und &bdquo;mastersthesis&ldquo;).
+
+<H2>Suchoptionen</H2>
+
+Der <em>Einstellungen</em>-Knopf öffnet ein Menü, das die Suchoptionen anzeigt: welche Felder durchsucht werden, ob der Suchbegriff als regulärer Ausdruck interpretiert werden soll und ob nach Groß- und Kleinschreibung unterschieden werden soll oder nicht.
+
+<!--
+<p>You can at any time export a <em>bibtex</em> database containing
+only the entries in your currently shown group and/or search, by
+choosing <em>File -> Save special</em> in the menu. -->
+
+</BODY>
+</HTML>
