@@ -265,7 +265,7 @@ public class JabRefFrame
       importNewMenu = new JMenu(Globals.lang("Import")),
       exportMenu = new JMenu(Globals.lang("Export")),
       customExportMenu = new JMenu(Globals.lang("Custom export")),
-      newDatabaseMenu = new JMenu( Globals.lang( "New database menu" ) ) ;
+      newDatabaseMenu = new JMenu( Globals.lang( "New database" ) ) ;
 
 
   // The action for adding a new entry of unspecified type.
@@ -330,6 +330,7 @@ public class JabRefFrame
           searchToggle.setSelected(bp.sidePaneManager.isPanelVisible("search"));
 	  previewToggle.setSelected(bp.previewEnabled);
           Globals.focusListener.setFocused(bp.entryTable);
+	  new FocusRequester(bp.entryTable);
         }
       }
 
@@ -785,7 +786,7 @@ public JabRefPreferences prefs() {
     newDatabaseMenu.add(newDatabaseAction) ;
     newDatabaseMenu.add(newSubDatabaseAction) ;
 
-    file.add(newDatabaseMenu);
+    file.add(newDatabaseAction);
     file.add(open); //opendatabaseaction
     file.add(mergeDatabaseAction);
     file.add(importMenu);
@@ -857,15 +858,18 @@ public JabRefPreferences prefs() {
     tools.add(replaceAll);
     tools.add(dupliCheck);
     tools.addSeparator();
+    tools.add(manageSelectors);
     tools.add(makeKeyAction);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
     tools.add(fetchMedline);
     tools.add(fetchCiteSeer);
     //tools.add(fetchAuthorMedline);
+    tools.addSeparator();
     tools.add(openFile);
     tools.add(openUrl);
-    tools.add(manageSelectors);
+    tools.addSeparator();
+    tools.add(newSubDatabaseAction);
 
     mb.add(tools);
 
@@ -1037,8 +1041,10 @@ public JabRefPreferences prefs() {
     }
   }
 
+    /**
+     * Disable actions that demand an open database.
+     */
   private void setEmptyState() {
-    // Disable actions that demand an open database.
     mergeDatabaseAction.setEnabled(false);
     newSubDatabaseAction.setEnabled(false);
     close.setEnabled(false);
@@ -1085,16 +1091,16 @@ public JabRefPreferences prefs() {
     closeDatabaseAction.setEnabled(false);
   }
 
+    /**
+     * Enable actions that demand an open database.
+     */
   private void setNonEmptyState() {
-    // Enable actions that demand an open database.
     mergeDatabaseAction.setEnabled(true);
     newSubDatabaseAction.setEnabled(true);
     close.setEnabled(true);
     save.setEnabled(true);
     saveAs.setEnabled(true);
     saveSelectedAs.setEnabled(true);
-    nextTab.setEnabled(true);
-    prevTab.setEnabled(true);
     undo.setEnabled(true);
     redo.setEnabled(true);
     cut.setEnabled(true);
@@ -1132,6 +1138,22 @@ public JabRefPreferences prefs() {
     newEntryAction.setEnabled(true);
     closeDatabaseAction.setEnabled(true);
   }
+
+    /**
+     * Disable actions that need more than one database open.
+     */
+    private void setOnlyOne() {
+	nextTab.setEnabled(false);
+	prevTab.setEnabled(false);
+    }
+
+    /**
+     * Disable actions that need more than one database open.
+     */
+    private void setMultiple() {
+	nextTab.setEnabled(true);
+	prevTab.setEnabled(true);
+    }
 
   /**
    * This method causes all open BasePanels to set up their tables
@@ -1175,6 +1197,8 @@ public JabRefPreferences prefs() {
     }
     if (tabbedPane.getTabCount() == 1) {
       setNonEmptyState();
+    } else if (tabbedPane.getTabCount() == 2) {
+      setMultiple();
     }
   }
 
@@ -1273,6 +1297,8 @@ public JabRefPreferences prefs() {
         tabbedPane.remove(basePanel());
         if (tabbedPane.getTabCount() == 0) {
           setEmptyState();
+        } else if (tabbedPane.getTabCount() == 1) {
+          setOnlyOne();
         }
         output(Globals.lang("Closed database") + ".");
       }
@@ -1567,7 +1593,7 @@ class FetchCiteSeerAction
     {
       public NewSubDatabaseAction()
       {
-        super( Globals.lang( "New subdatabase" ),
+        super( Globals.lang( "New subdatabase based on AUX file" ),
 
         new ImageIcon( GUIGlobals.newIconFile ) ) ;
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;

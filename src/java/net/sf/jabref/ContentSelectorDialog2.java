@@ -73,7 +73,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	    fieldList.setSelectedIndex(fieldInd);
 
 	pack();
-	System.out.println("eee");
+	//System.out.println("eee");
     }
 
 
@@ -221,16 +221,18 @@ public class ContentSelectorDialog2 extends JDialog {
 
 
     private void applyChanges() {
+	boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
+
 	// First remove the mappings for fields that have been deleted.
 	// If these were re-added, they will be added below, so it doesn't
 	// cause any harm to remove them here.
 	for (Iterator i=removedFields.iterator(); i.hasNext();) {
 	    String fieldName = (String)i.next();
 	    metaData.remove(Globals.SELECTOR_META_PREFIX+fieldName);
+	    changedFieldSet = true;
 	}
 
 	// Cycle through all fields that we have created listmodels for:
-	boolean changedFieldSet = false;
 	loop: for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
 	    // For each field name, store the values:
 	    String fieldName = (String)i.next();
@@ -240,7 +242,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	    int start = 0;
 	    // Avoid storing the <new word> marker if it is there:
 	    if (lm.size() > 0)
-		while (((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+		while ((start<lm.size()) && ((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
 		    start++;
 	    Vector data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
 	    boolean newField = false;
@@ -265,8 +267,9 @@ public class ContentSelectorDialog2 extends JDialog {
 	// Update all selectors in the current BasePanel.
 	if (!changedFieldSet)
 	    panel.updateAllContentSelectors();
-	else
+	else {
 	    panel.rebuildAllEntryEditors();
+	}
     }
 
     /**

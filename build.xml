@@ -73,10 +73,9 @@
   <!-- Compiles project -->
             <target name="compile">
                 <mkdir dir="${build.classes}"/>
-
+			<!--deprecation="on"-->
                 <javac srcdir="${java.dir}"
                         debug="on"
-			deprecation="on"
 			destdir="${build.classes}"
 			source="1.4"
                         target="1.4">

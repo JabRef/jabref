@@ -1,6 +1,6 @@
 
-JabRef 1.X
-----------
+JabRef 1.55
+-----------
 
 
 Introduction:
@@ -38,7 +38,7 @@ Kit.
 
 
 Installing and running, Windows:
-JabRef 1.5 is available in Windows Installer (.msi) format. To install,
+JabRef 1.55 is available in Windows Installer (.msi) format. To install,
 double-click the .msi file. A shortcut to JabRef will be added to your
 start menu.
 
@@ -48,7 +48,7 @@ Wix (tool for compiling MSI files from an XML specification), available at http:
 
 
 Installing and running, general:
-JabRef 1.5 can be downloaded as an executable .jar file. Run the
+JabRef can be downloaded as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -84,7 +84,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Made method for opening PDF files robust with regard to file separators (/ and \),
+1.55:	- Made method for opening PDF files robust with regard to file separators (/ and \),
 	  so bib files can easier be used across platforms.
 	- Improved Medline fetcher. Can now fetch entries based on a search expression.
 	- Added option to always save database ordered by author/editor/year, and made this
@@ -100,6 +100,7 @@ Change log:
 	- Added 'Cancel' button to duplicate resolver dialog, so the process can be stopped.
 	- Added check for spaces in custom entry type names.
 	- Added several new key pattern markers.
+	- Fixed bug that prevented confirmation dialog when deleting entry from the entry editor.
 	- Fixed bug that made the next entry be opened instead of the current, when pressing 
 	  Enter in table.
         - Fixed bug that made it possible to leave a source edit when the source didn't validate

@@ -538,7 +538,6 @@ public class Util {
 	float opt = compareFieldSet(fields, one, two);
 	return (2*req + opt)/3 >= threshold;
     } else {
-	System.out.println("test");
 	return (req >= threshold);
     }
   }
