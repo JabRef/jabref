@@ -37,30 +37,37 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
+import java.awt.* ;
+import java.awt.event.* ;
 import javax.swing.* ;
-import java.awt.Dimension;
-import java.awt.*;
 
-public class OverlayPanel
-    extends JPanel
+public class OverlayPanel extends JPanel
 {
 
   private JLabel label ;
   private JComponent overlay ;
 
-  public OverlayPanel(JComponent over, String text)
-  {
-    overlay = over ;
-    overlay.setOpaque(false);
+  private JScrollPane scroller ;
 
-    setBackground( overlay.getBackground());
+  public OverlayPanel(JComponent container, String text)
+  {
+    OverlayLayout layout = new OverlayLayout(this) ;
+    this.setLayout( layout );
+    overlay = container ;
+
     label = new JLabel(text) ;
     label.setFont(new Font("dialog", Font.ITALIC, 18));
 //    label.setForeground(Color.lightGray);
     label.setForeground( new Color(224, 220, 220) );
+    label.setLocation(0, 0);
 
-    add(overlay) ;
+     scroller = new JScrollPane( overlay ) ;
+     scroller.setLocation(0, 0);
+
+     scroller.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+
     add(label) ;
+    add(scroller) ;
   }
 
   public void paint(Graphics g)
@@ -74,10 +81,17 @@ public class OverlayPanel
       int y = dim.height / 2 ;
 
       label.setLocation(x, y) ;
-      overlay.setLocation(0, 0);
     }
 
     super.paint(g);
   }
 
+/*
+  // it doesn't work well
+  public void addMouseListener(MouseListener listener)
+  {
+    overlay.addMouseListener(listener);
+    super.addMouseListener(listener);
+  }
+*/
 }

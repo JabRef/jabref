@@ -47,25 +47,25 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
-import java.net.*;
-import java.io.*;
+import java.net.* ;
+import java.io.* ;
 import java.util.* ;
 
 import java.awt.* ;
 import java.awt.event.* ;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.* ;
 import javax.swing.* ;
-import javax.swing.text.*;
+import javax.swing.text.* ;
 import javax.swing.border.* ;
-import javax.swing.event.*;
+import javax.swing.event.* ;
 
 import net.sf.jabref.* ;
-import net.sf.jabref.wizard.text.*;
-import net.sf.jabref.wizard.integrity.*;
-import net.sf.jabref.wizard.integrity.gui.*;
+import net.sf.jabref.wizard.text.* ;
+import net.sf.jabref.wizard.integrity.* ;
+import net.sf.jabref.wizard.integrity.gui.* ;
 
-
-public class TextInputDialog extends JDialog
+public class TextInputDialog
+    extends JDialog implements ActionListener
 {
   private JButton okButton = new JButton() ;
   private JButton cancelButton = new JButton() ;
@@ -77,6 +77,8 @@ public class TextInputDialog extends JDialog
   private IntegrityMessagePanel warnPanel = new IntegrityMessagePanel() ;
   private JList fieldList ;
   private JRadioButton overRadio, appRadio ;
+
+  private OverlayPanel testPanel ;
 
   private BibtexEntry entry ;
 
@@ -98,7 +100,7 @@ public class TextInputDialog extends JDialog
   {
     super( frame, title, modal ) ;
 
-    inputChanged = true ;  // for a first validCheck
+    inputChanged = true ; // for a first validCheck
 
     _frame = frame ;
 
@@ -125,8 +127,12 @@ public class TextInputDialog extends JDialog
 
     String typeStr = Globals.lang( "for" ) ;
     if ( entry != null )
+    {
       if ( entry.getType() != null )
+      {
         typeStr = typeStr + " " + entry.getType().getName() ;
+      }
+    }
 
     this.setTitle( Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
     getContentPane().add( panel1 ) ;
@@ -138,17 +144,19 @@ public class TextInputDialog extends JDialog
     JTabbedPane tabbed = new JTabbedPane() ;
     tabbed.addChangeListener(
         new ChangeListener()
+    {
+      public void stateChanged( ChangeEvent e )
+      {
+        if ( inputChanged )
         {
-          public void stateChanged(ChangeEvent e)
-          {
-            if (inputChanged)
-              warnPanel.updateView(entry) ;
-          }
-        });
+          warnPanel.updateView( entry ) ;
+        }
+      }
+    } ) ;
 
     tabbed.add( rawPanel, Globals.lang( "Raw_source" ) ) ;
     tabbed.add( sourcePanel, Globals.lang( "BibTeX_source" ) ) ;
-    tabbed.add( warnPanel, Globals.lang("Messages_and_Hints")) ;
+    tabbed.add( warnPanel, Globals.lang( "Messages_and_Hints" ) ) ;
 
     // Panel Layout
     GridBagLayout gbl = new GridBagLayout() ;
@@ -185,42 +193,26 @@ public class TextInputDialog extends JDialog
 
     rawPanel.setLayout( new BorderLayout() ) ;
 
-    // Textarea
-    textPane = new JTextPane()
-    {
-//    pane =  new JTextPane(){
-             public void setSize(Dimension d) {
-                if(d.width > 100) d.width = 100;
-                   super.setSize(d);
-             }
-             public boolean getScrollableTracksViewportWidth(){ return false; }
-      };
+        // Textarea
+        textPane = new JTextPane() ;
 
-    textPane.setEditable( false ) ;
-    textPane.setOpaque(false);
-    textPane.setMaximumSize( new Dimension(100, 100) );
+        textPane.setEditable( false ) ;
 
-    doc = textPane.getStyledDocument() ;
-    addStylesToDocument( doc ) ;
+        doc = textPane.getStyledDocument() ;
+        addStylesToDocument( doc ) ;
 
-    OverlayPanel testPanel = new OverlayPanel(textPane,
-                                              Globals.lang("Text_Input_Area") ) ;
+        try
+        {
+          doc.insertString( 0, "", doc.getStyle( "regular" ) ) ;
+        }
+        catch ( Exception e )
+        {}
 
-    try
-    {
-      doc.insertString( 0, "", doc.getStyle( "regular" ) ) ;
-    }
-    catch ( Exception e )
-    {}
+        testPanel = new OverlayPanel(textPane,
+                                     Globals.lang("Text_Input_Area") ) ;
 
-    // Scrollbar(s)
-    JScrollPane paneScrollPane = new JScrollPane( testPanel ) ;
-
-//    paneScrollPane.setVerticalScrollBarPolicy(
-//        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
-    paneScrollPane.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) ;
-    paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
-    paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
+        testPanel.setPreferredSize( new Dimension( 450, 255) );
+        testPanel.setMaximumSize( new Dimension(450, Integer.MAX_VALUE) );
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
@@ -231,7 +223,7 @@ public class TextInputDialog extends JDialog
 
     //Add listener to components that can bring up popup menus.
     MouseListener popupListener = new PopupListener( inputMenu ) ;
-    textPane.addMouseListener( popupListener ) ;
+    textPane.addMouseListener( popupListener );
     testPanel.addMouseListener( popupListener );
 
     // Toolbar
@@ -245,7 +237,8 @@ public class TextInputDialog extends JDialog
     JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
     leftPanel.add( toolBar, BorderLayout.NORTH ) ;
-    leftPanel.add( paneScrollPane, BorderLayout.CENTER ) ;
+    leftPanel.add( testPanel, BorderLayout.CENTER ) ;
+
 
     // ----------------------------------------------------------------
     JPanel inputPanel = new JPanel() ;
@@ -262,7 +255,7 @@ public class TextInputDialog extends JDialog
     // Border
     TitledBorder titledBorder1 = new TitledBorder(
         BorderFactory.createLineBorder(
-        new Color( 153, 153, 153 ), 2 ),
+            new Color( 153, 153, 153 ), 2 ),
         Globals.lang( "Input" ) ) ;
     inputPanel.setBorder( titledBorder1 ) ;
     inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
@@ -273,7 +266,7 @@ public class TextInputDialog extends JDialog
     ListSelectionModel listSelectionModel = fieldList.getSelectionModel() ;
     listSelectionModel.setSelectionMode( ListSelectionModel.SINGLE_SELECTION ) ;
     listSelectionModel.addListSelectionListener( new FieldListSelectionHandler() ) ;
-    fieldList.addMouseListener( new FieldListMouseListener() );
+    fieldList.addMouseListener( new FieldListMouseListener() ) ;
 
     JScrollPane fieldScroller = new JScrollPane( fieldList ) ;
     fieldScroller.setVerticalScrollBarPolicy(
@@ -283,16 +276,16 @@ public class TextInputDialog extends JDialog
 
     // insert button
     insertButton.setText( Globals.lang( "Insert" ) ) ;
-    insertButton.addActionListener( new TextInputDialog_insert_actionAdapter( this ) ) ;
+    insertButton.addActionListener( this ) ;
 
     // Radio buttons
     appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
-    appRadio.setToolTipText("append the selected text to bibtex key");
+    appRadio.setToolTipText( "append the selected text to bibtex key" ) ;
     appRadio.setMnemonic( KeyEvent.VK_A ) ;
     appRadio.setSelected( true ) ;
 
     overRadio = new JRadioButton( Globals.lang( "Override" ) ) ;
-    overRadio.setToolTipText("override the bibtex key by the selected text");
+    overRadio.setToolTipText( "override the bibtex key by the selected text" ) ;
     overRadio.setMnemonic( KeyEvent.VK_O ) ;
     overRadio.setSelected( false ) ;
 
@@ -332,24 +325,28 @@ public class TextInputDialog extends JDialog
     // add a short info, if available
 
     JEditorPane infoText = new JEditorPane() ;
-    infoText.setEditable(false);
-     // get the info text
+    infoText.setEditable( false ) ;
+    // get the info text
     //String middle = prefs.get("language")+"/";
     //if (middle.equals("en/")) middle = ""; // english in base help dir.
-    URL infoURL = JabRef.class.getResource(GUIGlobals.helpPre
-                                           +GUIGlobals.shortPlainImport);
-    if (infoURL != null)
+    URL infoURL = JabRef.class.getResource( GUIGlobals.helpPre
+                                            + GUIGlobals.shortPlainImport ) ;
+    if ( infoURL != null )
+    {
       try
       {
-        infoText.setPage(infoURL);
-        infoText.setBackground(GUIGlobals.infoField);
-        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        infoText.setPreferredSize( new Dimension(220, 50));
-        infoText.setMinimumSize( new Dimension(180, 50));
+        infoText.setPage( infoURL ) ;
+        infoText.setBackground( GUIGlobals.infoField ) ;
+        infoText.setBorder( new EtchedBorder( EtchedBorder.LOWERED ) ) ;
+        infoText.setPreferredSize( new Dimension( 220, 50 ) ) ;
+        infoText.setMinimumSize( new Dimension( 180, 50 ) ) ;
         rawPanel.add( infoText, BorderLayout.SOUTH ) ;
       }
-      catch (IOException e) {}
+      catch ( IOException e )
+      {}
+    }
   }
+
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -368,9 +365,9 @@ public class TextInputDialog extends JDialog
     // Buttons
     okButton.setText( Globals.lang( "Accept" ) ) ;
 //    okButton.setEnabled(false);
-    okButton.addActionListener( new TextInputDialog_ok_actionAdapter( this ) ) ;
+    okButton.addActionListener( this ) ;
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
-    cancelButton.addActionListener( new TextInputDialog_Cancel_actionAdapter( this ) ) ;
+    cancelButton.addActionListener( this ) ;
 
     // insert Buttons
     con.gridwidth = GridBagConstraints.REMAINDER ;
@@ -396,7 +393,7 @@ public class TextInputDialog extends JDialog
     paneScrollPane.setPreferredSize( new Dimension( 500, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
-    sourcePanel.setLayout( new BorderLayout() );
+    sourcePanel.setLayout( new BorderLayout() ) ;
     sourcePanel.add( paneScrollPane, BorderLayout.CENTER ) ;
   }
 
@@ -434,18 +431,18 @@ public class TextInputDialog extends JDialog
 // ---------------------------------------------------------------------------
   private void insertTextForTag()
   {
-    String type = (String) fieldList.getSelectedValue() ;
-    if (type != null)
+    String type = ( String ) fieldList.getSelectedValue() ;
+    if ( type != null )
     {
       String txt = textPane.getSelectedText() ;
 
-      if (txt != null)
+      if ( txt != null )
       {
         int selStart = textPane.getSelectionStart() ;
         int selEnd = textPane.getSelectionEnd() ;
 
-         // unselect text
-        textPane.setSelectionEnd(selStart);
+        // unselect text
+        textPane.setSelectionEnd( selStart ) ;
 
         // mark the selected text as "used"
         doc.setCharacterAttributes( selStart, selEnd - selStart,
@@ -469,9 +466,13 @@ public class TextInputDialog extends JDialog
 
           // merge old and selected text
           if ( old != null )
+          {
             entry.setField( type, old + txt ) ;
+          }
           else // "null"+"txt" Strings forbidden
+          {
             entry.setField( type, txt ) ;
+          }
         }
         // make the new data in bibtex source code visible
         updateSourceView() ;
@@ -486,36 +487,46 @@ public class TextInputDialog extends JDialog
     return okPressed ;
   }
 
-
 // ---------------------------------------------------------------------------
-  public void ok_actionPerformed( ActionEvent e )
+
+//  ActionListener
+//  handling of button-click actions
+  public void actionPerformed( ActionEvent e )
   {
-    okPressed = true ;
-    dispose() ;
+    Object source = e.getSource() ;
+
+    if (source == this.okButton)
+    {
+      okPressed = true ;
+      dispose() ;
+    }
+    else if (source == this.cancelButton)
+    {
+      dispose() ;
+    }
+    else if (source == this.cancelButton)
+    {
+      insertTextForTag() ;
+    }
   }
 
-  public void Cancel_actionPerformed( ActionEvent e )
-  {
-    dispose() ;
-  }
-
-  protected void insertField_actionPerformed( ActionEvent e )
-  {
-    insertTextForTag() ;
-  }
 // ---------------------------------------------------------------------------
   // update the bibtex source view and available List
   private final void updateSourceView()
   {
-    StringWriter sw = new StringWriter(200);
-    try {
-        entry.write(sw, new net.sf.jabref.export.LatexFieldFormatter(), false);
-        String srcString = sw.getBuffer().toString();
-        preview.setText(srcString);
-    } catch (IOException ex) {}
+    StringWriter sw = new StringWriter( 200 ) ;
+    try
+    {
+      entry.write( sw, new net.sf.jabref.export.LatexFieldFormatter(), false ) ;
+      String srcString = sw.getBuffer().toString() ;
+      preview.setText( srcString ) ;
+    }
+    catch ( IOException ex )
+    {}
 
-    fieldList.clearSelection();
+    fieldList.clearSelection() ;
   }
+
 // ---------------------------------------------------------------------------
   private final String[] getAllFields()
   {
@@ -523,7 +534,7 @@ public class TextInputDialog extends JDialog
     String dummy[][] = new String[3][] ;
 
     // fill
-    if (entry != null)
+    if ( entry != null )
     {
       dummy[0] = entry.getRequiredFields() ;
       dummy[1] = entry.getGeneralFields() ;
@@ -531,21 +542,23 @@ public class TextInputDialog extends JDialog
     }
 
     // get size of new result array
-    for (int t = 0 ; t < 3 ; t++)
+    for ( int t = 0 ; t < 3 ; t++ )
     {
-      if (dummy[t] != null)
+      if ( dummy[t] != null )
+      {
         len = len + dummy[t].length ;
+      }
     }
 
     String back[] = new String[len] ;
     int count = 0 ;
 
     // put
-    for (int t = 0 ; t < 3 ; t++)
+    for ( int t = 0 ; t < 3 ; t++ )
     {
-      if (dummy[t] != null)
+      if ( dummy[t] != null )
       {
-        System.arraycopy(dummy[t], 0, back, count, dummy[t].length);
+        System.arraycopy( dummy[t], 0, back, count, dummy[t].length ) ;
         count += dummy[t].length ;
       }
     }
@@ -553,41 +566,46 @@ public class TextInputDialog extends JDialog
   }
 
 // ---------------------------------------------------------------------------
-  class PasteAction extends BasicAction
+  class PasteAction
+      extends BasicAction
   {
     public PasteAction()
     {
-      super("Paste", "Paste from clipboard", GUIGlobals.pasteIconFile);
+      super( "Paste", "Paste from clipboard", GUIGlobals.pasteIconFile ) ;
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed( ActionEvent e )
     {
       String data = ClipBoardManager.clipBoard.getClipboardContents() ;
-      if (data != null)
+      if ( data != null )
       {
         int selStart = textPane.getSelectionStart() ;
         int selEnd = textPane.getSelectionEnd() ;
         if ( selEnd - selStart > 0 )
+        {
           textPane.replaceSelection( "" ) ;
+        }
         int cPos = textPane.getCaretPosition() ;
         try
         {
           doc.insertString( cPos, data, doc.getStyle( "regular" ) ) ;
         }
-        catch (Exception ex) {}
+        catch ( Exception ex )
+        {}
       }
     }
   }
 
 // ---------------------------------------------------------------------------
-  class LoadAction extends BasicAction
+  class LoadAction
+      extends BasicAction
   {
     public LoadAction()
     {
-      super("Open", "Open_file", GUIGlobals.openIconFile);
+      super( "Open", "Open_file", GUIGlobals.openIconFile ) ;
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed( ActionEvent e )
     {
       try
       {
@@ -600,135 +618,143 @@ public class TextInputDialog extends JDialog
           File newFile = new File( chosen ) ;
           doc.remove( 0, doc.getLength() ) ;
           EditorKit eKit = textPane.getEditorKit() ;
-          if (eKit != null)
+          if ( eKit != null )
           {
-            eKit.read( new FileInputStream(newFile), doc, 0);
-            doc.setLogicalStyle(0, doc.getStyle("regular"));
+            eKit.read( new FileInputStream( newFile ), doc, 0 ) ;
+            doc.setLogicalStyle( 0, doc.getStyle( "regular" ) ) ;
           }
         }
       }
-      catch (Exception ex) {}
+      catch ( Exception ex )
+      {}
     }
   }
 
 // ---------------------------------------------------------------------------
-  class ClearAction extends BasicAction
+  class ClearAction
+      extends BasicAction
   {
     public ClearAction()
     {
-      super("Clear", "Clear_inputarea", GUIGlobals.clearInputArea);
+      super( "Clear", "Clear_inputarea", GUIGlobals.clearInputArea ) ;
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed( ActionEvent e )
     {
-      textPane.setText("");
+      textPane.setText( "" ) ;
     }
   }
 
 // ---------------------------------------------------------------------------
-  class MenuHeaderAction extends BasicAction
+  class MenuHeaderAction
+      extends BasicAction
   {
     public MenuHeaderAction()
     {
-      super("Edit");
-      this.setEnabled(false);
+      super( "Edit" ) ;
+      this.setEnabled( false ) ;
     }
 
-    public void actionPerformed(ActionEvent e) { }
+    public void actionPerformed( ActionEvent e )
+    {}
   }
 
 // ---------------------------------------------------------------------------
 
-  class FieldListSelectionHandler implements ListSelectionListener
+  class FieldListSelectionHandler
+      implements ListSelectionListener
   {
-    private int lastIndex = -1;
+    private int lastIndex = -1 ;
 
-    public void valueChanged(ListSelectionEvent e)
+    public void valueChanged( ListSelectionEvent e )
     {
-        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+      ListSelectionModel lsm = ( ListSelectionModel ) e.getSource() ;
 
-        int index = lsm.getAnchorSelectionIndex();
-        if (index != lastIndex)
+      int index = lsm.getAnchorSelectionIndex() ;
+      if ( index != lastIndex )
+      {
+
+        boolean isAdjusting = e.getValueIsAdjusting() ;
+
+        if ( !isAdjusting ) // if selection is finished
         {
-
-          boolean isAdjusting = e.getValueIsAdjusting() ;
-
-          if ( !isAdjusting ) // if selection is finished
-          {
 //            System.out.println( "Event for index" + index ) ;
-            if (lastIndex > -1)
-            {
-              String tag1 = fieldList.getModel().getElementAt( lastIndex ).toString() ;
-              marked.setStyleForTag( tag1, "used", doc ) ;
-            }
-
-            String tag2 = fieldList.getModel().getElementAt( index ).toString() ;
-            marked.setStyleForTag( tag2, "marked", doc ) ;
-
-            lastIndex = index ;
+          if ( lastIndex > -1 )
+          {
+            String tag1 = fieldList.getModel().getElementAt( lastIndex ).
+                toString() ;
+            marked.setStyleForTag( tag1, "used", doc ) ;
           }
+
+          String tag2 = fieldList.getModel().getElementAt( index ).toString() ;
+          marked.setStyleForTag( tag2, "marked", doc ) ;
+
+          lastIndex = index ;
         }
+      }
     }
-}
+  }
 
 // ---------------------------------------------------------------------------
 
   // simple JList Renderer
   // based on : Advanced JList Programming at developers.sun.com
-  class SimpleCellRenderer extends DefaultListCellRenderer
+  class SimpleCellRenderer
+      extends DefaultListCellRenderer
   {
-      private Font baseFont ;
-      private Font usedFont ;
-      private ImageIcon okIcon = new ImageIcon( GUIGlobals.completeTagIcon) ;
-      private ImageIcon needIcon = new ImageIcon( GUIGlobals.wrongTagIcon) ;
+    private Font baseFont ;
+    private Font usedFont ;
+    private ImageIcon okIcon = new ImageIcon( GUIGlobals.completeTagIcon ) ;
+    private ImageIcon needIcon = new ImageIcon( GUIGlobals.wrongTagIcon ) ;
 
-      public SimpleCellRenderer(Font normFont)
-      {
-        baseFont = normFont ;
-        usedFont = baseFont.deriveFont(Font.ITALIC) ;
-      }
+    public SimpleCellRenderer( Font normFont )
+    {
+      baseFont = normFont ;
+      usedFont = baseFont.deriveFont( Font.ITALIC ) ;
+    }
 
-      /* This is the only method defined by ListCellRenderer.  We just
-       * reconfigure the Jlabel each time we're called.
+    /* This is the only method defined by ListCellRenderer.  We just
+     * reconfigure the Jlabel each time we're called.
+     */
+    public Component getListCellRendererComponent(
+        JList list,
+        Object value, // value to display
+        int index, // cell index
+        boolean iss, // is the cell selected
+        boolean chf ) // the list and the cell have the focus
+    {
+      /* The DefaultListCellRenderer class will take care of
+       * the JLabels text property, it's foreground and background
+       * colors, and so on.
        */
-      public Component getListCellRendererComponent(
-          JList list,
-          Object value,   // value to display
-          int index,      // cell index
-          boolean iss,    // is the cell selected
-          boolean chf)    // the list and the cell have the focus
-      {
-          /* The DefaultListCellRenderer class will take care of
-           * the JLabels text property, it's foreground and background
-           * colors, and so on.
-           */
-          super.getListCellRendererComponent(list, value, index, iss, chf);
+      super.getListCellRendererComponent( list, value, index, iss, chf ) ;
 
-          /* We additionally set the JLabels icon property here.
-           */
-          String s = value.toString();
+      /* We additionally set the JLabels icon property here.
+       */
+      String s = value.toString() ;
 //        setIcon((s.length > 10) ? longIcon : shortIcon);
-          if (entry.getField(s) != null)
-          {
-            this.setForeground( Color.gray);
-            this.setFont(usedFont);
-            this.setIcon( okIcon);
-            this.setToolTipText("filled");
-          }
-          else
-          {
-              this.setIcon(needIcon);
-              this.setToolTipText("field is missing");
-          }
-          return this;
+      if ( entry.getField( s ) != null )
+      {
+        this.setForeground( Color.gray ) ;
+        this.setFont( usedFont ) ;
+        this.setIcon( okIcon ) ;
+        this.setToolTipText( "filled" ) ;
       }
+      else
+      {
+        this.setIcon( needIcon ) ;
+        this.setToolTipText( "field is missing" ) ;
+      }
+      return this ;
+    }
   }
 
 //---------------------------------------------------------------
 
-  class FieldListMouseListener extends MouseAdapter
+  class FieldListMouseListener
+      extends MouseAdapter
   {
-    public void mouseClicked(MouseEvent e)
+    public void mouseClicked( MouseEvent e )
     {
       if ( e.getClickCount() == 2 )
       {
@@ -736,66 +762,15 @@ public class TextInputDialog extends JDialog
       }
     }
   }
-
-}
-
-// ---------------------------------------------------------------------------
-// ----------- helper class -------------------
-// ---------------------------------------------------------------------------
-class TextInputDialog_ok_actionAdapter
-    implements java.awt.event.ActionListener
-{
-  TextInputDialog adaptee ;
-
-  TextInputDialog_ok_actionAdapter( TextInputDialog adaptee )
-  {
-    this.adaptee = adaptee ;
-  }
-
-  public void actionPerformed( ActionEvent e )
-  {
-    adaptee.ok_actionPerformed( e ) ;
-  }
-}
-
-class TextInputDialog_Cancel_actionAdapter
-    implements java.awt.event.ActionListener
-{
-  TextInputDialog adaptee ;
-
-  TextInputDialog_Cancel_actionAdapter( TextInputDialog adaptee )
-  {
-    this.adaptee = adaptee ;
-  }
-
-  public void actionPerformed( ActionEvent e )
-  {
-    adaptee.Cancel_actionPerformed( e ) ;
-  }
-}
-
-class TextInputDialog_insert_actionAdapter
-    implements java.awt.event.ActionListener
-{
-  TextInputDialog adaptee ;
-
-  TextInputDialog_insert_actionAdapter( TextInputDialog adaptee )
-  {
-    this.adaptee = adaptee ;
-  }
-
-  public void actionPerformed( ActionEvent e )
-  {
-    adaptee.insertField_actionPerformed( e ) ;
-  }
 }
 
 //---------------------------------------------------------------
-class PopupListener extends MouseAdapter
+class PopupListener
+    extends MouseAdapter
 {
   private JPopupMenu popMenu ;
 
-  public PopupListener(JPopupMenu menu)
+  public PopupListener( JPopupMenu menu )
   {
     popMenu = menu ;
   }
@@ -814,6 +789,9 @@ class PopupListener extends MouseAdapter
   {
     if ( e.isPopupTrigger() )
     {
+//      System.out.println("show "
+//                         + e.getComponent() +"  x =" + e.getX() +"y =" + e.getY() ) ;
+//      popMenu.setVisible(true);
       popMenu.show( e.getComponent(), e.getX(), e.getY() ) ;
     }
   }
@@ -821,37 +799,37 @@ class PopupListener extends MouseAdapter
 
 //---------------------------------------------------------------
 
-abstract class BasicAction extends AbstractAction
+abstract class BasicAction
+    extends AbstractAction
 {
-  public BasicAction(String text, String description, URL icon)
+  public BasicAction( String text, String description, URL icon )
   {
-    super(Globals.lang(text), new ImageIcon(icon));
-    putValue(SHORT_DESCRIPTION, Globals.lang(description));
+    super( Globals.lang( text ), new ImageIcon( icon ) ) ;
+    putValue( SHORT_DESCRIPTION, Globals.lang( description ) ) ;
   }
 
-  public BasicAction(String text, String description, URL icon, KeyStroke key)
+  public BasicAction( String text, String description, URL icon, KeyStroke key )
   {
-    super(Globals.lang(text), new ImageIcon(icon));
-    putValue(ACCELERATOR_KEY, key);
-    putValue(SHORT_DESCRIPTION, Globals.lang(description));
+    super( Globals.lang( text ), new ImageIcon( icon ) ) ;
+    putValue( ACCELERATOR_KEY, key ) ;
+    putValue( SHORT_DESCRIPTION, Globals.lang( description ) ) ;
   }
 
-  public BasicAction(String text)
+  public BasicAction( String text )
   {
-    super(Globals.lang(text));
+    super( Globals.lang( text ) ) ;
   }
 
-  public BasicAction(String text, KeyStroke key)
+  public BasicAction( String text, KeyStroke key )
   {
-    super(Globals.lang(text));
-    putValue(ACCELERATOR_KEY, key);
+    super( Globals.lang( text ) ) ;
+    putValue( ACCELERATOR_KEY, key ) ;
   }
 
-  public abstract void actionPerformed(ActionEvent e) ;
+  public abstract void actionPerformed( ActionEvent e ) ;
 }
 //---------------------------------------------------------------
 
 
 //---------------------------------------------------------------
-
 
