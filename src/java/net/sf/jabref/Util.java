@@ -233,11 +233,31 @@ public class Util {
                     && (c != '}') && (c != '~') && (c != ',') && (c != '^')) newKey
                     .append(c);
         }
-        return newKey.toString();
+
+	// Replace non-english characters like umlauts etc. with a sensible
+	// letter or letter combination that bibtex can accept.
+	String newKeyS = replaceSpecialCharacters(newKey.toString());
+
+        return newKeyS;
     }
 
-    static public String wrap2(String in, int wrapAmount) {
-        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\n\\r]+", " "));
+    /** Replace non-english characters like umlauts etc. with a sensible
+     * letter or letter combination that bibtex can accept. The basis
+     * for replacement is the HashMap GLobals.UNICODE_CHARS.
+     */
+    public static String replaceSpecialCharacters(String s) {
+	for (Iterator i=Globals.UNICODE_CHARS.keySet().iterator(); i.hasNext();) {
+	    String chr = (String)i.next(),
+		replacer = (String)Globals.UNICODE_CHARS.get(chr);
+	    //pr(chr+" "+replacer);
+	    s = s.replaceAll(chr, replacer);
+	}
+	return s;
+    }
+
+    static public String wrap2(String in, int wrapAmount){
+        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\n\\r]+"," "));
+
         int p = in.length() - wrapAmount;
         while (p > 0){
             p = out.lastIndexOf(" ", p);
