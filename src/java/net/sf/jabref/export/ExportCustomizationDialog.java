@@ -109,6 +109,10 @@ public class ExportCustomizationDialog extends JDialog {
     InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     im.put(frame.prefs().getKey("Close dialog"), "close");
     am.put("close", closeAction);
+    //am = table.getActionMap();
+    //im = table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    //im.put(frame.prefs().getKey("Close dialog"), "close");
+    //am.put("close", closeAction);
 
     main.add(sp);
     options.add(help);

@@ -22,9 +22,9 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[HTMLChars]{\title}
+			\format[HTMLChars,RemoveLatexCommands]{\title}
 		</div>
-		\end{title}
+ 		\end{title}
 
 		\begin{author}
 		<div class="bibtex_author">
@@ -40,7 +40,7 @@
 
 		\begin{pages}
 		<div class="bibtex_pages">
-			pp. \pages
+			pp. \format[FormatPagesForHTML]{\pages}
 		</div>,
 		\end{pages}
 

@@ -237,6 +237,14 @@ class CustomExportDialog extends JDialog {
     public String oldRegexp() { return oldRegexp; }
     public String layoutFile() { return layoutFile.getText(); }
     public String name() { return name.getText(); }
-    public String extension() { return extension.getText(); }
+    public String extension() {
+      String ext = extension.getText();
+      if (ext.startsWith("."))
+        return ext;
+      else if (ext.startsWith("*."))
+        return ext.substring(1);
+      else
+        return "."+ext;
+    }
 
 }

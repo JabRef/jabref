@@ -22,7 +22,7 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[HTMLChars]{\title}
+			\format[HTMLChars,RemoveLatexCommands]{\title}
 		</div>
 		\end{title}
 
