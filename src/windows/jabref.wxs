@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
+    <Product Name="JabRef 1.4" Id="118b0801-c924-4071-a0ab-6ec9844cc55a"
+            Version="1.4" Manufacturer="http://jabref.sf.net/"
+            Language="1033">
+        <Package Id="4f4e8a4e-ef26-4716-b30d-af464fd2535a"
+                Comments="This MSI file installs JabRef."
+                Manufacturer="http://jabref.sf.net/" InstallerVersion="200"
+                Languages="1033" Compressed="yes"/>
+        <Media Id="1" EmbedCab="yes" Cabinet="JabRef.cab"/>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="JabRefDir" Name="JabRef 1.4" LongName="JabRef 1.4">
+                        <Component Id="Libraries"
+                                Guid="6922b877-d0ea-4c52-a2b4-1e1339c398f5">
+                            <File Id="jabrefjar" Name="JabRef.jar" LongName="jabref.jar" DiskId="1" src="jabref.jar" />
+                        </Component>
+                        <Component Id="Executables"
+                                Guid="bed93d86-d9c3-4c02-8cca-dfc7977b31a7">
+                            <File Id="Main program" Name="JabRef.exe" DiskId="1"
+                                    src="jabref.exe">
+                                <Shortcut Id="Program shortcut"
+                                        Directory="ProgramMenuFolder" Name="JabRef"
+                                        LongName="JabRef 1.4"
+                                        Show="normal"
+                                        WorkingDirectory="TARGETDIR"/>
+                            </File>
+                        </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramMenuFolder" Name="PMFolder"></Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Level="1">
+            <ComponentRef Id="Libraries"/>
+            <ComponentRef Id="Executables"/>
+        </Feature>
+    </Product>
+</Wix>
