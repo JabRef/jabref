@@ -30,6 +30,7 @@ package net.sf.jabref;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.QuickSearchRule;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -563,7 +564,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    for(int i = 0 ; i < numSelected ; i++){
 			bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
 			oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-			bes = frame.labelMaker.applyRule(bes, database) ;
+			//bes = frame.labelMaker.applyRule(bes, database) ;
+			bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
 			ce.addEdit(new UndoableKeyChange
 				   (database, bes.getId(), (String)oldValue, 
 				    (String)bes.getField(GUIGlobals.KEY_FIELD)));

@@ -85,16 +85,16 @@ public class LabelPatternUtil {
 	 * @param entryId a <code>String</code>
 	 * @return modified Bibtexentry
 	 */
-	public static BibtexEntry makeLabel(LabelPattern table, BibtexDatabase database, String entryId){
+	public static BibtexEntry makeLabel(LabelPattern table, BibtexDatabase database, BibtexEntry _entry){
 		_db = database;
-		BibtexEntry _entry = _db.getEntryById(entryId);
+		//BibtexEntry _entry = _db.getEntryById(entryId);
 		ArrayList _al;
 		String _spacer, _label;
 		StringBuffer _sb = new StringBuffer();
 
 		try {
 			// get the type of entry
-			String _type = _entry.getField("type").toString();
+			String _type = _entry.getType().getName().toLowerCase();
 			// Get the arrayList corrosponding to the type 		
 			_al = table.getValue(_type);
 			int _alSize = _al.size();
@@ -106,6 +106,7 @@ public class LabelPatternUtil {
 				// hmmmm..... the fields have different format... 
 				//TODO deal with different format for the fields :-)
 				String _field = _al.get(i).toString();
+
 				if(_field.equals("author")){
 					_sb.append(firstAuthor(_entry.getField("author").toString()));
 				}
