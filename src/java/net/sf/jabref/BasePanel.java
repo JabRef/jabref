@@ -212,6 +212,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     String id = tableModel.getNameFromNumber(clickedOn);
                     BibtexEntry be = database.getEntryById(id);
                     showEntry(be);
+                    
                     if (splitPane.getBottomComponent() != null)
                       new FocusRequester(splitPane.getBottomComponent());
                   }
@@ -1742,6 +1743,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             if (visPan >= 0)
               form.setVisiblePanel(visPan);
             splitPane.setBottomComponent(form);
+            //splitPane.revalidate();
+            //entryTable.ensureVisible(entryTable.getSelectedRow());
         } else {
             // We must instantiate a new editor for this type.
             form = new EntryEditor
@@ -1749,7 +1752,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             if (visPan >= 0)
                 form.setVisiblePanel(visPan);
             splitPane.setBottomComponent(form);
+            //splitPane.revalidate();
+            //entryTable.ensureVisible(entryTable.getSelectedRow());
             entryEditors.put(be.getType().getName(), form);
+           
         }
         if (divLoc > 0) {
           splitPane.setDividerLocation(divLoc);

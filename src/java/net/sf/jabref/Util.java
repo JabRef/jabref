@@ -437,8 +437,23 @@ public class Util {
                 Process child = Runtime.getRuntime().exec(cmd);
             }
 	    else if (Globals.ON_WIN) {
-		String cmd = "cmd.exe /c \"start "+link+"\"";
-		Process child = Runtime.getRuntime().exec(cmd);
+                String[] spl = link.split("\\\\");
+                StringBuffer sb = new StringBuffer();
+                for (int i=0; i<spl.length; i++) {
+                    if (i>0)
+                        sb.append("\\");
+                    if (spl[i].indexOf(" ") >= 0)
+                        spl[i] = "\""+spl[i]+"\"";
+                    sb.append(spl[i]);
+                    
+                                       
+                }
+                //pr(sb.toString());
+                link = sb.toString();
+
+		String cmd = "cmd.exe /c start "+link;
+		
+                Process child = Runtime.getRuntime().exec(cmd);
 	    }
             else{
                 cmdArray[0] = prefs.get("pdfviewer");

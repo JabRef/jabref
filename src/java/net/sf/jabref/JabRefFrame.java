@@ -303,8 +303,13 @@ public class JabRefFrame
   };
 
   public JabRefFrame() {
-    init();
-    setEmptyState();
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            init();
+            setEmptyState();
+              
+          }
+      });
   }
 
   private void init() {
