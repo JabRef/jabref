@@ -54,21 +54,21 @@ public class Util {
         EMPTY_IN_TWO = 3;
 
     public static void bool(boolean b) {
-	if (b) System.out.println("true");
-	else System.out.println("false");
+        if (b) System.out.println("true");
+        else System.out.println("false");
     }
 
     public static void pr(String s) {
-	System.out.println(s);
+        System.out.println(s);
     }
 
     public static void pr_(String s) {
-	System.out.print(s);
+        System.out.print(s);
     }
 
     public static String nCase(String s) {
-	// Make first character of String uppercase, and the
-	// rest lowercase.
+        // Make first character of String uppercase, and the
+        // rest lowercase.
         if (s.length() > 1)
           return s.substring(0,1).toUpperCase()
               + s.substring(1,s.length()).toLowerCase();
@@ -78,12 +78,12 @@ public class Util {
     }
 
     public static String checkName(String s) {
-	// Append '.bib' to the string unless it ends with that.
-	String extension = s.substring(s.length()-4);
-	if (!extension.equalsIgnoreCase(".bib"))
-	    return s+".bib";
-	else
-	    return s;
+        // Append '.bib' to the string unless it ends with that.
+        String extension = s.substring(s.length()-4);
+        if (!extension.equalsIgnoreCase(".bib"))
+            return s+".bib";
+        else
+            return s;
     }
 
     public static String createId(BibtexEntryType type, BibtexDatabase database) {
@@ -105,11 +105,11 @@ public class Util {
      * regard to another window, but not outside the screen on the left and the top.
      */
     public static void placeDialog(javax.swing.JDialog diag,
-				   java.awt.Container win) {
-	Dimension ds = diag.getSize(), df = win.getSize();
-	Point pf = win.getLocation();
-	diag.setLocation(new Point(Math.max(0, pf.x+(df.width-ds.width)/2),
-				   Math.max(0,pf.y+(df.height-ds.height)/2)));
+                                   java.awt.Container win) {
+        Dimension ds = diag.getSize(), df = win.getSize();
+        Point pf = win.getLocation();
+        diag.setLocation(new Point(Math.max(0, pf.x+(df.width-ds.width)/2),
+                                   Math.max(0,pf.y+(df.height-ds.height)/2)));
 
     }
 
@@ -120,103 +120,103 @@ public class Util {
      * enclosed in a pair of '#' characters.
      */
     public static String parseField(String content) {
-	if (content.length() == 0)
-	    return "";
-	String toSet = "";
-	boolean string;
-	// Keeps track of whether the next item is
-	// a reference to a string, or normal content. First we must
-	// check which we begin with. We simply check if we can find
-	// a '#' before either '"' or '{'.
-	int hash = content.indexOf('#'),
-	    wr1 = content.indexOf('"'),
-	    wr2 = content.indexOf('{'),
-	    end = content.length();
-	if (hash == -1) hash = end;
-	if (wr1 == -1) wr1 = end;
-	if (wr2 == -1) wr2 = end;
-	if (((wr1 == end) && (wr2 == end)) || (hash < Math.min(wr1, wr2)))
-	    string = true;
-	else string = false;
+        if (content.length() == 0)
+            return "";
+        String toSet = "";
+        boolean string;
+        // Keeps track of whether the next item is
+        // a reference to a string, or normal content. First we must
+        // check which we begin with. We simply check if we can find
+        // a '#' before either '"' or '{'.
+        int hash = content.indexOf('#'),
+            wr1 = content.indexOf('"'),
+            wr2 = content.indexOf('{'),
+            end = content.length();
+        if (hash == -1) hash = end;
+        if (wr1 == -1) wr1 = end;
+        if (wr2 == -1) wr2 = end;
+        if (((wr1 == end) && (wr2 == end)) || (hash < Math.min(wr1, wr2)))
+            string = true;
+        else string = false;
 
-	//System.out.println("FileLoader: "+content+" "+string+" "+hash+" "+wr1+" "+wr2);
-	StringTokenizer tok = new StringTokenizer(content, "#", true);
-	// 'tok' splits at the '#' sign, and keeps delimiters
+        //System.out.println("FileLoader: "+content+" "+string+" "+hash+" "+wr1+" "+wr2);
+        StringTokenizer tok = new StringTokenizer(content, "#", true);
+        // 'tok' splits at the '#' sign, and keeps delimiters
 
-	while (tok.hasMoreTokens()) {
-	    String str = tok.nextToken();
-	    if (str.equals("#"))
-		string = !string;
-	    else {
-		if (string) {
-		    // This part should normally be a string, but if it's
-		    // a pure number, it is not.
-		    String s = shaveString(str);
-		    try {
-			Integer.parseInt(s);
-			// If there's no exception, it's a number.
-			toSet = toSet+s;
-		    } catch (NumberFormatException ex) {
-			toSet = toSet+"#"+shaveString(str)+"#";
-		    }
+        while (tok.hasMoreTokens()) {
+            String str = tok.nextToken();
+            if (str.equals("#"))
+                string = !string;
+            else {
+                if (string) {
+                    // This part should normally be a string, but if it's
+                    // a pure number, it is not.
+                    String s = shaveString(str);
+                    try {
+                        Integer.parseInt(s);
+                        // If there's no exception, it's a number.
+                        toSet = toSet+s;
+                    } catch (NumberFormatException ex) {
+                        toSet = toSet+"#"+shaveString(str)+"#";
+                    }
 
-		}
-		else
-		    toSet = toSet+shaveString(str);
-	    }
-	}
-	return toSet;
+                }
+                else
+                    toSet = toSet+shaveString(str);
+            }
+        }
+        return toSet;
     }
 
     public static String shaveString(String s) {
-	// returns the string, after shaving off whitespace at the beginning
-	// and end, and removing (at most) one pair of braces or " surrounding it.
-	if (s == null)
-	    return null;
-	char ch = 0, ch2 = 0;
-	int beg = 0, end = s.length();
-	// We start out assuming nothing will be removed.
-	boolean begok = false, endok = false, braok = false;
-	while (!begok) {
-	    if (beg < s.length()) {
-		ch = s.charAt(beg);
-		if (Character.isWhitespace(ch))
-		    beg++;
-		else
-		    begok = true;
-	    } else begok = true;
+        // returns the string, after shaving off whitespace at the beginning
+        // and end, and removing (at most) one pair of braces or " surrounding it.
+        if (s == null)
+            return null;
+        char ch = 0, ch2 = 0;
+        int beg = 0, end = s.length();
+        // We start out assuming nothing will be removed.
+        boolean begok = false, endok = false, braok = false;
+        while (!begok) {
+            if (beg < s.length()) {
+                ch = s.charAt(beg);
+                if (Character.isWhitespace(ch))
+                    beg++;
+                else
+                    begok = true;
+            } else begok = true;
 
-	}
-	while (!endok) {
-	    if (end > beg+1) {
-		ch = s.charAt(end-1);
-		if (Character.isWhitespace(ch))
-		    end--;
-		else
-		    endok = true;
-	    } else
-		endok = true;
-	}
+        }
+        while (!endok) {
+            if (end > beg+1) {
+                ch = s.charAt(end-1);
+                if (Character.isWhitespace(ch))
+                    end--;
+                else
+                    endok = true;
+            } else
+                endok = true;
+        }
 
-	//	while (!braok) {
-	if (end > beg+1) {
-	    ch = s.charAt(beg);
-	    ch2 = s.charAt(end-1);
-	    if (((ch == '{') && (ch2 == '}')) ||
-		((ch == '"') && (ch2 == '"'))) {
-		beg++;
-		end--;
-	    }
-	} //else
-	//braok = true;
+        //	while (!braok) {
+        if (end > beg+1) {
+            ch = s.charAt(beg);
+            ch2 = s.charAt(end-1);
+            if (((ch == '{') && (ch2 == '}')) ||
+                ((ch == '"') && (ch2 == '"'))) {
+                beg++;
+                end--;
+            }
+        } //else
+        //braok = true;
 
-	//  } else
-	//braok = true;
-	//}
+        //  } else
+        //braok = true;
+        //}
 
-	s = s.substring(beg, end);
-	//Util.pr(s);
-	return s;
+        s = s.substring(beg, end);
+        //Util.pr(s);
+        return s;
     }
 
 
@@ -226,15 +226,15 @@ public class Util {
      * characters make a key unusable by bibtex.
      */
     public static String checkLegalKey(String key) {
-	if (key == null) return null;
-	StringBuffer newKey = new StringBuffer();
-	for (int i=0; i<key.length(); i++) {
-	    char c = key.charAt(i);
-	    if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
+        if (key == null) return null;
+        StringBuffer newKey = new StringBuffer();
+        for (int i=0; i<key.length(); i++) {
+            char c = key.charAt(i);
+            if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
                 && (c != '}') && (c != '~') && (c != ',') && (c != '^'))
-		newKey.append(c);
-	}
-	return newKey.toString();
+                newKey.append(c);
+        }
+        return newKey.toString();
     }
 
     static public String wrap2(String in, int wrapAmount){
@@ -254,18 +254,18 @@ public class Util {
 
     public static HashSet findDeliminatedWordsInField(BibtexDatabase db, String field, String deliminator) {
         HashSet res = new HashSet();
-    	Iterator i = db.getKeySet().iterator();
-    	while (i.hasNext()) {
-    	    BibtexEntry be = db.getEntryById(i.next().toString());
-    	    Object o = be.getField(field);
-    	    if (o != null) {
-    	        String fieldValue = o.toString().trim();
-    	        String[] resultSet = fieldValue.split(deliminator);
-    	        for(int index=0; index<resultSet.length; index++)
-    	            res.add(resultSet[index].trim());
-    	    }
-    	}
-    	return res;
+            Iterator i = db.getKeySet().iterator();
+            while (i.hasNext()) {
+                BibtexEntry be = db.getEntryById(i.next().toString());
+                Object o = be.getField(field);
+                if (o != null) {
+                    String fieldValue = o.toString().trim();
+                    String[] resultSet = fieldValue.split(deliminator);
+                    for(int index=0; index<resultSet.length; index++)
+                        res.add(resultSet[index].trim());
+                }
+            }
+            return res;
     }
 
     /**
@@ -277,20 +277,20 @@ public class Util {
      * @return a <code>HashSet</code> value
      */
     public static HashSet findAllWordsInField(BibtexDatabase db,
-					      String field, String remove) {
-	HashSet res = new HashSet();
-	StringTokenizer tok;
-	Iterator i = db.getKeySet().iterator();
-	while (i.hasNext()) {
-	    BibtexEntry be = db.getEntryById(i.next().toString());
-	    Object o = be.getField(field);
-	    if (o != null) {
-		tok = new StringTokenizer(o.toString(), remove, false);
-		while (tok.hasMoreTokens())
-		    res.add(tok.nextToken());
-	    }
-	}
-	return res;
+                                              String field, String remove) {
+        HashSet res = new HashSet();
+        StringTokenizer tok;
+        Iterator i = db.getKeySet().iterator();
+        while (i.hasNext()) {
+            BibtexEntry be = db.getEntryById(i.next().toString());
+            Object o = be.getField(field);
+            if (o != null) {
+                tok = new StringTokenizer(o.toString(), remove, false);
+                while (tok.hasMoreTokens())
+                    res.add(tok.nextToken());
+            }
+        }
+        return res;
     }
 
     /**
@@ -302,18 +302,18 @@ public class Util {
      * @return Delimited String.
      */
     public static String stringArrayToDelimited(String[] strs,
-						String delimiter) {
-	if ((strs == null) || (strs.length == 0))
-	    return "";
-	if (strs.length == 1)
-	    return strs[0];
-	StringBuffer sb = new StringBuffer();
-	for (int i=0; i<strs.length-1; i++) {
-	    sb.append(strs[i]);
-	    sb.append(delimiter);
-	}
-	sb.append(strs[strs.length-1]);
-	return sb.toString();
+                                                String delimiter) {
+        if ((strs == null) || (strs.length == 0))
+            return "";
+        if (strs.length == 1)
+            return strs[0];
+        StringBuffer sb = new StringBuffer();
+        for (int i=0; i<strs.length-1; i++) {
+            sb.append(strs[i]);
+            sb.append(delimiter);
+        }
+        sb.append(strs[strs.length-1]);
+        return sb.toString();
     }
 
 
@@ -324,10 +324,10 @@ public class Util {
      * @return a <code>String[]</code> value
      */
     public static String[] delimToStringArray(String names,
-					      String delimiter) {
-	if (names == null)
-	    return null;
-	return names.split(delimiter);
+                                              String delimiter) {
+        if (names == null)
+            return null;
+        return names.split(delimiter);
     }
 
 
@@ -366,23 +366,23 @@ public class Util {
         else if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("ps")))
           fieldName = "ps";
       }
-	String cmdArray[] = new String[2];
-	// check html first since browser can invoke viewers
-	if (fieldName.equals("doi"))
-	    {
-		cmdArray[0] = prefs.get("htmlviewer");
-		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
-		Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
-	    }
-	else if(fieldName.equals("url") || fieldName.equals("citeseerurl"))
-	    { // html
-		try
+        String cmdArray[] = new String[2];
+        // check html first since browser can invoke viewers
+        if (fieldName.equals("doi"))
+            {
+                cmdArray[0] = prefs.get("htmlviewer");
+                cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
+                Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+            }
+        else if(fieldName.equals("url") || fieldName.equals("citeseerurl"))
+            { // html
+                try
                 {
-		    	 if (fieldName.equals("citeseerurl")) {
-		    	     String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
-		    	     if (canonicalLink != null)
-		    	         link = canonicalLink;
-		    	 }
+                             if (fieldName.equals("citeseerurl")) {
+                                 String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
+                                 if (canonicalLink != null)
+                                     link = canonicalLink;
+                             }
                   // First check if the url is enclosed in \\url{}. If so, remove the wrapper.
                   if (link.startsWith("\\url{") && link.endsWith("}"))
                     link = link.substring(5, link.length()-1);
@@ -407,11 +407,11 @@ public class Util {
                 }
               }
               else if(fieldName.equals("ps"))
-	    {
-		try
-		    {
-			//System.err.println("Starting external viewer: "
-			//		   + prefs.get("psviewer") + " " + link);
+            {
+                try
+                    {
+                        //System.err.println("Starting external viewer: "
+                        //		   + prefs.get("psviewer") + " " + link);
                 if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("psviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
@@ -421,19 +421,19 @@ public class Util {
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
                 }
-		    }
-		catch (IOException e)
-		    {
-			System.err.println("An error occured on the command: "
-					   + prefs.get("psviewer") + " " + link);
-		    }
-	    }
-	else if(fieldName.equals("pdf"))
-	    {
-		try
-		    {
-			System.err.println("Starting external viewer: "
-					   + prefs.get("pdfviewer") + " " + link);
+                    }
+                catch (IOException e)
+                    {
+                        System.err.println("An error occured on the command: "
+                                           + prefs.get("psviewer") + " " + link);
+                    }
+            }
+        else if(fieldName.equals("pdf"))
+            {
+                try
+                    {
+                        System.err.println("Starting external viewer: "
+                                           + prefs.get("pdfviewer") + " " + link);
             if(Globals.ON_MAC){
                 String[] cmd = {"/usr/bin/open", "-a", prefs.get("pdfviewer"), link};
                 Process child = Runtime.getRuntime().exec(cmd);
@@ -443,19 +443,19 @@ public class Util {
                 cmdArray[1] = link;
                 Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
             }
-		    }
-		catch (IOException e)
-		    {
-			e.printStackTrace();
-			System.err.println("An error occured on the command: "
-					   + prefs.get("pdfviewer") + " #" + link);
+                    }
+                catch (IOException e)
+                    {
+                        e.printStackTrace();
+                        System.err.println("An error occured on the command: "
+                                           + prefs.get("pdfviewer") + " #" + link);
             System.err.println(e.getMessage());
-		    }
-	    }
-	else{
-	    System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
-	    //ignore
-	}
+                    }
+            }
+        else{
+            System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+            //ignore
+        }
     }
 
   /**
@@ -504,16 +504,21 @@ public class Util {
 
     // The check if they have the same required fields:
     String[] fields = one.getType().getRequiredFields();
+
+    if (fields == null) return false ;
+
     float req = compareFieldSet(fields, one, two);
     fields = one.getType().getOptionalFields();
     float opt = compareFieldSet(fields, one, two);
     return (2*req + opt)/3 >= threshold;
   }
 
-  private static float compareFieldSet(String[] fields, BibtexEntry one, BibtexEntry two) {
+  private static float compareFieldSet(String[] fields,
+                                       BibtexEntry one, BibtexEntry two)
+  {
     int res = 0;
-    for (int i=0; i<fields.length; i++) {
-
+    for (int i=0; i<fields.length; i++)
+    {
       //Util.pr(":"+compareSingleField(fields[i], one, two));
       if (compareSingleField(fields[i], one, two) == EQUAL) {
         res++;
@@ -562,40 +567,40 @@ public class Util {
      * in their respective Completers, if any.
      */
     /*    public static void updateCompletersForEntry(Hashtable autoCompleters,
-					 BibtexEntry be) {
+                                         BibtexEntry be) {
 
-	for (Iterator j=autoCompleters.keySet().iterator();
-	     j.hasNext();) {
-	    String field = (String)j.next();
-	    Completer comp = (Completer)autoCompleters.get(field);
-	    comp.addAll(be.getField(field));
-	}
-	}*/
+        for (Iterator j=autoCompleters.keySet().iterator();
+             j.hasNext();) {
+            String field = (String)j.next();
+            Completer comp = (Completer)autoCompleters.get(field);
+            comp.addAll(be.getField(field));
+        }
+        }*/
 
 
-	/**
-	 * Sets empty or non-existing owner fields of bibtex entries inside an array to
-	 * a specified default value.
-	 * @param bibs array of bibtex entries
-	 * @param defaultOwner default owner of bibtex entries
-	 */
-	public static void setDefaultOwner( ArrayList bibs, String defaultOwner )
-	{
+        /**
+         * Sets empty or non-existing owner fields of bibtex entries inside an array to
+         * a specified default value.
+         * @param bibs array of bibtex entries
+         * @param defaultOwner default owner of bibtex entries
+         */
+        public static void setDefaultOwner( ArrayList bibs, String defaultOwner )
+        {
 
-		// Iterate through all entries
-		for (int i = 0; i < bibs.size(); i++)
-		{
-			// Get current entry
-			BibtexEntry curEntry = (BibtexEntry)bibs.get(i);
-			// No or empty owner field?
-			if (curEntry.getField(Globals.OWNER) == null ||
-				((String)curEntry.getField(Globals.OWNER)).length() == 0)
-			{
-				// Set owner field to default value
-				curEntry.setField(Globals.OWNER, defaultOwner);
-			}
-		}
-	}
+                // Iterate through all entries
+                for (int i = 0; i < bibs.size(); i++)
+                {
+                        // Get current entry
+                        BibtexEntry curEntry = (BibtexEntry)bibs.get(i);
+                        // No or empty owner field?
+                        if (curEntry.getField(Globals.OWNER) == null ||
+                                ((String)curEntry.getField(Globals.OWNER)).length() == 0)
+                        {
+                                // Set owner field to default value
+                                curEntry.setField(Globals.OWNER, defaultOwner);
+                        }
+                }
+        }
 
 
 }

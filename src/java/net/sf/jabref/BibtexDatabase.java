@@ -28,6 +28,12 @@ Modified for use in JabRef
 
 */
 
+
+// created by : ?
+//
+// modified : r.nagel 23.08.2004
+//                - insert getEntryByKey() methode needed by AuxSubGenerator
+
 package net.sf.jabref;
 
 import java.beans.PropertyChangeEvent;
@@ -79,7 +85,7 @@ public class BibtexDatabase
                     {
                         _entries.put(pce.getOldValue(), oldEntry);
                         throw new PropertyVetoException
-			    ("New ID already in use, please choose another",
+                            ("New ID already in use, please choose another",
                             pce);
                     }
 
@@ -112,7 +118,7 @@ public class BibtexDatabase
      * sorted by the given Comparator.
      */
     public synchronized EntrySorter getSorter(java.util.Comparator comp) {
-	return new EntrySorter(_entries, comp);
+        return new EntrySorter(_entries, comp);
     }
 
     /**
@@ -170,19 +176,19 @@ public class BibtexDatabase
 
         entry.addPropertyChangeListener(listener);
 
-	// Possibly add a FieldChangeListener, which is there to add
-	// new words to the autocompleter's dictionary. In case the
-	// entry is non-empty (pasted), update completers.
-	/*if (_autoCompleters != null) {
-	    entry.addPropertyChangeListener(new FieldChangeListener
-					    (_autoCompleters, entry));
-	    Util.updateCompletersForEntry(_autoCompleters,
-					  entry);
-	}
-	*/
+        // Possibly add a FieldChangeListener, which is there to add
+        // new words to the autocompleter's dictionary. In case the
+        // entry is non-empty (pasted), update completers.
+        /*if (_autoCompleters != null) {
+            entry.addPropertyChangeListener(new FieldChangeListener
+                                            (_autoCompleters, entry));
+            Util.updateCompletersForEntry(_autoCompleters,
+                                          entry);
+        }
+        */
         _entries.put(id, entry);
 
-	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
 
     /**
@@ -191,7 +197,7 @@ public class BibtexDatabase
     public synchronized BibtexEntry removeEntry(String id)
     {
         BibtexEntry oldValue = (BibtexEntry) _entries.remove(id);
-	removeKeyFromSet(oldValue.getCiteKey());
+        removeKeyFromSet(oldValue.getCiteKey());
 
         if (oldValue != null)
         {
@@ -202,14 +208,14 @@ public class BibtexDatabase
     }
 
     public synchronized boolean setCiteKeyForEntry(String id, String key) {
-	if (!_entries.containsKey(id)) return false; // Entry doesn't exist!
-	BibtexEntry entry = getEntryById(id);
-	String oldKey = entry.getCiteKey();
+        if (!_entries.containsKey(id)) return false; // Entry doesn't exist!
+        BibtexEntry entry = getEntryById(id);
+        String oldKey = entry.getCiteKey();
         if (key != null)
           entry.setField(Globals.KEY_FIELD, key);
         else
           entry.clearField(Globals.KEY_FIELD);
-	return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
+        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
     /**
@@ -217,7 +223,7 @@ public class BibtexDatabase
      */
     public synchronized void setPreamble(String preamble)
     {
-	_preamble = preamble;
+        _preamble = preamble;
     }
 
     /**
@@ -225,7 +231,7 @@ public class BibtexDatabase
      */
     public synchronized String getPreamble()
     {
-	return _preamble;
+        return _preamble;
     }
 
     /**
@@ -234,43 +240,43 @@ public class BibtexDatabase
     public synchronized void addString(BibtexString string, int index)
         throws KeyCollisionException
     {
-	for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
-	    if (((BibtexString)i.next()).getName().equals(string.getName()))
-		throw new KeyCollisionException("A string with this label already exists,");
-	}
-	_strings.insertElementAt(string, index);
+        for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
+            if (((BibtexString)i.next()).getName().equals(string.getName()))
+                throw new KeyCollisionException("A string with this label already exists,");
+        }
+        _strings.insertElementAt(string, index);
     }
 
     /**
      * Removes the string at the given index.
      */
     public synchronized void removeString(int index) {
-	_strings.removeElementAt(index);
+        _strings.removeElementAt(index);
     }
 
     /**
      * Returns the string at the given index.
      */
     public synchronized BibtexString getString(int index) {
-	return (BibtexString)(_strings.elementAt(index));
+        return (BibtexString)(_strings.elementAt(index));
     }
 
     /**
      * Returns the number of strings.
      */
     public synchronized int getStringCount() {
-	return _strings.size();
+        return _strings.size();
     }
 
     /**
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-	for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
-	    if (((BibtexString)i.next()).getName().equals(label))
-		return true;
-	}
-	return false;
+        for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
+            if (((BibtexString)i.next()).getName().equals(label))
+                return true;
+        }
+        return false;
     }
 
     //##########################################
@@ -280,80 +286,80 @@ public class BibtexDatabase
         // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
-		// Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+                // Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
-	boolean duplicate=false;
-	if(oldKey==null){// this is a new entry so don't bother removing oldKey
-	    duplicate= addKeyToSet( newKey);
-	}else{
-	    if(oldKey.equals(newKey)){// were OK because the user did not change keys
-		duplicate=false;
-	    }else{// user changed the key
+        boolean duplicate=false;
+        if(oldKey==null){// this is a new entry so don't bother removing oldKey
+            duplicate= addKeyToSet( newKey);
+        }else{
+            if(oldKey.equals(newKey)){// were OK because the user did not change keys
+                duplicate=false;
+            }else{// user changed the key
 
-		// removed the oldkey
-		// But what if more than two have the same key?
-		// this means that user can add another key and would not get a warning!
-		// consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
-		// removes this key from the allKey. then I add another key xxx. I don't get a warning!
-		// i need a way to count the number of keys of each type
-		// hashmap=>int (increment each time)
+                // removed the oldkey
+                // But what if more than two have the same key?
+                // this means that user can add another key and would not get a warning!
+                // consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
+                // removes this key from the allKey. then I add another key xxx. I don't get a warning!
+                // i need a way to count the number of keys of each type
+                // hashmap=>int (increment each time)
 
-		removeKeyFromSet( oldKey);
-		duplicate = addKeyToSet( newKey );
-	    }
-	}
-	if(duplicate==true && issueWarning==true){
-	    JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
-					  Globals.lang("Duplicate Key Warning"),
-					  JOptionPane.WARNING_MESSAGE);//, options);
+                removeKeyFromSet( oldKey);
+                duplicate = addKeyToSet( newKey );
+            }
+        }
+        if(duplicate==true && issueWarning==true){
+            JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
+                                          Globals.lang("Duplicate Key Warning"),
+                                          JOptionPane.WARNING_MESSAGE);//, options);
 
-	}
-	return duplicate;
+        }
+        return duplicate;
     }
 
     //========================================================
     // keep track of all the keys to warn if there are duplicates
     //========================================================
     private boolean addKeyToSet(String key){
-		boolean exists=false;
-		if((key == null) || key.equals(""))
-			return false;//don't put empty key
-		if(allKeys.containsKey(key)){
-			// warning
-			exists=true;
-			allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
-		}else
-			allKeys.put( key, new Integer(1));
-		return exists;
+                boolean exists=false;
+                if((key == null) || key.equals(""))
+                        return false;//don't put empty key
+                if(allKeys.containsKey(key)){
+                        // warning
+                        exists=true;
+                        allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
+                }else
+                        allKeys.put( key, new Integer(1));
+                return exists;
     }
     //========================================================
     // reduce the number of keys by 1. if this number goes to zero then remove from the set
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key){
-		if((key == null) || key.equals("")) return;
-		if(allKeys.containsKey(key)){
-			Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-			if(tI.intValue()==1)
-				allKeys.remove( key);
-			else
-				allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
-		}else // ignore, as there is no such key
-			;
+                if((key == null) || key.equals("")) return;
+                if(allKeys.containsKey(key)){
+                        Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+                        if(tI.intValue()==1)
+                                allKeys.remove( key);
+                        else
+                                allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
+                }else // ignore, as there is no such key
+                        ;
     }
 
 
     /*
     public void setCompleters(Hashtable autoCompleters) {
-	_autoCompleters = autoCompleters;
+        _autoCompleters = autoCompleters;
 
-	for (Iterator i=getKeySet().iterator(); i.hasNext();) {
-	    BibtexEntry be = getEntryById((String)(i.next()));
-	    be.addPropertyChangeListener(new FieldChangeListener
-					 (autoCompleters, be));
+        for (Iterator i=getKeySet().iterator(); i.hasNext();) {
+            BibtexEntry be = getEntryById((String)(i.next()));
+            be.addPropertyChangeListener(new FieldChangeListener
+                                         (autoCompleters, be));
 
-	    Util.updateCompletersForEntry(autoCompleters, be);
-	}
-	}*/
+            Util.updateCompletersForEntry(autoCompleters, be);
+        }
+        }*/
 
 }

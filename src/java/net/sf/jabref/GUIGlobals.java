@@ -44,7 +44,7 @@ public class GUIGlobals {
    * Static variables for graphics files and keyboard shortcuts.
    */
 
- 	// for debugging
+         // for debugging
   static int teller = 0;
 
   // HashMap containing refs to all open BibtexDatabases.
@@ -53,7 +53,7 @@ public class GUIGlobals {
   // Frame titles.
   public static String
       frameTitle = "JabRef",
-      version = "1.4",
+      version = "1.5",
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
@@ -109,11 +109,11 @@ public class GUIGlobals {
     public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
 
     public static JLabel getTableIcon(String fieldType) {
-	Object o = tableIcons.get(fieldType);
-	if (o == null) {
-	    Globals.logger("Error: no table icon defined for type '"+fieldType+"'.");
-	    return null;
-	} else return (JLabel)o;
+        Object o = tableIcons.get(fieldType);
+        if (o == null) {
+            Globals.logger("Error: no table icon defined for type '"+fieldType+"'.");
+            return null;
+        } else return (JLabel)o;
     }
 
 
@@ -159,9 +159,9 @@ public class GUIGlobals {
       searchIconFile = GUIGlobals.class.getResource(pre + "find.png"),
       autoGroupIcon = GUIGlobals.class.getResource(pre + "run.png"),
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
-	  wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
+          wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
-	  fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
+          fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
       pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
@@ -210,9 +210,9 @@ public class GUIGlobals {
       searchIconFile = GUIGlobals.class.getResource(pre + "search.gif"),
       autoGroupIcon = GUIGlobals.class.getResource(pre + "addtsk_tsk.gif"),
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
-	  wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
+          wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
-	  fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
+          fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
       pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
       sheetIcon = GUIGlobals.class.getResource(pre + "defaults_ps.gif"),
@@ -304,7 +304,7 @@ public class GUIGlobals {
       "school",
       "abstract",
       "url",
-	  "citeseerurl",
+          "citeseerurl",
       "pdf",
       "comment",
       "bibtexkey",
@@ -312,13 +312,13 @@ public class GUIGlobals {
       "doi",
       "eid",
       "search",
-	  "citeseercitationcount"
+          "citeseercitationcount"
   };
 
   public static final Map FIELD_DISPLAYS;
   static {
-  	FIELD_DISPLAYS = new HashMap();
-  	FIELD_DISPLAYS.put("citeseercitationcount","Popularity");
+          FIELD_DISPLAYS = new HashMap();
+          FIELD_DISPLAYS.put("citeseercitationcount","Popularity");
   }
 
 

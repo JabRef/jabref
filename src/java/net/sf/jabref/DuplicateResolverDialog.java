@@ -14,14 +14,10 @@ import net.sf.jabref.export.*;
 import java.awt.*;
 
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
- * @author not attributable
- * @version 1.0
- */
+// created by : ?
+//
+// modified : r.nagel 2.09.2004
+//            - insert close button
 
 public class DuplicateResolverDialog extends JDialog {
 
@@ -29,7 +25,8 @@ public class DuplicateResolverDialog extends JDialog {
       NOT_CHOSEN = -1,
       KEEP_BOTH = 0,
       KEEP_UPPER = 1,
-      KEEP_LOWER = 2;
+      KEEP_LOWER = 2,
+      BREAK      = 5;  // close
 
   final Dimension DIM = new Dimension(650, 450);
 
@@ -40,7 +37,8 @@ public class DuplicateResolverDialog extends JDialog {
   GridBagConstraints con = new GridBagConstraints();
   JButton first = new JButton(Globals.lang("Keep upper")),
       second = new JButton(Globals.lang("Keep lower")),
-      both = new JButton(Globals.lang("Keep both"));
+      both = new JButton(Globals.lang("Keep both")),
+      closeButton = new JButton(Globals.lang("Close"));
   JPanel options = new JPanel(),
       main = new JPanel(),
       source = new JPanel();
@@ -84,6 +82,7 @@ public class DuplicateResolverDialog extends JDialog {
     options.add(first);
     options.add(second);
     options.add(both);
+    options.add(closeButton);
 
     first.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -104,6 +103,14 @@ public class DuplicateResolverDialog extends JDialog {
     both.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_BOTH;
+        block = false;
+        dispose();
+      }
+    });
+
+    closeButton.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e) {
+        status = BREAK;
         block = false;
         dispose();
       }

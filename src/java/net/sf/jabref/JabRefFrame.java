@@ -24,6 +24,12 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
+
+// created by : ?
+//
+// modified : r.nagel 23.08.2004
+//               - insert new Menuitem New Database -> New Database from Aux
+
 package net.sf.jabref;
 
 import net.sf.jabref.label.*;
