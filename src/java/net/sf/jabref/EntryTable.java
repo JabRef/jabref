@@ -30,6 +30,7 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.*;
 import java.io.*;
 import javax.swing.event.*;
@@ -39,7 +40,13 @@ public class EntryTable extends JTable {
 
     final int PREFERRED_WIDTH = 400, PREFERRED_HEIGHT = 30;
 
-    JScrollPane sp = new JScrollPane((JTable)this);
+    // We use a subclassed JScrollPane with setBorder() overridden as
+    // a no-op. This is done to avoid the JTable setting its border,
+    // which it does whether we want it or not. And we don't. :)
+    JScrollPane sp = new JScrollPane((JTable)this) {
+	    public void setBorder(Border b) {}
+	};
+
     JPopupMenu rightClickMenu = null;
     EntryTableModel tableModel;
     JabRefPreferences prefs;
@@ -58,7 +65,7 @@ public class EntryTable extends JTable {
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
 	super(tm_);
 	this.tableModel = tm_;
-        //sp.setBorder(BorderFactory.createEmptyBorder());
+	setBorder(null);
         panel = panel_;
         // Add the global focus listener, so a menu item can see if this table was focused when
         // an action was called.

@@ -33,57 +33,43 @@ import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
 
 public class SidePane extends JPanel {
 
+    Dimension PREFERRED_SIZE = new Dimension
+	(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
+
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JScrollPane sp;
     //JButton close = new JButton("X");
-    JSplitPane parent;
+    //JSplitPane parent;
     JPanel mainPanel = new JPanel(),
 	pan = new JPanel();
 
-    public SidePane(JSplitPane _parent) {
-	parent = _parent;
+    public SidePane() {
+	//	parent = _parent;
 
 	setLayout(new BorderLayout());
 	mainPanel.setLayout(gbl);
 	//setBackground(GUIGlobals.lightGray);//(Color.white);
 	//mainPanel.setBackground(GUIGlobals.lightGray);
 
-	sp = new JScrollPane
+	/*sp = new JScrollPane
 	    (mainPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-	     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);*/
 
 	//super.add(sp, BorderLayout.CENTER);
 	super.add(mainPanel, BorderLayout.NORTH);
 	JPanel pan = new JPanel();
+	//pan.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.red));
+	//mainPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.yellow));
 	//pan.setBackground(GUIGlobals.lightGray);
 	super.add(pan, BorderLayout.CENTER);
-    }
-
-    public Component add(Component c) {
-	if (pan != null)
-	    mainPanel.remove(pan);
-          con.anchor = GridBagConstraints.NORTH;
-          con.fill = GridBagConstraints.BOTH;
-          con.gridwidth = GridBagConstraints.REMAINDER;
-          con.insets = new Insets(1, 1, 2, 0);
-          con.gridheight = 1;
-          con.weightx = 1;
-          con.weighty = 1;
-          gbl.setConstraints(c, con);
-          mainPanel.add(c);
-	pan = new JPanel();
-	//pan.setBackground(GUIGlobals.lightGray);
-	con.gridheight = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(pan, con);
-	//mainPanel.add(pan);
-	return c;
     }
 
     public void setComponents(Vector comps) {
@@ -91,21 +77,31 @@ public class SidePane extends JPanel {
       con.anchor = GridBagConstraints.NORTH;
       con.fill = GridBagConstraints.BOTH;
       con.gridwidth = GridBagConstraints.REMAINDER;
-      con.insets = new Insets(1, 1, 2, 0);
+      con.insets = new Insets(0, 0, 3, 1);
       con.gridheight = 1;
       con.weightx = 1;
-      con.weighty = 1;
+      con.weighty = 0;
 
       for (int i=0; i<comps.size(); i++) {
         Component c = (Component)comps.elementAt(i);
         gbl.setConstraints(c, con);
         mainPanel.add(c);
+	System.out.println(c.getPreferredSize().toString());
       }
+      con.weighty = 1;
+      Component bx = Box.createVerticalGlue();
+      gbl.setConstraints(bx, con);
+      mainPanel.add(bx);
+
       revalidate();
       repaint();
     }
 
     public void remove(Component c) {
 	mainPanel.remove(c);
+    }
+
+    public Dimension getPreferredSize() {
+	return PREFERRED_SIZE;
     }
 }

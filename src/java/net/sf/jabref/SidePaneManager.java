@@ -49,7 +49,11 @@ public class SidePaneManager {
 	this.panel = panel;
 	this.metaData = metaData;
 	this.frame = frame;
-	sidep = new SidePane(panel);
+	sidep = new SidePane();
+    }
+
+    public SidePane getPanel() {
+	return sidep;
     }
 
     public void populatePanel() {
@@ -68,11 +72,18 @@ public class SidePaneManager {
               (frame, panel, v, this, prefs);
           register("groups", panel.groupSelector);
 	}
-
+	/*
 	if (components.size() > 0) {
 	    panel.setLeftComponent(sidep);
 	} else
 	    panel.setLeftComponent(null);
+	*/
+	updateView();
+
+	if (components.size() > 0) {
+	    sidep.setVisible(true);
+	} else
+	    sidep.setVisible(false);
     }
 
     public boolean isPanelVisible(String name) {
@@ -205,10 +216,11 @@ public class SidePaneManager {
         }
       }
       sidep.setComponents(toShow);
-      if (visible.size() > 0)
-        panel.setLeftComponent(sidep);
-      else
-        panel.remove(sidep);
+      if (visible.size() > 0) {
+	  sidep.setVisible(true);
+      } else
+	  sidep.setVisible(false);
+
     }
 
     public void revalidate() {

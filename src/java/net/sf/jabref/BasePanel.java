@@ -46,7 +46,7 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.collab.*;
 import net.sf.jabref.wizard.text.gui.*;
 
-public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateListener {
+public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, FileUpdateListener {
 
   boolean tmp = true;
 
@@ -68,6 +68,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     String fileMonitorHandle = null;
     boolean saving = false, updatedExternally = false;
     String encoding = null;
+
+    GridBagLayout gbl = new GridBagLayout();
+    GridBagConstraints con = new GridBagConstraints();
 
     //Hashtable autoCompleters = new Hashtable();
     // Hashtable that holds as keys the names of the fields where
@@ -134,7 +137,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     private HashMap actions = new HashMap();
 
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
-      super(JSplitPane.HORIZONTAL_SPLIT, true);
+	//super(JSplitPane.HORIZONTAL_SPLIT, true);
       database = new BibtexDatabase();
       metaData = new MetaData();
       this.frame = frame;
@@ -145,7 +148,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      HashMap meta, JabRefPreferences prefs) {
-      super(JSplitPane.HORIZONTAL_SPLIT, true);
+	//super(JSplitPane.HORIZONTAL_SPLIT, true);
       this.frame = frame;
       database = db;
       this.prefs = prefs;
@@ -1531,7 +1534,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         else
             showEntry(showing);
 
-        setRightComponent(splitPane);
         sidePaneManager = new SidePaneManager
             (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
@@ -1544,9 +1546,20 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.populatePanel();
 
+	setLayout(gbl);
+	con.fill = GridBagConstraints.BOTH;
+	con.weighty = 1;
+	con.weightx = 0;
+	gbl.setConstraints(sidePaneManager.getPanel(), con);
+	add(sidePaneManager.getPanel());
+
+	con.weightx = 1;
+	gbl.setConstraints(splitPane, con);
+	add(splitPane);
         //mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
-        setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-        setResizeWeight(0);
+        //setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+        //setResizeWeight(0);
+
         revalidate();
     }
 

@@ -304,6 +304,7 @@ public class GroupSelector
 
     JPanel pan = new JPanel();
     GridBagLayout gb = new GridBagLayout();
+    con.weighty = 0;
     gbl.setConstraints(pan, con);
     pan.setLayout(gb);
     con.weightx = 1;
@@ -582,4 +583,9 @@ public class GroupSelector
 
     }
   }
+
+    public Dimension getMinimumSize() {
+	return getPreferredSize();
+    }
+
 }
