@@ -28,10 +28,13 @@ package net.sf.jabref;
 
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
+
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.groups.*;
-import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.undo.NamedCompound;
 
 public class RightClickMenu extends JPopupMenu
     implements PopupMenuListener {
@@ -236,9 +239,9 @@ public class RightClickMenu extends JPopupMenu
     }
     
     private AbstractAction getAction(GroupTreeNode node, boolean add) {
+        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
+                : (AbstractAction) new RemoveFromGroupAction(node);
         AbstractGroup group = node.getGroup();
-        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(group)
-                : (AbstractAction) new RemoveFromGroupAction(group);
         action.setEnabled(add ? group.supportsAdd() : group.supportsRemove());
         return action;
     }
@@ -253,45 +256,42 @@ public class RightClickMenu extends JPopupMenu
     }
 
     class AddToGroupAction extends AbstractAction {
-        AbstractGroup m_group;
-        public AddToGroupAction(AbstractGroup group) {
-            super(group.getName());
-            m_group = group;
+        GroupTreeNode m_node;
+        public AddToGroupAction(GroupTreeNode node) {
+            super(node.getGroup().getName());
+            m_node = node;
         }
         public void actionPerformed(ActionEvent evt) {
-            m_group.addSelection(panel);
-            // JZTODO: mark change & add undo
+            AbstractUndoableEdit undo = m_node.getGroup().addSelection(panel);
+            if (undo == null)
+                return; // no changed made
+            
+            panel.undoManager.addEdit(undo);
+            panel.refreshTable();
+            panel.markBaseChanged();
+            panel.updateEntryEditorIfShowing();
+            panel.updateViewToSelected();
         }
     }
     
     class RemoveFromGroupAction extends AbstractAction {
-        AbstractGroup m_group;
-        public RemoveFromGroupAction(AbstractGroup group) {
-            super(group.getName());
-            m_group = group;
+        GroupTreeNode m_node;
+        public RemoveFromGroupAction(GroupTreeNode node) {
+            super(node.getGroup().getName());
+            m_node = node;
         }
         public void actionPerformed(ActionEvent evt) {
-            m_group.removeSelection(panel);
-            // JZTODO: mark change & add undo
+            AbstractUndoableEdit undo = m_node.getGroup().removeSelection(panel);
+            if (undo == null)
+                return; // no changed made
+            
+            panel.undoManager.addEdit(undo);
+            panel.refreshTable();
+            panel.markBaseChanged();
+            panel.updateEntryEditorIfShowing();
+            panel.updateViewToSelected();
         }
     }
-
-    class ToggleGroupAction extends AbstractAction {
-        AbstractGroup m_group;
-        boolean m_isIn;
-        public ToggleGroupAction(AbstractGroup group, boolean isIn) {
-            super(group.getName());
-            m_group = group;
-            m_isIn = isIn;
-        }
-        public void actionPerformed(ActionEvent evt) {
-            if (!m_isIn)
-                ((AbstractGroup)m_group).addSelection(panel);
-            else
-                ((AbstractGroup)m_group).removeSelection(panel);
-        }
-    }
-
 
     class ChangeTypeAction extends AbstractAction {
       BibtexEntryType type;
