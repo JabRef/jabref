@@ -362,14 +362,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     if (genFields == null){
       genFields = new String[0];
     }
-    String[] absFields = new String[] { "abstract" };
+    String[] absFields = new String[] { "abstract", "annote" };
 
     int iter, rmax, omax, gmax, amax;
 
     rmax = reqFields.length;
     omax = optFields.length;
     gmax = genFields.length;
-    amax = 1;
+    amax = absFields.length;
     iter = Math.max(rmax, Math.max(omax, gmax));
 
     FieldTextArea ta1 = null, ta2 = null, ta3 = null, ta4 = null, firstR = null, firstO = null;

@@ -522,6 +522,7 @@ public class GUIGlobals {
     fieldWeight.put("school", MEDIUM_W);
     fieldWeight.put("comment", MEDIUM_W);
     fieldWeight.put("abstract", LARGE_W);
+    fieldWeight.put("annote", MEDIUM_W);
     fieldWeight.put("citeseercitationcount", SMALL_W);
 
     FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
