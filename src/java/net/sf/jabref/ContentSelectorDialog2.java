@@ -29,6 +29,7 @@ public class ContentSelectorDialog2 extends JDialog {
     String currentField = null;
     TreeSet fieldSet, wordSet;
     JabRefFrame frame;
+    BasePanel panel;
     JButton help,
 	newField = new JButton(Globals.lang("New")),
 	removeField = new JButton(Globals.lang("Remove")),
@@ -48,16 +49,13 @@ public class ContentSelectorDialog2 extends JDialog {
 
     HashMap wordListModels = new HashMap();
 
-    public static void main(String[] args) {
-	(new ContentSelectorDialog2(null, true, new MetaData(), "journal")).show();
-    }
 
-    public ContentSelectorDialog2(JabRefFrame frame, boolean modal, MetaData metaData,
+    public ContentSelectorDialog2(JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
 				  String fieldName) {
 	super(frame, Globals.lang("Setup selectors"), modal);
 	this.metaData = metaData;
 	this.frame = frame;
-
+	this.panel = panel;
 	this.currentField = fieldName;
 
 	//help = new JButton(Globals.lang("Help"));
@@ -89,9 +87,7 @@ public class ContentSelectorDialog2 extends JDialog {
 
 	newWord.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    wordListModel.add(0, WORD_FIRSTLINE_TEXT);
-		    wordList.setSelectedIndex(0);
-		    wPane.getVerticalScrollBar().setValue(0);
+		    newWordAction();
 		}
 	    });
 
@@ -102,11 +98,15 @@ public class ContentSelectorDialog2 extends JDialog {
 			newVal = wordEditField.getText();
 		    if (newVal.equals("") || newVal.equals(old))
 			return; // Empty string or no change.
-		    int newIndex = findPosInWords(newVal);
-		    wordListModel.remove(index);
-		    wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
-				 newVal);
-
+		    int newIndex = findPos(wordListModel, newVal);
+		    if (index >= 0) {
+			wordListModel.remove(index);
+			wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
+					  newVal);
+		    } else
+			wordListModel.add(newIndex, newVal);
+		    
+		    wordEditField.selectAll();
 		}
 	    });
 
@@ -126,14 +126,49 @@ public class ContentSelectorDialog2 extends JDialog {
 	fieldList.addListSelectionListener(new ListSelectionListener() {
 		public void valueChanged(ListSelectionEvent e) {
 		    currentField = (String)fieldList.getSelectedValue();
-		    fieldNameField.setText(currentField);
+		    fieldNameField.setText("");
 		    setupWordSelector();
-
-		    //new FocusRequester(wordEditField);
 		}
 	    });
 
-	
+	newField.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    fieldListModel.add(0, FIELD_FIRST_LINE);
+		    fieldList.setSelectedIndex(0);
+		    fPane.getVerticalScrollBar().setValue(0);
+		    fieldNameField.setEnabled(true);
+		    fieldNameField.setText(currentField);
+		    fieldNameField.selectAll();
+
+		    new FocusRequester(fieldNameField);
+		}
+	    });
+
+	fieldNameField.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    fieldNameField.transferFocus();
+		}
+	    });
+
+	fieldNameField.addFocusListener(new FocusAdapter() {
+		public void focusLost(FocusEvent e) {
+		    String s = fieldNameField.getText();
+		    fieldNameField.setText("");
+		    fieldNameField.setEnabled(false);
+		    if (!FIELD_FIRST_LINE.equals(s) && !"".equals(s)) {
+			// Add new field.
+			int pos = findPos(fieldListModel, s);
+			fieldListModel.remove(0);
+			fieldListModel.add(Math.max(0, pos-1), s);
+			fieldList.setSelectedIndex(pos);
+			currentField = s;
+			setupWordSelector();
+			newWordAction();
+			//new FocusRequester(wordEditField);
+		    }
+		}
+	    });
+
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    applyChanges();
@@ -155,22 +190,31 @@ public class ContentSelectorDialog2 extends JDialog {
 
     }
 
+    private void newWordAction() {
+	wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+	wordList.setSelectedIndex(0);
+	wPane.getVerticalScrollBar().setValue(0);
+    }
+
 
     private void applyChanges() {
 	// Cycle through all fields that we have created listmodels for:
-	for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
+	loop: for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
 	    // For each field name, store the values:
 	    String fieldName = (String)i.next();
 	    DefaultListModel lm = (DefaultListModel)wordListModels.get(fieldName);
 	    int start = 0;
 	    // Avoid storing the <new word> marker if it is there:
-	    while (((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
-		start++;
+	    if (lm.size() > 0)
+		while (((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+		    start++;
 	    Vector data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
 	    boolean newField = false;
 	    if (data == null) {
 		newField = true;
 		data = new Vector();
+		System.out.println("TODO: rebuild all existing EntryEditor instances, so they contain selectors for the new field(s).");
+
 	    } else
 		data.clear();
 	    for (int wrd=start; wrd<lm.size(); wrd++) {
@@ -182,6 +226,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	}
 
 	// Update all selectors in the current BasePanel.
+	panel.updateAllContentSelectors();
     }
 
     /**
@@ -217,16 +262,16 @@ public class ContentSelectorDialog2 extends JDialog {
 		wordSet = new TreeSet(items);
 		for (Iterator i=wordSet.iterator(); i.hasNext();) {
 		    String s = (String)i.next();
-		    int index = findPosInWords(s);
+		    int index = findPos(wordListModel, s);
 		    wordListModel.add(index, s);
 		}
 	    }
 	}
     }
 
-    private int findPosInWords(String item) {
-	for (int i=0; i<wordListModel.size(); i++) {
-	    String s = (String)wordListModel.get(i);
+    private int findPos(DefaultListModel lm, String item) {
+	for (int i=0; i<lm.size(); i++) {
+	    String s = (String)lm.get(i);
 	    if (item.compareToIgnoreCase(s) < 0) { // item precedes s
 		return i;
 	    }
@@ -235,8 +280,13 @@ public class ContentSelectorDialog2 extends JDialog {
     }
 
     private void initLayout() {
+	fieldNameField.setEnabled(false);
 	fieldList.setVisibleRowCount(4);
 	wordList.setVisibleRowCount(10);
+	final String VAL = "Uren luren himmelturen, ja Besseggen.";
+	fieldList.setPrototypeCellValue(VAL);
+	wordList.setPrototypeCellValue(VAL);
+
 	fieldPan.setBorder(BorderFactory.createTitledBorder
 			       (BorderFactory.createEtchedBorder(),
 				Globals.lang("Field name")));

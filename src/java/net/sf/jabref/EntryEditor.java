@@ -104,6 +104,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     BasePanel panel;
     EntryEditor ths = this;
 
+    HashSet contentSelectors = new HashSet();
+
     boolean updateSource = true; // This can be set to false to stop the source
     // text area from gettin updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
@@ -493,6 +495,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               if (ex4 != null) con.gridwidth = 1;
               else con.gridwidth = GridBagConstraints.REMAINDER;
               con.fill = GridBagConstraints.BOTH;
+	      con.weightx = 1;
               con.weighty = GUIGlobals.getFieldWeight(absFields[i]);
               genW += con.weighty;
               gbl.setConstraints(ta4.getPane(),con);
@@ -559,6 +562,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX+editor.getFieldName()) != null) {
 	FieldContentSelector ws = new FieldContentSelector
 	    (this, editor, panel.metaData);
+	contentSelectors.add(ws);
 	return ws;
     }
     else if ((s!=null) && s.equals("browse")) {
@@ -1573,6 +1577,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 ed.setBackground(GUIGlobals.validFieldBackground);
             }
         }
+    }
+
+    public void updateAllContentSelectors() {
+	if (contentSelectors.size() > 0) {
+	    for (Iterator i=contentSelectors.iterator(); i.hasNext();) {
+		((FieldContentSelector)i.next()).updateList();
+	    }
+	}
     }
 
 

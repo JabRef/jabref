@@ -51,6 +51,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	list.setEditable(true);
 	final MetaData metaData = data;
         final JabRefFrame frame = parent.frame;
+	final BasePanel panel = parent.panel;
 	updateList();
 	//else
 	//    list = new JComboBox(items.toArray());
@@ -67,16 +68,16 @@ class FieldContentSelector extends JComponent implements ItemListener {
 
         manage.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      ContentSelectorDialog2 csd = new ContentSelectorDialog2(frame, true, metaData,
-								    editor.getFieldName());
+	      ContentSelectorDialog2 csd = new ContentSelectorDialog2
+		  (frame, panel, true, metaData, editor.getFieldName());
 	      Util.placeDialog(csd, frame);
 	      csd.show();
-	      updateList();
+	      //updateList();
           }
         });
     }
 
-    private void updateList() {
+    public void updateList() {
 	list.removeAllItems();
 	list.addItem(""); //(Globals.lang(""));
 	Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
@@ -147,7 +148,8 @@ class FieldContentSelector extends JComponent implements ItemListener {
       if (!exists) {
         items.add(Math.max(0, pos), newWord);
         parent.panel.markNonUndoableBaseChanged();
-        updateList();
+	parent.panel.updateAllContentSelectors();
+        //updateList();
       }
 
     }

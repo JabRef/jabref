@@ -1169,6 +1169,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                   }
                 });
 
+	      actions.put("manageSelectors", new BaseAction() {
+		      public void action() {
+			  ContentSelectorDialog2 csd = new ContentSelectorDialog2
+			      (frame, ths, true, metaData, null);
+			  Util.placeDialog(csd, frame);
+			  csd.show();
+		      }
+		  });
     }
 
     /**
@@ -1650,6 +1658,20 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         } else
           editor.updateAllFields();
       }
+    }
+
+    /**
+     * This method iterates through all existing entry editors in this
+     * BasePanel, telling each to update all its instances of 
+     * FieldContentSelector. This is done to ensure that the list of words
+     * in each selector is up-to-date after the user has made changes in
+     * the Manage dialog.
+     */
+    public void updateAllContentSelectors() {
+	for (Iterator i=entryEditors.keySet().iterator(); i.hasNext();) {
+	    EntryEditor ed = (EntryEditor)entryEditors.get(i.next());
+	    ed.updateAllContentSelectors();
+	}
     }
 
     public void markBaseChanged() {

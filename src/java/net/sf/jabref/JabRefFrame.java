@@ -176,6 +176,7 @@ public class JabRefFrame
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   prefs.getKey("Unmark entries")),
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
+      manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -860,7 +861,7 @@ public JabRefPreferences prefs() {
     //tools.add(fetchAuthorMedline);
     tools.add(openFile);
     tools.add(openUrl);
-
+    tools.add(manageSelectors);
 
     mb.add(tools);
 
@@ -2299,5 +2300,6 @@ class SaveSessionAction
       ecd.show();
     }
   }
+
 
 }
