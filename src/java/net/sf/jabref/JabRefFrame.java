@@ -528,6 +528,9 @@ public class JabRefFrame extends JFrame {
 	tlb.add(copy);
 	tlb.add(paste);
 	tlb.addSeparator();
+	tlb.add(undo);
+	tlb.add(redo);
+	tlb.addSeparator();
 	tlb.add(newEntryAction);
 	tlb.add(editPreamble);
 	tlb.add(editStrings);

@@ -199,10 +199,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	am.put("copyKey", copyKeyAction);
 	im.put(GUIGlobals.generateKeyStroke, "generateKey");
 	am.put("generateKey", generateKeyAction);
-	im.put(GUIGlobals.switchPanelLeft, "left");
+	im.put(prefs.getKey("Entry editor: previous panel"), "left");
 	am.put("left", switchLeftAction);
-	im.put(GUIGlobals.switchPanelRight, "right");
+	im.put(prefs.getKey("Entry editor: next panel"), "right");
 	am.put("right", switchRightAction);
+	im.put(prefs.getKey("Entry editor: previous entry"), "prev");
+	am.put("prev", prevEntryAction);
+	im.put(prefs.getKey("Entry editor: next entry"), "next");
+	am.put("next", nextEntryAction);
 	im.put(GUIGlobals.undoStroke, "undo");
 	am.put("undo", undoAction);
 	im.put(GUIGlobals.redoStroke, "redo");
@@ -941,7 +945,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	if (entry.getType() == be.getType()) {
 	    switchTo(be);
 	} else {		    
-	    panel.showEntry(be);
+	    panel.showEntry(be);	    
 	} 
 
     }
@@ -975,6 +979,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	entry = be;
 	updateAllFields();
 	updateSource();
+	if (tabbed.getSelectedComponent() instanceof FieldPanel)
+	    ((FieldPanel)tabbed.getSelectedComponent()).activate(); 
+	else ((JComponent)tabbed.getSelectedComponent()).requestFocus();
     }
 	
 

@@ -268,7 +268,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		public void action() {
 		    runCommand("copy");
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    if (bes.length > 0) {
+		    if ((bes != null) && (bes.length > 0)) {
 			// Create a CompoundEdit to make the action undoable.
 			NamedCompound ce = new NamedCompound
 			    (bes.length > 1 ? Globals.lang("cut entries") 
@@ -777,7 +777,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	else
 	    splitPane.setDividerLocation
 		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);	
-	form.requestFocus();
+	new FocusRequester(form);
+	//form.requestFocus();
 
 	showing = be;
     }

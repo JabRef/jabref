@@ -290,6 +290,10 @@ public class JabRefPreferences {
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
 	defKeyBinds.put("Close entry editor", "ESCAPE");
 	defKeyBinds.put("Clear search", "ESCAPE");
+	defKeyBinds.put("Entry editor: next panel", "ctrl shift RIGHT");
+	defKeyBinds.put("Entry editor: previous panel", "ctrl shift LEFT");
+	defKeyBinds.put("Entry editor: next entry", "ctrl shift DOWN");
+	defKeyBinds.put("Entry editor: previous entry", "ctrl shift UP");
 
     }
 
