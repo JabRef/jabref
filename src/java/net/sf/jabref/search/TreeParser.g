@@ -20,6 +20,8 @@ options {
 	private BibtexEntry bibtexEntry;
 	private Object[] searchKeys;
 
+    private static final int PSEUDOFIELD_TYPE = 1;
+
     public int apply(AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
 		this.bibtexEntry = bibtexEntry;
 		// specification of fields to search is done in the search expression itself
@@ -68,14 +70,20 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 		{
 			Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 			Pattern valueSpec = ((RegExNode)var_v).getPattern();
-			boolean pseudoField_type;
-			for (int i = 0; i <= searchKeys.length && !ret; ++i) {
-				pseudoField_type = i == searchKeys.length; // additional (pseudo) field
-				String field = !pseudoField_type ? searchKeys[i].toString() : "type"; // pseudo field
-				if (!fieldSpec.matcher(field).matches()) 
-					continue;
-				Matcher matcher = valueSpec.matcher(!pseudoField_type ? bibtexEntry.getField(field).toString()
-					: bibtexEntry.getType().getName().toLowerCase());
+			int pseudoField = 0;
+			// this loop iterates over all regular keys, then over pseudo keys like "type"
+			for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
+				String content = null;
+				switch (i - searchKeys.length + 1) {
+					case PSEUDOFIELD_TYPE:
+						if (!fieldSpec.matcher("entrytype").matches())
+							continue;
+						content = bibtexEntry.getType().getName().toLowerCase();
+						break;
+					default: // regular field
+						content = bibtexEntry.getField(searchKeys[i].toString()).toString();
+				}
+				Matcher matcher = valueSpec.matcher(content);
 				switch (matchType) {
 				case MATCH_CONTAINS:
 					ret = matcher.find();
