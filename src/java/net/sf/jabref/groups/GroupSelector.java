@@ -737,5 +737,10 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "'.");
         }
     };
+    
     JMenu moveSubmenu = new JMenu("Move");
+    
+    public GroupTreeNode getGroupTreeRoot() {
+        return groupsRoot;
+    }
 }
