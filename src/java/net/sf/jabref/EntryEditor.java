@@ -504,7 +504,43 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
       });
       return but;
-    } else
+    }
+    else if ((s!=null) && s.equals("browsePdf")) {
+      JButton but = new JButton(Globals.lang("Browse"));
+      ((JComponent)editor).addMouseListener(new ExternalViewerListener());
+      but.setBackground(GUIGlobals.lightGray);
+      but.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          String pdfDir = prefs.get("pdfDirectory");
+          JabRefFileChooser chooser = new JabRefFileChooser(new File(ed.getText()));
+          if (ed.getText().equals("")) {
+            if (pdfDir != null)
+              chooser = new JabRefFileChooser(new File(pdfDir));
+            else
+              chooser.setCurrentDirectory(new File(prefs.get(fieldName +
+                  Globals.FILETYPE_PREFS_EXT, "")));
+          }
+          OpenFileFilter off = new OpenFileFilter(".pdf");
+          chooser.addChoosableFileFilter(off);
+
+          //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+          int returnVal = chooser.showOpenDialog(null);
+          if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File newFile = chooser.getSelectedFile();
+            String position = newFile.getParent();
+            if (position.equals(pdfDir) || (position+System.getProperty("file.separator")).equals(pdfDir))
+              ed.setText(newFile.getName());
+            else
+              ed.setText(newFile.getPath());
+            prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());
+            storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+          }
+        }
+      });
+      return but;
+    }
+
+    else
       return null;
   }
 

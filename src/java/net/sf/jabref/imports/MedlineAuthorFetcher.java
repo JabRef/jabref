@@ -74,21 +74,22 @@ public class MedlineAuthorFetcher extends SidePaneComponent implements Runnable 
     }
 
     public String setupTerm(String in){
-	Pattern part1=Pattern.compile(", ");
-	Pattern part2=Pattern.compile(",");
-	Pattern part3=Pattern.compile(" ");
-	Matcher matcher;
-	matcher=part1.matcher(in);
-	in=matcher.replaceAll("\\+AND\\+");
-	matcher=part2.matcher(in);
-	in=matcher.replaceAll("\\+AND\\+");
-	matcher=part3.matcher(in);
-	in=matcher.replaceAll("+");
+        Pattern part1=Pattern.compile(", ");
+        Pattern part2=Pattern.compile(",");
+        Pattern part3=Pattern.compile(" ");
+        Matcher matcher;
+        matcher=part1.matcher(in);
+        in=matcher.replaceAll("\\+AND\\+");
+        matcher=part2.matcher(in);
+        in=matcher.replaceAll("\\+AND\\+");
+        matcher=part3.matcher(in);
+        in=matcher.replaceAll("+");
 
-	return in;
+        return in;
     }
 
     public void run() {
+
 	String idList = tf.getText().replace(';', ',');
 
 	if(idList==null || idList.trim().equals(""))//if user pressed cancel

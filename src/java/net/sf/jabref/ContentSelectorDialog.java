@@ -39,7 +39,7 @@ public class ContentSelectorDialog extends JDialog {
     GridBagLayout gridBagLayout6 = new GridBagLayout();
     JButton select = new JButton();
 
-    final String 
+    final String
 	WORD_EMPTY_TEXT = Globals.lang("<no field>"),
 	WORD_FIRSTLINE_TEXT = Globals.lang("<select word>"),
 	FIELD_FIRST_LINE = Globals.lang("<field name>");
@@ -68,7 +68,7 @@ public class ContentSelectorDialog extends JDialog {
     public ContentSelectorDialog(JabRefFrame frame, boolean modal, MetaData metaData,
 				 String fieldName) {
 	this(frame, modal, metaData);
-	
+
 	try {
 	    fieldSelector.setSelectedItem(fieldName);
 	} catch (Exception ex) {
@@ -95,11 +95,11 @@ public class ContentSelectorDialog extends JDialog {
 	    if (s.startsWith(Globals.SELECTOR_META_PREFIX))
 		fieldSelector.addItem(s.substring(Globals.SELECTOR_META_PREFIX.length()));
 	}
-	
+
     }
 
 
-    private void updateWordPanel() {       
+    private void updateWordPanel() {
 	if (currentField == null) {
 	    titledBorder2.setTitle("");
 	    jPanel3.repaint();
@@ -132,7 +132,7 @@ public class ContentSelectorDialog extends JDialog {
 	    wordSet.add(word);
 	    // Create a new Vector for this word list, and update the MetaData.
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
-			     new Vector(wordSet));	    
+			     new Vector(wordSet));
 	    fillWordSelector();
 	    frame.basePanel().markNonUndoableBaseChanged();
 	    //wordTf.selectAll();
@@ -145,7 +145,7 @@ public class ContentSelectorDialog extends JDialog {
 	currentField = fieldTf.getText().trim().toLowerCase();
 	if (metaData.getData(Globals.SELECTOR_META_PREFIX+currentField) == null) {
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
-			     new Vector());	    
+			     new Vector());
 	    frame.basePanel().markNonUndoableBaseChanged();
 	    setupFieldSelector();
 	    updateWordPanel();
@@ -153,12 +153,12 @@ public class ContentSelectorDialog extends JDialog {
     }
 
     private void removeWord() {
-	String word = wordTf.getText().trim().toLowerCase();
+	String word = wordTf.getText().trim();
 	if (wordSet.contains(word)) {
 	    wordSet.remove(word);
 	    // Create a new Vector for this word list, and update the MetaData.
 	    metaData.putData(Globals.SELECTOR_META_PREFIX+currentField,
-			     new Vector(wordSet));	    
+			     new Vector(wordSet));
 	    fillWordSelector();
 	    frame.basePanel().markNonUndoableBaseChanged();
 	    //wordTf.selectAll();
@@ -208,7 +208,7 @@ public class ContentSelectorDialog extends JDialog {
 	//tlb.setPreferredSize(new Dimension(28, 28));
 	//tlb.setFloatable(false);
 	//tlb.add(help);
-	jPanel2.add(help, null);	
+	jPanel2.add(help, null);
 	jPanel2.add(Close, null);
 
 	panel1.add(jPanel1,   new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0
@@ -275,7 +275,7 @@ public class ContentSelectorDialog extends JDialog {
 		}
 	    });
 
-	
+
 
 	setupFieldSelector();
     }

@@ -581,7 +581,7 @@ public class JabRefFrame extends JFrame {
 	tools.add(makeKeyAction);
         tools.add(lyxPushAction);
         tools.add(fetchMedline);
-        tools.add(fetchAuthorMedline);
+        //tools.add(fetchAuthorMedline);
         tools.add(openFile);
         tools.add(openUrl);
 
@@ -1007,9 +1007,12 @@ public class JabRefFrame extends JFrame {
                 // Open a new database.
                 if ((e.getActionCommand() == null) ||
                     (e.getActionCommand().equals(Globals.lang("Open database")))) {
-                    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                    /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
                         new JabRefFileChooser((File)null) :
-                        new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+                        new JabRefFileChooser(new File(prefs.get("workingDirectory")));*/
+                    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                        new JFileChooser((File)null) :
+                        new JFileChooser(new File(prefs.get("workingDirectory")));
                     chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
                     int returnVal = chooser.showOpenDialog(ths);
                     if(returnVal == JFileChooser.APPROVE_OPTION) {

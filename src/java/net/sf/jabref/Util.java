@@ -356,6 +356,14 @@ public class Util {
 		/*System.err.println("Message: Opening file (" + link
 				   + ") with the pdf viewer ("
 				   + prefs.get("pdfviewer") +")");*/
+                File f = new File(link);
+                String dir = prefs.get("pdfDirectory");
+                if (!f.exists() && (dir != null)) {
+                  if (dir.endsWith(System.getProperty("file.separator")))
+                    link = dir + link;
+                  else
+                    link = dir + System.getProperty("file.separator") + link;
+                }
 		Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer")
 							  + " " + link);
 	    } catch (IOException e) {
@@ -370,7 +378,7 @@ public class Util {
 	    System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
 	    //ignore
 	}
-    }
+  }
 
   /**
    * Checks if the two entries represent the same publication.

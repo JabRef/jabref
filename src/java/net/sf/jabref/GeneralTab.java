@@ -17,7 +17,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
     JTextField
-	pdf, ps, html, lyx;
+	pdfDir, pdf, ps, html, lyx;
 
     public GeneralTab(JabRefPreferences prefs) {
 	_prefs = prefs;
@@ -110,29 +110,45 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	// ------------------------------------------------------------
 	// External programs panel.
 	// ------------------------------------------------------------
-	pdf = new JTextField(_prefs.get("pdfviewer"), 30);
+        pdfDir = new JTextField(_prefs.get("pdfDirectory"), 30);
+        pdf = new JTextField(_prefs.get("pdfviewer"), 30);
 	ps = new JTextField(_prefs.get("psviewer"), 30);
 	html = new JTextField(_prefs.get("htmlviewer"), 30);
 	lyx = new JTextField(_prefs.get("lyxpipe"), 30);
 
         con.gridwidth = 1;
 	con.weightx = 0;
-	con.insets = new Insets(10, 10, 10, 10);
+       con.insets = new Insets(5, 10, 15, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
-	lab = new JLabel(Globals.lang("Path to PDF viewer")+":");
-	gbl.setConstraints(lab, con);
+        lab = new JLabel(Globals.lang("Main PDF directory")+":");
+        gbl.setConstraints(lab, con);
         external.add(lab);
-	con.weightx = 1;
-	gbl.setConstraints(pdf, con);
-	external.add(pdf);
-	con.weightx = 0;
+        con.weightx = 1;
+        gbl.setConstraints(pdfDir, con);
+        external.add(pdfDir);
+        con.weightx = 0;
         con.gridwidth = GridBagConstraints.REMAINDER;
         JButton browse = new JButton(Globals.lang("Browse"));
-        browse.addActionListener(new BrowseAction(pdf));
+        browse.addActionListener(new BrowseAction(pdfDir, true));
         gbl.setConstraints(browse, con);
         external.add(browse);
         con.gridwidth = 1;
-	con.fill = GridBagConstraints.HORIZONTAL;
+        con.fill = GridBagConstraints.HORIZONTAL;
+        con.insets = new Insets(5, 10, 5, 10);
+        lab = new JLabel(Globals.lang("Path to PDF viewer")+":");
+        gbl.setConstraints(lab, con);
+        external.add(lab);
+        con.weightx = 1;
+        gbl.setConstraints(pdf, con);
+        external.add(pdf);
+        con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(pdf, false));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+        con.gridwidth = 1;
+        con.fill = GridBagConstraints.HORIZONTAL;
 	lab = new JLabel(Globals.lang("Path to PS viewer")+":");
 	gbl.setConstraints(lab, con);
 	external.add(lab);
@@ -142,7 +158,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	con.weightx = 0;
         con.gridwidth = GridBagConstraints.REMAINDER;
         browse = new JButton(Globals.lang("Browse"));
-        browse.addActionListener(new BrowseAction(ps));
+        browse.addActionListener(new BrowseAction(ps, false));
         gbl.setConstraints(browse, con);
         external.add(browse);
 	con.gridwidth = 1;
@@ -155,7 +171,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         con.gridwidth = GridBagConstraints.REMAINDER;
 	con.weightx = 0;
         browse = new JButton(Globals.lang("Browse"));
-        browse.addActionListener(new BrowseAction(html));
+        browse.addActionListener(new BrowseAction(html, false));
         gbl.setConstraints(browse, con);
         external.add(browse);
 	con.gridwidth = 1;
@@ -168,7 +184,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	external.add(lyx);
         con.weightx = 0;
         browse = new JButton(Globals.lang("Browse"));
-        browse.addActionListener(new BrowseAction(lyx));
+        browse.addActionListener(new BrowseAction(lyx, false));
         gbl.setConstraints(browse, con);
         external.add(browse);
 
@@ -188,13 +204,17 @@ public class GeneralTab extends JPanel implements PrefsTab {
    */
   class BrowseAction extends AbstractAction {
       JTextField comp;
-      public BrowseAction(JTextField tc) {
+      boolean dir;
+      public BrowseAction(JTextField tc, boolean dir) {
         super(Globals.lang("Browse"));
+        this.dir = dir;
         comp = tc;
       }
       public void actionPerformed(ActionEvent e) {
         JabRefFileChooser chooser = new JabRefFileChooser(new File(comp.getText()));
         //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+        if (dir)
+          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
           File newFile = chooser.getSelectedFile();
@@ -216,7 +236,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 
 	// We should maybe do some checking on the validity of the contents?
-	_prefs.put("pdfviewer", pdf.getText());
+        _prefs.put("pdfDirectory", pdfDir.getText());
+        _prefs.put("pdfviewer", pdf.getText());
 	_prefs.put("psviewer", ps.getText());
 	_prefs.put("htmlviewer", html.getText());
 	_prefs.put("lyxpipe", lyx.getText());

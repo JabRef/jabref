@@ -67,6 +67,7 @@ appear in your chosen languages.
 
 Change log:
 1.x:	- Added detection of duplicate entries.
+	- Fixed bug in selector word removal.
 	- Added menu and toolbar actions for open pdf/ps and url/doi.
 	- Added web lookup of DOI.
 1.2:	- Replaced the icon set.
