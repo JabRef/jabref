@@ -233,7 +233,8 @@ public class Util {
         for (int i=0; i<key.length(); i++) {
             char c = key.charAt(i);
             if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
-                && (c != '}') && (c != '~') && (c != ',') && (c != '^'))
+                && (c != '}') && (c != '~') && (c != ',') && (c != '^')
+		&& (c != '\\'))
                 newKey.append(c);
         }
 
@@ -246,7 +247,7 @@ public class Util {
 	for (Iterator i=Globals.UNICODE_CHARS.keySet().iterator(); i.hasNext();) {
 	    String chr = (String)i.next(),
 		replacer = (String)Globals.UNICODE_CHARS.get(chr);
-	    pr(chr+" "+replacer);
+	    //pr(chr+" "+replacer);
 	    s = s.replaceAll(chr, replacer);
 	}
 	return s;

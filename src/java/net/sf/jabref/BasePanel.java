@@ -753,35 +753,30 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             });
 
         // The action for auto-generating keys.
-        actions.put("makeKey", new BaseAction() {
-                public void action() {
-                    int[] rows = entryTable.getSelectedRows() ;
-                    int numSelected = rows.length ;
-                    BibtexEntry bes = null ;
+        actions.put("makeKey", new AbstractWorker() {
+		int[] rows;
+		int numSelected;
 
-                    /*if (numSelected > 0) {
-                        int answer = JOptionPane.showConfirmDialog
-                            (frame, "Generate bibtex key"+
-                             (numSelected>1 ? "s for the selected "
-                              +numSelected+" entries?" :
-                              " for the selected entry?"),
-                             "Autogenerate Bibtexkey",
-                             JOptionPane.YES_NO_CANCEL_OPTION);
-                        if (answer != JOptionPane.YES_OPTION) {
-                            return ;
+		// Run first, in EDT:
+		public void init() {
 
-                            }
-                        */
+                    rows = entryTable.getSelectedRows() ;
+                    numSelected = rows.length ;
+
                     if (numSelected == 0) { // None selected. Inform the user to select entries first.
                         JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
                                                       Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
                         return ;
                     }
-
-                     output(Globals.lang("Generating BibTeX key for")+" "+
+		    
+		    output(Globals.lang("Generating BibTeX key for")+" "+
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
-                                            : Globals.lang("entry")));
+                                            : Globals.lang("entry"))+"...");
+		}
 
+		// Run second, on a different thread:
+                public void run() {
+                    BibtexEntry bes = null ;
                     NamedCompound ce = new NamedCompound("autogenerate keys");
                     //BibtexEntry be;
                     Object oldValue;
@@ -804,9 +799,12 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     }
                     ce.end();
                     undoManager.addEdit(ce);
+		}
+
+		// Run third, on EDT:
+		public void update() {
                     markBaseChanged() ;
                     refreshTable() ;
-
                     output(Globals.lang("Generated BibTeX key for")+" "+
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
                                             : Globals.lang("entry")));
@@ -1421,6 +1419,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 			// by Spin.off(), which makes its methods be run in
 			// a different thread from the EDT.
 			CallBack clb = ((AbstractWorker)o).getCallBack();
+
+			((AbstractWorker)o).init(); // This method runs in this same thread, the EDT.
+			// Useful for initial GUI actions, like printing a message.
+
 			// The CallBack returned by getCallBack() has been wrapped
 			// by Spin.over(), which makes its methods be run on
 			// the EDT.			

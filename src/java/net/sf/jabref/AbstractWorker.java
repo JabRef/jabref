@@ -21,6 +21,10 @@ public abstract class AbstractWorker implements Worker, CallBack {
 	callBack = (CallBack)Spin.over(this);
     }
 
+    public void init() {
+
+    }
+
     /**
      * This method returns a wrapped Worker instance of this AbstractWorker.
      * whose methods will automatically be run off the EDT (Swing) thread.
