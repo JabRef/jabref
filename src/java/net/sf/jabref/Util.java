@@ -252,6 +252,21 @@ public class Util {
         return out.toString();
      }
 
+    public static HashSet findDeliminatedWordsInField(BibtexDatabase db, String field, String deliminator) {
+        HashSet res = new HashSet();
+    	Iterator i = db.getKeySet().iterator();
+    	while (i.hasNext()) {
+    	    BibtexEntry be = db.getEntryById(i.next().toString());
+    	    Object o = be.getField(field);
+    	    if (o != null) {
+    	        String fieldValue = o.toString().trim();
+    	        String[] resultSet = fieldValue.split(deliminator);
+    	        for(int index=0; index<resultSet.length; index++)
+    	            res.add(resultSet[index].trim());
+    	    }
+    	}
+    	return res;
+    }
 
     /**
      * Returns a HashMap containing all words used in the database in the

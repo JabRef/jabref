@@ -43,10 +43,11 @@ class AutoGroupDialog extends JDialog {
 
     JTextField
         remove = new JTextField(60),
-	field = new JTextField(60);
-    JLabel
-	nr = new JLabel(Globals.lang("Characters to ignore")+":"),
-	nf = new JLabel(Globals.lang("Field to group by")+":");
+	field = new JTextField(60),
+    deliminator = new JTextField(60);
+    JLabel nf = new JLabel(Globals.lang("Field to group by")+":"),
+    		nr = new JLabel(Globals.lang("Characters to ignore")+":");
+	JCheckBox nd = new JCheckBox(Globals.lang("Use the following deliminator") + ":");
     JButton
 	ok = new JButton(Globals.lang("Ok")),
 	cancel = new JButton(Globals.lang("Cancel"));
@@ -68,7 +69,8 @@ class AutoGroupDialog extends JDialog {
 			   GroupSelector gs_,
 			   Vector groups_,
 			   String defaultField,
-			   String defaultRemove) {
+			   String defaultRemove,
+			   String defaultDeliminator) {
 	super(frame_, Globals.lang("Automatically create groups"), true);
 	frame = frame_;
 	gs = gs_;
@@ -76,7 +78,7 @@ class AutoGroupDialog extends JDialog {
 	groups = groups_;
 	field.setText(defaultField);
 	remove.setText(defaultRemove);
-
+	deliminator.setText(defaultDeliminator);
 	ActionListener okListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
@@ -93,9 +95,15 @@ class AutoGroupDialog extends JDialog {
 		    ok_pressed = true;
 		    dispose();
 
-		    HashSet hs = Util.findAllWordsInField
-			(panel.getDatabase(), field().toLowerCase(),
-			 remove());
+		    groups.clear();
+		    HashSet hs = null;
+		    if (nd.isSelected()) {
+			    hs = Util.findDeliminatedWordsInField(panel.getDatabase(), field().toLowerCase().trim(), 
+			            deliminator.getText());		        
+		    } else {
+		        hs = Util.findAllWordsInField(panel.getDatabase(), field().toLowerCase().trim(),
+		                remove());
+		    }
 		    Vector added = new Vector(20, 20);
 		    NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
 		    //boolean any = false; // To see if _any_ groups were created.
@@ -208,7 +216,10 @@ class AutoGroupDialog extends JDialog {
 	con.gridy = 1;
 	gbl.setConstraints(nr, con);
 	main.add(nr);
-
+	con.gridy = 2;
+	gbl.setConstraints(nd, con);
+	main.add(nd);
+	
 	con.weightx = 1;
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.HORIZONTAL;
@@ -219,7 +230,9 @@ class AutoGroupDialog extends JDialog {
 	con.gridy = 1;
 	gbl.setConstraints(remove, con);
 	main.add(remove);
-
+	con.gridy = 2;
+	gbl.setConstraints(deliminator, con);
+	main.add(deliminator);
        	// Option buttons:
 	con.gridx = GridBagConstraints.RELATIVE;
 	con.gridy = GridBagConstraints.RELATIVE;
@@ -238,7 +251,7 @@ class AutoGroupDialog extends JDialog {
 	getContentPane().add(opt, BorderLayout.SOUTH);
 
 	//pack();
-	setSize(400, 140);
+	setSize(400, 200);
 
 	Util.placeDialog(this, frame);
     }

@@ -920,6 +920,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		String toSet = null;
 		FieldEditor fe = (FieldEditor)e.getSource();
 		boolean set;
+
+		// Trim the whitespace off this value
+		fe.setText(fe.getText().trim());
+
 		if (fe.getText().length() > 0)
 		    toSet = fe.getText();
 
@@ -935,7 +939,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			&& toSet.equals(entry.getField(fe.getFieldName()).toString()))
 			set = false;
 		    else
-			set = true;
+		    set = true;
 		}
 		if (set) try {
 
