@@ -269,6 +269,37 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		public void action() {
 		    runCommand("copy");
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
+		    if (bes.length > 0) {
+			// Create a CompoundEdit to make the action undoable.
+			NamedCompound ce = new NamedCompound
+			    (bes.length > 1 ? Globals.lang("cut entries") 
+			     : Globals.lang("cut entry"));
+			// Loop through the array of entries, and delete them.
+			for (int i=0; i<bes.length; i++) {
+			    database.removeEntry(bes[i].getId());
+			    Object o = entryTypeForms.get(bes[i].getId());
+			    if (o != null) {
+				((EntryTypeForm)o).dispose();
+			    }
+			    ce.addEdit(new UndoableRemoveEntry
+				       (database, bes[i], entryTypeForms));
+			}
+			entryTable.clearSelection();
+			frame.output(Globals.lang("Cut")+" "+
+				     (bes.length>1 ? bes.length
+				      +" "+ Globals.lang("entries") 
+				      : Globals.lang("entry"))+".");
+			ce.end();
+			undoManager.addEdit(ce);		    
+			refreshTable();
+			markBaseChanged();
+		    }	       		
+		}
+	    });
+
+	actions.put("delete", new BaseAction() {
+		public void action() {
+		    BibtexEntry[] bes = entryTable.getSelectedEntries();
 
 		    if (bes.length > 0) {
 			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
@@ -305,7 +336,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 							       entryTypeForms));
 			}
 			entryTable.clearSelection();
-			frame.output(Globals.lang("Cut")+" "+
+			frame.output(Globals.lang("Deleted")+" "+
 				     (bes.length>1 ? bes.length
 				      +" "+ Globals.lang("entries") 
 				      : Globals.lang("entry"))+".");

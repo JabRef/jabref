@@ -25,7 +25,8 @@ class FileHistory extends JMenu implements ActionListener {
 		add(item);
 		history.addFirst(item);
 	    }
-	}
+	} else
+	    setEnabled(false);
     }
 
     public void newFile(String filename) {
@@ -36,6 +37,8 @@ class FileHistory extends JMenu implements ActionListener {
 	    history.removeLast();
 	}
 	setItems();
+	if (!isEnabled())
+	    setEnabled(true);
     }
 
     private void setItems() {
