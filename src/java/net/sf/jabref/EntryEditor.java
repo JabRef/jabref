@@ -1073,7 +1073,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		final int nr = newRow;
 		(new Thread() {
 			public void run() {
-			    scrollTo(nr);
+			    scrollTo(nr);			    
 			}
 		    }).start();
 	    }
@@ -1119,7 +1119,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * @param row an <code>int</code> value
      */
     private void scrollTo(int row) {
-	panel.entryTable.scrollToCenter(row, 0);
+	panel.entryTable.ensureVisible(row);
 	panel.entryTable.setRowSelectionInterval(row, row);
 	panel.entryTable.setColumnSelectionInterval
 	    (0, panel.entryTable.getColumnCount()-1);

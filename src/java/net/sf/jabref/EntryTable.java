@@ -270,6 +270,12 @@ public class EntryTable extends JTable {
 	//public DefaultTableCellRenderer darker() { return darker; }
     }
 
+    public void ensureVisible(int row) {
+	JScrollBar vert = sp.getVerticalScrollBar();
+	int y = row*getRowHeight();
+	if ((y < vert.getValue()) || (y > vert.getValue()+vert.getVisibleAmount()))
+	    scrollToCenter(row, 1);
+    }
 
 	public void scrollToCenter( int rowIndex, int vColIndex) {
         if (!(this.getParent() instanceof JViewport)) {
@@ -284,7 +290,7 @@ public class EntryTable extends JTable {
         // The location of the view relative to the table
         Rectangle viewRect = viewport.getViewRect();
 
-        // Translate the cell location so that it is relative
+         // Translate the cell location so that it is relative
         // to the view, assuming the northwest corner of the
         // view is (0,0).
         rect.setLocation(rect.x-viewRect.x, rect.y-viewRect.y);
