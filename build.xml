@@ -34,166 +34,172 @@
      ========================================================================================== -->
 
   <!-- Set the properties for intermediate directory -->
-  <property name="build.dir" value="build"/>
-  <property name="build.classes" value="${build.dir}/classes"/>
-  <property name="build.lib" value="${build.dir}/lib"/>
-  <property name="build.bin" value="${build.dir}/bin"/>
-  <property name="build.images" value="${build.dir}/images"/>
-  <property name="build.resource" value="${build.dir}/resource"/>
-  <property name="build.help" value="${build.dir}/help"/>
-  <property name="build.javadocs" value="${build.dir}/docs/API"/>
-  <property name="build.kunststoff.icons.dir" value="${build.classes}/com/incors/plaf/kunststoff/icons"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.classes" value="${build.dir}/classes"/>
+    <property name="build.lib" value="${build.dir}/lib"/>
+    <property name="build.bin" value="${build.dir}/bin"/>
+    <property name="build.win" value="${build.dir}/windows"/>
+        <property name="build.images" value="${build.dir}/images"/>
+        <property name="build.resource" value="${build.dir}/resource"/>
+        <property name="build.help" value="${build.dir}/help"/>
+        <property name="build.javadocs" value="${build.dir}/docs/API"/>
+        <property name="build.kunststoff.icons.dir" value="${build.classes}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for source directories -->
-  <property name="src.dir" value="src"/>
-  <property name="txt.dir" value="src/txt"/>
-  <property name="java.dir" value="${src.dir}/java"/>
-  <property name="osx.dir" value="${src.dir}/osx"/>
-  <property name="resource.dir" value="${src.dir}/resource"/>
-  <property name="bin.dir" value="${src.dir}/scripts"/>
-  <property name="images.dir" value="${src.dir}/images"/>
-  <property name="help.dir" value="${src.dir}/help"/>
-  <property name="src.kunststoff.icons.dir" value="${java.dir}/com/incors/plaf/kunststoff/icons"/>
+        <property name="src.dir" value="src"/>
+        <property name="txt.dir" value="src/txt"/>
+        <property name="java.dir" value="${src.dir}/java"/>
+        <property name="osx.dir" value="${src.dir}/osx"/>
+        <property name="win.dir" value="${src.dir}/windows"/>
+            <property name="resource.dir" value="${src.dir}/resource"/>
+            <property name="bin.dir" value="${src.dir}/scripts"/>
+            <property name="images.dir" value="${src.dir}/images"/>
+            <property name="help.dir" value="${src.dir}/help"/>
+            <property name="src.kunststoff.icons.dir" value="${java.dir}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for library directories -->
-  <property name="library.directory"              value="lib" />
+            <property name="library.directory" value="lib" />
 
   <!-- Build classpath -->
-  <path id="classpath">
-    <pathelement path="${build.classes}"/>
-    <fileset dir="${library.directory}">
-      <include name="*.jar" />
-    </fileset>
-  </path>
+            <path id="classpath">
+                <pathelement path="${build.classes}"/>
+                <fileset dir="${library.directory}">
+                    <include name="*.jar" />
+                </fileset>
+            </path>
 
   <!-- Compiles project -->
-  <target name="compile">
-    <mkdir dir="${build.classes}"/>
+            <target name="compile">
+                <mkdir dir="${build.classes}"/>
 
-    <javac srcdir="${java.dir}"
-           debug="on"
-           destdir="${build.classes}"
-           target="1.4">
-    </javac>
+                <javac srcdir="${java.dir}"
+                        debug="on"
+                        destdir="${build.classes}"
+                        target="1.4"></javac>
 
-    <mkdir dir="${build.kunststoff.icons.dir}"/>
-    <copy todir="${build.kunststoff.icons.dir}">
-      <fileset dir="${src.kunststoff.icons.dir}">
-        <include name="*" />
-      </fileset>
-    </copy>
+                <mkdir dir="${build.kunststoff.icons.dir}"/>
+                <copy todir="${build.kunststoff.icons.dir}">
+                    <fileset dir="${src.kunststoff.icons.dir}">
+                        <include name="*" />
+                    </fileset>
+                </copy>
 
-  </target>
+            </target>
 
   <!-- Compiles project -->
-  <target name="osx">
-    <mkdir dir="${build.classes}"/>
+            <target name="osx">
+                <mkdir dir="${build.classes}"/>
 
-    <javac srcdir="${osx.dir}"
-           debug="on"
-           destdir="${build.classes}"
-           target="1.4">
-    </javac>
-  </target>
+                <javac srcdir="${osx.dir}"
+                        debug="on"
+                        destdir="${build.classes}"
+                        target="1.4"></javac>
+            </target>
 
 
 
   <!-- Jars up project -->
-  <target name="jars" depends="compile">
-    <mkdir dir="${build.lib}"/>
+            <target name="jars" depends="compile">
+                <mkdir dir="${build.lib}"/>
 
-    <jar destfile="${build.lib}/jabref.jar">
-    	<fileset dir="${build.classes}"/>
-    	<fileset dir="${src.dir}">
-			<include name="images/**"/>
-			<include name="help/**"/>
-			<include name="help/de/**"/>
-			<include name="help/no/**"/>
-			<include name="resource/**"/>
-        </fileset>
-	<fileset dir="${txt.dir}">
-	                <include name = "gpl.txt"/>
-	                <include name = "lesser.txt"/>
-	                <include name = "README"/>
-	</fileset>
-        <manifest>
-		  <attribute name="Main-Class" value="net.sf.jabref.JabRef"/>
-        </manifest>
-     </jar>
+                <jar destfile="${build.lib}/jabref.jar">
+                    <fileset dir="${build.classes}"/>
+                    <fileset dir="${src.dir}">
+                        <include name="images/**"/>
+                        <include name="help/**"/>
+                        <include name="help/de/**"/>
+                        <include name="help/no/**"/>
+                        <include name="resource/**"/>
+                    </fileset>
+                    <fileset dir="${txt.dir}">
+                        <include name="gpl.txt"/>
+                        <include name="lesser.txt"/>
+                        <include name="README"/>
+                    </fileset>
+                    <manifest>
+                        <attribute name="Main-Class" value="net.sf.jabref.JabRef"/>
+                    </manifest>
+                </jar>
 
-     </target>
+            </target>
 
-  <target name="build" depends="jars" description="Build project">
-    <mkdir dir="${build.bin}"/>
-<!-- Uncomment when we actually have scripts.
+            <target name="build" depends="jars" description="Build project">
+                <mkdir dir="${build.bin}"/>
+<!--  
     <copy todir="${build.bin}">
       <fileset dir="${bin.dir}">
         <include name="*" />
       </fileset>
     </copy>
 -->
+                <mkdir dir="${build.resource}"/>
+                <copy todir="${build.resource}">
+                    <fileset dir="${resource.dir}">
+                        <include name="*" />
+                    </fileset>
+                </copy>
+                <mkdir dir="${build.images}"/>
+                <copy todir="${build.images}">
+                    <fileset dir="${images.dir}">
+                        <include name="*" />
+                    </fileset>
+                </copy>
+                <mkdir dir="${build.help}"/>
+                <copy todir="${build.help}">
+                    <fileset dir="${help.dir}">
+        <!--<include name="*" />--></fileset>
+                </copy>
 
-    <mkdir dir="${build.resource}"/>
-    <copy todir="${build.resource}">
-      <fileset dir="${resource.dir}">
-        <include name="*" />
-      </fileset>
-    </copy>
-    <mkdir dir="${build.images}"/>
-    <copy todir="${build.images}">
-      <fileset dir="${images.dir}">
-        <include name="*" />
-      </fileset>
-    </copy>
-    <mkdir dir="${build.help}"/>
-    <copy todir="${build.help}">
-      <fileset dir="${help.dir}">
-        <!--<include name="*" />-->
-      </fileset>
-    </copy>
+                <mkdir dir="${build.win}"/>
+                <copy file="${build.lib}/jabref.jar" todir="${build.win}" />
+                <copy todir="${build.win}">
+                    <fileset dir="${win.dir}">
+                        <include name="*"/>
+                    </fileset>
+                </copy>
 
-  </target>
+            </target>
 
 
   <!-- Creates all docs -->
-  <target name="docs" depends="javadocs" description="Generates all the documentation"/>
+            <target name="docs" depends="javadocs" description="Generates all the documentation"/>
 
   <!-- Creates javadocs -->
-  <target name="javadocs" depends="compile" description="Generates the javadocs">
-    <mkdir dir="${build.javadocs}"/>
-    <javadoc sourcepath="${java.dir}"
-             destdir="${build.javadocs}"
-             author="true"
-             version="true"
-             windowtitle="JabRef API"
-             link="http://java.sun.com/j2se/1.4.1/docs/api/">
+            <target name="javadocs" depends="compile" description="Generates the javadocs">
+                <mkdir dir="${build.javadocs}"/>
+                <javadoc sourcepath="${java.dir}"
+                        destdir="${build.javadocs}"
+                        author="true"
+                        version="true"
+                        windowtitle="JabRef API"
+                        link="http://java.sun.com/j2se/1.4.1/docs/api/">
 
-      <fileset dir="${java.dir}" defaultexcludes="yes">
-        <include name="**.java" />
-      </fileset>
+                    <fileset dir="${java.dir}" defaultexcludes="yes">
+                        <include name="**.java" />
+                    </fileset>
 
-      <classpath refid="classpath" />
-    </javadoc>
-  </target>
+                    <classpath refid="classpath" />
+                </javadoc>
+            </target>
 
-  <target name="clean" description="Clean project">
-    <delete dir="${build.dir}" />
-  </target>
+            <target name="clean" description="Clean project">
+                <delete dir="${build.dir}" />
+            </target>
 
 <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         What's about the software design ?!;-)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-  <target name="pmd" description="SOFTWAREDESIGN: Project Mess Detector !;-)">
-      <echo>Checking Project Mess Detection (PMD) rulesets.</echo>
-      <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
-        <classpath>
-          <pathelement path="${classpath}" />
-          <fileset dir="${library.directory}">
-            <include name="*.jar" />
-          </fileset>
-        </classpath>
-      </taskdef>
+            <target name="pmd" description="SOFTWAREDESIGN: Project Mess Detector !;-)">
+                <echo>Checking Project Mess Detection (PMD) rulesets.</echo>
+                <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+                    <classpath>
+                        <pathelement path="${classpath}" />
+                        <fileset dir="${library.directory}">
+                            <include name="*.jar" />
+                        </fileset>
+                    </classpath>
+                </taskdef>
       <!-- allowed Pretty Much Done rulsets -->
       <!-- rulesets/basic.xml -->
       <!-- rulesets/braces.xml -->
@@ -212,42 +218,42 @@
       <!-- rulesets/strings.xml -->
       <!-- rulesets/unusedcode.xml -->
 
-      <pmd rulesetfiles="rulesets/unusedcode.xml,rulesets/basic.xml" failonerror="no">
-          <formatter type="html" toFile="${build.dir}/pmd_report.html"/>
-          <fileset dir="${src.dir}">
-              <include name="**/*.java"/>
-          </fileset>
-      </pmd>
+                <pmd rulesetfiles="rulesets/unusedcode.xml,rulesets/basic.xml" failonerror="no">
+                    <formatter type="html" toFile="${build.dir}/pmd_report.html"/>
+                    <fileset dir="${src.dir}">
+                        <include name="**/*.java"/>
+                    </fileset>
+                </pmd>
 
       <!-- check for duplicated code -->
-      <echo>WARNING: use environment variable: ANT_OPTS=-Xmx512m or this task will fail.</echo>
-      <echo>Checking for duplicated code using the Copy/Paste Detector (CPD).</echo>
-      <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" >
-        <classpath>
-          <pathelement path="${classpath}" />
-          <fileset dir="${library.directory}">
-            <include name="*.jar" />
-          </fileset>
-        </classpath>
-      </taskdef>
-      <cpd format="text" minimumTokenCount="100" outputFile="${build.dir}/duplicated_code_report.txt">
-        <fileset dir="${src.dir}">
-            <include name="**/*.java"/>
-        </fileset>
-      </cpd>
-  </target>
+                <echo>WARNING: use environment variable: ANT_OPTS=-Xmx512m or this task will fail.</echo>
+                <echo>Checking for duplicated code using the Copy/Paste Detector (CPD).</echo>
+                <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask">
+                    <classpath>
+                        <pathelement path="${classpath}" />
+                        <fileset dir="${library.directory}">
+                            <include name="*.jar" />
+                        </fileset>
+                    </classpath>
+                </taskdef>
+                <cpd format="text" minimumTokenCount="100" outputFile="${build.dir}/duplicated_code_report.txt">
+                    <fileset dir="${src.dir}">
+                        <include name="**/*.java"/>
+                    </fileset>
+                </cpd>
+            </target>
 
 
-  <target name="javancss" description="SOFTWAREDESIGN: Determining the NCSS and CCN code metrics for JOELib.">
-    <taskdef name="javancss" classname="javancss.JavancssAntTask">
-      <classpath>
-          <pathelement path="${classpath}" />
-          <fileset dir="${library.directory}">
-            <include name="*.jar" />
-          </fileset>
-        </classpath>
-    </taskdef>
-    <echo>Cyclomatic
+            <target name="javancss" description="SOFTWAREDESIGN: Determining the NCSS and CCN code metrics for JOELib.">
+                <taskdef name="javancss" classname="javancss.JavancssAntTask">
+                    <classpath>
+                        <pathelement path="${classpath}" />
+                        <fileset dir="${library.directory}">
+                            <include name="*.jar" />
+                        </fileset>
+                    </classpath>
+                </taskdef>
+                <echo>Cyclomatic
 Complexity             Ease of       Risk
 Number (CCN)           maintenance
 (McCabe metric)
@@ -258,41 +264,40 @@ Number (CCN)           maintenance
 >50, unstable          very hard     very high
 
 </echo>
-     <javancss srcdir="${src.dir}"
-            includes="**/*.java"
-            excludes="jama/**/*.java, jmat/**/*.java, cformat/**/*.java"
-            abortOnFail="false"
-            ccnPerFuncMax="30"
-            generateReport="true"
-            outputfile="${build.dir}/javancss_report.plain"
-            format="plain"
-            packageMetrics="true"
-            classMetrics="false"
-            functionMetrics="false"
-            />
-  </target>
+                <javancss srcdir="${src.dir}"
+                        includes="**/*.java"
+                        excludes="jama/**/*.java, jmat/**/*.java, cformat/**/*.java"
+                        abortOnFail="false"
+                        ccnPerFuncMax="30"
+                        generateReport="true"
+                        outputfile="${build.dir}/javancss_report.plain"
+                        format="plain"
+                        packageMetrics="true"
+                        classMetrics="false"
+                        functionMetrics="false" />
+            </target>
 
-  <target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
-    <taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
-      <classpath>
-        <pathelement path="${classpath}" />
-        <fileset dir="${library.directory}">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </taskdef>
-    <jalopy fileformat="unix"
-            convention="${src.dir}/java/jalopy.format.convention.xml"
-            history="file"
-            historymethod="adler32"
-            loglevel="error"
-            threads="2"
-            classpathref="classpath"
-            backup="bak">
-      <fileset dir="${src.dir}">
-        <include name="**/*.java"/>
-      </fileset>
-    </jalopy>
-  </target>
+            <target name="jalopy" description="SOFTWAREDESIGN: source code formatter using the JOELib convention.">
+                <taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
+                    <classpath>
+                        <pathelement path="${classpath}" />
+                        <fileset dir="${library.directory}">
+                            <include name="*.jar" />
+                        </fileset>
+                    </classpath>
+                </taskdef>
+                <jalopy fileformat="unix"
+                        convention="${src.dir}/java/jalopy.format.convention.xml"
+                        history="file"
+                        historymethod="adler32"
+                        loglevel="error"
+                        threads="2"
+                        classpathref="classpath"
+                        backup="bak">
+                    <fileset dir="${src.dir}">
+                        <include name="**/*.java"/>
+                    </fileset>
+                </jalopy>
+            </target>
 
-</project>
+        </project>
