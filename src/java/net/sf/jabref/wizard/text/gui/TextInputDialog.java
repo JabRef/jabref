@@ -189,6 +189,8 @@ public class TextInputDialog extends JDialog
     textPane = new JTextPane() ;
     textPane.setEditable( false ) ;
     textPane.setOpaque(false);
+//    textPane.setMaximumSize( new Dimension(100, 100) );
+
     doc = textPane.getStyledDocument() ;
     addStylesToDocument( doc ) ;
 
@@ -209,6 +211,7 @@ public class TextInputDialog extends JDialog
         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
     paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
+//    paneScrollPane.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) ;
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
