@@ -608,7 +608,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
                   new JabRefFileChooser((File)null) :
                   new JabRefFileChooser(new File(prefs.get("workingDirectory")));
               chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-              int returnVal = chooser.showOpenDialog(ths);
+               int returnVal = chooser.showOpenDialog(ths);
               if(returnVal == JFileChooser.APPROVE_OPTION) {
                 fileToOpen = chooser.getSelectedFile();
 
@@ -1258,9 +1258,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
     public void mouseClicked(MouseEvent e) {
 	// Intercepts mouse clicks from the JTable showing the base contents.
 	// A double click on an entry should open the entry's editor.
-	/*if (e.getClickCount() == 2) {
+	if (e.getClickCount() == 2) {
 	    runCommand("edit");
-	}*/
+	}
     }
 
     public void mouseEntered(MouseEvent e) {}

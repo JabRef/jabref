@@ -43,8 +43,8 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     JLabel messageLabel=new JLabel("", SwingConstants.CENTER);
 
     JTextField name = new JTextField("", width);
-    JTextArea req_ta=new JTextArea("",1,width),//10 row, 20 columns
-	opt_ta=new JTextArea("",1,width);//10 row, 20 columns
+    JTextArea req_ta=new JTextArea("",5,width),//10 row, 20 columns
+	opt_ta=new JTextArea("",5,width);//10 row, 20 columns
     // need to get FIeld name from somewhere
 
     JComboBox types_cb = new JComboBox();
@@ -69,7 +69,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
 			      "Help", GUIGlobals.helpSmallIconFile);
 	setTypeSelection();
-	setSize(440,400);
+	//setSize(440,400);
 	initialize();
 	makeButtons();
 
@@ -153,7 +153,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
             dispose();
           }
         });
-
+        pack();
 	name.requestFocus();
     }
 

@@ -223,12 +223,15 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public boolean isCellEditable(int row, int col) {
-	if (col <= PADLEFT) return false;
+	if (col < PADLEFT) return false;
 	// getColumnClass will throw a NullPointerException if there is no
 	// entry in FieldTypes.GLOBAL_FIELD_TYPES for the column.
 	try {
-	    getColumnClass(col);
+          if (!getColumnName(col).toLowerCase().equals(GUIGlobals.TYPE_HEADER))
+//	    getColumnClass(col);
 	    return true;
+          else
+            return false;
 	} catch (NullPointerException ex) {
 	    return false;
 	}

@@ -240,4 +240,5 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
 
     }
+
 }

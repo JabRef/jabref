@@ -3,6 +3,8 @@ package net.sf.jabref;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
 
 class ExternalProgramsTab extends JPanel implements PrefsTab {
 
@@ -24,47 +26,85 @@ class ExternalProgramsTab extends JPanel implements PrefsTab {
 		  (BorderFactory.createEtchedBorder(),
 		  Globals.lang("Paths to external programs")));*/
 	JLabel lab;
+        BrowseAction ba;
+        //JToolBar tlb;
 	setLayout(gbl);
 	con.weightx = 0;
 	con.insets = new Insets(10, 10, 10, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
 	lab = new JLabel(Globals.lang("Path to PDF viewer")+":");
 	gbl.setConstraints(lab, con);
-	add(lab);
+        add(lab);
 	con.weightx = 1;
-	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(pdf, con);
 	add(pdf);
 	con.weightx = 0;
-	con.gridwidth = 1;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        JButton browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(pdf));
+        gbl.setConstraints(browse, con);
+        add(browse);
+        con.gridwidth = 1;
 	con.fill = GridBagConstraints.HORIZONTAL;
 	lab = new JLabel(Globals.lang("Path to PS viewer")+":");
 	gbl.setConstraints(lab, con);
 	add(lab);
 	con.weightx = 1;
-	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(ps, con);
 	add(ps);
 	con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(ps));
+        gbl.setConstraints(browse, con);
+        add(browse);
 	con.gridwidth = 1;
 	lab = new JLabel(Globals.lang("Path to HTML viewer")+":");
 	gbl.setConstraints(lab, con);
 	add(lab);
 	con.weightx = 1;
-	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(html, con);
 	add(html);
+        con.gridwidth = GridBagConstraints.REMAINDER;
 	con.weightx = 0;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(html));
+        gbl.setConstraints(browse, con);
+        add(browse);
 	con.gridwidth = 1;
 	con.fill = GridBagConstraints.HORIZONTAL;
 	lab = new JLabel(Globals.lang("Path to LyX pipe")+":");
 	gbl.setConstraints(lab, con);
 	add(lab);
-	con.weightx = 1;
-	con.gridwidth = GridBagConstraints.REMAINDER;
+        con.weightx = 1;
 	gbl.setConstraints(lyx, con);
 	add(lyx);
+        con.weightx = 0;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(lyx));
+        gbl.setConstraints(browse, con);
+        add(browse);
 
+    }
+
+  /**
+   * Action used to produce a "Browse" button for one of the text fields.
+   */
+  class BrowseAction extends AbstractAction {
+      JTextField comp;
+      public BrowseAction(JTextField tc) {
+        super(Globals.lang("Browse"));
+        comp = tc;
+      }
+      public void actionPerformed(ActionEvent e) {
+        JabRefFileChooser chooser = new JabRefFileChooser(new File(comp.getText()));
+        //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+        int returnVal = chooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+          File newFile = chooser.getSelectedFile();
+          comp.setText(newFile.getPath());
+        }
+      }
     }
 
     /**
