@@ -45,7 +45,7 @@ public class BibtexDatabase
     Hashtable _autoCompleters = null;
 
     private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
-    
+
     /* Entries are stored in a HashMap with the ID as key.
      * What happens if someone changes a BibtexEntry's ID
      * after it has been added to this BibtexDatabase?
@@ -131,7 +131,6 @@ public class BibtexDatabase
         throws KeyCollisionException
     {
         String id = entry.getId();
-
         if (getEntryById(id) != null)
         {
             throw new KeyCollisionException(
@@ -151,8 +150,8 @@ public class BibtexDatabase
 	}
 	*/
         _entries.put(id, entry);
-	
-	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);    
+
+	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
 
     /**
@@ -191,7 +190,7 @@ public class BibtexDatabase
     /**
      * Returns the database's preamble.
      */
-    public synchronized String getPreamble() 
+    public synchronized String getPreamble()
     {
 	return _preamble;
     }
@@ -199,12 +198,12 @@ public class BibtexDatabase
     /**
      * Inserts a Bibtex String at the given index.
      */
-    public synchronized void addString(BibtexString string, int index) 
+    public synchronized void addString(BibtexString string, int index)
         throws KeyCollisionException
     {
 	for (java.util.Iterator i=_strings.iterator(); i.hasNext();) {
 	    if (((BibtexString)i.next()).getName().equals(string.getName()))
-		throw new KeyCollisionException("A string with this label already exists,");					    
+		throw new KeyCollisionException("A string with this label already exists,");
 	}
 	_strings.insertElementAt(string, index);
     }
@@ -242,14 +241,14 @@ public class BibtexDatabase
     }
 
     //##########################################
-    //  usage: 
+    //  usage:
     //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
     //############################################
         // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
 	Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
-	
+
 	boolean duplicate=false;
 	if(oldKey==null){// this is a new entry so don't bother removing oldKey
 	    duplicate= addKeyToSet( newKey);
@@ -257,7 +256,7 @@ public class BibtexDatabase
 	    if(oldKey.equals(newKey)){// were OK because the user did not change keys
 		duplicate=false;
 	    }else{// user changed the key
-		
+
 		// removed the oldkey
 		// But what if more than two have the same key?
 		// this means that user can add another key and would not get a warning!
@@ -274,7 +273,7 @@ public class BibtexDatabase
 	    JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
 					  Globals.lang("Duplicate Key Warning"),
 					  JOptionPane.WARNING_MESSAGE);//, options);
-	    
+
 	}
 	return duplicate;
     }
@@ -299,7 +298,7 @@ public class BibtexDatabase
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key){
-	if(key.equals("")) return;
+	if((key == null) || key.equals("")) return;
 	if(allKeys.containsKey(key)){
 	    Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
 	    if(tI.intValue()==1)
@@ -314,7 +313,7 @@ public class BibtexDatabase
     /*
     public void setCompleters(Hashtable autoCompleters) {
 	_autoCompleters = autoCompleters;
-       
+
 	for (Iterator i=getKeySet().iterator(); i.hasNext();) {
 	    BibtexEntry be = getEntryById((String)(i.next()));
 	    be.addPropertyChangeListener(new FieldChangeListener

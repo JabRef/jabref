@@ -942,6 +942,7 @@ public class JabRefFrame extends JFrame {
       if (tabbedPane.getTabCount() > 0)
         for (int i=0; i<tabbedPane.getTabCount(); i++) {
           ((BasePanel)tabbedPane.getComponentAt(i)).sidePaneManager.ensureVisible("fetchMedline");
+          new FocusRequester(basePanel().medlineFetcher);
         }
     }
 

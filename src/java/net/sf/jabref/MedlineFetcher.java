@@ -23,7 +23,7 @@ import net.sf.jabref.undo.UndoableInsertEntry;
  * @version 1.0
  */
 
-public class MedlineFetcher extends SidePaneComponent {
+public class MedlineFetcher extends SidePaneComponent implements Runnable {
 
   SidePaneHeader header = new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
   BasePanel panel;
@@ -32,6 +32,7 @@ public class MedlineFetcher extends SidePaneComponent {
   GridBagLayout gbl = new GridBagLayout();
   GridBagConstraints con = new GridBagConstraints();
   JButton ok = new JButton(new ImageIcon(GUIGlobals.fetchMedlineIcon));
+  MedlineFetcher ths = this;
 
   public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
     super(p0);
@@ -57,43 +58,51 @@ public class MedlineFetcher extends SidePaneComponent {
     //add(ok);
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        String idList = tf.getText().replace(';', ',');
-        if(idList==null || idList.trim().equals(""))//if user pressed cancel
-          return;
-        Pattern p = Pattern.compile("\\d+[,\\d+]*");
-        Matcher m = p.matcher( idList );
-        if ( m.matches() ) {
-          panel.output(Globals.lang("Fetching Medline..."));
-          ArrayList bibs = fetchMedline(idList);
-          if (bibs.size() > 0) {
-            tf.setText("");
-            NamedCompound ce = new NamedCompound(Globals.lang("Fetch Medline"));
-            Iterator i = bibs.iterator();
-            while (i.hasNext()) {
-              try {
-                BibtexEntry be = (BibtexEntry) i.next();
-                panel.database.insertEntry(be);
-                ce.addEdit(new UndoableInsertEntry(panel.database, be, panel));
-              }
-              catch (KeyCollisionException ex) {
-              }
-            }
-            ce.end();
-            panel.output(Globals.lang("Medline entries fetched:")+" "+bibs.size());
-            panel.undoManager.addEdit(ce);
-            panel.markBaseChanged();
-            panel.refreshTable();
-          } else
-            panel.output(Globals.lang("No Medline entries found."));
-        } else {
-          JOptionPane.showMessageDialog(panel.frame,"Sorry, I was expecting a semicolon or comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
-        }
+        (new Thread(ths)).start(); // Run fetch in thread.
       }
     };
 
     ok.addActionListener(listener);
     tf.addActionListener(listener);
   }
+
+  public void run() {
+    String idList = tf.getText().replace(';', ',');
+    if(idList==null || idList.trim().equals(""))//if user pressed cancel
+      return;
+    Pattern p = Pattern.compile("\\d+[,\\d+]*");
+    Matcher m = p.matcher( idList );
+    if ( m.matches() ) {
+      panel.frame.output(Globals.lang("Fetching Medline..."));
+      ArrayList bibs = fetchMedline(idList);
+      if (bibs.size() > 0) {
+        tf.setText("");
+        NamedCompound ce = new NamedCompound(Globals.lang("Fetch Medline"));
+        Iterator i = bibs.iterator();
+        while (i.hasNext()) {
+          try {
+            BibtexEntry be = (BibtexEntry) i.next();
+            String id = Util.createId(be.getType(), panel.database);
+            be.setId(id);
+            panel.database.insertEntry(be);
+            ce.addEdit(new UndoableInsertEntry(panel.database, be, panel));
+          }
+          catch (KeyCollisionException ex) {
+          }
+        }
+        ce.end();
+        panel.output(Globals.lang("Medline entries fetched:")+" "+bibs.size());
+        panel.undoManager.addEdit(ce);
+        panel.markBaseChanged();
+        panel.refreshTable();
+      } else
+        panel.output(Globals.lang("No Medline entries found."));
+    } else {
+      JOptionPane.showMessageDialog(panel.frame,"Sorry, I was expecting a semicolon or comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
+
 
 //==================================================
 //

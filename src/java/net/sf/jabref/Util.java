@@ -76,21 +76,26 @@ public class Util {
     }
 
     public static String createId(BibtexEntryType type, BibtexDatabase database) {
-	String s;
-	do {
-	    s = type.getName()+(new Integer((int)(Math.random()*10000))).toString();
-	} while (database.getEntryById(s) != null);
-	return s;
+        String s;
+        do {
+            s = type.getName()+(new Integer((int)(Math.random()*10000))).toString();
+        } while (database.getEntryById(s) != null);
+        return s;
+    }
+
+    private static int idCounter=0;
+    public static String createNeutralId() {
+        return ""+(idCounter++);
     }
 
 
-    /** 
+    /**
      * This method sets the location of a Dialog such that it is centered with
      * regard to another window, but not outside the screen on the left and the top.
      */
-    public static void placeDialog(javax.swing.JDialog diag, 
+    public static void placeDialog(javax.swing.JDialog diag,
 				   java.awt.Container win) {
-	Dimension ds = diag.getSize(), df = win.getSize();		
+	Dimension ds = diag.getSize(), df = win.getSize();
 	Point pf = win.getLocation();
 	diag.setLocation(new Point(Math.max(0, pf.x+(df.width-ds.width)/2),
 				   Math.max(0,pf.y+(df.height-ds.height)/2)));
@@ -99,7 +104,7 @@ public class Util {
 
     /**
      * This method translates a field or string from Bibtex notation, with
-     * possibly text contained in " " or { }, and string references, concatenated 
+     * possibly text contained in " " or { }, and string references, concatenated
      * by '#' characters, into Bibkeeper notation, where string references are
      * enclosed in a pair of '#' characters.
      */
@@ -107,7 +112,7 @@ public class Util {
 	if (content.length() == 0)
 	    return "";
 	String toSet = "";
-	boolean string; 
+	boolean string;
 	// Keeps track of whether the next item is
 	// a reference to a string, or normal content. First we must
 	// check which we begin with. We simply check if we can find
@@ -126,7 +131,7 @@ public class Util {
 	//System.out.println("FileLoader: "+content+" "+string+" "+hash+" "+wr1+" "+wr2);
 	StringTokenizer tok = new StringTokenizer(content, "#", true);
 	// 'tok' splits at the '#' sign, and keeps delimiters
-	
+
 	while (tok.hasMoreTokens()) {
 	    String str = tok.nextToken();
 	    if (str.equals("#"))
@@ -136,7 +141,7 @@ public class Util {
 		    // This part should normally be a string, but if it's
 		    // a pure number, it is not.
 		    String s = shaveString(str);
-		    try {			
+		    try {
 			Integer.parseInt(s);
 			// If there's no exception, it's a number.
 			toSet = toSet+s;
@@ -150,15 +155,15 @@ public class Util {
 	    }
 	}
 	return toSet;
-    }	
-  
+    }
+
     public static String shaveString(String s) {
 	// returns the string, after shaving off whitespace at the beginning
 	// and end, and removing (at most) one pair of braces or " surrounding it.
 	if (s == null)
 	    return null;
 	char ch = 0, ch2 = 0;
-	int beg = 0, end = s.length(); 
+	int beg = 0, end = s.length();
 	// We start out assuming nothing will be removed.
 	boolean begok = false, endok = false, braok = false;
 	while (!begok) {
@@ -189,7 +194,7 @@ public class Util {
 	    if (((ch == '{') && (ch2 == '}')) ||
 		((ch == '"') && (ch2 == '"'))) {
 		beg++;
-		end--;		  
+		end--;
 	    }
 	} //else
 	//braok = true;
@@ -209,16 +214,16 @@ public class Util {
      * except all whitespace and '#' characters are removed. These
      * characters make a key unusable by bibtex.
      */
-    public static String checkLegalKey(String key) { 
-	StringBuffer newKey = new StringBuffer(); 
-	for (int i=0; i<key.length(); i++) { 
-	    char c = key.charAt(i); 
+    public static String checkLegalKey(String key) {
+	StringBuffer newKey = new StringBuffer();
+	for (int i=0; i<key.length(); i++) {
+	    char c = key.charAt(i);
 	    if (!Character.isWhitespace(c) & (c != '#'))
-		newKey.append(c); 
-	} 
+		newKey.append(c);
+	}
 	return newKey.toString();
     }
-    
+
     static public String wrap2(String in, int wrapAmount){
         StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\n\\r]+"," "));
         int p = in.length() - wrapAmount;
@@ -268,7 +273,7 @@ public class Util {
      * @param delimiter String to use as delimiter.
      * @return Delimited String.
      */
-    public static String stringArrayToDelimited(String[] strs, 
+    public static String stringArrayToDelimited(String[] strs,
 						String delimiter) {
 	if ((strs == null) || (strs.length == 0))
 	    return "";
@@ -285,7 +290,7 @@ public class Util {
 
 
     /**
-     * Takes a delimited string, splits it and returns 
+     * Takes a delimited string, splits it and returns
      *
      * @param names a <code>String</code> value
      * @return a <code>String[]</code> value
@@ -303,7 +308,7 @@ public class Util {
      */
     /*    public static void updateCompletersForEntry(Hashtable autoCompleters,
 					 BibtexEntry be) {
-      
+
 	for (Iterator j=autoCompleters.keySet().iterator();
 	     j.hasNext();) {
 	    String field = (String)j.next();
@@ -311,6 +316,6 @@ public class Util {
 	    comp.addAll(be.getField(field));
 	}
 	}*/
-    
+
 
 }

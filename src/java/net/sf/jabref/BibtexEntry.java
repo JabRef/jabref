@@ -133,11 +133,11 @@ public class BibtexEntry
 
         _type = type;
     }
-    
+
     /**
-     * Prompts the entry to call BibtexEntryType.getType(String) with 
+     * Prompts the entry to call BibtexEntryType.getType(String) with
      * its current type name as argument, and sets its type according
-     * to what is returned. This method is called when a user changes 
+     * to what is returned. This method is called when a user changes
      * the type customization, to make sure all entries are set with
      * current types.
      * @return true if the entry could find a type, false if not (in
@@ -158,9 +158,9 @@ public class BibtexEntry
      * Sets this entry's ID, provided the database containing it
      * doesn't veto the change.
      */
-    public void setId(String id) throws KeyCollisionException { 
-	
-	if (id == null) { 
+    public void setId(String id) throws KeyCollisionException {
+
+	if (id == null) {
 	    throw new
 		NullPointerException("Every BibtexEntry must have an ID");
 	}
@@ -239,7 +239,7 @@ public class BibtexEntry
         _changeSupport.fireVetoableChange(new PropertyChangeEvent(this,
                 fieldName, oldValue, newValue));
     }
-    
+
     /**
      * Adds a VetoableChangeListener, which is notified of field
      * changes. This is useful for an object that needs to update
@@ -264,7 +264,7 @@ public class BibtexEntry
     public void write(Writer out, FieldFormatter ff) throws IOException {
 	// Write header with type and bibtex-key.
 	out.write("@"+_type.getName().toUpperCase()+"{");
-	
+
 	String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
 	out.write(((str == null) ? "" : str.toString())+",\n");
 	HashMap written = new HashMap();
@@ -283,10 +283,10 @@ public class BibtexEntry
 	}
 	// Then write remaining fields, if any.
 	/*for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-	    if (!written.containsKey(GUIGlobals.ALL_FIELDS[i]) 
+	    if (!written.containsKey(GUIGlobals.ALL_FIELDS[i])
             &&
               GUIGlobals.isWriteableField(GUIGlobals.ALL_FIELDS[i])
-              )  
+              )
         {
             writeField(GUIGlobals.ALL_FIELDS[i], out);
         }
@@ -296,7 +296,7 @@ public class BibtexEntry
             String key = (String)i.next();
             if (!written.containsKey(key)
                 && GUIGlobals.isWriteableField(key))
-		
+
                 {
                     writeField(key, out, ff);
                 }
@@ -317,7 +317,7 @@ public class BibtexEntry
 				    GUIGlobals.isStandardField(name)));
 	    } catch (Throwable ex) {
 		throw new IOException
-		    ("Error in field '"+name+"': "+ex.getMessage()); 
+		    ("Error in field '"+name+"': "+ex.getMessage());
 	    }
 	    //Util.writeField(name, o, out);
 	    out.write(",\n");
@@ -329,7 +329,7 @@ public class BibtexEntry
      */
     public Object clone() {
 	BibtexEntry clone = new BibtexEntry(_id, _type);
-	clone._fields = (Map)((HashMap)_fields).clone();	
+	clone._fields = (Map)((HashMap)_fields).clone();
 	return clone;
     }
 

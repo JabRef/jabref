@@ -59,14 +59,14 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
     public void undo() {
 	super.undo();
-	
+
 	// Revert the change.
 	try {
 	    base.removeEntry(entry.getId());
 	    // If the entry has an editor currently open, we must close it.
 	    panel.ensureNotShowing(entry);
 	} catch (Throwable ex) {
-	    Util.pr(ex.getMessage());
+          ex.printStackTrace();
 	}
     }
 
@@ -75,11 +75,11 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
 	// Redo the change.
 	try {
-	    String id = Util.createId(entry.getType(), base);
+          String id = Util.createId(entry.getType(), base);
 	    entry.setId(id);
 	    base.insertEntry(entry);
 	} catch (Throwable ex) {
-	    Util.pr(ex.getMessage());
+          ex.printStackTrace();
 	}
     }
 

@@ -56,6 +56,8 @@ public class EntryComparator implements Comparator {
     }
 
     public int compare(Object o1, Object o2) throws ClassCastException {
+      //if (o1 == null) Util.pr("o1 == null");
+     //if (o2 == null) Util.pr("o2 == null");
 	if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
 	   throw new ClassCastException("Trouble comparing objects: "+o1.toString()+"\n\n"+o2.toString());
 	BibtexEntry e1 = (BibtexEntry)o1,

@@ -68,7 +68,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     EntryTableModel tableModel = null;
     EntryTable entryTable = null;
+
+    // The sidepane manager takes care of populating the sidepane.
+    SidePaneManager sidePaneManager;
+
     SearchManager2 searchManager;
+    MedlineFetcher medlineFetcher;
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -89,9 +94,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     boolean showingSearchResults = false,
 	showingGroup = false;
-
-    // The sidepane manager takes care of populating the sidepane.
-    SidePaneManager sidePaneManager;
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
@@ -727,7 +729,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	setRightComponent(splitPane);
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
-	sidePaneManager.register("fetchMedline", new MedlineFetcher(this, sidePaneManager));
+        medlineFetcher = new MedlineFetcher(this, sidePaneManager);
+	sidePaneManager.register("fetchMedline", medlineFetcher);
 	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
 	sidePaneManager.add("search", searchManager);
 	sidePaneManager.populatePanel();

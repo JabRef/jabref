@@ -6,7 +6,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /*
-Copyright (C) 2002-2003 Morten ). Alver & Nizar N. Batada 
+Copyright (C) 2002-2003 Morten ). Alver & Nizar N. Batada
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
 described below.
@@ -47,14 +47,14 @@ public class MedlineHandler extends DefaultHandler
 	lastName="",year="",forename="", abstractText="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
-	pubmedid="", descriptorName="";		
+	pubmedid="", descriptorName="";
     ArrayList authors=new ArrayList();
     int rowNum=0;
     public ArrayList getItems(){ return bibitems;}
-    
+
     public MedlineHandler(){
 	super();
-	
+
     }
     public void startElement(String uri, String localName, String qName,  Attributes atts)
     {
@@ -86,9 +86,9 @@ public class MedlineHandler extends DefaultHandler
 	else if(localName.equals("URL")){inUrl=true;}
 	else if(localName.equals("Initials")){inInitials=true;}
 	else if(localName.equals("AbstractText")){ inAbstractText=true;}
-	
-	
-	
+
+
+
 	return;
     }
     String join(Object[] sa,String delim){
@@ -103,7 +103,7 @@ public class MedlineHandler extends DefaultHandler
     }
     String makeBibtexString(){
 	String out  = "";
-	out= "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year + 
+	out= "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
 	    "},\n volume = { " + volume + "},\n number = { "+ number + "},\n pages = { " + page + "},\n abstract = { " + abstractText + "},\n}";
 	return out;
     }
@@ -122,7 +122,7 @@ public class MedlineHandler extends DefaultHandler
 		}
 	    }
 	    //################################## 09/23/03  put {} around capitals
-	    
+
 	    title=Globals.putBracesAroundCapitals(title);
 	    //##############################
 	    // made pubmedid the keyword (user request)
@@ -132,7 +132,7 @@ public class MedlineHandler extends DefaultHandler
 // 				     type, series, editor, booktitle,
 // 				     address, number, keyword, url, abstractText.replaceAll("%","\\\\%"), Globals.nextKey(),""+rowNum++ );
 // 	    if(b.getType().length() > 0)
-	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
+	    BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
 	    b.setField("author",author);
 	    b.setField("title",title);
@@ -145,9 +145,9 @@ public class MedlineHandler extends DefaultHandler
 	    b.setField("month",month);
 	    b.setField("url",url);
 	    b.setField("number",number);
-	    
+
 	    bibitems.add( b  );
-	    
+
 	    abstractText = "";
 	    author = "";
 	    title="";
@@ -160,12 +160,12 @@ public class MedlineHandler extends DefaultHandler
 	    month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
 	    MedlineDate="";
 	}
-	
+
 	else if(localName.equals("ArticleTitle")){inTitle=false;}
 	else if(localName.equals("PubDate")){inPubDate=false;}
 	else if(localName.equals("Year")){inYear=false;}
-	else if(localName.equals("PMID")){inPubMedID=false;}			
-	else if(localName.equals("MedlineDate")){inMedlineDate=false;}			
+	else if(localName.equals("PMID")){inPubMedID=false;}
+	else if(localName.equals("MedlineDate")){inMedlineDate=false;}
 	else if(localName.equals("MedlineTA")){inJournal=false;} //journal name
 	else if(localName.equals("Month")){inMonth=false;}
 	else if(localName.equals("Volume")){inVolume=false;}
@@ -175,7 +175,7 @@ public class MedlineHandler extends DefaultHandler
 	}
 	else if(localName.equals("Author")){
 	    // forename sometimes has initials with " " in middle: is pattern [A-Z] [A-Z]
-	    // when above is the case replace it with initials 
+	    // when above is the case replace it with initials
 	    if(forename.length()==3 && forename.charAt(1)==' '){
 		forename=initials;
 	    }
@@ -196,9 +196,9 @@ public class MedlineHandler extends DefaultHandler
 	}
 	else if(localName.equals("AbstractText")){ inAbstractText=false;}
     }
-    
+
     public void characters( char[] data, int start, int length ) {
-	
+
 	// if stack is not ready, data is not content of recognized element
 	if( inTitle ){ title = new String( data, start, length);}
 	else if(inYear){ year=new String(data,start,length);}
