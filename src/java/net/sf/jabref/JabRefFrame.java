@@ -83,7 +83,7 @@ public class JabRefFrame extends JFrame {
 	open = new OpenDatabaseAction(),
 	close = new CloseDatabaseAction(),
 	quit = new CloseAction(),
-    //selectKeys = new SelectKeysAction(),
+	selectKeys = new SelectKeysAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	help = new HelpAction("JabRef help", helpDiag,
 			      GUIGlobals.baseFrameHelp, "JabRef help",
@@ -597,7 +597,7 @@ public class JabRefFrame extends JFrame {
 		}
 		});*/
 
-//options.add(selectKeys);
+	options.add(selectKeys);
 	mb.add(options);
 
 	helpMenu.add(help);
@@ -783,8 +783,8 @@ public class JabRefFrame extends JFrame {
 		prefs.setNewKeyBindings(d.getNewKeyBindings());
 		JOptionPane.showMessageDialog
 		    (ths,
-		     Globals.lang("Your new key bindings have been stored.\n"
-				  +"You must restart JabRef for the new key "
+		     Globals.lang("Your new key bindings have been stored.")+"\n"
+		     +Globals.lang("You must restart JabRef for the new key "
 				  +"bindings to work properly."),
 		     Globals.lang("Key bindings changed"),
 		     JOptionPane.INFORMATION_MESSAGE);

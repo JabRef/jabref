@@ -270,6 +270,7 @@ public class JabRefPreferences {
 	    }
 	    putStringArray("bindNames", bindNames);
 	    putStringArray("bindings", bindings);
+	    keyBinds = newBindings;
 	}
     }
 
@@ -380,6 +381,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
 	defKeyBinds.put("Next tab", "ctrl RIGHT");
 	defKeyBinds.put("Previous tab", "ctrl LEFT");
+	defKeyBinds.put("Replace string", "ctrl R");
+	defKeyBinds.put("Delete", "Delete");
     }
 
     private String getNextUnit(Reader data) throws IOException {

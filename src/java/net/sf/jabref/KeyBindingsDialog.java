@@ -56,9 +56,9 @@ class KeyBindingsDialog extends JDialog
 	getContentPane().add( listScroller, BorderLayout.CENTER);
 
 	Box buttonBox=new Box(BoxLayout.X_AXIS);
-	ok=new JButton("OK");
-	cancel=new JButton("CANCEL");
-	grabB=new JButton("Grab");	
+	ok=new JButton(Globals.lang("Ok"));
+	cancel=new JButton(Globals.lang("Cancel"));
+	grabB=new JButton(Globals.lang("Grab"));	
 	grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
 	buttonBox.add(grabB);
 	buttonBox.add(ok);
@@ -73,7 +73,7 @@ class KeyBindingsDialog extends JDialog
     void setTop(){
 	Box topBox=new Box(BoxLayout.X_AXIS);
 
-	topBox.add(new JLabel("Binding:",JLabel.RIGHT));
+	topBox.add(new JLabel(Globals.lang("Binding")+":",JLabel.RIGHT));
 	topBox.add(keyTF);
 	getContentPane().add(topBox,BorderLayout.NORTH);
 
@@ -90,21 +90,32 @@ class KeyBindingsDialog extends JDialog
  	    String code=KeyEvent.getKeyText(evt.getKeyCode());
  	    String mod=KeyEvent.getKeyModifiersText(evt.getModifiers());
 	    // all key bindings must have a modifier: ctrl alt etc 
-	    if(mod.equals(""))
-		return;//need a modifier
+
+	    if(mod.equals("")) {
+		int kc = evt.getKeyCode();
+		if ((kc < KeyEvent.VK_F1) && (kc > KeyEvent.VK_F12) &&
+		    (kc != KeyEvent.VK_ESCAPE) && (kc != KeyEvent.VK_DELETE))
+		    return; // need a modifier except for function keys
+	    }
 	    // second key cannot be a modifiers 
-	    if ( evt.isActionKey()
-		 || code.equals("Escape") 
-		 || code.equals("Tab") 
-		 || code.equals("Backspace") 
-		 || code.equals("Enter") 
-		 || code.equals("Delete")
-		 || code.equals("Space") 
-		 || code.equals("Ctrl") 
-		 || code.equals("Shift") 
-		 || code.equals("Alt") )	    	
-		return;
-	    String newKey =mod.toLowerCase() + " " + code; 
+	    //if ( evt.isActionKey()) {
+	    //Util.pr(code);
+	    if (//code.equals("Escape") 
+		    code.equals("Tab") 
+		    || code.equals("Backspace") 
+		    || code.equals("Enter") 
+		    //|| code.equals("Delete")
+		    || code.equals("Space") 
+		    || code.equals("Ctrl") 
+		    || code.equals("Shift") 
+		    || code.equals("Alt") )    	
+		    return;
+		//}
+	    String newKey;
+	    if (!mod.equals(""))
+		newKey = mod.toLowerCase() + " " + code; 
+	    else
+		newKey = code;
 	    keyTF.setText(newKey);
 	    //find which key is selected and set its value int the bindHM
 	    String selectedFunction=(String)list.getSelectedValue();
@@ -185,7 +196,8 @@ class KeyBindingsDialog extends JDialog
 	// This method is called each time the user changes the set of selected items
 	list.addListSelectionListener(new MyListSelectionListener());
 	DefaultListModel listModel = new DefaultListModel();
-  	Iterator it = bindHM.keySet().iterator();
+	TreeMap sorted = new TreeMap(bindHM);
+  	Iterator it = sorted.keySet().iterator();
 	while(it.hasNext()){
 	    listModel.addElement(it.next());
 	}
