@@ -11,11 +11,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -29,11 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.PropertyConfigurator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -57,7 +52,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	final static String OAI_METADATAPREFIX ="metadataPrefix=oai_citeseer";
 	protected SAXParserFactory parserFactory;
 	protected SAXParser saxParser;
-	protected HttpClient citeseerHttpClient;
+	
 	boolean citationFetcherActive;
 	boolean importFetcherActive;
 
@@ -101,34 +96,11 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		gbl.setConstraints(citeSeerProgress, con);
 		add(citeSeerProgress);		
 		try {
-			HostConfiguration hostConfiguration = new HostConfiguration();
 			citationFetcherActive = false;
 			importFetcherActive = false;
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
-			Properties properties = new Properties();
-			ResourceBundle bundle = ResourceBundle.getBundle("resource/log4j");			 
-			Enumeration enum = bundle.getKeys();
-			String key = null; 
-			while(enum.hasMoreElements()) {			  
-			    key = (String) enum.nextElement();
-			    properties.put(key, bundle.getObject(key));
-			}						
-			PropertyConfigurator.configure(properties);
 
-			citeseerHttpClient = new HttpClient();
-			if (System.getProperty("proxySet") != null) {
-				String proxyHost;
-				int proxyPort = 8080;
-				if (System.getProperty("proxyHost") != null) {
-					proxyHost = System.getProperty("proxyHost");
-					if (System.getProperty("proxyPort") != null)
-						proxyPort = Integer.parseInt(System.getProperty("proxyPort"));
-					hostConfiguration.setProxy(proxyHost, proxyPort);
-					citeseerHttpClient.setHostConfiguration(hostConfiguration);
-				}
-			}
-			citeseerHttpClient.setConnectionTimeout(10000); // 10 seconds
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -452,40 +424,36 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		try {
 			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");
 			BooleanAssign dummyBoolean = new BooleanAssign(false);
-		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
-			int citationCounter=0;
-			for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
-				String key = (String) e.nextElement();
-				String id = Util.createId(BibtexEntryType.ARTICLE, database);
-				BibtexEntry newEntry = new BibtexEntry(id);
-				StringBuffer citeseerURLString = new StringBuffer();
-				citeseerURLString.append(OAI_URL);
-				citeseerURLString.append(OAI_ACTION);
-				citeseerURLString.append("&" + OAI_METADATAPREFIX);
-				citeseerURLString.append("&" + "identifier=" + key);
-				GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-				citeseerHttpClient.executeMethod(citeseerMethod);
-				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel, dummyBoolean));
-				citeseerMethod.releaseConnection();
-				database.insertEntry(newEntry);
-				citationCounter++;
-				UpdateProgressBarTwoValue updateValue = new UpdateProgressBarTwoValue(citationCounter);
-				SwingUtilities.invokeLater(updateValue);
+			if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
+			    int citationCounter=0;
+			    for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
+			        String key = (String) e.nextElement();
+					String id = Util.createId(BibtexEntryType.ARTICLE, database);
+					BibtexEntry newEntry = new BibtexEntry(id);
+					StringBuffer citeseerURLString = new StringBuffer();
+					citeseerURLString.append(OAI_URL);
+					citeseerURLString.append(OAI_ACTION);
+					citeseerURLString.append("&" + OAI_METADATAPREFIX);
+					citeseerURLString.append("&" + "identifier=" + key);
+					URL citeseerUrl = new URL( citeseerURLString.toString());
+					HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();				
+					saxParser.parse(citeseerConnection.getInputStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel, dummyBoolean));
+					database.insertEntry(newEntry);
+					citationCounter++;
+					UpdateProgressBarTwoValue updateValue = new UpdateProgressBarTwoValue(citationCounter);
+					SwingUtilities.invokeLater(updateValue);
+			    }
 			}
-		}
-		} catch (HttpException e) {
-			System.out.println("HttpException: " + e.getReason());
-			e.printStackTrace();
-			} catch (SAXException e) {
+		} catch (SAXException e) {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (IOException e) {
+		} catch (IOException e) {
 				ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
 				SwingUtilities.invokeLater(dialog);
-			} catch (KeyCollisionException e) {
-                // TODO Auto-generated catch block
+		} catch (KeyCollisionException e) {
+		    	System.out.println("KeyCollisionException: " + e.getLocalizedMessage());
                 e.printStackTrace();
-            }
+        }
 		return citationHashTable;
 	}
 
@@ -538,17 +506,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
                       citeseerURLString.append(OAI_ACTION);
                       citeseerURLString.append("&" + OAI_METADATAPREFIX);
                       citeseerURLString.append("&" + "identifier=" + identifier);
-                      GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-                      citeseerHttpClient.executeMethod(citeseerMethod);
-                      saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
-                      citeseerMethod.releaseConnection();
+                      URL citeseerUrl = new URL( citeseerURLString.toString());
+                      HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();				
+                      saxParser.parse(citeseerConnection.getInputStream(), new CiteSeerCitationHandler(citationHashTable));
                     } else {
                       int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
                       rejectedEntries.put(new Integer(row+1),currentEntry);                     
                     }
-		} catch(HttpException e) {
-			System.out.println("HttpException: " + e.getReason());
-			e.printStackTrace();
 		} catch (SAXException e) {
 			System.out.println("SAXException: " + e.getLocalizedMessage());
 			e.printStackTrace();
@@ -610,31 +574,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append(OAI_ACTION);
 					citeseerURLString.append("&" + OAI_METADATAPREFIX);
 					citeseerURLString.append("&" + "identifier=" + identifier);
-					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
-					int response = citeseerHttpClient.executeMethod(citeseerMethod);
-					InputStream inputStream  = citeseerMethod.getResponseBodyAsStream();
+                    URL citeseerUrl = new URL( citeseerURLString.toString());
+                    HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();									
+					InputStream inputStream  = citeseerConnection.getInputStream();
 					DefaultHandler handlerBase = new CiteSeerUndoHandler(citeseerNC, be, panel, newValue, overwriteAll, overwriteNone);
 
-					/*
-					 * Debugging: there must exist an easier way to do this.
-					 *
-					 *
-					InputStreamReader iReader = new InputStreamReader(inputStream);
-					int nextChar;
-					while ((nextChar = iReader.read()) != -1) {
-						System.out.print((char) nextChar);
-					}
-					*/
 					saxParser.parse(inputStream, handlerBase);
-					citeseerMethod.releaseConnection();
 				} else {
                     int row = panel.getTableModel().getNumberFromName(be.getId());
                     rejectedEntries.put(new Integer(row+1), be);                
 				}
-			} catch (HttpException e) {
-				System.out.println("HttpException: " + e.getReason());
-				e.printStackTrace();
-				abortOperation = true;				
 			} catch (IOException e) {
 					ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
 					SwingUtilities.invokeLater(dialog);
