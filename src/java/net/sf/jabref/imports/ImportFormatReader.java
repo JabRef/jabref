@@ -53,6 +53,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import java.util.regex.*;
+
 
 /*
  * // int jabrefframe BibtexDatabase database=new BibtexDatabase(); String
@@ -64,6 +66,12 @@ import java.util.Vector;
  *  } }
  */
 public class ImportFormatReader {
+
+    private final static String SPACE_MARKER = "__SPC__";
+    private final static Pattern bracketsPattern = Pattern.compile("\\{.*\\}"),
+	spaceMarkerPattern = Pattern.compile(SPACE_MARKER);
+
+
   private TreeMap formats = new TreeMap();
 
   public ImportFormatReader() {
@@ -264,6 +272,24 @@ public class ImportFormatReader {
   // output format string: LN, FN [and LN, FN]*
   //========================================================
   public static String fixAuthor_lastnameFirst(String in) {
+
+      if (in.indexOf("{") > 0) {
+	  StringBuffer tmp = new StringBuffer();
+	  int start = -1, end = 0;
+	  while ((start = in.indexOf("{", end)) > -1) {
+	      tmp.append(in.substring(end, start));
+	      end = in.indexOf("}", start);
+	      if (end > 0) {
+		  tmp.append(in.substring(start, end).replaceAll(" ", SPACE_MARKER));
+	      }
+	  }
+	  if ((end > 0) && (end < in.length()-1))
+	      tmp.append(in.substring(end));
+
+	  in = tmp.toString();
+
+      }
+
     //Util.pr("lastnamefirst: in");
     StringBuffer sb = new StringBuffer();
 
@@ -326,7 +352,10 @@ test:
     //Util.pr(in+" -> "+sb.toString());
     String fixed = sb.toString();
 
-    return fixed;
+    if (spaceMarkerPattern.matcher(fixed).find())
+	return fixed.replaceAll(SPACE_MARKER, " ");
+    else
+	return fixed;
   }
 
   static File checkAndCreateFile(String filename) {

@@ -88,10 +88,14 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added wildcard (*) option for command-line import, to try to automatically
+1.x:	
+	- Added automatic import format chooser for import (same as wildcard import below).
+	- Added wildcard (*) option for command-line import, to try to automatically
 	  determine the correct format.
 	- Improved layout of Preferences dialog.
 	- Added authIniN/edtrIniN key formatters.
+	- Fixed problem with opening file dialog on Win NT - AWT dialog is now opened if
+	  Swing dialog fails.
 1.6:    - Improved handling of entry selection in various ways. E.g. selected entry is now scrolled
           into view when opening entry editor and entry is kept selected when importing CiteSeer
           fields.
