@@ -528,7 +528,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
-        _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());        
+        _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?

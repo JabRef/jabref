@@ -251,15 +251,21 @@ public class GroupSelector
     gbl.setConstraints(sp, con);
     add(sp);
 
-    con.gridwidth = 2;
-    gbl.setConstraints(openset, con);
-    add(openset);
+    JPanel pan = new JPanel();
+    GridBagLayout gb = new GridBagLayout();
+    gbl.setConstraints(pan, con);
+    pan.setLayout(gb);
+    con.weightx = 1;
     con.gridwidth = 1;
-    gbl.setConstraints(expand, con);
-    add(expand);
-    con.gridwidth = GridBagConstraints.REMAINDER;
-    gbl.setConstraints(reduce, con);
-    add(reduce);
+    gb.setConstraints(openset, con);
+    pan.add(openset);
+    con.weightx = 0;
+    gb.setConstraints(expand, con);
+    pan.add(expand);
+
+    gb.setConstraints(reduce, con);
+    pan.add(reduce);
+        add(pan);
     /*
     JPanel lower = new JPanel();
     lower.setLayout(gbl);

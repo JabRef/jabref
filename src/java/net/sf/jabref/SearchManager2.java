@@ -128,6 +128,10 @@ settings.add(select);
 	searchField.addActionListener(this);
         search.addActionListener(this);
 	searchField.addFocusListener(new FocusAdapter() {
+          public void focusGained(FocusEvent e) {
+            if (increment.isSelected())
+              searchField.setText("");
+          }
 		public void focusLost(FocusEvent e) {
 		    incSearch = false;
 		    incSearchPos = -1; // Reset incremental
@@ -135,8 +139,10 @@ settings.add(select);
 				       // incremental search reset
 				       // once the user moves focus to
 				       // somewhere else.
-		    if (increment.isSelected())
-			searchField.setText("");
+                    if (increment.isSelected()) {
+                      //searchField.setText("");
+                      //System.out.println("focuslistener");
+                    }
 		}
 	    });
 	escape.addActionListener(this);
@@ -196,24 +202,19 @@ settings.add(select);
         add(highlight);
 	gbl.setConstraints(reorder, con);
         add(reorder);
-/*        JSeparator js = new JSeparator(JSeparator.HORIZONTAL);
-        gbl.setConstraints(js, con);
-        add(js);
-        gbl.setConstraints(select, con);
-        add(select);*/
-	con.gridwidth = 2;
+
+        JPanel pan = new JPanel();
+        GridBagLayout gb = new GridBagLayout();
+        gbl.setConstraints(pan, con);
+        pan.setLayout(gb);
         con.weightx = 1;
-        gbl.setConstraints(openset,con);
-        add(openset);
-	//JPanel empt = new JPanel();
-	//con.insets = new Insets(0, 0, 2, 0);
-	con.gridwidth = GridBagConstraints.REMAINDER;
+        con.gridwidth = 1;
+        gb.setConstraints(openset, con);
+        pan.add(openset);
         con.weightx = 0;
-        gbl.setConstraints(help,con);
-        add(help);
-        //con.gridwidth = 2;
-	//gbl.setConstraints(escape, con);
-        //add(escape);
+        gb.setConstraints(help, con);
+        pan.add(help);
+        add(pan);
 
 	searchField.getInputMap().put(prefs.getKey("Repeat incremental search"),
 				      "repeat");
@@ -248,6 +249,7 @@ settings.add(select);
     public void startIncrementalSearch() {
 	increment.setSelected(true);
 	searchField.setText("");
+        //System.out.println("startIncrementalSearch");
 	searchField.requestFocus();
     }
 
@@ -339,6 +341,7 @@ settings.add(select);
 
 	    // Afterwards, select all text in the search field.
 	    searchField.select(0,searchField.getText().length()) ;
+           new FocusRequester(frame.basePanel().entryTable);
 	}
     }
 

@@ -363,20 +363,15 @@ public class EntryTable extends JTable {
 	    renderer = defRenderer;
 	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
-	    renderer = iconStringRenderer;
-//	    renderer = defRenderer;
-	    /*if (tableModel.isComplete(row))
+	    renderer = defRenderer;
+	    if (tableModel.isComplete(row))
 		renderer = defRenderer;
 	    else {
-		if (tableModel.hasCrossRef(row))
-		    renderer = maybeIncRenderer;
-		else
-		    renderer = incRenderer;
-		    }*/
-
-
-
-
+              //if (tableModel.hasCrossRef(row))
+              //  renderer = maybeIncRenderer;
+              //else
+              renderer = iconStringRenderer;
+            }
 
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}

@@ -144,7 +144,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", new Boolean(false));
         defaults.put("pdfColumn", new Boolean(true));
         defaults.put("urlColumn", new Boolean(true));
-        defaults.put("citeseerColumn", new Boolean(true));
+        defaults.put("citeseerColumn", new Boolean(false));
         defaults.put("useOwner", new Boolean(true));
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
@@ -443,6 +443,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
         defKeyBinds.put("Close dialog", "ESCAPE");
         defKeyBinds.put("Close entry editor", "ESCAPE");
+        defKeyBinds.put("Close preamble editor", "ESCAPE");
         defKeyBinds.put("Back, help dialog", "LEFT");
         defKeyBinds.put("Forward, help dialog", "RIGHT");
 	defKeyBinds.put("Preamble editor, store changes", "alt S");
@@ -453,6 +454,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
 	defKeyBinds.put("Entry editor, store field", "alt S");
         defKeyBinds.put("String dialog, add string", "ctrl N");
+        defKeyBinds.put("String dialog, remove string", "shift DELETE");
         defKeyBinds.put("String dialog, move string up", "ctrl UP");
         defKeyBinds.put("String dialog, move string down", "ctrl DOWN");
 	defKeyBinds.put("Save session", "F11");

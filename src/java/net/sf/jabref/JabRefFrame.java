@@ -1078,7 +1078,7 @@ public JabRefPreferences prefs() {
     unmark.setEnabled(true);
     unmarkAll.setEnabled(true);
     editEntry.setEnabled(true);
-	importCiteSeer.setEnabled(true);
+    importCiteSeer.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
     copyCiteKey.setEnabled(true);
@@ -1399,14 +1399,14 @@ class ImportCiteSeerAction
 				BasePanel currentBp;
 				String id;
 				int[] clickedOn = null;
-				
+
 				class UpdateComponent implements Runnable {
 					boolean changesMade;
-					
+
 					UpdateComponent(boolean changesMade) {
 						this.changesMade = changesMade;
 					}
-					
+
 					public void run() {
 					    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
 					    if (changesMade)
@@ -1432,13 +1432,13 @@ class ImportCiteSeerAction
 						JOptionPane.WARNING_MESSAGE);
 					}
 					if (clickedOn != null) {
-						basePanel().citeSeerFetcher.beginImportCiteSeerProgress();						
+						basePanel().citeSeerFetcher.beginImportCiteSeerProgress();
 						NamedCompound citeseerNamedCompound =
 							new NamedCompound("CiteSeer Import Fields");
-						boolean newValues = basePanel().citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);						
+						boolean newValues = basePanel().citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);
 						if (newValues) {
 							citeseerNamedCompound.end();
-							currentBp.undoManager.addEdit(citeseerNamedCompound);						
+							currentBp.undoManager.addEdit(citeseerNamedCompound);
 						}
 						UpdateComponent updateComponent = new UpdateComponent(newValues);
 						SwingUtilities.invokeLater(updateComponent);

@@ -67,7 +67,11 @@ Building JabRef from source:
 If you have downloaded the source for JabRef, we recommend that you
 build with Ant.  Ant is open source and freely available from
 http://ant.apache.org. The default build target builds JabRef and
-creates the executable jabref.jar in the directory build/lib.
+creates the executable jabref.jar in the directory build/lib. The
+jar file requires access to JGoodies Looks 1.2.2 and Antlr 2.7.4
+in your classpath. These are distributed with JabRef in the lib/
+directory, and you can optionally have these unpacked into the JabRef
+jar by running "ant compile unjarlib jars" instead of the default target.
 
 
 Documentation:
@@ -80,7 +84,10 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.5:	- Added Highlight and select options to the group interface, and made it possible
+1.x:
+1.5:	- Enabled selection of default encoding, and started storing encoding information in
+	  saved .bib files, which is used when reopening.
+	- Added Highlight and select options to the group interface, and made it possible
   	  to change the number of visible lines in the list.
       	- Added option to allow or disallow direct table editing.
 	- Added optional confirmation dialog for deleting entries.

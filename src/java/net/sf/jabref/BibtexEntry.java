@@ -229,13 +229,14 @@ public class BibtexEntry
      * Removes the mapping for the field name.
      */
     public void clearField(String name) {
+
       if ("id".equals(name)) {
            throw new IllegalArgumentException("The field name '" + name +
                                               "' is reserved");
        }
 
        try {
-           firePropertyChangedEvent(name, _fields.get(name), null);
+           firePropertyChangedEvent(name, _fields.get(name), "");
        } catch (PropertyVetoException pve) {
            throw new IllegalArgumentException("Change rejected: " + pve);
        }

@@ -48,7 +48,7 @@ public class DuplicateResolverDialog extends JDialog {
   boolean block = true;
 
   public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two) {
-    super(frame, Globals.lang("Possible duplicate entries"), false);
+    super(frame, Globals.lang("Possible duplicate entries"), true);
 
     p1 = new PreviewPanel(one);
     p2 = new PreviewPanel(two);
@@ -89,7 +89,7 @@ public class DuplicateResolverDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_UPPER;
         block = false;
-        //dispose();
+        dispose();
       }
     });
 
@@ -97,7 +97,7 @@ public class DuplicateResolverDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_LOWER;
         block = false;
-        //dispose();
+        dispose();
       }
     });
 
@@ -105,7 +105,7 @@ public class DuplicateResolverDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_BOTH;
         block = false;
-        //dispose();
+        dispose();
       }
     });
 
@@ -133,7 +133,6 @@ public class DuplicateResolverDialog extends JDialog {
 
 
   public void setEntries(BibtexEntry newOne, BibtexEntry newTwo) {
-    Util.pr("jass");
     setSourceView(newOne, newTwo);
     p1.setEntry(newOne);
     p2.setEntry(newTwo);

@@ -1102,6 +1102,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    panel.refreshTable();
 		    panel.markBaseChanged();
 		} catch (Throwable ex) {
+                  ex.printStackTrace();
 		    // The source couldn't be parsed, so the user is given an
 		    // error message, and the choice to keep or revert the contents
 		    // of the source text field.
@@ -1508,7 +1509,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 
     // Update the JTextArea when a field has changed.
-    public void vetoableChange(PropertyChangeEvent e) {    	
+    public void vetoableChange(PropertyChangeEvent e) {
 	setField(e.getPropertyName(), e.getNewValue().toString());
 	//Util.pr(e.getPropertyName());
     }

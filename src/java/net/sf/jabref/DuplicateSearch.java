@@ -26,6 +26,7 @@ public void run() {
     bes[i] = panel.database.getEntryById((String)keys[i]);
 
   SearcherThread st = new SearcherThread();
+  st.setPriority(Thread.MIN_PRIORITY);
   st.start();
   int current = 0;
   DuplicateResolverDialog drd = null;
@@ -44,19 +45,8 @@ public void run() {
     if ((panel.database.getEntryById(be[0].getId()) != null) &&
         (panel.database.getEntryById(be[1].getId()) != null)) {
 
-
-      if (drd == null) {
-        drd = new DuplicateResolverDialog(panel.frame, be[0], be[1]);
-        drd.show();
-      }
-      else
-        drd.setEntries(be[0], be[1]);
-
-      while (drd.isBlocking()) {
-        try {
-          sleep(100);
-        } catch (InterruptedException ex) {}
-      }
+      drd = new DuplicateResolverDialog(panel.frame, be[0], be[1]);
+      drd.show();
 
 
       int answer = drd.getSelected();
