@@ -859,92 +859,107 @@ public class JabRefFrame extends JFrame {
 			//
 			// put in menu
 			//
-			//========================================
-			// medline
-			//========================================
-			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
-			newMedlineFile_mItem.addActionListener(new ActionListener()
+	    //########################################
+	    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Import Endnote"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newEndnoteFile_mItem.addActionListener(new ActionListener()
+			    {
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						String tempFilename= getNewFile();
-						if(tempFilename != null){
-							ArrayList bibs = ImportFormatReader.readMedline(tempFilename);//MedlineParser.readMedline(tempFilename);
-							addBibEntries( bibs, tempFilename);	
-						}
-					}
-				});
-			importMenu.add(newMedlineFile_mItem);
-			
-			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("Import RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
-			newRefMan_mItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						String tempFilename=getNewFile();
-						if(tempFilename != null){
-							ArrayList bibs = ImportFormatReader.readReferenceManager10(tempFilename);
-							addBibEntries( bibs, tempFilename);
-						}
-						
-					}
-				});
-			importMenu.add(newRefMan_mItem);
-			
-			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("Import ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
-			newISIFile_mItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						String tempFilename=getNewFile();
-						if(tempFilename != null){
-							ArrayList bibs = ImportFormatReader.readISI(tempFilename);
-							addBibEntries( bibs, tempFilename);
-						}
-						
-					}
-				});
-			importMenu.add( newISIFile_mItem);
-			
-			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Import Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
-			newOvidFile_mItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						String tempFilename=getNewFile();
-						if(tempFilename != null){
-							ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
-							addBibEntries( bibs, tempFilename);
-						}
-						
-					}
-				});
-			importMenu.add(newOvidFile_mItem);
-			
+				    String tempFilename= getNewFile();
+				    if(tempFilename != null){
+					ArrayList bibs = ImportFormatReader.readEndnote(tempFilename);//MedlineParser.readMedline(tempFilename);
+					addBibEntries( bibs, tempFilename);	
+				    }
+				}
+			    });
+			importMenu.add(newEndnoteFile_mItem);
+			//########################################			
 			JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("Import INSPEC"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newINSPECFile_mItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {
 						String tempFilename=getNewFile();
 						if(tempFilename != null){
-							ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
-							addBibEntries( bibs, tempFilename);
+						    ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
+						    addBibEntries( bibs, tempFilename);
 						}
 						
-					}
-				});
+				}
+			    });
 			importMenu.add(newINSPECFile_mItem);
+	    //########################################			
+			JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("Import ISI"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newISIFile_mItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    String tempFilename=getNewFile();
+				    if(tempFilename != null){
+					ArrayList bibs = ImportFormatReader.readISI(tempFilename);
+					addBibEntries( bibs, tempFilename);
+				    }
+				    
+				}
+			    });
+			importMenu.add( newISIFile_mItem);
+			
+	    //########################################			
+			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Import Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newMedlineFile_mItem.addActionListener(new ActionListener()
+			    {
+				public void actionPerformed(ActionEvent e)
+				{
+				    String tempFilename= getNewFile();
+				    if(tempFilename != null){
+					ArrayList bibs = ImportFormatReader.readMedline(tempFilename);//MedlineParser.readMedline(tempFilename);
+					addBibEntries( bibs, tempFilename);	
+				    }
+				}
+			    });
+			importMenu.add(newMedlineFile_mItem);
+	    //########################################			
+			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Import Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newOvidFile_mItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    String tempFilename=getNewFile();
+				    if(tempFilename != null){
+					ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
+					addBibEntries( bibs, tempFilename);
+				    }
+				    
+				}
+			    });
+			importMenu.add(newOvidFile_mItem);
+	    //########################################			
+			JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("Import RIS"));//, new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			newRefMan_mItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    String tempFilename=getNewFile();
+				    if(tempFilename != null){
+					ArrayList bibs = ImportFormatReader.readReferenceManager10(tempFilename);
+					addBibEntries( bibs, tempFilename);
+				    }
+				    
+				}
+			    });
+			importMenu.add(newRefMan_mItem);
+			
+	    //########################################			
 			
 			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("Import SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
 			newSciFinderFile_mItem.addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent e)
+				public void actionPerformed(ActionEvent e)
+				{
+				    String tempFilename = getNewFile();
+				    if( tempFilename != null )//filenm != null)
 					{
-						String tempFilename = getNewFile();
-						if( tempFilename != null )//filenm != null)
-						{
-							//ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
-							ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
-							addBibEntries( bibs, tempFilename);
-						}
+					    //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
+					    ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
+					    addBibEntries( bibs, tempFilename);
 					}
-				});
+				}
+			    });
 			importMenu.add(newSciFinderFile_mItem);
 			
-		}
+	}
 		
 		//
 		// simply opens up a jfilechooser dialog and gets a filename

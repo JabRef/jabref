@@ -38,20 +38,20 @@ public class Globals {
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
 	
-    public void logThis(String s){
+    public static void logThis(String s){
 	Logger.global.info(s);
     }
     
-    public void turnOffLogging(){ // only log exceptions
+    public static void turnOffLogging(){ // only log exceptions
 	Logger.global.setLevel(java.util.logging.Level.SEVERE); 
     }
 
     // should be only called ones
-    public void turnOnConsoleLogging(){
+    public static void turnOnConsoleLogging(){
 	Logger.global.addHandler( new java.util.logging.ConsoleHandler());
     }
 
-    public void turnOnFileLogging(){
+    public static void turnOnFileLogging(){
 	Logger.global.setLevel(java.util.logging.Level.ALL);	
 	java.util.logging.Handler handler;
 	try{

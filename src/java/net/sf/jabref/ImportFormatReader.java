@@ -342,7 +342,83 @@ public class ImportFormatReader
 	}
 	return bibitems;
     }
+    static File checkAndCreateFile(String filename){
+	File f = new File(filename);
+	if(!f.exists() && !f.canRead() && !f.isFile()){
+	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
+	    Globals.logThis( "Error " + filename + " is not a valid file and|or is not readable.");
+	    return null;
+	}else
+	    return f;
+	
+    }
+    
+    static ArrayList readEndnote(String filename){
+	String ENDOFRECORD="__EOREOR__";
+	ArrayList bibitems = new ArrayList();
+	File f = checkAndCreateFile( filename );// will return null if file is not readable
+	if(f==null)  return null;
+	StringBuffer sb = new StringBuffer();
+	try{
+	    BufferedReader in = new BufferedReader(new FileReader( filename));
+	    
+	    String str;
+	    while ((str = in.readLine()) != null) {
+		str = str.trim();
+		if(str.equals(""))
+		    continue;
+		else if(str.indexOf("%X")==0){
+		    sb.append(str);
+		    sb.append(ENDOFRECORD);
+		}else
+		    sb.append(str);
+		sb.append("\n");
+	    }
+	    in.close();
+	}
 
+	catch(IOException e){return null;}
+
+	String [] entries=sb.toString().split(ENDOFRECORD);
+
+	int rowNum=0;
+	HashMap hm=new HashMap();
+	String Author="",Type="";
+	for(int i=0; i<entries.length-1; i++){
+	    if(entries[i].length() <=2 ) continue;
+	    hm.clear();
+	    Author=""; Type="";
+	    String[] fields = entries[i].split("\n");
+	    for(int j=0; j <fields.length; j++){
+		String prefix=fields[j].substring(0,2);
+		String val = fields[j].substring(3);
+		if( prefix.equals("%A")) Author += " and " + val;
+		else if(prefix.equals("%T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
+		else if(prefix.equals("%O")){
+		    if(val.equals("Journal Article"))
+			Type="article";
+		    else
+			Type = "misc"; //
+		}
+		else if(prefix.equals("%D")) hm.put("year",val);
+		else if(prefix.equals("%J")) hm.put("journal",val);
+		else if(prefix.equals("%P")) hm.put("pages",val);
+		else if(prefix.equals("%V")) hm.put("volume",val);
+		else if(prefix.equals("%N")) hm.put("number",val);
+		else if(prefix.equals("%U")) hm.put("url",val);
+		else if(prefix.equals("%X")) hm.put("abstract",val);
+	    }
+	    Author=fixAuthor(Author);
+	    //fixauthorscomma
+	    hm.put("author",Author);
+	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
+					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
+	    b.setField( hm);
+	    bibitems.add( b  );
+	    
+	}
+	return bibitems;
+    }
     //========================================================
     //
     //========================================================
@@ -420,6 +496,7 @@ public class ImportFormatReader
 		try{
 		    hm.put("author", Author.substring(0,Author.length()-1));
 		}catch(java.lang.StringIndexOutOfBoundsException ex){
+
 		    //ignore
 		}
 	    else
