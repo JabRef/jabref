@@ -3,6 +3,8 @@ package net.sf.jabref.groups;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.tree.*;
+
+import net.sf.jabref.*;
 import net.sf.jabref.Util;
 import net.sf.jabref.groups.*;
 
@@ -12,6 +14,10 @@ import net.sf.jabref.groups.*;
  * @author zieren
  */
 public class GroupTreeNode extends DefaultMutableTreeNode {
+    public static final int GROUP_UNION_CHILDREN = 0;
+    public static final int GROUP_INTERSECTION_PARENT = 1;
+    public static final int GROUP_ITSELF = 2;
+
     /**
      * Creates this node and associates the specified group with it.
      */
@@ -55,7 +61,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
     /**
      * Parses the textual representation obtained from GroupTreeNode.toString()
      * and recreates that node and all of its children from it.
-     * @throws Exception When a group could not be recreated
+     * 
+     * @throws Exception
+     *             When a group could not be recreated
      */
     public static GroupTreeNode fromString(String s) throws Exception {
         GroupTreeNode root = null;
@@ -185,5 +193,31 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
         for (int i = 0; i < indexedPath.length && cursor != null; ++i)
             cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
         return cursor;
+    }
+
+    /**
+     * A GroupTreeNode can create a SearchRule that finds elements contained in
+     * its own group (GROUP_ITSELF), or the union of those elements in its own
+     * group and its children's groups (recursively) (GROUP_UNION_CHILDREN), or
+     * the intersection of the elements in its own group and its parent's group
+     * (GROUP_INTERSECTION_PARENT).
+     * 
+     * @return A SearchRule that finds the desired elements.
+     */
+    public SearchRule getSearchRule(int searchMode) {
+        if (searchMode == GROUP_ITSELF)
+            return getGroup().getSearchRule();
+        AndOrSearchRuleSet searchRule = new AndOrSearchRuleSet(
+                searchMode == GROUP_INTERSECTION_PARENT, false);
+        searchRule.addRule(getGroup().getSearchRule());
+        if (searchMode == GROUP_UNION_CHILDREN) {
+            for (int i = 0; i < getChildCount(); ++i)
+                searchRule.addRule(((GroupTreeNode) getChildAt(i))
+                        .getSearchRule(searchMode));
+        } else if (searchMode == GROUP_INTERSECTION_PARENT && !isRoot()) {
+            searchRule.addRule(((GroupTreeNode) getParent())
+                    .getSearchRule(searchMode));
+        }
+        return searchRule;
     }
 }
