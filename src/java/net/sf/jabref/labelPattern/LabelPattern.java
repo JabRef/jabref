@@ -41,7 +41,7 @@ public class LabelPattern extends Hashtable{
 	}
 	
 	public void addLabelPattern(String type, String pattern){
-		put(type, LabelPatternUtil.split(pattern));
+		put(type, pattern);
 	}
 	
 	
@@ -53,7 +53,7 @@ public class LabelPattern extends Hashtable{
 	 */
 	public void removeLabelPattern(String type){
 		if(containsKey(type) && parent != null){
-			remove(type);
+		    remove(type);
 		}
 	}
 	
@@ -84,10 +84,13 @@ public class LabelPattern extends Hashtable{
 			if(_obj == null){
 				//TODO Throw some error
 				System.err.println("Warning: I could not find the label \'"
-														+ key + "\' and gave up");
-			}
+						   + key + "\' and gave up");
+				return null;
+			} else return (ArrayList)_obj;
 		}
-		return (ArrayList)_obj;
+		//		System.out.println(_obj.toString());
+		else 
+		    return LabelPatternUtil.split((String)_obj);
 	}
 
 }

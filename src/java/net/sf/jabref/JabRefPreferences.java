@@ -49,8 +49,8 @@ public class JabRefPreferences {
     HashMap defaults = new HashMap(),
 	keyBinds = new HashMap(),
 	defKeyBinds = new HashMap();
-	private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
-	private static LabelPattern keyPattern = new LabelPattern(KEY_PATTERN);
+    private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
+    private static LabelPattern keyPattern;
 
     public JabRefPreferences() {
 
@@ -274,11 +274,44 @@ public class JabRefPreferences {
     }
 
 	public LabelPattern getKeyPattern(){
+	    // Lazy initialization..... Read overridden definitions from Preferences
+	    // and add these.
+	    if (keyPattern != null)
 		return keyPattern;
+	    keyPattern = new LabelPattern(KEY_PATTERN);
+	    Preferences pre = Preferences.userNodeForPackage
+		(net.sf.jabref.labelPattern.LabelPattern.class);
+	    try {
+		String[] keys = pre.keys();
+	    if (keys.length > 0) for (int i=0; i<keys.length; i++)
+		keyPattern.put(keys[i], pre.get(keys[i], null));
+	    } catch (BackingStoreException ex) {
+		Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
+	    }
+
+	    ///
+	    //keyPattern.addLabelPattern("article", "[author][year]");
+	    //putKeyPattern(keyPattern);
+	    ///
+
+	    return keyPattern;
 	}
 
 	public void putKeyPattern(LabelPattern pattern){
-		keyPattern = pattern;
+	    keyPattern = pattern;
+	    LabelPattern parent = pattern.getParent();
+	    if (parent == null)
+		return;
+
+	    // Store overridden definitions to Preferences.	    
+	    Preferences pre = Preferences.userNodeForPackage
+		(net.sf.jabref.labelPattern.LabelPattern.class);
+	    Iterator i = pattern.keySet().iterator();
+	    while (i.hasNext()) {
+		String s = (String)i.next();
+		if (!(pattern.get(s)).equals(parent.get(s)))
+		    pre.put(s, (String)pattern.get(s));
+	    }
 	}
 
     private void restoreKeyBindings() {
