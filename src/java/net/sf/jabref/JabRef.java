@@ -28,12 +28,17 @@ package net.sf.jabref;
 import java.io.File;
 import java.awt.Font;
 import javax.swing.UIManager;
+import javax.swing.UIDefaults;
 
 public class JabRef {
 
     public static void main(String[] args) {
 
-	Font fnt = new Font("plain", Font.PLAIN, 12);
+	//Font fnt = new Font("plain", Font.PLAIN, 12);
+	Object fnt = new UIDefaults.ProxyLazyValue 
+	    ("javax.swing.plaf.FontUIResource", null, 
+	     new Object[] {"plain", new Integer(Font.PLAIN), new Integer(12)});
+
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
 	UIManager.put("RadioButton.font", fnt);
@@ -67,40 +72,35 @@ public class JabRef {
 	UIManager.put("Tree.font", fnt);
 
 
-	//Globals.turnOffLogging();
-	/*	try {
-	javax.swing.UIManager.setLookAndFeel(
-				 "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-				 } catch (Throwable ex) {}*/
-		JabRefPreferences prefs = new JabRefPreferences();
-		BibtexEntryType.loadCustomEntryTypes(prefs);
-		Globals.setLanguage(prefs.get("language"), "");
-                GUIGlobals.CURRENTFONT = new Font
-                    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
-                     prefs.getInt("fontSize"));
-
-		JabRefFrame jrf = new JabRefFrame();
-
-		if(args.length > 0){
-			System.out.println("Opening: " + args[0]);
-			jrf.output("Opening: " + args[0]);
-			//verify the file
-			File f = new File (args[0]);
-
-			if( f.exists() && f.canRead() && f.isFile()) {
-				jrf.fileToOpen=f;
-				jrf.openDatabaseAction.openIt(true);
-			}else{
-				System.err.println("Error" + args[0] + " is not a valid file or is not readable");
-				//JOptionPane...
-			}
-
-
-		}else{//no arguments (this will be for later and other command line switches)
-			// ignore..
-		}
-
-
+	JabRefPreferences prefs = new JabRefPreferences();
+	BibtexEntryType.loadCustomEntryTypes(prefs);
+	Globals.setLanguage(prefs.get("language"), "");
+	GUIGlobals.CURRENTFONT = new Font
+	    (prefs.get("fontFamily"), prefs.getInt("fontStyle"),
+	     prefs.getInt("fontSize"));
+	
+	JabRefFrame jrf = new JabRefFrame();
+	
+	if(args.length > 0){
+	    System.out.println("Opening: " + args[0]);
+	    jrf.output("Opening: " + args[0]);
+	    //verify the file
+	    File f = new File (args[0]);
+	    
+	    if( f.exists() && f.canRead() && f.isFile()) {
+		jrf.fileToOpen=f;
+		jrf.openDatabaseAction.openIt(true);
+	    }else{
+		System.err.println("Error" + args[0] + " is not a valid file or is not readable");
+		//JOptionPane...
+	    }
+	    
+	    
+	}else{//no arguments (this will be for later and other command line switches)
+	    // ignore..
 	}
-
+	
+	
+    }
+    
 }
