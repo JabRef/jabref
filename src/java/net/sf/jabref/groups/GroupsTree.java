@@ -36,10 +36,22 @@ import net.sf.jabref.TransferableBibtexEntry;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
+    /** distance from component borders from which on autoscrolling starts. */
     private static final int dragScrollActivationMargin = 10;
+    /** number of pixels to scroll each time handler is called. */
     private static final int dragScrollDistance = 5;
-    private long lastDragAutoscroll = 0L;
-    private long minAutoscrollInterval = 50L;
+    /** time of last autoscroll event (for limiting speed). */
+    private static long lastDragAutoscroll = 0L;
+    /** minimum interval between two autoscroll events (for limiting speed). */
+    private static final long minAutoscrollInterval = 50L;
+    /** the point on which the cursor is currently idling during a drag operation. */
+    private Point idlePoint;
+    /** time since which cursor is idling. */
+    private long idleStartTime = 0L;
+    /** max. distance cursor may move in x or y direction while idling. */
+    private static final int idleMargin = 1;
+    /** idle time after which the node below is expanded. */
+    private static final long idleTimeToExpandNode = 1000L;
 
     private GroupSelector groupSelector;
     private GroupTreeNode dragNode = null;
@@ -92,15 +104,17 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragOver(DropTargetDragEvent dtde) {
-        long currentTime = System.currentTimeMillis();
+        final Point cursor = dtde.getLocation();
+        final long currentTime = System.currentTimeMillis();
+        
+        // autoscrolling
         if (currentTime - lastDragAutoscroll < minAutoscrollInterval)
             return;
-        Rectangle r = getVisibleRect();
-        Point cursor = dtde.getLocation();
-        boolean scrollUp = cursor.y - r.y < dragScrollActivationMargin;
-        boolean scrollDown = r.y + r.height - cursor.y < dragScrollActivationMargin;
-        boolean scrollLeft = cursor.x - r.x < dragScrollActivationMargin;
-        boolean scrollRight = r.x + r.width - cursor.x < dragScrollActivationMargin;
+        final Rectangle r = getVisibleRect();
+        final boolean scrollUp = cursor.y - r.y < dragScrollActivationMargin;
+        final boolean scrollDown = r.y + r.height - cursor.y < dragScrollActivationMargin;
+        final boolean scrollLeft = cursor.x - r.x < dragScrollActivationMargin;
+        final boolean scrollRight = r.x + r.width - cursor.x < dragScrollActivationMargin;
         if (scrollUp)
             r.translate(0, -dragScrollDistance);
         else if (scrollDown)
@@ -111,6 +125,20 @@ public class GroupsTree extends JTree implements DragSourceListener,
             r.translate(+dragScrollDistance, 0);
         scrollRectToVisible(r);
         lastDragAutoscroll = currentTime;
+        
+        // auto open
+        if (Math.abs(cursor.x - idlePoint.x) < idleMargin
+                && Math.abs(cursor.y - idlePoint.y) < idleMargin) {
+            if (currentTime - idleStartTime >= idleTimeToExpandNode) {
+                TreePath path = getPathForLocation(cursor.x, cursor.y);
+                if (path != null) {
+                    expandPath(path);
+                }
+            }
+        } else {
+            idlePoint = cursor;
+            idleStartTime = currentTime;
+        }
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {
@@ -183,6 +211,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             return; // nothing to transfer (select manually?)
         Cursor cursor = DragSource.DefaultMoveDrop;
         dragNode = selectedNode;
+        idlePoint = new Point(dge.getDragOrigin());
         dge.getDragSource().startDrag(dge, cursor, selectedNode, this);
     }
 
