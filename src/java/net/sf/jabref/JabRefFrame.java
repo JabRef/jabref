@@ -658,12 +658,31 @@ public class JabRefFrame extends JFrame {
 	tlb.addSeparator();
 	tlb.add(showPrefs);
         tlb.add(Box.createHorizontalGlue());
+        //tlb.add(new JabRefLabel(GUIGlobals.frameTitle+" "+GUIGlobals.version));
+
         tlb.add(closeDatabaseAction);
 	//for (int i=0; i<tlb.getComponentCount(); i++)
 	//    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
 
     }
 
+    private class JabRefLabel extends JPanel {
+      private String label;
+      public JabRefLabel(String name) {
+        label = name;
+      }
+      public void paint(Graphics g) {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setColor(GUIGlobals.nullFieldColor);
+        g2.setFont(GUIGlobals.jabRefFont);
+        FontMetrics fm = g2.getFontMetrics();
+        int width = fm.stringWidth(label);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.drawString(label,getWidth()-width-7,getHeight()-10);
+
+      }
+    }
 
 
     private JMenuItem mItem(AbstractAction a, KeyStroke ks) {

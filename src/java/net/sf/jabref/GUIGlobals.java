@@ -52,17 +52,20 @@ public class GUIGlobals {
   // Frame titles.
   static String
       frameTitle = "JabRef",
+      version = "1.2",
       stringsTitle = Globals.lang("Strings for database") + ": ",
       untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = Globals.lang("untitled"),
       helpTitle = "JabRef help",
       TYPE_HEADER = "entrytype";
 
-  public static Font CURRENTFONT;
+  public static Font CURRENTFONT,
+      typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24),
+      jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
 
   // Signature written at the top of the .bib file.
   public static final String SIGNATURE =
-      "This file was created with JabRef 1.2.\n\n";
+      "This file was created with JabRef "+version+".\n\n";
 
   // Size of help window.
   static Dimension

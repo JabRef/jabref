@@ -186,8 +186,10 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\´\\{I\\}\\}", "&Iacute;");
 	HTML_CHARS.put("\\{\\\\\\´\\{o\\}\\}", "&oacute;");
 	HTML_CHARS.put("\\{\\\\\\´\\{O\\}\\}", "&Oacute;");
-	HTML_CHARS.put("\\{\\\\\\´\\{u\\}\\}", "&uacute;");
-	HTML_CHARS.put("\\{\\\\\\´\\{U\\}\\}", "&Uacute;");
+        HTML_CHARS.put("\\{\\\\\\´\\{u\\}\\}", "&uacute;");
+        HTML_CHARS.put("\\{\\\\\\´\\{U\\}\\}", "&Uacute;");
+        HTML_CHARS.put("\\{\\\\\\´\\{a\\}\\}", "&aacute;");
+        HTML_CHARS.put("\\{\\\\\\´\\{A\\}\\}", "&Aacute;");
 
 	HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
@@ -223,14 +225,16 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
 	HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
 	HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
-	HTML_CHARS.put("\\{\\\\\\`A\\}", "&eacute;");
+	HTML_CHARS.put("\\{\\\\\\´A\\}", "&eacute;");
 	HTML_CHARS.put("\\{\\\\\\´E\\}", "&Eacute;");
 	HTML_CHARS.put("\\{\\\\\\´i\\}", "&iacute;");
 	HTML_CHARS.put("\\{\\\\\\´I\\}", "&Iacute;");
 	HTML_CHARS.put("\\{\\\\\\´o\\}", "&oacute;");
 	HTML_CHARS.put("\\{\\\\\\´O\\}", "&Oacute;");
-	HTML_CHARS.put("\\{\\\\\\´u\\}", "&uacute;");
-	HTML_CHARS.put("\\{\\\\\\´U\\}", "&Uacute;");
+        HTML_CHARS.put("\\{\\\\\\´u\\}", "&uacute;");
+        HTML_CHARS.put("\\{\\\\\\´U\\}", "&Uacute;");
+        HTML_CHARS.put("\\{\\\\\\´a\\}", "&aacute;");
+        HTML_CHARS.put("\\{\\\\\\´A\\}", "&Aacute;");
 
 	HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");
@@ -245,8 +249,10 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\~n\\}", "&ntilde;");
 	HTML_CHARS.put("\\{\\\\\\~N\\}", "&Ntilde;");
 	HTML_CHARS.put("\\{\\\\\\~a\\}", "&atilde;");
-	HTML_CHARS.put("\\{\\\\\\~A\\}", "&Atilde;");
+        HTML_CHARS.put("\\{\\\\\\~A\\}", "&Atilde;");
 
+        HTML_CHARS.put("\\{\\\\c c\\}", "&ccedil;");
+        HTML_CHARS.put("\\{\\\\c C\\}", "&Ccedil;");
     }
 
 }

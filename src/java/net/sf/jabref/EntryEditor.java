@@ -100,7 +100,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     JabRefFrame frame;
     BasePanel panel;
     EntryEditor ths = this;
-    Font font = new Font("arial", Font.ITALIC+Font.BOLD, 24);
 
     boolean updateSource = true; // This can be set to false to stop the source
     // text area from gettin updated. This is used in cases where the source
@@ -250,7 +249,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	public void paint(Graphics g) {
 	    Graphics2D g2 = (Graphics2D)g;
 	    g2.setColor(GUIGlobals.nullFieldColor);
-	    g2.setFont(font);
+	    g2.setFont(GUIGlobals.typeNameFont);
 	    FontMetrics fm = g2.getFontMetrics();
 	    int width = fm.stringWidth(label);
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
