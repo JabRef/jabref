@@ -29,13 +29,12 @@ package net.sf.jabref.groups;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.util.*;
+import java.util.Hashtable;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
-import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.*;
 
 import net.sf.jabref.*;
 
@@ -65,8 +64,8 @@ public class GroupSelector extends SidePaneComponent implements
     JPopupMenu groupsContextMenu = new JPopupMenu();
     JPopupMenu settings = new JPopupMenu();
     private JRadioButtonMenuItem hideNonHits, grayOut;
-    JRadioButtonMenuItem groupModeUnion = new JRadioButtonMenuItem(
-            Globals.lang("Groups: Include Subgroups"), true);
+    JRadioButtonMenuItem groupModeUnion = new JRadioButtonMenuItem(Globals
+            .lang("Groups: Include Subgroups"), true);
     JRadioButtonMenuItem groupModeIntersection = new JRadioButtonMenuItem(
             Globals.lang("Groups: Intersection with Supergroups"), false);
     JRadioButtonMenuItem groupModeIndependent = new JRadioButtonMenuItem(
@@ -88,7 +87,7 @@ public class GroupSelector extends SidePaneComponent implements
     ButtonGroup groupModeGroup = new ButtonGroup();
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
-    ButtonGroup	nonHits = new ButtonGroup();
+    ButtonGroup nonHits = new ButtonGroup();
     JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
             reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
     SidePaneManager manager;
@@ -112,12 +111,12 @@ public class GroupSelector extends SidePaneComponent implements
         this.manager = manager;
         this.frame = frame;
         this.panel = panel;
-	hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
-				       !prefs.getBoolean("grayOutNonHits"));
-	grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
-				   prefs.getBoolean("grayOutNonHits"));
-	nonHits.add(hideNonHits);
-	nonHits.add(grayOut);
+        hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
+                !prefs.getBoolean("grayOutNonHits"));
+        grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
+                prefs.getBoolean("grayOutNonHits"));
+        nonHits.add(hideNonHits);
+        nonHits.add(grayOut);
         floatCb.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
                 _prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
@@ -175,8 +174,8 @@ public class GroupSelector extends SidePaneComponent implements
         settings.addSeparator();
         settings.add(select);
         settings.addSeparator();
-	settings.add(grayOut);
-	settings.add(hideNonHits);
+        settings.add(grayOut);
+        settings.add(hideNonHits);
 
         // settings.add(moreRow);
         // settings.add(lessRow);
@@ -399,24 +398,19 @@ public class GroupSelector extends SidePaneComponent implements
             addGroupAction.setEnabled(false);
             removeGroupAndSubgroupsAction.setEnabled(false);
             removeGroupKeepSubgroupsAction.setEnabled(false);
-            moveSubmenu.setEnabled(false);
-            moveNodeUp.setEnabled(false);
-            moveNodeDown.setEnabled(false);
-            moveNodeLeft.setEnabled(false);
-            moveNodeRight.setEnabled(false);
         } else {
             editGroupAction.setEnabled(true);
             addGroupAction.setEnabled(true);
             removeGroupAndSubgroupsAction.setEnabled(true);
             removeGroupKeepSubgroupsAction.setEnabled(true);
-            moveNodeUp.setEnabled(node.getPreviousSibling() != null);
-            moveNodeDown.setEnabled(node.getNextSibling() != null);
-            moveNodeLeft.setEnabled(node.getParent() != groupsRoot);
-            moveNodeRight.setEnabled(node.getPreviousSibling() != null);
-            moveSubmenu.setEnabled(moveNodeUp.isEnabled()
-                    || moveNodeDown.isEnabled() || moveNodeLeft.isEnabled()
-                    || moveNodeRight.isEnabled());
         }
+        moveNodeUp.setEnabled(node.canMoveUp());
+        moveNodeDown.setEnabled(node.canMoveDown());
+        moveNodeLeft.setEnabled(node.canMoveLeft());
+        moveNodeRight.setEnabled(node.canMoveRight());
+        moveSubmenu.setEnabled(moveNodeUp.isEnabled()
+                || moveNodeDown.isEnabled() || moveNodeLeft.isEnabled()
+                || moveNodeRight.isEnabled());
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
 
@@ -447,10 +441,9 @@ public class GroupSelector extends SidePaneComponent implements
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
         DatabaseSearch search = new DatabaseSearch(searchOptions, searchRules,
-                panel, Globals.GROUPSEARCH, floatCb.isSelected(), 
-						   Globals.prefs.getBoolean("grayOutNonHits"),
-						   /*true,*/ select
-                        .isSelected());
+                panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
+                        .getBoolean("grayOutNonHits"),
+                /* true, */select.isSelected());
         search.start();
         frame.output(Globals.lang("Updated group selection") + ".");
     }
@@ -561,6 +554,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     };
+
     AbstractAction addGroupAction = new AbstractAction(Globals
             .lang("Add Group")) {
         public void actionPerformed(ActionEvent e) {
@@ -584,6 +578,7 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output("Added group '" + newGroup.getName() + "'.");
         }
     };
+
     AbstractAction addSubgroupAction = new AbstractAction(Globals
             .lang("Add Subgroup")) {
         public void actionPerformed(ActionEvent e) {
@@ -606,6 +601,7 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output("Added group '" + newGroup.getName() + "'.");
         }
     };
+
     AbstractAction removeGroupAndSubgroupsAction = new AbstractAction(Globals
             .lang("Remove group and subgroups")) {
         public void actionPerformed(ActionEvent e) {
@@ -631,6 +627,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     };
+
     AbstractAction removeGroupKeepSubgroupsAction = new AbstractAction(Globals
             .lang("Remove group, keep subgroups")) {
         public void actionPerformed(ActionEvent e) {
@@ -660,56 +657,44 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     };
+
     AbstractAction moveNodeUp = new AbstractAction("Up") {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupTreeNode parent = (GroupTreeNode) node.getParent();
-            final int index = parent.getIndex(node);
-            if (index > 0) {
-                UndoableMoveGroup undo = new UndoableMoveGroup(
-                        GroupSelector.this, groupsRoot, node, parent, index - 1);
-                parent.insert(node, index - 1);
-                revalidateGroups(new TreePath(node.getPath()));
-                panel.undoManager.addEdit(undo);
-                panel.markBaseChanged();
-                frame.output(Globals.lang("Moved group") + " '"
-                        + node.getGroup().getName() + "'.");
-            }
+            AbstractUndoableEdit undo = node.moveUp(GroupSelector.this);
+            if (undo == null) // paranoia
+                return; // nothing happened
+            revalidateGroups(new TreePath(node.getPath()));
+            panel.undoManager.addEdit(undo);
+            panel.markBaseChanged();
+            frame.output(Globals.lang("Moved group") + " '"
+                    + node.getGroup().getName() + "'.");
         }
     };
+
     AbstractAction moveNodeDown = new AbstractAction("Down") {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupTreeNode parent = (GroupTreeNode) node.getParent();
-            final int index = parent.getIndex(node);
-            if (index < parent.getChildCount() - 1) {
-                UndoableMoveGroup undo = new UndoableMoveGroup(
-                        GroupSelector.this, groupsRoot, node, parent, index + 1);
-                parent.insert(node, index + 1);
-                revalidateGroups(new TreePath(node.getPath()));
-                panel.undoManager.addEdit(undo);
-                panel.markBaseChanged();
-                frame.output(Globals.lang("Moved group") + " '"
-                        + node.getGroup().getName() + "'.");
-            }
+            AbstractUndoableEdit undo = node.moveDown(GroupSelector.this);
+            if (undo == null) // paranoia
+                return; // nothing happened
+            revalidateGroups(new TreePath(node.getPath()));
+            panel.undoManager.addEdit(undo);
+            panel.markBaseChanged();
+            frame.output(Globals.lang("Moved group") + " '"
+                    + node.getGroup().getName() + "'.");
         }
     };
+
     AbstractAction moveNodeLeft = new AbstractAction("Left") {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupTreeNode parent = (GroupTreeNode) node.getParent();
-            final GroupTreeNode grandParent = (GroupTreeNode) parent
-                    .getParent();
-            // paranoia
-            if (grandParent == null)
-                return;
-            final int index = grandParent.getIndex(parent);
-            UndoableMoveGroup undo = new UndoableMoveGroup(GroupSelector.this,
-                    groupsRoot, node, grandParent, index + 1);
-            grandParent.insert(node, index + 1);
+            AbstractUndoableEdit undo = node.moveLeft(GroupSelector.this);
+            if (undo == null) // paranoia
+                return; // nothing happened
             revalidateGroups(new TreePath(node.getPath()));
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -717,19 +702,14 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "'.");
         }
     };
+
     AbstractAction moveNodeRight = new AbstractAction("Right") {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupTreeNode previousSibling = (GroupTreeNode) node
-                    .getPreviousSibling();
-            // paranoia
-            if (previousSibling == null)
-                return;
-            UndoableMoveGroup undo = new UndoableMoveGroup(GroupSelector.this,
-                    groupsRoot, node, previousSibling, previousSibling
-                            .getChildCount());
-            previousSibling.add(node);
+            AbstractUndoableEdit undo = node.moveRight(GroupSelector.this);
+            if (undo == null) // paranoia
+                return; // nothing happened
             revalidateGroups(new TreePath(node.getPath()));
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -737,9 +717,9 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "'.");
         }
     };
-    
+
     JMenu moveSubmenu = new JMenu("Move");
-    
+
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
     }
