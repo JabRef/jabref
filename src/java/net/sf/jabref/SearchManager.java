@@ -207,6 +207,10 @@ class SearchManager extends JPanel
      * focused. Otherwise, cycles to the next search type.     
      */
     public void startSearch() {
+	if (increment.isSelected() && (incSearchPos >= 0)) {
+	    repeatIncremental();
+	    return;
+	}
 	if (!searchField.hasFocus()) {
 	    searchField.setText("");
 	    searchField.requestFocus();
