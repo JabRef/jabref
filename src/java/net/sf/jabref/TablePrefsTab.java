@@ -15,7 +15,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private JComboBox 
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
-    private JTextArea tableFields = new JTextArea();
+    private JTextArea tableFields = new JTextArea();//"", 80, 5);
 
     /**
      * Customization of external program paths.
@@ -37,6 +37,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 				_prefs.getBoolean("secDescending"));
 	terDesc = new JCheckBox(Globals.lang("Descending"),
 				_prefs.getBoolean("terDescending"));
+	tableFields.setText(Util.stringArrayToDelimited
+			    (_prefs.getStringArray("columnNames"), ";"));
 
 	JLabel lab;
 	JPanel upper = new JPanel(),
@@ -165,9 +167,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	table.setShowVerticalLines(false);
 	innerTablePanel.setBorder(BorderFactory.createEtchedBorder());
 	//innerTablePanel.setBorder(BorderFactory.createLoweredBevelBorder());
-	tablePanel.setBorder(BorderFactory.createTitledBorder
-			     (BorderFactory.createEtchedBorder(),
-			      Globals.lang("Visible fields")));
 	innerTablePanel.add(table);
 	tablePanel.add(innerTablePanel);
 
@@ -178,16 +177,20 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	cm.getColumn(2).setPreferredWidth(90);
 	cm.getColumn(3).setPreferredWidth(25);
 
-	con.gridwidth = 1;
-	gbl.setConstraints(tablePanel, con);
-	add(tablePanel);
+	//con.gridwidth = 1;
+	//gbl.setConstraints(tablePanel, con);
+	//add(tablePanel);
 
 	JScrollPane sp = new JScrollPane
 	    (tableFields, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 	     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-	//gbl.setConstraints(sp, con);
-	//add(sp);
+	sp.setMinimumSize(new Dimension(200,300));
+	sp.setBorder(BorderFactory.createTitledBorder
+		     (BorderFactory.createEtchedBorder(),
+		      Globals.lang("Visible fields")));
+	con.weighty = 1;
+	gbl.setConstraints(sp, con);
+	add(sp);
 	
     }
 
@@ -217,7 +220,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public void storeSettings() {
 
-	_prefs.putStringArray("columnNames", getChoices());
+	//_prefs.putStringArray("columnNames", getChoices());
+	String[] cols = tableFields.getText().replaceAll("\\s+","")
+	    .replaceAll("\\n+","").toLowerCase().split(";");
+	if (cols.length > 0) for (int i=0; i<cols.length; i++)
+	    cols[i] = cols[i].trim();
+	else cols = null;
+	_prefs.putStringArray("columnNames", cols);
+
 	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?

@@ -283,6 +283,20 @@ public class Util {
 	return sb.toString();
     }
 
+
+    /**
+     * Takes a 
+     *
+     * @param names a <code>String</code> value
+     * @return a <code>String[]</code> value
+     */
+    public static String[] delimToStringArray(String names,
+					      String delimiter) {
+	if (names == null)
+	    return null;
+	return names.split(delimiter);
+    }
+
     /**
      * This methods assures all words in the given entry are recorded
      * in their respective Completers, if any.

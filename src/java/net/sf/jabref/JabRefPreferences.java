@@ -155,6 +155,11 @@ public class JabRefPreferences {
      * transparent even if strings contain ';'.
      */
     public void putStringArray(String key, String[] value) {
+	if (value == null) {
+	    remove(key);
+	    return;
+	}
+
 	if (value.length > 0) {
 	    StringBuffer linked = new StringBuffer();
 	    for (int i=0; i<value.length-1; i++) {

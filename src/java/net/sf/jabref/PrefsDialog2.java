@@ -82,7 +82,7 @@ public class PrefsDialog2 extends JDialog {
 	lower.add(ok);
 	lower.add(cancel);
 
-	setSize(440, 570);
+	setSize(440, 350);
     }
 
     class OkAction extends AbstractAction {
