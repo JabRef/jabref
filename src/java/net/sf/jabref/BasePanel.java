@@ -1362,6 +1362,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	//form.requestFocus();
 
 	showing = be;
+
+	//form.setEnabled(false);
     }
 
     /**

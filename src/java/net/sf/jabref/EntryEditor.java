@@ -92,6 +92,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     JTextField bibtexKey;
     FieldTextField tf;
     JTextArea source;
+    JToolBar tlb;
     JTabbedPane tabbed = new JTabbedPane();//JTabbedPane.RIGHT);
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -180,7 +181,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     private void setupToolBar() {
-	JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
+	tlb = new JToolBar(JToolBar.VERTICAL);
 	//tlb.setMargin(new Insets(2,2,2,2));
 	tlb.setMargin(new Insets(0,0,0,2));
 	// The toolbar carries all the key bindings that are valid for the whole
@@ -663,6 +664,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    ((FieldPanel)tabbed.getSelectedComponent()).activate();
 	else
 	    source.requestFocus();
+    }
+
+    public void setEnabled(boolean enabled) {
+
+	FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
+	for (int i=0; i<panels.length; i++) {
+	    Vector fields = panels[i].getFields();
+	    for (int j=0; j<fields.size(); j++) {
+		((Component)fields.elementAt(j)).setEnabled(enabled);
+	    }
+
+	}
+	source.setEnabled(enabled);
+	Component[] comps = tlb.getComponents();
+	for (int i=1; i<comps.length; i++)
+	    //if (comps[i] != closeAction)
+	    comps[i].setEnabled(enabled);
     }
 
     class FieldListener extends FocusAdapter {
