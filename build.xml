@@ -134,7 +134,7 @@
 
 
 	<!-- Jars up project -->
-	<target name="jars" depends="compile">
+	<target name="jars" depends="compile, unjarlib">
 		<mkdir dir="${build.lib}" />
 
 		<jar destfile="${build.lib}/jabref.jar">
