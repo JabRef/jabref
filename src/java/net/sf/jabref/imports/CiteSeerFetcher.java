@@ -10,7 +10,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,6 +25,8 @@ import javax.swing.SwingUtilities;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -51,7 +52,6 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	final static String OAI_METADATAPREFIX ="metadataPrefix=oai_citeseer";
 	protected SAXParserFactory parserFactory;
 	protected SAXParser saxParser;
-	protected HttpURLConnection citeseerCon;
 	protected HttpClient citeseerHttpClient;
 	boolean citationFetcherActive;
 	boolean importFetcherActive;
@@ -96,11 +96,23 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		gbl.setConstraints(citeSeerProgress, con);
 		add(citeSeerProgress);		
 		try {
+			HostConfiguration hostConfiguration = new HostConfiguration();
 			citationFetcherActive = false;
 			importFetcherActive = false;
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
 			citeseerHttpClient = new HttpClient();
+			if (System.getProperty("proxySet") != null) {
+				String proxyHost;
+				int proxyPort = 8080;
+				if (System.getProperty("proxyHost") != null) {
+					proxyHost = System.getProperty("proxyHost");
+					if (System.getProperty("proxyPort") != null)
+						proxyPort = Integer.parseInt(System.getProperty("proxyPort"));
+					hostConfiguration.setProxy(proxyHost, proxyPort);
+					citeseerHttpClient.setHostConfiguration(hostConfiguration);
+				}
+			}
 			citeseerHttpClient.setConnectionTimeout(10000); // 10 seconds
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
