@@ -210,39 +210,46 @@ public class RightClickMenu extends JPopupMenu
       add(groupAddMenu);
       add(groupRemoveMenu);
 
-      insertNodes(groupAddMenu,metaData.getGroups(),true);
-      insertNodes(groupRemoveMenu,metaData.getGroups(),false);
+      insertNodes(groupAddMenu,metaData.getGroups(),bes,true);
+      insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false);
     }
     
-    private void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
-        AbstractAction action = getAction(node,add);
+    private void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, boolean add) {
+        final AbstractAction action = getAction(node,selection,add);
         
         if (node.getChildCount() == 0) {
             menu.add(action);
+            if (action.isEnabled())
+                menu.setEnabled(true);
             return;
         }
         
         JMenu submenu = null;
         if (node.getGroup() instanceof AllEntriesGroup) {
             for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu,(GroupTreeNode) node.getChildAt(i),add);
+                insertNodes(menu,(GroupTreeNode) node.getChildAt(i), selection, add);
             }
         } else {
             submenu = new JMenu("["+node.getGroup().getName()+"]");
+            // setEnabled(true) is done above/below if at least one menu 
+            // entry (item or submenu) is enabled
+            submenu.setEnabled(action.isEnabled()); 
             submenu.add(action);
             submenu.add(new Separator());
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(submenu,(GroupTreeNode) node.getChildAt(i),add);
-            }
+            for (int i = 0; i < node.getChildCount(); ++i)
+                insertNodes(submenu,(GroupTreeNode) node.getChildAt(i), selection, add);
             menu.add(submenu);
+            if (submenu.isEnabled())
+                menu.setEnabled(true);
         }
     }
     
-    private AbstractAction getAction(GroupTreeNode node, boolean add) {
+    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection, boolean add) {
         AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
                 : (AbstractAction) new RemoveFromGroupAction(node);
         AbstractGroup group = node.getGroup();
-        action.setEnabled(add ? group.supportsAdd() : group.supportsRemove());
+        action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
+                : group.supportsRemove() && group.containsAny(selection));
         return action;
     }
 
