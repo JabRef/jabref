@@ -38,6 +38,7 @@ import net.sf.jabref.export.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import com.jgoodies.plaf.FontSizeHints;
 import com.jgoodies.plaf.plastic.PlasticLookAndFeel;
+import com.jgoodies.plaf.windows.ExtWindowsLookAndFeel;
 
 //import javax.swing.UIManager;
 //import javax.swing.UIDefaults;
@@ -370,12 +371,15 @@ public class JabRef {
       // Set antialiasing on everywhere. This only works in JRE >= 1.5. Or... it doesn't work, period.
       System.setProperty("swing.aatext", "true");
 
+      int fontSizes = prefs.getInt("menuFontSize");
+
       //String osName = System.getProperty("os.name", "def");
       if (Globals.ON_WIN) {
         try {
           //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-          UIManager.setLookAndFeel(new com.jgoodies.plaf.windows.
-                                   ExtWindowsLookAndFeel());
+	    ExtWindowsLookAndFeel lnf = new ExtWindowsLookAndFeel();
+	    lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+	    UIManager.setLookAndFeel(lnf);
         }
         catch (UnsupportedLookAndFeelException ex) {}
       }
@@ -383,9 +387,9 @@ public class JabRef {
         try {
           //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
           PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
-	  MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
-	  int fontSizes = prefs.getInt("menuFontSize");
 	  lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+	  MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
+
           //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
           //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
           //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());

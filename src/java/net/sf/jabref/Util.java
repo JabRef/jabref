@@ -482,6 +482,14 @@ public class Util {
         else
           name = dir + System.getProperty("file.separator") + name;
         file = new File(name);
+	if (file.exists())
+	    return file;
+	// Ok, try to fix / and \ problems:
+	if (Globals.ON_WIN)
+	    name = name.replaceAll("/", "\\");
+	else
+	    name = name.replaceAll("\\\\", "/");
+        file = new File(name);
         return (file.exists() ? file : null);
       }
       else

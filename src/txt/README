@@ -84,7 +84,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Improved Medline fetcher. Can now fetch entries based on a search expression.
+1.x:	- Made method for opening PDF files robust with regard to file separators (/ and \),
+	  so bib files can easier be used across platforms.
+	- Improved Medline fetcher. Can now fetch entries based on a search expression.
 	- Added option to always save database ordered by author/editor/year, and made this
 	  the default setting.
 	- When a single entry is selected, right-click menu now shows a checkbox menu for group

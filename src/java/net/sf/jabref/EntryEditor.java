@@ -89,7 +89,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	srcPanel = new JPanel();
     FieldPanel reqPanel = new FieldPanel(),
 	optPanel = new FieldPanel(),
-	genPanel = new FieldPanel();
+	genPanel = new FieldPanel(),
+	absPanel = new FieldPanel();
     JTextField bibtexKey;
     FieldTextField tf;
     JTextArea source;
@@ -149,7 +150,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//bl.setVgap(5);
 	setLayout(bl);
 	setupToolBar();
-	setupFieldPanels(reqPanel, optPanel, genPanel);
+	setupFieldPanels(reqPanel, optPanel, genPanel, absPanel);
 	setupSourcePanel();
 	tabbed.addTab(Globals.lang("Required fields"),
 		      new ImageIcon(GUIGlobals.showReqIconFile),
@@ -164,6 +165,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    tabbed.addTab(Globals.lang("General fields"),
 			  new ImageIcon(GUIGlobals.showGenIconFile),
 			  genPanel.getPane(), Globals.lang("Show general fields"));
+	tabbed.addTab(Globals.lang("Abstract"),
+		      new ImageIcon(GUIGlobals.showAbsIconFile),
+		      absPanel.getPane(), Globals.lang("Show abstract"));
 	tabbed.addTab(Globals.lang("BibTeX source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile),
 		      srcPanel, Globals.lang("Show/edit BibTeX source"));
@@ -284,7 +288,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
     }
 
-    private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen) {
+    private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen, FieldPanel abs) {
 
 	// First we ask the BibtexEntry which fields are optional and
 	// required.
@@ -296,22 +300,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	if (reqFields == null) reqFields = new String[0];
 	if (optFields == null) optFields = new String[0];
 	if (genFields == null) genFields = new String[0];
+	String[] absFields = new String[] {"abstract"};
 
-	int iter, rmax, omax, gmax;
+	int iter, rmax, omax, gmax, amax;
 
 	rmax = reqFields.length;
 	omax = optFields.length;
 	gmax = genFields.length;
+	amax = 1;
 	iter = Math.max(rmax, Math.max(omax, gmax));
 
-	FieldTextArea ta1 = null, ta2 = null, ta3 = null, firstR = null, firstO = null;
-        JComponent ex1 = null, ex2 = null, ex3 = null;
+	FieldTextArea ta1 = null, ta2 = null, ta3 = null, ta4 = null, firstR = null, firstO = null;
+        JComponent ex1 = null, ex2 = null, ex3 = null, ex4 = null;
 	String stringContent;
 	Object content;
 
 	req.setLayout(gbl);
 	opt.setLayout(gbl);
 	gen.setLayout(gbl);
+	abs.setLayout(gbl);
 	con.insets = new Insets(5,5,0,0);
 
 	con.anchor = GridBagConstraints.WEST;
@@ -385,6 +392,27 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		}
 	    }
 
+	    if (i<amax) {
+		if ((content = entry.getField(absFields[i])) != null) {
+		    stringContent = content.toString();
+		} else
+		    stringContent = null;
+
+		ta4 = new FieldTextArea(absFields[i], stringContent);
+                ex4 = getExtra(absFields[i], ta4);
+		/*if (i == 0)
+		    firstGen = ta1;
+		if (i == gmax-1)
+		ta1.setNextFocusableComponent(firstGen);*/
+		setupJTextComponent(ta4);
+
+		if (i==0) {
+		    firstO = ta4;
+		    abs.setActive(ta4);
+		}
+	    }
+	    
+
 	    if (i<rmax) {
 		gbl.setConstraints(ta1.getLabel(),con);
 		req.add(ta1.getLabel());
@@ -396,6 +424,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    if (i<gmax) {
 		gbl.setConstraints(ta3.getLabel(),con);
 		gen.add(ta3.getLabel());
+	    }
+	    if (i<amax) {
+		gbl.setConstraints(ta4.getLabel(),con);
+		abs.add(ta4.getLabel());
 	    }
 
 	    // Constraints for the text fields.
@@ -454,6 +486,26 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 gbl.setConstraints(ex3, con);
                 con.fill = GridBagConstraints.BOTH;
                 gen.add(ex3);
+                con.anchor = GridBagConstraints.CENTER;
+              }
+	    }
+	    if (i<amax) {
+              if (ex4 != null) con.gridwidth = 1;
+              else con.gridwidth = GridBagConstraints.REMAINDER;
+              con.fill = GridBagConstraints.BOTH;
+              con.weighty = GUIGlobals.getFieldWeight(absFields[i]);
+              genW += con.weighty;
+              gbl.setConstraints(ta4.getPane(),con);
+              abs.add(ta4.getPane());
+              if (ex4 != null) {
+                con.gridwidth = GridBagConstraints.REMAINDER;
+                con.weightx = 0;
+                //con.weighty = 1;
+                con.fill = GridBagConstraints.HORIZONTAL;
+                con.anchor = GridBagConstraints.NORTH;
+                gbl.setConstraints(ex4, con);
+                con.fill = GridBagConstraints.BOTH;
+                abs.add(ex4);
                 con.anchor = GridBagConstraints.CENTER;
               }
 	    }

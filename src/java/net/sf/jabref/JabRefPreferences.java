@@ -137,8 +137,10 @@ public class JabRefPreferences {
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
 	defaults.put("defaultOwner", System.getProperty("user.name"));
-  defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
-	     "pdf;abstract;comment;owner");
+	//  defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
+	//	     "pdf;abstract;comment;owner");
+	defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
+		     "pdf;comment;owner");
 
 	//defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
 	defaults.put("historySize", new Integer(5));
