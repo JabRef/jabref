@@ -24,75 +24,27 @@
  */
 package net.sf.jabref;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import java.beans.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.JTextComponent;
+
 import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.undo.UndoableKeyChange;
-import net.sf.jabref.undo.UndoableRemoveEntry;
-
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.VetoableChangeListener;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
+import net.sf.jabref.undo.*;
 
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
@@ -772,6 +724,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       newKey = nu.getCiteKey();
       boolean anyChanged = false;
       boolean duplicateWarning = false;
+      boolean emptyWarning = newKey == null || newKey.equals(""); 
 
       if (panel.database.setCiteKeyForEntry(id, newKey)) {
         duplicateWarning = true;
@@ -822,11 +775,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
        * (newKey == null)) || ((oldKey != null) && (newKey != null) &&
        * !oldKey.equals(newKey))) { }
        */
-      if (duplicateWarning)
-        panel.output(Globals.lang("Warning: duplicate bibtex key."));
-      else
+      if (duplicateWarning) {
+        warnDuplicateBibtexkey();
+      } else if (emptyWarning) {
+        warnEmptyBibtexkey();
+      } else {
         panel.output(Globals.lang("Stored entry") + ".");
-
+      }
+      
       lastSourceStringAccepted = source.getText();
       updateAllFields();
       lastSourceAccepted = true;
@@ -1149,23 +1105,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         boolean isDuplicate = panel.database.setCiteKeyForEntry(entry.getId(), newValue);
 
         if (newValue != null) {
-          if (isDuplicate) {
-            panel.output(Globals.lang("Warning") + ": "
-              + Globals.lang("duplicate BibTeX key."));
-
-            if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
-              CheckBoxMessage jcb =
-                new CheckBoxMessage(Globals.lang("Warning") + ": "
-                  + Globals.lang("duplicate BibTeX key."),
-                  Globals.lang("Disable this warning dialog"), false);
-              JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
-                JOptionPane.WARNING_MESSAGE);
-
-              if (jcb.isSelected())
-                prefs.putBoolean("dialogWarningForDuplicateKey", false);
-            }
-          } else
+          if (isDuplicate)
+              warnDuplicateBibtexkey();
+          else
             panel.output(Globals.lang("BibTeX key is unique."));
+        } else { // key is null/empty
+            warnEmptyBibtexkey();
         }
 
         // Add an UndoableKeyChange to the baseframe's undoManager.
@@ -1190,6 +1135,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         }
       }
     }
+
   }
 
   class SwitchLeftAction extends AbstractAction {
@@ -1410,5 +1356,55 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     public void actionPerformed(ActionEvent evt) {
       panel.changeType(entry, type);
     }
+  }
+  
+  /**
+   * Scans all groups.
+   * @return true if the specified entry is contained in any ExplicitGroup,
+   * false otherwise. 
+   */
+  private boolean containedInExplicitGroup(BibtexEntry entry) {
+      AbstractGroup[] matchingGroups = panel.getGroupSelector().getGroupTreeRoot().
+      getMatchingGroups(entry);
+      for (int i = 0; i < matchingGroups.length; ++i) {
+          if (matchingGroups[i] instanceof ExplicitGroup)
+              return true;
+      }
+      return false;
+  }
+  
+  private void warnDuplicateBibtexkey() {
+        panel.output(Globals.lang("Warning") + ": "
+                + Globals.lang("duplicate BibTeX key."));
+
+        if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+            CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
+                    + ": " + Globals.lang("duplicate BibTeX key."), Globals
+                    .lang("Disable this warning dialog"), false);
+            JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (jcb.isSelected())
+                prefs.putBoolean("dialogWarningForDuplicateKey", false);
+
+            // JZTODO lyrics
+            if (containedInExplicitGroup(entry)) {
+                JOptionPane.showMessageDialog(
+                                frame,
+                                "Groups assignment for this entry cannot be restored after next load due to duplicate key",
+                                Globals.lang("Warning"),
+                                JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+  private void warnEmptyBibtexkey() {
+      // JZTODO lyrics
+      if (containedInExplicitGroup(entry)) {
+          JOptionPane.showMessageDialog(frame, 
+                  "Groups assignment for this entry cannot be restored after next load due to lacking key", 
+                  Globals.lang("Warning"),
+                  JOptionPane.WARNING_MESSAGE);
+      }
   }
 }
