@@ -177,7 +177,7 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-	    TreeSet sorter = getSortedEntries(database);
+	    TreeSet sorter = getSortedEntries(database, true);
 
             FieldFormatter ff = new LatexFieldFormatter();
 
@@ -376,7 +376,7 @@ public class FileActions
             // Write database entrie; entries will be sorted as they
             // appear on the screen, or sorted by author, depending on
 	    // Preferences.
-	    TreeSet sorted = getSortedEntries(database);
+	    TreeSet sorted = getSortedEntries(database, false);
             /*String pri = prefs.get("priSort"),
 		sec = prefs.get("secSort"),
 		ter = prefs.get("terSort");
@@ -450,7 +450,7 @@ public class FileActions
 	fieldFormatters.put("pdf", new ResolvePDF());
 	    
 	String SEPARATOR = "\t";
-	TreeSet sorted = getSortedEntries(database);
+	TreeSet sorted = getSortedEntries(database, true);
 	Set fields = new TreeSet();
 	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++)
 	    fields.add(GUIGlobals.ALL_FIELDS[i]);
@@ -535,10 +535,16 @@ public class FileActions
       return reader;
     }
     
-    protected static TreeSet getSortedEntries(BibtexDatabase database) {
+    /*
+     * We have begun to use getSortedEntries() for both database save operations
+     * and non-database save operations.  In a non-database save operation
+     * (such as the exportDatabase call), we do not wish to use the 
+     * global preference of saving in standard order.
+     */
+    protected static TreeSet getSortedEntries(BibtexDatabase database, boolean isSaveOperation) {
 	String pri, sec, ter;
 	boolean priD, secD, terD;
-	if (!Globals.prefs.getBoolean("saveInStandardOrder")) {
+	if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
 	    // The setting is to save according to the current table order.
 	    
 	    pri = Globals.prefs.get("priSort");
