@@ -30,7 +30,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
-import org.xml.sax.*; // for medline 
+import org.xml.sax.*; // for medline
 import org.xml.sax.helpers.*;  //for medline
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
@@ -78,13 +78,13 @@ public class ImportFormatReader
 	return sb.toString();
     }
 
-    
+
     //========================================================
-    // rearranges the author names 
+    // rearranges the author names
     // input format string: LN, FN [and LN, FN]*
     // output format string: FN LN [and FN LN]*
     //========================================================
-    
+
     public static String fixAuthor(String in){
 	StringBuffer sb=new StringBuffer();
 	//System.out.println("FIX AUTHOR: in= " + in);
@@ -93,7 +93,7 @@ public class ImportFormatReader
 	for(int i=0; i<authors.length; i++){
 	    String[] t = authors[i].split(",");
 	    if(t.length < 2)
-		return in; // something went wrong or there is no "," 
+		return in; // something went wrong or there is no ","
 	    sb.append( t[1].trim() + " " + t[0].trim());
 	    if(i != authors.length-1 ) // put back the " and "
 		sb.append(" and ");
@@ -102,7 +102,7 @@ public class ImportFormatReader
     }
 
     //========================================================
-    // rearranges the author names 
+    // rearranges the author names
     // input format string: LN, FN [and LN, FN]*
     // output format string: LN, FN [and LN, FN]*
     //========================================================
@@ -124,10 +124,10 @@ public class ImportFormatReader
 		// The name is written with last name first, so it's ok.
 		sb.append(authors[i]);
 	    }
-		
+
 	    if(i !=authors.length-1)
 		sb.append(" and ");
-	    
+
 	}
 	//Util.pr(in+" -> "+sb.toString());
 	return sb.toString();
@@ -137,12 +137,12 @@ public class ImportFormatReader
     // given a filename, parses the file (assuming scifinder)
     // returns null if unable to find any entries or if the
     // file is not in scifinder format
-    //============================================================    
+    //============================================================
     static ArrayList readScifinder( String filename)
-    {									  
-		ArrayList bibitems=new ArrayList();		
+    {
+		ArrayList bibitems=new ArrayList();
 		File f = new File(filename);
-		
+
 		if(!f.exists() && !f.canRead() && !f.isFile()){
 			System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
 			return null;
@@ -150,13 +150,13 @@ public class ImportFormatReader
 		StringBuffer sb=new StringBuffer();
 		try{
 			BufferedReader in = new BufferedReader(new FileReader( filename));
-			
+
 			String str;
 			while ((str = in.readLine()) != null) {
 				sb.append(str);
 			}
 			in.close();
-			
+
 		}
 		catch(IOException e){return null;}
 		String [] entries=sb.toString().split("START_RECORD");
@@ -173,10 +173,10 @@ public class ImportFormatReader
 						hm.put( "author", tmp[1].replaceAll(";"," and ") );
 					else if(tmp[0].equals("Title"))
 						hm.put("title",tmp[1]);
-					
+
 					else if(tmp[0].equals("Journal Title"))
 						hm.put("journal",tmp[1]);
-					
+
 					else if(tmp[0].equals("Volume"))
 					hm.put("volume",tmp[1]);
 				else if(tmp[0].equals("Page"))
@@ -191,24 +191,24 @@ public class ImportFormatReader
 					Type=tmp[1].replaceAll("Journal","article");
 			}
 	    }
-	    
+
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
 	    bibitems.add( b  );
-	    
+
 	}
 	return bibitems;
      }
     //==================================================
     //
     //==================================================
-    
+
     static ArrayList readISI( String filename) //jbm for new Bibitem
     {
 	ArrayList bibitems=new ArrayList();
 	File f = new File(filename);
-	
+
 	if(!f.exists() && !f.canRead() && !f.isFile()){
 	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
 	    return null;
@@ -232,13 +232,13 @@ public class ImportFormatReader
 		    if(beg.length()==2) {
 			sb.append(" ## ");// mark the begining of each field
 			sb.append(str);
-			
+
 		    }else{
 			sb.append("EOLEOL");// mark the end of each line
 			sb.append(str.substring(2,str.length()));//remove the initial " "
-			
+
 		    }
-		    
+
 		}
 	    }
 	    in.close();
@@ -247,17 +247,17 @@ public class ImportFormatReader
 	    System.err.println("Error reading file: " + filename);
 	    return null;
 	}
-	
+
 	String[] entries = sb.toString().split("::");
 	// skip the first entry as it is either empty or has document header
-	
+
 	int rowNum = 0;
 	HashMap hm=new HashMap();
 	for(int i=1; i<entries.length; i++){
 	    String[] fields = entries[i].split(" ## ");
 	    String Type="",PT="",pages="";
 	    hm.clear();
-	    
+
 	    for(int j=0; j<fields.length; j++){
 		String beg=fields[j].substring(0,2);
 		if(beg.equals("PT")){
@@ -267,19 +267,19 @@ public class ImportFormatReader
 		else if(beg.equals("AU"))
 		    hm.put( "author", fixAuthor( fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," and ") ));
 		else if(beg.equals("TI"))
-		    hm.put("title", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));	
+		    hm.put("title", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
 		else if(beg.equals("SO")){ // journal name
 		    hm.put("journal",fields[j].substring(2,fields[j].length()).trim());
 		}
 		else if(beg.equals("ID"))
 		    hm.put( "keywords",fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
 		else if(beg.equals("AB"))
-		    hm.put("abstract", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," ")); 
+		    hm.put("abstract", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
 		else if(beg.equals("BP"))
 		    //hm.put("pages", fields[j].substring(2,fields[j].length()).trim());
 		    pages=fields[j].substring(2,fields[j].length()).trim();
 		else if(beg.equals("EP")){
-		    pages=pages + "--" + fields[j].substring(2,fields[j].length()).trim();		    
+		    pages=pages + "--" + fields[j].substring(2,fields[j].length()).trim();
 		}
 		else if(beg.equals("PY"))
 		    hm.put("year", fields[j].substring(2,fields[j].length()).trim());
@@ -300,19 +300,19 @@ public class ImportFormatReader
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
-	    
+
 	    bibitems.add( b  );
 	}
-	
+
 	return bibitems;
     }
 
-    
+
     //==================================================
     //
     //==================================================
     static Pattern ovid_src_pat= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
-    static Pattern ovid_src_pat_no_issue= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");    
+    static Pattern ovid_src_pat_no_issue= Pattern.compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
     static ArrayList readOvid( String filename){
 	ArrayList bibitems = new ArrayList();
@@ -335,7 +335,7 @@ public class ImportFormatReader
 	    String items[]=sb.toString().split("<[0-9]+>");
 	    String key="";
 	    String BibManKey="";
-				
+
 	    for(int i =1; i<items.length; i++){
 		HashMap h=new HashMap();
 		String[] fields=items[i].split("__NEWFIELD__");
@@ -351,9 +351,9 @@ public class ImportFormatReader
 			else{// LN FN. [LN FN.]*
 			    isComma=true;
 			    author  = fields[j].substring(7,fields[j].length()).replaceAll("\\."," and").replaceAll(" and$","");
-			    
+
 			}
-			if(author.split(" and ").length > 1){ // single author or no ";" 
+			if(author.split(" and ").length > 1){ // single author or no ";"
 			    if(isComma==false)
 				h.put("author",  fixAuthor( author) );
 			    else
@@ -369,22 +369,22 @@ public class ImportFormatReader
 			Matcher matcher = ovid_src_pat.matcher(s);
 			boolean matchfound = matcher.find();
 			if(matchfound){
-			    h.put("journal", matcher.group(1));			    
-			    h.put("volume", matcher.group(2));			    			    
-			    h.put("issue", matcher.group(3));			    			    			    
-			    h.put("pages", matcher.group(4));			    			    			    
+			    h.put("journal", matcher.group(1));
+			    h.put("volume", matcher.group(2));
+			    h.put("issue", matcher.group(3));
+			    h.put("pages", matcher.group(4));
 			    h.put("year", matcher.group(5));
 			}else{// may be missing the issue
 			    matcher = ovid_src_pat_no_issue.matcher(s);
 			    matchfound = matcher.find();
 			    if(matchfound){
-				h.put("journal", matcher.group(1));			    
-				h.put("volume", matcher.group(2));			    			    
-				h.put("pages", matcher.group(3));			    			    			    
+				h.put("journal", matcher.group(1));
+				h.put("volume", matcher.group(2));
+				h.put("pages", matcher.group(3));
 				h.put("year", matcher.group(4));
-			    }			    
+			    }
 			}
-			    
+
 		    }
 		    else if(fields[j].indexOf("Abstract")==0)
 			h.put("abstract",fields[j].substring(9,fields[j].length()));
@@ -394,15 +394,15 @@ public class ImportFormatReader
 		BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
 		b.setField( h);
-		
+
 		bibitems.add( b  );
 
 	    }
-			
+
 	}
 	catch(IOException ex){
 	    return null;
-			
+
 	}
 	return bibitems;
     }
@@ -414,7 +414,7 @@ public class ImportFormatReader
 	    return null;
 	}else
 	    return f;
-	
+
     }
     // check here for details on the format
     // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
@@ -426,7 +426,7 @@ public class ImportFormatReader
 	StringBuffer sb = new StringBuffer();
 	try{
 	    BufferedReader in = new BufferedReader(new FileReader( filename));
-	    
+
 	    String str;
 	    while ((str = in.readLine()) != null) {
 		str = str.trim();
@@ -449,7 +449,7 @@ public class ImportFormatReader
 	int rowNum=0;
 	HashMap hm=new HashMap();
 	String Author="",Type="",Editor="";
-	for(int i=0; i<entries.length-1; i++){
+	for(int i=0; i<entries.length; i++){
 	    hm.clear();
 	    Author=""; Type="";Editor="";
 	    String[] fields = entries[i].split("\n");
@@ -476,8 +476,8 @@ public class ImportFormatReader
 			Type="book";
 		    else if( val.indexOf("Conference")==0)// Proceedings
 			Type="inproceedings";
-		    else 
-			Type = "misc"; // 
+		    else
+			Type = "misc"; //
 		    System.out.println(val);
 		}
 		else if(prefix.equals("%7")) hm.put("edition",val);
@@ -497,7 +497,7 @@ public class ImportFormatReader
 					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
 	    bibitems.add( b  );
-	    
+
 	}
 	return bibitems;
     }
@@ -506,9 +506,9 @@ public class ImportFormatReader
     //========================================================
     static ArrayList readReferenceManager10(String filename)
     {
-	ArrayList bibitems=new ArrayList();		
+	ArrayList bibitems=new ArrayList();
 	File f = new File(filename);
-	
+
 	if(!f.exists() && !f.canRead() && !f.isFile()){
 	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
 	    return null;
@@ -516,14 +516,14 @@ public class ImportFormatReader
 	StringBuffer sb=new StringBuffer();
 	try{
 	    BufferedReader in = new BufferedReader(new FileReader( filename));
-	    
+
 	    String str;
 	    while ((str = in.readLine()) != null) {
 		sb.append(str);
 		sb.append("\n");
 	    }
 	    in.close();
-	    
+
 	}
 
 	catch(IOException e){return null;}
@@ -549,7 +549,7 @@ public class ImportFormatReader
 			else Type = "other";
 		    }else if(lab.equals("T1"))
 			hm.put("title",val);//Title = val;
-		    
+
 		    else if(lab.equals("A1") ||lab.equals("AU")){
 			val = val.substring(0,val.length()-1);
 			if( Author.equals("")) // don't add " and " for the first author
@@ -558,12 +558,12 @@ public class ImportFormatReader
 			    Author += " and " + val;
 		    }else if( lab.equals("JA") || lab.equals("JF") || lab.equals("JO"))
 			hm.put("journal",val);
-		    else if(lab.equals("SP")) 
+		    else if(lab.equals("SP"))
 			StartPage=val;
-			
-		    else if(lab.equals("EP")) 
+
+		    else if(lab.equals("EP"))
 			EndPage=val;
-			    
+
 		    else if(lab.equals("VL")) hm.put("volume",val);
 		    else if(lab.equals("N2") || lab.equals("AB")) hm.put("abstract",val);
 		    else if(lab.equals("UR")) hm.put("url",val);
@@ -578,19 +578,19 @@ public class ImportFormatReader
 		hm.put("author", Author.substring(0,Author.length()-1));
 	    else
 		hm.put("author", Author);
-	    
+
 	    hm.put("pages",StartPage+"--"+EndPage);
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
-	    
+
 	    bibitems.add( b  );
 
 	}
 
 	return bibitems;
     }
-    
+
     //==================================================
     //
     //==================================================
@@ -601,13 +601,13 @@ public class ImportFormatReader
 	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
 	    return null;
 	}
-	
+
 	// Obtain a factory object for creating SAX parsers
 	SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	// Configure the factory object to specify attributes of the parsers it creates
 	parserFactory.setValidating(true);
 	parserFactory.setNamespaceAware(true);
-	
+
 	// Now create a SAXParser object
 	ArrayList bibItems=null;
 	try{
@@ -617,7 +617,7 @@ public class ImportFormatReader
 	    parser.parse(new File(filename), handler);
 	    // When you're done, report the results stored by your handler object
 	    bibItems = handler.getItems();
-	    
+
 	}
 	catch(javax.xml.parsers.ParserConfigurationException e1){}
 	catch(org.xml.sax.SAXException e2){}
@@ -644,7 +644,7 @@ public class ImportFormatReader
 	    // Configure the factory object to specify attributes of the parsers it creates
 	    parserFactory.setValidating(true);
 	    parserFactory.setNamespaceAware(true);
-	
+
 	    // Now create a SAXParser object
 	    SAXParser parser = parserFactory.newSAXParser();   //May throw exceptions
 	    MedlineHandler handler = new MedlineHandler();
@@ -652,14 +652,14 @@ public class ImportFormatReader
 	    parser.parse( data.getInputStream(), handler);
 	    // When you're done, report the results stored by your handler object
 	    bibItems = handler.getItems();
-	    
+
 	}
 	catch(javax.xml.parsers.ParserConfigurationException e1){}
 	catch(org.xml.sax.SAXException e2){}
 	catch(java.io.IOException e3){}
 	return bibItems;
     }
-    
+
     //========================================================
     //
     //========================================================
@@ -667,7 +667,7 @@ public class ImportFormatReader
     {
 	ArrayList bibitems = new ArrayList();
 	File f = new File(filename);
-	
+
 	if(!f.exists() && !f.canRead() && !f.isFile()){
 	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
 	    return null;
@@ -687,7 +687,7 @@ public class ImportFormatReader
 	    String[] entries = sb.toString().split("__::__");
 	    String Type="";
 	    int rowNum=0;
-	    HashMap h=new HashMap();	    
+	    HashMap h=new HashMap();
 	    for(int i=0; i<entries.length; i++){
 		if(entries[i].indexOf("Record") != 0)
 		    continue;
@@ -701,9 +701,9 @@ public class ImportFormatReader
 		    String frest = s.substring(5);
 		    if(f3.equals("TI")) h.put("title", frest);
 		    else if(f3.equals("PY")) h.put("year", frest);
-		    else if(f3.equals("AU")) h.put("author", fixAuthor(frest.replaceAll(",-",", ").replaceAll(";"," and ")));		    
+		    else if(f3.equals("AU")) h.put("author", fixAuthor(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
 		    else if(f3.equals("AB")) h.put("abstract", frest);
-		    else if(f3.equals("ID")) h.put("keywords", frest);		    
+		    else if(f3.equals("ID")) h.put("keywords", frest);
 		    else if(f3.equals("SO")){
 			int m = frest.indexOf(".");
 			if(m >= 0){
@@ -723,7 +723,7 @@ public class ImportFormatReader
 				}
 			    }
 			}
-			
+
 		    }
 		    else if(f3.equals("RT")){
 			frest=frest.trim();
@@ -738,7 +738,7 @@ public class ImportFormatReader
 		BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 		b.setField( h);
-		
+
 		bibitems.add( b  );
 
 	    }
@@ -750,6 +750,6 @@ public class ImportFormatReader
     //==================================================
     //
     //==================================================
-    
-    
+
+
 }

@@ -44,7 +44,7 @@ import javax.swing.table.*;
 public class PrefsDialog2 extends JDialog {
 
     private JabRefPreferences _prefs;
-    JPanel upper = new JPanel(), 
+    JPanel upper = new JPanel(),
 	lower = new JPanel();
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -60,12 +60,15 @@ public class PrefsDialog2 extends JDialog {
 	con.weightx = 1;
 	con.fill = GridBagConstraints.BOTH;
 	con.gridwidth = GridBagConstraints.REMAINDER;
+        con.insets = new Insets(5, 5, 0, 5);
 	gbl.setConstraints(tabbed, con);
-	getContentPane().add(tabbed);	
+	getContentPane().add(tabbed);
 	con.weighty = 0;
 	con.gridheight = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(lower, con);
-	getContentPane().add(lower);	
+        lower.setBackground(GUIGlobals.lightGray);
+        getContentPane().setBackground(GUIGlobals.lightGray);
+	getContentPane().add(lower);
 
 	// ----------------------------------------------------------------
 	// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
@@ -75,7 +78,7 @@ public class PrefsDialog2 extends JDialog {
 	tabbed.addTab("External programs", new ExternalProgramsTab(_prefs));
 	tabbed.addTab("Label Pattern", new TabLabelPattern(_prefs));
 
-	JButton 
+	JButton
 	    ok = new JButton("Ok"),
 	    cancel = new JButton("Cancel");
 	ok.addActionListener(new OkAction());
@@ -83,13 +86,13 @@ public class PrefsDialog2 extends JDialog {
 	lower.add(ok);
 	lower.add(cancel);
 
-	setSize(440, 500);
+	pack(); //setSize(440, 500);
     }
 
     class OkAction extends AbstractAction {
 	public OkAction() {
 	    super("Ok");
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    for (int i=0; i<tabbed.getTabCount(); i++) {
 		((PrefsTab)tabbed.getComponentAt(i)).storeSettings();
@@ -103,7 +106,7 @@ public class PrefsDialog2 extends JDialog {
 	public CancelAction() {
 	    super("Cancel");
 
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    // Just close dialog without recording changes.
 	    dispose();
