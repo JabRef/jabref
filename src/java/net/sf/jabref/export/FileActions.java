@@ -34,7 +34,8 @@ import java.util.TreeSet;
 import java.util.HashMap;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-
+import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.*;
 import net.sf.jabref.*;
 
 
@@ -417,6 +418,12 @@ public class FileActions
                                       File outFile, JabRefPreferences prefs)
         throws Exception {
 
+	HashMap fieldFormatters = new HashMap();
+	fieldFormatters.put("default", new RemoveLatexCommands());
+	fieldFormatters.put("author", new Object[] {new AuthorLastFirst(),
+						    new RemoveLatexCommands()});
+	fieldFormatters.put("pdf", new ResolvePDF());
+	    
 	String SEPARATOR = "\t";
 	TreeSet sorted = getSortedEntries(database);
 	Set fields = new TreeSet();
@@ -434,10 +441,10 @@ public class FileActions
 
 	for (Iterator i=sorted.iterator(); i.hasNext();) {
 	    BibtexEntry entry = (BibtexEntry)i.next();
-	    writeField(entry, (String)o[0], out);
+	    writeField(entry, (String)o[0], fieldFormatters, out);
 	    for (int j=1; j<o.length; j++) {
 		out.write(SEPARATOR);
-		writeField(entry, (String)o[j], out);
+		writeField(entry, (String)o[j], fieldFormatters, out);
 	    }
 	    out.write("\n");
 	}
@@ -449,10 +456,28 @@ public class FileActions
 	
     }
 
-    private static void writeField(BibtexEntry entry, String field, Writer out) 
+    private static void writeField(BibtexEntry entry, String field, 
+				   HashMap fieldFormatters, Writer out) 
 	throws IOException {
+
 	String s = (String)entry.getField(field);
-	out.write(s != null ? s : "");
+	if (s == null) {
+	    return;
+	}
+	Object form = fieldFormatters.get(field);
+	if (form == null)
+	    form = fieldFormatters.get("default");
+
+	if (form instanceof LayoutFormatter) {
+	    s = ((LayoutFormatter)form).format(s);
+	} else if (form instanceof Object[]) {
+	    Object[] forms = (Object[])form;
+	    for (int i=0; i<forms.length; i++) {
+		s = ((LayoutFormatter)(forms[i])).format(s);
+	    }
+	}
+
+	out.write(s);
     }
 
     /**
