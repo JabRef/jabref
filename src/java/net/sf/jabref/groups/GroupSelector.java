@@ -337,7 +337,7 @@ public class GroupSelector extends SidePaneComponent implements
         sp = new JScrollPane(groupsTree,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        revalidateGroups(null,null);
+        revalidateGroups();
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         gbl.setConstraints(sp, con);
@@ -466,11 +466,11 @@ public class GroupSelector extends SidePaneComponent implements
         frame.output(Globals.lang("Updated group selection") + ".");
     }
     
-    /** Clear selection, maintain expansion state */
+    /** 
+     * Revalidate the groups tree (e.g. after the data stored in the model has
+     * been changed) and set the specified selection and expansion state. */
     public void revalidateGroups(TreePath[] selectionPaths, 
             Enumeration expandedNodes) {
-        // JZTODO: calls to this method may modify the current selection and
-        // expasion state in an undesirable way. this must be checked and fixed...
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -484,9 +484,10 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.revalidate();
     }
     
+    /** 
+     * Revalidate the groups tree (e.g. after the data stored in the model has
+     * been changed) and maintain the current selection and expansion state. */
     public void revalidateGroups() {
-        // JZTODO: calls to this method may modify the current selection and
-        // expasion state in an undesirable way. this must be checked and fixed...
         revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
     }
 
@@ -500,7 +501,7 @@ public class GroupSelector extends SidePaneComponent implements
                 AbstractGroup newGroup = gd.getResultingGroup();
                 GroupTreeNode newNode = new GroupTreeNode(newGroup);
                 groupsRoot.add(newNode);
-                revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+                revalidateGroups();
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                         GroupSelector.this, groupsRoot, newNode,
                         UndoableAddOrRemoveGroup.ADD_NODE);
@@ -565,8 +566,7 @@ public class GroupSelector extends SidePaneComponent implements
                 UndoableModifyGroup undo = new UndoableModifyGroup(
                         GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
-                revalidateGroups(groupsTree.getSelectionPaths(),
-                        getExpandedPaths());
+                revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -592,7 +592,7 @@ public class GroupSelector extends SidePaneComponent implements
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                     GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+            revalidateGroups();
             groupsTree.expandPath(new TreePath(node.getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
@@ -616,7 +616,7 @@ public class GroupSelector extends SidePaneComponent implements
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                     GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+            revalidateGroups();
             groupsTree.expandPath(new TreePath(node.getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
@@ -641,8 +641,7 @@ public class GroupSelector extends SidePaneComponent implements
                         GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
                 node.removeFromParent();
-                revalidateGroups(groupsTree.getSelectionPaths(),
-                        getExpandedPaths());
+                revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -672,8 +671,7 @@ public class GroupSelector extends SidePaneComponent implements
                 while (node.getChildCount() > 0)
                     parent.insert((GroupTreeNode) node.getFirstChild(),
                             childIndex);
-                revalidateGroups(groupsTree.getSelectionPaths(),
-                        getExpandedPaths());
+                revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
