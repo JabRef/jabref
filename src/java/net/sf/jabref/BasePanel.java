@@ -1315,6 +1315,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     }
 
     public void showEntry(BibtexEntry be) {
+
 	if (showing == be) {
 	    if (splitPane.getBottomComponent() == null) {
 		// This is the special occasion when showing is set to an
@@ -1353,8 +1354,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    splitPane.setBottomComponent(form);
 	    entryEditors.put(be.getType().getName(), form);
 	}
-	if (showing != null)
-	    splitPane.setDividerLocation(divLoc);
+	if (divLoc > 0) {
+          splitPane.setDividerLocation(divLoc);
+        }
 	else
 	    splitPane.setDividerLocation
 		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
@@ -1362,20 +1364,25 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	//form.requestFocus();
 
 	showing = be;
-
-	//form.setEnabled(false);
+        setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
     /**
      * Closes the entry editor.
-     *
+     * Set showing to null, and call updateViewToSelected.
      */
     public void hideEntryEditor() {
-	splitPane.setBottomComponent(previewPanel);
+      BibtexEntry be = showing;
+      showing = null;
+      if (be != null)
+        updateWiewToSelected(be);
+
+      new FocusRequester(entryTable);
+	/*splitPane.setBottomComponent(previewPanel);
         if (previewPanel != null)
           splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
-	new FocusRequester(entryTable);
-	showing = null;
+
+*/
     }
 
     /**
@@ -1705,6 +1712,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
   public boolean previewEnabled() {
     return previewEnabled;
+  }
+
+  public void setEntryEditorEnabled(boolean enabled) {
+    if ((showing != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {
+          EntryEditor ed = (EntryEditor)splitPane.getBottomComponent();
+          if (ed.isEnabled() != enabled)
+            ed.setEnabled(enabled);
+    }
   }
 
 }

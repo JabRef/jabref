@@ -46,7 +46,8 @@ public class EntryTable extends JTable {
 	showingGroup = false;
     private EntryTable ths = this;
     private boolean antialiasing = true,
-        ctrlClick = false;
+        ctrlClick = false,
+        selectionListenerOn = true;
     //RenderingHints renderingHints;
     private BasePanel panel;
 
@@ -114,11 +115,29 @@ public class EntryTable extends JTable {
         if (previewListener == null)
           previewListener = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+              if (!selectionListenerOn) return;
               if (!e.getValueIsAdjusting()) {
-                int row = getSelectedRow();//e.getFirstIndex();
-                if (row >= 0)
-                  panel.updateWiewToSelected(panel.database().getEntryById(tableModel.
-                      getNameFromNumber(row)));
+                if (getSelectedRowCount() == 1) {
+                  int row = getSelectedRow(); //e.getFirstIndex();
+                  if (row >= 0) {
+                    panel.updateWiewToSelected(panel.database().getEntryById(
+                        tableModel.
+                        getNameFromNumber(row)));
+                  }
+                } else {
+                  /* With a multiple selection, there are three alternative behaviours:
+                   1. Disable the entry editor. Do not update it.
+                   2. Do not disable the entry editor, and do not update it.
+                   3. Update the entry editor, and keep it enabled.
+
+                   We currently implement 1 and 2, and choose between them based on
+                   prefs.getBoolean("disableOnMultipleSelection");
+                   */
+                  if (prefs.getBoolean("disableOnMultipleSelection")) { // 1.
+                    panel.setEntryEditorEnabled(false);
+                  }
+                  // 2. Do nothing.
+                }
               }
             }
           };
@@ -130,6 +149,16 @@ public class EntryTable extends JTable {
        */
       public void disablePreviewListener() {
         getSelectionModel().removeListSelectionListener(previewListener);
+      }
+
+      /**
+       * This method overrides the superclass' to disable the selection listener while the
+       * row selection is adjusted.
+       */
+      public void setRowSelectionInterval(int row1, int row2) {
+        selectionListenerOn = false;
+        super.setRowSelectionInterval(row1, row2);
+        selectionListenerOn = true;
       }
 
     public void setWidths() {

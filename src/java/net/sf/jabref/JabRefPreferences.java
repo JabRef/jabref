@@ -133,6 +133,7 @@ public class JabRefPreferences {
         defaults.put("fontSize", new Integer(12));
         defaults.put("antialias", new Boolean(true));
         defaults.put("ctrlClick", new Boolean(false));
+        defaults.put("disableOnMultipleSelection", new Boolean(true));
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 

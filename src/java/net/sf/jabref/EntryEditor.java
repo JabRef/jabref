@@ -666,6 +666,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    source.requestFocus();
     }
 
+    /**
+     * Reports the enabled status of the editor, as set by setEnabled()
+     */
+    public boolean isEnabled() {
+      return source.isEnabled();
+    }
+
+    /**
+     * Sets the enabled status of all text fields of the entry editor.
+     */
     public void setEnabled(boolean enabled) {
 
 	FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
@@ -1182,9 +1192,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    return; // newRow is still -1, so we can assume the database
 		            // has only one entry.
 
-		id = panel.tableModel
-		    .getNameFromNumber(newRow);
-
+		id = panel.tableModel.getNameFromNumber(newRow);
 		switchTo(id);
 		final int nr = newRow;
 		(new Thread() {
@@ -1202,8 +1210,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      */
     private void scrollTo(int row) {
 	panel.entryTable.setRowSelectionInterval(row, row);
-	panel.entryTable.setColumnSelectionInterval
-	    (0, panel.entryTable.getColumnCount()-1);
 	panel.entryTable.ensureVisible(row);
     }
 
@@ -1275,6 +1281,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	entry = be;
 	updateAllFields();
 	updateSource();
+        panel.showing = be;
 	if (tabbed.getSelectedComponent() instanceof FieldPanel)
 	    ((FieldPanel)tabbed.getSelectedComponent()).activate();
 	else ((JComponent)tabbed.getSelectedComponent()).requestFocus();

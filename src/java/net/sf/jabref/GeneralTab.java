@@ -12,7 +12,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
-		defSource, editSource,defSort, ctrlClick;
+		defSource, editSource,defSort, ctrlClick, disableOnMultiple;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -44,6 +44,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("defaultAutoSort"));
           ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"),
 				  _prefs.getBoolean("ctrlClick"));
+        disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"),
+                                  _prefs.getBoolean("disableOnMultipleSelection"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
 	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
@@ -69,13 +71,17 @@ public class GeneralTab extends JPanel implements PrefsTab {
         gbl.setConstraints(backup, con);
 	general.add(backup);
 
-	con.gridwidth = GridBagConstraints.REMAINDER;
+        con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
-        //con.gridwidth = 1;
+        con.gridwidth = 1;
+        gbl.setConstraints(disableOnMultiple, con);
+        general.add(disableOnMultiple);
+
+        con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(ctrlClick, con);
-	general.add(ctrlClick);
+        general.add(ctrlClick);
 
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	//gbl.setConstraints(defSort, con);
@@ -100,7 +106,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(groupField, con);
         general.add(groupField);
-        
+
 	// Language choice
         String oldLan = _prefs.get("language");
         int ilk = 0;
@@ -242,6 +248,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
         _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
+        _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());

@@ -1579,7 +1579,7 @@ public class JabRefFrame
     importMenu.add(newSixpack_mItem);
 
     //########################################
-    JMenuItem newBiblioscapeTagFile_mItem = new JMenuItem(Globals.lang("Biblioscape Tag File"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+    JMenuItem newBiblioscapeTagFile_mItem = new JMenuItem(Globals.lang("Biblioscape Tag file"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
     newBiblioscapeTagFile_mItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e)
       {
@@ -1631,6 +1631,7 @@ public class JabRefFrame
 
   JMenuItem
       htmlItem = new JMenuItem(Globals.lang("HTML")),
+      simpleHtmlItem = new JMenuItem(Globals.lang("Simple HTML")),
       //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
       docbookItem = new JMenuItem(Globals.lang("Docbook"));
 
@@ -1641,6 +1642,10 @@ public class JabRefFrame
         String lfFileName = null, extension = null;
         if (source == htmlItem) {
           lfFileName = "html";
+          extension = ".html";
+        }
+        if (source == simpleHtmlItem) {
+          lfFileName = "simplehtml";
           extension = ".html";
         }
         //else if (source == plainTextItem)
@@ -1689,6 +1694,8 @@ public class JabRefFrame
 
     htmlItem.addActionListener(listener);
     menu.add(htmlItem);
+    simpleHtmlItem.addActionListener(listener);
+    menu.add(simpleHtmlItem);
     //plainTextItem.addActionListener(listener);
     //menu.add(plainTextItem);
     docbookItem.addActionListener(listener);

@@ -1,7 +1,7 @@
 <font face="arial">
 <b><i>\bibtextype</i>
-<dt><a name="\bibtexkey">(\bibtexkey)</a></dt>
-<dd></b>
+<a name="\bibtexkey">(\bibtexkey)</a>
+</b>
 <br>
 \begin{author} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author} \end{author}<BR>
 \begin{title} In: \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title} \end{title}<BR>
