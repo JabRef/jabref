@@ -21,7 +21,7 @@ public class ContentSelectorDialog extends JDialog {
     JButton remove = new JButton();
     JComboBox fieldSelector = new JComboBox();
     GridBagLayout gridBagLayout2 = new GridBagLayout();
-    JButton help = new JButton();
+    HelpAction help;
     JPanel jPanel4 = new JPanel();
     GridBagLayout gridBagLayout3 = new GridBagLayout();
     GridBagLayout gridBagLayout4 = new GridBagLayout();
@@ -51,6 +51,7 @@ public class ContentSelectorDialog extends JDialog {
 	super(frame, Globals.lang("Setup selectors"), modal);
 	this.metaData = metaData;
 	this.frame = frame;
+	help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
 	try {
 	    jbInit();
 	    wordSelector.addItem(WORD_EMPTY_TEXT);
@@ -75,8 +76,8 @@ public class ContentSelectorDialog extends JDialog {
 	// the user to control which fields have a selector. I think this
 	// makes the dialog more intuitive. When the user opens this dialog
 	// from the Tools menu, the full interface will be available.
-	panel1.remove(jPanel1);
-	pack();
+	//panel1.remove(jPanel1);
+	//pack();
     }
 
     /**
@@ -187,7 +188,6 @@ public class ContentSelectorDialog extends JDialog {
 	remove.setText(Globals.lang("Remove"));
 	jPanel1.setLayout(gridBagLayout2);
 	jPanel1.setBorder(titledBorder1);
-	help.setText("help");
 	jPanel3.setBorder(titledBorder2);
 	jPanel3.setLayout(gridBagLayout4);
 	jPanel4.setLayout(gridBagLayout3);
@@ -201,6 +201,13 @@ public class ContentSelectorDialog extends JDialog {
 	getContentPane().add(panel1);
 	this.getContentPane().add(jPanel2, BorderLayout.SOUTH);
 	jPanel2.add(Close, null);
+	JToolBar tlb = new JToolBar();
+	//tlb.setLayout(new GridLayout(1,1));
+	//tlb.setPreferredSize(new Dimension(28, 28));
+	tlb.setFloatable(false);
+	tlb.add(help);
+	jPanel2.add(Close, null);
+	jPanel2.add(tlb, null);
 	panel1.add(jPanel1,   new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0
 						     ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 	jPanel1.add(lab,      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
@@ -213,8 +220,6 @@ public class ContentSelectorDialog extends JDialog {
 								,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 	jPanel1.add(fieldSelector,       new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0
 								,GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5), 0, 0));
-	jPanel1.add(help,     new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0
-						     ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 	jPanel1.add(jPanel4,    new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0
 						       ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 	jPanel4.add(add,     new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0

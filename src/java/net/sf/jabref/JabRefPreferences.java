@@ -343,6 +343,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Save session", "F11");
 	defKeyBinds.put("Load session", "F12");
 	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
+	defKeyBinds.put("Next tab", "ctrl RIGHT");
+	defKeyBinds.put("Previous tab", "ctrl LEFT");
     }
 
     private String getNextUnit(Reader data) throws IOException {

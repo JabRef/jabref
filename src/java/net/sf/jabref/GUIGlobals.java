@@ -128,6 +128,7 @@ public class GUIGlobals {
 	refreshSmallIconFile = GUIGlobals.class.getResource(pre+"GreenFlag.gif"),
 	helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
 	helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),
+	helpContentsIconFile = GUIGlobals.class.getResource(pre+"HelpIndex.gif"),
 	newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
 	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste2.gif"),
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
@@ -145,6 +146,7 @@ public class GUIGlobals {
 	searchHelp = "SearchHelp.html",
 	groupsHelp = "GroupsHelp.html",
 	customEntriesHelp = "CustomEntriesHelp.html",
+	contentSelectorHelp = "ContentSelectorHelp.html",
 	aboutPage = "About.html";
 
 

@@ -285,8 +285,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    if ((bes != null) && (bes.length > 0)) {
 			// Create a CompoundEdit to make the action undoable.
 			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? Globals.lang("cut entries")
-			     : Globals.lang("cut entry"));
+			    (bes.length > 1 ? "cut entries" : "cut entry");
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
 			    database.removeEntry(bes[i].getId());
@@ -406,10 +405,17 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				markBaseChanged();
 			    }
 			}
+			Util.pr(flavor.length+"");
+			Util.pr(flavor[0].toString());
+			Util.pr(flavor[1].toString());
+			Util.pr(flavor[2].toString());
+			Util.pr(flavor[3].toString());
+			Util.pr(flavor[4].toString());
 			if ((flavor != null) && (flavor.length > 0) && flavor[0].equals(DataFlavor.stringFlavor)) {
 			    // We have determined that the clipboard data is a string.
 			    int[] rows = entryTable.getSelectedRows(),
 				cols = entryTable.getSelectedColumns();
+			    Util.pr(rows.length+" x "+cols.length);
 			    if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
 				&& (rows != null) && (rows.length == 1)) {
 				try {

@@ -39,6 +39,7 @@ public interface FieldEditor {
     public void setBackground(java.awt.Color c);
     public String getText();
     public void setText(String newText);
+    public void append(String text);
     public java.awt.Container getParent();
     public void requestFocus();
 

@@ -33,7 +33,7 @@ import java.awt.event.*;
 
 class FieldContentSelector extends JComponent implements ItemListener {
 
-    final String DELIMITER = " ";
+    final String DELIMITER = " ", DELIMITER_2 = "";
     FieldEditor editor;
     JComboBox list = new JComboBox();
     JButton manage;
@@ -48,6 +48,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	this.editor = editor_;
 	this.parent = parent;
 	metaData = data;
+	list.setEditable(true);
 	final MetaData metaData = data;
         final JabRefFrame frame = parent.frame;
 	updateList();
@@ -78,7 +79,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 
     private void updateList() {
 	list.removeAllItems();
-	list.addItem(Globals.lang("<select>"));
+	list.addItem(""); //(Globals.lang(""));
 	Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
 				    editor.getFieldName());
 	if ((items != null) && (items.size() > 0)) {
@@ -94,7 +95,29 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	if (list.getSelectedIndex() == 0)
 	    return; // The first element is only for show.
 	String chosen = (String)list.getSelectedItem();
-	editor.setText(editor.getText()+chosen+DELIMITER);
+	if (list.getSelectedIndex() == -1) {  // User edited in a new word. Add this.
+	    Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
+					    editor.getFieldName());
+	    boolean exists = false;
+	    int pos = -1;
+	    for (int i=0; i<items.size(); i++) {
+		String s = (String)items.elementAt(i);
+		if (s.equals(chosen)) {
+		    exists = true;
+		    break;
+		}
+		if (s.toLowerCase().compareTo(chosen.toLowerCase()) < 0)
+		    pos = i+1;
+	    }
+	    if (!exists) {
+		items.add(Math.max(0, pos), chosen);
+		parent.panel.markNonUndoableBaseChanged();
+		updateList();
+	    }	   
+	}
+	if (!editor.getText().equals(""))
+	    editor.append(DELIMITER);
+	editor.append(chosen+DELIMITER_2);
 	parent.storeFieldAction.actionPerformed
 	    (new ActionEvent(editor, 0, ""));
     }

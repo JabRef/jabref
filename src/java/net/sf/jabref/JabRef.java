@@ -27,9 +27,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 import java.io.File;
 import java.awt.Font;
-import javax.swing.UIManager;
-import javax.swing.UIDefaults;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
+//import javax.swing.UIManager;
+//import javax.swing.UIDefaults;
+//import javax.swing.UnsupportedLookAndFeelException;
 
 public class JabRef {
 
@@ -73,7 +74,9 @@ public class JabRef {
 	UIManager.put("Tree.font", fnt);
 	
 	try {
-	    UIManager.setLookAndFeel(new com.incors.plaf.kunststoff.KunststoffLookAndFeel());
+	    LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+	    //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
+	    UIManager.setLookAndFeel(lnf);
 	} catch (UnsupportedLookAndFeelException ex) {}
 	
 	JabRefPreferences prefs = new JabRefPreferences();

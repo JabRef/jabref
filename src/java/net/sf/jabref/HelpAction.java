@@ -74,6 +74,14 @@ public class HelpAction extends AbstractAction {
 	this.helpFile = helpFile;
     }
 
+    public HelpAction(String title, HelpDialog diag, String helpFile, String tooltip,
+		      URL iconFile) {
+	super(Globals.lang(title), new ImageIcon(iconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
+
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip) {
 	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));

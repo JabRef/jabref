@@ -3,7 +3,9 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.Iterator;
+import java.io.File;
 
 public class GeneralTab extends JPanel implements PrefsTab {
 
@@ -14,15 +16,17 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
+    JTextField
+	pdf, ps, html, lyx;
 
     public GeneralTab(JabRefPreferences prefs) {
 	_prefs = prefs;
 
-	setLayout(gbl);
+ 	setLayout(gbl);
 	con.weightx = 0;
 	con.insets = new Insets(10, 10, 10, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridwidth = GridBagConstraints.REMAINDER;
+	
 	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"),
 				     _prefs.getBoolean("autoOpenForm"));
 	openLast = new JCheckBox(Globals.lang
@@ -33,22 +37,31 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("defaultShowSource"));
 	editSource = new JCheckBox(Globals.lang("Enable source editing"),
 				   _prefs.getBoolean("enableSourceEditing"));
-	JPanel general = new JPanel();
+	JPanel general = new JPanel(),
+	    external = new JPanel();
         groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
 	general.setBorder(BorderFactory.createTitledBorder
 			  (BorderFactory.createEtchedBorder(),
 			   Globals.lang("Miscellaneous")));
+	external.setBorder(BorderFactory.createTitledBorder
+			  (BorderFactory.createEtchedBorder(),
+			   Globals.lang("External programs")));
 	general.setLayout(gbl);
+	external.setLayout(gbl);
 
+	con.gridwidth = 1;
 	gbl.setConstraints(openLast, con);
 	general.add(openLast);
 
-	gbl.setConstraints(backup, con);
-	general.add(backup);
-
+	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(autoOpenForm, con);
 	general.add(autoOpenForm);
 
+	con.gridwidth = 1;
+	gbl.setConstraints(backup, con);
+	general.add(backup);
+
+	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
@@ -80,10 +93,101 @@ public class GeneralTab extends JPanel implements PrefsTab {
         gbl.setConstraints(language, con);
         general.add(language);
 
+
+	// ------------------------------------------------------------
+	// External programs panel.
+	// ------------------------------------------------------------
+	pdf = new JTextField(_prefs.get("pdfviewer"), 30);
+	ps = new JTextField(_prefs.get("psviewer"), 30);
+	html = new JTextField(_prefs.get("htmlviewer"), 30);
+	lyx = new JTextField(_prefs.get("lyxpipe"), 30);
+
+        con.gridwidth = 1;
+	con.weightx = 0;
+	con.insets = new Insets(10, 10, 10, 10);
+	con.fill = GridBagConstraints.HORIZONTAL;
+	lab = new JLabel(Globals.lang("Path to PDF viewer")+":");
+	gbl.setConstraints(lab, con);
+        external.add(lab);
+	con.weightx = 1;
+	gbl.setConstraints(pdf, con);
+	external.add(pdf);
+	con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        JButton browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(pdf));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+        con.gridwidth = 1;
+	con.fill = GridBagConstraints.HORIZONTAL;
+	lab = new JLabel(Globals.lang("Path to PS viewer")+":");
+	gbl.setConstraints(lab, con);
+	external.add(lab);
+	con.weightx = 1;
+	gbl.setConstraints(ps, con);
+	external.add(ps);
+	con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(ps));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+	con.gridwidth = 1;
+	lab = new JLabel(Globals.lang("Path to HTML viewer")+":");
+	gbl.setConstraints(lab, con);
+	external.add(lab);
+	con.weightx = 1;
+	gbl.setConstraints(html, con);
+	external.add(html);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+	con.weightx = 0;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(html));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+	con.gridwidth = 1;
+	con.fill = GridBagConstraints.HORIZONTAL;
+	lab = new JLabel(Globals.lang("Path to LyX pipe")+":");
+	gbl.setConstraints(lab, con);
+	external.add(lab);
+        con.weightx = 1;
+	gbl.setConstraints(lyx, con);
+	external.add(lyx);
+        con.weightx = 0;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(lyx));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+
+
+	con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(general, con);
         add(general);
 
+        gbl.setConstraints(external, con);
+        add(external);
 
+
+    }
+
+  /**
+   * Action used to produce a "Browse" button for one of the text fields.
+   */
+  class BrowseAction extends AbstractAction {
+      JTextField comp;
+      public BrowseAction(JTextField tc) {
+        super(Globals.lang("Browse"));
+        comp = tc;
+      }
+      public void actionPerformed(ActionEvent e) {
+        JabRefFileChooser chooser = new JabRefFileChooser(new File(comp.getText()));
+        //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+        int returnVal = chooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+          File newFile = chooser.getSelectedFile();
+          comp.setText(newFile.getPath());
+        }
+      }
     }
 
     public void storeSettings() {
@@ -93,6 +197,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.put("groupsDefaultField", groupField.getText().trim());
+
+	// We should maybe do some checking on the validity of the contents?
+	_prefs.put("pdfviewer", pdf.getText());
+	_prefs.put("psviewer", ps.getText());
+	_prefs.put("htmlviewer", html.getText());
+	_prefs.put("lyxpipe", lyx.getText());
+
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
           _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString());

@@ -89,7 +89,8 @@ public class JabRefFrame extends JFrame {
 			      GUIGlobals.baseFrameHelp, "JabRef help",
 			      prefs.getKey("Help")),
 	contents = new HelpAction("Help contents", helpDiag,
-				  GUIGlobals.helpContents, "Help contents"),
+				  GUIGlobals.helpContents, "Help contents",
+				  GUIGlobals.helpContentsIconFile),
 	about = new HelpAction("About JabRef", helpDiag,
 			       GUIGlobals.aboutPage, "About JabRef"),
 	save = new GeneralAction("save", "Save database",
@@ -98,6 +99,8 @@ public class JabRefFrame extends JFrame {
 	saveAs = new GeneralAction("saveAs", "Save database as ...",
 				 "Save database as ...",
 				   GUIGlobals.saveAsIconFile),
+	nextTab = new ChangeTabAction(true),
+	prevTab = new ChangeTabAction(false),
 	undo = new GeneralAction("undo", "Undo", "Undo",
 				 GUIGlobals.undoIconFile,
 				 prefs.getKey("Undo")),
@@ -531,7 +534,9 @@ public class JabRefFrame extends JFrame {
 	edit.addSeparator();
 	edit.add(selectAll);
 	mb.add(edit);
-
+	view.add(nextTab);
+	view.add(prevTab);
+	view.addSeparator();
 	view.add(toggleGroups);
 	mb.add(view);
 
@@ -680,6 +685,8 @@ public class JabRefFrame extends JFrame {
 	close.setEnabled(false);
 	save.setEnabled(false);
 	saveAs.setEnabled(false);
+	nextTab.setEnabled(false);
+	prevTab.setEnabled(false);
 	undo.setEnabled(false);
 	redo.setEnabled(false);
 	cut.setEnabled(false);
@@ -710,6 +717,8 @@ public class JabRefFrame extends JFrame {
 	close.setEnabled(true);
 	save.setEnabled(true);
 	saveAs.setEnabled(true);
+	nextTab.setEnabled(true);
+	prevTab.setEnabled(true);
 	undo.setEnabled(true);
 	redo.setEnabled(true);
 	cut.setEnabled(true);
@@ -1434,6 +1443,23 @@ public class JabRefFrame extends JFrame {
 		}
 		}).start();
 
+	}
+    }
+
+    class ChangeTabAction extends AbstractAction {
+	private boolean next;
+	public ChangeTabAction(boolean next) {
+	    super(Globals.lang(next?"Next tab":"Previous tab"));
+	    this.next = next;
+	    putValue(ACCELERATOR_KEY,
+		     (next?prefs.getKey("Next tab"):prefs.getKey("Previous tab")));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    int i=tabbedPane.getSelectedIndex();
+	    int newI = (next?i+1:i-1);
+	    if (newI<0) newI=tabbedPane.getTabCount()-1;
+	    if (newI==tabbedPane.getTabCount()) newI=0;
+	    tabbedPane.setSelectedIndex(newI);
 	}
     }
 

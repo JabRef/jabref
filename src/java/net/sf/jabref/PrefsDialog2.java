@@ -75,7 +75,7 @@ public class PrefsDialog2 extends JDialog {
 	// ----------------------------------------------------------------
 	tabbed.addTab(Globals.lang("General"), new GeneralTab(_prefs));
 	tabbed.addTab(Globals.lang("Table"), new TablePrefsTab(_prefs));
-	tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
+	//tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
 	//tabbed.addTab("Label Pattern", new TabLabelPattern(_prefs));
 
 	JButton

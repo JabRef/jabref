@@ -51,6 +51,10 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	    label.setForeground(GUIGlobals.nullFieldColor);
     }
 
+    public void append(String text) {
+	setText(getText()+text);
+    }
+
     public String getFieldName() { return fieldName; }
     public JLabel getLabel() { return label; }
     public void setLabelColor(Color c) { label.setForeground(c); }
