@@ -16,11 +16,14 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     JTextArea layout1 = new JTextArea("", 1, 1),
     layout2 = new JTextArea("", 1, 1);
     JButton def1 = new JButton(Globals.lang("Default")),
-	def2 = new JButton(Globals.lang("Default"));
+	    def2 = new JButton(Globals.lang("Default")),
+        test1 = new JButton(Globals.lang("Test")),
+        test2 = new JButton(Globals.lang("Test"));
     JPanel p1 = new JPanel(),
 	p2 = new JPanel();
     JScrollPane sp1 = new JScrollPane(layout1),
 	sp2 = new JScrollPane(layout2);
+    private BibtexEntry entry;
 
     public PreviewPrefsTab(JabRefPreferences prefs, HelpDialog diag) {
 	_prefs = prefs;
@@ -45,10 +48,20 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(sp1, con);
 	p1.add(sp1);
 	con.weighty = 0;
+    con.gridwidth = 1;
+    con.weightx = 0;
 	con.fill = GridBagConstraints.NONE;
-	gbl.setConstraints(def1, con);
+    con.anchor = GridBagConstraints.WEST;
+    gbl.setConstraints(test1, con);
+	p1.add(test1);
+    gbl.setConstraints(def1, con);
 	p1.add(def1);
-	lab = new JLabel(Globals.lang("Preview")+" 2");
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    JPanel pan = new JPanel();
+    con.weightx = 1;
+    gbl.setConstraints(pan, con);
+    p1.add(pan);
+    lab = new JLabel(Globals.lang("Preview")+" 2");
 	gbl.setConstraints(lab, con);
 	//p2.add(lab);
 	con.weighty = 1;
@@ -56,10 +69,18 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(sp2, con);
 	p2.add(sp2);
 	con.weighty = 0;
+    con.weightx = 0;
 	con.fill = GridBagConstraints.NONE;
+    con.gridwidth = 1;
+    gbl.setConstraints(test2, con);
+	p2.add(test2);
 	gbl.setConstraints(def2, con);
 	p2.add(def2);
-
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    pan = new JPanel();
+    con.weightx = 1;
+    gbl.setConstraints(pan, con);
+    p2.add(pan);
 	add(p1);
 	add(p2);
 
@@ -80,6 +101,42 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		}
 	    });
 
+
+    test1.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+            initTestEntry();
+            PreviewPanel testPanel = new PreviewPanel(entry, layout1.getText());
+            JOptionPane.showMessageDialog(null, testPanel);
+		}
+	    });
+
+    test2.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+            initTestEntry();
+            PreviewPanel testPanel = new PreviewPanel(entry, layout2.getText());
+            JOptionPane.showMessageDialog(null, testPanel);
+		}
+	    });
+    }
+
+    /**
+     * Create the BibtexEntry that will be used to test the previews.
+     */
+    private void initTestEntry() {
+        if (entry != null)
+            return;
+        entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
+        entry.setField(Globals.KEY_FIELD, "alba04");
+        entry.setField("author", "Morten O. Alver and Nizar Batada");
+        entry.setField("title", "JabRef, a reference management application");
+        entry.setField("year", "2004");
+        entry.setField("journal", "Open Source Journal");
+        entry.setField("month", "January");
+        entry.setField("number", "1");
+        entry.setField("volume", "52");
+        entry.setField("pdf", "alba04.pdf");
+        entry.setField("url", "http://thereferencedatabase.com/10011101.html");
+        
     }
 
     public void setValues() {
