@@ -47,6 +47,9 @@ import javax.swing.*;
  * @version $Id$
  * <p>
  * $Log$
+ * Revision 1.4  2004/02/17 09:14:02  mortenalver
+ * Similar update in FontSelector preview.
+ *
  * Revision 1.3  2004/02/17 07:35:22  mortenalver
  * Experimenting with antialiasing in table.
  *
@@ -216,7 +219,8 @@ public class FontSelectorDialog extends JDialog {
 			    rh.put(RenderingHints.KEY_ANTIALIASING,
 				   RenderingHints.VALUE_ANTIALIAS_ON);
 			    g2.setRenderingHints(rh);
-			    g2.drawString(getText(), 40, 15+f.getSize());
+			    //g2.drawString(getText(), 40, 15+f.getSize());
+			    super.paint(g2);
 			}
 
 		    };
