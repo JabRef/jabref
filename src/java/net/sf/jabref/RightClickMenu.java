@@ -189,10 +189,10 @@ public class RightClickMenu extends JPopupMenu
         groupAddMenu.setEnabled(false);
         groupRemoveMenu.setEnabled(false);
         return;
-      } else {
-        groupAddMenu.setEnabled(true);
-        groupRemoveMenu.setEnabled(true);
       }
+      
+      groupAddMenu.setEnabled(true);
+      groupRemoveMenu.setEnabled(true);
       groupAddMenu.removeAll();
       groupRemoveMenu.removeAll();
       
@@ -219,13 +219,20 @@ public class RightClickMenu extends JPopupMenu
             return;
         }
         
-        JMenu submenu = new JMenu("["+node.getGroup().getName()+"]");
-        submenu.add(action);
-        submenu.add(new Separator());
-        for (int i = 0; i < node.getChildCount(); ++i) {
-            insertNodes(submenu,(GroupTreeNode) node.getChildAt(i),add);
+        JMenu submenu = null;
+        if (node.getGroup() instanceof AllEntriesGroup) {
+            for (int i = 0; i < node.getChildCount(); ++i) {
+                insertNodes(menu,(GroupTreeNode) node.getChildAt(i),add);
+            }
+        } else {
+            submenu = new JMenu("["+node.getGroup().getName()+"]");
+            submenu.add(action);
+            submenu.add(new Separator());
+            for (int i = 0; i < node.getChildCount(); ++i) {
+                insertNodes(submenu,(GroupTreeNode) node.getChildAt(i),add);
+            }
+            menu.add(submenu);
         }
-        menu.add(submenu);
     }
     
     private AbstractAction getAction(GroupTreeNode node, boolean add) {
@@ -253,6 +260,7 @@ public class RightClickMenu extends JPopupMenu
         }
         public void actionPerformed(ActionEvent evt) {
             m_group.addSelection(panel);
+            // JZTODO: mark change & add undo
         }
     }
     
@@ -263,7 +271,8 @@ public class RightClickMenu extends JPopupMenu
             m_group = group;
         }
         public void actionPerformed(ActionEvent evt) {
-            ((AbstractGroup)m_group).removeSelection(panel);
+            m_group.removeSelection(panel);
+            // JZTODO: mark change & add undo
         }
     }
 
