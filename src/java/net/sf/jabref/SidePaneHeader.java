@@ -55,13 +55,14 @@ public class SidePaneHeader extends JPanel implements ActionListener {
       Graphics2D g2 = (Graphics2D)g;
       Paint oldPaint = g2.getPaint();
       //g2.setColor(Color.red);
-      int width = getWidth(),
-          height = getHeight();
+      Insets ins = getInsets();
+      int width = getWidth() - ins.left - ins.right,
+          height = getHeight() - ins.top - ins.bottom;
       //g2.setPaint(new GradientPaint(0, 0, GUIGlobals.gradientGray,
      //                              width, height, GUIGlobals.gradientBlue, false));
-     g2.setPaint(new GradientPaint(0, 0, GUIGlobals.gradientGray,
+     g2.setPaint(new GradientPaint(ins.left, ins.top, GUIGlobals.gradientGray,
                                    width, height, GUIGlobals.gradientBlue, false));
-      g2.fillRect(0, 0, width, height);
+      g2.fillRect(ins.left, ins.top, width, height);
       //g2.fillRect(0, 0, 100, 10);
       g2.setPaint(oldPaint);
       //super.paintComponent(g);
@@ -102,7 +103,8 @@ public class SidePaneHeader extends JPanel implements ActionListener {
   close.setMinimumSize(new Dimension(15, 15));
   close.addActionListener(this);
 
-	//setBorder(BorderFactory.createEtchedBorder());
+  //setBorder(BorderFactory.createEtchedBorder());
+  setBorder(BorderFactory.createMatteBorder(1,1,1,2,new Color(150,150,150)));
 	//add(imageIcon, BorderLayout.WEST);
 	con.insets = new Insets(1, 1, 1, 1);
 	con.gridwidth = 1;

@@ -85,7 +85,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.56:	- Bibtex strings are now sorted automatically.
+1.56:	- Added mnemonic keys to menus and menu items.
+	- Bibtex strings are now sorted automatically.
 	- Fixed PDF/PS view routine to remove problems with filenames
           containing spaces.
         - Fixed bug that interfered with Fetch Medline by ID, and fixed

@@ -14,17 +14,23 @@ class FileHistory extends JMenu implements ActionListener {
     JabRefFrame frame;
 
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {
-	super(Globals.lang("Recent files"));
+	String name = Globals.menuTitle("Recent files");
+	int i = name.indexOf('&');
+	if (i >= 0) {
+	    setText(name.substring(0, i)+name.substring(i+1));
+	    char mnemonic = Character.toUpperCase(name.charAt(i+1));
+	    setMnemonic((int)mnemonic);
+	}
+	else setText(name);
+	
 	this.prefs = prefs;
 	this.frame = frame;
 	String[] old = prefs.getStringArray("recentFiles");
 	if ((old != null) && (old.length > 0)) {
-	    for (int i=0; i<old.length; i++) {
-		JMenuItem item = new JMenuItem(old[i]);
-		item.addActionListener(this);
-		add(item);
-		history.addFirst(item);
+	    for (i=0; i<old.length; i++) {
+		history.addFirst(old[i]);
 	    }
+	    setItems();
 	} else
 	    setEnabled(false);
     }
@@ -36,15 +42,13 @@ class FileHistory extends JMenu implements ActionListener {
      * @param filename a <code>String</code> value
      */
     public void newFile(String filename) {
-	JMenuItem item = new JMenuItem(filename);
-	item.addActionListener(this);
 	int i=0;
 	while (i < history.size()) {
-	    if (((JMenuItem)history.get(i)).getText().equals(filename))
+	    if (((String)history.get(i)).equals(filename))
 		history.remove(i--);
 	    i++;
 	}
-	history.addFirst(item);
+	history.addFirst(filename);
 	while (history.size() > prefs.getInt("historySize")) {
 	    history.removeLast();
 	}
@@ -56,16 +60,27 @@ class FileHistory extends JMenu implements ActionListener {
     private void setItems() {
 	removeAll();
 	Iterator i= history.iterator();
+	int count = 1;
 	while (i.hasNext()) {
-	    add((JMenuItem)i.next());
+	    addItem((String)i.next(), count++);
 	}
+    }
+
+    private void addItem(String filename, int num) {
+	String number = num+"";
+	JMenuItem item = new JMenuItem(number+". "+filename);
+	char mnemonic = Character.toUpperCase(number.charAt(0));
+	item.setMnemonic((int)mnemonic);
+	item.addActionListener(this);
+	add(item);
+	//history.addFirst(item);
     }
 
     public void storeHistory() {
 	if (history.size() > 0) {
 	    String[] names = new String[history.size()];
 	    for (int i=0; i<names.length; i++)
-		names[i] = ((JMenuItem)history.get(i)).getText();
+		names[i] = (String)history.get(i);
 	    prefs.putStringArray("recentFiles", names);
 	}
     }
@@ -76,6 +91,9 @@ class FileHistory extends JMenu implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
 	String name = ((JMenuItem)e.getSource()).getText();
+	int pos = name.indexOf(" ");
+	name = name.substring(pos+1);
+	//Util.pr("'"+name+"'");
 	frame.fileToOpen = new File(name);
 	(new Thread() {
 		public void run() {
