@@ -781,11 +781,19 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			  Object link = bes[0].getField("ps");
 			  if (bes[0].getField("pdf") != null)
 			      link = bes[0].getField("pdf");
-			  if (link != null)
-			      Util.openExternalViewer(link.toString(), prefs);
+			  if (link != null) {
+                            //output(Globals.lang("Calling external viewer..."));
+                            try {
+                              Util.openExternalViewer(link.toString(), prefs);
+                              output(Globals.lang("External viewer called")+".");
+                            } catch (IOException ex) {
+                              output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
+                            }
+                          }
 			  else
-			      output("No pdf or ps defined.");
-		      }
+			      output(Globals.lang("No pdf or ps defined."));
+		      } else
+                        output(Globals.lang("No entries or multiple entries selected."));
 		  }
 	      });
 

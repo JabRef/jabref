@@ -771,7 +771,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    // cause an IOException if the field is not
 		    // properly formatted. If that happens, the field
 		    // is not stored and the textarea turns red.
-		    
+
 		    if (toSet != null)
 			(new LatexFieldFormatter()).format
 			    (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
@@ -1100,10 +1100,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * @param id a <code>String</code> value
      */
     private void switchTo(String id) {
-	
-	// Make sure the current edit is stored. 
+
+	// Make sure the current edit is stored.
 	Component comp = tabbed.getSelectedComponent();
-	if (comp instanceof FieldPanel) {	 
+	if (comp instanceof FieldPanel) {
 	    if (((FieldPanel)comp).activeField != null) {
 		//Util.pr(((FieldPanel)comp).getText());
 		storeFieldAction.actionPerformed
@@ -1186,7 +1186,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                // this updates the table automatically, on close, but not within the tab
 	       Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
 	       //entry = frame.labelMaker.applyRule(entry, panel.database) ;
-	       entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), 
+	       entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(),
 						  panel.database, entry);
 	       // Store undo information:
 	       panel.undoManager.addEdit(new UndoableKeyChange
@@ -1322,7 +1322,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    return;
 		tf.selectAll();
 		String link = tf.getText(); // get selected ?  String 	getSelectedText()
-		Util.openExternalViewer(link, prefs);
+                try {
+                  Util.openExternalViewer(link, prefs);
+                } catch (IOException ex) {
+                  System.err.println("Error opening file.");
+                }
 	    }
 
 	}

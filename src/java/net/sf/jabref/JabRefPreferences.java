@@ -404,7 +404,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Next tab", "ctrl RIGHT");
 	defKeyBinds.put("Previous tab", "ctrl LEFT");
 	defKeyBinds.put("Replace string", "ctrl R");
-	defKeyBinds.put("Delete", "Delete");
+        defKeyBinds.put("Delete", "Delete");
+        defKeyBinds.put("Open pdf or ps", "F2");
 	//defKeyBinds.put("Edit entry", "ctrl E");
     }
 

@@ -165,10 +165,14 @@ public class JabRefFrame extends JFrame {
 					  "Autogenerate BibTeX keys",
 					  GUIGlobals.genKeyIconFile,
 					  prefs.getKey("Autogenerate BibTeX keys")),
-	lyxPushAction = new GeneralAction("pushToLyX", "Insert selected citations into LyX",
-					  "push selection to lyx",
-					  GUIGlobals.lyxIconFile,
-					  prefs.getKey("Push To LyX"));
+        lyxPushAction = new GeneralAction("pushToLyX", "Insert selected citations into LyX",
+                                          "push selection to lyx",
+                                          GUIGlobals.lyxIconFile,
+                                          prefs.getKey("Push To LyX")),
+        openFile = new GeneralAction("openFile", "Open pdf or ps",
+                                          "Open pdf or ps",
+                                          GUIGlobals.pdfIcon,
+                                          prefs.getKey("Open pdf or ps"));
     /*setupSelector = new GeneralAction("setupSelector", "", "",
 					  GUIGlobals.pasteIconFile,
 					  prefs.getKey(")),*/
@@ -566,6 +570,7 @@ public class JabRefFrame extends JFrame {
 	tools.add(makeKeyAction);
         tools.add(fetchMedline);
 	tools.add(lyxPushAction);
+        tools.add(openFile);
 	tools.addSeparator();
 	tools.add(replaceAll);
 	mb.add(tools);
@@ -602,7 +607,7 @@ public class JabRefFrame extends JFrame {
 		}
 		});*/
 
-	//options.add(selectKeys);
+	options.add(selectKeys);
 	mb.add(options);
 
 	helpMenu.add(help);
@@ -634,7 +639,8 @@ public class JabRefFrame extends JFrame {
 	tlb.add(editPreamble);
 	tlb.add(editStrings);
 	tlb.add(makeKeyAction);
-	tlb.add(lyxPushAction);
+        tlb.add(lyxPushAction);
+        tlb.add(openFile);
 	tlb.addSeparator();
 	tlb.add(normalSearch);
 	tlb.add(toggleGroups);
@@ -723,6 +729,7 @@ public class JabRefFrame extends JFrame {
 	importMenu.setEnabled(false);
 	exportMenu.setEnabled(false);
 	fetchMedline.setEnabled(false);
+        openFile.setEnabled(false);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
 	newEntryAction.setEnabled(false);
@@ -757,7 +764,8 @@ public class JabRefFrame extends JFrame {
 	replaceAll.setEnabled(true);
 	importMenu.setEnabled(true);
 	exportMenu.setEnabled(true);
-	fetchMedline.setEnabled(true);
+        fetchMedline.setEnabled(true);
+        openFile.setEnabled(true);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
 	newEntryAction.setEnabled(true);
