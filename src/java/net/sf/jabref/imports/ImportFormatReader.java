@@ -130,6 +130,7 @@ public class ImportFormatReader
 
 	String[] authors = in.split(" and ");
 	for(int i=0; i<authors.length; i++){
+	    authors[i]=authors[i].trim();
 	    String[] t = authors[i].split(",");
 	    if(t.length < 2)
 	        // there is no comma, assume we have FN LN order
@@ -172,10 +173,11 @@ public class ImportFormatReader
 
       String[] authors = in.split(" and ");
       for(int i=0; i<authors.length; i++){
-        int comma = authors[i].indexOf(',');
-        test:if (comma >= 0) {
-          // There is a comma, so we assume it's ok.
-          sb.append(authors[i]);
+	  authors[i]=authors[i].trim();
+	  int comma = authors[i].indexOf(',');
+	  test:if (comma >= 0) {
+	      // There is a comma, so we assume it's ok.
+	      sb.append(authors[i]);
         }
         else {
           // The name is without a comma, so it must be rearranged.
@@ -468,7 +470,7 @@ public class ImportFormatReader
 		    hm.put( "keywords",fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
 		else if(beg.equals("AB"))
 		    hm.put("abstract", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," "));
-		else if(beg.equals("BP"))
+		else if(beg.equals("BP") || beg.equals("BR"))
 		    //hm.put("pages", fields[j].substring(2,fields[j].length()).trim());
 		    pages=fields[j].substring(2,fields[j].length()).trim();
 		else if(beg.equals("EP")){

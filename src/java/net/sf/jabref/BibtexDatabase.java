@@ -147,7 +147,7 @@ public class BibtexDatabase
           {
             String entrieID = (String) it.next() ;
             BibtexEntry entry = getEntryById(entrieID) ;
-            if (entry != null)
+            if ((entry != null) && (entry.getCiteKey() != null))
             {
               if (keyHash == entry.getCiteKey().hashCode())
               {

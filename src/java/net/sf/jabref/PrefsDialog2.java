@@ -77,7 +77,7 @@ public class PrefsDialog2 extends JDialog {
 	tabbed.addTab(Globals.lang("Table"), new TablePrefsTab(_prefs, parent));
 	//tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
 	tabbed.addTab(Globals.lang("Key pattern"), new TabLabelPattern(_prefs, parent.helpDiag));
-
+	tabbed.addTab(Globals.lang("Entry preview"), new PreviewPrefsTab(_prefs, parent.helpDiag));
 	JButton
 	    ok = new JButton(Globals.lang("Ok")),
 	    cancel = new JButton(Globals.lang("Cancel"));
