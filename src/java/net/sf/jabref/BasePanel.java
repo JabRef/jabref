@@ -2153,10 +2153,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                 return tableModel ;
     }
     
-    public BibtexEntry[] getSelectedEntries() {
-        return entryTable.getSelectedEntries();
-    }
-
     public boolean isEntriesSelected() {
         return entryTable.getSelectedRows().length > 0;
     }
