@@ -485,6 +485,8 @@ public class ImportFormatReader
 		else if(beg.equals("EP")){
 		    pages=pages + "--" + fields[j].substring(2,fields[j].length()).trim();
 		}
+		else if(beg.equals("AR"))
+		    pages = fields[j].substring(2,fields[j].length()).trim();
 		else if(beg.equals("IS"))
 			hm.put( "number",fields[j].substring(2,fields[j].length()).trim());
 		else if(beg.equals("PY"))
