@@ -318,7 +318,7 @@ public class BibtexEntry
 				    GUIGlobals.isStandardField(name)));
 	    } catch (Throwable ex) {
 		throw new IOException
-		    ("Error in field '"+name+"': "+ex.getMessage());
+		    (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
 	    }
 	    //Util.writeField(name, o, out);
 	    out.write(",\n");

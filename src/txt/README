@@ -58,18 +58,24 @@ http://ant.apache.org. The default build target builds JabRef and
 creates the executable jabref.jar in the directory build/lib. 
 
 
-Documentation:
+Documentation: 
 JabRef comes with an online help function, accessed by presing F1 or
 clicking on a question mark icon. The help files are probably not
 exhaustive enough to satisfy everyone yet, but they should help sort
 out the most important issues about using the program. The help files
 can also be viewed outside the program with a standard HTML browser.
-
+If you choose languages other than English, some or all help pages may
+appear in your chosen languages.
 
 Change log:
-1.x:	- Changed default font to a more friendly one.
+1.x:	- Entry editor is now opened for an entry that causes an error when saving.
+	- Added options to display names in harmonised format in the main table.
+	- Added HTML and Docbook export.
+	- Enabled 'doi' and 'pii' fields for Medline import.
+	- Added the Kunststoff look&feel to give a more pleasant user interface.
+	- Added font selector for the main table.
 	- Improved table column customization.
-	- Added word selector feature for selected fields (e.g. keywords).
+	- Added word selector feature for selected fields (keywords, journal).
 	- Added support for German and Norwegian language.
 	- Generalized copy cite key features for multiple entries.
 	- Added quick load/save session feature.
@@ -79,7 +85,7 @@ Change log:
 	- Added functionality for using Browse buttons for file-related fields
 	  (ps, pdf, etc.).
 	- Added Browse buttons to External programs tab in Preferences.
-	- Fixed bug related to Save database and Source field, which caused changes
+	- Fixed bug related to Save database and Source field which caused changes
 	  to disappear.
 1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration
 	  from generating non-unique keys.

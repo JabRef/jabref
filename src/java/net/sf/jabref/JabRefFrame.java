@@ -126,6 +126,8 @@ public class JabRefFrame extends JFrame {
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
 	fetchMedline = new FetchMedlineAction(),
+	copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
+				    //"Put a BibTeX reference to the selected entries on the clipboard",
 	copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
 					//"Put a BibTeX reference to the selected entries on the clipboard",
 					prefs.getKey("Copy \\cite{BibTeX key}")),
@@ -524,6 +526,7 @@ public class JabRefFrame extends JFrame {
 	edit.add(paste);
 	//edit.add(remove);
 	edit.add(delete);
+	edit.add(copyKey);
 	edit.add(copyCiteKey);
 	edit.addSeparator();
 	edit.add(selectAll);

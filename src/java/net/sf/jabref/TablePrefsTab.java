@@ -11,7 +11,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     private String[] _choices;
     private Boolean[] _sel;
-    private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc;
+    private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
+	namesAsIs, namesFf, namesFl;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -52,18 +53,34 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	setLayout(gbl);
 
 	colorCodes = new JCheckBox(Globals.lang
-				   ("Use color codes for required and optional fields")
+				   ("Color codes for required and optional fields")
 				   ,_prefs.getBoolean("tableColorCodesOn"));
 	autoResizeMode = new JCheckBox(Globals.lang
 				       ("Fit table horizontally on screen"),
 				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
+	namesAsIs = new JCheckBox(Globals.lang("Show names unchanged"));
+	namesFf = new JCheckBox(Globals.lang("Show 'Firstname Lastname'"));
+	namesFl = new JCheckBox(Globals.lang("Show 'Lastname, Firstname'"));
+	ButtonGroup bg = new ButtonGroup();
+	bg.add(namesAsIs);
+	bg.add(namesFf);
+	bg.add(namesFl);
+	if (_prefs.getBoolean("namesAsIs"))
+	    namesAsIs.setSelected(true);
+	else {
+	    if (_prefs.getBoolean("namesFf"))
+		namesFf.setSelected(true);
+	    else
+		namesFl.setSelected(true);
+	}
+
 	secDesc = new JCheckBox(Globals.lang("Descending"),
 				_prefs.getBoolean("secDescending"));
 	terDesc = new JCheckBox(Globals.lang("Descending"),
 				_prefs.getBoolean("terDescending"));
 	tableFields.setText(Util.stringArrayToDelimited
 			    (_prefs.getStringArray("columnNames"), ";"));
-
+	
 	String[] names = _prefs.getStringArray("columnNames"),
 	    lengths = _prefs.getStringArray("columnWidths");
 	for (int i=0; i<names.length; i++) {
@@ -131,9 +148,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	JLabel lab;
 	JPanel upper = new JPanel(),
-	    sort = new JPanel();
+	    sort = new JPanel(),
+	    namesp = new JPanel();
 	upper.setLayout(gbl);
 	sort.setLayout(gbl);
+	namesp.setLayout(gbl);
 
 	upper.setBorder(BorderFactory.createTitledBorder
 			(BorderFactory.createEtchedBorder(),
@@ -141,6 +160,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	sort.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
                         Globals.lang("Sort options")));
+	namesp.setBorder(BorderFactory.createTitledBorder
+			 (BorderFactory.createEtchedBorder(),
+			  Globals.lang("Format of author and editor names")));
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
@@ -150,8 +172,24 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(autoResizeMode, con);
 	upper.add(autoResizeMode);
 	con.fill = GridBagConstraints.BOTH;
+	con.gridwidth = 1;
 	gbl.setConstraints(upper, con);
 	add(upper);
+
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	con.fill = GridBagConstraints.NONE;
+	con.anchor = GridBagConstraints.WEST;
+	gbl.setConstraints(namesAsIs, con);
+	namesp.add(namesAsIs);
+	gbl.setConstraints(namesFf, con);
+	namesp.add(namesFf);
+	gbl.setConstraints(namesFl, con);
+	namesp.add(namesFl);
+	con.fill = GridBagConstraints.BOTH;
+	gbl.setConstraints(namesp, con);
+	add(namesp);
+
+	
 
 	// Set the correct value for the primary sort JComboBox.
 	String sec = prefs.get("secSort"),
@@ -216,7 +254,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			       Globals.lang("Visible fields")));
 	JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
 	tlb.setFloatable(false);
-	tlb.setRollover(true);
+	//tlb.setRollover(true);
 	tlb.add(new AddRowAction());
 	tlb.add(new DeleteRowAction());
 	gbl.setConstraints(tlb, con);
@@ -348,6 +386,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//_prefs.putStringArray("columnNames", cols);
 
 	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
+	_prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
+	_prefs.putBoolean("namesFf", namesFf.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?
 		      JTable.AUTO_RESIZE_ALL_COLUMNS :

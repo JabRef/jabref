@@ -147,26 +147,28 @@ public class MedlineHandler extends DefaultHandler
 // 				     type, series, editor, booktitle,
 // 				     address, number, keyword, url, abstractText.replaceAll("%","\\\\%"), Globals.nextKey(),""+rowNum++ );
 // 	    if(b.getType().length() > 0)
+
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
-			b.setField("author",author);
-			b.setField("title",title);
-			b.setField("journal",journal);
-			b.setField("year",year);
-			b.setField("pages",page);
-			b.setField("volume",volume);
-			b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
-			b.setField("keywords",keyword);
-			b.setField("month",month);
+			if (!author.equals("")) b.setField("author",author);
+			if (!title.equals("")) b.setField("title",title);
+			if (!journal.equals("")) b.setField("journal",journal);
+			if (!year.equals("")) b.setField("year",year);
+			if (!page.equals("")) b.setField("pages",page);
+			if (!volume.equals("")) b.setField("volume",volume);
+			if (!abstractText.equals("")) b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
+			if (!keyword.equals("")) b.setField("keywords",keyword);
+			if (!month.equals("")) b.setField("month",month);
+			//if (!url.equals("")) b.setField("url",url);
+			if (!number.equals("")) b.setField("number",number);
 
-
-			b.setField("number",number);
 			if(!doi.equals("")){
-				b.setField("doi",doi);
-				b.setField("url","http://dx.doi.org/"+doi);
+			    b.setField("doi",doi);
+			    b.setField("url","http://dx.doi.org/"+doi);
 			}
 			if(!pii.equals(""))
-				b.setField("pii",pii);			
+			    b.setField("pii",pii);			
+
 			bibitems.add( b  );
 
 			abstractText = "";

@@ -56,6 +56,9 @@ public class EntryTableModel extends AbstractTableModel {
 	OTHER = 3,
 	PADLEFT = 1;
 
+    int[] nameCols = null;
+    boolean namesAsIs, namesFf;
+
     public EntryTableModel(JabRefFrame frame_,
 			   BasePanel panel_,
 			   BibtexDatabase db_) {
@@ -124,8 +127,20 @@ public class EntryTableModel extends AbstractTableModel {
           if (columns[col-PADLEFT].equals(GUIGlobals.TYPE_HEADER)) {
             o = be.getType().getName();
           }
-          else
-            o = be.getField(columns[col-PADLEFT]);
+          else {
+	      o = be.getField(columns[col-PADLEFT]);
+	      for (int i=0; i<nameCols.length; i++) if (col-PADLEFT == nameCols[i]) {
+		  if (o == null) return null;
+		  if (namesAsIs)
+		      return o;
+		  else {
+		      if (namesFf)
+			  return ImportFormatReader.fixAuthor((String)o);
+		      else
+			  return ImportFormatReader.fixAuthor_lastnameFirst((String)o);
+		  }
+	      }
+	  }
 	}
 	return o;
     }
@@ -159,6 +174,21 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public void remap() {
+	// Set up the int[] nameCols, to mark which columns should be 
+	// treated as lists of names. This is to provide a correct presentation
+	// of names as efficiently as possible.
+	Vector tmp = new Vector(2,1);
+	for (int i=0; i<columns.length; i++) {
+	    if (columns[i].equals("author")
+		|| columns[i].equals("editor"))
+		tmp.add(new Integer(i));
+	}
+	nameCols = new int[tmp.size()];
+	for (int i=0; i<nameCols.length; i++)
+	    nameCols[i] = ((Integer)tmp.elementAt(i)).intValue();
+	namesAsIs = panel.prefs.getBoolean("namesAsIs");
+	namesFf = panel.prefs.getBoolean("namesFf");
+
 	// Build a vector of prioritized search objectives,
 	// then pick the 3 first.
 	Vector fields = new Vector(5,1),

@@ -42,6 +42,7 @@
   <property name="build.resource" value="${build.dir}/resource"/>
   <property name="build.help" value="${build.dir}/help"/>
   <property name="build.javadocs" value="${build.dir}/docs/API"/>
+  <property name="build.kunststoff.icons.dir" value="${build.dir}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for source directories -->
   <property name="src.dir" value="src"/>
@@ -51,6 +52,7 @@
   <property name="bin.dir" value="${src.dir}/scripts"/>
   <property name="images.dir" value="${src.dir}/images"/>
   <property name="help.dir" value="${src.dir}/help"/>
+  <property name="src.kunststoff.icons.dir" value="${java.dir}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for library directories -->
   <property name="library.directory"              value="lib" />
@@ -72,6 +74,14 @@
            destdir="${build.classes}"
            target="1.4">
     </javac>
+
+    <mkdir dir="${build.kunststoff.icons.dir}"/>
+    <copy todir="${build.kunststoff.icons.dir}">
+      <fileset dir="${src.kunststoff.icons.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+
   </target>
 
   <!-- Jars up project -->

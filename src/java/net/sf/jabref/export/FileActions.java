@@ -192,7 +192,7 @@ public class FileActions
         }
          catch (Throwable ex)
         {
-            ex.printStackTrace();
+            //ex.printStackTrace();
 
             // Repair the file with our temp file since saving failed.
             String name = file.getName();

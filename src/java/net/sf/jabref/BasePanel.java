@@ -202,8 +202,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				entryTable.setColumnSelectionInterval
 				    (0, entryTable.getColumnCount()-1);
 				entryTable.scrollTo(topShow);
+				showEntry(ex.getEntry());
 			    }
-			    ex.printStackTrace();
+			    else ex.printStackTrace();
+
 			    JOptionPane.showMessageDialog
 				(frame, Globals.lang("Could not save file")
 				 +".\n"+ex.getMessage(),

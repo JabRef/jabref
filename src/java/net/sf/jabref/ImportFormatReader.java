@@ -86,6 +86,7 @@ public class ImportFormatReader
     //========================================================
 
     public static String fixAuthor(String in){
+	//Util.pr("firstnamefirst");
 	StringBuffer sb=new StringBuffer();
 	//System.out.println("FIX AUTHOR: in= " + in);
 
@@ -107,6 +108,7 @@ public class ImportFormatReader
     // output format string: LN, FN [and LN, FN]*
     //========================================================
     public static String fixAuthor_lastnameFirst(String in){
+	//Util.pr("lastnamefirst: in");
 	StringBuffer sb=new StringBuffer();
 
 	String[] authors = in.split(" and ");
@@ -115,10 +117,11 @@ public class ImportFormatReader
 	    if(t.length < 2) {
 		// The name is without a comma, so it must be rearranged.
 		t = authors[i].split(" ");
-		sb.append(t[t.length - 1]+ ","); // Last name
-		if (t.length > 1) for (int j=0; j<t.length-1; j++) {
-		    sb.append(" "+t[j]);
-		}
+		if (t.length > 1) {
+		    sb.append(t[t.length - 1]+ ","); // Last name
+		    for (int j=0; j<t.length-1; j++)
+			sb.append(" "+t[j]);
+		} else sb.append(t[0]);
 	    }
 	    else {
 		// The name is written with last name first, so it's ok.

@@ -29,6 +29,7 @@ package net.sf.jabref.export;
 
 import java.io.*;
 import java.text.StringCharacterIterator;
+import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
 import java.util.Vector;
 import net.sf.jabref.Util;
@@ -77,8 +78,10 @@ public class LatexFieldFormatter implements FieldFormatter {
 		//System.out.println("pos2:"+pos2);
 		if (pos2 == -1) {
 		    throw new IllegalArgumentException
-			("# characters don't match!");
-		    //break; // Where does 'break' take us?
+			(Globals.lang("The # character is not allowed in BibTeX fields")+".\n"+
+			 Globals.lang("In JabRef, use pairs of # characters to indicate "
+				      +"a string.")+"\n"+
+			 Globals.lang("Note that the entry causing the problem has been selected."));
 		}		    
 	    }
 
