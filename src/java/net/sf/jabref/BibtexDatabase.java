@@ -35,6 +35,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 
 import java.util.*;
+import javax.swing.JOptionPane;
 
 public class BibtexDatabase
 {
@@ -42,6 +43,8 @@ public class BibtexDatabase
     String _preamble = null;
     Vector _strings = new Vector();
     Hashtable _autoCompleters = null;
+
+    private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
     
     /* Entries are stored in a HashMap with the ID as key.
      * What happens if someone changes a BibtexEntry's ID
@@ -124,7 +127,7 @@ public class BibtexDatabase
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      */
-    public synchronized void insertEntry(BibtexEntry entry)
+    public synchronized boolean insertEntry(BibtexEntry entry)
         throws KeyCollisionException
     {
         String id = entry.getId();
@@ -148,7 +151,8 @@ public class BibtexDatabase
 	}
 	*/
         _entries.put(id, entry);
-
+	
+	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);    
     }
 
     /**
@@ -157,6 +161,7 @@ public class BibtexDatabase
     public synchronized BibtexEntry removeEntry(String id)
     {
         BibtexEntry oldValue = (BibtexEntry) _entries.remove(id);
+	removeKeyFromSet(oldValue.getCiteKey());
 
         if (oldValue != null)
         {
@@ -164,6 +169,13 @@ public class BibtexDatabase
         }
 
         return oldValue;
+    }
+
+    public synchronized boolean setCiteKeyForEntry(String id, String key) {
+	if (!_entries.containsKey(id)) return false; // Entry doesn't exist!
+	BibtexEntry entry = getEntryById(id);
+	entry.setField(Globals.KEY_FIELD, key);
+	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
 
     /**
@@ -226,6 +238,76 @@ public class BibtexDatabase
 	}
 	return false;
     }
+
+    //##########################################
+    //  usage: 
+    //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
+    //############################################
+        // if the newkey already exists and is not the same as oldkey it will give a warning
+    // else it will add the newkey to the to set and remove the oldkey
+    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
+	Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+	
+	boolean duplicate=false;
+	if(oldKey==null){// this is a new entry so don't bother removing oldKey
+	    duplicate= addKeyToSet( newKey);
+	}else{
+	    if(oldKey.equals(newKey)){// were OK because the user did not change keys
+		duplicate=false;
+	    }else{// user changed the key
+		
+		// removed the oldkey
+		// But what if more than two have the same key?
+		// this means that user can add another key and would not get a warning!
+		// consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
+		// removes this key from the allKey. then I add another key xxx. I don't get a warning!
+		// i need a way to count the number of keys of each type
+		// hashmap=>int (increment each time)
+		
+		removeKeyFromSet( oldKey);
+		duplicate = addKeyToSet( newKey );
+	    }
+	}
+	if(duplicate==true && issueWarning==true){
+	    JOptionPane.showMessageDialog(null,  Globals.lang("Warning there is a duplicate key")+":" + newKey ,
+					  Globals.lang("Duplicate Key Warning"),
+					  JOptionPane.WARNING_MESSAGE);//, options);
+	    
+	}
+	return duplicate;
+    }
+
+    //========================================================
+    // keep track of all the keys to warn if there are duplicates
+    //========================================================
+    private boolean addKeyToSet(String key){
+	boolean exists=false;
+	if((key == null) || key.equals(""))
+	    return false;//don't put empty key
+	if(allKeys.containsKey(key)){
+	    // warning
+	    exists=true;
+	    allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
+	}else
+	    allKeys.put( key, new Integer(1));
+	return exists;
+    }
+    //========================================================
+    // reduce the number of keys by 1. if this number goes to zero then remove from the set
+    // note: there is a good reason why we should not use a hashset but use hashmap instead
+    //========================================================
+    private void removeKeyFromSet(String key){
+	if(key.equals("")) return;
+	if(allKeys.containsKey(key)){
+	    Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+	    if(tI.intValue()==1)
+		allKeys.remove( key);
+	    else
+		allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
+	}else // ignore, as there is no such key
+	    ;
+    }
+
 
     /*
     public void setCompleters(Hashtable autoCompleters) {
