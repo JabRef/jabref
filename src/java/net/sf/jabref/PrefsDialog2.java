@@ -101,12 +101,18 @@ public class PrefsDialog2 extends JDialog {
 	    super("Ok");
 	}
 	public void actionPerformed(ActionEvent e) {
-	    for (int i=0; i<tabbed.getTabCount(); i++) {
-		((PrefsTab)tabbed.getComponentAt(i)).storeSettings();
-	    }
-	    frame.setupAllTables();
-	    frame.output(Globals.lang("Preferences recorded."));
-	    dispose();
+
+          (new Thread() {
+            public void run() {
+              //setVisible(false);
+              for (int i = 0; i < tabbed.getTabCount(); i++) {
+                ( (PrefsTab) tabbed.getComponentAt(i)).storeSettings();
+              }
+              frame.setupAllTables();
+              frame.output(Globals.lang("Preferences recorded."));
+              dispose();
+            }
+          }).start();
 	}
     }
 

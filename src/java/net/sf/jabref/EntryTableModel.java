@@ -95,7 +95,7 @@ public class EntryTableModel
     }
     return columns[col - padleft];
   }
-        
+
   public String getColumnName(int col) {
   	if (col == 0) {
       return GUIGlobals.NUMBER_COL;
@@ -128,7 +128,7 @@ public class EntryTableModel
     // Return the field named frame.prefs.columnNames[col] from the Entry
     // corresponding to the row.
     Object o;
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+    BibtexEntry be = sorter.getEntryAt(row);
     String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
     if (col == 0) {
       if (!isComplete(row)) {
@@ -387,7 +387,7 @@ public class EntryTableModel
 
         be.setField(fieldName, toSet);
         panel.markBaseChanged();
-        panel.updateWiewToSelected();
+        panel.updateViewToSelected();
         //panel.updateEntryEditorIfShowing();
         // Should the table also be scheduled for repaint?
       }

@@ -51,7 +51,7 @@ public class GUIGlobals {
   //static HashMap frames = new HashMap();
 
   // Frame titles.
-  static String
+  public static String
       frameTitle = "JabRef",
       version = "1.4",
       stringsTitle = "Strings for database",
@@ -59,7 +59,8 @@ public class GUIGlobals {
       untitledTitle = "untitled",
       helpTitle = "JabRef help",
       TYPE_HEADER = "entrytype",
-      NUMBER_COL = "#";
+      NUMBER_COL = "#",
+      encPrefix = "Encoding: "; // Part of the signature in written bib files.
 
   public static Font CURRENTFONT,
       typeNameFont,
@@ -68,7 +69,7 @@ public class GUIGlobals {
 
   // Signature written at the top of the .bib file.
   public static final String SIGNATURE =
-      "This file was created with JabRef "+version+".\n\n";
+      "This file was created with JabRef";
 
   // Size of help window.
   static Dimension

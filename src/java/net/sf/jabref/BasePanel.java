@@ -178,19 +178,21 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	// The action for opening an entry editor.
 	actions.put("edit", new BaseAction() {
 		public void action() {
-		    int clickedOn = -1;
-		    // We demand that one and only one row is selected.
-		    if (entryTable.getSelectedRowCount() == 1) {
-			clickedOn = entryTable.getSelectedRow();
-		    }
-		    if (clickedOn >= 0) {
-			String id =  tableModel.getNameFromNumber(clickedOn);
-			BibtexEntry be = database.getEntryById(id);
-			showEntry(be);
-                        if (splitPane.getBottomComponent() != null)
-                          new FocusRequester(splitPane.getBottomComponent());
-		    }
-		}
+                  //(new Thread() {
+                  //public void run() {
+                  int clickedOn = -1;
+                  // We demand that one and only one row is selected.
+                  if (entryTable.getSelectedRowCount() == 1) {
+                    clickedOn = entryTable.getSelectedRow();
+                  }
+                  if (clickedOn >= 0) {
+                    String id = tableModel.getNameFromNumber(clickedOn);
+                    BibtexEntry be = database.getEntryById(id);
+                    showEntry(be);
+                    if (splitPane.getBottomComponent() != null)
+                      new FocusRequester(splitPane.getBottomComponent());
+                  }
+                }
 
 	    });
 
@@ -776,8 +778,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                   try {
                     prefs.put("workingDirectory", fileToOpen.getPath());
                     // Should this be done _after_ we know it was successfully opened?
-
-                    ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen);
+                    String encoding = Globals.prefs.get("defaultEncoding");
+                    ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
                     BibtexDatabase db = pr.getDatabase();
                     MetaData meta = new MetaData(pr.getMetaData());
                     NamedCompound ce = new NamedCompound("Append database");
@@ -1078,7 +1080,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                     else {
                       //BibtexEntry[] bes = entryTable.getSelectedEntries();
                       //if ((bes != null) && (bes.length > 0))
-                      updateWiewToSelected();
+                      updateViewToSelected();
                     }
                   }
                 });
@@ -1103,10 +1105,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	try {
 	    if (!selectedOnly)
               FileActions.saveDatabase(database, metaData, file,
-					 prefs, false, false);
+					 prefs, false, false, prefs.get("defaultEncoding"));
 	    else
 		FileActions.savePartOfDatabase(database, metaData, file,
-					       prefs, entryTable.getSelectedEntries());
+					       prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
 	} catch (SaveException ex) {
 	    if (ex.specificEntry()) {
 		// Error occured during processing of
@@ -1347,14 +1349,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    stringDialog.refreshTable();
     }
 
-    public void updateWiewToSelected() {
+    public void updateViewToSelected() {
       // First, if the entry editor is visible, we should update it to the selected entry.
 
       BibtexEntry be = null;
       BibtexEntry[] bes = entryTable.getSelectedEntries();
       if ((bes != null) && (bes.length > 0))
         be = bes[0];
-      else
+      else if (showing != null)
         return;
 
       if (showing != null) {
@@ -1459,7 +1461,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       BibtexEntry be = showing;
       showing = null;
       if (be != null) {
-        updateWiewToSelected();
+        if (entryTable.getSelectedRows().length == 0) {
+          int row = tableModel.getNumberFromName(be.getId());
+          entryTable.addRowSelectionInterval(row, row);
+        }
+        updateViewToSelected();
       }
       new FocusRequester(entryTable);
 	/*splitPane.setBottomComponent(previewPanel);
@@ -1703,7 +1709,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
-                updateWiewToSelected();
+                updateViewToSelected();
 	    }
 
 	    output("Appended '"+regexp+"' to the '"
@@ -1758,7 +1764,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
-                updateWiewToSelected();
+                updateViewToSelected();
 	    }
 
 	    output("Removed '"+regexp+"' from the '"

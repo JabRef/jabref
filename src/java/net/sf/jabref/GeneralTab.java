@@ -18,10 +18,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
-    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
+    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
+        encodings = new JComboBox(Globals.ENCODINGS);
     JTextField
 	pdfDir, pdf, ps, html, lyx;
     private HelpAction ownerHelp, pdfHelp;
+
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
 	_prefs = prefs;
@@ -68,6 +70,16 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
                                   "Help", GUIGlobals.helpSmallIconFile);
        pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
                                   "Help", GUIGlobals.helpSmallIconFile);
+
+         String enc = prefs.get("defaultEncoding");
+         outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
+           if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
+             encodings.setSelectedIndex(i);
+             break outer;
+           }
+         }
+
+
 	general.setLayout(gbl);
 	external.setLayout(gbl);
 
@@ -156,6 +168,13 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
         gbl.setConstraints(language, con);
         general.add(language);
 
+        lab = new JLabel(Globals.lang("Default encoding")+":");
+        con.gridwidth = 1;
+        gbl.setConstraints(lab, con);
+        general.add(lab);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(encodings, con);
+        general.add(encodings);
 
 	// ------------------------------------------------------------
 	// External programs panel.
@@ -306,7 +325,7 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
 	_prefs.put("psviewer", ps.getText());
 	_prefs.put("htmlviewer", html.getText());
 	_prefs.put("lyxpipe", lyx.getText());
-
+        _prefs.put("defaultEncoding", (String)encodings.getSelectedItem());
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
           _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString());

@@ -49,13 +49,13 @@ public class CountingUndoManager extends UndoManager {
     public synchronized void undo() throws CannotUndoException {
 	super.undo();
 	current--;
-	panel.updateWiewToSelected();
+	panel.updateViewToSelected();
     }
 
     public synchronized void redo() throws CannotUndoException {
 	super.redo();
 	current++;
-	panel.updateWiewToSelected();
+	panel.updateViewToSelected();
     }
 
     public synchronized void markUnchanged() {

@@ -127,6 +127,8 @@ public class JabRefPreferences {
 	defaults.put("groupSelectorVisible", new Boolean(true));
         defaults.put("groupsDefaultField", "keywords");
 
+        defaults.put("defaultEncoding", System.getProperty("file.encoding"));
+
         defaults.put("groupsVisibleRows", new Integer(8));
 	defaults.put("defaultOwner", System.getProperty("user.name"));
   defaults.put("generalFields", "crossref;keywords;doi;url;"+

@@ -1300,8 +1300,8 @@ public JabRefPreferences prefs() {
         try {
           prefs.put("workingDirectory", fileToOpen.getPath());
           // Should this be done _after_ we know it was successfully opened?
-
-          ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen);
+          String encoding = Globals.prefs.get("defaultEncoding");
+          ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
           BibtexDatabase db = pr.getDatabase();
           HashMap meta = pr.getMetaData();
 
@@ -1407,7 +1407,7 @@ class ImportCiteSeerAction
 						currentBp.entryTable.setRowSelectionInterval(row, row);
 						currentBp.entryTable.scrollTo(row);
 						currentBp.markBaseChanged(); // The database just changed.
-						currentBp.updateWiewToSelected();
+						currentBp.updateViewToSelected();
 						output(Globals.lang("Completed citation import from CiteSeer."));
 						 }
 				};
@@ -1484,16 +1484,16 @@ class FetchCiteSeerAction
 						/* TODO: This should probably be selectable on/off
 						 * in the preferences window, but for now all
 						 * Citation fetcher operations will sort by citation count.
-						 */						
+						 */
 						private void setSortingByCitationCount() {
 							newBp.frame.prefs.put("priSort", "citeseerCitationCount");
 							newBp.frame.prefs.put("secSort", "year");
 							newBp.frame.prefs.put("terSort", "author");
 							newBp.frame.prefs.putBoolean("priDescending", true);
 							newBp.frame.prefs.putBoolean("secDescending", true);
-							newBp.frame.prefs.putBoolean("terDescending", true);														
+							newBp.frame.prefs.putBoolean("terDescending", true);
 						}
-						
+
 						public void run() {
 							setSortingByCitationCount();
 							tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);

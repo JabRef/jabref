@@ -56,6 +56,10 @@ public class Globals {
       FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
   public static float duplicateThreshold = 0.75f;
 
+  public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
+      "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257", "ISO8859_2",
+      "ISO8859_4", "ISO8859_5", "ISO8859_7"};
+
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
 
@@ -306,16 +310,16 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
     HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
     HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
-    HTML_CHARS.put("\\{\\\\\\´\\{e\\}\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{E\\}\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{i\\}\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{I\\}\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{o\\}\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{O\\}\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{u\\}\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{U\\}\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{a\\}\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\´\\{A\\}\\}", "&Aacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{e\\}\\}", "&eacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&Eacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&iacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&Iacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{o\\}\\}", "&oacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{O\\}\\}", "&Oacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{u\\}\\}", "&uacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{U\\}\\}", "&Uacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&aacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&Aacute;");
 
     HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
     HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
@@ -351,16 +355,16 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
     HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
     HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
-    HTML_CHARS.put("\\{\\\\\\´A\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\´E\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\´i\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\´I\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\´o\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\´O\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\´u\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\´U\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\´a\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\´A\\}", "&Aacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&eacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDE\\}", "&Eacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDi\\}", "&iacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDI\\}", "&Iacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDo\\}", "&oacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDO\\}", "&Oacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDu\\}", "&uacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDU\\}", "&Uacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDa\\}", "&aacute;");
+    HTML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&Aacute;");
 
     HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
     HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");
@@ -400,16 +404,16 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&#x00D2;");
     XML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&#x00F9;");
     XML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&#x00D9;");
-    XML_CHARS.put("\\{\\\\\\´\\{e\\}\\}", "&#x00E9;");
-    XML_CHARS.put("\\{\\\\\\´\\{E\\}\\}", "&#x00C9;");
-    XML_CHARS.put("\\{\\\\\\´\\{i\\}\\}", "&#x00ED;");
-    XML_CHARS.put("\\{\\\\\\´\\{I\\}\\}", "&#x00CD;");
-    XML_CHARS.put("\\{\\\\\\´\\{o\\}\\}", "&#x00F3;");
-    XML_CHARS.put("\\{\\\\\\´\\{O\\}\\}", "&#x00D3;");
-    XML_CHARS.put("\\{\\\\\\´\\{u\\}\\}", "&#x00FA;");
-    XML_CHARS.put("\\{\\\\\\´\\{U\\}\\}", "&#x00DA;");
-    XML_CHARS.put("\\{\\\\\\´\\{a\\}\\}", "&#x00E1;");
-    XML_CHARS.put("\\{\\\\\\´\\{A\\}\\}", "&#x00C1;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{e\\}\\}", "&#x00E9;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&#x00C9;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&#x00ED;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&#x00CD;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{o\\}\\}", "&#x00F3;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{O\\}\\}", "&#x00D3;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{u\\}\\}", "&#x00FA;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{U\\}\\}", "&#x00DA;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&#x00E1;");
+    XML_CHARS.put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&#x00C1;");
 
     XML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&#x00F4;");
     XML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&#x00D4;");
@@ -446,16 +450,16 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\`O\\}", "&#x00D2;");
     XML_CHARS.put("\\{\\\\\\`u\\}", "&#x00F9;");
     XML_CHARS.put("\\{\\\\\\`U\\}", "&#x00D9;");
-    XML_CHARS.put("\\{\\\\\\´e\\}", "&#x00E9;");
-    XML_CHARS.put("\\{\\\\\\´E\\}", "&#x00C9;");
-    XML_CHARS.put("\\{\\\\\\´i\\}", "&#x00ED;");
-    XML_CHARS.put("\\{\\\\\\´I\\}", "&#x00CD;");
-    XML_CHARS.put("\\{\\\\\\´o\\}", "&#x00F3;");
-    XML_CHARS.put("\\{\\\\\\´O\\}", "&#x00D3;");
-    XML_CHARS.put("\\{\\\\\\´u\\}", "&#x00FA;");
-    XML_CHARS.put("\\{\\\\\\´U\\}", "&#x00DA;");
-    XML_CHARS.put("\\{\\\\\\´a\\}", "&#x00E1;");
-    XML_CHARS.put("\\{\\\\\\´A\\}", "&#x00C1;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDe\\}", "&#x00E9;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDE\\}", "&#x00C9;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDi\\}", "&#x00ED;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDI\\}", "&#x00CD;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDo\\}", "&#x00F3;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDO\\}", "&#x00D3;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDu\\}", "&#x00FA;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDU\\}", "&#x00DA;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDa\\}", "&#x00E1;");
+    XML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&#x00C1;");
 
     XML_CHARS.put("\\{\\\\\\^o\\}", "&#x00F4;");
     XML_CHARS.put("\\{\\\\\\^O\\}", "&#x00D4;");

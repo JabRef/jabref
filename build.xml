@@ -82,6 +82,7 @@
 	                <pathelement path="${build.classes}"/>
         	        <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
                 	 <pathelement location="${library.directory}/commons-logging.jar" />
+                       	 <pathelement location="${library.directory}/plastic-1.2.1.jar" />
                 </classpath>
                 </javac>
 
@@ -199,6 +200,7 @@
         	<unjar src="${library.directory}/commons-httpclient-2.0.jar" dest="${build.classes}" />
                 <unjar src="${library.directory}/commons-logging.jar" dest="${build.classes}" />
                 <unjar src="${library.directory}/antlr.jar" dest="${build.classes}" />
+                <unjar src="${library.directory}/plastic-1.2.1.jar" dest="${build.classes}" />
 	</target>
 
 <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -125,6 +125,16 @@ public class FileActions
     }
 
     /**
+     * Writes the JabRef signature and the encoding.
+     *
+     * @param encoding String the name of the encoding, which is part of the header.
+     */
+    private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
+      out.write(GUIGlobals.SIGNATURE);
+      out.write(" "+GUIGlobals.version+".\n"+GUIGlobals.encPrefix+encoding+"\n\n");
+    }
+
+    /**
      * Saves the database to file. Two boolean values indicate whether
      * only entries with a nonzero Globals.SEARCH value and only
      * entries with a nonzero Globals.GROUPSEARCH value should be
@@ -133,7 +143,7 @@ public class FileActions
      */
     public static void saveDatabase(BibtexDatabase database, MetaData metaData,
         File file, JabRefPreferences prefs, boolean checkSearch,
-        boolean checkGroup) throws SaveException
+        boolean checkGroup, String encoding) throws SaveException
     {
         BibtexEntry be = null;
         try
@@ -141,11 +151,10 @@ public class FileActions
 	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
-            //Writer fw = getWriter(file, "UTF-8");
-            FileWriter fw = new FileWriter(file);
+            Writer fw = getWriter(file, encoding);
 
             // Write signature.
-            fw.write(GUIGlobals.SIGNATURE);
+            writeBibFileHeader(fw, encoding);
 
             // Write preamble if there is one.
             writePreamble(fw, database.getPreamble());
@@ -224,7 +233,7 @@ public class FileActions
      * in the supplied input array bes.
      */
     public static void savePartOfDatabase(BibtexDatabase database, MetaData metaData,
-        File file, JabRefPreferences prefs, BibtexEntry[] bes) throws SaveException
+        File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding) throws SaveException
     {
 
         BibtexEntry be = null;
@@ -234,11 +243,10 @@ public class FileActions
 	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
-            FileWriter fw = new FileWriter(file);
-
+            Writer fw = getWriter(file, encoding);
 
             // Write signature.
-            fw.write(GUIGlobals.SIGNATURE);
+            writeBibFileHeader(fw, encoding);
 
             // Write preamble if there is one.
             writePreamble(fw, database.getPreamble());
@@ -293,11 +301,8 @@ public class FileActions
   public static OutputStreamWriter getWriter(File f, String encoding)
       throws IOException {
     OutputStreamWriter ow;
-    //try {
+
     ow = new OutputStreamWriter(new FileOutputStream(f), encoding);
-    //} catch (UnsupportedEncodingException ex) {
-    //  ow = new OutputStreamWriter(new FileOutputStream(f));
-    //}
 
     return ow;
   }
@@ -322,6 +327,8 @@ public class FileActions
                                       File outFile, JabRefPreferences prefs)
     throws Exception {
 
+  String encoding = "iso-8859-1";
+
 	//PrintStream ps=null;
         OutputStreamWriter ps=null;
 
@@ -333,7 +340,7 @@ public class FileActions
 
             // Trying to change the encoding:
             //ps=new PrintStream(new FileOutputStream(outFile));
-            ps=new OutputStreamWriter(new FileOutputStream(outFile), "iso-8859-1");
+            ps=new OutputStreamWriter(new FileOutputStream(outFile), encoding);
 
 	    // Print header
             try {

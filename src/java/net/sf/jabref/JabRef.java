@@ -154,7 +154,7 @@ public class JabRef {
         Object fnt = new UIDefaults.ProxyLazyValue
             ("javax.swing.plaf.FontUIResource", null,
              new Object[] {"Arial", new Integer(Font.PLAIN), new Integer(12)});
-
+/*
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
 	UIManager.put("RadioButton.font", fnt);
@@ -186,7 +186,7 @@ public class JabRef {
 	UIManager.put("ToolBar.font", fnt);
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
-
+*/
         // This property is set to make the Mac OSX Java VM move the menu bar to the top
         // of the screen, where Mac users expect it to be.
         System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -200,7 +200,7 @@ public class JabRef {
 	else if (!Globals.ON_MAC) {
            try {
             //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-            //LookAndFeel lnf = new com.jgoodies.plaf.plastic.PlasticLookAndFeel();
+            //LookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
             //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
             LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
             //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
@@ -255,7 +255,7 @@ public class JabRef {
                   FileActions.saveDatabase(pr.getDatabase(),
                                            new MetaData(pr.getMetaData()),
                                            new File(data[0]),
-                                           prefs, false, false);
+                                           prefs, false, false, prefs.get("defaultEncoding"));
                 } catch (SaveException ex) {
                   System.err.println(Globals.lang("Could not save file")+" '"+ data[0]+"': "+ex.getMessage());
                 }
@@ -438,7 +438,8 @@ public class JabRef {
      System.out.println(Globals.lang("Opening")+": " + name);
      try {
        File file = new File(name);
-       ParserResult pr = ImportFormatReader.loadDatabase(file);
+       String encoding = Globals.prefs.get("defaultEncoding");
+       ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
        pr.setFile(file);
        return pr;
      } catch (IOException ex) {

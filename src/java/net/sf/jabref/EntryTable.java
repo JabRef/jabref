@@ -47,7 +47,8 @@ public class EntryTable extends JTable {
     private EntryTable ths = this;
     private boolean antialiasing = true,
         ctrlClick = false,
-        selectionListenerOn = true;
+        selectionListenerOn = true,
+        tableColorCodes = true;
     //RenderingHints renderingHints;
     private BasePanel panel;
 
@@ -71,6 +72,7 @@ public class EntryTable extends JTable {
 	prefs = prefs_;
         antialiasing = prefs.getBoolean("antialias");
         ctrlClick = prefs.getBoolean("ctrlClick");
+        tableColorCodes = prefs.getBoolean("tableColorCodesOn");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
         setGridColor(GUIGlobals.gridColor);
 	setShowVerticalLines(true);
@@ -125,7 +127,7 @@ public class EntryTable extends JTable {
                 if (getSelectedRowCount() == 1) {
                   int row = getSelectedRow(); //e.getFirstIndex();
                   if (row >= 0) {
-                    panel.updateWiewToSelected();//panel.database().getEntryById(
+                    panel.updateViewToSelected();//panel.database().getEntryById(
                         //tableModel.getNameFromNumber(row)));
                   }
                 } else {
@@ -353,7 +355,7 @@ public class EntryTable extends JTable {
 	else if (score == -1)
 	    renderer = grayedOutRenderer;
 
-	else if (!prefs.getBoolean("tableColorCodesOn"))
+	else if (!tableColorCodes)
 	    renderer = defRenderer;
 	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.

@@ -32,7 +32,8 @@ import java.util.*;
 public class EntrySorter {
 
     TreeSet set;
-    Object[] entryArray;
+    String[] idArray;
+    BibtexEntry[] entryArray;
 
     public EntrySorter(Map entries, Comparator comp) {
 	set = new TreeSet(comp);
@@ -47,11 +48,24 @@ public class EntrySorter {
     }
 
     public void index() {
-	entryArray = set.toArray();
+	Object[] array = set.toArray();
+        // Create aan array of IDs for quick access, since getIdAt() is called by
+        // getValueAt() in EntryTableModel, which *has* to be efficient.
+        idArray = new String[array.length];
+        entryArray = new BibtexEntry[array.length];
+        for (int i=0; i<idArray.length; i++) {
+          idArray[i] = ( (BibtexEntry) (array[i])).getId();
+          entryArray[i] = (BibtexEntry)array[i];
+        }
     }
 
     public String getIdAt(int pos) {
-	return ((BibtexEntry)(entryArray[pos])).getId();
+      return idArray[pos];
+	//return ((BibtexEntry)(entryArray[pos])).getId();
+    }
+
+    public BibtexEntry getEntryAt(int pos) {
+      return entryArray[pos];
     }
 
     public int getEntryCount() {
