@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.HashMap;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 
@@ -229,7 +230,7 @@ public class FileActions
 	        
 	try {
 	    Object[] keys = database.getKeySet().toArray();
-	    String key;
+	    String key, type;
 	    InputStreamReader reader;
 	    ps=new PrintStream(new FileOutputStream(outFile));
 	    // Print header
@@ -255,18 +256,36 @@ public class FileActions
 				     prefs.getBoolean("terDescending"), 
 				     pri, sec, ter));	   
 
-
+	    // Load default layout
+	    reso = JabRefFrame.class.getResource
+		(Globals.LAYOUT_PREFIX+lfName+".layout");    
+	    reader = new InputStreamReader(reso.openStream());
+	    LayoutHelper layoutHelper = new LayoutHelper(reader);
+	    Layout defLayout = layoutHelper.getLayoutFromText();
+	    HashMap layouts = new HashMap();
+	    Layout layout;
 	    for (int i=0; i<sorter.getEntryCount(); i++) {
-
-
-		reso = JabRefFrame.class.getResource
-		    (Globals.LAYOUT_PREFIX+lfName+".layout");
-		reader = new InputStreamReader(reso.openStream());
-		LayoutHelper layoutHelper = new LayoutHelper(reader);
-		Layout layout = layoutHelper.getLayoutFromText();
-
+		// Get the entry
 		key = (String)sorter.getIdAt(i);
 		BibtexEntry entry = database.getEntryById(key);
+
+		// Get the layout
+		type = entry.getType().getName().toLowerCase();
+		if (layouts.containsKey(type))
+		    layout = (Layout)layouts.get(type);
+		else {
+		    reso = JabRefFrame.class.getResource
+			(Globals.LAYOUT_PREFIX+lfName+"."+type+".layout");
+		    if (reso != null) {
+			reader = new InputStreamReader(reso.openStream());
+			layoutHelper = new LayoutHelper(reader);
+			layout = layoutHelper.getLayoutFromText();
+			layouts.put(type, layout);
+		    } else
+			layout = defLayout;
+		}
+		//Layout layout = layoutHelper.getLayoutFromText();
+
 		//System.out.println(layout.doLayout(entry));
 		ps.println(layout.doLayout(entry));
 	    }
