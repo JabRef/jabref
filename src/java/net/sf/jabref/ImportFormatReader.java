@@ -84,7 +84,7 @@ public class ImportFormatReader
     // output format string: FN LN [and FN LN]*
     //========================================================
     
-    static String fixAuthor(String in){
+    public static String fixAuthor(String in){
 	StringBuffer sb=new StringBuffer();
 	//System.out.println("FIX AUTHOR: in= " + in);
 
@@ -94,9 +94,7 @@ public class ImportFormatReader
 	    if(t.length < 2)
 		return in; // something went wrong
 	    sb.append( t[1].trim() + " " + t[0].trim());
-	    if(i==authors.length-1)
-		sb.append(".");
-	    else
+	    if(i !=authors.length-1)
 		sb.append(" and ");
 	}
 	return sb.toString();

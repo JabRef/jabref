@@ -44,7 +44,11 @@ public class ArticleLabelRule extends DefaultLabelRule {
 	    author=(String)oldEntry.getField("author");
 	    String[] tokens= author.split("\\band\\b");
 	    if( tokens.length > 0){ // if author is empty
+		if(tokens[0].indexOf(",") > 0)
+		    tokens[0] = ImportFormatReader.fixAuthor( tokens[0] ); // convert lastname, firstname to firstname lastname
 		String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
+		// lastname, firstname
+		
 		newLabel += firstAuthor[ firstAuthor.length-1];
 	    }
         }catch(Throwable t){
@@ -62,6 +66,12 @@ public class ArticleLabelRule extends DefaultLabelRule {
         }catch(Throwable t){
 	    System.out.println("error getting year: "+t) ; 
         }
+
+	// now check for uniqueness
+	// i need access to basepanes: checkForDuplicateKey
+	
+	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
+	return oldEntry ; 
 	
 
 	/*
@@ -98,8 +108,6 @@ public class ArticleLabelRule extends DefaultLabelRule {
         catch(Throwable t){  System.err.println(t) ; }
 	*/
 	
-	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-	return oldEntry ; 
     }
 
 
