@@ -1311,9 +1311,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	updateAllFields();
 	updateSource();
         panel.showing = be;
-	if (tabbed.getSelectedComponent() instanceof FieldPanel)
-	    ((FieldPanel)tabbed.getSelectedComponent()).activate();
-	else ((JComponent)tabbed.getSelectedComponent()).requestFocus();
+	//if (tabbed.getSelectedComponent() instanceof FieldPanel)
+	//    ((FieldPanel)tabbed.getSelectedComponent()).activate();
+	//else ((JComponent)tabbed.getSelectedComponent()).requestFocus();
     }
 
 

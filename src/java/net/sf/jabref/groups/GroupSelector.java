@@ -65,9 +65,12 @@ public class GroupSelector extends SidePaneComponent
     BasePanel panel;
     String searchField;
     JPopupMenu gropt = new JPopupMenu();
-    JCheckBox andCb = new JCheckBox(Globals.lang("Intersection"), true),
-        orCb = new JCheckBox(Globals.lang("Union"), false),
-        invCb = new JCheckBox(Globals.lang("Inverted"), false);
+    JRadioButton
+        andCb = new JRadioButton(Globals.lang("Intersection"), true),
+        orCb = new JRadioButton(Globals.lang("Union"), false),
+        floatCb = new JRadioButton(Globals.lang("Float"), true),
+        highlCb = new JRadioButton(Globals.lang("Highlight"), false);
+    JCheckBox invCb = new JCheckBox(Globals.lang("Inverted"), false);
     ButtonGroup bgr = new ButtonGroup();
 
     SidePaneManager manager;

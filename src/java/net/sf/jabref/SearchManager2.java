@@ -51,7 +51,7 @@ class SearchManager2 extends SidePaneComponent
     private JabRefPreferences prefs;
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
-    private JCheckBox increment, select, reorder;
+    private JRadioButton increment, select, reorder;
     private ButtonGroup types = new ButtonGroup();
     private SearchManager2 ths = this;
     private boolean incSearch = false;
@@ -84,9 +84,9 @@ class SearchManager2 extends SidePaneComponent
         regExpSearch = new JCheckBoxMenuItem
 	    (Globals.lang("Use regular expressions"),
 	     prefs.getBoolean("regExpSearch"));
-	increment = new JCheckBox(Globals.lang("Incremental"), false);
-	select = new JCheckBox(Globals.lang("Highlight"), true);
-	reorder = new JCheckBox(Globals.lang("Float"), false);
+	increment = new JRadioButton(Globals.lang("Incremental"), false);
+	select = new JRadioButton(Globals.lang("Highlight"), true);
+	reorder = new JRadioButton(Globals.lang("Float"), false);
 
 	// Add an item listener that makes sure we only listen for key events
 	// when incremental search is turned on.
@@ -132,8 +132,14 @@ class SearchManager2 extends SidePaneComponent
 
 	openset.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    JButton src = (JButton)e.getSource();
-		    settings.show(src, 0, 0);
+                  if (settings.isVisible()) {
+                    //System.out.println("oee");
+                    //settings.setVisible(false);
+                  }
+                  else {
+                    JButton src = (JButton) e.getSource();
+                    settings.show(src, 0, openset.getHeight());
+                  }
 		}
 	    });
 

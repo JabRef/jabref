@@ -12,7 +12,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	namesAsIs, namesFf, namesFl, antialias, pdfColumn, urlColumn;
+	antialias, pdfColumn, urlColumn, allowEditing;
+    private JRadioButton namesAsIs, namesFf, namesFl;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -65,13 +66,15 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	autoResizeMode = new JCheckBox(Globals.lang
 				       ("Fit table horizontally on screen"),
 				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
-	namesAsIs = new JCheckBox(Globals.lang("Show names unchanged"));
-	namesFf = new JCheckBox(Globals.lang("Show 'Firstname Lastname'"));
-        namesFl = new JCheckBox(Globals.lang("Show 'Lastname, Firstname'"));
+	namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
+	namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
+        namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"), _prefs.getBoolean("pdfColumn"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"), _prefs.getBoolean("urlColumn"));
+        allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"), _prefs.getBoolean("allowTableEditing"));
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
+
         secSort.insertItemAt(Globals.lang("<select>"), 0);
         terSort.insertItemAt(Globals.lang("<select>"), 0);
         secSort.setSelectedIndex(0);
@@ -190,10 +193,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	JLabel lab;
 	JPanel upper = new JPanel(),
 	    sort = new JPanel(),
-	    namesp = new JPanel();
+	    namesp = new JPanel(),
+            iconCol = new JPanel();
 	upper.setLayout(gbl);
 	sort.setLayout(gbl);
-	namesp.setLayout(gbl);
+        namesp.setLayout(gbl);
+        iconCol.setLayout(gbl);
 
 	upper.setBorder(BorderFactory.createTitledBorder
 			(BorderFactory.createEtchedBorder(),
@@ -201,9 +206,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	sort.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
                         Globals.lang("Sort options")));
-	namesp.setBorder(BorderFactory.createTitledBorder
-			 (BorderFactory.createEtchedBorder(),
-			  Globals.lang("Format of author and editor names")));
+        iconCol.setBorder(BorderFactory.createTitledBorder
+                         (BorderFactory.createEtchedBorder(),
+                          Globals.lang("Special table columns")));
+        namesp.setBorder(BorderFactory.createTitledBorder
+                         (BorderFactory.createEtchedBorder(),
+                          Globals.lang("Format of author and editor names")));
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
@@ -214,18 +222,27 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	upper.add(autoResizeMode);
         gbl.setConstraints(antialias, con);
         upper.add(antialias);
-        gbl.setConstraints(pdfColumn, con);
-        upper.add(pdfColumn);
-        gbl.setConstraints(urlColumn, con);
-        upper.add(urlColumn);
+        gbl.setConstraints(allowEditing, con);
+        upper.add(allowEditing);
 	con.anchor = GridBagConstraints.EAST;
 	gbl.setConstraints(fontButton, con);
 	upper.add(fontButton);
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.BOTH;
-	con.gridwidth = 1;
+        con.gridwidth = 1;
+        con.gridheight = 2;
 	gbl.setConstraints(upper, con);
 	add(upper);
+        con.gridheight = 1;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(pdfColumn, con);
+        iconCol.add(pdfColumn);
+        gbl.setConstraints(urlColumn, con);
+        iconCol.add(urlColumn);
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(iconCol, con);
+	add(iconCol);
+
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
@@ -236,8 +253,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	namesp.add(namesFf);
 	gbl.setConstraints(namesFl, con);
 	namesp.add(namesFl);
-	con.fill = GridBagConstraints.BOTH;
-	gbl.setConstraints(namesp, con);
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(namesp, con);
 	add(namesp);
 
 
@@ -508,6 +525,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
+        _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?
 		      JTable.AUTO_RESIZE_ALL_COLUMNS :

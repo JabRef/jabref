@@ -88,7 +88,7 @@ public class JabRefFrame
   // for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
-  JToggleButton groupToggle;
+  JToggleButton groupToggle, searchToggle;
 
   AbstractAction
       open = new OpenDatabaseAction(),
@@ -307,13 +307,9 @@ public class JabRefFrame
       public void stateChanged(ChangeEvent e) {
         BasePanel bp = basePanel();
         if (bp != null) {
-          //SwingUtilities.invokeLater(new Runnable() {
-          //public void run() {
-          //Util.pr(""+bp.groupSelector.isVisible());
           groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));
-        //groupSelector.isVisible());
-          //  }
-          //});
+          searchToggle.setSelected(bp.sidePaneManager.isPanelVisible("search"));
+
           Globals.focusListener.setFocused(bp.entryTable);
         }
       }
@@ -917,7 +913,10 @@ public JabRefPreferences prefs() {
     tlb.add(openFile);
     tlb.add(openUrl);
     tlb.addSeparator();
-    tlb.add(normalSearch);
+    searchToggle = new JToggleButton(normalSearch);
+    searchToggle.setText(null);
+    tlb.add(searchToggle);
+
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
     tlb.add(groupToggle);
@@ -1364,23 +1363,23 @@ public JabRefPreferences prefs() {
 
 class ImportCiteSeerAction
 	extends AbstractAction {
-    
+
     public ImportCiteSeerAction() {
         super(Globals.lang("Import Data from CiteSeer"));
         putValue(SHORT_DESCRIPTION, Globals.lang("Import Data from CiteSeer Database"));
-        
-	}	
-	
+
+	}
+
 	public void actionPerformed(ActionEvent e) {
 
 		if(basePanel().citeSeerFetcher.activateImportFetcher()) {
-		    
-				
+
+
 			(new Thread() {
 
 				BasePanel currentBp;
 				String id;
-				
+
 				Runnable updateComponent = new Runnable() {
 					public void run() {
 					    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
@@ -1392,8 +1391,8 @@ class ImportCiteSeerAction
 						currentBp.updateWiewToSelected();
 						output(Globals.lang("Completed citation import from CiteSeer."));
 						 }
-				};			    
-			    			    
+				};
+
 			    public void run() {
 			        currentBp = (BasePanel) tabbedPane.getSelectedComponent();
 					int clickedOn = -1;
@@ -1411,9 +1410,9 @@ class ImportCiteSeerAction
 						Globals.lang("You must select a row to perform this operation."),
 						Globals.lang("CiteSeer Import Error"),
 						JOptionPane.WARNING_MESSAGE);
-					} 		
+					}
 					if (clickedOn >= 0) {
-					    currentBp.citeSeerFetcher.beginImportCiteSeerProgress();					    
+					    currentBp.citeSeerFetcher.beginImportCiteSeerProgress();
 						id =  currentBp.tableModel.getNameFromNumber(clickedOn);
 						NamedCompound citeseerNamedCompound =
 							new NamedCompound("CiteSeer Import Fields");
@@ -1424,25 +1423,25 @@ class ImportCiteSeerAction
 						if (newValue) {
 							citeseerNamedCompound.end();
 							currentBp.undoManager.addEdit(citeseerNamedCompound);
-							SwingUtilities.invokeLater(updateComponent);							
+							SwingUtilities.invokeLater(updateComponent);
 						} else {
 						    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
 							output(Globals.lang("Citation import from CiteSeer failed."));
 						}
 					}
 					basePanel().citeSeerFetcher.deactivateImportFetcher();
-			    }				  
+			    }
 			}).start();
 		} else {
 			JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
 					Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
 					Globals.lang("Please wait until it has finished."),
 					Globals.lang("CiteSeer Import Error"),
-					JOptionPane.WARNING_MESSAGE);		    
+					JOptionPane.WARNING_MESSAGE);
 		}
 	}
 }
-  
+
 class FetchCiteSeerAction
 	extends AbstractAction {
 
@@ -1490,7 +1489,7 @@ class FetchCiteSeerAction
 						Globals.lang("A CiteSeer fetch operation is currently in progress.") + "  " +
 						Globals.lang("Please wait until it has finished."),
 						Globals.lang("CiteSeer Fetch Error"),
-						JOptionPane.WARNING_MESSAGE);		    			    
+						JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}

@@ -103,7 +103,7 @@ public class JabRefPreferences {
 	defaults.put("entryTypeFormHeightFactor", new Integer(1));
 	defaults.put("entryTypeFormWidth", new Integer(1));
 	defaults.put("backup", new Boolean(true));
-	defaults.put("openLastEdited", new Boolean(false));
+	defaults.put("openLastEdited", new Boolean(true));
 	defaults.put("lastEdited", (String)null);
 	defaults.put("stringsPosX", new Integer(0));
 	defaults.put("stringsPosY", new Integer(0));
@@ -141,6 +141,7 @@ public class JabRefPreferences {
         defaults.put("pdfColumn", new Boolean(true));
         defaults.put("urlColumn", new Boolean(true));
         defaults.put("useOwner", new Boolean(true));
+        defaults.put("allowTableEditing", new Boolean(false));
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 

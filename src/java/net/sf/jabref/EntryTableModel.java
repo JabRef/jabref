@@ -307,6 +307,8 @@ public class EntryTableModel
   }
 
   public boolean isCellEditable(int row, int col) {
+    if (!Globals.prefs.getBoolean("allowTableEditing"))
+      return false;
     if (col < padleft) {
       return false;
     }

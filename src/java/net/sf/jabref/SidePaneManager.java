@@ -27,9 +27,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import javax.swing.*;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 import net.sf.jabref.groups.GroupSelector;
+import java.util.Iterator;
 
 public class SidePaneManager {
 
@@ -38,7 +39,7 @@ public class SidePaneManager {
     SidePane sidep;
     JabRefPreferences prefs;
     MetaData metaData;
-    HashMap components = new HashMap();
+    LinkedHashMap components = new LinkedHashMap();
     Vector visible = new Vector();
     private int visibleComponents = 0;
 
@@ -89,11 +90,13 @@ public class SidePaneManager {
       if (o != null) {
         if (!visible.contains(o)) {
           visible.add(o);
-          sidep.setComponents(visible);
+          //sidep.setComponents(visible);
+          updateView();
           ((SidePaneComponent)o).componentOpening();
         } else {
           visible.remove(o);
-          sidep.setComponents(visible);
+          //sidep.setComponents(visible);
+          updateView();
           ((SidePaneComponent)o).componentClosing();
         }
 
@@ -128,7 +131,8 @@ public class SidePaneManager {
       if (o != null) {
         if (!visible.contains(o)) {
           visible.add(o);
-          sidep.setComponents(visible);
+          //sidep.setComponents(visible);
+          updateView();
           ((SidePaneComponent)o).componentOpening();
         }
       } else System.err.println("Side pane component '"+name+"' unknown.");
@@ -141,7 +145,8 @@ public class SidePaneManager {
     public synchronized void add(String name, SidePaneComponent comp) {
       components.put(name, comp);
       visible.add(comp);
-      sidep.setComponents(visible);
+      //sidep.setComponents(visible);
+      updateView();
       comp.componentOpening();
 	/*sidep.add(comp);
 	components.put(name, comp);
@@ -169,7 +174,8 @@ public class SidePaneManager {
         ((SidePaneComponent)o).componentClosing();
         if (visible.contains(o)) {
           visible.remove(o);
-          sidep.setComponents(visible);
+          //sidep.setComponents(visible);
+          updateView();
         }
       } else System.err.println("Side pane component '"+name+"' unknown.");
     }
@@ -177,7 +183,8 @@ public class SidePaneManager {
     public synchronized void hideAway(SidePaneComponent comp) {
       comp.componentClosing();
       visible.remove(comp);
-      sidep.setComponents(visible);
+      //sidep.setComponents(visible);
+      updateView();
 	/*comp.componentClosing();
 	comp.setVisible(false);  // Swing method to make component invisible.
 	comp.setVisibility(false); // Our own boolean to keep track of visibility.
@@ -185,5 +192,21 @@ public class SidePaneManager {
 	if (visibleComponents == 0)
 	    panel.remove(sidep);
       */
+    }
+
+    private void updateView() {
+      Vector toShow = new Vector();
+
+      for (Iterator i = components.keySet().iterator(); i.hasNext(); ) {
+        Object key = i.next();
+        if (visible.contains(components.get(key))) {
+          toShow.add(components.get(key));
+        }
+      }
+      sidep.setComponents(toShow);
+      if (visible.size() > 0)
+        panel.setLeftComponent(sidep);
+      else
+        panel.remove(sidep);
     }
 }

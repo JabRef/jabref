@@ -185,6 +185,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			String id =  tableModel.getNameFromNumber(clickedOn);
 			BibtexEntry be = database.getEntryById(id);
 			showEntry(be);
+                        if (splitPane.getBottomComponent() != null)
+                          new FocusRequester(splitPane.getBottomComponent());
 		    }
 		}
 
@@ -632,14 +634,18 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	actions.put("search", new BaseAction() {
 		public void action() {
-		    sidePaneManager.ensureVisible("search");
-		    searchManager.startSearch();
+		    sidePaneManager.togglePanel("search");
+                    boolean on = sidePaneManager.isPanelVisible("search");
+                    frame.searchToggle.setSelected(on);
+                    if (on)
+                      searchManager.startSearch();
 		}
 	    });
 
 	actions.put("incSearch", new BaseAction() {
 		public void action() {
 		    sidePaneManager.ensureVisible("search");
+                    frame.searchToggle.setSelected(true);
 		    searchManager.startIncrementalSearch();
 		}
 	    });
@@ -1372,7 +1378,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     }
 
     public void showEntry(BibtexEntry be) {
-
 	if (showing == be) {
 	    if (splitPane.getBottomComponent() == null) {
 		// This is the special occasion when showing is set to an
@@ -1386,6 +1391,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
               // The correct entry is already being shown. Make sure the editor
               // is updated.
               ((EntryEditor)splitPane.getBottomComponent()).updateAllFields();
+
             }
 	    return;
 
@@ -1404,8 +1410,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    form = (EntryEditor)entryEditors.get
 		((be.getType().getName()));
 	    form.switchTo(be);
-	    if (visPan >= 0)
-		form.setVisiblePanel(visPan);
+            if (visPan >= 0)
+              form.setVisiblePanel(visPan);
 	    splitPane.setBottomComponent(form);
 	} else {
 	    // We must instantiate a new editor for this type.
@@ -1422,7 +1428,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	else
 	    splitPane.setDividerLocation
 		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
-	new FocusRequester(form);
+	//new FocusRequester(form);
 	//form.requestFocus();
 
 	showing = be;

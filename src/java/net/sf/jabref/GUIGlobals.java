@@ -203,9 +203,9 @@ public class GUIGlobals {
       tableIncompleteEntryBackground = new Color(250, 175, 175),
       maybeIncompleteEntryBackground = new Color(255, 255, 200),
       markedEntryBackground = new Color(255, 255, 180),
-      grayedOutBackground = new Color(225, 210, 210),
+      grayedOutBackground = new Color(210, 210, 210),
       grayedOutText = new Color(40, 40, 40),
-      veryGrayedOutBackground = new Color(205, 180, 180),
+      veryGrayedOutBackground = new Color(180, 180, 180),
       veryGrayedOutText = new Color(40, 40, 40);
 
   public static String META_FLAG = "jabref-meta: ";
