@@ -26,6 +26,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import java.beans.*;
 import java.io.*;
 import java.util.*;
@@ -1184,8 +1185,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    try {
                // this updates the table automatically, on close, but not within the tab
 	       Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
-	       entry = frame.labelMaker.applyRule(entry, panel.database) ;
-
+	       //entry = frame.labelMaker.applyRule(entry, panel.database) ;
+	       entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), 
+						  panel.database, entry);
 	       // Store undo information:
 	       panel.undoManager.addEdit(new UndoableKeyChange
 					 (panel.database, entry.getId(),

@@ -41,7 +41,8 @@ public class LabelPattern extends Hashtable{
 	}
 	
 	public void addLabelPattern(String type, String pattern){
-		put(type, pattern);
+	    //put(type, pattern);
+	    put(type, LabelPatternUtil.split(pattern));
 	}
 	
 	
@@ -75,7 +76,6 @@ public class LabelPattern extends Hashtable{
 	 */
 	public final ArrayList getValue(String key){
 		Object _obj = get(key); // throws the NullPointerException
-		
 		// Test to see if we found anything
 		if(_obj == null){
 			if(parent != null){
@@ -86,11 +86,10 @@ public class LabelPattern extends Hashtable{
 				System.err.println("Warning: I could not find the label \'"
 						   + key + "\' and gave up");
 				return null;
-			} else return (ArrayList)_obj;
+			}
 		}
-		//		System.out.println(_obj.toString());
-		else 
-		    return LabelPatternUtil.split((String)_obj);
+
+		return (ArrayList)_obj;
 	}
 
 }

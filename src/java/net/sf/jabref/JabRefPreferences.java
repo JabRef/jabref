@@ -284,7 +284,7 @@ public class JabRefPreferences {
 	    try {
 		String[] keys = pre.keys();
 	    if (keys.length > 0) for (int i=0; i<keys.length; i++)
-		keyPattern.put(keys[i], pre.get(keys[i], null));
+		keyPattern.addLabelPattern(keys[i], pre.get(keys[i], null));
 	    } catch (BackingStoreException ex) {
 		Globals.logger("BackingStoreException in JabRefPreferences.getKeyPattern");
 	    }
@@ -310,7 +310,7 @@ public class JabRefPreferences {
 	    while (i.hasNext()) {
 		String s = (String)i.next();
 		if (!(pattern.get(s)).equals(parent.get(s)))
-		    pre.put(s, (String)pattern.get(s));
+		    pre.put(s, pattern.getValue(s).get(0).toString());
 	    }
 	}
 

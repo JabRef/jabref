@@ -655,7 +655,6 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 * nessesary to catch those exceptions here... 
 	 */
 	private void fillTextfields(){
-
 		txtArticle.setText(_keypatterns.getValue("article").get(0).toString());
 		txtBook.setText(_keypatterns.getValue("book").get(0).toString());
 		txtBooklet.setText(_keypatterns.getValue("booklet").get(0).toString());

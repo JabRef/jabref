@@ -4,6 +4,7 @@
 package net.sf.jabref.labelPattern;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +42,18 @@ public class LabelPatternUtil {
 	public static ArrayList split(String labelPattern){
 		// A holder for fields of the entry to be used for the key
 		ArrayList _alist = new ArrayList();
+
+		// Before we do anything, we add the parameter to the ArrayLIst
+		_alist.add(labelPattern);
 		
+		//String[] ss = labelPattern.split("\\[|\\]");
+		StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
+		while (tok.hasMoreTokens())
+		    _alist.add(tok.nextToken());
+
+		return _alist;
+		
+		/*
 		// Regular expresion for identifying the fields
 		Pattern pi = Pattern.compile("\\[\\w*\\]");
 		// Regular expresion for identifying the spacer
@@ -74,7 +86,7 @@ public class LabelPatternUtil {
 			_alist.add(t_str); 
 		}
 		
-		return _alist;
+		return _alist;*/
 	}
 	
 	/**
@@ -86,6 +98,91 @@ public class LabelPatternUtil {
 	 * @return modified Bibtexentry
 	 */
 	public static BibtexEntry makeLabel(LabelPattern table, BibtexDatabase database, BibtexEntry _entry){
+		_db = database;
+		ArrayList _al;
+		String _spacer, _label;
+		StringBuffer _sb = new StringBuffer();
+
+		try {
+		    // get the type of entry
+		    String _type = _entry.getType().getName().toLowerCase();
+		    // Get the arrayList corrosponding to the type 		
+		    _al = table.getValue(_type);
+		    int _alSize = _al.size();
+		    boolean field = false;
+		    for(int i = 2; i < _alSize; i++){
+			String val = _al.get(i).toString();
+			if (val.equals("[")) field = true;
+			else if (val.equals("]")) field = false;
+			else if (field) {
+			    if (_entry.getField(val) == null) {
+				Globals.logger("Key generator warning: field '"+val+"' empty.");
+			    }
+			    else {
+				if(val.equals("author")){
+				    _sb.append(firstAuthor(_entry.getField("author").toString()));
+				}
+				else if(val.equals("editor")){
+				    _sb.append(firstAuthor(_entry.getField("editor").toString()));
+				}
+				else if(val.equals("firstpage")){
+				    _sb.append(firstPage(_entry.getField("pages").toString()));
+				}
+				else if(val.equals("lastpage")){
+				    _sb.append(lastPage(_entry.getField("pages").toString()));
+				}
+				// we havent seen any special demands
+				else{
+				    _sb.append(_entry.getField(val).toString());
+				}
+			    }
+			} else {
+			    _sb.append(val);			    
+			}
+		    }
+		}
+					
+		catch (Exception e) {
+				System.err.println(e);
+		}
+		
+		/**
+		 * Edited by Morten Alver 2004.02.04.
+		 *
+		 * We now have a system for easing key duplicate prevention, so
+		 * I am changing this method to conform to it.
+		 *
+
+   		 // here we make sure the key is unique		
+		   _label = makeLabelUnique(_sb.toString());				
+		   _entry.setField(Globals.KEY_FIELD, _label);		
+		   return _entry;
+		*/
+
+		// Remove all illegal characters from the key.
+		_label = Util.checkLegalKey(_sb.toString());
+
+		// Try new keys until we get a unique one:
+		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {	    
+		    char c = 'b';
+		    String modKey = _label+"a";
+		    while (_db.setCiteKeyForEntry(_entry.getId(), modKey))
+			modKey = _label+((char)(c++));	    
+		}
+		return _entry;
+		/** End of edit, Morten Alver 2004.02.04.  */
+
+	}
+
+	/**
+	 * Generates a BibTeX label according to the pattern for a given entry type, and
+	 * returns the <code>Bibtexentry</code> with the unique label.
+	 * @param table a <code>LabelPattern</code>
+	 * @param database a <code>BibtexDatabase</code>
+	 * @param entryId a <code>String</code>
+	 * @return modified Bibtexentry
+	 */
+	public static BibtexEntry makeLabel_(LabelPattern table, BibtexDatabase database, BibtexEntry _entry){
 		_db = database;
 		//BibtexEntry _entry = _db.getEntryById(entryId);
 		ArrayList _al;
