@@ -93,6 +93,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
+    //## keep track of all keys for duplicate key warning and unique key generation
+    private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
 
     private boolean suppressOutput = false;
 
@@ -470,7 +472,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		if( numSelected > 0){
 		    try {
 			BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
-			//String citeStr="LYXCMD:sampleclient:citation-insert:\\cite{"+(String) model.getValueAt( selectedRows[0], Globals.INDEX_KEY);
 			String citeStr="LYXCMD:sampleclient:citation-insert:"+ database.getEntryById( tableModel.getNameFromNumber( rows[0])).getField(GUIGlobals.KEY_FIELD);
 			String message="LYXPIPE: sent rows " + rows[0];
 			for(int i=1; i< numSelected; i++){
@@ -1070,5 +1071,36 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     // Method pertaining to the ClipboardOwner interface.
     public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+
+    //========================================================
+    // keep track of all the keys to warn if there are duplicates
+    //========================================================
+    public boolean addKeyToSet(String key){
+	boolean exists=false;
+	if(  key.equals(""))
+	    return false;//don't put empty key
+	if(allKeys.containsKey(key)){
+	    // warning
+	    exists=true;
+	    allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
+	}else
+	    allKeys.put( key, new Integer(1));
+	return exists;
+    }
+    //========================================================
+    // reduce the number of keys by 1. if this number goes to zero then remove from the set
+    // note: there is a good reason why we should not use a hashset but use hashmap instead
+    //========================================================
+    public void removeKeyFromSet(String key){
+	if(key.equals("")) return;
+	if(allKeys.containsKey(key)){
+	    Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+	    if(tI.intValue()==1)
+		allKeys.remove( key);
+	    else
+		allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
+	}else // ignore, as there is no such key
+	    ;
+    }
 
 }
