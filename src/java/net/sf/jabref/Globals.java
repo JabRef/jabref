@@ -32,8 +32,9 @@ import java.util.regex.Matcher;
 import javax.swing.JFileChooser;
 import java.util.logging.*;
 import java.io.IOException;
+import java.awt.Font;
 public class Globals {
-
+	public static Font CURRENTFONT=new Font("Times",Font.PLAIN,12);
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;

@@ -536,7 +536,17 @@ public class JabRefFrame extends JFrame {
 		    dl.show();
 		}
 		});
-	//options.add(selectKeys);
+
+	
+	options.add(new AbstractAction("Font") {
+		public void actionPerformed(ActionEvent e) {
+		    // JDialog dl = new EntryCustomizationDialog(ths);
+			Globals.CURRENTFONT =new FontSelectorDialog(ths, Globals.CURRENTFONT).getSelectedFont();			
+			// updatefont
+		}
+		});
+
+//options.add(selectKeys);
 	mb.add(options);
 
 	helpMenu.add(help);
