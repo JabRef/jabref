@@ -2,7 +2,7 @@
    <authorgroup>
 \begin{author}       \format[net.sf.jabref.export.layout.format.CreateDocBookAuthors]{\author} \end{author}
    </authorgroup>
-   <citetitle pubwork="article">\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}</citetitle>
+   <citetitle pubwork="article">\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForXML]{\title}</citetitle>
 \begin{journal}   <citetitle pubwork="journal">\journal</citetitle>\end{journal}
 \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
 \begin{pages}   <artpagenums>\format[net.sf.jabref.export.layout.format.CreateDocBookPages]{\pages}</artpagenums> \end{pages}
