@@ -326,7 +326,17 @@ public class JabRefFrame
     // when the user switches tabs. Without this, cut/paste/copy operations would some times
     // occur in the wrong tab.
     tabbedPane.addChangeListener(new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
+      private int lastSelectionIndex = -1 ;
+      public void stateChanged(ChangeEvent e)
+      {
+
+        int now = tabbedPane.getSelectedIndex() ;
+        if (lastSelectionIndex > -1)
+          tabbedPane.setForegroundAt(lastSelectionIndex, GUIGlobals.inActiveTabbed);
+        if (now > -1)
+          tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
+        lastSelectionIndex = now ;
+
         BasePanel bp = basePanel();
         if (bp != null) {
           groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));

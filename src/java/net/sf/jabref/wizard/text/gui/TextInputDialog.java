@@ -155,6 +155,7 @@ public class TextInputDialog extends JDialog
     rawPanel.setLayout( new BorderLayout());
     // Textarea
     textPane = new JTextPane() ;
+    textPane.setEditable(false);
     doc = textPane.getStyledDocument();
     addStylesToDocument(doc);
 

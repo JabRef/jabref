@@ -281,9 +281,10 @@ public class GUIGlobals {
       veryGrayedOutBackground = new Color(180, 180, 180),
       veryGrayedOutText = new Color(40, 40, 40),
       gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
-      gradientBlue = new Color(0, 27, 102);  // Title bar gradient color, sidepaneheader
-
-
+      gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
+      activeTabbed = Color.black,  // active Database (JTabbedPane)
+      inActiveTabbed = Color.gray  // inactive Database
+      ;
 
   public static String META_FLAG = "jabref-meta: ";
   public static String META_FLAG_OLD = "bibkeeper-meta: ";

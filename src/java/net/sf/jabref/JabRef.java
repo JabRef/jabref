@@ -311,17 +311,17 @@ public class JabRef {
     //openGui = false;
     if (!graphicFailure && !disableGui.isInvoked()) {
 
-	
+
       //Font fnt = new Font("plain", Font.PLAIN, 12);
 
       /*Font fnt = new Font
           (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
-	  prefs.getInt("menuFontSize"));
+          prefs.getInt("menuFontSize"));
 
       Object fnt = new UIDefaults.ProxyLazyValue
           ("javax.swing.plaf.FontUIResource", null,
            new Object[] { prefs.get("menuFontFamily"), new Integer(prefs.getInt("menuFontStyle")),
-			  new Integer(prefs.getInt("menuFontSize")) });
+                          new Integer(prefs.getInt("menuFontSize")) });
 
       UIManager.put("MenuBar.font", fnt);
       UIManager.put("MenuItem.font", fnt);
@@ -363,7 +363,7 @@ public class JabRef {
       UIManager.put("ToolBar.font", fnt);
       UIManager.put("ToolTip.font", fnt);
       UIManager.put("Tree.font", fnt);
-      */	
+      */
       // This property is set to make the Mac OSX Java VM move the menu bar to the top
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -377,9 +377,9 @@ public class JabRef {
       if (Globals.ON_WIN) {
         try {
           //UIManager.setLookAndFeel(new com.sun.java.swing.plaf.windows.WindowsLookAndFeel());
-	    ExtWindowsLookAndFeel lnf = new ExtWindowsLookAndFeel();
-	    lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-	    UIManager.setLookAndFeel(lnf);
+            ExtWindowsLookAndFeel lnf = new ExtWindowsLookAndFeel();
+            lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+            UIManager.setLookAndFeel(lnf);
         }
         catch (UnsupportedLookAndFeelException ex) {}
       }
@@ -387,8 +387,8 @@ public class JabRef {
         try {
           //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
           PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
-	  lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-	  MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
+          lnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+          MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBlue());
 
           //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
           //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
