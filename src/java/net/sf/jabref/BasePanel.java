@@ -1265,6 +1265,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     }
 
     public void previewEntry(BibtexEntry be) {
+	if (isShowingEditor()) return;
       if (previewPanel == null) {
         previewPanel = new PreviewPanel(be);
       } else
