@@ -577,7 +577,8 @@ lastEdLoop:
                 jrf.loadSessionAction.actionPerformed(new java.awt.event.ActionEvent(
                         jrf, 0, ""));
 
-            ss.dispose();
+            if (ss != null) // do this only if splashscreen was actually created 
+                ss.dispose();
 
             jrf.setVisible(true);
 
