@@ -195,9 +195,8 @@ public class JabRefPreferences {
                        +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
                        +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
                        +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                       +"\\begin{abstract}<BR><BR><B>Abstract:</B> <I>\\format[HTMLChars]{\\abstract}</I>\\end{abstract}"
+                       +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");
-
 
         defaults.put("tempDir", "/tmp/");
 

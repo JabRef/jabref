@@ -355,9 +355,9 @@ public class Util {
                                 "'.");
         }
 
+	link = file.getPath();
+
         // Use the correct viewer even if pdf and ps are mixed up:
-        link = file.getPath().replaceAll("\\s", "\\\\ ");
-        pr("rill '"+link+"'");
         String[] split = file.getName().split("\\.");
         if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("pdf")))
           fieldName = "pdf";
@@ -394,7 +394,7 @@ public class Util {
                   else{
                     cmdArray[0] = prefs.get("htmlviewer");
                     cmdArray[1] = link;
-                    Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+                    Process child = Runtime.getRuntime().exec(cmdArray);
                   }
 
                 }
@@ -417,7 +417,7 @@ public class Util {
                 else{
                     cmdArray[0] = prefs.get("psviewer");
                     cmdArray[1] = link;
-                    Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+                    Process child = Runtime.getRuntime().exec(cmdArray);
                 }
                     }
                 catch (IOException e)
@@ -439,7 +439,8 @@ public class Util {
             else{
                 cmdArray[0] = prefs.get("pdfviewer");
                 cmdArray[1] = link;
-                Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+                //Process child = Runtime.getRuntime().exec(cmdArray[0]+" "+cmdArray[1]);
+		Process child = Runtime.getRuntime().exec(cmdArray);
             }
                     }
                 catch (IOException e)

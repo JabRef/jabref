@@ -120,33 +120,36 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    System.out.println(idList);
 	    ArrayList bibs = fetchMedline(idList);
 	    if ((bibs != null) && (bibs.size() > 0)) {
-		if (panel.prefs().getBoolean("useOwner")) {
-		    Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
-		}
-        tf.setText("");
-        NamedCompound ce = new NamedCompound("fetch Medline");
-        Iterator i = bibs.iterator();
-        while (i.hasNext()) {
-	    try {
-		BibtexEntry be = (BibtexEntry) i.next();
-		String id = Util.createId(be.getType(), panel.database());
-		be.setId(id);
-		panel.database().insertEntry(be);
-		ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-	    }
-	    catch (KeyCollisionException ex) {
-	    }
-        }
-        ce.end();
-        panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
-        panel.undoManager.addEdit(ce);
-        panel.markBaseChanged();
-        panel.refreshTable();
+		//if (panel.prefs().getBoolean("useOwner")) {
+		//    Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
+		//}
+		tf.setText("");
+		/*NamedCompound ce = new NamedCompound("fetch Medline");
+		Iterator i = bibs.iterator();
+		while (i.hasNext()) {
+		    try {
+			BibtexEntry be = (BibtexEntry) i.next();
+			String id = Util.createId(be.getType(), panel.database());
+			be.setId(id);
+			entries.add(be);
+			//panel.database().insertEntry(be);
+			//ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
+		    }
+		    catch (KeyCollisionException ex) {
+		    }
+		    }*/
+		//ce.end();
+		panel.frame().addBibEntries(bibs, null, false);
+		panel.markBaseChanged();
+		panel.refreshTable();
+		panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
+	
+		//panel.undoManager.addEdit(ce);
 	    } else
 		panel.output(Globals.lang("No Medline entries found."));
 	} else {
 	    JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
-    }
+	}
     }
     
     
@@ -247,7 +250,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		ArrayList bibs = fetchMedline(result.ids);
 		if ((bibs != null) && (bibs.size() > 0)) {
 		    tf.setText("");
-		    NamedCompound ce = new NamedCompound("fetch Medline");
+		    /*NamedCompound ce = new NamedCompound("fetch Medline");
 		    Iterator i = bibs.iterator();
 		    while (i.hasNext()) {
 			try {
@@ -260,9 +263,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 			catch (KeyCollisionException ex) {
 			}
 		    }
-		    ce.end();
+		    ce.end();*/
+		    panel.frame().addBibEntries(bibs, null, false);
 		    panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
-		    panel.undoManager.addEdit(ce);
+		    //panel.undoManager.addEdit(ce);
 		    panel.markBaseChanged();
 		    panel.refreshTable();
 		} else

@@ -1747,7 +1747,16 @@ class FetchCiteSeerAction
     }
   }
 
-  private void addBibEntries(ArrayList bibentries, String filename,
+
+    /**
+     * Adds the entries to the database, possibly checking for duplicates first.
+     * @param filename If non-null, a message is printed to the status line describing
+     * how many entries were imported, and from which file. If null, the message will not
+     * be printed.
+     * @param intoNew Determines if the entries will be put in a new database or in the current
+     * one.
+     */
+  public void addBibEntries(ArrayList bibentries, String filename,
                              boolean intoNew) {
     if (bibentries.size() == 0) {
       // No entries found. We need a message for this.
@@ -1798,10 +1807,11 @@ class FetchCiteSeerAction
       if (tabbedPane.getTabCount() == 1) {
         setNonEmptyState();
       }
-      output(Globals.lang("Imported database") + " '" + filename + "' " +
-             Globals.lang("with") + " " +
-             database.getEntryCount() + " " +
-             Globals.lang("entries into new database") + ".");
+      if (filename != null)
+	  output(Globals.lang("Imported database") + " '" + filename + "' " +
+		 Globals.lang("with") + " " +
+		 database.getEntryCount() + " " +
+		 Globals.lang("entries into new database") + ".");
     }
     else {
       // Import into current database.
@@ -1809,7 +1819,7 @@ class FetchCiteSeerAction
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
-      NamedCompound ce = new NamedCompound("Import database");
+      NamedCompound ce = new NamedCompound("Import entries");
       Iterator it = bibentries.iterator();
       mainLoop: while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();
@@ -1856,10 +1866,11 @@ class FetchCiteSeerAction
       basePanel.undoManager.addEdit(ce);
       basePanel.markBaseChanged();
       basePanel.refreshTable();
-      output(Globals.lang("Imported database") + " '" + filename + "' " +
-             Globals.lang("with") + " " +
-             (database.getEntryCount() - oldCount) + " " +
-             Globals.lang("entries into new database") + ".");
+      if (filename != null) 
+	  output(Globals.lang("Imported database") + " '" + filename + "' " +
+		 Globals.lang("with") + " " +
+		 (database.getEntryCount() - oldCount) + " " +
+		 Globals.lang("entries into new database") + ".");
 
     }
   }
