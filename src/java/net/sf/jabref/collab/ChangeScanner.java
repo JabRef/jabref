@@ -48,13 +48,13 @@ public class ChangeScanner extends Thread {
             ParserResult pr = ImportFormatReader.loadDatabase(tempFile,
             Globals.prefs.get("defaultEncoding"));
             BibtexDatabase inTemp = pr.getDatabase();
-            MetaData mdInTemp = new MetaData(pr.getMetaData());
+            MetaData mdInTemp = new MetaData(pr.getMetaData(),inTemp);
             //Util.pr(tempFile.getPath()+": "+inMem.getEntryCount());
             
             // Parse the modified file.
             pr = ImportFormatReader.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
             BibtexDatabase onDisk = pr.getDatabase();
-            MetaData mdOnDisk = new MetaData(pr.getMetaData());
+            MetaData mdOnDisk = new MetaData(pr.getMetaData(),onDisk);
             
             //Util.pr(f.getPath()+": "+onDisk.getEntryCount());
             

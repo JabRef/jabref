@@ -257,7 +257,7 @@ public class JabRef {
                         try {
                             System.out.println(Globals.lang("Saving") + ": " + data[0]);
                             FileActions.saveDatabase(pr.getDatabase(),
-                                new MetaData(pr.getMetaData()), new File(data[0]), prefs,
+                                new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), prefs,
                                 false, false, prefs.get("defaultEncoding"));
                         } catch (SaveException ex) {
                             System.err.println(Globals.lang("Could not save file") + " '"

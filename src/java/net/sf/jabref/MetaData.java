@@ -43,7 +43,7 @@ public class MetaData {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(HashMap inData) {
+    public MetaData(HashMap inData, BibtexDatabase db) {
         this();
         for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
@@ -59,7 +59,7 @@ public class MetaData {
                 System.err.println("Weird error while parsing meta data.");
             }
             if (key.equals("groupstree"))
-                putGroups(orderedData);
+                putGroups(orderedData,db);
             else
                 putData(key, orderedData);
         }
@@ -96,12 +96,12 @@ public class MetaData {
         metaData.put(key, orderedData);
     }
     
-    private void putGroups(Vector orderedData) {
+    private void putGroups(Vector orderedData, BibtexDatabase db) {
         // JZTODO add groups version!!!
         
         try {
             // version 1: orderedData contains exactly 1 element
-            groupsRoot = GroupTreeNode.fromString((String) orderedData.firstElement());
+            groupsRoot = GroupTreeNode.fromString((String) orderedData.firstElement(),db);
         } catch (Exception e) {
             // JZTODO: what now? should never happen, unless 
             // metadata was edited directly in the file
