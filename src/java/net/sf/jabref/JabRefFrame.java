@@ -71,6 +71,7 @@ public class JabRefFrame extends JFrame {
     AbstractAction
 	open = new OpenDatabaseAction(),
 	close = new CloseDatabaseAction(),
+	quit = new CloseAction(),
 	selectKeys = new SelectKeysAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	save = new GeneralAction("save", "Save database",
@@ -366,6 +367,7 @@ public class JabRefFrame extends JFrame {
 	file.add(saveAs);
 	file.addSeparator();
 	file.add(close);
+	file.add(quit);
 	mb.add(file);
 
 	edit.add(undo);
@@ -513,6 +515,7 @@ public class JabRefFrame extends JFrame {
 	public CloseAction() {
 	    super(Globals.lang("Quit"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
 	}    
 	
 	public void actionPerformed(ActionEvent e) {
@@ -584,6 +587,7 @@ public class JabRefFrame extends JFrame {
 
 	    putValue(SHORT_DESCRIPTION, 
 		     Globals.lang("Close the current database"));
+	    putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
 	}    
 	public void actionPerformed(ActionEvent e) {
 	    // Ask here if the user really wants to close, if the base

@@ -29,7 +29,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.undo.*;
 import net.sf.jabref.export.*;
-//import net.sf.jabref.groups.QuickSearchRule;
+import net.sf.jabref.groups.QuickSearchRule;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -509,9 +509,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    });
 
 	// Set the right-click menu for the entry table.
-	//RightClickMenu rcm = new RightClickMenu(this, metaData);
-	//entryTable.setRightClickMenu(rcm);
-	Util.pr("BasePanel: must add right click menu");
+	RightClickMenu rcm = new RightClickMenu(this, metaData);
+	entryTable.setRightClickMenu(rcm);
+	//Util.pr("BasePanel: must add right click menu");
 
 	setRightComponent(entryTable.getPane());
 	sidePaneManager = new SidePaneManager
@@ -666,6 +666,152 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	stringDialog = null;
     }
 
+    public void addToGroup(String groupName, String regexp, String field) {
+	
+	boolean giveWarning = false;
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
+		&& !field.equals("keywords")) {
+		giveWarning = true;
+		break;
+	    }	       
+	}
+	if (giveWarning) {
+	    String message = "This action will modify the '"+field+"' field "
+		+"of your entries.\nThis could cause undesired changes to "
+		+"your entries, so it\nis recommended that you change the field "
+		+"in your group\ndefinition to 'keywords' or a non-standard name."
+		+"\n\nDo you still want to continue?";
+	    int choice = JOptionPane.showConfirmDialog
+		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+		 JOptionPane.WARNING_MESSAGE);
+	    
+	    if (choice == JOptionPane.NO_OPTION)
+		return;
+	}
+	
+	BibtexEntry[] bes = entryTable.getSelectedEntries();	    
+	if ((bes != null) && (bes.length > 0)) {
+	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+	    NamedCompound ce = new NamedCompound("add to group");
+	    boolean hasEdits = false;
+	    for (int i=0; i<bes.length; i++) {
+		if (qsr.applyRule(null, bes[i]) == 0) {
+		    String oldContent = (String)bes[i].getField(field),
+			pre = " ",
+			post = "";
+		    String newContent = 
+			(oldContent==null ? "" : oldContent+pre)
+			+regexp+post;
+		    bes[i].setField
+			(field, newContent);
+		    
+		    // Store undo information.
+		    ce.addEdit(new UndoableFieldChange
+			       (bes[i], field, oldContent, newContent));
+		    hasEdits = true;
+		}
+	    }
+	    if (hasEdits) {
+		ce.end();
+		undoManager.addEdit(ce);
+		refreshTable();
+		markBaseChanged();
+	    }		    
+
+	    output("Appended '"+regexp+"' to the '"
+		   +field+"' field of "+bes.length+" entr"+
+		   (bes.length > 1 ? "ies." : "y."));
+	}       
+    }
+
+    public void removeFromGroup
+	(String groupName, String regexp, String field) {
+	
+	boolean giveWarning = false;
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
+		&& !field.equals("keywords")) {
+		giveWarning = true;
+		break;
+	    }	       
+	}
+	if (giveWarning) {
+	    String message = "This action will modify the '"+field+"' field "
+		+"of your entries.\nThis could cause undesired changes to "
+		+"your entries, so it\nis recommended that you change the field "
+		+"in your group\ndefinition to 'keywords' or a non-standard name."
+		+"\n\nDo you still want to continue?";
+	    int choice = JOptionPane.showConfirmDialog
+		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+		 JOptionPane.WARNING_MESSAGE);
+	    
+	    if (choice == JOptionPane.NO_OPTION)
+		return;
+	}
+	
+	BibtexEntry[] bes = entryTable.getSelectedEntries();	    
+	if ((bes != null) && (bes.length > 0)) {
+	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+	    NamedCompound ce = new NamedCompound("remove from group");
+	    boolean hasEdits = false;
+	    for (int i=0; i<bes.length; i++) {
+		if (qsr.applyRule(null, bes[i]) > 0) {
+		    String oldContent = (String)bes[i].getField(field);
+		    qsr.removeMatches(bes[i]);
+		    		    // Store undo information.
+		    ce.addEdit(new UndoableFieldChange
+			       (bes[i], field, oldContent,
+				bes[i].getField(field)));
+		    hasEdits = true;
+		}
+	    }
+	    if (hasEdits) {
+		ce.end();
+		undoManager.addEdit(ce);
+		refreshTable();
+		markBaseChanged();
+	    }	    
+	    
+	    output("Removed '"+regexp+"' from the '"
+		   +field+"' field of "+bes.length+" entr"+
+		   (bes.length > 1 ? "ies." : "y."));
+	}
+	
+    }
+
+    public void changeType(BibtexEntryType type) {
+	BibtexEntry[] bes = entryTable.getSelectedEntries();
+	if ((bes == null) || (bes.length == 0)) {
+	    output("First select the entries you wish to change type "+
+		   "for.");
+	    return;
+	}
+	if (bes.length > 1) {
+	    int choice = JOptionPane.showConfirmDialog
+		(this, "Multiple entries selected. Do you want to change"
+		 +"\nthe type of all these to '"+type.getName()+"'?",
+		 "Change type", JOptionPane.YES_NO_OPTION,
+		 JOptionPane.WARNING_MESSAGE);
+	    if (choice == JOptionPane.NO_OPTION)
+		return;
+	}
+
+	NamedCompound ce = new NamedCompound("change type");
+	for (int i=0; i<bes.length; i++) {
+	    ce.addEdit(new UndoableChangeType(bes[i],
+					      bes[i].getType(),
+					      type));
+	    bes[i].setType(type);
+	}
+
+	output("Changed type to '"+type.getName()+"' for "+bes.length
+	       +" entries.");
+	ce.end();
+	undoManager.addEdit(ce);
+	refreshTable();
+	markBaseChanged();
+    }
 
     class UndoAction extends BaseAction {
 	public void action() {

@@ -58,6 +58,12 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
     CopyKeyAction copyKeyAction;
     // The action concerned with copying the BibTeX key to the clipboard.
 
+
+    AbstractAction 
+	nextEntryAction = new NextEntryAction(),
+	prevEntryAction = new PrevEntryAction();
+    // Actions for switching to next/previous entry.
+
     StoreFieldAction storeFieldAction;
     // The action concerned with storing a field value.
 
@@ -83,6 +89,7 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
     JLabel lab;
     JabRefFrame frame;
     BasePanel panel;
+    EntryTypeForm ths = this;
 
     boolean updateSource = true; // This can be set to false to stop the source
     // text area from gettin updated. This is used in cases where the source
@@ -215,7 +222,9 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 	tlb.addSeparator();
 	//tlb.add(undoAction);
 	//tlb.add(redoAction);
-	//tlb.addSeparator();
+	tlb.add(prevEntryAction);
+	tlb.add(nextEntryAction);
+	tlb.addSeparator();
 	tlb.add(helpAction);
 	contentPane.add(tlb, BorderLayout.NORTH);
     }
@@ -774,7 +783,6 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
      	        // Set focus to the last used textfield.
 	}
     }
-
     /*
     class ShowReqAction extends AbstractAction {
 	public ShowReqAction() {
@@ -821,6 +829,69 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
     }
     */
 
+    class NextEntryAction extends AbstractAction {
+	    public NextEntryAction() {
+		super(Globals.lang("Next entry"),
+		      new ImageIcon(GUIGlobals.forwardIconFile));
+
+		putValue(SHORT_DESCRIPTION, Globals.lang("Next entry"));
+	    }
+	    public void actionPerformed(ActionEvent e) {
+		int thisRow = panel.tableModel
+		    .getNumberFromName(entry.getId());
+		String id = null;
+		if (thisRow+1 < panel.database.getEntryCount())
+		    id = panel.tableModel
+			.getNameFromNumber(thisRow+1);
+		else if (thisRow > 0)
+		    id = panel.tableModel
+			.getNameFromNumber(0);
+		switchTo(id);
+	    }
+    }
+
+    class PrevEntryAction extends AbstractAction {
+	    public PrevEntryAction() {
+		super(Globals.lang("Previous entry"),
+		      new ImageIcon(GUIGlobals.backIconFile));
+
+		putValue(SHORT_DESCRIPTION, Globals.lang("Previous entry"));
+		
+	    }
+	    public void actionPerformed(ActionEvent e) {
+		int thisRow = panel.tableModel
+		    .getNumberFromName(entry.getId());
+		String id = null;
+		if (thisRow-1 >= 0)
+		    id = panel.tableModel
+			.getNameFromNumber(thisRow-1);
+		else if (thisRow != panel.database.getEntryCount()-1)
+		    id = panel.tableModel
+			.getNameFromNumber(panel.database.getEntryCount()-1);
+		switchTo(id);
+	    }
+	};
+    
+    private void switchTo(String id) {
+	if (id != null) {
+	    if (!panel.entryTypeForms.containsKey(id)) {
+		BibtexEntry be = panel.database.getEntryById(id);
+		EntryTypeForm form = new EntryTypeForm
+		    (frame, panel, be, prefs);
+		form.setLocation(ths.getLocation());
+		//Util.placeDialog(form, frame); 
+		// We want to center the editor.
+		form.setVisible(true);
+		dispose();
+		panel.entryTypeForms.put(id, form);
+	    } else {
+		((EntryTypeForm)(panel.entryTypeForms.get(id)))
+		    .setVisible(true);
+		dispose();
+	    }
+	    
+	}
+    }
 
     class GenerateKeyAction extends AbstractAction {
         JabRefFrame parent ; 

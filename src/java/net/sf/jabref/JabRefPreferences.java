@@ -191,9 +191,13 @@ public class JabRefPreferences {
 	// we fall back on the default. This should only happen when a
 	// user has his own set in Preferences, and has upgraded to a
 	// new version where new bindings have been introduced.
-	if (s == null)
+	if (s == null) {
 	    s = (String)defKeyBinds.get(bindName);
-
+	    // So, if this happens, we add the default value to the current
+	    // hashmap, so this doesn't happen again, and so this binding
+	    // will appear in the KeyBindingsDialog.
+	    keyBinds.put(bindName, s);
+	}
 	return KeyStroke.getKeyStroke(s);
     }
 
@@ -252,8 +256,10 @@ public class JabRefPreferences {
     }
 
     private void defineDefaultKeyBindings() {
+	defKeyBinds.put("Quit JabRef", "ctrl Q");
 	defKeyBinds.put("Open", "ctrl O");
 	defKeyBinds.put("Save", "ctrl S");
+	defKeyBinds.put("Close database", "ctrl W");
 	defKeyBinds.put("New entry", "ctrl N");
 	defKeyBinds.put("Cut", "ctrl X");
 	defKeyBinds.put("Copy", "ctrl C");
