@@ -1,0 +1,229 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\usepackage{fancyhdr}
+\usepackage{charter}
+\usepackage{bbm} % for symbols
+\usepackage{fullpage}
+\def\FileAuthor{ {\sc Batada, Shepp \& Siegmund} }
+\def\FileTitle{  }
+\fancyhead[L]{\small \FileTitle{}}
+\fancyhead[R]{\small \FileAuthor{}}
+\fancyfoot[L]{\small \today}
+%\pagestyle{fancy}
+%\setstretch{1.8} % table row height
+% \renewcommand{\baselinestretch}{2.0} %2.0} % triplespacing
+%\usepackage[nofiglist,notablist,nomarker]{endfloat}
+%\usepackage{pstricks}
+
+%\beamertemplateshadingbackground{red!5}{structure!5}
+%\usepackage{beamerthemeshadow}
+ %\beamertemplatetransparentcovereddynamic
+%\beamertemplatetransparentcovered
+\newcommand{\E}[1]{\mathbf{\mathbbm{E}}\left[#1\right]}
+\newcommand{\V}[1]{\mathbf{Var}\left[#1\right]}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\ang}{\mathring{A}}
+\renewcommand{\P}[1]{\mathbf{\mathbbm{P}}\bigl(#1\bigr)}
+\usepackage{color}
+\newcommand{\jabref}{ {\color{red}J}ab{\color{blue}R}ef}
+\end_preamble
+\language english
+\inputencoding latin1
+\fontscheme default
+\graphics default
+\paperfontsize 11
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 1
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 4
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+jabref
+\end_inset 
+
+\SpecialChar ~
+(1.2) User Manual 
+\layout Author
+
+Morten Alver and Nizar Batada
+\layout Date
+
+Feb 20, 2004
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Standard
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+newpage
+\end_inset 
+
+
+\layout Section
+
+Revision
+\layout Enumerate
+
+Initial Draft: Nizar Batada Feb 20, 2004
+\layout Section
+
+About This Guide
+\layout Standard
+
+This manual is a brief introduction to some of the most useful features
+ and functions of JabRef.
+ Learning this short list of features will enable you to use the JabRef
+ efficiently.
+ This manual is not an exhaustive list of the capabilities of this software.
+ JabRef is a result of merger between BibKeeper and JBibtexManager.
+\layout Standard
+
+Additional Information is available at : http://jabref.sourceforge.net and
+ in help\SpecialChar \menuseparator
+Help content from the menu bar.
+ 
+\layout Section
+
+Introduction to BibTeX 
+\layout Section
+
+Installation
+\layout Section
+
+Features
+\layout Subsection
+
+Import
+\layout Standard
+
+Following formats are supported.
+ 
+\layout Enumerate
+
+Medline (XML) (also Fetch Medline)
+\layout Enumerate
+
+RIS
+\layout Enumerate
+
+Endnote
+\layout Enumerate
+
+Scifinder
+\layout Standard
+
+If you like other formats to be supported, please send an example file and
+ put in a request at the sourceforge site.
+\layout Subsection
+
+Export
+\layout Subsection
+
+Editing
+\layout Subsection
+
+Grouping
+\layout Subsection
+
+Defining New Entry Types
+\layout Subsection
+
+Preamble and Strings
+\layout Subsection
+
+External Program
+\layout Section
+
+Customization
+\layout Subsection
+
+Table Display Content
+\layout Subsection
+
+Toolbar
+\layout Subsection
+
+Sidepanel
+\layout Subsection
+
+Appearance
+\layout Enumerate
+
+Fonts (see 
+\begin_inset LatexCommand \ref{sub:How-do-install-fonts}
+
+\end_inset 
+
+ for instructions to install new fonts)
+\layout Section
+
+Keyboard Shortcuts
+\layout Section
+
+Limitations and Known Bugs
+\layout Section
+
+Future Additions
+\layout Subsection
+
+Shortcut customization
+\layout Section
+
+Feature Request and Bug Reports
+\layout Section
+
+Developing JabRef
+\layout Section
+
+Acknowledgements
+\layout Section
+
+FAQ
+\layout Subsection
+
+I don't know programing, is there any way I can contribute?
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sub:How-do-install-fonts}
+
+\end_inset 
+
+How do install new fonts
+\the_end
