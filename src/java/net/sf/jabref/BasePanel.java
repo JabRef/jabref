@@ -64,7 +64,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     JabRefPreferences prefs;
     // The database shown in this panel.
     File file = null,
-	fileToOpen = null; // The filename of the database.
+        fileToOpen = null; // The filename of the database.
     String fileMonitorHandle = null;
     boolean saving = false;
     String encoding = null;
@@ -118,8 +118,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     boolean sortingBySearchResults = false,
         coloringBySearchResults = false,
-	sortingByGroup = false,
-	sortingByCiteSeerResults = false,
+        sortingByGroup = false,
+        sortingByCiteSeerResults = false,
         coloringByGroup = false,
         previewEnabled = true;
 
@@ -144,12 +144,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
-		     HashMap meta, JabRefPreferences prefs) {
+                     HashMap meta, JabRefPreferences prefs) {
       super(JSplitPane.HORIZONTAL_SPLIT, true);
       this.frame = frame;
       database = db;
       this.prefs = prefs;
-      parseMetaData(meta);
+      if (meta != null)
+        parseMetaData(meta);
+      else
+        metaData = new MetaData();
       setupActions();
       setupMainPanel();
       /*if (prefs.getBoolean("autoComplete")) {
@@ -172,8 +175,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     public JabRefPreferences prefs() { return prefs; }
 
     public void output(String s) {
-	if (!suppressOutput)
-	    frame.output(s);
+        if (!suppressOutput)
+            frame.output(s);
     }
 
     /**
@@ -182,17 +185,17 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      * appropriate BaseAction object, and runs its action() method.
      */
     abstract class BaseAction {//implements Runnable {
-	abstract void action() throws Throwable;
+        abstract void action() throws Throwable;
     }
 
     private void setupActions() {
 
-	actions.put("undo", undoAction);
-	actions.put("redo", redoAction);
+        actions.put("undo", undoAction);
+        actions.put("redo", redoAction);
 
-	// The action for opening an entry editor.
-	actions.put("edit", new BaseAction() {
-		public void action() {
+        // The action for opening an entry editor.
+        actions.put("edit", new BaseAction() {
+                public void action() {
                   //(new Thread() {
                   //public void run() {
                   int clickedOn = -1;
@@ -209,14 +212,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                   }
                 }
 
-	    });
+            });
 
-	// The action for saving a database.
-	actions.put("save", new BaseAction() {
-		public void action() throws Throwable {
-		    if (file == null)
-			runCommand("saveAs");
-		    else {
+        // The action for saving a database.
+        actions.put("save", new BaseAction() {
+                public void action() throws Throwable {
+                    if (file == null)
+                        runCommand("saveAs");
+                    else {
                       saving = true;
                       saveDatabase(file, false);
                       try {
@@ -236,12 +239,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       frame.setTabTitle(ths, file.getName());
                       frame.output(Globals.lang("Saved database")+" '"
                                    +file.getPath()+"'.");
-		    }
-		}
-	    });
+                    }
+                }
+            });
 
-	actions.put("saveAs", new BaseAction () {
-		public void action() throws Throwable {
+        actions.put("saveAs", new BaseAction () {
+                public void action() throws Throwable {
 
                   String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".bib",
                                                          JFileChooser.SAVE_DIALOG, false);
@@ -267,12 +270,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                     }
                     else
                       file = null;
-		    }
-		}
-	    });
+                    }
+                }
+            });
 
-	actions.put("saveSelectedAs", new BaseAction () {
-		public void action() throws Throwable {
+        actions.put("saveSelectedAs", new BaseAction () {
+                public void action() throws Throwable {
 
                   String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".bib",
                                                          JFileChooser.SAVE_DIALOG, false);
@@ -289,73 +292,73 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       frame.fileHistory.newFile(expFile.getPath());
                       frame.output(Globals.lang("Saved selected to")+" '"
                                    +expFile.getPath()+"'.");
-			}
-		    }
-		}
-	    });
+                        }
+                    }
+                }
+            });
 
-	// The action for copying selected entries.
-	actions.put("copy", new BaseAction() {
-		public void action() {
-		    BibtexEntry[] bes = entryTable.getSelectedEntries();
+        // The action for copying selected entries.
+        actions.put("copy", new BaseAction() {
+                public void action() {
+                    BibtexEntry[] bes = entryTable.getSelectedEntries();
 
-		    if ((bes != null) && (bes.length > 0)) {
-			TransferableBibtexEntry trbe
-			    = new TransferableBibtexEntry(bes);
-			Toolkit.getDefaultToolkit().getSystemClipboard()
-			    .setContents(trbe, ths);
-			output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
-							   +Globals.lang("entries")
-							   : "1 "+Globals.lang("entry")+"."));
-		    } else {
-			// The user maybe selected a single cell.
-			int[] rows = entryTable.getSelectedRows(),
-			    cols = entryTable.getSelectedColumns();
-			if ((cols.length == 1) && (rows.length == 1)) {
-			    // Copy single value.
-			    Object o = tableModel.getValueAt(rows[0], cols[0]);
-			    if (o != null) {
-				StringSelection ss = new StringSelection(o.toString());
-				Toolkit.getDefaultToolkit().getSystemClipboard()
-				    .setContents(ss, ths);
+                    if ((bes != null) && (bes.length > 0)) {
+                        TransferableBibtexEntry trbe
+                            = new TransferableBibtexEntry(bes);
+                        Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .setContents(trbe, ths);
+                        output(Globals.lang("Copied")+" "+(bes.length>1 ? bes.length+" "
+                                                           +Globals.lang("entries")
+                                                           : "1 "+Globals.lang("entry")+"."));
+                    } else {
+                        // The user maybe selected a single cell.
+                        int[] rows = entryTable.getSelectedRows(),
+                            cols = entryTable.getSelectedColumns();
+                        if ((cols.length == 1) && (rows.length == 1)) {
+                            // Copy single value.
+                            Object o = tableModel.getValueAt(rows[0], cols[0]);
+                            if (o != null) {
+                                StringSelection ss = new StringSelection(o.toString());
+                                Toolkit.getDefaultToolkit().getSystemClipboard()
+                                    .setContents(ss, ths);
 
-				output(Globals.lang("Copied cell contents")+".");
-			    }
-			}
-		    }
-		}
-	    });
+                                output(Globals.lang("Copied cell contents")+".");
+                            }
+                        }
+                    }
+                }
+            });
 
-	actions.put("cut", new BaseAction() {
-		public void action() throws Throwable {
-		    runCommand("copy");
-		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    if ((bes != null) && (bes.length > 0)) {
-			// Create a CompoundEdit to make the action undoable.
-			NamedCompound ce = new NamedCompound
-			    (bes.length > 1 ? "cut entries" : "cut entry");
-			// Loop through the array of entries, and delete them.
-			for (int i=0; i<bes.length; i++) {
-			    database.removeEntry(bes[i].getId());
-			    ensureNotShowing(bes[i]);
-			    ce.addEdit(new UndoableRemoveEntry
-				       (database, bes[i], ths));
-			}
-			entryTable.clearSelection();
-			frame.output(Globals.lang("Cut_pr")+" "+
-				     (bes.length>1 ? bes.length
-				      +" "+ Globals.lang("entries")
-				      : Globals.lang("entry"))+".");
-			ce.end();
-			undoManager.addEdit(ce);
-			refreshTable();
-			markBaseChanged();
-		    }
-		}
-	    });
+        actions.put("cut", new BaseAction() {
+                public void action() throws Throwable {
+                    runCommand("copy");
+                    BibtexEntry[] bes = entryTable.getSelectedEntries();
+                    if ((bes != null) && (bes.length > 0)) {
+                        // Create a CompoundEdit to make the action undoable.
+                        NamedCompound ce = new NamedCompound
+                            (bes.length > 1 ? "cut entries" : "cut entry");
+                        // Loop through the array of entries, and delete them.
+                        for (int i=0; i<bes.length; i++) {
+                            database.removeEntry(bes[i].getId());
+                            ensureNotShowing(bes[i]);
+                            ce.addEdit(new UndoableRemoveEntry
+                                       (database, bes[i], ths));
+                        }
+                        entryTable.clearSelection();
+                        frame.output(Globals.lang("Cut_pr")+" "+
+                                     (bes.length>1 ? bes.length
+                                      +" "+ Globals.lang("entries")
+                                      : Globals.lang("entry"))+".");
+                        ce.end();
+                        undoManager.addEdit(ce);
+                        refreshTable();
+                        markBaseChanged();
+                    }
+                }
+            });
 
-	actions.put("delete", new BaseAction() {
-		public void action() {
+        actions.put("delete", new BaseAction() {
+                public void action() {
                   boolean cancelled = false;
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   int row0 = entryTable.getSelectedRow();
@@ -407,36 +410,36 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
                     }
                   }
-		}
+                }
 
 
 
-	    });
+            });
 
-	// The action for pasting entries or cell contents.
+        // The action for pasting entries or cell contents.
         // Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 14-Apr-04:
         //  - more robust detection of available content flavors (doesn't only look at first one offered)
         //  - support for parsing string-flavor clipboard contents which are bibtex entries.
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
-	actions.put("paste", new BaseAction() {
-		public void action() {
+        actions.put("paste", new BaseAction() {
+                public void action() {
                     // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
-		    Transferable content = Toolkit.getDefaultToolkit()
-			.getSystemClipboard().getContents(null);
-		    if (content != null) {
+                    Transferable content = Toolkit.getDefaultToolkit()
+                        .getSystemClipboard().getContents(null);
+                    if (content != null) {
                         BibtexEntry[] bes = null;
-			if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
-			    // We have determined that the clipboard data is a set of entries.
-			    try {
-				bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
-			    } catch (UnsupportedFlavorException ex) {
-				ex.printStackTrace();
-			    } catch (IOException ex) {
-				ex.printStackTrace();
-			    }
-			} else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                        if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
+                            // We have determined that the clipboard data is a set of entries.
+                            try {
+                                bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
+                            } catch (UnsupportedFlavorException ex) {
+                                ex.printStackTrace();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                             // We have determined that no TransferableBibtexEntry is available, but
                             // there is a string, which we will handle according to context:
                             int[] rows = entryTable.getSelectedRows(),
@@ -489,7 +492,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                                   ex.printStackTrace();
                               }
                             }
-			}
+                        }
 
                         // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
                         // or were parsed from a string
@@ -537,66 +540,66 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
 });
 
-	actions.put("selectAll", new BaseAction() {
-		public void action() {
-		    entryTable.selectAll();
-		}
-	    });
+        actions.put("selectAll", new BaseAction() {
+                public void action() {
+                    entryTable.selectAll();
+                }
+            });
 
-	// The action for opening the preamble editor
-	actions.put("editPreamble", new BaseAction() {
-		public void action() {
-		    if (preambleEditor == null) {
-			PreambleEditor form = new PreambleEditor
-			    (frame, ths, database, prefs);
-			Util.placeDialog(form, frame);
-			form.setVisible(true);
-			preambleEditor = form;
-		    } else {
-			preambleEditor.setVisible(true);
-		    }
+        // The action for opening the preamble editor
+        actions.put("editPreamble", new BaseAction() {
+                public void action() {
+                    if (preambleEditor == null) {
+                        PreambleEditor form = new PreambleEditor
+                            (frame, ths, database, prefs);
+                        Util.placeDialog(form, frame);
+                        form.setVisible(true);
+                        preambleEditor = form;
+                    } else {
+                        preambleEditor.setVisible(true);
+                    }
 
-		}
-	    });
+                }
+            });
 
-	// The action for opening the string editor
-	actions.put("editStrings", new BaseAction() {
-		public void action() {
-		    if (stringDialog == null) {
-			StringDialog form = new StringDialog
-			    (frame, ths, database, prefs);
-			Util.placeDialog(form, frame);
-			form.setVisible(true);
-			stringDialog = form;
-		    } else {
-			stringDialog.setVisible(true);
-		    }
+        // The action for opening the string editor
+        actions.put("editStrings", new BaseAction() {
+                public void action() {
+                    if (stringDialog == null) {
+                        StringDialog form = new StringDialog
+                            (frame, ths, database, prefs);
+                        Util.placeDialog(form, frame);
+                        form.setVisible(true);
+                        stringDialog = form;
+                    } else {
+                        stringDialog.setVisible(true);
+                    }
 
-		}
-	    });
+                }
+            });
 
-	// The action for toggling the groups interface
-	actions.put("toggleGroups", new BaseAction() {
-		public void action() {
+        // The action for toggling the groups interface
+        actions.put("toggleGroups", new BaseAction() {
+                public void action() {
                   sidePaneManager.togglePanel("groups");
                   frame.groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
-		}
-	    });
+                }
+            });
 
-	actions.put("pushToLyX",new BaseAction(){
-		public void action(){
-		    final int[] rows = entryTable.getSelectedRows();
-		    final int numSelected = rows.length;
-		    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
-		    // check if lyxpipe is defined
-		    final File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-		    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-			output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
+        actions.put("pushToLyX",new BaseAction(){
+                public void action(){
+                    final int[] rows = entryTable.getSelectedRows();
+                    final int numSelected = rows.length;
+                    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
+                    // check if lyxpipe is defined
+                    final File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+                    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
+                        output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
                                +". [" + prefs.get("lyxpipe") +"]");
-			return;
-		    }
+                        return;
+                    }
                     //Util.pr("tre");
-		    if( numSelected > 0){
+                    if( numSelected > 0){
                       Thread pushThread = new Thread() {
                         public void run() {
                           try {
@@ -641,17 +644,17 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       t.start();
                     }
                   }
-	    });
+            });
 
             actions.put("pushToWinEdt",new BaseAction(){
               public void action(){
-		    final int[] rows = entryTable.getSelectedRows();
-		    final int numSelected = rows.length;
-		    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to WinEdt");
+                    final int[] rows = entryTable.getSelectedRows();
+                    final int numSelected = rows.length;
+                    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to WinEdt");
 
                     //Util.pr("tre");
 
-		    if( numSelected > 0){
+                    if( numSelected > 0){
                       Thread pushThread = new Thread() {
                         public void run() {
                           String winEdt = prefs.get("winEdtPath");
@@ -715,157 +718,157 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       pushThread.start();
                     }
                   }
-	    });
+            });
 
 
 
 
-	// The action for auto-generating keys.
-	actions.put("makeKey", new BaseAction() {
-		public void action() {
-		    int[] rows = entryTable.getSelectedRows() ;
-		    int numSelected = rows.length ;
-		    BibtexEntry bes = null ;
+        // The action for auto-generating keys.
+        actions.put("makeKey", new BaseAction() {
+                public void action() {
+                    int[] rows = entryTable.getSelectedRows() ;
+                    int numSelected = rows.length ;
+                    BibtexEntry bes = null ;
 
-		    /*if (numSelected > 0) {
-			int answer = JOptionPane.showConfirmDialog
-			    (frame, "Generate bibtex key"+
-			     (numSelected>1 ? "s for the selected "
-			      +numSelected+" entries?" :
-			      " for the selected entry?"),
-			     "Autogenerate Bibtexkey",
-			     JOptionPane.YES_NO_CANCEL_OPTION);
-			if (answer != JOptionPane.YES_OPTION) {
-			    return ;
+                    /*if (numSelected > 0) {
+                        int answer = JOptionPane.showConfirmDialog
+                            (frame, "Generate bibtex key"+
+                             (numSelected>1 ? "s for the selected "
+                              +numSelected+" entries?" :
+                              " for the selected entry?"),
+                             "Autogenerate Bibtexkey",
+                             JOptionPane.YES_NO_CANCEL_OPTION);
+                        if (answer != JOptionPane.YES_OPTION) {
+                            return ;
 
-			    }
-			*/
-		    if (numSelected == 0) { // None selected. Inform the user to select entries first.
-			JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
-						      Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
-			return ;
-		    }
+                            }
+                        */
+                    if (numSelected == 0) { // None selected. Inform the user to select entries first.
+                        JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
+                                                      Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
+                        return ;
+                    }
 
- 		    output(Globals.lang("Generating BibTeX key for")+" "+
-			   numSelected+" "+(numSelected>1 ? Globals.lang("entries")
-					    : Globals.lang("entry")));
+                     output(Globals.lang("Generating BibTeX key for")+" "+
+                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
+                                            : Globals.lang("entry")));
 
-		    NamedCompound ce = new NamedCompound("autogenerate keys");
-		    //BibtexEntry be;
-		    Object oldValue;
-		    for(int i = 0 ; i < numSelected ; i++){
-			bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
-			oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-			//bes = frame.labelMaker.applyRule(bes, database) ;
-			bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
-			ce.addEdit(new UndoableKeyChange
-				   (database, bes.getId(), (String)oldValue,
-				    (String)bes.getField(GUIGlobals.KEY_FIELD)));
-		    }
-		    ce.end();
-		    undoManager.addEdit(ce);
-		    markBaseChanged() ;
-		    refreshTable() ;
+                    NamedCompound ce = new NamedCompound("autogenerate keys");
+                    //BibtexEntry be;
+                    Object oldValue;
+                    for(int i = 0 ; i < numSelected ; i++){
+                        bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
+                        oldValue = bes.getField(GUIGlobals.KEY_FIELD);
+                        //bes = frame.labelMaker.applyRule(bes, database) ;
+                        bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
+                        ce.addEdit(new UndoableKeyChange
+                                   (database, bes.getId(), (String)oldValue,
+                                    (String)bes.getField(GUIGlobals.KEY_FIELD)));
+                    }
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged() ;
+                    refreshTable() ;
 
                     output(Globals.lang("Generated BibTeX key for")+" "+
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
                                             : Globals.lang("entry")));
-		}
-	    });
+                }
+            });
 
-	actions.put("search", new BaseAction() {
-		public void action() {
-		    //sidePaneManager.togglePanel("search");
+        actions.put("search", new BaseAction() {
+                public void action() {
+                    //sidePaneManager.togglePanel("search");
                     sidePaneManager.ensureVisible("search");
                     //boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(true);
                     if (true)
                       searchManager.startSearch();
-		}
-	    });
+                }
+            });
 
-	actions.put("incSearch", new BaseAction() {
-		public void action() {
-		    sidePaneManager.ensureVisible("search");
+        actions.put("incSearch", new BaseAction() {
+                public void action() {
+                    sidePaneManager.ensureVisible("search");
                     frame.searchToggle.setSelected(true);
-		    searchManager.startIncrementalSearch();
-		}
-	    });
+                    searchManager.startIncrementalSearch();
+                }
+            });
 
-	// The action for copying the selected entry's key.
-	actions.put("copyKey", new BaseAction() {
-		public void action() {
-		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    if ((bes != null) && (bes.length > 0)) {
-			//String[] keys = new String[bes.length];
-			Vector keys = new Vector();
-			// Collect all non-null keys.
-			for (int i=0; i<bes.length; i++)
-			    if (bes[i].getField(Globals.KEY_FIELD) != null)
-				keys.add(bes[i].getField(Globals.KEY_FIELD));
-			if (keys.size() == 0) {
-			    output("None of the selected entries have BibTeX keys.");
-			    return;
-			}
-			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
-			for (int i=1; i<keys.size(); i++) {
-			    sb.append(',');
-			    sb.append((String)keys.elementAt(i));
-			}
+        // The action for copying the selected entry's key.
+        actions.put("copyKey", new BaseAction() {
+                public void action() {
+                    BibtexEntry[] bes = entryTable.getSelectedEntries();
+                    if ((bes != null) && (bes.length > 0)) {
+                        //String[] keys = new String[bes.length];
+                        Vector keys = new Vector();
+                        // Collect all non-null keys.
+                        for (int i=0; i<bes.length; i++)
+                            if (bes[i].getField(Globals.KEY_FIELD) != null)
+                                keys.add(bes[i].getField(Globals.KEY_FIELD));
+                        if (keys.size() == 0) {
+                            output("None of the selected entries have BibTeX keys.");
+                            return;
+                        }
+                        StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+                        for (int i=1; i<keys.size(); i++) {
+                            sb.append(',');
+                            sb.append((String)keys.elementAt(i));
+                        }
 
-			StringSelection ss = new StringSelection(sb.toString());
-			Toolkit.getDefaultToolkit().getSystemClipboard()
-			    .setContents(ss, ths);
+                        StringSelection ss = new StringSelection(sb.toString());
+                        Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .setContents(ss, ths);
 
-			if (keys.size() == bes.length)
-			    // All entries had keys.
-			    output(Globals.lang((bes.length > 1) ? "Copied keys"
-						: "Copied key")+".");
-			else
-			    output(Globals.lang("Warning")+": "+(bes.length-keys.size())
-				   +" "+Globals.lang("out of")+" "+bes.length+" "+
-				   Globals.lang("entries have undefined BibTeX key")+".");
-		    }
-		}
-	    });
+                        if (keys.size() == bes.length)
+                            // All entries had keys.
+                            output(Globals.lang((bes.length > 1) ? "Copied keys"
+                                                : "Copied key")+".");
+                        else
+                            output(Globals.lang("Warning")+": "+(bes.length-keys.size())
+                                   +" "+Globals.lang("out of")+" "+bes.length+" "+
+                                   Globals.lang("entries have undefined BibTeX key")+".");
+                    }
+                }
+            });
 
-	// The action for copying a cite for the selected entry.
-	actions.put("copyCiteKey", new BaseAction() {
-		public void action() {
-		    BibtexEntry[] bes = entryTable.getSelectedEntries();
-		    if ((bes != null) && (bes.length > 0)) {
-			//String[] keys = new String[bes.length];
-			Vector keys = new Vector();
-			// Collect all non-null keys.
-			for (int i=0; i<bes.length; i++)
-			    if (bes[i].getField(Globals.KEY_FIELD) != null)
-				keys.add(bes[i].getField(Globals.KEY_FIELD));
-			if (keys.size() == 0) {
-			    output("None of the selected entries have BibTeX keys.");
-			    return;
-			}
-			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
-			for (int i=1; i<keys.size(); i++) {
-			    sb.append(',');
-			    sb.append((String)keys.elementAt(i));
-			}
+        // The action for copying a cite for the selected entry.
+        actions.put("copyCiteKey", new BaseAction() {
+                public void action() {
+                    BibtexEntry[] bes = entryTable.getSelectedEntries();
+                    if ((bes != null) && (bes.length > 0)) {
+                        //String[] keys = new String[bes.length];
+                        Vector keys = new Vector();
+                        // Collect all non-null keys.
+                        for (int i=0; i<bes.length; i++)
+                            if (bes[i].getField(Globals.KEY_FIELD) != null)
+                                keys.add(bes[i].getField(Globals.KEY_FIELD));
+                        if (keys.size() == 0) {
+                            output("None of the selected entries have BibTeX keys.");
+                            return;
+                        }
+                        StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
+                        for (int i=1; i<keys.size(); i++) {
+                            sb.append(',');
+                            sb.append((String)keys.elementAt(i));
+                        }
 
-			StringSelection ss = new StringSelection
-			    ("\\cite{"+sb.toString()+"}");
-			Toolkit.getDefaultToolkit().getSystemClipboard()
-			    .setContents(ss, ths);
+                        StringSelection ss = new StringSelection
+                            ("\\cite{"+sb.toString()+"}");
+                        Toolkit.getDefaultToolkit().getSystemClipboard()
+                            .setContents(ss, ths);
 
-			if (keys.size() == bes.length)
-			    // All entries had keys.
-			    output(Globals.lang((bes.length > 1) ? "Copied keys"
-						: "Copied key")+".");
-			else
-			    output(Globals.lang("Warning")+": "+(bes.length-keys.size())
-				   +" "+Globals.lang("out of")+" "+bes.length+" "+
-				   Globals.lang("entries have undefined BibTeX key")+".");
-		    }
-		}
-	    });
+                        if (keys.size() == bes.length)
+                            // All entries had keys.
+                            output(Globals.lang((bes.length > 1) ? "Copied keys"
+                                                : "Copied key")+".");
+                        else
+                            output(Globals.lang("Warning")+": "+(bes.length-keys.size())
+                                   +" "+Globals.lang("out of")+" "+bes.length+" "+
+                                   Globals.lang("entries have undefined BibTeX key")+".");
+                    }
+                }
+            });
 
           actions.put("mergeDatabase", new BaseAction() {
             public void action() {
@@ -873,7 +876,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                 final MergeDialog md = new MergeDialog(frame, Globals.lang("Append database"), true);
                 Util.placeDialog(md, ths);
                 md.setVisible(true);
-		if (md.okPressed) {
+                if (md.okPressed) {
                   String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")),
                                                          null, JFileChooser.OPEN_DIALOG, false);
                   /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
@@ -1066,35 +1069,35 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                           } else
                             output(Globals.lang("No entries or multiple entries selected."));
                       }
-	      });
+              });
 
-	  actions.put("replaceAll", new BaseAction() {
-	  	  public void action() {
-		      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
-		      rsd.show();
-		      if (!rsd.okPressed())
-			  return;
-		      int counter = 0;
-		      NamedCompound ce = new NamedCompound("Replace string");
-		      if (!rsd.selOnly()) {
-			  for (Iterator i=database.getKeySet().iterator();
-			       i.hasNext();)
-			      counter += rsd.replace(database.getEntryById((String)i.next()), ce);
-		      } else {
-			  BibtexEntry[] bes = entryTable.getSelectedEntries();
-			  for (int i=0; i<bes.length; i++)
-			      counter += rsd.replace(bes[i], ce);
-		      }
-		      output(Globals.lang("Replaced")+" "+counter+" "+
-			     Globals.lang(counter==1?"occurence":"occurences")+".");
-		      if (counter > 0) {
-			  ce.end();
-			  undoManager.addEdit(ce);
-			  markBaseChanged();
-			  refreshTable();
-		      }
-		  }
-	      });
+          actions.put("replaceAll", new BaseAction() {
+                    public void action() {
+                      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
+                      rsd.show();
+                      if (!rsd.okPressed())
+                          return;
+                      int counter = 0;
+                      NamedCompound ce = new NamedCompound("Replace string");
+                      if (!rsd.selOnly()) {
+                          for (Iterator i=database.getKeySet().iterator();
+                               i.hasNext();)
+                              counter += rsd.replace(database.getEntryById((String)i.next()), ce);
+                      } else {
+                          BibtexEntry[] bes = entryTable.getSelectedEntries();
+                          for (int i=0; i<bes.length; i++)
+                              counter += rsd.replace(bes[i], ce);
+                      }
+                      output(Globals.lang("Replaced")+" "+counter+" "+
+                             Globals.lang(counter==1?"occurence":"occurences")+".");
+                      if (counter > 0) {
+                          ce.end();
+                          undoManager.addEdit(ce);
+                          markBaseChanged();
+                          refreshTable();
+                      }
+                  }
+              });
 
               actions.put("dupliCheck", new BaseAction() {
                 public void action() {
@@ -1192,36 +1195,36 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
-	try {
-	    if (!selectedOnly)
+        try {
+            if (!selectedOnly)
               FileActions.saveDatabase(database, metaData, file,
-					 prefs, false, false, prefs.get("defaultEncoding"));
-	    else
-		FileActions.savePartOfDatabase(database, metaData, file,
-					       prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
-	} catch (SaveException ex) {
-	    if (ex.specificEntry()) {
-		// Error occured during processing of
-		// be. Highlight it:
-		int row = tableModel.getNumberFromName
-		    (ex.getEntry().getId()),
-		    topShow = Math.max(0, row-3);
-		//Util.pr(""+row);
-		entryTable.setRowSelectionInterval(row, row);
-		entryTable.setColumnSelectionInterval
-		    (0, entryTable.getColumnCount()-1);
-		entryTable.scrollTo(topShow);
-		showEntry(ex.getEntry());
-	    }
-	    else ex.printStackTrace();
+                                         prefs, false, false, prefs.get("defaultEncoding"));
+            else
+                FileActions.savePartOfDatabase(database, metaData, file,
+                                               prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
+        } catch (SaveException ex) {
+            if (ex.specificEntry()) {
+                // Error occured during processing of
+                // be. Highlight it:
+                int row = tableModel.getNumberFromName
+                    (ex.getEntry().getId()),
+                    topShow = Math.max(0, row-3);
+                //Util.pr(""+row);
+                entryTable.setRowSelectionInterval(row, row);
+                entryTable.setColumnSelectionInterval
+                    (0, entryTable.getColumnCount()-1);
+                entryTable.scrollTo(topShow);
+                showEntry(ex.getEntry());
+            }
+            else ex.printStackTrace();
 
-	    JOptionPane.showMessageDialog
-		(frame, Globals.lang("Could not save file")
-		 +".\n"+ex.getMessage(),
-		 Globals.lang("Save database"),
-		 JOptionPane.ERROR_MESSAGE);
-	    throw new SaveException("rt");
-	}
+            JOptionPane.showMessageDialog
+                (frame, Globals.lang("Could not save file")
+                 +".\n"+ex.getMessage(),
+                 Globals.lang("Save database"),
+                 JOptionPane.ERROR_MESSAGE);
+            throw new SaveException("rt");
+        }
     }
 
 
@@ -1233,44 +1236,44 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      * @param type The type of the entry to create.
      */
     public void newEntry(BibtexEntryType type) {
-	if (type == null) {
-	    // Find out what type is wanted.
-	    EntryTypeDialog etd = new EntryTypeDialog(frame);
-	    // We want to center the dialog, to make it look nicer.
-	    Util.placeDialog(etd, frame);
-	    etd.setVisible(true);
-	    type = etd.getChoice();
-	}
-	if (type != null) { // Only if the dialog was not cancelled.
-	    String id = Util.createId(type, database);
-	    BibtexEntry be = new BibtexEntry(id, type);
-	    try {
-		database.insertEntry(be);
-	    // Create new Bibtex entry
-	    // Set owner field to default value
+        if (type == null) {
+            // Find out what type is wanted.
+            EntryTypeDialog etd = new EntryTypeDialog(frame);
+            // We want to center the dialog, to make it look nicer.
+            Util.placeDialog(etd, frame);
+            etd.setVisible(true);
+            type = etd.getChoice();
+        }
+        if (type != null) { // Only if the dialog was not cancelled.
+            String id = Util.createId(type, database);
+            BibtexEntry be = new BibtexEntry(id, type);
+            try {
+                database.insertEntry(be);
+            // Create new Bibtex entry
+            // Set owner field to default value
             if (prefs.getBoolean("useOwner"))
               be.setField(Globals.OWNER, prefs.get("defaultOwner") );
-		// Create an UndoableInsertEntry object.
-		undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
-		output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
-		       +Globals.lang("entry")+".");
-		refreshTable();
+                // Create an UndoableInsertEntry object.
+                undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
+                output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
+                       +Globals.lang("entry")+".");
+                refreshTable();
                 int row = tableModel.getNumberFromName(id);
                 //Util.pr(""+row);
                 entryTable.clearSelection();
                 entryTable.scrollTo(row);
-		markBaseChanged(); // The database just changed.
-		if (prefs.getBoolean("autoOpenForm")) {
-		    showEntry(be);
-		    //EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
-		    //Util.placeDialog(etf, frame);
-		    //etf.setVisible(true);
-		    //entryTypeForms.put(id, etf);
-		}
-	    } catch (KeyCollisionException ex) {
-		Util.pr(ex.getMessage());
-	    }
-	}
+                markBaseChanged(); // The database just changed.
+                if (prefs.getBoolean("autoOpenForm")) {
+                    showEntry(be);
+                    //EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
+                    //Util.placeDialog(etf, frame);
+                    //etf.setVisible(true);
+                    //entryTypeForms.put(id, etf);
+                }
+            } catch (KeyCollisionException ex) {
+                Util.pr(ex.getMessage());
+            }
+        }
 
     }
 
@@ -1278,61 +1281,61 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public void setupTable() {
-	tableModel = new EntryTableModel(frame, this, database);
-	entryTable = new EntryTable(tableModel, ths, frame.prefs);
-	entryTable.getActionMap().put("cut", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    try { runCommand("cut");
-		    } catch (Throwable ex) {
-			ex.printStackTrace();
-		    }
-		}
-	    });
-	entryTable.getActionMap().put("copy", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    try { runCommand("copy");
-		    } catch (Throwable ex) {
-			ex.printStackTrace();
-		    }
-		}
-	    });
-	entryTable.getActionMap().put("paste", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    try { runCommand("paste");
-		    } catch (Throwable ex) {
-			ex.printStackTrace();
-		    }
-		}
-	    });
+        tableModel = new EntryTableModel(frame, this, database);
+        entryTable = new EntryTable(tableModel, ths, frame.prefs);
+        entryTable.getActionMap().put("cut", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    try { runCommand("cut");
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        entryTable.getActionMap().put("copy", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    try { runCommand("copy");
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        entryTable.getActionMap().put("paste", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    try { runCommand("paste");
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
 
-	/*
-	entryTable.getInputMap().put(prefs.getKey("Edit entry"), "Edit");
-	entryTable.getActionMap().put("Edit", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    Util.pr("eueo");
-		    try { runCommand("edit");
-		    } catch (Throwable ex) {
-			ex.printStackTrace();
-		    }
-		}
-	    });
-	*/
+        /*
+        entryTable.getInputMap().put(prefs.getKey("Edit entry"), "Edit");
+        entryTable.getActionMap().put("Edit", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Util.pr("eueo");
+                    try { runCommand("edit");
+                    } catch (Throwable ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        */
 
-	entryTable.addKeyListener(new KeyAdapter() {
+        entryTable.addKeyListener(new KeyAdapter() {
 
-		public void keyPressed(KeyEvent e) {
-		    if (e.getKeyCode() == KeyEvent.VK_ENTER){
-			try { runCommand("edit");
-			} catch (Throwable ex) {
-			    ex.printStackTrace();
-			}
-		    }
-		    else if(e.getKeyCode() == KeyEvent.VK_DELETE){
-			try { runCommand("delete");
-			} catch (Throwable ex) {
-			    ex.printStackTrace();
-			}
-		    }
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                        try { runCommand("edit");
+                        } catch (Throwable ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    else if(e.getKeyCode() == KeyEvent.VK_DELETE){
+                        try { runCommand("delete");
+                        } catch (Throwable ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                     /*
                     if (((e.getKeyCode() == KeyEvent.VK_DOWN) || (e.getKeyCode() == KeyEvent.VK_UP))
                       && (e.getModifiers() == 0)) {
@@ -1340,64 +1343,64 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       Util.pr(entryTable.getSelectedRow()+"");
                     }*/
                   }
-	    });
+            });
 
 
-	// Set the right-click menu for the entry table.
-	//rcm = new RightClickMenu(this, metaData);
-	entryTable.setRightClickMenu(rcm);
-	int pos = splitPane.getDividerLocation();
-	splitPane.setTopComponent(entryTable.getPane());
-	splitPane.setDividerLocation(pos);
-	//splitPane.revalidate();
+        // Set the right-click menu for the entry table.
+        //rcm = new RightClickMenu(this, metaData);
+        entryTable.setRightClickMenu(rcm);
+        int pos = splitPane.getDividerLocation();
+        splitPane.setTopComponent(entryTable.getPane());
+        splitPane.setDividerLocation(pos);
+        //splitPane.revalidate();
     }
 
     public void setupMainPanel() {
 
-	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-	// We replace the default FocusTraversalPolicy with a subclass
-	// that only allows FieldEditor components to gain keyboard focus,
-	// if there is an entry editor open.
-	/*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
-		protected boolean accept(Component c) {
-		    Util.pr("jaa");
-		    if (showing == null)
-			return super.accept(c);
-		    else
-			return (super.accept(c) &&
-				(c instanceof FieldEditor));
-		}
-		});*/
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+        // We replace the default FocusTraversalPolicy with a subclass
+        // that only allows FieldEditor components to gain keyboard focus,
+        // if there is an entry editor open.
+        /*splitPane.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
+                protected boolean accept(Component c) {
+                    Util.pr("jaa");
+                    if (showing == null)
+                        return super.accept(c);
+                    else
+                        return (super.accept(c) &&
+                                (c instanceof FieldEditor));
+                }
+                });*/
 
-	setupTable();
-	// If an entry is currently being shown, make sure it stays shown,
-	// otherwise set the bottom component to null.
-	if (showing == null) {
+        setupTable();
+        // If an entry is currently being shown, make sure it stays shown,
+        // otherwise set the bottom component to null.
+        if (showing == null) {
           splitPane.setBottomComponent(previewPanel);
           if (previewPanel != null)
             splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
         }
-	else
-	    showEntry(showing);
+        else
+            showEntry(showing);
 
-	setRightComponent(splitPane);
-	sidePaneManager = new SidePaneManager
-	    (frame, this, prefs, metaData);
+        setRightComponent(splitPane);
+        sidePaneManager = new SidePaneManager
+            (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
         citeSeerFetcher = new CiteSeerFetcher(this, sidePaneManager);
         sidePaneManager.register("fetchMedline", medlineFetcher);
         //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
         //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
-	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
-	sidePaneManager.add("search", searchManager);
-	sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
-	sidePaneManager.populatePanel();
+        searchManager = new SearchManager2(frame, prefs, sidePaneManager);
+        sidePaneManager.add("search", searchManager);
+        sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
+        sidePaneManager.populatePanel();
 
-	//mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
-	setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-	setResizeWeight(0);
-	revalidate();
+        //mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
+        setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+        setResizeWeight(0);
+        revalidate();
     }
 
     /**
@@ -1410,34 +1413,34 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      * @param meta Metadata to input.
      */
     public void parseMetaData(HashMap meta) {
-	metaData = new MetaData(meta);
+        metaData = new MetaData(meta);
 
     }
 
     public void refreshTable() {
-	// This method is called by EntryTypeForm when a field value is
-	// stored. The table is scheduled for repaint.
+        // This method is called by EntryTypeForm when a field value is
+        // stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
         //entryTable.invalidate();
-	tableModel.remap();
+        tableModel.remap();
 
         //entryTable.revalidate();
-	//entryTable.repaint();
+        //entryTable.repaint();
     }
 
     public void updatePreamble() {
-	if (preambleEditor != null)
-	    preambleEditor.updatePreamble();
+        if (preambleEditor != null)
+            preambleEditor.updatePreamble();
     }
 
     public void assureStringDialogNotEditing() {
-	if (stringDialog != null)
-	    stringDialog.assureNotEditing();
+        if (stringDialog != null)
+            stringDialog.assureNotEditing();
     }
 
     public void updateStringDialog() {
-	if (stringDialog != null)
-	    stringDialog.refreshTable();
+        if (stringDialog != null)
+            stringDialog.refreshTable();
     }
 
     public void updateViewToSelected() {
@@ -1487,60 +1490,60 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public void showEntry(BibtexEntry be) {
-	if (showing == be) {
-	    if (splitPane.getBottomComponent() == null) {
-		// This is the special occasion when showing is set to an
-		// entry, but no entry editor is in fact shown. This happens
-		// after Preferences dialog is closed, and it means that we
-		// must make sure the same entry is shown again. We do this by
-		// setting showing to null, and recursively calling this method.
-	        showing = null;
-		showEntry(be);
-	    } else {
+        if (showing == be) {
+            if (splitPane.getBottomComponent() == null) {
+                // This is the special occasion when showing is set to an
+                // entry, but no entry editor is in fact shown. This happens
+                // after Preferences dialog is closed, and it means that we
+                // must make sure the same entry is shown again. We do this by
+                // setting showing to null, and recursively calling this method.
+                showing = null;
+                showEntry(be);
+            } else {
               // The correct entry is already being shown. Make sure the editor
               // is updated.
               ((EntryEditor)splitPane.getBottomComponent()).updateAllFields();
 
             }
-	    return;
+            return;
 
-	}
+        }
 
-	EntryEditor form;
-	int divLoc = -1, visPan = -1;
-	if (showing != null)
-	    visPan = ((EntryEditor)splitPane.getBottomComponent()).
-		getVisiblePanel();
-	if (showing != null)
-	    divLoc = splitPane.getDividerLocation();
+        EntryEditor form;
+        int divLoc = -1, visPan = -1;
+        if (showing != null)
+            visPan = ((EntryEditor)splitPane.getBottomComponent()).
+                getVisiblePanel();
+        if (showing != null)
+            divLoc = splitPane.getDividerLocation();
 
-	if (entryEditors.containsKey(be.getType().getName())) {
-	    // We already have an editor for this entry type.
-	    form = (EntryEditor)entryEditors.get
-		((be.getType().getName()));
-	    form.switchTo(be);
+        if (entryEditors.containsKey(be.getType().getName())) {
+            // We already have an editor for this entry type.
+            form = (EntryEditor)entryEditors.get
+                ((be.getType().getName()));
+            form.switchTo(be);
             if (visPan >= 0)
               form.setVisiblePanel(visPan);
-	    splitPane.setBottomComponent(form);
-	} else {
-	    // We must instantiate a new editor for this type.
-	    form = new EntryEditor
-		(frame, ths, be, prefs);
-	    if (visPan >= 0)
-		form.setVisiblePanel(visPan);
-	    splitPane.setBottomComponent(form);
-	    entryEditors.put(be.getType().getName(), form);
-	}
-	if (divLoc > 0) {
+            splitPane.setBottomComponent(form);
+        } else {
+            // We must instantiate a new editor for this type.
+            form = new EntryEditor
+                (frame, ths, be, prefs);
+            if (visPan >= 0)
+                form.setVisiblePanel(visPan);
+            splitPane.setBottomComponent(form);
+            entryEditors.put(be.getType().getName(), form);
+        }
+        if (divLoc > 0) {
           splitPane.setDividerLocation(divLoc);
         }
-	else
-	    splitPane.setDividerLocation
-		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
-	//new FocusRequester(form);
-	//form.requestFocus();
+        else
+            splitPane.setDividerLocation
+                (GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+        //new FocusRequester(form);
+        //form.requestFocus();
 
-	showing = be;
+        showing = be;
         setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
@@ -1559,7 +1562,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         updateViewToSelected();
       }
       new FocusRequester(entryTable);
-	/*splitPane.setBottomComponent(previewPanel);
+        /*splitPane.setBottomComponent(previewPanel);
         if (previewPanel != null)
           splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
 
@@ -1572,10 +1575,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      * @param be a <code>BibtexEntry</code> value
      */
     public void ensureNotShowing(BibtexEntry be) {
-	if (showing == be) {
-	    hideEntryEditor();
-	    showing = null;
-	}
+        if (showing == be) {
+            hideEntryEditor();
+            showing = null;
+        }
     }
 
     public void updateEntryEditorIfShowing() {
@@ -1591,38 +1594,38 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public void markBaseChanged() {
-	baseChanged = true;
+        baseChanged = true;
 
-	// Put an asterix behind the file name to indicate the
-	// database has changed.
-	String oldTitle = frame.getTabTitle(this);
-	if (!oldTitle.endsWith("*"))
-	    frame.setTabTitle(this, oldTitle+"*");
+        // Put an asterix behind the file name to indicate the
+        // database has changed.
+        String oldTitle = frame.getTabTitle(this);
+        if (!oldTitle.endsWith("*"))
+            frame.setTabTitle(this, oldTitle+"*");
 
-	// If the status line states that the base has been saved, we
-	// remove this message, since it is no longer relevant. If a
-	// different message is shown, we leave it.
-	if (frame.statusLine.getText().startsWith("Saved database"))
-	    frame.output(" ");
+        // If the status line states that the base has been saved, we
+        // remove this message, since it is no longer relevant. If a
+        // different message is shown, we leave it.
+        if (frame.statusLine.getText().startsWith("Saved database"))
+            frame.output(" ");
     }
 
     public void markNonUndoableBaseChanged() {
-	nonUndoableChange = true;
-	markBaseChanged();
+        nonUndoableChange = true;
+        markBaseChanged();
     }
 
     public synchronized void markChangedOrUnChanged() {
-	if (undoManager.hasChanged()) {
-	    if (!baseChanged)
-		markBaseChanged();
-	}
-	else if (baseChanged && !nonUndoableChange) {
-	    baseChanged = false;
-	    if (file != null)
-		frame.setTabTitle(ths, file.getName());
-	    else
-		frame.setTabTitle(ths, Globals.lang("untitled"));
-	}
+        if (undoManager.hasChanged()) {
+            if (!baseChanged)
+                markBaseChanged();
+        }
+        else if (baseChanged && !nonUndoableChange) {
+            baseChanged = false;
+            if (file != null)
+                frame.setTabTitle(ths, file.getName());
+            else
+                frame.setTabTitle(ths, Globals.lang("untitled"));
+        }
     }
 
     /**
@@ -1635,14 +1638,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      *
      */
     public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut, boolean select) {
-	//entryTable.scrollTo(0);
+        //entryTable.scrollTo(0);
 
         entryTable.invalidate();
-	if (searchValueField == Globals.SEARCH) {
+        if (searchValueField == Globals.SEARCH) {
           sortingBySearchResults = reorder;
           coloringBySearchResults = grayOut;
         }
-	else if (searchValueField == Globals.GROUPSEARCH) {
+        else if (searchValueField == Globals.GROUPSEARCH) {
           sortingByGroup = reorder;
           coloringByGroup = grayOut;
         }
@@ -1709,9 +1712,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
      *
      */
     public void selectSingleEntry(int pos) {
-	entryTable.clearSelection();
-	entryTable.addRowSelectionInterval(pos, pos);
-	entryTable.scrollToCenter(pos, 0);
+        entryTable.clearSelection();
+        entryTable.addRowSelectionInterval(pos, pos);
+        entryTable.scrollToCenter(pos, 0);
     }
 
     public void stopShowingSearchResults() {
@@ -1736,134 +1739,134 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public EntryTableModel getTableModel(){
-		return tableModel ;
+                return tableModel ;
     }
 
     public BibtexDatabase getDatabase(){
-	return database ;
+        return database ;
     }
 
     public void preambleEditorClosing() {
-	preambleEditor = null;
+        preambleEditor = null;
     }
 
     public void stringsClosing() {
-	stringDialog = null;
+        stringDialog = null;
     }
 
     public void addToGroup(String groupName, String regexp, String field) {
 
-	boolean giveWarning = false;
-	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
-		&& !field.equals("keywords")) {
-		giveWarning = true;
-		break;
-	    }
-	}
-	if (giveWarning) {
-	    String message = "This action will modify the '"+field+"' field "
-		+"of your entries.\nThis could cause undesired changes to "
-		+"your entries, so it\nis recommended that you change the field "
-		+"in your group\ndefinition to 'keywords' or a non-standard name."
-		+"\n\nDo you still want to continue?";
-	    int choice = JOptionPane.showConfirmDialog
-		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
-		 JOptionPane.WARNING_MESSAGE);
+        boolean giveWarning = false;
+        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+            if (field.equals(GUIGlobals.ALL_FIELDS[i])
+                && !field.equals("keywords")) {
+                giveWarning = true;
+                break;
+            }
+        }
+        if (giveWarning) {
+            String message = "This action will modify the '"+field+"' field "
+                +"of your entries.\nThis could cause undesired changes to "
+                +"your entries, so it\nis recommended that you change the field "
+                +"in your group\ndefinition to 'keywords' or a non-standard name."
+                +"\n\nDo you still want to continue?";
+            int choice = JOptionPane.showConfirmDialog
+                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                 JOptionPane.WARNING_MESSAGE);
 
-	    if (choice == JOptionPane.NO_OPTION)
-		return;
-	}
+            if (choice == JOptionPane.NO_OPTION)
+                return;
+        }
 
-	BibtexEntry[] bes = entryTable.getSelectedEntries();
-	if ((bes != null) && (bes.length > 0)) {
-	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-	    NamedCompound ce = new NamedCompound("add to group");
-	    boolean hasEdits = false;
-	    for (int i=0; i<bes.length; i++) {
-		if (qsr.applyRule(null, bes[i]) == 0) {
-		    String oldContent = (String)bes[i].getField(field),
-			pre = " ",
-			post = "";
-		    String newContent =
-			(oldContent==null ? "" : oldContent+pre)
-			+regexp+post;
-		    bes[i].setField
-			(field, newContent);
+        BibtexEntry[] bes = entryTable.getSelectedEntries();
+        if ((bes != null) && (bes.length > 0)) {
+            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+            NamedCompound ce = new NamedCompound("add to group");
+            boolean hasEdits = false;
+            for (int i=0; i<bes.length; i++) {
+                if (qsr.applyRule(null, bes[i]) == 0) {
+                    String oldContent = (String)bes[i].getField(field),
+                        pre = " ",
+                        post = "";
+                    String newContent =
+                        (oldContent==null ? "" : oldContent+pre)
+                        +regexp+post;
+                    bes[i].setField
+                        (field, newContent);
 
-		    // Store undo information.
-		    ce.addEdit(new UndoableFieldChange
-			       (bes[i], field, oldContent, newContent));
-		    hasEdits = true;
-		}
-	    }
-	    if (hasEdits) {
-		ce.end();
-		undoManager.addEdit(ce);
-		refreshTable();
-		markBaseChanged();
+                    // Store undo information.
+                    ce.addEdit(new UndoableFieldChange
+                               (bes[i], field, oldContent, newContent));
+                    hasEdits = true;
+                }
+            }
+            if (hasEdits) {
+                ce.end();
+                undoManager.addEdit(ce);
+                refreshTable();
+                markBaseChanged();
                 updateViewToSelected();
-	    }
+            }
 
-	    output("Appended '"+regexp+"' to the '"
-		   +field+"' field of "+bes.length+" entr"+
-		   (bes.length > 1 ? "ies." : "y."));
-	}
+            output("Appended '"+regexp+"' to the '"
+                   +field+"' field of "+bes.length+" entr"+
+                   (bes.length > 1 ? "ies." : "y."));
+        }
     }
 
     public void removeFromGroup
-	(String groupName, String regexp, String field) {
+        (String groupName, String regexp, String field) {
 
-	boolean giveWarning = false;
-	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-	    if (field.equals(GUIGlobals.ALL_FIELDS[i])
-		&& !field.equals("keywords")) {
-		giveWarning = true;
-		break;
-	    }
-	}
-	if (giveWarning) {
-	    String message = "This action will modify the '"+field+"' field "
-		+"of your entries.\nThis could cause undesired changes to "
-		+"your entries, so it\nis recommended that you change the field "
-		+"in your group\ndefinition to 'keywords' or a non-standard name."
-		+"\n\nDo you still want to continue?";
-	    int choice = JOptionPane.showConfirmDialog
-		(this, message, "Warning", JOptionPane.YES_NO_OPTION,
-		 JOptionPane.WARNING_MESSAGE);
+        boolean giveWarning = false;
+        for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+            if (field.equals(GUIGlobals.ALL_FIELDS[i])
+                && !field.equals("keywords")) {
+                giveWarning = true;
+                break;
+            }
+        }
+        if (giveWarning) {
+            String message = "This action will modify the '"+field+"' field "
+                +"of your entries.\nThis could cause undesired changes to "
+                +"your entries, so it\nis recommended that you change the field "
+                +"in your group\ndefinition to 'keywords' or a non-standard name."
+                +"\n\nDo you still want to continue?";
+            int choice = JOptionPane.showConfirmDialog
+                (this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                 JOptionPane.WARNING_MESSAGE);
 
-	    if (choice == JOptionPane.NO_OPTION)
-		return;
-	}
+            if (choice == JOptionPane.NO_OPTION)
+                return;
+        }
 
-	BibtexEntry[] bes = entryTable.getSelectedEntries();
-	if ((bes != null) && (bes.length > 0)) {
-	    QuickSearchRule qsr = new QuickSearchRule(field, regexp);
-	    NamedCompound ce = new NamedCompound("remove from group");
-	    boolean hasEdits = false;
-	    for (int i=0; i<bes.length; i++) {
-		if (qsr.applyRule(null, bes[i]) > 0) {
-		    String oldContent = (String)bes[i].getField(field);
-		    qsr.removeMatches(bes[i]);
-		    		    // Store undo information.
-		    ce.addEdit(new UndoableFieldChange
-			       (bes[i], field, oldContent,
-				bes[i].getField(field)));
-		    hasEdits = true;
-		}
-	    }
-	    if (hasEdits) {
-		ce.end();
-		undoManager.addEdit(ce);
-		refreshTable();
-		markBaseChanged();
+        BibtexEntry[] bes = entryTable.getSelectedEntries();
+        if ((bes != null) && (bes.length > 0)) {
+            QuickSearchRule qsr = new QuickSearchRule(field, regexp);
+            NamedCompound ce = new NamedCompound("remove from group");
+            boolean hasEdits = false;
+            for (int i=0; i<bes.length; i++) {
+                if (qsr.applyRule(null, bes[i]) > 0) {
+                    String oldContent = (String)bes[i].getField(field);
+                    qsr.removeMatches(bes[i]);
+                                        // Store undo information.
+                    ce.addEdit(new UndoableFieldChange
+                               (bes[i], field, oldContent,
+                                bes[i].getField(field)));
+                    hasEdits = true;
+                }
+            }
+            if (hasEdits) {
+                ce.end();
+                undoManager.addEdit(ce);
+                refreshTable();
+                markBaseChanged();
                 updateViewToSelected();
-	    }
+            }
 
-	    output("Removed '"+regexp+"' from the '"
-		   +field+"' field of "+bes.length+" entr"+
-		   (bes.length > 1 ? "ies." : "y."));
-	}
+            output("Removed '"+regexp+"' from the '"
+                   +field+"' field of "+bes.length+" entr"+
+                   (bes.length > 1 ? "ies." : "y."));
+        }
 
     }
 
@@ -1878,75 +1881,75 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     public void changeType(BibtexEntry[] bes, BibtexEntryType type) {
 
-	if ((bes == null) || (bes.length == 0)) {
-	    output("First select the entries you wish to change type "+
-		   "for.");
-	    return;
-	}
-	if (bes.length > 1) {
-	    int choice = JOptionPane.showConfirmDialog
-		(this, "Multiple entries selected. Do you want to change"
-		 +"\nthe type of all these to '"+type.getName()+"'?",
-		 "Change type", JOptionPane.YES_NO_OPTION,
-		 JOptionPane.WARNING_MESSAGE);
-	    if (choice == JOptionPane.NO_OPTION)
-		return;
-	}
+        if ((bes == null) || (bes.length == 0)) {
+            output("First select the entries you wish to change type "+
+                   "for.");
+            return;
+        }
+        if (bes.length > 1) {
+            int choice = JOptionPane.showConfirmDialog
+                (this, "Multiple entries selected. Do you want to change"
+                 +"\nthe type of all these to '"+type.getName()+"'?",
+                 "Change type", JOptionPane.YES_NO_OPTION,
+                 JOptionPane.WARNING_MESSAGE);
+            if (choice == JOptionPane.NO_OPTION)
+                return;
+        }
 
-	NamedCompound ce = new NamedCompound("change type");
-	for (int i=0; i<bes.length; i++) {
-	    ce.addEdit(new UndoableChangeType(bes[i],
-					      bes[i].getType(),
-					      type));
-	    bes[i].setType(type);
-	}
+        NamedCompound ce = new NamedCompound("change type");
+        for (int i=0; i<bes.length; i++) {
+            ce.addEdit(new UndoableChangeType(bes[i],
+                                              bes[i].getType(),
+                                              type));
+            bes[i].setType(type);
+        }
 
-	output(Globals.lang("Changed type to")+" '"+type.getName()+"' "
-	       +Globals.lang("for")+" "+bes.length
-	       +" "+Globals.lang("entries")+".");
-	ce.end();
-	undoManager.addEdit(ce);
-	refreshTable();
-	markBaseChanged();
+        output(Globals.lang("Changed type to")+" '"+type.getName()+"' "
+               +Globals.lang("for")+" "+bes.length
+               +" "+Globals.lang("entries")+".");
+        ce.end();
+        undoManager.addEdit(ce);
+        refreshTable();
+        markBaseChanged();
         updateEntryEditorIfShowing();
     }
 
     class UndoAction extends BaseAction {
-	public void action() {
-	    try {
-		String name = undoManager.getUndoPresentationName();
-		undoManager.undo();
-		markBaseChanged();
-		refreshTable();
-		frame.output(name);
-	    } catch (CannotUndoException ex) {
-		frame.output(Globals.lang("Nothing to undo")+".");
-	    }
-	    // After everything, enable/disable the undo/redo actions
-	    // appropriately.
-	    //updateUndoState();
-	    //redoAction.updateRedoState();
-	    markChangedOrUnChanged();
-	}
+        public void action() {
+            try {
+                String name = undoManager.getUndoPresentationName();
+                undoManager.undo();
+                markBaseChanged();
+                refreshTable();
+                frame.output(name);
+            } catch (CannotUndoException ex) {
+                frame.output(Globals.lang("Nothing to undo")+".");
+            }
+            // After everything, enable/disable the undo/redo actions
+            // appropriately.
+            //updateUndoState();
+            //redoAction.updateRedoState();
+            markChangedOrUnChanged();
+        }
     }
 
     class RedoAction extends BaseAction {
-	public void action() {
-	    try {
-		String name = undoManager.getRedoPresentationName();
-		undoManager.redo();
-		markBaseChanged();
-		refreshTable();
-		frame.output(name);
-	    } catch (CannotRedoException ex) {
-		frame.output(Globals.lang("Nothing to redo")+".");
-	    }
-	    // After everything, enable/disable the undo/redo actions
-	    // appropriately.
-	    //updateRedoState();
-	    //undoAction.updateUndoState();
-	    markChangedOrUnChanged();
-	}
+        public void action() {
+            try {
+                String name = undoManager.getRedoPresentationName();
+                undoManager.redo();
+                markBaseChanged();
+                refreshTable();
+                frame.output(name);
+            } catch (CannotRedoException ex) {
+                frame.output(Globals.lang("Nothing to redo")+".");
+            }
+            // After everything, enable/disable the undo/redo actions
+            // appropriately.
+            //updateRedoState();
+            //undoAction.updateUndoState();
+            markChangedOrUnChanged();
+        }
     }
 
     // Method pertaining to the ClipboardOwner interface.
