@@ -1119,10 +1119,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * @param row an <code>int</code> value
      */
     private void scrollTo(int row) {
-	panel.entryTable.ensureVisible(row);
 	panel.entryTable.setRowSelectionInterval(row, row);
 	panel.entryTable.setColumnSelectionInterval
 	    (0, panel.entryTable.getColumnCount()-1);
+	panel.entryTable.ensureVisible(row);
     }
 
     /**

@@ -312,8 +312,8 @@ public class EntryTable extends JTable {
         // Scroll the area into view.
         viewport.scrollRectToVisible(rect);
 
-	revalidate();
-	repaint();
+	//revalidate();
+	//repaint();
     }
 
   /**

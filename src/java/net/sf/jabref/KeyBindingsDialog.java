@@ -29,6 +29,7 @@ package net.sf.jabref;
 
 import java.util.*;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
@@ -37,7 +38,8 @@ import javax.swing.event.*;
 class KeyBindingsDialog
     extends JDialog {
   JTable table;
-  JList list = new JList();
+  AbstractTableModel tableModel;
+  //JList list = new JList();
   JTextField keyTF = new JTextField();
   JButton ok, cancel, grabB, defB;
   HashMap bindHM, defBinds;
@@ -70,12 +72,12 @@ class KeyBindingsDialog
     grabB = new JButton(Globals.lang("Grab"));
     defB = new JButton(Globals.lang("Default"));
     grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
-    grabB.addActionListener(new ActionListener() {
+    /*grabB.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        selectedRow = table.getSelectedRow();
+        selectedRow = (table.getSelectedRows())[0];
         Util.pr(""+selectedRow);
       }
-    });
+    });*/
     buttonBox.add(grabB);
     buttonBox.add(defB);
     buttonBox.add(ok);
@@ -84,7 +86,6 @@ class KeyBindingsDialog
     getContentPane().add(buttonBox, BorderLayout.SOUTH);
     //setTop();
     setButtons();
-    setList();
     keyTF.setEditable(false);
 
     addWindowListener(new WindowAdapter() {
@@ -111,10 +112,10 @@ class KeyBindingsDialog
       extends KeyAdapter {
     public void keyPressed(KeyEvent evt) {
       // first check if anything is selected if not the return
-
-      if (table.getSelectedRow() < 0)
+      int selRow = table.getSelectedRow();
+      if (selRow < 0)
         return;
-      Util.pr("dei"+selectedRow+" "+table.getSelectedRow());
+      //Util.pr("dei"+selectedRow+" "+table.getSelectedRow());
       //Object[] selected = list.getSelectedValues();
       //if (selected.length == 0) {
       //  return;
@@ -155,15 +156,16 @@ class KeyBindingsDialog
       }
       keyTF.setText(newKey);
       //find which key is selected and set its value int the bindHM
-      String selectedFunction = (String) table.getValueAt(table.getSelectedRow(), 0);
-      table.setValueAt(newKey, table.getSelectedRow(), 1);
+      String selectedFunction = (String) table.getValueAt(selRow, 0);
+      table.setValueAt(newKey, selRow, 1);
       table.revalidate();
       table.repaint();
-      Util.pr(selectedFunction);
+      //Util.pr(selectedFunction);
       //String selectedFunction = (String) list.getSelectedValue();
       // log print
       // System.out.println("selectedfunction " + selectedFunction + " new key: " + newKey);
       bindHM.put(selectedFunction, newKey);
+      //table.setValueAt(newKey, );
     }
   }
 
@@ -240,7 +242,8 @@ class KeyBindingsDialog
     //list.getModel().addListDataListener(new MyListDataListener());
 
     // This method is called each time the user changes the set of selected items
-    list.addListSelectionListener(new MyListSelectionListener());
+    //list.addListSelectionListener(new MyListSelectionListener());
+
     DefaultListModel listModel = new DefaultListModel();
     TreeMap sorted = new TreeMap(bindHM);
     Iterator it = sorted.keySet().iterator();
@@ -251,13 +254,14 @@ class KeyBindingsDialog
       tableData[i][0] = s;
       tableData[i][1] = (String) bindHM.get(s);
       i++;
-      listModel.addElement(s + " (" + bindHM.get(s) + ")");
-    }
-    table = new JTable(tableData, new String[] {Globals.lang("Action"),
-                       Globals.lang("Shortcut")}) {
+      //listModel.addElement(s + " (" + bindHM.get(s) + ")");
+   }
+
+    tableModel = new KeystrokeTableModel(tableData);
+    table = new JTable(tableModel) {
       public boolean isCellEditable(int row, int col) { return false; }
     };
-    table.setCellSelectionEnabled(false);
+    //table.setCellSelectionEnabled(false);
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(false);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -265,6 +269,30 @@ class KeyBindingsDialog
     //list.setModel(listModel);
 
     table.setRowSelectionInterval(0, 0); //select the first entry
+  }
+
+  class KeystrokeTableModel extends AbstractTableModel {
+    String[][] data;
+    public KeystrokeTableModel(String[][] tableData) {
+      data = tableData;
+    }
+    public boolean isCellEditable(int row, int col) { return false; }
+    public String getColumnName(int col) {
+      return (col==0 ? Globals.lang("Action") : Globals.lang("Shortcut"));
+    }
+    public int getColumnCount() {
+      return 2;
+    }
+
+    public int getRowCount() {
+      return data.length;
+    }
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      return data[rowIndex][columnIndex];
+    }
+    public void setValueAt(Object o, int row, int col) {
+      data[row][col] = (String)o;
+    }
   }
 
   // listners
@@ -286,11 +314,11 @@ class KeyBindingsDialog
     });
     defB.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Object[] selected = list.getSelectedValues();
+        /*Object[] selected = list.getSelectedValues();
         if (selected.length == 0) {
           return;
         }
-        keyTF.setText(setToDefault( (String) list.getSelectedValue()));
+        keyTF.setText(setToDefault( (String) list.getSelectedValue()));*/
       }
     });
 
