@@ -1061,14 +1061,15 @@ public JabRefPreferences prefs() {
     }
   }
 
-  protected ParserResult loadDatabase(File fileToOpen) throws IOException {
-    // Temporary (old method):
-    //FileLoader fl = new FileLoader();
-    //BibtexDatabase db = fl.load(fileToOpen.getPath());
-
-    BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));
-    ParserResult pr = bp.parse();
-    return pr;
+  public void addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
+    BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
+    tabbedPane.add(file.getName(), bp);
+    if (raisePanel) {
+      tabbedPane.setSelectedComponent(bp);
+    }
+    if (tabbedPane.getTabCount() == 1) {
+      setNonEmptyState();
+    }
   }
 
   class SelectKeysAction
@@ -1232,7 +1233,7 @@ public JabRefPreferences prefs() {
           prefs.put("workingDirectory", fileToOpen.getPath());
           // Should this be done _after_ we know it was successfully opened?
 
-          ParserResult pr = loadDatabase(fileToOpen);
+          ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen);
           BibtexDatabase db = pr.getDatabase();
           HashMap meta = pr.getMetaData();
 
@@ -1258,7 +1259,7 @@ public JabRefPreferences prefs() {
 
         }
         catch (Throwable ex) {
-	    ex.printStackTrace();
+            ex.printStackTrace();
           JOptionPane.showMessageDialog
               (ths, ex.getMessage(),
                Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);

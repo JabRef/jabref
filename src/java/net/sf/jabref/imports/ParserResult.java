@@ -27,12 +27,14 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.imports;
 
 import java.util.HashMap;
+import java.io.File;
 import net.sf.jabref.*;
 
 public class ParserResult {
 
     private BibtexDatabase base;
     private HashMap metaData;
+    private File file = null;
 
     public ParserResult(BibtexDatabase base, HashMap metaData) {
 	this.base = base;
@@ -45,6 +47,14 @@ public class ParserResult {
 
     public HashMap getMetaData() {
 	return metaData;
+    }
+
+    public File getFile() {
+      return file;
+    }
+
+    public void setFile(File f) {
+      file = f;
     }
 
 }

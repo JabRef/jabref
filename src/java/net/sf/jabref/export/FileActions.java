@@ -136,7 +136,6 @@ public class FileActions
         boolean checkGroup) throws SaveException
     {
         BibtexEntry be = null;
-
         try
         {
 	    initFile(file, prefs.getBoolean("backup"));

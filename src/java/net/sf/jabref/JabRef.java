@@ -29,6 +29,10 @@ import java.io.File;
 import java.awt.Font;
 import java.awt.Color;
 import javax.swing.*;
+import net.sf.jabref.imports.*;
+import java.io.*;
+import java.util.*;
+import net.sf.jabref.export.*;
 //import javax.swing.UIManager;
 //import javax.swing.UIDefaults;
 //import javax.swing.UnsupportedLookAndFeelException;
@@ -37,13 +41,29 @@ public class JabRef {
 
     public static void main(String[] args) {
 
-      SplashScreen ss = new SplashScreen();
-      ss.show();
+      // First we quickly scan the command line parameters for any that signal that the GUI
+      // should not be opened. This is used to decide whether we should show the splash screen or not.
+      boolean openGui = true;
+      if (args.length > 0) for (int i=0; i<args.length; i++) {
+        if (args[i].startsWith("-o"))
+          openGui = false;
+        if (args[i].equals("-h")) {
+          System.out.println("Help info goes here.");
+          System.exit(0);
+        }
+      }
+
+      SplashScreen ss = null;
+      if (openGui) {
+        ss = new SplashScreen();
+        ss.show();
+      } else
+        Util.pr("JabRef "+GUIGlobals.version);
 
 	//Font fnt = new Font("plain", Font.PLAIN, 12);
 	Object fnt = new UIDefaults.ProxyLazyValue
 	    ("javax.swing.plaf.FontUIResource", null,
-	     new Object[] {"plain", new Integer(Font.PLAIN), new Integer(12)});
+	     new Object[] {"Arial", new Integer(Font.PLAIN), new Integer(12)});
 
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
@@ -110,28 +130,83 @@ public class JabRef {
 	     prefs.getInt("fontSize"));
 
 
-	JabRefFrame jrf = new JabRefFrame();
-        ss.dispose();
-        jrf.setVisible(true);
+        // Basic command line interpretation...
+        Vector loaded = new Vector();
 
-	if(args.length > 0){
-	    System.out.println("Opening: " + args[0]);
-	    jrf.output("Opening: " + args[0]);
-	    //verify the file
-	    File f = new File (args[0]);
+	if(args.length > 0) for (int i=0; i<args.length; i++) {
+          if (!args[i].startsWith("-")) {
+            // Load a bibtex file:
+            System.out.println(Globals.lang("Opening")+": " + args[i]);
+            try {
+              File file = new File(args[i]);
+              ParserResult pr = ImportFormatReader.loadDatabase(file);
+              pr.setFile(file);
+              loaded.add(pr);
+            } catch (IOException ex) {
+              System.err.println(Globals.lang("Error opening file")+" '"+ args[i]+"': "+ex.getMessage());
+            }
 
-	    if( f.exists() && f.canRead() && f.isFile()) {
-		jrf.fileToOpen=f;
-		jrf.openDatabaseAction.openIt(true);
-	    }else{
-		System.err.println("Error" + args[0] + " is not a valid file or is not readable");
-		//JOptionPane...
-	    }
+            /*jrf.output("Opening: " + args[i]);
+            //verify the file
+            File f = new File (args[i]);
+            if( f.exists() && f.canRead() && f.isFile()) {
+              jrf.fileToOpen=f;
+              jrf.openDatabaseAction.openIt(true);
+              base = jrf.basePanel().database();
+            }else{
+              System.err.println("Error" + args[i] + " is not a valid file or is not readable");
+              //JOptionPane...
+            }*/
+          } else {
+            // A command line switch.
+            if (args[i].startsWith("-i") && (args[i].length() > 3) && (args.length > i+1)) {
+              // Import a database in a certain format.
+              try {
+                System.out.println(Globals.lang("Importing")+": " + args[i+1]);
+                BibtexDatabase base = ImportFormatReader.importFile(args[i].substring(3, args[i].length()), args[i+1]);
+                ParserResult pr = new ParserResult(base, new HashMap());
+                pr.setFile(new File(args[i+1]));
+                loaded.add(pr);
+              } catch (IOException ex) {
+                System.err.println(Globals.lang("Error opening file")+" '"+ args[i+1]+"': "+ex.getMessage());
+              }
+              i++;
+            }
+            else if (args[i].equals("-o") && (args.length > i+1)) {
+              // This signals that the latest import should be stored in BibTeX format to the given file.
 
+              if (loaded.size() > 0) {
+                ParserResult pr = (ParserResult)loaded.elementAt(loaded.size()-1);
+                try {
+                  System.out.println(Globals.lang("Saving")+": "+args[i+1]);
+                  FileActions.saveDatabase(pr.getDatabase(),
+                                           new MetaData(pr.getMetaData()),
+                                           new File(args[i+1]),
+                                           prefs, false, false);
+                } catch (SaveException ex) {
+                  System.err.println(Globals.lang("Could not save file")+" '"+ args[i+1]+"': "+ex.getMessage());
+                }
+              } else System.err.println(Globals.lang("The -o option must be preceded by an import option."));
+              i++;
+            }
+          }
 
 	}else{//no arguments (this will be for later and other command line switches)
 	    // ignore..
 	}
+
+
+        if (openGui) {
+          JabRefFrame jrf = new JabRefFrame();
+
+          if (loaded.size() > 0) for (int i=0; i<loaded.size(); i++) {
+            ParserResult pr = (ParserResult)loaded.elementAt(i);
+            jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i==0));
+          }
+          ss.dispose();
+          jrf.setVisible(true);
+        } else System.exit(0);
+
       }
 
 }

@@ -164,7 +164,7 @@ public class GUIGlobals {
       doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif"),
-      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png");
+      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash2.png");
 
 
 // Help files (in HTML format):

@@ -747,7 +747,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                     prefs.put("workingDirectory", fileToOpen.getPath());
                     // Should this be done _after_ we know it was successfully opened?
 
-                    ParserResult pr = frame.loadDatabase(fileToOpen);
+                    ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen);
                     BibtexDatabase db = pr.getDatabase();
                     MetaData meta = new MetaData(pr.getMetaData());
                     NamedCompound ce = new NamedCompound("Append database");
@@ -1072,7 +1072,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
 	try {
 	    if (!selectedOnly)
-		FileActions.saveDatabase(database, metaData, file,
+              FileActions.saveDatabase(database, metaData, file,
 					 prefs, false, false);
 	    else
 		FileActions.savePartOfDatabase(database, metaData, file,

@@ -181,10 +181,10 @@ class AutoGroupDialog extends JDialog {
 	cancel.addActionListener(cancelAction);
 	ok.addActionListener(okListener);
 
-	// Key bindings:
-	ActionMap am = main.getActionMap();
-	InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	im.put(frame.prefs().getKey("Close dialog"), "close");
+        // Key bindings:
+        ActionMap am = main.getActionMap();
+        InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(frame.prefs().getKey("Close dialog"), "close");
 	am.put("close", cancelAction);
 
 

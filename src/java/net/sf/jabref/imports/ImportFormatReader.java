@@ -800,7 +800,7 @@ public class ImportFormatReader
         parserFactory.setNamespaceAware(true);
 
         // Now create a SAXParser object
-        ArrayList bibItems=null;
+        ArrayList bibItems= new ArrayList();
         try{
             SAXParser parser = parserFactory.newSAXParser();   //May throw exceptions
             BibTeXMLHandler handler = new BibTeXMLHandler();
@@ -1104,7 +1104,67 @@ public class ImportFormatReader
   return bibitems;
 }
 
+public static ParserResult loadDatabase(File fileToOpen) throws IOException {
+  // Temporary (old method):
+  //FileLoader fl = new FileLoader();
+  //BibtexDatabase db = fl.load(fileToOpen.getPath());
 
+  BibtexParser bp = new BibtexParser(new FileReader(fileToOpen));
+  ParserResult pr = bp.parse();
+  return pr;
+}
+
+public static BibtexDatabase importFile(String format, String filename) throws IOException {
+  BibtexDatabase database = null;
+  ArrayList bibentries = null;
+  File f = new File(filename);
+  if (!f.exists())
+    throw new IOException(Globals.lang("File not found")+": "+filename);
+
+  if (format.equals("endnote"))
+    bibentries = readEndnote(filename);
+  else if (format.equals("medline"))
+    bibentries = fetchMedline(filename);
+  else if (format.equals("biblioscape"))
+    bibentries = readBiblioscapeTagFile(filename);
+  else if (format.equals("sixpack"))
+    bibentries = readSixpack(filename);
+  else if (format.equals("bibtexml"))
+    bibentries = readBibTeXML(filename);
+  else if (format.equals("inspec"))
+    bibentries = readINSPEC(filename);
+  else if (format.equals("isi"))
+    bibentries = readISI(filename);
+  else if (format.equals("ovid"))
+    bibentries = readOvid(filename);
+  else if (format.equals("refmanager"))
+    bibentries = readReferenceManager10(filename);
+  else if (format.equals("scifinder"))
+    bibentries = readScifinder(filename);
+  else
+    throw new IOException(Globals.lang("Could not resolve import format")+" '"+format+"'");
+
+  if (bibentries == null)
+    throw new IOException(Globals.lang("Import failed"));
+
+    // Add entries to database.
+    database = new BibtexDatabase();
+  Iterator it = bibentries.iterator();
+  while (it.hasNext()) {
+    BibtexEntry entry = (BibtexEntry) it.next();
+    try {
+      entry.setId(Util.createNeutralId());
+      database.insertEntry(entry);
+    }
+    catch (KeyCollisionException ex) {
+      //ignore
+      System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+    }
+  }
+
+
+  return database;
+}
 
 
 

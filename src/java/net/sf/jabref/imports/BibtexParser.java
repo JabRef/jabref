@@ -283,8 +283,19 @@ public class BibtexParser
         skipWhitespace();
         consume('=');
 	String content = parseFieldContent();
-	if (content.length() > 0)
-	    entry.setField(key, content);
+	if (content.length() > 0) {
+          if (entry.getField(key) == null)
+            entry.setField(key, content);
+          else {
+            // The following hack enables the parser to deal with multiple author or
+            // editor lines, stringing them together instead of getting just one of them.
+            // Multiple author or editor lines are not allowed by the bibtex format, but
+            // at least one online database exports bibitex like that, making it inconvenient
+            // for users if JabRef didn't accept it.
+            if (key.equals("author") || key.equals("editor"))
+              entry.setField(key, entry.getField(key)+" and "+content);
+          }
+        }
     }
 
     private String parseFieldContent() throws IOException

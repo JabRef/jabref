@@ -43,6 +43,7 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
+    //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
     public static Locale locale;
     public static final String FILETYPE_PREFS_EXT = "_dir",
 	SELECTOR_META_PREFIX = "selector_",
@@ -108,20 +109,21 @@ public class Globals {
 	javax.swing.JComponent.setDefaultLocale(locale);
     }
 
+
     public static String lang(String key){
 	String translation=null;
-	try{
-	    if(Globals.messages!=null)
-	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
-	}catch(MissingResourceException ex){
-	    translation= key;
+        try{
+            if(Globals.messages!=null)
+            translation=Globals.messages.getString(key.replaceAll(" ","_"));
+        }catch(MissingResourceException ex){
+            translation= key;
 
-	    System.err.println("Warning: could not get translation for \""
-	    	       + key +"\"");
-	}
-	if(translation!=null)
-	return translation.replaceAll("_"," ");
-	else return null;
+            System.err.println("Warning: could not get translation for \""
+                           + key +"\"");
+        }
+        if(translation!=null)
+        return translation.replaceAll("_"," ");
+        else return null;
     }
     //============================================================
     // Using the hashmap of entry types found in BibtexEntryType

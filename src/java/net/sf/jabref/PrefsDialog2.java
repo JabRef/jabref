@@ -82,9 +82,16 @@ public class PrefsDialog2 extends JDialog {
 	    ok = new JButton(Globals.lang("Ok")),
 	    cancel = new JButton(Globals.lang("Cancel"));
 	ok.addActionListener(new OkAction());
-	cancel.addActionListener(new CancelAction());
+        CancelAction cancelAction = new CancelAction();
+	cancel.addActionListener(cancelAction);
 	lower.add(ok);
 	lower.add(cancel);
+
+        // Key bindings:
+        ActionMap am = tabbed.getActionMap();
+        InputMap im = tabbed.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(frame.prefs().getKey("Close dialog"), "close");
+	am.put("close", cancelAction);
 
 	pack(); //setSize(440, 500);
     }
