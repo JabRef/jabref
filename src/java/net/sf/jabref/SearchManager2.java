@@ -303,9 +303,19 @@ settings.add(select);
 	    SearchRuleSet searchRules = new SearchRuleSet() ;
 	    SearchRule rule1;
 	    if (prefs.getBoolean("regExpSearch"))
-		rule1 = new RegExpRule(prefs);
+	        rule1 = new RegExpRule(
+                    prefs.getBoolean("caseSensitiveSearch"),
+                    prefs.getBoolean("searchAll"),
+                    prefs.getBoolean("searchReq"),
+                    prefs.getBoolean("searchOpt"),
+                    prefs.getBoolean("searchGen"));
 	    else
-		rule1 = new SimpleSearchRule(prefs);
+	        rule1 = new SimpleSearchRule(
+                    prefs.getBoolean("caseSensitiveSearch"),
+                    prefs.getBoolean("searchAll"),
+                    prefs.getBoolean("searchReq"),
+                    prefs.getBoolean("searchOpt"),
+                    prefs.getBoolean("searchGen"));
 
 		try {
 			// JZ: for testing; this does the new search if the
