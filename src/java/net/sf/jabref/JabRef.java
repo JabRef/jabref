@@ -439,6 +439,7 @@ public class JabRef {
       // If we are not on Mac, deal with font sizes and LookAndFeels:
       if (!Globals.ON_MAC) {
 	  int fontSizes = prefs.getInt("menuFontSize");
+          
 	  String defaultLookAndFeel;
 	  if (Globals.ON_WIN)
 	      defaultLookAndFeel = GUIGlobals.windowsDefaultLookAndFeel;
@@ -475,6 +476,7 @@ public class JabRef {
 	  
 	  // Set font sizes if we are using a JGoodies look and feel.
 	  if ((lnf != null) && (lnf instanceof PlasticLookAndFeel)) {
+              
 	      PlasticLookAndFeel plLnf = (PlasticLookAndFeel)lnf;
 	      plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
 	      MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());

@@ -220,6 +220,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         // The action for saving a database.
         actions.put("save", new BaseAction() {
                 public void action() throws Throwable {
+                    
                     if (file == null)
                         runCommand("saveAs");
                     else {
@@ -261,7 +262,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                       //Util.pr("Testing resolve string... BasePanel line 237");
                       //Util.pr("Resolve aq: "+database.resolveString("aq"));
                       //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
-
+    
                       try {
                         Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
                       } catch (IllegalArgumentException ex) {
@@ -299,6 +300,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                          == JOptionPane.OK_OPTION)) {
 
                       runCommand("save");
+                      
                       // Register so we get notifications about outside changes to the file.
                       try {
                         fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(ths,file);
@@ -1323,7 +1325,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
             else try {
               ( (BaseAction) actions.get(command)).action();
             } catch (Throwable ex) {
-
+                ex.printStackTrace();
             }
       //  }
       //}).start();

@@ -1,6 +1,6 @@
 
-JabRef 1.6b
------------
+JabRef 1.6 beta
+---------------
 
 
 Introduction:
@@ -86,6 +86,9 @@ appear in your chosen languages.
 
 Change log:
 1.6b:	- Added mnemonic keys to menus and menu items.
+        - Added MODS and tab-separated file export
+        - Added facility for detecting and handling external changes to open bib files.
+        - Added scan option for exact duplicates with automatic removal.
         - Bibtex strings are now sorted automatically.
         - Bibtex strings are now resolved when exporting database.
         - Fixed PDF/PS view routine to remove problems with filenames

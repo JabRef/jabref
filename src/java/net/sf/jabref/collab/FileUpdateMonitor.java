@@ -65,6 +65,7 @@ public class FileUpdateMonitor extends Thread {
    * @throws IOException if the file does not exist.
    */
   public String addUpdateListener(FileUpdateListener ul, File file) throws IOException {
+     // System.out.println(file.getPath());
     if (!file.exists())
       throw new IOException("File not found");
     no++;
@@ -80,7 +81,8 @@ public class FileUpdateMonitor extends Thread {
     public boolean hasBeenModified(String handle) throws IllegalArgumentException {
 	Object o = entries.get(handle);
 	if (o == null)
-	    throw new IllegalArgumentException("Entry not found");
+            return false;
+        //	    throw new IllegalArgumentException("Entry not found");
 	try {
 	    return ((Entry)o).hasBeenUpdated();
 	} catch (IOException ex) {
