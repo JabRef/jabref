@@ -1,0 +1,208 @@
+package net.sf.jabref.mods;
+import net.sf.jabref.*;
+import net.sf.jabref.export.layout.format.*;
+import net.sf.jabref.export.layout.*;
+
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+import org.w3c.dom.*;
+import java.util.*;
+import java.io.*;
+/**
+ * @author Michael Wrighton
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class MODSEntry {
+	protected String id;
+	protected List authors = null;
+	protected List editors = null;
+	// should really be handled with an enum
+	protected String issuance = "monographic";
+	
+	protected String publisher = null;
+	protected String date = null;
+	protected String place = null;
+	
+	protected String title = null;
+	// should really be handled with an enum
+	protected String type = "text";
+	protected String genre = null;
+	
+	public MODSEntry(BibtexEntry bibtex) {
+		populateFromBibtex(bibtex);
+	}
+	
+	protected void populateFromBibtex(BibtexEntry bibtex) {
+		LayoutFormatter chars = new XMLChars();
+		if (bibtex.getField("title") != null)
+			title = chars.format(bibtex.getField("title").toString());
+		
+		if (bibtex.getField("publisher") != null)
+			publisher = chars.format(bibtex.getField("publisher").toString());
+		if (bibtex.getField("bibtexkey") != null)
+			id = bibtex.getField("bibtexkey").toString();
+		if (bibtex.getField("place") != null)
+			place = chars.format(bibtex.getField("place").toString());
+		date = getDate(bibtex);	
+		genre = getMODSgenre(bibtex);
+		if (bibtex.getField("author") != null)
+			authors = getAuthors(bibtex.getField("author").toString());
+	}
+	
+	protected List getAuthors(String authors) {
+		List result = new LinkedList();
+		LayoutFormatter chars = new XMLChars();
+		
+		if (authors.indexOf(" and ") == -1)
+          result.add(new PersonName(chars.format(authors)));
+        else
+        {
+            String[] names = authors.split(" and ");
+            for (int i=0; i<names.length; i++)
+              result.add(new PersonName(chars.format(names[i])));
+        }
+		return result;
+	}
+	
+	/* construct a MODS date object */
+	protected String getDate(BibtexEntry bibtex) {
+		String result = "";
+		if (bibtex.getField("year") != null)
+			result += (bibtex.getField("year").toString());
+		if (bibtex.getField("month") != null)
+			result += "-" + bibtex.getField("month").toString();
+		
+		return result.toString();
+	}
+	// must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
+	protected String getMODSgenre(BibtexEntry bibtex) {
+		String bibtexType = bibtex.getType().toString();
+		String result;
+		if (bibtexType.equals("Mastersthesis"))
+			result = "theses";
+		else
+			result = "conference publication";
+		// etc...
+		return bibtexType;		
+	}
+	
+	public Document getDOMrepresentation() {
+		Document result = null;
+		try {
+			DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			
+		//	result = getDOMrepresentation(d);
+		}
+		catch (Exception e) 
+		{
+			throw new Error(e);
+		}
+		return result;
+	}
+		
+	
+	public Node getDOMrepresentation(Document d) {
+		Node result = null;
+	   	try {
+	   		Element mods = d.createElement("mods");
+	   		mods.setAttribute("version", "3.0");
+	   		mods.setAttribute("xmlns:xlink:", "http://www.w3.org/1999/xlink");
+	   		mods.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+	   		mods.setAttribute("xsi:schemaLocation", "http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
+	   		mods.setAttribute("ID", id);
+	   		// title
+			Element titleInfo = d.createElement("titleInfo");
+	   		Element mainTitle = d.createElement("title");
+	   		mainTitle.setTextContent(title);
+	   		titleInfo.appendChild(mainTitle);
+	   		mods.appendChild(titleInfo);
+	   		if (authors != null) {
+	   			for(Iterator iter = authors.iterator(); iter.hasNext();) {
+	   				PersonName name = (PersonName) iter.next();
+	   				Element modsName = d.createElement("name");
+	   				modsName.setAttribute("type", "personal");
+	   				if (name.getSurname() != null) {
+	   					Element namePart = d.createElement("namePart");
+	   					namePart.setAttribute("type", "family");
+	   					namePart.setTextContent(name.getSurname());
+	   					modsName.appendChild(namePart);
+	   				}
+	   				if (name.getGivenNames() != null) {
+	   					Element namePart = d.createElement("namePart");
+	   					namePart.setAttribute("type", "given");
+	   					namePart.setTextContent(name.getGivenNames());
+	   					modsName.appendChild(namePart);
+	   				}
+	   				Element role = d.createElement("name");
+	   				Element roleTerm = d.createElement("roleTerm");
+	   				roleTerm.setAttribute("type", "text");
+	   				roleTerm.setTextContent("author");
+	   				role.appendChild(roleTerm);
+	   				modsName.appendChild(role);
+	   				mods.appendChild(modsName);
+	   			}
+	   		}
+	   		//publisher
+	   		Element originInfo = d.createElement("originInfo");
+	   		mods.appendChild(originInfo);
+	   		if (this.publisher != null) {
+	   			Element publisher = d.createElement("publisher");
+				publisher.setTextContent(this.publisher);
+	   			originInfo.appendChild(publisher);
+	   		}
+	   		if (date != null) {
+	   			Element dateIssued = d.createElement("dateIssued");
+	   			dateIssued.setTextContent(date);
+	   			originInfo.appendChild(dateIssued);
+	   		}
+	   		Element issuance = d.createElement("issuance");
+	   		issuance.setTextContent(this.issuance);
+	   		originInfo.appendChild(issuance);
+	   		
+	   		Element idref = d.createElement("identifier");
+	   		idref.setTextContent(id);
+	   		mods.appendChild(idref);
+	   		
+	   		Element typeOfResource = d.createElement("typeOfResource");
+	   		typeOfResource.setTextContent(type);
+	   		mods.appendChild(typeOfResource);
+	   		
+	   		if (genre != null) {
+	   			Element genreElement = d.createElement("genre");
+	   			genreElement.setAttribute("authority", "marc");
+	   			genreElement.setTextContent(genre);
+	   			mods.appendChild(genreElement);
+	   		}
+	   		return mods;
+	   	}
+	   	catch (Exception e)
+		{
+	   		System.out.println("Exception caught..." + e);
+	   		e.printStackTrace();
+		}
+	   	return result;
+	   }
+	
+	/*
+	 * render as XML
+	 */
+	public String toString() {
+		StringWriter sresult = new StringWriter();
+	   	try {
+	      	 DOMSource source = new DOMSource(getDOMrepresentation());
+	      	 StreamResult result = new StreamResult(sresult);
+	      	 Transformer trans = TransformerFactory.newInstance().newTransformer();
+	      	 trans.setOutputProperty(OutputKeys.INDENT, "yes");
+	      	 trans.transform(source, result);
+	      	}
+	      	catch (Exception e) {
+	      		throw new Error(e);
+	      	}
+	      return sresult.toString();
+	}
+
+}
