@@ -223,7 +223,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                         runCommand("saveAs");
                     else {
 
-                      if (updatedExternally) {
+                      if (Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
                         int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
                             +"Are you sure you want to save?"), Globals.lang("File updated externally"),
                                                                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);

@@ -13,7 +13,7 @@ import java.util.Iterator;
  */
 public class FileUpdateMonitor extends Thread {
 
-  final int WAIT = 5000;
+  final int WAIT = 4000;
   static int tmpNum = 0;
   int no = 0;
   HashMap entries = new HashMap();
@@ -72,6 +72,22 @@ public class FileUpdateMonitor extends Thread {
     entries.put(key, new Entry(ul, file));
     return key;
   }
+
+    /**
+     * Forces a check on the file, and returns the result. Does not
+     * force a report to all listeners before the next routine check.
+     */
+    public boolean hasBeenModified(String handle) throws IllegalArgumentException {
+	Object o = entries.get(handle);
+	if (o == null)
+	    throw new IllegalArgumentException("Entry not found");
+	try {
+	    return ((Entry)o).hasBeenUpdated();
+	} catch (IOException ex) {
+	    // Thrown if file has been removed. We return false.
+	    return false;
+	}
+    }
 
   /**
    * Removes a listener from the monitor.
