@@ -1,0 +1,163 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Utilisation des <em>Groupes</em></H1>
+<em>Cette fonction est accessible depuis l'interface des groupes du panneau latéral.
+L'interface des groupes peut être activée et désactivée en appuyant sur CTRL-SHIFT-G.
+[NdT: mais aussi par le menu Affichage ainsi que par un icône de la barre d'outils]</em>
+
+<p>Les <em>Groupes</em> sont une fonction qui permet d'organiser votre base
+de données <em>BibTeX</em> en groupes logiques. Les groupes sont implémentés
+d'une manière très simple&nbsp;: une fois que vous avez sélectionné un ou plusieurs
+groupes, JabRef traite un champ par entrée (ce champ est configuré dans la définition des
+groupes) et vérifie s'il contient l'expression régulière du groupe [NdT: pas très clair...],
+puis vous affiche soit les entrées appartenant aux groupes sélectionnés
+(intersection de groupes), soit les entrées appartenant à n'importe
+lequel des groupes sélectionnés (union de groupes).
+
+<p>Le choix <em>Toutes les entrées</em> sera toujours en tête de la liste
+des groupes. Cliquez sur ce choix pour désélectionner les autres groupes.
+Vos groupes sélectionnés seront aussi désélectionnés si vous fermez
+l'interface des groupes.
+
+<p>Puisque vos définitions de groupes seront spécifiques à chaque base
+de données, elles sont sauvegardées dans votre fichier .bib. Cette
+information sera incluse dans un bloc @COMMENT de BibTeX 
+qui sera alors ignoré par le programme <em>BibTeX</em>.
+Changer le contenu de ce bloc manuellement pourrait (bien entendu)
+causer la perte ou la modification de vos définitions de groupes.
+
+<H2>Différentes façons d'utiliser les <em>groupes</em></H2>
+
+<p>La fonction Groupes pourrait sembler un peu déroutante
+au début. Elle est construite de façon à assurer autant
+de flexibilité que possible&nbsp;: 
+
+<p>Si vous voulez que vos groupes soient clairs et simples, vous pouvez
+définir vos groupes en utilisant un nom de champ non-standard, tel
+que 'supersnill' [NdT: supersnill?] ou n'importe quoi d'autre, et simplement utiliser
+les fonctions <em>Ajouter au groupe</em> et <em>Supprimer du groupe</em>
+pour assigner des entrées à ces groupes.
+
+<p>Cependant, si votre base de données possède déjà des mots-clefs
+pertinents, vous pourriez vouloir définir certains groupes en
+utilisant le champ 'keywords'. Votre base de données peut
+alors être groupée pour vous.
+
+<p>Une troisième option est de définir certains groupes à partir
+de champs habituels - par exemple, pour définir des recherches
+rapides sur des auteurs particuliers et importants pour
+votre travail. Si vous faîtes cela, vous devrez éviter d'utiliser
+les fonctions <em>Ajouter au groupe</em> et <em>Supprimer du
+groupe</em>, puisque vous ne voulez probablement pas que le champ
+soit modifié. Un avertissement sera affiché si vous tentez
+cette opération.
+
+<H2>Afficher et chercher dans les groupes</H2>
+
+<p>Pour voir les entrées d'un groupe, cliquez sur le nom du groupe.
+Quand l'interface des groupes est accessible au clavier, vous
+pouvez naviguer entre les groupes en utilisant les flèches du
+clavier HAUT et BAS. En utilisant MAJ et CONTROL, vous pouvez
+sélectionner plusieurs groupes à la fois. Les menus cochables
+<em>Intersection</em> et <em>Union</em> déterminent la façon
+dont une sélection de plusieurs groupes est traitée [NdT: Quid
+des autres éléments du menu Paramètres ?].
+ 
+<p>Notez qu'afficher un groupe est en fait une action
+similaire à une recherche. Cela signifie que si vous ajoutez 
+de nouvelles entrées à un groupe, vous devrez mettre à jour
+la recherche afin que les entrées soient affichées comme faisant
+partie du groupe. Par exemple, vous devrez resélectionner vos
+groupes actuels, ou cliquer sur le bouton <em>Rafraîchir
+la vue</em>.
+
+<p>La fonction Groupes peut être combinée avec les recherches
+ordinaires&nbsp;; toutes les recherches seront alors limitées
+aux entrées appartenant à votre sélection de groupes. Lorsqu'une
+recherche est active, vous pouvez naviguez entre les groupes ou
+affichez toutes les entrées&nbsp;; le tableau sera mis à jour
+pour montrer les correspondances à l'intérieur des groupes
+actuellement sélectionnés.
+
+<p>A tout moment, vous pouvez exporter une base de données
+<em>BibTeX</em> contenant uniquement les entrées appartenant
+aux groupes sélectionnés et/ou à la recherche en cours en 
+choisissant dans le menu <em>Fichier -> Sauvegarde spéciale</em>
+[NdT menu <em>Fichier -> Sauvegarder la sélection sous...</em>&nbsp;?].
+
+<H2>Créer un nouveau groupe</H2>
+
+<p>Pour définir un groupe, appuyer sur le bouton <em>Nouveau groupe</em> 
+dans l'interface des groupes. Une fenêtre de dialogue apparaît,
+à l'intérieur de laquelle vous pouvez entrer le nom du groupe,
+une expression régulière, et un nom de champ. Le nom du champ
+sera initialisé à une valeur par défaut qui peut être changée
+dans le menu <em>Options -> Préférences</em> [NdT: puis dans Général].
+Pour terminer la création de votre nouveau groupe, appuyez sur Entrée
+dans un des champs de texte, ou cliquez sur <em>Ok</em>. Pour quitter
+sans créer le groupe, appuyer sur ESCAPE ou cliquer sur <em>Annuler</em>.
+
+<H2>Modifier la définition d'un groupe existant</H2>
+
+<p>Pour modifier la définition d'un groupe existant, double-cliquez
+sur le nom du groupe dans l'interface des groupes, ou faites
+un clic droit sur son nom et choisissez <em>Editer le groupe</em>.
+La boîte de dialogue utilisée pour créer de nouveaux groupes 
+s'affichera, vous permettant de modifier le nom du groupe. Le nom
+de champ et l'expression régulière ne peuvent pas être modifiés
+après la création du groupe (cette restriction sera probablement
+levée une fois que nous aurons trouvé une méthode qui puisse
+mettre à jour les entrées de groupe pour vous, pour éviter que les 
+entrées ne sortent du groupe modifié [NdT: cela a l'air opérationnel à présent]).
+
+<H2>Ajouter des entrées à un groupe</H2>
+
+<p>L'appartenance d'une entrée à un groupe dépend de la correspondance entre
+l'expression régulière du groupe et le contenu du champ spécifié de cette entrée.
+Ainsi, pour ajouter une entrée à un groupe, vous devez simplement vous
+assurer que c'est le cas.
+
+<p>Au lieu d'éditer le champ manuellement, vous pouvez sélectionner
+les entrées que vous souhaitez ajouter, et faire un clic droit pour
+afficher le menu contextuel. Dans ce menu, choisissez
+<em>Ajouter au groupe</em> et sélectionner ensuite le groupe désiré&nbsp;;
+les entrées qui ne sont pas encore incluses dans le groupe seront
+ajoutées pour vous.
+
+<H2>Supprimer des entrées d'un groupe</H2>
+
+<p>Le principe utilisé pour l'ajout d'entrées s'applique pour
+les supprimer. Supprimez toutes correspondances pour l'expression
+régulière du groupe à partir du champ spécifié, ou utilisez la
+fonction <em>Supprimer du groupe</em>.
+
+<H2>Supprimer un groupe</H2>
+
+<p>Pour supprimer un groupe, faites un clic droit sur ce groupe et choisissez
+<em>Supprimez les groupes</em>. Une fenêtre vous demandera de confirmer
+votre action.
+
+<H2>Génération automatique des groupes</H2>
+
+<p>En cliquant sur le bouton <em>Créer automatiquement des groupes pour
+la base</em>, vous pouvez rapidement avoir une série de groupes
+appropriés pour votre base de données. Cette fonction va collecter
+tous les mots trouvés dans le champ que vous spécifiez et créer
+un groupe pour chaque mot. Ceci est utile par exemple si votre
+base de données contient des mots clefs pertinents pour toutes
+ses entrées. En générant automatiquement des groupes basés
+sur le champ <em>keywords</em>, vous devriez obtenir sans effort une
+série de groupes appropriés. 
+
+<p>Vous pouvez aussi spécifier des caractères à ignorer, par exemple
+les virgules utilisées entre les mots clefs. Ces caractères seront
+alors traités comme des séparateurs de mots et non comme faisant
+partie d'eux. Vous ne pouvez pas utiliser cette option pour
+supprimer des mots entiers.
+
+<p>La fonction d'autogénération sera améliorée par de futurs développements.
+
+</HTML> 
