@@ -27,12 +27,13 @@ public class SearchExpression implements SearchRule {
 		// parse search expression
 		SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(new StringReader(
 			searchOptions.elements().nextElement().toString()))); // supports only single entry
+		parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
 		parser.searchExpression(); // this is the "global" rule
 		ast = parser.getAST(); // remember abstract syntax tree
 	}
 	public int applyRule(Hashtable searchStrings, BibtexEntry bibtexEntry) {
 		try {
-			return treeParser.apply(prefs,ast,bibtexEntry);
+			return treeParser.apply(ast,bibtexEntry);
 		} catch (RecognitionException e) {
 			return 0; // this should never occur
 		}

@@ -27,11 +27,8 @@ public class SearchExpressionTreeParser extends antlr.TreeParser       implement
 
 	private BibtexEntry bibtexEntry;
 	private Object[] searchKeys;
-	// JabRefPreferences
-	private boolean caseSensitiveSearch = false;
 
-    public int apply(JabRefPreferences prefs, AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
-		this.caseSensitiveSearch = prefs.getBoolean("caseSensitiveSearch");
+    public int apply(AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
 		this.bibtexEntry = bibtexEntry;
 		// specification of fields to search is done in the search expression itself
 		this.searchKeys = bibtexEntry.getAllFields();
