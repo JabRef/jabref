@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -104,7 +106,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			importFetcherActive = false;
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
-			PropertyConfigurator.configure("src/resource/log4j.properties");
+			Properties properties = new Properties();
+			ResourceBundle bundle = ResourceBundle.getBundle("resource/log4j");			 
+			Enumeration enum = bundle.getKeys();
+			String key = null; 
+			while(enum.hasMoreElements()) {			  
+			    key = (String) enum.nextElement();
+			    properties.put(key, bundle.getObject(key));
+			}						
+			PropertyConfigurator.configure(properties);
+
 			citeseerHttpClient = new HttpClient();
 			if (System.getProperty("proxySet") != null) {
 				String proxyHost;
