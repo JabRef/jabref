@@ -133,8 +133,7 @@ public class JabRefFrame
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   prefs.getKey("Unmark entries")),
-       unmarkAll = new GeneralAction("unmarkAll", "Unmark all",
-                                   prefs.getKey("Unmark all")),
+       unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -296,7 +295,7 @@ public class JabRefFrame
          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     jp.setEditable(false);
     try {
-      jp.setPage(GUIGlobals.aboutPage);
+      jp.setPage(new URL("help/About.html"));//GUIGlobals.aboutPage);
       // We need a hyperlink listener to be able to switch to the license
       // terms and back.
       jp.addHyperlinkListener(new javax.swing.event.HyperlinkListener() {

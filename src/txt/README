@@ -1,6 +1,6 @@
 
-JabRef 1.2
------------
+JabRef 1.3
+----------
 
 
 Introduction:
@@ -11,7 +11,8 @@ logical groups, and with a single click limit your view to a single
 group or an intersection or union of several groups. You can customize
 the entry information shown in the main window, and sort by any of the
 standard Bibtex fields. JabRef can autogenerate bibtex keys for your
-entries. Most operations can be done without using the mouse.
+entries. JabRef also lets you easily link to PDF or web sources for your
+reference entries.
 
 
 License:
@@ -33,7 +34,7 @@ Kit.
 
 
 Installing and running:
-JabRef 1.2 is distributed as an executable .jar file. Run the
+JabRef 1.3 is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -66,16 +67,17 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added entry preview.
+1.3:	- Added entry preview.
 	- Added detection of duplicate entries.
       	- Added possibility to mark entries persistently.
-	[- Added keyboard shortcut customization.]
 	- Added import filter for Sixpack and Biblioscape Tag files.
-      	- Added option to use a standard directory for PDFs.
+      	- Added option to use a standard directory for PDFs. PDFs placed in or below this directory
+          and named after an entry's BibTeX key can be automatically found.
 	- Added menu and toolbar actions for open pdf/ps and url/doi.
 	- Added web lookup of DOI.
 	- Added several new special field markers to the key autogenerator.
       	- Added BibTeXML and simple HTML export.
+      	- Changed browsing of entries. Entry editor now shows the selected entry.
       	- Improved HTML export for several entry types.
       	- Improved compatibility with Mac OSX.
 	- Made it possible to set custom secondary and tertiary sort fields.

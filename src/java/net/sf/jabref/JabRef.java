@@ -81,6 +81,9 @@ public class JabRef {
 	//String osName = System.getProperty("os.name", "def");
 	if (!Globals.ON_MAC) {
           try {
+            //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
+            //new com.jgoodies.plaf.plastic.PlasticLookAndFeel();
+
             LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
             //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
             UIManager.setLookAndFeel(lnf);

@@ -92,9 +92,9 @@ public class Globals {
      */
     public static final String
 	KEY_FIELD = "bibtexkey",
-	SEARCH = "search",
-	GROUPSEARCH = "groupsearch",
-        MARKED = "markedentry",
+	SEARCH = "__search",
+	GROUPSEARCH = "__groupsearch",
+        MARKED = "__markedentry",
 	// Using this when I have no database open when I read
 	// non bibtex file formats (used byte ImportFormatReader.java
 		DEFAULT_BIBTEXENTRY_ID="__ID";
@@ -227,7 +227,7 @@ public class Globals {
                                             FilenameFilter filter) {
 
         FileDialog fc = new FileDialog(owner);
-        fc.setFilenameFilter(filter);
+        //fc.setFilenameFilter(filter);
         if (directory != null)
           fc.setDirectory(directory.getParent());
         if (dialogType == JFileChooser.OPEN_DIALOG)

@@ -111,7 +111,8 @@ public class GroupSelector extends SidePaneComponent
 	newButton.addActionListener(this);
 	refresh.addActionListener(this);
 	andCb.addActionListener(this);
-	orCb.addActionListener(this);
+        orCb.addActionListener(this);
+        invCb.addActionListener(this);
 	autoGroup.addActionListener(this);
 	newButton.setToolTipText(Globals.lang("New group"));
 	refresh.setToolTipText(Globals.lang("Refresh view"));
