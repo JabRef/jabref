@@ -28,6 +28,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 import java.util.*;
 import java.io.*;
+import java.net.*;
 import java.util.regex.*;
 import org.xml.sax.*; // for medline 
 import org.xml.sax.helpers.*;  //for medline
@@ -92,9 +93,9 @@ public class ImportFormatReader
 	for(int i=0; i<authors.length; i++){
 	    String[] t = authors[i].split(",");
 	    if(t.length < 2)
-		return in; // something went wrong
+		return in; // something went wrong or there is no "," 
 	    sb.append( t[1].trim() + " " + t[0].trim());
-	    if(i !=authors.length-1)
+	    if(i != authors.length-1 ) // put back the " and "
 		sb.append(" and ");
 	}
 	return sb.toString();
@@ -546,7 +547,7 @@ public class ImportFormatReader
 		    
 		    else if(lab.equals("A1") ||lab.equals("AU")){
 			val = val.substring(0,val.length()-1);
-			if( Author.equals(""))
+			if( Author.equals("")) // don't add " and " for the first author
 			    Author=val;
 			else
 			    Author += " and " + val;
@@ -566,17 +567,13 @@ public class ImportFormatReader
 
 		}
 	    }
-	    // fix authors	
-	    Author = fixAuthor(Author);    
-	    if( Author.indexOf(" and ") < 0)//single author has extra "." for some reason
-		try{
-		    hm.put("author", Author.substring(0,Author.length()-1));
-		}catch(java.lang.StringIndexOutOfBoundsException ex){
-
-		    //ignore
-		}
+	    // fix authors
+	    Author = fixAuthor(Author);
+	    if(Author.endsWith("."))
+		hm.put("author", Author.substring(0,Author.length()-1));
 	    else
-		hm.put("author",Author);
+		hm.put("author", Author);
+	    
 	    hm.put("pages",StartPage+"--"+EndPage);
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
@@ -613,6 +610,41 @@ public class ImportFormatReader
 	    MedlineHandler handler = new MedlineHandler();
 	    // Start the parser. It reads the file and calls methods of the handler.
 	    parser.parse(new File(filename), handler);
+	    // When you're done, report the results stored by your handler object
+	    bibItems = handler.getItems();
+	    
+	}
+	catch(javax.xml.parsers.ParserConfigurationException e1){}
+	catch(org.xml.sax.SAXException e2){}
+	catch(java.io.IOException e3){}
+	return bibItems;
+    }
+
+    //==================================================
+    //
+    //==================================================
+    static ArrayList fetchMedline(String id)
+    {
+
+	ArrayList bibItems=null;
+	try {
+
+	    String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" + id;
+
+	    URL url = new URL( baseUrl );
+	    HttpURLConnection data = (HttpURLConnection)url.openConnection();
+
+	    // Obtain a factory object for creating SAX parsers
+	    SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+	    // Configure the factory object to specify attributes of the parsers it creates
+	    parserFactory.setValidating(true);
+	    parserFactory.setNamespaceAware(true);
+	
+	    // Now create a SAXParser object
+	    SAXParser parser = parserFactory.newSAXParser();   //May throw exceptions
+	    MedlineHandler handler = new MedlineHandler();
+	    // Start the parser. It reads the file and calls methods of the handler.
+	    parser.parse( data.getInputStream(), handler);
 	    // When you're done, report the results stored by your handler object
 	    bibItems = handler.getItems();
 	    

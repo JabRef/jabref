@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.*;
 import java.net.URL;
-import java.util.regex.Matcher;
+import java.util.regex.*;
 
 /**
  * The main window of the application.
@@ -1085,19 +1085,38 @@ public class JabRefFrame extends JFrame {
 			importMenu.add( newISIFile_mItem);
 			
 	    //########################################			
-			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML"));//,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
+			JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang("Medline XML File"));
 			newMedlineFile_mItem.addActionListener(new ActionListener()
 			    {
 				public void actionPerformed(ActionEvent e)
 				{
 				    String tempFilename= getNewFile();
 				    if(tempFilename != null){
-					ArrayList bibs = ImportFormatReader.readMedline(tempFilename);//MedlineParser.readMedline(tempFilename);
+					ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
 					addBibEntries( bibs, tempFilename);	
 				    }
 				}
 			    });
 			importMenu.add(newMedlineFile_mItem);
+			//##############################
+ 			JMenuItem newMedlineId_mItem = new JMenuItem(Globals.lang("Medline Fetch By ID"));
+ 			newMedlineId_mItem.addActionListener(new ActionListener()
+ 			    {
+ 				public void actionPerformed(ActionEvent e)
+ 				{
+ 			   	    String idList = JOptionPane.showInputDialog(ths,"Enter a comma separated list of Medline ids","Fetch Medline Citation",JOptionPane.PLAIN_MESSAGE);
+ 		    		    Pattern p = Pattern.compile("\\d+[,\\d+]*");
+ 		    		    Matcher m = p.matcher( idList );
+ 				    if ( m.matches() ) {
+ 				        ArrayList bibs = ImportFormatReader.fetchMedline(idList);
+ 				        addBibEntries( bibs, idList );	
+ 				    } else {
+					JOptionPane.showMessageDialog(ths,"Sorry, I was expecting a comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
+				    }
+ 				}
+ 			    });
+ 			importMenu.add(newMedlineId_mItem);
+			
 	    //########################################			
 			JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Ovid"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
 			newOvidFile_mItem.addActionListener(new ActionListener() {
@@ -1151,7 +1170,7 @@ public class JabRefFrame extends JFrame {
 		// it should also do a check perhaps to see if
 		// file exists and is readable?
 		//
-		
+
 		public String getNewFile(){
 			JFileChooser fc;
 			if( prefs.get("workingDirectory")== null )
