@@ -46,6 +46,7 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.util.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import net.sf.jabref.gui.ImportInspectionDialog;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
@@ -1387,12 +1388,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         output("Storing.");
 		      }
 		      public void run() {
-                          try {
-                            OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File("/home/alver/export.sxc"), database);
-                          } catch (Exception ex) {
-                              ex.printStackTrace();
-                          }
+                  String[] fields = new String[] {"author", "title", "year"};
+                  ImportInspectionDialog diag = new ImportInspectionDialog(frame, ths, fields,
+                          "Add entries", false);
+                  Util.placeDialog(diag, frame);
+                  diag.setVisible(true);
+                  for (int i=0; i<entryTable.getRowCount(); i++) {
+                      try {
+                          Thread.sleep(200);
+                      } catch (InterruptedException e) {
+
                       }
+                      ArrayList entries = new ArrayList();
+                      entries.add(database.getEntryById(tableModel.getNameFromNumber(i)).clone());
+                      diag.addEntries(entries);
+                  }
+                  diag.entryListComplete();
+              }
                       
 		  });
 

@@ -935,7 +935,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    //edit.add(test);
+    edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -1930,7 +1930,10 @@ class FetchCiteSeerAction
                  (database.getEntryCount() - oldCount) + " " +
                  Globals.lang("entries into new database") + ".");
 
+
+
     }
+
   }
 
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {

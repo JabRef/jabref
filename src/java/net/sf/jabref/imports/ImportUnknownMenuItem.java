@@ -7,12 +7,17 @@ import java.io.File;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.AbstractWorker;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.gui.ImportInspectionDialog;
+
 import java.util.List;
 
-public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
+public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
+        ImportInspectionDialog.CallBack {
     
     JabRefFrame frame;
     boolean openInNew;
+    MyWorker worker = null;
 
     public ImportUnknownMenuItem(JabRefFrame frame, boolean openInNew) {
 	super(Globals.lang("Autodetect format"));
@@ -22,7 +27,7 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-	MyWorker worker = new MyWorker();
+	worker = new MyWorker();
 	worker.init();
 	worker.getWorker().run();
 	worker.getCallBack().update();
@@ -67,9 +72,20 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
 		return;
 	    
 	    if (entries != null) {
-		frame.addBibEntries(entries, filename, openInNew);
-		frame.output(Globals.lang("Imported entries")+": "+entries.size()
-			     +"  "+Globals.lang("Format used")+": "+formatName);
+            BasePanel panel = null;
+            if (!openInNew) {
+                panel = (BasePanel)frame.getTabbedPane().getSelectedComponent();
+            }
+            String[] fields = new String[] {"author", "title", "year" };
+            ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, fields,
+                    "Import", openInNew);
+            diag.addEntries(entries);
+            diag.addCallBack(ImportUnknownMenuItem.this);
+            diag.entryListComplete();
+            diag.setVisible(true);
+
+		    //frame.addBibEntries(entries, filename, openInNew);
+
 	    }
 	    else if (bibtexResult != null) {
 		frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), 
@@ -84,5 +100,12 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
 		frame.output(Globals.lang("Could not find a suitable import format."));
 	    frame.unblock();
 	}
+    }
+
+    public void done(int entriesImported) {
+        if (worker.entries != null) {
+            frame.output(Globals.lang("Imported entries")+": "+entriesImported
+    			     +"  "+Globals.lang("Format used")+": "+worker.formatName);
+        }
     }
 }
