@@ -325,6 +325,10 @@ public class EntryTableModel
     fields.add(frame.prefs.get("secSort"));
     fields.add(frame.prefs.get("terSort"));
 
+    // Remove the old sorter as change listener for the database:
+    if (sorter != null)
+	db.removeDatabaseChangeListener(sorter);
+
     // Then pick the three highest ranking ones, and go.
     if (directions.size() < 4) {
       sorter = db.getSorter(new EntryComparator(
