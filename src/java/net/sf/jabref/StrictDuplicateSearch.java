@@ -16,21 +16,14 @@ import java.util.Iterator;
  *
  * @author  alver
  */
-public class StrictDuplicateSearch extends JDialog implements Runnable {
+public class StrictDuplicateSearch extends Thread {
     
     BasePanel panel;
     
     /** Creates a new instance of StrictDuplicateSearch */
     public StrictDuplicateSearch(BasePanel bp) {
-        super(bp.frame, "Test", true);
         this.panel = bp;
         
-    }
-    
-    public void start() {
-        Thread tr = new Thread(this);
-        tr.start();
-        setVisible(true);
     }
     
     public void run() {
@@ -58,12 +51,20 @@ public class StrictDuplicateSearch extends JDialog implements Runnable {
             }
          }
     
-        panel.output(Globals.lang("Duplicates removed")+": "+toRemove.size());
         if (toRemove.size() == 0) {
+            panel.output(Globals.lang("No duplicates found")+".");
             return;
         }
-        
+               
         // Finished searching. Now, remove all entries scheduled for removal:
+        int answer = JOptionPane.showConfirmDialog(panel.frame(), Globals.lang("Duplicates found")+": "+
+            toRemove.size()+". "+Globals.lang("Remove all?"), Globals.lang("Remove duplicates"),
+            JOptionPane.OK_CANCEL_OPTION);
+        if (answer == JOptionPane.CANCEL_OPTION)
+            return;
+        
+        panel.output(Globals.lang("Duplicates removed")+": "+toRemove.size());
+        
         for (Iterator i=toRemove.iterator(); i.hasNext();) {
             BibtexEntry entry = (BibtexEntry)i.next();
             panel.database.removeEntry(entry.getId());        
@@ -72,7 +73,7 @@ public class StrictDuplicateSearch extends JDialog implements Runnable {
      
         ce.end();
         panel.undoManager.addEdit(ce);
-        dispose();
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {                
                 panel.markBaseChanged();
