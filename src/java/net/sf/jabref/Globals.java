@@ -166,6 +166,7 @@ public class Globals {
      */
   }
 
+
   //========================================================
   // lot of abreviations in medline
   // PKC etc convert to {PKC} ...
@@ -322,7 +323,7 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
     HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
     HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
-                
+
     HTML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&eacute;");
     HTML_CHARS.put("\\{\\\\\\'\\{E\\}\\}", "&Eacute;");
     HTML_CHARS.put("\\{\\\\\\'\\{i\\}\\}", "&iacute;");
@@ -367,13 +368,13 @@ public class Globals {
     HTMLCHARS.put("`O", "&Ograve;");
     HTMLCHARS.put("`u", "&ugrave;");
     HTMLCHARS.put("`U", "&Ugrave;");
-    HTMLCHARS.put("'e", "&eacute;");                                                      
+    HTMLCHARS.put("'e", "&eacute;");
     HTMLCHARS.put("'E", "&Eacute;");
     HTMLCHARS.put("'i", "&iacute;");
     HTMLCHARS.put("'I", "&Iacute;");
-    HTMLCHARS.put("'o", "&oacute;");                                                      
+    HTMLCHARS.put("'o", "&oacute;");
     HTMLCHARS.put("'O", "&Oacute;");
-    HTMLCHARS.put("'u", "&uacute;");                                                      
+    HTMLCHARS.put("'u", "&uacute;");
     HTMLCHARS.put("'U", "&Uacute;");
     HTMLCHARS.put("'a", "&aacute;");
     HTMLCHARS.put("'A", "&Aacute;");
@@ -386,12 +387,12 @@ public class Globals {
     HTMLCHARS.put("^i", "&icirc;");
     HTMLCHARS.put("^I", "&Icirc;");
     HTMLCHARS.put("~o", "&otilde;");
-    HTMLCHARS.put("~O", "&Otilde;");                                
+    HTMLCHARS.put("~O", "&Otilde;");
     HTMLCHARS.put("~n", "&ntilde;");
-    HTMLCHARS.put("~N", "&Ntilde;");                                
+    HTMLCHARS.put("~N", "&Ntilde;");
     HTMLCHARS.put("~a", "&atilde;");
-    HTMLCHARS.put("~A", "&Atilde;");                                
-    
+    HTMLCHARS.put("~A", "&Atilde;");
+
     HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
     HTML_CHARS.put("\\{\\\\\\\"e\\}", "&euml;");

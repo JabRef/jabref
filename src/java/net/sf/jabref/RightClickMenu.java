@@ -161,12 +161,12 @@ public class RightClickMenu extends JPopupMenu
      * types, and add them.
      */
     public void populateTypeMenu() {
-	typeMenu.removeAll();
-	for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
-	     i.hasNext();) {
-	    typeMenu.add(new ChangeTypeAction
-	    		 (BibtexEntryType.getType((String)i.next())));
-	}
+        typeMenu.removeAll();
+        for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+             i.hasNext();) {
+            typeMenu.add(new ChangeTypeAction
+                             (BibtexEntryType.getType((String)i.next()), panel));
+        }
     }
 
     /**
@@ -232,15 +232,16 @@ public class RightClickMenu extends JPopupMenu
     }
 
     class ChangeTypeAction extends AbstractAction {
-	BibtexEntryType type;
-	public ChangeTypeAction(BibtexEntryType type) {
-	    super(type.getName());
-	    this.type = type;
-	}
-	public void actionPerformed(ActionEvent evt) {
-	    panel.changeType(type);
-	}
+      BibtexEntryType type;
+      BasePanel panel;
 
-    }
-
+      public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {
+        super(type.getName());
+        this.type = type;
+        panel = bp;
+      }
+      public void actionPerformed(ActionEvent evt) {
+        panel.changeType(type);
+      }
+}
 }

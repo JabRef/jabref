@@ -36,6 +36,7 @@
   <!-- Set the properties for intermediate directory -->
     <property name="build.dir" value="build"/>
     <property name="build.classes" value="${build.dir}/classes"/>
+    <property name="build.osx" value="${build.dir}/classes/osxadapter"/>
     <property name="build.lib" value="${build.dir}/lib"/>
     <property name="build.bin" value="${build.dir}/bin"/>
     <property name="build.win" value="${build.dir}/windows"/>
@@ -43,7 +44,6 @@
         <property name="build.resource" value="${build.dir}/resource"/>
         <property name="build.help" value="${build.dir}/help"/>
         <property name="build.javadocs" value="${build.dir}/docs/API"/>
-        <property name="build.kunststoff.icons.dir" value="${build.classes}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for source directories -->
         <property name="src.dir" value="src"/>
@@ -55,7 +55,7 @@
             <property name="bin.dir" value="${src.dir}/scripts"/>
             <property name="images.dir" value="${src.dir}/images"/>
             <property name="help.dir" value="${src.dir}/help"/>
-            <property name="src.kunststoff.icons.dir" value="${java.dir}/com/incors/plaf/kunststoff/icons"/>
+
 
   <!-- Set the properties for library directories -->
             <property name="library.directory" value="lib" />
@@ -87,16 +87,9 @@
                 </classpath>
                 </javac>
 
-                <mkdir dir="${build.kunststoff.icons.dir}"/>
-                <copy todir="${build.kunststoff.icons.dir}">
-                    <fileset dir="${src.kunststoff.icons.dir}">
-                        <include name="*" />
-                    </fileset>
-                </copy>
-
             </target>
 
-  <!-- Compiles project -->
+  <!-- Builds the OSXAdapter -->
             <target name="osx">
                 <mkdir dir="${build.classes}"/>
 
@@ -106,6 +99,12 @@
                         target="1.4"></javac>
             </target>
 
+  <!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
+            <target name="non_osx">
+                <mkdir dir="${build.osx}"/>
+		<copy file="${library.directory}/OSXAdapter.class"
+		    todir ="${build.osx}" />
+            </target>
 
 
   <!-- Jars up project -->

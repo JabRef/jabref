@@ -53,6 +53,8 @@ import net.sf.jabref.collab.*;
 
 public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateListener {
 
+  boolean tmp = true;
+
     BasePanel ths = this;
     JSplitPane splitPane;
     PreviewPanel previewPanel = null;
@@ -653,8 +655,14 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                       Thread pushThread = new Thread() {
                         public void run() {
                           String winEdt = prefs.get("winEdtPath");
+                          winEdt = "osascript";
                           try {
-                            StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
+                            //StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
+                            StringBuffer toSend = new StringBuffer
+                                ("-e 'tell application \"iTeXMac\" to insert \"\\\\cite{");
+                            if (tmp)
+                              toSend = new StringBuffer
+                                  ("-e 'tell application \"TeXShop\" to set the selection of the front document to \"\\\\cite{");
                             String citeKey = "", message = "";
                             boolean first = true;
                             for (int i = 0; i < numSelected; i++) {
@@ -680,7 +688,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                             if (first)
                               output(Globals.lang("Please define BibTeX key first"));
                             else {
-                              toSend.append("}');]\"");
+                              //toSend.append("}');]\"");
+                              if (!tmp)
+                                toSend.append("}\" in the text of the front document'");
+                              else
+                                toSend.append("}\"'");
+
+                              tmp = !tmp;
+
+                              System.out.println("Running command: "+winEdt + " " + toSend.toString());
                               Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
                               output(
                                   Globals.lang("Pushed the citations for the following rows to")+"WinEdt: " +
@@ -691,7 +707,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                           catch (IOException excep) {
                             output(Globals.lang("Error")+": "+Globals.lang("Could not call executable")+" '"
                                    +winEdt+"'.");
-                            //excep.printStackTrace();
+                            excep.printStackTrace();
                           }
                         }
                       };
@@ -1440,7 +1456,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
       }
 
       // If no entry editor is visible we must either instantiate a new preview panel or update the one we have.
-      if (!previewEnabled) {
+      if (!previewEnabled || be==null) {
         splitPane.setBottomComponent(null);
         return; // Do nothing if previews are disabled.
       }
@@ -1563,8 +1579,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
     }
 
     public void updateEntryEditorIfShowing() {
-      if (isShowingEditor())
-        ((EntryEditor)splitPane.getBottomComponent()).updateAllFields();
+      if (isShowingEditor()) {
+        EntryEditor editor = (EntryEditor)splitPane.getBottomComponent();
+        if (editor.getType() != editor.entry.getType()) {
+          // The entry has changed type, so we must get a new editor.
+          showing = null;
+          showEntry(editor.entry);
+        } else
+          editor.updateAllFields();
+      }
     }
 
     public void markBaseChanged() {
@@ -1844,8 +1867,17 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
     }
 
+    public void changeType(BibtexEntry entry, BibtexEntryType type) {
+      changeType(new BibtexEntry[] {entry}, type);
+    }
+
     public void changeType(BibtexEntryType type) {
-	BibtexEntry[] bes = entryTable.getSelectedEntries();
+      BibtexEntry[] bes = entryTable.getSelectedEntries();
+      changeType(bes, type);
+    }
+
+    public void changeType(BibtexEntry[] bes, BibtexEntryType type) {
+
 	if ((bes == null) || (bes.length == 0)) {
 	    output("First select the entries you wish to change type "+
 		   "for.");
@@ -1876,6 +1908,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 	undoManager.addEdit(ce);
 	refreshTable();
 	markBaseChanged();
+        updateEntryEditorIfShowing();
     }
 
     class UndoAction extends BaseAction {

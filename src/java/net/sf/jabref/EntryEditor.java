@@ -56,6 +56,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     // A reference to the entry this object works on.
     BibtexEntry entry;
+    BibtexEntryType type;
 
     CloseAction closeAction;
     // The action concerned with closing the window.
@@ -97,7 +98,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
-    JPanel typeLabel;
+    TypeLabel typeLabel;
     JabRefFrame frame;
     BasePanel panel;
     EntryEditor ths = this;
@@ -129,7 +130,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	panel = panel_;
 	entry = entry_;
 	prefs = prefs_;
-
+        type = entry.getType();
 	//setBackground(GUIGlobals.lightGray);//Color.white);
 
 	entry.addPropertyChangeListener(this);
@@ -178,6 +179,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    tabbed.setSelectedIndex(sourceIndex);
 	}
 
+    }
+
+    public BibtexEntryType getType() {
+      return type;
     }
 
     private void setupToolBar() {
@@ -246,6 +251,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         private String label;
         public TypeLabel(String type) {
             label = type;
+            addMouseListener(new MouseAdapter() {
+              public void mouseClicked(MouseEvent e) {
+                JPopupMenu typeMenu = new JPopupMenu();
+                //typeMenu.add(new JLabel(Globals.lang("Set entry type")));
+                //typeMenu.addSeparator();
+                for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+                     i.hasNext();) {
+                  typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType((String)i.next()), panel));
+                }
+                typeMenu.show(ths, e.getX(), e.getY());
+              }
+            });
         }
         public void paint(Graphics g) {
             Graphics2D g2 = (Graphics2D)g;
@@ -259,9 +276,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             g2.drawString(label,-width-7,28);
 
         }
-        /*	public Dimension getPreferredSize() {
-            return new Dimension(22, 30);
-            }*/
     }
 
     private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen) {
@@ -1428,9 +1442,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           // Source panel.
           storeFieldAction.actionPerformed(new ActionEvent(comp, 0,""));
         }
-	try {
-	    panel.runCommand("save");
-	} catch (Throwable ex) {}
+        try {
+            panel.runCommand("save");
+        } catch (Throwable ex) {}
       }
     }
 
@@ -1532,5 +1546,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	}
     }
 
+    class ChangeTypeAction extends AbstractAction {
+      BibtexEntryType type;
+      BasePanel panel;
 
+      public ChangeTypeAction(BibtexEntryType type, BasePanel bp) {
+        super(type.getName());
+        this.type = type;
+        panel = bp;
+      }
+      public void actionPerformed(ActionEvent evt) {
+        panel.changeType(entry, type);
+      }
+}
 }
