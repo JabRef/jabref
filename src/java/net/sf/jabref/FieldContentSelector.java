@@ -69,7 +69,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
         manage.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      ContentSelectorDialog2 csd = new ContentSelectorDialog2
-		  (frame, panel, true, metaData, editor.getFieldName());
+		  (frame, panel, false, metaData, editor.getFieldName());
 	      Util.placeDialog(csd, frame);
 	      csd.show();
 	      //updateList();

@@ -31,7 +31,7 @@ public class ContentSelectorDialog2 extends JDialog {
     TreeSet fieldSet, wordSet;
     JabRefFrame frame;
     BasePanel panel;
-    JButton help,
+    JButton help = new JButton(Globals.lang("Help")),
 	newField = new JButton(Globals.lang("New")),
 	removeField = new JButton(Globals.lang("Remove")),
 	newWord = new JButton(Globals.lang("New")),
@@ -73,6 +73,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	    fieldList.setSelectedIndex(fieldInd);
 
 	pack();
+	System.out.println("eee");
     }
 
 
@@ -182,6 +183,12 @@ public class ContentSelectorDialog2 extends JDialog {
 		    fieldNameField.setText("");
 		    if (fieldListModel.size() > 0)
 			fieldList.setSelectedIndex(Math.min(index, wordListModel.size()-1));
+		}
+	    });
+
+	help.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    frame.helpDiag.showPage(GUIGlobals.contentSelectorHelp);
 		}
 	    });
 
@@ -375,6 +382,8 @@ public class ContentSelectorDialog2 extends JDialog {
 	wordEditPan.add(wordEditField);
 
 	// Add buttons:
+	buttonPan.add(help);
+	buttonPan.add(Box.createHorizontalStrut(10));
 	buttonPan.add(ok);
 	buttonPan.add(apply);
 	buttonPan.add(cancel);

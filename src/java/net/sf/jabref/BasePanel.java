@@ -1158,6 +1158,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 			      //if ((bes != null) && (bes.length > 0))
 			      updateViewToSelected();
 			  }
+			  frame.previewToggle.setSelected(previewEnabled);
 		      }
 		  });
 	      
