@@ -1,3 +1,4 @@
+<font face="arial">
 <dt><a name="\bibtexkey">[\bibtexkey]</a></dt>
 <dd>
 \begin{author} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author} ,\end{author}<BR>
@@ -8,3 +9,4 @@
 \begin{pages}, \pages \end{pages}
 .</dd>
 <p></p>
+</font>

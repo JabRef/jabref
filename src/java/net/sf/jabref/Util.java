@@ -317,28 +317,27 @@ public class Util {
      * Open a http/pdf/ps viewer for the given link string.
      *
      */
-    public static void openExternalViewer(String link, JabRefPreferences prefs) throws
+    public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws
       IOException {
 	// check html first since browser can invoke viewers
-        if (link.startsWith("doi")) {
-          link = Globals.DOI_LOOKUP_PREFIX+link;
+        if (fieldName.equals("doi")) {
+          Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
+                                                    +" "+Globals.DOI_LOOKUP_PREFIX+link);
         }
-
-	if(link.substring(0,7).equals("http://")){ // hml
+	if(fieldName.equals("url")){ // html
 	    try {
 		/*System.err.println("Message: Opening url (" + link
 				   + ") with the HTML viewer ("
 				   + prefs.get("htmlviewer") +")");*/
-
-		Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
-							  + " " + link);
+               Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
+                                                         + " " + link);
 	    } catch (IOException e) {
 		/*System.err.println("Warning: Unable to open url "
 				   + link + " with the HTML viewer ("
 				   + prefs.get("htmlviewer") +")");*/
 	    }
 	}
-	else if(link.endsWith(".ps")){
+	else if(fieldName.equals("ps")) {
 	    try {
 		/*System.err.println("Message: Opening file " + link
 				   + " with the ps viewer ("
@@ -351,7 +350,7 @@ public class Util {
 				   + prefs.get("psviewer") +")");*/
 	    }
 
-	}else if(link.endsWith(".pdf")){
+	}else if(fieldName.equals("pdf")) {
 	    try {
 		/*System.err.println("Message: Opening file (" + link
 				   + ") with the pdf viewer ("
@@ -375,7 +374,7 @@ public class Util {
 	}
 
 	else{
-	    System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
+	    System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
 	    //ignore
 	}
   }

@@ -1387,13 +1387,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     class ExternalViewerListener extends MouseAdapter {
 	public void mouseClicked(MouseEvent evt) {
 	    if (evt.getClickCount() == 2) {
-		JTextComponent tf = (JTextComponent)evt.getSource();
+		FieldTextArea tf = (FieldTextArea)evt.getSource();
 		if (tf.getText().equals(""))
 		    return;
 		tf.selectAll();
 		String link = tf.getText(); // get selected ?  String 	getSelectedText()
                 try {
-                  Util.openExternalViewer(link, prefs);
+                  Util.openExternalViewer(link, tf.getFieldName(), prefs);
                 } catch (IOException ex) {
                   System.err.println("Error opening file.");
                 }

@@ -782,14 +782,17 @@ public class BasePanel extends JSplitPane implements MouseListener,
          actions.put("openFile", new BaseAction() {
                  public void action() {
                      BibtexEntry[] bes = entryTable.getSelectedEntries();
+                     String field = "ps";
                      if ((bes != null) && (bes.length == 1)) {
                          Object link = bes[0].getField("ps");
-                         if (bes[0].getField("pdf") != null)
-                             link = bes[0].getField("pdf");
+                         if (bes[0].getField("pdf") != null) {
+                           link = bes[0].getField("pdf");
+                           field = "pdf";
+                         }
                          if (link != null) {
                            //output(Globals.lang("Calling external viewer..."));
                            try {
-                             Util.openExternalViewer(link.toString(), prefs);
+                             Util.openExternalViewer(link.toString(), field, prefs);
                              output(Globals.lang("External viewer called")+".");
                            } catch (IOException ex) {
                              output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
@@ -805,14 +808,17 @@ public class BasePanel extends JSplitPane implements MouseListener,
               actions.put("openUrl", new BaseAction() {
                       public void action() {
                           BibtexEntry[] bes = entryTable.getSelectedEntries();
+                          String field = "doi";
                           if ((bes != null) && (bes.length == 1)) {
                               Object link = bes[0].getField("doi");
-                              if (bes[0].getField("url") != null)
+                              if (bes[0].getField("url") != null) {
                                 link = bes[0].getField("url");
+                                field = "url";
+                              }
                               if (link != null) {
                                 //output(Globals.lang("Calling external viewer..."));
                                 try {
-                                  Util.openExternalViewer(link.toString(), prefs);
+                                  Util.openExternalViewer(link.toString(), field, prefs);
                                   output(Globals.lang("External viewer called")+".");
                                 } catch (IOException ex) {
                                   output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
@@ -859,6 +865,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
                   int dupl = 0;
                   output(Globals.lang("Searching for duplicates..."));
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  if ((bes == null) || (bes.length < 2))
+                    return;
                   for (int i = 0; i < bes.length - 1; i++)
                     for (int j = i + 1; j < bes.length; j++) {
                       boolean eq = Util.isDuplicate(bes[i], bes[j],
