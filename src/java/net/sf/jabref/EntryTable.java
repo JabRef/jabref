@@ -249,8 +249,8 @@ public class EntryTable extends JTable {
 	rh.put(RenderingHints.KEY_ANTIALIASING,
 		RenderingHints.VALUE_ANTIALIAS_ON);
 	g2.setRenderingHints(rh);
-	g2.drawString(getText(), 3, f.getSize());
-	
+	//g2.drawString(getText(), 3, f.getSize());
+	super.paint(g2);
 	}
 
 	//public DefaultTableCellRenderer darker() { return darker; }
