@@ -111,7 +111,13 @@ public class JabRefFrame extends JFrame {
 	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups interface", 
 					 "Toggle groups interface",
 					 GUIGlobals.groupsIconFile,
-					 prefs.getKey("Toggle groups"));  
+					 prefs.getKey("Toggle groups")),
+	makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
+					  "Autogenerate BibTeX keys",
+					  GUIGlobals.genKeyIconFile,
+					  prefs.getKey("Autgenerate BibTeX keys"));
+
+
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
     NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
@@ -392,6 +398,7 @@ public class JabRefFrame extends JFrame {
 	bibtex.add(editStrings);
 	mb.add(bibtex);
 
+	tools.add(makeKeyAction);
 	mb.add(tools);
 
 	options.add(showPrefs);

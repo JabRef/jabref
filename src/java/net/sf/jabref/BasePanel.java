@@ -432,7 +432,52 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    sidePaneManager.togglePanel("groups");
 		}
 	    });
-    }
+
+    // The action for auto-generating keys.
+	actions.put("makeKey", new BaseAction() {
+		public void action() {
+		    int[] rows = entryTable.getSelectedRows() ;
+		    int numSelected = rows.length ; 
+		    BibtexEntry bes = null ;
+		    if (numSelected > 0) {
+			int answer = JOptionPane.showConfirmDialog
+			    (frame, "Generate bibtex key"+
+			     (numSelected>1 ? "s for the selected "
+			      +numSelected+" entries?" :
+			      " for the selected entry?"), 
+			     "Autogenerate Bibtexkey", 
+			     JOptionPane.YES_NO_CANCEL_OPTION);
+			if (answer != JOptionPane.YES_OPTION) {
+			    return ; 
+			}
+		    } else { // None selected. Inform the user to select entries first.
+			JOptionPane.showMessageDialog(frame, "First select the entries you want keys to be generated for.",
+						      "Autogenerate Bibtexkey", JOptionPane.INFORMATION_MESSAGE);
+			return ;
+		    }
+		    
+		    output("Generating Bibtexkey for "+numSelected+(numSelected>1 ? " entries" : "entry"));
+		    
+		    NamedCompound ce = new NamedCompound("autogenerate keys");
+		    //BibtexEntry be;
+		    Object oldValue;
+		    for(int i = 0 ; i < numSelected ; i++){
+			bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
+			oldValue = bes.getField(GUIGlobals.KEY_FIELD);
+			bes = frame.labelMaker.applyRule(bes) ; 
+			ce.addEdit(new UndoableFieldChange
+				   (bes, GUIGlobals.KEY_FIELD, oldValue,
+				    bes.getField(GUIGlobals.KEY_FIELD)));
+		    }
+		    ce.end();
+		    undoManager.addEdit(ce);
+		    markBaseChanged() ; 
+		    refreshTable() ; 
+		}
+	    });
+
+    }			    
+		    
 
     /**
      * This method is called from JabRefFrame is a database specific

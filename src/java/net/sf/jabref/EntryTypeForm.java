@@ -876,19 +876,36 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 	if (id != null) {
 	    if (!panel.entryTypeForms.containsKey(id)) {
 		BibtexEntry be = panel.database.getEntryById(id);
-		EntryTypeForm form = new EntryTypeForm
-		    (frame, panel, be, prefs);
-		form.setLocation(ths.getLocation());
-		//Util.placeDialog(form, frame); 
-		// We want to center the editor.
-		form.setVisible(true);
-		dispose();
-		panel.entryTypeForms.put(id, form);
+
+		// If the entry we are switching to is of the same type as
+		// this one, we can make the switch more elegant by keeping this
+		// same dialog, and updating it.
+		if (entry.getType() == be.getType()) {
+		    panel.entryTypeForms.remove(entry.getId());
+		    entry = be;
+		    updateAllFields();
+		    updateSource();
+		    panel.entryTypeForms.put(id, ths);
+
+		} else {
+
+		    EntryTypeForm form = new EntryTypeForm
+			(frame, panel, be, prefs);
+		    form.setLocation(ths.getLocation());
+		    //Util.placeDialog(form, frame); 
+		    // We want to center the editor.
+		    form.setVisible(true);
+		    dispose();
+		    panel.entryTypeForms.remove(entry.getId());
+		    panel.entryTypeForms.put(id, form);
+		} 
 	    } else {
 		((EntryTypeForm)(panel.entryTypeForms.get(id)))
 		    .setVisible(true);
+		panel.entryTypeForms.remove(entry.getId());
 		dispose();
 	    }
+	    
 	    
 	}
     }
