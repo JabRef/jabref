@@ -460,41 +460,46 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int[] rows = entryTable.getSelectedRows();
 		    int numSelected = rows.length;
 		    BibtexEntry bes = null;
-		    output("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
-		Object citekey;
-		// check if lyxpipe is defined
-		//File lyxpipe = new File( System.getProperty("user.home")+File.separator+".lyx/lyxpipe" + ".in");
-		File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-		if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-		    output("ERROR: verify that LyX is running and that the lyxpipe is valid. [" + prefs.get("lyxpipe") +"]");
-		    return;
-		}
-		if( numSelected > 0){
-		    try {
-			BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
-			String citeStr="LYXCMD:sampleclient:citation-insert:"+ database.getEntryById( tableModel.getNameFromNumber( rows[0])).getField(GUIGlobals.KEY_FIELD);
-			String message="LYXPIPE: sent rows " + rows[0];
-			for(int i=1; i< numSelected; i++){
-			    bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
-			    citekey= bes.getField(GUIGlobals.KEY_FIELD);
-			    // if the key is empty we give a warning and ignore this entry
-			    if(citekey==null || citekey.equals(""))
-				continue;
-			    citeStr += "," + citekey;
-			    message+= ", " + rows[i];
+		    Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
+		    // check if lyxpipe is defined
+		    File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+		    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
+			output("ERROR: verify that LyX is running and that the lyxpipe is valid. [" + prefs.get("lyxpipe") +"]");
+			return;
+		    }
+		    if( numSelected > 0){
+			try {
+			    BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
+			    String citeStr="", citeKey="", message="";
+			    for(int i=0; i< numSelected; i++){
+				bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
+				citeKey= (String)bes.getField(GUIGlobals.KEY_FIELD);
+				// if the key is empty we give a warning and ignore this entry
+				if(citeKey==null || citeKey.equals(""))
+				    continue;
+				if(citeStr.equals(""))
+				    citeStr= citeKey;
+				else
+				    citeStr += "," + citeKey;
+				message+= ", " + rows[i];
+			    }
+			    if(citeStr.equals(""))
+				output("Please define citekey first");
+			    else{
+				citeStr="LYXCMD:sampleclient:citation-insert:"+ citeStr;
+				lyx_out.write(citeStr +"\n");
+				output("Pushed the citations for the following rows to Lyx: " + message);
+			    }
+			    lyx_out.close();
+
 			}
-			lyx_out.write(citeStr +"\n");
-			
-			lyx_out.close();
-			output(message);
+			catch (IOException excep) {
+			    output("ERROR: unable to write to " + prefs.get("lyxpipe") +".in");
+			}
 		    }
-		    catch (IOException excep) {
-			output("ERROR: unable to write to " + prefs.get("lyxpipe") +".in");
-		    }
-		}
 		}
 	    });
-    // The action for auto-generating keys.
+	// The action for auto-generating keys.
 	actions.put("makeKey", new BaseAction() {
 		public void action() {
 		    int[] rows = entryTable.getSelectedRows() ;
