@@ -1089,9 +1089,14 @@ public JabRefPreferences prefs() {
    database.setCompleters(autoCompleters);
    }*/
 
-  public void output(String s) {
-    statusLine.setText(s);
-    statusLine.repaint();
+ public void output(final String s) {
+     
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+              statusLine.setText(s);
+              statusLine.repaint();              
+          }
+      });
   }
 
   public void stopShowingSearchResults() {
@@ -1429,6 +1434,26 @@ public JabRefPreferences prefs() {
       }
     }
 
+    class openItSwingHelper implements Runnable{
+        BasePanel bp;
+        boolean raisePanel;
+        
+        openItSwingHelper(BasePanel bp, boolean raisePanel) {
+            this.bp = bp;
+            this.raisePanel = raisePanel;
+        }
+        
+        public void run() {
+            tabbedPane.add(fileToOpen.getName(), bp);
+            if (raisePanel) {
+                tabbedPane.setSelectedComponent(bp);
+            }
+            if (tabbedPane.getTabCount() == 1) {
+                setNonEmptyState();
+            }
+        }
+    }
+    
     public void openIt(boolean raisePanel) {
       if ( (fileToOpen != null) && (fileToOpen.exists())) {
         try {
@@ -1463,13 +1488,8 @@ public JabRefPreferences prefs() {
             db.setCompleters(autoCompleters);
             }
            */
-          tabbedPane.add(fileToOpen.getName(), bp);
-          if (raisePanel) {
-            tabbedPane.setSelectedComponent(bp);
-          }
-          if (tabbedPane.getTabCount() == 1) {
-            setNonEmptyState();
-          }
+          SwingUtilities.invokeLater(new openItSwingHelper(bp, raisePanel));
+
           output(Globals.lang("Opened database") + " '" + fileToOpen.getPath() +
                  "' " + Globals.lang("with") + " " +
                  db.getEntryCount() + " " + Globals.lang("entries") + ".");
