@@ -7,29 +7,53 @@ body {
     background-color:#ddd;
 }
 
+.bibtex_entry {
+    border:2px solid black;
+    margin:1em;
+}
+
+.bibtex_header {
+    border-bottom:solid gray 2px;
+}
 .bibtex_key {
     font-size:small;
-    color:navy;
-    border-bottom:solid navy 1px;
+    color:#555;
+    display:inline;
+	font-weight:bold;
 }
 
 .bibtex_content {
     padding-bottom:1em;
 }
 
-.author {
-    font-style:italic;
-}
-
-.title {
+.bibtex_author {
     font-weight:bold;
+    padding-bottom:1em;
 }
 
-.journal {}
-.year {}
-.volume {}
-.pages {}
+.bibtex_title {
+    font-weight:bold;
+    padding-bottom:1em;
+}
 
+.bibtex_url, .bibtex_pdf {
+    display:inline;
+	font-size:small;
+	float:right;
+	padding-left:1em;
+	padding-right:1em;
+}
+
+.bibtex_url a, .bibtex_pdf a, .bibtex_url a:visited, .bibtex_pdf a:visited {
+	text-decoration:none;
+	font-weight:bold;
+	color:darkblue;
+
+}
+
+.bibtex_journal, .bibtex_year, .bibtex_volume, .bibtex_pages {
+    display:inline;
+}
 	</style>
 </header>
 <body>

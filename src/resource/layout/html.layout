@@ -1,15 +1,57 @@
-<div class="bibtex_key"><a name="\bibtexkey">[\bibtexkey]</a></div>
-<div class="bibtex_content">
-    <span class="author">
-        \begin{author}      \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author} \end{author}
-    </span>.
-    <span class="title">
-        \begin{title} \format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title} \end{title}
-    </span>
+<div class="bibtex_entry">
 
-    \begin{journal},  <span class="journal">\journal</span> \end{journal}
+	<div class="bibtex_header">
+		<div class="bibtex_key">
+			<a name="\bibtexkey">\bibtexkey</a>
+		</div>
+		
+		\begin{pdf}
+		<div class="bibtex_pdf">
+			<a href="\pdf">pdf</a>
+		</div>
+		\end{pdf}
+		
+		\begin{url}
+		<div class="bibtex_url">
+			<a href="\url">url</a>
+		</div>
+		\end{url}
+	</div>
+	
+	<div class="bibtex_content">
 
-    \begin{year}, <span class="year">\year</span>\end{year}
-    \begin{volume}, <span class="volume">\volume</span>\end{volume}
-    \begin{pages}, <span class="pages">\pages</span> \end{pages}
-.</div>
+		\begin{title}
+		<div class="bibtex_title">
+			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}
+		</div>
+		\end{title}
+		
+		\begin{author}
+		<div class="bibtex_author">
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author}
+		</div>
+		\end{author}
+		
+		\begin{journal}
+		<div class="bibtex_journal">
+			\journal
+		</div>,
+		\end{journal}
+
+		\begin{volume}
+		<div class="bibtex_volume">
+			Vol. \volume
+		</div>,
+		\end{volume}
+		
+		\begin{pages}
+		<div class="bibtex_pages">
+			pp. \pages
+		</div>,
+		\end{pages}
+		
+		<div class="bibtex_year">
+			\year
+		</div>    
+	</div>
+</div>
