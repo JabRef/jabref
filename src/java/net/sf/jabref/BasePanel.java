@@ -447,6 +447,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                                           }
                                       }
                                   } else {
+                                    String cont = (String)(content.getTransferData(DataFlavor.stringFlavor));
+                                    Util.pr("----------------\n"+cont+"\n---------------------");
+                                    Util.guessBibtexFields(cont);
                                       output(Globals.lang("Unable to parse clipboard text as Bibtex entries."));
                                   }
                               } catch (UnsupportedFlavorException ex) {
@@ -551,56 +554,64 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	actions.put("pushToLyX",new BaseAction(){
 		public void action(){
-		    int[] rows = entryTable.getSelectedRows();
-		    int numSelected = rows.length;
-		    BibtexEntry bes = null;
+		    final int[] rows = entryTable.getSelectedRows();
+		    final int numSelected = rows.length;
 		    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
 		    // check if lyxpipe is defined
-		    File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+		    final File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
 		    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
 			output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
                                +". [" + prefs.get("lyxpipe") +"]");
 			return;
 		    }
-                    Util.pr("tre");
+                    //Util.pr("tre");
 		    if( numSelected > 0){
-			try {
-                          Util.pr("fil");
-                          FileWriter fw = new FileWriter(lyxpipe);
-                                                    Util.pr("fil pluss");
-	 		    BufferedWriter lyx_out = new BufferedWriter(fw);
-                             Util.pr("fem");
-			    String citeStr="", citeKey="", message="";
-			    for(int i=0; i< numSelected; i++){
-                              Util.pr(":"+i);
-				bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
-				citeKey= (String)bes.getField(GUIGlobals.KEY_FIELD);
-				// if the key is empty we give a warning and ignore this entry
-				if(citeKey==null || citeKey.equals(""))
-				    continue;
-				if(citeStr.equals(""))
-				    citeStr= citeKey;
-				else
-                                  citeStr += "," + citeKey;
-                                if (i>0)
-                                  message+=", ";
-				message+= (1+rows[i]);
-			    }
-			    if(citeStr.equals(""))
-				output("Please define citekey first");
-			    else{
-				citeStr="LYXCMD:sampleclient:citation-insert:"+ citeStr;
-				lyx_out.write(citeStr +"\n");
-				output("Pushed the citations for the following rows to Lyx: " + message);
-			    }
-			    lyx_out.close();
+                      Thread pushThread = new Thread() {
+                        public void run() {
+                          try {
+                                                      Util.pr("test");
+                            FileWriter fw = new FileWriter(lyxpipe);
+                                                      Util.pr("test2");
+                            BufferedWriter lyx_out = new BufferedWriter(fw);
+                            String citeStr = "", citeKey = "", message = "";
+                            for (int i = 0; i < numSelected; i++) {
+                              Util.pr(":" + i);
+                              BibtexEntry bes = database.getEntryById(tableModel.getNameFromNumber(rows[
+                                  i]));
+                              citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
+                              // if the key is empty we give a warning and ignore this entry
+                              if (citeKey == null || citeKey.equals(""))
+                                continue;
+                              if (citeStr.equals(""))
+                                citeStr = citeKey;
+                              else
+                                citeStr += "," + citeKey;
+                              if (i > 0)
+                                message += ", ";
+                              message += (1 + rows[i]);
+                            }
+                            if (citeStr.equals(""))
+                              output("Please define citekey first");
+                            else {
+                              citeStr = "LYXCMD:sampleclient:citation-insert:" + citeStr;
+                              lyx_out.write(citeStr + "\n");
+                              output("Pushed the citations for the following rows to Lyx: " +
+                                     message);
+                            }
+                            lyx_out.close();
 
-			}
-			catch (IOException excep) {
-			    output("ERROR: unable to write to " + prefs.get("lyxpipe") +".in");
-			}
-		    }
-		}
+                          }
+                          catch (IOException excep) {
+                            output("ERROR: unable to write to " + prefs.get("lyxpipe") +
+                                   ".in");
+                          }
+                        }
+                      };
+                      pushThread.start();
+                      Timeout t = new Timeout(2000, pushThread, Globals.lang("Error: unable to access LyX-pipe"));
+                      t.start();
+                    }
+                  }
 	    });
 	// The action for auto-generating keys.
 	actions.put("makeKey", new BaseAction() {
@@ -857,62 +868,71 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
             });
 
          actions.put("openFile", new BaseAction() {
-                 public void action() {
-                     BibtexEntry[] bes = entryTable.getSelectedEntries();
-                     String field = "ps";
-                     if ((bes != null) && (bes.length == 1)) {
-                         Object link = bes[0].getField("ps");
-                         if (bes[0].getField("pdf") != null) {
-                           link = bes[0].getField("pdf");
-                           field = "pdf";
+           public void action() {
+             (new Thread() {
+               public void run() {
+                 BibtexEntry[] bes = entryTable.getSelectedEntries();
+                 String field = "ps";
+                 if ( (bes != null) && (bes.length == 1)) {
+                   Object link = bes[0].getField("ps");
+                   if (bes[0].getField("pdf") != null) {
+                     link = bes[0].getField("pdf");
+                     field = "pdf";
+                   }
+                   String filepath = null;
+                   if (link != null) {
+                     filepath = link.toString();
+                   }
+                   else {
+                     // see if we can fall back to a filename based on the bibtex key
+                     String basefile;
+                     Object key = bes[0].getField(Globals.KEY_FIELD);
+                     if (key != null) {
+                       basefile = key.toString();
+                       String dir = prefs.get("pdfDirectory");
+                       if (dir.endsWith(System.getProperty("file.separator"))) {
+                         basefile = dir + basefile;
+                       }
+                       else {
+                         basefile = dir + System.getProperty("file.separator") +
+                             basefile;
+                       }
+                       final String[] typesToTry = new String[] {
+                           "html", "ps", "pdf"};
+                       for (int i = 0; i < typesToTry.length; i++) {
+                         File f = new File(basefile + "." + typesToTry[i]);
+                         Util.pr("Checking for " + f);
+                         if (f.exists()) {
+                           field = typesToTry[i];
+                           filepath = f.getPath();
+                           break;
                          }
-                         String filepath = null;
-                         if (link != null) {
-                           filepath = link.toString();
-                         } else {
-                           // see if we can fall back to a filename based on the bibtex key
-                           String basefile;
-                           Object key = bes[0].getField(Globals.KEY_FIELD);
-                           if(key != null) {
-                             basefile = key.toString();
-                             String dir = prefs.get("pdfDirectory");
-                             if (dir.endsWith(System.getProperty("file.separator"))) {
-                               basefile = dir + basefile;
-                             }
-                             else {
-                               basefile = dir + System.getProperty("file.separator") +
-                                   basefile;
-                             }
-                             final String[] typesToTry = new String[] {
-                                 "html", "ps", "pdf"};
-                             for (int i = 0; i < typesToTry.length; i++) {
-                               File f = new File(basefile + "." + typesToTry[i]);
-                               Util.pr("Checking for "+f);
-                               if (f.exists()) {
-                                 field = typesToTry[i];
-                                 filepath = f.getPath();
-                                 break;
-                               }
-                             }
-                           }
-                         }
+                       }
+                     }
+                   }
 
-                         if (filepath != null) {
-                           //output(Globals.lang("Calling external viewer..."));
-                           try {
-                             Util.pr("Opening external "+field+" file '"+filepath+"'.");
-                             Util.openExternalViewer(filepath, field, prefs);
-                             output(Globals.lang("External viewer called")+".");
-                           } catch (IOException ex) {
-                             output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
-                           }
-                         }
-                         else
-                             output(Globals.lang("No pdf or ps defined, and no file matching Bibtex key found")+".");
-                     } else
-                       output(Globals.lang("No entries or multiple entries selected."));
+                   if (filepath != null) {
+                     //output(Globals.lang("Calling external viewer..."));
+                     try {
+                       Util.openExternalViewer(filepath, field, prefs);
+                       output(Globals.lang("External viewer called") + ".");
+                     }
+                     catch (IOException ex) {
+                       output(Globals.lang("Error") + ": " + ex.getMessage());
+                     }
+                   }
+                   else
+                     output(Globals.lang(
+                         "No pdf or ps defined, and no file matching Bibtex key found") +
+                            ".");
                  }
-	      });
+                 else
+                   output(Globals.lang("No entries or multiple entries selected."));
+               }
+             }).start();
+           }
+         });
+
 
               actions.put("openUrl", new BaseAction() {
                       public void action() {
@@ -970,63 +990,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
               actions.put("dupliCheck", new BaseAction() {
                 public void action() {
-                  NamedCompound ce = null;
-                  int dupl = 0;
-                  output(Globals.lang("Searching for duplicates..."));
-                  Object[] keys = database.getKeySet().toArray();
-                  if ((keys == null) || (keys.length < 2))
-                    return;
-                  BibtexEntry[] bes = new BibtexEntry[keys.length];
-                  for (int i=0; i<keys.length; i++)
-                    bes[i] = database.getEntryById((String)keys[i]);
-                  DuplicateResolverDialog drd = null;
-                  for (int i = 0; i < bes.length - 1; i++)
-                    for (int j = i + 1; j < bes.length; j++) {
-                      boolean eq = Util.isDuplicate(bes[i], bes[j],
-                                                    Globals.duplicateThreshold);
-
-                      // Show the duplicate resolver dialog if they are deemed duplicates,
-                      // AND they both are still present in the database.
-                      if (eq && (database.getEntryById(bes[i].getId()) != null) &&
-                          (database.getEntryById(bes[j].getId()) != null)) {
-                        if (drd == null)
-                          drd = new DuplicateResolverDialog(frame, bes[i], bes[j]);
-                        else
-                          drd.setEntries(bes[i], bes[j]);
-                        drd.show();
-                        //drd.setVisible(true);
-                        int answer = drd.getSelected();
-                        if (answer == DuplicateResolverDialog.KEEP_UPPER) {
-                          if (ce == null) ce = new NamedCompound("duplicate removal");
-                          database.removeEntry(bes[j].getId());
-                          refreshTable();
-                          markBaseChanged();
-                          ce.addEdit(new UndoableRemoveEntry(database, bes[j], ths));
-                        }
-                        else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
-                          if (ce == null) ce = new NamedCompound("duplicate removal");
-                          database.removeEntry(bes[i].getId());
-                          refreshTable();
-                          markBaseChanged();
-                          ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
-                        }
-                        dupl++;
-                        //Util.pr("---------------------------------------------------");
-                        //Util.pr("--> "+i+" and "+j+" ...");
-                        //Util.pr("---------------------------------------------------");
-                      }
-                    }
-                  if (drd != null)
-                    drd.dispose();
-                  output(Globals.lang("Duplicate pairs found") + ": " + dupl);
-
-                  if (ce != null) {
-                    ce.end();
-                    //Util.pr("ox");
-                    undoManager.addEdit(ce);
-                    //markBaseChanged();
-                    //refreshTable();
-                  }
+                  DuplicateSearch ds = new DuplicateSearch(ths);
+                  ds.start();
                 }
               });
 
@@ -1878,4 +1843,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     }
   }
 
+  class Timeout extends javax.swing.Timer {
+    public Timeout(int timeout, final Thread toStop, final String message) {
+      super(timeout, new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          toStop.stop();
+          stop();
+          //output(message);
+        }
+      });
+    }
+  }
 }

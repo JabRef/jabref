@@ -316,7 +316,9 @@ public class EntryTable extends JTable {
               try {
                 Util.openExternalViewer( (String) link, fieldName, prefs);
               }
-              catch (IOException ex) {}
+              catch (IOException ex) {
+                panel.output(Globals.lang("Error")+": "+ex.getMessage());
+              }
             }
 
           }).start();

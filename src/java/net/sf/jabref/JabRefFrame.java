@@ -61,7 +61,17 @@ public class JabRefFrame
   JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
 
   JTabbedPane tabbedPane = new JTabbedPane();
-  JToolBar tlb = new JToolBar();
+
+  class ToolBar extends JToolBar {
+    Insets marg = new Insets(0,0,0,0);
+    void addAction(Action a) {
+      JButton b = new JButton(a);
+      b.setMargin(marg);
+      add(a);
+    }
+  }
+  ToolBar tlb = new ToolBar();
+
   JMenuBar mb = new JMenuBar();/* {
     public void paintComponent(Graphics g) {
       Graphics2D g2 = (Graphics2D)g;
@@ -906,12 +916,12 @@ public JabRefPreferences prefs() {
     //tlb.setBackground(GUIGlobals.lightGray);
     //tlb.setForeground(GUIGlobals.lightGray);
     tlb.setFloatable(false);
-    tlb.add(newDatabaseAction);
-    tlb.add(open);
-    tlb.add(save);
+    tlb.addAction(newDatabaseAction);
+    tlb.addAction(open);
+    tlb.addAction(save);
 
     tlb.addSeparator();
-    tlb.add(cut);
+    tlb.addAction(cut);
     tlb.add(copy);
     tlb.add(paste);
     tlb.add(undo);

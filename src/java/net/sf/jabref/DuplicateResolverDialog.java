@@ -26,6 +26,7 @@ import java.awt.*;
 public class DuplicateResolverDialog extends JDialog {
 
   public static final int
+      NOT_CHOSEN = -1,
       KEEP_BOTH = 0,
       KEEP_UPPER = 1,
       KEEP_LOWER = 2;
@@ -43,10 +44,11 @@ public class DuplicateResolverDialog extends JDialog {
   JPanel options = new JPanel(),
       main = new JPanel(),
       source = new JPanel();
-  int status = KEEP_BOTH;
+  int status = NOT_CHOSEN;
+  boolean block = true;
 
   public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two) {
-    super(frame, Globals.lang("Possible duplicate entries"), true);
+    super(frame, Globals.lang("Possible duplicate entries"), false);
 
     p1 = new PreviewPanel(one);
     p2 = new PreviewPanel(two);
@@ -86,21 +88,24 @@ public class DuplicateResolverDialog extends JDialog {
     first.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_UPPER;
-        dispose();
+        block = false;
+        //dispose();
       }
     });
 
     second.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_LOWER;
-        dispose();
+        block = false;
+        //dispose();
       }
     });
 
     both.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         status = KEEP_BOTH;
-        dispose();
+        block = false;
+        //dispose();
       }
     });
 
@@ -125,11 +130,22 @@ public class DuplicateResolverDialog extends JDialog {
     }
   }
 
+
+
   public void setEntries(BibtexEntry newOne, BibtexEntry newTwo) {
+    Util.pr("jass");
     setSourceView(newOne, newTwo);
     p1.setEntry(newOne);
     p2.setEntry(newTwo);
+    status = NOT_CHOSEN;
+    p1.revalidate();
+    p1.repaint();
+    block = true;
   }
+
+public boolean isBlocking() {
+  return block;
+}
 
   public int getSelected() {
     return status;

@@ -39,7 +39,9 @@ import javax.swing.*;
 
 public class Globals {
 
-  static int SHORTCUT_MASK;// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+  static int SHORTCUT_MASK,// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+      FUTURE_YEAR = 2050; // Needs to give a year definitely in the future. Used for guessing the
+                          // year field when parsing textual data.  :-)
 
   private static String resourcePrefix = "resource/JabRef";
   private static String logfile = "jabref.log";

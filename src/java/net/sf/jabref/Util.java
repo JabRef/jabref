@@ -31,6 +31,7 @@ import java.io.*;
 import java.util.*;
 import net.sf.jabref.imports.ImportFormatReader;
 import java.awt.*;
+import java.util.regex.Pattern;
 
 /**
  * Describe class <code>Util</code> here.
@@ -319,8 +320,23 @@ public class Util {
      */
     public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException
     {
-	String cmdArray[] = new String[2];
+      if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
+        // Check that the file exists:
+        File file = new File(link);
+        if (!file.exists()) {
+          throw new IOException(Globals.lang("File not found") + ": '" + link +
+                                "'.");
+        }
+
+        // Use the correct viewer even if pdf and ps are mixed up:
+        String[] split = file.getName().split("\\.");
+        if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("pdf")))
+          fieldName = "pdf";
+        else if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("ps")))
+          fieldName = "ps";
+      }
+	String cmdArray[] = new String[2];
 	// check html first since browser can invoke viewers
 	if (fieldName.equals("doi"))
 	    {
@@ -336,8 +352,8 @@ public class Util {
                   if (link.startsWith("\\url{") && link.endsWith("}"))
                     link = link.substring(5, link.length()-1);
 
-                  System.err.println("Starting HTML browser: "
-                                     + prefs.get("htmlviewer") + " " + link);
+                  //System.err.println("Starting HTML browser: "
+                  //                   + prefs.get("htmlviewer") + " " + link);
                   if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
@@ -359,8 +375,8 @@ public class Util {
 	    {
 		try
 		    {
-			System.err.println("Starting external viewer: "
-					   + prefs.get("psviewer") + " " + link);
+			//System.err.println("Starting external viewer: "
+			//		   + prefs.get("psviewer") + " " + link);
                 if(Globals.ON_MAC){
                     String[] cmd = {"/usr/bin/open", "-a", prefs.get("psviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
@@ -555,5 +571,74 @@ public class Util {
 		}
 	}
 
+
+        public static void guessBibtexFields(String text) {
+
+          text = "  "+text+"  ";
+
+          String[] split = null;
+
+          // Look for the year:
+          String year = null;
+          String yearRx = "\\s\\d\\d\\d\\d";
+          String[] cand = getMatches(text, yearRx);
+          if (cand.length == 1) {
+            // Only one four-digit number, so we guess that is the year.
+            year = cand[0].trim();
+            Util.pr("Guessing 'year': '"+year+"'");
+          } else if (cand.length > 1) {
+            // More than one four-digit numbers, so we look for one giving a reasonable year:
+
+            int good = -1, yearFound = -1;
+            find: for (int i=0; i<cand.length; i++) {
+              int number = Integer.parseInt(cand[i].trim());
+              if (number == yearFound)
+                continue find;
+              if (number < 2500) {
+                if (good == -1) {
+                  good = i;
+                  yearFound = number;
+                } else {
+                  // More than one found. Be a bit more specific.
+                  if ((yearFound < Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                    good = -1;
+                    break find; // Give up, both seem good enough.
+                  }
+                  else if ((yearFound >= Globals.FUTURE_YEAR) && (number < Globals.FUTURE_YEAR)) {
+                    good = i;
+                    yearFound = number;
+                  }
+                }
+              }
+            }
+            if (good >= 0) {
+              year = cand[good].trim();
+              Util.pr("Guessing 'year': '"+year+"'");
+            }
+          }
+          Util.pr("'"+text+"'");
+          // Look for Pages:
+          String pages = null;
+          String pagesRx = "\\s(\\d{1,4})( ??)-( ??)(\\d{1,4})(\\.|,|\\s)";
+          cand = getMatches(text, pagesRx);
+          if (cand.length > 0)
+            Util.pr(cand[0]);
+        }
+
+        public static String[] getMatches(String text, String regexp) {
+          int piv = 0;
+          String[] test = text.split(regexp);
+          if (test.length < 2)
+            return new String[0];
+
+          String[] out = new String[test.length-1];
+          for (int i=0; i<out.length; i++) {
+            String[] curr = text.split(regexp, i+2);
+            out[i] = text.substring(piv+curr[i].length(), text.length()-curr[i+1].length());
+            piv += curr[i].length()+out[i].length();
+            Util.pr("--"+out[i]+"\n-> "+piv);
+          }
+          return out;
+        }
 
 }

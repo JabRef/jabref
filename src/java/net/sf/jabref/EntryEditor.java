@@ -856,15 +856,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Close window"));
 	}
 	public void actionPerformed(ActionEvent e) {
+	    Thread t = new Thread() {
+		    public void run() {
+			panel.entryTypeFormClosing(entry.getId());
+			panel.hideEntryEditor();
+		    }
+		};
 	    if (tabbed.getSelectedComponent() == srcPanel) {
 		storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
 		if (lastSourceAccepted) {
-		    panel.entryTypeFormClosing(entry.getId());
-		    panel.hideEntryEditor();
+		    t.start();
 		}
 	    } else {
-		panel.entryTypeFormClosing(entry.getId());
-		panel.hideEntryEditor();
+		t.start();
 	    }
 	}
     }
