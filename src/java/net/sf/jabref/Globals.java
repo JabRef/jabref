@@ -36,6 +36,7 @@ import java.awt.Font;
 import java.io.*;
 import java.awt.*;
 import javax.swing.*;
+import net.sf.jabref.collab.FileUpdateMonitor;
 
 public class Globals {
 
@@ -46,6 +47,7 @@ public class Globals {
   private static String resourcePrefix = "resource/JabRef";
   private static String logfile = "jabref.log";
   public static ResourceBundle messages;
+  public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
 
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
   public static Locale locale;
@@ -284,9 +286,16 @@ public class Globals {
     }
   }
 
+
+  public static String SPECIAL_COMMAND_CHARS = "\"`^~'";
   public static HashMap HTML_CHARS = new HashMap(),
+  	HTMLCHARS = new HashMap(),
       XML_CHARS = new HashMap();
   static {
+
+    // Start the thread that monitors file time stamps.
+    Util.pr("Starting FileUpdateMonitor thread. Globals line 293.");
+    fileUpdateMonitor.start();
 
     try {
       SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -313,17 +322,17 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
     HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
     HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{e\\}\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{o\\}\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{O\\}\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{u\\}\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{U\\}\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&Aacute;");
-
+                
+    HTML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&eacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{E\\}\\}", "&Eacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{i\\}\\}", "&iacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{I\\}\\}", "&Iacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{o\\}\\}", "&oacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{O\\}\\}", "&Oacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{u\\}\\}", "&uacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{U\\}\\}", "&Uacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{a\\}\\}", "&aacute;");
+    HTML_CHARS.put("\\{\\\\\\'\\{A\\}\\}", "&Aacute;");
     HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
     HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
     HTML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&ucirc;");
@@ -339,6 +348,50 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
     HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
 
+
+    HTMLCHARS.put("\"a", "&auml;");
+    HTMLCHARS.put("\"A", "&Auml;");
+    HTMLCHARS.put("\"e", "&euml;");
+    HTMLCHARS.put("\"E", "&Euml;");
+    HTMLCHARS.put("\"i", "&iuml;");
+    HTMLCHARS.put("\"I", "&Iuml;");
+    HTMLCHARS.put("\"o", "&ouml;");
+    HTMLCHARS.put("\"O", "&Ouml;");
+    HTMLCHARS.put("\"u", "&uuml;");
+    HTMLCHARS.put("\"U", "&Uuml;");
+    HTMLCHARS.put("`e", "&egrave;");
+    HTMLCHARS.put("`E", "&Egrave;");
+    HTMLCHARS.put("`i", "&igrave;");
+    HTMLCHARS.put("`I", "&Igrave;");
+    HTMLCHARS.put("`o", "&ograve;");
+    HTMLCHARS.put("`O", "&Ograve;");
+    HTMLCHARS.put("`u", "&ugrave;");
+    HTMLCHARS.put("`U", "&Ugrave;");
+    HTMLCHARS.put("'e", "&eacute;");                                                      
+    HTMLCHARS.put("'E", "&Eacute;");
+    HTMLCHARS.put("'i", "&iacute;");
+    HTMLCHARS.put("'I", "&Iacute;");
+    HTMLCHARS.put("'o", "&oacute;");                                                      
+    HTMLCHARS.put("'O", "&Oacute;");
+    HTMLCHARS.put("'u", "&uacute;");                                                      
+    HTMLCHARS.put("'U", "&Uacute;");
+    HTMLCHARS.put("'a", "&aacute;");
+    HTMLCHARS.put("'A", "&Aacute;");
+    HTMLCHARS.put("^o", "&ocirc;");
+    HTMLCHARS.put("^O", "&Ocirc;");
+    HTMLCHARS.put("^u", "&ucirc;");
+    HTMLCHARS.put("^U", "&Ucirc;");
+    HTMLCHARS.put("^e", "&ecirc;");
+    HTMLCHARS.put("^E", "&Ecirc;");
+    HTMLCHARS.put("^i", "&icirc;");
+    HTMLCHARS.put("^I", "&Icirc;");
+    HTMLCHARS.put("~o", "&otilde;");
+    HTMLCHARS.put("~O", "&Otilde;");                                
+    HTMLCHARS.put("~n", "&ntilde;");
+    HTMLCHARS.put("~N", "&Ntilde;");                                
+    HTMLCHARS.put("~a", "&atilde;");
+    HTMLCHARS.put("~A", "&Atilde;");                                
+    
     HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
     HTML_CHARS.put("\\{\\\\\\\"e\\}", "&euml;");
@@ -358,16 +411,16 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
     HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
     HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDE\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDi\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDI\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDo\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDO\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDu\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDU\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDa\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\\uFFFDA\\}", "&Aacute;");
+    HTML_CHARS.put("\\{\\\\\\'A\\}", "&eacute;");
+    HTML_CHARS.put("\\{\\\\\\'E\\}", "&Eacute;");
+    HTML_CHARS.put("\\{\\\\\\'i\\}", "&iacute;");
+    HTML_CHARS.put("\\{\\\\\\'I\\}", "&Iacute;");
+    HTML_CHARS.put("\\{\\\\\\'o\\}", "&oacute;");
+    HTML_CHARS.put("\\{\\\\\\'O\\}", "&Oacute;");
+    HTML_CHARS.put("\\{\\\\\\'u\\}", "&uacute;");
+    HTML_CHARS.put("\\{\\\\\\'U\\}", "&Uacute;");
+    HTML_CHARS.put("\\{\\\\\\'a\\}", "&aacute;");
+    HTML_CHARS.put("\\{\\\\\\'A\\}", "&Aacute;");
 
     HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
     HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");
@@ -407,7 +460,7 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&#x00D2;");
     XML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&#x00F9;");
     XML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&#x00D9;");
-    XML_CHARS.put("\\{\\\\\\\uFFFD\\{e\\}\\}", "&#x00E9;");
+    XML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&#x00E9;");
     XML_CHARS.put("\\{\\\\\\\uFFFD\\{E\\}\\}", "&#x00C9;");
     XML_CHARS.put("\\{\\\\\\\uFFFD\\{i\\}\\}", "&#x00ED;");
     XML_CHARS.put("\\{\\\\\\\uFFFD\\{I\\}\\}", "&#x00CD;");

@@ -1,68 +1,137 @@
-///////////////////////////////////////////////////////////////////////////////
-//  Filename: $RCSfile$
-//  Purpose:  Atom representation.
-//  Language: Java
-//  Compiler: JDK 1.4
-//  Authors:  Joerg K. Wegner, Morten O. Alver
-//  Version:  $Revision$
-//            $Date$
-//            $Author$
-//
-//  Copyright (c) Dept. Computer Architecture, University of Tuebingen, Germany
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation version 2 of the License.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-///////////////////////////////////////////////////////////////////////////////
-
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
-import java.util.regex.*;
-import java.util.Iterator;
-import net.sf.jabref.Util;
+import net.sf.jabref.export.layout.*;
 import net.sf.jabref.Globals;
 
-/**
- * Changes {\^o} or {\^{o}} to ô
- *
- * @author $author$
- * @version $Revision$
- */
-public class HTMLChars implements LayoutFormatter
-{
-    //~ Methods ////////////////////////////////////////////////////////////////
-    //Pattern pattern = Pattern.compile(".*\\{..[a-zA-Z].\\}.*");
-    Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
+public class HTMLChars implements LayoutFormatter {
 
-    public String format(String fieldText)
-    {
-	fieldText = firstFormat(fieldText);
 
-	if (!pattern.matcher(fieldText).matches())
-	    return restFormat(fieldText);
+  public String format(String field) {
+    int i;
+    field = firstFormat(field);
 
-	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
-	    String s = (String)i.next();
-	    fieldText = fieldText.replaceAll(s, (String)Globals.HTML_CHARS.get(s));
-	}
-	//RemoveBrackets rb = new RemoveBrackets();
-	return restFormat(fieldText);
+    StringBuffer sb = new StringBuffer("");
+    StringBuffer currentCommand = null;
+    char c;
+    boolean escaped = false, incommand = false;
+    for (i=0; i<field.length(); i++) {
+      c = field.charAt(i);
+      if (escaped && (c == '\\')) {
+        sb.append('\\');
+        escaped = false;
+      }
+      else if (c == '\\') {
+        escaped = true;
+        incommand = true;
+        currentCommand = new StringBuffer();
+      }
+      else if (!incommand && (c=='{' || c=='}')) {
+        // Swallow the brace.
+      }
+      else if (Character.isLetter((char)c) ||
+               (Globals.SPECIAL_COMMAND_CHARS.indexOf(""+(char)c) >= 0)) {
+        escaped = false;
+        if (!incommand)
+          sb.append((char)c);
+          // Else we are in a command, and should not keep the letter.
+        else {
+          currentCommand.append( (char) c);
+          testCharCom: if ((currentCommand.length() == 1)
+              && (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
+            // This indicates that we are in a command of the type \^o or \~{n}
+            if (i >= field.length()-1)
+              break testCharCom;
+
+            String command = currentCommand.toString();
+            i++;
+            c = field.charAt(i);
+            //System.out.println("next: "+(char)c);
+            String combody;
+            if (c == '{') {
+              IntAndString part = getPart(field, i);
+              i += part.i;
+              combody = part.s;
+            }
+            else {
+              combody = field.substring(i,i+1);
+              //System.out.println("... "+combody);
+            }
+            Object result = Globals.HTMLCHARS.get(command+combody);
+            if (result != null)
+              sb.append((String)result);
+
+            incommand = false;
+            escaped = false;
+
+          }
+
+        }
+
+      }
+      else {
+        //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
+        testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
+          sb.append((char)c);
+        else {
+          // First test if we are already at the end of the string.
+          if (i >= field.length()-1)
+            break testContent;
+
+          if (c == '{') {
+
+            String command = currentCommand.toString();
+            // Then test if we are dealing with a italics or bold command. If so, handle.
+            if (command.equals("emph") || command.equals("textit")) {
+              IntAndString part = getPart(field, i);
+              i += part.i;
+              sb.append("<em>"+part.s+"</em>");
+            }
+            else if (command.equals("textbf")) {
+              IntAndString part = getPart(field, i);
+              i += part.i;
+              sb.append("<b>"+part.s+"</b>");
+            }
+          } else
+            sb.append((char)c);
+
+        }
+        incommand = false;
+        escaped = false;
+      }
     }
 
-    private String firstFormat(String s) {
-	return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
-    }
+    return sb.toString();
+        //field.replaceAll("\\\\emph", "").replaceAll("\\\\em", "").replaceAll("\\\\textbf", "");
+  }
 
-    private String restFormat(String s) {
-	return s.replaceAll("\\}","").replaceAll("\\{","");
+  private String firstFormat(String s) {
+    return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
+  }
+
+  private IntAndString getPart(String text, int i) {
+    char c;
+    int count = 0;//, i=index;
+    StringBuffer part = new StringBuffer();
+    while ((count >= 0) && (i < text.length())) {
+      i++;
+      c = text.charAt(i);
+      if (c == '}')
+        count--;
+      else if (c == '{')
+        count++;
+
+      part.append((char)c);
     }
+    //System.out.println("part: "+part.toString()+"\nformatted: "+format(part.toString()));
+    return new IntAndString(part.length(), format(part.toString()));
+  }
+
+  private class IntAndString{
+    public int i;
+    String s;
+    public IntAndString(int i, String s) {
+      this.i = i;
+      this.s = s;
+    }
+  }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

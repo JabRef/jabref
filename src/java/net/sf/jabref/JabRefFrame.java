@@ -1229,6 +1229,7 @@ public JabRefPreferences prefs() {
       }
 
       if (close) {
+        basePanel().cleanUp();
         tabbedPane.remove(basePanel());
         if (tabbedPane.getTabCount() == 0) {
           setEmptyState();

@@ -49,8 +49,9 @@ import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.*;
 import net.sf.jabref.undo.*;
+import net.sf.jabref.collab.*;
 
-public class BasePanel extends JSplitPane implements ClipboardOwner {
+public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateListener {
 
     BasePanel ths = this;
     JSplitPane splitPane;
@@ -62,6 +63,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // The database shown in this panel.
     File file = null,
 	fileToOpen = null; // The filename of the database.
+    String fileMonitorHandle = null;
+    boolean saving = false;
     String encoding = null;
 
     //Hashtable autoCompleters = new Hashtable();
@@ -129,29 +132,37 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     private HashMap actions = new HashMap();
 
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
-	database = new BibtexDatabase();
-	metaData = new MetaData();
-	this.frame = frame;
-	this.prefs = prefs;
-	setupActions();
-	setupMainPanel();
+      super(JSplitPane.HORIZONTAL_SPLIT, true);
+      database = new BibtexDatabase();
+      metaData = new MetaData();
+      this.frame = frame;
+      this.prefs = prefs;
+      setupActions();
+      setupMainPanel();
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
 		     HashMap meta, JabRefPreferences prefs) {
-	super(JSplitPane.HORIZONTAL_SPLIT, true);
-	this.frame = frame;
-        database = db;
-	this.prefs = prefs;
-	parseMetaData(meta);
-	setupActions();
-	setupMainPanel();
-	/*if (prefs.getBoolean("autoComplete")) {
-	    db.setCompleters(autoCompleters);
-	    }*/
+      super(JSplitPane.HORIZONTAL_SPLIT, true);
+      this.frame = frame;
+      database = db;
+      this.prefs = prefs;
+      parseMetaData(meta);
+      setupActions();
+      setupMainPanel();
+      /*if (prefs.getBoolean("autoComplete")) {
+            db.setCompleters(autoCompleters);
+            }*/
 
-        this.file = file;
+      this.file = file;
 
+      // Register so we get notifications about outside changes to the file.
+      if (file != null)
+        try {
+          fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this,
+              file);
+        } catch (IOException ex) {
+        }
     }
 
     public BibtexDatabase database() { return database; }
@@ -204,16 +215,25 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		    if (file == null)
 			runCommand("saveAs");
 		    else {
-			saveDatabase(file, false);
-			undoManager.markUnchanged();
-			// (Only) after a successful save the following
-			// statement marks that the base is unchanged
-			// since last save:
-			nonUndoableChange = false;
-			baseChanged = false;
-			frame.setTabTitle(ths, file.getName());
-			frame.output(Globals.lang("Saved database")+" '"
-				     +file.getPath()+"'.");
+                      saving = true;
+                      saveDatabase(file, false);
+                      try {
+                        Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
+                      } catch (IllegalArgumentException ex) {
+                        // This means the file has not yet been registered, which is the case
+                        // when doing a "Save as". Maybe we should change the monitor so no
+                        // exception is cast.
+                      }
+                      saving = false;
+                      undoManager.markUnchanged();
+                      // (Only) after a successful save the following
+                      // statement marks that the base is unchanged
+                      // since last save:
+                      nonUndoableChange = false;
+                      baseChanged = false;
+                      frame.setTabTitle(ths, file.getName());
+                      frame.output(Globals.lang("Saved database")+" '"
+                                   +file.getPath()+"'.");
 		    }
 		}
 	    });
@@ -231,7 +251,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                          (frame, "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
                           Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                          == JOptionPane.OK_OPTION)) {
+
                       runCommand("save");
+                      // Register so we get notifications about outside changes to the file.
+                      try {
+                        fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(ths,file);
+                      } catch (IOException ex) {
+                        ex.printStackTrace();
+                      }
+
                       prefs.put("workingDirectory", file.getParent());
                       frame.fileHistory.newFile(file.getPath());
                     }
@@ -1914,4 +1942,22 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       });
     }
   }
+
+    public void fileUpdated() {
+      if (saving)
+        return; // We are just saving the file, so this message is most likely due
+      // to bad timing. If not, we'll handle it on the next polling.
+
+      Util.pr("File '"+file.getPath()+"' has been modified.");
+    }
+
+      public void fileRemoved() {
+        Util.pr("File '"+file.getPath()+"' has been deleted.");
+      }
+
+
+      public void cleanUp() {
+        if (fileMonitorHandle != null)
+          Globals.fileUpdateMonitor.removeUpdateListener(fileMonitorHandle);
+      }
 }
