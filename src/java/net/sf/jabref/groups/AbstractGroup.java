@@ -1,6 +1,8 @@
 package net.sf.jabref.groups;
 
-import java.util.*;
+import java.util.Map;
+
+import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 
@@ -8,6 +10,12 @@ import net.sf.jabref.*;
  * A group of BibtexEntries.
  */
 public abstract class AbstractGroup {
+    protected String m_name;
+    
+    public AbstractGroup(String name) {
+        m_name = name;
+    }
+    
     /** Character used for quoting in the string representation. */
     protected static final char QUOTE_CHAR = '\\';
     /**
@@ -31,7 +39,8 @@ public abstract class AbstractGroup {
      *             If an error occured and a group could not be created, e.g.
      *             due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db)
+            throws Exception {
         if (s.startsWith(KeywordGroup.ID))
             return KeywordGroup.fromString(s);
         if (s.startsWith(AllEntriesGroup.ID))
@@ -39,30 +48,18 @@ public abstract class AbstractGroup {
         if (s.startsWith(SearchGroup.ID))
             return SearchGroup.fromString(s);
         if (s.startsWith(ExplicitGroup.ID))
-            return ExplicitGroup.fromString(s);
+            return ExplicitGroup.fromString(s, db);
         return null; // unknown group
     }
 
     /** Returns this group's name, e.g. for display in a list/tree. */
-    public abstract String getName();
-
-    /**
-     * Re-create multiple instances (of not necessarily the same type) from the
-     * specified Vector.
-     * 
-     * @param vector
-     *            A vector containing String representations obtained from a
-     *            group's toString() method.
-     * @return A vector containing the recreated group instances.
-     * @throws Exception
-     *             If an error occured and a group could not be created, e.g.
-     *             due to a malformed regular expression.
-     */
-    public static final Vector fromString(Vector vector) throws Exception {
-        Vector groups = new Vector();
-        for (int i = 0; i < vector.size(); ++i)
-            groups.add(fromString(vector.elementAt(i).toString()));
-        return groups;
+    public final String getName() {
+        return m_name;
+    }
+    
+    /** Sets the group's name. */
+    public final void setName(String name) {
+        m_name = name;
     }
 
     /**
@@ -79,19 +76,26 @@ public abstract class AbstractGroup {
 
     /**
      * Adds the selected entries to this group.
+     * 
+     * @return If this group or one or more entries was/were modified as a
+     *         result of this operation, an object is returned that allows to
+     *         undo this change. null is returned otherwise.
      */
-    public abstract void addSelection(BasePanel basePanel);
+    public abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
 
     /**
      * Removes the selected entries from this group.
+     * 
+     * @return If this group or one or more entries was/were modified as a
+     *         result of this operation, an object is returned that allows to
+     *         undo this change. null is returned otherwise.
      */
-    public abstract void removeSelection(BasePanel basePanel);
+    public abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
 
     /**
-     * @return A value >0 if this group contains the specified entry, 0
-     *         otherwise.
+     * @return true if this group contains the specified entry, false otherwise.
      */
-    public abstract int contains(Map searchOptions, BibtexEntry entry);
+    public abstract boolean contains(Map searchOptions, BibtexEntry entry);
 
     /**
      * @return A deep copy of this object.

@@ -65,7 +65,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
      * @throws Exception
      *             When a group could not be recreated
      */
-    public static GroupTreeNode fromString(String s) throws Exception {
+    public static GroupTreeNode fromString(String s, BibtexDatabase db) throws Exception {
         GroupTreeNode root = null;
         GroupTreeNode newNode;
         int i;
@@ -73,7 +73,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
         while (s.length() > 0) {
             if (s.startsWith("(")) {
                 String subtree = getSubtree(s);
-                newNode = fromString(subtree);
+                newNode = fromString(subtree,db);
                 // continue after this subtree by removing it
                 // and the leading/trailing braces, and
                 // the comma (that makes 3) that always trails it
@@ -88,7 +88,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
                 else
                     s = "";
                 newNode = new GroupTreeNode(AbstractGroup.fromString(Util
-                        .unquote(g, '\\')));
+                        .unquote(g, '\\'),db));
             }
             if (root == null) // first node will be root
                 root = newNode;

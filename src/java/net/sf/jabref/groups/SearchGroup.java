@@ -1,11 +1,13 @@
 package net.sf.jabref.groups;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.Map;
+
+import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.search.*;
-import antlr.*;
+import antlr.RecognitionException;
 import antlr.collections.AST;
 
 /**
@@ -16,7 +18,6 @@ import antlr.collections.AST;
  */
 public class SearchGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "SearchGroup:";
-    private String m_name;
     private final String m_searchExpression;
     private final boolean m_caseSensitive;
     private final boolean m_regExp;
@@ -41,7 +42,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             boolean caseSensitive, boolean regExp, boolean searchAllFields,
             boolean searchRequiredFields, boolean searchOptionalFields,
             boolean searchGeneralFields) {
-        m_name = name;
+        super(name);
         m_searchExpression = searchExpression;
         m_caseSensitive = caseSensitive;
         m_regExp = regExp;
@@ -127,10 +128,6 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
                 + (m_searchGeneralFields ? "1" : "0") + SEPARATOR;
     }
 
-    public String getName() {
-        return m_name;
-    }
-
     public String getSearchExpression() {
         return m_searchExpression;
     }
@@ -143,12 +140,14 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         return false;
     }
 
-    public void addSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
         // nothing to do, add is not supported
+        return null;
     }
 
-    public void removeSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
         // nothing to do, remove is not supported
+        return null;
     }
 
     public boolean equals(Object o) {
@@ -171,8 +170,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
-    public int contains(Map searchOptions, BibtexEntry entry) {
-        return m_searchRule.applyRule(searchOptions,entry);
+    public boolean contains(Map searchOptions, BibtexEntry entry) {
+        return m_searchRule.applyRule(searchOptions,entry) == 0 ? false : true;
     }
     
     public int applyRule(Map searchOptions, BibtexEntry entry) {

@@ -1,7 +1,9 @@
 package net.sf.jabref.groups;
 
-import java.util.*;
 import java.util.Map;
+
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.*;
 
 /**
@@ -10,8 +12,10 @@ import net.sf.jabref.*;
 public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "AllEntriesGroup:";
 
-    private static final String m_name = "All Entries";
-
+    public AllEntriesGroup() {
+        super("All Entries");
+    }
+    
     public static AbstractGroup fromString(String s) throws Exception {
         if (!s.startsWith(ID))
             throw new Exception(
@@ -24,10 +28,6 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return this;
     }
 
-    public String getName() {
-        return m_name;
-    }
-
     public boolean supportsAdd() {
         return false;
     }
@@ -36,16 +36,18 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return false;
     }
 
-    public void addSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
         // not supported -> ignore
+        return null;
     }
 
-    public void removeSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
         // not supported -> ignore
+        return null;
     }
 
-    public int contains(Map searchOptions, BibtexEntry entry) {
-        return 1; // contains everything
+    public boolean contains(Map searchOptions, BibtexEntry entry) {
+        return true; // contains everything
     }
 
     public AbstractGroup deepCopy() {

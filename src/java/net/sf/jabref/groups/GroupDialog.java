@@ -85,7 +85,8 @@ class GroupDialog extends JDialog {
     private JPanel m_mainPanel;
 
     private boolean m_okPressed = false;
-    private JabRefFrame m_parent;
+    private final JabRefFrame m_parent;
+    private final BasePanel m_basePanel;
     private AbstractGroup m_resultingGroup;
 
     /**
@@ -99,8 +100,9 @@ class GroupDialog extends JDialog {
      *            The group being edited, or null if a new group is to be
      *            created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
+    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel, AbstractGroup editedGroup) {
         super(jabrefFrame, Globals.lang("Edit group"), true);
+        m_basePanel = basePanel;
         m_parent = jabrefFrame;
 
         // set default values (overwritten if editedGroup != null)
@@ -202,7 +204,7 @@ class GroupDialog extends JDialog {
                 switch (m_typeSelector.getSelectedIndex()) {
                 case INDEX_EXPLICITGROUP:
                     m_resultingGroup = new ExplicitGroup(m_name.getText()
-                            .trim());
+                            .trim(),m_basePanel.database());
                     break;
                 case INDEX_KEYWORDGROUP:
                     // regex is correct, otherwise OK would have been disabled

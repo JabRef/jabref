@@ -87,7 +87,8 @@ class AutoGroupDialog extends JDialog {
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup("Automatically created groups"));
+                        new ExplicitGroup("Automatically created groups", panel
+                                .database()));
                 HashSet hs = null;
                 if (nd.isSelected()) {
                     hs = Util
@@ -101,8 +102,8 @@ class AutoGroupDialog extends JDialog {
                 Iterator i = hs.iterator();
                 while (i.hasNext()) {
                     String regExp = i.next().toString().toLowerCase();
-                    KeywordGroup group = new KeywordGroup(regExp, field(),
-                            Util.quoteMeta(regExp));
+                    KeywordGroup group = new KeywordGroup(regExp, field(), Util
+                            .quoteMeta(regExp));
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 

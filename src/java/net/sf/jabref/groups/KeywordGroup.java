@@ -1,10 +1,11 @@
 package net.sf.jabref.groups;
 
-import java.util.*;
+import java.util.Map;
 import java.util.regex.*;
-import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.*;
 
@@ -16,7 +17,6 @@ import net.sf.jabref.undo.*;
  */
 public class KeywordGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "KeywordGroup:";
-    private String m_name;
     private String m_searchField;
     private String m_searchExpression;
     private Pattern m_pattern;
@@ -27,7 +27,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      */
     public KeywordGroup(String name, String searchField, String searchExpression)
             throws IllegalArgumentException, PatternSyntaxException {
-        m_name = name;
+        super(name);
         m_searchField = searchField;
         m_searchExpression = searchExpression;
         compilePattern();
@@ -84,14 +84,6 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                 + SEPARATOR;
     }
 
-    public String getName() {
-        return m_name;
-    }
-
-    public void setName(String m_name) {
-        this.m_name = m_name;
-    }
-
     public String getSearchField() {
         return m_searchField;
     }
@@ -118,25 +110,25 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return true;
     }
 
-    public void addSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
         if (!supportsAdd()) {
             // this should never happen
             basePanel.output("The group \"" + getName()
                     + "\" does not support the adding of entries.");
-            return;
+            return null;
         }
         for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
             if (m_searchField.equals(GUIGlobals.ALL_FIELDS[i])
                     && !m_searchField.equals("keywords")) {
                 if (!showWarningDialog(basePanel))
-                    return;
+                    return null;
             }
         }
 
         BibtexEntry[] bes = basePanel.getSelectedEntries();
         if ((bes != null) && (bes.length > 0)) {
             NamedCompound ce = new NamedCompound("add to group");
-            boolean hasEdits = false;
+            boolean modified = false;
             for (int i = 0; i < bes.length; i++) {
                 if (applyRule(null, bes[i]) == 0) {
                     String oldContent = (String) bes[i].getField(m_searchField), pre = " ", post = "";
@@ -148,22 +140,20 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     // Store undo information.
                     ce.addEdit(new UndoableFieldChange(bes[i], m_searchField,
                             oldContent, newContent));
-                    hasEdits = true;
+                    modified = true;
                 }
             }
-            if (hasEdits) {
+            if (modified)
                 ce.end();
-                basePanel.undoManager.addEdit(ce);
-                basePanel.refreshTable();
-                basePanel.markBaseChanged();
-                basePanel.updateEntryEditorIfShowing();
-                basePanel.updateViewToSelected();
-            }
-
+ 
             basePanel.output("Appended '" + m_searchExpression + "' to the '"
                     + m_searchField + "' field of " + bes.length + " entr"
                     + (bes.length > 1 ? "ies." : "y."));
+            
+            return modified ? ce : null;
         }
+        
+        return null;
     }
 
     /**
@@ -186,25 +176,25 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return choice != JOptionPane.NO_OPTION;
     }
 
-    public void removeSelection(BasePanel basePanel) {
+    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
         if (!supportsRemove()) {
             // this should never happen
             basePanel.output("The group \"" + getName()
                     + "\" does not support the removal of entries.");
-            return;
+            return null;
         }
         for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; i++) {
             if (m_searchField.equals(GUIGlobals.ALL_FIELDS[i])
                     && !m_searchField.equals("keywords")) {
                 if (!showWarningDialog(basePanel))
-                    return;
+                    return null;
             }
         }
 
         BibtexEntry[] selectedEntries = basePanel.getSelectedEntries();
         if ((selectedEntries != null) && (selectedEntries.length > 0)) {
             NamedCompound ce = new NamedCompound("remove from group");
-            boolean hasEdits = false;
+            boolean modified = false;
             for (int i = 0; i < selectedEntries.length; ++i) {
                 if (applyRule(null, selectedEntries[i]) > 0) {
                     String oldContent = (String) selectedEntries[i]
@@ -214,22 +204,20 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     ce.addEdit(new UndoableFieldChange(selectedEntries[i],
                             m_searchField, oldContent, selectedEntries[i]
                                     .getField(m_searchField)));
-                    hasEdits = true;
+                    modified = true;
                 }
             }
-            if (hasEdits) {
+            if (modified)
                 ce.end();
-                basePanel.undoManager.addEdit(ce);
-                basePanel.refreshTable();
-                basePanel.markBaseChanged();
-                basePanel.updateEntryEditorIfShowing();
-                basePanel.updateViewToSelected();
-            }
 
             basePanel.output("Removed '" + m_searchExpression + "' from the '"
                     + m_searchField + "' field of " + selectedEntries.length
                     + " entr" + (selectedEntries.length > 1 ? "ies." : "y."));
+            
+            return modified ? ce : null;
         }
+        
+        return null;
     }
 
     public boolean equals(Object o) {
@@ -247,11 +235,11 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
      *      net.sf.jabref.BibtexEntry)
      */
-    public int contains(Map searchOptions, BibtexEntry entry) {
+    public boolean contains(Map searchOptions, BibtexEntry entry) {
         String content = (String) entry.getField(m_searchField);
         if ((content != null) && (m_pattern.matcher(content).find()))
-            return 1;
-        return 0;
+            return true;
+        return false;
     }
 
     /**
@@ -269,7 +257,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     public int applyRule(Map searchOptions, BibtexEntry entry) {
-        return contains(searchOptions, entry);
+        return contains(searchOptions, entry) ? 1 : 0;
     }
 
     public AbstractGroup deepCopy() {
