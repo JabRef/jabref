@@ -85,6 +85,10 @@ public class JabRefFrame
   // BasePanel's runCommand() method to be called with that command.
   // Note: GeneralAction's constructor automatically gets translations
   // for the name and message strings.
+
+  // References to the toggle buttons in the toolbar:
+  JToggleButton groupToggle;
+
   AbstractAction
       open = new OpenDatabaseAction(),
       close = new CloseDatabaseAction(),
@@ -301,8 +305,16 @@ public class JabRefFrame
     tabbedPane.addChangeListener(new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
         BasePanel bp = basePanel();
-        if (bp != null)
+        if (bp != null) {
+          //SwingUtilities.invokeLater(new Runnable() {
+          //public void run() {
+          //Util.pr(""+bp.groupSelector.isVisible());
+          groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));
+        //groupSelector.isVisible());
+          //  }
+          //});
           Globals.focusListener.setFocused(bp.entryTable);
+        }
       }
 
     });
@@ -905,7 +917,9 @@ public JabRefPreferences prefs() {
     tlb.add(openUrl);
     tlb.addSeparator();
     tlb.add(normalSearch);
-    tlb.add(toggleGroups);
+    groupToggle = new JToggleButton(toggleGroups);
+    groupToggle.setText(null);
+    tlb.add(groupToggle);
     tlb.addSeparator();
     tlb.add(showPrefs);
     tlb.add(Box.createHorizontalGlue());
@@ -1048,7 +1062,7 @@ public JabRefPreferences prefs() {
     unmark.setEnabled(true);
     unmarkAll.setEnabled(true);
     editEntry.setEnabled(true);
-	importCiteSeer.setEnabled(true);    
+	importCiteSeer.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
     copyCiteKey.setEnabled(true);
@@ -1349,24 +1363,24 @@ public JabRefPreferences prefs() {
 
 class FetchCiteSeerAction
 	extends AbstractAction {
-		
+
 		public FetchCiteSeerAction() {
 			super(Globals.lang("Fetch Citations from CiteSeer"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));					
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));
 		}
 
 		public void actionPerformed(ActionEvent e) {
 
 			if(basePanel().citeSeerFetcher.activateFetcher()) {
-				basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");				
+				basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");
 				(new Thread() {
 					BasePanel newBp;
-					BasePanel targetBp;				
+					BasePanel targetBp;
 					BibtexDatabase newDatabase;
 					BibtexDatabase targetDatabase;
 
 					Runnable updateComponent = new Runnable() {
-						public void run() { 
+						public void run() {
 							tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
 							tabbedPane.setSelectedComponent(newBp);
 							newBp.refreshTable();
@@ -1390,7 +1404,7 @@ class FetchCiteSeerAction
 				  }
 				}).start();
 			} else {
-				System.out.println("Fetch Currently Active");			
+				System.out.println("Fetch Currently Active");
 			}
 		}
 	}

@@ -74,6 +74,16 @@ public class SidePaneManager {
 	    panel.setLeftComponent(null);
     }
 
+    public boolean isPanelVisible(String name) {
+      Object o = components.get(name);
+      if (o != null) {
+        return visible.contains(o);
+      } else {
+        System.err.println("Side pane component '" + name + "' unknown.");
+        return false;
+      }
+    }
+
     public void togglePanel(String name) {
       Object o = components.get(name);
       if (o != null) {

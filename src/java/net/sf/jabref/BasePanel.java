@@ -109,6 +109,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // The group selector component for this database. Instantiated by the SidePaneManager if necessary,
     // or from this class if merging groups from a different database.
 
+
     boolean showingSearchResults = false,
 	showingGroup = false,
         previewEnabled = true;
@@ -579,7 +580,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	// The action for toggling the groups interface
 	actions.put("toggleGroups", new BaseAction() {
 		public void action() {
-		    sidePaneManager.togglePanel("groups");
+                  sidePaneManager.togglePanel("groups");
+                  frame.groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
 		}
 	    });
 
