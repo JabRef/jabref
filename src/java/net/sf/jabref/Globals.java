@@ -99,8 +99,8 @@ public class Globals {
 	}catch(MissingResourceException ex){
 	    translation= key;
 	 
-	    //System.err.println("Warning: could not get translation for \""
-	    //	       + key +"\"");
+	    System.err.println("Warning: could not get translation for \""
+	    	       + key +"\"");
 	}
 	if(translation!=null)
 	return translation.replaceAll("_"," ");

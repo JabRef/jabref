@@ -1,5 +1,5 @@
 
-JabRef 1.19
+JabRef 1.x
 -----------
 
 
@@ -13,11 +13,6 @@ the entry information shown in the main window, and sort by any of the
 standard Bibtex fields. JabRef can autogenerate bibtex keys for your
 entries, and autocomplete words or names in the field types of your
 choosing. Most operations can be done without using the mouse.
-
-Version 1.19 is a sort of preview of version 1.2. It gives a
-significant improvement in the user interface, due to the application
-of Incors' great free Look and Feel, Kunststoff, and the use of
-antialiased fonts.
 
 
 License:
@@ -39,7 +34,7 @@ Kit.
 
 
 Installing and running:
-JabRef 1.19 is distributed as an executable .jar file. Run the
+JabRef 1.x is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -72,6 +67,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.x:	- Fixed bug that made selector words added in the dialog to be lowercased.
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.
 	- Added options to display names in harmonised format in the main table.
 	- Added Docbook and (experimental) HTML export.

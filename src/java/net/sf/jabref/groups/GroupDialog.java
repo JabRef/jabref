@@ -31,6 +31,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.Vector;
 import net.sf.jabref.Util;
+import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
 
 /**
@@ -44,12 +45,12 @@ class GroupDialog extends JDialog {
 	regexp = new JTextField(60),
 	field = new JTextField(60);
     JLabel
-	nl = new JLabel("Group name:"),
-	nr = new JLabel("Search term:"),
-	nf = new JLabel("Field to search:");
+	nl = new JLabel(Globals.lang("Group name")+":"),
+	nr = new JLabel(Globals.lang("Search term")+":"),
+	nf = new JLabel(Globals.lang("Field to search")+":");
     JButton
-	ok = new JButton("Ok"),
-	cancel = new JButton("Cancel");
+	ok = new JButton(Globals.lang("Ok")),
+	cancel = new JButton(Globals.lang("Cancel"));
     JPanel
 	main = new JPanel(),
 	opt = new JPanel();
@@ -65,7 +66,7 @@ class GroupDialog extends JDialog {
 
     public GroupDialog(JFrame parent_, Vector groups_,
 		       int index_, String defaultField) {
-	super(parent_, "Edit group", true);
+	super(parent_, Globals.lang("Edit group"), true);
 	parent = parent_;
 	groups = groups_;
 	index = index_;
@@ -97,9 +98,10 @@ class GroupDialog extends JDialog {
 			(name.getText().equals("")) ||
 			(regexp.getText().equals(""))) {
 			JOptionPane.showMessageDialog
-			    (parent, "You must provide a name, a search "
-			     +"string and a field name for this group.",
-			     "Create group", JOptionPane.ERROR_MESSAGE);
+			    (parent, Globals.lang("You must provide a name, a search "
+						  +"string and a field name for this group."),
+						  Globals.lang("Create group"), 
+			     JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
 
@@ -157,7 +159,7 @@ class GroupDialog extends JDialog {
 	opt.setLayout(gbl);
 	main.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
-			"Group properties"));
+			Globals.lang("Group properties")));
 
 	// Main panel:
 	con.weightx = 0;

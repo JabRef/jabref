@@ -782,6 +782,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		      }
 		  }
 	      });
+	      
+	  actions.put("replaceAll", new BaseAction() {
+	  	  public void action() {
+		      output("Replace all");
+		      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);		      
+		      rsd.show();
+		  }
+	      });
     }
 
     /**

@@ -142,6 +142,9 @@ public class JabRefFrame extends JFrame {
 	  GUIGlobals.removeIconFile),*/
 	selectAll = new GeneralAction("selectAll", "Select all",
 				      prefs.getKey("Select all")),
+	replaceAll = new GeneralAction("replaceAll", "Replace string",
+				      prefs.getKey("Replace string")),
+
 	editPreamble = new GeneralAction("editPreamble", "Edit preamble",
 					 "Edit preamble",
 					 GUIGlobals.preambleIconFile,
@@ -554,6 +557,8 @@ public class JabRefFrame extends JFrame {
 	tools.add(makeKeyAction);
         tools.add(fetchMedline);
 	tools.add(lyxPushAction);
+	tools.addSeparator();
+	tools.add(replaceAll);
 	mb.add(tools);
 
 	options.add(showPrefs);
@@ -704,6 +709,7 @@ public class JabRefFrame extends JFrame {
 	lyxPushAction.setEnabled(false);
 	normalSearch.setEnabled(false);
 	incrementalSearch.setEnabled(false);
+	replaceAll.setEnabled(false);
 	importMenu.setEnabled(false);
 	exportMenu.setEnabled(false);
 	fetchMedline.setEnabled(false);
@@ -737,6 +743,7 @@ public class JabRefFrame extends JFrame {
 	lyxPushAction.setEnabled(true);
 	normalSearch.setEnabled(true);
 	incrementalSearch.setEnabled(true);
+	replaceAll.setEnabled(true);
 	importMenu.setEnabled(true);
 	exportMenu.setEnabled(true);
 	fetchMedline.setEnabled(true);
