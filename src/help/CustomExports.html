@@ -100,7 +100,8 @@ which will be copied directly to the output.
 <li><code>FormatPagesForHTML</code> : replaces "--" with "-".
   <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
 <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".
-<li><code>RemoveLatexCommands</code> : removes LaTeX commands like <code>\em</code>, <code>\textbf</code>, etc.
+<li><code>RemoveLatexCommands</code> : removes LaTeX commands like <code>\em</code>, <code>\textbf</code>, etc. If
+  used together with <code>HTMLChars</code> or <code>XMLChars</code>, this formatter should be called last.
 <li><code>ToLowerCase</code> : turns all characters into lower case.
 </ul>
 

@@ -1,18 +1,18 @@
 <biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
    <authorgroup>
-\begin{author}       \format[CreateDocBookAuthors]{\author} \end{author}
+\begin{author}       \format[XMLChars,CreateDocBookAuthors]{\author} \end{author}
    </authorgroup>
-<citetitle pubwork="article">\format[XMLChars]{\title}</citetitle>
+<citetitle pubwork="article">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle>
 \begin{journal}   <citetitle pubwork="journal">\format[XMLChars]{\journal}</citetitle>\end{journal}
 \begin{publisher}   <publisher>
       <publishername>\format[XMLChars]{\publisher}</publishername>
    </publisher>\end{publisher}
 \begin{volume}   <volumenum>\volume</volumenum> \end{volume}
-\begin{edition}   <edition>\edition</edition> \end{edition}
+\begin{edition}   <edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition> \end{edition}
 \begin{pages}   <artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
 \begin{year}   <pubdate>\year</pubdate>  \end{year}
 \begin{abstract}   <abstract>
-      <para>\format[XMLChars]{\abstract}
+      <para>\format[XMLChars,RemoveLatexCommands]{\abstract}
       </para>
    </abstract>\end{abstract}
 </biblioentry>

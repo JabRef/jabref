@@ -1,0 +1,52 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Command line options</H1>
+
+Although JabRef is primarily a GUI based application, it offers several command line options
+that may be useful, and can even perform file conversion operations without opening the graphical
+interface.
+
+<P>You can always specify one or more BibTeX files to load by simply listing their filenames. If you want
+  to immediately export a BibTeX file from the command line, you are adviced to load it using the <code>-i</code>
+  option, to ensure that your command line is processed correctly.
+
+<H2>Help: -h</H2>
+
+This option causes JabRef to display a summary of the command line options, and quit immediately.
+
+<H2>No-GUI mode: -n</H2>
+
+This option suppresses both the JabRef window and the splash window normally shown at startup. It
+causes the program to quit immediately once the command line options have been processed.
+<P>This option is useful for performing file conversion operations from the command line or a script.
+
+<H2>Load session: -l</H2>
+
+This option causes JabRef to load the saved session, if any, before opening the main window.
+
+<H2>Import file: -i filename[,format]</H2>
+
+This option causes JabRef to import or load the specified file. If only a filename is specified, it will
+be loaded as a BibTeX file. If the filename is followed by a comma and an import format, the given import
+filter will be used. Use the <code>-h</code> option to get a list of availiable import formats.
+
+<P>If an output option is also specified, an import will always be processed before it, and the imported or
+  loaded file will be given to the export filter. If the GUI is not suppressed using the <code>-n</code> option,
+  any imported or loaded file will show up in the main window.
+
+<H2>Export file: -o filename[,format]</H2>
+
+This option causes JabRef to save or export a file imported using the <code>-i</code> option. If only a filename
+is specified, it will be saved in BibTeX format. If the filename is followed by a comma and an export format,
+the given export filter will be used. A custom export filter can be used in this way, and will be preferred if
+the export name matches both a custom and a standard export filter.
+<P>Use the <code>-h</code> option to get a list of availiable export formats.
+
+<P>If the <code>-n</code> option has not been invoked, any export operation will be performed before the JabRef
+  window is opened, and the imported database will show up in the window.
+
+</BODY>
+</HTML>

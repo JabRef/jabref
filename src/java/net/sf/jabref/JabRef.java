@@ -81,8 +81,8 @@ public class JabRef {
       StringOption exportFile = new StringOption("");
       NotifyOption helpO = new NotifyOption("");
       NotifyOption disableGui = new NotifyOption("");
-      exportFile.setHelpDescriptionSize(80);
-      exportFile.setFileCompleteOptionSize(12);
+      //exportFile.setHelpDescriptionSize(80);
+      //exportFile.setFileCompleteOptionSize(12);
       NotifyOption loadSess = new NotifyOption("");
       StringOption exportPrefs = new StringOption("");
       StringOption importPrefs = new StringOption("");
@@ -101,8 +101,24 @@ public class JabRef {
 
       if (helpO.isInvoked()) {
         System.out.println(options.getHelp());
-        System.out.println(Globals.lang("Available import formats")+": biblioscape, bibtexml, endnote, inspec, isi, medline, ovid, ris, scifinder, sixpack.");
-        System.out.println(Globals.lang("Available export formats")+": bibtexml, docbook, html, simplehtml.\n");
+        System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack.");
+
+        // To specify export formats, we need to take the custom export formats into account.
+        // So we iterate through the custom formats and add them.
+        String outFormats = ": bibtexml, docbook, html, simplehtml";
+        int length = outFormats.length();
+        for (int i = 0; i < prefs.customExports.size(); i++) {
+          String[] format = prefs.customExports.getElementAt(i);
+          if (length + format[0].length() > 50) {
+            outFormats = outFormats+",\n\t"+format[0];
+            length = format[0].length();
+          }
+          else {
+            outFormats = outFormats+", "+format[0];
+            length += 1+format[0].length();
+          }
+        }
+        System.out.println(Globals.lang("Available export formats")+outFormats+".");
         System.exit(0);
       }
 
@@ -251,7 +267,7 @@ public class JabRef {
               boolean foundCustom = false;
               for (int i = 0; i < prefs.customExports.size(); i++) {
                 String[] format = prefs.customExports.getElementAt(i);
-                if (format[0].toLowerCase().equals(data[1])) {
+                if (format[0].equals(data[1])) {
                   // Found the correct export format here.
                   //System.out.println(format[0]+" "+format[1]+" "+format[2]);
                   try {
