@@ -357,7 +357,7 @@ public class Util {
 
         // Use the correct viewer even if pdf and ps are mixed up:
         link = file.getPath().replaceAll("\\s", "\\\\ ");
-	pr("rill '"+link+"'");
+        pr("rill '"+link+"'");
         String[] split = file.getName().split("\\.");
         if ((split.length >= 2) && (split[split.length-1].equalsIgnoreCase("pdf")))
           fieldName = "pdf";
@@ -744,14 +744,14 @@ public class Util {
 
 // -------------------------------------------------------------------------------
 
-    /** extend the filename with defaultExtension, if no Extension could be found */
+    /** extends the filename with a default Extension, if no Extension '.x' could be found */
     public static String getCorrectFileName(String orgName, String defaultExtension)
     {
       if (orgName == null)
         return "" ;
 
       String back = orgName ;
-      int t = orgName.indexOf(".", 1) ;  // hidden files (?)
+      int t = orgName.indexOf(".", 1) ;  // hidden files Linux/Unix (?)
       if (t < 1)
         back = back +"." +defaultExtension ;
 
