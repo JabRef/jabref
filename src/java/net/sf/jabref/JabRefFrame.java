@@ -602,7 +602,7 @@ public class JabRefFrame extends JFrame {
 		}
 		});*/
 
-	options.add(selectKeys);
+	//options.add(selectKeys);
 	mb.add(options);
 
 	helpMenu.add(help);

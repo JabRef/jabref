@@ -125,6 +125,8 @@ public class JabRefPreferences {
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));
         defaults.put("antialias", new Boolean(true));
+        defaults.put("ctrlClick", new Boolean(false));
+
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 
 	restoreKeyBindings();

@@ -12,7 +12,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
-		defSource, editSource,defSort;
+		defSource, editSource,defSort, ctrlClick;
     private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
@@ -24,7 +24,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
  	setLayout(gbl);
 	con.weightx = 0;
-	con.insets = new Insets(10, 10, 10, 10);
+        //con.insets = new Insets(10, 10, 10, 10);
+        con.insets = new Insets(5, 10, 5, 10);
 	con.fill = GridBagConstraints.HORIZONTAL;
 
 	autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"),
@@ -37,9 +38,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("defaultShowSource"));
 	editSource = new JCheckBox(Globals.lang("Enable source editing"),
 				   _prefs.getBoolean("enableSourceEditing"));
-	defSort = new JCheckBox(Globals.lang("Sort Automatically"),
+        defSort = new JCheckBox(Globals.lang("Sort Automatically"),
 				  _prefs.getBoolean("defaultAutoSort"));
-
+          ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"),
+				  _prefs.getBoolean("ctrlClick"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
         groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
@@ -60,13 +62,17 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(autoOpenForm, con);
 	general.add(autoOpenForm);
 
-	con.gridwidth = 1;
-	gbl.setConstraints(backup, con);
+        con.gridwidth = 1;
+        gbl.setConstraints(backup, con);
 	general.add(backup);
 
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
+
+        //con.gridwidth = 1;
+        gbl.setConstraints(ctrlClick, con);
+	general.add(ctrlClick);
 
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	//gbl.setConstraints(defSort, con);
@@ -202,8 +208,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("backup", backup.isSelected());
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
-	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
-	//_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
+        _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
+
+        _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
+      //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
 
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 

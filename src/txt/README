@@ -1,5 +1,5 @@
 
-JabRef 1.x
+JabRef 1.2
 -----------
 
 
@@ -34,7 +34,7 @@ Kit.
 
 
 Installing and running:
-JabRef 1.x is distributed as an executable .jar file. Run the
+JabRef 1.2 is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -67,9 +67,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Changed the icon set.
+1.2:	- Changed the icon set.
 	- Added support for French language.
-	- Added customization of shortcut keys.
 	- Added customization of key generation.
 	- Improved HTML export.
 	- Added Replace string feature.

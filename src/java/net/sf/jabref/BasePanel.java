@@ -207,8 +207,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			file = new File(path, name);
 			if (!file.exists() ||
 			    (JOptionPane.showConfirmDialog
-			     (frame, "File '"+name+"' exists. Overwrite?",
-			      "Save database", JOptionPane.OK_CANCEL_OPTION)
+			     (frame, "'"+name+"' "+Globals.lang("exists. Overwrite file?"),
+			      Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
 			     == JOptionPane.OK_OPTION)) {
 			    runCommand("save");
 			    prefs.put("workingDirectory", path);
@@ -234,14 +234,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			File expFile = new File(path, name);
 			if (!expFile.exists() ||
 			    (JOptionPane.showConfirmDialog
-			     (frame, Globals.lang("File")+" '"+name+"' "+
-                              Globals.lang("exists. Overwrite?"),
+			     (frame, "'"+name+"' "+
+                              Globals.lang("exists. Overwrite file?"),
 			      Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
 			     == JOptionPane.OK_OPTION)) {
 			    saveDatabase(expFile, true);
 			    //runCommand("save");
                             frame.fileHistory.newFile(expFile.getPath());
-                            frame.output(Globals.lang("Saved selected to file")+" '"
+                            frame.output(Globals.lang("Saved selected to")+" '"
 				     +expFile.getPath()+"'.");
 			}
 		    }

@@ -15,7 +15,7 @@ import net.sf.jabref.ImportFormatReader;
 import net.sf.jabref.Util;
 
 /**
- * 
+ *
  * @author Ulrik Stervbo (ulriks AT ruc.dk)
  */
 /**
@@ -26,15 +26,15 @@ public class LabelPatternUtil {
 	//this is SO crappy, but i have no idea of converting unicode into a String
 	// the content of the AL is build with the buildLetters()
 	private static ArrayList letters = builtLetters();
-    public static ArrayList DEFAULT_LABELPATTERN = split("[auth]_[year]");
-    
+    public static ArrayList DEFAULT_LABELPATTERN = split("[auth][year]");
+
 	private static BibtexDatabase _db;
 
 	/**
 	 * This method takes a string of the form [field1]spacer[field2]spacer[field3]...,
 	 * where the fields are the (required) fields of a BibTex entry. The string is split
 	 * into firlds and spacers by recognizing the [ and ].
-	 *  
+	 *
 	 * @param keyPattern a <code>String</code>
 	 * @return an <code>ArrayList</code> The first item of the list
 	 * is a string representation of the key pattern (the parameter),
@@ -46,29 +46,29 @@ public class LabelPatternUtil {
 
 		// Before we do anything, we add the parameter to the ArrayLIst
 		_alist.add(labelPattern);
-		
+
 		//String[] ss = labelPattern.split("\\[|\\]");
 		StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
 		while (tok.hasMoreTokens())
 		    _alist.add(tok.nextToken());
 
 		return _alist;
-		
+
 		/*
 		// Regular expresion for identifying the fields
 		Pattern pi = Pattern.compile("\\[\\w*\\]");
 		// Regular expresion for identifying the spacer
 		Pattern ps = Pattern.compile("\\].()*\\[");
-		
+
 		// The matcher for the field
 		Matcher mi = pi.matcher(labelPattern);
 		// The matcher for the spacer char
 		Matcher ms = ps.matcher(labelPattern);
-		
+
 		// Before we do anything, we add the parameter to the ArrayLIst
 		_alist.add(labelPattern);
-    
-		// If we can find the spacer character    
+
+		// If we can find the spacer character
 		if(ms.find()){
 			String t_spacer = ms.group();
 				// Remove the `]' and `[' at the ends
@@ -76,7 +76,7 @@ public class LabelPatternUtil {
 				t_spacer = t_spacer.substring(1,2);
 				_alist.add(t_spacer);
 		}
-                
+
 		while(mi.find()){
 			// Get the matched string
 			String t_str = mi.group();
@@ -84,12 +84,12 @@ public class LabelPatternUtil {
 				int _eindex = t_str.length() -1;
 				// Remove the `[' and `]' at the ends
 				t_str = t_str.substring(_sindex, _eindex);
-			_alist.add(t_str); 
+			_alist.add(t_str);
 		}
-		
+
 		return _alist;*/
 	}
-	
+
 	/**
 	 * Generates a BibTeX label according to the pattern for a given entry type, and
 	 * returns the <code>Bibtexentry</code> with the unique label.
@@ -107,7 +107,7 @@ public class LabelPatternUtil {
 		try {
 		    // get the type of entry
 		    String _type = _entry.getType().getName().toLowerCase();
-		    // Get the arrayList corrosponding to the type 		
+		    // Get the arrayList corrosponding to the type
 		    _al = table.getValue(_type);
 		    int _alSize = _al.size();
 		    boolean field = false;
@@ -116,7 +116,7 @@ public class LabelPatternUtil {
 			if (val.equals("[")) field = true;
 			else if (val.equals("]")) field = false;
 			else if (field) {
-			    try {				
+			    try {
 				if(val.equals("auth")){
 				    _sb.append(firstAuthor(_entry.getField("author").toString()));
 				}
@@ -149,20 +149,20 @@ public class LabelPatternUtil {
 				// we havent seen any special demands
 				else{
 				    _sb.append(_entry.getField(val).toString());
-				}			    
+				}
 			    } catch (Exception ex) {
 				Globals.logger("Key generator warning: field '"+val+"' empty.");
 			    }
 			} else {
-			    _sb.append(val);			    
+			    _sb.append(val);
 			}
 		    }
 		}
-					
+
 		catch (Exception e) {
 		    System.err.println(e);
 		}
-		
+
 		/**
 		 * Edited by Morten Alver 2004.02.04.
 		 *
@@ -170,9 +170,9 @@ public class LabelPatternUtil {
 		 * I am changing this method to conform to it.
 		 *
 
-   		 // here we make sure the key is unique		
-		   _label = makeLabelUnique(_sb.toString());				
-		   _entry.setField(Globals.KEY_FIELD, _label);		
+   		 // here we make sure the key is unique
+		   _label = makeLabelUnique(_sb.toString());
+		   _entry.setField(Globals.KEY_FIELD, _label);
 		   return _entry;
 		*/
 
@@ -180,11 +180,11 @@ public class LabelPatternUtil {
 		_label = Util.checkLegalKey(_sb.toString());
 
 		// Try new keys until we get a unique one:
-		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {	    
+		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {
 		    char c = 'b';
 		    String modKey = _label+"a";
 		    while (_db.setCiteKeyForEntry(_entry.getId(), modKey))
-			modKey = _label+((char)(c++));	    
+			modKey = _label+((char)(c++));
 		}
 		return _entry;
 		/** End of edit, Morten Alver 2004.02.04.  */
@@ -209,15 +209,15 @@ public class LabelPatternUtil {
 		try {
 			// get the type of entry
 			String _type = _entry.getType().getName().toLowerCase();
-			// Get the arrayList corrosponding to the type 		
+			// Get the arrayList corrosponding to the type
 			_al = table.getValue(_type);
 			int _alSize = _al.size();
 			// get the pacer (first item is the string version of the key pattern)
 			// the second is the spacer, the third, fourth and so forth are fields
 			_spacer = _al.get(1).toString();
-			
+
 			for(int i = 2; i < _alSize; i++){
-				// hmmmm..... the fields have different format... 
+				// hmmmm..... the fields have different format...
 				//TODO deal with different format for the fields :-)
 				String _field = _al.get(i).toString();
 
@@ -238,17 +238,17 @@ public class LabelPatternUtil {
 				else{
 					_sb.append(_entry.getField(_al.get(i).toString()).toString());
 				}
-				
+
 				if(i < _alSize - 1){ // It is not the space before the last field
 					_sb.append(_spacer);
 				}
 			}
 		}
-					
+
 		catch (Exception e) {
 				System.err.println(e);
 		}
-		
+
 		/**
 		 * Edited by Morten Alver 2004.02.04.
 		 *
@@ -256,9 +256,9 @@ public class LabelPatternUtil {
 		 * I am changing this method to conform to it.
 		 *
 
-   		 // here we make sure the key is unique		
-		   _label = makeLabelUnique(_sb.toString());				
-		   _entry.setField(Globals.KEY_FIELD, _label);		
+   		 // here we make sure the key is unique
+		   _label = makeLabelUnique(_sb.toString());
+		   _entry.setField(Globals.KEY_FIELD, _label);
 		   return _entry;
 		*/
 
@@ -266,20 +266,20 @@ public class LabelPatternUtil {
 		_label = Util.checkLegalKey(_sb.toString());
 
 		// Try new keys until we get a unique one:
-		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {	    
+		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {
 		    char c = 'b';
 		    String modKey = _label+"a";
 		    while (_db.setCiteKeyForEntry(_entry.getId(), modKey))
-			modKey = _label+((char)(c++));	    
+			modKey = _label+((char)(c++));
 		}
 		return _entry;
 		/** End of edit, Morten Alver 2004.02.04.  */
 
 	}
-	
+
 
 	/**
-	 * This method returns a truely unique label (in the BibtexDatabase), by taking a 
+	 * This method returns a truely unique label (in the BibtexDatabase), by taking a
 	 * label and add the letters a-z until a unique key is found.
 	 * @param key a <code>String</code>
 	 * @return a unique label
@@ -290,12 +290,12 @@ public class LabelPatternUtil {
 		String _orgLabel = label;
 		String _newLabel = label;
 		int lettersSize = letters.size();
-		
+
 		for(int i = 0; i < lettersSize; i++){
 			if(isLabelUnique(_newLabel)){
 				// Hurray! the key is unique! lets get outta here
 				break;
-			} 
+			}
 			else{
 				// though luck! lets add a new letter...
 				_newLabel = _orgLabel + letters.get(i).toString();
@@ -304,7 +304,7 @@ public class LabelPatternUtil {
 		return _newLabel;
 
 	}
-	
+
 	/**
 	 * Tests whether a given label is unique.
 	 * @param label a <code>String</code>
@@ -318,7 +318,7 @@ public class LabelPatternUtil {
 		// if this could be made recursive I would be very happy
 		// it kinda sux that we have to run through the whole db.
 		// The idea here is that if we meet NO match, the _duplicate
-		// field will be true 
+		// field will be true
 
 		for(int i = 0; i < _dbSize; i++){
 			_entry = _db.getEntryById(String.valueOf(i));
@@ -328,7 +328,7 @@ public class LabelPatternUtil {
 			if(_entry.getField(Globals.KEY_FIELD).equals(label)){
 				_isUnique = false;
 				break;
-			} 			
+			}
 		}
 
 		return _isUnique;
@@ -341,7 +341,7 @@ public class LabelPatternUtil {
 	 * @return the sur name of an author/editor
 	 */
 	private static String firstAuthor(String authorField){
-		String author = "" ; 
+		String author = "" ;
 		// This code was part of 'ApplyRule' in 'ArticleLabelRule'
 		String[] tokens= authorField.split("\\band\\b");
 		if( tokens.length > 0){ // if author is empty
@@ -353,7 +353,7 @@ public class LabelPatternUtil {
 
 		author += firstAuthor[ firstAuthor.length-1];
 
-		}		
+		}
 		return author;
 	}
 
@@ -363,24 +363,24 @@ public class LabelPatternUtil {
 	 * @return the sur name of all authors/editors
 	 */
 	private static String allAuthors(String authorField){
-		String author = "" ; 
+		String author = "" ;
 		// This code was part of 'ApplyRule' in 'ArticleLabelRule'
 		String[] tokens= authorField.split("\\band\\b");
 		int i=0;
 		while (tokens.length > i){
 		    // convert lastname, firstname to firstname lastname
 		    if(tokens[i].indexOf(",") > 0)
-			tokens[i] = ImportFormatReader.fixAuthor( tokens[i] ); 
-		    	    
+			tokens[i] = ImportFormatReader.fixAuthor( tokens[i] );
+
 		    String[] firstAuthor = tokens[i].replaceAll("\\s+"," ").split(" ");
 		    // lastname, firstname
 
 		    author += firstAuthor[ firstAuthor.length-1];
 		    i++;
-		}		
+		}
 		return author;
 	}
-	
+
 	/**
 	 * Split the pages field into two and return the first one
 	 * @param pages a <code>String</code>
@@ -399,14 +399,14 @@ public class LabelPatternUtil {
 	private static String lastPage(String pages){
 		String[] _pages = pages.split("-");
 		return _pages[1];
-	}	
+	}
 	/**
-	 * I <b>HATE</b> this method!! I looked and looked but couldn't find a way to 
+	 * I <b>HATE</b> this method!! I looked and looked but couldn't find a way to
 	 * turn 61 (or in real unicode 0061) into the letter 'a' - crap!
 	 * @return an <code>ArrayList</code> which shouldn't be!!
 	 */
 	private static ArrayList builtLetters(){
-		ArrayList _letters = new ArrayList(); 
+		ArrayList _letters = new ArrayList();
 		_letters.add("a"); _letters.add("b"); _letters.add("c"); _letters.add("d");
 		_letters.add("e"); _letters.add("f"); _letters.add("g"); _letters.add("h");
 		_letters.add("i"); _letters.add("j"); _letters.add("k"); _letters.add("l");
@@ -414,7 +414,7 @@ public class LabelPatternUtil {
 		_letters.add("q"); _letters.add("r"); _letters.add("s"); _letters.add("t");
 		_letters.add("u"); _letters.add("v"); _letters.add("x"); _letters.add("y");
 		_letters.add("z");
-		
+
 		return _letters;
 	}
 }

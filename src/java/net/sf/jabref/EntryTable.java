@@ -43,7 +43,8 @@ public class EntryTable extends JTable {
     protected boolean showingSearchResults = false,
 	showingGroup = false;
     private EntryTable ths = this;
-    private boolean antialiasing = true;
+    private boolean antialiasing = true,
+        ctrlClick = false;
     //RenderingHints renderingHints;
 
     public EntryTable(EntryTableModel tm_, JabRefPreferences prefs_) {
@@ -56,7 +57,8 @@ public class EntryTable extends JTable {
 	//renderingHints.put(RenderingHints.KEY_RENDERING,
 	//		   RenderingHints.VALUE_RENDER_QUALITY);
 	prefs = prefs_;
-	antialiasing = prefs.getBoolean("antialias");
+        antialiasing = prefs.getBoolean("antialias");
+        ctrlClick = prefs.getBoolean("ctrlClick");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
 	setShowVerticalLines(true);
 	setShowHorizontalLines(true);
@@ -84,8 +86,8 @@ public class EntryTable extends JTable {
 	    });
 	addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-                                    //|| (Globals.osName.equals(Globals.MAC) && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+				if ((e.getButton() == MouseEvent.BUTTON3)
+                                    || (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
 					if (rightClickMenu != null)
 						rightClickMenu.show(ths, e.getX(), e.getY());
 				}

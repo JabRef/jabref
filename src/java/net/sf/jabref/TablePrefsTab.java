@@ -86,13 +86,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 				_prefs.getBoolean("terDescending"));
 	tableFields.setText(Util.stringArrayToDelimited
 			    (_prefs.getStringArray("columnNames"), ";"));
-	
+
 	String[] names = _prefs.getStringArray("columnNames"),
 	    lengths = _prefs.getStringArray("columnWidths");
 	for (int i=0; i<names.length; i++) {
 	    if (i<lengths.length)
 		tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
-	    else 
+	    else
 		tableRows.add(new TableRow(names[i]));
 	}
 	rowCount = tableRows.size()+5;
@@ -110,12 +110,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		    switch (column) {
 		    case 0:
 			return tr.name;
-		    case 1:			
+		    case 1:
 			return ((tr.length > 0) ? new Integer(tr.length).toString() : "");
 		    }
 		    return null; // Unreachable.
 		}
-		
+
 		public String getColumnName(int col) {
 		    return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
 		}
@@ -147,7 +147,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	    };
 
-	colSetup = new JTable(tm);	
+	colSetup = new JTable(tm);
 	TableColumnModel cm = colSetup.getColumnModel();
 	cm.getColumn(0).setPreferredWidth(140);
 	cm.getColumn(1).setPreferredWidth(80);
@@ -201,7 +201,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(namesp, con);
 	add(namesp);
 
-	
+
 
 	// Set the correct value for the primary sort JComboBox.
 	String sec = prefs.get("secSort"),
@@ -267,8 +267,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	JToolBar tlb = new JToolBar(SwingConstants.VERTICAL);
 	tlb.setFloatable(false);
 	//tlb.setRollover(true);
-	tlb.add(new AddRowAction());
-	tlb.add(new DeleteRowAction());
+        //tlb.setLayout(gbl);
+        AddRowAction ara = new AddRowAction();
+        DeleteRowAction dra = new DeleteRowAction();
+
+	tlb.add(ara);
+	tlb.add(dra);
 	tlb.addSeparator();
 	tlb.add(new UpdateWidthsAction());
 	gbl.setConstraints(tlb, con);
@@ -296,13 +300,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     class DeleteRowAction extends AbstractAction {
 	public DeleteRowAction() {
-	    super("Delete row", new ImageIcon(GUIGlobals.delRowIconFile));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
+          //super(Globals.lang("Delete rows"));
+          super("Delete row", new ImageIcon(GUIGlobals.delRowIconFile));
+	  putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
 	}
 	public void actionPerformed(ActionEvent e) {
 	    int[] rows = colSetup.getSelectedRows();
-	    if (rows.length == 0) 
-		return;	    
+	    if (rows.length == 0)
+		return;
 	    for (int i=0; i<rows.length; i++) {
 		if (rows[i]-i < tableRows.size())
 		    tableRows.remove(rows[i]-i);
@@ -317,8 +322,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     class AddRowAction extends AbstractAction {
 	public AddRowAction() {
-	    super("Add row", new ImageIcon(GUIGlobals.addIconFile));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
+          //super(Globals.lang("Insert rows"));
+          super("Add row", new ImageIcon(GUIGlobals.addIconFile));
+	  putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
 	}
 	public void actionPerformed(ActionEvent e) {
 	    int[] rows = colSetup.getSelectedRows();
@@ -340,11 +346,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    tableChanged = true;
 	}
     }
-    
+
     class UpdateWidthsAction extends AbstractAction {
 	public UpdateWidthsAction() {
-	    super("Add row", new ImageIcon(GUIGlobals.sheetIcon));
-	    putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
+          //super(Globals.lang("Update to current column widths"));
+          super("Add row", new ImageIcon(GUIGlobals.sheetIcon));
+          putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
 	}
 	public void actionPerformed(ActionEvent e) {
 	    BasePanel panel = frame.basePanel();
@@ -361,7 +368,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		    colSetup.setValueAt(""+width, i-1, 1);
 		else { // Doesn't match; search for a matching col in our table
 		    for (int j=0; j<colSetup.getRowCount(); j++) {
-			if ((j < tableRows.size()) && 
+			if ((j < tableRows.size()) &&
 			    (((String)colSetup.getValueAt(j, 0)).toLowerCase()).equals(name)) {
 			    colSetup.setValueAt(""+width, j, 1);
 			    break;
@@ -426,9 +433,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	    while (i < tableRows.size()) {
 		if (((TableRow)tableRows.elementAt(i)).name.equals(""))
 		    tableRows.removeElementAt(i);
-		else i++;		
+		else i++;
 	    }
-	    // Then we make arrays 
+	    // Then we make arrays
 	    String[] names = new String[tableRows.size()],
 		widths = new String[tableRows.size()];
 	    int[] nWidths = new int[tableRows.size()];
@@ -442,7 +449,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	    // Finally, we store the new preferences.
 	    _prefs.putStringArray("columnNames", names);
-	    _prefs.putStringArray("columnWidths", widths);	    
+	    _prefs.putStringArray("columnWidths", widths);
 	}
 
 	//_prefs.putStringArray("columnNames", cols);
