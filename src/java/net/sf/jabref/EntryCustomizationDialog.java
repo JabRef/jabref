@@ -35,24 +35,24 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     BibtexEntryType type;
 
     JScrollPane reqSP, optSP;
-    JButton ok, cancel, helpButton, delete;
+    JButton ok, cancel, helpButton, delete, genFields;
     JPanel panel=new JPanel(),
 	fieldPanel = new JPanel(),
 	typePanel = new JPanel();
     int width=10;
-    JLabel messageLabel=new JLabel("", SwingConstants.CENTER);    
+    JLabel messageLabel=new JLabel("", SwingConstants.CENTER);
 
     JTextField name = new JTextField("", width);
     JTextArea req_ta=new JTextArea("",1,width),//10 row, 20 columns
 	opt_ta=new JTextArea("",1,width);//10 row, 20 columns
     // need to get FIeld name from somewhere
-	
+
     JComboBox types_cb = new JComboBox();
 
     HelpAction help;
 
     GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();	
+    GridBagConstraints con = new GridBagConstraints();
     JPanel buttonPanel = new JPanel();
 
     JabRefFrame parent;
@@ -68,11 +68,11 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
 			      "Help", GUIGlobals.helpSmallIconFile);
 	setTypeSelection();
-	setSize(400,400);
+	setSize(440,400);
 	initialize();
 	makeButtons();
 
-	reqSP = new JScrollPane(req_ta,			
+	reqSP = new JScrollPane(req_ta,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	optSP = new JScrollPane(opt_ta,
@@ -91,7 +91,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	//panel.setBorder(BorderFactory.createEtchedBorder());
 	fieldPanel.setBorder(BorderFactory.createEtchedBorder());
 	typePanel.setBorder(BorderFactory.createEtchedBorder());
-	
+
 	JLabel lab = new JLabel(Globals.lang("Type: ")),
 	    lab2 = new JLabel(Globals.lang("Name: "));
 	con.insets = new Insets(5, 5, 5, 5);
@@ -108,16 +108,16 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	//gbl.setConstraints(helpButton, con);
 	gbl.setConstraints(tlb, con);
 	con.gridwidth = 1;
-	typePanel.add(lab);		
+	typePanel.add(lab);
 	typePanel.add(types_cb);
-	typePanel.add(lab2);		
+	typePanel.add(lab2);
 	typePanel.add(name);
 	//typePanel.add(helpButton);
 	typePanel.add(tlb);
 	lab = new JLabel(Globals.lang("Required fields"));
 	con.fill = GridBagConstraints.BOTH;
 	con.weightx = 1;
-	gbl.setConstraints(lab, con);	
+	gbl.setConstraints(lab, con);
 	con.weighty = 1;
 	gbl.setConstraints(reqSP, con);
 	fieldPanel.add(lab);
@@ -149,31 +149,31 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 				    BibtexEntryType type_) {
 	this(parent);
 	type = type_;
-	
+
     }
 
     void initialize(){
-		
+
 	getContentPane().setLayout(new BorderLayout());
 	getContentPane().add( buttonPanel, BorderLayout.SOUTH);
-	getContentPane().add( panel, BorderLayout.CENTER);		
+	getContentPane().add( panel, BorderLayout.CENTER);
 
 	messageLabel.setForeground(Color.black);
-	messageLabel.setText("Delimit fields with semicolon, ex.: author;title;journal");
+	messageLabel.setText(Globals.lang("Delimit fields with semicolon, ex.: author;title;journal"));
 
 	types_cb.addItemListener(this);
     }
 
     void save()
     {
-			
-	String 
+
+	String
 	    reqStr = req_ta.getText().replaceAll("\\s+","")
 	    .replaceAll("\\n+","").trim(),
 	    optStr = opt_ta.getText().replaceAll("\\s+","")
 	    .replaceAll("\\n+","").trim();
 
-									 
+
 	String typeName = name.getText().trim();
 
 	if(! typeName.equals("")) {
@@ -186,10 +186,10 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 				 " '"+Util.nCase(typ.getName())
 				 +"'.");
 	}
-	else{ 				
+	else{
 	    messageLabel.setText(Globals.lang("You must fill in a name for the entry type."));
 	}
-		
+
     }
 
     private void setTypeSelection() {
@@ -212,8 +212,10 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	ok = new JButton(Globals.lang("Store"));
 	cancel=new JButton(Globals.lang("Close"));
 	delete = new JButton(Globals.lang("Delete custom"));
-	buttonPanel.add( ok );
+        genFields = new JButton(Globals.lang("Set general fields"));
+        buttonPanel.add( ok );
 	buttonPanel.add(delete);
+        buttonPanel.add(genFields);
 	buttonPanel.add( cancel);
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -225,6 +227,13 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 		    dispose();
 		}
 	    });
+        genFields.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            GenFieldsCustomizer gf = new GenFieldsCustomizer(parent);
+            Util.placeDialog(gf, parent);
+            gf.show();
+          }
+        });
 	delete.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    BibtexEntryType type = BibtexEntryType
@@ -276,7 +285,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	    boolean anyChanges = false;
 	    bp.entryEditors.remove(typeName);
 	    bp.rcm.populateTypeMenu(); // Update type menu for change type.
-	    base = bp.database;  
+	    base = bp.database;
 	    iter = base.getKeySet().iterator();
 	    while (iter.hasNext()) {
 		anyChanges = anyChanges |
@@ -292,12 +301,12 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     public void itemStateChanged(ItemEvent e) {
 	if (types_cb.getSelectedIndex() > 0) {
 	    // User has selected one of the existing types.
-	    String name = (String)types_cb.getSelectedItem(); 
+	    String name = (String)types_cb.getSelectedItem();
 	    updateToType((name.split(" "))[0]);
 	} else {
 	    name.setText("");
 	    req_ta.setText("");
-	    opt_ta.setText("");	    
+	    opt_ta.setText("");
 	    name.requestFocus();
 	}
     }

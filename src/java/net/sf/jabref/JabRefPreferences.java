@@ -40,11 +40,11 @@ import java.util.*;
 
 public class JabRefPreferences {
 
-    final String 
+    final String
 	CUSTOM_TYPE_NAME = "customTypeName_",
 	CUSTOM_TYPE_REQ = "customTypeReq_",
 	CUSTOM_TYPE_OPT = "customTypeOpt_";
-    
+
     Preferences prefs;
     HashMap defaults = new HashMap(),
 	keyBinds = new HashMap(),
@@ -77,7 +77,7 @@ public class JabRefPreferences {
 	defaults.put("columnNames",
 		     "author;title;year;journal;bibtexkey");
 	defaults.put("workingDirectory", (String)null);
-	
+
 	defaults.put("autoOpenForm", new Boolean(true));
 	defaults.put("entryTypeFormHeightFactor", new Integer(1));
 	defaults.put("entryTypeFormWidth", new Integer(1));
@@ -104,6 +104,8 @@ public class JabRefPreferences {
 	defaults.put("autoCompFields", new byte[] {0, 1, 28});
 	defaults.put("groupSelectorVisible", new Boolean(true));
 	defaults.put("groupsDefaultField", "keywords");
+        defaults.put("generalFields", "crossref;keywords;doi;url;"+
+	     "pdf;abstract;comment");
 	//defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
 	defaults.put("historySize", new Integer(5));
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
@@ -260,7 +262,7 @@ public class JabRefPreferences {
 	public LabelPattern getKeyPattern(){
 		return keyPattern;
 	}
-	
+
 	public void putKeyPattern(LabelPattern pattern){
 		keyPattern = pattern;
 	}
@@ -352,7 +354,7 @@ public class JabRefPreferences {
 	}
 	if (res.length() > 0)
 	    return res.toString();
-	else 
+	else
 	    return null;
     }
 
@@ -384,7 +386,7 @@ public class JabRefPreferences {
      * Retrieves all information about the entry type in preferences,
      * with the tag given by number.
      */
-    public CustomEntryType getCustomEntryType(int number) {       
+    public CustomEntryType getCustomEntryType(int number) {
 	String nr = ""+number;
 	String
 	    name = get(CUSTOM_TYPE_NAME+nr);
@@ -395,7 +397,7 @@ public class JabRefPreferences {
 	    return null;
 	else return new CustomEntryType
 	    (Util.nCase(name), req, opt);
-	     
+
 
     }
 
