@@ -533,8 +533,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           if (chosenFile != null) {
             File newFile = new File(chosenFile);
             String position = newFile.getParent();
-            if (position.equals(pdfDir) || (position+System.getProperty("file.separator")).equals(pdfDir))
-              ed.setText(newFile.getName());
+            if (position.startsWith(pdfDir))
+						{
+							// Construct path relative to pdf base dir
+							String relPath = position.substring(pdfDir.length(), position.length()) + File.separator + newFile.getName();
+							// Remove leading path separator
+							if( relPath.startsWith( File.separator ) )
+								relPath = relPath.substring( File.separator.length(), relPath.length() );
+							// Set relative path as field value
+              ed.setText( relPath );
+						}
             else
               ed.setText(newFile.getPath());
             prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());

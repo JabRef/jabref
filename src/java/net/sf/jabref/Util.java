@@ -317,67 +317,82 @@ public class Util {
      * Open a http/pdf/ps viewer for the given link string.
      *
      */
-    public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws
-      IOException {
+    public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException 
+    {
+	String cmdArray[] = new String[2];
+	
 	// check html first since browser can invoke viewers
-        if (fieldName.equals("doi")) {
-          Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
-                                                    +" "+Globals.DOI_LOOKUP_PREFIX+link);
-        }
-	if(fieldName.equals("url")){ // html
-	    try {
-		/*System.err.println("Message: Opening url (" + link
-				   + ") with the HTML viewer ("
-				   + prefs.get("htmlviewer") +")");*/
-               Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
-                                                         + " " + link);
-	    } catch (IOException e) {
-		/*System.err.println("Warning: Unable to open url "
-				   + link + " with the HTML viewer ("
-				   + prefs.get("htmlviewer") +")");*/
+	if (fieldName.equals("doi"))
+	    {
+		cmdArray[0] = prefs.get("htmlviewer");
+		cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;  			
+		Process child = Runtime.getRuntime().exec(cmdArray);			 							   					
+	    }				
+	else if(fieldName.equals("url"))
+	    { // html
+		try 
+		    {
+			System.err.println("Starting HTML browser: " 
+					   + prefs.get("htmlviewer") + " " + link);
+			cmdArray[0] = prefs.get("htmlviewer");
+			cmdArray[1] = link;  			
+			Process child = Runtime.getRuntime().exec(cmdArray);			 							   					
+		    } 
+		catch (IOException e) 
+		    {
+			System.err.println("An error occured on the command: " 
+					   + prefs.get("htmlviewer") + " " + link);
+		    }
 	    }
-	}
-	else if(fieldName.equals("ps")) {
-	    try {
-		/*System.err.println("Message: Opening file " + link
-				   + " with the ps viewer ("
-				   + prefs.get("psviewer") +")");*/
-		Process child = Runtime.getRuntime().exec(prefs.get("psviewer")
-							  + " " + link);
-	    } catch (IOException e) {
-		/*System.err.println("Warning: Unable to open file ("
-				   + link + ") with the postscipt viewer ("
-				   + prefs.get("psviewer") +")");*/
+	else if(fieldName.equals("ps")) 
+	    {
+		try 
+		    {
+			System.err.println("Starting external viewer: " 
+					   + prefs.get("psviewer") + " " + link);
+			cmdArray[0] = prefs.get("psviewer");
+			cmdArray[1] = link;  			
+			Process child = Runtime.getRuntime().exec(cmdArray);			 							   
+		    } 
+		catch (IOException e) 
+		    {
+			System.err.println("An error occured on the command: " 
+					   + prefs.get("psviewer") + " " + link);
+		    }
 	    }
-
-	}else if(fieldName.equals("pdf")) {
-	    try {
-		/*System.err.println("Message: Opening file (" + link
-				   + ") with the pdf viewer ("
-				   + prefs.get("pdfviewer") +")");*/
-                File f = new File(link);
-                String dir = prefs.get("pdfDirectory");
-                if (!f.exists() && (dir != null)) {
-                  if (dir.endsWith(System.getProperty("file.separator")))
-                    link = dir + link;
-                  else
-                    link = dir + System.getProperty("file.separator") + link;
-                }
-		Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer")
-							  + " " + link);
-	    } catch (IOException e) {
-		/*System.err.println("Warning: Unable to open file " + link
-				   + " with the pdf viewer ("
-				   + prefs.get("pdfviewer") +")");*/
-                              throw e;
+	else if(fieldName.equals("pdf")) 
+	    {
+		try 
+		    {
+			File f = new File(link);
+			String dir = prefs.get("pdfDirectory");
+			if (!f.exists() && (dir != null)) 
+			    {
+				if (dir.endsWith(System.getProperty("file.separator")))
+				    link = dir + link;
+				else
+				    link = dir + System.getProperty("file.separator") + link;
+			    }
+			System.err.println("Starting external viewer: " 
+					   + prefs.get("pdfviewer") + " " + link);
+			cmdArray[0] = prefs.get("pdfviewer");
+			cmdArray[1] = link;  			
+			Process child = Runtime.getRuntime().exec(cmdArray);			 			
+		    }
+		catch (IOException e) 
+		    {
+			System.err.println("An error occured on the command: " 
+					   + prefs.get("pdfviewer") + " " + link);
+		    }
 	    }
-	}
-
 	else{
-	    //System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+	    System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
 	    //ignore
 	}
-  }
+    }
+
+    
+
 
   /**
    * Checks if the two entries represent the same publication.
@@ -462,4 +477,27 @@ public class Util {
 	}*/
 
 
+	/**
+	 * Sets empty or non-existing owner fields of bibtex entries inside an array to
+	 * a specified default value.
+	 * @param bibs array of bibtex entries
+	 * @param defaultOwner default owner of bibtex entries
+	 */
+	public static void setDefaultOwner( ArrayList bibs, String defaultOwner )
+	{
+		// Iterate through all entries
+		for (int i = 0; i < bibs.size(); i++)
+		{
+			// Get current entry		
+			BibtexEntry curEntry = (BibtexEntry)bibs.get(i);
+			// No or empty owner field?
+			if (curEntry.getField("owner") == null ||
+				((String)curEntry.getField("owner")).length() == 0)
+			{
+				// Set owner field to default value
+				curEntry.setField("owner", defaultOwner);
+			}
+		}
+	}
+	
 }

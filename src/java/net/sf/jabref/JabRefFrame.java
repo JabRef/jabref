@@ -1416,6 +1416,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readEndnote(tempFilename); //MedlineParser.readMedline(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1428,6 +1429,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1441,6 +1443,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readISI(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1456,6 +1459,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1502,6 +1506,7 @@ public class JabRefFrame
         String tempFilename = getNewFile();
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1516,6 +1521,7 @@ public class JabRefFrame
         if (tempFilename != null) {
           ArrayList bibs = ImportFormatReader.readReferenceManager10(
               tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));			  
           addBibEntries(bibs, tempFilename, intoNew);
         }
 
@@ -1533,6 +1539,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readScifinder(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1546,6 +1553,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readSixpack(tempFilename);
+		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));		  
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }

@@ -64,9 +64,9 @@ public class JabRefPreferences {
 	    defaults.put("htmlviewer","open /Applications/Safari.app");
 	}
 	else {
-	    defaults.put("pdfviewer","/usr/bin/acroread");
-	    defaults.put("psviewer","/usr/X11R6/bin/gv");
-	    defaults.put("htmlviewer","/usr/bin/mozilla");
+	    defaults.put("pdfviewer","acroread");
+	    defaults.put("psviewer","gv");
+	    defaults.put("htmlviewer","mozilla");
 	}
 	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
 	defaults.put("posX", new Integer(0));
@@ -84,8 +84,8 @@ public class JabRefPreferences {
 	defaults.put("secDescending", new Boolean(true));
 	defaults.put("terSort", "author");
 	defaults.put("terDescending", new Boolean(false));
-	defaults.put("columnNames", "entrytype;author;title;year;journal;bibtexkey");
-	defaults.put("columnWidths","75;280;400;60;100;100");
+	defaults.put("columnNames", "entrytype;author;title;year;journal;owner;bibtexkey");
+	defaults.put("columnWidths","75;280;400;60;100;100;100");
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
 	defaults.put("workingDirectory", (String)null);
 
@@ -116,8 +116,9 @@ public class JabRefPreferences {
 	defaults.put("autoCompFields", new byte[] {0, 1, 28});
 	defaults.put("groupSelectorVisible", new Boolean(true));
 	defaults.put("groupsDefaultField", "keywords");
-        defaults.put("generalFields", "crossref;keywords;doi;url;"+
-	     "pdf;abstract;comment");
+	defaults.put("defaultOwner", System.getProperty("user.name"));
+  defaults.put("generalFields", "crossref;keywords;doi;url;"+
+	     "pdf;abstract;comment;owner");
 
 	//defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
 	defaults.put("historySize", new Integer(5));

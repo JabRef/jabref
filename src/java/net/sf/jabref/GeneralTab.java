@@ -14,6 +14,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JCheckBox autoOpenForm, backup, openLast,
 		defSource, editSource,defSort, ctrlClick;
     private JTextField groupField = new JTextField(15);
+    private JTextField defOwnerField;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
@@ -45,6 +46,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 				  _prefs.getBoolean("ctrlClick"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
+	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
         groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
 	general.setBorder(BorderFactory.createTitledBorder
 			  (BorderFactory.createEtchedBorder(),
@@ -78,18 +80,28 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	//con.gridwidth = GridBagConstraints.REMAINDER;
 	//gbl.setConstraints(defSort, con);
 	//general.add(defSort);
+	// Default owner
+	con.gridwidth = 1;
+	JLabel lab = new JLabel(Globals.lang("Default owner")+":");
+        lab.setHorizontalAlignment(SwingConstants.LEFT);
+	gbl.setConstraints(lab, con);
+        general.add(lab);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(defOwnerField, con);
+        general.add(defOwnerField);
 
 
         // Grouping field
         con.gridwidth = 1;
-        JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
+        lab = new JLabel(Globals.lang("Default grouping field")+":");
         lab.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         general.add(lab);
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(groupField, con);
         general.add(groupField);
-        // Language choice
+        
+	// Language choice
         String oldLan = _prefs.get("language");
         int ilk = 0;
         for (Iterator i=GUIGlobals.LANGUAGES.keySet().iterator(); i.hasNext();) {
@@ -196,8 +208,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
         gbl.setConstraints(external, con);
         add(external);
-
-
     }
 
   /**
@@ -235,6 +245,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
+	_prefs.put("defaultOwner", defOwnerField.getText().trim());
 
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 
