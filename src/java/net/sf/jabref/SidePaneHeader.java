@@ -35,7 +35,7 @@ import javax.swing.JToolBar;
 
 public class SidePaneHeader extends JPanel implements ActionListener {
 
-  private JButton close = new JButton(new ImageIcon(GUIGlobals.close2IconFile));
+  private JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
     private JLabel nameLabel, imageIcon;
     private SidePaneComponent parent;
     private GridBagLayout gbl = new GridBagLayout();
