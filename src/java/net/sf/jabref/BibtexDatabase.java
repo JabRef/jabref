@@ -301,6 +301,83 @@ public class BibtexDatabase
         return false;
     }
 
+   /**
+    * If the label represents a string contained in this database, returns
+    * that string's content. Resolves references to other strings, taking
+    * care not to follow a circular reference pattern.
+    * If the string is undefined, returns the label itself.
+    */
+    public String resolveString(String label) {
+	return resolveString(label, new HashSet());
+    }
+   
+    /**
+     * Resolves any references to strings contained in this database,
+     * if possible.
+     */
+    public String resolveForStrings(String content) {
+	return resolveContent(content, new HashSet());
+    }
+
+    private String resolveString(String label, HashSet usedIds) {
+
+        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
+            BibtexString string = (BibtexString)_strings.get(i.next());
+
+	    //Util.pr(": "+string.getName());
+            if (string.getName().equals(label)) {
+
+		// First check if this string label has been resolved
+		// earlier in this recursion. If so, we have a
+		// circular reference, and have to stop to avoid
+		// infinite recursion.
+		if (usedIds.contains(string.getId())) {
+		    Util.pr("Stopped due to circular reference in strings: "+label);
+		    return label;
+		}
+		// If not, log this string's ID now.
+		usedIds.add(string.getId());
+
+		// Ok, we found the string. Now we must make sure we
+		// resolve any references to other strings in this one.
+		String res = string.getContent();
+		res = resolveContent(res, usedIds);
+
+		// Finished with recursing this branch, so we remove our
+		// ID again:
+		usedIds.remove(string.getId());
+
+		return res;
+	    }
+        }
+        return label;
+    }
+
+    private String resolveContent(String res, HashSet usedIds) {
+	if (res.matches(".*#[\\w]+#.*")) {
+	    StringBuffer newRes = new StringBuffer();
+	    int piv = 0, next = 0;
+	    while ((next=res.indexOf("#", piv)) >= 0) {
+		// We found the next string ref. Append the text
+		// up to it.
+		if (next > 0)
+		    newRes.append(res.substring(piv, next));
+		int stringEnd = res.indexOf("#", next+1);
+		if (stringEnd >= 0) {
+		    // We found the boundaries of the string ref,
+		    // now resolve that one.
+		    String refLabel = res.substring(next+1, stringEnd);
+		    newRes.append(resolveString(refLabel, usedIds));
+		}
+		piv = stringEnd+1;
+	    }
+	    if (piv < res.length()-1)
+		newRes.append(res.substring(piv));
+	    res = newRes.toString();
+	}
+	return res;
+    }
+
     //##########################################
     //  usage:
     //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);

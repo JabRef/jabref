@@ -422,7 +422,7 @@ public class FileActions
             //Layout layout = layoutHelper.getLayoutFromText();
 
             // Write the entry
-            ps.write(layout.doLayout(entry));
+            ps.write(layout.doLayout(entry, database));
           }
 
           // Print footer

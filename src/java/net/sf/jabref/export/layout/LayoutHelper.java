@@ -59,6 +59,7 @@ public class LayoutHelper
     
     //~ Instance fields ////////////////////////////////////////////////////////
 
+
     //public static final int IS_OPTION_FIELD_PARAM = 6;
     private PushbackReader _in;
     private Vector parsedEntries = new Vector();
@@ -71,6 +72,7 @@ public class LayoutHelper
 
     public LayoutHelper(Reader in)
     {
+
         if (in == null)
         {
             throw new NullPointerException();

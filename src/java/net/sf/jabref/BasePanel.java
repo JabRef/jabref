@@ -233,6 +233,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
                       saving = true;
                       saveDatabase(file, false);
+
+		      //Util.pr("Testing resolve string... BasePanel line 237");
+		      //Util.pr("Resolve aq: "+database.resolveString("aq"));
+		      //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
+
                       try {
                         Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
                       } catch (IllegalArgumentException ex) {

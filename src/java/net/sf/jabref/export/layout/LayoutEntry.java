@@ -31,6 +31,7 @@ import wsi.ra.types.StringInt;
 
 import java.util.Vector;
 
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 
@@ -189,11 +190,11 @@ public class LayoutEntry
     
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    public String doLayout(BibtexEntry bibtex)
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database)
     {
         if (type == LayoutHelper.IS_LAYOUT_TEXT)
         {
-            return text;
+            return text; 
         }
         else if (type == LayoutHelper.IS_SIMPLE_FIELD)
         {
@@ -202,7 +203,7 @@ public class LayoutEntry
                 return bibtex.getType().getName();
             }
 
-            String field = (String) bibtex.getField(text);
+            String field = getField(bibtex, text, database);
 
             if (field == null)
             {
@@ -210,13 +211,16 @@ public class LayoutEntry
             }
             else
             {
-                return field;
+		
+		return field;
+
             }
         }
         else if ((type == LayoutHelper.IS_FIELD_START) ||
                 	(type == LayoutHelper.IS_GROUP_START))
         {
-            String field = (String) bibtex.getField(text);
+            String field = getField(bibtex, text, database);
+            //String field = (String) bibtex.getField(text);
 
             if ((field == null) || ((type == LayoutHelper.IS_GROUP_START) &&
                     					(field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))))
@@ -234,14 +238,14 @@ public class LayoutEntry
 
                 for (int i = 0; i < layoutEntries.length; i++)
                 {
-                    fieldText = layoutEntries[i].doLayout(bibtex);
+                    fieldText = layoutEntries[i].doLayout(bibtex, database);
 
                     //System.out.println("'" + fieldText + "'");
                     if (fieldText == null)
                     {
                         if ((i + 1) < layoutEntries.length)
                         {
-                            if (layoutEntries[i + 1].doLayout(bibtex).trim()
+                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim()
                                                         .length() == 0)
                             {
                                 //sb.append("MISSING");
@@ -297,7 +301,8 @@ public class LayoutEntry
                 fieldEntry = bibtex.getType().getName();
             }
             else{
-            String field = (String) bibtex.getField(text);
+            String field = getField(bibtex, text, database);
+            //String field = (String) bibtex.getField(text);
 
             if (field == null)
             {
@@ -368,6 +373,14 @@ public class LayoutEntry
         }
 
         return formatter;
+    }
+
+
+    private String getField(BibtexEntry bibtex, String field, BibtexDatabase database) {
+            String res = (String) bibtex.getField(field);
+	    if ((res != null) && (database != null))
+		res = database.resolveForStrings(res);
+	    return res;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

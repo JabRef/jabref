@@ -126,7 +126,7 @@ public class LayoutTest
                 //System.out.println(key);
                 BibtexEntry entry = bibtex.getEntryById(key);
                 //System.out.println(layout.doLayout(entry));
-                ps.println(layout.doLayout(entry));
+                ps.println(layout.doLayout(entry, null));
             }
         }
          catch (FileNotFoundException e)

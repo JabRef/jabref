@@ -142,7 +142,7 @@ public class PreviewPanel extends JEditorPane {
 
     //StringBuffer sb = new StringBuffer(prefix);
     StringBuffer sb = new StringBuffer();
-    sb.append(layout.doLayout(entry));
+    sb.append(layout.doLayout(entry, null));
     //sb.append(postfix);
     setText(sb.toString());
     invalidate();

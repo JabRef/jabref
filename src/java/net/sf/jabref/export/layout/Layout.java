@@ -29,6 +29,7 @@ import wsi.ra.types.StringInt;
 
 import java.util.Vector;
 
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import java.io.IOException;
 
@@ -136,7 +137,13 @@ public class Layout
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    public String doLayout(BibtexEntry bibtex)
+    /**
+     * Returns the processed bibtex entry. If the database argument is
+     * null, no string references will be resolved. Otherwise all valid
+     * string references will be replaced by the strings' contents. Even
+     * recursive string references are resolved.
+     */
+    public String doLayout(BibtexEntry bibtex, BibtexDatabase database)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuffer sb = new StringBuffer(100);
@@ -145,14 +152,14 @@ public class Layout
 
         for (int i = 0; i < layoutEntries.length; i++)
         {
-            fieldText = layoutEntries[i].doLayout(bibtex);
+            fieldText = layoutEntries[i].doLayout(bibtex, database);
 
             //System.out.println("'" + fieldText + "'");
             if (fieldText == null)
             {
                 if ((i + 1) < layoutEntries.length)
                 {
-                    if (layoutEntries[i + 1].doLayout(bibtex).trim().length() == 0)
+                    if (layoutEntries[i + 1].doLayout(bibtex, database).trim().length() == 0)
                     {
                         //sb.append("MISSING");
                         i++;
