@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import net.sf.jabref.search.SearchExpression;
 
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener {
@@ -253,8 +254,26 @@ class SearchManager2 extends SidePaneComponent
 		rule1 = new RegExpRule(prefs);
 	    else
 		rule1 = new SimpleSearchRule(prefs);
+		
+		try {
+			rule1 = new SearchExpression(prefs,searchOptions);
+		} catch (Exception ex) {
+			// JZ: for testing; this does the new search if the
+			// search text is in correct syntax, and the regular search otherwise
+		}
+//		} catch (PatternSyntaxException ex) {
+//			System.out.println(ex);
+//			return;
+//		} catch (TokenStreamException ex) {
+//			System.out.println(ex);
+//			return;
+//		} catch (RecognitionException ex) {
+//			System.out.println(ex);
+//			return;
+//		}
+		
 	    searchRules.addRule(rule1) ;
-
+		
 	    if (reorder.isSelected()) {
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
