@@ -22,6 +22,9 @@
 
 package net.sf.jabref.groups;
 
+import java.awt.datatransfer.*;
+import java.awt.datatransfer.Transferable;
+import java.io.IOException;
 import java.util.*;
 
 import javax.swing.tree.*;
@@ -34,18 +37,26 @@ import net.sf.jabref.*;
  * 
  * @author jzieren
  */
-public class GroupTreeNode extends DefaultMutableTreeNode {
+public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
     public static final int GROUP_UNION_CHILDREN = 0;
-
     public static final int GROUP_INTERSECTION_PARENT = 1;
-
     public static final int GROUP_ITSELF = 2;
+    
+    public static DataFlavor flavor;
+    public static DataFlavor[] flavors;
 
     /**
      * Creates this node and associates the specified group with it.
      */
     public GroupTreeNode(AbstractGroup group) {
         setGroup(group);
+        try {
+            flavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
+                    + ";class=net.sf.jabref.groups.GroupTreeNode");
+            flavors = new DataFlavor[] { flavor };
+        } catch (ClassNotFoundException e) {
+            // never happens
+        }
     }
 
     /**
@@ -395,5 +406,19 @@ public class GroupTreeNode extends DefaultMutableTreeNode {
         if (undo instanceof UndoableChangeAssignment)
             ((UndoableChangeAssignment) undo).setEditedNode(this);
         return undo;
+    }
+
+    public DataFlavor[] getTransferDataFlavors() {
+        return flavors;
+    }
+
+    public boolean isDataFlavorSupported(DataFlavor someFlavor) {
+        return someFlavor.equals(GroupTreeNode.flavor);
+    }
+
+    public Object getTransferData(DataFlavor someFlavor) throws UnsupportedFlavorException, IOException {
+        if (!isDataFlavorSupported(someFlavor))
+            throw new UnsupportedFlavorException(someFlavor);
+        return this;
     }
 }

@@ -39,11 +39,7 @@ import javax.swing.undo.*;
 import net.sf.jabref.*;
 
 public class GroupSelector extends SidePaneComponent implements
-        TreeSelectionListener, ActionListener {
-    /*
-     * Groups are stored in the vector like the following: field1, name1,
-     * regexp1, field2, name2, regexp2, ...
-     */
+        TreeSelectionListener, ActionListener {    
     JButton newButton = new JButton(new ImageIcon(GUIGlobals.newSmallIconFile)),
             helpButton = new JButton(
                     new ImageIcon(GUIGlobals.helpSmallIconFile)),
@@ -52,7 +48,7 @@ public class GroupSelector extends SidePaneComponent implements
             autoGroup = new JButton(new ImageIcon(GUIGlobals.autoGroupIcon)),
             openset = new JButton(Globals.lang("Settings"));
     Color bgColor = Color.white;
-    JTree groupsTree;
+    GroupsTree groupsTree;
     DefaultTreeModel groupsTreeModel;
     GroupTreeNode groupsRoot;
     JScrollPane sp;
@@ -326,21 +322,16 @@ public class GroupSelector extends SidePaneComponent implements
         main.add(helpButton);
         // header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
-        groupsTree = new JTree();
+        groupsTree = new GroupsTree(this);
         groupsTree.setShowsRootHandles(true);
         groupsTree.setCellRenderer(new GroupTreeCellRenderer());
         groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
         ToolTipManager.sharedInstance().registerComponent(groupsTree);
+        
         // JZPUWIL: drag and drop...
-        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
-                groupsTree, DnDConstants.ACTION_MOVE,
-                new DragGestureListener() {
-                    public void dragGestureRecognized(DragGestureEvent dge) {
-                        // TODO Auto-generated method stub
-                        //System.out.println(dge);
-                    }
-                });
+        // ...see GroupsTree
+        
         groupsTree.setShowsRootHandles(false);
         // groupsTree.setPrototypeCellValue("Suitable length");
         // // The line above decides on the list's preferred width.
@@ -499,32 +490,6 @@ public class GroupSelector extends SidePaneComponent implements
     public void revalidateGroups() {
         revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
     }
-    
-    
-
-//    public void revalidateGroups() {
-//        groupsTreeModel.reload();
-//        groupsTree.clearSelection();
-//        groupsTree.revalidate();
-//    }
-
-//    /**
-//     * @param paths
-//     *            The paths to select.
-//     */
-//    public void revalidateGroups(TreePath[] paths) {
-//        groupsTreeModel.reload();
-//        groupsTree.setSelectionPaths(paths);
-//        groupsTree.revalidate();
-//    }
-
-//    /**
-//     * @param path
-//     *            The path to select.
-//     */
-//    public void revalidateGroups(TreePath path) {
-//        revalidateGroups(new TreePath[] { path });
-//    }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
@@ -720,7 +685,7 @@ public class GroupSelector extends SidePaneComponent implements
     public TreePath getSelectionPath() {
         return groupsTree.getSelectionPath();
     }
-
+    
     AbstractAction moveNodeUpAction = new AbstractAction("Up") {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
@@ -870,4 +835,5 @@ public class GroupSelector extends SidePaneComponent implements
          }
         validateTree();
     }
-}
+    }
+
