@@ -188,7 +188,7 @@ public class GUIGlobals {
 //       showAbsIconFile = GUIGlobals.class.getResource(pre + "g_icon.gif"),
       showReqIconFile = GUIGlobals.class.getResource(pre + "reqIcon.png"),
       showOptIconFile = GUIGlobals.class.getResource(pre + "optIcon.png"),
-      showGenIconFile = GUIGlobals.class.getResource(pre + "genIcon.png"),
+      showGenIconFile = GUIGlobals.class.getResource(pre + "absIcon.png"),
       showAbsIconFile = GUIGlobals.class.getResource(pre + "genIcon.png"),
       sourceIconFile = GUIGlobals.class.getResource(pre + "viewsource.gif"),
       copyIconFile = GUIGlobals.class.getResource(pre + "copy_edit.gif"),

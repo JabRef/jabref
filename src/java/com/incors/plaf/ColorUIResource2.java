@@ -1,5 +1,6 @@
 package com.incors.plaf;
 
+
 /**
  * This class had to be created because <code>ColorUIResouce</code> does not allow
  * transparency. Hopefully one day support for transparency will be added to we
@@ -14,127 +15,166 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
+
 import javax.swing.plaf.ColorUIResource;
 
-public class ColorUIResource2 extends ColorUIResource {
-  private Color myColor;
 
-  // constructors
+/**
+ * DOCUMENT ME!
+ *
+ * @author $author$
+ * @version $Revision$
+ */
+public class ColorUIResource2 extends ColorUIResource
+{
+    //~ Instance fields ////////////////////////////////////////////////////////
 
-  public ColorUIResource2(Color c) {
-    super(0, 0, 0);
-    myColor = c;
-  }
+    private Color myColor;
 
-  public ColorUIResource2(int r, int g, int b) {
-    super(0, 0, 0);
-    myColor = new Color(r, g, b);
-  }
+    //~ Constructors ///////////////////////////////////////////////////////////
 
-  public ColorUIResource2(int r, int g, int b, int a) {
-    super(0, 0, 0);
-    myColor = new Color(r, g, b, a);
-  }
+    // constructors
+    public ColorUIResource2(Color c)
+    {
+        super(0, 0, 0);
+        myColor = c;
+    }
 
-  public ColorUIResource2(int rgb) {
-    super(0, 0, 0);
-    myColor = new Color(rgb);
-  }
+    public ColorUIResource2(int r, int g, int b)
+    {
+        super(0, 0, 0);
+        myColor = new Color(r, g, b);
+    }
 
-  public ColorUIResource2(int rgba, boolean hasalpha) {
-    super(0, 0, 0);
-    myColor = new Color(rgba, hasalpha);
-  }
+    public ColorUIResource2(int r, int g, int b, int a)
+    {
+        super(0, 0, 0);
+        myColor = new Color(r, g, b, a);
+    }
 
-  public ColorUIResource2(float r, float g, float b) {
-    super(0, 0, 0);
-    myColor = new Color(r, g, b);
-  }
+    public ColorUIResource2(int rgb)
+    {
+        super(0, 0, 0);
+        myColor = new Color(rgb);
+    }
 
-  public ColorUIResource2(float r, float g, float b, float alpha) {
-    super(0, 0, 0);
-    myColor = new Color(r, g, b, alpha);
-  }
+    public ColorUIResource2(int rgba, boolean hasalpha)
+    {
+        super(0, 0, 0);
+        myColor = new Color(rgba, hasalpha);
+    }
 
+    public ColorUIResource2(float r, float g, float b)
+    {
+        super(0, 0, 0);
+        myColor = new Color(r, g, b);
+    }
 
-  // non static methods
+    public ColorUIResource2(float r, float g, float b, float alpha)
+    {
+        super(0, 0, 0);
+        myColor = new Color(r, g, b, alpha);
+    }
 
-  public int getRed() {
-    return myColor.getRed();
-  }
+    //~ Methods ////////////////////////////////////////////////////////////////
 
-  public int getGreen() {
-    return myColor.getGreen();
-  }
+    public int getAlpha()
+    {
+        return myColor.getAlpha();
+    }
 
-  public int getBlue() {
-    return myColor.getBlue();
-  }
+    public int getBlue()
+    {
+        return myColor.getBlue();
+    }
 
-  public int getAlpha() {
-    return myColor.getAlpha();
-  }
+    public float[] getColorComponents(float[] compArray)
+    {
+        return myColor.getColorComponents(compArray);
+    }
 
-  public int getRGB() {
-    return myColor.getRGB();
-  }
+    public float[] getColorComponents(ColorSpace cspace, float[] compArray)
+    {
+        return myColor.getColorComponents(cspace, compArray);
+    }
 
-  public Color brighter() {
-    return myColor.brighter();
-  }
+    public ColorSpace getColorSpace()
+    {
+        return myColor.getColorSpace();
+    }
 
-  public Color darker() {
-    return myColor.darker();
-  }
+    public float[] getComponents(float[] compArray)
+    {
+        return myColor.getComponents(compArray);
+    }
 
-  public int hashCode() {
-    return myColor.hashCode();
-  }
+    public float[] getComponents(ColorSpace cspace, float[] compArray)
+    {
+        return myColor.getComponents(cspace, compArray);
+    }
 
-  public boolean equals(Object obj) {
-    return myColor.equals(obj);
-  }
+    public int getGreen()
+    {
+        return myColor.getGreen();
+    }
 
-  public String toString() {
-    return myColor.toString();
-  }
+    public int getRGB()
+    {
+        return myColor.getRGB();
+    }
 
-  public float[] getRGBComponents(float[] compArray) {
-    return myColor.getRGBComponents(compArray);
-  }
+    public float[] getRGBColorComponents(float[] compArray)
+    {
+        return myColor.getRGBColorComponents(compArray);
+    }
 
-  public float[] getRGBColorComponents(float[] compArray) {
-    return myColor.getRGBColorComponents(compArray);
-  }
+    public float[] getRGBComponents(float[] compArray)
+    {
+        return myColor.getRGBComponents(compArray);
+    }
 
-  public float[] getComponents(float[] compArray) {
-    return myColor.getComponents(compArray);
-  }
+    // non static methods
+    public int getRed()
+    {
+        return myColor.getRed();
+    }
 
-  public float[] getColorComponents(float[] compArray) {
-    return myColor.getColorComponents(compArray);
-  }
+    public int getTransparency()
+    {
+        return myColor.getTransparency();
+    }
 
-  public float[] getComponents(ColorSpace cspace, float[] compArray) {
-    return myColor.getComponents(cspace, compArray);
-  }
+    public Color brighter()
+    {
+        return myColor.brighter();
+    }
 
-  public float[] getColorComponents(ColorSpace cspace, float[] compArray) {
-    return myColor.getColorComponents(cspace, compArray);
-  }
+    public PaintContext createContext(ColorModel cm, Rectangle r,
+        Rectangle2D r2d, AffineTransform xform, RenderingHints hints)
+    {
+        return myColor.createContext(cm, r, r2d, xform, hints);
+    }
 
-  public ColorSpace getColorSpace() {
-    return myColor.getColorSpace();
-  }
+    public Color darker()
+    {
+        return myColor.darker();
+    }
 
-  public PaintContext createContext(ColorModel cm, Rectangle r, Rectangle2D r2d,
-                                  AffineTransform xform, RenderingHints hints) {
-    return myColor.createContext(cm, r, r2d, xform, hints);
-  }
+    public boolean equals(Object obj)
+    {
+        return myColor.equals(obj);
+    }
 
-  public int getTransparency() {
-    return myColor.getTransparency();
-  }
+    public int hashCode()
+    {
+        return myColor.hashCode();
+    }
 
-
+    public String toString()
+    {
+        return myColor.toString();
+    }
 }
+///////////////////////////////////////////////////////////////////////////////
+//  END OF FILE.
+///////////////////////////////////////////////////////////////////////////////
