@@ -359,8 +359,15 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
     public static String NUMBER_COL = "#";
     public static int DEFAULT_FIELD_LENGTH = 100;
     public static final Map FIELD_LENGTH, FIELD_WEIGHT;
-    public static final Map FIELD_EXTRAS;
+    public static final Map FIELD_EXTRAS, LANGUAGES;
     static {
+
+      LANGUAGES = new HashMap();
+      // LANGUAGES contains mappings for supported languages.
+      LANGUAGES.put("English", "en");
+      LANGUAGES.put("Deutsch", "de");
+      LANGUAGES.put("Norsk", "no");
+
       FIELD_EXTRAS = new HashMap();
       // fieldExtras contains mappings to tell the EntryEditor to add a specific
       // function to this field, for instance a "browse" button for the "pdf" field.

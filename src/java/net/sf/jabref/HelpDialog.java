@@ -34,8 +34,8 @@ import javax.swing.event.HyperlinkEvent;
 import java.net.URL;
 
 /**
- * This is a non-modal help Dialog. The contents of the help is specified 
- * by calling 
+ * This is a non-modal help Dialog. The contents of the help is specified
+ * by calling
  */
 public class HelpDialog extends JDialog implements HyperlinkListener {
 
@@ -49,10 +49,10 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
     public HelpDialog(JabRefFrame bf) {
 	super(bf, GUIGlobals.helpTitle, false);
 	frame = bf;
-	content = new HelpContent();
+	content = new HelpContent(bf.prefs);
 	content.addHyperlinkListener(this);
 	setSize(GUIGlobals.helpSize);
-	Dimension ds = GUIGlobals.helpSize, 
+	Dimension ds = GUIGlobals.helpSize,
 	    df = bf.getSize();
 	Point pf = bf.getLocation();
 	//setLocation(new Point(Math.max(0,(pf.x+(df.width-ds.width)/2)),
@@ -64,7 +64,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 	diag.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    open = null;
-		}	       
+		}
 	    });*/
 
 	JToolBar tlb = new JToolBar();
@@ -124,7 +124,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 	    forward.setEnabled(false);
 	}
     }
-    
+
     class CloseAction extends AbstractAction {
 	public CloseAction() {
 	    super(Globals.lang("Close"));
@@ -133,7 +133,7 @@ public class HelpDialog extends JDialog implements HyperlinkListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    dispose();	    
+	    dispose();
 	}
     }
 

@@ -58,7 +58,9 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.x:	- Added Browse buttons to External programs tab in Preferences.
+1.x:	- Added functionality for using Browse buttons for file-related fields
+	  (ps, pdf, etc.).
+	- Added Browse buttons to External programs tab in Preferences.
 	- Fixed bug related to Save database and Source field, which caused changes
 	  to disappear.
 1.1:	- Added bibtex key uniqueness checking, and prevented autogeneration

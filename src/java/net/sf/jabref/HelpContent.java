@@ -29,19 +29,21 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.net.URL;
+import java.net.*;
 import java.io.IOException;
 import java.util.Stack;
 import javax.swing.event.HyperlinkListener;
+import java.io.File;
 
 public class HelpContent extends JEditorPane {
 
     JScrollPane pane;
-    private Stack history, forw; 
-
-    public HelpContent() {
+    private Stack history, forw;
+    JabRefPreferences prefs;
+    public HelpContent(JabRefPreferences prefs_) {
 	pane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			       JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        prefs = prefs_;
 	history = new Stack();
 	forw = new Stack();
 	setContentType("text/html");
@@ -66,7 +68,7 @@ public class HelpContent extends JEditorPane {
 	    setPageOnly(next);
 	}
 	return !forw.empty();
-	    
+
 
     }
 
@@ -77,7 +79,22 @@ public class HelpContent extends JEditorPane {
 
     public void setPage(URL url) {
 	URL old = getPage();
-	setPageOnly(url);
+        File f = new File(url.getPath());
+        File directory = new File(f.getParent());
+        File translatedFile = new File(directory.getPath()+"/"+prefs.get("language")
+                                       +"/"+f.getName());
+
+        if (translatedFile.exists()) {
+          try {
+            Util.pr("file:"+translatedFile.getPath());
+            URL translatedURL = new URL("file:"+translatedFile.getPath());
+            setPageOnly(translatedURL);
+
+          } catch (Throwable ex) {ex.printStackTrace();}//(MalformedURLException ex) {}
+        }
+        else {
+          setPageOnly(url);
+        }
 	forw.removeAllElements();
 	if (old != null)
 	    history.push(old);
@@ -95,5 +112,5 @@ public class HelpContent extends JEditorPane {
     public JComponent getPane() {
 	return pane;
     }
-    
+
 }

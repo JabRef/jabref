@@ -74,6 +74,7 @@ public class HelpAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent e) {
+      //Util.pr(helpfile.getPath());
 	diag.showPage(helpfile);
     }
 

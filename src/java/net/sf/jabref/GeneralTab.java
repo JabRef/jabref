@@ -3,6 +3,7 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
 
 public class GeneralTab extends JPanel implements PrefsTab {
 
@@ -12,6 +13,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	defSource, editSource;
     private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
+    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
 
     public GeneralTab(JabRefPreferences prefs) {
 	_prefs = prefs;
@@ -50,22 +52,37 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
+        // Grouping field
         con.gridwidth = 1;
         JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
         lab.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
         general.add(lab);
-
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(groupField, con);
         general.add(groupField);
 
+        // Language choice
+        String oldLan = _prefs.get("language");
+        int ilk = 0;
+        for (Iterator i=GUIGlobals.LANGUAGES.keySet().iterator(); i.hasNext();) {
+          if (GUIGlobals.LANGUAGES.get(i.next()).equals(oldLan)) {
+            language.setSelectedIndex(ilk);
+          }
+          ilk++;
+        }
+        con.gridwidth = 1;
+        lab = new JLabel(Globals.lang("Language")+":");
+        lab.setHorizontalAlignment(SwingConstants.LEFT);
+        gbl.setConstraints(lab, con);
+        general.add(lab);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(language, con);
+        general.add(language);
 
-	//gbl.setConstraints(editSource, con);
-	//general.add(editSource);
+        gbl.setConstraints(general, con);
+        add(general);
 
-	gbl.setConstraints(general, con);
-	add(general);
 
     }
 
@@ -76,6 +93,14 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.put("groupsDefaultField", groupField.getText().trim());
+
+        if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
+          _prefs.put("language", GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString());
+          Globals.setLanguage(GUIGlobals.LANGUAGES.get(language.getSelectedItem()).toString(), "");
+          JOptionPane.showMessageDialog(null, Globals.lang("You have changed the language setting. "
+              +"You must restart JabRef for this to come into effect."), Globals.lang("Changed language settings"),
+                                        JOptionPane.WARNING_MESSAGE);
+        }
     }
 
 }

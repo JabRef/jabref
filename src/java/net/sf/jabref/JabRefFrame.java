@@ -553,8 +553,8 @@ public class JabRefFrame extends JFrame {
                             baseAt(i).refreshTable();
                           }
                         }
-		}
-		});
+                      }
+                    });
 
 //options.add(selectKeys);
 	mb.add(options);

@@ -48,7 +48,7 @@
     	<fileset dir="${build.classes}"/>
     	<fileset dir="${src.dir}">
 			<include name="images/**"/>
-			<include name="help/**"/>
+			<include name="help"/>
 			<include name="resource/**"/>
         </fileset>
 	<fileset dir="${txt.dir}">
@@ -87,15 +87,9 @@
     <mkdir dir="${build.help}"/>
     <copy todir="${build.help}">
       <fileset dir="${help.dir}">
-        <include name="*" />
+        <!--<include name="*" />-->
       </fileset>
     </copy>
-<!--    <mkdir dir="${build.help}"/>
-    <copy todir="${build.help}">
-      <fileset dir="${help.dir}">
-        <include name="*" />
-      </fileset>
-    </copy>-->
 
   </target>
 

@@ -384,8 +384,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               if (ex3 != null) {
                 con.gridwidth = GridBagConstraints.REMAINDER;
                 con.weightx = 0;
+                //con.weighty = 1;
+                con.fill = GridBagConstraints.HORIZONTAL;
+                con.anchor = GridBagConstraints.NORTH;
                 gbl.setConstraints(ex3, con);
                 gen.add(ex3);
+                con.fill = GridBagConstraints.BOTH;
+                con.anchor = GridBagConstraints.CENTER;
               }
 	    }
 	}
@@ -427,6 +432,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       return null;
     if (((String)o).equals("browse")) {
       JButton but = new JButton(Globals.lang("Browse"));
+      but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           JabRefFileChooser chooser = new JabRefFileChooser
