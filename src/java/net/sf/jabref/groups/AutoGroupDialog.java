@@ -118,9 +118,9 @@ class AutoGroupDialog extends JDialog {
 			    added.add(new UndoableAddOrRemoveGroup
 				      (gs, groups, index, true,
 				       field(), Util.nCase(regExp), regExp));
-			    groups.add(index, field());
-			    groups.add(index, Util.nCase(regExp));
 			    groups.add(index, regExp);
+			    groups.add(index, Util.nCase(regExp));
+			    groups.add(index, field());
 			}
 			
 		    }

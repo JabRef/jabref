@@ -77,9 +77,7 @@ public class JabRefFrame extends JFrame {
 	open = new OpenDatabaseAction(),
 	close = new CloseDatabaseAction(),
 	quit = new CloseAction(),
-	selectKeys = new SelectKeysAction(),
-    //incrementalSearch = new IncrementalSearchAction(),
-    //normalSearch = new SearchAction(),
+    //selectKeys = new SelectKeysAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	help = new HelpAction("JabRef help", helpDiag, 
 			      GUIGlobals.baseFrameHelp, "JabRef help",
@@ -500,7 +498,7 @@ public class JabRefFrame extends JFrame {
 	mb.add(tools);
 
 	options.add(showPrefs);
-	options.add(selectKeys);
+	//options.add(selectKeys);
 	mb.add(options);
 
 	helpMenu.add(help);
@@ -524,6 +522,8 @@ public class JabRefFrame extends JFrame {
 	tlb.add(cut);
 	tlb.add(copy);
 	tlb.add(paste);
+	tlb.addSeparator();
+	tlb.add(normalSearch);
 	tlb.addSeparator();
 	tlb.add(editPreamble);
 	tlb.add(editStrings);

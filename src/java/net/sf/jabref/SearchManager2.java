@@ -199,7 +199,6 @@ class SearchManager2 extends SidePaneComponent
 	prefs.putBoolean("searchAll", searchAll.isSelected());
 	prefs.putBoolean("incrementS", increment.isSelected());
 	prefs.putBoolean("selectS", select.isSelected());
-	Util.pr(select.isSelected()+"");
 	prefs.putBoolean("caseSensitiveSearch", 
 			 caseSensitive.isSelected());
 	prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
@@ -226,12 +225,14 @@ class SearchManager2 extends SidePaneComponent
 	    searchField.requestFocus();
 	} else {
 	    if (increment.isSelected())
-		select.setSelected(true);
+		select.setSelected(true);	    
 	    else if (select.isSelected())
 		reorder.setSelected(true);
-	    else
+	    else {
 		increment.setSelected(true);
-
+	    }
+	    increment.revalidate();
+	    increment.repaint();
 	    searchField.requestFocus();
 	}
     }
