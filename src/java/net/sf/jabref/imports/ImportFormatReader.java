@@ -66,6 +66,8 @@ public class ImportFormatReader
      */
     public static String fixAuthor_nocomma(String in){
 
+	return fixAuthor(in);
+	/*
       // Check if we have cached this particular name string before:
       Object old = Globals.nameCache.get(in);
       if (old != null)
@@ -77,11 +79,17 @@ public class ImportFormatReader
         //System.out.println(authors[i]);
         authors[i]=authors[i].trim();
         String[] t = authors[i].split(" ");
-        sb.append( t[1].trim() + " " + t[0].trim());
-        if(i==authors.length-1)
-          sb.append(".");
-        else
-          sb.append(" and ");
+	if (t.length > 1) {
+	    sb.append(t[t.length-1].trim());
+	    for (int cnt=0; cnt<=t.length-2; cnt++)
+		sb.append(" " + t[cnt].trim());
+	} else
+	    sb.append(t[0].trim());
+	if(i==authors.length-1)
+	    sb.append(".");
+	else
+	    sb.append(" and ");
+	
       }
 
       String fixed = sb.toString();
@@ -89,7 +97,7 @@ public class ImportFormatReader
       // Add the fixed name string to the cache.
       Globals.nameCache.put(in, fixed);
 
-      return fixed;
+      return fixed;*/
     }
 
     //========================================================
