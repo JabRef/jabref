@@ -81,9 +81,9 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	//helpButton = new JButton(help);
 	//helpButton.setText(null);
-	JToolBar tlb = new JToolBar();
-	tlb.setFloatable(false);
-	tlb.add(help);
+        JToolBar tlb = new JToolBar();
+        tlb.setFloatable(false);
+        tlb.add(help);
 	panel.setBackground(GUIGlobals.lightGray);
 	buttonPanel.setBackground(GUIGlobals.lightGray);
 	panel.setLayout(gbl);

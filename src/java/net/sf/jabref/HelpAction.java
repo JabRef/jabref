@@ -50,7 +50,7 @@ public class HelpAction extends AbstractAction {
 	this.helpFile = helpFile;
     }
 
-    public HelpAction(HelpDialog diag, String helpfile, String tooltip,
+    public HelpAction(HelpDialog diag, String helpFile, String tooltip,
 		      URL iconFile) {
 	super(Globals.lang("Help"), new ImageIcon(iconFile));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
@@ -81,12 +81,13 @@ public class HelpAction extends AbstractAction {
 	this.diag = diag;
 	this.helpFile = helpFile;
     }
-
+/*
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip) {
 	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpfile = helpfile;
+              Util.pr("6. HelpAction: "+helpFile+" "+helpfile);
     }
 
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip,
@@ -95,6 +96,7 @@ public class HelpAction extends AbstractAction {
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpfile = helpfile;
+              Util.pr("7. HelpAction: "+helpFile+" "+helpfile);
     }
 
     public HelpAction(String title, HelpDialog diag, URL helpfile, String tooltip) {
@@ -102,6 +104,7 @@ public class HelpAction extends AbstractAction {
 	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	this.diag = diag;
 	this.helpfile = helpfile;
+              Util.pr("8. HelpAction: "+helpFile+" "+helpfile);
     }
 
     public HelpAction(String title, HelpDialog diag, URL helpfile, String tooltip,
@@ -111,10 +114,10 @@ public class HelpAction extends AbstractAction {
 	putValue(ACCELERATOR_KEY, key);
 	this.diag = diag;
 	this.helpfile = helpfile;
+              Util.pr("9. HelpAction: "+helpFile+" "+helpfile);
     }
-
+*/
     public void actionPerformed(ActionEvent e) {
-      //Util.pr(helpfile.getPath());
 	diag.showPage(helpFile);
     }
 

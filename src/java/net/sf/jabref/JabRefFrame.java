@@ -1276,7 +1276,6 @@ public class JabRefFrame
 
       // Create a new, empty, database.
       BasePanel bp = new BasePanel(ths, prefs);
-      Util.pr(":"+GUIGlobals.untitledTitle);
       tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), bp);
       tabbedPane.setSelectedComponent(bp);
       if (tabbedPane.getTabCount() == 1) {

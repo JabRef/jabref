@@ -143,6 +143,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     public BibtexDatabase database() { return database; }
     public JabRefFrame frame() { return frame; }
+    public JabRefPreferences prefs() { return prefs; }
 
     public void output(String s) {
 	if (!suppressOutput)

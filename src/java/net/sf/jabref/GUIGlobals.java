@@ -54,8 +54,8 @@ public class GUIGlobals {
   static String
       frameTitle = "JabRef",
       version = "1.2",
-      stringsTitle = Globals.lang("Strings for database") + ": ",
-      untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
+      stringsTitle = "Strings for database",
+      //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
       helpTitle = "JabRef help",
       TYPE_HEADER = "entrytype",
@@ -223,6 +223,8 @@ public class GUIGlobals {
       customEntriesHelp = "CustomEntriesHelp.html",
       contentSelectorHelp = "ContentSelectorHelp.html",
       labelPatternHelp = "LabelPatterns.html",
+      ownerHelp = "OwnerHelp.html",
+      pdfHelp = "ExternalFiles.html",
       aboutPage = "About.html";
 
 // Keystrokes for Entry editor.

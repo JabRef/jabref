@@ -72,7 +72,7 @@ public class StringDialog extends JDialog {
 	    });
 
 	// We replace the default FocusTraversalPolicy with a subclass
-	// that only allows the StringTable to gain keyboard focus.	
+	// that only allows the StringTable to gain keyboard focus.
 	setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
 		protected boolean accept(Component c) {
 		    return (super.accept(c) && (c instanceof StringTable));
@@ -81,7 +81,7 @@ public class StringDialog extends JDialog {
 
 	setLocation(prefs.getInt("stringsPosX"), prefs.getInt("stringsPosY"));
 	setSize(prefs.getInt("stringsSizeX"), prefs.getInt("stringsSizeY"));
-	
+
 	pan.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	con.weighty = 1;
@@ -112,7 +112,7 @@ public class StringDialog extends JDialog {
 	am.put("undo", undoAction);
 	im.put(GUIGlobals.redoStroke, "redo");
 	am.put("redo", redoAction);
-	
+
 	//tlb.add(closeAction);
 	//tlb.addSeparator();
 	tlb.add(newStringAction);
@@ -126,16 +126,16 @@ public class StringDialog extends JDialog {
 	conPane.add(pan, BorderLayout.CENTER);
 
 	if (panel.file != null)
-	    setTitle(GUIGlobals.stringsTitle+panel.file.getName());
+	    setTitle(Globals.lang(GUIGlobals.stringsTitle)+": "+panel.file.getName());
 	else
-	    setTitle(GUIGlobals.untitledStringsTitle);
-	
+	    setTitle(Globals.lang(GUIGlobals.stringsTitle)+": "+Globals.lang(GUIGlobals.untitledTitle));
+
     }
 
     class StringTable extends JTable {
 	JScrollPane sp = new JScrollPane((JTable)this);
 	public StringTable(StringTableModel stm) {
-	    super(stm);	  
+	    super(stm);
 	    setShowVerticalLines(true);
 	    setShowHorizontalLines(true);
 	    setColumnSelectionAllowed(true);
@@ -176,10 +176,10 @@ public class StringDialog extends JDialog {
 	    this.base = base;
 	}
 
-	public Object getValueAt(int row, int col) {	   
+	public Object getValueAt(int row, int col) {
 	    return ((col == 0) ?
-		    base.getString(row).getName() : 
-		    base.getString(row).getContent());		    
+		    base.getString(row).getName() :
+		    base.getString(row).getContent());
 	}
 
 	public void setValueAt(Object value, int row, int col) {
@@ -188,8 +188,8 @@ public class StringDialog extends JDialog {
 	                // thinks the user is still editing an entry,
 	                // which might now be outside
 	    if (col == 0) {
-		// Change name of string. 
-		if (!((String)value).equals(base.getString(row).getName())) {		    
+		// Change name of string.
+		if (!((String)value).equals(base.getString(row).getName())) {
 		    if (base.hasStringLabel((String)value))
 			JOptionPane.showMessageDialog(parent,
 						      Globals.lang("A string with that label "
@@ -215,7 +215,7 @@ public class StringDialog extends JDialog {
 		}
 	    } else {
 		// Change content of string.
-		if (!((String)value).equals(base.getString(row).getContent())) {		    
+		if (!((String)value).equals(base.getString(row).getContent())) {
 		    // Store undo information.
 		    panel.undoManager.addEdit
 			(new UndoableStringChange
@@ -267,7 +267,7 @@ public class StringDialog extends JDialog {
     }
 
     // The action concerned with closing the window.
-    CloseAction closeAction = new CloseAction(this); 
+    CloseAction closeAction = new CloseAction(this);
     class CloseAction extends AbstractAction {
 	StringDialog parent;
 	public CloseAction(StringDialog parent) {
@@ -275,7 +275,7 @@ public class StringDialog extends JDialog {
 	    //, new ImageIcon(GUIGlobals.closeIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Close dialog"));
 	    this.parent = parent;
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    panel.stringsClosing();
 	    dispose();
@@ -288,17 +288,17 @@ public class StringDialog extends JDialog {
 	}
     }
 
-    NewStringAction newStringAction = new NewStringAction(this); 
+    NewStringAction newStringAction = new NewStringAction(this);
     class NewStringAction extends AbstractAction {
 	StringDialog parent;
 	public NewStringAction(StringDialog parent) {
-	    super("New string", 
+	    super("New string",
 		  new ImageIcon(GUIGlobals.addIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("New string"));
 	    this.parent = parent;
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
-	    String name = 
+	    String name =
 		JOptionPane.showInputDialog(parent,
 					    Globals.lang("Please enter the string's label"));
 	    if (name == null)
@@ -309,12 +309,12 @@ public class StringDialog extends JDialog {
 		     Globals.lang("The label of the string can not be a number."),
 		     Globals.lang("Label"),
 		     JOptionPane.ERROR_MESSAGE);
-		return;	       
+		return;
 	    }
 
 	    try {
 		BibtexString bs = new BibtexString(name, "");
-		
+
 		// Store undo information:
 		panel.undoManager.addEdit
 		    (new UndoableInsertString
@@ -333,28 +333,28 @@ public class StringDialog extends JDialog {
 	}
     }
 
-    StoreContentAction storeContentAction = new StoreContentAction(this); 
+    StoreContentAction storeContentAction = new StoreContentAction(this);
     class StoreContentAction extends AbstractAction {
 	StringDialog parent;
 	public StoreContentAction(StringDialog parent) {
-	    super("Store string", 
+	    super("Store string",
 		  new ImageIcon(GUIGlobals.addIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Store string"));
 	    this.parent = parent;
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	}
     }
 
-    RemoveStringAction removeStringAction = new RemoveStringAction(this); 
+    RemoveStringAction removeStringAction = new RemoveStringAction(this);
     class RemoveStringAction extends AbstractAction {
 	StringDialog parent;
 	public RemoveStringAction(StringDialog parent) {
-	    super("Remove selected strings", 
+	    super("Remove selected strings",
 		  new ImageIcon(GUIGlobals.removeIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Remove selected strings"));
 	    this.parent = parent;
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    int[] sel = table.getSelectedRows();
 	    if (sel.length > 0) {
@@ -364,10 +364,10 @@ public class StringDialog extends JDialog {
 		assureNotEditing();
 
 		String msg = Globals.lang("Really delete the selected")+" "+
-		    ((sel.length>1) ? sel.length+" "+Globals.lang("entries") 
+		    ((sel.length>1) ? sel.length+" "+Globals.lang("entries")
 		     : Globals.lang("entry"))+"?";
 		int answer = JOptionPane.showConfirmDialog(parent, msg, Globals.lang("Delete strings"),
-							   JOptionPane.YES_NO_OPTION, 
+							   JOptionPane.YES_NO_OPTION,
 							   JOptionPane.QUESTION_MESSAGE);
 		if (answer == JOptionPane.YES_OPTION) {
 		    CompoundEdit ce = new CompoundEdit();
@@ -376,7 +376,7 @@ public class StringDialog extends JDialog {
 
 			// Store undo information:
 			ce.addEdit(new UndoableRemoveString
-				   (panel, base, 
+				   (panel, base,
 				    base.getString(sel[i]), sel[i]));
 
 			base.removeString(sel[i]);
@@ -394,13 +394,13 @@ public class StringDialog extends JDialog {
 	}
     }
 
-    StringUpAction stringUpAction = new StringUpAction(); 
+    StringUpAction stringUpAction = new StringUpAction();
     class StringUpAction extends AbstractAction {
 	public StringUpAction() {
-	    super("Move string up", 
+	    super("Move string up",
 		  new ImageIcon(GUIGlobals.upIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Move string up"));
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    int[] sel = table.getSelectedRows();
 	    if ((sel.length == 1) && (sel[0] > 0)) {
@@ -429,13 +429,13 @@ public class StringDialog extends JDialog {
 	}
     }
 
-    StringDownAction stringDownAction = new StringDownAction(); 
+    StringDownAction stringDownAction = new StringDownAction();
     class StringDownAction extends AbstractAction {
 	public StringDownAction() {
-	    super("Move string down", 
+	    super("Move string down",
 		  new ImageIcon(GUIGlobals.downIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Move string down"));
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    int[] sel = table.getSelectedRows();
 	    if ((sel.length == 1) && (sel[0]+1 < base.getStringCount())) {
@@ -443,7 +443,7 @@ public class StringDialog extends JDialog {
 		// Make sure no cell is being edited, as caused by the
 		// keystroke. This makes the content hang on the screen.
 		assureNotEditing();
-		
+
 		/*int col = table.getEditingColumn(),
 		    row = table.getEditingRow();
 		    table.getCellEditor(row, col).stopCellEditing();*/
@@ -472,7 +472,7 @@ public class StringDialog extends JDialog {
 	public UndoAction() {
 	    super("Undo", new ImageIcon(GUIGlobals.undoIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Undo"));
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("undo");
@@ -485,7 +485,7 @@ public class StringDialog extends JDialog {
 	public RedoAction() {
 	    super("Undo", new ImageIcon(GUIGlobals.redoIconFile));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Redo"));
-	}    
+	}
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		panel.runCommand("redo");

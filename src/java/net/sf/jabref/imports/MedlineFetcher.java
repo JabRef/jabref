@@ -82,6 +82,9 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
       panel.frame().output(Globals.lang("Fetching Medline by ID..."));
       ArrayList bibs = fetchMedline(idList);
       if ((bibs != null) && (bibs.size() > 0)) {
+        if (panel.prefs().getBoolean("useOwner")) {
+          Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
+        }
         tf.setText("");
         NamedCompound ce = new NamedCompound("fetch Medline");
         Iterator i = bibs.iterator();

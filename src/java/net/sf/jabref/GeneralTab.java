@@ -21,6 +21,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
     JTextField
 	pdfDir, pdf, ps, html, lyx;
+    private HelpAction ownerHelp, pdfHelp;
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
 	_prefs = prefs;
@@ -59,6 +60,10 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
 	external.setBorder(BorderFactory.createTitledBorder
 			  (BorderFactory.createEtchedBorder(),
 			   Globals.lang("External programs")));
+       ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
+                                  "Help", GUIGlobals.helpSmallIconFile);
+       pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
+                                  "Help", GUIGlobals.helpSmallIconFile);
 	general.setLayout(gbl);
 	external.setLayout(gbl);
 
@@ -95,13 +100,23 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
         //lab.setHorizontalAlignment(SwingConstants.LEFT);
 	gbl.setConstraints(useOwner, con);
         general.add(useOwner);
-        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.weightx = 1;
+        con.insets = new Insets(5, 10, 5, 2);
         gbl.setConstraints(defOwnerField, con);
         general.add(defOwnerField);
+        con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.insets = new Insets(5, 2, 5, 10);
+        JButton hlp = new JButton(ownerHelp);
+        hlp.setText(null);
+        hlp.setPreferredSize(new Dimension(24,24));
+        gbl.setConstraints(hlp, con);
+        general.add(hlp);
 
 
         // Grouping field
         con.gridwidth = 1;
+        con.insets = new Insets(5, 10, 5, 10);
         JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
         lab.setHorizontalAlignment(SwingConstants.LEFT);
         gbl.setConstraints(lab, con);
@@ -140,8 +155,8 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
 
         con.gridwidth = 1;
 	con.weightx = 0;
-       con.insets = new Insets(5, 10, 15, 10);
-	con.fill = GridBagConstraints.HORIZONTAL;
+        con.insets = new Insets(5, 10, 15, 10);
+        con.fill = GridBagConstraints.BOTH;
         lab = new JLabel(Globals.lang("Main PDF directory")+":");
         gbl.setConstraints(lab, con);
         external.add(lab);
@@ -149,11 +164,20 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
         gbl.setConstraints(pdfDir, con);
         external.add(pdfDir);
         con.weightx = 0;
-        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.insets = new Insets(5, 10, 15, 2);
         JButton browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(new BrowseAction(pdfDir, true));
         gbl.setConstraints(browse, con);
         external.add(browse);
+
+        con.insets = new Insets(5, 2, 15, 10);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        hlp = new JButton(pdfHelp);
+        hlp.setText(null);
+        hlp.setPreferredSize(new Dimension(24,24));
+        gbl.setConstraints(hlp, con);
+        external.add(hlp);
+
         con.gridwidth = 1;
         con.fill = GridBagConstraints.HORIZONTAL;
         con.insets = new Insets(5, 10, 5, 10);
@@ -205,6 +229,7 @@ useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":",
 	gbl.setConstraints(lyx, con);
 	external.add(lyx);
         con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
         browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(new BrowseAction(lyx, false));
         gbl.setConstraints(browse, con);
