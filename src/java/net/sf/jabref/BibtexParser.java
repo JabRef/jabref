@@ -117,17 +117,30 @@ public class BibtexParser
 		     * information in .bib files.
 		     *
 		     * Metadata are stored in bibtex files in the format
-		     * @comment{bibkeeper-meta: type:data0;data1;data2;...}
+		     * @comment{jabref-meta: type:data0;data1;data2;...}
 		     *
 		     * Each comment that starts with the META_FLAG is stored
 		     * in the meta HashMap, with type as key.
+		     * Unluckily, the old META_FLAG bibkeeper-meta: was used
+		     * in JabRef 1.0 and 1.1, so we need to support it as
+		     * well. At least for a while. We'll always save with the
+		     * new one.
 		     */
 
 		    if (comment.substring(0, GUIGlobals.META_FLAG.length())
-			.equals(GUIGlobals.META_FLAG)) {
+			.equals(GUIGlobals.META_FLAG) ||
+			comment.substring(0, GUIGlobals.META_FLAG_OLD.length())
+			.equals(GUIGlobals.META_FLAG_OLD)) {
 
-			String rest = comment.substring
-			    (GUIGlobals.META_FLAG.length());
+			String rest;
+			if (comment.substring(0, GUIGlobals.META_FLAG.length())
+			    .equals(GUIGlobals.META_FLAG))
+			    rest = comment.substring
+				(GUIGlobals.META_FLAG.length());
+			else
+			    rest = comment.substring
+				(GUIGlobals.META_FLAG_OLD.length());
+
 			int pos = rest.indexOf(':');
 
 			if (pos > 0)

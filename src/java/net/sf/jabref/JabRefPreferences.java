@@ -336,6 +336,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Entry editor: store field", "alt S");
 	defKeyBinds.put("Save session", "F11");
 	defKeyBinds.put("Load session", "F12");
+	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
     }
 
     private String getNextUnit(Reader data) throws IOException {

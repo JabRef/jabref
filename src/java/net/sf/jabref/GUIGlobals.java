@@ -240,7 +240,8 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	veryGrayedOutBackground = new Color(180, 180, 180),
 	veryGrayedOutText = new Color(40, 40, 40);
 
-    public static String META_FLAG = "bibkeeper-meta: ";
+    public static String META_FLAG = "jabref-meta: ";
+    public static String META_FLAG_OLD = "bibkeeper-meta: ";
     public static String KEY_FIELD = "bibtexkey";
     public static String[] ALL_FIELDS = new String[] {
 	"author",
@@ -374,6 +375,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
       // function to this field, for instance a "browse" button for the "pdf" field.
       FIELD_EXTRAS.put("pdf", "browse");
       FIELD_EXTRAS.put("ps", "browse");
+      FIELD_EXTRAS.put("keywords", "selector");
 
 	Map fieldLength = new HashMap();
 	fieldLength.put("author", new Integer(280));

@@ -427,17 +427,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     final FieldEditor ed = editor;
     Object o = GUIGlobals.FIELD_EXTRAS.get(string);
     final String fieldName = editor.getFieldName();
-    if (o == null)
-      return null;
+    //if (o == null)
+    //  return null;
     String s = (String)o;
 
-    if (s.equals("external")) {
+    if ((s!=null) && s.equals("external")) {
       // Add external viewer listener for "pdf" and "url" fields.
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
       return null;
     }
-
-    else if (s.equals("browse")) {
+    else if (((s!=null) && s.equals("selector")) || 
+	     (panel.metaData.getData(Globals.SELECTOR_META_PREFIX+editor.getFieldName()) != null)) {
+	FieldContentSelector ws = new FieldContentSelector
+	    (this, editor, panel.metaData);
+	return ws;
+    }
+    else if ((s!=null) && s.equals("browse")) {
       JButton but = new JButton(Globals.lang("Browse"));
       ((JComponent)editor).addMouseListener(new ExternalViewerListener());
       but.setBackground(GUIGlobals.lightGray);

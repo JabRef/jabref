@@ -124,7 +124,10 @@ public class JabRefFrame extends JFrame {
 	normalSearch = new GeneralAction("search", "Search", "Start",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
-       fetchMedline = new FetchMedlineAction(),
+	fetchMedline = new FetchMedlineAction(),
+	copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
+					//"Put a BibTeX reference to the selected entries on the clipboard", 
+					prefs.getKey("Copy \\cite{BibTeX key}")),
        mergeDatabaseAction = new GeneralAction("mergeDatabase", "Append database",
                                                "Append contents from a BibTeX database into the currently viewed database",
                                                GUIGlobals.openIconFile,
@@ -512,6 +515,7 @@ public class JabRefFrame extends JFrame {
 	edit.add(paste);
 	//edit.add(remove);
 	edit.add(delete);
+	edit.add(copyCiteKey);
 	edit.addSeparator();
 	edit.add(selectAll);
 	mb.add(edit);
@@ -671,6 +675,7 @@ public class JabRefFrame extends JFrame {
 	copy.setEnabled(false);
 	paste.setEnabled(false);
 	selectAll.setEnabled(false);
+	copyCiteKey.setEnabled(false);
 	editPreamble.setEnabled(false);
 	editStrings.setEnabled(false);
 	toggleGroups.setEnabled(false);
@@ -699,6 +704,7 @@ public class JabRefFrame extends JFrame {
 	copy.setEnabled(true);
 	paste.setEnabled(true);
 	selectAll.setEnabled(true);
+	copyCiteKey.setEnabled(true);
 	editPreamble.setEnabled(true);
 	editStrings.setEnabled(true);
 	toggleGroups.setEnabled(true);
@@ -1088,26 +1094,34 @@ public class JabRefFrame extends JFrame {
                            database.getEntryCount() + " entries into new database.");
                   }
                   else {
-                    // Import into current database.
-                    BibtexDatabase database = basePanel().database;
-                    Iterator it = bibentries.iterator();
-                    while (it.hasNext()) {
-                      BibtexEntry entry = (BibtexEntry) it.next();
-                      try {
-                        entry.setId(Util.createId(entry.getType(), database));
-                        database.insertEntry(entry);
-                      }
-                      catch (KeyCollisionException ex) {
-                        //ignore
-                        System.err.println("KeyCollisionException [ addBibEntries(...) ]");
-                      }
-                      basePanel().markBaseChanged();
-                      basePanel().refreshTable();
+		      // Import into current database.
+		      BasePanel basePanel = basePanel();
+		      BibtexDatabase database = basePanel.database;		      
+		      int oldCount = database.getEntryCount();
+		      NamedCompound ce = new NamedCompound("Import database");
+		      Iterator it = bibentries.iterator();
+		      while (it.hasNext()) {
+			  BibtexEntry entry = (BibtexEntry) it.next();
+			  try {
+			      entry.setId(Util.createId(entry.getType(), database));
+			      database.insertEntry(entry);
+			      ce.addEdit(new UndoableInsertEntry
+					 (database, entry, basePanel));
+			  }
+			  catch (KeyCollisionException ex) {
+			      //ignore
+			      System.err.println("KeyCollisionException [ addBibEntries(...) ]");
+			  }
+		      }
+		      ce.end();
+		      basePanel.undoManager.addEdit(ce);
+                      basePanel.markBaseChanged();
+                      basePanel.refreshTable();
                       output("Imported database '" + filename + "' with " +
-                             database.getEntryCount() + " entries.");
+                             (database.getEntryCount()-oldCount) + " entries.");
                     }
-                  }
-                }
+		}
+
 
 
 	private void setUpImportMenu(JMenu importMenu, boolean intoNew_){

@@ -72,6 +72,10 @@ public class MetaData {
     public MetaData() {	
     }
 
+    public Iterator iterator() {
+	return metaData.keySet().iterator();
+    }
+
     public Vector getData(String key) {
 	return (Vector)metaData.get(key);
     }

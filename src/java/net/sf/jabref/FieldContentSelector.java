@@ -1,0 +1,101 @@
+/*
+Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
+
+All programs in this directory and
+subdirectories are published under the GNU General Public License as
+described below.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+Further information about the GNU GPL is available at:
+http://www.gnu.org/copyleft/gpl.ja.html
+
+*/
+package net.sf.jabref;
+
+import java.util.Vector;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+class FieldContentSelector extends JComponent implements ItemListener {
+
+    final String DELIMITER = " ";
+    FieldEditor editor;
+    JComboBox list = new JComboBox();
+    JButton manage;
+    GridBagLayout gbl = new GridBagLayout();
+    GridBagConstraints con = new GridBagConstraints();
+    EntryEditor parent;
+    MetaData metaData;
+
+    public FieldContentSelector(EntryEditor parent,
+				FieldEditor editor_, MetaData data) {
+	setLayout(gbl);
+	this.editor = editor_;
+	this.parent = parent;
+	metaData = data;
+	final MetaData metaData = data;
+        final JabRefFrame frame = parent.frame;
+	updateList();
+	//else
+	//    list = new JComboBox(items.toArray());
+	list.setBackground(GUIGlobals.lightGray);
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	con.fill = GridBagConstraints.HORIZONTAL;
+	gbl.setConstraints(list, con);
+	list.addItemListener(this);
+	add(list);
+
+	manage = new JButton(Globals.lang("Manage"));
+	manage.setBackground(GUIGlobals.lightGray);
+	gbl.setConstraints(manage, con);
+	add(manage);
+
+        manage.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      ContentSelectorDialog csd = new ContentSelectorDialog(frame, true, metaData,
+								    editor.getFieldName());
+	      Util.placeDialog(csd, frame);
+	      csd.show();
+	      updateList();
+          }
+        });
+    }
+
+    private void updateList() {
+	list.removeAllItems();
+	list.addItem(Globals.lang("<select>"));
+	Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
+				    editor.getFieldName());
+	if ((items != null) && (items.size() > 0)) {
+	    for (int i=0; i<items.size(); i++)
+		list.addItem(items.elementAt(i));
+	    //list = new JComboBox();
+	}
+    }
+
+    public void itemStateChanged(ItemEvent e) {
+	if (e.getStateChange() == ItemEvent.DESELECTED)
+	    return; // We get an uninteresting DESELECTED event as well.
+	if (list.getSelectedIndex() == 0)
+	    return; // The first element is only for show.
+	String chosen = (String)list.getSelectedItem();
+	editor.setText(editor.getText()+chosen+DELIMITER);
+	parent.storeFieldAction.actionPerformed
+	    (new ActionEvent(editor, 0, ""));
+    }
+}

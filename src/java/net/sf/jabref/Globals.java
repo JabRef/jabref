@@ -38,7 +38,8 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
-    public static final String FILETYPE_PREFS_EXT = "_dir";
+    public static final String FILETYPE_PREFS_EXT = "_dir",
+	SELECTOR_META_PREFIX = "selector_";
 
     public static void logger(String s){
 		Logger.global.info(s);
