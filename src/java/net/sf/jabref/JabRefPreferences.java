@@ -50,7 +50,7 @@ public class JabRefPreferences {
 	defaults.put("sizeY", new Integer(680));
 	defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_OFF));
 	defaults.put("tableColorCodesOn", new Boolean(true));
-	defaults.put("language", "no");
+	defaults.put("language", "en");
 	defaults.put("priSort", "author");
 	defaults.put("priDescending", new Boolean(false));
 	defaults.put("secSort", "year");

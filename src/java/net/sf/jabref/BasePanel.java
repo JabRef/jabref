@@ -84,10 +84,11 @@ public class BasePanel extends JSplitPane implements MouseListener {
     boolean showingSearchResults = false, 
 	showingGroup = false;
 
-    //SidePaneManager sidePaneManager;
     // The sidepane manager takes care of populating the sidepane.
-    MetaData metaData;
+    SidePaneManager sidePaneManager;
+
     // MetaData parses, keeps and writes meta data.
+    MetaData metaData;
 
     private HashMap actions = new HashMap();
    
@@ -244,6 +245,29 @@ public class BasePanel extends JSplitPane implements MouseListener {
 	    
 		}
 	    });
+
+	// The action for opening the string editor
+	actions.put("editStrings", new BaseAction() {
+		public void action() {
+		    if (stringDialog == null) {
+			StringDialog form = new StringDialog
+			    (frame, ths, database, prefs);
+			Util.placeDialog(form, frame);
+			form.setVisible(true);
+			stringDialog = form;
+		    } else {
+			stringDialog.setVisible(true);
+		    }
+	    
+		}
+	    });
+
+	// The action for toggling the groups interface
+	actions.put("toggleGroups", new BaseAction() {
+		public void action() {
+		    sidePaneManager.togglePanel("groups");
+		}
+	    });
     }
 
     /**
@@ -273,12 +297,10 @@ public class BasePanel extends JSplitPane implements MouseListener {
 	//entryTable.setRightClickMenu(rcm);
 	Util.pr("BasePanel: must add right click menu");
 
-	//mainPanel.removeAll();
-	//mainPanel.setLayout(new GridLayout(1,1));
 	setRightComponent(entryTable.getPane());
-	/*sidePaneManager = new SidePaneManager
-	    (prefs, metaData, this, mainPanel);
-	    sidePaneManager.populatePanel();*/
+	sidePaneManager = new SidePaneManager
+	    (frame, this, prefs, metaData);
+	sidePaneManager.populatePanel();
 
 	//mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
 	setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);

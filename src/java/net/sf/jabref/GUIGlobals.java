@@ -111,17 +111,17 @@ public class GUIGlobals {
 	removeIconFile = GUIGlobals.class.getResource(pre+"Delete.gif"),
 	upIconFile = GUIGlobals.class.getResource(pre+"Up.gif"),
 	downIconFile = GUIGlobals.class.getResource(pre+"Down.gif"),
-	helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif");
-    /*newSmallIconFile = GUIGlobals.class.getResource(pre+"New16.gif"),
-	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste"+ex),
-	editEntryIconFile = GUIGlobals.class.getResource(pre+"Edit"+ex),
-	searchIconFile = GUIGlobals.class.getResource(pre+"Find"+ex),
-	helpSmallIconFile = GUIGlobals.class.getResource(pre+"Help16.gif"),
-	closeIconFile = GUIGlobals.class.getResource(pre+"close16.gif"),
-	stringsIconFile = GUIGlobals.class.getResource(pre+"strings.gif"),
-	groupsIconFile = GUIGlobals.class.getResource(pre+"groups.gif"),
-	refreshSmallIconFile = GUIGlobals.class.getResource(pre+"Refresh16.gif");
-	*/
+	stringsIconFile = GUIGlobals.class.getResource(pre+"Strings.gif"),
+	groupsIconFile = GUIGlobals.class.getResource(pre+"Groups.gif"),
+	closeIconFile = GUIGlobals.class.getResource(pre+"Close.gif"),
+	refreshSmallIconFile = GUIGlobals.class.getResource(pre+"GreenFlag.gif"),
+	helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
+	helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),
+	newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
+	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste.gif"),
+	editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
+	searchIconFile = GUIGlobals.class.getResource(pre+"SearchRow.gif");
+	
     // Help files (in HTML format):
     public static URL
 	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"GUIGlobalsHelp.html"),

@@ -81,7 +81,13 @@ public class JabRefFrame extends JFrame {
 				 GUIGlobals.redoIconFile),
 	editPreamble = new GeneralAction("editPreamble", "Edit preamble", 
 					 "Edit preamble",
-					 GUIGlobals.preambleIconFile);
+					 GUIGlobals.preambleIconFile),
+	editStrings = new GeneralAction("editStrings", "Edit strings", 
+					"Edit strings",
+					GUIGlobals.stringsIconFile),
+	toggleGroups = new GeneralAction("toggleGroups", "Toggle groups inteface", 
+					 "Toggle groups inteface",
+					 GUIGlobals.groupsIconFile);
 	
 
     public JabRefFrame() {
@@ -101,6 +107,16 @@ public class JabRefFrame extends JFrame {
 			      prefs.getInt("sizeY")));
 	setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
+
+	// If the option is enabled, open the last edited database, if any.
+	if (prefs.getBoolean("openLastEdited") && (prefs.get("lastEdited") != null)) {
+	    fileToOpen = new File(prefs.get("lastEdited"));
+	    if (fileToOpen.exists()) {
+		Util.pr("Opening last edited file: "+fileToOpen.getName());
+		openDatabaseAction.openIt();
+	    }
+	}
+
 	setVisible(true);
     }
 
@@ -288,7 +304,8 @@ public class JabRefFrame extends JFrame {
     private void fillMenu() {
 	JMenu file = new JMenu(Globals.lang("File")),
 	    edit = new JMenu(Globals.lang("Edit")),
-	    bibtex = new JMenu(Globals.lang("Bibtex"));
+	    bibtex = new JMenu(Globals.lang("Bibtex")),
+	    view = new JMenu(Globals.lang("View"));
 	file.add(newDatabaseAction);
 	file.add(open);
 	file.add(save);
@@ -301,7 +318,11 @@ public class JabRefFrame extends JFrame {
 	edit.add(redo);
 	mb.add(edit);
 
+	view.add(toggleGroups);
+	mb.add(view);
+
 	bibtex.add(editPreamble);
+	bibtex.add(editStrings);
 	mb.add(bibtex);
 
 	/*
