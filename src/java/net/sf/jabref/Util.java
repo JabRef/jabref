@@ -533,8 +533,14 @@ public class Util {
 
     float req = compareFieldSet(fields, one, two);
     fields = one.getType().getOptionalFields();
-    float opt = compareFieldSet(fields, one, two);
-    return (2*req + opt)/3 >= threshold;
+
+    if (fields != null) {
+	float opt = compareFieldSet(fields, one, two);
+	return (2*req + opt)/3 >= threshold;
+    } else {
+	System.out.println("test");
+	return (req >= threshold);
+    }
   }
 
   private static float compareFieldSet(String[] fields,
