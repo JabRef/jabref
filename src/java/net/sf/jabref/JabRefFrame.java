@@ -876,6 +876,7 @@ public JabRefPreferences prefs() {
     view.add(nextTab);
     view.add(prevTab);
     view.addSeparator();
+    view.add(toggleGroups);
     view.add(togglePreview);
     view.add(switchPreview);
     mb.add(view);

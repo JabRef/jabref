@@ -102,6 +102,10 @@ public class SidePane extends JPanel {
 	mainPanel.remove(c);
     }
 
+    public Dimension getMaximumSize() {
+	return PREFERRED_SIZE;
+    }
+    
     public Dimension getPreferredSize() {
 	return PREFERRED_SIZE;
     }

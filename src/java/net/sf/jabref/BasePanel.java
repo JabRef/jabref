@@ -1551,17 +1551,17 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         sidePaneManager.add("search", searchManager);
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.populatePanel();
-
-	setLayout(gbl);
-	con.fill = GridBagConstraints.BOTH;
-	con.weighty = 1;
-	con.weightx = 0;
-	gbl.setConstraints(sidePaneManager.getPanel(), con);
-	add(sidePaneManager.getPanel());
-
-	con.weightx = 1;
-	gbl.setConstraints(splitPane, con);
-	add(splitPane);
+        setLayout(new BorderLayout());
+        add(sidePaneManager.getPanel(), BorderLayout.WEST);
+        add(splitPane, BorderLayout.CENTER);
+        
+	//setLayout(gbl);
+	//con.fill = GridBagConstraints.BOTH;
+	//con.weighty = 1;
+	//con.weightx = 0;
+	//gbl.setConstraints(sidePaneManager.getPanel(), con);	
+	//con.weightx = 1;
+	//gbl.setConstraints(splitPane, con);
         //mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
         //setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
         //setResizeWeight(0);
