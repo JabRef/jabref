@@ -439,6 +439,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     else if (s.equals("browse")) {
       JButton but = new JButton(Globals.lang("Browse"));
+      ((JComponent)editor).addMouseListener(new ExternalViewerListener());
       but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -1293,8 +1294,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			System.err.println("Message: Opening url (" + link
 					   + ") with the HTML viewer ("
 					   + prefs.get("htmlviewer") +")");
-			Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer")
-								  + " " + link);
+			Process child = Runtime.getRuntime()
+			    .exec(prefs.get("htmlviewer")
+				  + " " + link.replaceAll(" ","\\ "));
 		    } catch (IOException e) {
 			System.err.println("Warning: Unable to open url "
 					   + link + " with the HTML viewer ("
