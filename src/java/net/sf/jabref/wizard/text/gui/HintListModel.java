@@ -19,4 +19,9 @@ public class HintListModel extends DefaultListModel
       }
     }
   }
+
+  public void valueUpdated(int index)
+  {
+    super.fireContentsChanged(this, index, index);
+  }
 }

@@ -62,12 +62,24 @@ public class IntegrityMessage implements Cloneable
       UNEXPECTED_CLOSING_BRACE_FAILURE   = 2010
       ;
 
+  public static int
+      FULL_MODE    = 1,  // print with Bibtex Entry
+      SINLGE_MODE  = 2   // print only Message
+      ;
+
+  private static int printMode = SINLGE_MODE ;
 
   private int type ;
   private BibtexEntry entry ;
   private String fieldName ;
   private Object additionalInfo ;
   private String msg ;
+  private boolean fixed ; // the user has changed sometings on BibtexEntry
+
+  public final synchronized static void setPrintMode(int newMode)
+  {
+    printMode = newMode ;
+  }
 
 
   public IntegrityMessage(int pType, BibtexEntry pEntry, String pFieldName, Object pAdditionalInfo)
@@ -76,6 +88,7 @@ public class IntegrityMessage implements Cloneable
     this.entry = pEntry;
     this.fieldName = pFieldName;
     this.additionalInfo = pAdditionalInfo;
+    fixed = false ;
 
     msg = getMessage() ;
   }
@@ -92,7 +105,12 @@ public class IntegrityMessage implements Cloneable
 
   public String toString()
   {
-    return msg ;
+    String back = msg ;
+    if (printMode == FULL_MODE)
+    {
+      back = "[" + entry.getCiteKey() + "] " + msg ;
+    }
+    return back ;
   }
 
   public int getType()
@@ -113,5 +131,15 @@ public class IntegrityMessage implements Cloneable
   public Object getAdditionalInfo()
   {
     return additionalInfo;
+  }
+
+  public boolean getFixed()
+  {
+    return fixed;
+  }
+
+  public void setFixed(boolean pFixed)
+  {
+    this.fixed = pFixed;
   }
 }

@@ -101,12 +101,22 @@ public class IntegrityMessagePanel
     this.add( fixPanel, BorderLayout.SOUTH) ;
   }
 
+  // ------------------------------------------------------------------------
+
   public void updateView( BibtexEntry entry )
   {
-//    validChecker.checkBibtexEntry(entry) ;
     warningData.clear();
+    IntegrityMessage.setPrintMode( IntegrityMessage.SINLGE_MODE) ;
     warningData.setData( validChecker.checkBibtexEntry( entry ) ) ;
   }
+
+  public void updateView( BibtexDatabase base )
+  {
+    warningData.clear();
+    IntegrityMessage.setPrintMode( IntegrityMessage.FULL_MODE) ;
+    warningData.setData( validChecker.checkBibtexDatabase( base ) ) ;
+  }
+
 
   // ------------------------------------------------------------------------
   //This method is required by ListSelectionListener.
@@ -165,7 +175,9 @@ public class IntegrityMessagePanel
         {
 //          System.out.println("update") ;
           entry.setField(msg.getFieldName(), content.getText());
-          updateView(entry) ;
+          msg.setFixed(true);
+//          updateView(entry) ;
+          warningData.valueUpdated(warnings.getSelectedIndex()) ;
         }
       }
 
@@ -180,6 +192,7 @@ public class IntegrityMessagePanel
     final ImageIcon warnIcon = new ImageIcon( GUIGlobals.integrityWarn ) ;
     final ImageIcon infoIcon = new ImageIcon( GUIGlobals.integrityInfo ) ;
     final ImageIcon failIcon = new ImageIcon( GUIGlobals.integrityFail ) ;
+    final ImageIcon fixedIcon = new ImageIcon( GUIGlobals.completeTagIcon) ;
 
     public Component getListCellRendererComponent(
         JList list,
@@ -192,13 +205,20 @@ public class IntegrityMessagePanel
 
       if (value != null)
       {
-        int id = ((IntegrityMessage) value).getType() ;
-        if (id < 1000)
-          setIcon(infoIcon) ;
-        else if (id < 2000)
-         setIcon( warnIcon ) ;
-        else setIcon( failIcon ) ;
-
+        IntegrityMessage msg = (IntegrityMessage) value ;
+        if (msg.getFixed())
+        {
+          setIcon(fixedIcon) ;
+        }
+        else
+        {
+          int id = msg.getType() ;
+          if ( id < 1000 )
+            setIcon( infoIcon ) ;
+          else if ( id < 2000 )
+            setIcon( warnIcon ) ;
+          else setIcon( failIcon ) ;
+        }
       }
       return this ;
     }

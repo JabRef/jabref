@@ -63,6 +63,7 @@ import net.sf.jabref.export.CustomExportList;
 import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
 import javax.swing.event.*;
+import net.sf.jabref.wizard.integrity.gui.*;
 
 
 /**
@@ -927,7 +928,7 @@ public JabRefPreferences prefs() {
     tools.add(openUrl);
     tools.addSeparator();
     tools.add(newSubDatabaseAction);
-//    tools.add(integrityCheckAction) ;
+    tools.add(integrityCheckAction) ;
 
     mb.add(tools);
 
@@ -1747,14 +1748,10 @@ class FetchCiteSeerAction
          BibtexDatabase refBase = bp.getDatabase() ;
          if (refBase != null)
          {
-           System.out.println("check " +refBase);
-           IntegrityCheck iCheck = new IntegrityCheck() ;
-           iCheck.checkBibtexDatabase(refBase);
+             IntegrityWizard wizard = new IntegrityWizard(ths, refBase) ;
+             wizard.show() ;
          }
        }
-       System.out.println("integrity") ;
-
-
       }
     }
 
