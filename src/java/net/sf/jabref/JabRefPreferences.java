@@ -119,6 +119,7 @@ public class JabRefPreferences {
 	defaults.put("searchGen", new Boolean(true));
 	defaults.put("searchAll", new Boolean(false));
 	defaults.put("incrementS", new Boolean(true));
+	defaults.put("saveInStandardOrder", new Boolean(true));
 	defaults.put("selectS", new Boolean(false));
 	defaults.put("regExpSearch", new Boolean(true));
 	defaults.put("searchPanePosX", new Integer(0));
@@ -144,6 +145,9 @@ public class JabRefPreferences {
         defaults.put("fontFamily", "Times");
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));
+        defaults.put("menuFontFamily", "Times");
+        defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
+        defaults.put("menuFontSize", new Integer(14));
         defaults.put("antialias", new Boolean(true));
         defaults.put("ctrlClick", new Boolean(false));
         defaults.put("disableOnMultipleSelection", new Boolean(false));

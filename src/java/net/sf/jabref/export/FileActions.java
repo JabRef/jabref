@@ -166,14 +166,29 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            String pri = prefs.get("priSort");
-            String sec = prefs.get("secSort");
-            // sorted as they appear on the screen.
-            String ter = prefs.get("terSort");
-            TreeSet sorter = new TreeSet(new CrossRefEntryComparator(
-                        new EntryComparator(prefs.getBoolean("priDescending"),
-                            prefs.getBoolean("secDescending"),
-                            prefs.getBoolean("terDescending"), pri, sec, ter)));
+	    String pri, sec, ter;
+	    boolean priD, secD, terD;
+	    if (!prefs.getBoolean("saveInStandardOrder")) {
+		// The setting is to save according to the current table order.
+
+		pri = prefs.get("priSort");
+		sec = prefs.get("secSort");
+		// sorted as they appear on the screen.
+		ter = prefs.get("terSort");
+		priD = prefs.getBoolean("priDescending");
+		secD = prefs.getBoolean("secDescending");
+		terD = prefs.getBoolean("terDescending");
+	    } else {
+		// The setting is to save in standard order: author, editor, year
+		pri = "author";
+		sec = "editor";
+		ter = "year";
+		priD = false;
+		secD = false;
+		terD = true;
+	    }
+            TreeSet sorter = new TreeSet(new CrossRefEntryComparator
+					 (new EntryComparator(priD, secD, terD, pri, sec, ter)));
             Set keySet = database.getKeySet();
 
             if (keySet != null)
@@ -258,15 +273,29 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-            String pri = prefs.get("priSort");
-            String sec = prefs.get("secSort");
-            // sorted as they appear on the screen.
-            String ter = prefs.get("terSort");
-            TreeSet sorter = new TreeSet(new CrossRefEntryComparator(
-                        new EntryComparator(prefs.getBoolean("priDescending"),
-                            prefs.getBoolean("secDescending"),
-                            prefs.getBoolean("terDescending"), pri, sec, ter)));
+	    String pri, sec, ter;
+	    boolean priD, secD, terD;
+	    if (!prefs.getBoolean("saveInStandardOrder")) {
+		// The setting is to save according to the current table order.
 
+		pri = prefs.get("priSort");
+		sec = prefs.get("secSort");
+		// sorted as they appear on the screen.
+		ter = prefs.get("terSort");
+		priD = prefs.getBoolean("priDescending");
+		secD = prefs.getBoolean("secDescending");
+		terD = prefs.getBoolean("terDescending");
+	    } else {
+		// The setting is to save in standard order: author, editor, year
+		pri = "author";
+		sec = "editor";
+		ter = "year";
+		priD = false;
+		secD = false;
+		terD = true;
+	    }
+            TreeSet sorter = new TreeSet(new CrossRefEntryComparator
+					 (new EntryComparator(priD, secD, terD, pri, sec, ter)));
 	    if ((bes != null) && (bes.length > 0))
 		for (int i=0; i<bes.length; i++) {
 		    sorter.add(bes[i]);

@@ -490,12 +490,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
                                               bes[i]=db.getEntryById((String) (it.next()));
                                           }
                                       }
-                                  } else {
+                                  } /*else {
                                     String cont = (String)(content.getTransferData(DataFlavor.stringFlavor));
                                     Util.pr("----------------\n"+cont+"\n---------------------");
                                     TextAnalyzer ta = new TextAnalyzer(cont);
                                       output(Globals.lang("Unable to parse clipboard text as Bibtex entries."));
-                                  }
+				      }*/
                               } catch (UnsupportedFlavorException ex) {
                                   ex.printStackTrace();
                               } catch (Throwable ex) {

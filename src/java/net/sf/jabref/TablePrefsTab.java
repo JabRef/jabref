@@ -21,12 +21,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextArea tableFields = new JTextArea();//"", 80, 5);
     private JTextField secField, terField;
-    private JButton fontButton = new JButton(Globals.lang("Set table font"));
+    private JButton fontButton = new JButton(Globals.lang("Set table font")),
+	menuFontButton = new JButton(Globals.lang("Set application font"));
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
     private Vector tableRows = new Vector(10);
-    private Font font = GUIGlobals.CURRENTFONT;
+    private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
 
     class TableRow {
@@ -56,6 +57,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs = prefs;
 	this.frame = frame;
 	setLayout(gbl);
+
+	menuFont = new Font
+	    (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
+	     prefs.getInt("menuFontSize"));
 
 	colorCodes = new JCheckBox(Globals.lang
 				   ("Color codes for required and optional fields")
@@ -226,6 +231,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         gbl.setConstraints(allowEditing, con);
         upper.add(allowEditing);
 	con.anchor = GridBagConstraints.EAST;
+        con.gridwidth = 1;
+	gbl.setConstraints(menuFontButton, con);
+	upper.add(menuFontButton);
+        con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(fontButton, con);
 	upper.add(fontButton);
 	con.anchor = GridBagConstraints.WEST;
@@ -357,6 +366,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 			    return;
 			else
 			    font = f;
+		}
+	    });
+	menuFontButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    Font f=new FontSelectorDialog
+				(null, menuFont).getSelectedFont();
+			if(f==null)
+			    return;
+			else
+			    menuFont = f;
 		}
 	    });
     }
@@ -544,6 +563,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.put("fontFamily", font.getFamily());
 	_prefs.putInt("fontStyle", font.getStyle());
 	_prefs.putInt("fontSize", font.getSize());
+	_prefs.put("menuFontFamily", menuFont.getFamily());
+	_prefs.putInt("menuFontStyle", menuFont.getStyle());
+	_prefs.putInt("menuFontSize", menuFont.getSize());
 	GUIGlobals.CURRENTFONT = font;
     }
 

@@ -13,7 +13,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     GridBagConstraints con = new GridBagConstraints();
     private JCheckBox autoOpenForm, backup, openLast,
 		defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-                useOwner, keyWarningDialog, confirmDelete;
+                useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField;
     JabRefPreferences _prefs;
@@ -56,6 +56,8 @@ keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplic
                                  _prefs.getBoolean("dialogWarningForDuplicateKey"));
 confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"),
                               _prefs.getBoolean("confirmDelete"));
+saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"),
+                              _prefs.getBoolean("saveInStandardOrder"));
 	JPanel general = new JPanel(),
 	    external = new JPanel();
 	defOwnerField = new JTextField(_prefs.get("defaultOwner"));
@@ -108,9 +110,13 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
         gbl.setConstraints(ctrlClick, con);
         general.add(ctrlClick);
 
-        con.gridwidth = GridBagConstraints.REMAINDER;
+	con.gridwidth = 1;
         gbl.setConstraints(confirmDelete, con);
         general.add(confirmDelete);
+
+	con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(saveInStandardOrder, con);
+        general.add(saveInStandardOrder);
 
         gbl.setConstraints(keyWarningDialog, con);
         general.add(keyWarningDialog);
@@ -328,6 +334,7 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
         _prefs.putBoolean("useOwner", useOwner.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
+        _prefs.putBoolean("saveInStandardOrder", saveInStandardOrder.isSelected());
 
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());

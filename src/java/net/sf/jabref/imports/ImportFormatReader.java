@@ -1089,9 +1089,19 @@ public class ImportFormatReader
 		    String frest = s.substring(5);
 		    if(f3.equals("TI")) h.put("title", frest);
 		    //else if(f3.equals("PY")) h.put("year", frest);
-		    else if(f3.equals("AU")) h.put("author", fixAuthor_lastnameFirst(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
+		    else if(f3.equals("AU")) {
+			if (frest.trim().endsWith("(ed)")) {
+			    String ed = frest.trim();
+			    ed = ed.substring(0, ed.length()-4);
+			    h.put("editor", fixAuthor_lastnameFirst(ed.replaceAll(",-",", ").replaceAll(";"," and ")));
+			} else			
+			    h.put("author", fixAuthor_lastnameFirst(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
+		    }
 		    else if(f3.equals("AB")) h.put("abstract", frest);
-		    else if(f3.equals("ID")) h.put("keywords", frest);
+		    else if(f3.equals("DE")) {
+			String kw = frest.replaceAll("-;", ",").toLowerCase();
+			h.put("keywords", kw.substring(0, kw.length()-1));
+		    }
 		    else if(f3.equals("SO")){
 			int m = frest.indexOf(".");
 			if(m >= 0){
@@ -1479,7 +1489,9 @@ public static BibtexDatabase importFile(String format, String filename) throws I
     bibentries = readScifinder(filename);
   else if (format.equals("jstor"))
     bibentries = readJStorFile(filename);
-  else
+  else if (format.equals("silverplatter"))
+    bibentries = readSilverPlatter(filename);
+ else
     throw new IOException(Globals.lang("Could not resolve import format")+" '"+format+"'");
 
   if (bibentries == null)

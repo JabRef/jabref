@@ -118,7 +118,7 @@ public class JabRef {
 
     if (helpO.isInvoked()) {
       System.out.println(options.getHelp());
-      System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor.");
+      System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor, silverplatter.");
 
       // To specify export formats, we need to take the custom export formats into account.
       // So we iterate through the custom formats and add them.
@@ -307,12 +307,27 @@ public class JabRef {
     //openGui = false;
     if (!graphicFailure && !disableGui.isInvoked()) {
 
+	
       //Font fnt = new Font("plain", Font.PLAIN, 12);
-	/*
+
+      /*Font fnt = new Font
+          (prefs.get("menuFontFamily"), prefs.getInt("menuFontStyle"),
+	  prefs.getInt("menuFontSize"));*/
+
       Object fnt = new UIDefaults.ProxyLazyValue
           ("javax.swing.plaf.FontUIResource", null,
-           new Object[] {"Plain", new Integer(Font.PLAIN), new Integer(10)});
+           new Object[] { prefs.get("menuFontFamily"), new Integer(prefs.getInt("menuFontStyle")),
+			  new Integer(prefs.getInt("menuFontSize")) });
 
+      /*UIManager.put("MenuBar.font", fnt);
+      UIManager.put("MenuItem.font", fnt);
+      UIManager.put("RadioButtonMenuItem.font", fnt);
+      UIManager.put("CheckBoxMenuItem.font", fnt);
+      UIManager.put("Menu.font", fnt);
+      UIManager.put("PopupMenu.font", fnt);
+      */
+      //"Plain", new Integer(Font.PLAIN), new Integer(10)});
+      /*
       UIManager.put("Button.font", fnt);
       UIManager.put("ToggleButton.font", fnt);
       UIManager.put("RadioButton.font", fnt);
@@ -340,11 +355,11 @@ public class JabRef {
       UIManager.put("TextArea.font", fnt);
       UIManager.put("TextPane.font", fnt);
       UIManager.put("EditorPane.font", fnt);
-      UIManager.put("TitledBorder.font", fnt);
+      //UIManager.put("TitledBorder.font", fnt);
       UIManager.put("ToolBar.font", fnt);
       UIManager.put("ToolTip.font", fnt);
       UIManager.put("Tree.font", fnt);
-	*/
+      */	
       // This property is set to make the Mac OSX Java VM move the menu bar to the top
       // of the screen, where Mac users expect it to be.
       System.setProperty("apple.laf.useScreenMenuBar", "true");
