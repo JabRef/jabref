@@ -666,12 +666,9 @@ public class JabRefFrame extends JFrame {
 	    if ((e.getActionCommand() == null) || 
 		(e.getActionCommand().equals("Open database"))) {
 		JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-		    new JFileChooser((File)null) :
-		    new JFileChooser(new File(prefs.get("workingDirectory")));
-		//chooser.setFileFilter(fileFilter);
-		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-		
-		Util.pr("JabRefFrame: must set file filter.");
+		    new JabRefFileChooser((File)null) :
+		    new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+		chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2       
 		int returnVal = chooser.showOpenDialog(ths);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 		    fileToOpen = chooser.getSelectedFile();
@@ -763,13 +760,17 @@ public class JabRefFrame extends JFrame {
 				putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
 			}    
 			public void actionPerformed(ActionEvent e) {	    
-				PrefsDialog.showPrefsDialog(ths, prefs);
+			    PrefsDialog.showPrefsDialog(ths, prefs);
+			    //PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
+			    //Util.placeDialog(pd, ths);
+			    //pd.show();
+				
 				// This action can be invoked without an open database, so
 				// we have to check if we have one before trying to invoke
 				// methods to execute changes in the preferences.
 				
 				// We want to notify all tabs about the changes to 
-				// avoid problems when changing the column set.	       
+				// avoid problems when changing the column set.	    
 				for (int i=0; i<tabbedPane.getTabCount(); i++) {
 					BasePanel bf = baseAt(i);
 					if (bf.database != null) {
