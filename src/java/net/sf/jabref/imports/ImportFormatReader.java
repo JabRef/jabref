@@ -136,7 +136,7 @@ public class ImportFormatReader
     public static String fixAuthor_lastnameFirst(String in){
 
       // Check if we have cached this particular name string before:
-      Object old = Globals.nameCache.get(in);
+      Object old = Globals.nameCache_lastFirst.get(in);
       if (old != null)
         return (String)old;
 
@@ -201,7 +201,7 @@ public class ImportFormatReader
       String fixed = sb.toString();
 
       // Add the fixed name string to the cache.
-      Globals.nameCache.put(in, fixed);
+      Globals.nameCache_lastFirst.put(in, fixed);
 
       return fixed;
     }
