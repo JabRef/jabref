@@ -12,7 +12,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	namesAsIs, namesFf, namesFl;
+	namesAsIs, namesFf, namesFl, antialias;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -55,6 +55,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	colorCodes = new JCheckBox(Globals.lang
 				   ("Color codes for required and optional fields")
 				   ,_prefs.getBoolean("tableColorCodesOn"));
+	antialias = new JCheckBox(Globals.lang
+				  ("Use antialiasing font")
+				  ,_prefs.getBoolean("antialias"));
 	autoResizeMode = new JCheckBox(Globals.lang
 				       ("Fit table horizontally on screen"),
 				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
@@ -171,6 +174,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	upper.add(colorCodes);
 	gbl.setConstraints(autoResizeMode, con);
 	upper.add(autoResizeMode);
+	gbl.setConstraints(antialias, con);
+	upper.add(antialias);
 	con.fill = GridBagConstraints.BOTH;
 	con.gridwidth = 1;
 	gbl.setConstraints(upper, con);
@@ -388,6 +393,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
 	_prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
 	_prefs.putBoolean("namesFf", namesFf.isSelected());
+	_prefs.putBoolean("antialias", antialias.isSelected());
 	_prefs.putInt("autoResizeMode",
 		      autoResizeMode.isSelected() ?
 		      JTable.AUTO_RESIZE_ALL_COLUMNS :

@@ -150,4 +150,22 @@ public class Globals {
 
 
 	}*/
+
+
+    public static HashMap HTML_CHARS = new HashMap();
+    static {
+	HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&ucirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{U\\}\\}", "&Ucirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{e\\}\\}", "&ecirc;");
+	HTML_CHARS.put("\\{\\\\\\^\\{E\\}\\}", "&Ecirc;");
+	HTML_CHARS.put("\\{\\\\\\~\\{o\\}\\}", "&otilde;");
+	HTML_CHARS.put("\\{\\\\\\~\\{O\\}\\}", "&Otilde;");
+	HTML_CHARS.put("\\{\\\\\\~\\{n\\}\\}", "&ntilde;");
+	HTML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&Ntilde;");
+	HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
+	HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
+    }
+
 }

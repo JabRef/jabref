@@ -43,12 +43,13 @@ public class EntryTable extends JTable {
     protected boolean showingSearchResults = false,
 	showingGroup = false;
     private EntryTable ths = this;
+    private boolean antialiasing = true;
 
     public EntryTable(EntryTableModel tm_, JabRefPreferences prefs_) {
 	super(tm_);
 	this.tableModel = tm_;
 	prefs = prefs_;
-
+	antialiasing = prefs.getBoolean("antialias");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
 	setShowVerticalLines(true);
 	setShowHorizontalLines(true);
@@ -131,7 +132,6 @@ public class EntryTable extends JTable {
 	    Globals.logger("Error happened in getCellRenderer method of EntryTable.");
 	    return defRenderer; // This should not occur.
 	}
-
 
 	if (!showingSearchResults ||
 	    tableModel.nonZeroField(row, Globals.SEARCH))
@@ -245,10 +245,12 @@ public class EntryTable extends JTable {
 	g2.fill(g2.getClipBounds());
 	g2.setColor(getForeground());
 	//g2.setFont(f);
-	RenderingHints rh = g2.getRenderingHints();
-	rh.put(RenderingHints.KEY_ANTIALIASING,
-		RenderingHints.VALUE_ANTIALIAS_ON);
-	g2.setRenderingHints(rh);
+	if (antialiasing) {
+	    RenderingHints rh = g2.getRenderingHints();
+	    rh.put(RenderingHints.KEY_ANTIALIASING,
+		   RenderingHints.VALUE_ANTIALIAS_ON);
+	    g2.setRenderingHints(rh);
+	}
 	//g2.drawString(getText(), 3, f.getSize());
 	super.paint(g2);
 	}

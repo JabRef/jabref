@@ -116,6 +116,7 @@ public class JabRefPreferences {
         defaults.put("fontFamily", "Times");
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));
+        defaults.put("antialias", new Boolean(true));
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 
 	restoreKeyBindings();
