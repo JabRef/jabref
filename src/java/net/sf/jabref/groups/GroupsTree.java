@@ -35,6 +35,8 @@ import javax.swing.tree.*;
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
     private static final int dragScrollActivationMargin = 10;
+    private static final int dragScrollDistance = 5;
+    
     private GroupSelector groupSelector;
     private GroupTreeNode dragNode = null;
 
@@ -85,11 +87,20 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragOver(DropTargetDragEvent dtde) {
-        Rectangle r = new Rectangle(
-                dtde.getLocation().x - dragScrollActivationMargin,
-                dtde.getLocation().y - dragScrollActivationMargin, 
-                1 + 2 * dragScrollActivationMargin, 
-                1 + 2 * dragScrollActivationMargin);
+        Rectangle r = getVisibleRect();
+        Point cursor = dtde.getLocation();
+        boolean scrollUp = cursor.y - r.y < dragScrollActivationMargin;
+        boolean scrollDown = r.y + r.height - cursor.y < dragScrollActivationMargin;
+        boolean scrollLeft = cursor.x - r.x < dragScrollActivationMargin;
+        boolean scrollRight = r.x + r.width - cursor.x < dragScrollActivationMargin;
+        if (scrollUp)
+            r.translate(0,-dragScrollDistance);
+        else if (scrollDown)
+            r.translate(0,+dragScrollDistance);
+        if (scrollLeft)
+            r.translate(-dragScrollDistance,0);
+        else if (scrollRight)
+            r.translate(+dragScrollDistance,0);
         scrollRectToVisible(r);
     }
 
@@ -123,6 +134,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 return;
             }
             Enumeration expandedPaths = groupSelector.getExpandedPaths(); 
+            // JZFIXME somehow it is possible to arrive here with the root
+            // node being dragged...
             UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                     groupSelector.getGroupTreeRoot(), source, target, target
                             .getChildCount());
