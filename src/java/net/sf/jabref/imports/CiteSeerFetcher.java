@@ -236,14 +236,6 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 		generateCitationList(citationHashTable, newDatabase);
 		newEntryEnum = citationHashTable.elements();	
-		while (newEntryEnum.hasMoreElements()) {
-			try {				
-				BibtexEntry nextEntry = (BibtexEntry) newEntryEnum.nextElement();
-				newDatabase.insertEntry(nextEntry);
-			} catch(KeyCollisionException ex) {
-				ex.printStackTrace();						    
-			}
-		}
 	}
 
 
@@ -265,6 +257,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				citeseerHttpClient.executeMethod(citeseerMethod);
 				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerImportHandler(newEntry));
 				citeseerMethod.releaseConnection();
+				database.insertEntry(newEntry);
 				citationHashTable.put(key, newEntry);
 				citationCounter++;
 				UpdateProgressBarValue updateValue = new UpdateProgressBarValue(citationCounter);
@@ -280,7 +273,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			} catch (IOException e) {
 				ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
 				SwingUtilities.invokeLater(dialog);
-			}
+			} catch (KeyCollisionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 		return citationHashTable;
 	}
 
