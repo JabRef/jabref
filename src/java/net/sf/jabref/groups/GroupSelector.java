@@ -529,7 +529,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     public void componentClosing() {
-        panel.stopShowingGroup();
+        if (panel != null) // panel may be null if no file is open any more
+            panel.stopShowingGroup();
         frame.groupToggle.setSelected(false);
     }
 
@@ -848,9 +849,14 @@ public class GroupSelector extends SidePaneComponent implements
                 new TreePath(groupsRoot.getPath()));
     }
 
+    /** panel may be null to indicate that no file is currently open. */
     public void setActiveBasePanel(BasePanel panel) {
-        super.setActiveBasePanel(panel);    //To change body of overridden methods use File | Settings | File Templates.
-
+        super.setActiveBasePanel(panel);
+        if (panel == null) { // hide groups
+            if (frame.sidePaneManager.isPanelVisible("groups"))
+                frame.sidePaneManager.togglePanel("groups");
+            return;
+        }
         MetaData metaData = panel.metaData();
         if (metaData.getGroups() != null) {
             setGroups(metaData.getGroups());
