@@ -34,11 +34,12 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.TreePath;
 import javax.swing.undo.*;
 import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
+import net.sf.jabref.external.PushToLyx;
 import net.sf.jabref.groups.*;
-import net.sf.jabref.external.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
@@ -1602,14 +1603,41 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         entryTable.addKeyListener(new KeyAdapter() {
 
                 public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                	final int keyCode = e.getKeyCode();
+                    final TreePath path = groupSelector.getSelectionPath();
+                    final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
+                    
+                	if (e.isControlDown()) {
+                		switch (keyCode) {
+                		case KeyEvent.VK_UP:
+                            e.consume();
+                            if (node != null)
+                                groupSelector.moveNodeUp(node);
+                			break;
+                		case KeyEvent.VK_DOWN:
+                            e.consume();
+                            if (node != null)
+                                groupSelector.moveNodeDown(node);
+                			break;
+                		case KeyEvent.VK_LEFT:
+                            e.consume();
+                            if (node != null)
+                                groupSelector.moveNodeLeft(node);
+                			break;
+                		case KeyEvent.VK_RIGHT:
+                            e.consume();
+                            if (node != null)
+                                groupSelector.moveNodeRight(node);
+                			break;
+                		}
+                	} else if (keyCode == KeyEvent.VK_ENTER){
                         e.consume();
                         try { runCommand("edit");
                         } catch (Throwable ex) {
                             ex.printStackTrace();
                         }
                     }
-                    else if(e.getKeyCode() == KeyEvent.VK_DELETE){
+                    else if(keyCode == KeyEvent.VK_DELETE){
                         try { runCommand("delete");
                         } catch (Throwable ex) {
                             ex.printStackTrace();

@@ -352,10 +352,10 @@ public class GroupSelector extends SidePaneComponent implements
         groupsContextMenu.add(removeGroupAndSubgroupsAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsAction);
         groupsContextMenu.add(moveSubmenu);
-        moveSubmenu.add(moveNodeUp);
-        moveSubmenu.add(moveNodeDown);
-        moveSubmenu.add(moveNodeLeft);
-        moveSubmenu.add(moveNodeRight);
+        moveSubmenu.add(moveNodeUpAction);
+        moveSubmenu.add(moveNodeDownAction);
+        moveSubmenu.add(moveNodeLeftAction);
+        moveSubmenu.add(moveNodeRightAction);
         groupsTree.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
@@ -404,13 +404,13 @@ public class GroupSelector extends SidePaneComponent implements
             removeGroupAndSubgroupsAction.setEnabled(true);
             removeGroupKeepSubgroupsAction.setEnabled(true);
         }
-        moveNodeUp.setEnabled(node.canMoveUp());
-        moveNodeDown.setEnabled(node.canMoveDown());
-        moveNodeLeft.setEnabled(node.canMoveLeft());
-        moveNodeRight.setEnabled(node.canMoveRight());
-        moveSubmenu.setEnabled(moveNodeUp.isEnabled()
-                || moveNodeDown.isEnabled() || moveNodeLeft.isEnabled()
-                || moveNodeRight.isEnabled());
+        moveNodeUpAction.setEnabled(node.canMoveUp());
+        moveNodeDownAction.setEnabled(node.canMoveDown());
+        moveNodeLeftAction.setEnabled(node.canMoveLeft());
+        moveNodeRightAction.setEnabled(node.canMoveRight());
+        moveSubmenu.setEnabled(moveNodeUpAction.isEnabled()
+                || moveNodeDownAction.isEnabled() || moveNodeLeftAction.isEnabled()
+                || moveNodeRightAction.isEnabled());
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
 
@@ -657,67 +657,127 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     };
+    
+    public TreePath getSelectionPath() {
+        return groupsTree.getSelectionPath();
+    }
 
-    AbstractAction moveNodeUp = new AbstractAction("Up") {
+    AbstractAction moveNodeUpAction = new AbstractAction("Up") {
         public void actionPerformed(ActionEvent e) {
-            final GroupTreeNode node = (GroupTreeNode) groupsTree
-                    .getSelectionPath().getLastPathComponent();
-            AbstractUndoableEdit undo = node.moveUp(GroupSelector.this);
-            if (undo == null) // paranoia
-                return; // nothing happened
-            revalidateGroups(new TreePath(node.getPath()));
-            panel.undoManager.addEdit(undo);
-            panel.markBaseChanged();
-            frame.output(Globals.lang("Moved group") + " '"
-                    + node.getGroup().getName() + "'.");
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            moveNodeUp(node);
         }
     };
 
-    AbstractAction moveNodeDown = new AbstractAction("Down") {
+    AbstractAction moveNodeDownAction = new AbstractAction("Down") {
         public void actionPerformed(ActionEvent e) {
-            final GroupTreeNode node = (GroupTreeNode) groupsTree
-                    .getSelectionPath().getLastPathComponent();
-            AbstractUndoableEdit undo = node.moveDown(GroupSelector.this);
-            if (undo == null) // paranoia
-                return; // nothing happened
-            revalidateGroups(new TreePath(node.getPath()));
-            panel.undoManager.addEdit(undo);
-            panel.markBaseChanged();
-            frame.output(Globals.lang("Moved group") + " '"
-                    + node.getGroup().getName() + "'.");
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            moveNodeDown(node);
         }
     };
 
-    AbstractAction moveNodeLeft = new AbstractAction("Left") {
+    AbstractAction moveNodeLeftAction = new AbstractAction("Left") {
         public void actionPerformed(ActionEvent e) {
-            final GroupTreeNode node = (GroupTreeNode) groupsTree
-                    .getSelectionPath().getLastPathComponent();
-            AbstractUndoableEdit undo = node.moveLeft(GroupSelector.this);
-            if (undo == null) // paranoia
-                return; // nothing happened
-            revalidateGroups(new TreePath(node.getPath()));
-            panel.undoManager.addEdit(undo);
-            panel.markBaseChanged();
-            frame.output(Globals.lang("Moved group") + " '"
-                    + node.getGroup().getName() + "'.");
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            moveNodeLeft(node);
         }
     };
 
-    AbstractAction moveNodeRight = new AbstractAction("Right") {
+    AbstractAction moveNodeRightAction = new AbstractAction("Right") {
         public void actionPerformed(ActionEvent e) {
-            final GroupTreeNode node = (GroupTreeNode) groupsTree
-                    .getSelectionPath().getLastPathComponent();
-            AbstractUndoableEdit undo = node.moveRight(GroupSelector.this);
-            if (undo == null) // paranoia
-                return; // nothing happened
-            revalidateGroups(new TreePath(node.getPath()));
-            panel.undoManager.addEdit(undo);
-            panel.markBaseChanged();
-            frame.output(Globals.lang("Moved group") + " '"
-                    + node.getGroup().getName() + "'.");
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            moveNodeRight(node);
         }
     };
 
+    /**
+     * @param node The node to move
+     * @return true if move was successful, false if not.
+     */
+    public boolean moveNodeUp(GroupTreeNode node) {
+        AbstractUndoableEdit undo = null;
+        if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
+            frame.output(Globals.lang("Cannot move group") + " '"
+                    + node.getGroup().getName() + "' up.");
+            return false; // not possible
+        }
+        revalidateGroups(new TreePath(node.getPath()));
+        panel.undoManager.addEdit(undo);
+        panel.markBaseChanged();
+        frame.output(Globals.lang("Moved group") + " '"
+                + node.getGroup().getName() + "'.");
+        return true;
+    }
+    
+    /**
+     * @param node The node to move
+     * @return true if move was successful, false if not.
+     */
+    public boolean moveNodeDown(GroupTreeNode node) {
+        AbstractUndoableEdit undo = null;
+        if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
+            frame.output(Globals.lang("Cannot move group") + " '"
+                    + node.getGroup().getName() + "' down.");
+            return false; // not possible
+        }
+        revalidateGroups(new TreePath(node.getPath()));
+        panel.undoManager.addEdit(undo);
+        panel.markBaseChanged();
+        frame.output(Globals.lang("Moved group") + " '"
+                + node.getGroup().getName() + "'.");
+        return true;
+    }
+    
+    /**
+     * @param node The node to move
+     * @return true if move was successful, false if not.
+     */
+    public boolean moveNodeLeft(GroupTreeNode node) {
+        AbstractUndoableEdit undo = null;
+        if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
+            frame.output(Globals.lang("Cannot move group") + " '"
+                    + node.getGroup().getName() + "' left.");
+            return false; // not possible
+        }
+        revalidateGroups(new TreePath(node.getPath()));
+        panel.undoManager.addEdit(undo);
+        panel.markBaseChanged();
+        frame.output(Globals.lang("Moved group") + " '"
+                + node.getGroup().getName() + "'.");
+        return true;
+    }
+    
+    /**
+     * @param node The node to move
+     * @return true if move was successful, false if not.
+     */
+    public boolean moveNodeRight(GroupTreeNode node) {
+        AbstractUndoableEdit undo = null;
+        if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
+            frame.output(Globals.lang("Cannot move group") + " '"
+                    + node.getGroup().getName() + "' right.");
+            return false; // not possible
+        }
+        revalidateGroups(new TreePath(node.getPath()));
+        panel.undoManager.addEdit(undo);
+        panel.markBaseChanged();
+        frame.output(Globals.lang("Moved group") + " '"
+                + node.getGroup().getName() + "'.");
+        return true;
+    }
+    
     JMenu moveSubmenu = new JMenu("Move");
 
     public GroupTreeNode getGroupTreeRoot() {
