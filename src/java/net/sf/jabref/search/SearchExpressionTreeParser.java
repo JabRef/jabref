@@ -1,0 +1,297 @@
+// $ANTLR 2.7.1: "TreeParser.g" -> "SearchExpressionTreeParser.java"$
+
+package net.sf.jabref.search;
+import java.util.*;
+import java.util.regex.*;
+import net.sf.jabref.*;
+
+import antlr.TreeParser;
+import antlr.Token;
+import antlr.collections.AST;
+import antlr.RecognitionException;
+import antlr.ANTLRException;
+import antlr.NoViableAltException;
+import antlr.MismatchedTokenException;
+import antlr.SemanticException;
+import antlr.collections.impl.BitSet;
+import antlr.ASTPair;
+import antlr.collections.impl.ASTArray;
+
+
+public class SearchExpressionTreeParser extends antlr.TreeParser
+       implements SearchExpressionTreeParserTokenTypes
+ {
+
+	private static final int MATCH_EXACT = 0;
+	private static final int MATCH_CONTAINS = 1;
+	private static final int MATCH_DOES_NOT_CONTAIN = 2;
+
+	private BibtexEntry bibtexEntry;
+	private Object[] searchKeys;
+	// JabRefPreferences
+	private boolean caseSensitiveSearch = false;
+
+    public int apply(JabRefPreferences prefs, AST ast, BibtexEntry bibtexEntry) throws antlr.RecognitionException {
+		this.caseSensitiveSearch = prefs.getBoolean("caseSensitiveSearch");
+		this.bibtexEntry = bibtexEntry;
+		// specification of fields to search is done in the search expression itself
+		this.searchKeys = bibtexEntry.getAllFields();
+		return tSearchExpression(ast) ? 1 : 0;
+	}
+public SearchExpressionTreeParser() {
+	tokenNames = _tokenNames;
+}
+
+	public final boolean  tSearchExpression(AST _t) throws RecognitionException, PatternSyntaxException {
+		boolean ret = false;;
+		
+		AST tSearchExpression_AST_in = (AST)_t;
+		
+			boolean a = false, b = false;
+		
+		
+		try {      // for error handling
+			if (_t==null) _t=ASTNULL;
+			switch ( _t.getType()) {
+			case And:
+			{
+				AST __t2 = _t;
+				AST tmp1_AST_in = (AST)_t;
+				match(_t,And);
+				_t = _t.getFirstChild();
+				a=tSearchExpression(_t);
+				_t = _retTree;
+				{
+				if (_t==null) _t=ASTNULL;
+				if ((((_t.getType() >= And && _t.getType() <= ExpressionSearch)))&&(a)) {
+					b=tSearchExpression(_t);
+					_t = _retTree;
+				}
+				else if (((_t.getType() >= LITERAL_and && _t.getType() <= LITERAL_matches))) {
+					AST tmp2_AST_in = (AST)_t;
+					if ( _t==null ) throw new MismatchedTokenException();
+					_t = _t.getNextSibling();
+				}
+				else {
+					throw new NoViableAltException(_t);
+				}
+				
+				}
+				_t = __t2;
+				_t = _t.getNextSibling();
+				ret = a && b;
+				break;
+			}
+			case Or:
+			{
+				AST __t4 = _t;
+				AST tmp3_AST_in = (AST)_t;
+				match(_t,Or);
+				_t = _t.getFirstChild();
+				a=tSearchExpression(_t);
+				_t = _retTree;
+				{
+				if (_t==null) _t=ASTNULL;
+				if ((((_t.getType() >= And && _t.getType() <= ExpressionSearch)))&&(!a)) {
+					b=tSearchExpression(_t);
+					_t = _retTree;
+				}
+				else if (((_t.getType() >= LITERAL_and && _t.getType() <= LITERAL_matches))) {
+					AST tmp4_AST_in = (AST)_t;
+					if ( _t==null ) throw new MismatchedTokenException();
+					_t = _t.getNextSibling();
+				}
+				else {
+					throw new NoViableAltException(_t);
+				}
+				
+				}
+				_t = __t4;
+				_t = _t.getNextSibling();
+				ret = a || b;
+				break;
+			}
+			case Not:
+			{
+				AST __t6 = _t;
+				AST tmp5_AST_in = (AST)_t;
+				match(_t,Not);
+				_t = _t.getFirstChild();
+				a=tSearchExpression(_t);
+				_t = _retTree;
+				_t = __t6;
+				_t = _t.getNextSibling();
+				ret = !a;
+				break;
+			}
+			case ExpressionSearch:
+			{
+				ret=tExpressionSearch(_t);
+				_t = _retTree;
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(_t);
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			if (_t!=null) {_t = _t.getNextSibling();}
+		}
+		_retTree = _t;
+		return ret;
+	}
+	
+	public final boolean  tExpressionSearch(AST _t) throws RecognitionException, PatternSyntaxException {
+		 boolean ret = false; ;
+		
+		AST tExpressionSearch_AST_in = (AST)_t;
+		AST var_f = null;
+		AST var_v = null;
+		
+			int matchType = 0;
+		
+		
+		try {      // for error handling
+			AST __t9 = _t;
+			AST tmp6_AST_in = (AST)_t;
+			match(_t,ExpressionSearch);
+			_t = _t.getFirstChild();
+			var_f = (AST)_t;
+			match(_t,RegularExpression);
+			_t = _t.getNextSibling();
+			matchType=tSearchType(_t);
+			_t = _retTree;
+			var_v = (AST)_t;
+			match(_t,RegularExpression);
+			_t = _t.getNextSibling();
+			
+						Pattern fieldSpec = ((RegExNode)var_f).getPattern();
+						Pattern valueSpec = ((RegExNode)var_v).getPattern();
+						boolean pseudoField_type;
+						for (int i = 0; i <= searchKeys.length && !ret; ++i) {
+							pseudoField_type = i == searchKeys.length; // additional (pseudo) field
+							String field = !pseudoField_type ? searchKeys[i].toString() : "type"; // pseudo field
+							if (!fieldSpec.matcher(field).matches()) 
+								continue;
+							Matcher matcher = valueSpec.matcher(!pseudoField_type ? bibtexEntry.getField(field).toString()
+								: bibtexEntry.getType().getName().toLowerCase());
+							switch (matchType) {
+							case MATCH_CONTAINS:
+								ret = matcher.find();
+								break;
+							case MATCH_EXACT:
+								ret = matcher.matches();
+								break;
+							case MATCH_DOES_NOT_CONTAIN:
+								ret = !matcher.find();
+								break;
+							}
+						}
+					
+			_t = __t9;
+			_t = _t.getNextSibling();
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			if (_t!=null) {_t = _t.getNextSibling();}
+		}
+		_retTree = _t;
+		return ret;
+	}
+	
+	public final int  tSearchType(AST _t) throws RecognitionException {
+		 int matchType = 0; ;
+		
+		AST tSearchType_AST_in = (AST)_t;
+		
+		try {      // for error handling
+			if (_t==null) _t=ASTNULL;
+			switch ( _t.getType()) {
+			case LITERAL_contains:
+			{
+				AST tmp7_AST_in = (AST)_t;
+				match(_t,LITERAL_contains);
+				_t = _t.getNextSibling();
+				matchType = MATCH_CONTAINS;
+				break;
+			}
+			case LITERAL_matches:
+			{
+				AST tmp8_AST_in = (AST)_t;
+				match(_t,LITERAL_matches);
+				_t = _t.getNextSibling();
+				matchType = MATCH_EXACT;
+				break;
+			}
+			case EQUAL:
+			{
+				AST tmp9_AST_in = (AST)_t;
+				match(_t,EQUAL);
+				_t = _t.getNextSibling();
+				matchType = MATCH_CONTAINS;
+				break;
+			}
+			case EEQUAL:
+			{
+				AST tmp10_AST_in = (AST)_t;
+				match(_t,EEQUAL);
+				_t = _t.getNextSibling();
+				matchType = MATCH_EXACT;
+				break;
+			}
+			case NEQUAL:
+			{
+				AST tmp11_AST_in = (AST)_t;
+				match(_t,NEQUAL);
+				_t = _t.getNextSibling();
+				matchType = MATCH_DOES_NOT_CONTAIN;
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(_t);
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			if (_t!=null) {_t = _t.getNextSibling();}
+		}
+		_retTree = _t;
+		return matchType;
+	}
+	
+	
+	public static final String[] _tokenNames = {
+		"<0>",
+		"EOF",
+		"<2>",
+		"NULL_TREE_LOOKAHEAD",
+		"\"and\"",
+		"\"or\"",
+		"\"not\"",
+		"\"contains\"",
+		"\"equals\"",
+		"white space",
+		"'('",
+		"')'",
+		"'='",
+		"'=='",
+		"'!='",
+		"'\\\"'",
+		"a text literal",
+		"a letter",
+		"a field type",
+		"RegularExpression",
+		"And",
+		"Or",
+		"Not",
+		"ExpressionSearch",
+		"LITERAL_matches"
+	};
+	
+	}
+	
