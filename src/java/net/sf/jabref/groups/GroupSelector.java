@@ -859,8 +859,9 @@ public class GroupSelector extends SidePaneComponent implements
             setGroups(metaData.getGroups());
         }
         else {
-            metaData.setGroups(groupsRoot);
-            setGroups(groupsRoot); 
+            GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
+            metaData.setGroups(newGroupsRoot);
+            setGroups(newGroupsRoot);
          }
         validateTree();
     }
