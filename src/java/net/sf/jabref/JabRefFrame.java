@@ -131,6 +131,7 @@ public class JabRefFrame extends JFrame {
     };
 
     public JabRefFrame() {
+
 	//Globals.setLanguage("no", "");
 	setTitle(GUIGlobals.frameTitle);
 	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -202,13 +203,21 @@ public class JabRefFrame extends JFrame {
 	gbl.setConstraints(tabbedPane, con);
 	getContentPane().add(tabbedPane);
 
-	con.gridwidth = 1;
+	JPanel status = new JPanel();
+	status.setLayout(gbl);
 	con.weighty = 0;
-	gbl.setConstraints(statusLabel, con);
-	getContentPane().add(statusLabel);
+	con.weightx = 0;
+	con.gridwidth = 0;
+	status.add(statusLabel);
+	con.weightx = 1;
+	con.insets = new Insets(0, 4, 0, 0);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(statusLine, con);
-	getContentPane().add(statusLine);
+	status.add(statusLine);
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	statusLabel.setForeground(GUIGlobals.nullFieldColor.darker());
+	gbl.setConstraints(status, con);
+	getContentPane().add(status);
 
     }
 

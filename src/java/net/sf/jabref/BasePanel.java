@@ -117,7 +117,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     }
 
-    private void output(String s) {
+    void output(String s) {
 	if (!suppressOutput)
 	    frame.output(s);
     }

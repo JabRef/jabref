@@ -39,10 +39,11 @@ class SearchManager extends JPanel
 
     private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 30);
-    private JLabel lab = new JLabel(Globals.lang("Search")+":");
+    private JLabel lab = //new JLabel(Globals.lang("Search")+":");
+	new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings")),
-	escape = new JButton(Globals.lang("Unshow"));
+	escape = new JButton(Globals.lang("Clear search"));
     private JabRefPreferences prefs;
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen, 
 	searchAll, caseSensitive, regExpSearch;
@@ -56,16 +57,21 @@ class SearchManager extends JPanel
 
 	setBorder(BorderFactory.createEtchedBorder());
 
-        searchReq = new JCheckBoxMenuItem("Search required fields",
-				  prefs.getBoolean("searchReq"));
-	searchOpt = new JCheckBoxMenuItem("Search optional fields",
-				  prefs.getBoolean("searchOpt"));
-	searchGen = new JCheckBoxMenuItem("Search general fields",
-				  prefs.getBoolean("searchGen"));
-        searchAll = new JCheckBoxMenuItem("Search all fields",
-				  prefs.getBoolean("searchAll"));
-        regExpSearch = new JCheckBoxMenuItem("Use regular expressions",
-					     prefs.getBoolean("regExpSearch"));
+        searchReq = new JCheckBoxMenuItem
+	    (Globals.lang("Search required fields"),
+	     prefs.getBoolean("searchReq"));
+	searchOpt = new JCheckBoxMenuItem
+	    (Globals.lang("Search optional fields"),
+	     prefs.getBoolean("searchOpt"));
+	searchGen = new JCheckBoxMenuItem
+	    (Globals.lang("Search general fields"),
+	     prefs.getBoolean("searchGen"));
+        searchAll = new JCheckBoxMenuItem
+	    (Globals.lang("Search all fields"),
+	     prefs.getBoolean("searchAll"));
+        regExpSearch = new JCheckBoxMenuItem
+	    (Globals.lang("Use regular expressions"),
+	     prefs.getBoolean("regExpSearch"));
 	increment = new JCheckBox(Globals.lang("Incremental"), false);
 	select = new JCheckBox(Globals.lang("Highlight"), true);
 	reorder = new JCheckBox(Globals.lang("Float"), false);

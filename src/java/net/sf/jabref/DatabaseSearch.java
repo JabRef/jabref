@@ -67,7 +67,8 @@ public class DatabaseSearch extends Thread {
         BibtexEntry bes = null ;
 //        System.out.println("doing search using this regular expr: "+searchString) ; 
         // 0. for each field in the database
-        int numRows = thisDatabase.getEntryCount() ; 
+        int numRows = thisDatabase.getEntryCount(),
+	    hits = 0;
 
 	for(int row = 0 ; row < numRows ; row++){
 	    // 1. search all required fields using searchString
@@ -80,17 +81,19 @@ public class DatabaseSearch extends Thread {
 	    // 2.1 set score to search field               
 	    bes.setField(searchValueField, String.valueOf(searchScore)) ; 
                 
-	    // 3. fire "sort" on "search"
-	    // 4. add "search all optional fields"
-	    // 5. modify algorithm to taste
-              
+	    if (searchScore > 0)
+		hits++;
 	}
 	 
 	if (reorder) // Float search.
 	    panel.showSearchResults(searchValueField);
 	else // Highlight search.
 	    panel.selectSearchResults();
-	    
+
+	if ((searchValueField == null) 
+	    || (searchValueField == Globals.SEARCH))
+	    panel.output(Globals.lang("Searched database. Number of hits")
+			 +": "+hits);
     }
 
 }
