@@ -58,6 +58,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     CloseAction closeAction;
     // The action concerned with closing the window.
 
+    DeleteAction deleteAction = new DeleteAction();
+    // The action that deletes the current entry, and closes the editor.
+
     CopyKeyAction copyKeyAction;
     // The action concerned with copying the BibTeX key to the clipboard.
 
@@ -130,7 +133,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//setTitle(entry.getType().getName());
 	//setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	helpAction = new HelpAction
-	    (frame.helpDiag, GUIGlobals.entryEditorHelp, "Help (F1)");
+	    (frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
 	closeAction = new CloseAction();
 	copyKeyAction = new CopyKeyAction();
 //    generateKeyAction = new GenerateKeyAction(baseFrame,entry);
@@ -203,6 +206,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	ActionMap am = tlb.getActionMap();
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
+
 	im.put(GUIGlobals.exitDialog, "close");
 	am.put("close", closeAction);
 	im.put(prefs.getKey("Entry editor: store field"), "store");
@@ -229,6 +233,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//tlb.addSeparator();
 	//tlb.add(copyKeyAction);
 	tlb.addSeparator();
+	tlb.add(deleteAction);
 	tlb.add(generateKeyAction);
 	tlb.addSeparator();
 	//tlb.add(undoAction);
@@ -610,7 +615,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	}
     }
 
-
+    class DeleteAction extends AbstractAction {
+	public DeleteAction() {
+	    super(Globals.lang("Delete"),
+		  new ImageIcon(GUIGlobals.removeIconFile));
+	    putValue(SHORT_DESCRIPTION,
+		     Globals.lang("Delete")+" "+Globals.lang("entry"));
+	}
+	public void actionPerformed(ActionEvent e) {
+          panel.hideEntryEditor();
+          panel.database.removeEntry(entry.getId());
+          panel.markBaseChanged();
+          panel.refreshTable();
+          panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
+          panel.output(Globals.lang("Deleted")+" "+Globals.lang("entry"));
+	}
+    }
 
     class CloseAction extends AbstractAction {
 	public CloseAction() {
