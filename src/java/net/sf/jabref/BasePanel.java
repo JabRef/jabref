@@ -201,13 +201,13 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 						"The CiteSeer import functionality is currently " +
 						"supported for only one row at a time.",
 						"CiteSeer Import Error",
-						JOptionPane.WARNING_MESSAGE);						
+						JOptionPane.WARNING_MESSAGE);
 					} else {
 						JOptionPane.showMessageDialog(frame(),
 						"You must select a row to perform the " +
 						"CiteSeer import operation.",
 						"CiteSeer Import Error",
-						JOptionPane.WARNING_MESSAGE);												 
+						JOptionPane.WARNING_MESSAGE);
 					}
 					if (clickedOn >= 0) {
 						String id =  tableModel.getNameFromNumber(clickedOn);
@@ -224,14 +224,16 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 			//					   +Globals.lang("entry")+".");
 							undoManager.addEdit(citeseerNamedCompound);
 							refreshTable();
-							updateEntryEditorIfShowing();							
+							updateEntryEditorIfShowing();
 							int row = tableModel.getNumberFromName(id);
-							entryTable.clearSelection();
+							//entryTable.clearSelection();
+                                                        entryTable.setRowSelectionInterval(row, row);
 							entryTable.scrollTo(row);
 							markBaseChanged(); // The database just changed.
+                                                        updateWiewToSelected();
 						}
 					}
-			} 
+			}
 		});
 
 
