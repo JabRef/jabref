@@ -2261,14 +2261,6 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     }
     
-    public boolean showBibtexkeyConfirmationDialog(String message) {
-        JOptionPane.showConfirmDialog(frame, 
-                message, "Confirm new Bibtexkey",// JZTODO
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-        return true;
-    }
-
     class UndoAction extends BaseAction {
         public void action() {
             try {
