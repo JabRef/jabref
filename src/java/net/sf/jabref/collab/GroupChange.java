@@ -1,59 +1,46 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
-import net.sf.jabref.KeyCollisionException;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import java.util.TreeSet;
-import java.util.Iterator;
-import javax.swing.JTextPane;
-import net.sf.jabref.Globals;
-import java.util.Enumeration;
-import javax.swing.JScrollPane;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.MetaData;
 import java.util.Vector;
+import javax.swing.*;
+import net.sf.jabref.*;
+import net.sf.jabref.groups.*;
+import net.sf.jabref.undo.NamedCompound;
 
 public class GroupChange
     extends Change {
 
-  String tmpField, diskField, tmpRegexp, diskRegexp, gName;
+  AbstractGroup tmpGroup;
+  AbstractGroup diskGroup;
   boolean removedLocally = false;
   MetaData md;
 
-  public GroupChange(MetaData md, String gName, String tmpField, String diskField,
-                     String tmpRegexp, String diskRegexp) {
+  public GroupChange(MetaData md, AbstractGroup tmpGroup, AbstractGroup diskGroup) {
     super("Modified group");
-    this.gName = gName;
-    this.tmpField = tmpField;
-    this.diskField = diskField;
-    this.tmpRegexp = tmpRegexp;
-    this.diskRegexp = diskRegexp;
-    this.md = md;
-
-    if (md == null)
-      removedLocally = true;
-    else {
-      Vector groups = md.getData("groups");
-      if ((groups == null) || (Util.findGroup(gName, groups) == -1))
-        removedLocally = true;
-    }
+    // JZTODO
+//    this.tmpGroup = tmpGroup;
+//    this.diskGroup = diskGroup;
+//    this.md = md;
+//
+//    if (md == null)
+//      removedLocally = true;
+//    else {
+//      GroupTreeNode groups = md.getGroups();
+//      if ((groups == null) || (GroupSelector.findGroupByName(groups, tmpGroup.getName()) == -1))
+//        removedLocally = true;
+//    }
   }
 
   public void makeChange(BasePanel panel, NamedCompound undoEdit) {
-
-    Vector groups = md.getData("groups");
-    //if (groups == null)
-    // Error, no groups...
-
-    int pos = Util.findGroup(gName, groups);
-    if (pos >= 0) {
-      groups.setElementAt(diskField, pos);
-      groups.setElementAt(diskRegexp, pos+2);
-    }
+      // JZTODO
+//
+//    GroupTreeNode groups = md.getGroups();
+//    //if (groups == null)
+//    // Error, no groups...
+//
+//    int pos = GroupSelector.findGroupByName(groups,tmpGroup.getName());
+//    if (pos >= 0) {
+//      groups.setElementAt(diskGroup, pos);
+//    }
   }
 
   JComponent description() {
