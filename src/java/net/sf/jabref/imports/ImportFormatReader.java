@@ -906,7 +906,7 @@ public class ImportFormatReader
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         // Configure the factory object to specify attributes of the parsers it creates
-        parserFactory.setValidating(true);
+        // parserFactory.setValidating(true);
         parserFactory.setNamespaceAware(true);
 
         // Now create a SAXParser object
