@@ -184,7 +184,8 @@ public class GUIGlobals {
       editEntryIconFile = GUIGlobals.class.getResource(pre + "DocumentDraw.gif"),
       searchIconFile = GUIGlobals.class.getResource(pre + "find.png"),
       autoGroupIcon = GUIGlobals.class.getResource(pre + "run.png"),
-      fetchMedlineIcon = GUIGlobals.class.getResource(pre + "www.png"),
+      wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
+      fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");

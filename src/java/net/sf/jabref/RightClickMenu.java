@@ -33,9 +33,9 @@ import java.awt.event.*;
 import java.util.Vector;
 import java.util.Iterator;
 
-public class RightClickMenu extends JPopupMenu 
+public class RightClickMenu extends JPopupMenu
     implements PopupMenuListener {
-    
+
     BasePanel panel;
     MetaData metaData;
     JMenu groupMenu = new JMenu(Globals.lang("Add to group")),
@@ -72,14 +72,22 @@ public class RightClickMenu extends JPopupMenu
 
 	addSeparator();
 
-	add(new AbstractAction(Globals.lang("Open pdf or ps")) {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			panel.runCommand("openFile");
-		    } catch (Throwable ex) {}
-		}
-	    });	
-	
+        add(new AbstractAction(Globals.lang("Open pdf or ps")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("openFile");
+                    } catch (Throwable ex) {}
+                }
+            });
+
+            add(new AbstractAction(Globals.lang("Open url")) {
+              public void actionPerformed(ActionEvent e) {
+                try {
+                  panel.runCommand("openUrl");
+                } catch (Throwable ex) {}
+              }
+            });
+
 	add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
 		public void actionPerformed(ActionEvent e) {
 		    try {
@@ -131,7 +139,7 @@ public class RightClickMenu extends JPopupMenu
 	groupRemoveMenu.setEnabled(true);
 	groupMenu.removeAll();
 	groupRemoveMenu.removeAll();
-	for (int i=GroupSelector.OFFSET; i<groups.size()-2; 
+	for (int i=GroupSelector.OFFSET; i<groups.size()-2;
 	     i+=GroupSelector.DIM) {
 	    String name = (String)groups.elementAt(i+1),
 		regexp = (String)groups.elementAt(i+2),
@@ -160,7 +168,7 @@ public class RightClickMenu extends JPopupMenu
 	    this.field = field;
 	}
 	public void actionPerformed(ActionEvent evt) {
-	    panel.addToGroup(grp, regexp, field);	     
+	    panel.addToGroup(grp, regexp, field);
 	}
     }
 
@@ -175,7 +183,7 @@ public class RightClickMenu extends JPopupMenu
 	    this.field = field;
 	}
 	public void actionPerformed(ActionEvent evt) {
-	    panel.removeFromGroup(grp, regexp, field);	     
+	    panel.removeFromGroup(grp, regexp, field);
 	}
     }
 
@@ -186,9 +194,9 @@ public class RightClickMenu extends JPopupMenu
 	    this.type = type;
 	}
 	public void actionPerformed(ActionEvent evt) {
-	    panel.changeType(type);	     
+	    panel.changeType(type);
 	}
-	
+
     }
-    
+
 }

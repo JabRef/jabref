@@ -172,8 +172,12 @@ public class JabRefFrame extends JFrame {
         openFile = new GeneralAction("openFile", "Open pdf or ps",
                                           "Open pdf or ps",
                                           GUIGlobals.pdfIcon,
-                                          prefs.getKey("Open pdf or ps"));
-    /*setupSelector = new GeneralAction("setupSelector", "", "",
+                                          prefs.getKey("Open pdf or ps")),
+         openUrl = new GeneralAction("openUrl", "Open url",
+                                            "Open url",
+                                            GUIGlobals.wwwIcon,
+                                          prefs.getKey("Open url"));
+             /*setupSelector = new GeneralAction("setupSelector", "", "",
 					  GUIGlobals.pasteIconFile,
 					  prefs.getKey(")),*/
 
@@ -567,12 +571,14 @@ public class JabRefFrame extends JFrame {
 	mb.add(bibtex);
 	tools.add(normalSearch);
 	tools.add(incrementalSearch);
+        tools.add(replaceAll);
+        tools.addSeparator();
 	tools.add(makeKeyAction);
+        tools.add(lyxPushAction);
         tools.add(fetchMedline);
-	tools.add(lyxPushAction);
         tools.add(openFile);
-	tools.addSeparator();
-	tools.add(replaceAll);
+        tools.add(openUrl);
+
 	mb.add(tools);
 
 	options.add(showPrefs);
@@ -641,6 +647,7 @@ public class JabRefFrame extends JFrame {
 	tlb.add(makeKeyAction);
         tlb.add(lyxPushAction);
         tlb.add(openFile);
+        tlb.add(openUrl);
 	tlb.addSeparator();
 	tlb.add(normalSearch);
 	tlb.add(toggleGroups);
@@ -730,6 +737,7 @@ public class JabRefFrame extends JFrame {
 	exportMenu.setEnabled(false);
 	fetchMedline.setEnabled(false);
         openFile.setEnabled(false);
+        openUrl.setEnabled(false);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
 	newEntryAction.setEnabled(false);
@@ -766,6 +774,7 @@ public class JabRefFrame extends JFrame {
 	exportMenu.setEnabled(true);
         fetchMedline.setEnabled(true);
         openFile.setEnabled(true);
+        openUrl.setEnabled(true);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
 	newEntryAction.setEnabled(true);

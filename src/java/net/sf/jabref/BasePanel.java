@@ -774,27 +774,48 @@ public class BasePanel extends JSplitPane implements MouseListener,
            }
          });
 
-	  actions.put("openFile", new BaseAction() {
-		  public void action() {
-		      BibtexEntry[] bes = entryTable.getSelectedEntries();
-		      if ((bes != null) && (bes.length == 1)) {
-			  Object link = bes[0].getField("ps");
-			  if (bes[0].getField("pdf") != null)
-			      link = bes[0].getField("pdf");
-			  if (link != null) {
-                            //output(Globals.lang("Calling external viewer..."));
-                            try {
-                              Util.openExternalViewer(link.toString(), prefs);
-                              output(Globals.lang("External viewer called")+".");
-                            } catch (IOException ex) {
-                              output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
-                            }
-                          }
-			  else
-			      output(Globals.lang("No pdf or ps defined."));
-		      } else
-                        output(Globals.lang("No entries or multiple entries selected."));
-		  }
+         actions.put("openFile", new BaseAction() {
+                 public void action() {
+                     BibtexEntry[] bes = entryTable.getSelectedEntries();
+                     if ((bes != null) && (bes.length == 1)) {
+                         Object link = bes[0].getField("ps");
+                         if (bes[0].getField("pdf") != null)
+                             link = bes[0].getField("pdf");
+                         if (link != null) {
+                           //output(Globals.lang("Calling external viewer..."));
+                           try {
+                             Util.openExternalViewer(link.toString(), prefs);
+                             output(Globals.lang("External viewer called")+".");
+                           } catch (IOException ex) {
+                             output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
+                           }
+                         }
+                         else
+                             output(Globals.lang("No pdf or ps defined")+".");
+                     } else
+                       output(Globals.lang("No entries or multiple entries selected."));
+                 }
+	      });
+
+              actions.put("openUrl", new BaseAction() {
+                      public void action() {
+                          BibtexEntry[] bes = entryTable.getSelectedEntries();
+                          if ((bes != null) && (bes.length == 1)) {
+                              Object link = bes[0].getField("url");
+                              if (link != null) {
+                                //output(Globals.lang("Calling external viewer..."));
+                                try {
+                                  Util.openExternalViewer(link.toString(), prefs);
+                                  output(Globals.lang("External viewer called")+".");
+                                } catch (IOException ex) {
+                                  output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
+                                }
+                              }
+                              else
+                                  output(Globals.lang("No url defined")+".");
+                          } else
+                            output(Globals.lang("No entries or multiple entries selected."));
+                      }
 	      });
 
 	  actions.put("replaceAll", new BaseAction() {

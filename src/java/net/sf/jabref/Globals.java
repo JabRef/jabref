@@ -180,14 +180,14 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
 	HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
 	HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
-	HTML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&eacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&Eacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&iacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&Iacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&oacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Oacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&uacute;");
-	HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Uacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{e\\}\\}", "&eacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{E\\}\\}", "&Eacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{i\\}\\}", "&iacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{I\\}\\}", "&Iacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{o\\}\\}", "&oacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{O\\}\\}", "&Oacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{u\\}\\}", "&uacute;");
+	HTML_CHARS.put("\\{\\\\\\´\\{U\\}\\}", "&Uacute;");
 
 	HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
@@ -223,14 +223,14 @@ public class Globals {
 	HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
 	HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
 	HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
-	HTML_CHARS.put("\\{\\\\\\`e\\}", "&eacute;");
-	HTML_CHARS.put("\\{\\\\\\`E\\}", "&Eacute;");
-	HTML_CHARS.put("\\{\\\\\\`i\\}", "&iacute;");
-	HTML_CHARS.put("\\{\\\\\\`I\\}", "&Iacute;");
-	HTML_CHARS.put("\\{\\\\\\`o\\}", "&oacute;");
-	HTML_CHARS.put("\\{\\\\\\`O\\}", "&Oacute;");
-	HTML_CHARS.put("\\{\\\\\\`u\\}", "&uacute;");
-	HTML_CHARS.put("\\{\\\\\\`U\\}", "&Uacute;");
+	HTML_CHARS.put("\\{\\\\\\`A\\}", "&eacute;");
+	HTML_CHARS.put("\\{\\\\\\´E\\}", "&Eacute;");
+	HTML_CHARS.put("\\{\\\\\\´i\\}", "&iacute;");
+	HTML_CHARS.put("\\{\\\\\\´I\\}", "&Iacute;");
+	HTML_CHARS.put("\\{\\\\\\´o\\}", "&oacute;");
+	HTML_CHARS.put("\\{\\\\\\´O\\}", "&Oacute;");
+	HTML_CHARS.put("\\{\\\\\\´u\\}", "&uacute;");
+	HTML_CHARS.put("\\{\\\\\\´U\\}", "&Uacute;");
 
 	HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
 	HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");

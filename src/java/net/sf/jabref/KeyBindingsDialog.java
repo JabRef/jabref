@@ -42,6 +42,7 @@ class KeyBindingsDialog
   JButton ok, cancel, grabB, defB;
   HashMap bindHM, defBinds;
   boolean clickedSave = false;
+  int selectedRow = -1;
   boolean getAction() {
     return clickedSave;
   }
@@ -69,6 +70,12 @@ class KeyBindingsDialog
     grabB = new JButton(Globals.lang("Grab"));
     defB = new JButton(Globals.lang("Default"));
     grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
+    grabB.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        selectedRow = table.getSelectedRow();
+        Util.pr(""+selectedRow);
+      }
+    });
     buttonBox.add(grabB);
     buttonBox.add(defB);
     buttonBox.add(ok);
@@ -104,10 +111,10 @@ class KeyBindingsDialog
       extends KeyAdapter {
     public void keyPressed(KeyEvent evt) {
       // first check if anything is selected if not the return
-      Util.pr("en: "+(table.getValueAt(2,0)));
+
       if (table.getSelectedRow() < 0)
         return;
-      Util.pr("dei");
+      Util.pr("dei"+selectedRow+" "+table.getSelectedRow());
       //Object[] selected = list.getSelectedValues();
       //if (selected.length == 0) {
       //  return;
@@ -248,14 +255,15 @@ class KeyBindingsDialog
     }
     table = new JTable(tableData, new String[] {Globals.lang("Action"),
                        Globals.lang("Shortcut")});
-    table.setCellSelectionEnabled(true);
+    table.setCellSelectionEnabled(false);
     table.setRowSelectionAllowed(true);
+    table.setColumnSelectionAllowed(false);
 
-    //table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     //table.set
     //list.setModel(listModel);
 
-    list.setSelectionInterval(0, 0); //select the first entry
+    table.setRowSelectionInterval(0, 0); //select the first entry
   }
 
   // listners
