@@ -22,7 +22,7 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title}
 		</div>
 		\end{title}
 		
@@ -34,7 +34,7 @@
 		
 		\begin{publisher}
 		<div class="bibtex_publisher">
-			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\publisher}
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\publisher}
 		</div>,
 		\end{publisher}
 

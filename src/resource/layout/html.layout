@@ -22,7 +22,7 @@
 
 		\begin{title}
 		<div class="bibtex_title">
-			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title}
 		</div>
 		\end{title}
 		
@@ -34,7 +34,7 @@
 		
 		\begin{journal}
 		<div class="bibtex_journal">
-			\journal
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\journal}
 		</div>,
 		\end{journal}
 

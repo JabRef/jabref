@@ -96,7 +96,7 @@ public class PreambleEditor extends JDialog {
 	//tlb.add(closeAction);
 	//conPane.add(tlb, BorderLayout.NORTH);
 	conPane.add(pan, BorderLayout.CENTER);
-	setTitle("Edit preamble");	
+	setTitle(Globals.lang("Edit preamble"));	
     }
 
     private void setupJTextComponent(javax.swing.text.JTextComponent ta) {

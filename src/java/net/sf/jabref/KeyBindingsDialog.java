@@ -48,7 +48,7 @@ class KeyBindingsDialog extends JDialog
     {
 	super();
 	this.defBinds = defBinds;
-	setTitle("JabRef Key Binding:");
+	setTitle(Globals.lang("Key bindings"));
 	setModal(true);//this needs to be modal so that client knows when ok or cancel was clicked
 	getContentPane().setLayout(new BorderLayout());
 	bindHM=name2binding;
