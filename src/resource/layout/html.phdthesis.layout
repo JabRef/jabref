@@ -32,17 +32,11 @@
 		</div>
 		\end{author}
 
-		\begin{publisher}
-		<div class="bibtex_publisher">
-			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\publisher}
+		\begin{school}
+		<div class="bibtex_journal">
+			\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\school}
 		</div>,
-		\end{publisher}
-
-		\begin{pages}
-		<div class="bibtex_pages">
-			pp. \pages
-		</div>,
-		\end{pages}
+		\end{school}
 
 		<div class="bibtex_year">
 			\year

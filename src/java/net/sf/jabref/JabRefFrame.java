@@ -95,6 +95,9 @@ public class JabRefFrame
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
                              GUIGlobals.aboutIcon),
+      editEntry = new GeneralAction("edit", "Edit entry",
+                               "Edit entry", GUIGlobals.editIconFile,
+                               prefs.getKey("Edit entry")),
       save = new GeneralAction("save", "Save database",
                                "Save database", GUIGlobals.saveIconFile,
                                prefs.getKey("Save database")),
@@ -773,6 +776,7 @@ public class JabRefFrame
     }
     bibtex.add(newSpec);
     bibtex.addSeparator();
+    bibtex.add(editEntry);
     bibtex.add(editPreamble);
     bibtex.add(editStrings);
     mb.add(bibtex);
@@ -850,6 +854,7 @@ public class JabRefFrame
     tlb.add(redo);
     tlb.addSeparator();
     tlb.add(newEntryAction);
+    tlb.add(editEntry);
     tlb.add(editPreamble);
     tlb.add(editStrings);
     tlb.add(makeKeyAction);
@@ -951,6 +956,7 @@ public class JabRefFrame
     delete.setEnabled(false);
     copy.setEnabled(false);
     paste.setEnabled(false);
+    editEntry.setEnabled(false);
     selectAll.setEnabled(false);
     copyKey.setEnabled(false);
     copyCiteKey.setEnabled(false);
@@ -990,6 +996,7 @@ public class JabRefFrame
     delete.setEnabled(true);
     copy.setEnabled(true);
     paste.setEnabled(true);
+    editEntry.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
     copyCiteKey.setEnabled(true);
@@ -1564,7 +1571,7 @@ public class JabRefFrame
         if (tempFilename != null) { //filenm != null)
           //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
           ArrayList bibs = ImportFormatReader.readSixpack(tempFilename);
-		  Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
+          Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries(bibs, tempFilename, intoNew);
         }
       }
@@ -1580,6 +1587,7 @@ public class JabRefFrame
         if( tempFilename != null )//filenm != null)
         {
           ArrayList bibs=ImportFormatReader.readBiblioscapeTagFile(tempFilename);
+          Util.setDefaultOwner( bibs, prefs.get("defaultOwner"));
           addBibEntries( bibs, tempFilename, intoNew);
         }
       }

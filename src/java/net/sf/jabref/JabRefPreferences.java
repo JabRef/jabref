@@ -427,8 +427,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Close preamble editor", "ESCAPE");
 	defKeyBinds.put("Preamble editor, store changes", "alt S");
 	defKeyBinds.put("Clear search", "ESCAPE");
-	defKeyBinds.put("Entry editor, next panel", "ctrl shift Right");
-	defKeyBinds.put("Entry editor, previous panel", "ctrl shift Left");
+	defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"shift Right");
+	defKeyBinds.put("Entry editor, previous panel", "ctrl shift TAB");
 	defKeyBinds.put("Entry editor, next entry", "ctrl shift Down");
 	defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
 	defKeyBinds.put("Entry editor, store field", "alt S");
@@ -442,7 +442,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Open PDF or PS", "F4");
         defKeyBinds.put("Open URL or DOI", "F3");
         defKeyBinds.put("Toggle entry preview", "F9");
-	//defKeyBinds.put("Edit entry", "ctrl E");
+	defKeyBinds.put("Edit entry", "ctrl E");
     }
 
     private String getNextUnit(Reader data) throws IOException {

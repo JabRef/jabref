@@ -635,11 +635,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//am.put("close", closeAction);
         im.put(prefs.getKey("Entry editor, store field"), "store");
         am.put("store", storeFieldAction);
-	im.put(GUIGlobals.switchPanelLeft, "left");
+	im.put(prefs.getKey("Entry editor, next panel"), "left");
 	am.put("left", switchLeftAction);
-	im.put(GUIGlobals.switchPanelRight, "right");
+	im.put(prefs.getKey("Entry editor, previous panel"), "right");
 	am.put("right", switchRightAction);
-	im.put(GUIGlobals.helpKeyStroke, "help");
+	im.put(prefs.getKey("Help"), "help");
 	am.put("help", helpAction);
         im.put(prefs.getKey("Save database"), "save");
         am.put("save", saveDatabaseAction);

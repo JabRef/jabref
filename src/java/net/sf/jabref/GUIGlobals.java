@@ -163,10 +163,9 @@ public class GUIGlobals {
    */
   public static URL
       openIconFile = GUIGlobals.class.getResource(pre + "fileopen2.png"),
-
+      editIconFile = GUIGlobals.class.getResource(pre + "pencil.png"),
       saveIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
       saveAsIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
-
       prefsIconFile = GUIGlobals.class.getResource(pre + "configure2.png"),
       newIconFile = GUIGlobals.class.getResource(pre + "filenew.png"),
       undoIconFile = GUIGlobals.class.getResource(pre + "undo.png"),

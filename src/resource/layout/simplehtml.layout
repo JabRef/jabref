@@ -3,11 +3,11 @@
 <dt><a name="\bibtexkey">(\bibtexkey)</a></dt>
 <dd></b>
 <br>
-\begin{author} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author} \end{author}<BR>
+\begin{author} \format[net.sf.jabref.export.layout.format.FixAuthorLastFirst]{\author} \end{author}<BR>
 \begin{title} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title} \end{title}<BR>
-\begin{journal} <em>\journal </em>\end{journal}
+\begin{journal} <em>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\journal} </em>\end{journal}
 \begin{year}, <b>\year </b>\end{year}
-\begin{volume}, <i>\volume</i>\end{volume}
+\begin{volume}, <i>\volume </i>\end{volume}
 \begin{pages}, \pages \end{pages}
 </dd>
 <p></p>
