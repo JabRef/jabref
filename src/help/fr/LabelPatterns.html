@@ -1,0 +1,62 @@
+<HTML>
+
+<BODY text="#275856">
+
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Personnalisation du g&eacute;n&eacute;rateur de clefs BibTeX</H1>
+
+<p>
+Dans le menu 'Param&eacute;trage des clefs' de la fen&ecirc;tre Pr&eacute;f&eacute;rences, on peut indiquer les champs &agrave; utiliser pour la g&eacute;n&eacute;ration automatique des clefs BibTeX. La d&eacute;finition peut &ecirc;tre faite pour chacune des entr&eacute;es standards.
+</p>
+
+<p>
+La d&eacute;finition peut contenir n'importe quel texte au choix ainsi que des marqueurs de champs qui indiquent les champs particuliers de l'entr&eacute;e utilis&eacute;s et leur position dans la clef. Un marqueur de champ est constitu&eacute; g&eacute;n&eacute;ralement du nom du champ entre crochets, par ex. <b>[volume]</b>. Si le champ n'est pas d&eacute;fini dans l'entr&eacute;e lorsque la clef est g&eacute;n&eacute;r&eacute;e, aucun texte n'est ins&eacute;r&eacute; dans la clef.
+</p>
+
+<p>
+Plusieurs marqueurs de champs sp&eacute;ciaux sont fournis et permettent l'extraction d'une partie du contenu d'un champ. Ils sont donn&eacute;s ci-dessous. Vous pouvez librement sugg&eacute;rer de nouveaux marqueurs de champs sp&eacute;ciaux.
+</p>
+
+<p>
+Les marqueurs de champs sp&eacute;ciaux&nbsp;:
+</p>
+
+<ul>
+<li><b>[<code>auth</code>]</b>&nbsp;: Le nom du premier auteur<BR>
+<li><b>[<code>authors</code>]</b>&nbsp;: Le nom de tous les auteurs<BR>
+<li><b>[<code>authIniN</code>]</b>&nbsp;: Les N premi&egrave;res lettres (ou moins) du nom de chacun des auteurs.<BR>
+<li><b>[<code>authorIni</code>]</b>&nbsp;: Les 5 premi&egrave;res lettres du nom du premier auteur et les initiales du nom des auteurs restants<BR>
+<li><b>[<code>authN</code>]</b>&nbsp;: Les N premi&egrave;res lettres du premier auteur.<BR>
+<li><b>[<code>authN_M</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom des M premiers auteurs.<BR>
+<li><b>[<code>auth.auth.ea</code>]</b>&nbsp;: Le nom des deux premiers auteurs suivi de ".ea" lorsqu'ils sont plus de deux.<BR>
+<li><b>[<code>edtr</code>]</b>&nbsp;: Le nom du premier &eacute;diteur<BR>
+<li><b>[<code>edtrIniN</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom de chaque &eacute;diteur<BR>
+<li><b>[<code>editors</code>]</b>&nbsp;: Le nom des chacun des &eacute;diteurs<BR>
+<li><b>[<code>editorIni</code>]</b>&nbsp;: Les cinq premi&egrave;res lettres du nom du premier &eacute;diteur suivi des initiales du nom des &eacute;diteurs restants.<BR>
+<li><b>[<code>edtrN</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom du premier &eacute;diteur<BR>
+<li><b>[<code>edtrN_M</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom des M premiers &eacute;diteurs.<BR>
+<li><b>[<code>edtr.edtr.ea</code>]</b>&nbsp;: Le nom des deux premiers &eacute;diteurs suivi de ".ea" lorsqu'ils sont plus de deux.<BR>
+<li><b>[<code>firstpage</code>]</b>&nbsp;: Le num&eacute;ro de la premi&egrave;re page de la publication<BR>
+<li><b>[<code>lastpage</code>]</b>&nbsp;: Le num&eacute;ro de la derni&egrave;re page de la publication<BR>
+<li><b>[<code>shorttitle</code>]</b>&nbsp;: Les 3 premiers mots du titre<BR>
+<li><b>[<code>shortyear</code>]</b>&nbsp;: Les 2 derniers chiffres de l'ann&eacute;e de publication<BR>
+<li><b>[<code>veryshorttitle</code>]</b>&nbsp;: Le premier mot du titre qui ne soit pas 'the', 'a', 'an'.<BR>
+</ul>
+ 
+ <p>
+ Un nom de champs (ou celui de l'un des pseudo-champs vu au dessus) peut, de fa&ccedil;on optionnelle, &ecirc;tre suivi par un modificateur. Actuellement, le seul modificateur d&eacute;fini, <b>:lower</b>, force le texte ins&eacute;r&eacute; par le marqueur de champ &agrave; &ecirc;tre en minuscules. Par exemple, <b>[auth:lower]</b> bascule le nom du premier auteur en minuscules.
+ </p>
+
+<p>
+La clef utilis&eacute;e par d&eacute;faut est [auth][year]; elle produit des clefs du type <code>Yared1998</code>. Si la clef n'est pas unique dans la base de donn&eacute;e, elle est modifi&eacute;e par l'ajout d'une des lettres de a &agrave; z et ceci jusqu'a ce quelle soit unique. De cette fa&ccedil;on, les &eacute;tiquettes ressemblent &agrave;&nbsp;:
+</p>
+
+<blockquote> 
+<code>Yared1998</code><BR> 
+<code>Yared1998a</code><BR>
+<code>Yared1998b</code> 
+</blockquote>
+
+</body>
+</html>

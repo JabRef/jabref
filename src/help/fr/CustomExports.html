@@ -1,0 +1,170 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<h1>Filtres d'exportation personnalis&eacute;s</h1>
+
+<p>
+JabRef vous permet de d&eacute;finir et d'utiliser vos propres filtres d'exportation de la m&ecirc;me mani&egrave;re que les filtres d'exportation standards. Un filtre d'exportation est d&eacute;fini par un ou plusieurs <i>fichiers gabarit</i> qui, avec l'aide d'un certain nombre de routines internes de formatage, d&eacute;finissent le format des fichiers export&eacute;s. Vos fichiers gabarit doivent &ecirc;tre pr&eacute;par&eacute;s avec un &eacute;diteur de texte &agrave; l'ext&eacute;rieur de JabRef.
+</p>
+
+<h2>Ajout d'un filtre d'exportation personnalis&eacute; </h2>
+
+<p>
+La seule obligation pour avoir un filtre d'exportation valide est l'existence d'un fichier avec l'extension <b>.layout</b>. Pour ajouter un nouveau filtre d'exportation, on utilise le menu <b>Options -> G&eacute;rer les exportations personnalis&eacute;es</b>, et on clique sur <b>Ajouter nouvelle</b>. Une nouvelle boite de dialogue appara&icirc;t et vous permet de sp&eacute;cifier un nom pour le nouveau filtre d'exportation (ce nom appara&icirc;tra dans le menu <b>Fichier -> Exportation personnalis&eacute;e</b> de la fen&ecirc;tre JabRef), le chemin du fichier <b>.layout</b> et l'extension pr&eacute;f&eacute;r&eacute;e pour les fichiers cr&eacute;es par le filtre d'exportation (c'est cette extension qui sera sugg&eacute;r&eacute;e dans la boite de dialogue lorsque l'on utilisera le filtre).
+</p>
+
+<h2>Cr&eacute;ation d'un filtre d'exportation</h2>
+
+<p>
+Pour voir des exemples de constitution de filtres d'exportation, recherchez le r&eacute;pertoire contenant les fichiers gabarit des filtres d'exportation standards sur notre page de t&eacute;l&eacute;chargement.
+</p>
+
+<h3>Les fichiers gabarit</h3>
+
+<p>
+On suppose que l'on veut cr&eacute;er un filtre d'exportation pour une sortie HTML.
+</p>
+
+<p>
+Bien que le filtre d'exportation ne n&eacute;cessite qu'un seul fichier <b>.layout</b>, qui dans ce cas pourrait s'appeler <i>html.layout</i>, vous pouvez d&eacute;sirer ajouter deux autres fichiers appel&eacute;s <i>html.begin.layout</i> et <i>html.end.layout</i>. Le premier contient le d&eacute;but de la sortie et le dernier la fin. JabRef recherche ces deux fichiers quelque soit le fichier d'exportation utilis&eacute; et, s'il les trouve, les recopie tel quel dans la sortie avant et apr&egrave;s l'&eacute;criture des entr&eacute;es individuelles.
+</p>
+
+<p>
+Il faut noter que ces fichiers doivent &ecirc;tre dans le m&ecirc;me r&eacute;pertoire que le fichier <i>html.layout</i>, et que leur nom doit comporter <b>.begin</b> pour l'un et <b>.end</b> pour l'autre.
+</p>
+
+<p>
+Dans notre exemple de fichier d'exportation, cela pourrait ressembler &agrave; 
+</p>
+
+<p>
+<i>html.begin.layout</i>&nbsp;:<br>
+<code>
+&lt;HTML&gt;<br>
+  &lt;BODY&gt; text="#275856"&gt;<br>
+&lt;basefont size="4" color="#2F4958" face="arial"&gt;
+</code>
+</p>
+
+<p>
+<i>html.end.layout</i>&nbsp;:<br>
+<code>
+&lt;/BODY&gt;<br>
+  &lt;/HTML&gt;
+</code>
+</p>
+
+<p>
+Le fichier <i>html.layout</i> fournit le gabarit par d&eacute;faut pour l'exportation  d'une seule entr&eacute;e. Si vous devez utiliser diff&eacute;rents gabarits pour les diff&eacute;rentes entr&eacute;es, vous pouvez le faire en ajoutant des fichiers <b>.layout</b> sp&eacute;cifiques.
+Les fichiers doivent aussi &ecirc;tre dans le m&ecirc;me r&eacute;pertoire que le gabarit principal et ils sont nomm&eacute;s en ins&eacute;rant <b>.entrytype</b> dans le nom du fichier gabarit principal. Le nom de l'entr&eacute;e doit &ecirc;tre en minuscules.
+Dans notre exemple, on peut vouloir ajouter un gabarit diff&eacute;rent pour les livres et cela se fera via le fichier <i>html.book.layout</i>. Pour une th&egrave;se, on ajoutera le fichier <i>html.phdthesis.layout</i>.
+Ces fichiers sont similaires au gabarit principal, si ce n'est qu'ils sont utilis&eacute;s pour des entr&eacute;es sp&eacute;cifiques. A noter que le gabarit g&eacute;n&eacute;ral peut ais&eacute;ment &ecirc;tre cr&eacute;&eacute; suffisamment g&eacute;n&eacute;ral pour &ecirc;tre utilisable avec la plupart des entr&eacute;es dans la majorit&eacute; des filtres d'exportation.
+</p>
+
+<h3>Le format des fichiers gabarit</h3>
+
+<p>
+Les fichiers gabarit utilisent un simple langage de balisage dans lequel les commandes sont identifi&eacute;es par l'antislash (\) les pr&eacute;c&eacute;dant. Tout texte non identifi&eacute; comme faisant partie d'une entr&eacute;e est recopi&eacute; tel quel dans le fichier de sortie.
+</p>
+
+<h3>Les commandes relatives aux champs</h3>
+
+<p>
+Les mots pr&eacute;c&eacute;d&eacute;s d'un antislash, par exemple <code>\author</code>, <code>\editor</code>, <code>\title</code> ou <code>\year</code>, sont interpr&eacute;t&eacute;s comme des r&eacute;f&eacute;rences aux champs correspondants et le contenu du champ est copi&eacute; directement dans la sortie.
+</p>
+
+<h3>Les formateurs de champs</h3>
+
+<p>
+Souvent, on a besoin de faire subir au contenu des champs un pr&eacute;-traitement avant de le copier dans le fichier de sortie. Cela est r&eacute;alis&eacute; en utilisant un <i>formateur de champ</i> - une classe java contenant une seule m&eacute;thode qui manipule le contenu du champ.
+</p>
+
+<p>
+Le formateur est utilis&eacute; en ins&eacute;rant la commande <code>\format</code> suivie du nom du formateur entre crochets et du nom du champ entre accolades, par exemple&nbsp;:
+</p>
+<p>
+<code>\format[ToLowerCase]{\author}</code>
+</p>
+
+<p>
+Vous pouvez aussi indiquer plusieurs formateurs s&eacute;par&eacute;s par des virgules. Il seront alors appel&eacute;s s&eacute;quentiellement de la gauche vers la droite, par exemple&nbsp;: 
+</p>
+<p>
+<code>\format[ToLowerCase,HTMLChars]{\author}</code>
+</p>
+<p>
+va d'abord appliqu&eacute; le formateur <b>ToLowerCase</b> puis <b>HTMLChars</b> sur le r&eacute;sultat. Vous pouvez lister un nombre arbitraire de formateurs de cette mani&egrave;re.
+</p>
+
+<p>
+JabRef fournit les formateurs suivants, certains d'entre eux d&eacute;pendant d'autres formateurs&nbsp;:
+</p>
+
+<ul>
+<li><code>HTMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation HTML.
+<li><code>XMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation XML.
+<li><code>CreateDocBookAuthors</code>&nbsp;: formate le contenu du champ author selon le style DocBook.
+<li><code>AuthorFirstFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier.
+<li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier et des virgules comme s&eacute;parateurs.
+<li><code>AuthorLastFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant le nom de famille en premier.
+<li><code>AuthorLastFirstAbbreviator</code>&nbsp;: r&eacute;duit les pr&eacute;noms de tous les auteurs &agrave; leurs initiales. Ce formateur n&eacute;cessite d'avoir pr&eacute;alablement utilis&eacute; AuthorLastFirst.
+<li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and" par ";" entre les premiers noms et par "&" entre les deux derniers. 
+<li><code>FormatPagesForHTML</code>&nbsp;: remplace "--" par "-".
+  <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par un tiret XML.
+<li><code>RemoveBrackets</code>&nbsp;: supprime toutes les accolades "{" ou "}".
+<li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes les commandes LaTeX comme <code>\em</code>, <code>\textbf</code>, etc. Lorsqu'il est utilis&eacute; avec <code>HTMLChars</code> ou <code>XMLChars</code>, ce formateur doit &ecirc;tre appel&eacute; en dernier.
+<li><code>ToLowerCase</code>&nbsp;: bascule tous les caract&egrave;res en minuscules.
+</ul>
+
+<p>
+Si aucun des formateurs disponibles ne peut faire ce que vous d&eacute;sirez, vous pouvez ajouter le votre &agrave; l'interface <code> net.sf.jabref.export.layout.LayoutFormatter</code>. Si vous ins&eacute;rez votre propre classe dans <code>net.sf.jabref.export.layout.format</code>, vous pouvez appeler votre formateur en utilisant son nom de classe, comme pour les formateurs standards. Sinon, vous devez appeler le formateur par son nom complet (incluant le nom du package). Dans les deux cas, le formateur doit &ecirc;tre dans votre chemin de classe lorsque vous lancez JabRef
+</p>
+
+<h3>Les sorties conditionnelles</h3>
+<p>
+Certaines informations dans les sorties ne prennent de sens que si un certain champ est utilis&eacute;. Par exemple, disons que l'on veuille faire suivre le nom de l'&eacute;diteur par le texte <code>(Ed.)</code>. Cela peut &ecirc;tre r&eacute;alis&eacute; avec le code suivant&nbsp;:
+</p>
+
+<p>
+<code>\format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)</code>
+</p>
+
+<p>
+Cependant, si le champs <code>editor</code> n'a pas &eacute;t&eacute; renseign&eacute; - il n'a pas de sens pour l'entr&eacute;e export&eacute;e - le texte <code>(Ed.)</code> doit &ecirc;tre ignor&eacute;. Cela peut &ecirc;tre effectu&eacute; en utilisant les commandes <code>\begin</code> et <code>\end</code>&nbsp;:
+</p>
+
+<p>
+<code>\begin{editor}<br>\format[HTMLChars,AuthorFirstFirst]{\editor} (Ed.)
+<br>\end{editor}</code>
+</p>
+
+<p>Les commandes <code>\begin</code> et <code>\end</code> assure que le texte contenu entre les deux commandes ne sera imprim&eacute; que si et seulement si le champ sp&eacute;cifi&eacute; entre accolades est renseign&eacute; dans l'entr&eacute;e que l'on veut exporter.
+</p>
+
+<p>
+<b>Note&nbsp;:</b> L'utilisation des commandes <code>\begin</code> et <code>\end</code> est une mani&egrave;re astucieuse de cr&eacute;er des gabarits qui sont communs &agrave; une grande vari&eacute;t&eacute; d'entr&eacute;es.
+</p>
+
+<h3>Les sorties group&eacute;es</h3>
+
+<p>
+Si vous d&eacute;sirez s&eacute;parer vos entr&eacute;es en groupes bas&eacute;s sur un certain champ, vous pouvez utiliser les commandes de sorties group&eacute;es. La sortie group&eacute;e est assez similaire aux sorties conditionnelles, except&eacute; que le texte sp&eacute;cifi&eacute; n'est imprim&eacute; que si le champ indiqu&eacute; dans les accolades change de valeur.
+</p>
+
+<p>
+Par exemple, on suppose que l'on d&eacute;sire faire des groupes &agrave; partir de mots-clefs. Avant l'exportation, on s'assure que les entr&eacute;es sont tri&eacute;es selon les mots-clefs. Ensuite, on utilise les commandes suivantes pour les grouper par mot-clefs&nbsp;:
+</p>
+<p>
+<code>\begingroup{keywords}New Category: \format[HTMLChars]{\keywords}
+<br>	\endgroup{keywords}</code>
+</p>
+
+<h2>Partage de votre travail </h2>
+
+<p>
+Avec les fichiers gabarit externes, il est relativement simple de partager des formats d'exportation entre utilisateurs. Si vous &eacute;crivez un filtre d'exportation pour un format non support&eacute; par JabRef, ou si vous am&eacute;liorez un filtre d&eacute;j&agrave; existant, nous vous encourageons &agrave; d&eacute;poser votre travail sur notre page SourceForge.net. La m&ecirc;me chose est possible pour les nouvelles classes de formateur que vous avez &eacute;crites. Nous serons heureux de distribuer une collection des fichiers gabarit soumis ou de les ajouter &agrave; la s&eacute;rie des filtres d'exportation standard ou des formateurs.
+</p>
+</body>
+</html>
