@@ -37,13 +37,13 @@ public class Globals {
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
     public static ResourceBundle messages;
-	
+
     public static void logger(String s){
 		Logger.global.info(s);
     }
-    
+
     public static void turnOffLogging(){ // only log exceptions
-		Logger.global.setLevel(java.util.logging.Level.SEVERE); 
+		Logger.global.setLevel(java.util.logging.Level.SEVERE);
     }
 
     // should be only called ones
@@ -52,12 +52,12 @@ public class Globals {
     }
 
     public static void turnOnFileLogging(){
-	Logger.global.setLevel(java.util.logging.Level.ALL);	
+	Logger.global.setLevel(java.util.logging.Level.ALL);
 	java.util.logging.Handler handler;
 	try{
 	    handler = new FileHandler(logfile);// this will overwrite
 	}catch (IOException e){ //can't open log file so use console
-	    handler =  new ConsoleHandler() ; 
+	    handler =  new ConsoleHandler() ;
 	}
 	Logger.global.addHandler( handler);
 
@@ -92,21 +92,21 @@ public class Globals {
 	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
 	}catch(MissingResourceException ex){
 	    translation= key;
-	    //System.err.println("Warning: could not get translation for \""
-	    //	       + key +"\"");
+	    System.err.println("Warning: could not get translation for \""
+	    	       + key +"\"");
 	}
 	return translation.replaceAll("_"," ");
     }
     //============================================================
     // Using the hashmap of entry types found in BibtexEntryType
-    //============================================================    
+    //============================================================
     static BibtexEntryType getEntryType(String type){
 	// decide which entryType object to return
 	Object o = BibtexEntryType.ALL_TYPES.get(type);
 	if (o != null)
 	    return (BibtexEntryType)o;
 	else {
-	    return BibtexEntryType.OTHER;	    
+	    return BibtexEntryType.OTHER;
 	}
 	/*
 	if(type.equals("article"))
@@ -120,13 +120,13 @@ public class Globals {
 
     //========================================================
     // lot of abreviations in medline
-	// PKC etc convert to {PKC} ... 
+	// PKC etc convert to {PKC} ...
     //========================================================
-    static Pattern titleCapitalPattern=Pattern.compile("[A-Z]+");    
+    static Pattern titleCapitalPattern=Pattern.compile("[A-Z]+");
 
     static String putBracesAroundCapitals(String title){
 		StringBuffer buf = new StringBuffer();
-		
+
 		Matcher mcr=Globals.titleCapitalPattern.matcher(title.substring(1));
 		boolean found =false;
 		while((found=mcr.find())){
@@ -137,10 +137,10 @@ public class Globals {
 		String titleCap=title.substring(0,1)+buf.toString();
 		return titleCap;
     }
-	
-	
+
+
 	/*    public static void setupKeyBindings(JabRefPreferences prefs) {
-		  
-	
+
+
 	}*/
 }

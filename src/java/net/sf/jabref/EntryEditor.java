@@ -38,6 +38,7 @@ import java.io.IOException;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.export.LatexFieldFormatter;
 import java.beans.*;
+import javax.swing.JComponent;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
 
@@ -69,13 +70,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     StoreFieldAction storeFieldAction;
     // The action concerned with storing a field value.
 
-
     SwitchLeftAction switchLeftAction = new SwitchLeftAction();
     SwitchRightAction switchRightAction = new SwitchRightAction();
     // The actions concerned with switching the panels.
 
     GenerateKeyAction generateKeyAction ;
     // The action which generates a bibtexkey for this entry.
+
+    SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     JPanel mainPanel = new JPanel(), // The area below the toolbar.
 	srcPanel = new JPanel();
@@ -471,14 +473,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	ActionMap am = ta.getActionMap();
 	//im.put(KeyStroke.getKeyStroke(GUIGlobals.closeKey), "close");
 	//am.put("close", closeAction);
-	im.put(prefs.getKey("Entry editor: store field"), "store");
-	am.put("store", storeFieldAction);
+        im.put(prefs.getKey("Entry editor: store field"), "store");
+        am.put("store", storeFieldAction);
 	im.put(GUIGlobals.switchPanelLeft, "left");
 	am.put("left", switchLeftAction);
 	im.put(GUIGlobals.switchPanelRight, "right");
 	am.put("right", switchRightAction);
 	im.put(GUIGlobals.helpKeyStroke, "help");
 	am.put("help", helpAction);
+        im.put(prefs.getKey("Save"), "save");
+        am.put("save", saveDatabaseAction);
 
 	try{
 	    int i = 0 ;
@@ -1130,6 +1134,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	public void actionPerformed(ActionEvent e) {
 	    panel.runCommand("redo");
 	}
+    }
+
+    class SaveDatabaseAction extends AbstractAction {
+      public SaveDatabaseAction() { super("Save database"); }
+      public void actionPerformed(ActionEvent e) {
+        Object comp = tabbed.getSelectedComponent();
+        if (comp instanceof FieldPanel) {
+          // Normal panel.
+          FieldPanel fp = (FieldPanel)comp;
+          storeFieldAction.actionPerformed(new ActionEvent(fp.activeField, 0,""));
+        } else {
+          // Source panel.
+          storeFieldAction.actionPerformed(new ActionEvent(comp, 0,""));
+        }
+        panel.runCommand("save");
+      }
     }
 
     public boolean setField(String fieldName, String newFieldData){

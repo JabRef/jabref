@@ -31,7 +31,7 @@ public class JabRef {
 
     public static void main(String[] args) {
 
-	Globals.turnOffLogging();
+	//Globals.turnOffLogging();
 
 		JabRefPreferences prefs = new JabRefPreferences();
 		BibtexEntryType.loadCustomEntryTypes(prefs);
@@ -43,7 +43,7 @@ public class JabRef {
 			jrf.output("Opening: " + args[0]);
 			//verify the file
 			File f = new File (args[0]);
-			
+
 			if( f.exists() && f.canRead() && f.isFile()) {
 				jrf.fileToOpen=f;
 				jrf.openDatabaseAction.openIt(true);
@@ -51,12 +51,12 @@ public class JabRef {
 				System.err.println("Error" + args[0] + " is not a valid file or is not readable");
 				//JOptionPane...
 			}
-			
-			
+
+
 		}else{//no arguments (this will be for later and other command line switches)
 			// ignore..
 		}
-		
+
 
 	}
 
