@@ -21,15 +21,15 @@
   <property name="txt.dir" value="src/txt"/>
   <property name="java.dir" value="${src.dir}/java"/>
   <property name="resource.dir" value="${src.dir}/resource"/>
-  <property name="bin.dir" value="${src.dir}/scripts"/> 
-  <property name="images.dir" value="${src.dir}/images"/> 
-  <property name="help.dir" value="${src.dir}/help"/> 
+  <property name="bin.dir" value="${src.dir}/scripts"/>
+  <property name="images.dir" value="${src.dir}/images"/>
+  <property name="help.dir" value="${src.dir}/help"/>
 
   <!-- Build classpath -->
   <path id="classpath">
     <pathelement path="${build.classes}"/>
   </path>
-  
+
   <!-- Compiles project -->
   <target name="compile">
     <mkdir dir="${build.classes}"/>
@@ -48,8 +48,8 @@
     	<fileset dir="${build.classes}"/>
     	<fileset dir="${src.dir}">
 			<include name="images/**"/>
-			<include name="help/**"/>			
-			<include name="resource/**"/>			
+			<include name="help/**"/>
+			<include name="resource/**"/>
         </fileset>
 	<fileset dir="${txt.dir}">
 	                <include name = "gpl.txt"/>
@@ -81,6 +81,12 @@
     <mkdir dir="${build.images}"/>
     <copy todir="${build.images}">
       <fileset dir="${images.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${build.help}"/>
+    <copy todir="${build.help}">
+      <fileset dir="${help.dir}">
         <include name="*" />
       </fileset>
     </copy>

@@ -8,8 +8,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
-    private JCheckBox autoOpenForm, backup, openLast, 
+    private JCheckBox autoOpenForm, backup, openLast,
 	defSource, editSource;
+    private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
 
     public GeneralTab(JabRefPreferences prefs) {
@@ -31,9 +32,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	editSource = new JCheckBox(Globals.lang("Enable source editing"),
 				   _prefs.getBoolean("enableSourceEditing"));
 	JPanel general = new JPanel();
-	    
+        groupField = new JTextField(_prefs.get("groupsDefaultField"), 15);
 	general.setBorder(BorderFactory.createTitledBorder
-			  (BorderFactory.createEtchedBorder(), 
+			  (BorderFactory.createEtchedBorder(),
 			   Globals.lang("Miscellaneous")));
 	general.setLayout(gbl);
 
@@ -49,6 +50,17 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
+        con.gridwidth = 1;
+        JLabel lab = new JLabel(Globals.lang("Default grouping field:"));
+        lab.setHorizontalAlignment(SwingConstants.LEFT);
+        gbl.setConstraints(lab, con);
+        general.add(lab);
+
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(groupField, con);
+        general.add(groupField);
+
+
 	//gbl.setConstraints(editSource, con);
 	//general.add(editSource);
 
@@ -63,7 +75,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
-
+        _prefs.put("groupsDefaultField", groupField.getText());
     }
-   
+
 }
