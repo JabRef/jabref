@@ -635,9 +635,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//am.put("close", closeAction);
         im.put(prefs.getKey("Entry editor, store field"), "store");
         am.put("store", storeFieldAction);
-	im.put(prefs.getKey("Entry editor, next panel"), "left");
+	im.put(prefs.getKey("Entry editor, next panel"), "right");
 	am.put("left", switchLeftAction);
-	im.put(prefs.getKey("Entry editor, previous panel"), "right");
+	im.put(prefs.getKey("Entry editor, previous panel"), "left");
 	am.put("right", switchRightAction);
 	im.put(prefs.getKey("Help"), "help");
 	am.put("help", helpAction);
@@ -646,9 +646,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	try{
 	    HashSet keys =  new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS)) ;
+            keys.clear();
 	    keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB")) ;
 	    ta.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys) ;
 	    keys = new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS)) ;
+            keys.clear();
 	    keys.add(KeyStroke.getKeyStroke("shift pressed TAB")) ;
 	    ta.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys) ;
 	}catch(Throwable t){

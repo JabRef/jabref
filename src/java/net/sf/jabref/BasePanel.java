@@ -933,9 +933,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                   NamedCompound ce = null;
                   int dupl = 0;
                   output(Globals.lang("Searching for duplicates..."));
-                  BibtexEntry[] bes = entryTable.getSelectedEntries();
-                  if ((bes == null) || (bes.length < 2))
+                  Object[] keys = database.getKeySet().toArray();
+                  if ((keys == null) || (keys.length < 2))
                     return;
+                  BibtexEntry[] bes = new BibtexEntry[keys.length];
+                  for (int i=0; i<keys.length; i++)
+                    bes[i] = database.getEntryById((String)keys[i]);
                   DuplicateResolverDialog drd = null;
                   for (int i = 0; i < bes.length - 1; i++)
                     for (int j = i + 1; j < bes.length; j++) {

@@ -129,9 +129,10 @@ public class JabRefFrame
       copy = new EditAction("copy", GUIGlobals.copyIconFile),
       paste = new EditAction("paste", GUIGlobals.pasteIconFile),
       cut = new EditAction("cut", GUIGlobals.cutIconFile),
-      /*paste = new GeneralAction("paste", "Paste", "Paste",
-                               GUIGlobals.pasteIconFile,
-                                prefs.getKey("Paste")),*/
+      mark = new GeneralAction("markEntries", "Mark entries",
+                               prefs.getKey("Mark entries")),
+       unmark = new GeneralAction("unmarkEntries", "Unmark entries",
+                                  prefs.getKey("Unmark entries")),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -776,6 +777,9 @@ public class JabRefFrame
     }
     bibtex.add(newSpec);
     bibtex.addSeparator();
+    bibtex.add(mark);
+    bibtex.add(unmark);
+    bibtex.addSeparator();
     bibtex.add(editEntry);
     bibtex.add(editPreamble);
     bibtex.add(editStrings);
@@ -956,6 +960,8 @@ public class JabRefFrame
     delete.setEnabled(false);
     copy.setEnabled(false);
     paste.setEnabled(false);
+    mark.setEnabled(false);
+    unmark.setEnabled(false);
     editEntry.setEnabled(false);
     selectAll.setEnabled(false);
     copyKey.setEnabled(false);
@@ -996,6 +1002,8 @@ public class JabRefFrame
     delete.setEnabled(true);
     copy.setEnabled(true);
     paste.setEnabled(true);
+    mark.setEnabled(true);
+    unmark.setEnabled(true);
     editEntry.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
@@ -1281,6 +1289,7 @@ public class JabRefFrame
     public FetchMedlineAction() {
       super(Globals.lang("Fetch Medline"),
             new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
     }
 
@@ -1811,6 +1820,7 @@ public class JabRefFrame
     public ChangeTabAction(boolean next) {
       super(Globals.lang(next ? "Next tab" : "Previous tab"));
       this.next = next;
+      //Util.pr(""+prefs.getKey("Next tab"));
       putValue(ACCELERATOR_KEY,
                (next ? prefs.getKey("Next tab") : prefs.getKey("Previous tab")));
     }

@@ -1,18 +1,18 @@
 /*
   File:    OSXAdapter.java
-  
+
   Description:A single class with clear, static entry points for hooking existing preferences,
         about, quit functionality from an existing Java app into handlers for the Mac OS X
-        application menu.  Useful for developers looking to support 
-        multiple platforms with a single codebase, and support Mac OS X features with 
+        application menu.  Useful for developers looking to support
+        multiple platforms with a single codebase, and support Mac OS X features with
         minimal impact.
 
         This sample is designed for Java 1.4.1 and later on Mac OS X.
-        
+
   Author:    mdrance
 
   Copyright:   © Copyright 2003 Apple Computer, Inc. All rights reserved.
-  
+
   Disclaimer:  IMPORTANT:  This Apple software is supplied to you by Apple Computer, Inc.
         ("Apple") in consideration of your agreement to the following terms, and your
         use, installation, modification or redistribution of this Apple software
@@ -47,7 +47,7 @@
         OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT, TORT
         (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN
         ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-        
+
   Change History (most recent first):
     04092003  mdrance    added comments
 
@@ -66,22 +66,22 @@ public class OSXAdapter extends ApplicationAdapter {
 
   // reference to the app where the existing quit, about, prefs code is
   private JabRefFrame mainApp;
-  
+
   private OSXAdapter (JabRefFrame inApp) {
     mainApp = inApp;
   }
-  
-  // implemented handler methods.  These are basically hooks into existing 
+
+  // implemented handler methods.  These are basically hooks into existing
   // functionality from the main app, as if it came over from another platform.
   public void handleAbout(ApplicationEvent ae) {
     if (mainApp != null) {
-      ae.setHandled(true);
+      ae.setHandled(false);
       mainApp.about();
     } else {
       throw new IllegalStateException("handleAbout: MyApp instance detached from listener");
     }
   }
-  
+
   public void handlePreferences(ApplicationEvent ae) {
     if (mainApp != null) {
       mainApp.preferences();
@@ -90,10 +90,10 @@ public class OSXAdapter extends ApplicationAdapter {
       throw new IllegalStateException("handlePreferences: MyApp instance detached from listener");
     }
   }
-  
+
   public void handleQuit(ApplicationEvent ae) {
     if (mainApp != null) {
-      /*  
+      /*
       /  You MUST setHandled(false) if you want to delay or cancel the quit.
       /  This is important for cross-platform development -- have a universal quit
       /  routine that chooses whether or not to quit, so the functionality is identical
@@ -106,24 +106,24 @@ public class OSXAdapter extends ApplicationAdapter {
       throw new IllegalStateException("handleQuit: MyApp instance detached from listener");
     }
   }
-  
-  
+
+
   // The main entry-point for this functionality.  This is the only method
   // that needs to be called at runtime, and it can easily be done using
-  // reflection (see MyApp.java) 
+  // reflection (see MyApp.java)
   public static void registerMacOSXApplication(JabRefFrame inApp) {
     if (theApplication == null) {
       theApplication = new com.apple.eawt.Application();
-    }      
-    
+    }
+
     if (theAdapter == null) {
       theAdapter = new OSXAdapter(inApp);
     }
     theApplication.addApplicationListener(theAdapter);
   }
-  
-  // Another static entry point for EAWT functionality.  Enables the 
-  // "Preferences..." menu item in the application menu. 
+
+  // Another static entry point for EAWT functionality.  Enables the
+  // "Preferences..." menu item in the application menu.
   public static void enablePrefs(boolean enabled) {
     if (theApplication == null) {
       theApplication = new com.apple.eawt.Application();

@@ -243,9 +243,8 @@ public class JabRefPreferences {
      * defaults, or in the Preferences.
      */
     public KeyStroke getKey(String bindName) {
-	//Util.pr(bindName+" "+(String)keyBinds.get(bindName));
-	String s = (String)keyBinds.get(bindName);
 
+	String s = (String)keyBinds.get(bindName);
 	// If the current key bindings don't contain the one asked for,
 	// we fall back on the default. This should only happen when a
 	// user has his own set in Preferences, and has upgraded to a
@@ -428,22 +427,25 @@ public class JabRefPreferences {
 	defKeyBinds.put("Close preamble editor", "ESCAPE");
 	defKeyBinds.put("Preamble editor, store changes", "alt S");
 	defKeyBinds.put("Clear search", "ESCAPE");
-	defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"shift Right");
-	defKeyBinds.put("Entry editor, previous panel", "ctrl shift TAB");
+	defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"ctrl PLUS");//"shift Right");
+	defKeyBinds.put("Entry editor, previous panel", "ctrl shift TAB");//"ctrl MINUS");
 	defKeyBinds.put("Entry editor, next entry", "ctrl shift Down");
 	defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
 	defKeyBinds.put("Entry editor, store field", "alt S");
 	defKeyBinds.put("Save session", "F11");
 	defKeyBinds.put("Load session", "F12");
 	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
-	defKeyBinds.put("Next tab", "ctrl Right");
-	defKeyBinds.put("Previous tab", "ctrl Left");
+	defKeyBinds.put("Next tab", "ctrl RIGHT");
+	defKeyBinds.put("Previous tab", "ctrl LEFT");
 	defKeyBinds.put("Replace string", "ctrl R");
-        defKeyBinds.put("Delete", "Delete");
+        defKeyBinds.put("Delete", "DELETE");
         defKeyBinds.put("Open PDF or PS", "F4");
         defKeyBinds.put("Open URL or DOI", "F3");
         defKeyBinds.put("Toggle entry preview", "F9");
-	defKeyBinds.put("Edit entry", "ctrl E");
+        defKeyBinds.put("Edit entry", "ctrl E");
+        defKeyBinds.put("Mark entries", "ctrl M");
+        defKeyBinds.put("Unmark entries", "ctrl shift M");
+        defKeyBinds.put("Fetch Medline", "F5");
     }
 
     private String getNextUnit(Reader data) throws IOException {
