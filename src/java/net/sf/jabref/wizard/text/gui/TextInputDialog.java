@@ -197,7 +197,8 @@ public class TextInputDialog extends JDialog
     doc = textPane.getStyledDocument() ;
     addStylesToDocument( doc ) ;
 
-    OverlayPanel testPanel = new OverlayPanel(textPane, "Text Input Area" ) ;
+    OverlayPanel testPanel = new OverlayPanel(textPane,
+                                              Globals.lang("Text_Input_Area") ) ;
 
     try
     {
@@ -213,11 +214,6 @@ public class TextInputDialog extends JDialog
         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
     paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
     paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
-//    paneScrollPane.setBackground(Color.white);
-//    paneScrollPane.setForeground(Color.green);
-//    paneScrollPane.setOpaque(false);
-
-//    testPanel.add(paneScrollPane) ;
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
@@ -242,7 +238,6 @@ public class TextInputDialog extends JDialog
     JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
     leftPanel.add( toolBar, BorderLayout.NORTH ) ;
-//    leftPanel.add( testPanel, BorderLayout.CENTER ) ;
     leftPanel.add( paneScrollPane, BorderLayout.CENTER ) ;
 
     // ----------------------------------------------------------------
