@@ -298,10 +298,12 @@ public class EntryTableModel
     List fields = new ArrayList(6),
         directions = new ArrayList(6);
 
-    // For testing MARKED feature:
-    fields.add(Globals.MARKED);
-    directions.add(new Boolean(true));
-
+    // For testing MARKED feature. With this IF clause, the marked entries will only float to the top when
+    // no sorting/grouping reordering is active.
+    if  (!panel.sortingBySearchResults && !panel.sortingByCiteSeerResults && !panel.sortingByGroup) {
+        fields.add(Globals.MARKED);
+        directions.add(new Boolean(true));
+    }
     if (panel.sortingByGroup) {
       // Group search has the highest priority if active.
       fields.add(Globals.GROUPSEARCH);

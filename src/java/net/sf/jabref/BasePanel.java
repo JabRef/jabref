@@ -43,6 +43,7 @@ import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
+import net.sf.jabref.util.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 
 public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, FileUpdateListener {
@@ -1346,36 +1347,13 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 		      String filename = null, formatName = null;
 		      java.util.List entries = null;
 		      public void init() {
-			  output("importing");
-			  
-			  filename = Globals.getNewFile(frame,  prefs,
-							null, null,
-							JFileChooser.OPEN_DIALOG,
-							false);
-			  frame.block();
+                        output("Extracting file.");
 		      }
 		      public void run() {
-			  if ((filename != null) && !(new File(filename)).exists()) {
-			      System.out.println("File not found");
-			      return;
-			  }
-			  try {
-			      Object[] o = Globals.importFormatReader.importUnknownFormat(filename);
-			      formatName = (String)o[0];
-			      entries = (java.util.List)o[1];
-			  } catch (IOException ex) {
-			      ex.printStackTrace();
-			  }
-		      }
-		      public void update() {
-			  if (entries != null) {
-			      frame.addBibEntries(entries, filename, true);
-			      output(Globals.lang("Imported entries")+": "+entries.size()
-				     +"  "+Globals.lang("Format used")+": "+formatName);
-			  } else
-			      output(Globals.lang("Could not find a suitable import format."));
-			  frame.unblock();
-		      }
+                        ResourceExtractor re = new ResourceExtractor(frame, "/images/JabRef-splash.png", new File("/home/alver/splash.png"));
+                        re.run();
+                      }
+                      
 		  });
 
     }

@@ -147,11 +147,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         builder.append(pan); builder.append(tabPanel); builder.nextLine();
 //	lab = new JLabel("<HTML>("+Globals.lang("this button will update the column width settings<BR>"
 //						+"to match the current widths in your table")+")</HTML>");
-        lab = new JLabel("<HTML>("+Globals.lang("this_button_will_update") +")</HTML>") ;
+//        lab = new JLabel("<HTML>("+Globals.lang("this_button_will_update") +")</HTML>") ;
         builder.append(pan);
         JButton button = new JButton(new UpdateWidthsAction());
         builder.append(button); builder.nextLine();
-        builder.append(pan); builder.append(lab);
+        builder.append(pan); 
+        //builder.append(lab);
         builder.nextLine();
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));

@@ -16,6 +16,9 @@ import net.sf.jabref.net.URLDownload;
  * and storing it to the given File. It may prove useful e.g. for extracting Endnote export/import filters which
  * are needed for full integration with the export filter in JabRef, so we can bundle these for the user even though
  * they are not used by JabRef directly.
+ *
+ *
+ *
  * @author alver
  */
 public class ResourceExtractor implements Worker {
