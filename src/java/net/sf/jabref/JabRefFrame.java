@@ -114,7 +114,7 @@ public class JabRefFrame extends JFrame {
 					      "Start incremental search",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Incremental search")),
-	normalSearch = new GeneralAction("search", "Search", "Start search",
+	normalSearch = new GeneralAction("search", "Search", "Start",
 					      GUIGlobals.searchIconFile,
 					      prefs.getKey("Search")),
 
@@ -163,6 +163,11 @@ public class JabRefFrame extends JFrame {
     };
 
     public JabRefFrame() {
+	/*try {
+	    //UIManager.setLookAndFeel("com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
+	    UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
+	    } catch (Exception e) { e.printStackTrace();}*/
+
 	//Globals.setLanguage("no", "");
 	setTitle(GUIGlobals.frameTitle);	       
 	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -523,10 +528,14 @@ public class JabRefFrame extends JFrame {
 	tlb.add(copy);
 	tlb.add(paste);
 	tlb.addSeparator();
-	tlb.add(normalSearch);
-	tlb.addSeparator();
+	tlb.add(newEntryAction);
 	tlb.add(editPreamble);
 	tlb.add(editStrings);
+	tlb.add(makeKeyAction);
+	tlb.add(lyxPushAction);
+	tlb.addSeparator();
+	tlb.add(normalSearch);
+	tlb.add(toggleGroups);
 	tlb.addSeparator();
 	tlb.add(showPrefs);
 
