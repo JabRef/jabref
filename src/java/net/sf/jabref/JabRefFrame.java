@@ -400,10 +400,10 @@ public class JabRefFrame
   public void preferences() {
     //PrefsDialog.showPrefsDialog(ths, prefs);
       AbstractWorker worker = new AbstractWorker() {
-	      PrefsDialog2 pd = null;
+	      PrefsDialog3 pd = null;
               public void run() {
 		  output(Globals.lang("Opening preferences..."));
-                  pd = new PrefsDialog2(ths, prefs);
+                  pd = new PrefsDialog3(ths, prefs);
                   Util.placeDialog(pd, ths);
               }
 	      public void update() {
