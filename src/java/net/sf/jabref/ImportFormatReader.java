@@ -559,7 +559,7 @@ public class ImportFormatReader
 			EndPage=val;
 			    
 		    else if(lab.equals("VL")) hm.put("volume",val);
-		    else if(lab.equals("N2")) hm.put("abstract",val);
+		    else if(lab.equals("N2") || lab.equals("AB")) hm.put("abstract",val);
 		    else if(lab.equals("UR")) hm.put("url",val);
 		    else if((lab.equals("Y1")||lab.equals("PY"))&& val.length()>=4)
 			hm.put("year",val.substring(0,4));
