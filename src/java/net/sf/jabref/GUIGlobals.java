@@ -74,7 +74,9 @@ public class GUIGlobals {
     public static final int
 	SPLIT_PANE_DIVIDER_SIZE = 2,
 	SPLIT_PANE_DIVIDER_LOCATION = 145,
-	GROUPS_VISIBLE_ROWS = 8;
+	GROUPS_VISIBLE_ROWS = 8,
+        TABLE_ROW_PADDING = 4;  // Added to the font size when determining table
+                                // row height
     public static final double
 	VERTICAL_DIVIDER_LOCATION = 0.4;
     // File names.
@@ -357,7 +359,14 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
     public static String NUMBER_COL = "#";
     public static int DEFAULT_FIELD_LENGTH = 100;
     public static final Map FIELD_LENGTH, FIELD_WEIGHT;
+    public static final Map FIELD_EXTRAS;
     static {
+      FIELD_EXTRAS = new HashMap();
+      // fieldExtras contains mappings to tell the EntryEditor to add a specific
+      // function to this field, for instance a "browse" button for the "pdf" field.
+      FIELD_EXTRAS.put("pdf", "browse");
+      FIELD_EXTRAS.put("ps", "browse");
+
 	Map fieldLength = new HashMap();
 	fieldLength.put("author", new Integer(280));
 	fieldLength.put("editor", new Integer(280));

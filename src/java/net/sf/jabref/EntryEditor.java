@@ -26,19 +26,19 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
+import java.beans.*;
+import java.io.*;
+import java.util.*;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.util.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
-import java.io.StringWriter;
-import java.io.IOException;
+import javax.swing.text.*;
+
+import net.sf.jabref.export.*;
 import net.sf.jabref.undo.*;
-import net.sf.jabref.export.LatexFieldFormatter;
-import java.beans.*;
-import javax.swing.JComponent;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
 
@@ -139,27 +139,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 //    generateKeyAction = new GenerateKeyAction(baseFrame,entry);
     generateKeyAction = new GenerateKeyAction(frame);
 	storeFieldAction = new StoreFieldAction();
-	/*addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e) {
-		    closeAction.actionPerformed(null);
-		}
-		public void windowOpened(WindowEvent e) {
-		    switch (tabbed.getSelectedIndex()) {
-		    case 0:
-			reqPanel.activate();
-			break;
-		    case 1:
-			optPanel.activate();
-			break;
-		    case 2:
-			genPanel.activate();
-			break;
-		    case 3:
-			source.requestFocus();
-			break;
-		    }
-		}
-		});*/
 
 	BorderLayout bl = new BorderLayout();
 	//bl.setVgap(5);
@@ -265,20 +244,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	gmax = genFields.length;
 	iter = Math.max(rmax, Math.max(omax, gmax));
 
-	/*if (reqFields == null) {
-	    iter = Math.max(optFields.length, genFields.length);
-	    rmax = 0;
-	    omax = optFields.length;
-	} else if (optFields == null) {
-	    iter = Math.max(reqFields.length, genFields.length);
-	    rmax = reqFields.length;
-	    omax = 0;
-	} else {
-	    iter = Math.max(reqFields.length, optFields.length);
-	    rmax = reqFields.length;
-	    omax = optFields.length;
-	    }*/
 	FieldTextArea ta1 = null, ta2 = null, ta3 = null, firstR = null, firstO = null;
+        JComponent ex1 = null, ex2 = null, ex3 = null;
 	String stringContent;
 	Object content;
 
@@ -305,6 +272,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 
 		ta1 = new FieldTextArea(reqFields[i], stringContent);
+                ex1 = getExtra(reqFields[i], ta1);
 		/*if (i == 0)
 		    firstReq = ta1;
 		if ((i == rmax-1) && (firstReq != null))
@@ -323,6 +291,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 
 		ta2 = new FieldTextArea(optFields[i], stringContent);
+                ex2 = getExtra(optFields[i], ta2);
 		/*if (i == 0)
 		    firstOpt = ta1;
 		if (i == omax-1)
@@ -341,6 +310,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    stringContent = null;
 
 		ta3 = new FieldTextArea(genFields[i], stringContent);
+                ex3 = getExtra(genFields[i], ta3);
 		/*if (i == 0)
 		    firstGen = ta1;
 		if (i == gmax-1)
@@ -376,23 +346,47 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 	    //con.fill = GridBagConstraints.BOTH;
 	    if (i<rmax) {
-		con.weighty = GUIGlobals.getFieldWeight(reqFields[i]);
-		reqW += con.weighty;
-		//Util.pr(reqFields[i]+" "+con.weighty+"");
-		gbl.setConstraints(ta1.getPane(),con);
-		req.add(ta1.getPane());
-	    }
-	    if (i<omax) {
-		con.weighty = GUIGlobals.getFieldWeight(optFields[i]);
-		optW += con.weighty;
-		gbl.setConstraints(ta2.getPane(),con);
-		opt.add(ta2.getPane());
+              if (ex1 != null) con.gridwidth = 1;
+              else con.gridwidth = GridBagConstraints.REMAINDER;
+              con.weighty = GUIGlobals.getFieldWeight(reqFields[i]);
+              reqW += con.weighty;
+              //Util.pr(reqFields[i]+" "+con.weighty+"");
+              gbl.setConstraints(ta1.getPane(),con);
+              req.add(ta1.getPane());
+              if (ex1 != null) {
+                con.gridwidth = GridBagConstraints.REMAINDER;
+                con.weightx = 0;
+                gbl.setConstraints(ex1, con);
+                req.add(ex1);
+              }
+            }
+            if (i<omax) {
+              if (ex2 != null) con.gridwidth = 1;
+              else con.gridwidth = GridBagConstraints.REMAINDER;
+              con.weighty = GUIGlobals.getFieldWeight(optFields[i]);
+              optW += con.weighty;
+              gbl.setConstraints(ta2.getPane(),con);
+              opt.add(ta2.getPane());
+              if (ex2 != null) {
+                con.gridwidth = GridBagConstraints.REMAINDER;
+                con.weightx = 0;
+                gbl.setConstraints(ex2, con);
+                opt.add(ex2);
+              }
 	    }
 	    if (i<gmax) {
-		con.weighty = GUIGlobals.getFieldWeight(genFields[i]);
-		genW += con.weighty;
-		gbl.setConstraints(ta3.getPane(),con);
-		gen.add(ta3.getPane());
+              if (ex3 != null) con.gridwidth = 1;
+              else con.gridwidth = GridBagConstraints.REMAINDER;
+              con.weighty = GUIGlobals.getFieldWeight(genFields[i]);
+              genW += con.weighty;
+              gbl.setConstraints(ta3.getPane(),con);
+              gen.add(ta3.getPane());
+              if (ex3 != null) {
+                con.gridwidth = GridBagConstraints.REMAINDER;
+                con.weightx = 0;
+                gbl.setConstraints(ex3, con);
+                gen.add(ex3);
+              }
 	    }
 	}
 	// Add the edit field for Bibtex-key.
@@ -418,7 +412,40 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     }
 
-    private void setupSourcePanel() {
+  /**
+   * getExtra checks the field name against GUIGlobals.FIELD_EXTRAS. If the name
+   * has an entry, the proper component to be shown is created and returned.
+   * Otherwise, null is returned.
+   *
+   * @param string Field name
+   * @return Component to show, or null if none.
+   */
+  private JComponent getExtra(String string, FieldEditor editor) {
+    final FieldEditor ed = editor;
+    Object o = GUIGlobals.FIELD_EXTRAS.get(string);
+    if (o == null)
+      return null;
+    if (((String)o).equals("browse")) {
+      JButton but = new JButton(Globals.lang("Browse"));
+      but.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          JabRefFileChooser chooser = new JabRefFileChooser
+              (new File(ed.getText()));
+          //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+          int returnVal = chooser.showOpenDialog(null);
+          if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File newFile = chooser.getSelectedFile();
+            ed.setText(newFile.getPath());
+            storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+          }
+        }
+      });
+      return but;
+    } else
+      return null;
+  }
+
+  private void setupSourcePanel() {
 	source = new JTextArea();
 	con = new GridBagConstraints();
 	con.insets = new Insets(10,10,10,10);
