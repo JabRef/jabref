@@ -1626,9 +1626,9 @@ class FetchCiteSeerAction
     {
       public IntegrityCheckAction()
       {
-        super( "Integrity Check", //Globals.lang( "" ),
+        super(Globals.lang("Integrity check"), //Globals.lang( "" ),
                new ImageIcon( GUIGlobals.integrityCheck ) ) ;
-               putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
+               //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
 

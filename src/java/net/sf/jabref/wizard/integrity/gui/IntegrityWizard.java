@@ -92,9 +92,9 @@ public class IntegrityWizard
     con.fill = GridBagConstraints.HORIZONTAL ;
 
     // Buttons
-    startButton = new JButton( "scan") ;
+    startButton = new JButton(Globals.lang("Scan")) ;
     startButton.addActionListener( this) ;
-    closeButton = new JButton( "close") ;
+    closeButton = new JButton(Globals.lang("Close"));
     closeButton.addActionListener( this) ;
 
     // insert Buttons

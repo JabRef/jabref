@@ -63,7 +63,7 @@ public class Globals {
       NONE = "_non__",
       FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
   public static float duplicateThreshold = 0.75f;
-
+  private static Handler consoleHandler = new java.util.logging.ConsoleHandler();
   public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
       "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257", "ISO8859_2",
       "ISO8859_4", "ISO8859_5", "ISO8859_7"};
@@ -87,9 +87,12 @@ public class Globals {
 
   // should be only called ones
   public static void turnOnConsoleLogging() {
-    Logger.global.addHandler(new java.util.logging.ConsoleHandler());
+    Logger.global.addHandler(consoleHandler);
+
   }
 
+  
+  
   public static void turnOnFileLogging() {
     Logger.global.setLevel(java.util.logging.Level.ALL);
     java.util.logging.Handler handler;
@@ -97,6 +100,7 @@ public class Globals {
       handler = new FileHandler(logfile); // this will overwrite
     }
     catch (IOException e) { //can't open log file so use console
+        e.printStackTrace();
       handler = new ConsoleHandler();
     }
     Logger.global.addHandler(handler);
@@ -140,7 +144,7 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-      System.err.println("Warning: could not get translation for \""
+      logger("Warning: could not get translation for \""
                          + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
@@ -722,11 +726,11 @@ public class Globals {
     RTFCHARS.put("`i", "\\'ec");
     RTFCHARS.put("`o", "\\'f2");
     RTFCHARS.put("`u", "\\'f9");
-    RTFCHARS.put("´a", "\\'e1");
-    RTFCHARS.put("´e", "\\'e9");
-    RTFCHARS.put("´i", "\\'ed");
-    RTFCHARS.put("´o", "\\'f3");
-    RTFCHARS.put("´u", "\\'fa");
+    RTFCHARS.put("?a", "\\'e1");
+    RTFCHARS.put("?e", "\\'e9");
+    RTFCHARS.put("?i", "\\'ed");
+    RTFCHARS.put("?o", "\\'f3");
+    RTFCHARS.put("?u", "\\'fa");
     RTFCHARS.put("^a", "\\'e2");
     RTFCHARS.put("^e", "\\'ea");
     RTFCHARS.put("^i", "\\'ee");
@@ -743,11 +747,11 @@ public class Globals {
     RTFCHARS.put("`I", "\\'cc");
     RTFCHARS.put("`O", "\\'d2");
     RTFCHARS.put("`U", "\\'d9");
-    RTFCHARS.put("´A", "\\'c1");
-    RTFCHARS.put("´E", "\\'c9");
-    RTFCHARS.put("´I", "\\'cd");
-    RTFCHARS.put("´O", "\\'d3");
-    RTFCHARS.put("´U", "\\'da");
+    RTFCHARS.put("?A", "\\'c1");
+    RTFCHARS.put("?E", "\\'c9");
+    RTFCHARS.put("?I", "\\'cd");
+    RTFCHARS.put("?O", "\\'d3");
+    RTFCHARS.put("?U", "\\'da");
     RTFCHARS.put("^A", "\\'c2");
     RTFCHARS.put("^E", "\\'ca");
     RTFCHARS.put("^I", "\\'ce");

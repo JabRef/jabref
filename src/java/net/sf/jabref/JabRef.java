@@ -77,6 +77,7 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 	Globals.prefs = prefs;
         BibtexEntryType.loadCustomEntryTypes(prefs);
+        Globals.turnOnFileLogging(); 
         Globals.setLanguage(prefs.get("language"), "");
 
         // ----------------------------------------------------------------
