@@ -250,8 +250,18 @@ public class EntryTable extends JTable {
       public void setRowSelectionInterval(int row1, int row2) {
         boolean oldState = selectionListenerOn;
         selectionListenerOn = false;
-        super.setRowSelectionInterval(row1, row2);
-        selectionListenerOn = oldState;
+        // Introducing a try-catch here to maybe track down the preview update bug
+        // that occurs sometimes (20050405 M. Alver):
+        try {
+            super.setRowSelectionInterval(row1, row2);
+            selectionListenerOn = oldState;
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            System.out.println("Error occured. Trying to recover...");
+            // Maybe try to remap the entry table:
+            tableModel.remap();
+            clearSelection();
+        }
       }
 
       public void addRowSelectionIntervalQuietly(int row1, int row2) {

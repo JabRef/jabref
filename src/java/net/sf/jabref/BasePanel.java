@@ -1382,30 +1382,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 		  });
 
               actions.put("test", new AbstractWorker() {
-		      String filename = null, formatName = null;
-		      java.util.List entries = null;
-		      public void init() {
-                        output("Storing.");
-		      }
-		      public void run() {
-                  String[] fields = new String[] {"author", "title", "year"};
-                  ImportInspectionDialog diag = new ImportInspectionDialog(frame, ths, fields,
-                          "Add entries", false);
-                  Util.placeDialog(diag, frame);
-                  diag.setVisible(true);
-                  for (int i=0; i<entryTable.getRowCount(); i++) {
-                      try {
-                          Thread.sleep(200);
-                      } catch (InterruptedException e) {
-
-                      }
-                      ArrayList entries = new ArrayList();
-                      entries.add(database.getEntryById(tableModel.getNameFromNumber(i)).clone());
-                      diag.addEntries(entries);
-                  }
-                  diag.entryListComplete();
-              }
-                      
+        	      public void init() {
+                    output("Downloading.");
+		          }
+		          public void run() {
+                    //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
+                    }
 		  });
 
     }

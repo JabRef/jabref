@@ -51,6 +51,7 @@ public class ImportInspectionDialog extends JDialog {
     private PreviewPanel preview = new PreviewPanel(Globals.prefs.get("preview1"));
     private ListSelectionListener previewListener = null;
     private boolean generatedKeys = false;
+    private Rectangle toRect = new Rectangle(0, 0, 1, 1);
 
     /**
      * Creates a dialog that displays the given set of fields in the table.
@@ -347,6 +348,12 @@ public class ImportInspectionDialog extends JDialog {
                 return;
             preview.setEntry((BibtexEntry)entries.get(row));
             contentPane.setDividerLocation(0.5f);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    preview.scrollRectToVisible(toRect);
+                }
+            });
+            
         }
     }
 

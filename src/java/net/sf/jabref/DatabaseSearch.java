@@ -67,11 +67,11 @@ public class DatabaseSearch extends Thread {
         int numRows = thisDatabase.getEntryCount(),
 	    hits = 0;
 
-	for(int row = 0 ; row < numRows ; row++){
+        for (Iterator i=thisDatabase.getKeySet().iterator(); i.hasNext();) {
 	    // 1. search all required fields using searchString
 
-	    bes = thisDatabase.getEntryById
-		(thisTableModel.getNameFromNumber(row));
+	    bes = thisDatabase.getEntryById((String)i.next());
+		//(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit
 	    searchScore = thisRuleSet.applyRule(thisSearchOptions,bes) ;
