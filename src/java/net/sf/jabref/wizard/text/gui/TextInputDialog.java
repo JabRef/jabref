@@ -32,6 +32,7 @@
 // todo     : - change colors and fonts
 //            - delete selected text
 //            - make textarea editable
+//            - create several bibtex entries in dialog
 //
 // modified :
 
@@ -79,7 +80,7 @@ public class TextInputDialog extends JDialog
   private boolean okPressed = false ;
 
   public TextInputDialog( JabRefFrame frame, String title, boolean modal,
-                          BibtexEntry bibEntry)
+                          BibtexEntry bibEntry )
   {
     super( frame, title, modal ) ;
 
@@ -98,7 +99,7 @@ public class TextInputDialog extends JDialog
       ex.printStackTrace() ;
     }
 
-    updateSourceView();
+    updateSourceView() ;
   }
 
   private void jbInit( JabRefFrame parent ) throws Exception
@@ -106,12 +107,12 @@ public class TextInputDialog extends JDialog
     this.setModal( true ) ;
     this.setResizable( false ) ;
 
-    String typeStr = Globals.lang("for") ;
-    if (entry != null)
-      if (entry.getType() != null)
+    String typeStr = Globals.lang( "for" ) ;
+    if ( entry != null )
+      if ( entry.getType() != null )
         typeStr = typeStr + " " + entry.getType().getName() ;
 
-    this.setTitle( Globals.lang("plain_text_import" ) + " " +typeStr) ;
+    this.setTitle( Globals.lang( "plain_text_import" ) + " " + typeStr ) ;
     getContentPane().add( panel1 ) ;
 
     initRawPanel() ;
@@ -119,23 +120,23 @@ public class TextInputDialog extends JDialog
     initSourcePanel() ;
 
     JTabbedPane tabbed = new JTabbedPane() ;
-    tabbed.add(rawPanel, Globals.lang("raw_source")) ;
-    tabbed.add(sourcePanel, Globals.lang("BibTeX_source")) ;
+    tabbed.add( rawPanel, Globals.lang( "raw_source" ) ) ;
+    tabbed.add( sourcePanel, Globals.lang( "BibTeX_source" ) ) ;
 
     // Panel Layout
-     GridBagLayout gbl = new GridBagLayout() ;
-     GridBagConstraints con = new GridBagConstraints() ;
-     con.weightx = 0 ;
-     con.insets = new Insets( 5, 10, 0, 10 ) ;
-     con.fill = GridBagConstraints.HORIZONTAL ;
+    GridBagLayout gbl = new GridBagLayout() ;
+    GridBagConstraints con = new GridBagConstraints() ;
+    con.weightx = 0 ;
+    con.insets = new Insets( 5, 10, 0, 10 ) ;
+    con.fill = GridBagConstraints.HORIZONTAL ;
 
-    panel1.setLayout(gbl) ;
+    panel1.setLayout( gbl ) ;
 
     con.gridwidth = GridBagConstraints.REMAINDER ;
     gbl.setConstraints( tabbed, con ) ;
-    panel1.add( tabbed) ;
+    panel1.add( tabbed ) ;
     gbl.setConstraints( buttonPanel, con ) ;
-    panel1.add( buttonPanel) ;
+    panel1.add( buttonPanel ) ;
 
     // Key bindings:
     ActionMap am = buttonPanel.getActionMap() ;
@@ -154,46 +155,50 @@ public class TextInputDialog extends JDialog
   // Panel with text import functionality
   private void initRawPanel()
   {
-    rawPanel.setLayout( new BorderLayout());
+    rawPanel.setLayout( new BorderLayout() ) ;
     // Textarea
     textPane = new JTextPane() ;
-    textPane.setEditable(false);
-    doc = textPane.getStyledDocument();
-    addStylesToDocument(doc);
+    textPane.setEditable( false ) ;
+    doc = textPane.getStyledDocument() ;
+    addStylesToDocument( doc ) ;
 
-    try { doc.insertString(0, "", doc.getStyle("regular")); }
-    catch (Exception e) {}
+    try
+    {
+      doc.insertString( 0, "", doc.getStyle( "regular" ) ) ;
+    }
+    catch ( Exception e )
+    {}
 
     // Scrollbar(s)
-    JScrollPane paneScrollPane = new JScrollPane(textPane);
+    JScrollPane paneScrollPane = new JScrollPane( textPane ) ;
     paneScrollPane.setVerticalScrollBarPolicy(
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    paneScrollPane.setPreferredSize(new Dimension(350, 255));
-    paneScrollPane.setMinimumSize(new Dimension(10, 10));
+        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+    paneScrollPane.setPreferredSize( new Dimension( 350, 255 ) ) ;
+    paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
     // copy/paste Menu
     PasteAction pasteAction = new PasteAction() ;
-    JMenuItem pasteMI = new JMenuItem(pasteAction) ;
-    inputMenu.add( new MenuHeaderAction()) ;
-    inputMenu.addSeparator();
-    inputMenu.add(pasteMI) ;
+    JMenuItem pasteMI = new JMenuItem( pasteAction ) ;
+    inputMenu.add( new MenuHeaderAction() ) ;
+    inputMenu.addSeparator() ;
+    inputMenu.add( pasteMI ) ;
 
     //Add listener to components that can bring up popup menus.
-    MouseListener popupListener = new PopupListener(inputMenu);
-    textPane.addMouseListener(popupListener);
+    MouseListener popupListener = new PopupListener( inputMenu ) ;
+    textPane.addMouseListener( popupListener ) ;
 
     // Toolbar
     JToolBar toolBar = new JToolBar() ;
     toolBar.add( new ClearAction() ) ;
-    toolBar.setBorderPainted(false);
-    toolBar.addSeparator();
-    toolBar.add(pasteAction) ;
+    toolBar.setBorderPainted( false ) ;
+    toolBar.addSeparator() ;
+    toolBar.add( pasteAction ) ;
     toolBar.add( new LoadAction() ) ;
 
-    JPanel leftPanel = new JPanel(new BorderLayout() ) ;
+    JPanel leftPanel = new JPanel( new BorderLayout() ) ;
 
-    leftPanel.add(toolBar, BorderLayout.NORTH) ;
-    leftPanel.add(paneScrollPane, BorderLayout.CENTER) ;
+    leftPanel.add( toolBar, BorderLayout.NORTH ) ;
+    leftPanel.add( paneScrollPane, BorderLayout.CENTER ) ;
 
     // ----------------------------------------------------------------
     JPanel inputPanel = new JPanel() ;
@@ -205,79 +210,80 @@ public class TextInputDialog extends JDialog
     con.insets = new Insets( 5, 5, 0, 5 ) ;
     con.fill = GridBagConstraints.HORIZONTAL ;
 
-    inputPanel.setLayout(gbl) ;
+    inputPanel.setLayout( gbl ) ;
 
     // Border
     TitledBorder titledBorder1 = new TitledBorder(
-                                  BorderFactory.createLineBorder(
-                                         new Color(153, 153, 153 ), 2 ),
-                                  Globals.lang( "input" ) ) ;
+        BorderFactory.createLineBorder(
+        new Color( 153, 153, 153 ), 2 ),
+        Globals.lang( "input" ) ) ;
     inputPanel.setBorder( titledBorder1 ) ;
-    inputPanel.setPreferredSize(new Dimension(200, 255));
-    inputPanel.setMinimumSize(new Dimension(10, 10));
+    inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
+    inputPanel.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
-    fieldList = new JList(getAllFields() ) ;
-    fieldList.setCellRenderer( new SimpleCellRenderer( fieldList.getFont()) );
-    ListSelectionModel listSelectionModel = fieldList.getSelectionModel();
-    listSelectionModel.setSelectionMode( ListSelectionModel.SINGLE_SELECTION);
-    listSelectionModel.addListSelectionListener( new FieldListSelectionHandler());
+    fieldList = new JList( getAllFields() ) ;
+    fieldList.setCellRenderer( new SimpleCellRenderer( fieldList.getFont() ) ) ;
+    ListSelectionModel listSelectionModel = fieldList.getSelectionModel() ;
+    listSelectionModel.setSelectionMode( ListSelectionModel.SINGLE_SELECTION ) ;
+    listSelectionModel.addListSelectionListener( new FieldListSelectionHandler() ) ;
+    fieldList.addMouseListener( new FieldListMouseListener() );
 
-    JScrollPane fieldScroller = new JScrollPane(fieldList);
+    JScrollPane fieldScroller = new JScrollPane( fieldList ) ;
     fieldScroller.setVerticalScrollBarPolicy(
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    fieldScroller.setPreferredSize(new Dimension(180, 190));
-    fieldScroller.setMinimumSize(new Dimension(180, 190));
+        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+    fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
+    fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
     // insert button
-    insertButton.setText(Globals.lang("insert"));
-    insertButton.addActionListener( new TextInputDialog_insert_actionAdapter( this ) );
+    insertButton.setText( Globals.lang( "insert" ) ) ;
+    insertButton.addActionListener( new TextInputDialog_insert_actionAdapter( this ) ) ;
 
     // Radio buttons
-    appRadio = new JRadioButton(Globals.lang("append"));
-    appRadio.setMnemonic(KeyEvent.VK_A);
-    appRadio.setSelected(true);
+    appRadio = new JRadioButton( Globals.lang( "append" ) ) ;
+    appRadio.setMnemonic( KeyEvent.VK_A ) ;
+    appRadio.setSelected( true ) ;
 
-    overRadio = new JRadioButton(Globals.lang("override"));
-    overRadio.setMnemonic(KeyEvent.VK_O);
-    overRadio.setSelected(false);
+    overRadio = new JRadioButton( Globals.lang( "override" ) ) ;
+    overRadio.setMnemonic( KeyEvent.VK_O ) ;
+    overRadio.setSelected( false ) ;
 
-     //Group the radio buttons.
-     ButtonGroup group = new ButtonGroup();
-     group.add(appRadio);
-     group.add(overRadio);
+    //Group the radio buttons.
+    ButtonGroup group = new ButtonGroup() ;
+    group.add( appRadio ) ;
+    group.add( overRadio ) ;
 
-     JPanel radioPanel = new JPanel(new GridLayout(0, 1));
-     radioPanel.add(appRadio);
-     radioPanel.add(overRadio);
+    JPanel radioPanel = new JPanel( new GridLayout( 0, 1 ) ) ;
+    radioPanel.add( appRadio ) ;
+    radioPanel.add( overRadio ) ;
 
     // insert sub components
-    JLabel label1 = new JLabel(Globals.lang("available fields")) ;
+    JLabel label1 = new JLabel( Globals.lang( "available fields" ) ) ;
     con.gridwidth = GridBagConstraints.REMAINDER ;
-    gbl.setConstraints(label1, con);
-    inputPanel.add(label1) ;
+    gbl.setConstraints( label1, con ) ;
+    inputPanel.add( label1 ) ;
 
     con.gridwidth = GridBagConstraints.REMAINDER ;
     con.gridheight = 8 ;
-    gbl.setConstraints(fieldScroller, con);
-    inputPanel.add(fieldScroller) ;
+    gbl.setConstraints( fieldScroller, con ) ;
+    inputPanel.add( fieldScroller ) ;
 
     con.gridwidth = 2 ;
     gbl.setConstraints( radioPanel, con ) ;
-    inputPanel.add(radioPanel);
+    inputPanel.add( radioPanel ) ;
 
     con.gridwidth = GridBagConstraints.REMAINDER ;
     gbl.setConstraints( insertButton, con ) ;
-    inputPanel.add( insertButton) ;
+    inputPanel.add( insertButton ) ;
 
-    rawPanel.add(leftPanel, BorderLayout.CENTER) ;
-    rawPanel.add(inputPanel, BorderLayout.EAST) ;
+    rawPanel.add( leftPanel, BorderLayout.CENTER ) ;
+    rawPanel.add( inputPanel, BorderLayout.EAST ) ;
   }
 
 // ---------------------------------------------------------------------------
 
   private void initButtonPanel()
   {
-     // Panel Layout
+    // Panel Layout
     GridBagLayout gbl = new GridBagLayout() ;
     GridBagConstraints con = new GridBagConstraints() ;
     con.weightx = 0 ;
@@ -286,20 +292,20 @@ public class TextInputDialog extends JDialog
 
 //    buttonPanel.setLayout(gbl) ;
 
-     // Buttons
+    // Buttons
     okButton.setText( Globals.lang( "Accept" ) ) ;
 //    okButton.setEnabled(false);
     okButton.addActionListener( new TextInputDialog_ok_actionAdapter( this ) ) ;
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
     cancelButton.addActionListener( new TextInputDialog_Cancel_actionAdapter( this ) ) ;
 
-     // insert Buttons
+    // insert Buttons
     con.gridwidth = GridBagConstraints.REMAINDER ;
     gbl.setConstraints( okButton, con ) ;
-    buttonPanel.add( okButton) ;
+    buttonPanel.add( okButton ) ;
 
     gbl.setConstraints( cancelButton, con ) ;
-    buttonPanel.add( cancelButton) ;
+    buttonPanel.add( cancelButton ) ;
   }
 
 // ---------------------------------------------------------------------------
@@ -309,76 +315,94 @@ public class TextInputDialog extends JDialog
   {
 //    preview =  new PreviewPanel(entry) ;
     preview = new JTextArea() ;
-    preview.setEditable(false);
+    preview.setEditable( false ) ;
 
-    JScrollPane paneScrollPane = new JScrollPane(preview);
+    JScrollPane paneScrollPane = new JScrollPane( preview ) ;
     paneScrollPane.setVerticalScrollBarPolicy(
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    paneScrollPane.setPreferredSize(new Dimension(450, 255));
-    paneScrollPane.setMinimumSize(new Dimension(10, 10));
+        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
+    paneScrollPane.setPreferredSize( new Dimension( 450, 255 ) ) ;
+    paneScrollPane.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
-    sourcePanel.add( paneScrollPane) ;
+    sourcePanel.add( paneScrollPane ) ;
   }
 
-
-
 // ---------------------------------------------------------------------------
-  protected void addStylesToDocument(StyledDocument doc)
+  protected void addStylesToDocument( StyledDocument doc )
   {
-      //Initialize some styles.
-      Style def = StyleContext.getDefaultStyleContext().
-                      getStyle(StyleContext.DEFAULT_STYLE);
+    //Initialize some styles.
+    Style def = StyleContext.getDefaultStyleContext().
+        getStyle( StyleContext.DEFAULT_STYLE ) ;
 
-      Style regular = doc.addStyle("regular", def);
-      StyleConstants.setFontFamily(def, "SansSerif");
-      StyleConstants.setFontSize(def, 12);
+    Style regular = doc.addStyle( "regular", def ) ;
+    StyleConstants.setFontFamily( def, "SansSerif" ) ;
+    StyleConstants.setFontSize( def, 12 ) ;
 
-      Style s = doc.addStyle("oldused", regular);
-      StyleConstants.setItalic(s, true);
-      StyleConstants.setForeground(s, Color.blue);
+    Style s = doc.addStyle( "oldused", regular ) ;
+    StyleConstants.setItalic( s, true ) ;
+    StyleConstants.setForeground( s, Color.blue ) ;
 
-      s = doc.addStyle("used", regular);
-      StyleConstants.setBold(s, true);
-      StyleConstants.setForeground(s, Color.blue);
+    s = doc.addStyle( "used", regular ) ;
+    StyleConstants.setBold( s, true ) ;
+    StyleConstants.setForeground( s, Color.blue ) ;
 
-      s = doc.addStyle("marked", regular);
-      StyleConstants.setBold(s, true);
-      StyleConstants.setForeground(s, Color.red);
+    s = doc.addStyle( "marked", regular ) ;
+    StyleConstants.setBold( s, true ) ;
+    StyleConstants.setForeground( s, Color.red ) ;
 
+    s = doc.addStyle( "small", regular ) ;
+    StyleConstants.setFontSize( s, 10 ) ;
 
-      s = doc.addStyle("small", regular);
-      StyleConstants.setFontSize(s, 10);
-
-      s = doc.addStyle("large", regular);
-      StyleConstants.setFontSize(s, 16);
-/*
-      s = doc.addStyle("icon", regular);
-      StyleConstants.setAlignment(s, StyleConstants.ALIGN_CENTER);
-      ImageIcon pigIcon = createImageIcon("images/Pig.gif",
-                                          "a cute pig");
-      if (pigIcon != null) {
-          StyleConstants.setIcon(s, pigIcon);
-      }
-
-      s = doc.addStyle("button", regular);
-      StyleConstants.setAlignment(s, StyleConstants.ALIGN_CENTER);
-      ImageIcon soundIcon = createImageIcon("images/sound.gif",
-                                            "sound icon");
-      JButton button = new JButton();
-      if (soundIcon != null) {
-          button.setIcon(soundIcon);
-      } else {
-          button.setText("BEEP");
-      }
-      button.setCursor(Cursor.getDefaultCursor());
-      button.setMargin(new Insets(0,0,0,0));
-      button.setActionCommand(buttonString);
-      button.addActionListener(this);
-      StyleConstants.setComponent(s, button);
-*/
+    s = doc.addStyle( "large", regular ) ;
+    StyleConstants.setFontSize( s, 16 ) ;
   }
 
 // ---------------------------------------------------------------------------
+  private void insertTextForTag()
+  {
+    String type = (String) fieldList.getSelectedValue() ;
+    if (type != null)
+    {
+      String txt = textPane.getSelectedText() ;
+
+      if (txt != null)
+      {
+        int selStart = textPane.getSelectionStart() ;
+        int selEnd = textPane.getSelectionEnd() ;
+
+         // unselect text
+        textPane.setSelectionEnd(selStart);
+
+        // mark the selected text as "used"
+        doc.setCharacterAttributes( selStart, selEnd - selStart,
+                                    doc.getStyle( "marked" ), true ) ;
+
+        // override an existing entry
+        if ( overRadio.isSelected() )
+        {
+          entry.setField( type, txt ) ;
+          // erase old text selection
+          marked.setStyleForTag( type, "regular", doc ) ; // delete all previous styles
+          marked.insertPosition( type, selStart, selEnd ) ; // insert new selection style
+        }
+        else // append text
+        {
+          // memorize the selection for text highlighting
+          marked.appendPosition( type, selStart, selEnd ) ;
+
+          // get old text from bibtex tag
+          String old = ( String ) entry.getField( type ) ;
+
+          // merge old and selected text
+          if ( old != null )
+            entry.setField( type, old + txt ) ;
+          else // "null"+"txt" Strings forbidden
+            entry.setField( type, txt ) ;
+        }
+        // make the new data in bibtex source code visible
+        updateSourceView() ;
+      }
+    }
+  }
 
 // ---------------------------------------------------------------------------
 
@@ -403,40 +427,7 @@ public class TextInputDialog extends JDialog
 
   protected void insertField_actionPerformed( ActionEvent e )
   {
-    String type = (String) fieldList.getSelectedValue() ;
-    if (type != null)
-    {
-      String txt = textPane.getSelectedText() ;
-      int selStart = textPane.getSelectionStart() ;
-      int selEnd = textPane.getSelectionEnd() ;
-
-      textPane.setSelectionStart(-1);
-      textPane.setSelectionEnd(-1);
-
-      doc.setCharacterAttributes(selStart, selEnd-selStart,
-                                 doc.getStyle("marked"), true);
-
-      // override an existing entry
-      if (overRadio.isSelected())
-      {
-        entry.setField( type, txt ) ;
-        marked.setStyleForTag(type, "regular", doc); // delete all previous styles
-        marked.insertPosition(type, selStart, selEnd); // insert new selection style
-      }
-      else
-      {
-          // memorize the selection
-        marked.appendPosition(type, selStart, selEnd) ;
-
-        String old = (String) entry.getField(type) ;
-
-        if (old != null)
-          entry.setField(type, old +txt);
-        else // "null"+"txt" Strings forbidden
-          entry.setField(type, txt);
-      }
-      updateSourceView() ;
-    }
+    insertTextForTag() ;
   }
 // ---------------------------------------------------------------------------
   // update the bibtex source view and available List
@@ -655,6 +646,19 @@ public class TextInputDialog extends JDialog
           }
           return this;
       }
+  }
+
+//---------------------------------------------------------------
+
+  class FieldListMouseListener extends MouseAdapter
+  {
+    public void mouseClicked(MouseEvent e)
+    {
+      if ( e.getClickCount() == 2 )
+      {
+        insertTextForTag() ;
+      }
+    }
   }
 
 }
