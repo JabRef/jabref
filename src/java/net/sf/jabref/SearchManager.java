@@ -37,8 +37,7 @@ class SearchManager extends JPanel
     GridBagLayout gbl = new GridBagLayout() ; 
     GridBagConstraints con = new GridBagConstraints() ; 
 
-    IncrementalSearcher incSearcher;
-
+    IncrementalSearcher incSearcher;   
 
     private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 20);
@@ -53,6 +52,7 @@ class SearchManager extends JPanel
     private JCheckBox increment, select, reorder;
     private ButtonGroup types = new ButtonGroup();
     private SearchManager ths = this;
+    private boolean incSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
 				   // an incremental search. -1 means
@@ -109,6 +109,7 @@ class SearchManager extends JPanel
 	searchField.addActionListener(this);
 	searchField.addFocusListener(new FocusAdapter() {
 		public void focusLost(FocusEvent e) {
+		    incSearch = false;
 		    incSearchPos = -1; // Reset incremental
 				       // search. This makes the
 				       // incremental search reset
@@ -175,6 +176,7 @@ class SearchManager extends JPanel
 
 	searchField.getInputMap().put(prefs.getKey("Repeat incremental search"),
 				      "repeat");
+
 	searchField.getActionMap().put("repeat", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    if (increment.isSelected())
@@ -213,7 +215,7 @@ class SearchManager extends JPanel
      * focused. Otherwise, cycles to the next search type.     
      */
     public void startSearch() {
-	if (increment.isSelected() && (incSearchPos >= 0)) {
+	if (increment.isSelected() && incSearch) {
 	    repeatIncremental();
 	    return;
 	}
@@ -227,11 +229,14 @@ class SearchManager extends JPanel
 		reorder.setSelected(true);
 	    else
 		increment.setSelected(true);
+
+	    searchField.requestFocus();
 	}
     }
 
     public void actionPerformed(ActionEvent e) {
 	if (e.getSource() == escape) {
+	    incSearch = false;
 	    if (frame.basePanel() != null)
 		frame.basePanel().stopShowingSearchResults();
 	}
@@ -308,6 +313,7 @@ class SearchManager extends JPanel
     }
 
     private void goIncremental() {
+	incSearch = true;
 	SwingUtilities.invokeLater(new Thread() {
 		public void run() { 
 		    String text = searchField.getText();
