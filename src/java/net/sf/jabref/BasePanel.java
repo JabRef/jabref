@@ -2326,4 +2326,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
   public void addEntryTableSelectionListener(ListSelectionListener listener) {
       entryTable.getSelectionModel().addListSelectionListener(listener);
   }
+  
+  public BibtexEntry[] getSelectedEntries() {
+    return entryTable.getSelectedEntries();
+      }
 }
