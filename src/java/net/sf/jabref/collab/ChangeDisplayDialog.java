@@ -70,9 +70,9 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
         // Perform all accepted changes:
         // Store all edits in an Undoable object:
         NamedCompound ce = new NamedCompound(Globals.lang("Merged external changes"));
-        Enumeration enum = root.children();
-        for (; enum.hasMoreElements();) {
-          Change c = (Change)enum.nextElement();
+        Enumeration enumer = root.children();
+        for (; enumer.hasMoreElements();) {
+          Change c = (Change)enumer.nextElement();
           if (c.isAcceptable() && c.isAccepted())
             c.makeChange(panel, ce);
         }
