@@ -28,99 +28,127 @@ import net.sf.jabref.HelpAction;
 
 public class MedlineFetcher extends SidePaneComponent implements Runnable {
 
-  final int MAX_TO_FETCH = 10;
-  SidePaneHeader header = new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
-  BasePanel panel;
-  JTextField tf = new JTextField();
-  JPanel pan = new JPanel();
-  GridBagLayout gbl = new GridBagLayout();
-  GridBagConstraints con = new GridBagConstraints();
-  MedlineFetcher ths = this;
-  AuthorDialog authorDialog;
-  JFrame jFrame; // invisible dialog holder
-  JButton go = new JButton(Globals.lang("Fetch")),
-      helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
-  HelpAction help;
+    /**@class SearchResult
+     *        nested class.
+     */
+    public class SearchResult {
+	public int count;
+	public int retmax;
+	public int retstart;
+	public String ids = "";
 
-  public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
-    super(p0);
-    panel = panel_;
-    help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
-    helpBut.addActionListener(help);
-    helpBut.setMargin(new Insets(0,0,0,0));
-    tf.setMinimumSize(new Dimension(1,1));
-    //add(hd, BorderLayout.NORTH);
-    //ok.setToolTipText(Globals.lang("Fetch Medline"));
-    setLayout(gbl);
-    con.fill = GridBagConstraints.BOTH;
-    con.insets = new Insets(0, 0, 2,  0);
-    con.gridwidth = GridBagConstraints.REMAINDER;
-    con.weightx = 1;
-    con.weighty = 0;
-    gbl.setConstraints(header, con);
-    add(header);
-    con.insets = new Insets(0, 0, 0,  0);
-//    pan.setLayout(gbl);
-    con.fill = GridBagConstraints.BOTH;
-    gbl.setConstraints(tf, con);
-    add(tf);
-    con.gridwidth = 1;
-    gbl.setConstraints(go, con);
-    add(go);
-    con.weightx = 0;
-    con.gridwidth = GridBagConstraints.REMAINDER;
-    gbl.setConstraints(helpBut, con);
-    add(helpBut);
-    ActionListener listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        (new Thread(ths)).start(); // Run fetch in thread.
-      }
-    };
+	public SearchResult()
+	    {
+		count = 0;
+		retmax = 0;
+		retstart = 0;
+	    }
 
-    go.addActionListener(listener);
-    tf.addActionListener(listener);
-  }
-
-  public void fetchById() {
-    String idList = tf.getText().replace(';', ',');
-    //if(idList==null || idList.trim().equals(""))//if user pressed cancel
-    //  return;
-    Pattern p = Pattern.compile("\\d+[,\\d+]*");
-    Matcher m = p.matcher( idList );
-    if ( m.matches() ) {
-      panel.frame().output(Globals.lang("Fetching Medline by ID..."));
-      ArrayList bibs = fetchMedline(idList);
-      if ((bibs != null) && (bibs.size() > 0)) {
-        if (panel.prefs().getBoolean("useOwner")) {
-          Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
-        }
+	public void addID(String id)
+	    {
+		if(ids!="")
+		    ids += ","+id;
+		else
+		    ids = id;
+	    }
+    }
+    final int PACING = 20;
+    final int MAX_TO_FETCH = 10;
+    SidePaneHeader header = 
+	new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
+    BasePanel panel;
+    String idList;
+    JTextField tf = new JTextField();
+    JPanel pan = new JPanel();
+    GridBagLayout gbl = new GridBagLayout();
+    GridBagConstraints con = new GridBagConstraints();
+    MedlineFetcher ths = this;
+    AuthorDialog authorDialog;
+    JFrame jFrame; // invisible dialog holder
+    JButton go = new JButton(Globals.lang("Fetch")),
+	helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    HelpAction help;
+    
+    public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
+	super(p0);
+	panel = panel_;
+	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
+	helpBut.addActionListener(help);
+	helpBut.setMargin(new Insets(0,0,0,0));
+	tf.setMinimumSize(new Dimension(1,1));
+	//add(hd, BorderLayout.NORTH);
+	//ok.setToolTipText(Globals.lang("Fetch Medline"));
+	setLayout(gbl);
+	con.fill = GridBagConstraints.BOTH;
+	con.insets = new Insets(0, 0, 2,  0);
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	con.weightx = 1;
+	con.weighty = 0;
+	gbl.setConstraints(header, con);
+	add(header);
+	con.insets = new Insets(0, 0, 0,  0);
+	//    pan.setLayout(gbl);
+	con.fill = GridBagConstraints.BOTH;
+	gbl.setConstraints(tf, con);
+	add(tf);
+	con.gridwidth = 1;
+	gbl.setConstraints(go, con);
+	add(go);
+	con.weightx = 0;
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	gbl.setConstraints(helpBut, con);
+	add(helpBut);
+	ActionListener listener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    (new Thread(ths)).start(); // Run fetch in thread.
+		}
+	    };
+	
+	go.addActionListener(listener);
+	tf.addActionListener(listener);
+    }
+    
+    public void fetchById() {
+	//if(idList==null || idList.trim().equals(""))//if user pressed cancel
+	//  return;
+	Pattern p = Pattern.compile("\\d+[,\\d+]*");
+	Matcher m = p.matcher( idList );
+	if ( m.matches() ) {
+	    panel.frame().output(Globals.lang("Fetching Medline by ID..."));
+	    System.out.println("idList");
+	    System.out.println(idList);
+	    ArrayList bibs = fetchMedline(idList);
+	    if ((bibs != null) && (bibs.size() > 0)) {
+		if (panel.prefs().getBoolean("useOwner")) {
+		    Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
+		}
         tf.setText("");
         NamedCompound ce = new NamedCompound("fetch Medline");
         Iterator i = bibs.iterator();
         while (i.hasNext()) {
-          try {
-            BibtexEntry be = (BibtexEntry) i.next();
-            String id = Util.createId(be.getType(), panel.database());
-            be.setId(id);
-            panel.database().insertEntry(be);
-            ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-          }
-          catch (KeyCollisionException ex) {
-          }
+	    try {
+		BibtexEntry be = (BibtexEntry) i.next();
+		String id = Util.createId(be.getType(), panel.database());
+		be.setId(id);
+		panel.database().insertEntry(be);
+		ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
+	    }
+	    catch (KeyCollisionException ex) {
+	    }
         }
         ce.end();
         panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
         panel.undoManager.addEdit(ce);
         panel.markBaseChanged();
         panel.refreshTable();
-      } else
-        panel.output(Globals.lang("No Medline entries found."));
-    } else {
-      JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
+	    } else
+		panel.output(Globals.lang("No Medline entries found."));
+	} else {
+	    JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
     }
-  }
-
-
+    }
+    
+    
 
 //==================================================
 //
@@ -175,76 +203,63 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
          Matcher m1 = p1.matcher( idList ),
              m2 = p2.matcher( idList );
          if ( m1.matches() ) {
-           fetchById();
+	     panel.frame().output(Globals.lang("Fetching Medline by id ..."));
+	     idList = tf.getText().replace(';', ',');
+	     fetchById();
+	     System.out.println("Fetch by id");
          }
          else if ( m2.matches() ) {
-
-           // Fetch by author.
-
-	    panel.frame().output(Globals.lang("Fetching Medline by author..."));
+	    panel.frame().output(Globals.lang("Fetching Medline by term ..."));
 
 	    // my stuff
 	    //---------------------------
-	    idList=setupTerm(idList); // fix the syntax
-	    String[] idListArray=getIds(idList); // get the ids from entrez
-	    //int idMax=idListArray.length; // check length
-            //Util.pr("fikk "+idListArray.length);
-	    //String[] titles=new String[idMax]; // prepare an array of titles for the dialog
-	    //titles=getTitles(idListArray);
-            //Util.pr("titler "+titles.length);
-	    // get a list of which ids the user wants.
-            if (idListArray.length > 0) {
-              // prompt the user to select articles
-              authorDialog = new AuthorDialog(jFrame, this, idListArray);
-
-              //boolean[] picks = authorDialog.showDialog();
-            }
-
-	    //idList="";
-	    //for (int i=0; i<titles.length;i++){
-		//if (picks[i]){
-		  //  idList+=idListArray[i]+",";
-		    //System.out.println(idListArray[i]);
-		//}
-	    //}
-	    //System.out.println(idList);
-		 //----------------------------
-		 // end my stuff
-
-	    ArrayList bibs = fetchMedline(idList);
-	    if ((bibs != null) && (bibs.size() > 0)) {
-		tf.setText("");
-		NamedCompound ce = new NamedCompound("fetch Medline");
-		Iterator i = bibs.iterator();
-		while (i.hasNext()) {
-		    try {
-			BibtexEntry be = (BibtexEntry) i.next();
-			String id = Util.createId(be.getType(), panel.database());
-			be.setId(id);
-			panel.database().insertEntry(be);
-			ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
+	    String searchTerm = setupTerm(idList); // fix the syntax
+	    SearchResult result = getIds(searchTerm ,0,1); // get the ids from entrez
+	    // prompt the user to number articles to retrieve
+	    String question = 
+		new String("Found ")
+		+ Integer.toString(result.count)
+		+ new String(" references. Retrieve references")
+		+ new String(" from 1 through");
+	    String strCount = 
+		JOptionPane.showInputDialog(question, 
+					    Integer.toString(result.count));
+	    
+	    // for strCount ...
+	    if(strCount=="")
+		return;
+	    int count = Integer.parseInt(strCount);
+	    for (int jj = 0; jj < count; jj+=PACING) {
+		// get the ids from entrez
+		result = getIds(searchTerm,jj,PACING);
+		System.out.println("fetching: " + result.ids); 
+		ArrayList bibs = fetchMedline(result.ids);
+		if ((bibs != null) && (bibs.size() > 0)) {
+		    tf.setText("");
+		    NamedCompound ce = new NamedCompound("fetch Medline");
+		    Iterator i = bibs.iterator();
+		    while (i.hasNext()) {
+			try {
+			    BibtexEntry be = (BibtexEntry) i.next();
+			    String id = Util.createId(be.getType(), panel.database());
+			    be.setId(id);
+			    panel.database().insertEntry(be);
+			    ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
+			}
+			catch (KeyCollisionException ex) {
+			}
 		    }
-		    catch (KeyCollisionException ex) {
-		    }
-		}
-		ce.end();
-		panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
-		panel.undoManager.addEdit(ce);
-		panel.markBaseChanged();
-		panel.refreshTable();
-	    } else
-		panel.output(Globals.lang("No Medline entries found."));
-
-	} else {
-                JOptionPane.showMessageDialog(panel.frame(),Globals.lang("Please enter a semicolon or comma separated list of Medline IDs (numbers)."),
-                                              Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
-	    //JOptionPane.showMessageDialog(panel.frame(), Globals.lang("Please enter a semicolon or comma separated list of either Medline IDs (numbers), "+
-            //    "or author names to search for."),Globals.lang("Input error"),JOptionPane.ERROR_MESSAGE);
-	}
-
-    }
-
-
+		    ce.end();
+		    panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
+		    panel.undoManager.addEdit(ce);
+		    panel.markBaseChanged();
+		    panel.refreshTable();
+		} else
+		    panel.output(Globals.lang("No Medline entries found."));
+		
+	    }
+	 }
+   }
     public String setupTerm(String in){
         Pattern part1=Pattern.compile(", ");
         Pattern part2=Pattern.compile(",");
@@ -261,15 +276,24 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     }
 
     // this gets the initial list of ids
-    public String[] getIds(String term){
+    public SearchResult getIds(String term, int start,int pacing){
         String baseUrl="http://eutils.ncbi.nlm.nih.gov/entrez/eutils";
-        String medlineUrl = baseUrl+"/esearch.fcgi?retmax=20&usehistory=y&db=pubmed&term=";
+        String medlineUrl = baseUrl
+	    +"/esearch.fcgi?db=pubmed&retmax="
+	    +Integer.toString(pacing)
+	    +"&retstart="+Integer.toString(start)
+	    +"&term=";
         Pattern idPattern=Pattern.compile("<Id>(\\d+)</Id>");
         Pattern countPattern=Pattern.compile("<Count>(\\d+)<\\/Count>");
-        Matcher matcher;
-        boolean doCount=true;
-        int count=0;
-        String[] id=new String[10]; // doesn't matter
+	Pattern retMaxPattern=Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
+	Pattern retStartPattern=Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
+        Matcher idMatcher;
+        Matcher countMatcher;
+        Matcher retMaxMatcher;
+        Matcher retStartMatcher;
+	boolean doCount = true;
+	SearchResult result = new SearchResult();
+	System.out.println(medlineUrl+term);
         try{
             URL ncbi = new URL(medlineUrl+term);
             // get the ids
@@ -280,24 +304,24 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
                  ( ncbi.openStream()));
             String inLine;
             while ((inLine=in.readLine())!=null){
-                if (doCount){
-                    // get the count
-                    matcher=countPattern.matcher(inLine);
-                    if (matcher.find()){
-                        count=Integer.parseInt(matcher.group(1));
-                        id=new String[count];
-                        count=0;
-                        doCount=false;
-                    }
-                }
-                else {
-                    // get the ids
-                    matcher=idPattern.matcher(inLine);
-                    if (matcher.find()){
-                        id[count++]=matcher.group(1);
-                    }
-                }
-
+		// get the count
+		idMatcher=idPattern.matcher(inLine);
+		if (idMatcher.find()){
+		    result.addID(idMatcher.group(1));
+		}
+		retMaxMatcher=retMaxPattern.matcher(inLine);
+		if (idMatcher.find()){
+		    result.retmax=Integer.parseInt(retMaxMatcher.group(1));
+		}
+		retStartMatcher=retStartPattern.matcher(inLine);
+		if (retStartMatcher.find()){
+		    result.retstart=Integer.parseInt(retStartMatcher.group(1));
+		}
+		countMatcher=countPattern.matcher(inLine);
+		if (doCount && countMatcher.find()){
+		    result.count=Integer.parseInt(countMatcher.group(1));
+		    doCount = false;
+		}
             }
 
         }
@@ -310,7 +334,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
             e.printStackTrace();
 
         }
-        return id;
+        return result;
     }
 
     public String[] getTitles(String[] idArrayList) {
