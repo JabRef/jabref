@@ -318,7 +318,7 @@ public class JabRefFrame
     //Globals.setLanguage("no", "");
 
     macOSXRegistration();
-
+    setGlassPane(new MyGlassPane());
     setTitle(GUIGlobals.frameTitle);
     setIconImage(new ImageIcon(GUIGlobals.jabreflogo).getImage());
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -2317,6 +2317,22 @@ class FetchCiteSeerAction
   }
 
 
+    /**
+     * This method shows a wait cursor and blocks all input to the JFrame's contents.
+     */
+    public void block() {
+	getGlassPane().setVisible(true);
+	//getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+
+    /**
+     * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents.
+     */
+    public void unblock() {
+	getGlassPane().setVisible(false);
+	//	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
+    }
+
 class SaveSessionAction
       extends MnemonicAwareAction {
     public SaveSessionAction() {
@@ -2563,4 +2579,16 @@ class SaveSessionAction
             dl.show();
         }
     }
+
+  private class MyGlassPane extends JPanel {
+
+    public MyGlassPane() {
+      addKeyListener(new KeyAdapter() { });
+      addMouseListener(new MouseAdapter() { });
+      super.setCursor(
+	Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }
+      // Override isOpaque() to prevent the glasspane from hiding the window contents:
+      public boolean isOpaque() { return false; }
+  }     
 }

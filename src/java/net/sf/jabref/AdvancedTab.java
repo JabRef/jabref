@@ -5,6 +5,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.*;
+import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.builder.*;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -13,8 +16,6 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     HelpDialog helpDiag;
     JPanel pan = new JPanel(),
 	lnf = new JPanel();
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
     JLabel lab;
     JCheckBox useDefault;
     JTextField className;
@@ -42,40 +43,42 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 		}
 	    });
 
-	setLayout(new BorderLayout());
- 	lnf.setLayout(gbl);
-	lnf.setBorder(BorderFactory.createTitledBorder
-		     (BorderFactory.createEtchedBorder(),Globals.lang("Look and feel")));
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.HORIZONTAL;
-	con.weightx = 0;
-	lab = new JLabel(Globals.lang("Default look and feel")+": "
+	FormLayout layout = new FormLayout
+	    ("1dlu, 8dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
+	     "");                	
+	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+	JPanel pan = new JPanel();
+	builder.appendSeparator(Globals.lang("Look and feel"));
+	JLabel lab = new JLabel(Globals.lang("Default look and feel")+": "
 			 +(Globals.ON_WIN ? GUIGlobals.windowsDefaultLookAndFeel :
 			   GUIGlobals.linuxDefaultLookAndFeel));
-	gbl.setConstraints(lab, con);
-	lnf.add(lab);
-	gbl.setConstraints(useDefault, con);
-	lnf.add(useDefault);
+	builder.nextLine();
+	builder.append(pan);
+	builder.append(lab);
+	builder.nextLine();
+	builder.append(pan);
+	builder.append(useDefault);
+	builder.nextLine();
+	builder.append(pan);
+	JPanel pan2 = new JPanel();
 	lab = new JLabel(Globals.lang("Class name")+":");
-	con.insets = new Insets(0, 5, 2, 0);
-	con.gridwidth = 1;
-	gbl.setConstraints(lab, con);
-	lnf.add(lab);
-	con.weightx = 1;
-	con.insets = new Insets(0, 5, 2, 25);
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(className, con);
-	lnf.add(className);
-	con.insets = new Insets(0, 5, 2, 0);
+	pan2.add(lab);
+	pan2.add(className);
+	builder.append(pan2);
+	builder.nextLine();
+	builder.append(pan);
 	lab = new JLabel(Globals.lang("Note: You must specify the fully qualified class name for the look and feel,"));
-	gbl.setConstraints(lab, con);
-	lnf.add(lab);
+	builder.append(lab);
+	builder.nextLine();
+	builder.append(pan);
 	lab = new JLabel(Globals.lang("and the class must be available in your classpath next time you start JabRef."));
-	gbl.setConstraints(lab, con);
-	lnf.add(lab);
+	builder.append(lab);
+	builder.nextLine();
 
-	add(lnf, BorderLayout.NORTH);
-
+	pan = builder.getPanel();
+	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	setLayout(new BorderLayout());
+	add(pan, BorderLayout.CENTER);
 	init();
     }
 

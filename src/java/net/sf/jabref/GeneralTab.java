@@ -81,8 +81,7 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 
 	FormLayout layout = new FormLayout
 	    ("1dlu, 8dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-	     "");                
-	
+	     "");                	
 	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 	JPanel pan = new JPanel();
 	builder.appendSeparator(Globals.lang("File"));

@@ -768,7 +768,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                                                       Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
                         return ;
                     }
-		    
+		    frame.block();
 		    output(Globals.lang("Generating BibTeX key for")+" "+
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
                                             : Globals.lang("entry"))+"...");
@@ -808,6 +808,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     output(Globals.lang("Generated BibTeX key for")+" "+
                            numSelected+" "+(numSelected>1 ? Globals.lang("entries")
                                             : Globals.lang("entry")));
+		    frame.unblock();
                 }
             });
 
@@ -1378,16 +1379,21 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 		  });
 
               actions.put("test", new AbstractWorker() {
+		      public void init() {
+			  output("blocking");
+			  frame.block();
+		      }
 		      public void run() {
 			  output("starting");
 			  try {
 			      Thread.sleep(4000);
 			  } catch (InterruptedException ex) {
 			  }
-			  //getCallBack().update();
+			  throw new RuntimeException();
 		      }
 		      public void update() {
-			  output("done");
+			  output("unblocking");
+			  frame.unblock();
 		      }
 		  });
 
@@ -1432,6 +1438,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 			clb.update(); // Runs the update() method on the EDT.
 		    }
 		} catch (Throwable ex) {
+		    // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
+		    // The call to unblock will simply hide the glasspane, so there is no harm in calling
+		    // it even if the frame hasn't been blocked.
+		    frame.unblock();
 		    ex.printStackTrace();
 		}
 	    }
