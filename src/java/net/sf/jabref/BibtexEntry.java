@@ -36,8 +36,7 @@ import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.io.*;
 
 
@@ -307,26 +306,17 @@ public class BibtexEntry
             writeField(s[i], out, ff);
             written.put(s[i], null);
         }
-        // Then write remaining fields, if any.
-        /*for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-            if (!written.containsKey(GUIGlobals.ALL_FIELDS[i])
-            &&
-              GUIGlobals.isWriteableField(GUIGlobals.ALL_FIELDS[i])
-              )
-        {
-            writeField(GUIGlobals.ALL_FIELDS[i], out);
-        }
-        }//*/
-
-        for (java.util.Iterator i=_fields.keySet().iterator(); i.hasNext();) {
+        // Then write remaining fields in alphabetic order.
+        TreeSet remainingFields = new TreeSet();
+        for (Iterator i = _fields.keySet().iterator(); i.hasNext(); ) {
             String key = (String)i.next();
             boolean writeIt = (write ? GUIGlobals.isWriteableField(key) :
                                GUIGlobals.isDisplayableField(key));
             if (!written.containsKey(key) && writeIt)
-                {
-                    writeField(key, out, ff);
-                }
+               	remainingFields.add(key);
         }
+        for (Iterator i = remainingFields.iterator(); i.hasNext(); )
+            writeField((String)i.next(),out,ff);
 
         // Finally, end the entry.
         out.write("}\n");
