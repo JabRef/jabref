@@ -136,6 +136,7 @@ public class GUIGlobals {
 		autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif"),
     //fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
 		fetchMedlineIcon = GUIGlobals.class.getResource(pre+"World2.gif"),
+		sheetIcon = GUIGlobals.class.getResource(pre+"Sheet.gif"),
 		jabreflogo = GUIGlobals.class.getResource(pre+"JabRef-Logo.gif");
 	//jabreflogo=new ImageIcon(getClass().getResource(pre+"JabRef-Logo.gif")));//.getImage());
 // Help files (in HTML format):

@@ -25,6 +25,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private int rowCount = -1;
     private Vector tableRows = new Vector(10);
     private Font font = GUIGlobals.CURRENTFONT;
+    private JabRefFrame frame;
 
     class TableRow {
 	String name;
@@ -49,9 +50,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      *
      * @param prefs a <code>JabRefPreferences</code> value
      */
-    public TablePrefsTab(JabRefPreferences prefs) {
+    public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
 	_prefs = prefs;
-
+	this.frame = frame;
 	setLayout(gbl);
 
 	colorCodes = new JCheckBox(Globals.lang
@@ -268,6 +269,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//tlb.setRollover(true);
 	tlb.add(new AddRowAction());
 	tlb.add(new DeleteRowAction());
+	tlb.addSeparator();
+	tlb.add(new UpdateWidthsAction());
 	gbl.setConstraints(tlb, con);
 	tabPanel.add(tlb);
 	//Component glue = Box.createHorizontalGlue();
@@ -338,6 +341,33 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	}
     }
     
+    class UpdateWidthsAction extends AbstractAction {
+	public UpdateWidthsAction() {
+	    super("Add row", new ImageIcon(GUIGlobals.sheetIcon));
+	    putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    BasePanel panel = frame.basePanel();
+	    if (panel == null) return;
+	    TableColumnModel colMod = panel.entryTable.getColumnModel();
+
+	    for (int i=1; i<colMod.getColumnCount(); i++) {
+	    try {
+		String name = panel.entryTable.getColumnName(i).toLowerCase();
+		int width = colMod.getColumn(i).getWidth();
+		//Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
+		//Util.pr("-"+name);
+		if ((i < tableRows.size()) && (((String)colSetup.getValueAt(i-1, 0)).toLowerCase()).equals(name))
+		    colSetup.setValueAt(""+width, i-1, 1);
+	    } catch (Throwable ex) {
+		ex.printStackTrace();
+	    }
+	    colSetup.revalidate();
+	    colSetup.repaint();
+	}
+
+	}
+    }
 
     private String[] getChoices() {
 

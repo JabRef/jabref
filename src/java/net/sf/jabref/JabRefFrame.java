@@ -757,6 +757,27 @@ public class JabRefFrame extends JFrame {
         closeDatabaseAction.setEnabled(true);
     }
 
+    /**
+     * This method causes all open BasePanels to set up their tables
+     * anew. When called from PrefsDialog2, this updates to the new
+     * settings.
+     */
+    public void setupAllTables() {
+	// This action can be invoked without an open database, so
+	// we have to check if we have one before trying to invoke
+	// methods to execute changes in the preferences.
+	
+	// We want to notify all tabs about the changes to
+	// avoid problems when changing the column set.
+	for (int i=0; i<tabbedPane.getTabCount(); i++) {
+	    BasePanel bf = baseAt(i);
+	    if (bf.database != null) {
+		bf.entryTable.updateFont();
+		bf.setupTable();
+	    }
+	}
+    }
+
 
     protected ParserResult loadDatabase(File fileToOpen) throws IOException {
 	// Temporary (old method):
@@ -1054,22 +1075,7 @@ public class JabRefFrame extends JFrame {
 			    //PrefsDialog.showPrefsDialog(ths, prefs);
 			    PrefsDialog2 pd = new PrefsDialog2(ths, prefs);
 			    Util.placeDialog(pd, ths);
-			    pd.show();
-
-				// This action can be invoked without an open database, so
-				// we have to check if we have one before trying to invoke
-				// methods to execute changes in the preferences.
-
-				// We want to notify all tabs about the changes to
-				// avoid problems when changing the column set.
-				for (int i=0; i<tabbedPane.getTabCount(); i++) {
-					BasePanel bf = baseAt(i);
-					if (bf.database != null) {
-					    bf.entryTable.updateFont();
-					    bf.setupTable();
-					}
-				}
-
+			    pd.show();			    
 			}
 		}
 
