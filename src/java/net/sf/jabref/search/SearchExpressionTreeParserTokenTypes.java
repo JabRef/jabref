@@ -12,7 +12,7 @@ public interface SearchExpressionTreeParserTokenTypes {
 	int LITERAL_or = 5;
 	int LITERAL_not = 6;
 	int LITERAL_contains = 7;
-	int LITERAL_equals = 8;
+	int LITERAL_matches = 8;
 	int WS = 9;
 	int LPAREN = 10;
 	int RPAREN = 11;
@@ -28,5 +28,4 @@ public interface SearchExpressionTreeParserTokenTypes {
 	int Or = 21;
 	int Not = 22;
 	int ExpressionSearch = 23;
-	int LITERAL_matches = 24;
 }

@@ -1,7 +1,7 @@
 header {
 package net.sf.jabref.search;
 }
-	
+
 class SearchExpressionLexer extends Lexer;
 
 options {
@@ -18,7 +18,7 @@ tokens {
 	"or";
 	"not";
 	"contains";
-	"equals";
+	"matches";
 
 }
 
@@ -62,4 +62,4 @@ LETTER options { paraphrase = "a letter"; testLiterals = true; }
 FIELDTYPE options { paraphrase = "a field type"; testLiterals = true; }
 	:	( LETTER )+
 	;
-	
+

@@ -42,11 +42,11 @@ public SearchExpressionLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = false;
 	setCaseSensitive(false);
 	literals = new Hashtable();
+	literals.put(new ANTLRHashString("matches", this), new Integer(8));
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
 	literals.put(new ANTLRHashString("contains", this), new Integer(7));
-	literals.put(new ANTLRHashString("equals", this), new Integer(8));
 }
 
 public Token nextToken() throws TokenStreamException {

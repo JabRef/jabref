@@ -428,7 +428,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		"\"or\"",
 		"\"not\"",
 		"\"contains\"",
-		"\"equals\"",
+		"\"matches\"",
 		"white space",
 		"'('",
 		"')'",
@@ -443,8 +443,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		"And",
 		"Or",
 		"Not",
-		"ExpressionSearch",
-		"LITERAL_matches"
+		"ExpressionSearch"
 	};
 	
 	protected void buildTokenTypeASTClassMap() {
@@ -457,12 +456,12 @@ public SearchExpressionParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 17134784L, 0L};
+		long[] data = { 357824L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 16806016L, 0L};
+		long[] data = { 29056L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
