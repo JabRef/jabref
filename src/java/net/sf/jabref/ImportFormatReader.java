@@ -414,7 +414,7 @@ public class ImportFormatReader
 	String Author="",Type="",Editor="";
 	for(int i=0; i<entries.length-1; i++){
 	    hm.clear();
-	    Author=""; Type="";
+	    Author=""; Type="";Editor="";
 	    String[] fields = entries[i].split("\n");
 	    for(int j=0; j <fields.length; j++){
 		if(fields[j].length() < 3)
@@ -454,7 +454,8 @@ public class ImportFormatReader
 	    }
 	    //fixauthorscomma
 	    hm.put("author",fixAuthor(Author));
-	    hm.put("editor",fixAuthor(Editor));
+	    if( !Editor.equals(""))
+		hm.put("editor",fixAuthor(Editor));
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
