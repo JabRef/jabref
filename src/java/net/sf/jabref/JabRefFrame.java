@@ -971,5 +971,6 @@ public class JabRefFrame extends JFrame {
 			return selectedFile.getAbsolutePath();
 		}
 		
-	}
+
+}
 	

@@ -45,6 +45,7 @@ public class JabRefPreferences {
 
 	prefs = Preferences.userNodeForPackage(JabRef.class);
 	//Util.pr(prefs.toString());
+	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
 	defaults.put("pdfviewer","/usr/bin/acroread");
 	defaults.put("psviewer","/usr/X11R6/bin/gv");
 	defaults.put("htmlviewer","/usr/bin/mozilla");

@@ -30,11 +30,43 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import javax.swing.JFileChooser;
+import java.util.logging.*;
+import java.io.IOException;
 public class Globals {
 
     private static String resourcePrefix = "resource/JabRef";
+    private static String logfile= "jabref.log";
     public static ResourceBundle messages;
+	
+    public void logThis(String s){
+	Logger.global.info(s);
+    }
+    
+    public void turnOffLogging(){ // only log exceptions
+	Logger.global.setLevel(java.util.logging.Level.SEVERE); 
+    }
 
+    // should be only called ones
+    public void turnOnConsoleLogging(){
+	Logger.global.addHandler( new java.util.logging.ConsoleHandler());
+    }
+
+    public void turnOnFileLogging(){
+	Logger.global.setLevel(java.util.logging.Level.ALL);	
+	java.util.logging.Handler handler;
+	try{
+	    handler = new FileHandler(logfile);// this will overwrite
+	}catch (IOException e){ //can't open log file so use console
+	    handler =  new ConsoleHandler() ; 
+	}
+	Logger.global.addHandler( handler);
+
+	handler.setFilter(new Filter() { // select what gets logged
+		public boolean isLoggable(LogRecord record) {
+		    return true;
+		}
+	    });
+    }
 
     /**
      * String constants.
