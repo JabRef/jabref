@@ -176,8 +176,8 @@ public class BibtexDatabase
 	BibtexEntry entry = getEntryById(id);
 	String oldKey = entry.getCiteKey();
 	entry.setField(Globals.KEY_FIELD, key);
-	removeKeyFromSet(oldKey);
-	return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
+	//removeKeyFromSet(oldKey);
+	return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
     /**
@@ -265,7 +265,7 @@ public class BibtexDatabase
 		// removes this key from the allKey. then I add another key xxx. I don't get a warning!
 		// i need a way to count the number of keys of each type
 		// hashmap=>int (increment each time)
-		
+
 		removeKeyFromSet( oldKey);
 		duplicate = addKeyToSet( newKey );
 	    }

@@ -738,8 +738,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    (entry.getId(), newValue);
 		
 		if (isDuplicate)
-		    panel.output("Warning: bibtexkey is already used!");
-
+		    panel.output(Globals.lang("Warning: duplicate bibtex key."));
+		else
+		    panel.output(Globals.lang("Bibtex key is unique."));
 		// Add an UndoableKeyChange to the baseframe's undoManager.
 		panel.undoManager.addEdit
 		    (new UndoableKeyChange(panel.database, entry.getId(),
@@ -766,12 +767,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			throw new Exception("More than one entry found.");
 		    if (db.getEntryCount() < 1)
 			throw new Exception("No entries found.");
-		    String id = entry.getId();
-
 		    NamedCompound compound = new NamedCompound("source edit");
 		    BibtexEntry nu = db.getEntryById
 			((String)db.getKeySet().iterator().next());
-		    boolean anyChanged = false;
+		    String id = entry.getId(),
+			oldKey = entry.getCiteKey(),
+			newKey = nu.getCiteKey();
+		    boolean anyChanged = false, duplicateWarning = false;
+
+		    if (panel.database.setCiteKeyForEntry(id, newKey))
+			duplicateWarning = true;
 
 		    // First, remove fields that the user have removed.
 		    Object[] fields = entry.getAllFields();
@@ -802,8 +807,23 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 				anyChanged = true;
 			    }
 		    compound.end();
-		    if (anyChanged)
-			panel.undoManager.addEdit(compound);
+		    if (!anyChanged)
+			return;
+
+		    panel.undoManager.addEdit(compound);
+
+		    /*if (((oldKey == null) && (newKey != null)) ||
+			((oldKey != null) && (newKey == null)) ||
+			((oldKey != null) && (newKey != null) 
+			 && !oldKey.equals(newKey))) {
+
+			 } */
+
+		    if (duplicateWarning)
+			panel.output(Globals.lang("Warning: duplicate bibtex key."));
+		    else
+			panel.output(Globals.lang("Stored entry."));
+		    
 		    lastSourceStringAccepted = source.getText();
 		    updateAllFields();
 		    lastSourceAccepted = true;
