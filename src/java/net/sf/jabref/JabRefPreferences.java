@@ -198,8 +198,8 @@ public class JabRefPreferences {
                        +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");
 
-        defaults.put("tempDir", "/tmp/");
-
+        //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
+	//Util.pr(System.getProperty("java.io.tempdir"));
 
 	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 

@@ -126,7 +126,7 @@ public class FileUpdateMonitor extends Thread {
       listener = ul;
       file = f;
       timeStamp = file.lastModified();
-      //tmpFile = getTempFile();
+      tmpFile = getTempFile();
       copy();
     }
 
@@ -151,7 +151,7 @@ public class FileUpdateMonitor extends Thread {
     }
 
     public boolean copy() {
-	/*
+	
       Util.pr("<copy file=\""+tmpFile.getPath()+"\">");
       boolean res = false;
       try {
@@ -161,8 +161,8 @@ public class FileUpdateMonitor extends Thread {
       }
       Util.pr("</copy>");
       return res;
-	*/
-	return true;
+	
+      //return true;
     }
 
     /**
@@ -192,8 +192,14 @@ public class FileUpdateMonitor extends Thread {
 
   static synchronized File getTempFile() {
     File f = null;
-    while ((f = new File(Globals.prefs.get("tempDir")+"jabref"+(tmpNum++)+".tmp")).exists());
-    System.out.println(f.getPath());
+    // Globals.prefs.get("tempDir")
+    //while ((f = File.createTempFile("jabref"+(tmpNum++), null)).exists());
+    try {
+	f = File.createTempFile("jabref", null);
+	System.out.println(f.getPath());
+    } catch (IOException ex) {
+	ex.printStackTrace();
+    }
     return f;
   }
 }

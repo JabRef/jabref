@@ -2227,7 +2227,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
 
       // Adding the sidepane component is Swing work, so we must do this in the Swing
       // thread:
-      /*
       Thread t = new Thread() {
         public void run() {
           FileUpdatePanel pan = new FileUpdatePanel(frame, ths, sidePaneManager, Globals.prefs);
@@ -2235,7 +2234,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
         }
       };
       SwingUtilities.invokeLater(t);
-      */
+      
     }
 
       public void fileRemoved() {

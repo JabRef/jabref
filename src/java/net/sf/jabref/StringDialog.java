@@ -422,11 +422,12 @@ public class StringDialog extends JDialog {
 		    ce.end();
 		    panel.undoManager.addEdit(ce);
 
-		    table.revalidate();
+		    //table.revalidate();
+		    refreshTable();
 		    if (base.getStringCount() > 0)
 			table.setRowSelectionInterval(0,0);
-		    table.repaint();
-		    panel.markBaseChanged();
+		    //table.repaint();
+		    //panel.markBaseChanged();
 		}
 	    }
 	}

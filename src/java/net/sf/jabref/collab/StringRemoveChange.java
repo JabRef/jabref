@@ -36,7 +36,7 @@ public class StringRemoveChange extends Change {
   public void makeChange(BasePanel panel, NamedCompound undoEdit) {
 
     try {
-      panel.database().removeString(string.getId());
+      panel.database().removeString(inMem.getId());
       undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
     } catch (Exception ex) {
       Globals.logger("Error: could not add string '"+string.getName()+"': "+ex.getMessage());
