@@ -45,6 +45,8 @@ public class CiteSeerUndoHandler extends HandlerBase {
 
     boolean overwriteNone = false;
 
+    BooleanAssign recordFound;
+    
     String newAuthors = null;
 
     /*
@@ -102,10 +104,12 @@ public class CiteSeerUndoHandler extends HandlerBase {
      * implementation of addAuthor()
      */
     public CiteSeerUndoHandler(NamedCompound newCompound, BibtexEntry be,
-            BasePanel basePanel) {
+            BasePanel basePanel, BooleanAssign assignment) {
         citeseerNamedCompound = newCompound;
         bibEntry = be;
         panel = basePanel;
+        recordFound = assignment;
+        recordFound.setValue(false);
     }
 
     public void characters(char[] ch, int start, int length) {
@@ -168,7 +172,9 @@ public class CiteSeerUndoHandler extends HandlerBase {
 
     public void startElement(String name, AttributeList attrs)
             throws SAXException {
-        if (name.equals("oai_citeseer:author")) {
+        if(name.equals("record")) {
+            recordFound.setValue(true);
+        } else if (name.equals("oai_citeseer:author")) {
             addAuthor(attrs.getValue("name"));
         } else if (name.equals("dc:title")) {
             nextField = "title";

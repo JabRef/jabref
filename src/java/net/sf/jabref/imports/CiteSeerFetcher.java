@@ -14,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -38,7 +40,8 @@ import net.sf.jabref.undo.NamedCompound;
  */
 public class CiteSeerFetcher extends SidePaneComponent {
 
-	final String PREFIX_URL = "http://citeseer.ist.psu.edu/";
+    final String CITESEER_HOST = "citeseer.ist.psu.edu";
+	final String PREFIX_URL = "http://" + CITESEER_HOST + "/";
 	final String PREFIX_IDENTIFIER = "oai:CiteSeerPSU:";
 	final String OAI_HOST = "http://cs1.ist.psu.edu/";
 	final String OAI_URL = OAI_HOST + "cgi-bin/oai.cgi?";
@@ -122,6 +125,24 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 	}
 
+	class ShowBadIdentifierDialog implements Runnable {
+		protected String badURL = "";
+		protected int rowNumber;
+
+		ShowBadIdentifierDialog(String URL, int row) {
+			badURL = URL;
+			rowNumber = row;
+		}
+		public void run() {
+			JOptionPane.showMessageDialog(panel.frame(),
+			Globals.lang("I couldn't seem to find an entry associated with this URL") + ": \"" + badURL + '\"' +
+			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " +
+			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
+			Globals.lang("CiteSeer Error"),
+			JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	class ShowBadURLDialog implements Runnable {
 		protected String badURL = "";
 		protected int rowNumber;
@@ -140,6 +161,21 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 	}
 
+	class ShowMissingURLDialog implements Runnable {
+		protected int rowNumber;
+
+		ShowMissingURLDialog(int row) {
+			rowNumber = row;
+		}
+		public void run() {
+			JOptionPane.showMessageDialog(panel.frame(),
+			Globals.lang("The URL field appears to be empty on entry number ") + (rowNumber + 1) + ".  " +
+			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
+			Globals.lang("CiteSeer Error"),
+			JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	class UpdateProgressBarMaximum implements Runnable {
 		protected int maximum;
 		UpdateProgressBarMaximum(int newValue) {
@@ -243,6 +279,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 {
 		try {
 			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");
+			BooleanAssign dummyBoolean = new BooleanAssign();
 		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			int citationCounter=0;
 			for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
@@ -256,7 +293,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				citeseerURLString.append("&" + "identifier=" + key);
 				GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 				citeseerHttpClient.executeMethod(citeseerMethod);
-				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel));
+				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel, dummyBoolean));
 				citeseerMethod.releaseConnection();
 				database.insertEntry(newEntry);
 				citationCounter++;
@@ -280,18 +317,43 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		return citationHashTable;
 	}
 
+	public String generateCanonicalNumber(BibtexEntry be) {
+	    String IDnumber = null;
+	    String inputString = (String) be.getField("url");
+	    if (inputString != null) {
+	        Pattern pattern = Pattern.compile("[0-9]+");
+	        Matcher matcher = pattern.matcher(inputString);
+	        if (matcher.find()) {
+	            IDnumber = matcher.group();
+	        }
+	    }
+	    return(IDnumber);
+	}
+	
+	public String generateCanonicalIdentifier(BibtexEntry be) {
+	    String canonID = null;
+	    String IDnumber = generateCanonicalNumber(be);
+	    if (IDnumber != null) {
+	        canonID = PREFIX_IDENTIFIER + IDnumber;
+	    }
+	    return(canonID);
+	}
+	
+	public String generateCanonicalURL(BibtexEntry be) {
+	    String canonURL = null;
+	    String IDnumber = generateCanonicalNumber(be);
+	    if (IDnumber != null) {
+	        canonURL = PREFIX_URL + IDnumber + ".html";
+	    }
+	    return(canonURL);
+	}
+	
 	private boolean generateIdentifierList(BibtexEntry currentEntry, Hashtable citationHashTable)
 		{
                   boolean abortOperation = false;
-                  Object o = currentEntry.getField("url");
-                  String targetURL = (String)o;
+                  String identifier = generateCanonicalIdentifier(currentEntry);                  
                   try {
-                    if ((o != null) && targetURL.startsWith(PREFIX_URL) &&
-                        (targetURL.length() > (PREFIX_URL.length() + 5))) {
-
-                      Util.pr("targetUrl: "+targetURL);
-                      String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
-                      String identifier = PREFIX_IDENTIFIER + id;
+                    if (identifier != null) {
                       StringBuffer citeseerURLString = new StringBuffer();
                       citeseerURLString.append(OAI_URL);
                       citeseerURLString.append(OAI_ACTION);
@@ -301,11 +363,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
                       citeseerHttpClient.executeMethod(citeseerMethod);
                       saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerCitationHandler(citationHashTable));
                       citeseerMethod.releaseConnection();
-                    } else if (o != null) {
+                    } else {
                       int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
-                      ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
-                      SwingUtilities.invokeLater(dialog);
-		}
+                      if (currentEntry.getField("url") == null) {
+                          ShowMissingURLDialog dialog = new ShowMissingURLDialog(row);
+                          SwingUtilities.invokeLater(dialog);
+                      } else {
+                          ShowBadURLDialog dialog = new ShowBadURLDialog((String) currentEntry.getField("url"), row);
+                          SwingUtilities.invokeLater(dialog);
+                      }                      
+                    }
 		} catch(HttpException e) {
 			System.out.println("HttpException: " + e.getReason());
 			e.printStackTrace();
@@ -324,17 +391,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	/**
 	 * @param be
 	 *
-	 * Reminder: this method runs in the EventDispatcher thread
 	 */
 	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC) {
-		boolean newValue = false;
 		SAXParserFactory factory = SAXParserFactory.newInstance();
-			String targetURL = (String) be.getField("url");
+		BooleanAssign newValue = new BooleanAssign();
+    	String identifier = generateCanonicalIdentifier(be);			 
 		try {
-			if (targetURL != null && targetURL.startsWith(PREFIX_URL) &&
-				(targetURL.length() > (PREFIX_URL.length() + 5))) {
-					String id = targetURL.substring(PREFIX_URL.length(), targetURL.length() - 5);
-					String identifier = PREFIX_IDENTIFIER + id;
+			if (identifier != null) {
 					StringBuffer citeseerURLString = new StringBuffer();
 					citeseerURLString.append(OAI_URL);
 					citeseerURLString.append(OAI_ACTION);
@@ -342,25 +405,34 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append("&" + "identifier=" + identifier);
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 					int response = citeseerHttpClient.executeMethod(citeseerMethod);
-					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be, panel));
+					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be, panel, newValue));
 					citeseerMethod.releaseConnection();
-					newValue = true;
+					if (newValue.getValue() == false) {
+					    int row = panel.getTableModel().getNumberFromName(be.getId());					    
+					    ShowBadIdentifierDialog dialog = new ShowBadIdentifierDialog(generateCanonicalURL(be), row);
+				        SwingUtilities.invokeLater(dialog);			    
+					}
 				} else {
 				    int row = panel.getTableModel().getNumberFromName(be.getId());
-					ShowBadURLDialog dialog = new ShowBadURLDialog(targetURL, row);
-					dialog.run();
+				    if (be.getField("url") == null) {
+				        ShowMissingURLDialog dialog = new ShowMissingURLDialog(row);
+				        SwingUtilities.invokeLater(dialog);
+				    } else {
+				        ShowBadURLDialog dialog = new ShowBadURLDialog((String) be.getField("url"), row);
+				        SwingUtilities.invokeLater(dialog);
+				    }
 				}
 			} catch (HttpException e) {
 				System.out.println("HttpException: " + e.getReason());
 				e.printStackTrace();
 			} catch (IOException e) {
 					ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
-					dialog.run();
+					SwingUtilities.invokeLater(dialog);
 			} catch (SAXException e) {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
-			return newValue;
+			return newValue.getValue();
 		}
 
 
