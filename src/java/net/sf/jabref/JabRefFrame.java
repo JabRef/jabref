@@ -1105,7 +1105,9 @@ public class JabRefFrame extends JFrame {
  				public void actionPerformed(ActionEvent e)
  				{
  			   	    String idList = JOptionPane.showInputDialog(ths,"Enter a comma separated list of Medline ids","Fetch Medline Citation",JOptionPane.PLAIN_MESSAGE);
- 		    		    Pattern p = Pattern.compile("\\d+[,\\d+]*");
+				    if(idList==null || idList.trim().equals(""))//if user pressed cancel
+					return;
+				    Pattern p = Pattern.compile("\\d+[,\\d+]*");
  		    		    Matcher m = p.matcher( idList );
  				    if ( m.matches() ) {
  				        ArrayList bibs = ImportFormatReader.fetchMedline(idList);

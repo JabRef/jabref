@@ -255,7 +255,7 @@ public class ImportFormatReader
 	HashMap hm=new HashMap();
 	for(int i=1; i<entries.length; i++){
 	    String[] fields = entries[i].split(" ## ");
-	    String Type="",PT="";
+	    String Type="",PT="",pages="";
 	    hm.clear();
 	    
 	    for(int j=0; j<fields.length; j++){
@@ -276,7 +276,11 @@ public class ImportFormatReader
 		else if(beg.equals("AB"))
 		    hm.put("abstract", fields[j].substring(2,fields[j].length()).trim().replaceAll("EOLEOL"," ")); 
 		else if(beg.equals("BP"))
-		    hm.put("pages", fields[j].substring(2,fields[j].length()).trim());
+		    //hm.put("pages", fields[j].substring(2,fields[j].length()).trim());
+		    pages=fields[j].substring(2,fields[j].length()).trim();
+		else if(beg.equals("EP")){
+		    pages=pages + "--" + fields[j].substring(2,fields[j].length()).trim();		    
+		}
 		else if(beg.equals("PY"))
 		    hm.put("year", fields[j].substring(2,fields[j].length()).trim());
 		else if(beg.equals("VL"))
@@ -291,7 +295,8 @@ public class ImportFormatReader
 		else if(beg.equals("CR")) //cited references
 		    hm.put("CitedReferences",fields[j].substring(2,fields[j].length()).replaceAll("EOLEOL"," ; ").trim());
 	    }
-	    
+
+	    hm.put("pages",pages);
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);

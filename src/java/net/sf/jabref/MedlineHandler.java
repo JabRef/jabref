@@ -6,7 +6,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /*
-Copyright (C) 2002-2003 Nizar N. Batada 
+Copyright (C) 2002-2003 Morten ). Alver & Nizar N. Batada 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
 described below.

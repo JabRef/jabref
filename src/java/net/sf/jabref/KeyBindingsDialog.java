@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada
+Copyright (C) 2003 Morten O.Alver & Nizar N. Batada
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
