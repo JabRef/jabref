@@ -1048,6 +1048,108 @@ public class ImportFormatReader
 	return bibitems;
     }
 
+    //========================================================
+    //
+    //========================================================
+    public static ArrayList readSilverPlatter( String filename)
+    {
+	ArrayList bibitems = new ArrayList();
+	File f = new File(filename);
+
+	if(!f.exists() && !f.canRead() && !f.isFile()){
+	    System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
+	    return null;
+	}
+	StringBuffer sb=new StringBuffer();
+	try {
+	    BufferedReader in = new BufferedReader(new FileReader( filename));
+	    String str;
+	    while((str=in.readLine())!=null){
+		if(str.length() < 2) 
+		    sb.append("__::__"+str);
+		else
+		    sb.append("__NEWFIELD__"+str);
+	    }
+	    in.close();
+	    String[] entries = sb.toString().split("__::__");
+	    String Type="";
+	    HashMap h=new HashMap();
+	    entryLoop: for(int i=0; i<entries.length; i++){
+		if (entries[i].trim().length() < 6)
+		    continue entryLoop;
+		//System.out.println("'"+entries[i]+"'");
+		h.clear();
+		String[] fields = entries[i].split("__NEWFIELD__");
+		fieldLoop: for(int j=0; j<fields.length; j++){
+		    if (fields[j].length() < 6)
+			continue fieldLoop;
+		    //System.out.println(">"+fields[j]+"<");
+		    String s = fields[j];
+		    String f3 = s.substring(0,2);
+		    String frest = s.substring(5);
+		    if(f3.equals("TI")) h.put("title", frest);
+		    //else if(f3.equals("PY")) h.put("year", frest);
+		    else if(f3.equals("AU")) h.put("author", fixAuthor_lastnameFirst(frest.replaceAll(",-",", ").replaceAll(";"," and ")));
+		    else if(f3.equals("AB")) h.put("abstract", frest);
+		    else if(f3.equals("ID")) h.put("keywords", frest);
+		    else if(f3.equals("SO")){
+			int m = frest.indexOf(".");
+			if(m >= 0){
+			    String jr = frest.substring(0,m);
+			    h.put("journal",jr.replaceAll("-"," "));
+			    frest = frest.substring(m);
+			    m = frest.indexOf(";");
+			    if(m>=5){
+				String yr = frest.substring(m-5,m).trim();
+				h.put("year",yr);
+				frest = frest.substring(m);
+				m = frest.indexOf(":");
+				if(m>=0){
+				    String pg = frest.substring(m+1).trim();
+				    h.put("pages",pg);
+				    h.put("volume",frest.substring(1,m));
+				}
+			    }
+			}
+		    }
+		    else if(f3.equals("PB")){
+			int m = frest.indexOf(":");
+			if(m >= 0){
+			    String jr = frest.substring(0,m);
+			    h.put("publisher",jr.replaceAll("-"," ").trim());
+			    frest = frest.substring(m);
+			    m = frest.indexOf(", ");
+			    if(m+2<frest.length()){
+				String yr = frest.substring(m+2).trim();
+				h.put("year",yr);
+			    }
+			}
+		    }
+		    else if(f3.equals("DT")){
+			frest=frest.trim();
+			if(frest.equals("Monograph"))
+			    Type="book";
+			else if(frest.equals("Contribution"))
+			    Type="incollection";
+			else if(frest.equals("Journal-Article"))
+			    Type="article";
+			else
+			    Type=frest.replaceAll(" ","");
+		    }
+		}
+		BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
+									  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
+		b.setField( h);
+
+		bibitems.add( b  );
+
+	    }
+	}
+	catch(IOException e){ return null;}
+
+	return bibitems;
+    }
+
     //==================================================
     // Set a field, unless the string to set is empty.
     //==================================================

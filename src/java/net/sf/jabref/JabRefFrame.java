@@ -1938,6 +1938,22 @@ class FetchCiteSeerAction
     });
     importMenu.add(newJStorFile_mItem);
 
+    //########################################
+    JMenuItem newSilverPlatter_mItem = new JMenuItem(Globals.lang("SilverPlatter"));
+    newSilverPlatter_mItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+      {
+        String tempFilename = getNewFile();
+        if( tempFilename != null )
+        {
+          ArrayList bibs=ImportFormatReader.readSilverPlatter(tempFilename);
+
+          addBibEntries( bibs, tempFilename, intoNew);
+        }
+      }
+    });
+    importMenu.add(newSilverPlatter_mItem);
+
   }
 
 
