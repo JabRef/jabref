@@ -6,6 +6,7 @@ package net.sf.jabref;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -108,7 +109,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		
 		// The header - can be removed
 		lblEntryType = new JLabel(Globals.lang("Entry type"));
-		
+		Font f = new Font("plain", Font.BOLD, 12);
+		lblEntryType.setFont(f);
 		con.gridx = 0;
 		con.gridy = 0;
 		con.gridwidth = 1;
@@ -120,6 +122,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		add( lblEntryType );
 
 		lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
+		lblKeyPattern.setFont(f);
 		con.gridx = 1;
 		con.gridy = 0;
 		//con.gridwidth = 2;

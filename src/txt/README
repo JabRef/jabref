@@ -67,7 +67,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Added Replace string feature.
+1.x:	- Added customization of key generation.
+	- Improved HTML export.
+	- Added Replace string feature.	
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
 	- Fixed bug that made selector words added in the dialog to be lowercased.
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.
