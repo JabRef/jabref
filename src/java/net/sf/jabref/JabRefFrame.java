@@ -916,6 +916,7 @@ public JabRefPreferences prefs() {
   }
 
   private void createToolBar() {
+
     tlb.setRollover(true);
 
     //tlb.setBorderPainted(true);

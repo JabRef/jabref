@@ -569,13 +569,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                       Thread pushThread = new Thread() {
                         public void run() {
                           try {
-                                                      Util.pr("test");
                             FileWriter fw = new FileWriter(lyxpipe);
-                                                      Util.pr("test2");
                             BufferedWriter lyx_out = new BufferedWriter(fw);
                             String citeStr = "", citeKey = "", message = "";
                             for (int i = 0; i < numSelected; i++) {
-                              Util.pr(":" + i);
                               BibtexEntry bes = database.getEntryById(tableModel.getNameFromNumber(rows[
                                   i]));
                               citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
