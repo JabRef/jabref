@@ -37,6 +37,7 @@ import java.io.*;
 import java.awt.*;
 import javax.swing.*;
 import net.sf.jabref.collab.FileUpdateMonitor;
+import net.sf.jabref.imports.ImportFormatReader;
 
 public class Globals {
 
@@ -49,6 +50,8 @@ public class Globals {
   private static String logfile = "jabref.log";
   public static ResourceBundle messages, menuTitles;
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
+    public static ImportFormatReader importFormatReader = new ImportFormatReader();
+
 
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
   public static Locale locale;
@@ -252,8 +255,18 @@ public class Globals {
                               updateWorkingDirectory, dirOnly, off);
     }
 
-    JFileChooser fc;
-    fc = new JabRefFileChooser(directory);
+    JFileChooser fc = null;
+    try {
+	fc = new JabRefFileChooser(directory);
+    } catch (InternalError errl) {
+	// This try/catch clause was added because a user reported an
+	// InternalError getting thrown on WinNT, presumably because of a
+	// bug in JGoodies Windows PLAF. This clause can be removed if the
+	// bug is fixed, but for now we just resort to the native file
+	// dialog, using the same method as is always used on Mac:
+	return getNewFileForMac(owner, prefs, directory, extension, dialogType,
+				updateWorkingDirectory, dirOnly, off);
+    }
 
     if (dirOnly) {
       fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

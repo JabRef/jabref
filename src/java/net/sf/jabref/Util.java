@@ -40,6 +40,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -668,7 +669,7 @@ public class Util {
      * @param defaultOwner
      *            default owner of bibtex entries
      */
-    public static void setDefaultOwner(ArrayList bibs, String defaultOwner) {
+    public static void setDefaultOwner(List bibs, String defaultOwner) {
 
         // Iterate through all entries
         for (int i = 0; i < bibs.size(); i++){

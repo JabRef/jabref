@@ -97,7 +97,7 @@ class FileHistory extends JMenu implements ActionListener {
 	frame.fileToOpen = new File(name);
 	(new Thread() {
 		public void run() {
-		    frame.openDatabaseAction.openIt(true);
+		    frame.open.openIt(true);
 		}
 	    }).start();
 

@@ -1222,6 +1222,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
                   NamedCompound ce = new NamedCompound("Mark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
+		  if (bes == null)
+		      return;
                   for (int i=0; i<bes.length; i++) {
                     ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
                                                        bes[i].getField(Globals.MARKED), "0"));
@@ -1241,6 +1243,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     try {
                   NamedCompound ce = new NamedCompound("Unmark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
+		  if (bes == null)
+		      return;
                   for (int i=0; i<bes.length; i++) {
                     ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
                                                        bes[i].getField(Globals.MARKED), null));
@@ -1380,7 +1384,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
               actions.put("test", new AbstractWorker() {
 		      String filename = null, formatName = null;
-		      BibtexDatabase base = null;
+		      java.util.List entries = null;
 		      public void init() {
 			  output("importing");
 			  
@@ -1396,18 +1400,17 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 			      return;
 			  }
 			  try {
-			      Object[] o = ImportFormatReader.importUnknownFormat(filename);
+			      Object[] o = Globals.importFormatReader.importUnknownFormat(filename);
 			      formatName = (String)o[0];
-			      base = (BibtexDatabase)o[1];
+			      entries = (java.util.List)o[1];
 			  } catch (IOException ex) {
 			      ex.printStackTrace();
 			  }
 		      }
 		      public void update() {
-			  if (base != null) {
-			      BasePanel newBp = frame.addTab(base, null, new HashMap(), true);
-			      newBp.markBaseChanged();
-			      output(Globals.lang("Imported entries")+": "+base.getEntryCount()
+			  if (entries != null) {
+			      frame.addBibEntries(entries, filename, true);
+			      output(Globals.lang("Imported entries")+": "+entries.size()
 				     +"  "+Globals.lang("Format used")+": "+formatName);
 			  } else
 			      output(Globals.lang("Could not find a suitable import format."));

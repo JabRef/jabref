@@ -48,7 +48,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
+import java.util.Map;
 import java.io.*;
 import java.net.URL;
 import java.util.regex.*;
@@ -126,8 +128,9 @@ public class JabRefFrame
   // References to the toggle buttons in the toolbar:
   public JToggleButton groupToggle, searchToggle, previewToggle;
 
-  AbstractAction
-      open = new OpenDatabaseAction(),
+  OpenDatabaseAction
+      open = new OpenDatabaseAction(true);
+  AbstractAction  
       close = new CloseDatabaseAction(),
       quit = new CloseAction(),
       selectKeys = new SelectKeysAction(),
@@ -1392,40 +1395,26 @@ public JabRefPreferences prefs() {
   }
 
   // The action concerned with opening an existing database.
-  OpenDatabaseAction openDatabaseAction = new OpenDatabaseAction();
   class OpenDatabaseAction
       extends MnemonicAwareAction {
-    public OpenDatabaseAction() {
-      super(new ImageIcon(GUIGlobals.openIconFile));
-      putValue(NAME, "Open database");
-      putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
-      putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-    }
+      boolean showDialog;
+      public OpenDatabaseAction(boolean showDialog) {
+	  super(new ImageIcon(GUIGlobals.openIconFile));
+	  this.showDialog = showDialog;
+	  putValue(NAME, "Open database");
+	  putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
+	  putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
+      }
 
     public void actionPerformed(ActionEvent e) {
       // Open a new database.
-      if ( (e.getActionCommand() == null) ||
-          (e.getActionCommand().equals(Globals.lang("Open database")))) {
-        /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-            new JabRefFileChooser( (File)null) :
-            new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-        JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-            new JFileChooser((File)null) :
-            new JFileChooser(new File(prefs.get("workingDirectory")));*/
-
-        //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
-        //int returnVal = chooser.showOpenDialog(ths);
+      if (showDialog) {
 
         String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".bib",
                                                JFileChooser.OPEN_DIALOG, true);
 
-        /*FileDialog chooser = new FileDialog(ths, "Open", FileDialog.LOAD);
-                             chooser.show();
-                             int returnVal = 0;*/
-        //if (returnVal == JFileChooser.APPROVE_OPTION) {
         if (chosenFile != null) {
           fileToOpen = new File(chosenFile);
-          //fileToOpen = new File(chooser.getFile());
         }
       }
       else {
@@ -1854,7 +1843,7 @@ class FetchCiteSeerAction
      * @param intoNew Determines if the entries will be put in a new database or in the current
      * one.
      */
-  public void addBibEntries(ArrayList bibentries, String filename,
+  public void addBibEntries(java.util.List bibentries, String filename,
                              boolean intoNew) {
   	if (bibentries == null || bibentries.size() == 0) {
       // No entries found. We need a message for this.
@@ -1974,211 +1963,14 @@ class FetchCiteSeerAction
   }
 
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
-    final boolean intoNew = intoNew_;
-    //
-    // put in menu
-    //
-    //########################################
-    JMenuItem newEndnoteFile_mItem = new JMenuItem(Globals.lang("Refer/Endnote")); //,						       new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newEndnoteFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readEndnote(tempFilename); //MedlineParser.readMedline(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
+      final boolean intoNew = intoNew_;
+      
+      // Put in all formatters registered in ImportFormatReader:
+      for (Iterator i=Globals.importFormatReader.getImportFormats().iterator(); i.hasNext();) {
+	  ImportFormat imFo = (ImportFormat)((Map.Entry)i.next()).getValue();
+	  importMenu.add(new ImportMenuItem(ths, imFo, intoNew));
       }
-    });
-    importMenu.add(newEndnoteFile_mItem);
-    //########################################
-    JMenuItem newINSPECFile_mItem = new JMenuItem(Globals.lang("INSPEC")); //, new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newINSPECFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readINSPEC(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-
-      }
-    });
-    importMenu.add(newINSPECFile_mItem);
-    //########################################
-    JMenuItem newISIFile_mItem = new JMenuItem(Globals.lang("ISI")); //, new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newISIFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readISI(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-
-      }
-    });
-    importMenu.add(newISIFile_mItem);
-
-    //########################################
-    JMenuItem newMedlineFile_mItem = new JMenuItem(Globals.lang(
-        "Medline XML File"));
-    newMedlineFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readMedline(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newMedlineFile_mItem);
-    //########################################
-    JMenuItem newBibTeXMLFile_mItem = new JMenuItem(Globals.lang(
-        "BibTeXML File"));
-    newBibTeXMLFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readBibTeXML(tempFilename);
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newBibTeXMLFile_mItem);
-    //##############################
-    /*JMenuItem newMedlineId_mItem = new JMenuItem(Globals.lang("Medline Fetch By ID"));
-         newMedlineId_mItem.addActionListener(new ActionListener()
-        {
-     public void actionPerformed(ActionEvent e)
-     {
-            String idList = JOptionPane.showInputDialog(ths,"Enter a comma separated list of Medline ids","Fetch Medline Citation",JOptionPane.PLAIN_MESSAGE);
-        if(idList==null || idList.trim().equals(""))//if user pressed cancel
-     return;
-        Pattern p = Pattern.compile("\\d+[,\\d+]*");
-             Matcher m = p.matcher( idList );
-         if ( m.matches() ) {
-             ArrayList bibs = ImportFormatReader.fetchMedline(idList);
-             addBibEntries( bibs, idList, intoNew);
-         } else {
-     JOptionPane.showMessageDialog(ths,"Sorry, I was expecting a comma separated list of Medline IDs (numbers)!","Input Error",JOptionPane.ERROR_MESSAGE);
-        }
-     }
-        });
-         importMenu.add(newMedlineId_mItem);*/
-
-    //########################################
-    JMenuItem newOvidFile_mItem = new JMenuItem(Globals.lang("Ovid")); //,new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newOvidFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readOvid(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-
-      }
-    });
-    importMenu.add(newOvidFile_mItem);
-    //########################################
-    JMenuItem newRefMan_mItem = new JMenuItem(Globals.lang("RIS")); //, new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newRefMan_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) {
-          ArrayList bibs = ImportFormatReader.readReferenceManager10(
-              tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-
-      }
-    });
-    importMenu.add(newRefMan_mItem);
-
-    //########################################
-
-    JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("SciFinder")); //,new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    //newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
-    newSciFinderFile_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) { //filenm != null)
-          //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
-          ArrayList bibs = ImportFormatReader.readScifinder(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newSciFinderFile_mItem);
-
-    JMenuItem newSixpack_mItem = new JMenuItem(Globals.lang("Sixpack"));
-    newSixpack_mItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tempFilename = getNewFile();
-        if (tempFilename != null) { //filenm != null)
-          //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
-          ArrayList bibs = ImportFormatReader.readSixpack(tempFilename);
-
-          addBibEntries(bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newSixpack_mItem);
-
-    //########################################
-    JMenuItem newBiblioscapeTagFile_mItem = new JMenuItem(Globals.lang("Biblioscape Tag file"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
-    newBiblioscapeTagFile_mItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e)
-      {
-        String tempFilename = getNewFile();
-        if( tempFilename != null )//filenm != null)
-        {
-          ArrayList bibs=ImportFormatReader.readBiblioscapeTagFile(tempFilename);
-
-          addBibEntries( bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newBiblioscapeTagFile_mItem);
-
-    //########################################
-    JMenuItem newJStorFile_mItem = new JMenuItem(Globals.lang("JStor file"));
-    newJStorFile_mItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e)
-      {
-        String tempFilename = getNewFile();
-        if( tempFilename != null )
-        {
-          ArrayList bibs=ImportFormatReader.readJStorFile(tempFilename);
-
-          addBibEntries( bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newJStorFile_mItem);
-
-    //########################################
-    JMenuItem newSilverPlatter_mItem = new JMenuItem("SilverPlatter");
-    newSilverPlatter_mItem.addActionListener(new ActionListener(){
-      public void actionPerformed(ActionEvent e)
-      {
-        String tempFilename = getNewFile();
-        if( tempFilename != null )
-        {
-          ArrayList bibs=ImportFormatReader.readSilverPlatter(tempFilename);
-
-          addBibEntries( bibs, tempFilename, intoNew);
-        }
-      }
-    });
-    importMenu.add(newSilverPlatter_mItem);
-
   }
-
 
 
   //
@@ -2473,7 +2265,7 @@ class SaveSessionAction
               if (fileToOpen.exists()) {
                 //Util.pr("Opening last edited file:"
                 //+fileToOpen.getName());
-                openDatabaseAction.openIt(i == 0);
+                open.openIt(i == 0);
               }
             }
           }
