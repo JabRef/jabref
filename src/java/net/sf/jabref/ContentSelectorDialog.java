@@ -21,7 +21,8 @@ public class ContentSelectorDialog extends JDialog {
     JButton remove = new JButton();
     JComboBox fieldSelector = new JComboBox();
     GridBagLayout gridBagLayout2 = new GridBagLayout();
-    HelpAction help;
+    //HelpAction help;
+    JButton help;
     JPanel jPanel4 = new JPanel();
     GridBagLayout gridBagLayout3 = new GridBagLayout();
     GridBagLayout gridBagLayout4 = new GridBagLayout();
@@ -51,7 +52,9 @@ public class ContentSelectorDialog extends JDialog {
 	super(frame, Globals.lang("Setup selectors"), modal);
 	this.metaData = metaData;
 	this.frame = frame;
-	help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
+	help = new JButton(Globals.lang("Help"));
+	help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help"));
+	//help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
 	try {
 	    jbInit();
 	    wordSelector.addItem(WORD_EMPTY_TEXT);
@@ -76,8 +79,8 @@ public class ContentSelectorDialog extends JDialog {
 	// the user to control which fields have a selector. I think this
 	// makes the dialog more intuitive. When the user opens this dialog
 	// from the Tools menu, the full interface will be available.
-	//panel1.remove(jPanel1);
-	//pack();
+	panel1.remove(jPanel1);
+	pack();
     }
 
     /**
@@ -200,14 +203,14 @@ public class ContentSelectorDialog extends JDialog {
 	fieldSelector.addActionListener(new ContentSelectorDialog_fieldSelector_actionAdapter(this));
 	getContentPane().add(panel1);
 	this.getContentPane().add(jPanel2, BorderLayout.SOUTH);
-	jPanel2.add(Close, null);
-	JToolBar tlb = new JToolBar();
+	//JToolBar tlb = new JToolBar();
 	//tlb.setLayout(new GridLayout(1,1));
 	//tlb.setPreferredSize(new Dimension(28, 28));
-	tlb.setFloatable(false);
-	tlb.add(help);
+	//tlb.setFloatable(false);
+	//tlb.add(help);
+	jPanel2.add(help, null);	
 	jPanel2.add(Close, null);
-	jPanel2.add(tlb, null);
+
 	panel1.add(jPanel1,   new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0
 						     ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 	jPanel1.add(lab,      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0

@@ -68,9 +68,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(defSource, con);
 	general.add(defSource);
 
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(defSort, con);
-	general.add(defSort);
+	//con.gridwidth = GridBagConstraints.REMAINDER;
+	//gbl.setConstraints(defSort, con);
+	//general.add(defSort);
 	
 
         // Grouping field
@@ -203,7 +203,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("openLastEdited", openLast.isSelected());
 	_prefs.putBoolean("defaultShowSource", defSource.isSelected());
 	_prefs.putBoolean("enableSourceEditing", editSource.isSelected());
-	_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
+	//_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
 	
         _prefs.put("groupsDefaultField", groupField.getText().trim());
 

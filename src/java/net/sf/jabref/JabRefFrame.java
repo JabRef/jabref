@@ -695,6 +695,7 @@ public class JabRefFrame extends JFrame {
 	copy.setEnabled(false);
 	paste.setEnabled(false);
 	selectAll.setEnabled(false);
+	copyKey.setEnabled(false);
 	copyCiteKey.setEnabled(false);
 	editPreamble.setEnabled(false);
 	editStrings.setEnabled(false);
@@ -727,6 +728,7 @@ public class JabRefFrame extends JFrame {
 	copy.setEnabled(true);
 	paste.setEnabled(true);
 	selectAll.setEnabled(true);
+	copyKey.setEnabled(true);
 	copyCiteKey.setEnabled(true);
 	editPreamble.setEnabled(true);
 	editStrings.setEnabled(true);

@@ -118,6 +118,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	if (!editor.getText().equals(""))
 	    editor.append(DELIMITER);
 	editor.append(chosen+DELIMITER_2);
+	list.setSelectedIndex(0);
 	parent.storeFieldAction.actionPerformed
 	    (new ActionEvent(editor, 0, ""));
     }
