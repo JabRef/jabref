@@ -179,41 +179,16 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    if (file == null)
 			runCommand("saveAs");
 		    else {
-			try {
-			    FileActions.saveDatabase(database, metaData, file,
-						     prefs, false, false);
-			    undoManager.markUnchanged();
-			    // (Only) after a successful save the following
-			    // statement marks that the base is unchanged
-			    // since last save:
-			    nonUndoableChange = false;
-			    baseChanged = false;
-			    frame.setTabTitle(ths, file.getName());
-			    frame.output(Globals.lang("Saved database")+" '"
-					 +file.getPath()+"'.");
-			} catch (SaveException ex) {
-			    if (ex.specificEntry()) {
-				// Error occured during processing of
-				// be. Highlight it:
-				int row = tableModel.getNumberFromName
-				    (ex.getEntry().getId()),
-				    topShow = Math.max(0, row-3);
-				//Util.pr(""+row);
-				entryTable.setRowSelectionInterval(row, row);
-				entryTable.setColumnSelectionInterval
-				    (0, entryTable.getColumnCount()-1);
-				entryTable.scrollTo(topShow);
-				showEntry(ex.getEntry());
-			    }
-			    else ex.printStackTrace();
-
-			    JOptionPane.showMessageDialog
-				(frame, Globals.lang("Could not save file")
-				 +".\n"+ex.getMessage(),
-				 Globals.lang("Save database"),
-				 JOptionPane.ERROR_MESSAGE);
-			    throw new SaveException("rt");
-			}
+			saveDatabase(file, false);
+			undoManager.markUnchanged();
+			// (Only) after a successful save the following
+			// statement marks that the base is unchanged
+			// since last save:
+			nonUndoableChange = false;
+			baseChanged = false;
+			frame.setTabTitle(ths, file.getName());
+			frame.output(Globals.lang("Saved database")+" '"
+				     +file.getPath()+"'.");
 		    }
 		}
 	    });
@@ -245,6 +220,30 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
+	actions.put("saveSelectedAs", new BaseAction () {
+		public void action() throws Throwable {
+		    JFileChooser chooser = new JFileChooser
+			(prefs.get("workingDirectory"));
+		    chooser.setFileFilter(new OpenFileFilter());
+		    int returnVal = chooser.showSaveDialog(frame);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+			String name = chooser.getSelectedFile().getName(),
+			    path = chooser.getSelectedFile().getParent();
+			if (!name.endsWith(".bib"))
+			    name = name+".bib";
+			File expFile = new File(path, name);
+			if (!expFile.exists() ||
+			    (JOptionPane.showConfirmDialog
+			     (frame, "File '"+name+"' exists. Overwrite?",
+			      "Save database", JOptionPane.OK_CANCEL_OPTION)
+			     == JOptionPane.OK_OPTION)) {
+			    saveDatabase(expFile, true);
+			    //runCommand("save");
+                            frame.fileHistory.newFile(expFile.getPath());
+			}
+		    }
+		}
+	    });
 
 	// The action for copying selected entries.
 	actions.put("copy", new BaseAction() {
@@ -829,6 +828,40 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    Util.pr("No action defined for'"+command+"'");
 	else ((BaseAction)actions.get(command)).action();
     }
+
+    private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
+	try {
+	    if (!selectedOnly)
+		FileActions.saveDatabase(database, metaData, file,
+					 prefs, false, false);
+	    else
+		FileActions.savePartOfDatabase(database, metaData, file,
+					       prefs, entryTable.getSelectedEntries());
+	} catch (SaveException ex) {
+	    if (ex.specificEntry()) {
+		// Error occured during processing of
+		// be. Highlight it:
+		int row = tableModel.getNumberFromName
+		    (ex.getEntry().getId()),
+		    topShow = Math.max(0, row-3);
+		//Util.pr(""+row);
+		entryTable.setRowSelectionInterval(row, row);
+		entryTable.setColumnSelectionInterval
+		    (0, entryTable.getColumnCount()-1);
+		entryTable.scrollTo(topShow);
+		showEntry(ex.getEntry());
+	    }
+	    else ex.printStackTrace();
+	    
+	    JOptionPane.showMessageDialog
+		(frame, Globals.lang("Could not save file")
+		 +".\n"+ex.getMessage(),
+		 Globals.lang("Save database"),
+		 JOptionPane.ERROR_MESSAGE);
+	    throw new SaveException("rt");
+	}
+    }
+
 
     /**
      * This method is called from JabRefFrame when the user wants to

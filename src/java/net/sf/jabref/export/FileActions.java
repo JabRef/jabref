@@ -49,6 +49,81 @@ public class FileActions
 
     //~ Methods ////////////////////////////////////////////////////////////////
 
+    private static void initFile(File file, boolean backup) throws IOException {
+	String name = file.getName();
+	String path = file.getParent();
+	File temp = new File(path, name + GUIGlobals.tempExt);
+	
+	if (backup)
+        {
+	    File back = new File(path, name + GUIGlobals.backupExt);
+	    
+	    if (back.exists()) {
+		back.renameTo(temp);
+	    }
+	    
+	    if (file.exists())
+            {
+		file.renameTo(back);
+	    }
+
+	    if (temp.exists())
+            {
+		temp.delete();
+	    }
+	}
+	else {
+	    if (file.exists()) {
+		file.renameTo(temp);
+	    }
+	}
+    }
+
+    private static void writePreamble(Writer fw, String preamble) throws IOException {
+	if (preamble != null) {
+	    fw.write("@PREAMBLE{");
+	    fw.write(preamble);
+	    fw.write("}\n\n");
+	}
+    }
+
+    private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
+	for (int i = 0; i < database.getStringCount(); i++) {
+	    BibtexString bs = database.getString(i);
+
+	    //fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
+	    fw.write("@STRING{" + bs.getName() + " = ");
+	    if (!bs.getContent().equals(""))
+		fw.write((new LatexFieldFormatter()).format(bs.getContent(),
+							    true));
+	    else fw.write("{}");
+	    
+	    //Util.writeField(bs.getName(), bs.getContent(), fw) ;
+	    fw.write("}\n\n");
+	}
+    }
+
+    public static void repairAfterError(File file) {
+	// Repair the file with our temp file since saving failed.
+	String name = file.getName();
+	
+	// Repair the file with our temp file since saving failed.
+	String path = file.getParent();
+	File temp = new File(path, name + GUIGlobals.tempExt);
+	File back = new File(path, name + GUIGlobals.backupExt);
+	
+	if (file.exists()) {
+	    file.delete();
+	}
+
+	if (temp.exists()) {
+	    temp.renameTo(file);
+	}
+	else {
+	    back.renameTo(file);
+	}
+    }
+
     /**
      * Saves the database to file. Two boolean values indicate whether
      * only entries with a nonzero Globals.SEARCH value and only
@@ -64,36 +139,7 @@ public class FileActions
 
         try
         {
-            String name = file.getName();
-            String path = file.getParent();
-            File temp = new File(path, name + GUIGlobals.tempExt);
-
-            if (prefs.getBoolean("backup"))
-            {
-                File back = new File(path, name + GUIGlobals.backupExt);
-
-                if (back.exists())
-                {
-                    back.renameTo(temp);
-                }
-
-                if (file.exists())
-                {
-                    file.renameTo(back);
-                }
-
-                if (temp.exists())
-                {
-                    temp.delete();
-                }
-            }
-            else
-            {
-                if (file.exists())
-                {
-                    file.renameTo(temp);
-                }
-            }
+	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
             FileWriter fw = new FileWriter(file);
@@ -102,30 +148,10 @@ public class FileActions
             fw.write(GUIGlobals.SIGNATURE);
 
             // Write preamble if there is one.
-            String preamble = database.getPreamble();
-
-            if (preamble != null)
-            {
-                fw.write("@PREAMBLE{");
-                fw.write(preamble);
-                fw.write("}\n\n");
-            }
+            writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-            for (int i = 0; i < database.getStringCount(); i++)
-            {
-                BibtexString bs = database.getString(i);
-
-                //fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
-                fw.write("@STRING{" + bs.getName() + " = ");
-		if (!bs.getContent().equals(""))
-		    fw.write((new LatexFieldFormatter()).format(bs.getContent(),
-								true));
-		else fw.write("{}");
-
-                //Util.writeField(bs.getName(), bs.getContent(), fw) ;
-                fw.write("}\n\n");
-            }
+	    writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
@@ -187,32 +213,79 @@ public class FileActions
         }
          catch (Throwable ex)
         {
-            //ex.printStackTrace();
-
-            // Repair the file with our temp file since saving failed.
-            String name = file.getName();
-
-            // Repair the file with our temp file since saving failed.
-            String path = file.getParent();
-            File temp = new File(path, name + GUIGlobals.tempExt);
-            File back = new File(path, name + GUIGlobals.backupExt);
-
-            if (file.exists())
-            {
-                file.delete();
-            }
-
-            if (temp.exists())
-            {
-                temp.renameTo(file);
-            }
-            else
-            {
-                back.renameTo(file);
-            }
-
+	    repairAfterError(file);
             throw new SaveException(ex.getMessage(), be);
+	}
+
+    }
+
+    /**
+     * Saves the database to file, including only the entries included
+     * in the supplied input array bes.
+     */
+    public static void savePartOfDatabase(BibtexDatabase database, MetaData metaData,
+        File file, JabRefPreferences prefs, BibtexEntry[] bes) throws SaveException
+    {
+
+        BibtexEntry be = null;
+
+        try
+        {
+	    initFile(file, prefs.getBoolean("backup"));
+
+            // Define our data stream.
+            FileWriter fw = new FileWriter(file);
+
+            // Write signature.
+            fw.write(GUIGlobals.SIGNATURE);
+
+            // Write preamble if there is one.
+            writePreamble(fw, database.getPreamble());
+
+            // Write strings if there are any.
+	    writeStrings(fw, database);
+
+            // Write database entries. Take care, using CrossRefEntry-
+            // Comparator, that referred entries occur after referring
+            // ones. Apart from crossref requirements, entries will be
+            // sorted as they appear on the screen.
+            String pri = prefs.get("priSort");
+            String sec = prefs.get("secSort");
+            // sorted as they appear on the screen.
+            String ter = prefs.get("terSort");
+            TreeSet sorter = new TreeSet(new CrossRefEntryComparator(
+                        new EntryComparator(prefs.getBoolean("priDescending"),
+                            prefs.getBoolean("secDescending"),
+                            prefs.getBoolean("terDescending"), pri, sec, ter)));
+	    
+	    if ((bes != null) && (bes.length > 0))
+		for (int i=0; i<bes.length; i++) {
+		    sorter.add(bes[i]);
+		}	
+	    
+            FieldFormatter ff = new LatexFieldFormatter();
+
+            for (Iterator i = sorter.iterator(); i.hasNext();)
+            {
+                be = (BibtexEntry) (i.next());
+		be.write(fw, ff);
+		fw.write("\n");
+	    }
+
+            // Write meta data.
+            if (metaData != null)
+            {
+                metaData.writeMetaData(fw);
+            }
+
+            fw.close();
         }
+         catch (Throwable ex)
+        {
+	    repairAfterError(file);
+            throw new SaveException(ex.getMessage(), be);
+	}
+
     }
 
     public static void exportDatabase(BibtexDatabase database, String lfName, 

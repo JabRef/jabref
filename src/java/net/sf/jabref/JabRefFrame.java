@@ -100,6 +100,9 @@ public class JabRefFrame extends JFrame {
 	saveAs = new GeneralAction("saveAs", "Save database as ...",
 				 "Save database as ...",
 				   GUIGlobals.saveAsIconFile),
+	saveSelectedAs = new GeneralAction("saveSelectedAs", "Save selected as ...",
+					   "Save selected as ...",
+					   GUIGlobals.saveAsIconFile),
 	nextTab = new ChangeTabAction(true),
 	prevTab = new ChangeTabAction(false),
 	undo = new GeneralAction("undo", "Undo", "Undo",
@@ -509,6 +512,7 @@ public class JabRefFrame extends JFrame {
         file.add(importNewMenu);
         file.add(save);
 	file.add(saveAs);
+	file.add(saveSelectedAs);
         file.add(exportMenu);
         file.addSeparator();
 	file.add(fileHistory);
@@ -696,6 +700,7 @@ public class JabRefFrame extends JFrame {
 	close.setEnabled(false);
 	save.setEnabled(false);
 	saveAs.setEnabled(false);
+	saveSelectedAs.setEnabled(false);
 	nextTab.setEnabled(false);
 	prevTab.setEnabled(false);
 	undo.setEnabled(false);
@@ -730,6 +735,7 @@ public class JabRefFrame extends JFrame {
 	close.setEnabled(true);
 	save.setEnabled(true);
 	saveAs.setEnabled(true);
+	saveSelectedAs.setEnabled(true);
 	nextTab.setEnabled(true);
 	prevTab.setEnabled(true);
 	undo.setEnabled(true);
