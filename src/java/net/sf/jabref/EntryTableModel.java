@@ -32,7 +32,7 @@ import javax.swing.table.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import net.sf.jabref.export.LatexFieldFormatter;
-import java.util.Vector;
+import java.util.*;
 import java.util.StringTokenizer;
 import net.sf.jabref.imports.ImportFormatReader;
 import java.util.*;
@@ -45,6 +45,7 @@ public class EntryTableModel
   JabRefFrame frame;
   String[] columns; // Contains the current column names.
   private EntrySorter sorter;
+    private int visibleRows = 0;
 
   //private Object[] entryIDs; // Temporary
 
@@ -111,9 +112,18 @@ public class EntryTableModel
     return Util.nCase(columns[col - padleft]);
   }
 
+    public void showAllEntries() {
+	visibleRows = sorter.getEntryCount();
+    }
+
+    public void setRowCount(int rows) {
+	visibleRows = rows;
+    }
+
   public int getRowCount() {
     //Util.pr("rc "+sorter.getEntryCount());
-    return sorter.getEntryCount();
+    //return sorter.getEntryCount();
+      return visibleRows;
     //entryIDs.length;  // Temporary?
   }
 
@@ -250,7 +260,7 @@ public class EntryTableModel
     return (be.getField(field) != null);
   }
 
-  public void remap() {
+  private void updateSorter() {
 
     // Set the icon columns, indicating the number of special columns to the left.
     // We add those that are enabled in preferences.
@@ -285,8 +295,8 @@ public class EntryTableModel
 
     // Build a vector of prioritized search objectives,
     // then pick the 3 first.
-    Vector fields = new Vector(5, 1),
-        directions = new Vector(5, 1);
+    List fields = new ArrayList(6),
+        directions = new ArrayList(6);
 
     // For testing MARKED feature:
     fields.add(Globals.MARKED);
@@ -318,28 +328,38 @@ public class EntryTableModel
     // Then pick the three highest ranking ones, and go.
     if (directions.size() < 4) {
       sorter = db.getSorter(new EntryComparator(
-          ( (Boolean) directions.elementAt(0)).booleanValue(),
-          ( (Boolean) directions.elementAt(1)).booleanValue(),
-          ( (Boolean) directions.elementAt(2)).booleanValue(),
-          (String) fields.elementAt(0),
-          (String) fields.elementAt(1),
-          (String) fields.elementAt(2)));
+          ( (Boolean) directions.get(0)).booleanValue(),
+          ( (Boolean) directions.get(1)).booleanValue(),
+          ( (Boolean) directions.get(2)).booleanValue(),
+          (String) fields.get(0),
+          (String) fields.get(1),
+          (String) fields.get(2)));
     }
     else {
       sorter = db.getSorter(new EntryComparator(
-          ( (Boolean) directions.elementAt(0)).booleanValue(),
-          ( (Boolean) directions.elementAt(1)).booleanValue(),
-          ( (Boolean) directions.elementAt(2)).booleanValue(),
-          ( (Boolean) directions.elementAt(3)).booleanValue(),
-          (String) fields.elementAt(0),
-          (String) fields.elementAt(1),
-          (String) fields.elementAt(2),
-          (String) fields.elementAt(3)));
+          ( (Boolean) directions.get(0)).booleanValue(),
+          ( (Boolean) directions.get(1)).booleanValue(),
+          ( (Boolean) directions.get(2)).booleanValue(),
+          ( (Boolean) directions.get(3)).booleanValue(),
+          (String) fields.get(0),
+          (String) fields.get(1),
+          (String) fields.get(2),
+          (String) fields.get(3)));
 
     }
-    //Util.pr("remap");
-    fireTableDataChanged();
   }
+
+    public void remap() {
+	updateSorter();
+	showAllEntries(); // Update the visible row count.
+	fireTableDataChanged();
+    }
+
+    public void remap(int rows) {
+	updateSorter();
+	setRowCount(rows);
+	fireTableDataChanged();
+    }
 
   public boolean isCellEditable(int row, int col) {
     if (!Globals.prefs.getBoolean("allowTableEditing"))

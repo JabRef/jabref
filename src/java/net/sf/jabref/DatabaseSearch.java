@@ -92,7 +92,7 @@ public class DatabaseSearch extends Thread {
 	SwingUtilities.invokeLater(new Thread() {
 		public void run() {
 		    panel.entryTable.invalidate();
-		    panel.showSearchResults(searchValueField, reorder, grayOut, select);
+		    panel.showSearchResults(searchValueField, reorder, grayOut, select, outputHits);
 		    if ((searchValueField == null)
 			|| (searchValueField == Globals.SEARCH))
 			panel.output(Globals.lang("Searched database. Global number of hits")

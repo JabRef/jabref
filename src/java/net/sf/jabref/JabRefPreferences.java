@@ -175,6 +175,7 @@ public class JabRefPreferences {
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
         defaults.put("confirmDelete", new Boolean(true));
+        defaults.put("grayOutNonHits", new Boolean(true));
 
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"

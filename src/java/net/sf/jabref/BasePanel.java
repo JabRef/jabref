@@ -121,10 +121,13 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     boolean sortingBySearchResults = false,
         coloringBySearchResults = false,
+	hidingNonHits = false,
         sortingByGroup = false,
         sortingByCiteSeerResults = false,
         coloringByGroup = false,
         previewEnabled = true;
+    int lastSearchHits = -1; // The number of hits in the latest search.
+    // Potential use in hiding non-hits completely.
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
@@ -1715,7 +1718,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         entryTable.assureNotEditing();
         //entryTable.invalidate();
         BibtexEntry[] bes = entryTable.getSelectedEntries();
-        tableModel.remap();
+	if (hidingNonHits)
+	    tableModel.remap(lastSearchHits);
+	else 
+	    tableModel.remap();
         if ((bes != null) && (bes.length > 0))
             highlightEntries(bes, 0);
         //entryTable.revalidate();r
@@ -2046,8 +2052,11 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
      * Globals.GROUPSEARCH.
      *
      */
-    public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut, boolean select) {
+    public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut, boolean select, int numberOfHits) {
         //entryTable.scrollTo(0);
+
+	lastSearchHits = numberOfHits;
+	hidingNonHits = !grayOut; // We either gray out, or hide, non-hits.
 
         entryTable.invalidate();
         if (searchValueField == Globals.SEARCH) {
@@ -2129,6 +2138,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public void stopShowingSearchResults() {
       sortingBySearchResults = false;
       coloringBySearchResults = false;
+      hidingNonHits = false;
       /* entryTable.setShowingSearchResults(showingSearchResults,
         showingGroup);
        */
