@@ -242,6 +242,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database) 
 	 {
 		try {
+			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");		    
 		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			int citationCounter=0;
 			for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
@@ -255,10 +256,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 				citeseerURLString.append("&" + "identifier=" + key);
 				GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 				citeseerHttpClient.executeMethod(citeseerMethod);
-				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerImportHandler(newEntry));
+				saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel));
 				citeseerMethod.releaseConnection();
 				database.insertEntry(newEntry);
-				citationHashTable.put(key, newEntry);
 				citationCounter++;
 				UpdateProgressBarValue updateValue = new UpdateProgressBarValue(citationCounter);
 				SwingUtilities.invokeLater(updateValue);
@@ -339,7 +339,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append("&" + "identifier=" + identifier);
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 					int response = citeseerHttpClient.executeMethod(citeseerMethod);
-					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be));
+					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be, panel));
 					citeseerMethod.releaseConnection();				
 					newValue = true;
 				} else {	
