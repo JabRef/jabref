@@ -65,7 +65,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             return;
         }
         GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
-        if (target == null || dragNode.isNodeChild(target) || dragNode == target) {
+        if (target == null || dragNode.isNodeDescendant(target) || dragNode == target) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
@@ -134,14 +134,11 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 dtde.rejectDrop(); // ignore this
                 return;
             }
-            if (source.isNodeChild(target)) {
+            if (source.isNodeDescendant(target)) {
                 dtde.rejectDrop();
-                // JZTODO invokeLater: error message; e.g. status line
                 return;
             }
             Enumeration expandedPaths = groupSelector.getExpandedPaths(); 
-            // JZFIXME somehow it is possible to arrive here with the root
-            // node being dragged...
             UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
                     groupSelector.getGroupTreeRoot(), source, target, target
                             .getChildCount());
