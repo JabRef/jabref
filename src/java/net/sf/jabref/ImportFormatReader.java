@@ -428,13 +428,18 @@ public class ImportFormatReader
 	    BufferedReader in = new BufferedReader(new FileReader( filename));
 
 	    String str;
+	    boolean first = true;
 	    while ((str = in.readLine()) != null) {
 		str = str.trim();
 		if(str.equals(""))
 		    continue;
-		else if(str.indexOf("%X")==0){
-		    sb.append(str);
-		    sb.append(ENDOFRECORD);
+		else if(str.indexOf("%0")==0){
+		    if (first)
+			first = false;
+		    else {
+			sb.append(ENDOFRECORD);
+			sb.append(str);
+		    }
 		}else
 		    sb.append(str);
 		sb.append("\n");
@@ -452,24 +457,26 @@ public class ImportFormatReader
 	for(int i=0; i<entries.length; i++){
 	    hm.clear();
 	    Author=""; Type="";Editor="";
-	    String[] fields = entries[i].split("\n");
+	    String[] fields = entries[i].substring(1).split("\n%");
+            //String lastPrefix = "";
 	    for(int j=0; j <fields.length; j++){
 		if(fields[j].length() < 3)
 		    continue;
-		String prefix=fields[j].substring(0,2);
-		String val = fields[j].substring(3);
-		if( prefix.equals("%A")){
+
+		String prefix=fields[j].substring(0,1);
+		String val = fields[j].substring(2);
+		if( prefix.equals("A")){
 		    if( Author.equals(""))
 			Author=val;
 		    else
 			Author += " and " + val;
 		}
-		else if(prefix.equals("%Y")){
+		else if(prefix.equals("Y")){
 		    if( Editor.equals("")) Editor=val;
 		    else Editor += " and " + val;
 		}
-		else if(prefix.equals("%T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
-		else if(prefix.equals("%0")){
+		else if(prefix.equals("T")) hm.put( Globals.putBracesAroundCapitals("title"),val);
+		else if(prefix.equals("0")){
 		    if(val.indexOf("Journal")==0)
 			Type="article";
 		    else if(val.indexOf("Book")==0)
@@ -478,25 +485,34 @@ public class ImportFormatReader
 			Type="inproceedings";
 		    else
 			Type = "misc"; //
-		    System.out.println(val);
 		}
-		else if(prefix.equals("%7")) hm.put("edition",val);
-		else if(prefix.equals("%D")) hm.put("year",val);
-		else if(prefix.equals("%J")) hm.put("journal",val);
-		else if(prefix.equals("%P")) hm.put("pages",val);
-		else if(prefix.equals("%V")) hm.put("volume",val);
-		else if(prefix.equals("%N")) hm.put("number",val);
-		else if(prefix.equals("%U")) hm.put("url",val);
-		else if(prefix.equals("%X")) hm.put("abstract",val);
+		else if(prefix.equals("7")) hm.put("edition",val);
+		else if(prefix.equals("D")) hm.put("year",val);
+                else if(prefix.equals("8")) hm.put("date",val);
+		else if(prefix.equals("J")) hm.put("journal", val);
+                else if (prefix.equals("B")) {
+                  if (Type.equals("article")) hm.put("journal", val);
+
+                }
+		else if(prefix.equals("P")) hm.put("pages",val);
+		else if(prefix.equals("V")) hm.put("volume",val);
+		else if(prefix.equals("N")) hm.put("number",val);
+		else if(prefix.equals("U")) hm.put("url",val);
+                else if(prefix.equals("O")) hm.put("note",val);
+                else if(prefix.equals("K")) hm.put("keywords", val);
+		else if(prefix.equals("X")) hm.put("abstract",val);
 	    }
 	    //fixauthorscomma
-	    hm.put("author",fixAuthor(Author));
+            if (!Author.equals(""))
+              hm.put("author",fixAuthor(Author));
 	    if( !Editor.equals(""))
 		hm.put("editor",fixAuthor(Editor));
 	    BibtexEntry b=new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
 					  Globals.getEntryType(Type)); // id assumes an existing database so don't create one here
 	    b.setField( hm);
-	    bibitems.add( b  );
+            //if (hm.isEmpty())
+            if (b.getAllFields().length > 0)
+              bibitems.add(b);
 
 	}
 	return bibitems;

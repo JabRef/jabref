@@ -43,33 +43,33 @@ public class HelpAction extends AbstractAction {
     protected URL helpfile;
 
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip) {
-	super("Help", new ImageIcon(GUIGlobals.helpIconFile));
-	putValue(SHORT_DESCRIPTION, tooltip);
-	this.diag = diag;       
+	super(Globals.lang("Help"), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
 	this.helpfile = helpfile;
     }
 
     public HelpAction(HelpDialog diag, URL helpfile, String tooltip,
 		      URL iconFile) {
-	super("Help", new ImageIcon(iconFile));
-	putValue(SHORT_DESCRIPTION, tooltip);
-	this.diag = diag;       
+	super(Globals.lang("Help"), new ImageIcon(iconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
 	this.helpfile = helpfile;
     }
 
     public HelpAction(String title, HelpDialog diag, URL helpfile, String tooltip) {
-	super(title, new ImageIcon(GUIGlobals.helpIconFile));
-	putValue(SHORT_DESCRIPTION, tooltip);
-	this.diag = diag;       
+	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
+	this.diag = diag;
 	this.helpfile = helpfile;
     }
 
     public HelpAction(String title, HelpDialog diag, URL helpfile, String tooltip,
 		      KeyStroke key) {
-	super(title, new ImageIcon(GUIGlobals.helpIconFile));
-	putValue(SHORT_DESCRIPTION, tooltip);
+	super(Globals.lang(title), new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, Globals.lang(tooltip));
 	putValue(ACCELERATOR_KEY, key);
-	this.diag = diag;       
+	this.diag = diag;
 	this.helpfile = helpfile;
     }
 

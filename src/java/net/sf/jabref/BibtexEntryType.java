@@ -154,7 +154,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "volume", "number", "series", "type", "address", "edition", 
+                    "volume", "number", "series", "type", "address", "edition",
 		    "month", "note"
                 };
             }
@@ -163,7 +163,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "chapter", "pages", "title", "publisher", "year", "editor", 
+                    "chapter", "pages", "title", "publisher", "year", "editor",
 		    "author"
                 };
             }
@@ -250,7 +250,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "booktitle", "publisher", "year" 
+                    "author", "title", "booktitle", "publisher", "year"
                 };
             }
 
@@ -263,7 +263,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return entry.allFieldsPresent(new String[]
                     {
-			"author", "title", "booktitle", "publisher", "year", 
+			"author", "title", "booktitle", "publisher", "year",
 			"bibtexkey"
 
                     });
@@ -282,7 +282,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "editor", "volume", "number", "series", "pages", 
+                    "editor", "volume", "number", "series", "pages",
 		    "address", "month", "organization", "publisher", "note"
                 };
             }
@@ -291,7 +291,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "booktitle", "year" 
+                    "author", "title", "booktitle", "year"
                 };
             }
 
@@ -321,7 +321,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "editor", "volume", "number", "series", "address", 
+                    "editor", "volume", "number", "series", "address",
 		    "publisher", "note", "month", "organization"
                 };
             }
@@ -330,7 +330,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "title", "year" 
+                    "title", "year"
                 };
             }
 
@@ -448,7 +448,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "school", "year" 
+                    "author", "title", "school", "year"
                 };
             }
 
@@ -487,7 +487,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "author", "title", "school", "year" 
+                    "author", "title", "school", "year"
                 };
             }
 
@@ -624,8 +624,8 @@ public abstract class BibtexEntryType implements Comparable
     public abstract String[] getRequiredFields();
 
     public String[] getGeneralFields() {
-        return new String[] 
-	    {"crossref", "keywords", "doi", "url", 
+        return new String[]
+	    {"crossref", "keywords", "doi", "url",
 	     "pdf", "abstract", "comment"};
     }
 
@@ -635,10 +635,10 @@ public abstract class BibtexEntryType implements Comparable
 
 
     public String[] getUtilityFields(){
-        return new String[] {"search" } ; 
+        return new String[] {"search" } ;
     }
 
-    
+
     public boolean isRequired(String field) {
 	String[] req = getRequiredFields();
 	if (req == null) return false;
@@ -671,7 +671,8 @@ public abstract class BibtexEntryType implements Comparable
 	ALL_TYPES.put("phdthesis", PHDTHESIS);
 	ALL_TYPES.put("techreport", TECHREPORT);
 	ALL_TYPES.put("unpublished", UNPUBLISHED);
-	ALL_TYPES.put("misc", MISC);
+        ALL_TYPES.put("misc", MISC);
+        ALL_TYPES.put("other", OTHER);
 
 	// We need a record of the standard types, in case the user wants
 	// to remove a customized version. Therefore we clone the map.
@@ -691,7 +692,7 @@ public abstract class BibtexEntryType implements Comparable
     }
 
     /**
-     * This method returns the standard BibtexEntryType for the 
+     * This method returns the standard BibtexEntryType for the
      * name of a type, or null if it does not exist.
      */
     public static BibtexEntryType getStandardType(String name) {

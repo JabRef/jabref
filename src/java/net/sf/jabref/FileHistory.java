@@ -14,7 +14,7 @@ class FileHistory extends JMenu implements ActionListener {
     JabRefFrame frame;
 
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {
-	super("Recent files");
+	super(Globals.lang("Recent files"));
 	this.prefs = prefs;
 	this.frame = frame;
 	String[] old = prefs.getStringArray("recentFiles");

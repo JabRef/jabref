@@ -96,7 +96,7 @@ class SearchManager2 extends SidePaneComponent
 	    searchOpt.setEnabled(false);
 	    searchGen.setEnabled(false);
 	}
-        caseSensitive = new JCheckBoxMenuItem("Case sensitive",
+        caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
 				      prefs.getBoolean("caseSensitiveSearch"));
 	settings.add(caseSensitive);
 	settings.addSeparator();

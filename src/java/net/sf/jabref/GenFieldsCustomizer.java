@@ -30,10 +30,12 @@ public class GenFieldsCustomizer extends JDialog {
   GridBagLayout gridBagLayout2 = new GridBagLayout();
   JabRefFrame parent;
   JButton revert = new JButton();
+  EntryCustomizationDialog diag;
 
-  public GenFieldsCustomizer(JabRefFrame frame) {
+  public GenFieldsCustomizer(JabRefFrame frame, EntryCustomizationDialog diag) {
     super(frame, Globals.lang("Set general fields"), false);
     parent = frame;
+    this.diag = diag;
     try {
       jbInit();
       setSize(new Dimension(400, 200));
@@ -72,6 +74,18 @@ public class GenFieldsCustomizer extends JDialog {
     jScrollPane1.getViewport().add(fieldsArea, null);
     jPanel4.add(jLabel2,    new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+
+  // Key bindings:
+  ActionMap am = jPanel2.getActionMap();
+  InputMap im = jPanel2.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+  im.put(GUIGlobals.exitDialog, "close");
+  am.put("close", new AbstractAction() {
+    public void actionPerformed(ActionEvent e) {
+      dispose();
+      diag.requestFocus();
+    }
+  });
+
   }
 
   void ok_actionPerformed(ActionEvent e) {
@@ -83,10 +97,12 @@ public class GenFieldsCustomizer extends JDialog {
       bp.entryEditors.clear();
     }
     dispose();
+    diag.requestFocus();
   }
 
   void cancel_actionPerformed(ActionEvent e) {
     dispose();
+    diag.requestFocus();
   }
 
   void revert_actionPerformed(ActionEvent e) {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003 David Weitzman, Nizar N. Batada, Morten O. Alver
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -65,7 +65,7 @@ public class BibtexParser
                 _eof = true;
                 return;
             }
-           
+
 	    if (Character.isWhitespace((char) c))
             {
                 continue;
@@ -96,9 +96,9 @@ public class BibtexParser
 		consumeUncritically('@');
 		skipWhitespace();
 		String entryType = parseTextToken();
-		BibtexEntryType tp = 
-		    BibtexEntryType.getType(entryType); 
-		if (tp != null) 
+		BibtexEntryType tp =
+		    BibtexEntryType.getType(entryType);
+		if (tp != null)
                 {
 		    //Util.pr("Found: "+tp.getName());
 		    _db.insertEntry(parseEntry(tp));
@@ -202,7 +202,7 @@ public class BibtexParser
     public BibtexEntry parseEntry(BibtexEntryType tp) throws IOException
     {
 	String id = Util.createId(tp, _db);
-	BibtexEntry result = new BibtexEntry(id, tp); 
+	BibtexEntry result = new BibtexEntry(id, tp);
 
 	skipWhitespace();
 	consume('{','(');
@@ -217,9 +217,9 @@ public class BibtexParser
 		else key = parseKey();
 	    } catch (NoLabelException ex) {
 		// This exception will be thrown if the entry lacks a key
-		// altogether, like in "@article{ author = { ...". 
+		// altogether, like in "@article{ author = { ...".
 		// It will also be thrown if a key contains =.
-	        char c = (char)peek();	    
+	        char c = (char)peek();
 		if (Character.isWhitespace(c) || (c == '{')
 		    || (c == '\"')) {
 
@@ -229,7 +229,7 @@ public class BibtexParser
 		    if (key != null)
 			key = key+ex.getMessage()+"=";
 		    else key = ex.getMessage()+"=";
-		    doAgain = true;		  
+		    doAgain = true;
 		}
 	    }
 	}
@@ -237,11 +237,11 @@ public class BibtexParser
 	result.setField(GUIGlobals.KEY_FIELD, key);
 
 	skipWhitespace();
-	
+
 	while (true)
 	{
 	    int c = peek();
-	    if ((c == '}') || (c == ')'))	    
+	    if ((c == '}') || (c == ')'))
 	    {
 		break;
 	    }
@@ -323,10 +323,10 @@ public class BibtexParser
 		//entry.setField(key, new Integer(numVal));
 	    }
 	    else if (c == '#')
-	    {    
+	    {
 		//value.append(" # ");
 		consume('#');
-	    } 
+	    }
 	    else
 	    {
 		String textToken = parseTextToken();
@@ -335,7 +335,7 @@ public class BibtexParser
 					  "Empty text token.\nThis could be caused "+
 					  "by a missing comma between two fields.");
 		value.append("#"+textToken+"#");
-		//Util.pr(parseTextToken());	    
+		//Util.pr(parseTextToken());
 		//throw new RuntimeException("Unknown field type");
 	    }
 	    skipWhitespace();
@@ -364,7 +364,7 @@ public class BibtexParser
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) c) || 
+            if (Character.isLetterOrDigit((char) c) ||
 		(c == ':') || (c == '-')
 		|| (c == '_') || (c == '*') || (c == '+') || (c == '.')
 		|| (c == '/') || (c == '\''))
@@ -398,12 +398,12 @@ public class BibtexParser
                 return token.toString();
             }
 
-	    // Ikke: #{}¤~¨
+	    // Ikke: #{}\uFFFD~\uFFFD
 	    //
-	    // Går:  $_*+.-\/?"^
-            if (Character.isLetterOrDigit((char) c) || 
-		((c != '#') && (c != '{') && (c != '}') && (c != '¤')
-		 && (c != '~') && (c != '¨') && (c != ',') && (c != '=')
+	    // G\uFFFDr:  $_*+.-\/?"^
+            if (Character.isLetterOrDigit((char) c) ||
+		((c != '#') && (c != '{') && (c != '}') && (c != '\uFFFD')
+		 && (c != '~') && (c != '\uFFFD') && (c != ',') && (c != '=')
 		 ))
 	    {
                 token.append((char) c);
@@ -424,10 +424,10 @@ public class BibtexParser
 		    throw new IOException("Error in line "+line+":"+
 					  "Character '"+(char)c+"' is not "+
 					  "allowed in bibtex keys.");
-		
+
             }
         }
- 
+
 
     }
 
@@ -446,9 +446,9 @@ public class BibtexParser
 
 	int brackets = 0;
 
-	while (!((peek() == '}') && (brackets == 0))) 
+	while (!((peek() == '}') && (brackets == 0)))
         {
-	    
+
 	    int j = read();
             if ((j == -1) || (j == 65535))
 	    {
@@ -467,9 +467,9 @@ public class BibtexParser
 		skipWhitespace();
 	    } else
 		value.append((char) j);
-	    
+
 	}
-	
+
 	consume('}');
 
 	return value;
@@ -483,7 +483,7 @@ public class BibtexParser
         if (c != expected)
         {
             throw new RuntimeException("Error in line "+line
-		    +": Expected " 
+		    +": Expected "
 		    + expected + " but received " + (char) c);
         }
 

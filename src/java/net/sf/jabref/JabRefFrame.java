@@ -186,7 +186,7 @@ public class JabRefFrame extends JFrame {
                   openDatabaseAction.openIt(i == 0);
               }
           }
-          output(Globals.lang("Files opened: "+tabbedPane.getTabCount()));
+          output(Globals.lang("Files opened")+": "+tabbedPane.getTabCount());
       }
       setVisible(true);
       if (tabbedPane.getTabCount() > 0) {
@@ -1228,4 +1228,5 @@ public class JabRefFrame extends JFrame {
 
 
 }
+
 

@@ -288,7 +288,7 @@ public class GroupSelector extends SidePaneComponent
 
     public void revalidateList(int sel) {
 	Vector newData = new Vector();
-	newData.add(GUIGlobals.SHOW_ALL);
+	newData.add(Globals.lang("All entries"));
 	for (int i=1+OFFSET; i<groups.size(); i+=DIM) {
 	    newData.add(groups.elementAt(i));
 	}

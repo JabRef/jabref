@@ -56,6 +56,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     JPanel buttonPanel = new JPanel();
 
     JabRefFrame parent;
+    EntryCustomizationDialog ths = this;
 
     public EntryCustomizationDialog(JabRefFrame parent)
     {
@@ -142,6 +143,17 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	panel.add(typePanel);
 	panel.add(fieldPanel);
 	panel.add(messageLabel);
+
+        // Key bindings:
+        ActionMap am = panel.getActionMap();
+        InputMap im = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        im.put(GUIGlobals.exitDialog, "close");
+        am.put("close", new AbstractAction() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        });
+
 	name.requestFocus();
     }
 
@@ -229,7 +241,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	    });
         genFields.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            GenFieldsCustomizer gf = new GenFieldsCustomizer(parent);
+            GenFieldsCustomizer gf = new GenFieldsCustomizer(parent, ths);
             Util.placeDialog(gf, parent);
             gf.show();
           }
