@@ -24,31 +24,39 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.undo;
 
-package net.sf.jabref;
+import javax.swing.undo.*;
 
-public class BibtexString {
+public class CountingUndoManager extends UndoManager {
 
-    String _name, _content;
+    private int unchangedPoint = 0,
+	current = 0;
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    public CountingUndoManager() {
+	super();
     }
 
-    public String getName() {
-	return _name;
+    public synchronized boolean addEdit(UndoableEdit edit) {
+	current++;
+	return super.addEdit(edit);
+    }
+    
+    public synchronized void undo() throws CannotUndoException {
+	super.undo();
+	current--;
     }
 
-    public void setName(String name) {
-	_name = name;
+    public synchronized void redo() throws CannotUndoException {
+	super.redo();
+	current++;
     }
 
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
+    public synchronized void markUnchanged() {
+	unchangedPoint = current;
     }
 
-    public void setContent(String content) {
-	_content = content;
+    public boolean hasChanged() {
+	return !(current == unchangedPoint);
     }
 }

@@ -12,6 +12,7 @@
   <property name="build.lib" value="${build.dir}/lib"/>
   <property name="build.bin" value="${build.dir}/bin"/>
   <property name="build.images" value="${build.dir}/images"/>
+  <property name="build.resource" value="${build.dir}/resource"/>
   <property name="build.help" value="${build.dir}/help"/>
   <property name="build.javadocs" value="${build.dir}/docs/API"/>
 
@@ -19,6 +20,7 @@
   <property name="src.dir" value="src"/>
   <property name="txt.dir" value="src/txt"/>
   <property name="java.dir" value="${src.dir}/java"/>
+  <property name="resource.dir" value="${src.dir}/resource"/>
   <property name="bin.dir" value="${src.dir}/scripts"/> 
   <property name="images.dir" value="${src.dir}/images"/> 
   <property name="help.dir" value="${src.dir}/help"/> 
@@ -47,13 +49,14 @@
     	<fileset dir="${src.dir}">
 			<include name="images/**"/>
 			<include name="help/**"/>			
+			<include name="resource/**"/>			
         </fileset>
 	<fileset dir="${txt.dir}">
 	                <include name = "gpl.txt"/>
 	</fileset>
-<!--        <manifest>
-			<attribute name="Main-Class" value=""/>
-        </manifest>-->
+        <manifest>
+		  <attribute name="Main-Class" value="net.sf.jabref.JabRef"/>
+        </manifest>
      </jar>
 
      </target>
@@ -68,19 +71,25 @@
     </copy>
 -->
 
-
-<!--    <mkdir dir="${build.images}"/>
+    <mkdir dir="${build.resource}"/>
+    <copy todir="${build.resource}">
+      <fileset dir="${resource.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${build.images}"/>
     <copy todir="${build.images}">
       <fileset dir="${images.dir}">
         <include name="*" />
       </fileset>
     </copy>
-    <mkdir dir="${build.help}"/>
+<!--    <mkdir dir="${build.help}"/>
     <copy todir="${build.help}">
       <fileset dir="${help.dir}">
         <include name="*" />
       </fileset>
     </copy>-->
+
   </target>
 
 

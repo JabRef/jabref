@@ -27,28 +27,19 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-public class BibtexString {
+public interface FieldEditor {
 
-    String _name, _content;
+    public String getFieldName();
+    public javax.swing.JComponent getPane(); 
+    // Returns the component to be added to a container. Might 
+    // be a JScrollPane or the component itself.
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
-    }
+    public javax.swing.JLabel getLabel();
+    public void setLabelColor(java.awt.Color c);
+    public void setBackground(java.awt.Color c);
+    public String getText();
+    public void setText(String newText);
+    public java.awt.Container getParent();
+    public void requestFocus();
 
-    public String getName() {
-	return _name;
-    }
-
-    public void setName(String name) {
-	_name = name;
-    }
-
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
-    }
-
-    public void setContent(String content) {
-	_content = content;
-    }
 }

@@ -24,31 +24,40 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-
 package net.sf.jabref;
 
-public class BibtexString {
+import java.util.*;
 
-    String _name, _content;
+public class Globals {
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    private static String resourcePrefix = "resource/JabRef";
+    public static ResourceBundle messages;
+
+    /**
+     * String constants.
+     */
+    public static final String
+	KEY_FIELD = "bibtexkey",
+	SEARCH = "search",
+	GROUPSEARCH = "groupsearch";
+
+    public static void setLanguage(String language, String country) {
+	messages = ResourceBundle.getBundle(resourcePrefix,
+					    new Locale(language,
+						       country));
+
     }
 
-    public String getName() {
-	return _name;
+    public static String lang(String key){
+	String translation;
+	try{
+	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
+	}catch(MissingResourceException ex){
+	    translation= key;
+	    System.err.println("Warning: could not get translation for \""
+			       + key +"\"");
+	}
+	return translation.replaceAll("_"," ");
     }
 
-    public void setName(String name) {
-	_name = name;
-    }
-
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
-    }
-
-    public void setContent(String content) {
-	_content = content;
-    }
 }

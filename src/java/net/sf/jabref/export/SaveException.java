@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -25,30 +25,35 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 
-package net.sf.jabref;
+package net.sf.jabref.export;
 
-public class BibtexString {
+import net.sf.jabref.BibtexEntry;
 
-    String _name, _content;
+/**
+ * Exception thrown if saving goes wrong. If caused by a specific
+ * entry, keeps track of which entry caused the problem.
+ */
+public class SaveException extends Throwable {
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    private BibtexEntry entry;
+
+    public SaveException(String message) {
+	super(message);
+	entry = null;
     }
 
-    public String getName() {
-	return _name;
+    public SaveException(String message, BibtexEntry entry) {
+	super(message);
+	this.entry = entry;
     }
 
-    public void setName(String name) {
-	_name = name;
+    public boolean specificEntry() {
+	return (entry != null);
     }
 
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
+    public BibtexEntry getEntry() {
+	return entry;
     }
 
-    public void setContent(String content) {
-	_content = content;
-    }
+
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -24,31 +24,26 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-
 package net.sf.jabref;
 
-public class BibtexString {
+import java.util.HashMap;
 
-    String _name, _content;
+public class ParserResult {
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    private BibtexDatabase base;
+    private HashMap metaData;
+
+    public ParserResult(BibtexDatabase base, HashMap metaData) {
+	this.base = base;
+	this.metaData = metaData;
     }
 
-    public String getName() {
-	return _name;
+    public BibtexDatabase getDatabase() {
+	return base;
     }
 
-    public void setName(String name) {
-	_name = name;
+    public HashMap getMetaData() {
+	return metaData;
     }
 
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
-    }
-
-    public void setContent(String content) {
-	_content = content;
-    }
 }

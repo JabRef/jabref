@@ -24,31 +24,57 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.undo;
 
-package net.sf.jabref;
+import javax.swing.undo.*;
+import net.sf.jabref.*;
 
-public class BibtexString {
+public class UndoableRemoveString extends AbstractUndoableEdit {
 
-    String _name, _content;
+    private BibtexDatabase base;
+    private BibtexString string;
+    private int pos;
+    private BasePanel panel;
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    public UndoableRemoveString(BasePanel panel,
+				BibtexDatabase base, BibtexString string, 
+				int pos) {
+	this.base = base;
+	this.string = string;
+	this.pos = pos;
+	this.panel = panel;
     }
 
-    public String getName() {
-	return _name;
+    public String getUndoPresentationName() {
+	return "Undo: remove string ";
     }
 
-    public void setName(String name) {
-	_name = name;
+    public String getRedoPresentationName() {
+	return "Redo: remove string ";
     }
 
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
+    public void undo() {
+	super.undo();
+	
+	// Revert the change.
+	try {
+	    base.addString(string, pos);
+	} catch (KeyCollisionException ex) {
+	    ex.printStackTrace();
+	}
+
+	panel.updateStringDialog();
     }
 
-    public void setContent(String content) {
-	_content = content;
+    public void redo() {
+	super.redo();
+
+	// Redo the change.
+	base.removeString(pos);
+
+	panel.updateStringDialog();
     }
+
+
+
 }

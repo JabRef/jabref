@@ -24,31 +24,43 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.undo;
 
-package net.sf.jabref;
+import javax.swing.undo.*;
+import java.util.HashMap;
+import net.sf.jabref.*;
 
-public class BibtexString {
+/**
+ * This class represents the change of type for an entry.
+ */
+public class UndoableChangeType extends AbstractUndoableEdit {
 
-    String _name, _content;
+    BibtexEntryType oldType, newType;
+    BibtexEntry be;
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
+    public UndoableChangeType(BibtexEntry be, BibtexEntryType oldType,
+			      BibtexEntryType newType) {
+	this.oldType = oldType;
+	this.newType = newType;
+	this.be = be;
     }
 
-    public String getName() {
-	return _name;
+    public String getUndoPresentationName() {
+	return "Undo: change type";
     }
 
-    public void setName(String name) {
-	_name = name;
+    public String getRedoPresentationName() {
+	return "Redo: change type";
     }
 
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
+    public void undo() {
+	super.undo();
+	be.setType(oldType);
     }
 
-    public void setContent(String content) {
-	_content = content;
+    public void redo() {
+	super.redo();
+	be.setType(newType);
     }
+
 }

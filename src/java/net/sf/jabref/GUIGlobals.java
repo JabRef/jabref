@@ -51,16 +51,14 @@ public class GUIGlobals {
 
     // Frame titles.
     static String 
-	baseTitle = "GUIGlobals: ",
-	untitledTitle = baseTitle+"untitled",
-	emptyTitle = "GUIGlobals",
-	stringsTitle = "Strings for database: ",
-	untitledStringsTitle = stringsTitle+"untitled",
-	helpTitle = "GUIGlobals help";
+	frameTitle = "JabRef",
+	stringsTitle = Globals.lang("Strings for database")+": ",
+	untitledStringsTitle = stringsTitle+Globals.lang("untitled"),
+	helpTitle = "JabRef help";
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =
-	"This file was created with GUIGlobals.\n\n",
+	"This file was created with JabRef.\n\n",
 	SHOW_ALL = "All entries";
 
     // Size of help window.
@@ -91,17 +89,20 @@ public class GUIGlobals {
 
     public static URL 
 	//appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
-	openIconFile = GUIGlobals.class.getResource(pre+"Open"+ex),
-	newIconFile = GUIGlobals.class.getResource(pre+"New"+ex),
-	newSmallIconFile = GUIGlobals.class.getResource(pre+"New16.gif"),
-	saveIconFile = GUIGlobals.class.getResource(pre+"Save"+ex),
-	saveAsIconFile = GUIGlobals.class.getResource(pre+"SaveAs"+ex),
+	openIconFile = GUIGlobals.class.getResource(pre+"Open.gif"),
+	saveIconFile = GUIGlobals.class.getResource(pre+"Save.gif"),
+	saveAsIconFile = GUIGlobals.class.getResource(pre+"SaveAs.gif"),
+	prefsIconFile = GUIGlobals.class.getResource(pre+"Options.gif"),
+	newIconFile = GUIGlobals.class.getResource(pre+"New.gif"),
+	undoIconFile = GUIGlobals.class.getResource(pre+"Undo.gif"),
+	redoIconFile = GUIGlobals.class.getResource(pre+"Redo.gif");
+
+    /*newSmallIconFile = GUIGlobals.class.getResource(pre+"New16.gif"),
 	addIconFile = GUIGlobals.class.getResource(pre+"Add"+ex),
 	removeIconFile = GUIGlobals.class.getResource(pre+"Remove"+ex),
 	copyIconFile = GUIGlobals.class.getResource(pre+"Copy"+ex),
 	pasteIconFile = GUIGlobals.class.getResource(pre+"Paste"+ex),
 	editEntryIconFile = GUIGlobals.class.getResource(pre+"Edit"+ex),
-	prefsIconFile = GUIGlobals.class.getResource(pre+"Preferences"+ex),
 	searchIconFile = GUIGlobals.class.getResource(pre+"Find"+ex),
 	helpIconFile = GUIGlobals.class.getResource(pre+"Help"+ex),
 	helpSmallIconFile = GUIGlobals.class.getResource(pre+"Help16.gif"),
@@ -121,10 +122,9 @@ public class GUIGlobals {
 	sourceIconFile = GUIGlobals.class.getResource(pre+"viewsource.gif"),
 	stringsIconFile = GUIGlobals.class.getResource(pre+"strings.gif"),
 	contentsIconFile = GUIGlobals.class.getResource(pre+"contents.gif"),
-	undoIconFile = GUIGlobals.class.getResource(pre+"Undo"+ex),
-	redoIconFile = GUIGlobals.class.getResource(pre+"Redo"+ex),
 	groupsIconFile = GUIGlobals.class.getResource(pre+"groups.gif"),
 	refreshSmallIconFile = GUIGlobals.class.getResource(pre+"Refresh16.gif");
+	*/
     // Help files (in HTML format):
     public static URL
 	baseFrameHelp = GUIGlobals.class.getResource(helpPre+"GUIGlobalsHelp.html"),

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -24,31 +24,23 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.label;
 
-package net.sf.jabref;
+import net.sf.jabref.*;
+import java.util.StringTokenizer ; 
 
-public class BibtexString {
+public class IncollectionLabelRule extends ArticleLabelRule {
 
-    String _name, _content;
+    // this is the rule used handle articles
+    // we try (first author)/(year)
 
-    public BibtexString(String name, String content) {
-	_name = name;
-	_content = content;
-    }
+    // Same thing as the ArticleLabelRule
+//    public BibtexEntry applyRule(BibtexEntry oldEntry){
+//    }
+//
 
-    public String getName() {
-	return _name;
-    }
-
-    public void setName(String name) {
-	_name = name;
-    }
-
-    public String getContent() {
-	return ((_content == null) ? "" : _content);
-    }
-
-    public void setContent(String content) {
-	_content = content;
-    }
+    
 }
+
+
+
