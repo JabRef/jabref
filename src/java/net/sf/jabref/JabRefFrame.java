@@ -33,6 +33,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -1413,41 +1414,45 @@ class ImportCiteSeerAction
 
 			    public void run() {
 			        currentBp = (BasePanel) tabbedPane.getSelectedComponent();
-					int clickedOn = -1;
+					int[] clickedOn = null;
 					// We demand that one and only one row is selected.
 					int rowCount = currentBp.entryTable.getSelectedRowCount();
-					if (rowCount == 1) {
-						clickedOn = currentBp.entryTable.getSelectedRow();
-					} else if (rowCount > 1) {
-						JOptionPane.showMessageDialog(currentBp.frame(),
-				        Globals.lang("This operation cannot work on multiple rows."),
-				        Globals.lang("CiteSeer Import Error"),
-						JOptionPane.WARNING_MESSAGE);
+					if (rowCount >= 1) {
+						clickedOn = currentBp.entryTable.getSelectedRows();
 					} else {
 						JOptionPane.showMessageDialog(currentBp.frame(),
 						Globals.lang("You must select a row to perform this operation."),
 						Globals.lang("CiteSeer Import Error"),
 						JOptionPane.WARNING_MESSAGE);
 					}
-					if (clickedOn >= 0) {
-					    currentBp.citeSeerFetcher.beginImportCiteSeerProgress();
-						id =  currentBp.tableModel.getNameFromNumber(clickedOn);
+					if (clickedOn != null) {
+						Vector clickedVector = new Vector();
+						for(int i=0; i < clickedOn.length; i++)
+							clickedVector.add(new Integer(clickedOn[i]));
+						Iterator clickedIterator = clickedVector.iterator();
 						NamedCompound citeseerNamedCompound =
 							new NamedCompound("CiteSeer Import Fields");
-						BibtexEntry be =
-							(BibtexEntry) currentBp.database.getEntryById(id);
-						boolean newValue =
-						    currentBp.citeSeerFetcher.importCiteSeerEntry(be, citeseerNamedCompound);
-						if (newValue) {
-							citeseerNamedCompound.end();
-							currentBp.undoManager.addEdit(citeseerNamedCompound);
-							SwingUtilities.invokeLater(updateComponent);
-						} else {
-						    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
-							output(Globals.lang("Citation import from CiteSeer failed."));
+						BooleanAssign overwriteAll = new BooleanAssign(false);
+						BooleanAssign overwriteNone = new BooleanAssign(false);						
+						while (clickedIterator.hasNext()) {
+							int currentIndex = ((Integer) clickedIterator.next()).intValue();
+							currentBp.citeSeerFetcher.beginImportCiteSeerProgress();
+							id =  currentBp.tableModel.getNameFromNumber(currentIndex);
+							BibtexEntry be =
+								(BibtexEntry) currentBp.database.getEntryById(id);
+							boolean newValue =
+								currentBp.citeSeerFetcher.importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone);
+							if (newValue) {
+								SwingUtilities.invokeLater(updateComponent);
+							} else {
+								currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+								output(Globals.lang("Citation import from CiteSeer failed."));
+							}
 						}
+						citeseerNamedCompound.end();
+						currentBp.undoManager.addEdit(citeseerNamedCompound);						
+						basePanel().citeSeerFetcher.deactivateImportFetcher();
 					}
-					basePanel().citeSeerFetcher.deactivateImportFetcher();
 			    }
 			}).start();
 		} else {

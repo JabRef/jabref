@@ -41,10 +41,8 @@ public class CiteSeerUndoHandler extends HandlerBase {
 
     BasePanel panel = null;
 
-    boolean overwriteAll = false;
-
-    boolean overwriteNone = false;
-
+    BooleanAssign overwriteAll;
+    BooleanAssign overwriteNone;
     BooleanAssign recordFound;
     
     String newAuthors = null;
@@ -89,32 +87,33 @@ public class CiteSeerUndoHandler extends HandlerBase {
 
         String userChoice = (String) optionPane.getValue();
         if (userChoice.equals("Yes to All")) {
-            overwriteAll = true;
+            overwriteAll.setValue(true);
             retval = true;
         } else if (userChoice.equals("Yes")) {
             retval = true;
         } else if (userChoice.equals("No to All")) {
-            overwriteNone = true;
+            overwriteNone.setValue(true);
         }
         return (retval);
     }
 
-    /**
-     * @param be
-     * 
-     * We must remember to clobber the author field, because of the current
-     * implementation of addAuthor()
-     */
     public CiteSeerUndoHandler(NamedCompound newCompound, BibtexEntry be,
-            BasePanel basePanel, BooleanAssign assignment) {
+            BasePanel basePanel, BooleanAssign assignment, BooleanAssign overwriteAll, BooleanAssign overwriteNone) {
         citeseerNamedCompound = newCompound;
         bibEntry = be;
         panel = basePanel;
         recordFound = assignment;
         recordFound.setValue(false);
+        this.overwriteAll = overwriteAll;
+        this.overwriteNone = overwriteNone;    	
     }
 
-    public void characters(char[] ch, int start, int length) {
+    public CiteSeerUndoHandler(NamedCompound newCompound, BibtexEntry be,
+            BasePanel basePanel, BooleanAssign assignment) {
+    	this(newCompound, be, basePanel, assignment, new BooleanAssign(false), new BooleanAssign(false));
+    }
+       
+	public void characters(char[] ch, int start, int length) {
         if (nextAssign == true) {
             String target = new String(ch, start, length);        
             if (nextField.equals("title")) {
@@ -163,9 +162,9 @@ public class CiteSeerUndoHandler extends HandlerBase {
             overwrite = true;
         else if (oldValue.equals(newValue))
             overwrite = false;
-        else if (overwriteAll == true)
+        else if (overwriteAll.getValue() == true)
             overwrite = true;
-        else if (overwriteNone == true)
+        else if (overwriteNone.getValue() == true)
             overwrite = false;
         else
             overwrite = overwriteDialog(oldValue, newValue, fieldName);

@@ -133,7 +133,9 @@ public class EntryTableModel
     String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
     if (col == 0) {
       if (!isComplete(row)) {
-        return GUIGlobals.incompleteLabel;
+      	JLabel incomplete = new JLabel("" + (row + 1),GUIGlobals.incompleteLabel.getIcon(), JLabel.RIGHT);
+//      	JLabel incomplete = new JLabel("" + (row + 1));
+        return incomplete;
       } else
         o = "" + (row + 1);
 

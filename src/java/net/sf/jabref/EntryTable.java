@@ -363,7 +363,8 @@ public class EntryTable extends JTable {
 	    renderer = defRenderer;
 	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
-	    renderer = defRenderer;
+	    renderer = iconStringRenderer;
+//	    renderer = defRenderer;
 	    /*if (tableModel.isComplete(row))
 		renderer = defRenderer;
 	    else {
@@ -425,6 +426,7 @@ public class EntryTable extends JTable {
     // The following classes define the renderers used to render required
     // and optional fields in the table. The purpose of these renderers is
     // to visualize which fields are needed for each entry.
+    private 	IconStringRenderer iconStringRenderer = new IconStringRenderer();
     private Renderer defRenderer = new Renderer(GUIGlobals.tableBackground),
 	reqRenderer = new Renderer(GUIGlobals.tableReqFieldBackground),
 	optRenderer = new Renderer(GUIGlobals.tableOptFieldBackground),

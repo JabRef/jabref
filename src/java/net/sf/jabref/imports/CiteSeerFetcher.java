@@ -320,7 +320,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 {
 		try {
 			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");
-			BooleanAssign dummyBoolean = new BooleanAssign();
+			BooleanAssign dummyBoolean = new BooleanAssign(false);
 		if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			int citationCounter=0;
 			for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
@@ -432,11 +432,13 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	/**
 	 * @param be
+	 * @param overwriteNone
+	 * @param overwriteAll
 	 *
 	 */
-	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC) {
+	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC, BooleanAssign overwriteAll, BooleanAssign overwriteNone) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
-		BooleanAssign newValue = new BooleanAssign();
+		BooleanAssign newValue = new BooleanAssign(false);
     	String identifier = generateCanonicalIdentifier(be);			 
 		try {
 			if (identifier != null) {
@@ -447,7 +449,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append("&" + "identifier=" + identifier);
 					GetMethod citeseerMethod = new GetMethod(citeseerURLString.toString());
 					int response = citeseerHttpClient.executeMethod(citeseerMethod);		
-					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), new CiteSeerUndoHandler(citeseerNC, be, panel, newValue));
+					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), 
+							new CiteSeerUndoHandler(citeseerNC, be, panel, newValue, overwriteAll, overwriteNone));
 					citeseerMethod.releaseConnection();
 					if (newValue.getValue() == false) {
 					    int row = panel.getTableModel().getNumberFromName(be.getId());					    

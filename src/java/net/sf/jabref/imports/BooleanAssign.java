@@ -14,7 +14,14 @@ public class BooleanAssign {
     
     boolean value;
     
-    public void setValue(boolean value) {
+    /**
+	 * @param b
+	 */
+	public BooleanAssign(boolean b) {
+		setValue(b);		
+	}
+
+	public void setValue(boolean value) {
         this.value = value;
     }
     
