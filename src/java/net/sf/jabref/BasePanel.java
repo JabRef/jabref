@@ -1125,7 +1125,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    try {
 		database.insertEntry(be);
 	    // Create new Bibtex entry
-	    // Create new Bibtex entry
 	    // Set owner field to default value
 	    be.setField( "owner", prefs.get("defaultOwner") );
 
@@ -1136,6 +1135,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
 		       +Globals.lang("entry")+".");
 		refreshTable();
+                int row = tableModel.getNumberFromName(id);
+                //Util.pr(""+row);
+                entryTable.clearSelection();
+                entryTable.scrollTo(row);
 		markBaseChanged(); // The database just changed.
 		if (prefs.getBoolean("autoOpenForm")) {
 		    showEntry(be);
