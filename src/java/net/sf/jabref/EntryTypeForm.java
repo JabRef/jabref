@@ -1027,5 +1027,48 @@ public class EntryTypeForm extends JDialog implements VetoableChangeListener {
 	setField(e.getPropertyName(), (String)(e.getNewValue())); 
 	//Util.pr(e.getPropertyName());
     }
+	
+	class ExternalViewerListener extends MouseAdapter {
+		public void mouseClicked(MouseEvent evt) {
+			if (evt.getClickCount() == 2) {
+				JTextField tf = (JTextField)evt.getSource();
+				tf.selectAll();
+				String link = tf.getText(); // get selected ?  String 	getSelectedText() 
+				// check html first since browser can invoke viewers
+				if(link.substring(0,7).equals("http://")){ // hml
+					try {
+						System.err.println("Message: Opening url (" + link + ") with the HTML viewer (" + prefs.get("htmlviewer") +")");						
+						Process child = Runtime.getRuntime().exec(prefs.get("htmlviewer") + " " + link);
+					} catch (IOException e) {
+						System.err.println("Warning: Unable to open url " + link + " with the HTML viewer (" + prefs.get("htmlviewer") +")");			
+					}
+				}
+				else if(link.endsWith(".ps")){
+					try {
+						System.err.println("Message: Opening file " + link + " with the ps viewer (" + prefs.get("psviewer") +")");									
+						Process child = Runtime.getRuntime().exec(prefs.get("psviewer") + " " + link);
+					} catch (IOException e) {
+						System.err.println("Warning: Unable to open file (" + link + ") with the postscipt viewer (" + prefs.get("psviewer") +")");
+					}
+					
+				}else if(link.endsWith(".pdf")){
+					try {
+						System.err.println("Message: Opening file (" + link + ") with the pdf viewer (" + prefs.get("pdfviewer") +")");						
+						Process child = Runtime.getRuntime().exec(prefs.get("pdfviewer") + " " + link);
+					} catch (IOException e) {
+						System.err.println("Warning: Unable to open file " + link + " with the pdf viewer (" + prefs.get("pdfviewer") +")");			
+					}
+				}
+				
+				else{
+					System.err.println("Message: currently only pdf, ps and HTML files can be opened by double clicking");
+					//ignore
+				}
+
+			}
+			
+		}
+    }
+ 
 
 }
