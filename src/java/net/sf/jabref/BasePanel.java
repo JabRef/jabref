@@ -823,6 +823,17 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                 }
             });
 
+        actions.put("toggleSearch", new BaseAction() {
+                public void action() {
+                    //sidePaneManager.togglePanel("search");
+                    sidePaneManager.togglePanel("search");
+                    boolean on = sidePaneManager.isPanelVisible("search");
+                    frame.searchToggle.setSelected(on);
+                    if (on)
+                      searchManager.startSearch();
+                }
+            });
+
         actions.put("incSearch", new BaseAction() {
                 public void action() {
                     sidePaneManager.ensureVisible("search");

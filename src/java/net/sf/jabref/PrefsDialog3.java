@@ -50,7 +50,12 @@ public class PrefsDialog3 extends JDialog {
     private JabRefPreferences _prefs;
     JPanel upper = new JPanel(),
         lower = new JPanel(),
-	main = new JPanel();
+	main = new JPanel();/* {
+		public void add(Component c, Object o) {
+		    super.add(c, o);
+		    System.out.println(o+" "+c.getPreferredSize());
+		    }
+		    };*/
     JList chooser;
     CardLayout cardLayout = new CardLayout();
     HashMap panels = new HashMap();
@@ -159,13 +164,16 @@ public class PrefsDialog3 extends JDialog {
         public void actionPerformed(ActionEvent e) {
 
 	    AbstractWorker worker = new AbstractWorker() {
+		    boolean ready = true;
 		    public void run() {
 			// First check that all tabs are ready to close:
 			int count = main.getComponentCount();
 			Component[] comps = main.getComponents();
 			for (int i = 0; i < count; i++) {
-			    if (!((PrefsTab)comps[i]).readyToClose())
+			    if (!((PrefsTab)comps[i]).readyToClose()) {
+				ready = false;
 				return; // If not, break off.
+			    }
 			}			
 			// Then store settings and close:
 			for (int i = 0; i < count; i++) {
@@ -175,6 +183,8 @@ public class PrefsDialog3 extends JDialog {
 			//try { Thread.sleep(3000); } catch (InterruptedException ex) {}
 		    }
 		    public void update() {
+			if (!ready)
+			    return;
 			dispose();
 			frame.setupAllTables();
 			frame.output(Globals.lang("Preferences recorded."));

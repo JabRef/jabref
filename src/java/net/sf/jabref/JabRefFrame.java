@@ -196,9 +196,12 @@ public class JabRefFrame
                                             "Start incremental search",
                                             GUIGlobals.searchIconFile,
                                             prefs.getKey("Incremental search")),
-      normalSearch = new GeneralAction("search", "Search", "Toggle search panel",
+      normalSearch = new GeneralAction("search", "Search", "Search",
                                        GUIGlobals.searchIconFile,
                                        prefs.getKey("Search")),
+      toggleSearch = new GeneralAction("toggleSearch", "Search", "Toggle search panel",
+                                       GUIGlobals.searchIconFile),
+    //                                       prefs.getKey("Search")),
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
@@ -1011,7 +1014,7 @@ public JabRefPreferences prefs() {
     tlb.addAction(unmark);
 
     tlb.addSeparator();
-    searchToggle = new JToggleButton(normalSearch);
+    searchToggle = new JToggleButton(toggleSearch);
     searchToggle.setText(null);
     if (!Globals.ON_MAC)
         searchToggle.setMargin(marg);
@@ -1148,6 +1151,7 @@ public JabRefPreferences prefs() {
     editPreamble.setEnabled(false);
     editStrings.setEnabled(false);
     toggleGroups.setEnabled(false);
+    toggleSearch.setEnabled(false);
     makeKeyAction.setEnabled(false);
     lyxPushAction.setEnabled(false);
     winEdtPushAction.setEnabled(false);
@@ -1200,6 +1204,7 @@ public JabRefPreferences prefs() {
     editPreamble.setEnabled(true);
     editStrings.setEnabled(true);
     toggleGroups.setEnabled(true);
+    toggleSearch.setEnabled(true);
     makeKeyAction.setEnabled(true);
     lyxPushAction.setEnabled(true);
     winEdtPushAction.setEnabled(true);

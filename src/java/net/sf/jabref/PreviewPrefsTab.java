@@ -13,8 +13,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    JTextArea layout1 = new JTextArea("", 1, 60),
-	layout2 = new JTextArea("", 1, 60);
+    JTextArea layout1 = new JTextArea("", 1, 1),
+    layout2 = new JTextArea("", 1, 1);
     JButton def1 = new JButton(Globals.lang("Default")),
 	def2 = new JButton(Globals.lang("Default"));
     JPanel p1 = new JPanel(),

@@ -17,13 +17,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder,
 	allowEditing;
     private JTextField groupField = new JTextField(15);
-    private JTextField defOwnerField;
+    private JTextField defOwnerField, fontSize;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
         encodings = new JComboBox(Globals.ENCODINGS);
     private HelpAction ownerHelp, pdfHelp;
-
+    private int oldMenuFontSize;
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
 	_prefs = prefs;
@@ -68,6 +68,12 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
              break outer;
            }
          }
+
+	 // Font sizes:
+	 fontSize = new JTextField("");
+	 fontSize.setText(""+_prefs.getInt("menuFontSize"));
+	 oldMenuFontSize = _prefs.getInt("menuFontSize");
+
 
 	// Language choice
         String oldLan = _prefs.get("language");
@@ -119,7 +125,10 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
 	lab = new JLabel(Globals.lang("Default encoding")+":");
 	builder2.append(lab); 
 	builder2.append(encodings);
-
+	lab = new JLabel(Globals.lang("Menu and label font size")+":");
+	builder2.nextLine();
+	builder2.append(lab); 
+	builder2.append(fontSize); 
 	builder.append(pan);
 	builder.append(builder2.getPanel());
 	builder.nextLine();
@@ -157,10 +166,32 @@ defOwnerField = new JTextField(_prefs.get("defaultOwner"));
               +"You must restart JabRef for this to come into effect."), Globals.lang("Changed language settings"),
                                         JOptionPane.WARNING_MESSAGE);
         }
+
+	try {
+	    int size = Integer.parseInt(fontSize.getText());	    
+	    if (size != oldMenuFontSize) {
+		_prefs.putInt("menuFontSize", size);
+		JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
+								 +"You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
+					      JOptionPane.WARNING_MESSAGE);
+	    }
+	    
+	} catch (NumberFormatException ex) {
+	    ex.printStackTrace();
+	}
     }
 
     public boolean readyToClose() {
-	return true;
+	try {
+	    int size = Integer.parseInt(fontSize.getText());	    
+	    return true; // Ok, the number was legal.
+	} catch (NumberFormatException ex) {
+	    JOptionPane.showMessageDialog
+		(null, Globals.lang("You must enter an integer value in the text field for")+" '"+
+		 Globals.lang("Menu and label font size")+"'", Globals.lang("Changed font settings"),
+		 JOptionPane.ERROR_MESSAGE);
+	    return false;
+	}
     }
 
 }

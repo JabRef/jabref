@@ -391,7 +391,8 @@ public class GroupSelector
 
       public void mouseClicked(MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
-        if (e.getButton() == MouseEvent.BUTTON3) {
+        if ( (e.getButton() == MouseEvent.BUTTON3) ||
+             (prefs.getBoolean("ctrlClick") && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
           if ( (index > 0) // Menu for index 0 also?
               && (index < list.getModel().getSize())) {
             list.setSelectedIndex(index);

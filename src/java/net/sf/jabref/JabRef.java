@@ -71,8 +71,10 @@ public class JabRef {
     }*/
 
   public static void main(String[] args) {
-
     boolean graphicFailure = false;
+
+    System.setProperty("sun.awt.noerasebackground", "true");
+    //System.out.println(java.awt.Toolkit.getDefaultToolkit().getDesktopProperty("awt.dynamicLayoutSupported"));
 
     // Make sure of a proper cleanup when quitting (e.g. deleting temporary files).
     System.runFinalizersOnExit(true);
@@ -575,6 +577,7 @@ public class JabRef {
       }
 
       ss.dispose();
+
       jrf.setVisible(true);
       if (loaded.size() > 0) {
         jrf.tabbedPane.setSelectedIndex(0);

@@ -44,7 +44,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 	    });
 
 	FormLayout layout = new FormLayout
-	    ("1dlu, 8dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
+	    ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
 	     "");                	
 	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 	JPanel pan = new JPanel();

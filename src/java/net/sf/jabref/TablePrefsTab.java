@@ -28,7 +28,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private boolean tableChanged = false;
     private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
-    private int oldMenuFontSize;
+
 
     /**
      * Customization of external program paths.
@@ -62,11 +62,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
         secField = new JTextField(_prefs.get("secSort"), 10);
         terField = new JTextField(_prefs.get("terSort"), 10);
-        //fontSize = new JFormattedTextField(java.text.NumberFormat.getIntegerInstance());
-        fontSize = new JTextField("");
-	fontSize.setPreferredSize(new Dimension(45, fontSize.getPreferredSize().height));
-	fontSize.setText(""+_prefs.getInt("menuFontSize"));
-	oldMenuFontSize = _prefs.getInt("menuFontSize");
+
+
 	
 
         secSort.insertItemAt(Globals.lang("<select>"), 0);
@@ -320,32 +317,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//_prefs.put("menuFontFamily", menuFont.getFamily());
 	//_prefs.putInt("menuFontStyle", menuFont.getStyle());
 	//_prefs.putInt("menuFontSize", menuFont.getSize());
-	try {
-	    int size = Integer.parseInt(fontSize.getText());	    
-	    if (size != oldMenuFontSize) {
-		_prefs.putInt("menuFontSize", size);
-		JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
-              +"You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
-					      JOptionPane.WARNING_MESSAGE);
-	    }
 
-	} catch (NumberFormatException ex) {
-	    ex.printStackTrace();
-	}
 	GUIGlobals.CURRENTFONT = font;
     }
 
     public boolean readyToClose() {
-	try {
-	    int size = Integer.parseInt(fontSize.getText());	    
-	    return true; // Ok, the number was legal.
-	} catch (NumberFormatException ex) {
-	    JOptionPane.showMessageDialog
-		(null, Globals.lang("You must enter an integer value in the text field for")+" '"+
-		 Globals.lang("Menu and label font size")+"'", Globals.lang("Changed font settings"),
-		 JOptionPane.ERROR_MESSAGE);
-	    return false;
-	}
+	return true;
     }
 
 }
