@@ -38,9 +38,11 @@ public class IsiImporter implements ImportFormat {
     String str;
 
     while ((str = in.readLine()) != null) {
-      //Inspec and IEEE seem to have these strange " - " between key and value
-      str = str.replace(" - ", "");
-      //System.out.println(str);
+
+      // The following line gives false positives for RIS files, so it should
+      // not be uncommented. The hypen is a characteristic of the RIS format.
+      //str = str.replace(" - ", "");
+
 
       if (pat1.matcher(str).find())
         return true;
