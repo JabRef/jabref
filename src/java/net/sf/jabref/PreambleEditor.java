@@ -183,7 +183,9 @@ public class PreambleEditor extends JDialog {
 	    putValue(SHORT_DESCRIPTION, "Undo");
 	}    
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("undo");
+	    try {
+		panel.runCommand("undo");
+	    } catch (Throwable ex) {}
 	}
     }
 
@@ -194,7 +196,9 @@ public class PreambleEditor extends JDialog {
 	    putValue(SHORT_DESCRIPTION, "Redo");
 	}    
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("redo");
+	    try {
+		panel.runCommand("redo");
+	    } catch (Throwable ex) {}
 	}
     }
 

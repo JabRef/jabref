@@ -147,7 +147,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      * appropriate BaseAction object, and runs its action() method.
      */
     abstract class BaseAction {
-	abstract void action();
+	abstract void action() throws Throwable;
     }
 
     private void setupActions() {
@@ -174,7 +174,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 	// The action for saving a database.
 	actions.put("save", new BaseAction() {
-		public void action() {
+		public void action() throws Throwable {
 		    if (file == null)
 			runCommand("saveAs");
 		    else {
@@ -211,13 +211,14 @@ public class BasePanel extends JSplitPane implements MouseListener,
 				 +".\n"+ex.getMessage(),
 				 Globals.lang("Save database"),
 				 JOptionPane.ERROR_MESSAGE);
+			    throw new SaveException("rt");
 			}
 		    }
 		}
 	    });
 
 	actions.put("saveAs", new BaseAction () {
-		public void action() {
+		public void action() throws Throwable {
 		    JFileChooser chooser = new JFileChooser
 			(prefs.get("workingDirectory"));
 		    chooser.setFileFilter(new OpenFileFilter());
@@ -277,7 +278,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	    });
 
 	actions.put("cut", new BaseAction() {
-		public void action() {
+		public void action() throws Throwable {
 		    runCommand("copy");
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
 		    if ((bes != null) && (bes.length > 0)) {
@@ -821,7 +822,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
      *
      * @param command The name of the command to run.
     */
-    public void runCommand(String command) {
+    public void runCommand(String command) throws Throwable {
 	if (actions.get(command) == null)
 	    Util.pr("No action defined for'"+command+"'");
 	else ((BaseAction)actions.get(command)).action();
@@ -882,27 +883,42 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
 	entryTable.getActionMap().put("Cut", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    runCommand("cut");
+		    try { runCommand("cut"); 
+		    } catch (Throwable ex) {
+			ex.printStackTrace();
+		    }
 		}
 	    });
 	entryTable.getActionMap().put("Copy", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    runCommand("copy");
+		    try { runCommand("copy");
+		    } catch (Throwable ex) {
+			ex.printStackTrace();
+		    }
 		}
 	    });
 	entryTable.getActionMap().put("Paste", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    runCommand("paste");
+		    try { runCommand("paste");
+		    } catch (Throwable ex) {
+			ex.printStackTrace();
+		    }
 		}
 	    });
 
 	entryTable.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER){
-					runCommand("edit");
+					try { runCommand("edit");
+					} catch (Throwable ex) {
+					    ex.printStackTrace();
+					}
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_DELETE){
-					runCommand("delete");
+					try { runCommand("delete");
+					} catch (Throwable ex) {
+					    ex.printStackTrace();
+					}
 		    }
 		}
 	    });
@@ -1381,7 +1397,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	// Intercepts mouse clicks from the JTable showing the base contents.
 	// A double click on an entry should open the entry's editor.
 	if (e.getClickCount() == 2) {
-	    runCommand("edit");
+	    try{ runCommand("edit");
+	    } catch (Throwable ex) {
+		ex.printStackTrace();
+	    }
 	}
     }
 

@@ -50,17 +50,23 @@ public class RightClickMenu extends JPopupMenu
 
 	add(new AbstractAction(Globals.lang("Copy")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("copy");
+		    try {
+			panel.runCommand("copy");
+		    } catch (Throwable ex) {}
 		}
 	    });
 	add(new AbstractAction(Globals.lang("Paste")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("paste");
+		    try {
+			panel.runCommand("paste");
+		    } catch (Throwable ex) {}
 		}
 	    });
 	add(new AbstractAction(Globals.lang("Cut")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("cut");
+		    try {
+			panel.runCommand("cut");
+		    } catch (Throwable ex) {}
 		}
 	    });
 
@@ -68,19 +74,25 @@ public class RightClickMenu extends JPopupMenu
 
 	add(new AbstractAction(Globals.lang("Open pdf or ps")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("openFile");
+		    try {
+			panel.runCommand("openFile");
+		    } catch (Throwable ex) {}
 		}
 	    });	
 	
 	add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("copyKey");
+		    try {
+			panel.runCommand("copyKey");
+		    } catch (Throwable ex) {}
 		}
 	    });
 
 	add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}")) {
 		public void actionPerformed(ActionEvent e) {
-		    panel.runCommand("copyCiteKey");
+		    try {
+			panel.runCommand("copyCiteKey");
+		    } catch (Throwable ex) {}
 		}
 	    });
 

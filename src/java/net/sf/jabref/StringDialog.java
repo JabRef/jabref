@@ -474,7 +474,9 @@ public class StringDialog extends JDialog {
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Undo"));
 	}    
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("undo");
+	    try {
+		panel.runCommand("undo");
+	    } catch (Throwable ex) {}
 	}
     }
 
@@ -485,7 +487,9 @@ public class StringDialog extends JDialog {
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Redo"));
 	}    
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("redo");
+	    try {
+		panel.runCommand("redo");
+	    } catch (Throwable ex) {}
 	}
     }
 

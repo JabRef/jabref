@@ -385,8 +385,12 @@ public class JabRefFrame extends JFrame {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (tabbedPane.getTabCount() > 0)
-		((BasePanel)(tabbedPane.getSelectedComponent()))
-		    .runCommand(command);
+		try {
+		    ((BasePanel)(tabbedPane.getSelectedComponent()))
+			.runCommand(command);
+		} catch (Throwable ex) {
+		    ex.printStackTrace();
+		}
 	    else
 		Util.pr("Action '"+command+"' must be disabled when no "
 			+"database is open.");
@@ -819,7 +823,14 @@ public class JabRefFrame extends JFrame {
 							close = false; // The user has cancelled.
 						if (answer == JOptionPane.YES_OPTION) {
 							// The user wants to save.
+						    try {
 							basePanel().runCommand("save");
+						    } catch (Throwable ex) {
+							// Something prevented the file
+							// from being saved. Break!!!
+							close = false;
+							break;
+						    }
 						}
 					}
 					if (baseAt(i).file != null)
@@ -890,7 +901,14 @@ public class JabRefFrame extends JFrame {
 					close = false; // The user has cancelled.
 				if (answer == JOptionPane.YES_OPTION) {
 					// The user wants to save.
+				    try {
 					basePanel().runCommand("save");
+				    } catch (Throwable ex) {
+					// Something prevented the file
+					// from being saved. Break!!!
+					close = false;
+				    }
+
 				}
 			}
 
@@ -1404,7 +1422,9 @@ public class JabRefFrame extends JFrame {
 			     JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 			    // The user wants to save.
-			    basePanel().runCommand("save");
+			    try {
+				basePanel().runCommand("save");
+			    } catch (Throwable ex) {}
 			}
 		    }
 		    if (baseAt(i).file != null)

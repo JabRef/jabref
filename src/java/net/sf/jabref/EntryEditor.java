@@ -1213,7 +1213,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    putValue(SHORT_DESCRIPTION, "Undo");
 	}
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("undo");
+	    try {
+		panel.runCommand("undo");
+	    } catch (Throwable ex) {}
 	}
     }
 
@@ -1224,7 +1226,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    putValue(SHORT_DESCRIPTION, "Redo");
 	}
 	public void actionPerformed(ActionEvent e) {
-	    panel.runCommand("redo");
+	    try {
+		panel.runCommand("redo");
+	    } catch (Throwable ex) {}
 	}
     }
 
@@ -1240,7 +1244,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           // Source panel.
           storeFieldAction.actionPerformed(new ActionEvent(comp, 0,""));
         }
-        panel.runCommand("save");
+	try {
+	    panel.runCommand("save");
+	} catch (Throwable ex) {}
       }
     }
 
