@@ -1633,7 +1633,8 @@ public class JabRefFrame
       htmlItem = new JMenuItem(Globals.lang("HTML")),
       simpleHtmlItem = new JMenuItem(Globals.lang("Simple HTML")),
       //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
-      docbookItem = new JMenuItem(Globals.lang("Docbook"));
+      docbookItem = new JMenuItem(Globals.lang("Docbook")),
+      bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML"));
 
   private void setUpExportMenu(JMenu menu) {
     ActionListener listener = new ActionListener() {
@@ -1654,6 +1655,12 @@ public class JabRefFrame
           lfFileName = "docbook";
           extension = ".xml";
         }
+        else if (source == bibtexmlItem) {
+          lfFileName = "bibtexml";
+          extension = ".xml";
+        }
+
+
         // We need to find out:
         // 1. The layout definition string to use. Or, rather, we
         //    must provide a Reader for the layout definition.
@@ -1698,6 +1705,8 @@ public class JabRefFrame
     menu.add(simpleHtmlItem);
     //plainTextItem.addActionListener(listener);
     //menu.add(plainTextItem);
+    bibtexmlItem.addActionListener(listener);
+    menu.add(bibtexmlItem);
     docbookItem.addActionListener(listener);
     menu.add(docbookItem);
 

@@ -74,6 +74,7 @@ Change log:
 	- Added menu and toolbar actions for open pdf/ps and url/doi.
 	- Added web lookup of DOI.
 	- Added several new special field markers to the key autogenerator.
+      	- Added BibTeXML and simple HTML export.
       	- Improved HTML export for several entry types.
       	- Improved compatibility with Mac OSX.
 	- Made it possible to set custom secondary and tertiary sort fields.
