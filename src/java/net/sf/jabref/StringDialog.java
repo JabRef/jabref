@@ -86,7 +86,8 @@ public class StringDialog extends JDialog {
 	con.fill = GridBagConstraints.BOTH;
 	con.weighty = 1;
 	con.weightx = 1;
-	table = new StringTable(this, base);
+	StringTableModel stm = new StringTableModel(this, base);
+	table = new StringTable(stm);
 	if (base.getStringCount() > 0)
 	    table.setRowSelectionInterval(0,0);
 
@@ -138,8 +139,8 @@ public class StringDialog extends JDialog {
 
     class StringTable extends JTable {
 	JScrollPane sp = new JScrollPane((JTable)this);
-	public StringTable(StringDialog parent, BibtexDatabase base) {
-	    super(new StringTableModel(parent, base));	  
+	public StringTable(StringTableModel stm) {
+	    super(stm);	  
 	    setShowVerticalLines(true);
 	    setShowHorizontalLines(true);
 	    setColumnSelectionAllowed(true);
