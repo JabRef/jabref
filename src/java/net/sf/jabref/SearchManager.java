@@ -181,6 +181,12 @@ class SearchManager extends JPanel
 			repeatIncremental();
 		}
 	    });
+	searchField.getInputMap().put(prefs.getKey("Clear search"), "escape");
+	searchField.getActionMap().put("escape", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    ths.actionPerformed(new ActionEvent(escape, 0, ""));
+		}
+	    });
     }
 
     protected void updatePrefs() {

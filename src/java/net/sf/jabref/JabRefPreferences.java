@@ -287,6 +287,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Search", "ctrl F");
 	defKeyBinds.put("Incremental search", "ctrl shift F");
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
+	defKeyBinds.put("Close entry editor", "ESCAPE");
+	defKeyBinds.put("Clear search", "ESCAPE");
     }
 
     private String getNextUnit(Reader data) throws IOException {

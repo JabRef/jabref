@@ -869,6 +869,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	entryTable.setShowingSearchResults(showingSearchResults,
 					   showingGroup);
 	refreshTable();
+	entryTable.requestFocus();
     }
 
     public void stopShowingGroup() {

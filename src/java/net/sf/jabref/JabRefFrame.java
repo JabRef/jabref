@@ -972,6 +972,8 @@ public class JabRefFrame extends JFrame {
 			*/
 			tabbedPane.add(Globals.lang("untitled"), bp);
 			tabbedPane.setSelectedComponent(bp);
+			if (tabbedPane.getTabCount() == 1)
+			    setNonEmptyState();
 			output("Imported database '"+filename+"' with "+
 			       database.getEntryCount()+" entries.");
 		}
