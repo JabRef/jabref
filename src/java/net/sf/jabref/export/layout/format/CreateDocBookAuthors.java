@@ -26,6 +26,7 @@ import wsi.ra.tool.WSITools;
 import java.util.Vector;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.imports.*;
 
 
 /**
@@ -37,8 +38,6 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 public class CreateDocBookAuthors implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
-    FixAuthorFirstFirst authorFormatter = new FixAuthorFirstFirst();
-
 
     public String format(String fieldText)
     {
@@ -46,11 +45,12 @@ public class CreateDocBookAuthors implements LayoutFormatter
         //     <author><firstname>F.</firstname><othername role="mi">L.</othername><surname>Stahura</surname></author>
         //     <author><firstname>J.</firstname><othername role="mi">W.</othername><surname>Godden</surname></author>
         //     <author><firstname>J.</firstname><surname>Bajorath</surname></author>
+
         int index = 0;
         int oldPos = 0;
         String author;
         StringBuffer sb = new StringBuffer(100);
-
+        fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
 
         if (fieldText.indexOf(" and ") == -1)
         {
@@ -86,7 +86,8 @@ public class CreateDocBookAuthors implements LayoutFormatter
     {
         // TODO: replace special characters
         Vector v = new Vector();
-        String authorMod = authorFormatter.format(author);
+        String authorMod = ImportFormatReader.fixAuthor(author);
+
         WSITools.tokenize(v, authorMod, " \n\r");
 
         if (v.size() == 1)

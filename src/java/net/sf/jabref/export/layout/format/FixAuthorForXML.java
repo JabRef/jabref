@@ -31,12 +31,12 @@ import net.sf.jabref.imports.ImportFormatReader;
  * @author $author$
  * @version $Revision$
  */
-public class FixAuthorFirstFirst implements LayoutFormatter
+public class FixAuthorForXML implements LayoutFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
     public String format(String fieldText)
     {
-	ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
+	ConvertSpecialCharactersForXML conv = new ConvertSpecialCharactersForXML();
 	return conv.format(ImportFormatReader.fixAuthor(fieldText));
     }
 }

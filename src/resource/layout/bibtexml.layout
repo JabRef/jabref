@@ -1,11 +1,11 @@
 <bibtex:entry id="\bibtexkey">
   <bibtex:\format[net.sf.jabref.export.layout.format.ToLowerCase]{\bibtextype}>
-\begin{author}    <bibtex:author>\author</bibtex:author>\end{author}
-\begin{editor}    <bibtex:editor>\editor</bibtex:editor>\end{editor}
-    <bibtex:title>\title</bibtex:title>
-\begin{journal}    <bibtex:journal>\journal</bibtex:journal>\end{journal}
-\begin{publisher}    <bibtex:publisher>\publisher</bibtex:publisher>\end{publisher}
-\begin{pages}    <bibtex:pages>\pages</bibtex:pages>\end{pages}
+\begin{author}    <bibtex:author>\format[net.sf.jabref.export.layout.format.FixAuthorForXML{\author}</bibtex:author>\end{author}
+\begin{editor}    <bibtex:editor>\format[net.sf.jabref.export.layout.format.FixAuthorForXML{\editor}</bibtex:editor>\end{editor}
+    <bibtex:title>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForXML]{\title}</bibtex:title>
+\begin{journal}    <bibtex:journal>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForXML]{\journal}</bibtex:journal>\end{journal}
+\begin{publisher}    <bibtex:publisher>\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForXML]{\publisher<}/bibtex:publisher>\end{publisher}
+\begin{pages}    <bibtex:pages>\format[net.sf.jabref.export.layout.format.FormatPagesForXML]{\pages}</bibtex:pages>\end{pages}
     <bibtex:year>\year</bibtex:year>
   </bibtex:\format[net.sf.jabref.export.layout.format.ToLowerCase]{\bibtextype}>
 </bibtex:entry>

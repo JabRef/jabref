@@ -163,7 +163,7 @@ public class JabRef {
               // Import a database in a certain format.
               try {
                 System.out.println(Globals.lang("Importing")+": " + args[i+1]);
-                BibtexDatabase base = ImportFormatReader.importFile(args[i].substring(3, args[i].length()), args[i+1]);
+                BibtexDatabase base = ImportFormatReader.importFile(args[i].substring(3), args[i+1]);
                 ParserResult pr = new ParserResult(base, new HashMap());
                 pr.setFile(new File(args[i+1]));
                 loaded.add(pr);
@@ -186,6 +186,26 @@ public class JabRef {
                 } catch (SaveException ex) {
                   System.err.println(Globals.lang("Could not save file")+" '"+ args[i+1]+"': "+ex.getMessage());
                 }
+              } else System.err.println(Globals.lang("The -o option must be preceded by an import option."));
+              i++;
+            }
+            else if (args[i].startsWith("-o") && (args.length > i+1)) {
+              // The database should be exported to the named database in the format following "-o_"
+              if (loaded.size() > 0) {
+                ParserResult pr = (ParserResult) loaded.elementAt(loaded.size() - 1);
+                try {
+                  System.out.println(Globals.lang("Exporting")+": "+args[i+1]);
+                  FileActions.exportDatabase(pr.getDatabase(),
+                                             args[i].substring(3),
+                                             new File(args[i + 1]), prefs);
+                }
+                catch (IOException ex) {
+                  System.err.println(Globals.lang("Could not export file")+" '"+ args[i+1]+"': "+ex.getMessage());
+                }
+                catch (NullPointerException ex2) {
+                  System.err.println(Globals.lang("Unknown export type")+": "+args[i].substring(3));
+                }
+
               } else System.err.println(Globals.lang("The -o option must be preceded by an import option."));
               i++;
             }
