@@ -420,17 +420,8 @@ class GroupDialog extends JDialog {
         case INDEX_SEARCHGROUP:
             s = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & s.length() > 0;
-            m_parser = new SearchExpressionParser(new SearchExpressionLexer(
-                    new StringReader(s)));
-            m_parser.caseSensitive = m_caseSensitive.isSelected();
-            m_parser.regex = m_isRegExp.isSelected();
-            boolean advancedSearch = false;
-            try {
-                m_parser.searchExpression();
-                advancedSearch = true;
-            } catch (Exception e) {
-                // advancedSearch remains false;
-            }
+            boolean advancedSearch = SearchExpressionParser.isValidSyntax(
+                    s, m_caseSensitive.isSelected(), m_isRegExp.isSelected());
             m_searchType.setText(advancedSearch ? "Advanced Search"
                     : "Plaintext Search");
             m_searchAllFields.setEnabled(!advancedSearch);
