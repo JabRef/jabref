@@ -29,7 +29,7 @@ package net.sf.jabref.groups;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
-import java.util.Hashtable;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -321,7 +321,7 @@ public class GroupSelector extends SidePaneComponent implements
         sp = new JScrollPane(groupsTree,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        revalidateGroups();
+        revalidateGroups(null,null);
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         gbl.setConstraints(sp, con);
@@ -447,30 +447,52 @@ public class GroupSelector extends SidePaneComponent implements
         search.start();
         frame.output(Globals.lang("Updated group selection") + ".");
     }
-
-    public void revalidateGroups() {
+    
+    /** Clear selection, maintain expansion state */
+    public void revalidateGroups(TreePath[] selectionPaths, 
+            Enumeration expandedNodes) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
+        if (selectionPaths != null) {
+            groupsTree.setSelectionPaths(selectionPaths);
+        }
+        // tree is completely collapsed here
+        if (expandedNodes != null) {
+            while (expandedNodes.hasMoreElements())
+                groupsTree.expandPath((TreePath)expandedNodes.nextElement());
+        }
         groupsTree.revalidate();
     }
-
-    /**
-     * @param paths
-     *            The paths to select.
-     */
-    public void revalidateGroups(TreePath[] paths) {
-        groupsTreeModel.reload();
-        groupsTree.setSelectionPaths(paths);
-        groupsTree.revalidate();
+    
+    public void revalidateGroups() {
+        revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
     }
+    
+    
 
-    /**
-     * @param path
-     *            The path to select.
-     */
-    public void revalidateGroups(TreePath path) {
-        revalidateGroups(new TreePath[] { path });
-    }
+//    public void revalidateGroups() {
+//        groupsTreeModel.reload();
+//        groupsTree.clearSelection();
+//        groupsTree.revalidate();
+//    }
+
+//    /**
+//     * @param paths
+//     *            The paths to select.
+//     */
+//    public void revalidateGroups(TreePath[] paths) {
+//        groupsTreeModel.reload();
+//        groupsTree.setSelectionPaths(paths);
+//        groupsTree.revalidate();
+//    }
+
+//    /**
+//     * @param path
+//     *            The path to select.
+//     */
+//    public void revalidateGroups(TreePath path) {
+//        revalidateGroups(new TreePath[] { path });
+//    }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == refresh) {
@@ -482,7 +504,7 @@ public class GroupSelector extends SidePaneComponent implements
                 AbstractGroup newGroup = gd.getResultingGroup();
                 GroupTreeNode newNode = new GroupTreeNode(newGroup);
                 groupsRoot.add(newNode);
-                revalidateGroups(groupsTree.getSelectionPaths());
+                revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                         GroupSelector.this, groupsRoot, newNode,
                         UndoableAddOrRemoveGroup.ADD_NODE);
@@ -545,7 +567,8 @@ public class GroupSelector extends SidePaneComponent implements
                 UndoableModifyGroup undo = new UndoableModifyGroup(
                         GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
-                revalidateGroups(new TreePath(node.getPath()));
+                revalidateGroups(groupsTree.getSelectionPaths(),
+                        getExpandedPaths());
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -571,7 +594,8 @@ public class GroupSelector extends SidePaneComponent implements
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                     GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups();
+            revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+            groupsTree.expandPath(new TreePath(node.getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -594,7 +618,8 @@ public class GroupSelector extends SidePaneComponent implements
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                     GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups();
+            revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+            groupsTree.expandPath(new TreePath(node.getPath()));
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
@@ -618,7 +643,8 @@ public class GroupSelector extends SidePaneComponent implements
                         GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
                 node.removeFromParent();
-                revalidateGroups();
+                revalidateGroups(groupsTree.getSelectionPaths(),
+                        getExpandedPaths());
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -648,7 +674,8 @@ public class GroupSelector extends SidePaneComponent implements
                 while (node.getChildCount() > 0)
                     parent.insert((GroupTreeNode) node.getFirstChild(),
                             childIndex);
-                revalidateGroups();
+                revalidateGroups(groupsTree.getSelectionPaths(),
+                        getExpandedPaths());
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -713,7 +740,9 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "' up.");
             return false; // not possible
         }
-        revalidateGroups(new TreePath(node.getPath()));
+        // JZTODO really?:
+        revalidateGroups(groupsTree.getSelectionPaths(),
+                getExpandedPaths());
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -732,7 +761,9 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "' down.");
             return false; // not possible
         }
-        revalidateGroups(new TreePath(node.getPath()));
+        // JZTODO really?:
+        revalidateGroups(groupsTree.getSelectionPaths(),
+                getExpandedPaths());
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -751,7 +782,9 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "' left.");
             return false; // not possible
         }
-        revalidateGroups(new TreePath(node.getPath()));
+        // JZTODO really?:
+        revalidateGroups(groupsTree.getSelectionPaths(),
+                getExpandedPaths());
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -770,7 +803,9 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "' right.");
             return false; // not possible
         }
-        revalidateGroups(new TreePath(node.getPath()));
+        // JZTODO really?:
+        revalidateGroups(groupsTree.getSelectionPaths(),
+                getExpandedPaths());
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
@@ -782,5 +817,10 @@ public class GroupSelector extends SidePaneComponent implements
 
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
+    }
+    
+    private Enumeration getExpandedPaths() {
+        return groupsTree.getExpandedDescendants(
+                new TreePath(groupsRoot.getPath()));
     }
 }
