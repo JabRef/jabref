@@ -119,6 +119,7 @@ public class EntryEditorTab {
 	    con.fill = GridBagConstraints.HORIZONTAL;
 	    con.anchor = GridBagConstraints.SOUTHWEST;
 	    FieldTextField tf = new FieldTextField(Globals.KEY_FIELD, (String) parent.entry.getField(Globals.KEY_FIELD));//(String) entry.getField(Globals.KEY_FIELD));
+        editors.put("bibtexkey", tf);
 	    gbl.setConstraints(tf.getLabel(), con);
 	    panel.add(tf.getLabel());
 	    con.gridwidth = GridBagConstraints.REMAINDER;
