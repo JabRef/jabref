@@ -74,7 +74,7 @@ public class MedlineHandler extends DefaultHandler
 	else if(localName.equals("DescriptorName")){
 	    //keyword="";
 	    inDescriptorName=true;
-	    descriptorName="";
+	    //descriptorName="";
 	}
 	else if(localName.equals("Author")){inAuthor=true;author="";}
 	else if(localName.equals("PMID")){inPubMedID=true;pubmedid="";}

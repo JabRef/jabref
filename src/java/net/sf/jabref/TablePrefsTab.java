@@ -201,6 +201,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		     (BorderFactory.createEtchedBorder(),
 		      Globals.lang("Visible fields")));
 	con.weighty = 1;
+	con.weightx = 0;
+	con.fill = GridBagConstraints.NONE;
 	gbl.setConstraints(sp, con);
 	add(sp);
 

@@ -65,8 +65,8 @@ public class GroupSelector extends SidePaneComponent
     BasePanel panel;
     String searchField;
     JPopupMenu gropt = new JPopupMenu();
-    JCheckBox andCb = new JCheckBox("Intersection", true),
-	orCb = new JCheckBox("Union", false);
+    JCheckBox andCb = new JCheckBox(Globals.lang("Intersection"), true),
+	orCb = new JCheckBox(Globals.lang("Union"), false);
     ButtonGroup bgr = new ButtonGroup();
 
     SidePaneManager manager;

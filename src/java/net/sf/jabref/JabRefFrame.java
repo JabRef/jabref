@@ -1306,7 +1306,7 @@ public class JabRefFrame extends JFrame {
 		    //lfFileName = "text";
 		    else if (source == docbookItem) {
 			lfFileName = "docbook";
-			extension = ".docbook";
+			extension = ".xml";
 		    }
 		    // We need to find out:
 		    // 1. The layout definition string to use. Or, rather, we
