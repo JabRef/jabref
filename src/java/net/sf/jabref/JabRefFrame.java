@@ -889,7 +889,7 @@ public class JabRefFrame extends JFrame {
 				tabbedPane.remove(basePanel());
 				if (tabbedPane.getTabCount() == 0)
 				    setEmptyState();
-				output("Closed database.");
+				output(Globals.lang("Closed database")+".");
 			}
 		}
 	}
@@ -957,15 +957,15 @@ public class JabRefFrame extends JFrame {
                             tabbedPane.setSelectedComponent(bp);
                         if (tabbedPane.getTabCount() == 1)
                             setNonEmptyState();
-                        output("Opened database '"+fileToOpen.getPath()+"' with "+
-                               db.getEntryCount()+" entries.");
+                        output(Globals.lang("Opened database")+" '"+fileToOpen.getPath()+"' "+Globals.lang("with")+" "+
+                               db.getEntryCount()+" "+Globals.lang("entries")+".");
 
                         fileToOpen = null;
 
                     } catch (Throwable ex) {
                         JOptionPane.showMessageDialog
                             (ths, ex.getMessage(),
-                             "Open database", JOptionPane.ERROR_MESSAGE);
+                             Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -1114,8 +1114,8 @@ public class JabRefFrame extends JFrame {
                     tabbedPane.setSelectedComponent(bp);
                     if (tabbedPane.getTabCount() == 1)
                       setNonEmptyState();
-                    output("Imported database '" + filename + "' with " +
-                           database.getEntryCount() + " entries into new database.");
+                    output(Globals.lang("Imported database")+" '" + filename + "' "+Globals.lang("with")+" " +
+                           database.getEntryCount()+" "+Globals.lang("entries into new database")+".");
                   }
                   else {
 		      // Import into current database.
@@ -1141,8 +1141,9 @@ public class JabRefFrame extends JFrame {
 		      basePanel.undoManager.addEdit(ce);
                       basePanel.markBaseChanged();
                       basePanel.refreshTable();
-                      output("Imported database '" + filename + "' with " +
-                             (database.getEntryCount()-oldCount) + " entries.");
+		      output(Globals.lang("Imported database")+" '" + filename + "' "+Globals.lang("with")+" " +
+			     (database.getEntryCount()-oldCount)+" "+Globals.lang("entries into new database")+".");
+
                     }
 		}
 

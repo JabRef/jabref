@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 import java.io.File;
 import java.awt.Font;
+import java.awt.Color;
 import javax.swing.*;
 //import javax.swing.UIManager;
 //import javax.swing.UIDefaults;
@@ -40,7 +41,7 @@ public class JabRef {
 	Object fnt = new UIDefaults.ProxyLazyValue 
 	    ("javax.swing.plaf.FontUIResource", null, 
 	     new Object[] {"plain", new Integer(Font.PLAIN), new Integer(12)});
-	
+
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
 	UIManager.put("RadioButton.font", fnt);

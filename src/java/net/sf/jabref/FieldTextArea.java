@@ -28,8 +28,8 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-import java.awt.Dimension;
-import java.awt.Color;
+import java.awt.*;
+//import java.awt.Color;
 import java.awt.event.*;
 
 public class FieldTextArea extends JTextArea implements FieldEditor {
@@ -77,6 +77,19 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     public Dimension getPreferredScrollableViewportSize() {
 	return PREFERRED_SIZE;
     }
+
+  public void paintComponent(Graphics g) {
+	//Util.pr("her");
+	
+	Graphics2D g2 = (Graphics2D)g;	
+	RenderingHints rh = g2.getRenderingHints();
+	rh.put(RenderingHints.KEY_ANTIALIASING,
+	       RenderingHints.VALUE_ANTIALIAS_ON);
+	rh.put(RenderingHints.KEY_RENDERING,
+	       RenderingHints.VALUE_RENDER_QUALITY);	
+	g2.setRenderingHints(rh);
+	super.paintComponent(g2);
+  }
 
     public String getFieldName() { return fieldName; }
     public void setFieldName(String newName) { fieldName = newName ; }

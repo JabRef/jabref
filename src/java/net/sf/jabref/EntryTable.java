@@ -44,10 +44,17 @@ public class EntryTable extends JTable {
 	showingGroup = false;
     private EntryTable ths = this;
     private boolean antialiasing = true;
+    //RenderingHints renderingHints;
 
     public EntryTable(EntryTableModel tm_, JabRefPreferences prefs_) {
 	super(tm_);
 	this.tableModel = tm_;
+
+	//renderingHints = g2.getRenderingHints();
+	//renderingHints.put(RenderingHints.KEY_ANTIALIASING,
+	//		   RenderingHints.VALUE_ANTIALIAS_ON);
+	//renderingHints.put(RenderingHints.KEY_RENDERING,
+	//		   RenderingHints.VALUE_RENDER_QUALITY);	
 	prefs = prefs_;
 	antialiasing = prefs.getBoolean("antialias");
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
@@ -240,10 +247,10 @@ public class EntryTable extends JTable {
 	//Util.pr("her");
 	
 	Graphics2D g2 = (Graphics2D)g;
-	Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
-	g2.setColor(getBackground());
-	g2.fill(g2.getClipBounds());
-	g2.setColor(getForeground());
+	//Font f = g2.getFont();//new Font("Plain", Font.PLAIN, 24);
+	//g2.setColor(getBackground());
+	//g2.fill(g2.getClipBounds());
+	//g2.setColor(getForeground());
 	//g2.setFont(f);
 	if (antialiasing) {
 	    RenderingHints rh = g2.getRenderingHints();
