@@ -1723,23 +1723,22 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     }
 
     public void refreshTable() {
-	long tic = System.currentTimeMillis();
+
         // This method is called by EntryTypeForm when a field value is
         // stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();
         //entryTable.invalidate();
         BibtexEntry[] bes = entryTable.getSelectedEntries();
 	if (hidingNonHits)
-	    tableModel.remap(lastSearchHits);
+	    tableModel.update(lastSearchHits);
 	else 
-	    //tableModel.TEST_TEST();
-	    tableModel.remap();
+	    tableModel.update();
+	//tableModel.remap();
         if ((bes != null) && (bes.length > 0))
             highlightEntries(bes, 0);
-        //entryTable.revalidate();r
-        //entryTable.repaint();
-	long toc = System.currentTimeMillis();
-	Util.pr("Refresh took: "+(toc-tic)+" ms");
+
+	//long toc = System.currentTimeMillis();
+	//	Util.pr("Refresh took: "+(toc-tic)+" ms");
     }
 
     public void updatePreamble() {
@@ -1954,6 +1953,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntries(final BibtexEntry[] bes, final int toScrollTo) {
+	//Util.pr("highlighting...");
         SwingUtilities.invokeLater(new Thread() {
              public void run() {    
                  int rowToScrollTo = 0;
@@ -2093,7 +2093,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 	}
 	// We either gray out, or hide, non-hits.
 
-        //tableModel.remap();
+        tableModel.remap();
         entryTable.clearSelection();
         refreshTable();
 
@@ -2168,6 +2168,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         showingGroup);
        */
       entryTable.clearSelection();
+      tableModel.remap();
       refreshTable();
       entryTable.requestFocus();
     }
@@ -2180,6 +2181,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
       entryTable.setShowingSearchResults(showingSearchResults,
                                          showingGroup);*/
       entryTable.clearSelection();
+      tableModel.remap();
       refreshTable();
     }
 

@@ -29,7 +29,7 @@ package net.sf.jabref;
 
 import java.util.*;
 
-public class EntrySorter {
+public class EntrySorter implements DatabaseChangeListener {
 
     TreeSet set;
     String[] idArray;
@@ -51,7 +51,6 @@ public class EntrySorter {
 
     public void index() {
 
-	//Object[] array = set.toArray();
         // Create aan array of IDs for quick access, since getIdAt() is called by
         // getValueAt() in EntryTableModel, which *has* to be efficient.
 
@@ -86,5 +85,26 @@ public class EntrySorter {
 	    return entryArray.length;
 	else
 	    return 0;
+    }
+
+    public void databaseChanged(DatabaseChangeEvent e) {
+	if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
+	    set.add(e.getEntry());
+	}
+	else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
+	    set.remove(e.getEntry());
+	}
+	else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
+	    set.remove(e.getEntry());
+	}
+	else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
+	    // Remove and re-add the entry, to make sure it is in the
+	    // correct sort position.
+
+	    set.add(e.getEntry());
+
+
+	}
+
     }
 }

@@ -50,6 +50,8 @@ public class BibtexDatabase
     HashMap _strings = new HashMap();
     Vector _strings_ = new Vector();
     Hashtable _autoCompleters = null;
+    Set changeListeners = new HashSet();
+    private BibtexDatabase ths = this;
 
     private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
 
@@ -66,7 +68,14 @@ public class BibtexDatabase
             public void vetoableChange(PropertyChangeEvent pce)
                 throws PropertyVetoException
             {
-                if ("id".equals(pce.getPropertyName()))
+		if (pce.getPropertyName() == null)
+		    // A nulled changeevent like this just signals that the entry
+		    // is about to change. The signal enables listeners to
+		    // prepare. This is needed for EntrySorter which must remove
+		    // the entry from its TreeMap before it changes, and re-add it
+		    // afterwards to keep it in the correct sort position.
+		    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
+                else if ("id".equals(pce.getPropertyName()))
                 {
                     // locate the entry under its old key
                     Object oldEntry =
@@ -93,7 +102,11 @@ public class BibtexDatabase
                     // and re-file this entry
                     _entries.put((String) pce.getNewValue(),
                         (BibtexEntry) pce.getSource());
-                }
+                } else {
+		    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGED_ENTRY, (BibtexEntry)pce.getSource()));
+		    //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
+		    //    +"\n"+pce.getNewValue());
+		}
             }
         };
 
@@ -119,7 +132,9 @@ public class BibtexDatabase
      * sorted by the given Comparator.
      */
     public synchronized EntrySorter getSorter(java.util.Comparator comp) {
-        return new EntrySorter(_entries, comp);
+	EntrySorter sorter = new EntrySorter(_entries, comp);
+	addDatabaseChangeListener(sorter);
+        return sorter;
     }
 
     /**
@@ -210,6 +225,8 @@ public class BibtexDatabase
         */
         _entries.put(id, entry);
 
+	fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ADDED_ENTRY, entry));
+
         return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
 
@@ -225,6 +242,8 @@ public class BibtexDatabase
         {
             oldValue.removePropertyChangeListener(listener);
         }
+
+	fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.REMOVED_ENTRY, oldValue));
 
         return oldValue;
     }
@@ -459,6 +478,21 @@ public class BibtexDatabase
                         ;
     }
 
+
+    
+    public void fireDatabaseChanged(DatabaseChangeEvent e) {
+	for (Iterator i=changeListeners.iterator(); i.hasNext();) {
+	    ((DatabaseChangeListener)i.next()).databaseChanged(e);
+	}
+    }
+
+    public void addDatabaseChangeListener(DatabaseChangeListener l) {
+	changeListeners.add(l);
+    }
+
+    public void removeDatabaseChangeListener(DatabaseChangeListener l) {
+	changeListeners.remove(l);
+    }
 
     /*
     public void setCompleters(Hashtable autoCompleters) {

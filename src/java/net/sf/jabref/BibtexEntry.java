@@ -215,14 +215,29 @@ public class BibtexEntry
         // This mechanism is probably not really necessary.
         //Object normalValue = FieldTypes.normalize(name, value);
 
+
+	Object oldValue = _fields.get(name);
+
         try {
-            firePropertyChangedEvent(name, _fields.get(name), value);
+	    // First throw an empty event that just signals that this entry
+	    // is about to change. This is needed, so the EntrySorter can
+	    // remove the entry from its TreeSet. After a sort-sensitive
+	    // field changes, the entry will not be found by the TreeMap,
+	    // so without this event it would be impossible to reinsert this
+	    // entry to keep everything sorted properly.
+            firePropertyChangedEvent(null, null, null);
+	    // We set the field before throwing the changeEvent, to enable
+	    // the change listener to access the new value if the change 
+	    // sets off a change in database sorting etc.
+	    _fields.put(name, value);
+            firePropertyChangedEvent(name, oldValue, value);
         } catch (PropertyVetoException pve) {
+	    // Since we have already made the change, we must undo it since
+	    // the change was rejected:
+	    _fields.put(name, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
 
-        //Object oldValue =
-        _fields.put(name, value);
     }
 
     /**
@@ -349,8 +364,9 @@ public class BibtexEntry
         return clone;
     }
 
+   
     public String toString() {
-	return "Entry:"+getType().getName()+":"+getField(Globals.KEY_FIELD);
+	return getType().getName()+":"+getField(Globals.KEY_FIELD);
     }
 
 }

@@ -349,20 +349,43 @@ public class EntryTableModel
     }
   }
 
+    /**
+     * Remaps and resorts the table model.
+     */
     public void remap() {
 	updateSorter();
 	showAllEntries(); // Update the visible row count.
 	fireTableDataChanged();
     }
 
+    /**
+     * Remaps and resorts the table model, and restricts the row number
+     * as directed.
+     */
     public void remap(int rows) {
 	updateSorter();
 	setRowCount(rows);
 	fireTableDataChanged();
     }
 
-    public void TEST_TEST() {
+    /**
+     * Quick remap of the table model. Sufficient for all operations except
+     * those that require a changed sort regime.
+     */
+    public void update() {
 	sorter.index();
+	showAllEntries();
+	fireTableDataChanged();
+    }
+
+    /**
+     * Quick remap of the table model. Sufficient for all operations except
+     * those that require a changed sort regime.
+     * Restricts the row number as directed.
+     */
+    public void update(int rows) {
+	sorter.index();
+	setRowCount(rows);
 	fireTableDataChanged();
     }
 

@@ -67,14 +67,24 @@ public class EntryComparator implements Comparator {
     public int compare(Object o1, Object o2) throws ClassCastException {
       //if (o1 == null) Util.pr("o1 == null");
      //if (o2 == null) Util.pr("o2 == null");
+
+	/*  The explicit instanceof test is unnecessary, since the 
+	    explicit casts below will throw ClassCastException anyway 
+	    if there is trouble.
+
 	if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
-	   throw new ClassCastException("Trouble comparing objects: "+o1.toString()+"\n\n"+o2.toString());
+	  throw new ClassCastException("Trouble comparing objects: "+o1.toString()+"\n\n"+o2.toString());*/
+
 	BibtexEntry e1 = (BibtexEntry)o1,
 	    e2 = (BibtexEntry)o2;
 
+	if (e1 == e2)
+	    return 0;
+
+	//Util.pr("EntryComparator: "+e1+" : "+e2);
 	Object f1 = e1.getField(sortField),
 	    f2 = e2.getField(sortField);
-
+	
 	// If the field is author or editor, we rearrange names so they are
 	// sorted according to last name.
 	if (sortField.equals("author") || sortField.equals("editor")) {
