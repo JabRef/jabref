@@ -487,7 +487,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       but.setBackground(GUIGlobals.lightGray);
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          JabRefFileChooser chooser = new JabRefFileChooser
+          String dir = ed.getText();
+          if (dir.equals(""))
+            dir = prefs.get(fieldName+Globals.FILETYPE_PREFS_EXT, "");
+
+          String chosenFile = Globals.getNewFile(frame, prefs, new File(dir),
+                                                 "."+fieldName, JFileChooser.OPEN_DIALOG, false);
+          /*JabRefFileChooser chooser = new JabRefFileChooser
               (new File(ed.getText()));
           if (ed.getText().equals("")) {
             chooser.setCurrentDirectory(new File(prefs.get(fieldName +
@@ -495,13 +501,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           }
           //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
           int returnVal = chooser.showOpenDialog(null);
-          if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File newFile = chooser.getSelectedFile();
-            ed.setText(newFile.getPath());
-            prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-            storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
-          }
-        }
+          if (returnVal == JFileChooser.APPROVE_OPTION) {*/
+  if (chosenFile != null) {
+    File newFile = new File(chosenFile);//chooser.getSelectedFile();
+    ed.setText(newFile.getPath());
+    prefs.put(fieldName+Globals.FILETYPE_PREFS_EXT, newFile.getPath());
+    storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+  }
+}
       });
       return but;
     }
@@ -512,21 +519,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       but.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String pdfDir = prefs.get("pdfDirectory");
-          JabRefFileChooser chooser = new JabRefFileChooser(new File(ed.getText()));
-          if (ed.getText().equals("")) {
+          String dir = ed.getText();
+          if (dir.equals("") || !(new File(dir)).isAbsolute()) {
             if (pdfDir != null)
-              chooser = new JabRefFileChooser(new File(pdfDir));
+              dir = pdfDir;
             else
-              chooser.setCurrentDirectory(new File(prefs.get(fieldName +
-                  Globals.FILETYPE_PREFS_EXT, "")));
+              dir = prefs.get(fieldName+Globals.FILETYPE_PREFS_EXT, "");
           }
-          OpenFileFilter off = new OpenFileFilter(".pdf");
-          chooser.addChoosableFileFilter(off);
 
-          //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
-          int returnVal = chooser.showOpenDialog(null);
-          if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File newFile = chooser.getSelectedFile();
+          String chosenFile = Globals.getNewFile(frame, prefs, new File(dir),
+                                                  ".pdf", JFileChooser.OPEN_DIALOG, false);
+
+          if (chosenFile != null) {
+            File newFile = new File(chosenFile);
             String position = newFile.getParent();
             if (position.equals(pdfDir) || (position+System.getProperty("file.separator")).equals(pdfDir))
               ed.setText(newFile.getName());

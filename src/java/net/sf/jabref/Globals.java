@@ -33,7 +33,12 @@ import javax.swing.JFileChooser;
 import java.util.logging.*;
 import java.io.IOException;
 import java.awt.Font;
+import java.io.*;
+import java.awt.*;
+import javax.swing.*;
 public class Globals {
+
+  static int SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     private static String resourcePrefix = "resource/JabRef";
     private static String logfile= "jabref.log";
@@ -43,12 +48,14 @@ public class Globals {
 	SELECTOR_META_PREFIX = "selector_",
 	LAYOUT_PREFIX = "/resource/layout/",
 	MAC = "Mac OS X",
-        DOI_LOOKUP_PREFIX = "http://dx.doi.org/";
+        DOI_LOOKUP_PREFIX = "http://dx.doi.org/",
+        NONE = "_non__";
     public static float duplicateThreshold = 0.78f;
 
     public static GlobalFocusListener focusListener = new GlobalFocusListener();
 
     public static String osName = System.getProperty("os.name", "def");
+    public static boolean ON_MAC = (osName.equals(MAC));
 
     public static void logger(String s){
 		Logger.global.info(s);
@@ -161,6 +168,78 @@ public class Globals {
 
 	}*/
 
+
+      public static String getNewFile(JFrame owner, JabRefPreferences prefs, File directory, String extension,
+                                      int dialogType, boolean updateWorkingDirectory) {
+        return getNewFile(owner, prefs, directory, extension, dialogType, updateWorkingDirectory, false);
+      }
+
+      public static String getNewDir(JFrame owner, JabRefPreferences prefs, File directory, String extension,
+                                      int dialogType, boolean updateWorkingDirectory) {
+        return getNewFile(owner, prefs, directory, extension, dialogType, updateWorkingDirectory, true);
+      }
+
+      private static String getNewFile(JFrame owner, JabRefPreferences prefs, File directory, String extension, int dialogType,
+                                      boolean updateWorkingDirectory, boolean dirOnly) {
+
+        OpenFileFilter off = null;
+         if (extension == null)
+           off = new OpenFileFilter();
+         else if (!extension.equals(NONE))
+           off = new OpenFileFilter(extension);
+
+         if (ON_MAC)
+           return getNewFileForMac(owner, prefs, directory, extension, dialogType,
+                                   updateWorkingDirectory, dirOnly, off);
+
+        JFileChooser fc;
+        fc = new JabRefFileChooser(directory);
+
+        if (dirOnly)
+          fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        fc.addChoosableFileFilter(off);
+        fc.setDialogType(dialogType);
+        fc.showOpenDialog(null);
+        File selectedFile = fc.getSelectedFile();
+        if (selectedFile == null) { // cancel
+          return null;
+        }
+
+        // If this is a save dialog, and the user has not chosen "All files" as filter
+        // we enforce the given extension.
+        if ((dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
+            !selectedFile.getPath().endsWith(extension)) {
+
+          selectedFile = new File(selectedFile.getPath() + extension);
+        }
+
+        if (updateWorkingDirectory)
+          prefs.put("workingDirectory", selectedFile.getPath());
+        return selectedFile.getAbsolutePath();
+      }
+
+      private static String getNewFileForMac(JFrame owner, JabRefPreferences prefs, File directory, String extensions,
+                                            int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
+                                            FilenameFilter filter) {
+
+        FileDialog fc = new FileDialog(owner);
+        fc.setFilenameFilter(filter);
+        if (directory != null)
+          fc.setDirectory(directory.getParent());
+        if (dialogType == JFileChooser.OPEN_DIALOG)
+          fc.setMode(FileDialog.LOAD);
+        else
+          fc.setMode(FileDialog.SAVE);
+        fc.show();
+
+        if (fc.getFile() != null) {
+          prefs.put("workingDirectory", fc.getDirectory()+fc.getFile());
+          return fc.getDirectory()+fc.getFile();
+        }
+        else
+          return null;
+      }
 
     public static HashMap HTML_CHARS = new HashMap();
     static {

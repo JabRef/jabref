@@ -100,7 +100,8 @@ public class JabRefFrame
                                prefs.getKey("Save database")),
       saveAs = new GeneralAction("saveAs", "Save database as ...",
                                  "Save database as ...",
-                                 GUIGlobals.saveAsIconFile),
+                                 GUIGlobals.saveAsIconFile,
+                                 prefs.getKey("Save database as ...")),
       saveSelectedAs = new GeneralAction("saveSelectedAs",
                                          "Save selected as ...",
                                          "Save selected as ...",
@@ -455,8 +456,9 @@ public class JabRefFrame
     con.weighty = 0;
     con.gridwidth = GridBagConstraints.REMAINDER;
     mb.setMinimumSize(mb.getPreferredSize());
-    gbl.setConstraints(mb, con);
-    getContentPane().add(mb);
+    //gbl.setConstraints(mb, con);
+    //getContentPane().add(mb);
+    setJMenuBar(mb);
     con.anchor = GridBagConstraints.NORTH;
     //con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
     gbl.setConstraints(tlb, con);
@@ -920,6 +922,7 @@ public class JabRefFrame
 
   public void output(String s) {
     statusLine.setText(s);
+    statusLine.repaint();
   }
 
   public void stopShowingSearchResults() {
@@ -1150,20 +1153,25 @@ public class JabRefFrame
       // Open a new database.
       if ( (e.getActionCommand() == null) ||
           (e.getActionCommand().equals(Globals.lang("Open database")))) {
-        JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+        /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
             new JabRefFileChooser( (File)null) :
             new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-        /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+        JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
             new JFileChooser((File)null) :
             new JFileChooser(new File(prefs.get("workingDirectory")));*/
-        chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
-        int returnVal = chooser.showOpenDialog(ths);
+
+        //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+        //int returnVal = chooser.showOpenDialog(ths);
+
+        String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".bib",
+                                               JFileChooser.OPEN_DIALOG, true);
 
         /*FileDialog chooser = new FileDialog(ths, "Open", FileDialog.LOAD);
                              chooser.show();
                              int returnVal = 0;*/
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          fileToOpen = chooser.getSelectedFile();
+        //if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (chosenFile != null) {
+          fileToOpen = new File(chosenFile);
           //fileToOpen = new File(chooser.getFile());
         }
       }
@@ -1351,7 +1359,9 @@ public class JabRefFrame
             db.setCompleters(autoCompleters);
             }
        */
+
       tabbedPane.add(Globals.lang("untitled"), bp);
+      bp.markBaseChanged();
       tabbedPane.setSelectedComponent(bp);
       if (tabbedPane.getTabCount() == 1) {
         setNonEmptyState();
@@ -1551,7 +1561,11 @@ public class JabRefFrame
   //
 
   public String getNewFile() {
-    JFileChooser fc;
+
+    return Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
+                              null, JFileChooser.OPEN_DIALOG, false);
+
+    /*JFileChooser fc;
     if (prefs.get("workingDirectory") == null) {
       fc = new JabRefFileChooser(new File(System.getProperty("user.home"))); //cwd));
     }
@@ -1567,7 +1581,7 @@ public class JabRefFrame
       return null;
     }
     prefs.put("workingDirectory", selectedFile.getPath());
-    return selectedFile.getAbsolutePath();
+    return selectedFile.getAbsolutePath();*/
   }
 
   JMenuItem
@@ -1596,24 +1610,15 @@ public class JabRefFrame
         // 2. The preferred extension for the layout format.
         // 3. The name of the file to use.
         File outFile = null;
-        JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-            new JabRefFileChooser( (File)null) :
-            new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-        OpenFileFilter off = new OpenFileFilter(extension);
-        chooser.addChoosableFileFilter(off);
-        int returnVal = chooser.showSaveDialog(ths);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          outFile = chooser.getSelectedFile();
-          if ( (chooser.getFileFilter() == off) &&
-              !outFile.getPath().endsWith(extension)) {
+        String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
+                                               extension, JFileChooser.SAVE_DIALOG, false);
 
-            // We need to append the selected extension.
-            outFile = new File(outFile.getPath() + extension);
-          }
-        }
-        else {
-          return;
-        }
+         if (chosenFile != null)
+           outFile = new File(chosenFile);
+
+         else {
+           return;
+         }
 
         final String lfName = lfFileName;
         final File oFile = outFile;
@@ -1782,8 +1787,12 @@ public class JabRefFrame
 
       //Util.pr(Globals.focusListener.getFocused().toString());
       JComponent source = Globals.focusListener.getFocused();
-      source.getActionMap().get(command).actionPerformed
-          (new ActionEvent(source, 0, command));
+      try {
+        source.getActionMap().get(command).actionPerformed
+            (new ActionEvent(source, 0, command));
+      } catch (NullPointerException ex) {
+        // No component is focused, so we do nothing.
+      }
     }
   }
 

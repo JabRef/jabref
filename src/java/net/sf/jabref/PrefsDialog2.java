@@ -73,7 +73,7 @@ public class PrefsDialog2 extends JDialog {
 	// ----------------------------------------------------------------
 	// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
 	// ----------------------------------------------------------------
-	tabbed.addTab(Globals.lang("General"), new GeneralTab(_prefs));
+	tabbed.addTab(Globals.lang("General"), new GeneralTab(frame, _prefs));
 	tabbed.addTab(Globals.lang("Table"), new TablePrefsTab(_prefs, parent));
 	//tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
 	tabbed.addTab(Globals.lang("Key pattern"), new TabLabelPattern(_prefs, parent.helpDiag));

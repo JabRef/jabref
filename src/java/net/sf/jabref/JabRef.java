@@ -74,18 +74,18 @@ public class JabRef {
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
 
+        // This property is set to make the Mac OSX Java VM move the menu bar to the top
+        // of the screen, where Mac users expect it to be.
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
 	//String osName = System.getProperty("os.name", "def");
-	if (Globals.osName.equals(Globals.MAC)) {
-          // This property is set to make the Mac OSX Java VM move the menu bar to the top
-          // of the screen, where Mac users expect it to be.
-          System.setProperty("com.apple.laf.useScreenMenuBar", "true");
-	} else {
-	    try {
-		LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
-		//com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
-		UIManager.setLookAndFeel(lnf);
-	    } catch (UnsupportedLookAndFeelException ex) {}
-	}
+	if (!Globals.ON_MAC) {
+          try {
+            LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+            //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
+            UIManager.setLookAndFeel(lnf);
+          } catch (UnsupportedLookAndFeelException ex) {}
+        }
 
 	JabRefPreferences prefs = new JabRefPreferences();
         /*if (!prefs.get("columnNames").substring(0,1).equals(GUIGlobals.NUMBER_COL)) {
@@ -118,24 +118,6 @@ public class JabRef {
 	}else{//no arguments (this will be for later and other command line switches)
 	    // ignore..
 	}
-      /*
-      BibtexEntry b1 = new BibtexEntry("ee", BibtexEntryType.ARTICLE);
-      BibtexEntry b2 = new BibtexEntry("eee", BibtexEntryType.ARTICLE);
-      BibtexEntry b3 = new BibtexEntry("eeee", BibtexEntryType.ARTICLE);
-
-      b1.setField("author", "M. O. Alver");
-      b2.setField("author", "Alver, Morten");
-      b3.setField("author", "Morten Alver and Fredrik Skagen");
-
-      b1.setField("title", "Ole Brumm");
-      b2.setField("title", "Ole Brumm");
-      b2.setField("journal", "Ole Brumm");
-      b3.setField("title", "Ole Brumm er i skagen");
-      float threshold = 0.8f;
-      Util.pr(""+Util.isDuplicate(b1, b2, threshold)+
-              "\n"+Util.isDuplicate(b1, b3, threshold)+
-              "\n"+Util.isDuplicate(b2, b3, threshold));
-      */
       }
 
 }

@@ -15,13 +15,14 @@ public class GeneralTab extends JPanel implements PrefsTab {
 		defSource, editSource,defSort, ctrlClick;
     private JTextField groupField = new JTextField(15);
     JabRefPreferences _prefs;
+    JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
     JTextField
 	pdfDir, pdf, ps, html, lyx;
 
-    public GeneralTab(JabRefPreferences prefs) {
+    public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
 	_prefs = prefs;
-
+        _frame = frame;
  	setLayout(gbl);
 	con.weightx = 0;
         //con.insets = new Insets(10, 10, 10, 10);
@@ -211,13 +212,15 @@ public class GeneralTab extends JPanel implements PrefsTab {
         comp = tc;
       }
       public void actionPerformed(ActionEvent e) {
-        JabRefFileChooser chooser = new JabRefFileChooser(new File(comp.getText()));
-        //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
+        String chosen = null;
         if (dir)
-          chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          File newFile = chooser.getSelectedFile();
+          chosen = Globals.getNewDir(_frame, _prefs, new File(comp.getText()), Globals.NONE,
+                                     JFileChooser.OPEN_DIALOG, false);
+        else
+          chosen = Globals.getNewFile(_frame, _prefs, new File(comp.getText()), Globals.NONE,
+                                      JFileChooser.OPEN_DIALOG, false);
+        if (chosen != null) {
+          File newFile = new File(chosen);
           comp.setText(newFile.getPath());
         }
       }

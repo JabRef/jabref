@@ -37,6 +37,7 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.util.prefs.*;
 import java.util.*;
+import java.awt.event.*;
 
 public class JabRefPreferences {
 
@@ -251,7 +252,30 @@ public class JabRefPreferences {
         if (s == null) {
           Globals.logger("Could not get key binding for \"" + bindName + "\"");
         }
-	return KeyStroke.getKeyStroke(s);
+
+        if (Globals.ON_MAC)
+          return getKeyForMac(KeyStroke.getKeyStroke(s));
+        else
+          return KeyStroke.getKeyStroke(s);
+    }
+
+    /**
+     * Returns the KeyStroke for this binding, as defined by the
+     * defaults, or in the Preferences, but adapted for Mac users,
+     * with the Command key preferred instead of Control.
+     */
+    private KeyStroke getKeyForMac(KeyStroke ks) {
+      if (ks == null) return null;
+      int keyCode = ks.getKeyCode();
+      if ((ks.getModifiers() & KeyEvent.CTRL_MASK) == 0) {
+        return ks;
+      }
+      else {
+        if ((ks.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
+          return KeyStroke.getKeyStroke(keyCode, Globals.SHORTCUT_MASK+KeyEvent.SHIFT_MASK);
+        }
+        return KeyStroke.getKeyStroke(keyCode, Globals.SHORTCUT_MASK);
+      }
     }
 
     /**
@@ -367,7 +391,8 @@ public class JabRefPreferences {
 	defKeyBinds.put("Push to LyX","ctrl L");
 	defKeyBinds.put("Quit JabRef", "ctrl Q");
 	defKeyBinds.put("Open database", "ctrl O");
-	defKeyBinds.put("Save database", "ctrl S");
+        defKeyBinds.put("Save database", "ctrl S");
+        defKeyBinds.put("Save database as ...", "ctrl shift S");
 	defKeyBinds.put("Close database", "ctrl W");
 	defKeyBinds.put("New entry", "ctrl N");
 	defKeyBinds.put("Cut", "ctrl X");

@@ -1,6 +1,7 @@
 package net.sf.jabref;
 import java.io.File;
-public class OpenFileFilter extends javax.swing.filechooser.FileFilter{
+import java.io.*;
+public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
     String filetype;
     boolean specific = false;
@@ -17,6 +18,8 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter{
 	filetype = s;
 	specific = true;
     }
+
+
 
     public boolean accept(File file){
 	String filenm = file.getName();
@@ -38,4 +41,8 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter{
 	else
 	    return "*"+filetype;
     }
+
+  public boolean accept(File dir, String name) {
+    return accept(new File(dir.getPath()+name));
+  }
 }

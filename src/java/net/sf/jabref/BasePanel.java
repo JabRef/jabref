@@ -200,54 +200,45 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 	actions.put("saveAs", new BaseAction () {
 		public void action() throws Throwable {
-		    JFileChooser chooser = new JFileChooser
-			(prefs.get("workingDirectory"));
-		    chooser.setFileFilter(new OpenFileFilter());
-		    int returnVal = chooser.showSaveDialog(frame);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-			String name = chooser.getSelectedFile().getName(),
-			    path = chooser.getSelectedFile().getParent();
-			if (!name.endsWith(".bib"))
-			    name = name+".bib";
-			file = new File(path, name);
-			if (!file.exists() ||
-			    (JOptionPane.showConfirmDialog
-			     (frame, "'"+name+"' "+Globals.lang("exists. Overwrite file?"),
-			      Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-			     == JOptionPane.OK_OPTION)) {
-			    runCommand("save");
-			    prefs.put("workingDirectory", path);
-                            frame.fileHistory.newFile(file.getPath());
-			}
-			else
-			    file = null;
+
+                  String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".bib",
+                                                         JFileChooser.SAVE_DIALOG, false);
+
+                  if (chosenFile != null) {
+                    file = new File(chosenFile);
+                    if (!file.exists() ||
+                        (JOptionPane.showConfirmDialog
+                         (frame, "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                          Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
+                         == JOptionPane.OK_OPTION)) {
+                      runCommand("save");
+                      prefs.put("workingDirectory", file.getParent());
+                      frame.fileHistory.newFile(file.getPath());
+                    }
+                    else
+                      file = null;
 		    }
 		}
 	    });
 
 	actions.put("saveSelectedAs", new BaseAction () {
 		public void action() throws Throwable {
-		    JFileChooser chooser = new JFileChooser
-			(prefs.get("workingDirectory"));
-		    chooser.setFileFilter(new OpenFileFilter());
-		    int returnVal = chooser.showSaveDialog(frame);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-			String name = chooser.getSelectedFile().getName(),
-			    path = chooser.getSelectedFile().getParent();
-			if (!name.endsWith(".bib"))
-			    name = name+".bib";
-			File expFile = new File(path, name);
-			if (!expFile.exists() ||
-			    (JOptionPane.showConfirmDialog
-			     (frame, "'"+name+"' "+
-                              Globals.lang("exists. Overwrite file?"),
-			      Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-			     == JOptionPane.OK_OPTION)) {
-			    saveDatabase(expFile, true);
-			    //runCommand("save");
-                            frame.fileHistory.newFile(expFile.getPath());
-                            frame.output(Globals.lang("Saved selected to")+" '"
-				     +expFile.getPath()+"'.");
+
+                  String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".bib",
+                                                         JFileChooser.SAVE_DIALOG, false);
+                  if (chosenFile != null) {
+                    File expFile = new File(chosenFile);
+                    if (!expFile.exists() ||
+                        (JOptionPane.showConfirmDialog
+                         (frame, "'"+expFile.getName()+"' "+
+                          Globals.lang("exists. Overwrite file?"),
+                          Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
+                         == JOptionPane.OK_OPTION)) {
+                      saveDatabase(expFile, true);
+                      //runCommand("save");
+                      frame.fileHistory.newFile(expFile.getPath());
+                      frame.output(Globals.lang("Saved selected to")+" '"
+                                   +expFile.getPath()+"'.");
 			}
 		    }
 		}
@@ -599,7 +590,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			return ;
 		    }
 
-		    output(Globals.lang("Generating BibTeX key for")+" "+
+ 		    output(Globals.lang("Generating BibTeX key for")+" "+
 			   numSelected+" "+(numSelected>1 ? Globals.lang("entries")
 					    : Globals.lang("entry")));
 
@@ -619,6 +610,10 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    undoManager.addEdit(ce);
 		    markBaseChanged() ;
 		    refreshTable() ;
+
+                    output(Globals.lang("Generated BibTeX key for")+" "+
+                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
+                                            : Globals.lang("entry")));
 		}
 	    });
 
@@ -718,104 +713,106 @@ public class BasePanel extends JSplitPane implements MouseListener,
                 Util.placeDialog(md, ths);
                 md.setVisible(true);
 		if (md.okPressed) {
-		    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-			new JabRefFileChooser((File)null) :
-			new JabRefFileChooser(new File(prefs.get("workingDirectory")));
-		    chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-		    int returnVal = chooser.showOpenDialog(ths);
-		    if(returnVal != JFileChooser.APPROVE_OPTION)
-			return;
-		    fileToOpen = chooser.getSelectedFile();
+                  String chosenFile = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")),
+                                                         null, JFileChooser.OPEN_DIALOG, false);
+                  /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                      new JabRefFileChooser((File)null) :
+                      new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+                  chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
+                  int returnVal = chooser.showOpenDialog(ths);*/
+                  if(chosenFile == null)
+                    return;
+                  fileToOpen = new File(chosenFile);
 
-		    // Run the actual open in a thread to prevent the program
-		    // locking until the file is loaded.
-		    if (fileToOpen != null) {
-			(new Thread() {
-				public void run() {
-				    openIt(md.importEntries(), md.importStrings(),
-					   md.importGroups(), md.importSelectorWords());
-				}
-			    }).start();
-			frame.fileHistory.newFile(fileToOpen.getPath());
-		    }
-		}
-            }
+                  // Run the actual open in a thread to prevent the program
+                  // locking until the file is loaded.
+                  if (fileToOpen != null) {
+                    (new Thread() {
+                      public void run() {
+                        openIt(md.importEntries(), md.importStrings(),
+                               md.importGroups(), md.importSelectorWords());
+                      }
+                    }).start();
+                    frame.fileHistory.newFile(fileToOpen.getPath());
+                  }
+                }
+              }
 
-           void openIt(boolean importEntries, boolean importStrings,
-                       boolean importGroups, boolean importSelectorWords) {
-             if ((fileToOpen != null) && (fileToOpen.exists())) {
-               try {
-                 prefs.put("workingDirectory", fileToOpen.getPath());
-                 // Should this be done _after_ we know it was successfully opened?
+              void openIt(boolean importEntries, boolean importStrings,
+                          boolean importGroups, boolean importSelectorWords) {
+                if ((fileToOpen != null) && (fileToOpen.exists())) {
+                  try {
+                    prefs.put("workingDirectory", fileToOpen.getPath());
+                    // Should this be done _after_ we know it was successfully opened?
 
-                 ParserResult pr = frame.loadDatabase(fileToOpen);
-                 BibtexDatabase db = pr.getDatabase();
-                 MetaData meta = new MetaData(pr.getMetaData());
-                 NamedCompound ce = new NamedCompound("Append database");
+                    ParserResult pr = frame.loadDatabase(fileToOpen);
+                    BibtexDatabase db = pr.getDatabase();
+                    MetaData meta = new MetaData(pr.getMetaData());
+                    NamedCompound ce = new NamedCompound("Append database");
 
-                 if (importEntries) { // Add entries
-                   Iterator i = db.getKeySet().iterator();
-                   while (i.hasNext()) {
-                     BibtexEntry be = (BibtexEntry)(db.getEntryById((String)i.next()).clone());
-                     be.setId(Util.createNeutralId());
-                     database.insertEntry(be);
-                     ce.addEdit(new UndoableInsertEntry(database, be, ths));
-                   }
-                 }
+                    if (importEntries) { // Add entries
+                      Iterator i = db.getKeySet().iterator();
+                      while (i.hasNext()) {
+                        BibtexEntry be = (BibtexEntry)(db.getEntryById((String)i.next()).clone());
+                        be.setId(Util.createNeutralId());
+                        database.insertEntry(be);
+                        ce.addEdit(new UndoableInsertEntry(database, be, ths));
+                      }
+                    }
 
-                 if (importStrings) {
-                   BibtexString bs;
-                   int pos = 0;
-                   for (int i=0; i<db.getStringCount(); i++) {
-                     bs = (BibtexString)(db.getString(i).clone());
-                     if (!database.hasStringLabel(bs.getName())) {
-                       pos = database.getStringCount();
-                       database.addString(bs, pos);
-                       ce.addEdit(new UndoableInsertString(ths, database, bs, pos));
-                     }
-                   }
-                 }
+                    if (importStrings) {
+                      BibtexString bs;
+                      int pos = 0;
+                      for (int i=0; i<db.getStringCount(); i++) {
+                        bs = (BibtexString)(db.getString(i).clone());
+                        if (!database.hasStringLabel(bs.getName())) {
+                          pos = database.getStringCount();
+                          database.addString(bs, pos);
+                          ce.addEdit(new UndoableInsertString(ths, database, bs, pos));
+                        }
+                      }
+                    }
 
-                 if (importGroups) {
-                   Vector newGroups = meta.getData("groups");
-                   if (newGroups != null) {
-                     if (groupSelector == null) {
-                       // The current database has no group selector defined, so we must instantiate one.
-                       groupSelector = new GroupSelector
-                           (frame, ths, new Vector(), sidePaneManager, prefs);
-                       sidePaneManager.register("groups", groupSelector);
-                     }
+                    if (importGroups) {
+                      Vector newGroups = meta.getData("groups");
+                      if (newGroups != null) {
+                        if (groupSelector == null) {
+                          // The current database has no group selector defined, so we must instantiate one.
+                          groupSelector = new GroupSelector
+                              (frame, ths, new Vector(), sidePaneManager, prefs);
+                          sidePaneManager.register("groups", groupSelector);
+                        }
 
-                     groupSelector.addGroups(newGroups, ce);
-                     groupSelector.revalidateList();
-                   }
-                 }
+                        groupSelector.addGroups(newGroups, ce);
+                        groupSelector.revalidateList();
+                      }
+                    }
 
-		 if (importSelectorWords) {
-		     Iterator i=meta.iterator();
-		     while (i.hasNext()) {
-			 String s = (String)i.next();
-			 if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-			     metaData.putData(s, meta.getData(s));
-			 }
-		     }
-		 }
+                    if (importSelectorWords) {
+                      Iterator i=meta.iterator();
+                      while (i.hasNext()) {
+                        String s = (String)i.next();
+                        if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+                          metaData.putData(s, meta.getData(s));
+                        }
+                      }
+                    }
 
-                 ce.end();
-                 undoManager.addEdit(ce);
-                 markBaseChanged();
-                 refreshTable();
-                 output("Imported from database '"+fileToOpen.getPath()+"':");
-                 fileToOpen = null;
-               } catch (Throwable ex) {
-                 ex.printStackTrace();
-                 JOptionPane.showMessageDialog
-                     (ths, ex.getMessage(),
-                      "Open database", JOptionPane.ERROR_MESSAGE);
-               }
-             }
-           }
-         });
+                    ce.end();
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
+                    refreshTable();
+                    output("Imported from database '"+fileToOpen.getPath()+"':");
+                    fileToOpen = null;
+                  } catch (Throwable ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog
+                        (ths, ex.getMessage(),
+                         "Open database", JOptionPane.ERROR_MESSAGE);
+                  }
+                }
+              }
+            });
 
          actions.put("openFile", new BaseAction() {
                  public void action() {
