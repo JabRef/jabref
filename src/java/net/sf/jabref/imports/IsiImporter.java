@@ -120,7 +120,7 @@ public class IsiImporter implements ImportFormat {
         value = value.trim();
 
         if (beg.equals("PT")) {
-          PT = value.replaceAll("Journal", "article");
+          PT = value.replaceAll("Journal", "article").replaceAll("J", "article");
           Type = "article"; //make all of them PT?
         } else if (beg.equals("TY")) {
           if ("CONF".equals(value))
@@ -128,8 +128,8 @@ public class IsiImporter implements ImportFormat {
         } else if (beg.equals("JO"))
           hm.put("booktitle", value);
         else if (beg.equals("AU")) {
-          String author =
-            ImportFormatReader.fixAuthor_lastnameFirst(value.replaceAll("EOLEOL", " and "));
+	    String author = isiAuthorConvert(
+            ImportFormatReader.fixAuthor_lastnameFirst(value.replaceAll("EOLEOL", " and ")));
 
           // if there is already someone there then append with "and"
           if (hm.get("author") != null)
@@ -164,8 +164,11 @@ public class IsiImporter implements ImportFormat {
           hm.put("volume", value);
         else if (beg.equals("DT")) {
           Type = value;
-
-          if (!Type.equals("Article") && !PT.equals("Journal"))
+	  if (Type.equals("Review")) {
+	      Type = "article";
+	      // set "Review" in Note/Comment?
+	  }
+          else if (!Type.equals("Article") && !PT.equals("Journal"))
             Type = "misc";
           else
             Type = "article";
@@ -188,4 +191,28 @@ public class IsiImporter implements ImportFormat {
 
     return bibitems;
   }
+
+    private String isiAuthorConvert(String authors) {
+	String[] author = authors.split(" and ");
+	StringBuffer sb = new StringBuffer();
+	for (int i=0; i<author.length; i++) {
+	    int pos = author[i].indexOf(", ");
+	    if (pos > 0) {
+		sb.append(author[i].substring(0, pos));
+		sb.append(", ");
+
+		for (int j=pos+2; j<author[i].length(); j++) {
+		    sb.append(author[i].charAt(j));
+		    sb.append(".");
+		    if (j<author[i].length()-1)
+			sb.append(" ");
+		}
+	    } else
+		sb.append(author[i]);
+	    if (i<author.length-1)
+		sb.append(" and ");
+	}
+	return sb.toString();
+    }
+
 }

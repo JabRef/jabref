@@ -162,13 +162,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     private void setupFieldPanels() {
 	tabbed.removeAll();
 	tabs.clear();
-	
-	reqPan = new EntryEditorTab(java.util.Arrays.asList(entry.getRequiredFields()), this, true);
-	tabbed.addTab(Globals.lang("Required fields"),
-		      new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
-		      Globals.lang("Show required fields"));
-	tabs.add(reqPan);
-		
+	String[] fields = entry.getRequiredFields();
+	if (fields != null) {
+	    reqPan = new EntryEditorTab(java.util.Arrays.asList(fields), this, true);
+	    tabbed.addTab(Globals.lang("Required fields"),
+			  new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
+			  Globals.lang("Show required fields"));
+	    tabs.add(reqPan);
+	}
 	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
 	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this, false);
 	    tabbed.addTab(Globals.lang("Optional fields"),
