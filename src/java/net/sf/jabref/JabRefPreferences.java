@@ -35,6 +35,11 @@ import java.util.prefs.*;
 import java.util.*;
 
 public class JabRefPreferences {
+
+    final String 
+	CUSTOM_TYPE_NAME = "customTypeName_",
+	CUSTOM_TYPE_REQ = "customTypeReq_",
+	CUSTOM_TYPE_OPT = "customTypeOpt_";
     
     Preferences prefs;
     HashMap defaults = new HashMap(),
@@ -150,15 +155,17 @@ public class JabRefPreferences {
      * transparent even if strings contain ';'.
      */
     public void putStringArray(String key, String[] value) {
-	StringBuffer linked = new StringBuffer();
 	if (value.length > 0) {
+	    StringBuffer linked = new StringBuffer();
 	    for (int i=0; i<value.length-1; i++) {
 		linked.append(makeEscape(value[i]));
 		linked.append(";");
 	    }
+	    linked.append(makeEscape(value[value.length-1]));
+	    put(key, linked.toString());
+	} else {
+	    put(key, "");
 	}
-	linked.append(makeEscape(value[value.length-1]));
-	put(key, linked.toString());
     }
 
     /**
@@ -339,4 +346,47 @@ public class JabRefPreferences {
 	return sb.toString();
     }
 
+    /**
+     * Stores all information about the entry type in preferences, with
+     * the tag given by number.
+     */
+    public void storeCustomEntryType(CustomEntryType tp, int number) {
+	String nr = ""+number;
+	put(CUSTOM_TYPE_NAME+nr, tp.getName());
+	putStringArray(CUSTOM_TYPE_REQ+nr, tp.getRequiredFields());
+	putStringArray(CUSTOM_TYPE_OPT+nr, tp.getOptionalFields());
+
+    }
+
+    /**
+     * Retrieves all information about the entry type in preferences,
+     * with the tag given by number.
+     */
+    public CustomEntryType getCustomEntryType(int number) {       
+	String nr = ""+number;
+	String
+	    name = get(CUSTOM_TYPE_NAME+nr);
+	String[]
+	    req = getStringArray(CUSTOM_TYPE_REQ+nr),
+	    opt = getStringArray(CUSTOM_TYPE_OPT+nr);
+	if (name == null)
+	    return null;
+	else return new CustomEntryType
+	    (name, req, opt);
+	     
+
+    }
+
+    /**
+     * Removes all information about custom entry types with tags of
+     * @param number or higher.
+     */
+    public void purgeCustomEntryTypes(int number) {
+	while (get(CUSTOM_TYPE_NAME+number) != null) {
+	    remove(CUSTOM_TYPE_NAME+number);
+	    remove(CUSTOM_TYPE_REQ+number);
+	    remove(CUSTOM_TYPE_OPT+number);
+	    number++;
+	}
+    }
 }

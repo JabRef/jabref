@@ -92,8 +92,8 @@ public class Globals {
 	    translation=Globals.messages.getString(key.replaceAll(" ","_"));
 	}catch(MissingResourceException ex){
 	    translation= key;
-	    //System.err.println("Warning: could not get translation for \""
-	    //	       + key +"\"");
+	    System.err.println("Warning: could not get translation for \""
+	    	       + key +"\"");
 	}
 	return translation.replaceAll("_"," ");
     }

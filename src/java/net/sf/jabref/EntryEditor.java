@@ -106,6 +106,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     // These values can be used to calculate the preferred height for the form.
     // reqW starts at 1 because it needs room for the bibtex key field.
 
+    private int sourceIndex = -1; // The index the source panel has in tabbed.
+
     private final int REQ=0, OPT=1, GEN=2, FIELD_WIDTH=40, FIELD_HEIGHT=2;
     private final String KEY_PROPERTY = "bibtexkey";
     JabRefPreferences prefs;
@@ -163,15 +165,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tabbed.addTab("Required fields", 
 		      new ImageIcon(GUIGlobals.showReqIconFile),
 		      reqPanel.getPane(), "Show required fields");
-	tabbed.addTab("Optional fields", 
-		      new ImageIcon(GUIGlobals.showOptIconFile),
-		      optPanel.getPane(), "Show optional fields");
-	tabbed.addTab("General fields", 
-		      new ImageIcon(GUIGlobals.showGenIconFile), 
-		      genPanel.getPane(), "Show general fields");
+	if ((entry.getOptionalFields() != null) &&
+	    (entry.getOptionalFields().length >= 1))
+	    tabbed.addTab("Optional fields", 
+			  new ImageIcon(GUIGlobals.showOptIconFile),
+			  optPanel.getPane(), "Show optional fields");
+	if ((entry.getGeneralFields() != null) &&
+	    (entry.getGeneralFields().length >= 1))
+	    tabbed.addTab("General fields", 
+			  new ImageIcon(GUIGlobals.showGenIconFile), 
+			  genPanel.getPane(), "Show general fields");
 	tabbed.addTab("Bibtex source", 
 		      new ImageIcon(GUIGlobals.sourceIconFile), 
 		      srcPanel, "Show/edit bibtex source");
+	sourceIndex = tabbed.getTabCount()-1; // Set the sourceIndex variable.
 	tabbed.addChangeListener(new TabListener());
 
 	add(tabbed, BorderLayout.CENTER);
@@ -180,7 +187,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	int prefHeight = (int)(Math.max(genW, Math.max(optW, reqW))*GUIGlobals.FORM_HEIGHT[prefs.getInt("entryTypeFormHeightFactor")]);
 	setSize(GUIGlobals.FORM_WIDTH[prefs.getInt("entryTypeFormWidth")], prefHeight);
 	if (prefs.getBoolean("defaultShowSource")) {
-	    tabbed.setSelectedIndex(3);
+	    tabbed.setSelectedIndex(sourceIndex);
 	}
 
     }
@@ -579,7 +586,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     class TabListener implements ChangeListener {
 	public void stateChanged(ChangeEvent e) {
-	    if (((JTabbedPane)e.getSource()).getSelectedIndex() < 3) {
+	    if (((JTabbedPane)e.getSource()).getSelectedIndex() != sourceIndex) {
 		FieldPanel fp = (FieldPanel)(((JTabbedPane)e.getSource()).getSelectedComponent());
 		fp.activate();
 	    } else {
@@ -876,6 +883,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    newRow = thisRow+1;
 		else if (thisRow > 0)
 		    newRow = 0;
+		else 
+		    return; // newRow is still -1, so we can assume the database
+		            // has only one entry. 
 
 		id = panel.tableModel.getNameFromNumber(newRow);
 		switchTo(id);
@@ -905,6 +915,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    newRow = thisRow-1;
 		else if (thisRow != panel.database.getEntryCount()-1)
 		    newRow = panel.database.getEntryCount()-1;
+		else 
+		    return; // newRow is still -1, so we can assume the database
+		            // has only one entry. 
 
 		id = panel.tableModel
 		    .getNameFromNumber(newRow);

@@ -135,6 +135,7 @@ public class GUIGlobals {
 	helpContents = GUIGlobals.class.getResource(helpPre+"Contents.html"),
 	searchHelp = GUIGlobals.class.getResource(helpPre+"SearchHelp.html"),
 	groupsHelp = GUIGlobals.class.getResource(helpPre+"GroupsHelp.html"),
+	customEntriesHelp = GUIGlobals.class.getResource(helpPre+"CustomEntriesHelp.html"),
 	aboutPage = GUIGlobals.class.getResource(helpPre+"About.html");
 
 

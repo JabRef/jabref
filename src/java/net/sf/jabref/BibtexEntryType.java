@@ -29,15 +29,10 @@ Modified for use in JabRef.
 */
 package net.sf.jabref;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Set;
+import java.util.*;
+
 public abstract class BibtexEntryType implements Comparable
 {
-
-    public static TreeMap ALL_TYPES = new TreeMap();
 
     public static final BibtexEntryType OTHER =
         new BibtexEntryType()
@@ -585,34 +580,6 @@ public abstract class BibtexEntryType implements Comparable
         };
 
 
-    static {
-	// Put the standard entry types into the type map.
-	ALL_TYPES.put("article", ARTICLE);
-	ALL_TYPES.put("inbook", INBOOK);
-	ALL_TYPES.put("book", BOOK);
-	ALL_TYPES.put("booklet", BOOKLET);
-	ALL_TYPES.put("incollection", INCOLLECTION);
-	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
-	ALL_TYPES.put("proceedings", PROCEEDINGS);
-	ALL_TYPES.put("manual", MANUAL);
-	ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
-	ALL_TYPES.put("phdthesis", PHDTHESIS);
-	ALL_TYPES.put("techreport", TECHREPORT);
-	ALL_TYPES.put("unpublished", UNPUBLISHED);
-	ALL_TYPES.put("misc", MISC);
-    }
-
-    /**
-     * This method returns the BibtexEntryType for the name of a type.
-     */
-    public static BibtexEntryType getType(String name) {
-	//Util.pr(name);
-	Object o = ALL_TYPES.get(name.toLowerCase());
-	if (o == null)
-	    return null;
-	else return (BibtexEntryType)o;
-    }
-
     public abstract String getName();
 
     public int compareTo(Object o) {
@@ -653,6 +620,95 @@ public abstract class BibtexEntryType implements Comparable
 	for (int i=0; i<opt.length; i++)
 	    if (opt[i].equals(field)) return true;
 	return false;
+    }
+
+    public static TreeMap ALL_TYPES = new TreeMap();
+    public static TreeMap STANDARD_TYPES = new TreeMap();
+    static {
+	// Put the standard entry types into the type map.
+	ALL_TYPES.put("article", ARTICLE);
+	ALL_TYPES.put("inbook", INBOOK);
+	ALL_TYPES.put("book", BOOK);
+	ALL_TYPES.put("booklet", BOOKLET);
+	ALL_TYPES.put("incollection", INCOLLECTION);
+	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
+	ALL_TYPES.put("proceedings", PROCEEDINGS);
+	ALL_TYPES.put("manual", MANUAL);
+	ALL_TYPES.put("mastersthesis", MASTERSTHESIS);
+	ALL_TYPES.put("phdthesis", PHDTHESIS);
+	ALL_TYPES.put("techreport", TECHREPORT);
+	ALL_TYPES.put("unpublished", UNPUBLISHED);
+	ALL_TYPES.put("misc", MISC);
+
+	// We need a record of the standard types, in case the user wants
+	// to remove a customized version. Therefore we clone the map.
+	STANDARD_TYPES = (TreeMap)ALL_TYPES.clone();
+    }
+
+    /**
+     * This method returns the BibtexEntryType for the name of a type.
+     */
+    public static BibtexEntryType getType(String name) {
+	//Util.pr(name);
+	Object o = ALL_TYPES.get(name.toLowerCase());
+	if (o == null)
+	    return null;
+	else return (BibtexEntryType)o;
+    }
+
+    /**
+     * Removes a customized entry type from the type map. If this type
+     * overrode a standard type, we reinstate the standard one.
+     *
+     * @param name The customized entry type to remove.
+     */
+    public static void removeType(String name) {
+	//BibtexEntryType type = getType(name);
+	String nm = name.toLowerCase();
+	ALL_TYPES.remove(nm);
+	if (STANDARD_TYPES.get(nm) != null) {
+	    // In this case the user has removed a customized version
+	    // of a standard type. We reinstate the standard type.
+	    ALL_TYPES.put(nm, STANDARD_TYPES.get(nm));
+	}
+
+    }
+
+    /**
+     * Load all custom entry types from preferences. This method is
+     * called from JabRef when the program starts.
+     */
+    public static void loadCustomEntryTypes(JabRefPreferences prefs) {
+	int number = 0;
+	CustomEntryType type;
+	while ((type = prefs.getCustomEntryType(number)) != null) {
+	    //	    Util.pr(type.getName());
+	    ALL_TYPES.put(type.getName(), type);
+	    number++;
+	}
+    }
+
+    /**
+     * Iterate through all entry types, and store those that are
+     * custom defined to preferences. This method is called from
+     * JabRefFrame when the program closes.
+     */
+    public static void saveCustomEntryTypes(JabRefPreferences prefs) {
+	Iterator i=ALL_TYPES.keySet().iterator();
+	int number = 0;
+	//Vector customTypes = new Vector(10, 10);
+	while (i.hasNext()) {
+	    Object o=ALL_TYPES.get(i.next());
+	    if (o instanceof CustomEntryType) {
+		// Store this entry type.
+		prefs.storeCustomEntryType((CustomEntryType)o, number);
+		number++;
+	    }
+	}
+	// Then, if there are more 'old' custom types defined, remove these
+	// from preferences. This is necessary if the number of custom types
+	// has decreased.
+	prefs.purgeCustomEntryTypes(number);
     }
 
 }

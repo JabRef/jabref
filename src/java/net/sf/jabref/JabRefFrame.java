@@ -146,20 +146,20 @@ public class JabRefFrame extends JFrame {
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
     NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
-	new NewEntryAction(BibtexEntryType.ARTICLE, prefs.getKey("New article")),
-	new NewEntryAction(BibtexEntryType.BOOK, prefs.getKey("New book")),
-	new NewEntryAction(BibtexEntryType.PHDTHESIS, prefs.getKey("New phdthesis")),
-	new NewEntryAction(BibtexEntryType.INBOOK, prefs.getKey("New inbook")),
-	new NewEntryAction(BibtexEntryType.MASTERSTHESIS, prefs.getKey("New mastersthesis")),
-	new NewEntryAction(BibtexEntryType.PROCEEDINGS, prefs.getKey("New proceedings")),
-	new NewEntryAction(BibtexEntryType.INPROCEEDINGS),
-	new NewEntryAction(BibtexEntryType.INCOLLECTION),
-	new NewEntryAction(BibtexEntryType.BOOKLET), 
-	new NewEntryAction(BibtexEntryType.MANUAL),
-	new NewEntryAction(BibtexEntryType.TECHREPORT),
-	new NewEntryAction(BibtexEntryType.UNPUBLISHED,
+	new NewEntryAction("article", prefs.getKey("New article")),
+	new NewEntryAction("book", prefs.getKey("New book")),
+	new NewEntryAction("phdthesis", prefs.getKey("New phdthesis")),
+	new NewEntryAction("inbook", prefs.getKey("New inbook")),
+	new NewEntryAction("mastersthesis", prefs.getKey("New mastersthesis")),
+	new NewEntryAction("proceedings", prefs.getKey("New proceedings")),
+	new NewEntryAction("inproceedings"),
+	new NewEntryAction("incollection"),
+	new NewEntryAction("booklet"), 
+	new NewEntryAction("manual"),
+	new NewEntryAction("techreport"),
+	new NewEntryAction("unpublished",
 			   prefs.getKey("New unpublished")),
-	new NewEntryAction(BibtexEntryType.MISC) 
+	new NewEntryAction("misc") 
     };
 
     public JabRefFrame() {
@@ -388,7 +388,7 @@ public class JabRefFrame extends JFrame {
 
     class NewEntryAction extends AbstractAction {
 
-	BibtexEntryType type = null; // The type of item to create.
+	String type = null; // The type of item to create.
 	KeyStroke keyStroke = null;  // Used for the specific instances.
 
 	public NewEntryAction(KeyStroke key) {
@@ -399,15 +399,15 @@ public class JabRefFrame extends JFrame {
 	    putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX entry"));
 	}    
 
-	public NewEntryAction(BibtexEntryType type_) { 
+	public NewEntryAction(String type_) { 
 	    // This action leads to the creation of a specific entry.
-	    super(type_.getName());
+	    super(Util.nCase(type_));
 	    type = type_;
 	}    
 
-	public NewEntryAction(BibtexEntryType type_, KeyStroke key) { 
+	public NewEntryAction(String type_, KeyStroke key) { 
 	    // This action leads to the creation of a specific entry.
-	    super(type_.getName());
+	    super(Util.nCase(type_));
 	    putValue(ACCELERATOR_KEY, key);
 	    type = type_;
 	}    
@@ -415,7 +415,7 @@ public class JabRefFrame extends JFrame {
 	public void actionPerformed(ActionEvent e) {
 	    if (tabbedPane.getTabCount() > 0)
 		((BasePanel)(tabbedPane.getSelectedComponent()))
-		    .newEntry(type);
+		    .newEntry(BibtexEntryType.getType(type));
 	    else
 		Util.pr("Action 'New entry' must be disabled when no "
 			+"database is open.");	    
@@ -503,6 +503,13 @@ public class JabRefFrame extends JFrame {
 	mb.add(tools);
 
 	options.add(showPrefs);
+	options.add(new AbstractAction("Customize entry types") {
+		public void actionPerformed(ActionEvent e) {
+		    JDialog dl = new EntryCustomizationDialog(ths);
+		    Util.placeDialog(dl, ths);
+		    dl.show();
+		}
+		});
 	//options.add(selectKeys);
 	mb.add(options);
 
@@ -520,12 +527,6 @@ public class JabRefFrame extends JFrame {
 	tlb.setBackground(GUIGlobals.lightGray);
 	tlb.setForeground(GUIGlobals.lightGray);
 	tlb.setFloatable(false);
-	/*tlb.add(new AbstractAction("Form dialog") {
-		public void actionPerformed(ActionEvent e) {
-		    JDialog dl = new EntryCustomizationDialog(ths);
-		    dl.show();
-		}
-		});*/
 	tlb.add(newDatabaseAction);
 	tlb.add(open);
 	tlb.add(save);
@@ -763,6 +764,8 @@ public class JabRefFrame extends JFrame {
 
 					fileHistory.storeHistory();
 				}
+
+				BibtexEntryType.saveCustomEntryTypes(prefs);
 				
 				// Let the search interface store changes to prefs.
 				// But which one? Let's use the one that is visible.

@@ -30,55 +30,120 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
-class EntryCustomizationDialog extends JDialog
+class EntryCustomizationDialog extends JDialog implements ItemListener
 {
     BibtexEntryType type;
 
-    JButton ok, cancel;
-    JPanel typePanel=new JPanel();
-    JPanel fieldPanel = new JPanel();
+    JScrollPane reqSP, optSP;
+    JButton ok, cancel, helpButton, delete;
+    JPanel panel=new JPanel(),
+	fieldPanel = new JPanel(),
+	typePanel = new JPanel();
     int width=10;
-    JLabel messageLabel=new JLabel("");    
+    JLabel messageLabel=new JLabel("", SwingConstants.CENTER);    
 
     JTextField name = new JTextField("", width);
-    JTextArea req_ta=new JTextArea("",17,width),//10 row, 20 columns
-	opt_ta=new JTextArea("",17,width);//10 row, 20 columns
+    JTextArea req_ta=new JTextArea("",1,width),//10 row, 20 columns
+	opt_ta=new JTextArea("",1,width);//10 row, 20 columns
     // need to get FIeld name from somewhere
 	
-    //JComboBox types_cb = new JComboBox(Globals.typeNames);
+    JComboBox types_cb = new JComboBox();
+
+    HelpAction help;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 	
     JPanel buttonPanel = new JPanel();
-    public EntryCustomizationDialog(JFrame parent)
+    public EntryCustomizationDialog(JabRefFrame parent)
     {
 	//Type=Article, Book etc
 	// templateName will be used to put on the dialog frame
 	// create 10 default entries
 	// return an array
-	super(parent,"Customize Form fields",true);
-	setSize(230,400);
+	super(parent,Globals.lang("Customize entry types"),true);
+	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
+			      "Help", GUIGlobals.helpSmallIconFile);
+	setTypeSelection();
+	setSize(400,400);
 	initialize();
 	makeButtons();
-	typePanel.add( new JLabel("TYPE",JLabel.RIGHT));
-	//typePanel.add( types_cb);
-	fieldPanel.add(name);
-	fieldPanel.add(new JLabel("FIELDS",JLabel.RIGHT));
-	fieldPanel.add(new JScrollPane
-		       (req_ta,			
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
 
-	fieldPanel.add(new JScrollPane
-		       (opt_ta,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+	reqSP = new JScrollPane(req_ta,			
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	optSP = new JScrollPane(opt_ta,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	//helpButton = new JButton(help);
+	//helpButton.setText(null);
+	JToolBar tlb = new JToolBar();
+	tlb.setFloatable(false);
+	tlb.add(help);
+	panel.setBackground(GUIGlobals.lightGray);
+	buttonPanel.setBackground(GUIGlobals.lightGray);
+	panel.setLayout(gbl);
+	typePanel.setLayout(gbl);
+	fieldPanel.setLayout(gbl);
+	//panel.setBorder(BorderFactory.createEtchedBorder());
+	fieldPanel.setBorder(BorderFactory.createEtchedBorder());
+	typePanel.setBorder(BorderFactory.createEtchedBorder());
+	
+	JLabel lab = new JLabel(Globals.lang("Type: ")),
+	    lab2 = new JLabel(Globals.lang("Name: "));
+	con.insets = new Insets(5, 5, 5, 5);
+	gbl.setConstraints(lab, con);
+	gbl.setConstraints(lab2, con);
+	gbl.setConstraints(types_cb, con);
 
-	fieldPanel.add(messageLabel);
+	con.weightx = 1;
+	con.fill = GridBagConstraints.HORIZONTAL;
+	gbl.setConstraints(name, con);
+	con.fill = GridBagConstraints.NONE;
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	con.weightx = 0;
+	//gbl.setConstraints(helpButton, con);
+	gbl.setConstraints(tlb, con);
+	con.gridwidth = 1;
+	typePanel.add(lab);		
+	typePanel.add(types_cb);
+	typePanel.add(lab2);		
+	typePanel.add(name);
+	//typePanel.add(helpButton);
+	typePanel.add(tlb);
+	lab = new JLabel(Globals.lang("Required fields"));
+	con.fill = GridBagConstraints.BOTH;
+	con.weightx = 1;
+	gbl.setConstraints(lab, con);	
+	con.weighty = 1;
+	gbl.setConstraints(reqSP, con);
+	fieldPanel.add(lab);
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	lab = new JLabel(Globals.lang("Optional fields"));
+	con.weighty = 0;
+	gbl.setConstraints(lab, con);
+	fieldPanel.add(lab);
+	con.weighty = 1;
+	gbl.setConstraints(optSP, con);
+
+	fieldPanel.add(reqSP);
+	fieldPanel.add(optSP);
+
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	con.weighty = 0;
+	gbl.setConstraints(typePanel, con);
+	con.weighty = 1;
+	gbl.setConstraints(fieldPanel, con);
+	con.weighty = 0;
+	gbl.setConstraints(messageLabel, con);
+	panel.add(typePanel);
+	panel.add(fieldPanel);
+	panel.add(messageLabel);
+	name.requestFocus();
     }
 
-    public EntryCustomizationDialog(JFrame parent, BibtexEntryType type_) {
+    public EntryCustomizationDialog(JabRefFrame parent,
+				    BibtexEntryType type_) {
 	this(parent);
 	type = type_;
 	
@@ -86,16 +151,16 @@ class EntryCustomizationDialog extends JDialog
 
     void initialize(){
 	setModal(true);
-	setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+	//setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		
 	getContentPane().setLayout(new BorderLayout());
 	getContentPane().add( buttonPanel, BorderLayout.SOUTH);
-	getContentPane().add( typePanel, BorderLayout.NORTH);
-	getContentPane().add( fieldPanel, BorderLayout.CENTER);		
+	getContentPane().add( panel, BorderLayout.CENTER);		
 
 	messageLabel.setForeground(Color.black);
-	messageLabel.setText("Field names delimiter is semicolon.\n Ex: author;title;journal;");
-		
+	messageLabel.setText("Delimit fields with semicolon, ex.: author;title;journal");
+
+	types_cb.addItemListener(this);
     }
 
     void save()
@@ -111,20 +176,43 @@ class EntryCustomizationDialog extends JDialog
 	String typeName = name.getText().trim();
 
 	if(! typeName.equals("")) {
-	    Util.pr("Save entry definition.");
 	    CustomEntryType typ = new CustomEntryType
-		(typeName, reqStr, optStr);
-	    BibtexEntryType.ALL_TYPES.put(typeName, typ);
+		(typeName.toLowerCase(), reqStr, optStr);
+	    BibtexEntryType.ALL_TYPES.put(typ.getName(), typ);
+
+	    setTypeSelection();
+	    messageLabel.setText(Globals.lang("Stored definition for type"+
+					      " '"+Util.nCase(typ.getName())
+					      +"'."));
 	}
 	else{ 				
-	    Util.pr("No name.");
+	    messageLabel.setText(Globals.lang("You must fill in a name for the entry type."));
 	}
 		
     }
+
+    private void setTypeSelection() {
+	types_cb.removeAllItems();
+	types_cb.addItem("<new>");
+	Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator();
+	BibtexEntryType type;
+	String toSet;
+	while (i.hasNext()) {
+	    type = BibtexEntryType.getType((String)i.next());
+	    toSet = Util.nCase(type.getName());
+	    if (type instanceof CustomEntryType)
+		toSet = toSet + " *";
+	    types_cb.addItem(toSet);
+
+	}
+    }
+
     void makeButtons(){
-	ok = new JButton(Globals.lang("Ok"));
-	cancel=new JButton(Globals.lang("Cancel"));
+	ok = new JButton(Globals.lang("Store"));
+	cancel=new JButton(Globals.lang("Close"));
+	delete = new JButton(Globals.lang("Delete custom"));
 	buttonPanel.add( ok );
+	buttonPanel.add(delete);
 	buttonPanel.add( cancel);
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -136,7 +224,47 @@ class EntryCustomizationDialog extends JDialog
 		    dispose();
 		}
 	    });
-		
+	delete.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    BibtexEntryType type = BibtexEntryType
+			.getType(name.getText());
+		    if (type == null)
+			messageLabel.setText(Globals.lang("There is no entry type")+
+					     " '"+Util.nCase(name.getText())+
+					     "' "+Globals.lang("defined."));
+		    else if (!(type instanceof CustomEntryType))
+			messageLabel.setText("'"+type.getName()+"' "+
+					     Globals.lang("is a standard type."));
+		    else {
+			BibtexEntryType.removeType(name.getText());
+			setTypeSelection();			
+		    }
+		}
+	    });
     }
 
+    public void itemStateChanged(ItemEvent e) {
+	if (types_cb.getSelectedIndex() > 0) {
+	    // User has selected one of the existing types.
+	    String name = (String)types_cb.getSelectedItem(); 
+	    updateToType((name.split(" "))[0]);
+	} else {
+	    name.setText("");
+	    req_ta.setText("");
+	    opt_ta.setText("");	    
+	    name.requestFocus();
+	}
+    }
+
+    public void updateToType(String o) {
+
+	BibtexEntryType type = BibtexEntryType.getType(o);
+	name.setText(type.getName());
+	req_ta.setText(Util.stringArrayToDelimited
+		       (type.getRequiredFields(), ";\n"));
+	opt_ta.setText(Util.stringArrayToDelimited
+		       (type.getOptionalFields(), ";\n"));
+
+	req_ta.requestFocus();
+    }
 }

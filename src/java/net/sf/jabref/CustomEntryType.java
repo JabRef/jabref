@@ -17,8 +17,14 @@ public class CustomEntryType extends BibtexEntryType {
 
     public CustomEntryType(String name_, String reqStr, String optStr) {
 	name = name_;
-	req = reqStr.split(";");
-	opt = optStr.split(";");
+	if (reqStr.length() == 0)
+	    req = new String[0];
+	else
+	    req = reqStr.split(";");
+	if (optStr.length() == 0)
+	    opt = new String[0];
+	else
+	    opt = optStr.split(";");	
     }
 
     public String getName() {

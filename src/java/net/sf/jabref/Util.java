@@ -260,6 +260,28 @@ public class Util {
 	return res;
     }
 
+    /**
+     * Takes a String array and returns a string with the array's
+     * elements delimited by a certain String.
+     *
+     * @param strs String array to convert.
+     * @param delimiter String to use as delimiter.
+     * @return Delimited String.
+     */
+    public static String stringArrayToDelimited(String[] strs, 
+						String delimiter) {
+	if ((strs == null) || (strs.length == 0))
+	    return "";
+	if (strs.length == 1)
+	    return strs[0];
+	StringBuffer sb = new StringBuffer();
+	for (int i=0; i<strs.length-1; i++) {
+	    sb.append(strs[i]);
+	    sb.append(delimiter);
+	}
+	sb.append(strs[strs.length-1]);
+	return sb.toString();
+    }
 
     /**
      * This methods assures all words in the given entry are recorded
