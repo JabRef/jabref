@@ -36,7 +36,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.undo.*;
 
 /**
- * Dialog for creating or modifying groups. Operates directly on the 
+ * Dialog for creating or modifying groups. Operates directly on the
  * Vector containing group information.
  */
 class AutoGroupDialog extends JDialog {
@@ -63,11 +63,11 @@ class AutoGroupDialog extends JDialog {
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
-    
+
     public AutoGroupDialog(JabRefFrame frame_, BasePanel panel_,
 			   GroupSelector gs_,
 			   Vector groups_,
-			   String defaultField, 
+			   String defaultField,
 			   String defaultRemove) {
 	super(frame_, Globals.lang("Automatically create groups"), true);
 	frame = frame_;
@@ -79,16 +79,16 @@ class AutoGroupDialog extends JDialog {
 
 	ActionListener okListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    
+
 		    // Check that there are no empty strings.
 		    if (field.getText().equals("")) {
 			JOptionPane.showMessageDialog
 			    (frame, Globals.lang("You must provide a field name "+
 			     "as basis for the group creation."),
-			     Globals.lang("Automatically create groups"), 
+			     Globals.lang("Automatically create groups"),
 			     JOptionPane.ERROR_MESSAGE);
-			return;						      
-		    } 
+			return;
+		    }
 
 		    ok_pressed = true;
 		    dispose();
@@ -106,7 +106,7 @@ class AutoGroupDialog extends JDialog {
 			// Check if a group with this search term already exists.
 			for (int j=GroupSelector.OFFSET+1; j<groups.size();
 			     j += GroupSelector.DIM) {
-			    
+
 			    if (regExp.equals(((String)groups.elementAt(j)).toLowerCase()))
 				found = true;
 			}
@@ -122,7 +122,7 @@ class AutoGroupDialog extends JDialog {
 			    groups.add(index, Util.nCase(regExp));
 			    groups.add(index, field());
 			}
-			
+
 		    }
 
 		    if (added.size() > 0) {
@@ -134,7 +134,7 @@ class AutoGroupDialog extends JDialog {
 			    for (int k=1; k<added.size()-1; k++)
 				((UndoableAddOrRemoveGroup)added.elementAt(k)).
 				    setRevalidate(false);
-			    
+
 			}
 			for (int k=0; k<added.size(); k++)
 			    ce.addEdit((UndoableAddOrRemoveGroup)added.
@@ -142,7 +142,7 @@ class AutoGroupDialog extends JDialog {
 			ce.end();
 			panel.undoManager.addEdit(ce);
 		    }
-		    
+
 
 		    /*
 		    if (index < 0) {
@@ -184,7 +184,7 @@ class AutoGroupDialog extends JDialog {
 	// Key bindings:
 	ActionMap am = main.getActionMap();
 	InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	im.put(GUIGlobals.exitDialog, "close");
+	im.put(frame.prefs().getKey("Close dialog"), "close");
 	am.put("close", cancelAction);
 
 
@@ -204,22 +204,22 @@ class AutoGroupDialog extends JDialog {
 	con.gridx = 0;
 	con.gridy = 0;
 	gbl.setConstraints(nf, con);
-	main.add(nf); 
+	main.add(nf);
 	con.gridy = 1;
 	gbl.setConstraints(nr, con);
-	main.add(nr); 
+	main.add(nr);
 
 	con.weightx = 1;
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridy = 0; 
+	con.gridy = 0;
 	con.gridx = 1;
 	gbl.setConstraints(field, con);
-	main.add(field); 
+	main.add(field);
 	con.gridy = 1;
 	gbl.setConstraints(remove, con);
-	main.add(remove); 
-	
+	main.add(remove);
+
        	// Option buttons:
 	con.gridx = GridBagConstraints.RELATIVE;
 	con.gridy = GridBagConstraints.RELATIVE;

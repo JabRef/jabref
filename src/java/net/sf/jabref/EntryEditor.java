@@ -191,11 +191,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 
-	im.put(GUIGlobals.exitDialog, "close");
+	im.put(prefs.getKey("Close entry editor"), "close");
 	am.put("close", closeAction);
 	im.put(prefs.getKey("Entry editor, store field"), "store");
 	am.put("store", storeFieldAction);
-	im.put(GUIGlobals.generateKeyStroke, "generateKey");
+	im.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
 	am.put("generateKey", generateKeyAction);
 	im.put(prefs.getKey("Entry editor, previous panel"), "left");
 	am.put("left", switchLeftAction);
@@ -205,11 +205,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	am.put("prev", prevEntryAction);
 	im.put(prefs.getKey("Entry editor, next entry"), "next");
 	am.put("next", nextEntryAction);
-	im.put(GUIGlobals.undoStroke, "undo");
+	im.put(prefs.getKey("Undo"), "undo");
 	am.put("undo", undoAction);
-	im.put(GUIGlobals.redoStroke, "redo");
+	im.put(prefs.getKey("Redo"), "redo");
 	am.put("redo", redoAction);
-	im.put(GUIGlobals.helpKeyStroke, "help");
+	im.put(prefs.getKey("Help"), "help");
 	am.put("help", helpAction);
 
 	tlb.setFloatable(false);

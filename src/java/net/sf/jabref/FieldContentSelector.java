@@ -54,7 +54,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	updateList();
 	//else
 	//    list = new JComboBox(items.toArray());
-	list.setBackground(GUIGlobals.lightGray);
+	//list.setBackground(GUIGlobals.lightGray);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.HORIZONTAL;
 	gbl.setConstraints(list, con);
@@ -62,7 +62,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	add(list);
 
 	manage = new JButton(Globals.lang("Manage"));
-	manage.setBackground(GUIGlobals.lightGray);
+	//manage.setBackground(GUIGlobals.lightGray);
 	gbl.setConstraints(manage, con);
 	add(manage);
 

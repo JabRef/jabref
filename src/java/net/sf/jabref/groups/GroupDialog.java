@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.Vector;
+import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
@@ -57,14 +58,14 @@ class GroupDialog extends JDialog {
     private boolean ok_pressed = false;
     private Vector groups;
     private int index;
-    private JFrame parent;
+    private JabRefFrame parent;
 
     private String /*name, regexp, field,*/ oldName, oldRegexp, oldField;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    public GroupDialog(JFrame parent_, Vector groups_,
+    public GroupDialog(JabRefFrame parent_, Vector groups_,
 		       int index_, String defaultField) {
 	super(parent_, Globals.lang("Edit group"), true);
 	parent = parent_;
@@ -100,7 +101,7 @@ class GroupDialog extends JDialog {
 			JOptionPane.showMessageDialog
 			    (parent, Globals.lang("You must provide a name, a search "
 						  +"string and a field name for this group."),
-						  Globals.lang("Create group"), 
+						  Globals.lang("Create group"),
 			     JOptionPane.ERROR_MESSAGE);
 			return;
 		    }
@@ -150,7 +151,7 @@ class GroupDialog extends JDialog {
 	// Key bindings:
 	ActionMap am = main.getActionMap();
 	InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	im.put(GUIGlobals.exitDialog, "close");
+	im.put(parent.prefs().getKey("Close dialog"), "close");
 	am.put("close", cancelAction);
 
 

@@ -81,7 +81,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         lower.setBackground(GUIGlobals.lightGray);
 	// Make ESC close dialog, equivalent to clicking Cancel.
 	cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-	    .put(GUIGlobals.exitDialog, "close");
+	    .put(baseFrame_.prefs.getKey("Close dialog"), "close");
 	cancel.getActionMap().put("close", cancelAction);
 
 	//lower.add(ok);

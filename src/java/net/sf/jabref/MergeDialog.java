@@ -28,10 +28,10 @@ public class MergeDialog extends JDialog {
 
   boolean okPressed = false;
 
-  public MergeDialog(Frame frame, String title, boolean modal) {
+  public MergeDialog(JabRefFrame frame, String title, boolean modal) {
     super(frame, title, modal);
     try {
-      jbInit();
+      jbInit(frame);
       pack();
     }
     catch(Exception ex) {
@@ -43,7 +43,7 @@ public class MergeDialog extends JDialog {
     this(null, "", false);
   }
 
-  private void jbInit() throws Exception {
+  private void jbInit(JabRefFrame parent) throws Exception {
       titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
     panel1.setLayout(borderLayout1);
     ok.setText(Globals.lang("Ok"));
@@ -79,7 +79,7 @@ public class MergeDialog extends JDialog {
     // Key bindings:
     ActionMap am = jPanel1.getActionMap();
     InputMap im = jPanel1.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-    im.put(GUIGlobals.exitDialog, "close");
+    im.put(parent.prefs.getKey("Close dialog"), "close");
     am.put("close", new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
         dispose();

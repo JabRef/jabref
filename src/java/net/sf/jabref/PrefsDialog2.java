@@ -66,8 +66,8 @@ public class PrefsDialog2 extends JDialog {
 	con.weighty = 0;
 	con.gridheight = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(lower, con);
-        lower.setBackground(GUIGlobals.lightGray);
-        getContentPane().setBackground(GUIGlobals.lightGray);
+        //lower.setBackground(GUIGlobals.lightGray);
+        //getContentPane().setBackground(GUIGlobals.lightGray);
 	getContentPane().add(lower);
 
 	// ----------------------------------------------------------------

@@ -37,14 +37,14 @@ import net.sf.jabref.undo.*;
  */
 class ReplaceStringDialog extends JDialog {
 
-    JTextField 
+    JTextField
 	fields = new JTextField("", 30),
 	from = new JTextField("", 30),
 	to = new JTextField("", 30);
     JLabel
 	fl = new JLabel(Globals.lang("Search for")+":"),
 	tl = new JLabel(Globals.lang("Replace with")+":");
-    
+
     JButton
 	ok = new JButton(Globals.lang("Ok")),
 	cancel = new JButton(Globals.lang("Cancel"));
@@ -58,21 +58,21 @@ class ReplaceStringDialog extends JDialog {
 	field = new JCheckBox(Globals.lang("Limit to fields")+":", false);
     ButtonGroup bg = new ButtonGroup();
     private boolean ok_pressed = false;
-    private JFrame parent;
+    private JabRefFrame parent;
     String[] flds = null;
     String s1, s2;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    public ReplaceStringDialog(JFrame parent_) {
+    public ReplaceStringDialog(JabRefFrame parent_) {
 	super(parent_, Globals.lang("Replace string"), true);
 	parent = parent_;
 
 	bg.add(allFi);
 	bg.add(field);
 	ActionListener okListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {		    
+		public void actionPerformed(ActionEvent e) {
 		    s1 = from.getText();
 		    s2 = to.getText();
 		    if (s1.equals(""))
@@ -95,7 +95,7 @@ class ReplaceStringDialog extends JDialog {
 	// Key bindings:
 	ActionMap am = settings.getActionMap();
 	InputMap im = settings.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	im.put(GUIGlobals.exitDialog, "close");
+	im.put(parent.prefs.getKey("Close dialog"), "close");
 	am.put("close", cancelAction);
 
 	// Layout starts here.
@@ -187,7 +187,7 @@ class ReplaceStringDialog extends JDialog {
     public boolean allFields() { return allFi.isSelected(); }
     public boolean selOnly() { return selOnly.isSelected(); }
     public String[] fields() { return Util.delimToStringArray(field.getText(), ";"); }
-    
+
     /**
      * Does the actual operation on a Bibtex entry based on the
      * settings specified in this same dialog. Returns the number of
@@ -201,13 +201,13 @@ class ReplaceStringDialog extends JDialog {
 		String s = (String)os[i];
 		if (!s.equals(Globals.KEY_FIELD))
 		    counter += replaceField(be, s, ce);
-	    }		
+	    }
 	} else {
 	    for (int i=0; i<flds.length; i++) {
 		if (!flds[i].equals(Globals.KEY_FIELD))
 		    counter += replaceField(be, flds[i], ce);
-	    }		
-	    
+	    }
+
 	}
 	return counter;
     }

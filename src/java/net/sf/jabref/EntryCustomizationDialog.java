@@ -84,8 +84,8 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
         JToolBar tlb = new JToolBar();
         tlb.setFloatable(false);
         tlb.add(help);
-	panel.setBackground(GUIGlobals.lightGray);
-	buttonPanel.setBackground(GUIGlobals.lightGray);
+	//panel.setBackground(GUIGlobals.lightGray);
+	//buttonPanel.setBackground(GUIGlobals.lightGray);
 	panel.setLayout(gbl);
 	typePanel.setLayout(gbl);
 	fieldPanel.setLayout(gbl);
@@ -147,7 +147,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
         // Key bindings:
         ActionMap am = panel.getActionMap();
         InputMap im = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(GUIGlobals.exitDialog, "close");
+        im.put(parent.prefs.getKey("Close dialog"), "close");
         am.put("close", new AbstractAction() {
           public void actionPerformed(ActionEvent e) {
             dispose();

@@ -426,8 +426,10 @@ public class JabRefPreferences {
 	defKeyBinds.put("Search", "ctrl F");
 	defKeyBinds.put("Incremental search", "ctrl shift F");
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
-	defKeyBinds.put("Close entry editor", "ESCAPE");
-	defKeyBinds.put("Close preamble editor", "ESCAPE");
+        defKeyBinds.put("Close dialog", "ESCAPE");
+        defKeyBinds.put("Close entry editor", "ESCAPE");
+        defKeyBinds.put("Back, help dialog", "LEFT");
+        defKeyBinds.put("Forward, help dialog", "RIGHT");
 	defKeyBinds.put("Preamble editor, store changes", "alt S");
 	defKeyBinds.put("Clear search", "ESCAPE");
 	defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"ctrl PLUS");//"shift Right");
@@ -435,6 +437,9 @@ public class JabRefPreferences {
 	defKeyBinds.put("Entry editor, next entry", "ctrl shift Down");
 	defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
 	defKeyBinds.put("Entry editor, store field", "alt S");
+        defKeyBinds.put("String dialog, add string", "ctrl N");
+        defKeyBinds.put("String dialog, move string up", "ctrl UP");
+        defKeyBinds.put("String dialog, move string down", "ctrl DOWN");
 	defKeyBinds.put("Save session", "F11");
 	defKeyBinds.put("Load session", "F12");
 	defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");

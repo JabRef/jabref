@@ -78,7 +78,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     SearchManager2 searchManager;
     MedlineFetcher medlineFetcher;
-    MedlineAuthorFetcher medlineAuthorFetcher;
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -1265,8 +1264,8 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
         sidePaneManager.register("fetchMedline", medlineFetcher);
-        medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
-        sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
+        //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
+        //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
 	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
 	sidePaneManager.add("search", searchManager);
 	sidePaneManager.populatePanel();

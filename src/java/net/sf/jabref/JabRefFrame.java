@@ -331,6 +331,10 @@ public class JabRefFrame
     pd.show();
   }
 
+public JabRefPreferences prefs() {
+  return prefs;
+}
+
   // General info dialog.  The OSXAdapter calls this method when "Quit OSXAdapter"
   // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
   public void quit() {
@@ -984,6 +988,7 @@ public class JabRefFrame
     openFile.setEnabled(false);
     openUrl.setEnabled(false);
     togglePreview.setEnabled(false);
+    dupliCheck.setEnabled(false);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(false);
     }
@@ -1027,6 +1032,7 @@ public class JabRefFrame
     openFile.setEnabled(true);
     openUrl.setEnabled(true);
     togglePreview.setEnabled(true);
+    dupliCheck.setEnabled(true);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(true);
     }

@@ -106,7 +106,7 @@ public class PreambleEditor extends JDialog {
 	ta.getActionMap().put("close", closeAction);
 	ta.getInputMap().put(prefs.getKey("Preamble editor, store changes"), "store");
 	ta.getActionMap().put("store", storeFieldAction);
-	ta.getInputMap().put(GUIGlobals.exitDialog, "close");
+	ta.getInputMap().put(prefs.getKey("Close preamble editor"), "close");
 	ta.getActionMap().put("close", closeAction);
 
 	ta.getInputMap().put(prefs.getKey("Undo"), "undo");

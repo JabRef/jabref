@@ -50,14 +50,14 @@ public class GenFieldsCustomizer extends JDialog {
     ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
     cancel.setText(Globals.lang("Cancel"));
     cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
-    jPanel2.setBackground(GUIGlobals.lightGray);
+    //jPanel2.setBackground(GUIGlobals.lightGray);
     jLabel1.setText(Globals.lang("Delimit fields with semicolon, ex.")+": url;pdf;note");
     jPanel3.setLayout(gridBagLayout2);
     jPanel4.setBorder(BorderFactory.createEtchedBorder());
     jPanel4.setLayout(gridBagLayout1);
     jLabel2.setText(Globals.lang("General fields"));
     fieldsArea.setText(parent.prefs.get("generalFields"));
-    jPanel3.setBackground(GUIGlobals.lightGray);
+    //jPanel3.setBackground(GUIGlobals.lightGray);
     revert.setText(Globals.lang("Default"));
     revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
     this.getContentPane().add(jPanel2, BorderLayout.SOUTH);
@@ -78,7 +78,7 @@ public class GenFieldsCustomizer extends JDialog {
   // Key bindings:
   ActionMap am = jPanel2.getActionMap();
   InputMap im = jPanel2.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-  im.put(GUIGlobals.exitDialog, "close");
+  im.put(parent.prefs.getKey("Close dialog"), "close");
   am.put("close", new AbstractAction() {
     public void actionPerformed(ActionEvent e) {
       dispose();

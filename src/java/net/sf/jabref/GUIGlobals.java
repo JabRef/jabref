@@ -114,53 +114,7 @@ public class GUIGlobals {
 	} else return (ImageIcon)o;
     }
 
-/*    public static URL
-    //appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
-     openIconFile = GUIGlobals.class.getResource(pre+"Open.gif"),
-   saveIconFile = GUIGlobals.class.getResource(pre+"Save.gif"),
-     saveAsIconFile = GUIGlobals.class.getResource(pre+"SaveAs.gif"),
-    //prefsIconFile = GUIGlobals.class.getResource(pre+"Options.gif"),
-     prefsIconFile = GUIGlobals.class.getResource(pre+"Hammer.gif"),
-     newIconFile = GUIGlobals.class.getResource(pre+"New.gif"),
-     undoIconFile = GUIGlobals.class.getResource(pre+"Undo.gif"),
-     redoIconFile = GUIGlobals.class.getResource(pre+"Redo.gif"),
-     preambleIconFile = GUIGlobals.class.getResource(pre+"Preamble.gif"),
-     addIconFile = GUIGlobals.class.getResource(pre+"UpdateRow.gif"),
-     delRowIconFile = GUIGlobals.class.getResource(pre+"DeleteRow.gif"),
-     showReqIconFile = GUIGlobals.class.getResource(pre+"r_icon.gif"),
-     showOptIconFile = GUIGlobals.class.getResource(pre+"o_icon.gif"),
-     showGenIconFile = GUIGlobals.class.getResource(pre+"g_icon.gif"),
-     sourceIconFile = GUIGlobals.class.getResource(pre+"viewsource.gif"),
-     copyIconFile = GUIGlobals.class.getResource(pre+"Copy3.gif"),
-     cutIconFile = GUIGlobals.class.getResource(pre+"Cut2.gif"),
-     copyKeyIconFile = GUIGlobals.class.getResource(pre+"CopyKey.gif"),
-     genKeyIconFile = GUIGlobals.class.getResource(pre+"GenKey.gif"),
-     lyxIconFile = GUIGlobals.class.getResource(pre+"LyX.gif"),
-     backIconFile = GUIGlobals.class.getResource(pre+"VCRBack.gif"),
-     forwardIconFile = GUIGlobals.class.getResource(pre+"VCRForward.gif"),
-     contentsIconFile = GUIGlobals.class.getResource(pre+"Contents.gif"),
-     removeIconFile = GUIGlobals.class.getResource(pre+"Delete.gif"),
-     upIconFile = GUIGlobals.class.getResource(pre+"Up.gif"),
-     downIconFile = GUIGlobals.class.getResource(pre+"Down.gif"),
-     stringsIconFile = GUIGlobals.class.getResource(pre+"Strings.gif"),
-     groupsIconFile = GUIGlobals.class.getResource(pre+"Groups.gif"),
-        closeIconFile = GUIGlobals.class.getResource(pre+"Close.gif"),
-     refreshSmallIconFile = GUIGlobals.class.getResource(pre+"GreenFlag.gif"),
-     helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
-     helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),
-     helpContentsIconFile = GUIGlobals.class.getResource(pre+"HelpIndex.gif"),
-      aboutIcon = GUIGlobals.class.getResource(pre + "Help.gif"),
-     newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
-     pasteIconFile = GUIGlobals.class.getResource(pre+"Paste2.gif"),
-     editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
-     searchIconFile = GUIGlobals.class.getResource(pre+"Binocular.gif"),
-     autoGroupIcon = GUIGlobals.class.getResource(pre+"NewBCard.gif"),
-    //fetchMedlineIcon = GUIGlobals.class.getResource(pre+"BlueCircle.gif");
-                fetchMedlineIcon = GUIGlobals.class.getResource(pre+"World2.gif"),
-     sheetIcon = GUIGlobals.class.getResource(pre+"Sheet.gif"),
-     jabreflogo = GUIGlobals.class.getResource(pre+"JabRef-Logo.gif");
-    //jabreflogo=new ImageIcon(getClass().getResource(pre+"JabRef-Logo.gif")));//.getImage());
-   */
+
   public static URL
       openIconFile = GUIGlobals.class.getResource(pre + "fileopen2.png"),
       editIconFile = GUIGlobals.class.getResource(pre + "pencil.png"),
@@ -228,97 +182,13 @@ public class GUIGlobals {
       pdfHelp = "ExternalFiles.html",
       aboutPage = "About.html";
 
-// Keystrokes for Entry editor.
-  public static String
-      openKey = "control O",
-      closeKey = "control Q",
-      storeFieldKey = "control S",
-      copyKeyKey = "control K",
-      showReqKey = "control R",
-      showOptKey = "control O",
-      showGenKey = "control G",
-      addKey = "control N",
-      removeKey = "shift DELETE",
-      upKey = "control UP",
-      downKey = "control DOWN";
-
-// The following defines the mnemonic keys for menu items.
-  public static Integer
-      openKeyCode = new Integer(KeyEvent.VK_O),
-//	newKeyCode = new Integer(KeyEvent.VK_N),
-      saveKeyCode = new Integer(KeyEvent.VK_S),
-      copyKeyCode = new Integer(KeyEvent.VK_K),
-      closeKeyCode = new Integer(KeyEvent.VK_Q),
-      showReqKeyCode = new Integer(KeyEvent.VK_R),
-      showOptKeyCode = new Integer(KeyEvent.VK_O),
-      showGenKeyCode = new Integer(KeyEvent.VK_G),
-      newEntryKeyCode = new Integer(KeyEvent.VK_N),
-      newBookKeyCode = new Integer(KeyEvent.VK_B),
-      newArticleKeyCode = new Integer(KeyEvent.VK_A),
-      newPhdthesisKeyCode = new Integer(KeyEvent.VK_T),
-      newInBookKeyCode = new Integer(KeyEvent.VK_I),
-      newMasterKeyCode = new Integer(KeyEvent.VK_M),
-      newProcKeyCode = new Integer(KeyEvent.VK_P);
-
-//    	newInProcKeyCode = new Integer(KeyEvent.VK_M);
-
-
-// The following defines the accelerator keys for menu items,
-// corresponding to the letters for mnemonics.
-  public static KeyStroke
-      generateKeyStroke = KeyStroke.getKeyStroke("control G"),
-      exitDialog = KeyStroke.getKeyStroke("ESCAPE"),
-      copyStroke = KeyStroke.getKeyStroke("control C"),
-      pasteStroke = KeyStroke.getKeyStroke("control V"),
-      undoStroke = KeyStroke.getKeyStroke("control Z"),
-      redoStroke = KeyStroke.getKeyStroke("control Y"),
-      selectAllKeyStroke = KeyStroke.getKeyStroke("control A"),
-      editEntryKeyStroke = KeyStroke.getKeyStroke("control D"),
-      helpKeyStroke = KeyStroke.getKeyStroke("F1"),
-//setupTableKeyStroke = KeyStroke.getKeyStroke(""),
-      editPreambleKeyStroke = KeyStroke.getKeyStroke("control P"),
-      editStringsKeyStroke = KeyStroke.getKeyStroke("control shift S"),
-      simpleSearchKeyStroke = KeyStroke.getKeyStroke("control F"),
-      autoCompKeyStroke = KeyStroke.getKeyStroke("control W"),
-      showGroupsKeyStroke = KeyStroke.getKeyStroke("control shift G"),
-//newKeyStroke = KeyStroke.getKeyStroke(newKeyCode.intValue(), ActionEvent.CTRL_MASK),
-      saveKeyStroke = KeyStroke.getKeyStroke(saveKeyCode.intValue(),
-                                             ActionEvent.CTRL_MASK),
-      openKeyStroke = KeyStroke.getKeyStroke(openKeyCode.intValue(),
-                                             ActionEvent.CTRL_MASK),
-      closeKeyStroke = KeyStroke.getKeyStroke(closeKeyCode.intValue(),
-                                              ActionEvent.CTRL_MASK),
-      newEntryKeyStroke = KeyStroke.getKeyStroke(newEntryKeyCode.intValue(),
-                                                 ActionEvent.CTRL_MASK),
-      removeEntryKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
-      ActionEvent.SHIFT_MASK),
-      newBookKeyStroke = KeyStroke.getKeyStroke(newBookKeyCode.intValue(),
-                                                ActionEvent.SHIFT_MASK |
-                                                ActionEvent.CTRL_MASK),
-      newArticleKeyStroke = KeyStroke.getKeyStroke(newArticleKeyCode.intValue(),
-      ActionEvent.SHIFT_MASK | ActionEvent.CTRL_MASK),
-      newPhdthesisKeyStroke = KeyStroke.getKeyStroke(newPhdthesisKeyCode.
-      intValue(),
-      ActionEvent.SHIFT_MASK | ActionEvent.CTRL_MASK),
-      newInBookKeyStroke = KeyStroke.getKeyStroke(newInBookKeyCode.intValue(),
-                                                  ActionEvent.SHIFT_MASK |
-                                                  ActionEvent.CTRL_MASK),
-      newMasterKeyStroke = KeyStroke.getKeyStroke(newMasterKeyCode.intValue(),
-                                                  ActionEvent.SHIFT_MASK |
-                                                  ActionEvent.CTRL_MASK),
-      newProcKeyStroke = KeyStroke.getKeyStroke(newProcKeyCode.intValue(),
-                                                ActionEvent.SHIFT_MASK |
-                                                ActionEvent.CTRL_MASK),
-      newUnpublKeyStroke = KeyStroke.getKeyStroke("control shift U"),
-      switchPanelLeft = KeyStroke.getKeyStroke("control shift LEFT"),
-      switchPanelRight = KeyStroke.getKeyStroke("control shift RIGHT");
 
 // Colors.
   public static Color
       gridColor = new Color(210, 210, 210),
-      lightGray = new Color(230, 230, 230), // Light gray background
+      lightGray = new Color(230, 30, 30), // Light gray background
       nullFieldColor = new Color(100, 100, 150), // Empty field, blue.
-      validFieldColor = new Color(75, 130, 75), // Valid field, green.
+      validFieldColor = new Color(75, 130, 95), // Valid field, green.
       invalidFieldColor = new Color(141, 0, 61), // Invalid field, red.
 //	invalidFieldColor = new Color(210, 70, 70), // Invalid field, red.
       validFieldBackground = Color.white, // Valid field backgnd.

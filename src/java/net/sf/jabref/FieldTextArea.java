@@ -53,12 +53,12 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	setWrapStyleWord(true);
 	fieldName = fieldName_;
 
-	//Util.pr(""+15*rows);
-	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
-	label.setBorder(BorderFactory.createEtchedBorder
-			 (GUIGlobals.lightGray, Color.gray));
-	label.setOpaque(true);
-	label.setBackground(GUIGlobals.lightGray);
+	label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
+	//label.setBorder(BorderFactory.createEtchedBorder
+	//		 (GUIGlobals.lightGray, Color.gray));
+        label.setBorder(BorderFactory.createEtchedBorder());
+	//label.setOpaque(true);
+	//label.setBackground(GUIGlobals.lightGray);
 	//label.setForeground(Color.gray);
 	setBackground(GUIGlobals.validFieldBackground);
 	if ((content != null) && (content.length() > 0))

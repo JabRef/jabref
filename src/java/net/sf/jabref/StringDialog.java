@@ -96,21 +96,21 @@ public class StringDialog extends JDialog {
 
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	ActionMap am = tlb.getActionMap();
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.addKey), "add");
+	im.put(prefs.getKey("String dialog, add string"), "add");
 	am.put("add", newStringAction);
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.removeKey), "remove");
+	im.put(prefs.getKey("String dialog, remove string"), "remove");
 	am.put("remove", removeStringAction);
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.upKey), "up");
+	im.put(prefs.getKey("String dialog, move string up"), "up");
 	am.put("up", stringUpAction);
-	im.put(KeyStroke.getKeyStroke(GUIGlobals.downKey), "down");
+	im.put(prefs.getKey("String dialog, move string down"), "down");
 	am.put("down", stringDownAction);
-	im.put(GUIGlobals.exitDialog, "close");
+	im.put(prefs.getKey("Close dialog"), "close");
 	am.put("close", closeAction);
-	im.put(GUIGlobals.helpKeyStroke, "help");
+	im.put(prefs.getKey("Help"), "help");
 	am.put("help", helpAction);
-	im.put(GUIGlobals.undoStroke, "undo");
+	im.put(prefs.getKey("Undo"), "undo");
 	am.put("undo", undoAction);
-	im.put(GUIGlobals.redoStroke, "redo");
+	im.put(prefs.getKey("Redo"), "redo");
 	am.put("redo", redoAction);
 
 	//tlb.add(closeAction);
@@ -147,9 +147,9 @@ public class StringDialog extends JDialog {
 	    cm.getColumn(1).setPreferredWidth(2000);
 	    sp.getViewport().setBackground(GUIGlobals.tableBackground);
 	    // getInputMap().remove(GUIGlobals.exitDialog);
-	    getInputMap().put(GUIGlobals.exitDialog, "close");
+	    getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
 	    getActionMap().put("close", closeAction);
-	    getInputMap().put(GUIGlobals.helpKeyStroke, "help");
+	    getInputMap().put(frame.prefs.getKey("Help"), "help");
 	    getActionMap().put("help", helpAction);
 
 	}

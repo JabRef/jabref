@@ -1,9 +1,10 @@
 package net.sf.jabref.imports;
 
+import net.sf.jabref.*;
 import javax.swing.*;
 import java.beans.*;
 
-public class AuthorDialog extends JDialog implements PropertyChangeListener{
+public class AuthorDialog extends JDialog {
 
     boolean[] checked;
     JCheckBox[] checkBox;
@@ -11,24 +12,11 @@ public class AuthorDialog extends JDialog implements PropertyChangeListener{
     int count, piv = 0;
 
 
-    public AuthorDialog(JFrame frame, MedlineFetcher mf, String args[]) {
-	super(frame, "Pick titles",true);
-	count = args.length;
-	checked=new boolean[count];
-	checkBox = new JCheckBox[count];
-	for (int i=0; i<count; i++){
-	    checkBox[i]=new JCheckBox(args[i]);
-	    checked[i]=false;
-	}
-	String message="A maximum of ten hits will be shown. If the desired article is not found, refine your search";
-	Object[] msgs = {message, checkBox};
-	optionPane =
-	    new JOptionPane(msgs,
-			    JOptionPane.WARNING_MESSAGE,
-			    JOptionPane.DEFAULT_OPTION);
-	setContentPane(optionPane);
+    public AuthorDialog(JFrame frame, MedlineFetcher mf, String ids[]) {
+	super(frame, Globals.lang("Pick titles"),true);
 
-	optionPane.addPropertyChangeListener(this);
+	count = ids.length;
+	checked=new boolean[count];
     }
 
     public boolean[] showDialog(){
@@ -37,21 +25,4 @@ public class AuthorDialog extends JDialog implements PropertyChangeListener{
 	return checked;
     }
 
-    public void propertyChange(java.beans.PropertyChangeEvent e) {
-	String prop = e.getPropertyName();
-
-	if (isVisible()
-	    && (e.getSource() == optionPane)
-	    && (prop.equals(JOptionPane.VALUE_PROPERTY) ||
-		prop.equals(JOptionPane.INPUT_VALUE_PROPERTY))) {
-
-	    // set the boolean array here
-	    for (int i=0; i<count; i++)
-		if (checkBox[i].isSelected())
-		    checked[i]=true;
-
-
-	    setVisible(false);
-	}
-    }
 }
