@@ -240,10 +240,12 @@ public class TextInputDialog extends JDialog
 
     // Radio buttons
     appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
+    appRadio.setToolTipText("append the selected text to bibtex key");
     appRadio.setMnemonic( KeyEvent.VK_A ) ;
     appRadio.setSelected( true ) ;
 
     overRadio = new JRadioButton( Globals.lang( "Override" ) ) ;
+    overRadio.setToolTipText("override the bibtex key by the selected text");
     overRadio.setMnemonic( KeyEvent.VK_O ) ;
     overRadio.setSelected( false ) ;
 
@@ -275,9 +277,33 @@ public class TextInputDialog extends JDialog
     gbl.setConstraints( insertButton, con ) ;
     inputPanel.add( insertButton ) ;
 
+    // ----------------------------------------------------------------------
     rawPanel.add( leftPanel, BorderLayout.CENTER ) ;
     rawPanel.add( inputPanel, BorderLayout.EAST ) ;
+
+    // ----------------------------------------------------------------------
+    // add a short info, if available
+
+    JEditorPane infoText = new JEditorPane() ;
+    infoText.setEditable(false);
+     // get the info text
+    //String middle = prefs.get("language")+"/";
+    //if (middle.equals("en/")) middle = ""; // english in base help dir.
+    URL infoURL = JabRef.class.getResource(GUIGlobals.helpPre
+                                           +GUIGlobals.shortPlainImport);
+    if (infoURL != null)
+      try
+      {
+        infoText.setPage(infoURL);
+        infoText.setBackground(GUIGlobals.infoField);
+        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        infoText.setPreferredSize( new Dimension(220, 50));
+        infoText.setMinimumSize( new Dimension(180, 50));
+        rawPanel.add( infoText, BorderLayout.SOUTH ) ;
+      }
+      catch (IOException e) {}
   }
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 
@@ -639,10 +665,12 @@ public class TextInputDialog extends JDialog
             this.setForeground( Color.gray);
             this.setFont(usedFont);
             this.setIcon( okIcon);
+            this.setToolTipText("filled");
           }
           else
           {
               this.setIcon(needIcon);
+              this.setToolTipText("field is missing");
           }
           return this;
       }
