@@ -549,7 +549,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		    }
 		    if( numSelected > 0){
 			try {
-			    BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
+	 		    BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
 			    String citeStr="", citeKey="", message="";
 			    for(int i=0; i< numSelected; i++){
 				bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
@@ -560,8 +560,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 				if(citeStr.equals(""))
 				    citeStr= citeKey;
 				else
-				    citeStr += "," + citeKey;
-				message+= ", " + rows[i];
+                                  citeStr += "," + citeKey;
+                                if (i>0)
+                                  message+=", ";
+				message+= (1+rows[i]);
 			    }
 			    if(citeStr.equals(""))
 				output("Please define citekey first");

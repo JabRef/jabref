@@ -336,15 +336,20 @@ public class EntryTable extends JTable {
 	    renderer = defRenderer;
 	else if (column == 0) {
 	    // Return a renderer with red background if the entry is incomplete.
-
-	    if (tableModel.isComplete(row))
+	    renderer = defRenderer;
+	    /*if (tableModel.isComplete(row))
 		renderer = defRenderer;
 	    else {
 		if (tableModel.hasCrossRef(row))
 		    renderer = maybeIncRenderer;
 		else
 		    renderer = incRenderer;
-	    }
+		    }*/
+
+
+
+
+
 	    //return (tableModel.isComplete(row) ? defRenderer: incRenderer);
 	}
         //else if (status == EntryTableModel.ICON_COL)
@@ -427,8 +432,14 @@ public class EntryTable extends JTable {
             if (value instanceof Icon) {
                 setIcon((Icon)value);
                 super.setValue(null);
+            } else if (value instanceof JLabel) {
+              JLabel lab = (JLabel)value;
+              super.setIcon(lab.getIcon());
+              super.setToolTipText(lab.getToolTipText());
+              super.setText(null);
             } else {
                 setIcon(null);
+                super.setToolTipText(null);
                 super.setValue(value);
             }
 	}

@@ -150,7 +150,7 @@ public class JabRefFrame
                                             "Start incremental search",
                                             GUIGlobals.searchIconFile,
                                             prefs.getKey("Incremental search")),
-      normalSearch = new GeneralAction("search", "Search", "Start",
+      normalSearch = new GeneralAction("search", "Search", "Toggle search panel",
                                        GUIGlobals.searchIconFile,
                                        prefs.getKey("Search")),
       fetchCiteSeer = new FetchCiteSeerAction(),
@@ -896,22 +896,21 @@ public JabRefPreferences prefs() {
     tlb.add(newDatabaseAction);
     tlb.add(open);
     tlb.add(save);
+
     tlb.addSeparator();
     tlb.add(cut);
     tlb.add(copy);
     tlb.add(paste);
-    tlb.addSeparator();
     tlb.add(undo);
     tlb.add(redo);
+
     tlb.addSeparator();
     tlb.add(newEntryAction);
     tlb.add(editEntry);
     tlb.add(editPreamble);
     tlb.add(editStrings);
     tlb.add(makeKeyAction);
-    tlb.add(lyxPushAction);
-    tlb.add(openFile);
-    tlb.add(openUrl);
+
     tlb.addSeparator();
     searchToggle = new JToggleButton(normalSearch);
     searchToggle.setText(null);
@@ -920,6 +919,12 @@ public JabRefPreferences prefs() {
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
     tlb.add(groupToggle);
+
+    tlb.addSeparator();
+    tlb.add(lyxPushAction);
+    tlb.add(openFile);
+    tlb.add(openUrl);
+
     tlb.addSeparator();
     tlb.add(showPrefs);
     tlb.add(Box.createHorizontalGlue());
@@ -2131,7 +2136,9 @@ class FetchCiteSeerAction
     public EditAction(String command, URL icon) {
       super(Globals.lang(Util.nCase(command)), new ImageIcon(icon));
       this.command = command;
-      putValue(ACCELERATOR_KEY, prefs.getKey(Util.nCase(command)));
+      String nName = Util.nCase(command);
+      putValue(ACCELERATOR_KEY, prefs.getKey(nName));
+      putValue(SHORT_DESCRIPTION, Globals.lang(nName));
       //putValue(ACCELERATOR_KEY,
       //         (next?prefs.getKey("Next tab"):prefs.getKey("Previous tab")));
     }

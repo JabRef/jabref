@@ -105,13 +105,14 @@ public class GUIGlobals {
 
     static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
     // further below.
+    public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
 
-    public static ImageIcon getTableIcon(String fieldType) {
+    public static JLabel getTableIcon(String fieldType) {
 	Object o = tableIcons.get(fieldType);
 	if (o == null) {
 	    Globals.logger("Error: no table icon defined for type '"+fieldType+"'.");
 	    return null;
-	} else return (ImageIcon)o;
+	} else return (JLabel)o;
     }
 
 
@@ -164,9 +165,14 @@ public class GUIGlobals {
       doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
       doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
+      incompleteIcon = GUIGlobals.class.getResource(pre + "incomplete.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
-      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash2.png");
+      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png");
 
+    /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
+    static {
+      incompleteEntryIcon.setTool
+    }*/
 
 // Help files (in HTML format):
   public static String
@@ -190,13 +196,13 @@ public class GUIGlobals {
   public static Color
       gridColor = new Color(210, 210, 210),
       lightGray = new Color(230, 30, 30), // Light gray background
-      nullFieldColor = new Color(100, 100, 150), // Empty field, blue.
-      validFieldColor = new Color(75, 130, 95), // Valid field, green.
+      validFieldColor = new Color(100, 100, 150), // Empty field, blue.
+      nullFieldColor = new Color(75, 130, 95), // Valid field, green.
       invalidFieldColor = new Color(141, 0, 61), // Invalid field, red.
 //	invalidFieldColor = new Color(210, 70, 70), // Invalid field, red.
       validFieldBackground = Color.white, // Valid field backgnd.
 //invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
-      invalidFieldBackground = new Color(241, 20, 41), // Invalid field backgnd.
+      invalidFieldBackground = new Color(255, 100, 100), // Invalid field backgnd.
       tableBackground = Color.white, // Background color for the entry table.
       tableReqFieldBackground = new Color(235, 235, 255),
       tableOptFieldBackground = new Color(230, 255, 230),
@@ -445,10 +451,21 @@ public class GUIGlobals {
    */
   public static void init() {
     typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
-    tableIcons.put("pdf", new ImageIcon(pdfIcon));
-    tableIcons.put("url", new ImageIcon(wwwIcon));
-    tableIcons.put("doi", new ImageIcon(doiSmallIcon));
-    tableIcons.put("ps", new ImageIcon(psIcon));
+    incompleteLabel = new JLabel(new ImageIcon(GUIGlobals.incompleteIcon));
+    incompleteLabel.setToolTipText(Globals.lang("Entry is incomplete"));
+    JLabel lab;
+    lab = new JLabel(new ImageIcon(pdfIcon));
+    lab.setToolTipText(Globals.lang("Open")+" PDF");
+    tableIcons.put("pdf", lab);
+    lab = new JLabel(new ImageIcon(wwwIcon));
+    lab.setToolTipText(Globals.lang("Open")+" URL");
+    tableIcons.put("url", lab);
+    lab = new JLabel(new ImageIcon(doiSmallIcon));
+    lab.setToolTipText(Globals.lang("Open")+" DOI "+Globals.lang("web link"));
+    tableIcons.put("doi", lab);
+    lab = new JLabel(new ImageIcon(psIcon));
+    lab.setToolTipText(Globals.lang("Open")+" PS");
+    tableIcons.put("ps", lab);
 
     //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
   }

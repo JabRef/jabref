@@ -61,11 +61,11 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	//label.setBackground(GUIGlobals.lightGray);
 	//label.setForeground(Color.gray);
 	setBackground(GUIGlobals.validFieldBackground);
-	if ((content != null) && (content.length() > 0))
-	    label.setForeground(GUIGlobals.validFieldColor);
+	//if ((content != null) && (content.length() > 0))
+        label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.
-	else
-	    label.setForeground(GUIGlobals.nullFieldColor);
+	//else
+	//    label.setForeground(GUIGlobals.nullFieldColor);
 
     }
 

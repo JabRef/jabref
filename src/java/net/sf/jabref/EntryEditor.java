@@ -249,7 +249,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	}
 	public void paint(Graphics g) {
 	    Graphics2D g2 = (Graphics2D)g;
-	    g2.setColor(GUIGlobals.nullFieldColor);
+	    g2.setColor(GUIGlobals.validFieldColor);
 	    g2.setFont(GUIGlobals.typeNameFont);
 	    FontMetrics fm = g2.getFontMetrics();
 	    int width = fm.stringWidth(label);
@@ -925,10 +925,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    Object oldValue = entry.getField(fe.getFieldName());
 		    entry.setField(fe.getFieldName(), toSet);
 		    if ((toSet != null) && (toSet.length() > 0)) {
-			fe.setLabelColor(GUIGlobals.validFieldColor);
+			//fe.setLabelColor(GUIGlobals.validFieldColor);
 			fe.setBackground(GUIGlobals.validFieldBackground);
 		    } else {
-			fe.setLabelColor(GUIGlobals.nullFieldColor);
+			//fe.setLabelColor(GUIGlobals.nullFieldColor);
 			fe.setBackground(GUIGlobals.validFieldBackground);
 		    }
 
@@ -944,21 +944,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                   JOptionPane.showMessageDialog
                       (frame, "Error: "+ex.getMessage(), Globals.lang("Error setting field"),
                        JOptionPane.ERROR_MESSAGE);
-		    //frame.output("Invalid field format: "+ex.getMessage());
-		    fe.setLabelColor(GUIGlobals.invalidFieldColor);
 		    fe.setBackground(GUIGlobals.invalidFieldBackground);
-		} /*catch (java.io.IOException ex2) {
-		    fe.setLabelColor(GUIGlobals.invalidFieldColor);
-		    fe.setBackground(GUIGlobals.invalidFieldBackground);
-		    }*/
+		}
 
 		else {
 		    // set == false
 		    // We set the field and label color.
 		    fe.setBackground(GUIGlobals.validFieldBackground);
-		    fe.setLabelColor((toSet == null) ?
+		    /*fe.setLabelColor((toSet == null) ?
 				     GUIGlobals.nullFieldColor :
-				     GUIGlobals.validFieldColor);
+				     GUIGlobals.validFieldColor);*/
 		}
 	    }
 	    else if (e.getSource() instanceof FieldTextField) {
@@ -983,10 +978,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 					   oldValue, newValue));
 
 		if ((newValue != null) && (newValue.length() > 0)) {
-		    fe.setLabelColor(GUIGlobals.validFieldColor);
+		    //fe.setLabelColor(GUIGlobals.validFieldColor);
 		    fe.setBackground(GUIGlobals.validFieldBackground);
 		} else {
-		    fe.setLabelColor(GUIGlobals.nullFieldColor);
+		    //fe.setLabelColor(GUIGlobals.nullFieldColor);
 		    fe.setBackground(GUIGlobals.validFieldBackground);
 		}
 		panel.refreshTable();
@@ -1309,6 +1304,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     public void switchTo(BibtexEntry be) {
 	entry = be;
 	updateAllFields();
+        validateAllFields();
 	updateSource();
         panel.showing = be;
 	//if (tabbed.getSelectedComponent() instanceof FieldPanel)
@@ -1435,30 +1431,48 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    if(((FieldEditor) fields.elementAt(i)).getFieldName().equals(fieldName)){
 		FieldEditor ed = ((FieldEditor) fields.elementAt(i));
 		ed.setText(newFieldData) ;
-		ed.setLabelColor(((newFieldData == null) || newFieldData.equals(""))
+		/*ed.setLabelColor(((newFieldData == null) || newFieldData.equals(""))
 				 ? GUIGlobals.nullFieldColor :
-				 GUIGlobals.validFieldColor);
+				 GUIGlobals.validFieldColor);*/
 		return true ;
 	    }
 	}
 	return false; // Nothing found.
     }
 
+    /**
+     * Sets all the text areas according to the shown entry.
+     */
     public void updateAllFields() {
-	FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
-	for (int i=0; i<panels.length; i++) {
-	    Vector fields = panels[i].getFields();
-	    for (int j=0; j<fields.size(); j++) {
-		FieldEditor ed = (FieldEditor)fields.elementAt(j);
-		Object content = entry.getField(ed.getFieldName());
-		ed.setText(content == null ? "" : content.toString());
-		ed.setLabelColor(content == null ? GUIGlobals.nullFieldColor :
-				 GUIGlobals.validFieldColor);
-		//if (ed.getFieldName().equals("year"))
-		//    Util.pr(content.toString());
-	    }
-	}
+        FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
+        for (int i=0; i<panels.length; i++) {
+            Vector fields = panels[i].getFields();
+            for (int j=0; j<fields.size(); j++) {
+                FieldEditor ed = (FieldEditor)fields.elementAt(j);
+                Object content = entry.getField(ed.getFieldName());
+                ed.setText(content == null ? "" : content.toString());
+                /*ed.setLabelColor(content == null ? GUIGlobals.nullFieldColor :
+                                 GUIGlobals.validFieldColor);*/
+                //if (ed.getFieldName().equals("year"))
+                //    Util.pr(content.toString());
+            }
+        }
     }
+
+    /**
+     * Removes the "invalid field" color from all text areas.
+     */
+    public void validateAllFields() {
+        FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
+        for (int i=0; i<panels.length; i++) {
+            Vector fields = panels[i].getFields();
+            for (int j=0; j<fields.size(); j++) {
+                JTextComponent ed = (JTextComponent)fields.elementAt(j);
+                ed.setBackground(GUIGlobals.validFieldBackground);
+            }
+        }
+    }
+
 
     // Update the JTextArea when a field has changed.
     public void vetoableChange(PropertyChangeEvent e) {

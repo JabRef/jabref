@@ -66,6 +66,7 @@ public class EntryTableModel
   int[] nameCols = null;
   boolean namesAsIs, namesFf;
 
+
     //ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
 
   public EntryTableModel(JabRefFrame frame_,
@@ -116,7 +117,10 @@ public class EntryTableModel
     BibtexEntry be = db.getEntryById(getNameFromNumber(row));
     String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
     if (col == 0) {
-      o = "" + (row + 1);
+      if (!isComplete(row)) {
+        return GUIGlobals.incompleteLabel;
+      } else
+        o = "" + (row + 1);
 
     }
     else if (iconType != null) {

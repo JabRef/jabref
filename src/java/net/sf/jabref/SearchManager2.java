@@ -87,7 +87,9 @@ class SearchManager2 extends SidePaneComponent
 	increment = new JRadioButton(Globals.lang("Incremental"), false);
 	select = new JRadioButton(Globals.lang("Highlight"), true);
 	reorder = new JRadioButton(Globals.lang("Float"), false);
-
+        increment.setToolTipText(Globals.lang("Incremental search"));
+        select.setToolTipText(Globals.lang("Select matching entries"));
+        reorder.setToolTipText(Globals.lang("Move matching entries to the top"));
 	// Add an item listener that makes sure we only listen for key events
 	// when incremental search is turned on.
 	increment.addItemListener(this);

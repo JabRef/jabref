@@ -46,11 +46,10 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	//label.setOpaque(true);
-	if ((content != null) && (content.length() > 0))
-	    label.setForeground(GUIGlobals.validFieldColor);
+	//if ((content != null) && (content.length() > 0))
+        label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.
-	else
-	    label.setForeground(GUIGlobals.nullFieldColor);
+	//else label.setForeground(GUIGlobals.nullFieldColor);
     }
 
     public void append(String text) {
@@ -59,7 +58,11 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
     public String getFieldName() { return fieldName; }
     public JLabel getLabel() { return label; }
-    public void setLabelColor(Color c) { label.setForeground(c); }
+    public void setLabelColor(Color c) {
+      label.setForeground(c);
+      throw new NullPointerException("ok");
+    }
+
     public JComponent getPane() { return this; }
 
   public void paintComponent(Graphics g) {
