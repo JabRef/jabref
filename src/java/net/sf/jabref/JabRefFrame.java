@@ -560,7 +560,7 @@ public class JabRefFrame extends JFrame {
 	options.add(new AbstractAction("Font") {
 		public void actionPerformed(ActionEvent e) {
 		    // JDialog dl = new EntryCustomizationDialog(ths);
-			Font f=new FontSelectorDialog
+		    Font f=new FontSelectorDialog
 				(ths, GUIGlobals.CURRENTFONT).getSelectedFont();
 			if(f==null)
 				return;
@@ -590,7 +590,7 @@ public class JabRefFrame extends JFrame {
     }
 
     private void createToolBar() {
-	tlb.setRollover(true);
+	//tlb.setRollover(true);
 
 	//tlb.setBorderPainted(true);
 	tlb.setBackground(GUIGlobals.lightGray);
@@ -619,8 +619,8 @@ public class JabRefFrame extends JFrame {
 	tlb.add(showPrefs);
         tlb.add(Box.createHorizontalGlue());
         tlb.add(closeDatabaseAction);
-	for (int i=0; i<tlb.getComponentCount(); i++)
-	    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
+	//for (int i=0; i<tlb.getComponentCount(); i++)
+	//    tlb.getComponentAtIndex(i).setBackground(GUIGlobals.lightGray);
 
     }
 

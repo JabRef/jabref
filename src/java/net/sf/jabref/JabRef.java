@@ -39,7 +39,7 @@ public class JabRef {
 	Object fnt = new UIDefaults.ProxyLazyValue 
 	    ("javax.swing.plaf.FontUIResource", null, 
 	     new Object[] {"plain", new Integer(Font.PLAIN), new Integer(12)});
-
+	
 	UIManager.put("Button.font", fnt);
 	UIManager.put("ToggleButton.font", fnt);
 	UIManager.put("RadioButton.font", fnt);
@@ -71,7 +71,7 @@ public class JabRef {
 	UIManager.put("ToolBar.font", fnt);
 	UIManager.put("ToolTip.font", fnt);
 	UIManager.put("Tree.font", fnt);
-
+	
 	try {
 	    UIManager.setLookAndFeel(new com.incors.plaf.kunststoff.KunststoffLookAndFeel());
 	} catch (UnsupportedLookAndFeelException ex) {}

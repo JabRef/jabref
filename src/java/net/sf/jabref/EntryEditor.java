@@ -181,7 +181,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tlb.setMargin(new Insets(2,2,2,2));
 	// The toolbar carries all the key bindings that are valid for the whole
 	// window.
-	tlb.setBackground(GUIGlobals.lightGray);//Color.white);
+	//tlb.setBackground(GUIGlobals.lightGray);//Color.white);
 	ActionMap am = tlb.getActionMap();
 	InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -218,9 +218,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//tlb.add(redoAction);
         tlb.add(deleteAction);
 	tlb.add(prevEntryAction);
+
 	tlb.add(nextEntryAction);
 	tlb.addSeparator();
 	tlb.add(helpAction);
+
+	Component[] comps = tlb.getComponents();
+	for (int i=0; i<comps.length; i++)
+	    ((JComponent)comps[i]).setOpaque(false);
 	add(tlb, BorderLayout.WEST);
     }
 

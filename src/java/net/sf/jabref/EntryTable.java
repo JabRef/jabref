@@ -280,8 +280,8 @@ public class EntryTable extends JTable {
    * updateFont
    */
   public void updateFont() {
-      //setFont(GUIGlobals.CURRENTFONT);
-      //  setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
+      setFont(GUIGlobals.CURRENTFONT);
+      setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
   }
 	
 }
