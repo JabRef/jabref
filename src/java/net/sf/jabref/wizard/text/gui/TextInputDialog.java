@@ -112,7 +112,7 @@ public class TextInputDialog extends JDialog
       if ( entry.getType() != null )
         typeStr = typeStr + " " + entry.getType().getName() ;
 
-    this.setTitle( Globals.lang( "plain_text_import" ) + " " + typeStr ) ;
+    this.setTitle( Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
     getContentPane().add( panel1 ) ;
 
     initRawPanel() ;
@@ -120,7 +120,7 @@ public class TextInputDialog extends JDialog
     initSourcePanel() ;
 
     JTabbedPane tabbed = new JTabbedPane() ;
-    tabbed.add( rawPanel, Globals.lang( "raw_source" ) ) ;
+    tabbed.add( rawPanel, Globals.lang( "Raw_source" ) ) ;
     tabbed.add( sourcePanel, Globals.lang( "BibTeX_source" ) ) ;
 
     // Panel Layout
@@ -216,7 +216,7 @@ public class TextInputDialog extends JDialog
     TitledBorder titledBorder1 = new TitledBorder(
         BorderFactory.createLineBorder(
         new Color( 153, 153, 153 ), 2 ),
-        Globals.lang( "input" ) ) ;
+        Globals.lang( "Input" ) ) ;
     inputPanel.setBorder( titledBorder1 ) ;
     inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
     inputPanel.setMinimumSize( new Dimension( 10, 10 ) ) ;
@@ -235,15 +235,15 @@ public class TextInputDialog extends JDialog
     fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
     // insert button
-    insertButton.setText( Globals.lang( "insert" ) ) ;
+    insertButton.setText( Globals.lang( "Insert" ) ) ;
     insertButton.addActionListener( new TextInputDialog_insert_actionAdapter( this ) ) ;
 
     // Radio buttons
-    appRadio = new JRadioButton( Globals.lang( "append" ) ) ;
+    appRadio = new JRadioButton( Globals.lang( "Append" ) ) ;
     appRadio.setMnemonic( KeyEvent.VK_A ) ;
     appRadio.setSelected( true ) ;
 
-    overRadio = new JRadioButton( Globals.lang( "override" ) ) ;
+    overRadio = new JRadioButton( Globals.lang( "Override" ) ) ;
     overRadio.setMnemonic( KeyEvent.VK_O ) ;
     overRadio.setSelected( false ) ;
 
@@ -257,7 +257,7 @@ public class TextInputDialog extends JDialog
     radioPanel.add( overRadio ) ;
 
     // insert sub components
-    JLabel label1 = new JLabel( Globals.lang( "available fields" ) ) ;
+    JLabel label1 = new JLabel( Globals.lang( "Available fields" ) ) ;
     con.gridwidth = GridBagConstraints.REMAINDER ;
     gbl.setConstraints( label1, con ) ;
     inputPanel.add( label1 ) ;
@@ -483,7 +483,7 @@ public class TextInputDialog extends JDialog
   {
     public PasteAction()
     {
-      super("paste", "paste from clipboard", GUIGlobals.pasteIconFile);
+      super("Paste", "Paste from clipboard", GUIGlobals.pasteIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -510,7 +510,7 @@ public class TextInputDialog extends JDialog
   {
     public LoadAction()
     {
-      super("open", "Open_File", GUIGlobals.openIconFile);
+      super("Open", "Open_file", GUIGlobals.openIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -542,7 +542,7 @@ public class TextInputDialog extends JDialog
   {
     public ClearAction()
     {
-      super("Clear", "clear_inputarea", GUIGlobals.clearInputArea);
+      super("Clear", "Clear_inputarea", GUIGlobals.clearInputArea);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -556,7 +556,7 @@ public class TextInputDialog extends JDialog
   {
     public MenuHeaderAction()
     {
-      super("plain_right_menu");
+      super("Edit");
       this.setEnabled(false);
     }
 

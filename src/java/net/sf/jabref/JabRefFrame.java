@@ -259,7 +259,8 @@ public class JabRefFrame
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
 
       plainTextImport = new GeneralAction("plainTextImport",
-                                          "New entry from plain text"),
+                                          "New entry from plain text",
+					  prefs.getKey("New from plain text")),
 
 
       customExpAction = new CustomizeExportsAction();

@@ -322,8 +322,8 @@ public class FileActions
                                       File outFile, JabRefPreferences prefs)
     throws Exception {
 
-  String encoding = "iso-8859-1";
-
+	String encoding = prefs.get("defaultEncoding");//"iso-8859-1";
+	//System.out.println(encoding);
 	//PrintStream ps=null;
         OutputStreamWriter ps=null;
 

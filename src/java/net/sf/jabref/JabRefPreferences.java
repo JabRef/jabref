@@ -518,6 +518,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Mark entries", "ctrl M");
         defKeyBinds.put("Unmark entries", "ctrl shift M");
         defKeyBinds.put("Fetch Medline", "F5");
+        defKeyBinds.put("New from plain text", "ctrl shift N");
     }
 
     private String getNextUnit(Reader data) throws IOException {
