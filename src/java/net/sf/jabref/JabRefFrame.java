@@ -28,6 +28,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import net.sf.jabref.label.*;
+import net.sf.jabref.export.FileActions;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -112,9 +113,9 @@ public class JabRefFrame extends JFrame {
 	copy = new GeneralAction("copy", "Copy", "Copy",
 				 GUIGlobals.copyIconFile,
 				 prefs.getKey("Copy")),
-	paste = new GeneralAction("paste", "Paste", "Paste",
-				 GUIGlobals.pasteIconFile,
-				  prefs.getKey("Paste")),
+        paste = new GeneralAction("paste", "Paste", "Paste",
+                                 GUIGlobals.pasteIconFile,
+                                  prefs.getKey("Paste")),
 	saveSessionAction = new SaveSessionAction(),
 	loadSessionAction = new LoadSessionAction(),
 	incrementalSearch = new GeneralAction("incSearch", "Incremental search",
@@ -126,7 +127,7 @@ public class JabRefFrame extends JFrame {
 					      prefs.getKey("Search")),
 	fetchMedline = new FetchMedlineAction(),
 	copyCiteKey = new GeneralAction("copyCiteKey", "Copy \\cite{BibTeX key}",
-					//"Put a BibTeX reference to the selected entries on the clipboard", 
+					//"Put a BibTeX reference to the selected entries on the clipboard",
 					prefs.getKey("Copy \\cite{BibTeX key}")),
        mergeDatabaseAction = new GeneralAction("mergeDatabase", "Append database",
                                                "Append contents from a BibTeX database into the currently viewed database",
@@ -159,7 +160,8 @@ public class JabRefFrame extends JFrame {
 
     // The menus for importing/appending other formats
     JMenu importMenu = new JMenu(Globals.lang("Import and append")),
-	importNewMenu = new JMenu(Globals.lang("Import"));
+	importNewMenu = new JMenu(Globals.lang("Import")),
+	exportMenu = new JMenu(Globals.lang("Export"));
 
     // The action for adding a new entry of unspecified type.
     NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -479,6 +481,7 @@ public class JabRefFrame extends JFrame {
 
         setUpImportMenu(importMenu, false);
         setUpImportMenu(importNewMenu, true);
+        setUpExportMenu(exportMenu);
 
 	file.add(newDatabaseAction);
 	file.add(open);//opendatabaseaction
@@ -488,8 +491,10 @@ public class JabRefFrame extends JFrame {
         file.add(importNewMenu);
         file.add(save);
 	file.add(saveAs);
+        file.add(exportMenu);
+        file.addSeparator();
 	file.add(fileHistory);
-	file.addSeparator();
+        //file.addSeparator();
 	file.add(loadSessionAction);
 	file.add(saveSessionAction);
 	file.addSeparator();
@@ -569,7 +574,7 @@ public class JabRefFrame extends JFrame {
 			}
 		}
 		});
-	
+
 //options.add(selectKeys);
 	mb.add(options);
 
@@ -684,6 +689,7 @@ public class JabRefFrame extends JFrame {
 	normalSearch.setEnabled(false);
 	incrementalSearch.setEnabled(false);
 	importMenu.setEnabled(false);
+	exportMenu.setEnabled(false);
 	fetchMedline.setEnabled(false);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(false);
@@ -713,6 +719,7 @@ public class JabRefFrame extends JFrame {
 	normalSearch.setEnabled(true);
 	incrementalSearch.setEnabled(true);
 	importMenu.setEnabled(true);
+	exportMenu.setEnabled(true);
 	fetchMedline.setEnabled(true);
 	for (int i=0; i<newSpecificEntryAction.length; i++)
 	    newSpecificEntryAction[i].setEnabled(true);
@@ -814,7 +821,7 @@ public class JabRefFrame extends JFrame {
 
 						prefs.putStringArray("lastEdited", names);
 					}
-					
+
 				}
 
 				fileHistory.storeHistory();
@@ -884,7 +891,7 @@ public class JabRefFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Open a new database.
                 if ((e.getActionCommand() == null) ||
-                    (e.getActionCommand().equals("Open database"))) {
+                    (e.getActionCommand().equals(Globals.lang("Open database")))) {
                     JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
                         new JabRefFileChooser((File)null) :
                         new JabRefFileChooser(new File(prefs.get("workingDirectory")));
@@ -1096,7 +1103,7 @@ public class JabRefFrame extends JFrame {
                   else {
 		      // Import into current database.
 		      BasePanel basePanel = basePanel();
-		      BibtexDatabase database = basePanel.database;		      
+		      BibtexDatabase database = basePanel.database;
 		      int oldCount = database.getEntryCount();
 		      NamedCompound ce = new NamedCompound("Import database");
 		      Iterator it = bibentries.iterator();
@@ -1277,6 +1284,72 @@ public class JabRefFrame extends JFrame {
 			return selectedFile.getAbsolutePath();
 		}
 
+    JMenuItem 
+	htmlItem = new JMenuItem(Globals.lang("HTML")),
+    //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
+		    docbookItem = new JMenuItem(Globals.lang("Docbook"));
+
+    private void setUpExportMenu(JMenu menu) {
+	ActionListener listener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    JMenuItem source = (JMenuItem)e.getSource();
+		    String lfFileName = null, extension = null;
+		    if (source == htmlItem) {
+			lfFileName = "html"; 
+			extension = ".html";
+		    }
+		    //else if (source == plainTextItem)
+		    //lfFileName = "text";
+		    else if (source == docbookItem) {
+			lfFileName = "docbook";
+			extension = ".docbook";
+		    }
+		    // We need to find out:
+		    // 1. The layout definition string to use. Or, rather, we
+		    //    must provide a Reader for the layout definition.
+		    // 2. The preferred extension for the layout format.
+		    // 3. The name of the file to use.
+		    File outFile = null;
+		    JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+			new JabRefFileChooser((File)null) :
+			new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+		    OpenFileFilter off = new OpenFileFilter(extension);
+		    chooser.addChoosableFileFilter(off);
+		    int returnVal = chooser.showSaveDialog(ths);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+			outFile = chooser.getSelectedFile();
+			if ((chooser.getFileFilter() == off) &&
+			    !outFile.getPath().endsWith(extension))
+			    // We need to append the selected extension.
+			    outFile = new File(outFile.getPath()+extension);		    }
+		    else return;
+
+		    InputStreamReader reader = null;
+		    try {
+			URL reso = JabRefFrame.class.getResource
+			    ("/resource/layout/"+lfFileName+".layout");
+			reader = new InputStreamReader(reso.openStream());
+
+			FileActions.exportDatabase(basePanel().database, 
+						   reader, outFile, prefs);
+		    } catch (IOException ex) {
+			ex.printStackTrace();
+		    }
+
+		    
+		}
+	    };
+	JMenuItem item;
+	
+	htmlItem.addActionListener(listener);
+	menu.add(htmlItem);	
+	//plainTextItem.addActionListener(listener);
+	//menu.add(plainTextItem);
+	docbookItem.addActionListener(listener);
+	menu.add(docbookItem);
+	
+    }
+
     class SaveSessionAction extends AbstractAction {
 	public SaveSessionAction() {
 	    super(Globals.lang("Save session"), new ImageIcon(GUIGlobals.saveIconFile));
@@ -1306,7 +1379,7 @@ public class JabRefFrame extends JFrame {
 			filenames.add(baseAt(i).file.getPath());
 		}
 	    }
-	    
+
 	    if (filenames.size() == 0) {
 		output(Globals.lang("Cowardly refusing to save empty session."));
 		return;
@@ -1314,11 +1387,11 @@ public class JabRefFrame extends JFrame {
 	    else {
 		String[] names = new String[filenames.size()];
 		for (int i=0; i<filenames.size(); i++)
-		    names[i] = (String)filenames.elementAt(i);		
+		    names[i] = (String)filenames.elementAt(i);
 		prefs.putStringArray("savedSession", names);
 		output(Globals.lang("Saved session."));
 	    }
-	    
+
 	}
     }
 
@@ -1338,8 +1411,8 @@ public class JabRefFrame extends JFrame {
 		    currentFiles.add(baseAt(i).file.getPath());
 	    int i0 = tabbedPane.getTabCount();
 	    String[] names = prefs.getStringArray("savedSession");
-	    for (int i=0; i<names.length; i++) 
-		if (!currentFiles.contains(names[i])) {	       
+	    for (int i=0; i<names.length; i++)
+		if (!currentFiles.contains(names[i])) {
 		    fileToOpen = new File(names[i]);
 		    if (fileToOpen.exists()) {
 			//Util.pr("Opening last edited file:"

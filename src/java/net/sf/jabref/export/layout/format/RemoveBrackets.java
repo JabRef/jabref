@@ -51,7 +51,6 @@ public class RemoveBrackets implements LayoutFormatter
         }
 
         fieldEntry = sb.toString();
-
         return fieldEntry;
     }
 }

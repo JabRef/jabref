@@ -241,6 +241,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
+
 	// The action for copying selected entries.
 	actions.put("copy", new BaseAction() {
 		public void action() {
@@ -579,7 +580,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			if (keys.size() == 0) {
 			    output("None of the selected entries have BibTeX keys.");
 			    return;
-			}			
+			}
 			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
 			for (int i=1; i<keys.size(); i++) {
 			    sb.append(',');
@@ -616,7 +617,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			if (keys.size() == 0) {
 			    output("None of the selected entries have BibTeX keys.");
 			    return;
-			}			
+			}
 			StringBuffer sb = new StringBuffer((String)keys.elementAt(0));
 			for (int i=1; i<keys.size(); i++) {
 			    sb.append(',');

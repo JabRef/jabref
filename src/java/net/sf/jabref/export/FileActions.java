@@ -31,6 +31,8 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
 
 import net.sf.jabref.*;
 
@@ -217,6 +219,44 @@ public class FileActions
             throw new SaveException(ex.getMessage(), be);
         }
     }
+
+    public static void exportDatabase(BibtexDatabase database, Reader formatReader, 
+				      File outFile, JabRefPreferences prefs) 
+	throws IOException {
+	
+	PrintStream ps=null;
+	        
+	try {
+	    LayoutHelper layoutHelper = new LayoutHelper(formatReader);
+	    Layout layout = layoutHelper.getLayoutFromText();
+	    Object[] keys = database.getKeySet().toArray();
+	    String key;
+	    ps=new PrintStream(new FileOutputStream(outFile));
+	
+            // Write database entrie; entries will be sorted as they
+            // appear on the screen.
+            String pri = prefs.get("priSort"),
+		sec = prefs.get("secSort"),
+		ter = prefs.get("terSort");
+            EntrySorter sorter = database.getSorter
+		(new EntryComparator(prefs.getBoolean("priDescending"),
+				     prefs.getBoolean("secDescending"),
+				     prefs.getBoolean("terDescending"), 
+				     pri, sec, ter));	   
+	    for (int i=0; i<sorter.getEntryCount(); i++) {
+		key = (String)sorter.getIdAt(i);
+		BibtexEntry entry = database.getEntryById(key);
+		//System.out.println(layout.doLayout(entry));
+		ps.println(layout.doLayout(entry));
+	    }
+	}
+	catch (IOException ex) {
+	    ex.printStackTrace();
+	}
+	
+	
+    }
+    
 
     /** Returns true iff the entry has a nonzero value in its field.
      */
