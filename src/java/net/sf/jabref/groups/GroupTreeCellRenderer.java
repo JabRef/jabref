@@ -22,6 +22,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (c instanceof JLabel) { // sanity check
             ((JLabel) c).setText(group.getName());
             ((JLabel) c).setToolTipText(group.getName());
+            ((JLabel) c).setIcon(null); // save some space
         }
         return c;
     }
