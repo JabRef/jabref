@@ -201,6 +201,10 @@ public class EntryTable extends JTable {
         selectionListenerOn = oldState;
       }
 
+    /*public boolean surrendersFocusOnKeystroke() {
+	return true;
+	}*/
+
       /**
        * This method overrides the superclass' to disable the selection listener while the
        * selection is cleared.

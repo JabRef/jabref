@@ -413,6 +413,47 @@ public class FileActions
           ps.close();
         }
 
+    public static void exportToCSV(BibtexDatabase database, 
+                                      File outFile, JabRefPreferences prefs)
+        throws Exception {
+
+	String SEPARATOR = "\t";
+	TreeSet sorted = getSortedEntries(database);
+	Set fields = new TreeSet();
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++)
+	    fields.add(GUIGlobals.ALL_FIELDS[i]);
+
+	//	try {
+	Object[] o = fields.toArray();
+	FileWriter out = new FileWriter(outFile);
+	out.write((String)o[0]);
+	for (int i=1; i<o.length; i++) {
+	    out.write(SEPARATOR+(String)o[i]);
+	}
+	out.write("\n");
+
+	for (Iterator i=sorted.iterator(); i.hasNext();) {
+	    BibtexEntry entry = (BibtexEntry)i.next();
+	    writeField(entry, (String)o[0], out);
+	    for (int j=1; j<o.length; j++) {
+		out.write(SEPARATOR);
+		writeField(entry, (String)o[j], out);
+	    }
+	    out.write("\n");
+	}
+
+
+	out.close();
+	//	} catch (Throwable ex) {}
+	    
+	
+    }
+
+    private static void writeField(BibtexEntry entry, String field, Writer out) 
+	throws IOException {
+	String s = (String)entry.getField(field);
+	out.write(s != null ? s : "");
+    }
 
     /**
      * This method attempts to get a Reader for the file path given, either by
@@ -490,6 +531,9 @@ public class FileActions
         return ((o != null) && !o.equals("0"));
     }
 }
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //  END OF FILE.
 ///////////////////////////////////////////////////////////////////////////////

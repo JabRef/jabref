@@ -79,7 +79,8 @@ public class JabRefFrame
     void addAction(Action a) {
       JButton b = new JButton(a);
       b.setText(null);
-      b.setMargin(marg);
+      if (!Globals.ON_MAC)
+	  b.setMargin(marg);
       add(b);
     }
   }
@@ -264,7 +265,8 @@ public class JabRefFrame
                                           prefs.getKey("New from plain text")),
 
 
-      customExpAction = new CustomizeExportsAction();
+      customExpAction = new CustomizeExportsAction(),
+      exportCSV = new ExportCSV();
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
@@ -982,17 +984,20 @@ public JabRefPreferences prefs() {
     tlb.addSeparator();
     searchToggle = new JToggleButton(normalSearch);
     searchToggle.setText(null);
-    searchToggle.setMargin(marg);
+    if (!Globals.ON_MAC)
+	searchToggle.setMargin(marg);
     tlb.add(searchToggle);
 
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
-    groupToggle.setMargin(marg);
+    if (!Globals.ON_MAC)
+	groupToggle.setMargin(marg);
     tlb.add(groupToggle);
 
     previewToggle = new JToggleButton(togglePreview);
     previewToggle.setText(null);
-    previewToggle.setMargin(marg);
+    if (!Globals.ON_MAC)
+	previewToggle.setMargin(marg);
     tlb.add(previewToggle);
 
     tlb.addSeparator();
@@ -2195,6 +2200,8 @@ class FetchCiteSeerAction
     docbookItem.addActionListener(listener);
     menu.add(docbookItem);
 
+    menu.add(exportCSV);
+
   }
 
   /**
@@ -2425,5 +2432,23 @@ class SaveSessionAction
     }
   }
 
+    class ExportCSV extends AbstractAction {
+	public ExportCSV() {
+	    super(Globals.lang("Tab-separated file"));
+	}
+	public void actionPerformed(ActionEvent e) {
+	    String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".csv",
+						   JFileChooser.SAVE_DIALOG, true);
+	    if (chosenFile == null)
+		return;
+	    try {
+		FileActions.exportToCSV(basePanel().database(), new File(chosenFile),
+					prefs);
+	    } catch (Exception ex) {
+		ex.printStackTrace();
+	    }
+				    
+	}
+    }
 
 }

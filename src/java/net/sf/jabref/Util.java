@@ -436,6 +436,10 @@ public class Util {
                 String[] cmd = {"/usr/bin/open", "-a", prefs.get("pdfviewer"), link};
                 Process child = Runtime.getRuntime().exec(cmd);
             }
+	    else if (Globals.ON_WIN) {
+		String cmd = "cmd.exe /c \"start "+link+"\"";
+		Process child = Runtime.getRuntime().exec(cmd);
+	    }
             else{
                 cmdArray[0] = prefs.get("pdfviewer");
                 cmdArray[1] = link;

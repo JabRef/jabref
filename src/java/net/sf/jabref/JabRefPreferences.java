@@ -484,7 +484,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("New mastersthesis", "ctrl shift M");
 	defKeyBinds.put("New proceedings", "ctrl shift P");
 	defKeyBinds.put("New unpublished", "ctrl shift U");
-	defKeyBinds.put("Edit strings", "ctrl shift S");
+	defKeyBinds.put("Edit strings", "ctrl T");
 	defKeyBinds.put("Edit preamble", "ctrl P");
 	defKeyBinds.put("Select all", "ctrl A");
 	defKeyBinds.put("Toggle groups interface", "ctrl shift G");
