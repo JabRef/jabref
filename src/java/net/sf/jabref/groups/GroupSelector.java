@@ -28,9 +28,9 @@ package net.sf.jabref.groups;
 
 import java.awt.*;
 import java.awt.dnd.*;
-import java.awt.dnd.DragSource;
 import java.awt.event.*;
-import java.util.Hashtable;
+import java.beans.PropertyChangeEvent;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -483,7 +483,7 @@ public class GroupSelector extends SidePaneComponent implements
         if (e.getSource() == refresh) {
             valueChanged(null); // JZTODO: null OK?
         } else if (e.getSource() == newButton) {
-            GroupDialog gd = new GroupDialog(frame, null);
+            GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.show();
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -545,7 +545,7 @@ public class GroupSelector extends SidePaneComponent implements
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
             final AbstractGroup oldGroup = node.getGroup();
-            final GroupDialog gd = new GroupDialog(frame, oldGroup);
+            final GroupDialog gd = new GroupDialog(frame, panel, oldGroup);
             gd.show();
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -566,7 +566,7 @@ public class GroupSelector extends SidePaneComponent implements
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupDialog gd = new GroupDialog(frame, null);
+            final GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.show();
             if (!gd.okPressed())
                 return; // ignore
@@ -589,7 +589,7 @@ public class GroupSelector extends SidePaneComponent implements
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
                     .getSelectionPath().getLastPathComponent();
-            final GroupDialog gd = new GroupDialog(frame, null);
+            final GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.show();
             if (!gd.okPressed())
                 return; // ignore
