@@ -210,6 +210,8 @@ class GroupDialog extends JDialog {
                     } else {
                         m_resultingGroup = new ExplicitGroup(m_name.getText()
                                 .trim(),m_basePanel.database());
+                        if (m_editedGroup == null)
+                            break; // do not perform the below converion
                         // JZTODO lyrics...
                         int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
                                 "Assign all entries that matched the previous group to this group?",
