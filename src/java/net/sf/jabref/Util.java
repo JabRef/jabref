@@ -322,10 +322,26 @@ public class Util {
      */
     public static void openExternalViewer(String link, String fieldName, JabRefPreferences prefs) throws IOException
     {
-      if (fieldName.equals("ps") || fieldName.equals("pdf")) {
 
-        // Check that the file exists:
         File file = new File(link);
+      if(fieldName.equals("pdf")) {
+//	try
+//        {
+		File f = new File(link);
+		String dir = prefs.get("pdfDirectory");
+		if (!f.exists() && (dir != null))
+		    {
+			if (dir.endsWith(System.getProperty("file.separator")))
+			    link = dir + link;
+			else
+			    link = dir + System.getProperty("file.separator") + link;
+			file = new File(link);
+		}
+//	}
+	}
+      if (fieldName.equals("ps") || fieldName.equals("pdf")) {
+        // Check that the file exists:
+
         if (!file.exists()) {
           throw new IOException(Globals.lang("File not found") + ": '" + link +
                                 "'.");
@@ -404,15 +420,6 @@ public class Util {
 	    {
 		try
 		    {
-			File f = new File(link);
-			String dir = prefs.get("pdfDirectory");
-			if (!f.exists() && (dir != null))
-			    {
-				if (dir.endsWith(System.getProperty("file.separator")))
-				    link = dir + link;
-				else
-				    link = dir + System.getProperty("file.separator") + link;
-			    }
 			System.err.println("Starting external viewer: "
 					   + prefs.get("pdfviewer") + " " + link);
             if(Globals.ON_MAC){
