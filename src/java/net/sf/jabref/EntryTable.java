@@ -355,8 +355,8 @@ public class EntryTable extends JTable {
         if ( (e.getButton() == MouseEvent.BUTTON3) ||
              (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
           int selRow = getSelectedRow();
-          if (selRow == -1)
-            addRowSelectionInterval(row, row);
+          if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
+            setRowSelectionInterval(row, row);
           rightClickMenu = new RightClickMenu(panel, panel.metaData);
           rightClickMenu.show(ths, e.getX(), e.getY());
         }
