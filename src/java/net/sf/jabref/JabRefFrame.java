@@ -1398,15 +1398,22 @@ class ImportCiteSeerAction
 
 				BasePanel currentBp;
 				String id;
-
-				Runnable updateComponent = new Runnable() {
+				int[] clickedOn = null;
+				
+				class UpdateComponent implements Runnable {
+					boolean changesMade;
+					
+					UpdateComponent(boolean changesMade) {
+						this.changesMade = changesMade;
+					}
+					
 					public void run() {
 					    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+					    if (changesMade)
+					    	currentBp.markBaseChanged();
 						currentBp.refreshTable();
-						int row = currentBp.tableModel.getNumberFromName(id);
-						currentBp.entryTable.setRowSelectionInterval(row, row);
-						currentBp.entryTable.scrollTo(row);
-						currentBp.markBaseChanged(); // The database just changed.
+						for(int i=0; i < clickedOn.length; i++)
+							currentBp.entryTable.addRowSelectionInterval(i,i);
 						currentBp.updateViewToSelected();
 						output(Globals.lang("Completed citation import from CiteSeer."));
 						 }
@@ -1414,43 +1421,27 @@ class ImportCiteSeerAction
 
 			    public void run() {
 			        currentBp = (BasePanel) tabbedPane.getSelectedComponent();
-					int[] clickedOn = null;
-					// We demand that one and only one row is selected.
+					// We demand that at least one row is selected.
 					int rowCount = currentBp.entryTable.getSelectedRowCount();
 					if (rowCount >= 1) {
 						clickedOn = currentBp.entryTable.getSelectedRows();
 					} else {
 						JOptionPane.showMessageDialog(currentBp.frame(),
-						Globals.lang("You must select a row to perform this operation."),
+						Globals.lang("You must select at least one row to perform this operation."),
 						Globals.lang("CiteSeer Import Error"),
 						JOptionPane.WARNING_MESSAGE);
 					}
 					if (clickedOn != null) {
-						Vector clickedVector = new Vector();
-						for(int i=0; i < clickedOn.length; i++)
-							clickedVector.add(new Integer(clickedOn[i]));
-						Iterator clickedIterator = clickedVector.iterator();
+						basePanel().citeSeerFetcher.beginImportCiteSeerProgress();						
 						NamedCompound citeseerNamedCompound =
 							new NamedCompound("CiteSeer Import Fields");
-						BooleanAssign overwriteAll = new BooleanAssign(false);
-						BooleanAssign overwriteNone = new BooleanAssign(false);						
-						while (clickedIterator.hasNext()) {
-							int currentIndex = ((Integer) clickedIterator.next()).intValue();
-							currentBp.citeSeerFetcher.beginImportCiteSeerProgress();
-							id =  currentBp.tableModel.getNameFromNumber(currentIndex);
-							BibtexEntry be =
-								(BibtexEntry) currentBp.database.getEntryById(id);
-							boolean newValue =
-								currentBp.citeSeerFetcher.importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone);
-							if (newValue) {
-								SwingUtilities.invokeLater(updateComponent);
-							} else {
-								currentBp.citeSeerFetcher.endImportCiteSeerProgress();
-								output(Globals.lang("Citation import from CiteSeer failed."));
-							}
+						boolean newValues = basePanel().citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);						
+						if (newValues) {
+							citeseerNamedCompound.end();
+							currentBp.undoManager.addEdit(citeseerNamedCompound);						
 						}
-						citeseerNamedCompound.end();
-						currentBp.undoManager.addEdit(citeseerNamedCompound);						
+						UpdateComponent updateComponent = new UpdateComponent(newValues);
+						SwingUtilities.invokeLater(updateComponent);
 						basePanel().citeSeerFetcher.deactivateImportFetcher();
 					}
 			    }
@@ -1491,7 +1482,7 @@ class FetchCiteSeerAction
 						 * Citation fetcher operations will sort by citation count.
 						 */
 						private void setSortingByCitationCount() {
-							newBp.frame.prefs.put("priSort", "citeseerCitationCount");
+							newBp.frame.prefs.put("priSort", "citeseercitationcount");
 							newBp.frame.prefs.put("secSort", "year");
 							newBp.frame.prefs.put("terSort", "author");
 							newBp.frame.prefs.putBoolean("priDescending", true);
@@ -2010,7 +2001,8 @@ class FetchCiteSeerAction
 
   }
 
-  class SaveSessionAction
+
+class SaveSessionAction
       extends AbstractAction {
     public SaveSessionAction() {
       super(Globals.lang("Save session"), new ImageIcon(GUIGlobals.saveIconFile));

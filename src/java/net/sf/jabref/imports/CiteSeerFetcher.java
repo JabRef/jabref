@@ -15,6 +15,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,7 +143,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
             } else if (rejectedEntries.size() > 1) {
                 String rowNumbers = new String("");
                 TreeSet rowSet = new TreeSet(rejectedEntries.keySet());
-                for(int i=0; i < rowSet.size() - 1; i++) {
+                int rowSize = rowSet.size();
+                for(int i=0; i < rowSize - 1; i++) {
                     Integer next = (Integer) rowSet.first();
                     if (rowNumbers.equals(""))
                         rowNumbers = next.toString();
@@ -152,7 +154,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
                 }
                 rowNumbers = rowNumbers + " and " + ((Integer)rowSet.first()).toString();            
                 JOptionPane.showMessageDialog(panel.frame(),
-                        Globals.lang("I couldn't parse the CiteSeer URL field of the following entries") + '\n' + 
+                        Globals.lang("I couldn't parse the CiteSeer URL field of the following entries") + ':' + '\n' + 
                         rowNumbers + ".\n" + 
                         Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools" + '.'),
                         Globals.lang("CiteSeer Warning"),
@@ -413,7 +415,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
                       citeseerMethod.releaseConnection();
                     } else {
                       int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
-                      rejectedEntries.put(new Integer(row),currentEntry);                     
+                      rejectedEntries.put(new Integer(row+1),currentEntry);                     
                     }
 		} catch(HttpException e) {
 			System.out.println("HttpException: " + e.getReason());
@@ -430,13 +432,42 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		return(abortOperation);
 	}
 
+	  public boolean importCiteSeerEntries(int[] clickedOn, NamedCompound citeseerNamedCompound) {
+	  	boolean newValues = false;
+	  	Vector clickedVector = new Vector();
+		Hashtable rejectedEntries = new Hashtable();		
+		for(int i=0; i < clickedOn.length; i++)
+			clickedVector.add(new Integer(clickedOn[i]));
+		Iterator clickedIterator = clickedVector.iterator();
+		BooleanAssign overwriteAll = new BooleanAssign(false);
+		BooleanAssign overwriteNone = new BooleanAssign(false);						
+		while (clickedIterator.hasNext()) {
+			int currentIndex = ((Integer) clickedIterator.next()).intValue();
+			String id =  panel.getTableModel().getNameFromNumber(currentIndex);
+			BibtexEntry be =
+				(BibtexEntry) panel.getDatabase().getEntryById(id);
+			boolean newValue = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, rejectedEntries);			
+			if (newValue)
+				newValues = true;
+		}
+		if (rejectedEntries.size() > 0) {
+		    ShowBadIdentifiersDialog badIdentifiersDialog = new ShowBadIdentifiersDialog(rejectedEntries);
+		    SwingUtilities.invokeLater(badIdentifiersDialog);
+		}
+		return newValues;
+	}
+	
+	
+	
 	/**
 	 * @param be
 	 * @param overwriteNone
 	 * @param overwriteAll
+	 * @param rejectedEntries
 	 *
 	 */
-	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC, BooleanAssign overwriteAll, BooleanAssign overwriteNone) {
+	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC, BooleanAssign overwriteAll, 
+			BooleanAssign overwriteNone, Hashtable rejectedEntries) {
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		BooleanAssign newValue = new BooleanAssign(false);
     	String identifier = generateCanonicalIdentifier(be);			 
@@ -452,20 +483,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					saxParser.parse(citeseerMethod.getResponseBodyAsStream(), 
 							new CiteSeerUndoHandler(citeseerNC, be, panel, newValue, overwriteAll, overwriteNone));
 					citeseerMethod.releaseConnection();
-					if (newValue.getValue() == false) {
-					    int row = panel.getTableModel().getNumberFromName(be.getId());					    
-					    ShowBadIdentifierDialog dialog = new ShowBadIdentifierDialog(generateCanonicalURL(be), row);
-				        SwingUtilities.invokeLater(dialog);			    
-					}
 				} else {
-				    int row = panel.getTableModel().getNumberFromName(be.getId());
-				    if (be.getField("citeseerurl") == null) {
-				        ShowMissingURLDialog dialog = new ShowMissingURLDialog(row);
-				        SwingUtilities.invokeLater(dialog);
-				    } else {
-				        ShowBadURLDialog dialog = new ShowBadURLDialog((String) be.getField("citeseerurl"), row);
-				        SwingUtilities.invokeLater(dialog);
-				    }
+                    int row = panel.getTableModel().getNumberFromName(be.getId());
+                    rejectedEntries.put(new Integer(row+1), be);                
 				}
 			} catch (HttpException e) {
 				System.out.println("HttpException: " + e.getReason());

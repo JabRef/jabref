@@ -209,11 +209,11 @@ public class CiteSeerUndoHandler extends HandlerBase {
         }
         Integer newCount = new Integer(citeseerCitationCount);
         UndoableFieldChange fieldChange = new UndoableFieldChange(
-                bibEntry, "citeseerCitationCount", 
-				bibEntry.getField("citeseerCitationCount"), 
+                bibEntry, "citeseercitationcount", 
+				bibEntry.getField("citeseercitationcount"), 
 				newCount);
         citeseerNamedCompound.addEdit(fieldChange);
-        bibEntry.setField("citeseerCitationCount", newCount);
+        bibEntry.setField("citeseercitationcount", newCount);
     }
 
     /**

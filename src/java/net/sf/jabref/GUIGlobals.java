@@ -312,13 +312,13 @@ public class GUIGlobals {
       "doi",
       "eid",
       "search",
-	  "citeseerCitationCount"
+	  "citeseercitationcount"
   };
 
   public static final Map FIELD_DISPLAYS;
   static {
   	FIELD_DISPLAYS = new HashMap();
-  	FIELD_DISPLAYS.put("citeseerCitationCount","Popularity");
+  	FIELD_DISPLAYS.put("citeseercitationcount","Popularity");
   }
 
 
@@ -462,7 +462,7 @@ public class GUIGlobals {
     fieldLength.put("number", new Integer(60));
     fieldLength.put("entrytype", new Integer(75));
     fieldLength.put("search", new Integer(75));
-    fieldLength.put("citeseerCitationCount", new Integer(75));
+    fieldLength.put("citeseercitationcount", new Integer(75));
     fieldLength.put(NUMBER_COL, new Integer(32));
 
     Map fieldWeight = new HashMap();
@@ -494,7 +494,7 @@ public class GUIGlobals {
     fieldWeight.put("school", MEDIUM_W);
     fieldWeight.put("comment", MEDIUM_W);
     fieldWeight.put("abstract", LARGE_W);
-    fieldWeight.put("citeseerCitationCount", SMALL_W);
+    fieldWeight.put("citeseercitationcount", SMALL_W);
 
     FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
   };

@@ -8,25 +8,27 @@
 <H2>Importing An Entry From CiteSeer</H2>
 
 JabRef can download information about a particular citation from the CiteSeer database.
-To start this process, add a new entry into your database and populate the URL field with
-a link to its content page on CiteSeer.  The URL field must have the following format:
+To start this process, add a new entry into your database and populate the citeseerurl field with
+a link to its content page on CiteSeer.  The citeseerurl field must be in one of the following formats:
 
-<p>http://citeseer.ist.psu.edu/DDDDDD.html
+<p>http://citeseer.ist.psu.edu/DDDDDD[.html], or <br>
+oai:CiteSeerPSU:DDDDDD, or <br>
+DDDDDD
 
-<p>where DDDDD is a sequence of digits.  To find the DDDD sequence for a CiteSeer entry,
+<p>where DDDDD is a sequence of digits.  To find the sequence of digits (DDDDD) for a CiteSeer entry,
 goto the citation's document page of the format http://citeseer.ist.psu.edu/<i>nameYearTitle</i>.html
 and click on the (Update) link for this citation.  The URL for the Update link will contain the numeric
 ID for this citation.
 
-<p>Once you have populated the URL field, you may download the CiteSeer fields by selecting
- <b>BibTex -> Import CiteSeer data</b>.  Make sure you have selected the row you wish to 
+<p>Once you have populated the citeseerurl field, you may download the CiteSeer fields by selecting
+ <b>BibTex -> Import Data from CiteSeer</b>.  Make sure you have selected the row(s) you wish to 
  update.
 
 <H2>Generating a Citation Database</H2>
 
 Given a set of references, you can generate a list of documents that cite the elements of this set.
-To facilitate this feature, each citation in a database must have a URL field with the format specified
-in <b>Importing An Entry From CiteSeer</b>.  To use this feature, select <b>Tools -> Select Citations
+To facilitate this feature, each citation in a database must have a citeseerurl field with the format specified
+in <b>Importing An Entry From CiteSeer</b>.  To use this feature, select <b>Tools -> Fetch Citations
 from CiteSeer</b>.
 
 </HTML>

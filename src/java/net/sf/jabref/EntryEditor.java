@@ -1508,8 +1508,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 
     // Update the JTextArea when a field has changed.
-    public void vetoableChange(PropertyChangeEvent e) {
-	setField(e.getPropertyName(), (String)(e.getNewValue()));
+    public void vetoableChange(PropertyChangeEvent e) {    	
+	setField(e.getPropertyName(), e.getNewValue().toString());
 	//Util.pr(e.getPropertyName());
     }
 
