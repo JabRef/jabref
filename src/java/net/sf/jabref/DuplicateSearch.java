@@ -72,7 +72,7 @@ public void run() {
       // No more duplicates to resolve, but search is still in progress. Sleep a little.
        try
        {
-         sleep(10);        // sleep is deprecated !!!!
+         sleep(10);
        } catch (InterruptedException ex) {}
        continue loop;
     }
