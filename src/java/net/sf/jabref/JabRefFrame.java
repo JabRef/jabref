@@ -261,7 +261,7 @@ public class JabRefFrame
                                   GUIGlobals.wwwIcon,
                                   prefs.getKey("Open URL or DOI")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
-
+      strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
       plainTextImport = new GeneralAction("plainTextImport",
                                           "New entry from plain text",
                                           prefs.getKey("New from plain text")),
@@ -897,6 +897,7 @@ public JabRefPreferences prefs() {
     tools.add(incrementalSearch);
     tools.add(replaceAll);
     tools.add(dupliCheck);
+    tools.add(strictDupliCheck);
     tools.addSeparator();
     tools.add(manageSelectors);
     tools.add(makeKeyAction);
@@ -1143,6 +1144,7 @@ public JabRefPreferences prefs() {
     openUrl.setEnabled(false);
     togglePreview.setEnabled(false);
     dupliCheck.setEnabled(false);
+    strictDupliCheck.setEnabled(false);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(false);
     }
@@ -1194,6 +1196,7 @@ public JabRefPreferences prefs() {
     openUrl.setEnabled(true);
     togglePreview.setEnabled(true);
     dupliCheck.setEnabled(true);
+    strictDupliCheck.setEnabled(true);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(true);
     }

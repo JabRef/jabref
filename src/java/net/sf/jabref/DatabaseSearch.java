@@ -75,6 +75,13 @@ public class DatabaseSearch extends Thread {
 
 	    // 2. add score per each hit
 	    searchScore = thisRuleSet.applyRules(thisSearchOptions,bes) ;
+            
+            // When using float search, it messes up the sort order if we retain
+            // graded search scores, because the table is sorted by the score.
+            // To prevent this, we let the search score saturate at 1.
+            if (searchScore > 0)
+                searchScore = 1;
+            
 	    // 2.1 set score to search field
             bes.setField(searchValueField, String.valueOf(searchScore)) ;
 

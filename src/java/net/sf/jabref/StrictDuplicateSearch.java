@@ -1,0 +1,86 @@
+/*  
+ * StrictDuplicateSearch.java
+ *
+ * Created on November 4, 2004, 11:59 PM
+ */
+
+package net.sf.jabref;
+
+import javax.swing.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableRemoveEntry;
+import java.util.HashSet;
+import java.util.Iterator;
+
+/**
+ *
+ * @author  alver
+ */
+public class StrictDuplicateSearch extends JDialog implements Runnable {
+    
+    BasePanel panel;
+    
+    /** Creates a new instance of StrictDuplicateSearch */
+    public StrictDuplicateSearch(BasePanel bp) {
+        super(bp.frame, "Test", true);
+        this.panel = bp;
+        
+    }
+    
+    public void start() {
+        Thread tr = new Thread(this);
+        tr.start();
+        setVisible(true);
+    }
+    
+    public void run() {
+        HashSet toRemove = new HashSet();
+        NamedCompound ce = new NamedCompound(Globals.lang("Remove duplicates"));
+        int duplicateCounter = 0;
+        panel.output(Globals.lang("Searching for duplicates..."));
+        Object[] keys = panel.database.getKeySet().toArray();
+        if ((keys == null) || (keys.length < 2))
+            return;
+        BibtexEntry[] bes = new BibtexEntry[keys.length];
+        for (int i=0; i<keys.length; i++)
+            bes[i] = panel.database.getEntryById((String)keys[i]);
+        
+        for (int i = 0; i<bes.length-1; i++) {
+            for (int j = i + 1; j<bes.length; j++) {
+                // We only check the entries if none of the two are already marked for removal.
+                if (!toRemove.contains(bes[i]) && !toRemove.contains(bes[j]) && 
+                    Util.compareEntriesStrictly(bes[i], bes[j]) > 1) {
+                    // These two entries are exactly the same, so we can remove one.                    
+                    if (!toRemove.contains(bes[i]) && !toRemove.contains(bes[j])) {
+                        toRemove.add(bes[j]);
+                    }
+                }
+            }
+         }
+    
+        panel.output(Globals.lang("Duplicates removed")+": "+toRemove.size());
+        if (toRemove.size() == 0) {
+            return;
+        }
+        
+        // Finished searching. Now, remove all entries scheduled for removal:
+        for (Iterator i=toRemove.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry)i.next();
+            panel.database.removeEntry(entry.getId());        
+            ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
+        }
+     
+        ce.end();
+        panel.undoManager.addEdit(ce);
+        dispose();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {                
+                panel.markBaseChanged();
+                panel.refreshTable();                
+            }
+        });
+
+        
+    }
+}
+

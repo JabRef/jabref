@@ -1120,6 +1120,12 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                 }
               });
 
+              actions.put("strictDupliCheck", new BaseAction() {
+                public void action() {
+                  StrictDuplicateSearch ds = new StrictDuplicateSearch(ths);
+                  ds.start();
+                }
+              });
 
               actions.put("plainTextImport", new BaseAction() {
                 public void action()

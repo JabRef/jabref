@@ -47,6 +47,7 @@
 
   <!-- Set the properties for source directories -->
         <property name="src.dir" value="src"/>
+        <property name="src.tests" value="src/java/tests"/>
         <property name="txt.dir" value="src/txt"/>
         <property name="java.dir" value="${src.dir}/java"/>
         <property name="osx.dir" value="${src.dir}/osx"/>
@@ -73,7 +74,7 @@
             </path>
 
   <!-- Runs project (e.g. in NetBeans 4) -->
-  <target name="run">
+  <target name="run" depends="build">
     <java jar="${build.lib}/jabref.jar" fork="true" />
   </target>
             
@@ -326,4 +327,25 @@ Number (CCN)           maintenance
                 </jalopy>
             </target>
 
+            <target name="test">
+                <junit  printsummary="yes" fork="yes" haltonfailure="no">
+                    <batchtest fork="yes" todir="/tmp/testres">
+                         <fileset dir="${build.classes}"> 
+                            <include name="**/*Tester.class"/>
+                            <include name="**/*Test.class"/>
+                        </fileset>
+                    </batchtest>
+
+                    <classpath>
+	                <pathelement location="${build.lib}/jabref.jar"/>
+        	        <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
+                        <pathelement location="${library.directory}/commons-logging.jar" />
+                       	<pathelement location="${library.directory}/antlr.jar" />
+                       	<pathelement location="${library.directory}/looks-1.2.2.jar" />
+                    </classpath>
+                    
+                    <!--<test name="tests.net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviatorTester"/>-->
+                </junit>                
+            </target>
+            
         </project>
