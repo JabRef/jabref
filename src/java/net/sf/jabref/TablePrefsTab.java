@@ -9,11 +9,19 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     private String[] _choices;
     private Boolean[] _sel;
-    private JCheckBox colorCodes, autoResizeMode;
+    private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
+    private JComboBox 
+	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
+	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
 
 
+    /**
+     * Customization of external program paths.
+     *
+     * @param prefs a <code>JabRefPreferences</code> value
+     */
     public TablePrefsTab(JabRefPreferences prefs) {
 	_prefs = prefs;
 
@@ -25,12 +33,23 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	autoResizeMode = new JCheckBox(Globals.lang
 				       ("Fit table horizontally on screen"),
 				       (_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
+	secDesc = new JCheckBox(Globals.lang("Descending"),
+				_prefs.getBoolean("secDescending"));
+	terDesc = new JCheckBox(Globals.lang("Descending"),
+				_prefs.getBoolean("terDescending"));
 
-	JPanel upper = new JPanel();
+	JLabel lab;
+	JPanel upper = new JPanel(),
+	    sort = new JPanel();
+	upper.setLayout(gbl);
+	sort.setLayout(gbl);
+
 	upper.setBorder(BorderFactory.createTitledBorder
 			(BorderFactory.createEtchedBorder(), 
 			 Globals.lang("Table appearance")));
-	upper.setLayout(gbl);
+	sort.setBorder(BorderFactory.createTitledBorder
+		       (BorderFactory.createEtchedBorder(), "Sort options"));
+
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.NONE;
 	con.anchor = GridBagConstraints.WEST;
@@ -42,6 +61,48 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	gbl.setConstraints(upper, con);
 	add(upper);
 
+	// Set the correct value for the primary sort JComboBox.
+	String sec = prefs.get("secSort"),
+	    ter = prefs.get("terSort");
+	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+	    if (sec.equals(GUIGlobals.ALL_FIELDS[i]))
+		secSort.setSelectedIndex(i);
+	    if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
+		terSort.setSelectedIndex(i);
+	}
+
+	lab = new JLabel("Secondary sort criterion");
+	con.gridwidth = 1;
+	con.insets = new Insets(0,5,0,0);
+	gbl.setConstraints(lab, con);
+	sort.add(lab);
+	con.weightx = 1;
+	gbl.setConstraints(secSort, con);
+	sort.add(secSort);
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	gbl.setConstraints(secDesc, con);
+	sort.add(secDesc);
+
+	con.gridwidth = 1;
+	//	con.anchor = GridBagConstraints.WEST;
+	//	con.weightx = 0;
+	//con.insets = new Insets(0,0,0,0);
+	//	con.weightx = 1;
+ 	lab = new JLabel("Tertiary sort criterion");
+	gbl.setConstraints(lab, con);
+	sort.add(lab);
+	con.weightx = 0;
+	//con.insets = new Insets(0,5,0,0);
+	gbl.setConstraints(terSort, con);
+	sort.add(terSort);
+	con.weightx = 1;
+	con.gridwidth = GridBagConstraints.REMAINDER;
+	gbl.setConstraints(terDesc, con);
+	sort.add(terDesc);
+
+	con.insets = new Insets(0,0,0,0);
+	gbl.setConstraints(sort, con);
+	add(sort);
 
 	Boolean[] sel = new Boolean[GUIGlobals.ALL_FIELDS.length];
 	boolean found;
@@ -147,12 +208,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public void storeSettings() {
 
-	    _prefs.putStringArray("columnNames", getChoices());
-	    _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
-	    _prefs.putInt("autoResizeMode",
-			  autoResizeMode.isSelected() ?
-			  JTable.AUTO_RESIZE_ALL_COLUMNS :
-			  JTable.AUTO_RESIZE_OFF);
-
+	_prefs.putStringArray("columnNames", getChoices());
+	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
+	_prefs.putInt("autoResizeMode",
+		      autoResizeMode.isSelected() ?
+		      JTable.AUTO_RESIZE_ALL_COLUMNS :
+		      JTable.AUTO_RESIZE_OFF);
+	_prefs.putBoolean("secDescending", secDesc.isSelected());
+	_prefs.putBoolean("terDescending", terDesc.isSelected());
+	_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
+	_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
+	
     }
 }

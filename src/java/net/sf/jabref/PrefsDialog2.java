@@ -67,11 +67,11 @@ public class PrefsDialog2 extends JDialog {
 	gbl.setConstraints(lower, con);
 	getContentPane().add(lower);	
 
-	// ---------------------------------------------------------------
-	// Add tabs to tabbed here. Remeber, tabs must implement PrefsTab.
-	// ---------------------------------------------------------------
+	// ----------------------------------------------------------------
+	// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
+	// ----------------------------------------------------------------
 	tabbed.addTab("Table", new TablePrefsTab(_prefs));
-
+	tabbed.addTab("External programs", new ExternalProgramsTab(_prefs));
 
 	JButton 
 	    ok = new JButton("Ok"),
@@ -81,7 +81,7 @@ public class PrefsDialog2 extends JDialog {
 	lower.add(ok);
 	lower.add(cancel);
 
-	setSize(400, 500);
+	setSize(440, 570);
     }
 
     class OkAction extends AbstractAction {

@@ -48,6 +48,7 @@ public class JabRefPreferences {
 	defaults.put("pdfviewer","/usr/bin/acroread");
 	defaults.put("psviewer","/usr/X11R6/bin/gv");
 	defaults.put("htmlviewer","/usr/bin/mozilla");
+	defaults.put("lyxpipe","somewhere");
 	defaults.put("posX", new Integer(0));
 	defaults.put("posY", new Integer(0));
 	defaults.put("sizeX", new Integer(840));
