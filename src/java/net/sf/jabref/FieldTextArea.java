@@ -41,57 +41,60 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     //protected Completer completer;
 
     public FieldTextArea(String fieldName_, String content) {
-	super(content);
+        super(content);
 
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
 
-	sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	setLineWrap(true);
-	setWrapStyleWord(true);
-	fieldName = fieldName_;
+        sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        setLineWrap(true);
+        setWrapStyleWord(true);
+        fieldName = fieldName_;
 
         label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
-	//label.setBorder(BorderFactory.createEtchedBorder
-	//		 (GUIGlobals.lightGray, Color.gray));
+        //label.setBorder(BorderFactory.createEtchedBorder
+        //		 (GUIGlobals.lightGray, Color.gray));
         //label.setBorder(BorderFactory.createEtchedBorder());
-	//label.setOpaque(true);
-	//label.setBackground(GUIGlobals.lightGray);
-	//label.setForeground(Color.gray);
-	setBackground(GUIGlobals.validFieldBackground);
-	//if ((content != null) && (content.length() > 0))
+        //label.setOpaque(true);
+        //label.setBackground(GUIGlobals.lightGray);
+        //label.setForeground(Color.gray);
+        setBackground(GUIGlobals.validFieldBackground);
+        //if ((content != null) && (content.length() > 0))
         //label.setForeground(GUIGlobals.validFieldColor);
-	// At construction time, the field can never have an invalid value.
-	//else
-	//    label.setForeground(GUIGlobals.nullFieldColor);
+        // At construction time, the field can never have an invalid value.
+        //else
+        //    label.setForeground(GUIGlobals.nullFieldColor);
 
+        FieldTextMenu popMenu = new FieldTextMenu(this) ;
+        this.addMouseListener( popMenu );
+        label.addMouseListener( popMenu);
     }
 
     /*
     public void setAutoComplete(Completer completer) {
-	addKeyListener(new AutoCompListener(completer));
+        addKeyListener(new AutoCompListener(completer));
     }
     */
 
     /*public Dimension getPreferredSize() {
-	return PREFERRED_SIZE;
-	}*/
+        return PREFERRED_SIZE;
+        }*/
 
     public Dimension getPreferredScrollableViewportSize() {
-	return PREFERRED_SIZE;
+        return PREFERRED_SIZE;
     }
 
   public void paintComponent(Graphics g) {
-	Graphics2D g2 = (Graphics2D)g;
-	RenderingHints rh = g2.getRenderingHints();
-	rh.put(RenderingHints.KEY_ANTIALIASING,
-	       RenderingHints.VALUE_ANTIALIAS_ON);
-	rh.put(RenderingHints.KEY_RENDERING,
-	       RenderingHints.VALUE_RENDER_QUALITY);
-	g2.setRenderingHints(rh);
-	super.paintComponent(g2);
+        Graphics2D g2 = (Graphics2D)g;
+        RenderingHints rh = g2.getRenderingHints();
+        rh.put(RenderingHints.KEY_ANTIALIASING,
+               RenderingHints.VALUE_ANTIALIAS_ON);
+        rh.put(RenderingHints.KEY_RENDERING,
+               RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHints(rh);
+        super.paintComponent(g2);
   }
 
     public String getFieldName() { return fieldName; }
@@ -100,4 +103,16 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     public void setLabelColor(Color c) { label.setForeground(c); }
     public JComponent getPane() { return sp; }
     public JComponent getTextComponent() { return this; }
+
+    public void paste(String textToInsert)
+    {
+      int sel =  getSelectionEnd() - getSelectionStart() ;
+      if (sel > 0) // selected text available
+        replaceSelection(textToInsert);
+      else
+      {
+       int cPos = this.getCaretPosition() ;
+       this.insert(textToInsert, cPos);
+      }
+    }
 }

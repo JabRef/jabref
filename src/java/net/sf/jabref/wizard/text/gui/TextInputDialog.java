@@ -514,20 +514,20 @@ public class TextInputDialog extends JDialog
 
     public void actionPerformed(ActionEvent e)
     {
-      Clipboard systemClip = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-      try
+      String data = ClipBoardManager.clipBoard.getClipboardContents() ;
+      if (data != null)
       {
-//        doc.remove( 0, doc.getLength() ) ; // no cut
         int selStart = textPane.getSelectionStart() ;
         int selEnd = textPane.getSelectionEnd() ;
-        if (selEnd - selStart > 0)
-          textPane.replaceSelection("");
+        if ( selEnd - selStart > 0 )
+          textPane.replaceSelection( "" ) ;
         int cPos = textPane.getCaretPosition() ;
-        doc.insertString(cPos, (String) systemClip.getContents(null).getTransferData( DataFlavor.stringFlavor),
-                         doc.getStyle("regular"));
+        try
+        {
+          doc.insertString( cPos, data, doc.getStyle( "regular" ) ) ;
+        }
+        catch (Exception ex) {}
       }
-      catch (Exception ex) {}
     }
   }
 

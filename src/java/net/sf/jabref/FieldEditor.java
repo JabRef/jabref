@@ -30,8 +30,8 @@ package net.sf.jabref;
 public interface FieldEditor {
 
     public String getFieldName();
-    public javax.swing.JComponent getPane(); 
-    // Returns the component to be added to a container. Might 
+    public javax.swing.JComponent getPane();
+    // Returns the component to be added to a container. Might
     // be a JScrollPane or the component itself.
     public javax.swing.JComponent getTextComponent();
     // Returns the text component itself.
@@ -44,4 +44,9 @@ public interface FieldEditor {
     public java.awt.Container getParent();
     public void requestFocus();
 
+    // paste text into component, it should also take some selected text into account
+    public void paste(String textToInsert) ;
+
+    // normally implemented in JTextArea and JTextField
+    public String getSelectedText() ;
 }

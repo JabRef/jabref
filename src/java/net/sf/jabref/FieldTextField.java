@@ -35,26 +35,30 @@ public class FieldTextField extends JTextField implements FieldEditor {
     protected JLabel label;
 
     public FieldTextField(String fieldName_, String content) {
-	super(content);
+        super(content);
 
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
 
-	fieldName = fieldName_;
+        fieldName = fieldName_;
         label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
-	//label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
-	label.setBorder(BorderFactory.createEtchedBorder());
-	setBackground(GUIGlobals.validFieldBackground);
-	//label.setOpaque(true);
-	//if ((content != null) && (content.length() > 0))
+        //label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
+        label.setBorder(BorderFactory.createEtchedBorder());
+        setBackground(GUIGlobals.validFieldBackground);
+        //label.setOpaque(true);
+        //if ((content != null) && (content.length() > 0))
         //label.setForeground(GUIGlobals.validFieldColor);
-	// At construction time, the field can never have an invalid value.
-	//else label.setForeground(GUIGlobals.nullFieldColor);
+        // At construction time, the field can never have an invalid value.
+        //else label.setForeground(GUIGlobals.nullFieldColor);
+
+        FieldTextMenu popMenu = new FieldTextMenu(this) ;
+        this.addMouseListener( popMenu );
+        label.addMouseListener( popMenu);
     }
 
     public void append(String text) {
-	setText(getText()+text);
+        setText(getText()+text);
     }
 
     public String getFieldName() { return fieldName; }
@@ -69,14 +73,24 @@ public class FieldTextField extends JTextField implements FieldEditor {
     public JComponent getTextComponent() { return this; }
 
   public void paintComponent(Graphics g) {
-	Graphics2D g2 = (Graphics2D)g;
-	RenderingHints rh = g2.getRenderingHints();
-	rh.put(RenderingHints.KEY_ANTIALIASING,
-	       RenderingHints.VALUE_ANTIALIAS_ON);
-	rh.put(RenderingHints.KEY_RENDERING,
-	       RenderingHints.VALUE_RENDER_QUALITY);
-	g2.setRenderingHints(rh);
-	super.paintComponent(g2);
+        Graphics2D g2 = (Graphics2D)g;
+        RenderingHints rh = g2.getRenderingHints();
+        rh.put(RenderingHints.KEY_ANTIALIASING,
+               RenderingHints.VALUE_ANTIALIAS_ON);
+        rh.put(RenderingHints.KEY_RENDERING,
+               RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHints(rh);
+        super.paintComponent(g2);
   }
 
+  public void paste(String textToInsert)
+  {
+    int sel =  getSelectionEnd() - getSelectionStart() ;
+    if (sel < 1)
+    {
+      int cPos = getCaretPosition() ;
+      select(cPos, cPos);
+    }
+    replaceSelection(textToInsert);
+  }
 }
