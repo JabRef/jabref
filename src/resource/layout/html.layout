@@ -1,8 +1,8 @@
 
 <dt><a name="\bibtexkey">[\bibtexkey]</a></dt>
 <dd>
-\begin{author} \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author},\end{author}
-\begin{title} '\format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\title}'\end{title}
+\begin{author} \format[net.sf.jabref.export.layout.format.RemoveBrackets]{\author},\end{author}
+\begin{title} '\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}'\end{title}
 \begin{journal},  <em>\journal </em>\end{journal}
 \begin{year}, <b>\year </b>\end{year}
 \begin{volume}, <i>\volume</i>\end{volume}

@@ -476,13 +476,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   private void setupSourcePanel() {
       source = new JTextArea() {
 	      public void paintComponent(Graphics g) {
-		  Graphics2D g2 = (Graphics2D)g;	
-		  RenderingHints rh = g2.getRenderingHints();
-		  rh.put(RenderingHints.KEY_ANTIALIASING,
-			 RenderingHints.VALUE_ANTIALIAS_ON);
-		  rh.put(RenderingHints.KEY_RENDERING,
-			 RenderingHints.VALUE_RENDER_QUALITY);	
-		  g2.setRenderingHints(rh);
+		  Graphics2D g2 = (Graphics2D)g;
+		  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				      RenderingHints.VALUE_ANTIALIAS_ON);
+		  g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+				      RenderingHints.VALUE_RENDER_QUALITY);
 		  super.paintComponent(g2);
 	      }
 	  };
@@ -1104,6 +1102,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * @param id a <code>String</code> value
      */
     private void switchTo(String id) {
+	
+	// Make sure the current edit is stored. 
+	Component comp = tabbed.getSelectedComponent();
+	if (comp instanceof FieldPanel) {	 
+	    if (((FieldPanel)comp).activeField != null) {
+		//Util.pr(((FieldPanel)comp).getText());
+		storeFieldAction.actionPerformed
+		    (new ActionEvent(((FieldPanel)comp).activeField, 0, ""));
+	    }
+	}
+
 	BibtexEntry be = panel.database.getEntryById(id);
 
 	// If the entry we are switching to is of the same type as

@@ -1,6 +1,6 @@
 
-JabRef 1.x
-----------
+JabRef 1.19
+-----------
 
 
 Introduction:
@@ -14,16 +14,20 @@ standard Bibtex fields. JabRef can autogenerate bibtex keys for your
 entries, and autocomplete words or names in the field types of your
 choosing. Most operations can be done without using the mouse.
 
-Version 1.1 improves customization features significantly, allowing you
-to customize which fields to include as optional and required for each of
-the existing entry types, as well as define new entry types. The "General
-fields" tab can also be set to display any combination of fields.
+Version 1.19 is a sort of preview of version 1.2. It gives a
+significant improvement in the user interface, due to the application
+of Incors' great free Look and Feel, Kunststoff, and the use of
+antialiased fonts.
 
 
 License:
 JabRef is free open source software, distributed under the GNU General
 Public Licence. See the enclosed text file 'gpl.txt', or the About
 dialog, for details about the GPL.
+
+Kunststoff is licenced under the GNU Lesser General Public
+Licence. See the enclosed text file 'lesser.txt' for details about the
+LGPL.
 
 
 Requirements:
@@ -35,7 +39,7 @@ Kit.
 
 
 Installing and running:
-JabRef 1.1 is distributed as an executable .jar file. Run the
+JabRef 1.19 is distributed as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -68,10 +72,11 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Entry editor is now opened for an entry that causes an error when saving.
+1.19:	- Entry editor is now opened for an entry that causes an error when saving.
 	- Added options to display names in harmonised format in the main table.
-	- Added HTML and Docbook export.
+	- Added Docbook and (experimental) HTML export.
 	- Enabled 'doi' and 'pii' fields for Medline import.
+	- Enabled antialiasing fonts.
 	- Added the Kunststoff look&feel to give a more pleasant user interface.
 	- Added font selector for the main table.
 	- Improved table column customization.

@@ -62,7 +62,7 @@ public class GUIGlobals {
 
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE =
-		"This file was created with JabRef.\n\n";
+		"This file was created with JabRef 1.19.\n\n";
 
     // Size of help window.
     static Dimension
