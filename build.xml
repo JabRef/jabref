@@ -60,6 +60,8 @@
   <!-- Set the properties for library directories -->
             <property name="library.directory" value="lib" />
 
+            
+            
   <!-- Build classpath -->
             <path id="classpath">
                 <pathelement path="${build.classes}"/>
@@ -70,6 +72,11 @@
                 </fileset>
             </path>
 
+  <!-- Runs project (e.g. in NetBeans 4) -->
+  <target name="run">
+    <java jar="${build.lib}/jabref.jar" fork="true" />
+  </target>
+            
   <!-- Compiles project -->
             <target name="compile">
                 <mkdir dir="${build.classes}"/>
