@@ -42,12 +42,12 @@ public SearchExpressionTreeParser() {
 
 	public final boolean  tSearchExpression(AST _t) throws RecognitionException, PatternSyntaxException {
 		boolean ret = false;;
-		
+
 		AST tSearchExpression_AST_in = (_t == ASTNULL) ? null : (AST)_t;
-		
+
 			boolean a = false, b = false;
-		
-		
+
+
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;
 			switch ( _t.getType()) {
@@ -73,7 +73,7 @@ public SearchExpressionTreeParser() {
 				else {
 					throw new NoViableAltException(_t);
 				}
-				
+
 				}
 				_t = __t2;
 				_t = _t.getNextSibling();
@@ -102,7 +102,7 @@ public SearchExpressionTreeParser() {
 				else {
 					throw new NoViableAltException(_t);
 				}
-				
+
 				}
 				_t = __t4;
 				_t = _t.getNextSibling();
@@ -141,17 +141,17 @@ public SearchExpressionTreeParser() {
 		_retTree = _t;
 		return ret;
 	}
-	
+
 	public final boolean  tExpressionSearch(AST _t) throws RecognitionException, PatternSyntaxException {
 		 boolean ret = false; ;
-		
+
 		AST tExpressionSearch_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		AST var_f = null;
 		AST var_v = null;
-		
+
 			int matchType = 0;
-		
-		
+
+
 		try {      // for error handling
 			AST __t9 = _t;
 			AST tmp6_AST_in = (AST)_t;
@@ -165,13 +165,15 @@ public SearchExpressionTreeParser() {
 			var_v = (AST)_t;
 			match(_t,RegularExpression);
 			_t = _t.getNextSibling();
-			
+
 						Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 						Pattern valueSpec = ((RegExNode)var_v).getPattern();
+
+                                                //System.out.println("title="+fieldSpec.matcher("title").matches());
 						int pseudoField = 0;
 						// this loop iterates over all regular keys, then over pseudo keys like "type"
 						for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
-							String content = null;
+							String content = "";//null;
 							switch (i - searchKeys.length + 1) {
 								case PSEUDOFIELD_TYPE:
 									if (!fieldSpec.matcher("entrytype").matches())
@@ -179,7 +181,12 @@ public SearchExpressionTreeParser() {
 									content = bibtexEntry.getType().getName();
 									break;
 								default: // regular field
-									content = bibtexEntry.getField(searchKeys[i].toString()).toString();
+                                                                  if (fieldSpec.matcher(searchKeys[i].toString()).matches()) {
+                                                                    Object o = bibtexEntry.getField(searchKeys[i].toString());
+                                                                    content = (o!=null ? o.toString() : "");
+                                                                  }
+                                                                  //System.out.println("SearchExpressionTree, 182: "+searchKeys[i].toString()+" "+bibtexEntry.getField(searchKeys[i].toString()));
+
 							}
 							Matcher matcher = valueSpec.matcher(content);
 							switch (matchType) {
@@ -194,7 +201,7 @@ public SearchExpressionTreeParser() {
 								break;
 							}
 						}
-					
+
 			_t = __t9;
 			_t = _t.getNextSibling();
 		}
@@ -205,12 +212,12 @@ public SearchExpressionTreeParser() {
 		_retTree = _t;
 		return ret;
 	}
-	
+
 	public final int  tSearchType(AST _t) throws RecognitionException {
 		 int matchType = 0; ;
-		
+
 		AST tSearchType_AST_in = (_t == ASTNULL) ? null : (AST)_t;
-		
+
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;
 			switch ( _t.getType()) {
@@ -267,8 +274,8 @@ public SearchExpressionTreeParser() {
 		_retTree = _t;
 		return matchType;
 	}
-	
-	
+
+
 	public static final String[] _tokenNames = {
 		"<0>",
 		"EOF",
@@ -296,6 +303,6 @@ public SearchExpressionTreeParser() {
 		"ExpressionSearch",
 		"LITERAL_matches"
 	};
-	
+
 	}
-	
+

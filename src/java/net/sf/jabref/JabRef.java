@@ -79,11 +79,11 @@ public class JabRef {
       StringOption importFile = new StringOption("");
       importFile.setDescription("imopoepuoeu");//Globals.lang);
       StringOption exportFile = new StringOption("");
-      NotifyOption helpO = new NotifyOption("");
-      NotifyOption disableGui = new NotifyOption("");
+      BooleanOption helpO = new BooleanOption();
+      BooleanOption disableGui = new BooleanOption();
       //exportFile.setHelpDescriptionSize(80);
       //exportFile.setFileCompleteOptionSize(12);
-      NotifyOption loadSess = new NotifyOption("");
+      BooleanOption loadSess = new BooleanOption();
       StringOption exportPrefs = new StringOption("");
       StringOption importPrefs = new StringOption("");
 
@@ -242,7 +242,7 @@ public class JabRef {
         }
 
         if (exportFile.isInvoked()) {
-          if (loaded.size() == 1) {
+          if (loaded.size() > 0) {
             String[] data = exportFile.getStringValue().split(",");
             if (data.length == 1) {
               // This signals that the latest import should be stored in BibTeX format to the given file.

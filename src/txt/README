@@ -1,6 +1,6 @@
 
-JabRef 1.3.1
-------------
+JabRef 1.4
+----------
 
 
 Introduction:
@@ -34,7 +34,7 @@ Kit.
 
 
 Installing and running, Windows:
-JabRef 1.3.1 is available in Windows Installer (.msi) format. To install,
+JabRef 1.4 is available in Windows Installer (.msi) format. To install,
 double-click the .msi file. A shortcut to JabRef will be added to your
 start menu.
 
@@ -44,7 +44,7 @@ Wix (tool for compiling MSI files from an XML specification), available at http:
 
 
 Installing and running, general:
-JabRef 1.3.1 can be downloaded as an executable .jar file. Run the
+JabRef 1.4 can be downloaded as an executable .jar file. Run the
 program as follows:
 If you are using the Java Development Kit:
      java -jar <path to jar>
@@ -76,13 +76,13 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x	- Added advanced search feature.
+1.4:	- Added advanced search feature.
 	- Added facility for using custom export formats.
 	- Added command line options for importing/exporting files, importing/exporting
 	  user preferences, loading session and for suppressing the GUI (using RitOpt for
           parsing options).
 	- Added automatic stripping of \url{} when opening url.
-        - Improved docbook and bibtexml exports.
+        - Improved export filters.
         - Fixed focus bug which sometimes interfered with cut/copy/paste.
 1.3.1:	- Bugfix.
 1.3:	- Added entry preview.

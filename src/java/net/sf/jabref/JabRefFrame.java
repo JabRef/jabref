@@ -297,7 +297,9 @@ public class JabRefFrame
     // occur in the wrong tab.
     tabbedPane.addChangeListener(new ChangeListener() {
       public void stateChanged(ChangeEvent e) {
-        Globals.focusListener.setFocused(basePanel().entryTable);
+        BasePanel bp = basePanel();
+        if (bp != null)
+          Globals.focusListener.setFocused(bp.entryTable);
       }
 
     });

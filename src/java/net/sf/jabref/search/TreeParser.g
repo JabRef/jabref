@@ -50,14 +50,14 @@ tSearchExpression returns [boolean ret = false;] throws PatternSyntaxException
 
 tSearchType returns [ int matchType = 0; ]
 	:
-	LITERAL_contains { matchType = MATCH_CONTAINS; } 
-	| 
-	LITERAL_matches { matchType = MATCH_EXACT; } 
-	| 
+	LITERAL_contains { matchType = MATCH_CONTAINS; }
+	|
+	LITERAL_matches { matchType = MATCH_EXACT; }
+	|
 	EQUAL { matchType = MATCH_CONTAINS; }
-	| 
+	|
 	EEQUAL { matchType = MATCH_EXACT; }
-	| 
+	|
 	NEQUAL { matchType = MATCH_DOES_NOT_CONTAIN; }
 	;
 
@@ -66,14 +66,14 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 	int matchType = 0;
 }
 	:
-	#( ExpressionSearch var_f:RegularExpression matchType=tSearchType var_v:RegularExpression 
+	#( ExpressionSearch var_f:RegularExpression matchType=tSearchType var_v:RegularExpression
 		{
 			Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 			Pattern valueSpec = ((RegExNode)var_v).getPattern();
 			int pseudoField = 0;
 			// this loop iterates over all regular keys, then over pseudo keys like "type"
 			for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
-				String content = null;
+				String content = "";// null; (Changed 2004.06.03, Morten A.)
 				switch (i - searchKeys.length + 1) {
 					case PSEUDOFIELD_TYPE:
 						if (!fieldSpec.matcher("entrytype").matches())
@@ -81,7 +81,10 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 						content = bibtexEntry.getType().getName();
 						break;
 					default: // regular field
-						content = bibtexEntry.getField(searchKeys[i].toString()).toString();
+                                        	if (fieldSpec.matcher(searchKeys[i].toString()).matches()) {
+	                                                Object o = bibtexEntry.getField(searchKeys[i].toString());
+	                                                content = (o!=null ? o.toString() : "");
+                                        	}
 				}
 				Matcher matcher = valueSpec.matcher(content);
 				switch (matchType) {

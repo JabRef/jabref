@@ -37,7 +37,7 @@ public class SearchExpression implements SearchRule {
 			return treeParser.apply(ast,bibtexEntry);
 		} catch (RecognitionException e) {
 			return 0; // this should never occur
-		}
+		} //catch (NullPointerException ex) { return 0; } // Just testing (Morten)
 	}
 }
 
