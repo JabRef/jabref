@@ -165,7 +165,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    tabbed.addTab(Globals.lang("General fields"),
 			  new ImageIcon(GUIGlobals.showGenIconFile),
 			  genPanel.getPane(), Globals.lang("Show general fields"));
-	tabbed.addTab(Globals.lang("Abstract"),
+	tabbed.addTab("Abstract",
 		      new ImageIcon(GUIGlobals.showAbsIconFile),
 		      absPanel.getPane(), Globals.lang("Show abstract"));
 	tabbed.addTab(Globals.lang("BibTeX source"),
@@ -1546,7 +1546,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * Sets all the text areas according to the shown entry.
      */
     public void updateAllFields() {
-        FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
+        FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel, absPanel};
         for (int i=0; i<panels.length; i++) {
             Vector fields = panels[i].getFields();
             for (int j=0; j<fields.size(); j++) {

@@ -1,0 +1,322 @@
+package net.sf.jabref;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import java.awt.event.*;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.HashMap;
+import java.util.TreeSet;
+
+public class ContentSelectorDialog2 extends JDialog {
+
+
+    GridBagLayout gbl = new GridBagLayout();
+    GridBagConstraints con = new GridBagConstraints();
+    JPanel fieldPan = new JPanel(),
+	wordPan = new JPanel(),
+	buttonPan = new JPanel(),
+	fieldNamePan = new JPanel(),
+	wordEditPan = new JPanel();
+
+    final String
+	WORD_EMPTY_TEXT = Globals.lang("<no field>"),
+	WORD_FIRSTLINE_TEXT = Globals.lang("<select word>"),
+	FIELD_FIRST_LINE = Globals.lang("<field name>");
+    MetaData metaData;
+    String currentField = null;
+    TreeSet fieldSet, wordSet;
+    JabRefFrame frame;
+    JButton help,
+	newField = new JButton(Globals.lang("New")),
+	removeField = new JButton(Globals.lang("Remove")),
+	newWord = new JButton(Globals.lang("New")),
+	removeWord = new JButton(Globals.lang("Remove")),
+	ok = new JButton(Globals.lang("Ok")),
+	cancel = new JButton(Globals.lang("Cancel")),
+	apply = new JButton(Globals.lang("Apply"));
+    DefaultListModel fieldListModel = new DefaultListModel(),
+	wordListModel = new DefaultListModel();
+    JList fieldList = new JList(fieldListModel),
+	wordList = new JList(wordListModel);
+    JTextField fieldNameField = new JTextField("", 20),
+	wordEditField = new JTextField("", 20);
+    JScrollPane fPane = new JScrollPane(fieldList),
+	wPane = new JScrollPane(wordList);
+
+    HashMap wordListModels = new HashMap();
+
+    public static void main(String[] args) {
+	(new ContentSelectorDialog2(null, true, new MetaData(), "journal")).show();
+    }
+
+    public ContentSelectorDialog2(JabRefFrame frame, boolean modal, MetaData metaData,
+				  String fieldName) {
+	super(frame, Globals.lang("Setup selectors"), modal);
+	this.metaData = metaData;
+	this.frame = frame;
+
+	this.currentField = fieldName;
+
+	//help = new JButton(Globals.lang("Help"));
+	//help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help"));
+	//help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
+	initLayout();
+	//	wordSelector.addItem(WORD_EMPTY_TEXT);
+
+	setupFieldSelector();
+	setupWordSelector();
+	setupActions();
+	int fieldInd = fieldListModel.indexOf(currentField);
+	if (fieldInd >= 0)
+	    fieldList.setSelectedIndex(fieldInd);
+
+	pack();
+    }
+
+
+    private void setupActions() {
+
+	wordList.addListSelectionListener(new ListSelectionListener() {
+		public void valueChanged(ListSelectionEvent e) {
+		    wordEditField.setText((String)wordList.getSelectedValue());
+		    wordEditField.selectAll();
+		    new FocusRequester(wordEditField);
+		}
+	    });
+
+	newWord.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    wordListModel.add(0, WORD_FIRSTLINE_TEXT);
+		    wordList.setSelectedIndex(0);
+		    wPane.getVerticalScrollBar().setValue(0);
+		}
+	    });
+
+	wordEditField.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    int index = wordList.getSelectedIndex();
+		    String old = (String)wordList.getSelectedValue(),
+			newVal = wordEditField.getText();
+		    if (newVal.equals("") || newVal.equals(old))
+			return; // Empty string or no change.
+		    int newIndex = findPosInWords(newVal);
+		    wordListModel.remove(index);
+		    wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
+				 newVal);
+
+		}
+	    });
+
+	removeWord.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    int index = wordList.getSelectedIndex();
+		    if (index == -1)
+			return;
+		    wordListModel.remove(index);
+		    wordEditField.setText("");
+		    if (wordListModel.size() > 0)
+			wordList.setSelectedIndex(Math.min(index, wordListModel.size()-1));
+		}
+	    });
+
+
+	fieldList.addListSelectionListener(new ListSelectionListener() {
+		public void valueChanged(ListSelectionEvent e) {
+		    currentField = (String)fieldList.getSelectedValue();
+		    fieldNameField.setText(currentField);
+		    setupWordSelector();
+
+		    //new FocusRequester(wordEditField);
+		}
+	    });
+
+	
+	ok.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    applyChanges();
+		    dispose();
+		}
+	    });
+
+	apply.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    applyChanges();
+		}
+	    });
+
+	cancel.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    dispose();
+		}
+	    });
+
+    }
+
+
+    private void applyChanges() {
+	// Cycle through all fields that we have created listmodels for:
+	for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
+	    // For each field name, store the values:
+	    String fieldName = (String)i.next();
+	    DefaultListModel lm = (DefaultListModel)wordListModels.get(fieldName);
+	    int start = 0;
+	    // Avoid storing the <new word> marker if it is there:
+	    while (((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
+		start++;
+	    Vector data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
+	    boolean newField = false;
+	    if (data == null) {
+		newField = true;
+		data = new Vector();
+	    } else
+		data.clear();
+	    for (int wrd=start; wrd<lm.size(); wrd++) {
+		String word = (String)lm.get(wrd);
+		data.add(word);
+	    }
+	    if (newField)
+		metaData.putData(Globals.SELECTOR_META_PREFIX+fieldName, data);
+	}
+
+	// Update all selectors in the current BasePanel.
+    }
+
+    /**
+     * Set the contents of the field selector list.
+     *
+     */
+    private void setupFieldSelector() {
+	fieldListModel.clear();
+	//fieldListModel.addElement(FIELD_FIRST_LINE);
+	for (Iterator i=metaData.iterator(); i.hasNext();) {
+	    String s = (String)i.next();
+	    if (s.startsWith(Globals.SELECTOR_META_PREFIX))
+		fieldListModel.addElement(s.substring(Globals.SELECTOR_META_PREFIX.length()));
+	}
+
+    }
+
+
+    private void setupWordSelector() {
+
+	// Have we already created a listmodel for this field?
+	Object o = wordListModels.get(currentField);
+	if (o != null) {
+	    wordListModel = (DefaultListModel)o;
+	    wordList.setModel(wordListModel);
+	} else {
+	    wordListModel = new DefaultListModel();
+	    wordListModels.put(currentField, wordListModel);
+	    wordListModel.clear();
+	    //wordListModel.addElement(WORD_FIRSTLINE_TEXT);
+	    Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+currentField);
+	    if ((items != null)) { // && (items.size() > 0)) {
+		wordSet = new TreeSet(items);
+		for (Iterator i=wordSet.iterator(); i.hasNext();) {
+		    String s = (String)i.next();
+		    int index = findPosInWords(s);
+		    wordListModel.add(index, s);
+		}
+	    }
+	}
+    }
+
+    private int findPosInWords(String item) {
+	for (int i=0; i<wordListModel.size(); i++) {
+	    String s = (String)wordListModel.get(i);
+	    if (item.compareToIgnoreCase(s) < 0) { // item precedes s
+		return i;
+	    }
+	}
+	return wordListModel.size();
+    }
+
+    private void initLayout() {
+	fieldList.setVisibleRowCount(4);
+	wordList.setVisibleRowCount(10);
+	fieldPan.setBorder(BorderFactory.createTitledBorder
+			       (BorderFactory.createEtchedBorder(),
+				Globals.lang("Field name")));
+	wordPan.setBorder(BorderFactory.createTitledBorder
+			       (BorderFactory.createEtchedBorder(),
+				Globals.lang("Keyword")));
+	fieldPan.setLayout(gbl);
+	wordPan.setLayout(gbl);
+	con.insets = new Insets(2, 2, 2, 2);
+	con.fill = GridBagConstraints.BOTH;
+	con.gridwidth = 2;
+	con.weightx = 1;
+	con.weighty = 1;
+	con.gridx = 0;
+	con.gridy = 0;
+	gbl.setConstraints(fPane, con);
+	fieldPan.add(fPane);
+	gbl.setConstraints(wPane, con);
+	wordPan.add(wPane);
+	con.gridwidth = 1;
+	con.gridx = 2;
+	//con.weightx = 0.7;
+	con.gridheight = 2;
+	gbl.setConstraints(fieldNamePan, con);
+	fieldPan.add(fieldNamePan);
+	gbl.setConstraints(wordEditPan, con);
+	wordPan.add(wordEditPan);
+	con.gridx = 0;
+	con.gridy = 1;
+	con.weightx = 0;
+	con.weighty = 0;
+	con.gridwidth = 1;
+	con.gridheight = 1;
+	con.fill = GridBagConstraints.NONE;
+	con.anchor = GridBagConstraints.WEST;
+	gbl.setConstraints(newField, con);
+	fieldPan.add(newField);
+	gbl.setConstraints(newWord, con);
+	wordPan.add(newWord);
+	con.gridx = 1;
+	//con.anchor = GridBagConstraints.EAST;
+	gbl.setConstraints(removeField, con);
+	fieldPan.add(removeField);
+	gbl.setConstraints(removeWord, con);
+	wordPan.add(removeWord);
+	con.anchor = GridBagConstraints.WEST;
+	con.gridx = 0;
+	con.gridy = 0;
+	gbl.setConstraints(fieldNameField, con);
+	fieldNamePan.add(fieldNameField);
+	gbl.setConstraints(wordEditField, con);
+	wordEditPan.add(wordEditField);
+
+	// Add buttons:
+	buttonPan.add(ok);
+	buttonPan.add(apply);
+	buttonPan.add(cancel);
+
+	// Add panels to dialog:
+	con.fill = GridBagConstraints.BOTH;
+	getContentPane().setLayout(gbl);
+	con.weightx = 1;
+	con.weighty = 0.5;
+	con.gridwidth = 1;
+	con.gridheight = 1;
+	con.gridx = 0;
+	con.gridy = 0;
+	gbl.setConstraints(fieldPan, con);
+	getContentPane().add(fieldPan);
+	con.gridy = 1;
+	gbl.setConstraints(wordPan, con);
+	getContentPane().add(wordPan);
+	con.weighty = 0;
+	con.gridy = 2;
+	con.insets = new Insets(12, 2, 2, 2);
+	gbl.setConstraints(buttonPan, con);
+	getContentPane().add(buttonPan);
+
+
+    }
+
+
+}

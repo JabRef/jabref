@@ -1939,7 +1939,7 @@ class FetchCiteSeerAction
     importMenu.add(newJStorFile_mItem);
 
     //########################################
-    JMenuItem newSilverPlatter_mItem = new JMenuItem(Globals.lang("SilverPlatter"));
+    JMenuItem newSilverPlatter_mItem = new JMenuItem("SilverPlatter");
     newSilverPlatter_mItem.addActionListener(new ActionListener(){
       public void actionPerformed(ActionEvent e)
       {

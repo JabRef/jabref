@@ -241,12 +241,15 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	lab = new JLabel(Globals.lang("Menu and label font size"));
 	gbl.setConstraints(lab, con);
 	upper.add(lab);
-        con.gridwidth = GridBagConstraints.REMAINDER;
 	Insets old = con.insets;
-	con.insets = new Insets(0, 10, 0, 0);
+	con.insets = new Insets(0, 5, 0, 5);
 	gbl.setConstraints(fontSize, con);
 	upper.add(fontSize);
 	con.insets = old;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+	lab = new JLabel("("+Globals.lang("non-Mac only")+")");
+	gbl.setConstraints(lab, con);
+	upper.add(lab);
 	//gbl.setConstraints(menuFontButton, con);
 	//upper.add(menuFontButton);
 	//con.anchor = GridBagConstraints.EAST;
