@@ -1345,14 +1345,14 @@ public class JabRefFrame extends JFrame {
 			    outFile = new File(outFile.getPath()+extension);		    }
 		    else return;
 
-		    InputStreamReader reader = null;
+		    //InputStreamReader reader = null;
 		    try {
-			URL reso = JabRefFrame.class.getResource
-			    ("/resource/layout/"+lfFileName+".layout");
-			reader = new InputStreamReader(reso.openStream());
+			//URL reso = JabRefFrame.class.getResource
+			//    ("/resource/layout/"+lfFileName+".layout");
+			//reader = new InputStreamReader(reso.openStream());
 
 			FileActions.exportDatabase(basePanel().database, 
-						   reader, outFile, prefs);
+						   lfFileName, outFile, prefs);
 		    } catch (IOException ex) {
 			ex.printStackTrace();
 		    }

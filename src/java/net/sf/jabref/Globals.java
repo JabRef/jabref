@@ -40,7 +40,8 @@ public class Globals {
     public static ResourceBundle messages;
     public static Locale locale;
     public static final String FILETYPE_PREFS_EXT = "_dir",
-	SELECTOR_META_PREFIX = "selector_";
+	SELECTOR_META_PREFIX = "selector_",
+	LAYOUT_PREFIX = "/resource/layout/";
 
     public static void logger(String s){
 		Logger.global.info(s);

@@ -27,7 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.export;
 
 import java.io.*;
-
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,6 +45,7 @@ import net.sf.jabref.*;
  */
 public class FileActions
 {
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
     /**
@@ -220,18 +221,28 @@ public class FileActions
         }
     }
 
-    public static void exportDatabase(BibtexDatabase database, Reader formatReader, 
+    public static void exportDatabase(BibtexDatabase database, String lfName, 
 				      File outFile, JabRefPreferences prefs) 
 	throws IOException {
 	
 	PrintStream ps=null;
 	        
 	try {
-	    LayoutHelper layoutHelper = new LayoutHelper(formatReader);
-	    Layout layout = layoutHelper.getLayoutFromText();
 	    Object[] keys = database.getKeySet().toArray();
 	    String key;
+	    InputStreamReader reader;
 	    ps=new PrintStream(new FileOutputStream(outFile));
+	    // Print header
+	    URL reso = JabRefFrame.class.getResource
+		(Globals.LAYOUT_PREFIX+lfName+".begin.layout");
+	    int c;
+	    if (reso != null) {
+		reader = new InputStreamReader(reso.openStream());
+		while ((c = reader.read()) != -1) {
+		    ps.write((char)c);
+		}
+		reader.close();
+	    }
 	
             // Write database entrie; entries will be sorted as they
             // appear on the screen.
@@ -243,11 +254,32 @@ public class FileActions
 				     prefs.getBoolean("secDescending"),
 				     prefs.getBoolean("terDescending"), 
 				     pri, sec, ter));	   
+
+
 	    for (int i=0; i<sorter.getEntryCount(); i++) {
+
+
+		reso = JabRefFrame.class.getResource
+		    (Globals.LAYOUT_PREFIX+lfName+".layout");
+		reader = new InputStreamReader(reso.openStream());
+		LayoutHelper layoutHelper = new LayoutHelper(reader);
+		Layout layout = layoutHelper.getLayoutFromText();
+
 		key = (String)sorter.getIdAt(i);
 		BibtexEntry entry = database.getEntryById(key);
 		//System.out.println(layout.doLayout(entry));
 		ps.println(layout.doLayout(entry));
+	    }
+
+	    // Print footer
+	    reso = JabRefFrame.class.getResource
+		(Globals.LAYOUT_PREFIX+lfName+".end.layout");
+	    if (reso != null) {
+		reader = new InputStreamReader(reso.openStream());
+		while ((c = reader.read()) != -1) {
+		    ps.write((char)c);
+		}
+		reader.close();
 	    }
 	}
 	catch (IOException ex) {
