@@ -64,16 +64,24 @@ public class RightClickMenu extends JPopupMenu
 		}
 	    });
 
-	for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
-	     i.hasNext();) {
-	    typeMenu.add(new ChangeTypeAction
-			 (BibtexEntryType.getType((String)i.next())));
-	}
-
+	populateTypeMenu();
 	add(typeMenu);
 	addSeparator();
 	add(groupMenu);
 	add(groupRemoveMenu);
+    }
+
+    /**
+     * Remove all types from the menu. Then cycle through all available
+     * types, and add them.
+     */
+    public void populateTypeMenu() {
+	typeMenu.removeAll();
+	for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+	     i.hasNext();) {
+	    typeMenu.add(new ChangeTypeAction
+	    		 (BibtexEntryType.getType((String)i.next())));
+	}
     }
 
     /**

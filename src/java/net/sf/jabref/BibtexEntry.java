@@ -135,6 +135,26 @@ public class BibtexEntry
     }
     
     /**
+     * Prompts the entry to call BibtexEntryType.getType(String) with 
+     * its current type name as argument, and sets its type according
+     * to what is returned. This method is called when a user changes 
+     * the type customization, to make sure all entries are set with
+     * current types.
+     * @return true if the entry could find a type, false if not (in
+     * this case the type will have been set to
+     * BibtexEntryType.TYPELESS).
+     */
+    public boolean updateType() {
+	BibtexEntryType newType = BibtexEntryType.getType(_type.getName());
+	if (newType != null) {
+	    _type = newType;
+	    return true;
+	}
+	_type = BibtexEntryType.TYPELESS;
+	return false;
+    }
+
+    /**
      * Sets this entry's ID, provided the database containing it
      * doesn't veto the change.
      */

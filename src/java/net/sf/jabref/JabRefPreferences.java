@@ -372,7 +372,7 @@ public class JabRefPreferences {
 	if (name == null)
 	    return null;
 	else return new CustomEntryType
-	    (name, req, opt);
+	    (Util.nCase(name), req, opt);
 	     
 
     }

@@ -246,24 +246,31 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    optFields = entry.getOptionalFields(),
 //        genFields = new String[] {"crossref", "url", "abstract", "comment"}; // May change...
 	    genFields = entry.getGeneralFields() ; 
+
+	if (reqFields == null) reqFields = new String[0];
+	if (optFields == null) optFields = new String[0];
+	if (genFields == null) genFields = new String[0];
 	
 	int iter, rmax, omax, gmax;
 	
+	rmax = reqFields.length;
+	omax = optFields.length;
 	gmax = genFields.length;
+	iter = Math.max(rmax, Math.max(omax, gmax));
 	
-	if (reqFields == null) {
-	    iter = optFields.length;
+	/*if (reqFields == null) {
+	    iter = Math.max(optFields.length, genFields.length);
 	    rmax = 0;
 	    omax = optFields.length;
 	} else if (optFields == null) {
-	    iter = reqFields.length;
+	    iter = Math.max(reqFields.length, genFields.length);
 	    rmax = reqFields.length;
 	    omax = 0;
 	} else {
 	    iter = Math.max(reqFields.length, optFields.length);
 	    rmax = reqFields.length;
 	    omax = optFields.length;
-	}
+	    }*/
 	FieldTextArea ta1 = null, ta2 = null, ta3 = null, firstR = null, firstO = null;
 	String stringContent;
 	Object content;
@@ -276,6 +283,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.BOTH;
 	FieldTextArea firstReq = null, firstOpt = null, firstGen = null;
+
 	for (int i=0; i<iter; i++) {
 
 	    // Constraints for the labels.
@@ -300,6 +308,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    req.setActive(ta1);
 		}
 	    }
+
 	    if (i<omax) {
 		if ((content = entry.getField(optFields[i])) != null) {
 		    stringContent = content.toString();
@@ -317,6 +326,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    opt.setActive(ta2);
 		}
 	    }
+
 	    if (i<gmax) {
 		if ((content = entry.getField(genFields[i])) != null) {
 		    stringContent = content.toString();
@@ -339,6 +349,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    gen.setActive(ta3);
 		}
 	    }
+
 	    if (i<rmax) {
 		gbl.setConstraints(ta1.getLabel(),con);
 		req.add(ta1.getLabel());

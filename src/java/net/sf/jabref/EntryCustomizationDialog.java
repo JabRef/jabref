@@ -52,9 +52,11 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     HelpAction help;
 
     GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-	
+    GridBagConstraints con = new GridBagConstraints();	
     JPanel buttonPanel = new JPanel();
+
+    JabRefFrame parent;
+
     public EntryCustomizationDialog(JabRefFrame parent)
     {
 	//Type=Article, Book etc
@@ -62,6 +64,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	// create 10 default entries
 	// return an array
 	super(parent,Globals.lang("Customize entry types"),true);
+	this.parent = parent;
 	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
 			      "Help", GUIGlobals.helpSmallIconFile);
 	setTypeSelection();
@@ -177,13 +180,13 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 
 	if(! typeName.equals("")) {
 	    CustomEntryType typ = new CustomEntryType
-		(typeName.toLowerCase(), reqStr, optStr);
-	    BibtexEntryType.ALL_TYPES.put(typ.getName(), typ);
-
+		(Util.nCase(typeName), reqStr, optStr);
+	    BibtexEntryType.ALL_TYPES.put(typeName.toLowerCase(), typ);
+	    updateTypesForEntries(typ.getName());
 	    setTypeSelection();
-	    messageLabel.setText(Globals.lang("Stored definition for type"+
-					      " '"+Util.nCase(typ.getName())
-					      +"'."));
+	    messageLabel.setText(Globals.lang("Stored definition for type")+
+				 " '"+Util.nCase(typ.getName())
+				 +"'.");
 	}
 	else{ 				
 	    messageLabel.setText(Globals.lang("You must fill in a name for the entry type."));
@@ -236,11 +239,56 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 			messageLabel.setText("'"+type.getName()+"' "+
 					     Globals.lang("is a standard type."));
 		    else {
-			BibtexEntryType.removeType(name.getText());
-			setTypeSelection();			
+			String nm = name.getText();
+			if (BibtexEntryType.getStandardType(nm) == null) {
+			    int reply = JOptionPane.showConfirmDialog
+				(parent, Globals.lang("All entries of this "
+						      +"type will be declared "
+						      +"typeless. Continue?"),
+				 Globals.lang("Delete custom format")+
+				 " '"+Util.nCase(nm)+"'", JOptionPane.YES_NO_OPTION,
+				 JOptionPane.WARNING_MESSAGE);
+			    if (reply != JOptionPane.YES_OPTION)
+				return;
+			}
+			BibtexEntryType.removeType(nm);
+			setTypeSelection();
+			updateTypesForEntries(Util.nCase(nm));
+			messageLabel.setText
+			    (Globals.lang("Removed entry type."));
 		    }
 		}
 	    });
+    }
+
+    /**
+     * Cycle through all databases, and make sure everything is updated with
+     * the new type customization. This includes making sure all entries have
+     * a valid type, that no obsolete entry editors are around, and that
+     * the right-click menus' change type menu is up-to-date.
+     */
+    private void updateTypesForEntries(String typeName) {
+	if (parent.tabbedPane.getTabCount() == 0)
+	    return;
+	messageLabel.setText(Globals.lang("Updating entries..."));
+	BibtexDatabase base;
+	Iterator iter;
+	for (int i=0; i<parent.tabbedPane.getTabCount(); i++) {
+	    BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(i);
+	    boolean anyChanges = false;
+	    bp.entryEditors.remove(typeName);
+	    bp.rcm.populateTypeMenu(); // Update type menu for change type.
+	    base = bp.database;  
+	    iter = base.getKeySet().iterator();
+	    while (iter.hasNext()) {
+		anyChanges = anyChanges |
+		    !(base.getEntryById((String)iter.next())).updateType();
+	    }
+	    if (anyChanges) {
+		bp.refreshTable();
+		bp.markBaseChanged();
+	    }
+	}
     }
 
     public void itemStateChanged(ItemEvent e) {

@@ -413,9 +413,19 @@ public class JabRefFrame extends JFrame {
 	}    
 
 	public void actionPerformed(ActionEvent e) {
+	    String thisType = type;
+	    if (thisType == null) {
+		EntryTypeDialog etd = new EntryTypeDialog(ths);
+		Util.placeDialog(etd, ths);
+		etd.show();
+		BibtexEntryType tp = etd.getChoice();
+		if (tp == null) return;
+		thisType = tp.getName();
+	    }
+
 	    if (tabbedPane.getTabCount() > 0)
 		((BasePanel)(tabbedPane.getSelectedComponent()))
-		    .newEntry(BibtexEntryType.getType(type));
+		    .newEntry(BibtexEntryType.getType(thisType));
 	    else
 		Util.pr("Action 'New entry' must be disabled when no "
 			+"database is open.");	    

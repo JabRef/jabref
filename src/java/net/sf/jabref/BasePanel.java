@@ -69,6 +69,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
     EntryTableModel tableModel = null;
     EntryTable entryTable = null;
     SearchManager2 searchManager;
+    RightClickMenu rcm;
 
     BibtexEntry showing = null;
     // To indicate which entry is currently shown.
@@ -650,7 +651,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 
 	// Set the right-click menu for the entry table.
-	RightClickMenu rcm = new RightClickMenu(this, metaData);
+	rcm = new RightClickMenu(this, metaData);
 	entryTable.setRightClickMenu(rcm);
 	int pos = splitPane.getDividerLocation();
 	splitPane.setTopComponent(entryTable.getPane());

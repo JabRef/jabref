@@ -579,6 +579,39 @@ public abstract class BibtexEntryType implements Comparable
             }
         };
 
+    /**
+     * This type is provided as an emergency choice if the user makes
+     * customization changes that remove the type of an entry.
+     */
+    public static final BibtexEntryType TYPELESS =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Typeless";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return null;
+            }
+
+            public String[] getRequiredFields()
+            {
+                return null;
+            }
+
+            public String describeRequiredFields()
+            {
+                return "None";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry)
+            {
+		return false;
+           }
+        };
+
 
     public abstract String getName();
 
@@ -646,11 +679,24 @@ public abstract class BibtexEntryType implements Comparable
     }
 
     /**
-     * This method returns the BibtexEntryType for the name of a type.
+     * This method returns the BibtexEntryType for the name of a type,
+     * or null if it does not exist.
      */
     public static BibtexEntryType getType(String name) {
-	//Util.pr(name);
+	//Util.pr("'"+name+"'");
 	Object o = ALL_TYPES.get(name.toLowerCase());
+	if (o == null)
+	    return null;
+	else return (BibtexEntryType)o;
+    }
+
+    /**
+     * This method returns the standard BibtexEntryType for the 
+     * name of a type, or null if it does not exist.
+     */
+    public static BibtexEntryType getStandardType(String name) {
+	//Util.pr("'"+name+"'");
+	Object o = STANDARD_TYPES.get(name.toLowerCase());
 	if (o == null)
 	    return null;
 	else return (BibtexEntryType)o;
@@ -682,8 +728,7 @@ public abstract class BibtexEntryType implements Comparable
 	int number = 0;
 	CustomEntryType type;
 	while ((type = prefs.getCustomEntryType(number)) != null) {
-	    //	    Util.pr(type.getName());
-	    ALL_TYPES.put(type.getName(), type);
+	    ALL_TYPES.put(type.getName().toLowerCase(), type);
 	    number++;
 	}
     }
