@@ -27,9 +27,6 @@ import net.sf.jabref.HelpAction;
 
 public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionListener {
 
-    //SidePaneHeader header = 
-	//new SidePaneHeader("Fetch CiteSeer", GUIGlobals.wwwCiteSeerIcon, this);
-    BasePanel panel;
     String idList;
     JTextField tf = new JTextField();
     JPanel pan = new JPanel();
@@ -43,10 +40,10 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     HelpAction help;
     CiteSeerFetcherPanel ths = this;
 
-    public CiteSeerFetcherPanel(BasePanel panel_, SidePaneManager p0, final CiteSeerFetcher fetcher) {
+    public CiteSeerFetcherPanel(SidePaneManager p0, final CiteSeerFetcher fetcher) {
 	super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
-	panel = panel_;
-	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
+
+	help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
 	this.citeSeerFetcher = fetcher;
 	helpBut.addActionListener(help);
 	helpBut.setMargin(new Insets(0,0,0,0));        

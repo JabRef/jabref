@@ -54,12 +54,12 @@ public class GroupSelector extends SidePaneComponent implements
     Color bgColor = Color.white;
     JTree groupsTree;
     DefaultTreeModel groupsTreeModel;
-    final GroupTreeNode groupsRoot;
+    GroupTreeNode groupsRoot;
     JScrollPane sp;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JabRefFrame frame;
-    BasePanel panel;
+
     String searchField;
     JPopupMenu groupsContextMenu = new JPopupMenu();
     JPopupMenu settings = new JPopupMenu();
@@ -91,7 +91,7 @@ public class GroupSelector extends SidePaneComponent implements
     JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
             reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
     SidePaneManager manager;
-    JabRefPreferences prefs;
+
 
     /**
      * The first element for each group defines which field to use for the
@@ -100,68 +100,65 @@ public class GroupSelector extends SidePaneComponent implements
      * @param groupData
      *            The group meta data in raw format.
      */
-    public GroupSelector(JabRefFrame frame, BasePanel panel,
-            GroupTreeNode groupsRoot, SidePaneManager manager,
-            JabRefPreferences prefs) {
+    public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, GUIGlobals.groupsIconFile, Globals.lang("Groups"));
-        this.prefs = prefs;
-        this.groupsRoot = groupsRoot;
-        final JabRefPreferences _prefs = prefs;
-        final BasePanel basePanel = panel;
+        this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
+        //this.groupsRoot = groupsRoot;
+
         this.manager = manager;
         this.frame = frame;
         this.panel = panel;
         hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
-                !prefs.getBoolean("grayOutNonHits"));
+                !Globals.prefs.getBoolean("grayOutNonHits"));
         grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
-                prefs.getBoolean("grayOutNonHits"));
+                Globals.prefs.getBoolean("grayOutNonHits"));
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
         floatCb.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
+                Globals.prefs.putBoolean("groupFloatSelections", floatCb.isSelected());
             }
         });
         andCb.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupIntersectSelections", andCb
+                Globals.prefs.putBoolean("groupIntersectSelections", andCb
                         .isSelected());
             }
         });
         invCb.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupInvertSelections", invCb.isSelected());
+                Globals.prefs.putBoolean("groupInvertSelections", invCb.isSelected());
             }
         });
         select.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupSelectMatches", select.isSelected());
+                Globals.prefs.putBoolean("groupSelectMatches", select.isSelected());
             }
         });
         grayOut.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
+                Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
             }
         });
         groupModeIndependent.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupSubgroupIndependent", groupModeIndependent.isSelected());
+                Globals.prefs.putBoolean("groupSubgroupIndependent", groupModeIndependent.isSelected());
             }
         });
         groupModeIntersection.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                _prefs.putBoolean("groupSubgroupIntersection", groupModeIntersection.isSelected());
+                Globals.prefs.putBoolean("groupSubgroupIntersection", groupModeIntersection.isSelected());
             }
         });
         
-        if (prefs.getBoolean("groupFloatSelections")) {
+        if (Globals.prefs.getBoolean("groupFloatSelections")) {
             floatCb.setSelected(true);
             highlCb.setSelected(false);
         } else {
             highlCb.setSelected(true);
             floatCb.setSelected(false);
         }
-        if (prefs.getBoolean("groupIntersectSelections")) {
+        if (Globals.prefs.getBoolean("groupIntersectSelections")) {
             andCb.setSelected(true);
             orCb.setSelected(false);
         } else {
@@ -170,13 +167,13 @@ public class GroupSelector extends SidePaneComponent implements
         }
         //defaults.put("groupSubgroupIndependent", Boolean.FALSE);
         //defaults.put("groupSubgroupIntersection", Boolean.TRUE);
-        if (prefs.getBoolean("groupSubgroupIndependent")) {
+        if (Globals.prefs.getBoolean("groupSubgroupIndependent")) {
             groupModeIndependent.setSelected(true);
             groupModeIntersection.setSelected(false);
             groupModeUnion.setSelected(false);
         } else {
             groupModeIndependent.setSelected(false);
-            if (prefs.getBoolean("groupSubgroupIntersection")) {
+            if (Globals.prefs.getBoolean("groupSubgroupIntersection")) {
                 groupModeIntersection.setSelected(true);
                 groupModeUnion.setSelected(false);
             } else {
@@ -186,8 +183,8 @@ public class GroupSelector extends SidePaneComponent implements
                 
         }
         
-        invCb.setSelected(prefs.getBoolean("groupInvertSelections"));
-        select.setSelected(prefs.getBoolean("groupSelectMatches"));
+        invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
+        select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(groupModeUnion);
         settings.add(groupModeIntersection);
@@ -221,18 +218,18 @@ public class GroupSelector extends SidePaneComponent implements
         });
         expand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int i = _prefs.getInt("groupsVisibleRows") + 1;
+                int i = Globals.prefs.getInt("groupsVisibleRows") + 1;
                 groupsTree.setVisibleRowCount(i);
                 groupsTree.revalidate();
                 groupsTree.repaint();
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
-                _prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt("groupsVisibleRows", i);
             }
         });
         reduce.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int i = _prefs.getInt("groupsVisibleRows") - 1;
+                int i = Globals.prefs.getInt("groupsVisibleRows") - 1;
                 if (i < 1)
                     i = 1;
                 groupsTree.setVisibleRowCount(i);
@@ -241,7 +238,7 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 // _panel.sidePaneManager.revalidate();
                 GroupSelector.this.repaint();
-                _prefs.putInt("groupsVisibleRows", i);
+                Globals.prefs.putInt("groupsVisibleRows", i);
             }
         });
         Dimension butDim = new Dimension(20, 20);
@@ -344,7 +341,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.setShowsRootHandles(false);
         // groupsTree.setPrototypeCellValue("Suitable length");
         // // The line above decides on the list's preferred width.
-        groupsTree.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
+        groupsTree.setVisibleRowCount(Globals.prefs.getInt("groupsVisibleRows"));
         groupsTree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
@@ -547,7 +544,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         } else if (e.getSource() == autoGroup) {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
-                    GroupSelector.this, groupsRoot, prefs
+                    GroupSelector.this, groupsRoot, Globals.prefs
                             .get("groupsDefaultField"), " .,", ",");
             gd.show();
             // gd does the operation itself
@@ -854,5 +851,20 @@ public class GroupSelector extends SidePaneComponent implements
     private Enumeration getExpandedPaths() {
         return groupsTree.getExpandedDescendants(
                 new TreePath(groupsRoot.getPath()));
+    }
+
+    public void setActiveBasePanel(BasePanel panel) {
+        super.setActiveBasePanel(panel);    //To change body of overridden methods use File | Settings | File Templates.
+
+        MetaData metaData = panel.metaData();
+        if (metaData.getGroups() != null) {
+            setGroups(metaData.getGroups());
+        }
+        else {
+            GroupTreeNode groupsRoot = new GroupTreeNode(new AllEntriesGroup());
+            metaData.setGroups(groupsRoot);
+            setGroups(groupsRoot); 
+         }
+        validateTree();
     }
 }

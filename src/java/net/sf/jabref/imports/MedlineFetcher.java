@@ -36,7 +36,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	public int retmax;
 	public int retstart;
 	public String ids = "";
-
+    public ArrayList idList = new ArrayList();
 	public SearchResult()
 	    {
 		count = 0;
@@ -45,7 +45,9 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    }
 
 	public void addID(String id)
-	    {
+        {
+
+        idList.add(id);
 		if(ids!="")
 		    ids += ","+id;
 		else
@@ -54,9 +56,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     }
     final int PACING = 20;
     final int MAX_TO_FETCH = 10;
-    //SidePaneHeader header = 
-	//new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
-    BasePanel panel;
+
     String idList;
     JTextField tf = new JTextField();
     JPanel pan = new JPanel();
@@ -69,10 +69,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
     HelpAction help;
     
-    public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
+    public MedlineFetcher(SidePaneManager p0) {
 	super(p0, GUIGlobals.fetchMedlineIcon, Globals.lang("Fetch Medline"));
-	panel = panel_;
-	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
+
+	help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
 	helpBut.addActionListener(help);
 	helpBut.setMargin(new Insets(0,0,0,0));        
 	//tf.setMinimumSize(new Dimension(1,1));
@@ -251,7 +251,13 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    for (int jj = 0; jj < count; jj+=PACING) {
 		// get the ids from entrez
 		result = getIds(searchTerm,jj,PACING);
-		//System.out.println("fetching: " + result.ids); 
+
+        String[] test = getTitles((String[])result.idList.toArray(new String[0]));
+        for (int pelle=0; pelle<test.length; pelle++) {
+            System.out.println(": "+test[pelle]);
+        }
+
+		//System.out.println("fetching: " + result.ids);
 		ArrayList bibs = fetchMedline(result.ids);
 		if ((bibs != null) && (bibs.size() > 0)) {
 		    tf.setText("");
@@ -324,6 +330,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
                  ( ncbi.openStream()));
             String inLine;
             while ((inLine=in.readLine())!=null){
+
 		// get the count
 		idMatcher=idPattern.matcher(inLine);
 		if (idMatcher.find()){
@@ -381,8 +388,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		 ( ncbi.openStream()));
 	    String inLine;
 	    while ((inLine=in.readLine())!=null){
+
 		sb.append(inLine);
 	    }
+
 	}
 	catch (MalformedURLException e) {     // new URL() failed
 	    System.out.println("bad url");
@@ -405,6 +414,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	matcher=articleTitle.matcher(sb);
 	if (matcher.find())
 	    result.append("Title: "+matcher.group(1));
+
 	//matcher=authorName.matcher(sb);
 	//while (matcher.find())
 	//   result.append("\tAuthor: "+matcher.group(1));

@@ -52,7 +52,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
   boolean tmp = true;
 
-    UIFSplitPane contentPane = new UIFSplitPane();
+    //UIFSplitPane contentPane = new UIFSplitPane();
     BasePanel ths = this;
     JSplitPane splitPane;
     //BibtexEntry testE = new BibtexEntry("tt");
@@ -93,13 +93,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     EntryTableModel tableModel = null;
     public EntryTable entryTable = null;
 
-    // The sidepane manager takes care of populating the sidepane.
-    public SidePaneManager sidePaneManager;
 
-    SearchManager2 searchManager;
-    MedlineFetcher medlineFetcher;
-    CiteSeerFetcher citeSeerFetcher;
-    CiteSeerFetcherPanel citeSeerFetcherPanel;
+
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -123,7 +118,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * SidePaneManager if necessary, or from this class if merging groups from a
      * different database.
      */
-    GroupSelector groupSelector;
+    //GroupSelector groupSelector;
 
     boolean sortingBySearchResults = false,
         coloringBySearchResults = false,
@@ -144,9 +139,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private boolean suppressOutput = false;
 
     private HashMap actions = new HashMap();
+    private SidePaneManager sidePaneManager;
 
     public BasePanel(JabRefFrame frame, JabRefPreferences prefs) {
 	//super(JSplitPane.HORIZONTAL_SPLIT, true);
+      this.sidePaneManager = Globals.sidePaneManager;
       database = new BibtexDatabase();
       metaData = new MetaData();
       this.frame = frame;
@@ -158,6 +155,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      HashMap meta, JabRefPreferences prefs) {
 	//super(JSplitPane.HORIZONTAL_SPLIT, true);
+        this.sidePaneManager = Globals.sidePaneManager;
       this.frame = frame;
       database = db;
       this.prefs = prefs;
@@ -771,7 +769,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     //boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(true);
                     if (true)
-                      searchManager.startSearch();
+                      frame.searchManager.startSearch();
                 }
             });
 
@@ -782,7 +780,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(on);
                     if (on)
-                      searchManager.startSearch();
+                      frame.searchManager.startSearch();
                 }
             });
 
@@ -790,7 +788,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() {
                     sidePaneManager.ensureVisible("search");
                     frame.searchToggle.setSelected(true);
-                    searchManager.startIncrementalSearch();
+                    frame.searchManager.startIncrementalSearch();
                 }
             });
 
@@ -949,9 +947,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // groupsSelector is always created, even when no groups
                         // have been defined. therefore, no check for null is
                         // required here
-                        groupSelector.addGroups(newGroups, ce);
+                        frame.groupSelector.addGroups(newGroups, ce);
                         // JZTODO: this should handle ExplicitGroups!!!
-                        groupSelector.revalidateGroups();
+                        frame.groupSelector.revalidateGroups();
                       }
                     }
 
@@ -1598,7 +1596,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 public void keyPressed(KeyEvent e) {
                 	final int keyCode = e.getKeyCode();
-                    final TreePath path = groupSelector.getSelectionPath();
+                    final TreePath path = frame.groupSelector.getSelectionPath();
                     final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
                     
                 	if (e.isControlDown()) {
@@ -1606,22 +1604,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 		case KeyEvent.VK_UP:
                             e.consume();
                             if (node != null)
-                                groupSelector.moveNodeUp(node);
+                                frame.groupSelector.moveNodeUp(node);
                 			break;
                 		case KeyEvent.VK_DOWN:
                             e.consume();
                             if (node != null)
-                                groupSelector.moveNodeDown(node);
+                                frame.groupSelector.moveNodeDown(node);
                 			break;
                 		case KeyEvent.VK_LEFT:
                             e.consume();
                             if (node != null)
-                                groupSelector.moveNodeLeft(node);
+                                frame.groupSelector.moveNodeLeft(node);
                 			break;
                 		case KeyEvent.VK_RIGHT:
                             e.consume();
                             if (node != null)
-                                groupSelector.moveNodeRight(node);
+                                frame.groupSelector.moveNodeRight(node);
                 			break;
                 		}
                 	} else if (keyCode == KeyEvent.VK_ENTER){
@@ -1699,28 +1697,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         else
             showEntry(showing);
 
-        sidePaneManager = new SidePaneManager
-            (frame, this, prefs, metaData);
-        medlineFetcher = new MedlineFetcher(this, sidePaneManager);
-        citeSeerFetcher = new CiteSeerFetcher(this, sidePaneManager);
-        citeSeerFetcherPanel = new CiteSeerFetcherPanel(this, sidePaneManager, citeSeerFetcher);
-
-        sidePaneManager.register("fetchMedline", medlineFetcher);
-        //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
-        //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
-        searchManager = new SearchManager2(frame, prefs, sidePaneManager);
-        sidePaneManager.add("search", searchManager);
-        sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
-        sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
-        sidePaneManager.populatePanel();
-        contentPane.setBorder(null);
+	/*        contentPane.setBorder(null);
         contentPane.setDividerLocation(-1);
         contentPane.setLeftComponent(sidePaneManager.getPanel());
         contentPane.setRightComponent(splitPane);
         contentPane.setDividerBorderVisible(false);
-        contentPane.setDividerSize(2);
+        contentPane.setDividerSize(2);*/
         setLayout(new BorderLayout());
-        add(contentPane, BorderLayout.CENTER);
+	add(splitPane, BorderLayout.CENTER);
+        //add(contentPane, BorderLayout.CENTER);
+
         //add(sidePaneManager.getPanel(), BorderLayout.WEST);
         //add(splitPane, BorderLayout.CENTER);
         
@@ -1739,7 +1725,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
     
     public void setDivider() {
-        contentPane.setDividerLocation(-1);
+        //contentPane.setDividerLocation(-1);
     }
 
     /**
@@ -2405,6 +2391,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
   }
   
   public GroupSelector getGroupSelector() {
-      return groupSelector;
+      return frame.groupSelector;
   }
 }

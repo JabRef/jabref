@@ -38,10 +38,11 @@ public class SidePaneComponent extends SimpleInternalFrame {
     protected JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
     protected boolean visible = false;
     protected SidePaneManager manager;
+    protected BasePanel panel = null;
 
     public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
         super(new ImageIcon(icon), title);
-	this.manager = manager;
+	    this.manager = manager;
         setSelected(true);
         JToolBar tlb = new JToolBar();
         close.setMargin(new Insets(0,0,0,0));
@@ -75,6 +76,10 @@ public class SidePaneComponent extends SimpleInternalFrame {
      */
     boolean hasVisibility() {
 	return visible;
+    }
+
+    public void setActiveBasePanel(BasePanel panel) {
+        this.panel = panel;
     }
 
     /**

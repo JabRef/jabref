@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
-<record>
-  <date>2005-03-06T22:01:14</date>
-  <millis>1110142874250</millis>
-  <sequence>0</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Unable to create graphical interface"</message>
-</record>
 </log>

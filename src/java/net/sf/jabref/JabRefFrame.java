@@ -68,7 +68,10 @@ import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
 import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
-
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.AllEntriesGroup;
+import net.sf.jabref.groups.GroupSelector;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * The main window of the application.
@@ -77,11 +80,16 @@ public class JabRefFrame
     extends JFrame {
 
   JabRefFrame ths = this;
+    UIFSplitPane contentPane = new UIFSplitPane();
+
   JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
     PrefsDialog3 prefsDialog = null;
   private int lastTabbedPanelSelectionIndex = -1 ;
 
-  JTabbedPane tabbedPane = new JTabbedPane();
+    // The sidepane manager takes care of populating the sidepane.
+    public SidePaneManager sidePaneManager;
+
+    JTabbedPane tabbedPane = new JTabbedPane();
   final Insets marg = new Insets(0,0,0,0);
   class ToolBar extends JToolBar {
     void addAction(Action a) {
@@ -288,6 +296,12 @@ public class JabRefFrame
           prefs.getKey(")),*/
 
 
+    MedlineFetcher medlineFetcher;
+    CiteSeerFetcher citeSeerFetcher;
+    CiteSeerFetcherPanel citeSeerFetcherPanel;
+    SearchManager2 searchManager;
+    GroupSelector groupSelector;
+
   // The menus for importing/appending other formats
   JMenu importMenu = subMenu("Import and append"),
       importNewMenu = subMenu("Import"),
@@ -341,6 +355,41 @@ public class JabRefFrame
 
     initLabelMaker();
 
+    sidePaneManager = new SidePaneManager(this);
+    
+    Globals.sidePaneManager = this.sidePaneManager;
+    Globals.helpDiag = this.helpDiag;
+
+    medlineFetcher = new MedlineFetcher(sidePaneManager);
+    citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
+    citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager, (CiteSeerFetcher)citeSeerFetcher);
+    searchManager = new SearchManager2(sidePaneManager);
+      // Groups
+      /*if (metaData.getGroups() != null) {
+          panel.groupSelector = new GroupSelector(frame, panel, metaData
+                  .getGroups(), this, prefs);
+          register("groups", panel.groupSelector);
+          if (prefs.getBoolean("groupSelectorVisible"))
+              ensureVisible("groups");
+      } else*/
+      {
+
+          groupSelector = new GroupSelector(this, sidePaneManager);
+          sidePaneManager.register("groups", groupSelector);
+      }
+
+
+    sidePaneManager.register("fetchMedline", medlineFetcher);
+    //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
+    //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
+
+    sidePaneManager.add("search", searchManager);
+    sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
+    sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
+    sidePaneManager.populatePanel();
+
+
+
     setupLayout();
     setSize(new Dimension(prefs.getInt("sizeX"),
                           prefs.getInt("sizeY")));
@@ -359,8 +408,8 @@ public class JabRefFrame
 
         BasePanel bp = basePanel();
         if (bp != null) {
-          groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));
-          searchToggle.setSelected(bp.sidePaneManager.isPanelVisible("search"));
+          groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
+          searchToggle.setSelected(sidePaneManager.isPanelVisible("search"));
           previewToggle.setSelected(bp.previewEnabled);
           Globals.focusListener.setFocused(bp.entryTable);
           new FocusRequester(bp.entryTable);
@@ -507,7 +556,7 @@ public JabRefPreferences prefs() {
       // Let the search interface store changes to prefs.
       // But which one? Let's use the one that is visible.
       if (basePanel() != null) {
-        basePanel().searchManager.updatePrefs();
+        ((SearchManager2)searchManager).updatePrefs();
 
       }
       System.exit(0); // End program.
@@ -563,6 +612,7 @@ public JabRefPreferences prefs() {
     fillMenu();
     createToolBar();
     getContentPane().setLayout(gbl);
+      contentPane.setDividerSize(1);
     //getContentPane().setBackground(GUIGlobals.lightGray);
     con.fill = GridBagConstraints.HORIZONTAL;
     con.anchor = GridBagConstraints.WEST;
@@ -604,8 +654,12 @@ public JabRefPreferences prefs() {
     //tabbedPane.setVisible(false);
     //tabbedPane.setForeground(GUIGlobals.lightGray);
     con.weighty = 1;
-    gbl.setConstraints(tabbedPane, con);
-    getContentPane().add(tabbedPane);
+    gbl.setConstraints(contentPane, con);
+    getContentPane().add(contentPane);
+    contentPane.setRightComponent(tabbedPane);
+    contentPane.setLeftComponent(sidePaneManager.getPanel());
+    //gbl.setConstraints(tabbedPane, con);
+    //getContentPane().add(tabbedPane);
 
     JPanel status = new JPanel();
     status.setLayout(gbl);
@@ -1448,7 +1502,7 @@ class ImportCiteSeerAction
 
         public void actionPerformed(ActionEvent e) {
 
-                if(basePanel().citeSeerFetcher.activateImportFetcher()) {
+                if(citeSeerFetcher.activateImportFetcher()) {
 
 
                         (new Thread() {
@@ -1466,7 +1520,7 @@ class ImportCiteSeerAction
                                         }
 
                                         public void run() {
-                                            currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+                                            citeSeerFetcher.endImportCiteSeerProgress();
                                             if (changesMade)
                                                     currentBp.markBaseChanged();
                                                 currentBp.refreshTable();
@@ -1491,10 +1545,10 @@ class ImportCiteSeerAction
                                         }
                                         toShow = currentBp.database().getEntryById(currentBp.getTableModel().getNameFromNumber(clickedOn[0]));
                                         if (clickedOn != null) {
-                                                basePanel().citeSeerFetcher.beginImportCiteSeerProgress();
+                                                citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =
                                                         new NamedCompound("CiteSeer Import Fields");
-                                                boolean newValues = basePanel().citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);
+                                                boolean newValues = citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);
                                                 if (newValues) {
                                                         citeseerNamedCompound.end();
                                                         currentBp.undoManager.addEdit(citeseerNamedCompound);
@@ -1502,7 +1556,7 @@ class ImportCiteSeerAction
                                                 UpdateComponent updateComponent = new UpdateComponent(newValues);
                                                 SwingUtilities.invokeLater(updateComponent);
                                         }
-                                        basePanel().citeSeerFetcher.deactivateImportFetcher();
+                                        citeSeerFetcher.deactivateImportFetcher();
                             }
                         }).start();
                 } else {
@@ -1528,8 +1582,8 @@ class FetchCiteSeerAction
 
                 public void actionPerformed(ActionEvent e) {
 
-                        if(basePanel().citeSeerFetcher.activateCitationFetcher()) {
-                                basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");
+                        if(citeSeerFetcher.activateCitationFetcher()) {
+                                sidePaneManager.ensureVisible("CiteSeerProgress");
                                 (new Thread() {
                                         BasePanel newBp;
                                         BasePanel targetBp;
@@ -1552,7 +1606,7 @@ class FetchCiteSeerAction
                                                         tabbedPane.setSelectedComponent(newBp);
                                                         newBp.refreshTable();
                                                         output(Globals.lang("Fetched all citations from target database."));
-                                                        targetBp.citeSeerFetcher.deactivateCitationFetcher();
+                                                        citeSeerFetcher.deactivateCitationFetcher();
                                                 }
                                         };
 
@@ -1563,13 +1617,13 @@ class FetchCiteSeerAction
                                                 targetBp = (BasePanel) tabbedPane.getSelectedComponent();
                                                 newDatabase = newBp.getDatabase();
                                                 targetDatabase = targetBp.getDatabase();
-                                                errorCode = basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
+                                                errorCode = citeSeerFetcher.populate(newDatabase, targetDatabase);
                                                 if (newDatabase.getEntryCount() > 0) {
                                                         SwingUtilities.invokeLater(updateComponent);
                                                 } else if(errorCode == 0) {
-                                                        SwingUtilities.invokeLater(basePanel().citeSeerFetcher.getEmptyFetchSetDialog());
+                                                        SwingUtilities.invokeLater(citeSeerFetcher.getEmptyFetchSetDialog());
                                             } else {
-                                                    targetBp.citeSeerFetcher.deactivateCitationFetcher();
+                                                    citeSeerFetcher.deactivateCitationFetcher();
                                             }
                                         }
                                         catch (Exception ex) {
@@ -1668,9 +1722,9 @@ class FetchCiteSeerAction
       if (tabbedPane.getTabCount() > 0) {
         //for (int i = 0; i < tabbedPane.getTabCount(); i++) {
         //  ( (BasePanel) tabbedPane.getComponentAt(i)).sidePaneManager.
-        basePanel().sidePaneManager.togglePanel("fetchMedline");// ensureVisible("fetchMedline");
-        if (basePanel().sidePaneManager.isPanelVisible("fetchMedline"))
-          new FocusRequester(basePanel().medlineFetcher.getTextField());
+        sidePaneManager.togglePanel("fetchMedline");// ensureVisible("fetchMedline");
+        if (sidePaneManager.isPanelVisible("fetchMedline"))
+          new FocusRequester(medlineFetcher.getTextField());
         //}
       }
     }
@@ -1688,9 +1742,9 @@ class FetchCiteSeerAction
 
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
-	  basePanel().sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
-	  if (basePanel().sidePaneManager.isPanelVisible("CiteSeerPanel"))
-          new FocusRequester(basePanel().medlineFetcher.getTextField());
+	  sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
+	  if (sidePaneManager.isPanelVisible("CiteSeerPanel"))
+          new FocusRequester(medlineFetcher.getTextField());
         //}
       }
     }

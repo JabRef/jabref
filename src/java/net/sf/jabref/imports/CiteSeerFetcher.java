@@ -58,16 +58,15 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	boolean citationFetcherActive;
 	boolean importFetcherActive;
 
-	BasePanel panel;
 	JProgressBar progressBar, progressBar2;
 	JLabel citeSeerProgress;
 	GridBagLayout gbl = new GridBagLayout();
 	GridBagConstraints con = new GridBagConstraints();
 	SidePaneManager sidePaneManager;
 
-	public CiteSeerFetcher(BasePanel panel_, SidePaneManager p0)  {
+	public CiteSeerFetcher(SidePaneManager p0)  {
 		super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("CiteSeer Transfer"));
-		panel = panel_;
+
 		sidePaneManager = p0;
 		progressBar = new JProgressBar();
 		progressBar2 = new JProgressBar();

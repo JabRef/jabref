@@ -30,7 +30,10 @@ import java.util.*;
 
 import net.sf.jabref.groups.*;
 
-public class SidePaneManager {
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
+public class SidePaneManager implements ChangeListener {
 
     JabRefFrame frame;
     BasePanel panel;
@@ -41,13 +44,12 @@ public class SidePaneManager {
     Vector visible = new Vector();
     private int visibleComponents = 0;
 
-    public SidePaneManager(JabRefFrame frame, BasePanel panel,
-			   JabRefPreferences prefs, MetaData metaData) {
-	this.prefs = prefs;
-	this.panel = panel;
-	this.metaData = metaData;
-	this.frame = frame;
-	sidep = new SidePane();
+    public SidePaneManager(JabRefFrame frame) {
+	    this.prefs = Globals.prefs;
+	    // TODO: tab listener, update all sidepanecomponents.
+	    this.frame = frame;
+        frame.tabbedPane.addChangeListener(this);
+	    sidep = new SidePane();
     }
 
     public SidePane getPanel() {
@@ -56,21 +58,7 @@ public class SidePaneManager {
 
     public void populatePanel() {
 
-        // Groups
-        if (metaData.getGroups() != null) {
-            panel.groupSelector = new GroupSelector(frame, panel, metaData
-                    .getGroups(), this, prefs);
-            register("groups", panel.groupSelector);
-            if (prefs.getBoolean("groupSelectorVisible"))
-                ensureVisible("groups");
-        } else {
-            GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
-            metaData.setGroups(newGroupsRoot);
-            panel.groupSelector = new GroupSelector(frame, panel,
-                    newGroupsRoot, this, prefs);
-            register("groups", panel.groupSelector);
-        }
-        
+
         /*
          * if (components.size() > 0) { panel.setLeftComponent(sidep); } else
          * panel.setLeftComponent(null);
@@ -180,6 +168,17 @@ public class SidePaneManager {
       */
     }
 
+    /**
+     * Update all side pane components to show information from the given BasePanel.
+     * @param panel
+     */
+    public void setActiveBasePanel(BasePanel panel) {
+        for (Iterator i = components.keySet().iterator(); i.hasNext(); ) {
+            Object key = i.next();
+            ((SidePaneComponent)components.get(key)).setActiveBasePanel(panel);
+        }
+    }
+
     private void updateView() {
       Vector toShow = new Vector();
 
@@ -193,8 +192,9 @@ public class SidePaneManager {
       boolean wasVisible = sidep.isVisible();
       if (visible.size() > 0) {
 	  sidep.setVisible(true);
-          if (!wasVisible)
-            panel.setDivider();
+      if (!wasVisible)
+        frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+      //    if (!wasVisible) panel.setDivider();
       } else
 	  sidep.setVisible(false);
 
@@ -203,5 +203,9 @@ public class SidePaneManager {
     public void revalidate() {
       sidep.revalidate();
       sidep.repaint();
+    }
+
+    public void stateChanged(ChangeEvent event) {
+        setActiveBasePanel((BasePanel)frame.tabbedPane.getSelectedComponent());
     }
 }

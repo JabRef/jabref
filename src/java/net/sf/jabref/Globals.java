@@ -94,14 +94,15 @@ public class Globals {
 
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
-
+ public static HelpDialog helpDiag = null;
   public static String osName = System.getProperty("os.name", "def");
   public static boolean ON_MAC = (osName.equals(MAC)),
       ON_WIN = (osName.startsWith("Windows"));
 
   public static String[] SKIP_WORDS = {"a", "an", "the", "for"};
+    public static SidePaneManager sidePaneManager;
 
-  public static void logger(String s) {
+    public static void logger(String s) {
     Logger.global.info(s);
   }
 
