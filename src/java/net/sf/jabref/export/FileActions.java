@@ -26,6 +26,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export;
 
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+import org.w3c.dom.*;
 import java.io.*;
 import java.net.URL;
 import java.util.Iterator;
@@ -37,7 +42,7 @@ import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.export.layout.format.*;
 import net.sf.jabref.*;
-
+import net.sf.jabref.mods.*;
 
 /**
  * DOCUMENT ME!
@@ -342,6 +347,21 @@ public class FileActions
             // Trying to change the encoding:
             //ps=new PrintStream(new FileOutputStream(outFile));
             ps=new OutputStreamWriter(new FileOutputStream(outFile), encoding);
+            if (lfName.equals("mods")) {
+            	MODSDatabase md = new MODSDatabase(database);
+        		try {
+        	      	 DOMSource source = new DOMSource(md.getDOMrepresentation());
+        	      	 StreamResult result = new StreamResult(ps);
+        	      	 Transformer trans = TransformerFactory.newInstance().newTransformer();
+        	      	 trans.setOutputProperty(OutputKeys.INDENT, "yes");
+        	      	 trans.transform(source, result);
+        	      	}
+        	      	catch (Exception e) {
+        	      		throw new Error(e);
+        	      	}
+        	      ps.close();
+        	      return;
+            }
 
 	    // Print header
             try {
