@@ -614,6 +614,7 @@ public JabRefPreferences prefs() {
     createToolBar();
     getContentPane().setLayout(gbl);
       contentPane.setDividerSize(1);
+      contentPane.setBorder(null);
     //getContentPane().setBackground(GUIGlobals.lightGray);
     con.fill = GridBagConstraints.HORIZONTAL;
     con.anchor = GridBagConstraints.WEST;

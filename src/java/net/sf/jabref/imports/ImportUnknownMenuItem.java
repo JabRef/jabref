@@ -108,4 +108,12 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
     			     +"  "+Globals.lang("Format used")+": "+worker.formatName);
         }
     }
+
+
+    // This method is called by the dialog when the user has cancelled or
+    // signalled a stop. It is expected that any long-running fetch operations
+    // will stop after this method is called.
+    public void stopFetching() {
+        // No process to stop.
+    }
 }

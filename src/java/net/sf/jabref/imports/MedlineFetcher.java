@@ -16,6 +16,7 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import java.io.*;
 import net.sf.jabref.HelpAction;
+import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
  * <p>Title: </p>
@@ -56,7 +57,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     }
     final int PACING = 20;
     final int MAX_TO_FETCH = 10;
-
+    boolean keepOn = true;
     String idList;
     JTextField tf = new JTextField();
     JPanel pan = new JPanel();
@@ -262,48 +263,46 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
             panel.output("");
             return;
         }
+
+        ImportInspectionDialog diag = new ImportInspectionDialog(panel.frame(), panel,
+                GUIGlobals.DEFAULT_INSPECTION_FIELDS, "Fetch Medline", false);
+        Util.placeDialog(diag, panel.frame());
+        // diag.setProgress(0, count);
+        diag.setVisible(true);
+        keepOn = true;
+         diag.addCallBack(new ImportInspectionDialog.CallBack() {
+             public void done(int entriesImported) {
+                 if (entriesImported > 0) {
+                 panel.output(Globals.lang("Medline entries fetched")+": "+entriesImported);
+                 panel.markBaseChanged();
+                 panel.refreshTable();
+             } else
+                 panel.output(Globals.lang("No Medline entries found."));
+            }
+
+             public void stopFetching() {
+                // Make sure the fetch loop exits at next iteration.
+                keepOn = false;
+             }
+         });
 	    for (int jj = 0; jj < count; jj+=PACING) {
-		// get the ids from entrez
-		result = getIds(searchTerm,jj,PACING);
+            if (!keepOn)
+                break;
+		    // get the ids from entrez
+		    result = getIds(searchTerm,jj,PACING);
 
-        String[] test = getTitles((String[])result.idList.toArray(new String[0]));
-        for (int pelle=0; pelle<test.length; pelle++) {
-            System.out.println(": "+test[pelle]);
-        }
+            /*String[] test = getTitles((String[])result.idList.toArray(new String[0]));
+            for (int pelle=0; pelle<test.length; pelle++) {
+                System.out.println(": "+test[pelle]);
+            } */
 
-		//System.out.println("fetching: " + result.ids);
-		ArrayList bibs = fetchMedline(result.ids);
-		if ((bibs != null) && (bibs.size() > 0)) {
-		    tf.setText("");
-		    /*NamedCompound ce = new NamedCompound("fetch Medline");
-		    Iterator i = bibs.iterator();
-		    while (i.hasNext()) {
-			try {
-			    BibtexEntry be = (BibtexEntry) i.next();
-			    String id = Util.createId(be.getType(), panel.database());
-			    be.setId(id);
-			    panel.database().insertEntry(be);
-			    ce.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
-			}
-			catch (KeyCollisionException ex) {
-			}
-		    }
-		    ce.end();*/
-		    panel.frame().addBibEntries(bibs, null, false);
-		    panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
-
-            BibtexEntry[] entries = (BibtexEntry[])bibs.toArray(new BibtexEntry[0]);
-            panel.selectEntries(entries, 0);
-            if (entries.length == 1)
-                panel.showEntry(entries[0]);
-
-		    //panel.undoManager.addEdit(ce);
-		    panel.markBaseChanged();
-		    panel.refreshTable();
-		} else
-		    panel.output(Globals.lang("No Medline entries found."));
-		
+            final ArrayList bibs = fetchMedline(result.ids);
+            if (!keepOn)
+                break;
+            diag.addEntries(bibs);
+            diag.setProgress(jj+PACING, count);
 	    }
+         diag.entryListComplete();
 	 }
    }
     public String setupTerm(String in){

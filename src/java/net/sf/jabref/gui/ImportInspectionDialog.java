@@ -41,7 +41,7 @@ public class ImportInspectionDialog extends JDialog {
     private boolean newDatabase;
     private JButton selectAll = new JButton(Globals.lang("Select all"));
     private JButton deselectAll = new JButton(Globals.lang("Deselect all"));
-
+    private JButton stop = new JButton(Globals.lang("Stop"));
     /**
      * Creates a dialog that displays the given set of fields in the table.
      * The dialog allows another process to add entries dynamically while the dialog
@@ -60,9 +60,13 @@ public class ImportInspectionDialog extends JDialog {
 
         tableModel.addColumn(Globals.lang("Keep"));
 
-        for (int i=0; i<fields.length; i++)
+        for (int i=0; i<fields.length; i++) {
             tableModel.addColumn(Util.nCase(fields[i]));
-
+            Object o = GUIGlobals.fieldLength.get(fields[i]);
+            int width = o==null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
+                    ((Integer)o).intValue();
+            table.getColumnModel().getColumn(i+1).setPreferredWidth(width);
+        }
         table.getColumnModel().getColumn(0).setPreferredWidth(25);
         table.setRowSelectionAllowed(false);
         table.setCellSelectionEnabled(false);
@@ -78,6 +82,7 @@ public class ImportInspectionDialog extends JDialog {
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addGridded(ok);
+        bb.addGridded(stop);
         bb.addGridded(cancel);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
@@ -91,10 +96,18 @@ public class ImportInspectionDialog extends JDialog {
         ok.setEnabled(false);
         ok.addActionListener(new OkListener());
         cancel.addActionListener(new CancelListener());
+        stop.addActionListener(new StopListener());
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         setSize(new Dimension(650, 500));
+    }
+
+    public void setProgress(int current, int max) {
+        progressBar.setIndeterminate(false);
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(max);
+        progressBar.setValue(current);
     }
 
     /**
@@ -150,29 +163,34 @@ public class ImportInspectionDialog extends JDialog {
     class OkListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             final List selected = getSelectedEntries();
+            if (selected.size() == 0) {
+                dispose();
+                return;
+            }
+
             NamedCompound ce = new NamedCompound(undoName);
-            if (selected.size() > 0) {
 
-                if (newDatabase) {
-                    // Create a new BasePanel for the entries:
-                    BibtexDatabase base = new BibtexDatabase();
-                    panel = new BasePanel(frame, base,  null, new HashMap(), Globals.prefs);
-                }
+            if (newDatabase) {
+                // Create a new BasePanel for the entries:
+                BibtexDatabase base = new BibtexDatabase();
+                panel = new BasePanel(frame, base,  null, new HashMap(), Globals.prefs);
+            }
 
-                for (Iterator i=selected.iterator(); i.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry)i.next();
-                    entry.clone();
-                    try {
-                        entry.setId(Util.createId(entry.getType(), panel.database()));
-                        panel.database().insertEntry(entry);
-                        ce.addEdit(new UndoableInsertEntry(panel.database(), entry,  panel));
-                    } catch (KeyCollisionException e) {
-                        e.printStackTrace();
-                    }
+            for (Iterator i=selected.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry)i.next();
+                entry.clone();
+                try {
+                entry.setId(Util.createId(entry.getType(), panel.database()));
+                    panel.database().insertEntry(entry);
+                    ce.addEdit(new UndoableInsertEntry(panel.database(), entry,  panel));
+                } catch (KeyCollisionException e) {
+                    e.printStackTrace();
                 }
             }
+
             ce.end();
             panel.undoManager.addEdit(ce);
+
             dispose();
             SwingUtilities.invokeLater(new Thread() {
                 public void run() {
@@ -191,8 +209,22 @@ public class ImportInspectionDialog extends JDialog {
 
     }
 
+    private void signalStopFetching() {
+        for (Iterator i=callBacks.iterator(); i.hasNext();) {
+            ((CallBack)i.next()).stopFetching();
+        }
+    }
+
+    class StopListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            signalStopFetching();
+            entryListComplete();
+        }
+    }
+
     class CancelListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
+            signalStopFetching();
             dispose();
         }
     }
@@ -231,6 +263,13 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     public static interface CallBack {
+        // This method is called by the dialog when the user has selected the
+        // wanted entries, and clicked Ok. The callback object can update status
+        // line etc.
         public void done(int entriesImported);
+        // This method is called by the dialog when the user has cancelled or
+        // signalled a stop. It is expected that any long-running fetch operations
+        // will stop after this method is called.
+        public void stopFetching();
     }
 }

@@ -116,6 +116,8 @@ public class GUIGlobals {
     // further below.
     public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
     public static Color activeEditor = new Color(230, 230, 255);
+    public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
+        {"author", "title", "year"};
 
     public static JLabel getTableIcon(String fieldType) {
         Object o = tableIcons.get(fieldType);

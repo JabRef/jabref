@@ -158,6 +158,7 @@ public class MetaData {
             sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
             sb.append(Util.quote(groupsRoot.toString(),";",'\\'));
             sb.append("}\n\n");
+            
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             out.write(sb.toString());
         }

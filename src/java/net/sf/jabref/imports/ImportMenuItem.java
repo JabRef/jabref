@@ -95,4 +95,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
     public void done(int entriesImported) {
         frame.output(Globals.lang("Imported entries")+": "+entriesImported);
     }
+
+    // This method is called by the dialog when the user has cancelled or
+    // signalled a stop. It is expected that any long-running fetch operations
+    // will stop after this method is called.
+    public void stopFetching() {
+        // No process to stop.
+    }
 }
