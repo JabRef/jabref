@@ -56,10 +56,12 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.x:	- Fixed shortcut key for "Store field" in entry editor, and fixed
+1.x:	- Added bibtex key uniqueness checking
+        - Fixed shortcut key for "Store field" in entry editor, and fixed
 	  problem that made shortcut for "Save database" unavailable from
 	  entry editor.
-	- Added option to fetch Medline entries automatically by ID.
+	- Added option to fetch Medline entries automatically by
+	  ID; patch submitted by Mike Smoot.
 	- Fixed bug in RIS import.
 	- Added options to copy key and copy "\cite{key}" to right-click menu.
 	- Fixed bug that caused some General fields not to get displayed.
