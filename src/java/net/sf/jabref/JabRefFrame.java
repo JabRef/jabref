@@ -31,6 +31,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
+import java.util.Vector;
 import java.io.*;
 import java.net.URL;
 
@@ -117,12 +118,19 @@ public class JabRefFrame extends JFrame {
 	setLocation(new Point(prefs.getInt("posX"),
 			      prefs.getInt("posY")));
 
-	// If the option is enabled, open the last edited database, if any.
-	if (prefs.getBoolean("openLastEdited") && (prefs.get("lastEdited") != null)) {
-	    fileToOpen = new File(prefs.get("lastEdited"));
-	    if (fileToOpen.exists()) {
-		Util.pr("Opening last edited file: "+fileToOpen.getName());
-		openDatabaseAction.openIt();
+	// If the option is enabled, open the last edited databases, if any.
+	if (prefs.getBoolean("openLastEdited") 
+	    && (prefs.get("lastEdited") != null)) {
+	    
+	    // How to handle errors in the databases to open?
+	    String[] names = prefs.getStringArray("lastEdited");
+	    for (int i=0; i<names.length; i++) {
+		fileToOpen = new File(names[i]);
+		if (fileToOpen.exists()) {
+		    //Util.pr("Opening last edited file:"
+		    //+fileToOpen.getName());
+		    openDatabaseAction.openIt();
+		}
 	    }
 	}
 
@@ -253,8 +261,9 @@ public class JabRefFrame extends JFrame {
 	    // Ask here if the user really wants to close, if the base
 	    // has not been saved since last save.
 	    boolean close = true;	    
+	    Vector filenames = new Vector();
 	    if (tabbedPane.getTabCount() > 0) {
-		for (int i=0; i<tabbedPane.getTabCount(); i++)
+		for (int i=0; i<tabbedPane.getTabCount(); i++) {
 		    if (baseAt(i).baseChanged) {
 			tabbedPane.setSelectedIndex(i);
 			int answer = JOptionPane.showConfirmDialog
@@ -272,24 +281,35 @@ public class JabRefFrame extends JFrame {
 			    basePanel().runCommand("save");
 			}
 		    }
+		    if (baseAt(i).file != null)
+			filenames.add(baseAt(i).file.getPath());
+		}
 	    }
 	    if (close) {
 		dispose();
+
+		
+
 		prefs.putInt("posX", ths.getLocation().x);
 		prefs.putInt("posY", ths.getLocation().y);
 		prefs.putInt("sizeX", ths.getSize().width);
 		prefs.putInt("sizeY", ths.getSize().height);
-		System.exit(0); // End program.
 		
-		/*
-		  if (prefs.getBoolean("openLastEdited")) {
-		  // Here we store the current file. If there is no current
-		  // file, we remove any previously stored file name.
-		  if ((database == null) || (file == null))
-		  prefs.remove("lastEdited");
-		  else
-		  prefs.put("lastEdited", file.getPath());
-		  }*/
+		if (prefs.getBoolean("openLastEdited")) {
+		  // Here we store the names of allcurrent filea. If
+		  // there is no current file, we remove any
+		  // previously stored file name.
+		    if (filenames.size() == 0)
+			prefs.remove("lastEdited");
+		    else {
+			String[] names = new String[filenames.size()];
+			for (int i=0; i<filenames.size(); i++)
+			    names[i] = (String)filenames.elementAt(i);
+			    
+			prefs.putStringArray("lastEdited", names);
+		    }
+		}
+		System.exit(0); // End program.
 	    }
 	}
     }

@@ -372,7 +372,7 @@ public class PrefsDialog extends JDialog {
 	return choices;
     }
 
-    public byte] getAcChoices() {
+    public byte[] getAcChoices() {
 
 	// First we count how many checkboxes the user has selected
 	// for which fields to autocomplete.
