@@ -110,13 +110,13 @@ public class LabelPatternUtil {
 				if(_field.equals("author")){
 					_sb.append(firstAuthor(_entry.getField("author").toString()));
 				}
-				if(_field.equals("editor")){
+				else if(_field.equals("editor")){
 					_sb.append(firstAuthor(_entry.getField("editor").toString()));
 				}
-				if(_field.equals("firstpage")){
+				else if(_field.equals("firstpage")){
 					_sb.append(firstPage(_entry.getField("pages").toString()));
 				}
-				if(_field.equals("lastpage")){
+				else if(_field.equals("lastpage")){
 					_sb.append(lastPage(_entry.getField("pages").toString()));
 				}
 				// we havent seen any special demands
@@ -231,10 +231,12 @@ public class LabelPatternUtil {
 		if( tokens.length > 0){ // if author is empty
 			if(tokens[0].indexOf(",") > 0)
 				tokens[0] = ImportFormatReader.fixAuthor( tokens[0] ); // convert lastname, firstname to firstname lastname
-		String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
-		// lastname, firstname
-		
+
+			String[] firstAuthor = tokens[0].replaceAll("\\s+"," ").split(" ");
+			// lastname, firstname
+
 		author += firstAuthor[ firstAuthor.length-1];
+
 		}		
 		return author;
 	}
