@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+
+<project name="JabRef" default="build" basedir=".">
+
+<!-- ==========================================================================================
+	PROPERTY SETUP
+     ========================================================================================== -->
+
+  <!-- Set the properties for intermediate directory -->
+  <property name="build.dir" value="build"/>
+  <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="build.lib" value="${build.dir}/lib"/>
+  <property name="build.bin" value="${build.dir}/bin"/>
+  <property name="build.images" value="${build.dir}/images"/>
+  <property name="build.help" value="${build.dir}/help"/>
+  <property name="build.javadocs" value="${build.dir}/docs/API"/>
+
+  <!-- Set the properties for source directories -->
+  <property name="src.dir" value="src"/>
+  <property name="txt.dir" value="src/txt"/>
+  <property name="java.dir" value="${src.dir}/java"/>
+  <property name="bin.dir" value="${src.dir}/scripts"/> 
+  <property name="images.dir" value="${src.dir}/images"/> 
+  <property name="help.dir" value="${src.dir}/help"/> 
+
+  <!-- Build classpath -->
+  <path id="classpath">
+    <pathelement path="${build.classes}"/>
+  </path>
+  
+  <!-- Compiles project -->
+  <target name="compile">
+    <mkdir dir="${build.classes}"/>
+
+    <javac srcdir="${java.dir}"
+           destdir="${build.classes}"
+           target="1.4">
+    </javac>
+  </target>
+
+  <!-- Jars up project -->
+  <target name="jars" depends="compile">
+    <mkdir dir="${build.lib}"/>
+
+    <jar destfile="${build.lib}/jabref.jar">
+    	<fileset dir="${build.classes}"/>
+    	<fileset dir="${src.dir}">
+			<include name="images/**"/>
+			<include name="help/**"/>			
+        </fileset>
+	<fileset dir="${txt.dir}">
+	                <include name = "gpl.txt"/>
+	</fileset>
+<!--        <manifest>
+			<attribute name="Main-Class" value=""/>
+        </manifest>-->
+     </jar>
+
+     </target>
+
+  <target name="build" depends="jars">
+    <mkdir dir="${build.bin}"/>
+<!-- Uncomment when we actually have scripts.
+    <copy todir="${build.bin}">
+      <fileset dir="${bin.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+-->
+
+
+<!--    <mkdir dir="${build.images}"/>
+    <copy todir="${build.images}">
+      <fileset dir="${images.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${build.help}"/>
+    <copy todir="${build.help}">
+      <fileset dir="${help.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>-->
+  </target>
+
+
+  <!-- Creates all docs -->
+  <target name="docs" depends="javadocs" description="generates all the documentation"/>
+
+  <!-- Creates javadocs -->
+  <target name="javadocs" depends="compile" description="Generates the javadocs">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc sourcepath="${java.dir}"
+             destdir="${build.javadocs}"
+             author="true"
+             version="true"
+             windowtitle="JabRef API"
+             link="http://java.sun.com/j2se/1.4.1/docs/api/">
+
+      <fileset dir="${java.dir}" defaultexcludes="yes">
+        <include name="**.java" />
+      </fileset>
+
+      <classpath refid="classpath" />
+    </javadoc>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}" />
+  </target>
+</project>

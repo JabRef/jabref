@@ -1,6 +1,6 @@
 package net.sf.jabref;
 
-import java.beans.*
+import java.beans.*;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -59,6 +59,7 @@ public class BibDatabase {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
 	_changeSupport.removePropertyChangeListener(listener);
     }
+
 
     private void firePropertyChangedEvent(String fieldName, Object oldValue,
 					  Object newValue) {
