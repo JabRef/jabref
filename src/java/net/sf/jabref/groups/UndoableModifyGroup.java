@@ -28,7 +28,7 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-class UndoableModifyGroup extends AbstractUndoableEdit {
+public class UndoableModifyGroup extends AbstractUndoableEdit {
     private final GroupSelector m_groupSelector;
     private final AbstractGroup m_oldGroupBackup;
     private final AbstractGroup m_newGroupBackup;
