@@ -20,6 +20,6 @@
       <ulink url="\format[XMLChars]{\url}"/>
    </bibliomisc>\end{url}
 \begin{doi}   <bibliomisc>
-      <ulink url="http://dx.doi.org/{\doi}">{\doi}</ulink>
+      <ulink url="http://dx.doi.org/\doi">\doi</ulink>
    </bibliomisc>\end{doi}
 </biblioentry>
