@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/aelfred-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/antlr.jar"/>
+	<classpathentry kind="lib" path="lib/ccl.jar"/>
+	<classpathentry kind="lib" path="lib/commons-httpclient-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/jalopy-1.0b10.jar"/>
+	<classpathentry kind="lib" path="lib/jalopy-ant-0.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/javancss.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen-core-1.0-fcs.jar"/>
+	<classpathentry kind="lib" path="lib/jaxp-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jdom-1.0b8.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/looks-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/oro-2.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/plastic-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/sax-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/saxpath-1.0-fcs.jar"/>
+	<classpathentry kind="lib" path="lib/vizant.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
