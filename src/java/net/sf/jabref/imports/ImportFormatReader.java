@@ -141,6 +141,34 @@ public class ImportFormatReader
 
     public static ArrayList readSixpack(String filename) {
       final String SEPARATOR = new String(new char[] {0, 48});
+      HashMap fI = new HashMap();
+      fI.put("id" , "bibtexkey");
+      fI.put("au" , "author");
+      fI.put("ti" , "title");
+      fI.put("jo" , "journal");
+      fI.put("vo" , "volume");
+      fI.put("nu" , "number");
+      fI.put("pa" , "pages");
+      fI.put("mo" , "month");
+      fI.put("yr" , "year");
+      fI.put("kw" , "keywords");
+      fI.put("ab" , "abstract");
+      fI.put("no" , "note");
+      fI.put("ed" , "editor");
+      fI.put("pu" , "publisher");
+      fI.put("se" , "series");
+      fI.put("ad" , "address");
+      fI.put("en" , "edition");
+      fI.put("ch" , "chapter");
+      fI.put("hp" , "howpublished");
+      fI.put("tb" , "booktitle");
+      fI.put("or" , "organization");
+      fI.put("sc" , "school");
+      fI.put("in" , "institution");
+      fI.put("ty" , "type");
+      fI.put("url" , "url");
+      fI.put("cr" , "crossref");
+
       ArrayList bibitems=new ArrayList();
       File f = new File(filename);
 
@@ -150,55 +178,57 @@ public class ImportFormatReader
       }
 
       try{
-              BufferedReader in = new BufferedReader(new FileReader( filename));
-              Util.pr(in.readLine());
-              Util.pr(in.readLine());
-              String s = null;
-              BibtexEntry entry = null;
-              while ((s = in.readLine()) != null) {
-                try {
-                  s = s.replaceAll("<par>", ""); // What is <par> ????
-                  String[] fields = s.split(SEPARATOR);
-                  // Check type and create entry:
-                  if (fields[1].equals("Article"))
-                    entry = new BibtexEntry(Util.createNeutralId(),
-                                            BibtexEntryType.getType("article"));
-
-                    // Set fields:
-                  entry.setField("author", fields[2].replaceAll(" and ", ", ").replaceAll(", ", " and "));
-                  // Regarding authors, it appears Sixpack saves with first name first, and normal grammar.
-                  entry.setField("title", fields[3]);
-                  entry.setField("journal", fields[4]);
-                  entry.setField("volume", fields[5]);
-                  entry.setField("number", fields[6]);
-                  entry.setField("pages", fields[7].replaceAll("-", "--"));
-                  entry.setField("month", fields[8]);
-                  entry.setField("year", fields[9]);
-                  entry.setField("abstract", fields[12]);
-
-                  bibitems.add(entry);
-                //         Util.pr(fields[1] + "   (" + fields.length + ")");
-                } catch (NullPointerException ex) {
-                  Globals.logger("Error parsing Sixpack file, ignoring entry.");
-                }
+        BufferedReader in = new BufferedReader(new FileReader( filename));
+        in.readLine();
+        String[] fieldDef = in.readLine().split(",");
+        String s = null;
+        BibtexEntry entry = null;
+        while ((s = in.readLine()) != null) {
+          try {
+            s = s.replaceAll("<par>", ""); // What is <par> ????
+            String[] fields = s.split(SEPARATOR);
+            // Check type and create entry:
+            BibtexEntryType typ = BibtexEntryType.getType(fields[1].toLowerCase());
+            if (typ == null) {
+              String type = "";
+              if (fields[1].equals("Masterthesis")) type = "mastersthesis";
+              if (fields[1].equals("PhD-Thesis")) type = "phdthesis";
+              if (fields[1].equals("miscellaneous")) type = "misc";
+              if (fields[1].equals("Conference")) type = "proceedings";
+              typ = BibtexEntryType.getType(type.toLowerCase());
+            }
+            entry = new BibtexEntry(Util.createNeutralId(), typ);
+            String fld;
+            for (int i=0; i<Math.min(fieldDef.length, fields.length); i++) {
+              fld = (String)fI.get(fieldDef[i]);
+              if (fld != null) {
+                if (fld.equals("author") || fld.equals("editor"))
+                  setField(entry, fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ", " and "));
+                else if (fld.equals("pages"))
+                  setField(entry, fld, fields[i].replaceAll("-", "--"));
+                else
+                  setField(entry, fld, fields[i]);
               }
-              //for (int i=0; i<s.length; i++)
-              //  Util.pr(":"+s[i]);
-              /*Util.pr(in.readLine());
-              Util.pr(in.readLine());
-              Util.pr(in.readLine());
-
-              int str, i=0;
-              while ((i < 100) && (str = in.read()) >= 0) {
-                      Util.pr(""+(char)str+"  "+str);
-                      i++;
-              }*/
-              in.close();
+            }
+            bibitems.add(entry);
+          } catch (NullPointerException ex) {
+            Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
+          }
+        }
+        in.close();
       }
       catch(IOException e){return null;}
 
-
       return bibitems;
+    }
+
+    /**
+     * Just a little wrapper for BibtexEntry's setField, to prevent the field
+     * from getting set when the content is an empty string.
+     */
+    private static void setField(BibtexEntry be, String field, String content) {
+      if (!content.equals(""))
+        be.setField(field, content);
     }
 
     //============================================================

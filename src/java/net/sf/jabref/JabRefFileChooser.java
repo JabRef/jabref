@@ -50,8 +50,10 @@ public class JabRefFileChooser extends JFileChooser {
     //========================================================
 
     protected void setUI(ComponentUI newUI) {
-      //super.setUI(new JabRefUI(this));
-      super.setUI(newUI);
+      if (Globals.osName.equals(Globals.MAC))
+        super.setUI(newUI);
+      else
+        super.setUI(new JabRefUI(this));
      }
     //========================================================
     //
