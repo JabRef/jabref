@@ -296,7 +296,11 @@ public class EntryTableModel
       fields.add(Globals.SEARCH);
       directions.add(new Boolean(true));
     }
-
+    if(panel.sortingByCiteSeerResults) {
+        fields.add("citeseercitationcount");
+        directions.add(new Boolean(true));        
+    }
+    
     // Then the sort options:
     directions.add(new Boolean(frame.prefs.getBoolean("priDescending")));
     directions.add(new Boolean(frame.prefs.getBoolean("secDescending")));

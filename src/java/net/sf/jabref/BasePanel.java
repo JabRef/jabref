@@ -114,6 +114,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     boolean sortingBySearchResults = false,
         coloringBySearchResults = false,
 	sortingByGroup = false,
+	sortingByCiteSeerResults = false,
         coloringByGroup = false,
         previewEnabled = true;
 

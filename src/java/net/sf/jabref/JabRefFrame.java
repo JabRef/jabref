@@ -1482,12 +1482,7 @@ class FetchCiteSeerAction
 						 * Citation fetcher operations will sort by citation count.
 						 */
 						private void setSortingByCitationCount() {
-							newBp.frame.prefs.put("priSort", "citeseercitationcount");
-							newBp.frame.prefs.put("secSort", "year");
-							newBp.frame.prefs.put("terSort", "author");
-							newBp.frame.prefs.putBoolean("priDescending", true);
-							newBp.frame.prefs.putBoolean("secDescending", true);
-							newBp.frame.prefs.putBoolean("terDescending", true);
+							newBp.sortingByCiteSeerResults = true;
 						}
 
 						public void run() {

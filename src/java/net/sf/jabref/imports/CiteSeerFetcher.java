@@ -501,20 +501,23 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	  public boolean importCiteSeerEntries(int[] clickedOn, NamedCompound citeseerNamedCompound) {
 	  	boolean newValues = false;
+	  	boolean abortOperation = false;
 	  	Vector clickedVector = new Vector();
 		Hashtable rejectedEntries = new Hashtable();		
 		for(int i=0; i < clickedOn.length; i++)
 			clickedVector.add(new Integer(clickedOn[i]));
 		Iterator clickedIterator = clickedVector.iterator();
 		BooleanAssign overwriteAll = new BooleanAssign(false);
-		BooleanAssign overwriteNone = new BooleanAssign(false);						
-		while (clickedIterator.hasNext()) {
+		BooleanAssign overwriteNone = new BooleanAssign(false);
+
+		while (clickedIterator.hasNext() && !abortOperation) {
 			int currentIndex = ((Integer) clickedIterator.next()).intValue();
 			String id =  panel.getTableModel().getNameFromNumber(currentIndex);
+			BooleanAssign newValue = new BooleanAssign(false);			
 			BibtexEntry be =
 				(BibtexEntry) panel.getDatabase().getEntryById(id);
-			boolean newValue = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, rejectedEntries);			
-			if (newValue)
+			abortOperation = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, newValue, rejectedEntries);			
+			if (newValue.getValue())
 				newValues = true;
 		}
 		if (rejectedEntries.size() > 0) {
@@ -534,9 +537,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 *
 	 */
 	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC, BooleanAssign overwriteAll, 
-			BooleanAssign overwriteNone, Hashtable rejectedEntries) {
+			BooleanAssign overwriteNone, BooleanAssign newValue, Hashtable rejectedEntries) {
+	    boolean abortOperation = false;
 		SAXParserFactory factory = SAXParserFactory.newInstance();
-		BooleanAssign newValue = new BooleanAssign(false);
     	String identifier = generateCanonicalIdentifier(be);			 
 		try {
 			if (identifier != null) {
@@ -557,14 +560,17 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			} catch (HttpException e) {
 				System.out.println("HttpException: " + e.getReason());
 				e.printStackTrace();
+				abortOperation = true;				
 			} catch (IOException e) {
 					ShowNoConnectionDialog dialog = new ShowNoConnectionDialog(OAI_HOST);
 					SwingUtilities.invokeLater(dialog);
+					abortOperation = true;
 			} catch (SAXException e) {
 				System.out.println("SAXException: " + e.getLocalizedMessage());
 				e.printStackTrace();
+				abortOperation = true;				
 			}
-			return newValue.getValue();
+			return abortOperation;
 		}
 
 
