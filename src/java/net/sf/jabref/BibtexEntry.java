@@ -192,6 +192,11 @@ public class BibtexEntry
         return _fields.get(name);
     }
 
+    public String getCiteKey() {
+	return (_fields.containsKey(Globals.KEY_FIELD) ?
+		(String)_fields.get(Globals.KEY_FIELD) : null);
+    }
+
     /**
      * Sets the given field to the given value.
      */

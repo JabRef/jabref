@@ -285,7 +285,7 @@ public class Util {
 
 
     /**
-     * Takes a 
+     * Takes a delimited string, splits it and returns 
      *
      * @param names a <code>String</code> value
      * @return a <code>String[]</code> value

@@ -104,7 +104,19 @@ public class LatexFieldFormatter implements FieldFormatter {
 	/*sb.append("{");
 	sb.append(text.substring(start_pos, end_pos));
 	sb.append("}");*/
-	putIn("{"+text.substring(start_pos, end_pos)+"}");
+	sb.append('{');
+	boolean escape = false;
+	char c;
+	for (int i=start_pos; i<end_pos; i++) {
+	    c = text.charAt(i);
+	    if ((c == '&') && !escape)
+		sb.append("\\&");
+	    else
+		sb.append(c);
+	    if (c == '\\') escape = true;
+	    else escape = false;	    
+	}	
+	sb.append('}');
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,

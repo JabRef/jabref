@@ -29,7 +29,6 @@ package net.sf.jabref;
 public class JabRef {
 
     public static void main(String[] args) {
-
 	JabRefPreferences prefs = new JabRefPreferences();
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
