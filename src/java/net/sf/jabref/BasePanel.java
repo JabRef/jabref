@@ -64,7 +64,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         fileToOpen = null; // The filename of the database.
     String fileMonitorHandle = null;
     boolean saving = false, updatedExternally = false;
-    String encoding = null;
+    private String encoding = null;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -175,6 +175,11 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
     public File file() { return file; }
     public JabRefFrame frame() { return frame; }
     public JabRefPreferences prefs() { return prefs; }
+
+    public String getEncoding() { return encoding; }
+    public void setEncoding(String encoding) { 
+	this.encoding = encoding;
+    }
 
     public void output(String s) {
 	//Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
@@ -310,7 +315,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                       }
 
                       prefs.put("workingDirectory", file.getParent());
-                      frame.fileHistory.newFile(file.getPath());
+                      frame.getFileHistory().newFile(file.getPath());
                     }
                     else
                       file = null;
@@ -333,7 +338,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                          == JOptionPane.OK_OPTION)) {
                       saveDatabase(expFile, true);
                       //runCommand("save");
-                      frame.fileHistory.newFile(expFile.getPath());
+                      frame.getFileHistory().newFile(expFile.getPath());
                       frame.output(Globals.lang("Saved selected to")+" '"
                                    +expFile.getPath()+"'.");
                         }
@@ -944,7 +949,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                                md.importGroups(), md.importSelectorWords());
                       }
                     }).start();
-                    frame.fileHistory.newFile(fileToOpen.getPath());
+                    frame.getFileHistory().newFile(fileToOpen.getPath());
                   }
                 }
               }

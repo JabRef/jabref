@@ -191,7 +191,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
             	if (i == 100) {
             		rowNumbers = rowNumbers + "..";
             	} else {
-            		rowNumbers = rowNumbers + " and " + ((Integer)rowSet.first()).toString();
+            		rowNumbers = rowNumbers + " "+Globals.lang("and")+" " + ((Integer)rowSet.first()).toString();
             	}
                 JOptionPane.showMessageDialog(panel.frame(),
                         Globals.lang("Couldn't parse the 'citeseerurl' field of the following entries") + ':' + '\n' + 

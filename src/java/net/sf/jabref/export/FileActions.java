@@ -248,6 +248,8 @@ public class FileActions
         File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding) throws SaveException
     {
 
+	TreeMap types = new TreeMap(); // Map to collect entry type definitions
+	// that we must save along with entries using them.
         BibtexEntry be = null;
 
         try
@@ -303,6 +305,15 @@ public class FileActions
             for (Iterator i = sorter.iterator(); i.hasNext();)
             {
                 be = (BibtexEntry) (i.next());
+
+		// Check if we must write the type definition for this
+		// entry, as well. Our criterion is that all non-standard
+		// types (*not* customized standard types) must be written.
+		BibtexEntryType tp = be.getType();
+		if (BibtexEntryType.getStandardType(tp.getName()) == null) {
+		    types.put(tp.getName(), tp);
+		}
+
 		be.write(fw, ff, true);
 		fw.write("\n");
 	    }
@@ -312,6 +323,17 @@ public class FileActions
             {
                 metaData.writeMetaData(fw);
             }
+
+	    // Write type definitions, if any:
+	    if (types.size() > 0) {
+		for (Iterator i=types.keySet().iterator(); i.hasNext();) {
+		    CustomEntryType tp = (CustomEntryType)types.get(i.next());
+		    tp.save(fw);
+		    fw.write("\n");
+		}
+
+	    }
+
 
             fw.close();
         }

@@ -537,7 +537,7 @@ found:
       ImportFormat imFo = (ImportFormat) ((Map.Entry) i.next()).getValue();
 
       try {
-        //System.out.println("Trying format: "+imFo.getFormatName());
+        System.out.println("Trying format: "+imFo.getFormatName());
         List entries = importFromFile(imFo, filename);
 
         if (entries != null)

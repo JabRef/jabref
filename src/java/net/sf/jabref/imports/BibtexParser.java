@@ -87,7 +87,7 @@ public class BibtexParser
         _db = new BibtexDatabase(); // Bibtex related contents.
 	_meta = new HashMap();      // Metadata in comments for Bibkeeper.
 	entryTypes = new HashMap(); // To store custem entry types parsed.
-        ParserResult _pr = new ParserResult(_db, _meta);
+        ParserResult _pr = new ParserResult(_db, _meta, entryTypes);
         skipWhitespace();
 
         try

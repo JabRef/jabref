@@ -347,6 +347,7 @@ public class Globals {
     else {
       fc.setMode(FileDialog.SAVE);
     }
+    
     fc.show();
 
     if (fc.getFile() != null) {

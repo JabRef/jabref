@@ -232,7 +232,7 @@ public class JabRef {
 
                     if (entries != null) {
                         BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                        ParserResult pr = new ParserResult(base, new HashMap());
+                        ParserResult pr = new ParserResult(base, null, new HashMap());
                         pr.setFile(new File(data[0]));
                         loaded.add(pr);
                     }

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Iterator;
 import java.io.File;
 
-class FileHistory extends JMenu implements ActionListener {
+public class FileHistory extends JMenu implements ActionListener {
 
     int bound = 5; //or user defined
     JabRefPreferences prefs;
@@ -94,10 +94,10 @@ class FileHistory extends JMenu implements ActionListener {
 	int pos = name.indexOf(" ");
 	name = name.substring(pos+1);
 	//Util.pr("'"+name+"'");
-	frame.fileToOpen = new File(name);
+	final File fileToOpen = new File(name);
 	(new Thread() {
 		public void run() {
-		    frame.open.openIt(true);
+		    frame.open.openIt(fileToOpen, true);
 		}
 	    }).start();
 

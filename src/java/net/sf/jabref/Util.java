@@ -116,7 +116,7 @@ public class Util {
      * regard to another window, but not outside the screen on the left and the
      * top.
      */
-    public static void placeDialog(javax.swing.JDialog diag,
+    public static void placeDialog(java.awt.Dialog diag,
             java.awt.Container win) {
         Dimension ds = diag.getSize(), df = win.getSize();
         Point pf = win.getLocation();

@@ -462,7 +462,12 @@ public class BrowserLauncher {
                 browser = "command.com";
                 break;
             case LINUX:
-                browser = "mozilla";
+		if ((new File("/usr/bin/mozilla")).exists())
+		    browser = "mozilla";
+		else if ((new File("/usr/bin/firefox")).exists())
+		    browser = "firefox";
+		else
+		    browser = "mozilla";
                 break;
             case OTHER:
             default:

@@ -34,14 +34,15 @@ import java.util.Vector;
 public class ParserResult {
 
     private BibtexDatabase base;
-    private HashMap metaData;
+    private HashMap metaData, entryTypes;
     private File file = null;
     private Vector warnings = new Vector();
     private String encoding = null; // Which encoding was used?
 
-    public ParserResult(BibtexDatabase base, HashMap metaData) {
+    public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
 	this.base = base;
 	this.metaData = metaData;
+	this.entryTypes = entryTypes;
     }
 
     public BibtexDatabase getDatabase() {
@@ -50,6 +51,10 @@ public class ParserResult {
 
     public HashMap getMetaData() {
 	return metaData;
+    }
+
+    public HashMap getEntryTypes() {
+	return entryTypes;
     }
 
     public File getFile() {

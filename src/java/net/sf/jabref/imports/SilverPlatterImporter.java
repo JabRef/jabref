@@ -13,12 +13,11 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+import java.util.regex.Pattern;
 
 /**
- * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm Several
- * Biblioscape field types are ignored. Others are only included in the BibTeX
- * field "comment".
+ * Imports a SilverPlatter exported file. This is a poor format to parse,
+ * so it currently doesn't handle everything correctly.
  */
 public class SilverPlatterImporter implements ImportFormat {
 
@@ -34,9 +33,19 @@ public class SilverPlatterImporter implements ImportFormat {
      */
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
+	// This format is very similar to Inspec, so we have a two-fold strategy:
+	// If we see the flag signalling that it is an inspec file, return false.
+	// This flag should appear above the first entry and prevent us from 
+	// accepting the Inspec format. Then we look for the title entry.
+	Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
 	String str;
 	while ((str = in.readLine()) != null){
-	    if ((str.length()>=5) && (str.substring(0, 5).equals("AU:  ")))
+
+	    if (pat1.matcher(str).find())
+		return false; // This is an inspec file, so return false.
+
+	    if ((str.length()>=5) && (str.substring(0, 5).equals("TI:  ")))
 		return true;
 	}
 	return false;

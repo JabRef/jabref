@@ -13,12 +13,10 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+import java.util.regex.Pattern;
 
 /**
- * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm Several
- * Biblioscape field types are ignored. Others are only included in the BibTeX
- * field "comment".
+ * INSPEC format importer.
  */
 public class InspecImporter implements ImportFormat {
 
@@ -29,12 +27,31 @@ public class InspecImporter implements ImportFormat {
 	return "INSPEC";
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+  /**
+   * Check whether the source is in the correct format for this importer.
+   */
+  public boolean isRecognizedFormat(InputStream stream)
+    throws IOException {
+    // Our strategy is to look for the "PY <year>" line.
+    BufferedReader in =
+      new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+    //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
+    Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
+
+    //was PY \\\\d{4}? before
+    String str;
+
+    while ((str = in.readLine()) != null) {
+      //Inspec and IEEE seem to have these strange " - " between key and value
+      //str = str.replace(" - ", "");
+      //System.out.println(str);
+
+      if (pat1.matcher(str).find())
+        return true;
     }
+
+    return false;
+  }
 
     /**
      * Parse the entries in the source, and return a List of BibtexEntry

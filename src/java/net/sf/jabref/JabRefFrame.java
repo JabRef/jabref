@@ -110,11 +110,9 @@ public class JabRefFrame
                                SwingConstants.LEFT);
   //SearchManager searchManager  = new SearchManager(ths, prefs);
 
-  FileHistory fileHistory = new FileHistory(prefs, this);
+  private FileHistory fileHistory = new FileHistory(prefs, this);
 
   LabelMaker labelMaker;
-  File fileToOpen = null;
-
 
   // The help window.
   public HelpDialog helpDiag = new HelpDialog(this);
@@ -130,7 +128,7 @@ public class JabRefFrame
   public JToggleButton groupToggle, searchToggle, previewToggle;
 
   OpenDatabaseAction
-      open = new OpenDatabaseAction(true);
+      open = new OpenDatabaseAction(this, true);
   AbstractAction
       close = new CloseDatabaseAction(),
       quit = new CloseAction(),
@@ -1286,18 +1284,22 @@ public JabRefPreferences prefs() {
 
   public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
       BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
-      tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
-                     bp);
-    if (raisePanel) {
-      tabbedPane.setSelectedComponent(bp);
-    }
-    if (tabbedPane.getTabCount() == 1) {
-      setNonEmptyState();
-    } else if (tabbedPane.getTabCount() == 2) {
-      setMultiple();
-    }
-    return bp;
+      addTab(bp, file, raisePanel);
+      return bp;
   }
+
+    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+	tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
+		       bp);
+	if (raisePanel) {
+	    tabbedPane.setSelectedComponent(bp);
+	}
+	if (tabbedPane.getTabCount() == 1) {
+	    setNonEmptyState();
+	} else if (tabbedPane.getTabCount() == 2) {
+	    setMultiple();
+	}
+    }
 
   class SelectKeysAction
       extends AbstractAction {
@@ -1404,123 +1406,6 @@ public JabRefPreferences prefs() {
     }
   }
 
-  // The action concerned with opening an existing database.
-  class OpenDatabaseAction
-      extends MnemonicAwareAction {
-      boolean showDialog;
-      public OpenDatabaseAction(boolean showDialog) {
-          super(new ImageIcon(GUIGlobals.openIconFile));
-          this.showDialog = showDialog;
-          putValue(NAME, "Open database");
-          putValue(ACCELERATOR_KEY, prefs.getKey("Open database"));
-          putValue(SHORT_DESCRIPTION, Globals.lang("Open BibTeX database"));
-      }
-
-    public void actionPerformed(ActionEvent e) {
-      // Open a new database.
-      if (showDialog) {
-
-        String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".bib",
-                                               JFileChooser.OPEN_DIALOG, true);
-
-        if (chosenFile != null) {
-          fileToOpen = new File(chosenFile);
-        }
-      }
-      else {
-        Util.pr(NAME);
-        Util.pr(e.getActionCommand());
-        fileToOpen = new File(Util.checkName(e.getActionCommand()));
-      }
-
-      // Run the actual open in a thread to prevent the program
-      // locking until the file is loaded.
-      if (fileToOpen != null) {
-        (new Thread() {
-          public void run() {
-            openIt(true);
-          }
-        }).start();
-        fileHistory.newFile(fileToOpen.getPath());
-      }
-    }
-
-    class openItSwingHelper implements Runnable{
-        BasePanel bp;
-        boolean raisePanel;
-
-        openItSwingHelper(BasePanel bp, boolean raisePanel) {
-            this.bp = bp;
-            this.raisePanel = raisePanel;
-        }
-
-        public void run() {
-            tabbedPane.add(fileToOpen.getName(), bp);
-            if (raisePanel) {
-                tabbedPane.setSelectedComponent(bp);
-            }
-            if (tabbedPane.getTabCount() == 1) {
-                setNonEmptyState();
-            } else if (tabbedPane.getTabCount() == 2) {
-                setMultiple();
-            }
-            fileToOpen = null;
-        }
-    }
-
-    public void openIt(boolean raisePanel) {
-      if ( (fileToOpen != null) && (fileToOpen.exists())) {
-        try {
-          String fileName = fileToOpen.getPath();
-          prefs.put("workingDirectory", fileToOpen.getPath());
-          // Should this be done _after_ we know it was successfully opened?
-          String encoding = Globals.prefs.get("defaultEncoding");
-          ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
-          BibtexDatabase db = pr.getDatabase();
-          HashMap meta = pr.getMetaData();
-
-          if (pr.hasWarnings()) {
-            final String[] wrns = pr.warnings();
-            (new Thread() {
-              public void run() {
-                StringBuffer wrn = new StringBuffer();
-                for (int i = 0; i < wrns.length; i++)
-                  wrn.append( (i + 1) + ". " + wrns[i] + "\n");
-                if (wrn.length() > 0)
-                  wrn.deleteCharAt(wrn.length() - 1);
-                JOptionPane.showMessageDialog(ths, wrn.toString(),
-                                              Globals.lang("Warnings"),
-                                              JOptionPane.WARNING_MESSAGE);
-              }
-            }).start();
-          }
-
-          BasePanel bp = new BasePanel(ths, db, fileToOpen,
-                                       meta, prefs);
-          bp.encoding = pr.getEncoding(); // Keep track of which encoding was used for loading.
-          /*
-            if (prefs.getBoolean("autoComplete")) {
-            db.setCompleters(autoCompleters);
-            }
-           */
-
-          // fileToOpen is set to null inside the EventDispatcherThread
-          SwingUtilities.invokeLater(new openItSwingHelper(bp, raisePanel));
-
-          output(Globals.lang("Opened database") + " '" + fileName +
-                 "' " + Globals.lang("with") + " " +
-                 db.getEntryCount() + " " + Globals.lang("entries") + ".");
-
-        }
-        catch (Throwable ex) {
-          //  ex.printStackTrace();
-          JOptionPane.showMessageDialog
-              (ths, ex.getMessage(),
-               Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);
-        }
-      }
-    }
-  }
 
   // The action concerned with opening a new database.
   class NewDatabaseAction
@@ -2006,6 +1891,10 @@ class FetchCiteSeerAction
     return selectedFile.getAbsolutePath();*/
   }
 
+    public FileHistory getFileHistory() {
+	return fileHistory;
+    }
+
   JMenuItem
       htmlItem = new JMenuItem(Globals.lang("HTML")),
       simpleHtmlItem = new JMenuItem(Globals.lang("Simple HTML")),
@@ -2015,6 +1904,8 @@ class FetchCiteSeerAction
       modsItem = new JMenuItem(Globals.lang("MODS")),
       rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
       endnoteItem = new JMenuItem(Globals.lang("Endnote"));
+
+
 
 
   private void setUpExportMenu(JMenu menu) {
@@ -2278,11 +2169,11 @@ class SaveSessionAction
           String[] names = prefs.getStringArray("savedSession");
           for (int i = 0; i < names.length; i++) {
             if (!currentFiles.contains(names[i])) {
-              fileToOpen = new File(names[i]);
-              if (fileToOpen.exists()) {
+              File file = new File(names[i]);
+              if (file.exists()) {
                 //Util.pr("Opening last edited file:"
                 //+fileToOpen.getName());
-                open.openIt(i == 0);
+                open.openIt(file, i == 0);
               }
             }
           }
