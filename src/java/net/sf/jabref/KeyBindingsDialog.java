@@ -37,30 +37,33 @@ class KeyBindingsDialog extends JDialog
 {
     JList list=new JList();
     JTextField keyTF=new JTextField();
-    JButton ok,cancel,grabB;
-    HashMap bindHM;
+    JButton ok,cancel,grabB,defB;
+    HashMap bindHM, defBinds;
     boolean clickedSave=false;
     boolean getAction(){return clickedSave;}
     HashMap getNewKeyBindings(){
 	return bindHM;
     }
-    public KeyBindingsDialog(HashMap name2binding)
+    public KeyBindingsDialog(HashMap name2binding, HashMap defBinds)
     {
 	super();
+	this.defBinds = defBinds;
 	setTitle("JabRef Key Binding:");
 	setModal(true);//this needs to be modal so that client knows when ok or cancel was clicked
 	getContentPane().setLayout(new BorderLayout());
 	bindHM=name2binding;
 	JScrollPane listScroller = new JScrollPane(list);
-	listScroller.setPreferredSize(new Dimension(250, 80));
+	listScroller.setPreferredSize(new Dimension(250, 400));
 	getContentPane().add( listScroller, BorderLayout.CENTER);
 
 	Box buttonBox=new Box(BoxLayout.X_AXIS);
 	ok=new JButton(Globals.lang("Ok"));
 	cancel=new JButton(Globals.lang("Cancel"));
 	grabB=new JButton(Globals.lang("Grab"));	
+	defB=new JButton(Globals.lang("Default"));	
 	grabB.addKeyListener(new JBM_CustomKeyBindingsListener());
 	buttonBox.add(grabB);
+	buttonBox.add(defB);
 	buttonBox.add(ok);
 	buttonBox.add(cancel);
 
@@ -219,8 +222,24 @@ class KeyBindingsDialog extends JDialog
 		    clickedSave=false;
 		    //System.exit(-1);//get rid of this
 		}});
+	defB.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    Object[] selected = list.getSelectedValues();
+		    if(selected.length==0)
+			return;
+		    keyTF.setText(setToDefault((String)list.getSelectedValue()));
+		}});
 	
     }
+
+    String setToDefault(String name) 
+    {
+	String defKey = (String)defBinds.get(name);
+	bindHM.put(name, defKey);
+	return defKey;
+    }
+
+    /*
     public static void main(String args[])
     {
 	HashMap h=new HashMap();
@@ -232,5 +251,5 @@ class KeyBindingsDialog extends JDialog
 	d.setSize(200,300);
 	d.setVisible(true);
 	
-    }
+	}*/
 }

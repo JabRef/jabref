@@ -251,6 +251,13 @@ public class JabRefPreferences {
     }
 
     /**
+     * Returns the HashMap containing default key bindings.
+     */
+    public HashMap getDefaultKeys() {
+	return defKeyBinds;
+    }
+
+    /**
      * Stores new key bindings into Preferences, provided they
      * actually differ from the old ones.
      */

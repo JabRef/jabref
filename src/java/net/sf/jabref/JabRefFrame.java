@@ -774,9 +774,10 @@ public class JabRefFrame extends JFrame {
 	}
 	public void actionPerformed(ActionEvent e) {
 	    KeyBindingsDialog d= new KeyBindingsDialog
-		((HashMap)prefs.getKeyBindings().clone());
+		((HashMap)prefs.getKeyBindings().clone(),
+		 prefs.getDefaultKeys());
 	    d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    d.setSize(300,500);
+	    d.pack();//setSize(300,500);
 	    Util.placeDialog(d, ths);
 	    d.setVisible(true);
 	    if (d.getAction()) {
