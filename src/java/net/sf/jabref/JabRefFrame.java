@@ -566,7 +566,7 @@ public class JabRefFrame extends JFrame {
 		});
 
 
-	options.add(new AbstractAction("Font") {
+	/*options.add(new AbstractAction("Font") {
 		public void actionPerformed(ActionEvent e) {
 		    // JDialog dl = new EntryCustomizationDialog(ths);
 		    Font f=new FontSelectorDialog
@@ -586,7 +586,7 @@ public class JabRefFrame extends JFrame {
 				}
 			}
 		}
-		});
+		});*/
 
 //options.add(selectKeys);
 	mb.add(options);
@@ -1037,6 +1037,7 @@ public class JabRefFrame extends JFrame {
 				for (int i=0; i<tabbedPane.getTabCount(); i++) {
 					BasePanel bf = baseAt(i);
 					if (bf.database != null) {
+					    bf.entryTable.updateFont();
 					    bf.setupTable();
 					}
 				}

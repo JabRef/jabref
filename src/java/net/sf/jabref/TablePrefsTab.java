@@ -19,11 +19,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextArea tableFields = new JTextArea();//"", 80, 5);
-
+    private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1;
     private Vector tableRows = new Vector(10);
+    private Font font = GUIGlobals.CURRENTFONT;
+
     class TableRow {
 	String name;
 	int length;
@@ -176,6 +178,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	upper.add(autoResizeMode);
 	gbl.setConstraints(antialias, con);
 	upper.add(antialias);
+	con.anchor = GridBagConstraints.EAST;
+	gbl.setConstraints(fontButton, con);
+	upper.add(fontButton);
+	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.BOTH;
 	con.gridwidth = 1;
 	gbl.setConstraints(upper, con);
@@ -271,6 +277,18 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	//tabPanel.add(glue);
 
 	//colSetup.getInputMap
+
+	fontButton.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    // JDialog dl = new EntryCustomizationDialog(ths);
+		    Font f=new FontSelectorDialog
+				(null, GUIGlobals.CURRENTFONT).getSelectedFont();
+			if(f==null)
+			    return;
+			else
+			    font = f;
+		}
+	    });
     }
 
     class DeleteRowAction extends AbstractAction {
@@ -402,7 +420,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	_prefs.putBoolean("terDescending", terDesc.isSelected());
 	_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
 	_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
-
+	// updatefont
+	_prefs.put("fontFamily", font.getFamily());
+	_prefs.putInt("fontStyle", font.getStyle());
+	_prefs.putInt("fontSize", font.getSize());
+	GUIGlobals.CURRENTFONT = font;
     }
 
 }
