@@ -210,6 +210,8 @@ public class RightClickMenu extends JPopupMenu
       add(groupAddMenu);
       add(groupRemoveMenu);
 
+      groupAddMenu.setEnabled(false);
+      groupRemoveMenu.setEnabled(false);
       insertNodes(groupAddMenu,metaData.getGroups(),bes,true);
       insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false);
     }
