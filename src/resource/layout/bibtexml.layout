@@ -1,0 +1,11 @@
+<bibtex:entry id="\bibtexkey">
+  <bibtex:\format[net.sf.jabref.export.layout.format.ToLowerCase]{\bibtextype}>
+\begin{author}    <bibtex:author>\author</bibtex:author>\end{author}
+    <bibtex:title>\title</bibtex:title>
+\begin{journal}    <bibtex:journal>\journal</bibtex:journal>\end{journal}
+\begin{pages}    <bibtex:pages>\pages</bibtex:pages>\end{pages}
+    <bibtex:year>\year</bibtex:year>
+  </bibtex:{\format[net.sf.jabref.export.layout.format.ToLowerCase]\bibtextype}>
+</bibtex:entry>
+
+ 
