@@ -26,6 +26,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
+import java.io.File;
+
 public class JabRef {
 
     public static void main(String[] args) {
@@ -33,6 +35,25 @@ public class JabRef {
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
 	JabRefFrame jrf = new JabRefFrame();
-    }
 
+	if(args.length > 0){
+	    //verify the file
+	    System.out.println("Opening: " + args[0]);
+	    File f = new File (args[0]);
+            
+	    if(! (f.exists() && f.canRead() && f.isFile()) ){
+		System.err.println("Error" + args[0] + 
+				   " is not a valid file or is not readable");
+		//JOptionPane...
+	    }else{
+		jrf.fileToOpen=f;
+		jrf.openDatabaseAction.openIt(true);
+	    }
+            
+            
+	}else{//no arguments (this will be for later and other command line switches)
+	    // ignore..
+	}
+    }
+    
 }

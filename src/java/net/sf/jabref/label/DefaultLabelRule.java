@@ -27,13 +27,14 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.label;
 
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 public class DefaultLabelRule implements LabelRule {
 
 
     // the default rule is that oit simply returns what it was given
-    public BibtexEntry applyRule(BibtexEntry oldEntry){
-		return oldEntry ; 
+    public String applyRule(BibtexEntry oldEntry){
+	return (String)oldEntry.getField(Globals.KEY_FIELD); 
     }
 
 

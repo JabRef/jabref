@@ -34,7 +34,7 @@ public class BookLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)
-    public BibtexEntry applyRule(BibtexEntry oldEntry){
+    public String applyRule(BibtexEntry oldEntry){
         String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
         String newLabel = "" ; 
 
@@ -64,8 +64,8 @@ public class BookLabelRule extends DefaultLabelRule {
 
         newLabel += "book" ;
         
-		oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-		return oldEntry ; 
+	//	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
+	return newLabel; 
     }
 
 

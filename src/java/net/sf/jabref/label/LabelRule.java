@@ -31,7 +31,7 @@ import net.sf.jabref.BibtexEntry;
 public interface LabelRule{
 
     // the default rule is that oit simply returns what it was given
-    public BibtexEntry applyRule(BibtexEntry oldEntry) ;
+    public String applyRule(BibtexEntry oldEntry) ;
 
 
 }

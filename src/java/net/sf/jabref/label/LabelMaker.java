@@ -27,7 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.label;
 
 import net.sf.jabref.*;
-import java.util.Hashtable ; 
+import java.util.Hashtable ;
 
 
 /**
@@ -37,40 +37,38 @@ import java.util.Hashtable ;
 public class LabelMaker {
 
     public BibtexEntry applyRule(BibtexEntry newEntry){
+	String newKey = "";
         if(ruleTable.containsKey(newEntry.getType().getName())){
-            newEntry = ((LabelRule) ruleTable.get(newEntry.getType().getName())).applyRule(newEntry) ; 
+            newKey = ((LabelRule)ruleTable.get(newEntry.getType().getName())).applyRule(newEntry) ;
         }
         else{
-			newEntry = applyDefaultRule(newEntry) ; 
+		newKey = applyDefaultRule(newEntry) ;
         }
 
-	// Remove all occurences of # from the key, since it's illegal.
-	String key = (String)newEntry.getField(GUIGlobals.KEY_FIELD),
-	    newKey = Util.checkLegalKey(key);
-	if (!newKey.equals(key))
-	    newEntry.setField(GUIGlobals.KEY_FIELD, newKey);
+	// Remove all illegal characters from the key.
+	newKey = Util.checkLegalKey(newKey);
+	newEntry.setField(Globals.KEY_FIELD, newKey);
 	// ...
 
-		return newEntry ; 
+		return newEntry ;
     }
-    
+
     public void setDefaultRule(LabelRule newRule) {
-		defaultRule = newRule ; 
+		defaultRule = newRule ;
     }
 
-    public BibtexEntry applyDefaultRule(BibtexEntry newEntry) {
-        newEntry = defaultRule.applyRule(newEntry) ;  
-        return newEntry ; 
+    public String applyDefaultRule(BibtexEntry newEntry) {
+        return defaultRule.applyRule(newEntry) ;
     }
 
-    
+
     // there should be a default rule for any type
     public void addRule(LabelRule rule,BibtexEntryType type){
-       ruleTable.put(type.getName(),rule) ; 
+       ruleTable.put(type.getName(),rule) ;
     }
 
-    protected LabelRule defaultRule = new ArticleLabelRule() ; 
-    protected Hashtable ruleTable = new Hashtable() ; 
+    protected LabelRule defaultRule = new ArticleLabelRule() ;
+    protected Hashtable ruleTable = new Hashtable() ;
 
 }
 

@@ -33,7 +33,7 @@ public class ArticleLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author last name)/(year)/(first unique journal word)
-    public BibtexEntry applyRule(BibtexEntry oldEntry){
+    public String applyRule(BibtexEntry oldEntry){
         String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
         String newLabel = "" ; 
 
@@ -70,8 +70,8 @@ public class ArticleLabelRule extends DefaultLabelRule {
 	// now check for uniqueness
 	// i need access to basepanes: checkForDuplicateKey
 	
-	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-	return oldEntry ; 
+	//oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
+	return newLabel ; 
 	
 
 	/*

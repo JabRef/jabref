@@ -1,3 +1,4 @@
+
 /*
 Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
 
@@ -1228,5 +1229,4 @@ public class JabRefFrame extends JFrame {
 
 
 }
-
 

@@ -33,7 +33,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)/(first unique booktitle word)
-    public BibtexEntry applyRule(BibtexEntry oldEntry){
+    public String applyRule(BibtexEntry oldEntry){
         String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
         String newLabel = "" ; 
 
@@ -87,8 +87,8 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
         }
         catch(Throwable t){  System.err.println(t) ; }
 
-		oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-		return oldEntry ; 
+	//	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
+	return newLabel; 
     }
 
 
