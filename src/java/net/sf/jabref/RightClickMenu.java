@@ -59,21 +59,21 @@ public class RightClickMenu extends JPopupMenu
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Globals.lang("Copy")) {
+        add(new AbstractAction(Globals.lang("Copy"), new ImageIcon(GUIGlobals.copyIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copy");
                     } catch (Throwable ex) {}
                 }
             });
-        add(new AbstractAction(Globals.lang("Paste")) {
+        add(new AbstractAction(Globals.lang("Paste"), new ImageIcon(GUIGlobals.pasteIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("paste");
                     } catch (Throwable ex) {}
                 }
             });
-        add(new AbstractAction(Globals.lang("Cut")) {
+        add(new AbstractAction(Globals.lang("Cut"), new ImageIcon(GUIGlobals.cutIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("cut");
@@ -81,17 +81,33 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
+        add(new AbstractAction(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile)) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("delete");
+                    } catch (Throwable ex) {}
+                }
+            });
             addSeparator();
 
+        /*add(new AbstractAction(Globals.lang("Export to clipboard")) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        panel.runCommand("exportToClipboard");
+                    } catch (Throwable ex) {}
+                }
+            });
+            addSeparator();
+          */
         if (multiple) {
-          add(new AbstractAction(Globals.lang("Mark entries")) {
+          add(new AbstractAction(Globals.lang("Mark entries"), new ImageIcon(GUIGlobals.markIcon)) {
             public void actionPerformed(ActionEvent e) {
               try {
                 panel.runCommand("markEntries");
               } catch (Throwable ex) {}
             }
           });
-          add(new AbstractAction(Globals.lang("Unmark entries")) {
+          add(new AbstractAction(Globals.lang("Unmark entries"), new ImageIcon(GUIGlobals.unmarkIcon)) {
             public void actionPerformed(ActionEvent e) {
               try {
                 panel.runCommand("unmarkEntries");
@@ -101,7 +117,7 @@ public class RightClickMenu extends JPopupMenu
           addSeparator();
         } else if (be != null) {
           if (be.getField(Globals.MARKED) == null)
-            add(new AbstractAction(Globals.lang("Mark entry")) {
+            add(new AbstractAction(Globals.lang("Mark entry"), new ImageIcon(GUIGlobals.markIcon)) {
                public void actionPerformed(ActionEvent e) {
                  try {
                    panel.runCommand("markEntries");
@@ -109,7 +125,7 @@ public class RightClickMenu extends JPopupMenu
                }
              });
            else
-             add(new AbstractAction(Globals.lang("Unmark entry")) {
+             add(new AbstractAction(Globals.lang("Unmark entry"), new ImageIcon(GUIGlobals.unmarkIcon)) {
                public void actionPerformed(ActionEvent e) {
                  try {
                    panel.runCommand("unmarkEntries");
@@ -119,7 +135,7 @@ public class RightClickMenu extends JPopupMenu
            addSeparator();
         }
 
-        add(new AbstractAction(Globals.lang("Open PDF or PS")) {
+        add(new AbstractAction(Globals.lang("Open PDF or PS"), new ImageIcon(GUIGlobals.pdfIcon)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("openFile");
@@ -127,7 +143,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-            add(new AbstractAction(Globals.lang("Open URL or DOI")) {
+            add(new AbstractAction(Globals.lang("Open URL or DOI"), new ImageIcon(GUIGlobals.wwwIcon)) {
               public void actionPerformed(ActionEvent e) {
                 try {
                   panel.runCommand("openUrl");
@@ -135,7 +151,7 @@ public class RightClickMenu extends JPopupMenu
               }
             });
 
-        add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
+        add(new AbstractAction(Globals.lang("Copy BibTeX key"), new ImageIcon(GUIGlobals.copyKeyIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copyKey");
@@ -143,7 +159,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-        add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}")) {
+        add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}"), new ImageIcon(GUIGlobals.copyKeyIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copyCiteKey");

@@ -1,6 +1,6 @@
 
-JabRef 1.7 beta
----------------
+JabRef 1.7
+----------
 
 
 Introduction:
@@ -88,9 +88,22 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.7...  - Made side pane resizable.
+1.7     - When fetching from Medline or CiteSeer, fetched entry is now opened in editor.
+        - Added French translations of help files.
+        - Added color highlighting of focused text field in entry editor.
+        - Added option in context menu of entry editor for changing capitalization
+	      of field contents.
+	    - Added name conversion "Smith, RA" -> "Smith, R. A." to Medline import.
+	    - Fixed bug that left some search settings items disabled when they shouldn't be.
+        - Fixed bug that caused requirement for restart to register change in default
+          key pattern.
+        - Fixed bug that caused crash some times after adding/removing field content selectors.
+        - Fixed bug in recognizing custom entry types when reading bib files.
+        - Fixed bug that allowed a deleted entry to stay visible in the entry editor.
+1.7b2:  - Made side pane resizable.
+        - Replaced entry customization dialog with improved interface.
         - Added standard entry type "conference", similar to "inproceedings".
-        - Added "default" label pattern to avoid the need to set similar patterns manually.
+        - Added default key pattern to avoid the need to set similar patterns manually.
         - Added line wrapping to metadata in saved .bib file to avoid long lines.
         - Added "bibtexkey" as implicit fourth sort criterion, to minimize problem with almost
           similar entries swapping places.
@@ -98,7 +111,8 @@ Change log:
           OpenOffice.org bibliography feature.
         - Added a couple of previously unsupported publication types in SciFinder.
         - Added extra shortcuts CTRL-+ and CTRL-- for switching tabs in entry editor, since 
-          original shortcuts CTRL[-SHIFT]-TAB is hijacked by some window managers (at least KDE).
+          original shortcuts CTRL[-SHIFT]-TAB is used by some window managers.
+        - Updated Endnote export filter.
         - Fixed focus and key binding problems for switching tabs/entries in entry editor
         - Fixed bug that prevented required fields tab from appearing for entries with only bibtex key
           as required field.

@@ -30,6 +30,9 @@ import java.util.Hashtable;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
 import net.sf.jabref.search.SearchExpression;
 
 class SearchManager2 extends SidePaneComponent
@@ -62,10 +65,12 @@ class SearchManager2 extends SidePaneComponent
 				   // an incremental search. -1 means
 				   // that the search is inactive.
 
+
     public SearchManager2(SidePaneManager manager) {
 	super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
 
 	incSearcher = new IncrementalSearcher(Globals.prefs);
+
 
 	
 	//setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.magenta));
@@ -115,6 +120,15 @@ class SearchManager2 extends SidePaneComponent
 	    searchOpt.setEnabled(false);
 	    searchGen.setEnabled(false);
 	}
+    searchAll.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent event) {
+            boolean state = !searchAll.isSelected();
+            searchReq.setEnabled(state);
+	        searchOpt.setEnabled(state);
+	        searchGen.setEnabled(state);            
+        }
+    });
+
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
 				      Globals.prefs.getBoolean("caseSensitiveSearch"));
 settings.add(select);
@@ -412,8 +426,10 @@ settings.add(select);
 		public void run() {
 		    String text = searchField.getText();
 
+
 		    if (incSearchPos >= panel.getDatabase().getEntryCount()) {
 			panel.output("'"+text+"' : "+Globals.lang
+
 				     ("Incremental search failed. Repeat to search from top.")+".");
 			incSearchPos = -1;
 			return;
@@ -437,8 +453,10 @@ settings.add(select);
 			}
 		    }
 		    if (incSearchPos >= 0) {
+
 			panel.selectSingleEntry(incSearchPos);
 			panel.output("'"+text+"' "+Globals.lang
+
 				     ("found")+".");
 		    }
 		}

@@ -282,11 +282,19 @@ public class ImportFormatReader {
     for (int i = 0; i < authors.length; i++) {
       authors[i] = authors[i].trim();
 
-      int comma = authors[i].indexOf(", ");
+      int comma = authors[i].indexOf(",");
 test: 
-      if (comma >= 0)
-        // There is a comma, so we assume it's ok.
-        sb.append(authors[i]);
+      if (comma >= 0) {
+          // There is a comma, so we assume it's ok. Fix it so there is no white
+          // space in front of the comma, and one space after:
+          String[] parts = authors[i].split(",");
+          sb.append(parts[0].trim());
+          for (int part=1; part<parts.length; part++) {
+              sb.append(", ");
+              sb.append(parts[part].trim());
+          }
+          //sb.append(authors[i]);
+      }
       else {
         // The name is without a comma, so it must be rearranged.
         int pos = authors[i].lastIndexOf(' ');
@@ -298,7 +306,7 @@ test:
           break test;
         }
 
-        String surname = authors[i].substring(pos + 1);
+        String surname = authors[i].substring(pos + 1).trim();
 
         if (surname.equalsIgnoreCase("jr.")) {
           pos = authors[i].lastIndexOf(' ', pos - 1);
@@ -314,7 +322,7 @@ test:
 
         // Ok, we've isolated the last name. Put together the rearranged name:
         sb.append(surname + ", ");
-        sb.append(authors[i].substring(0, pos));
+        sb.append(authors[i].substring(0, pos).trim());
       }
 
       if (i != (authors.length - 1))
@@ -344,6 +352,78 @@ test:
 
     return fixed;
   }
+
+    /**
+     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
+     * @param name
+     * @return
+     */
+  public static String expandAuthorInitials(String name) {
+      String[] authors = name.split(" and ");
+      StringBuffer sb = new StringBuffer();
+      for (int i=0; i<authors.length; i++) {
+          if (authors[i].indexOf(", ") >= 0) {
+              String[] names = authors[i].split(", ");
+              if (names.length > 0) {
+                  sb.append(names[0]);
+                  if (names.length > 1)
+                    sb.append(", ");
+              }
+              for (int j=1; j<names.length; j++) {
+                  sb.append(expandAll(names[j]));
+              }
+
+          } else {
+              String[] names = authors[i].split(" ");
+              if (names.length > 0) {
+                  sb.append(expandAll(names[0]));
+              }
+              for (int j=1; j<names.length; j++) {
+                  sb.append(" ");
+                  sb.append(names[j]);
+              }
+          }
+          if (i < authors.length-1)
+              sb.append(" and ");
+      }
+
+      return sb.toString().trim();
+  }
+
+  public static String expandAll(String s) {
+      //System.out.println("'"+s+"'");
+      // Avoid arrayindexoutof.... :
+      if (s.length() == 0)
+        return s;
+      // If only one character (uppercase letter), add a dot and return immediately:
+      if ((s.length() == 1) && (Character.isLetter(s.charAt(0)) &&
+              Character.isUpperCase(s.charAt(0))))
+        return s+".";
+      StringBuffer sb = new StringBuffer();
+      char c = s.charAt(0), d = 0;
+      for (int i=1; i<s.length(); i++) {
+          d = s.charAt(i);
+          if (Character.isLetter(c) && Character.isUpperCase(c) &&
+                  Character.isLetter(d) && Character.isUpperCase(d)) {
+              sb.append(c);
+              sb.append(". ");
+          }
+          else {
+              sb.append(c);
+          }
+          c = d;
+      }
+      if (Character.isLetter(c) && Character.isUpperCase(c) &&
+            Character.isLetter(d) && Character.isUpperCase(d)) {
+          sb.append(c);
+          sb.append(". ");
+      }
+      else {
+          sb.append(c);
+      }
+      return sb.toString().trim();
+  }
+
 
   static File checkAndCreateFile(String filename) {
     File f = new File(filename);
@@ -544,8 +624,7 @@ found:
    * and keeping the import that seems most promising. Returns an Object array
    * with two elements, 0: the name of the format used, 1: a List of entries.
    */
-  public Object[] importUnknownFormat(String filename)
-    throws IOException {
+  public Object[] importUnknownFormat(String filename) {
     Object entryList = null;
     String usedFormat = null;
     int bestResult = 0;

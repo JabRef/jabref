@@ -154,7 +154,7 @@ public class MedlineHandler extends DefaultHandler
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
 			if (!author.equals("")) { 
-			    b.setField("author",author);
+			    b.setField("author",ImportFormatReader.expandAuthorInitials(author));
 			    author = "";
 			}
 			if (!title.equals("")) b.setField("title",title);

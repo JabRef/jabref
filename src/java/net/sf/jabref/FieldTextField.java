@@ -28,6 +28,8 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 
@@ -40,7 +42,7 @@ public class FieldTextField extends JTextField implements FieldEditor {
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
-
+        addFocusListener(new FieldEditorFocusListener());
         fieldName = fieldName_;
         label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
         //label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
@@ -93,4 +95,5 @@ public class FieldTextField extends JTextField implements FieldEditor {
     }
     replaceSelection(textToInsert);
   }
+
 }

@@ -320,6 +320,7 @@ public class JabRefFrame
       new NewEntryAction("mastersthesis", prefs.getKey("New mastersthesis")),
       new NewEntryAction("proceedings", prefs.getKey("New proceedings")),
       new NewEntryAction("inproceedings"),
+      new NewEntryAction("conference"),
       new NewEntryAction("incollection"),
       new NewEntryAction("booklet"),
       new NewEntryAction("manual"),
@@ -908,7 +909,7 @@ public JabRefPreferences prefs() {
     file.add(open); //opendatabaseaction
     file.add(mergeDatabaseAction);
     file.add(importMenu);
-    file.add(importMenu);
+    //file.add(importMenu);
     file.add(importNewMenu);
     file.add(save);
     file.add(saveAs);
@@ -1702,8 +1703,11 @@ class FetchCiteSeerAction
          BibtexDatabase refBase = bp.getDatabase() ;
          if (refBase != null)
          {
-             IntegrityWizard wizard = new IntegrityWizard(ths, refBase) ;
+
+             IntegrityWizard wizard = new IntegrityWizard(ths, basePanel()) ;
+             Util.placeDialog(wizard, ths);
              wizard.setVisible(true) ;
+
          }
        }
       }
@@ -2065,7 +2069,7 @@ class FetchCiteSeerAction
           public void run() {
             try {
               FileActions.exportDatabase
-                  (basePanel().database, dir, lfName, oFile, prefs);
+                  (basePanel().database, dir, lfName, oFile);
               output(Globals.lang("Exported database to file") + " '" +
                      oFile.getPath() + "'.");
             }
@@ -2231,7 +2235,7 @@ class SaveSessionAction
           try {
             FileActions.exportDatabase
                 (basePanel().database, directory,
-                 lfName, oFile, prefs);
+                 lfName, oFile);
             output(Globals.lang("Exported database to file") + " '" +
                    oFile.getPath() + "'.");
           }

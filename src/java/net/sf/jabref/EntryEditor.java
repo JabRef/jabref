@@ -128,6 +128,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   HelpAction helpAction;
   UndoAction undoAction = new UndoAction();
   RedoAction redoAction = new RedoAction();
+  TabListener tabListener = new TabListener();
 
   public EntryEditor(JabRefFrame frame_, BasePanel panel_, BibtexEntry entry_) {
 
@@ -151,9 +152,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     setupToolBar();
     setupFieldPanels();
     setupSourcePanel();
-    tabbed.addChangeListener(new TabListener());
     add(tabbed, BorderLayout.CENTER);
-
+    tabbed.addChangeListener(tabListener);
     if (prefs.getBoolean("defaultShowSource"))
       tabbed.setSelectedIndex(sourceIndex);
 
@@ -164,13 +164,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tabbed.removeAll();
 	tabs.clear();
 	String[] fields = entry.getRequiredFields();
-	//if (fields != null) {
-	    reqPan = new EntryEditorTab(java.util.Arrays.asList(fields), this, true);
-	    tabbed.addTab(Globals.lang("Required fields"),
-			  new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
-			  Globals.lang("Show required fields"));
-	    tabs.add(reqPan);
+
+
+    List fieldList = null;
+    if (fields != null)
+        fieldList = java.util.Arrays.asList(fields);
+    reqPan = new EntryEditorTab(fieldList, this, true);
+    tabbed.addTab(Globals.lang("Required fields"),
+          new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
+          Globals.lang("Show required fields"));
+    tabs.add(reqPan);
 	//}
+
 	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
 	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this, false);
 	    tabbed.addTab(Globals.lang("Optional fields"),
@@ -206,7 +211,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		      Globals.lang("Show/edit BibTeX source"));
 	tabs.add(srcPanel);
 	sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
-	
+    srcPanel.setFocusCycleRoot(true);	
     }
 
   public BibtexEntryType getType() {
@@ -281,8 +286,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     typeLabel = new TypeLabel(entry.getType().getName());
   }
 
+  /**
+   * Rebuild the field tabs. This is called e.g. when a new content selector has been added.
+    */
   public void rebuildPanels() {
+      // Remove change listener, because the rebuilding causes meaningless events and trouble:
+      tabbed.removeChangeListener(tabListener);
       setupFieldPanels();//reqPanel, optPanel, genPanel, absPanel);
+      // Add the change listener again:
+      tabbed.addChangeListener(tabListener);
     revalidate();
     repaint();
   }
@@ -549,7 +561,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     source.setEditable(true); //prefs.getBoolean("enableSourceEditing"));
     source.setLineWrap(true);
     source.setTabSize(GUIGlobals.INDENT);
-
+    source.addFocusListener(new FieldEditorFocusListener());
     // Add the global focus listener, so a menu item can see if this field
     // was focused when
     // an action was called.
@@ -643,11 +655,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     private void activateVisible() {
 	Object activeTab = tabs.get(tabbed.getSelectedIndex());
-        
+
 	if (activeTab instanceof EntryEditorTab)
 	    ((EntryEditorTab)activeTab).activate();
 	else
-	    ((JComponent)activeTab).requestFocus();
+        new FocusRequester(source);
+	    //((JComponent)activeTab).requestFocus();
     }
 
   /**
@@ -1476,6 +1489,5 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                   JOptionPane.WARNING_MESSAGE);
       }
   }
-  
 
 }

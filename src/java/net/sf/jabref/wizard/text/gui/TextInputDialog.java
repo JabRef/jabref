@@ -74,7 +74,7 @@ public class TextInputDialog
   private JPanel buttonPanel = new JPanel() ;
   private JPanel rawPanel = new JPanel() ;
   private JPanel sourcePanel = new JPanel() ;
-  private IntegrityMessagePanel warnPanel = new IntegrityMessagePanel() ;
+  private IntegrityMessagePanel warnPanel;
   private JList fieldList ;
   private JRadioButton overRadio, appRadio ;
 
@@ -95,12 +95,14 @@ public class TextInputDialog
 
   private boolean okPressed = false ;
 
-  public TextInputDialog( JabRefFrame frame, String title, boolean modal,
+  public TextInputDialog( JabRefFrame frame, BasePanel panel, String title, boolean modal,
                           BibtexEntry bibEntry )
   {
     super( frame, title, modal ) ;
 
-    inputChanged = true ; // for a first validCheck
+    warnPanel = new IntegrityMessagePanel(panel);
+    inputChanged = true ;  // for a first validCheck
+
 
     _frame = frame ;
 
@@ -120,8 +122,7 @@ public class TextInputDialog
     updateSourceView() ;
   }
 
-  private void jbInit( JabRefFrame parent ) throws Exception
-  {
+  private void jbInit( JabRefFrame parent ) {
     this.setModal( true ) ;
     //this.setResizable( false ) ;
     getContentPane().setLayout(new BorderLayout());

@@ -175,7 +175,7 @@ public class ContentSelectorDialog extends JDialog {
 	}
     }
 
-    private void jbInit() throws Exception {
+    private void jbInit() {
 	titledBorder1 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),Globals.lang("Selector enabled fields"));
 	titledBorder2 = new TitledBorder(BorderFactory.createEtchedBorder(Color.white,new Color(142, 142, 142)),Globals.lang("Item list for field"));
 	//jPanel1.setBackground(GUIGlobals.lightGray);

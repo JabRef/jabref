@@ -52,7 +52,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
   boolean tmp = true;
 
-    //UIFSplitPane contentPane = new UIFSplitPane();
+    UIFSplitPane contentPane = new UIFSplitPane();
+
     BasePanel ths = this;
     JSplitPane splitPane;
     //BibtexEntry testE = new BibtexEntry("tt");
@@ -252,7 +253,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             return;
                         else if (answer == JOptionPane.YES_OPTION) {
                             ChangeScanner scanner = new ChangeScanner(frame, ths); //, panel.database(), panel.metaData());
-                            try {
+                            //try {
                                 scanner.changeScan(file());
                                 setUpdatedExternally(false);
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -261,9 +262,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                     }
                                 });
 
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
+                            //} catch (IOException ex) {
+                            //    ex.printStackTrace();
+                            //}
                             
                             return;
                         }
@@ -390,6 +391,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() throws Throwable {
                     runCommand("copy");
                     BibtexEntry[] bes = entryTable.getSelectedEntries();
+                    int row0 = entryTable.getSelectedRow();
                     if ((bes != null) && (bes.length > 0)) {
                         // Create a CompoundEdit to make the action undoable.
                         NamedCompound ce = new NamedCompound
@@ -410,6 +412,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         undoManager.addEdit(ce);
                         refreshTable();
                         markBaseChanged();
+
+                        // Reselect the entry in the first prev. selected position:
+                        if (row0 >= entryTable.getRowCount())
+                            row0 = entryTable.getRowCount()-1;
+                        if (row0 >= 0)
+                            entryTable.addRowSelectionInterval(row0, row0);
                     }
                 }
             });
@@ -420,21 +428,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   int row0 = entryTable.getSelectedRow();
                   if ((bes != null) && (bes.length > 0)) {
+
                     //&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
                       boolean goOn = showDeleteConfirmationDialog(bes.length);
                       if (!goOn) {
                           // This is a hack to avoid the action being called twice,
                           // feel free to fix it...
-                          entryTable.clearSelection();
+                          return;
+                          //entryTable.clearSelection();
                       }
                       else {
                           // Create a CompoundEdit to make the action undoable.
                           NamedCompound ce = new NamedCompound
-                              (bes.length > 1 ? Globals.lang("delete entries")
-                               : Globals.lang("delete entry"));
+                              (bes.length > 1 ? "delete entries" : "delete entry");
                           // Loop through the array of entries, and delete them.
                           for (int i = 0; i < bes.length; i++) {
                               database.removeEntry(bes[i].getId());
+                              ensureNotShowing(bes[i]);
                               ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
                           }
                           frame.output(Globals.lang("Deleted") + " " +
@@ -444,8 +454,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           ce.end();
                           undoManager.addEdit(ce);
                           //entryTable.clearSelection();
+
                           refreshTable();
                           markBaseChanged();
+
+                          // Reselect the entry in the first prev. selected position:
+                          if (row0 >= entryTable.getRowCount())
+                              row0 = entryTable.getRowCount()-1;
+                          if (row0 >= 0)
+                            entryTable.addRowSelectionInterval(row0, row0);
 
                       }
                   }
@@ -1127,7 +1144,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                   String id = Util.createId(tp, database);
                   BibtexEntry bibEntry = new BibtexEntry(id, tp) ;
-                  TextInputDialog tidialog = new TextInputDialog(frame,
+                  TextInputDialog tidialog = new TextInputDialog(frame, ths, 
                                                                  "import", true,
                                                                  bibEntry) ;
                   Util.placeDialog(tidialog, ths);
@@ -1155,7 +1172,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           // Create an UndoableInsertEntry object.
                           undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, ths));
 
-                          TextInputDialog tidialog = new TextInputDialog(frame,
+                          TextInputDialog tidialog = new TextInputDialog(frame, ths, 
                                                                          "import", true,
                                                                          bibEntry) ;
                           Util.placeDialog(tidialog, ths);
@@ -1300,20 +1317,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			  }
 
 			  // Make a list of possible formats:
-			  Set formats = new HashSet();
-			  formats.add("bibtexml");
-			  formats.add("docbook");
-			  formats.add("html");
-			  formats.add("simplehtml");
+			  Map formats = new HashMap();
+			  formats.put("BibTeXML", "bibtexml");
+			  formats.put("DocBook", "docbook");
+			  formats.put("HTML", "html");
+                          formats.put("RTF (Harvard)", "harvard/harvard");
+			  formats.put("Simple HTML", "simplehtml");
 			  for (int i = 0; i < prefs.customExports.size(); i++) {
-			      formats.add((prefs.customExports.getElementAt(i))[0]);
+                  Object o = (prefs.customExports.getElementAt(i))[0];
+			      formats.put(o, o);
 			  }
-			  JList list = new JList(formats.toArray());
+                          Object[] array = formats.keySet().toArray();
+                          Arrays.sort(array);
+			  JList list = new JList(array);
 			  list.setBorder(BorderFactory.createEtchedBorder());
 			  list.setSelectionInterval(0,0);
 			  list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			  int answer = 
-			      JOptionPane.showOptionDialog(frame, list, Globals.lang("Select the format to copy entries in"),
+			      JOptionPane.showOptionDialog(frame, list, Globals.lang("Select format"),
 							   JOptionPane.YES_NO_OPTION,
 							   JOptionPane.QUESTION_MESSAGE, null, 
 							   new String[] {Globals.lang("Ok"), Globals.lang("Cancel")}, 
@@ -1322,7 +1343,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			  if (answer == JOptionPane.NO_OPTION)
 			      return;
 			  
-			  String lfName = (String)(list.getSelectedValue());
+			  String lfName = (String)(formats.get(list.getSelectedValue()));
 			  final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
 			  String dir = null;
 			  if (custom) {
@@ -1339,13 +1360,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			  
 			  try {
 			      BibtexEntry[] bes = entryTable.getSelectedEntries();
-			      FileActions.exportToClipboard(database, bes, format, custom, directory, prefs);
+                  StringWriter sw = new StringWriter();
+			      FileActions.exportEntries(database, bes, format, custom, directory, sw);
+                  ClipboardOwner owner = new ClipboardOwner() {
+		            public void lostOwnership(Clipboard clipboard, Transferable content) {}
+	              };
+	              StringSelection ss = new StringSelection(sw.toString());
+ 	                Toolkit.getDefaultToolkit().getSystemClipboard()
+	                    .setContents(ss, owner);
 			      message = Globals.lang("Entries exported to clipboard")+": "+bes.length;
-			      
 			  } catch (Exception ex) {
 			      ex.printStackTrace();
 			  }
-
 		      }
 		      
 		      public void update() {
@@ -1378,9 +1404,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * defined, or prints an error message to the standard error
      * stream.
      *
-     * @param command The name of the command to run.
+     * @param _command The name of the command to run.
     */
-    public void runCommand(String _command) throws Throwable {
+    public void runCommand(String _command) {
       final String command = _command;
       //(new Thread() {
       //  public void run() {
@@ -1548,9 +1574,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
     }
 
-    public void validateMainPanel() {
-    }
-
     public void setupTable() {
         tableModel = new EntryTableModel(frame, this, database);
         entryTable = new EntryTable(tableModel, ths, frame.prefs);
@@ -1629,12 +1652,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             ex.printStackTrace();
                         }
                     }
-                    else if(keyCode == KeyEvent.VK_DELETE){
+                    /*else if(keyCode == KeyEvent.VK_DELETE){
                         try { runCommand("delete");
                         } catch (Throwable ex) {
                             ex.printStackTrace();
                         }
-                    }
+                    } */
                     /*
                     if (((e.getKeyCode() == KeyEvent.VK_DOWN) || (e.getKeyCode() == KeyEvent.VK_UP))
                       && (e.getModifiers() == 0)) {
@@ -1697,13 +1720,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         else
             showEntry(showing);
 
-	/*        contentPane.setBorder(null);
-        contentPane.setDividerLocation(-1);
-        contentPane.setLeftComponent(sidePaneManager.getPanel());
-        contentPane.setRightComponent(splitPane);
-        contentPane.setDividerBorderVisible(false);
-        contentPane.setDividerSize(2);*/
+
         setLayout(new BorderLayout());
+
 	add(splitPane, BorderLayout.CENTER);
         //add(contentPane, BorderLayout.CENTER);
 
@@ -1723,10 +1742,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         revalidate();
     }
+
     
     public void setDivider() {
         //contentPane.setDividerLocation(-1);
     }
+
 
     /**
      * This method is called after a database has been parsed. The
@@ -1755,7 +1776,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	    tableModel.update();
 	//tableModel.remap();
         if ((bes != null) && (bes.length > 0))
-            highlightEntries(bes, 0);
+            selectEntries(bes, 0);
 
 	//long toc = System.currentTimeMillis();
 	//	Util.pr("Refresh took: "+(toc-tic)+" ms");
@@ -1973,18 +1994,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * This method selects the given enties.
      * If an entryEditor is shown, it is given focus afterwards.
      */
-    public void highlightEntries(final BibtexEntry[] bes, final int toScrollTo) {
+    public void selectEntries(final BibtexEntry[] bes, final int toScrollTo) {
 	//Util.pr("highlighting...");
         SwingUtilities.invokeLater(new Thread() {
              public void run() {    
                  int rowToScrollTo = 0;
                  entryTable.revalidate();
-                 loop: for (int i=0; i<bes.length; i++) {                     
+                 entryTable.clearSelection();
+                 loop: for (int i=0; i<bes.length; i++) {
 		     if (bes[i] == null)
 			 continue loop;
 		     int row = tableModel.getNumberFromName(bes[i].getId());                    
 		     if (i==toScrollTo)
 			 rowToScrollTo = row;
+             //System.out.println("Adding: "+row+"\t'"+bes[i].getId()+"'");
 		     entryTable.addRowSelectionIntervalQuietly(row, row);
                  }
                  entryTable.ensureVisible(rowToScrollTo);

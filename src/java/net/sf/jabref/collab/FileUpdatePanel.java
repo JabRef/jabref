@@ -42,11 +42,11 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
   public void actionPerformed(ActionEvent e) {
       manager.hideAway(this);
     ChangeScanner scanner = new ChangeScanner(frame, panel); //, panel.database(), panel.metaData());
-    try {
+    //try {
       scanner.changeScan(panel.file());
       panel.setUpdatedExternally(false);
-    } catch (IOException ex) {
-        ex.printStackTrace();
-    }
+    //} catch (IOException ex) {
+    //    ex.printStackTrace();
+    //}
   }
 }

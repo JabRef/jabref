@@ -351,7 +351,7 @@ public class Util {
             BrowserLauncher.openURL(fileurl.toString());
             return;
         }catch (MalformedURLException mue){
-
+            mue.printStackTrace();
         }
 
         File file;

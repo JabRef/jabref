@@ -19,6 +19,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
     public AbstractWorker() {
 	worker = (Worker)Spin.off(this);
 	callBack = (CallBack)Spin.over(this);
+
     }
 
     public void init() throws Throwable {

@@ -103,7 +103,6 @@ public class GroupSelector extends SidePaneComponent implements
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, GUIGlobals.groupsIconFile, Globals.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
-        //this.groupsRoot = groupsRoot;
 
         this.manager = manager;
         this.frame = frame;
@@ -145,6 +144,7 @@ public class GroupSelector extends SidePaneComponent implements
                 Globals.prefs.putBoolean("groupSubgroupIndependent", groupModeIndependent.isSelected());
             }
         });
+
         groupModeIntersection.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
                 Globals.prefs.putBoolean("groupSubgroupIntersection", groupModeIntersection.isSelected());
@@ -152,6 +152,7 @@ public class GroupSelector extends SidePaneComponent implements
         });
         
         if (Globals.prefs.getBoolean("groupFloatSelections")) {
+
             floatCb.setSelected(true);
             highlCb.setSelected(false);
         } else {
@@ -165,6 +166,7 @@ public class GroupSelector extends SidePaneComponent implements
             orCb.setSelected(true);
             andCb.setSelected(false);
         }
+
         //defaults.put("groupSubgroupIndependent", Boolean.FALSE);
         //defaults.put("groupSubgroupIntersection", Boolean.TRUE);
         if (Globals.prefs.getBoolean("groupSubgroupIndependent")) {
@@ -185,6 +187,7 @@ public class GroupSelector extends SidePaneComponent implements
         
         invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
         select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
+
         openset.setMargin(new Insets(0, 0, 0, 0));
         settings.add(groupModeUnion);
         settings.add(groupModeIntersection);
@@ -335,7 +338,7 @@ public class GroupSelector extends SidePaneComponent implements
                 new DragGestureListener() {
                     public void dragGestureRecognized(DragGestureEvent dge) {
                         // TODO Auto-generated method stub
-                        System.out.println(dge);
+                        //System.out.println(dge);
                     }
                 });
         groupsTree.setShowsRootHandles(false);

@@ -141,8 +141,16 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		    }*/
 		//ce.end();
 		panel.frame().addBibEntries(bibs, null, false);
-		panel.markBaseChanged();
+        panel.markBaseChanged();
 		panel.refreshTable();
+        if (bibs.size() > 0) {
+            BibtexEntry[] entries = (BibtexEntry[])bibs.toArray(new BibtexEntry[0]);
+            panel.selectEntries(entries, 0);
+            if (entries.length == 1)
+                panel.showEntry(entries[0]);
+            //else
+            //    panel.updateViewToSelected();
+        }
 		panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
 	
 		//panel.undoManager.addEdit(ce);
@@ -247,7 +255,13 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	    // for strCount ...
 	    if(strCount=="")
 		return;
-	    int count = Integer.parseInt(strCount);
+	    int count;
+        try {
+            count = Integer.parseInt(strCount);
+        } catch (NumberFormatException ex) {
+            panel.output("");
+            return;
+        }
 	    for (int jj = 0; jj < count; jj+=PACING) {
 		// get the ids from entrez
 		result = getIds(searchTerm,jj,PACING);
@@ -277,6 +291,12 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		    ce.end();*/
 		    panel.frame().addBibEntries(bibs, null, false);
 		    panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
+
+            BibtexEntry[] entries = (BibtexEntry[])bibs.toArray(new BibtexEntry[0]);
+            panel.selectEntries(entries, 0);
+            if (entries.length == 1)
+                panel.showEntry(entries[0]);
+
 		    //panel.undoManager.addEdit(ce);
 		    panel.markBaseChanged();
 		    panel.refreshTable();
@@ -319,7 +339,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
         Matcher retStartMatcher;
 	boolean doCount = true;
 	SearchResult result = new SearchResult();
-	System.out.println(medlineUrl+term);
+	//System.out.println(medlineUrl+term);
         try{
             URL ncbi = new URL(medlineUrl+term);
             // get the ids

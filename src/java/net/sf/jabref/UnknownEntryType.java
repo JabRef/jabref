@@ -43,7 +43,7 @@ public class UnknownEntryType extends BibtexEntryType {
 	return true;
     }
 
-    public void save(Writer out) throws IOException {
+    public void save(Writer out) {
     }
 
 }

@@ -43,8 +43,10 @@ public class Globals {
   public static int SHORTCUT_MASK,// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
       FUTURE_YEAR = 2050, // Needs to give a year definitely in the future. Used for guessing the
                           // year field when parsing textual data.  :-)
-      STANDARD_EXPORT_COUNT = 4, // The number of standard export formats.
+
+      STANDARD_EXPORT_COUNT = 5, // The number of standard export formats.
       METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
+
   private static String resourcePrefix = "resource/JabRef",
                         menuResourcePrefix = "resource/Menu",
                         integrityResourcePrefix = "resource/IntegrityMessage";
@@ -54,7 +56,9 @@ public class Globals {
     public static ImportFormatReader importFormatReader = new ImportFormatReader();
 
 
+
     private final static Map tableCache = new WeakHashMap();
+
 
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
   public static Locale locale;
@@ -92,6 +96,7 @@ public class Globals {
       MONTH_STRINGS.put("dec", "December");
   }
 
+
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
  public static HelpDialog helpDiag = null;
@@ -121,13 +126,14 @@ public class Globals {
   public static void turnOnFileLogging() {
     Logger.global.setLevel(java.util.logging.Level.ALL);
     java.util.logging.Handler handler;
-    try {
+    handler = new ConsoleHandler();
+    /*try {
       handler = new FileHandler(logfile); // this will overwrite
     }
     catch (IOException e) { //can't open log file so use console
         e.printStackTrace();
-      handler = new ConsoleHandler();
-    }
+
+    } */
     Logger.global.addHandler(handler);
 
     handler.setFilter(new Filter() { // select what gets logged

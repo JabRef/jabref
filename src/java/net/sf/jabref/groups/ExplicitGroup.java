@@ -32,8 +32,6 @@ import net.sf.jabref.util.QuotedStringTokenizer;
 /**
  * @author jzieren
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "ExplicitGroup:";

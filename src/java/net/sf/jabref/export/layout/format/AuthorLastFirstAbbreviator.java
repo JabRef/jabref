@@ -92,6 +92,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
                         // appropriate format.
 			if((authors[i].indexOf(' ') >= 0) && (authors[i].lastIndexOf(',')==-1))
 			{
+                System.out.println(": '"+authors[i]+"'");
                             Exception e = new Exception("Error: names must be rearranged in Last, First format before formatted with AuthorLastFirstAbbreviator");
                             e.printStackTrace();
                             throw e;

@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Report
-%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E 

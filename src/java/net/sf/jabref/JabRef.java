@@ -25,19 +25,13 @@
 package net.sf.jabref;
 
 import com.jgoodies.plaf.FontSizeHints;
-
-//import com.jgoodies.plaf.plastic.PlasticLookAndFeel;
-import com.jgoodies.plaf.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.plaf.windows.ExtWindowsLookAndFeel;
-
 import net.sf.jabref.export.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.wizard.auximport.*;
 
 import gnu.dtools.ritopt.*;
-
-import java.awt.Color;
 import java.awt.Font;
+import java.awt.Frame;
 
 import java.io.*;
 import java.io.File;
@@ -45,7 +39,11 @@ import java.io.File;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import com.jgoodies.plaf.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.plaf.windows.ExtWindowsLookAndFeel;
+
+
 
 
 //import javax.swing.UIManager;
@@ -77,7 +75,7 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 	Globals.prefs = prefs;
         BibtexEntryType.loadCustomEntryTypes(prefs);
-        Globals.turnOnFileLogging(); 
+        //Globals.turnOnFileLogging(); 
         Globals.setLanguage(prefs.get("language"), "");
 
         // ----------------------------------------------------------------
@@ -166,12 +164,13 @@ public class JabRef {
          * (args[i].equals("-h")) { System.out.println("Help info goes here.");
          * System.exit(0); } }
          */
-        SplashScreen ss = null;
+        Frame ss = null;
 
         if (!disableGui.isInvoked()) {
             try {
-                ss = new SplashScreen();
-                ss.setVisible(true);
+
+                ss = SplashScreen.splash();
+
             } catch (Throwable ex) {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
@@ -289,7 +288,7 @@ public class JabRef {
                                 String fname = (lfFile.getName().split("\\."))[0];
                                 FileActions.exportDatabase(pr.getDatabase(),
                                     lfFile.getParent() + File.separator, fname,
-                                    new File(data[0]), prefs);
+                                    new File(data[0]));
                                 System.out.println(Globals.lang("Exporting") + ": "
                                     + data[0]);
                             } catch (Exception ex) {
@@ -308,7 +307,7 @@ public class JabRef {
                         try {
                             System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                             FileActions.exportDatabase(pr.getDatabase(), data[1],
-                                new File(data[0]), prefs);
+                                new File(data[0]));
                         } catch (NullPointerException ex2) {
                             System.err.println(Globals.lang("Unknown export format")
                                 + ": " + data[1]);
@@ -598,7 +597,11 @@ lastEdLoop:
             String encoding = Globals.prefs.get("defaultEncoding");
             ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
             pr.setFile(file);
-
+            if (pr.hasWarnings()) {
+                String[] warn = pr.warnings();
+                for (int i=0; i<warn.length; i++)
+                    System.out.println(Globals.lang("Warning")+": "+warn[i]);
+            }
             return pr;
         } catch (Throwable ex) {
             //System.err.println(Globals.lang("Error opening file")+" '"+ name+"':

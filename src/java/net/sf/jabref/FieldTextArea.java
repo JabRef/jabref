@@ -46,7 +46,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
-
+        addFocusListener(new FieldEditorFocusListener());
         sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setMinimumSize(new Dimension(200, 1));
@@ -117,4 +117,6 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
        this.insert(textToInsert, cPos);
       }
     }
+
+
 }

@@ -51,16 +51,16 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
 	    if (!fileOk)
 		return;
 	    
-	    try {
+	    //try {
 		Object[] o = Globals.importFormatReader.importUnknownFormat(filename);
 		formatName = (String)o[0];
 		if (o[1] instanceof java.util.List)
 		    entries = (java.util.List)o[1];
 		else if (o[1] instanceof ParserResult)
 		    bibtexResult = (ParserResult)o[1];
-	    } catch (IOException ex) {
-		ex.printStackTrace();
-	    }
+	    //} catch (IOException ex) {
+		//ex.printStackTrace();
+	    //}
 	}
 	public void update() {
 	    if (!fileOk)

@@ -194,7 +194,7 @@ public class SidePaneManager implements ChangeListener {
 	  sidep.setVisible(true);
       if (!wasVisible)
         frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
-      //    if (!wasVisible) panel.setDivider();
+
       } else
 	  sidep.setVisible(false);
 

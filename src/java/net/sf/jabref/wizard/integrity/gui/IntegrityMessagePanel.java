@@ -36,6 +36,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.wizard.integrity.gui ;
 
 import javax.swing.* ;
+import javax.swing.undo.UndoManager;
+import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.wizard.text.gui.HintListModel ;
 import java.awt.Dimension ;
 import net.sf.jabref.* ;
@@ -57,11 +59,11 @@ public class IntegrityMessagePanel
   private JTextField content  ;
   private JButton applyButton ;
   private JButton fixButton ;
+  private BasePanel basePanel;
 
-
-  public IntegrityMessagePanel()
+  public IntegrityMessagePanel(BasePanel basePanel)
   {
-
+    this.basePanel = basePanel;
     validChecker = new IntegrityCheck() ; // errors, warnings, hints
 
   // JList --------------------------------------------------------------
@@ -174,8 +176,13 @@ public class IntegrityMessagePanel
         if (entry != null)
         {
 //          System.out.println("update") ;
-          entry.setField(msg.getFieldName(), content.getText());
-          msg.setFixed(true);
+            Object oldContent = entry.getField(msg.getFieldName());
+            UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent, 
+                        content.getText());
+            entry.setField(msg.getFieldName(), content.getText());
+            basePanel.undoManager.addEdit(edit);
+            basePanel.markBaseChanged();
+            msg.setFixed(true);
 //          updateView(entry) ;
           warningData.valueUpdated(warnings.getSelectedIndex()) ;
         }

@@ -87,12 +87,12 @@ public class RTFChars implements LayoutFormatter {
             if (command.equals("emph") || command.equals("textit")) {
               IntAndString part = getPart(field, i);
               i += part.i;
-              sb.append("<em>"+part.s+"</em>");
+              sb.append("}{\\i "+part.s+"}{");
             }
             else if (command.equals("textbf")) {
               IntAndString part = getPart(field, i);
               i += part.i;
-              sb.append("<b>"+part.s+"</b>");
+              sb.append("}{\\b "+part.s+"}{");
             }
           } else
             sb.append((char)c);

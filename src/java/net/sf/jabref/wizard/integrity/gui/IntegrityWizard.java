@@ -55,16 +55,18 @@ public class IntegrityWizard
 
   private JabRefFrame _frame ;
   private BibtexDatabase dbase ;
+  private BasePanel basePanel;
   private JButton closeButton ;
   private JButton startButton ;
   private IntegrityMessagePanel warnPanel ;
 
-  public IntegrityWizard( JabRefFrame frame, BibtexDatabase database )
+  public IntegrityWizard( JabRefFrame frame, BasePanel basePanel)
   {
     super( frame, "dialog", true ) ;
 
     _frame = frame ;
-    dbase = database ;
+    this.basePanel = basePanel;
+    dbase = basePanel.database();
 
     try
     {
@@ -77,14 +79,16 @@ public class IntegrityWizard
     }
   }
 
-  private void jbInit() throws Exception
-  {
+  private void jbInit() {
 //    this.setModal( true ) ;
     this.setResizable( false ) ;
 
     // messages
     this.setTitle( Globals.lang("Integrity_check") ) ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
-    warnPanel = new IntegrityMessagePanel() ;
+    //warnPanel = new IntegrityMessagePanel() ;
+    //this.setTitle( "Experimental feature - Integrity Check") ;//Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
+    warnPanel = new IntegrityMessagePanel(basePanel) ;
+
 
     // ButtonPanel
     JPanel buttonPanel = new JPanel() ;

@@ -1,13 +1,11 @@
 package net.sf.jabref.imports;
 
-import java.util.ArrayList;
 import java.net.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.Hashtable;
+import java.util.*;
 //import java.util.regex.Pattern;
 //import java.util.regex.Matcher;
 import net.sf.jabref.*;
@@ -27,6 +25,7 @@ import net.sf.jabref.HelpAction;
 
 public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionListener {
 
+
     String idList;
     JTextField tf = new JTextField();
     JPanel pan = new JPanel();
@@ -44,6 +43,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 	super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
 
 	help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
+
 	this.citeSeerFetcher = fetcher;
 	helpBut.addActionListener(help);
 	helpBut.setMargin(new Insets(0,0,0,0));        
@@ -89,21 +89,29 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 		    BibtexEntry entry;
 		    
 		    class UpdateComponent implements Runnable {
-			boolean changesMade;
+			Set addedEntries;
 			
-			UpdateComponent(boolean changesMade) {
-			    this.changesMade = changesMade;
+			UpdateComponent(Set addedEntries) {
+                this.addedEntries = addedEntries;
 			}
 			
 			public void run() {
 			    citeSeerFetcher.endImportCiteSeerProgress();
-			    if (changesMade)
-				panel.markBaseChanged();
-			    panel.refreshTable();
-			    //for(int i=0; i < clickedOn.length; i++)
-			    //        currentBp.entryTable.addRowSelectionInterval(i,i);
-			    //currentBp.showEntry(toShow);
-			    panel.output(Globals.lang("Completed Import Fields from CiteSeer."));
+			    if (addedEntries != null)
+				    panel.markBaseChanged();
+			        panel.refreshTable();
+                    // Select the entries that were added:
+                    if (addedEntries.size() > 0) {
+                         BibtexEntry[] toSelect = new BibtexEntry[addedEntries.size()];
+                         toSelect = (BibtexEntry[])addedEntries.toArray(toSelect);
+
+                        panel.selectEntries(toSelect, 0);
+                        if (toSelect.length == 1)
+                            panel.showEntry(toSelect[0]);
+                        //else
+                        //    panel.updateViewToSelected();
+                     }
+    		        panel.output(Globals.lang("Completed Import Fields from CiteSeer."));
 			}
 		    };
 		    
@@ -113,8 +121,8 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 			    new NamedCompound("CiteSeer import entries"),
 			    // Use a dummy UndoEdit to avoid storing the information on
 			    // every field change, since we are importing new entries:
-			    dummyCompound = new NamedCompound("dummy");
-			BooleanAssign overwriteAll = new BooleanAssign(false),
+			    dummyCompound = new NamedCompound("Ok");
+			BooleanAssign overwriteAll = new BooleanAssign(true),
 			    overwriteNone = new BooleanAssign(false),
 			    newValue = new BooleanAssign(false);			
 			Hashtable rejectedEntries = new Hashtable();
@@ -133,27 +141,32 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 
 			}
 
+            Set addedEntries = new HashSet();
 			if (rejectedEntries.size() < entries.length) {
+
 			    for (int i=0; i<entries.length; i++) {
 				if (rejectedEntries.contains(entries[i]))
 				    continue;
 
 				try {
 				    panel.database().insertEntry(entries[i]);
-				    System.out.println(entries[i]);
+				    //System.out.println(entries[i]);
 				    UndoableInsertEntry undoItem = new UndoableInsertEntry
 					(panel.database(), entries[i], panel);
 				    undoEdit.addEdit(undoItem);
+                    addedEntries.add(entries[i]);
 				} catch (KeyCollisionException ex) {
 				    ex.printStackTrace();
 				}
-				
+
 			    }
 			    undoEdit.end();
 			    panel.undoManager.addEdit(undoEdit);
-			}   
+
+
+			}
 			UpdateComponent updateComponent = new UpdateComponent
-			    (rejectedEntries.size() < entries.length);
+			    (addedEntries.size() > 0 ? addedEntries : null);
 			SwingUtilities.invokeLater(updateComponent);
 		    
 			citeSeerFetcher.deactivateImportFetcher();

@@ -159,7 +159,7 @@ class CustomExportDialog extends JDialog {
 
 	// Layout starts here.
 	main.setLayout(gbl);
-	opt.setLayout(gbl);
+	//opt.setLayout(gbl);
 	main.setBorder(BorderFactory.createTitledBorder
 		       (BorderFactory.createEtchedBorder(),
 			Globals.lang("Export properties")));
@@ -211,11 +211,11 @@ class CustomExportDialog extends JDialog {
 	con.gridwidth = 1;
 	con.anchor = GridBagConstraints.EAST;
 	con.fill = GridBagConstraints.NONE;
-	gbl.setConstraints(ok, con);
+	//gbl.setConstraints(ok, con);
 	opt.add(ok);
 	con.anchor = GridBagConstraints.WEST;
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(cancel, con);
+	//gbl.setConstraints(cancel, con);
 	opt.add(cancel);
 
 	getContentPane().add(main, BorderLayout.CENTER);

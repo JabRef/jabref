@@ -64,6 +64,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	GridBagConstraints con = new GridBagConstraints();
 	SidePaneManager sidePaneManager;
 
+
 	public CiteSeerFetcher(SidePaneManager p0)  {
 		super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("CiteSeer Transfer"));
 

@@ -36,7 +36,7 @@ public class ChangeScanner extends Thread {
         this.mdInMem = bp.metaData();
     }
     
-    public void changeScan(File f) throws IOException {
+    public void changeScan(File f) {
         this.f = f;
         start();
     }

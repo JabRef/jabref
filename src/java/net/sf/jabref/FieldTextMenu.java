@@ -38,8 +38,10 @@ package net.sf.jabref ;
 import java.awt.* ;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.net.*;
 import java.awt.datatransfer.*;
+import net.sf.jabref.util.*;
 
 public class FieldTextMenu implements MouseListener
 {
@@ -53,10 +55,11 @@ public class FieldTextMenu implements MouseListener
     myFieldName = fieldComponent ;
 
     // copy/paste Menu
-    //inputMenu.add( new MenuHeaderAction(myFieldName.getFieldName()) ) ;
-    //inputMenu.addSeparator() ;
     inputMenu.add( pasteAct ) ;
     inputMenu.add( copyAct ) ;
+    inputMenu.addSeparator();
+    //inputMenu.add(new ReplaceAction());
+    inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
   }
 
   public void mouseClicked(MouseEvent e)
@@ -102,33 +105,27 @@ public class FieldTextMenu implements MouseListener
 
 
 // ---------------------------------------------------------------------------
-  abstract class BasicMenuAction extends AbstractAction
+  abstract class BasicAction extends AbstractAction
   {
-    public BasicMenuAction(String text, String description, URL icon)
+    public BasicAction(String text, String description, URL icon)
     {
       super(Globals.lang(text), new ImageIcon(icon));
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
-    public BasicMenuAction(String text, String description, URL icon, KeyStroke key)
+    public BasicAction(String text, String description, URL icon, KeyStroke key)
     {
       super(Globals.lang(text), new ImageIcon(icon));
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
-    public BasicMenuAction(String text, String extensionText)
-    {
-      super(Globals.lang(text) + " - " +extensionText);
-    }
-
-    public BasicMenuAction(String text)
+    public BasicAction(String text)
     {
       super(Globals.lang(text));
     }
 
-
-    public BasicMenuAction(String text, KeyStroke key)
+    public BasicAction(String text, KeyStroke key)
     {
       super(Globals.lang(text));
       putValue(ACCELERATOR_KEY, key);
@@ -137,24 +134,24 @@ public class FieldTextMenu implements MouseListener
     public abstract void actionPerformed(ActionEvent e) ;
   }
 //---------------------------------------------------------------
-  class MenuHeaderAction extends BasicMenuAction
+  /*class MenuHeaderAction extends BasicAction
   {
     public MenuHeaderAction(String comment)
     {
-      super("Edit", comment);
+      super("Edit -" +comment);
       this.setEnabled(false);
     }
 
     public void actionPerformed(ActionEvent e) { }
   }
-
+    */
 
 // ---------------------------------------------------------------------------
-  class PasteAction extends BasicMenuAction
+  class PasteAction extends BasicAction
   {
     public PasteAction()
     {
-      super("Paste", "Paste from clipboard", GUIGlobals.pasteIconFile);
+      super("Paste from clipboard", "Paste from clipboard", GUIGlobals.pasteIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -175,11 +172,11 @@ public class FieldTextMenu implements MouseListener
     }
   }
 // ---------------------------------------------------------------------------
-  class CopyAction extends BasicMenuAction
+  class CopyAction extends BasicAction
   {
     public CopyAction()
     {
-      super("Copy", "Copy to clipboard", GUIGlobals.copyIconFile);
+      super("Copy to clipboard", "Copy to clipboard", GUIGlobals.copyIconFile);
     }
 
     public void actionPerformed(ActionEvent e)
@@ -200,6 +197,18 @@ public class FieldTextMenu implements MouseListener
     }
   }
 // ---------------------------------------------------------------------------
-
-
+  /*class ReplaceAction extends BasicAction{
+    public ReplaceAction(){
+        super("Replace , by \u201e and\u201c");
+    }
+    public void actionPerformed(ActionEvent evt){
+        if (myFieldName.getText().equals("")){
+            return;
+        }
+        //myFieldName.selectAll();
+        String input = myFieldName.getText();
+        myFieldName.setText(input.replaceAll(","," and"));
+    }
+  }  */
+ //------------------------------------------------------------------------------
 }

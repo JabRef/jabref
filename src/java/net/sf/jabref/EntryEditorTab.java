@@ -47,10 +47,18 @@ public class EntryEditorTab {
     //    private BibtexEntry entry;
 
     public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField) {
-	this.fields = (String[])fields.toArray(ARRAY);
-	this.parent = parent;
-	setupPanel(addKeyField);
+        if (fields != null)
+	        this.fields = (String[])fields.toArray(ARRAY);
+        else
+            this.fields = new String[] {};
+        this.parent = parent;
+	    setupPanel(addKeyField);
+
+        // The following line makes sure focus cycles inside tab instead of being lost
+        // to other parts of the frame:
+        panel.setFocusCycleRoot(true);
     }
+
 
     private final void setupPanel(boolean addKeyField) {
 	GridBagLayout gbl = new GridBagLayout();
@@ -183,7 +191,10 @@ public class EntryEditorTab {
 	for (Iterator i=editors.keySet().iterator(); i.hasNext();) {
 	    String field = (String)i.next();
 	    FieldEditor ed = (FieldEditor)editors.get(field);
-	    ed.setBackground(GUIGlobals.validFieldBackground);
+        if (((Component)ed).hasFocus())
+            ed.setBackground(GUIGlobals.activeEditor);
+        else
+	        ed.setBackground(GUIGlobals.validFieldBackground);
 	}
     }
 

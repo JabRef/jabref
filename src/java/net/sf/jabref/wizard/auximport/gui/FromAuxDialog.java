@@ -91,8 +91,7 @@ public class FromAuxDialog
     }
   }
 
-  private void jbInit( JabRefFrame parent ) throws Exception
-  {
+  private void jbInit( JabRefFrame parent ) {
     panel1.setLayout( borderLayout1 ) ;
     okButton.setText( Globals.lang( "Ok" ) ) ;
     okButton.setEnabled(false);

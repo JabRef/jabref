@@ -13,53 +13,55 @@
     it takes for JabRef to consider an entry complete. You can both make changes to the existing
     entry types, and define new ones.
     <p>
+    Note that no modifications you make in this dialog will be stored until you click <b>Apply</b>
+    or <b>OK</b>. If you click <b>Cancel</b> or simply close the dialog, unapplied changes will
+    be lost.
+
     <h2>Using the entry customization dialog</h2> 
 
-In the dialog's upper left is a combo box where you can select one of
-the current entry types.  All custom types, either new types or
-redefined standard ones, are displayed with an asterisk (*) behind
-their names.
+The entry customization dialog is divided in three main panels. The leftmost panel
+is where you can select an entry type for modification, and add new ones. The middle
+panel is used for setting up the required fields of the selected entry type, and
+the right panel for setting up the optional fields.
 
-<p>Selecting an entry type merely updates the dialog to show its set
-of required and optional fields, to give you a template for
-customization. You can then proceed to change both the definition and
-the name of the entry type before storing. If the name written in the
-<em>Name</em> text field is different from the selected item in the
-combo box, the <em>Name</em> field takes precedence when you click
-<em>Store</em> or <em>Delete</em>
+<h3>Adding and removing entry types</h3>
 
-<p>You can delete a customized entry type by selecting it and clicking
-the <em>Delete</em> button; if the deleted definition redefined a
-standard type, the standard definition will be restored. You are not
-allowed to delete standard entry types.
+<p>The currently available entry types are listed in the left panel. Whenever
+you select an entry type, the other panels will update to show what fields are
+required and optional for this entry type.
 
-<p>Note that there is no undo when creating, changing and deleting
-entry type definitions.
+<p>To add a new entry type, you must enter a name for it in the text field below
+the type list, and click <b>Add</b>. The new entry type will be added to the list,
+and selected for modification.
 
-<p>When selecting one of the standard types from the combo box, the
-syntax for defining required and optional fields should become
-obvious; the field names are simply written in your preferred order,
-separated by semicolons. Either of the <em>Required fields</em> and
-<em>Optional fields</em> text boxes can be empty, if no fields fit
-into the category. The fields listed do not have to be standard fields
-known by JabRef.
+<p>To remove a custom entry type, select it and click <b>Remove</b>. This operation will
+only be available for custom entry types that are not merely modifications of standard types.
+It is not possible to remove a standard entry type.
 
-<h2>Redefining standard entry types</h2>
-    
-If you store an entry definition with an identical name to one of the
-standard types, the custom type will override the standard one. You
-can use this to redefine the order in which fields appear in the editor,
-add new fields that you use, remove fields you have no interest in, and
-even move all fields into the <em>Required fields</em> panel to avoid having
-to switch when editing entries.
+<p>To return a modified standard type to its default setup, select it and click <b>Default</b>.
+This operation will only be available for customized entry types that modify a standard type.
 
+<h2>Editing entry types</h2>
+
+When an entry type is selected, the current required and optional fields will be listed
+in the center and right panels of the dialog. The process of editing the lists are identical
+for the required and optional fields.
+
+<p>To add a new field, edit the text field below the list, or select a field name from the
+dropdown menu, then click <b>Add</b>. The chosen field name will be added at the end of the
+list.
+
+<p>To remove one or more fields, select them in the list, and click <b>Remove</b>.
+
+<p>To change the order of the fields, choose one field name, and click the arrow buttons to move
+it up or down in the list.
+
+<p>
 There is one limitation to customizing entry types; certain types have
 an and/or condition in their required fields. For instance, a <em>book</em>
 entry is complete with either the <em>author</em> or the <em>editor</em>
 field, or both. This type of condition cannot be represented in a customized
 entry.
 
-If you delete a customized version of a standard entry type, the standard 
-definition will be reinstated.
   </body>
 </html>

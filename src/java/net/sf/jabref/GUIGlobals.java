@@ -53,7 +53,7 @@ public class GUIGlobals {
   // Frame titles.
   public static String
       frameTitle = "JabRef",
-      version = "1.7b",
+      version = "1.7",
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
@@ -115,6 +115,7 @@ public class GUIGlobals {
     static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
     // further below.
     public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
+    public static Color activeEditor = new Color(230, 230, 255);
 
     public static JLabel getTableIcon(String fieldType) {
         Object o = tableIcons.get(fieldType);
@@ -235,9 +236,10 @@ public class GUIGlobals {
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
       incompleteIcon = GUIGlobals.class.getResource(pre + "exclamation.gif"),
       winEdtIcon = GUIGlobals.class.getResource(pre + "winedt.png"),
-      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
-      //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
-      splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
+      //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
+      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
+      //splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
+
       completeTagIcon = GUIGlobals.class.getResource(pre +"completeItem.png"),
       wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png"),
       clearInputArea = GUIGlobals.class.getResource(pre +"new_page.gif"),

@@ -43,12 +43,6 @@ import net.sf.jabref.export.layout.format.*;
 import net.sf.jabref.*;
 import net.sf.jabref.mods.*;
 
-/**
- * DOCUMENT ME!
- *
- * @author $author$
- * @version $Revision$
- */
 public class FileActions
 {
 
@@ -356,24 +350,24 @@ public class FileActions
   }
 
     public static void exportCustomDatabase(BibtexDatabase database, String directory, String lfName,
-                                            File outFile, JabRefPreferences prefs)
+                                            File outFile)
         throws Exception {
 
-      exportDatabase(database, directory, lfName, outFile, prefs);
+      exportDatabase(database, directory, lfName, outFile);
     }
 
 
 
     public static void exportDatabase(BibtexDatabase database, String lfName,
-                                      File outFile, JabRefPreferences prefs)
+                                      File outFile)
         throws Exception {
 
-       
-      exportDatabase(database, Globals.LAYOUT_PREFIX, lfName, outFile, prefs);
+      exportDatabase(database, Globals.LAYOUT_PREFIX, lfName, outFile);
+
     }
 
     public static void exportDatabase(BibtexDatabase database, String prefix, String lfName,
-                                      File outFile, JabRefPreferences prefs)
+                                      File outFile)
     throws Exception {
 
         if (lfName.equals("oocalc")) {
@@ -381,14 +375,15 @@ public class FileActions
 	    return;
         }
 
-	String encoding = prefs.get("defaultEncoding");//"iso-8859-1";
+	String encoding = Globals.prefs.get("defaultEncoding");//"iso-8859-1";
+
         OutputStreamWriter ps=null;
 	ps=new OutputStreamWriter(new FileOutputStream(outFile), encoding);
-	exportDatabase(database, null, prefix, lfName, ps, prefs);
+	exportDatabase(database, null, prefix, lfName, ps);
     }
 
     public static void exportDatabase(BibtexDatabase database, Set entries, String prefix, String lfName,
-                                      Writer ps, JabRefPreferences prefs)
+                                      Writer ps)
     throws Exception {
 
 	Object[] keys = database.getKeySet().toArray();
@@ -487,24 +482,15 @@ public class FileActions
         }
 
 
-    public static void exportToClipboard(BibtexDatabase database, BibtexEntry[] bes, 
-					 String lfName, boolean custom, String directory, JabRefPreferences prefs)
+    public static void exportEntries(BibtexDatabase database, BibtexEntry[] bes,
+                                     String lfName, boolean custom, String directory, Writer sw)
 	throws Exception {
 
-	StringWriter sw = new StringWriter();
 	HashSet keys = new HashSet();
 	for (int i=0; i<bes.length; i++)
 	    keys.add(bes[i].getId());
-	exportDatabase(database, keys, (custom ? directory : Globals.LAYOUT_PREFIX), lfName, sw, prefs);
-	//System.out.println(sw.toString());
-
-	ClipboardOwner owner = new ClipboardOwner() {
-		public void lostOwnership(Clipboard clipboard, Transferable content) {}
-	    }; 
-
-	StringSelection ss = new StringSelection(sw.toString());
-	Toolkit.getDefaultToolkit().getSystemClipboard()
-	    .setContents(ss, owner);
+	exportDatabase(database, keys, (custom ? directory : Globals.LAYOUT_PREFIX), lfName, sw);
+	
 
     }
 

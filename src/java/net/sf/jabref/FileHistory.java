@@ -85,10 +85,6 @@ public class FileHistory extends JMenu implements ActionListener {
 	}
     }
 
-    public void setFileHistory() {
-
-    }
-
     public void actionPerformed(ActionEvent e) {
 	String name = ((JMenuItem)e.getSource()).getText();
 	int pos = name.indexOf(" ");

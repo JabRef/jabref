@@ -43,6 +43,13 @@ public class HelpAction extends MnemonicAwareAction {
     protected URL helpfile;
     protected String helpFile;
 
+    public HelpAction(HelpDialog diag, String helpFile) {
+	super(new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(NAME, "Help");
+	this.diag = diag;
+	this.helpFile = helpFile;
+    }
+
     public HelpAction(HelpDialog diag, String helpFile, String tooltip) {
 	super(new ImageIcon(GUIGlobals.helpIconFile));
 	putValue(NAME, "Help");

@@ -32,6 +32,7 @@ import javax.swing.*;
 
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.export.CustomExportList;
 import java.awt.Point;
 import java.awt.Dimension;
@@ -181,6 +182,7 @@ public class JabRefPreferences {
         defaults.put("menuFontFamily", "Times");
         defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("menuFontSize", new Integer(11));
+
         defaults.put("antialias", Boolean.TRUE);
         defaults.put("ctrlClick", Boolean.FALSE);
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
@@ -192,7 +194,8 @@ public class JabRefPreferences {
         defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
         defaults.put("confirmDelete", Boolean.TRUE);
         defaults.put("grayOutNonHits", Boolean.TRUE);
-        defaults.put("defaultLabelPattern", "[author][year]");
+        defaults.put("defaultLabelPattern", "[auth][year]");
+
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
@@ -236,6 +239,8 @@ public class JabRefPreferences {
         //defaults.put("oooWarning", Boolean.TRUE);
 
     }
+
+
 
     public String get(String key) {
         return prefs.get(key, (String)defaults.get(key));

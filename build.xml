@@ -26,6 +26,7 @@
              $Date$
              $Author$
 
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 <project name="JabRef" default="build" basedir=".">
@@ -135,9 +136,9 @@
 
 
 	<!-- Jars up project -->
-	<target name="jars" depends="compile, unjarlib">
+	<target name="jars" depends="compile">
 		<mkdir dir="${build.lib}" />
-
+		<mkdir dir="${build.tmp}" />
 		<jar destfile="${build.lib}/jabref.jar">
 			<fileset dir="${build.classes}" />
 			<fileset dir="${build.tmp}" />

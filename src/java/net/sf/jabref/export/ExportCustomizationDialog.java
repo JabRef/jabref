@@ -25,7 +25,7 @@ public class ExportCustomizationDialog extends JDialog {
       modify = new JButton(Globals.lang("Modify")),
       remove = new JButton(Globals.lang("Remove")),
       close = new JButton(Globals.lang("Close")),
-      help = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+      help = new JButton(Globals.lang("Help"));
 
   JPanel options = new JPanel(),
       main = new JPanel();
@@ -113,13 +113,14 @@ public class ExportCustomizationDialog extends JDialog {
     //im = table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     //im.put(frame.prefs().getKey("Close dialog"), "close");
     //am.put("close", closeAction);
-
-    main.add(sp);
-    options.add(help);
+    main.setLayout(new BorderLayout());
+    main.add(sp, BorderLayout.CENTER);
     options.add(addExport);
     options.add(modify);
     options.add(remove);
     options.add(close);
+    options.add(Box.createHorizontalStrut(5));
+    options.add(help);
 
     getContentPane().add(main, BorderLayout.CENTER);
     getContentPane().add(options, BorderLayout.SOUTH);

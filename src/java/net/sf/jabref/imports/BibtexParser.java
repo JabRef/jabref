@@ -166,7 +166,8 @@ public class BibtexParser
 			    .equals(GUIGlobals.ENTRYTYPE_FLAG)) {
 			    
 			    CustomEntryType typ = CustomEntryType.parseEntryType(comment.toString());
-			    entryTypes.put(typ.getName(), typ);
+			    entryTypes.put(typ.getName().toLowerCase(), typ);
+
 			}
 		    }
 		    else {
@@ -194,7 +195,7 @@ public class BibtexParser
 
 	    // Before returning the database, update entries with unknown type
 	    // based on parsed type definitions, if possible.
-	    checkEntryTypes();
+	    checkEntryTypes(_pr);
 
             return _pr;
         }
@@ -455,7 +456,7 @@ public class BibtexParser
     /**
      * This method is used to parse the bibtex key for an entry.
      */
-    private String parseKey() throws IOException, NoLabelException
+    private String parseKey() throws IOException,NoLabelException
     {
        StringBuffer token = new StringBuffer(20);
 
@@ -624,16 +625,23 @@ public class BibtexParser
 
     }
 
-    public void checkEntryTypes() {
+    public void checkEntryTypes(ParserResult _pr) {
 	for (Iterator i=_db.getKeySet().iterator(); i.hasNext();) {
-	    BibtexEntry be = (BibtexEntry)_db.getEntryById((String)i.next());
+        Object key = i.next();
+	    BibtexEntry be = (BibtexEntry)_db.getEntryById((String)key);
 	    if (be.getType() instanceof UnknownEntryType) {
 		// Look up the unknown type name in our map of parsed types:
-		Object o = entryTypes.get(be.getType().getName());
+           
+		Object o = entryTypes.get(be.getType().getName().toLowerCase());
 		if (o != null) {
 		    BibtexEntryType type = (BibtexEntryType)o;
 		    be.setType(type);
-		}
+		} else {
+            //System.out.println("Unknown entry type: "+be.getType().getName());
+            _pr.addWarning(Globals.lang("unknown entry type")+": "+be.getType().getName()+". "+
+                 Globals.lang("Type set to 'other'")+".");
+            be.setType(BibtexEntryType.OTHER);
+        }
 	    }
 	}
     }

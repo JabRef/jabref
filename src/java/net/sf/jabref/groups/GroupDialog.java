@@ -26,7 +26,7 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.StringReader;
 import java.util.Iterator;
@@ -38,6 +38,9 @@ import javax.swing.event.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.components.*;
 import net.sf.jabref.search.*;
+import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.builder.*;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -83,13 +86,14 @@ class GroupDialog extends JDialog {
     private JComboBox m_typeSelector = new JComboBox();
     private JButton m_ok = new JButton(Globals.lang("Ok"));
     private JButton m_cancel = new JButton(Globals.lang("Cancel"));
-    private JPanel m_mainPanel;
+    private JPanel m_mainPanel, lowerPanel;
 
     private boolean m_okPressed = false;
     private final JabRefFrame m_parent;
     private final BasePanel m_basePanel;
     private AbstractGroup m_resultingGroup;
     private final AbstractGroup m_editedGroup;
+    private CardLayout lowerLayout = new CardLayout();
 
     /**
      * Shows a group add/edit dialog.
@@ -119,8 +123,11 @@ class GroupDialog extends JDialog {
         m_typeSelector.setModel(m_types);
 
         // create layout
+
         m_mainPanel = new JPanelYBoxPreferredWidth();
-        JPanel namePanel = new JPanelXBoxPreferredHeight();
+
+
+        /*JPanel namePanel = new JPanelXBoxPreferredHeight();
         namePanel.add(m_nameLabel);
         namePanel.add(Box.createHorizontalGlue());
         namePanel.add(new JPanelXBoxPreferredSize(m_name));
@@ -128,9 +135,19 @@ class GroupDialog extends JDialog {
         typePanel.add(m_typeLabel);
         typePanel.add(Box.createHorizontalGlue());
         typePanel.add(new JPanelXBoxPreferredSize(m_typeSelector));
+        */
 
         // ...for keyword group
-        m_keywordGroupPanel = new JPanelYBox();
+        FormLayout layout = new FormLayout
+	    ("left:pref, 4dlu, fill:130dlu","");
+	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        //builder.appendSeparator(Globals.lang("Keyword"));
+        builder.append(m_searchFieldLabel);
+        builder.append(m_searchField);
+        builder.nextLine();
+        builder.append(m_keywordLabel);
+        builder.append(m_kgSearchExpression);
+        /*m_keywordGroupPanel = new JPanelYBox();
         JPanel kgField = new JPanelXBoxPreferredHeight();
         kgField.add(m_searchFieldLabel);
         kgField.add(Box.createHorizontalGlue());
@@ -142,10 +159,30 @@ class GroupDialog extends JDialog {
         m_keywordGroupPanel.add(kgField);
         m_keywordGroupPanel.add(kgExpression);
         m_keywordGroupPanel.add(Box.createVerticalGlue());
-
+        */
+        m_keywordGroupPanel = builder.getPanel();
         // ...for search group
-        m_searchGroupPanel = new JPanelYBox();
-        JPanel sgExpression = new JPanelXBoxPreferredHeight();
+        layout = new FormLayout
+	    ("left:pref, 4dlu, fill:130dlu","");
+	    builder = new DefaultFormBuilder(layout);
+        //builder.appendSeparator(Globals.lang("Search Expression"));
+        builder.append(m_searchExpressionLabel);
+        builder.append(m_sgSearchExpression);
+        builder.nextLine();
+        builder.append(m_caseSensitive);
+        builder.nextLine();
+        builder.append(m_isRegExp);
+        builder.nextLine();
+        builder.append(m_searchAllFields);
+        builder.nextLine();
+        builder.append(m_searchRequiredFields);
+        builder.nextLine();
+        builder.append(m_searchOptionalFields);
+        builder.nextLine();
+        builder.append(m_searchGeneralFields);
+
+        m_searchGroupPanel = builder.getPanel();
+        /*JPanel sgExpression = new JPanelXBoxPreferredHeight();
         sgExpression.add(m_searchExpressionLabel);
         sgExpression.add(Box.createHorizontalGlue());
         sgExpression.add(new JPanelXBoxPreferredSize(m_sgSearchExpression));
@@ -172,21 +209,48 @@ class GroupDialog extends JDialog {
         m_searchGroupPanel.add(sgOpt);
         m_searchGroupPanel.add(sgGen);
         m_searchGroupPanel.add(Box.createVerticalGlue());
+        */
 
-        m_mainPanel.add(namePanel);
-        m_mainPanel.add(typePanel);
+        m_keywordGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        m_searchGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        lowerPanel = new JPanel();
+        lowerPanel.setLayout(lowerLayout);
+        lowerPanel.add(new JPanel(), String.valueOf(INDEX_EXPLICITGROUP));
+        lowerPanel.add(m_keywordGroupPanel, String.valueOf(INDEX_KEYWORDGROUP));
+        lowerPanel.add(m_searchGroupPanel, String.valueOf(INDEX_SEARCHGROUP));
 
-        JPanel buttons = new JPanelXBoxPreferredHeight();
+        layout = new FormLayout
+	    ("left:pref, 4dlu, fill:80dlu","");
+	    builder = new DefaultFormBuilder(layout);
+        builder.append(m_nameLabel);
+        builder.append(m_name);
+        builder.nextLine();
+        builder.append(m_typeLabel);
+        builder.append(m_typeSelector);
+        //builder.nextLine();
+        //builder.append(lowerPanel);
+
+        m_mainPanel = builder.getPanel();
+        m_mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        lowerPanel.setBorder(BorderFactory.createEtchedBorder());//createEmptyBorder(2, 2, 2, 2));
+        //m_mainPanel.add(namePanel);
+        //m_mainPanel.add(typePanel);
+
+        JPanel buttons = new JPanel();//XBoxPreferredHeight();
         buttons.add(m_ok);
-        buttons.add(Box.createHorizontalStrut(5));
+        //buttons.add(Box.createHorizontalStrut(5));
         buttons.add(m_cancel);
 
         Container cp = getContentPane();
-        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+        cp.setLayout(new BorderLayout());
+        cp.add(m_mainPanel, BorderLayout.NORTH);
+        cp.add(lowerPanel, BorderLayout.CENTER);
+        cp.add(buttons, BorderLayout.SOUTH);
+        //cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-        cp.add(m_mainPanel);
-        cp.add(Box.createVerticalGlue());
-        cp.add(buttons);
+        //cp.add(m_mainPanel);
+        //cp.add(Box.createVerticalGlue());
+        //cp.add(buttons);
 
         // add listeners
         m_typeSelector.addItemListener(new ItemListener() {
@@ -296,8 +360,8 @@ class GroupDialog extends JDialog {
         }
 
         pack();
-        setSize(350, 300);
-        setResizable(false);
+        //setSize(350, 300);
+        setResizable(true);
 
         updateComponents();
         setLayoutForGroup(m_typeSelector.getSelectedIndex());
@@ -314,7 +378,8 @@ class GroupDialog extends JDialog {
     }
 
     private void setLayoutForGroup(int index) {
-        switch (index) {
+        lowerLayout.show(lowerPanel, String.valueOf(index));
+        /*switch (index) {
         case INDEX_KEYWORDGROUP:
             m_mainPanel.remove(m_searchGroupPanel);
             m_mainPanel.add(m_keywordGroupPanel);
@@ -333,7 +398,7 @@ class GroupDialog extends JDialog {
             validate();
             repaint();
             break;
-        }
+        } */
     }
 
     private void updateComponents() {
