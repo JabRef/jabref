@@ -37,7 +37,8 @@ public class FieldTextField extends JTextField implements FieldEditor {
     public FieldTextField(String fieldName_, String content) {
 	super(content);
 	fieldName = fieldName_;
-	label = new JLabel(Util.nCase(fieldName));
+	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
+	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	if ((content != null) && (content.length() > 0))
 	    label.setForeground(GUIGlobals.validFieldColor);

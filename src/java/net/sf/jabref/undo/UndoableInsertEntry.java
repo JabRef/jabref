@@ -40,13 +40,13 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
     private BibtexDatabase base;
     private BibtexEntry entry;
-    private HashMap entryTypeForms;
+    private BasePanel panel;
 
     public UndoableInsertEntry(BibtexDatabase base, BibtexEntry entry,
-			       HashMap entryTypeForms) {
+			       BasePanel panel) {
 	this.base = base;
 	this.entry = entry;
-	this.entryTypeForms = entryTypeForms;
+	this.panel = panel;
     }
 
     public String getUndoPresentationName() {
@@ -64,11 +64,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 	try {
 	    base.removeEntry(entry.getId());
 	    // If the entry has an editor currently open, we must close it.
-	    Object o = entryTypeForms.get(entry.getId());
-	    if (o != null) {
-		System.out.println("UndoableInsertEntry must close EntryTypeForm.");
-		//((EntryTypeForm)o).dispose();
-	    }
+	    panel.ensureNotShowing(entry);
 	} catch (Throwable ex) {
 	    Util.pr(ex.getMessage());
 	}

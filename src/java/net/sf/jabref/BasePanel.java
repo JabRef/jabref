@@ -69,7 +69,13 @@ public class BasePanel extends JSplitPane implements MouseListener,
     EntryTableModel tableModel = null;
     EntryTable entryTable = null;
 
-    HashMap entryTypeForms = new HashMap();
+    BibtexEntry showing = null;
+    // To indicate which entry is currently shown.
+    HashMap entryEditors = new HashMap();
+    // To contain instantiated entry editors. This is to save time
+    // in switching between entries.
+
+    //HashMap entryTypeForms = new HashMap();
     // Hashmap to keep track of which entries currently have open
     // EntryTypeForm dialogs.
     
@@ -147,21 +153,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    }
 		    if (clickedOn >= 0) {
 			String id =  tableModel.getNameFromNumber(clickedOn);
-			
-			// First we check that no editor is already open for this
-			// entry.
-			if (!entryTypeForms.containsKey(id)) {
-			    BibtexEntry be = database.getEntryById(id);
-			    //EntryTypeForm form = new EntryTypeForm
-			    //(frame, ths, be, prefs);		    
-			    //Util.placeDialog(form, frame); // We want to center the editor.
-			    //form.setVisible(true);
-			    //entryTypeForms.put(id, form);
-
-			    showEntry(be);
-			} else {
-			    ((EntryTypeForm)(entryTypeForms.get(id))).setVisible(true);
-			}
+			BibtexEntry be = database.getEntryById(id);
+			showEntry(be);		       
 		    }
 		}
 	    	       
@@ -280,12 +273,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
 			    database.removeEntry(bes[i].getId());
-			    Object o = entryTypeForms.get(bes[i].getId());
-			    if (o != null) {
-				((EntryTypeForm)o).dispose();
-			    }
+			    ensureNotShowing(bes[i]);
 			    ce.addEdit(new UndoableRemoveEntry
-				       (database, bes[i], entryTypeForms));
+				       (database, bes[i], ths));
 			}
 			entryTable.clearSelection();
 			frame.output(Globals.lang("Cut")+" "+
@@ -331,12 +321,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			// Loop through the array of entries, and delete them.
 			for (int i=0; i<bes.length; i++) {
 			    database.removeEntry(bes[i].getId());
-			    Object o = entryTypeForms.get(bes[i].getId());
-			    if (o != null) {
-				((EntryTypeForm)o).dispose();
-			    }
-			    ce.addEdit(new UndoableRemoveEntry(database, bes[i],
-							       entryTypeForms));
+			    ensureNotShowing(bes[i]);
+			    ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
 			}
 			entryTable.clearSelection();
 			frame.output(Globals.lang("Deleted")+" "+
@@ -385,7 +371,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 					be.setId(Util.createId(be.getType(), database));
 					database.insertEntry(be);
 					ce.addEdit(new UndoableInsertEntry
-						   (database, be, entryTypeForms));
+						   (database, be, ths));
 				    } catch (KeyCollisionException ex) {
 					Util.pr("KeyCollisionException... this shouldn't happen.");
 				    }
@@ -585,8 +571,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		database.insertEntry(be);
 		
 		// Create an UndoableInsertEntry object.
-		undoManager.addEdit(new UndoableInsertEntry(database, be, 
-							    entryTypeForms));							       
+		undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
 		output("Added new "+type.getName().toLowerCase()+" entry.");
 		refreshTable();
 		markBaseChanged(); // The database just changed.
@@ -694,17 +679,54 @@ public class BasePanel extends JSplitPane implements MouseListener,
     }
 
     public void showEntry(BibtexEntry be) {
-	EntryEditor form = new EntryEditor
-	    (frame, ths, be, prefs);
-	splitPane.setBottomComponent(form);
-	splitPane.setDividerLocation(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+	if (showing == be)
+	    return;
+	EntryEditor form;
+	int divLoc = -1;
+	if (showing != null)
+	    divLoc = splitPane.getDividerLocation();	
+    
+	if (entryEditors.containsKey(be.getType().getName())) {
+	    // We already have an editor for this entry type.
+	    form = (EntryEditor)entryEditors.get
+		((be.getType().getName()));
+	    form.switchTo(be);
+	    splitPane.setBottomComponent(form);
+	} else {
+	    // We must instantiate a new editor for this type.
+	    form = new EntryEditor
+		(frame, ths, be, prefs);
+	    splitPane.setBottomComponent(form);
+	    entryEditors.put(be.getType().getName(), form);
+	}
+	if (showing != null)
+	    splitPane.setDividerLocation(divLoc);
+	else
+	    splitPane.setDividerLocation
+		(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
 	form.requestFocus();
+
+	showing = be;
     }
     
+    /**
+     * Closes the entry editor.
+     *
+     */
     public void hideEntryEditor() {
 	splitPane.setBottomComponent(null);
 	//entryTable.requestFocus();
 	splitPane.requestFocus();
+    }
+
+    /**
+     * Closes the entry editor if it is showing the given entry.
+     *
+     * @param be a <code>BibtexEntry</code> value
+     */
+    public void ensureNotShowing(BibtexEntry be) {
+	if (showing == be)
+	    hideEntryEditor();      
     }
 
     public void markBaseChanged() {
@@ -798,7 +820,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     public void entryTypeFormClosing(String id) {
 	// Called by EntryTypeForm when closing.
-	entryTypeForms.remove(id);
+	// Deprecated, since EntryEditor has replaced EntryTypeForm.
     }
 
     public void preambleEditorClosing() {

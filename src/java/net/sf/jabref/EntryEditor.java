@@ -189,7 +189,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     private void setupToolBar() {
 	JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
-
+	tlb.setMargin(new Insets(2,2,2,2));
 	// The toolbar carries all the key bindings that are valid for the whole
 	// window.
 	ActionMap am = tlb.getActionMap();
@@ -260,10 +260,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	req.setLayout(gbl);
 	opt.setLayout(gbl);
 	gen.setLayout(gbl);
-	con.insets = new Insets(5,5,0,5);
-	//con.fill = GridBagConstraints.HORIZONTAL;
+	con.insets = new Insets(5,5,0,0);
 
 	con.anchor = GridBagConstraints.WEST;
+	con.fill = GridBagConstraints.BOTH;
 
 	for (int i=0; i<iter; i++) {
 
@@ -271,7 +271,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    con.gridwidth = 1;
 	    con.weightx = 0;
 	    con.weighty = 0;
-	    con.fill = GridBagConstraints.NONE;
+	    //con.fill = GridBagConstraints.BOTH;
 	    if (i<rmax) {
 		if ((content = entry.getField(reqFields[i])) != null) {
 		    stringContent = content.toString();
@@ -334,7 +334,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    con.gridwidth = GridBagConstraints.REMAINDER;
 	    con.weightx = 1;
 
-	    con.fill = GridBagConstraints.BOTH;
+	    //con.fill = GridBagConstraints.BOTH;
 	    if (i<rmax) {
 		con.weighty = GUIGlobals.getFieldWeight(reqFields[i]);
 		reqW += con.weighty;
@@ -921,19 +921,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	// this one, we can make the switch more elegant by keeping this
 	// same dialog, and updating it.
 	if (entry.getType() == be.getType()) {
-	    //panel.entryTypeForms.remove(entry.getId());
-	    entry = be;
-	    updateAllFields();
-	    updateSource();
-	    //panel.entryTypeForms.put(id, ths);
-	    
+	    switchTo(be);
 	} else {		    
 	    panel.showEntry(be);
 	} 
 
     }
     
-	    
+	   
+    /**
+     * Updates this editor to show the given entry, regardless of
+     * type correspondence.
+     *
+     * @param be a <code>BibtexEntry</code> value
+     */
+    public void switchTo(BibtexEntry be) {
+	entry = be;
+	updateAllFields();
+	updateSource();
+    }
 	
 
 

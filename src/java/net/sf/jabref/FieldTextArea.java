@@ -48,7 +48,8 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	fieldName = fieldName_;
 
 	//Util.pr(""+15*rows);
-	label = new JLabel(Util.nCase(fieldName));
+	label = new JLabel(Util.nCase(fieldName), JLabel.CENTER);
+	label.setBorder(BorderFactory.createEtchedBorder());	
 	//label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	if ((content != null) && (content.length() > 0))
