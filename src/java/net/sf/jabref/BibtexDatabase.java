@@ -129,6 +129,10 @@ public class BibtexDatabase
     {
         return (BibtexEntry) _entries.get(id);
     }
+    
+    public synchronized Collection getEntries() {
+    	return _entries.values();
+    }
 
     /**
      * Returns the entry with the given bibtex key.
