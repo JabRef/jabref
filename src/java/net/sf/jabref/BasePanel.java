@@ -784,10 +784,30 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	      });
 	      
 	  actions.put("replaceAll", new BaseAction() {
-	  	  public void action() {
-		      output("Replace all");
-		      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);		      
+	  	  public void action() {		      
+		      ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
 		      rsd.show();
+		      if (!rsd.okPressed())
+			  return;
+		      int counter = 0;
+		      NamedCompound ce = new NamedCompound("Replace string");
+		      if (!rsd.selOnly()) {
+			  for (Iterator i=database.getKeySet().iterator();
+			       i.hasNext();)
+			      counter += rsd.replace(database.getEntryById((String)i.next()), ce);			  
+		      } else {
+			  BibtexEntry[] bes = entryTable.getSelectedEntries();
+			  for (int i=0; i<bes.length; i++)
+			      counter += rsd.replace(bes[i], ce);
+		      }
+		      output(Globals.lang("Replaced")+": "+counter+" "+
+			     Globals.lang(counter==1?"occurence":"occurences"));
+		      if (counter > 0) {
+			  ce.end();
+			  undoManager.addEdit(ce);
+			  markBaseChanged();
+			  refreshTable();
+		      }
 		  }
 	      });
     }
