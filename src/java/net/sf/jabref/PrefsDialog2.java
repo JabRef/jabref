@@ -49,11 +49,16 @@ public class PrefsDialog2 extends JDialog {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JTabbedPane tabbed = new JTabbedPane();
+    JabRefFrame frame;
+
     public PrefsDialog2(JabRefFrame parent, JabRefPreferences prefs) {
+	super(parent, Globals.lang("JabRef preferences"), true);
 	_prefs = prefs;
+	frame = parent;
 	getContentPane().setLayout(gbl);
 	con.weighty = 1;
 	con.weightx = 1;
+	con.fill = GridBagConstraints.BOTH;
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(tabbed, con);
 	getContentPane().add(tabbed);	
@@ -87,6 +92,7 @@ public class PrefsDialog2 extends JDialog {
 	    for (int i=0; i<tabbed.getTabCount(); i++) {
 		((PrefsTab)tabbed.getComponentAt(i)).storeSettings();
 	    }
+	    frame.output(Globals.lang("Preferences recorded."));
 	    dispose();
 	}
     }
