@@ -56,6 +56,15 @@ public class HelpAction extends AbstractAction {
 	this.helpfile = helpfile;
     }
 
+    public HelpAction(String title, HelpDialog diag, URL helpfile, String tooltip,
+		      KeyStroke key) {
+	super(title, new ImageIcon(GUIGlobals.helpIconFile));
+	putValue(SHORT_DESCRIPTION, tooltip);
+	putValue(ACCELERATOR_KEY, key);
+	this.diag = diag;       
+	this.helpfile = helpfile;
+    }
+
     public void actionPerformed(ActionEvent e) {
 	diag.showPage(helpfile);
     }

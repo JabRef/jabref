@@ -56,6 +56,7 @@ public class JabRefFrame extends JFrame {
 	statusLabel = new JLabel(Globals.lang("Status")+":",
 				 SwingConstants.LEFT);
     SearchManager searchManager  = new SearchManager(ths, prefs);
+
     FileHistory fileHistory = new FileHistory(prefs, this);
 
     LabelMaker labelMaker;
@@ -77,11 +78,12 @@ public class JabRefFrame extends JFrame {
 	close = new CloseDatabaseAction(),
 	quit = new CloseAction(),
 	selectKeys = new SelectKeysAction(),
-	incrementalSearch = new IncrementalSearchAction(),
-	normalSearch = new SearchAction(),
+    //incrementalSearch = new IncrementalSearchAction(),
+    //normalSearch = new SearchAction(),
 	newDatabaseAction = new NewDatabaseAction(),
 	help = new HelpAction("JabRef help", helpDiag, 
-			      GUIGlobals.baseFrameHelp, "JabRef help"),
+			      GUIGlobals.baseFrameHelp, "JabRef help",
+			      prefs.getKey("Help")),
 	contents = new HelpAction("Help contents", helpDiag, 
 				  GUIGlobals.helpContents, "Help contents"),
 	about = new HelpAction("About JabRef", helpDiag, 
@@ -110,6 +112,13 @@ public class JabRefFrame extends JFrame {
 	paste = new GeneralAction("paste", "Paste", "Paste",
 				 GUIGlobals.pasteIconFile,
 				  prefs.getKey("Paste")),
+	incrementalSearch = new GeneralAction("incSearch", "Incremental search", 
+					      "Start incremental search",
+					      GUIGlobals.searchIconFile,
+					      prefs.getKey("Incremental search")),
+	normalSearch = new GeneralAction("search", "Search", "Start search",
+					      GUIGlobals.searchIconFile,
+					      prefs.getKey("Search")),
 
 	/*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
 	  GUIGlobals.removeIconFile),*/
@@ -233,8 +242,8 @@ public class JabRefFrame extends JFrame {
 	con.anchor = GridBagConstraints.EAST;
 	con.weightx = 0;      
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(searchManager, con);
-	getContentPane().add(searchManager);
+	//gbl.setConstraints(searchManager, con);
+	//getContentPane().add(searchManager);
 
 	con.weightx = 1;
 	con.weighty = 0;

@@ -30,10 +30,12 @@ import javax.swing.*;
 
 public class SidePaneComponent extends JPanel {
 
+    protected boolean visible = false;
     protected SidePaneManager manager;
 
     public SidePaneComponent(SidePaneManager manager) {
 	this.manager = manager;
+	setBorder(BorderFactory.createEtchedBorder());
 	//setPreferredSize(new java.awt.Dimension
 	//		  (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
 	//Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
@@ -41,6 +43,22 @@ public class SidePaneComponent extends JPanel {
 
     public void hideAway() {	
 	manager.hideAway(this);
+    }
+
+    /**
+     * Used by SidePaneManager only, to keep track of visibility.
+     *
+     */
+    void setVisibility(boolean vis) {
+	visible = vis;
+    }
+
+    /**
+     * Used by SidePaneManager only, to keep track of visibility.
+     *
+     */
+    boolean hasVisibility() {
+	return visible;
     }
 
     /**

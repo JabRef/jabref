@@ -116,7 +116,7 @@ public class EntryTableModel extends AbstractTableModel {
 	Object o;
 	BibtexEntry be = db.getEntryById(getNameFromNumber(row));
 	if (col == 0)
-	    o = ""+row;
+	    o = ""+(row+1);
 	else if (col == 1) 
 	    o = be.getType().getName();
 	else {

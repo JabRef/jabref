@@ -66,7 +66,7 @@ public class SidePaneHeader extends JPanel implements ActionListener {
 
 	//setBorder(BorderFactory.createEtchedBorder());
 	//add(imageIcon, BorderLayout.WEST);
-
+	con.insets = new Insets(2, 0, 0, 0);
 	con.gridwidth = 1;
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.NONE;

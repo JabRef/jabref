@@ -272,6 +272,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Paste", "ctrl V");
 	defKeyBinds.put("Undo", "ctrl Z");
 	defKeyBinds.put("Redo", "ctrl Y");
+	defKeyBinds.put("Help", "F1");
 	defKeyBinds.put("New article", "ctrl shift A");
 	defKeyBinds.put("New book", "ctrl shift B");
 	defKeyBinds.put("New phdthesis", "ctrl shift T");
@@ -289,6 +290,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Repeat incremental search", "ctrl shift F");
 	defKeyBinds.put("Close entry editor", "ESCAPE");
 	defKeyBinds.put("Clear search", "ESCAPE");
+
     }
 
     private String getNextUnit(Reader data) throws IOException {

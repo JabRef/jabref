@@ -68,6 +68,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     EntryTableModel tableModel = null;
     EntryTable entryTable = null;
+    SearchManager2 searchManager;
 
     BibtexEntry showing = null;
     // To indicate which entry is currently shown.
@@ -542,6 +543,19 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
+	actions.put("search", new BaseAction() {
+		public void action() {
+		    sidePaneManager.ensureVisible("search");
+		    searchManager.startSearch();
+		}
+	    });
+
+	actions.put("incSearch", new BaseAction() {
+		public void action() {
+		    sidePaneManager.ensureVisible("search");
+		    searchManager.startIncrementalSearch();
+		}
+	    });
     }			    
 		    
 
@@ -674,6 +688,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	setRightComponent(splitPane);
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
+	//sidePaneManager.register("search", new SearchManager2(frame, prefs, this));
+	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
+	sidePaneManager.add("search", searchManager);
 	sidePaneManager.populatePanel();
 
 	//mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);

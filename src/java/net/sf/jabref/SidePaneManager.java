@@ -47,10 +47,11 @@ public class SidePaneManager {
 	this.panel = panel;
 	this.metaData = metaData;
 	this.frame = frame;
+	sidep = new SidePane(panel);
     }
 	
     public void populatePanel() {
-	sidep = new SidePane(panel);
+
 	// Groups
 	if (prefs.getBoolean("groupSelectorVisible")
 	    && (metaData.getData("groups") != null)) {
@@ -73,7 +74,9 @@ public class SidePaneManager {
 		((SidePaneComponent)components.get(name)).setVisible(true);
 		if (visibleComponents == 1)
 		    panel.setLeftComponent(sidep);
+
 		((SidePaneComponent)components.get(name)).componentOpening();
+		((SidePaneComponent)components.get(name)).setVisibility(true);
 	    } else {
 		hideAway((SidePaneComponent)components.get(name));
 	    }
@@ -89,18 +92,31 @@ public class SidePaneManager {
 
     }
 
-    private synchronized void add(String name, SidePaneComponent comp) {
+    public synchronized void ensureVisible(String name) {
+	Object o = components.get(name);
+	if ((o == null) || ((SidePaneComponent)o).hasVisibility())
+	    return;
+	togglePanel(name);	    
+    }
+
+    public synchronized void add(String name, SidePaneComponent comp) {
 	sidep.add(comp);
 	components.put(name, comp);
 	visibleComponents++;
 	if (visibleComponents == 1)
 	    panel.setLeftComponent(sidep);
 	comp.componentOpening();
+	comp.setVisibility(true);
+    }
+
+    public synchronized void register(String name, SidePaneComponent comp) {
+	components.put(name, comp);
     }
 
     public synchronized void hideAway(SidePaneComponent comp) {
 	comp.componentClosing();
-	comp.setVisible(false);
+	comp.setVisible(false);  // Swing method to make component invisible.
+	comp.setVisibility(false); // Our own boolean to keep track of visibility.
 	visibleComponents--;
 	if (visibleComponents == 0)
 	    panel.remove(sidep);
