@@ -55,6 +55,15 @@ out the most important issues about using the program. The help files
 can also be viewed outside the program with a standard HTML browser.
 
 
+Change log:
+1.x:	- Added option to fetch Medline entries automatically by ID.
+	- Fixed bug in RIS import.
+	- Added options to copy key and copy "\cite{key}" to right-click menu.
+	- Fixed bug that caused some General fields not to get displayed.
+	- Enabled customization of existing entry types, and definition of
+	  new types.
+1.0:	First release.
+
 Bug reports, suggestions, other feedback:
 We are thankful for any bug reports or other feedback. If there are
 features you want included in JabRef, tell us!
