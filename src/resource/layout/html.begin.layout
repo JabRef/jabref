@@ -1,0 +1,35 @@
+<html>
+<header>
+	<title>JabRef Output</title>
+	<style type="text/css">
+body {
+    font-family:Georgia, Garamond, Serif;
+    background-color:#ddd;
+}
+
+.bibtex_key {
+    font-size:small;
+    color:navy;
+    border-bottom:solid navy 1px;
+}
+
+.bibtex_content {
+    padding-bottom:1em;
+}
+
+.author {
+    font-style:italic;
+}
+
+.title {
+    font-weight:bold;
+}
+
+.journal {}
+.year {}
+.volume {}
+.pages {}
+
+	</style>
+</header>
+<body>

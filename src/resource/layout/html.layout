@@ -1,11 +1,15 @@
+<div class="bibtex_key"><a name="\bibtexkey">[\bibtexkey]</a></div>
+<div class="bibtex_content">
+    <span class="author">
+        \begin{author}      \format[net.sf.jabref.export.layout.format.ConvertSpecialCharactersForHTML]{\author} \end{author}
+    </span>.
+    <span class="title">
+        \begin{title} \format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title} \end{title}
+    </span>
 
-<dt><a name="\bibtexkey">[\bibtexkey]</a></dt>
-<dd>
-\begin{author} \format[net.sf.jabref.export.layout.format.RemoveBrackets]{\author},\end{author}
-\begin{title} '\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}'\end{title}
-\begin{journal},  <em>\journal </em>\end{journal}
-\begin{year}, <b>\year </b>\end{year}
-\begin{volume}, <i>\volume</i>\end{volume}
-\begin{pages}, \pages \end{pages}
-.</dd>
-<p></p>
+    \begin{journal},  <span class="journal">\journal</span> \end{journal}
+
+    \begin{year}, <span class="year">\year</span>\end{year}
+    \begin{volume}, <span class="volume">\volume</span>\end{volume}
+    \begin{pages}, <span class="pages">\pages</span> \end{pages}
+.</div>
