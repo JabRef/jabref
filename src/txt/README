@@ -67,7 +67,11 @@ can also be viewed outside the program with a standard HTML browser.
 
 
 Change log:
-1.x:	- Generalized copy cite key features for multiple entries.
+1.x:	- Changed default font to a more friendly one.
+	- Improved table column customization.
+	- Added word selector feature for selected fields (e.g. keywords).
+	- Added support for German and Norwegian language.
+	- Generalized copy cite key features for multiple entries.
 	- Added quick load/save session feature.
 	- Fixed issue/number bug in ISI import.
 	- Added "Open pdf/ps" item in right-click menu.

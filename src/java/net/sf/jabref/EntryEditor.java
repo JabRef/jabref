@@ -382,10 +382,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 con.weightx = 0;
                 //con.weighty = 1;
                 con.fill = GridBagConstraints.HORIZONTAL;
-                con.anchor = GridBagConstraints.NORTH;
+                con.anchor = GridBagConstraints.WEST;
                 gbl.setConstraints(ex3, con);
-                gen.add(ex3);
                 con.fill = GridBagConstraints.BOTH;
+                gen.add(ex3);
                 con.anchor = GridBagConstraints.CENTER;
               }
 	    }
@@ -896,7 +896,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    if (duplicateWarning)
 			panel.output(Globals.lang("Warning: duplicate bibtex key."));
 		    else
-			panel.output(Globals.lang("Stored entry."));
+			panel.output(Globals.lang("Stored entry")+".");
 
 		    lastSourceStringAccepted = source.getText();
 		    updateAllFields();

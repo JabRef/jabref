@@ -359,9 +359,11 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	LINE_LENGTH = 65; // Maximum
 
     public static String NUMBER_COL = "#";
-    public static int DEFAULT_FIELD_LENGTH = 100;
-    public static final Map FIELD_LENGTH, FIELD_WEIGHT;
+    public static int DEFAULT_FIELD_LENGTH = 100,
+	NUMBER_COL_LANGTH = 32;
+    public static final Map FIELD_WEIGHT;
     public static final Map FIELD_EXTRAS, LANGUAGES;
+    public static Map fieldLength = new HashMap();
     static {
 
       LANGUAGES = new HashMap();
@@ -376,21 +378,18 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
       FIELD_EXTRAS.put("pdf", "browse");
       FIELD_EXTRAS.put("ps", "browse");
       //FIELD_EXTRAS.put("keywords", "selector");
-
-	Map fieldLength = new HashMap();
-	fieldLength.put("author", new Integer(280));
-	fieldLength.put("editor", new Integer(280));
-	fieldLength.put("title", new Integer(400));
-	fieldLength.put("abstract", new Integer(400));
-	fieldLength.put("booktitle", new Integer(175));
-	fieldLength.put("year", new Integer(60));
-	fieldLength.put("volume", new Integer(60));
-	fieldLength.put("number", new Integer(60));
-	fieldLength.put("entrytype", new Integer(75));
-	fieldLength.put("search", new Integer(75));
-	fieldLength.put(NUMBER_COL, new Integer(32));
-
-	FIELD_LENGTH = Collections.unmodifiableMap(fieldLength);
+       
+      fieldLength.put("author", new Integer(280));
+      fieldLength.put("editor", new Integer(280));
+      fieldLength.put("title", new Integer(400));
+      fieldLength.put("abstract", new Integer(400));
+      fieldLength.put("booktitle", new Integer(175));
+      fieldLength.put("year", new Integer(60));
+      fieldLength.put("volume", new Integer(60));
+      fieldLength.put("number", new Integer(60));
+      fieldLength.put("entrytype", new Integer(75));
+      fieldLength.put("search", new Integer(75));
+      fieldLength.put(NUMBER_COL, new Integer(32));
 
 	Map fieldWeight = new HashMap();
 	fieldWeight.put("author", MEDIUM_W);
@@ -424,13 +423,14 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
     };
 
+    /*
     public static int getPreferredFieldLength(String name) {
 	int l = DEFAULT_FIELD_LENGTH;
-	Object o = FIELD_LENGTH.get(name.toLowerCase());
+	Object o = fieldLength.get(name.toLowerCase());
 	if (o != null)
 	    l = ((Integer)o).intValue();
 	return l;
-    }
+	}*/
 
     public static double getFieldWeight(String name) {
 	double l = DEFAULT_FIELD_WEIGHT;

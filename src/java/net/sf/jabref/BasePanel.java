@@ -517,7 +517,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int[] rows = entryTable.getSelectedRows() ;
 		    int numSelected = rows.length ;
 		    BibtexEntry bes = null ;
+		    
 		    if (numSelected > 0) {
+			/*
 			int answer = JOptionPane.showConfirmDialog
 			    (frame, "Generate bibtex key"+
 			     (numSelected>1 ? "s for the selected "
@@ -527,7 +529,9 @@ public class BasePanel extends JSplitPane implements MouseListener,
 			     JOptionPane.YES_NO_CANCEL_OPTION);
 			if (answer != JOptionPane.YES_OPTION) {
 			    return ;
-			}
+			
+			    }
+			*/
 		    } else { // None selected. Inform the user to select entries first.
 			JOptionPane.showMessageDialog(frame, "First select the entries you want keys to be generated for.",
 						      "Autogenerate Bibtexkey", JOptionPane.INFORMATION_MESSAGE);

@@ -1385,7 +1385,7 @@ public class JabRefFrame extends JFrame {
 	    }
 
 	    if (filenames.size() == 0) {
-		output(Globals.lang("Cowardly refusing to save empty session."));
+		output(Globals.lang("Not saved (empty session)")+".");
 		return;
 	    }
 	    else {
@@ -1393,7 +1393,7 @@ public class JabRefFrame extends JFrame {
 		for (int i=0; i<filenames.size(); i++)
 		    names[i] = (String)filenames.elementAt(i);
 		prefs.putStringArray("savedSession", names);
-		output(Globals.lang("Saved session."));
+		output(Globals.lang("Saved session")+".");
 	    }
 
 	}

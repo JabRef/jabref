@@ -88,12 +88,19 @@ public class EntryTable extends JTable {
     }
 
     public void setWidths() {
-		// Setting column widths:
-		
-		TableColumnModel cm = getColumnModel();
-		for (int i=0; i<getModel().getColumnCount(); i++) {
-			cm.getColumn(i).setPreferredWidth(GUIGlobals.getPreferredFieldLength(getModel().getColumnName(i)));
-		}
+	// Setting column widths:
+	String[] widths = prefs.getStringArray("columnWidths");
+	TableColumnModel cm = getColumnModel();
+	cm.getColumn(0).setPreferredWidth(GUIGlobals.NUMBER_COL_LANGTH);
+	for (int i=1; i<getModel().getColumnCount(); i++) {
+	    try {
+		cm.getColumn(i).setPreferredWidth(Integer.parseInt(widths[i-1]));
+	    } catch (Throwable ex) {
+		Globals.logger("Exception while setting column widths. Choosing default.");
+		cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
+	    }
+	    //cm.getColumn(i).setPreferredWidth(GUIGlobals.getPreferredFieldLength(getModel().getColumnName(i)));
+	}
     }
 	
     public JScrollPane getPane() {
