@@ -102,7 +102,6 @@ public class GroupSelector extends SidePaneComponent implements
 
         this.manager = manager;
         this.frame = frame;
-        this.panel = panel;
         hideNonHits = new JRadioButtonMenuItem(Globals.lang("Hide non-hits"),
                 !Globals.prefs.getBoolean("grayOutNonHits"));
         grayOut = new JRadioButtonMenuItem(Globals.lang("Gray out non-hits"),
