@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import net.sf.jabref.export.*;
+import java.awt.*;
 
 
 /**
@@ -28,6 +29,8 @@ public class DuplicateResolverDialog extends JDialog {
       KEEP_BOTH = 0,
       KEEP_UPPER = 1,
       KEEP_LOWER = 2;
+
+  final Dimension DIM = new Dimension(650, 450);
 
   PreviewPanel p1, p2;
   JTextArea ta1, ta2;
@@ -51,16 +54,8 @@ public class DuplicateResolverDialog extends JDialog {
     ta2 = new JTextArea();
     ta1.setEditable(false);
     ta2.setEditable(false);
-    try {
-      StringWriter sw = new StringWriter();
-      one.write(sw, new LatexFieldFormatter());
-      ta1.setText(sw.getBuffer().toString());
-      sw = new StringWriter();
-      two.write(sw, new LatexFieldFormatter());
-      ta2.setText(sw.getBuffer().toString());
-    }
-    catch (IOException ex) {
-    }
+
+    setSourceView(one, two);
 
     //getContentPane().setLayout();
     main.setLayout(gbl);
@@ -111,9 +106,29 @@ public class DuplicateResolverDialog extends JDialog {
 
     getContentPane().add(tabbed, BorderLayout.CENTER);
     getContentPane().add(options, BorderLayout.SOUTH);
-    pack();
+    //pack();
+    setSize(DIM);
     both.requestFocus();
     Util.placeDialog(this, frame);
+  }
+
+  private void setSourceView(BibtexEntry one, BibtexEntry two) {
+    try {
+      StringWriter sw = new StringWriter();
+      one.write(sw, new LatexFieldFormatter());
+      ta1.setText(sw.getBuffer().toString());
+      sw = new StringWriter();
+      two.write(sw, new LatexFieldFormatter());
+      ta2.setText(sw.getBuffer().toString());
+    }
+    catch (IOException ex) {
+    }
+  }
+
+  public void setEntries(BibtexEntry newOne, BibtexEntry newTwo) {
+    setSourceView(newOne, newTwo);
+    p1.setEntry(newOne);
+    p2.setEntry(newTwo);
   }
 
   public int getSelected() {

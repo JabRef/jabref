@@ -72,6 +72,10 @@ public class PreviewPanel extends JEditorPane {
 
   }
 
+  public void setEntry(BibtexEntry newEntry) {
+    entry = newEntry;
+    update();
+  }
 
   public void update() {
     //StringBuffer sb = new StringBuffer(prefix);

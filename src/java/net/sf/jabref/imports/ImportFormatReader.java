@@ -138,6 +138,69 @@ public class ImportFormatReader
 	return sb.toString();
     }
 
+
+    public static ArrayList readSixpack(String filename) {
+      final String SEPARATOR = new String(new char[] {0, 48});
+      ArrayList bibitems=new ArrayList();
+      File f = new File(filename);
+
+      if(!f.exists() && !f.canRead() && !f.isFile()){
+        System.err.println("Error " + filename + " is not a valid file and|or is not readable.");
+        return null;
+      }
+
+      try{
+              BufferedReader in = new BufferedReader(new FileReader( filename));
+              Util.pr(in.readLine());
+              Util.pr(in.readLine());
+              String s = null;
+              BibtexEntry entry = null;
+              while ((s = in.readLine()) != null) {
+                try {
+                  s = s.replaceAll("<par>", ""); // What is <par> ????
+                  String[] fields = s.split(SEPARATOR);
+                  // Check type and create entry:
+                  if (fields[1].equals("Article"))
+                    entry = new BibtexEntry(Util.createNeutralId(),
+                                            BibtexEntryType.getType("article"));
+
+                    // Set fields:
+                  entry.setField("author", fields[2].replaceAll(" and ", ", ").replaceAll(", ", " and "));
+                  // Regarding authors, it appears Sixpack saves with first name first, and normal grammar.
+                  entry.setField("title", fields[3]);
+                  entry.setField("journal", fields[4]);
+                  entry.setField("volume", fields[5]);
+                  entry.setField("number", fields[6]);
+                  entry.setField("pages", fields[7].replaceAll("-", "--"));
+                  entry.setField("month", fields[8]);
+                  entry.setField("year", fields[9]);
+                  entry.setField("abstract", fields[12]);
+
+                  bibitems.add(entry);
+                //         Util.pr(fields[1] + "   (" + fields.length + ")");
+                } catch (NullPointerException ex) {
+                  Globals.logger("Error parsing Sixpack file, ignoring entry.");
+                }
+              }
+              //for (int i=0; i<s.length; i++)
+              //  Util.pr(":"+s[i]);
+              /*Util.pr(in.readLine());
+              Util.pr(in.readLine());
+              Util.pr(in.readLine());
+
+              int str, i=0;
+              while ((i < 100) && (str = in.read()) >= 0) {
+                      Util.pr(""+(char)str+"  "+str);
+                      i++;
+              }*/
+              in.close();
+      }
+      catch(IOException e){return null;}
+
+
+      return bibitems;
+    }
+
     //============================================================
     // given a filename, parses the file (assuming scifinder)
     // returns null if unable to find any entries or if the

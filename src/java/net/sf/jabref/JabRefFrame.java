@@ -1007,12 +1007,12 @@ public class JabRefFrame extends JFrame {
                 // Open a new database.
                 if ((e.getActionCommand() == null) ||
                     (e.getActionCommand().equals(Globals.lang("Open database")))) {
-                    /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
-                        new JabRefFileChooser((File)null) :
-                        new JabRefFileChooser(new File(prefs.get("workingDirectory")));*/
                     JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
+                        new JabRefFileChooser((File)null) :
+                        new JabRefFileChooser(new File(prefs.get("workingDirectory")));
+                    /*JFileChooser chooser = (prefs.get("workingDirectory") == null) ?
                         new JFileChooser((File)null) :
-                        new JFileChooser(new File(prefs.get("workingDirectory")));
+                        new JFileChooser(new File(prefs.get("workingDirectory")));*/
                     chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
                     int returnVal = chooser.showOpenDialog(ths);
                     if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -1376,21 +1376,36 @@ public class JabRefFrame extends JFrame {
 
 	    //########################################
 
-			JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
-			//newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
-			newSciFinderFile_mItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e)
-				{
-				    String tempFilename = getNewFile();
-				    if( tempFilename != null )//filenm != null)
-					{
-					    //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
-					    ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
-					    addBibEntries( bibs, tempFilename, intoNew);
-					}
-				}
-			    });
-			importMenu.add(newSciFinderFile_mItem);
+            JMenuItem newSciFinderFile_mItem = new JMenuItem(Globals.lang("SciFinder"));//,new ImageIcon(getClass().getResource("images16/Open16.gif")));
+            //newSciFinderFile_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)); //Ctrl-F for new file
+            newSciFinderFile_mItem.addActionListener(new ActionListener(){
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        String tempFilename = getNewFile();
+                        if( tempFilename != null )//filenm != null)
+                            {
+                                //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
+                                ArrayList bibs=ImportFormatReader.readScifinder(tempFilename);
+                                addBibEntries( bibs, tempFilename, intoNew);
+                            }
+                    }
+                });
+            importMenu.add(newSciFinderFile_mItem);
+
+            JMenuItem newSixpack_mItem = new JMenuItem(Globals.lang("Sixpack"));
+            newSixpack_mItem.addActionListener(new ActionListener(){
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        String tempFilename = getNewFile();
+                        if( tempFilename != null )//filenm != null)
+                            {
+                                //ArrayList bibs = Scifinder2bibtex.readSciFinderFile( tempFilename);//filename);//filenm );
+                                ArrayList bibs=ImportFormatReader.readSixpack(tempFilename);
+                                addBibEntries( bibs, tempFilename, intoNew);
+                            }
+                    }
+                });
+            importMenu.add(newSixpack_mItem);
 
 	}
 

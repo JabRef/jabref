@@ -867,21 +867,31 @@ public class BasePanel extends JSplitPane implements MouseListener,
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   if ((bes == null) || (bes.length < 2))
                     return;
+                  DuplicateResolverDialog drd = null;
                   for (int i = 0; i < bes.length - 1; i++)
                     for (int j = i + 1; j < bes.length; j++) {
                       boolean eq = Util.isDuplicate(bes[i], bes[j],
                                                     Globals.duplicateThreshold);
                       if (eq) {
-                        int answer = DuplicateResolverDialog.resolveDuplicate(frame,
-                            bes[i], bes[j]);
+                        if (drd == null)
+                          drd = new DuplicateResolverDialog(frame, bes[i], bes[j]);
+                        else
+                          drd.setEntries(bes[i], bes[j]);
+                        drd.show();
+                        //drd.setVisible(true);
+                        int answer = drd.getSelected();
                         if (answer == DuplicateResolverDialog.KEEP_UPPER) {
                           if (ce == null) ce = new NamedCompound("duplicate removal");
                           database.removeEntry(bes[j].getId());
+                          refreshTable();
+                          markBaseChanged();
                           ce.addEdit(new UndoableRemoveEntry(database, bes[j], ths));
                         }
                         else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
                           if (ce == null) ce = new NamedCompound("duplicate removal");
                           database.removeEntry(bes[i].getId());
+                          refreshTable();
+                          markBaseChanged();
                           ce.addEdit(new UndoableRemoveEntry(database, bes[i], ths));
                         }
                         dupl++;
@@ -890,15 +900,16 @@ public class BasePanel extends JSplitPane implements MouseListener,
                         //Util.pr("---------------------------------------------------");
                       }
                     }
-
+                  if (drd != null)
+                    drd.dispose();
                   output(Globals.lang("Duplicate pairs found") + ": " + dupl);
 
                   if (ce != null) {
                     ce.end();
                     //Util.pr("ox");
                     undoManager.addEdit(ce);
-                    markBaseChanged();
-                    refreshTable();
+                    //markBaseChanged();
+                    //refreshTable();
                   }
                 }
               });

@@ -48,9 +48,10 @@ public class JabRefFileChooser extends JFileChooser {
     //========================================================
     //
     //========================================================
-    
+
     protected void setUI(ComponentUI newUI) {
-	 super.setUI(new JabRefUI(this));
+      //super.setUI(new JabRefUI(this));
+      super.setUI(newUI);
      }
     //========================================================
     //
@@ -90,4 +91,4 @@ class JabRefUI extends MetalFileChooserUI {
     protected MouseListener createDoubleClickListener(JFileChooser fc, JList list) {
 	return new DoubleClickListener(list);
     }
-} 
+}
