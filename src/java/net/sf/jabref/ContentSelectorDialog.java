@@ -125,7 +125,7 @@ public class ContentSelectorDialog extends JDialog {
     private void addWord() {
 	if (currentField == null)
 	    return;
-	String word = wordTf.getText().trim().toLowerCase();
+	String word = wordTf.getText().trim();
 
 	if (!wordSet.contains(word)) {
 	    Util.pr(Globals.SELECTOR_META_PREFIX+currentField);
