@@ -27,7 +27,8 @@ public class SearchExpression implements SearchRule {
 		// parse search expression
 		SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(new StringReader(
 			searchOptions.elements().nextElement().toString()))); // supports only single entry
-		parser.caseSensitive = prefs.getBoolean("caseSensitiveSearch");
+		parser.caseSensitive = this.prefs.getBoolean("caseSensitiveSearch");
+		parser.regex = this.prefs.getBoolean("regExpSearch");
 		parser.searchExpression(); // this is the "global" rule
 		ast = parser.getAST(); // remember abstract syntax tree
 	}

@@ -24,21 +24,22 @@ tokens {
 
 {
 	public boolean caseSensitive = false;
+    public boolean regex = true;
 }
 
 // ---------- Text and Regular Expressions ----------
 
-quotedRegularExpression[boolean caseSensitive]:
+quotedRegularExpression[boolean caseSensitive, boolean regex]:
 		var_s:STRING
 			{
-				## = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive)).add(##));
+				## = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(##));
 			}
 		;
 
-simpleRegularExpression[boolean caseSensitive]:
+simpleRegularExpression[boolean caseSensitive, boolean regex]:
 		var_s:FIELDTYPE
 			{
-				## = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive)).add(##));
+				## = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(##));
 			}
 		;
 
@@ -66,13 +67,16 @@ expression:
 		;
 
 expressionSearch:
-		quotedRegularExpression[false] compareType quotedRegularExpression[caseSensitive]
+		quotedRegularExpression[false,true] compareType quotedRegularExpression[caseSensitive,regex]
 			{ ## = #( [ExpressionSearch], ## ); }
 		|
-		simpleRegularExpression[false] compareType quotedRegularExpression[caseSensitive]
+		simpleRegularExpression[false,true] compareType quotedRegularExpression[caseSensitive,regex]
 			{ ## = #( [ExpressionSearch], ## ); }
 		|
-		simpleRegularExpression[false] compareType simpleRegularExpression[caseSensitive]
+		simpleRegularExpression[false,true] compareType simpleRegularExpression[caseSensitive,regex]
+			{ ## = #( [ExpressionSearch], ## ); }
+		|
+		quotedRegularExpression[false,true] compareType simpleRegularExpression[caseSensitive,regex]
 			{ ## = #( [ExpressionSearch], ## ); }
 		;
 

@@ -25,6 +25,7 @@ public class SearchExpressionParser extends antlr.LLkParser       implements Sea
  {
 
 	public boolean caseSensitive = false;
+    public boolean regex = true;
 
 protected SearchExpressionParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
@@ -56,7 +57,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 }
 
 	public final void quotedRegularExpression(
-		boolean caseSensitive
+		boolean caseSensitive, boolean regex
 	) throws RecognitionException, TokenStreamException {
 		
 		returnAST = null;
@@ -72,7 +73,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		if ( inputState.guessing==0 ) {
 			quotedRegularExpression_AST = (AST)currentAST.root;
 			
-							quotedRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive)).add(quotedRegularExpression_AST));
+							quotedRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(quotedRegularExpression_AST));
 						
 			currentAST.root = quotedRegularExpression_AST;
 			currentAST.child = quotedRegularExpression_AST!=null &&quotedRegularExpression_AST.getFirstChild()!=null ?
@@ -84,7 +85,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 	}
 	
 	public final void simpleRegularExpression(
-		boolean caseSensitive
+		boolean caseSensitive, boolean regex
 	) throws RecognitionException, TokenStreamException {
 		
 		returnAST = null;
@@ -100,7 +101,7 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		if ( inputState.guessing==0 ) {
 			simpleRegularExpression_AST = (AST)currentAST.root;
 			
-							simpleRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive)).add(simpleRegularExpression_AST));
+							simpleRegularExpression_AST = astFactory.make((new ASTArray(2)).add(new RegExNode(RegularExpression,var_s.getText(),caseSensitive,regex)).add(simpleRegularExpression_AST));
 						
 			currentAST.root = simpleRegularExpression_AST;
 			currentAST.child = simpleRegularExpression_AST!=null &&simpleRegularExpression_AST.getFirstChild()!=null ?
@@ -282,12 +283,12 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		ASTPair currentAST = new ASTPair();
 		AST expressionSearch_AST = null;
 		
-		if ((LA(1)==STRING)) {
-			quotedRegularExpression(false);
+		if ((LA(1)==STRING) && (_tokenSet_2.member(LA(2))) && (LA(3)==STRING)) {
+			quotedRegularExpression(false,true);
 			astFactory.addASTChild(currentAST, returnAST);
 			compareType();
 			astFactory.addASTChild(currentAST, returnAST);
-			quotedRegularExpression(caseSensitive);
+			quotedRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
 				expressionSearch_AST = (AST)currentAST.root;
@@ -300,11 +301,11 @@ public SearchExpressionParser(ParserSharedInputState state) {
 			expressionSearch_AST = (AST)currentAST.root;
 		}
 		else if ((LA(1)==FIELDTYPE) && (_tokenSet_2.member(LA(2))) && (LA(3)==STRING)) {
-			simpleRegularExpression(false);
+			simpleRegularExpression(false,true);
 			astFactory.addASTChild(currentAST, returnAST);
 			compareType();
 			astFactory.addASTChild(currentAST, returnAST);
-			quotedRegularExpression(caseSensitive);
+			quotedRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
 				expressionSearch_AST = (AST)currentAST.root;
@@ -317,11 +318,28 @@ public SearchExpressionParser(ParserSharedInputState state) {
 			expressionSearch_AST = (AST)currentAST.root;
 		}
 		else if ((LA(1)==FIELDTYPE) && (_tokenSet_2.member(LA(2))) && (LA(3)==FIELDTYPE)) {
-			simpleRegularExpression(false);
+			simpleRegularExpression(false,true);
 			astFactory.addASTChild(currentAST, returnAST);
 			compareType();
 			astFactory.addASTChild(currentAST, returnAST);
-			simpleRegularExpression(caseSensitive);
+			simpleRegularExpression(caseSensitive,regex);
+			astFactory.addASTChild(currentAST, returnAST);
+			if ( inputState.guessing==0 ) {
+				expressionSearch_AST = (AST)currentAST.root;
+				expressionSearch_AST = (AST)astFactory.make( (new ASTArray(2)).add(astFactory.create(ExpressionSearch)).add(expressionSearch_AST));
+				currentAST.root = expressionSearch_AST;
+				currentAST.child = expressionSearch_AST!=null &&expressionSearch_AST.getFirstChild()!=null ?
+					expressionSearch_AST.getFirstChild() : expressionSearch_AST;
+				currentAST.advanceChildToEnd();
+			}
+			expressionSearch_AST = (AST)currentAST.root;
+		}
+		else if ((LA(1)==STRING) && (_tokenSet_2.member(LA(2))) && (LA(3)==FIELDTYPE)) {
+			quotedRegularExpression(false,true);
+			astFactory.addASTChild(currentAST, returnAST);
+			compareType();
+			astFactory.addASTChild(currentAST, returnAST);
+			simpleRegularExpression(caseSensitive,regex);
 			astFactory.addASTChild(currentAST, returnAST);
 			if ( inputState.guessing==0 ) {
 				expressionSearch_AST = (AST)currentAST.root;
