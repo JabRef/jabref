@@ -90,4 +90,11 @@ public class LabelPattern extends Hashtable{
 		return (ArrayList)_obj;
 	}
 
+        /**
+         * Checks whether this pattern is customized or the default value.
+         */
+        public final boolean isDefaultValue(String key) {
+            Object _obj = get(key);
+            return _obj == null;
+        }
 }

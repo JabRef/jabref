@@ -143,8 +143,8 @@ public class MedlineHandler extends DefaultHandler
 
 			title=Globals.putBracesAroundCapitals(title);
 			//##############################
-			// made pubmedid the keyword (user request)
-			keyword=descriptorName + pubmedid;
+			// Sort keywords and remove duplicates. Add pubmedid as keyword (user request)
+                        keyword=Util.sortWordsAndRemoveDuplicates(descriptorName)+", "+pubmedid;
 // 	    Bibitem b =  new Bibitem(author, title, journal,
 // 				     key, year, page, volume,
 // 				     type, series, editor, booktitle,

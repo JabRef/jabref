@@ -253,16 +253,20 @@ public class ImportFormatReader {
 
       // Check if we have cached this particular name string before: 
       Object old = nameCacheLastFirst.get(in); if (old != null) return (String)old;
-
+      
       if (in.indexOf("{") >= 0) {
 	  StringBuffer tmp = new StringBuffer();
 	  int start = -1, end = 0;
 	  while ((start = in.indexOf("{", end)) > -1) {
-	      tmp.append(in.substring(end, start));
+              tmp.append(in.substring(end, start));
 	      end = in.indexOf("}", start);
 	      if (end > 0) {
 		  tmp.append(in.substring(start, end).replaceAll(" ", SPACE_MARKER));
-	      }
+	      } else if (end < 0) {
+                  // The braces are mismatched, so give up this.
+                  tmp.append(in.substring(start));
+                  break;
+              }
 	  }
 	  if ((end > 0) && (end < in.length()))
 	      tmp.append(in.substring(end));
@@ -370,7 +374,7 @@ test:
     //BibtexDatabase db = fl.load(fileToOpen.getPath());
     Reader reader = getReader(fileToOpen, encoding);
     String suppliedEncoding = null;
-
+    StringBuffer headerText = new StringBuffer();
     try {
       boolean keepon = true;
       int piv = 0;
@@ -378,17 +382,19 @@ test:
 
       while (keepon) {
         c = reader.read();
-
+        headerText.append((char)c);
         if (((piv == 0) && Character.isWhitespace((char) c))
             || (c == GUIGlobals.SIGNATURE.charAt(piv)))
           piv++;
-        else
+        else //if (((char)c) == '@')
           keepon = false;
-
+      //System.out.println(headerText.toString());
 found: 
         if (piv == GUIGlobals.SIGNATURE.length()) {
           keepon = false;
 
+          //if (headerText.length() > GUIGlobals.SIGNATURE.length())
+          //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
           // Found the signature. The rest of the line is unknown, so we skip
           // it:
           while (reader.read() != '\n')

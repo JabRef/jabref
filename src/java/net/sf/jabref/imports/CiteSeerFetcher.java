@@ -6,6 +6,7 @@
  */
 package net.sf.jabref.imports;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,7 +21,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -64,7 +66,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	SidePaneManager sidePaneManager;
 
 	public CiteSeerFetcher(BasePanel panel_, SidePaneManager p0)  {
-		super(p0);
+		super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("CiteSeer Transfer"));
 		panel = panel_;
 		sidePaneManager = p0;
 		progressBar = new JProgressBar();
@@ -78,23 +80,26 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		progressBar2.setMinimum(0);
 		progressBar2.setMaximum(100);
 		progressBar2.setStringPainted(true);
-		setLayout(gbl);
-		SidePaneHeader header = new SidePaneHeader
-			("CiteSeer Transfer", GUIGlobals.wwwCiteSeerIcon, this);
+                JPanel main = new JPanel();
+		main.setLayout(gbl);
+		//SidePaneHeader header = new SidePaneHeader
+		//	("CiteSeer Transfer", GUIGlobals.wwwCiteSeerIcon, this);
 		con.gridwidth = GridBagConstraints.REMAINDER;			
 		con.fill = GridBagConstraints.BOTH;
 		con.weightx = 1;
 		con.insets = new Insets(0, 0, 2,  0);
-		gbl.setConstraints(header, con);
-		add(header);
+		//gbl.setConstraints(header, con);
+		//add(header);
 		con.insets = new Insets(0, 0, 0,  0);
 		con.fill = GridBagConstraints.HORIZONTAL;		
 		gbl.setConstraints(progressBar, con);
-		add(progressBar);		
+		main.add(progressBar);		
 		gbl.setConstraints(progressBar2, con);
-		add(progressBar2);
+		main.add(progressBar2);
 		gbl.setConstraints(citeSeerProgress, con);
-		add(citeSeerProgress);		
+		main.add(citeSeerProgress);		
+                main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+                add(main, BorderLayout.CENTER);
 		try {
 			citationFetcherActive = false;
 			importFetcherActive = false;
@@ -145,7 +150,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 		public void run() {
 				JOptionPane.showMessageDialog(panel.frame(),
-				Globals.lang("I could not connect to host") + " " + targetURL + ".  " +
+				Globals.lang("Could not connect to host") + " " + targetURL + ".  " +
 				Globals.lang("Please check your network connection to this machine" + "."),
 				Globals.lang("CiteSeer Error"),
 				JOptionPane.ERROR_MESSAGE);
@@ -213,7 +218,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 		public void run() {
 			JOptionPane.showMessageDialog(panel.frame(),
-			Globals.lang("I couldn't seem to find an entry associated with this URL") + ": \"" + badURL + '\"' +
+			Globals.lang("Couldn't find an entry associated with this URL") + ": \"" + badURL + '\"' +
 			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " +
 			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
 			Globals.lang("CiteSeer Error"),
@@ -231,7 +236,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}
 		public void run() {
 			JOptionPane.showMessageDialog(panel.frame(),
-			Globals.lang("I couldn't parse the following URL") + ": \"" + badURL + '\"' +
+			Globals.lang("Unable to parse the following URL") + ": \"" + badURL + '\"' +
 			Globals.lang(" on entry number ") + (rowNumber + 1) + ".  " +
 			Globals.lang("Please refer to the JabRef help manual on using the CiteSeer tools."),
 			Globals.lang("CiteSeer Error"),

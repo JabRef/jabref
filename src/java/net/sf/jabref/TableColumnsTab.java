@@ -230,7 +230,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class UpdateWidthsAction extends AbstractAction {
         public UpdateWidthsAction() {
           //super(Globals.lang("Update to current column widths"));
-          super("Update to current column widths", new ImageIcon(GUIGlobals.sheetIcon));
+          super(Globals.lang("Update to current column widths"), new ImageIcon(GUIGlobals.sheetIcon));
           //putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
         }
         public void actionPerformed(ActionEvent e) {

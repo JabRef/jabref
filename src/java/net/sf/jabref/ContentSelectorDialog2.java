@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class ContentSelectorDialog2 extends JDialog {
 
-
+    ActionListener wordEditFieldListener = null;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JPanel fieldPan = new JPanel(),
@@ -92,26 +92,27 @@ public class ContentSelectorDialog2 extends JDialog {
 		    newWordAction();
 		}
 	    });
-
-	wordEditField.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    int index = wordList.getSelectedIndex();
-		    String old = (String)wordList.getSelectedValue(),
-			newVal = wordEditField.getText();
-		    if (newVal.equals("") || newVal.equals(old))
-			return; // Empty string or no change.
-		    int newIndex = findPos(wordListModel, newVal);
-		    if (index >= 0) {
-			wordListModel.remove(index);
-			wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
-					  newVal);
-		    } else
-			wordListModel.add(newIndex, newVal);
+                
+        wordEditFieldListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int index = wordList.getSelectedIndex();
+                String old = (String)wordList.getSelectedValue(),
+            	newVal = wordEditField.getText();
+                if (newVal.equals("") || newVal.equals(old))
+                    return; // Empty string or no change.
+                int newIndex = findPos(wordListModel, newVal);
+                if (index >= 0) {
+                    wordListModel.remove(index);
+                    wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
+                      newVal);
+		} else
+                    wordListModel.add(newIndex, newVal);
 		    
-		    wordEditField.selectAll();
-		}
-	    });
-
+		wordEditField.selectAll();
+            }
+	};
+        wordEditField.addActionListener(wordEditFieldListener);
+        
 	removeWord.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    int index = wordList.getSelectedIndex();
@@ -225,6 +226,13 @@ public class ContentSelectorDialog2 extends JDialog {
     private void applyChanges() {
 	boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
 
+        // Store if an entry is currently being edited:
+        if (!wordEditField.getText().equals("")) {
+            wordEditFieldListener.actionPerformed(null);
+        }
+        
+
+        
 	// First remove the mappings for fields that have been deleted.
 	// If these were re-added, they will be added below, so it doesn't
 	// cause any harm to remove them here.

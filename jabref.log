@@ -1,92 +1,15 @@
-<?xml version="1.0" encoding="ISO-8859-15" standalone="no"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE log SYSTEM "logger.dtd">
 <log>
 <record>
-  <date>2005-02-23T08:54:02</date>
-  <millis>1109145242487</millis>
+  <date>2005-03-06T22:01:14</date>
+  <millis>1110142874250</millis>
   <sequence>0</sequence>
   <logger>global</logger>
   <level>INFO</level>
   <class>net.sf.jabref.Globals</class>
   <method>logger</method>
   <thread>10</thread>
-  <message>Warning: could not get translation for "file"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:02</date>
-  <millis>1109145242528</millis>
-  <sequence>1</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "new"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:03</date>
-  <millis>1109145243614</millis>
-  <sequence>2</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "MODS"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:03</date>
-  <millis>1109145243636</millis>
-  <sequence>3</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Autodetect format"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:03</date>
-  <millis>1109145243647</millis>
-  <sequence>4</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Autodetect format"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:04</date>
-  <millis>1109145244007</millis>
-  <sequence>5</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:04</date>
-  <millis>1109145244195</millis>
-  <sequence>6</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
-</record>
-<record>
-  <date>2005-02-23T08:54:04</date>
-  <millis>1109145244268</millis>
-  <sequence>7</sequence>
-  <logger>global</logger>
-  <level>INFO</level>
-  <class>net.sf.jabref.Globals</class>
-  <method>logger</method>
-  <thread>10</thread>
-  <message>Warning: could not get translation for "Fetch CiteSeer"</message>
+  <message>Warning: could not get translation for "Unable to create graphical interface"</message>
 </record>
 </log>

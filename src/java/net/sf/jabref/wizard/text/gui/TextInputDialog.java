@@ -123,8 +123,8 @@ public class TextInputDialog
   private void jbInit( JabRefFrame parent ) throws Exception
   {
     this.setModal( true ) ;
-    this.setResizable( false ) ;
-
+    //this.setResizable( false ) ;
+    getContentPane().setLayout(new BorderLayout());
     String typeStr = Globals.lang( "for" ) ;
     if ( entry != null )
     {
@@ -135,7 +135,7 @@ public class TextInputDialog
     }
 
     this.setTitle( Globals.lang( "Plain_text_import" ) + " " + typeStr ) ;
-    getContentPane().add( panel1 ) ;
+    getContentPane().add( panel1, BorderLayout.CENTER ) ;
 
     initRawPanel() ;
     initButtonPanel() ;
@@ -161,17 +161,19 @@ public class TextInputDialog
     // Panel Layout
     GridBagLayout gbl = new GridBagLayout() ;
     GridBagConstraints con = new GridBagConstraints() ;
-    con.weightx = 0 ;
+    con.weightx = 1 ;
+    con.weighty = 1 ;
     con.insets = new Insets( 5, 10, 0, 10 ) ;
     con.fill = GridBagConstraints.HORIZONTAL ;
 
-    panel1.setLayout( gbl ) ;
+    panel1.setLayout( new BorderLayout() ) ;
 
     con.gridwidth = GridBagConstraints.REMAINDER ;
-    gbl.setConstraints( tabbed, con ) ;
-    panel1.add( tabbed ) ;
-    gbl.setConstraints( buttonPanel, con ) ;
-    panel1.add( buttonPanel ) ;
+    con.fill = GridBagConstraints.BOTH;
+    //gbl.setConstraints( tabbed, con ) ;
+    panel1.add( tabbed, BorderLayout.CENTER ) ;
+    //gbl.setConstraints( buttonPanel, con ) ;
+    panel1.add( buttonPanel, BorderLayout.SOUTH ) ;
 
     // Key bindings:
     ActionMap am = buttonPanel.getActionMap() ;
@@ -258,7 +260,7 @@ public class TextInputDialog
             new Color( 153, 153, 153 ), 2 ),
         Globals.lang( "Input" ) ) ;
     inputPanel.setBorder( titledBorder1 ) ;
-    inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
+    //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
     inputPanel.setMinimumSize( new Dimension( 10, 10 ) ) ;
 
     fieldList = new JList( getAllFields() ) ;
@@ -270,9 +272,9 @@ public class TextInputDialog
 
     JScrollPane fieldScroller = new JScrollPane( fieldList ) ;
     fieldScroller.setVerticalScrollBarPolicy(
-        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ) ;
-    fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
-    fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
+        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED ) ;
+    //fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
+    //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
     // insert button
     insertButton.setText( Globals.lang( "Insert" ) ) ;
@@ -306,9 +308,13 @@ public class TextInputDialog
 
     con.gridwidth = GridBagConstraints.REMAINDER ;
     con.gridheight = 8 ;
+    con.weighty = 1;
+    con.fill = GridBagConstraints.BOTH;
     gbl.setConstraints( fieldScroller, con ) ;
     inputPanel.add( fieldScroller ) ;
 
+    con.fill = GridBagConstraints.HORIZONTAL ;
+    con.weighty = 0;
     con.gridwidth = 2 ;
     gbl.setConstraints( radioPanel, con ) ;
     inputPanel.add( radioPanel ) ;
@@ -325,26 +331,19 @@ public class TextInputDialog
     // add a short info, if available
 
     JEditorPane infoText = new JEditorPane() ;
-    infoText.setEditable( false ) ;
-    // get the info text
-    //String middle = prefs.get("language")+"/";
-    //if (middle.equals("en/")) middle = ""; // english in base help dir.
-    URL infoURL = JabRef.class.getResource( GUIGlobals.helpPre
-                                            + GUIGlobals.shortPlainImport ) ;
-    if ( infoURL != null )
-    {
-      try
-      {
-        infoText.setPage( infoURL ) ;
-        infoText.setBackground( GUIGlobals.infoField ) ;
-        infoText.setBorder( new EtchedBorder( EtchedBorder.LOWERED ) ) ;
-        infoText.setPreferredSize( new Dimension( 220, 50 ) ) ;
-        infoText.setMinimumSize( new Dimension( 180, 50 ) ) ;
-        rawPanel.add( infoText, BorderLayout.SOUTH ) ;
-      }
-      catch ( IOException e )
-      {}
-    }
+    infoText.setEditable(false);
+     // get the info text
+
+    //infoText.setContentType("text/html");
+    infoText.setBackground(GUIGlobals.infoField);
+    infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+    infoText.setPreferredSize( new Dimension(220, 50));
+    infoText.setMinimumSize( new Dimension(180, 50));
+    infoText.setText(Globals.lang("This_is_a_simple_copy_and_paste_dialog._First_load_or_paste_some_"
+            +"text_into_the_text_input_area._After_that,_you_can_mark_text_and_assign_it_to_a_bibtex_field."));
+    
+    rawPanel.add( infoText, BorderLayout.SOUTH ) ;
+ 
   }
 
 // ---------------------------------------------------------------------------

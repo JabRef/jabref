@@ -72,7 +72,9 @@ public class EntryEditorTab {
 
 	    // Store the editor for later reference:
 	    editors.put(fields[i], ta);
-
+            if (i == 0)
+                activeField = ta;
+            
 	    // The label for this field:
 	    con.insets = new Insets(5, 5, 0, 0);
 	    con.anchor = GridBagConstraints.WEST;
@@ -120,6 +122,12 @@ public class EntryEditorTab {
 	    con.anchor = GridBagConstraints.SOUTHWEST;
 	    FieldTextField tf = new FieldTextField(Globals.KEY_FIELD, (String) parent.entry.getField(Globals.KEY_FIELD));//(String) entry.getField(Globals.KEY_FIELD));
         editors.put("bibtexkey", tf);
+        
+        // If the key field is the only field, we should have only one editor, and this one should be set
+        // as active initially:
+        if (editors.size() == 1)
+            activeField = tf;
+        
 	    gbl.setConstraints(tf.getLabel(), con);
 	    panel.add(tf.getLabel());
 	    con.gridwidth = GridBagConstraints.REMAINDER;
@@ -150,6 +158,7 @@ public class EntryEditorTab {
     public void activate() {
 	if (activeField != null)
 	    activeField.requestFocus();
+
 	//System.out.println("Activate, hurra");
     }
 
@@ -198,11 +207,18 @@ public class EntryEditorTab {
 	InputMap im = ta.getInputMap(JComponent.WHEN_FOCUSED);
 	ActionMap am = ta.getActionMap();
 
+        im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+        am.put("prev", parent.prevEntryAction);
+        im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+        am.put("next", parent.nextEntryAction);
+    
 	im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
 	am.put("store", parent.storeFieldAction);
 	im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
+        im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
 	am.put("left", parent.switchLeftAction);
 	im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
+        im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
 	am.put("right", parent.switchRightAction);
 	im.put(Globals.prefs.getKey("Help"), "help");
 	am.put("help", parent.helpAction);

@@ -59,7 +59,7 @@ public class ScifinderImporter implements ImportFormat {
 		if (fields[j].indexOf(":") >= 0){
 		    String tmp[] = new String[2];
 		    tmp[0] = fields[j].substring(0, fields[j].indexOf(":"));
-		    tmp[1] = fields[j].substring(fields[j].indexOf(":") + 1);
+		    tmp[1] = fields[j].substring(fields[j].indexOf(":") + 1).trim();
 		    if (tmp.length > 1){//==2
 			if (tmp[0].equals("Author")) hm.put("author", ImportFormatReader.fixAuthor_lastnameFirst(tmp[1].replaceAll(";", " and ")));
 			else if (tmp[0].equals("Title")) hm.put("title", tmp[1]);
@@ -72,8 +72,14 @@ public class ScifinderImporter implements ImportFormat {
 			else if (tmp[0].equals("Abstract")) hm.put("abstract", tmp[1]);
 			else if (tmp[0].equals("Supplementary Terms")) hm.put("keywords",
 									      tmp[1]);
-			else if (tmp[0].equals("Document Type")) Type = tmp[1].replaceAll(
-											  "Journal", "article");
+			else if (tmp[0].equals("Document Type")) {
+                                if (tmp[1].startsWith("Journal"))
+                                    Type = "article";
+                                else if (tmp[1].equals("Dissertation"))
+                                    Type = "phdthesis";
+                                else
+                                    Type = tmp[1];
+                        }
 		    }
 		}
 	    

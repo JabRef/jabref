@@ -23,6 +23,7 @@ USA
 Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
+ 
 */
 
 package net.sf.jabref;
@@ -45,11 +46,13 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.util.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
-public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, FileUpdateListener {
+public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
   boolean tmp = true;
 
+    UIFSplitPane contentPane = new UIFSplitPane();
     BasePanel ths = this;
     JSplitPane splitPane;
     //BibtexEntry testE = new BibtexEntry("tt");
@@ -101,7 +104,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     BibtexEntry showing = null;
     // To indicate which entry is currently shown.
-    HashMap entryEditors = new HashMap();
+    public HashMap entryEditors = new HashMap();
     // To contain instantiated entry editors. This is to save time
     // in switching between entries.
 
@@ -219,8 +222,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                     BibtexEntry be = database.getEntryById(id);
                     showEntry(be);
                     
-                    if (splitPane.getBottomComponent() != null)
-                      new FocusRequester(splitPane.getBottomComponent());
+                    if (splitPane.getBottomComponent() != null) {
+                        new FocusRequester(splitPane.getBottomComponent());  
+                    }
+                      
                   }
 		  frame.unblock();
                 }
@@ -734,7 +739,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldValue, null));
                     }
-                    
+                    //System.out.println("..");
                     for(int i = 0 ; i < numSelected ; i++){
                         bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
                         oldValue = bes.getField(GUIGlobals.KEY_FIELD);
@@ -1072,7 +1077,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
           actions.put("replaceAll", new BaseAction() {
                     public void action() {
                       ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
-                      rsd.show();
+                      rsd.setVisible(true);
                       if (!rsd.okPressed())
                           return;
                       int counter = 0;
@@ -1117,7 +1122,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                   // get Type of new entry
                   EntryTypeDialog etd = new EntryTypeDialog(frame);
                   Util.placeDialog(etd, ths);
-                  etd.show();
+                  etd.setVisible(true);
                   BibtexEntryType tp = etd.getChoice();
                   if (tp == null)
                     return;
@@ -1128,7 +1133,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                                                                  "import", true,
                                                                  bibEntry) ;
                   Util.placeDialog(tidialog, ths);
-                  tidialog.show();
+                  tidialog.setVisible(true);
 
                   if (tidialog.okPressed())
                   {
@@ -1156,7 +1161,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                                                                          "import", true,
                                                                          bibEntry) ;
                           Util.placeDialog(tidialog, ths);
-                          tidialog.show();
+                          tidialog.setVisible(true);
 
                           if (tidialog.okPressed())
                           {
@@ -1178,23 +1183,31 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                       }
                   });
 
-              actions.put("markEntries", new BaseAction() {
-                public void action() {
+              actions.put("markEntries", new AbstractWorker() {
+                  private int besLength = -1;
+                public void run() {
 
                   NamedCompound ce = new NamedCompound("Mark entries");
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  besLength = bes.length;
 		  if (bes == null)
 		      return;
                   for (int i=0; i<bes.length; i++) {
-                    ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
+                      Object o = bes[i].getField(Globals.MARKED);
+                      if ((o != null) && (o.toString().equals("0")))
+                          continue;
+                      ce.addEdit(new UndoableFieldChange(bes[i], Globals.MARKED,
                                                        bes[i].getField(Globals.MARKED), "0"));
-                    bes[i].setField(Globals.MARKED, "0");
+                      bes[i].setField(Globals.MARKED, "0");
                   }
                   ce.end();
                   undoManager.addEdit(ce);
+                }
+                
+                public void update() {
                   markBaseChanged();
                   refreshTable();
-                  output(Globals.lang("Marked selected")+" "+Globals.lang(bes.length>0?"entry":"entries"));
+                  output(Globals.lang("Marked selected")+" "+Globals.lang(besLength>0?"entry":"entries"));
 
                 }
               });
@@ -1274,7 +1287,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
                           ContentSelectorDialog2 csd = new ContentSelectorDialog2
                               (frame, ths, false, metaData, null);
                           Util.placeDialog(csd, frame);
-                          csd.show();
+                          csd.setVisible(true);
                       }
                   });
 
@@ -1347,11 +1360,14 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 		      String filename = null, formatName = null;
 		      java.util.List entries = null;
 		      public void init() {
-                        output("Extracting file.");
+                        output("Storing.");
 		      }
 		      public void run() {
-                        ResourceExtractor re = new ResourceExtractor(frame, "/images/JabRef-splash.png", new File("/home/alver/splash.png"));
-                        re.run();
+                          try {
+                            OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File("/home/alver/export.sxc"), database);
+                          } catch (Exception ex) {
+                              ex.printStackTrace();
+                          }
                       }
                       
 		  });
@@ -1643,6 +1659,7 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
 
     public void setupMainPanel() {
 
+        //splitPane = new com.jgoodies.uif_lite.component.UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
         // We replace the default FocusTraversalPolicy with a subclass
@@ -1696,9 +1713,16 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
         sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
         sidePaneManager.populatePanel();
+        contentPane.setBorder(null);
+        contentPane.setDividerLocation(-1);
+        contentPane.setLeftComponent(sidePaneManager.getPanel());
+        contentPane.setRightComponent(splitPane);
+        contentPane.setDividerBorderVisible(false);
+        contentPane.setDividerSize(2);
         setLayout(new BorderLayout());
-        add(sidePaneManager.getPanel(), BorderLayout.WEST);
-        add(splitPane, BorderLayout.CENTER);
+        add(contentPane, BorderLayout.CENTER);
+        //add(sidePaneManager.getPanel(), BorderLayout.WEST);
+        //add(splitPane, BorderLayout.CENTER);
         
 	//setLayout(gbl);
 	//con.fill = GridBagConstraints.BOTH;
@@ -1712,6 +1736,10 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
         //setResizeWeight(0);
 
         revalidate();
+    }
+    
+    public void setDivider() {
+        contentPane.setDividerLocation(-1);
     }
 
     /**
@@ -1923,7 +1951,8 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
       if (be != null) {
         if (entryTable.getSelectedRows().length == 0) {
           int row = tableModel.getNumberFromName(be.getId());
-          entryTable.addRowSelectionInterval(row, row);
+	  if (row < tableModel.getRowCount()) 
+	      entryTable.addRowSelectionInterval(row, row);
         }
         updateViewToSelected();
       }

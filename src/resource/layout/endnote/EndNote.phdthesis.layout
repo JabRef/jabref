@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Thesis
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E 
@@ -21,9 +21,9 @@
 %! \shorttitle
 %Z 
 %@ 
-%( 
+%(
 %)
-%* 
+%*
 %L
 %M
 %1 \pdf

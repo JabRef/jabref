@@ -381,6 +381,14 @@ public class BibtexDatabase
 		return res;
 	    }
         }
+        
+        // If we get to this point, the string has obviously not been defined locally.
+        // Check if one of the standard BibTeX month strings has been used:
+        Object o;
+        if ((o = Globals.MONTH_STRINGS.get(label.toLowerCase())) != null) {
+            return (String)o;
+        }
+        
         return label;
     }
 
@@ -447,6 +455,18 @@ public class BibtexDatabase
         return duplicate;
     }
 
+    /**
+     * Returns the number of occurences of the given key in this database.
+     */
+    public int getNumberOfKeyOccurences(String key) {
+        Object o = allKeys.get(key);
+        if (o == null)
+            return 0;
+        else
+            return ((Integer)o).intValue();
+            
+    }
+    
     //========================================================
     // keep track of all the keys to warn if there are duplicates
     //========================================================

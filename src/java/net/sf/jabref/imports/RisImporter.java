@@ -66,21 +66,38 @@ public class RisImporter implements ImportFormat {
 	    sb.append("\n");
 	}
 	String[] entries = sb.toString().split("ER  -");
-
-	HashMap hm = new HashMap();
+        
+	
 	for (int i = 0; i < entries.length - 1; i++){
-	    String Type = "", Author = "", StartPage = "", EndPage = "";
-	    hm.clear();
-	    
+            String Type = "", Author = "", StartPage = "", EndPage = "";
+            HashMap hm = new HashMap();
+		    
 	    String[] fields = entries[i].split("\n");
+            
 	    for (int j = 0; j < fields.length; j++){
-		if (fields[j].length() < 6) continue;
+                StringBuffer current = new StringBuffer(fields[j]);
+                boolean done = false;
+                while (!done && (j < fields.length-1)) {
+                    if ((fields[j+1].length() >= 6) && !fields[j+1].substring(2, 6).equals("  - ")) {
+                        current.append(fields[j+1]);
+                        j++;
+                    } else
+                        done = true;
+                }
+                String entry = current.toString();
+		if (entry.length() < 6) continue;
 		else{
-		    String lab = fields[j].substring(0, 2);
-		    String val = fields[j].substring(6).trim();
+		    String lab = entry.substring(0, 2);
+		    String val = entry.substring(6).trim();
 		    if (lab.equals("TY")){
 			if (val.equals("BOOK")) Type = "book";
-			else if (val.equals("JOUR")) Type = "article";
+			else if (val.equals("JOUR") || val.equals("MGZN")) Type = "article";
+                        else if (val.equals("THES")) Type = "phdthesis";
+                        else if (val.equals("UNPB")) Type = "unpublished";
+                        else if (val.equals("RPRT")) Type = "techreport";
+                        else if (val.equals("CONF")) Type = "inproceedings";
+                        else if (val.equals("CHAP")) Type = "inbook";
+                        
 			else Type = "other";
 		    }else if (lab.equals("T1") || lab.equals("TI")) hm.put("title", val);//Title
 		    // =
@@ -94,16 +111,34 @@ public class RisImporter implements ImportFormat {
 		    }else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) hm
 											    .put("journal", val);
 		    else if (lab.equals("SP")) StartPage = val;
-		    
+                    else if (lab.equals("PB"))
+                        hm.put("publisher", val);
+                    else if (lab.equals("AD"))
+                        hm.put("address", val);
 		    else if (lab.equals("EP")) EndPage = val;
-		    
+                    else if (lab.equals("SN"))
+                        hm.put("issn", val);
 		    else if (lab.equals("VL")) hm.put("volume", val);
 		    else if (lab.equals("IS")) hm.put("number", val);
 		    else if (lab.equals("N2") || lab.equals("AB")) hm
 								       .put("abstract", val);
 		    else if (lab.equals("UR")) hm.put("url", val);
-		    else if ((lab.equals("Y1") || lab.equals("PY")) && val.length() >= 4) hm
-											      .put("year", val.substring(0, 4));
+		    else if ((lab.equals("Y1") || lab.equals("PY")) && val.length() >= 4) {
+                        String[] parts = val.split("/");
+                        hm.put("year", parts[0]);
+                        if ((parts.length > 1) && (parts[1].length() > 0)) {
+                            try {
+                                int month = Integer.parseInt(parts[1]);
+                                if ((month > 0) && (month <= 12)) {
+                                    //System.out.println(Globals.MONTHS[month-1]);
+                                    hm.put("month", "#"+Globals.MONTHS[month-1]+"#");
+                                }
+                            } catch (NumberFormatException ex) {
+                                // The month part is unparseable, so we ignore it.
+                            }
+                        }
+                    }
+                        
 		    else if (lab.equals("KW")){
 			if (!hm.containsKey("keywords")) hm.put("keywords", val);
 			else{

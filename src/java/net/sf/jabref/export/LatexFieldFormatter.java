@@ -64,7 +64,10 @@ public class LatexFieldFormatter implements FieldFormatter {
 
           sb = new StringBuffer("{");
           // No formatting at all for these fields, to allow custom formatting?
-          sb.append(text); // Util.wrap2(text, GUIGlobals.LINE_LENGTH)
+          if (Globals.prefs.getBoolean("preserveFieldFormatting"))
+            sb.append(text); 
+          else
+            sb.append(Util.wrap2(text, GUIGlobals.LINE_LENGTH));
           sb.append("}");
           
           return sb.toString();

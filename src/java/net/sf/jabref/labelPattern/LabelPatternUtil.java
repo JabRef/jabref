@@ -27,10 +27,18 @@ public class LabelPatternUtil {
   //this is SO crappy, but i have no idea of converting unicode into a String
   // the content of the AL is build with the buildLetters()
   private static ArrayList letters = builtLetters();
-  public static ArrayList DEFAULT_LABELPATTERN = split("[auth][year]");
+  public static ArrayList DEFAULT_LABELPATTERN;
+  static {
+      updateDefaultPattern();
+  }
+  //"[auth][year]");
 
   private static BibtexDatabase _db;
 
+  public static void updateDefaultPattern() {
+      DEFAULT_LABELPATTERN = split(Globals.prefs.get("defaultLabelPattern"));
+  }
+  
   /**
    * This method takes a string of the form [field1]spacer[field2]spacer[field3]...,
    * where the fields are the (required) fields of a BibTex entry. The string is split
@@ -296,15 +304,38 @@ public class LabelPatternUtil {
     }
     if (forceLower) {
       _label = _label.toLowerCase();
-
-      // Try new keys until we get a unique one:
     }
-    if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {
-      char c = 'b';
-      String modKey = _label + "a";
-      while (_db.setCiteKeyForEntry(_entry.getId(), modKey)) {
-        modKey = _label + ( (char) (c++));
-      }
+      
+    
+    String oldKey = _entry.getCiteKey();
+    int occurences = _db.getNumberOfKeyOccurences(_label);
+    if ((oldKey != null) && oldKey.equals(_label))
+        occurences--; // No change, so we can accept one dupe.
+    
+    // Try new keys until we get a unique one:
+    //if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {
+    
+    if (occurences == 0) {
+        // No dupes found, so we can just go ahead.
+        if (!_label.equals(oldKey))
+            _db.setCiteKeyForEntry(_entry.getId(), _label);
+    }
+    else { 
+        // The key is already in use, so we must modify it.
+        char c = 'b';
+        String modKey = _label + "a";
+        occurences = _db.getNumberOfKeyOccurences(modKey);
+        if ((oldKey != null) && oldKey.equals(modKey))
+            occurences--;
+        //while (_db.setCiteKeyForEntry(_entry.getId(), modKey)) {
+        while (occurences > 0) {
+            modKey = _label + ( (char) (c++));
+            occurences = _db.getNumberOfKeyOccurences(modKey);
+            if ((oldKey != null) && oldKey.equals(modKey))
+                occurences--;
+        }
+        if (!modKey.equals(oldKey))
+            _db.setCiteKeyForEntry(_entry.getId(), modKey);
     }
     return _entry;
     /** End of edit, Morten Alver 2004.02.04.  */

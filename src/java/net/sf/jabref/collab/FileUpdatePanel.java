@@ -16,21 +16,21 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
   
   public FileUpdatePanel(JabRefFrame frame, BasePanel panel,
                          SidePaneManager manager, JabRefPreferences prefs) {
-    super(manager);
+    super(manager, GUIGlobals.saveIconFile, Globals.lang("File changed"));
     this.panel = panel;
     this.frame = frame;
     this.manager = manager;
-    SidePaneHeader header = new SidePaneHeader
-        ("File changed", GUIGlobals.saveIconFile, this);
-    setLayout(new BorderLayout());
-    add(header, BorderLayout.NORTH);
-    JPanel main = new JPanel();
-    //main.add(test);
-    JLabel lab = new JLabel("<html><center>Your file has<BR>been modified<BR>by another process!</center></html>");
     
-    add(lab, BorderLayout.CENTER);
-    //add(main, BorderLayout.CENTER);
-    add(test, BorderLayout.SOUTH);
+    JPanel main = new JPanel();
+    main.setLayout(new BorderLayout());
+    JLabel lab = new JLabel("<html><center>Your file has<BR>been modified<BR>by another process!</center></html>",
+            JLabel.CENTER);
+    
+    main.add(lab, BorderLayout.CENTER);
+    main.add(test, BorderLayout.SOUTH);
+    main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+    
+    add(main, BorderLayout.CENTER);
     test.addActionListener(this);
   }
 

@@ -236,6 +236,7 @@ public class GUIGlobals {
       incompleteIcon = GUIGlobals.class.getResource(pre + "exclamation.gif"),
       winEdtIcon = GUIGlobals.class.getResource(pre + "winedt.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
+      //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
       splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
       completeTagIcon = GUIGlobals.class.getResource(pre +"completeItem.png"),
       wrongTagIcon = GUIGlobals.class.getResource(pre +"wrongItem.png"),
@@ -472,7 +473,7 @@ public class GUIGlobals {
     // LANGUAGES contains mappings for supported languages.
     LANGUAGES.put("English", "en");
     LANGUAGES.put("Deutsch", "de");
-    LANGUAGES.put("Francais", "fr");
+    LANGUAGES.put("Fran\u00E7ais", "fr");
     LANGUAGES.put("Norsk", "no");
 
     FIELD_EXTRAS = new HashMap();

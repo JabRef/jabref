@@ -190,8 +190,11 @@ public class SidePaneManager {
         }
       }
       sidep.setComponents(toShow);
+      boolean wasVisible = sidep.isVisible();
       if (visible.size() > 0) {
 	  sidep.setVisible(true);
+          if (!wasVisible)
+            panel.setDivider();
       } else
 	  sidep.setVisible(false);
 

@@ -45,8 +45,12 @@ public class EntryTableModel
   JabRefFrame frame;
   String[] columns; // Contains the current column names.
   private EntrySorter sorter;
-    private int visibleRows = 0;
+  private int visibleRows = 0;
 
+    
+  // Testing something:
+  Object[][] allCache = null;
+    
   //private Object[] entryIDs; // Temporary
 
   // Constants used to define how a cell should be rendered.
@@ -132,6 +136,7 @@ public class EntryTableModel
   }
 
   public Class getColumnClass(int column) {
+     
     //return (getIconTypeForColumn(column) != null ? Icon.class : String.class);
       if (column == 0)
 	  return Boolean.class;
@@ -139,6 +144,21 @@ public class EntryTableModel
 	  return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
   }
 
+  public Object getValueAt_(int row, int col) {
+      return allCache[row][col];
+  }
+  
+  public void updateAllCache() {
+      /*long start = System.currentTimeMillis();
+      int rows = getRowCount();
+      int cols = getColumnCount();
+      allCache = new Object[rows][cols];
+      for (int row=0; row<rows; row++)
+          for (int col=0; col<cols; col++)
+              allCache[row][col] = getValueAt_old(row, col);
+      Globals.logger("Time spent: "+(System.currentTimeMillis()-start));*/
+  }
+  
   public Object getValueAt(int row, int col) {
     // Return the field named frame.prefs.columnNames[col] from the Entry
     // corresponding to the row.
@@ -177,16 +197,14 @@ public class EntryTableModel
     //  o = ""+(row+1);
     //}
     else {
+        
       o = be.getField(columns[col - padleft]);
       for (int i = 0; i < nameCols.length; i++) {
         if (col - padleft == nameCols[i]) {
           if (o == null) {
             return null;
           }
-          if (namesAsIs) {
-            return o;
-          }
-          else {
+          if (!namesAsIs) {
             if (namesFf) {
               return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
             }
@@ -196,9 +214,23 @@ public class EntryTableModel
           }
         }
       }
-    }
-    //}
 
+    }
+    
+    /*if (o != null) {
+        String processed = Globals.getCached((String)o);
+        if (processed == null) {
+            StringBuffer sb = new StringBuffer("");//"<html>");
+            sb.append((String)o);
+            //sb.append("</html>");
+            processed = sb.toString();
+            Globals.cache((String)o, processed);
+            o = processed;
+        } else
+            o = processed;
+        
+            
+    }*/
     return o;
   }
 
@@ -361,7 +393,9 @@ public class EntryTableModel
     public void remap() {
 	updateSorter();
 	showAllEntries(); // Update the visible row count.
+        updateAllCache();
 	fireTableDataChanged();
+        
     }
 
     /**
@@ -371,6 +405,7 @@ public class EntryTableModel
     public void remap(int rows) {
 	updateSorter();
 	setRowCount(rows);
+        updateAllCache();
 	fireTableDataChanged();
     }
 
@@ -381,7 +416,9 @@ public class EntryTableModel
     public void update() {
 	sorter.index();
 	showAllEntries();
+        updateAllCache();
 	fireTableDataChanged();
+        
     }
 
     /**
@@ -392,6 +429,7 @@ public class EntryTableModel
     public void update(int rows) {
 	sorter.index();
 	setRowCount(rows);
+        updateAllCache();
 	fireTableDataChanged();
     }
 

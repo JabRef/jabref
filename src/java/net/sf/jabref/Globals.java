@@ -43,7 +43,8 @@ public class Globals {
   public static int SHORTCUT_MASK,// = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
       FUTURE_YEAR = 2050, // Needs to give a year definitely in the future. Used for guessing the
                           // year field when parsing textual data.  :-)
-      STANDARD_EXPORT_COUNT = 4; // The number of standard export formats.
+      STANDARD_EXPORT_COUNT = 4, // The number of standard export formats.
+      METADATA_LINE_LENGTH = 70; // The line length used to wrap metadata.
   private static String resourcePrefix = "resource/JabRef",
                         menuResourcePrefix = "resource/Menu",
                         integrityResourcePrefix = "resource/IntegrityMessage";
@@ -53,6 +54,8 @@ public class Globals {
     public static ImportFormatReader importFormatReader = new ImportFormatReader();
 
 
+    private final static Map tableCache = new WeakHashMap();
+    
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
   public static Locale locale;
   public static final String FILETYPE_PREFS_EXT = "_dir",
@@ -68,6 +71,27 @@ public class Globals {
       "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257", "ISO8859_2",
       "ISO8859_4", "ISO8859_5", "ISO8859_7"};
 
+  // String array that maps from month number to month string label:
+  public static String[] MONTHS = new String[] {"jan", "feb", "mar", "apr", "may", "jun",
+          "jul", "aug", "sep", "oct", "nov", "dec"};
+          
+  // Map that maps from month string labels to 
+  public static Map MONTH_STRINGS = new HashMap();
+  static {
+      MONTH_STRINGS.put("jan", "January");
+      MONTH_STRINGS.put("feb", "February");
+      MONTH_STRINGS.put("mar", "March");
+      MONTH_STRINGS.put("apr", "April");
+      MONTH_STRINGS.put("may", "May");
+      MONTH_STRINGS.put("jun", "June");
+      MONTH_STRINGS.put("jul", "July");
+      MONTH_STRINGS.put("aug", "August");
+      MONTH_STRINGS.put("sep", "September");
+      MONTH_STRINGS.put("oct", "October");
+      MONTH_STRINGS.put("nov", "November");
+      MONTH_STRINGS.put("dec", "December");
+  }
+          
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
   public static JabRefPreferences prefs = null;
 
@@ -134,6 +158,22 @@ public class Globals {
     javax.swing.JComponent.setDefaultLocale(locale);
   }
 
+  /**
+   * Returns the cached value from the tableChache WeakHashMap.
+   */
+  public static String getCached(String text) {
+      Object res = tableCache.get(text);
+      return (String)res;
+  }
+  
+  /**
+   * Caches a new value in the tableCache WeakHashMap.
+   */
+  public static void cache(String text, String textProcessed) {
+      tableCache.put(text, textProcessed);
+      //System.out.println(tableCache.size());
+  }
+  
   public static String lang(String key) {
     String translation = null;
     try {
@@ -641,7 +681,7 @@ public class Globals {
     UNICODE_CHARS.put("\u00D9", "U");
     UNICODE_CHARS.put("\u00DA", "U");
     UNICODE_CHARS.put("\u00DB", "U");
-    UNICODE_CHARS.put("\u00DC", "U"); // U umlaut ..
+    UNICODE_CHARS.put("\u00DC", "Ue"); // U umlaut ..
     UNICODE_CHARS.put("\u00DD", "Y");
     UNICODE_CHARS.put("\u00DF", "ss");
     UNICODE_CHARS.put("\u00E0", "a");
@@ -671,7 +711,7 @@ public class Globals {
     UNICODE_CHARS.put("\u00F9", "u");
     UNICODE_CHARS.put("\u00FA", "u");
     UNICODE_CHARS.put("\u00FB", "u");
-    UNICODE_CHARS.put("\u00FC", "u"); // u umlaut...
+    UNICODE_CHARS.put("\u00FC", "ue"); // u umlaut...
     UNICODE_CHARS.put("\u00FD", "y");
     UNICODE_CHARS.put("\u00FF", "y");
     UNICODE_CHARS.put("\u0100", "A");

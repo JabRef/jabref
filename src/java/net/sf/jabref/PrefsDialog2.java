@@ -125,9 +125,9 @@ public class PrefsDialog2 extends JDialog {
 			frame.output(Globals.lang("Preferences recorded."));
 		    }
 		};
-	    worker.getWorker().run();
-	    worker.getCallBack().update();
-
+            worker.getWorker().run();
+            worker.getCallBack().update();
+            
         }
     }
 

@@ -65,7 +65,7 @@ class SearchManager2 extends SidePaneComponent
 
     public SearchManager2(JabRefFrame frame, JabRefPreferences prefs_,
 			 SidePaneManager manager) {
-	super(manager);
+	super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
 
 	this.frame = frame;
 	prefs = prefs_;
@@ -186,32 +186,31 @@ settings.add(select);
 	else if (!prefs.getBoolean("selectS"))
 	    reorder.setSelected(true);
 
-
-	setLayout(gbl);
-	SidePaneHeader header = new SidePaneHeader
-	    ("Search", GUIGlobals.searchIconFile, this);
+        JPanel main = new JPanel();
+	main.setLayout(gbl);
+	//SidePaneHeader header = new SidePaneHeader("Search", GUIGlobals.searchIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
-	con.insets = new Insets(0, 0, 2,  0);
-	gbl.setConstraints(header, con);
-	add(header);
-        con.insets = new Insets(0, 0, 0,  0);
+	//con.insets = new Insets(0, 0, 2,  0);
+	//gbl.setConstraints(header, con);
+	//add(header);
+        //con.insets = new Insets(0, 0, 0,  0);
         gbl.setConstraints(searchField,con);
-        add(searchField) ;
+        main.add(searchField) ;
         con.gridwidth = 1;
         gbl.setConstraints(search,con);
-        add(search) ;
+        main.add(search) ;
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(escape,con);
-        add(escape) ;
+        main.add(escape) ;
         con.insets = new Insets(0, 2, 0,  0);
 	gbl.setConstraints(increment, con);
-        add(increment);
+        main.add(increment);
 	gbl.setConstraints(highlight, con);
-        add(highlight);
+        main.add(highlight);
 	gbl.setConstraints(reorder, con);
-        add(reorder);
+        main.add(reorder);
         con.insets = new Insets(0, 0, 0,  0);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
@@ -224,7 +223,9 @@ settings.add(select);
         con.weightx = 0;
         gb.setConstraints(help, con);
         pan.add(help);
-        add(pan);
+        main.add(pan);
+        main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        add(main, BorderLayout.CENTER);
 
 	searchField.getInputMap().put(prefs.getKey("Repeat incremental search"),
 				      "repeat");
@@ -241,6 +242,7 @@ settings.add(select);
 		    ths.actionPerformed(new ActionEvent(escape, 0, ""));
 		}
 	    });
+            
     }
 
     protected void updatePrefs() {

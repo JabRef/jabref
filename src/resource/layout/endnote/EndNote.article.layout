@@ -20,10 +20,10 @@
 %? 
 %! \shorttitle
 %Z 
-%@ \isbn
-%( 
+%@ \issn
+%(
 %)
-%* 
+%*
 %L
 %M
 %1 \pdf

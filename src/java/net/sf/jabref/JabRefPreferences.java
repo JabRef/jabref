@@ -42,7 +42,7 @@ import net.sf.jabref.export.ExportComparator;
 
 public class JabRefPreferences {
 
-    final String
+    public final String
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
         CUSTOM_TYPE_OPT = "customTypeOpt_",
@@ -50,7 +50,7 @@ public class JabRefPreferences {
 	CUSTOM_TAB_FIELDS = "customTabFields_";
 
     Preferences prefs;
-    HashMap defaults = new HashMap(),
+    public HashMap defaults = new HashMap(),
         keyBinds = new HashMap(),
         defKeyBinds = new HashMap();
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
@@ -98,66 +98,68 @@ public class JabRefPreferences {
             defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
 
         }
-        defaults.put("useDefaultLookAndFeel", new Boolean(true));
+        defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
         defaults.put("posX", new Integer(0));
         defaults.put("posY", new Integer(0));
         defaults.put("sizeX", new Integer(840));
         defaults.put("sizeY", new Integer(680));
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_OFF));
-        defaults.put("tableColorCodesOn", new Boolean(true));
-        defaults.put("namesAsIs", new Boolean(false));
-        defaults.put("namesFf", new Boolean(false));
+        defaults.put("tableColorCodesOn", Boolean.TRUE);
+        defaults.put("namesAsIs", Boolean.FALSE);
+        defaults.put("namesFf", Boolean.FALSE);
         defaults.put("language", "en");
         defaults.put("priSort", "author");
-        defaults.put("priDescending", new Boolean(false));
+        defaults.put("priDescending", Boolean.FALSE);
         defaults.put("secSort", "year");
-        defaults.put("secDescending", new Boolean(true));
+        defaults.put("secDescending", Boolean.TRUE);
         defaults.put("terSort", "author");
-        defaults.put("terDescending", new Boolean(false));
+        defaults.put("terDescending", Boolean.FALSE);
         defaults.put("columnNames", "entrytype;author;title;year;journal;owner;bibtexkey");
         defaults.put("columnWidths","75;280;400;60;100;100;100");
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
-        defaults.put("autoOpenForm", new Boolean(true));
+        defaults.put("autoOpenForm", Boolean.TRUE);
         defaults.put("entryTypeFormHeightFactor", new Integer(1));
         defaults.put("entryTypeFormWidth", new Integer(1));
-        defaults.put("backup", new Boolean(true));
-        defaults.put("openLastEdited", new Boolean(true));
+        defaults.put("backup", Boolean.TRUE);
+        defaults.put("openLastEdited", Boolean.TRUE);
         defaults.put("lastEdited", (String)null);
         defaults.put("stringsPosX", new Integer(0));
         defaults.put("stringsPosY", new Integer(0));
         defaults.put("stringsSizeX", new Integer(600));
         defaults.put("stringsSizeY", new Integer(400));
-        defaults.put("defaultShowSource", new Boolean(false));
-        defaults.put("defaultAutoSort", new Boolean(false));
-        defaults.put("enableSourceEditing", new Boolean(true));
-        defaults.put("caseSensitiveSearch", new Boolean(false));
-        defaults.put("searchReq", new Boolean(true));
-        defaults.put("searchOpt", new Boolean(true));
-        defaults.put("searchGen", new Boolean(true));
-        defaults.put("searchAll", new Boolean(false));
-        defaults.put("incrementS", new Boolean(true));
-        defaults.put("saveInStandardOrder", new Boolean(true));
-        defaults.put("selectS", new Boolean(false));
-        defaults.put("regExpSearch", new Boolean(true));
+        defaults.put("defaultShowSource", Boolean.FALSE);
+        defaults.put("defaultAutoSort", Boolean.FALSE);
+        defaults.put("enableSourceEditing", Boolean.TRUE);
+        defaults.put("caseSensitiveSearch", Boolean.FALSE);
+        defaults.put("searchReq", Boolean.TRUE);
+        defaults.put("searchOpt", Boolean.TRUE);
+        defaults.put("searchGen", Boolean.TRUE);
+        defaults.put("searchAll", Boolean.FALSE);
+        defaults.put("incrementS", Boolean.TRUE);
+        defaults.put("saveInStandardOrder", Boolean.TRUE);
+        defaults.put("selectS", Boolean.FALSE);
+        defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
-        defaults.put("autoComplete", new Boolean(true));
+        defaults.put("autoComplete", Boolean.TRUE);
         defaults.put("autoCompFields", new byte[] {0, 1, 28});
-        defaults.put("groupSelectorVisible", new Boolean(true));
-        defaults.put("groupFloatSelections", new Boolean(true));
-        defaults.put("groupIntersectSelections", new Boolean(true));
-        defaults.put("groupInvertSelections", new Boolean(false));
-        defaults.put("groupSelectMatches", new Boolean(false));
+        defaults.put("groupSelectorVisible", Boolean.TRUE);
+        defaults.put("groupFloatSelections", Boolean.TRUE);
+        defaults.put("groupIntersectSelections", Boolean.TRUE);
+        defaults.put("groupInvertSelections", Boolean.FALSE);
+        defaults.put("groupSelectMatches", Boolean.FALSE);
         defaults.put("groupsDefaultField", "keywords");
-
+        defaults.put("groupSubgroupIndependent", Boolean.FALSE);
+        defaults.put("groupSubgroupIntersection", Boolean.TRUE);
+        
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
-
+        defaults.put("preserveFieldFormatting", Boolean.FALSE);
 	// The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
                      "pdf;comment;owner");
@@ -179,18 +181,18 @@ public class JabRefPreferences {
         defaults.put("menuFontFamily", "Times");
         defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("menuFontSize", new Integer(11));
-        defaults.put("antialias", new Boolean(true));
-        defaults.put("ctrlClick", new Boolean(false));
-        defaults.put("disableOnMultipleSelection", new Boolean(false));
-        defaults.put("pdfColumn", new Boolean(true));
-        defaults.put("urlColumn", new Boolean(true));
-        defaults.put("citeseerColumn", new Boolean(false));
-        defaults.put("useOwner", new Boolean(true));
-        defaults.put("allowTableEditing", new Boolean(false));
-        defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
-        defaults.put("confirmDelete", new Boolean(true));
-        defaults.put("grayOutNonHits", new Boolean(true));
-
+        defaults.put("antialias", Boolean.TRUE);
+        defaults.put("ctrlClick", Boolean.FALSE);
+        defaults.put("disableOnMultipleSelection", Boolean.FALSE);
+        defaults.put("pdfColumn", Boolean.TRUE);
+        defaults.put("urlColumn", Boolean.TRUE);
+        defaults.put("citeseerColumn", Boolean.FALSE);
+        defaults.put("useOwner", Boolean.TRUE);
+        defaults.put("allowTableEditing", Boolean.FALSE);
+        defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
+        defaults.put("confirmDelete", Boolean.TRUE);
+        defaults.put("grayOutNonHits", Boolean.TRUE);
+        defaults.put("defaultLabelPattern", "[author][year]");
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"
@@ -231,7 +233,7 @@ public class JabRefPreferences {
 
         customExports = new CustomExportList(this, new ExportComparator());
 
-        //defaults.put("oooWarning", new Boolean(true));
+        //defaults.put("oooWarning", Boolean.TRUE);
 
     }
 
@@ -350,6 +352,7 @@ public class JabRefPreferences {
         }
         if (s == null) {
           Globals.logger("Could not get key binding for \"" + bindName + "\"");
+          //throw new RuntimeException("");
         }
 
         if (Globals.ON_MAC)
@@ -525,8 +528,10 @@ public class JabRefPreferences {
         defKeyBinds.put("Clear search", "ESCAPE");
         defKeyBinds.put("Entry editor, next panel", "ctrl TAB");//"ctrl PLUS");//"shift Right");
         defKeyBinds.put("Entry editor, previous panel", "ctrl shift TAB");//"ctrl MINUS");
-        defKeyBinds.put("Entry editor, next entry", "ctrl shift Down");
-        defKeyBinds.put("Entry editor, previous entry", "ctrl shift Up");
+        defKeyBinds.put("Entry editor, next panel 2", "ctrl PLUS");//"ctrl PLUS");//"shift Right");
+        defKeyBinds.put("Entry editor, previous panel 2", "ctrl MINUS");//"ctrl MINUS");
+        defKeyBinds.put("Entry editor, next entry", "ctrl shift DOWN");
+        defKeyBinds.put("Entry editor, previous entry", "ctrl shift UP");
         defKeyBinds.put("Entry editor, store field", "alt S");
         defKeyBinds.put("String dialog, add string", "ctrl N");
         defKeyBinds.put("String dialog, remove string", "shift DELETE");
@@ -551,7 +556,7 @@ public class JabRefPreferences {
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
-
+        //defKeyBinds.put("Select value", "ctrl B");
     }
 
     private String getNextUnit(Reader data) throws IOException {

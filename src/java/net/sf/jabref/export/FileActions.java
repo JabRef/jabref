@@ -178,7 +178,7 @@ public class FileActions
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-	    TreeSet sorter = getSortedEntries(database, null, true);
+	    Set sorter = getSortedEntries(database, null, true);
 
             FieldFormatter ff = new LatexFieldFormatter();
 
@@ -368,12 +368,18 @@ public class FileActions
                                       File outFile, JabRefPreferences prefs)
         throws Exception {
 
+       
       exportDatabase(database, Globals.LAYOUT_PREFIX, lfName, outFile, prefs);
     }
 
     public static void exportDatabase(BibtexDatabase database, String prefix, String lfName,
                                       File outFile, JabRefPreferences prefs)
     throws Exception {
+
+        if (lfName.equals("oocalc")) {
+            OpenOfficeDocumentCreator.exportOpenOfficeCalc(outFile, database);
+	    return;
+        }
 
 	String encoding = prefs.get("defaultEncoding");//"iso-8859-1";
         OutputStreamWriter ps=null;
@@ -390,6 +396,7 @@ public class FileActions
 	Reader reader;
 	int c;
 	
+        
 	if (lfName.equals("mods")) {
 	    MODSDatabase md = new MODSDatabase(database);
 	    try {
@@ -608,7 +615,7 @@ public class FileActions
     protected static TreeSet getSortedEntries(BibtexDatabase database, Set keySet, boolean isSaveOperation) {
 	String pri, sec, ter;
 	boolean priD, secD, terD;
-	if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
+        if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
 	    // The setting is to save according to the current table order.
 	    
 	    pri = Globals.prefs.get("priSort");
@@ -628,7 +635,7 @@ public class FileActions
 	    terD = true;
 	}
 	TreeSet sorter = new TreeSet(new CrossRefEntryComparator
-				     (new EntryComparator(priD, secD, terD, pri, sec, ter)));
+				     (new EntryComparator(priD, secD, terD, false, pri, sec, ter, Globals.KEY_FIELD)));
 	if (keySet == null)
 	    keySet = database.getKeySet();
 	

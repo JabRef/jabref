@@ -137,6 +137,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     prefs = Globals.prefs;
     type = entry.getType();
 
+    
     entry.addPropertyChangeListener(this);
 
     helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
@@ -163,13 +164,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tabbed.removeAll();
 	tabs.clear();
 	String[] fields = entry.getRequiredFields();
-	if (fields != null) {
+	//if (fields != null) {
 	    reqPan = new EntryEditorTab(java.util.Arrays.asList(fields), this, true);
 	    tabbed.addTab(Globals.lang("Required fields"),
 			  new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
 			  Globals.lang("Show required fields"));
 	    tabs.add(reqPan);
-	}
+	//}
 	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
 	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this, false);
 	    tabbed.addTab(Globals.lang("Optional fields"),
@@ -230,10 +231,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     am.put("store", storeFieldAction);
     im.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
     am.put("generateKey", generateKeyAction);
-    im.put(prefs.getKey("Entry editor, previous panel"), "left");
+    /*im.put(prefs.getKey("Entry editor, previous panel"), "left");
+    im.put(prefs.getKey("Entry editor, previous panel 2"), "left");
     am.put("left", switchLeftAction);
     im.put(prefs.getKey("Entry editor, next panel"), "right");
-    am.put("right", switchRightAction);
+    im.put(prefs.getKey("Entry editor, next panel 2"), "right");
+    am.put("right", switchRightAction);*/
     im.put(prefs.getKey("Entry editor, previous entry"), "prev");
     am.put("prev", prevEntryAction);
     im.put(prefs.getKey("Entry editor, next entry"), "next");
@@ -582,6 +585,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   public void setupJTextComponent(JTextComponent ta) {
 
+     /*
+      * NOTE: This method is only used for the source panel, not for the other tabs. Look at
+      * EntryEditorTab for the setup of text components in the other tabs.
+      */
+      
     /*
      * if ((ta instanceof FieldTextArea) && (prefs.getBoolean("autoComplete"))) {
      * FieldTextArea fta = (FieldTextArea)ta; Completer comp =
@@ -597,10 +605,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     //am.put("close", closeAction);
     im.put(prefs.getKey("Entry editor, store field"), "store");
     am.put("store", storeFieldAction);
+    
     im.put(prefs.getKey("Entry editor, next panel"), "right");
-    am.put("left", switchLeftAction);
-    im.put(prefs.getKey("Entry editor, previous panel"), "left");
+    im.put(prefs.getKey("Entry editor, next panel 2"), "right");
     am.put("right", switchRightAction);
+    
+    im.put(prefs.getKey("Entry editor, previous panel"), "left");
+    im.put(prefs.getKey("Entry editor, previous panel 2"), "left");
+    am.put("left", switchLeftAction);
+    
     im.put(prefs.getKey("Help"), "help");
     am.put("help", helpAction);
     im.put(prefs.getKey("Save database"), "save");
@@ -630,6 +643,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     private void activateVisible() {
 	Object activeTab = tabs.get(tabbed.getSelectedIndex());
+        
 	if (activeTab instanceof EntryEditorTab)
 	    ((EntryEditorTab)activeTab).activate();
 	else
@@ -678,7 +692,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   private void switchTo(String id) {
     // Make sure the current edit is stored.
-      Util.pr("frilp");
+    
     Object activeTab = tabs.get(tabbed.getSelectedIndex());
     if (activeTab instanceof EntryEditorTab) {
         updateField(((EntryEditorTab)activeTab).getActive());
@@ -1196,6 +1210,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        //System.out.println("switch left");
       int i = tabbed.getSelectedIndex();
       tabbed.setSelectedIndex(((i > 0) ? (i - 1) : (tabbed.getTabCount() - 1)));
 
@@ -1209,6 +1224,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        //System.out.println("switch right");
       int i = tabbed.getSelectedIndex();
       tabbed.setSelectedIndex((i < (tabbed.getTabCount() - 1)) ? (i + 1) : 0);
       activateVisible();
@@ -1224,6 +1240,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+      
       int thisRow = panel.tableModel.getNumberFromName(entry.getId());
       String id = null;
       int newRow = -1;
@@ -1301,10 +1318,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         // this updates the table automatically, on close, but not
         // within the tab
         Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
-
+        
         //entry = frame.labelMaker.applyRule(entry, panel.database) ;
         entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
-
+        
         // Store undo information:
         panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
             (String) oldValue, (String) entry.getField(GUIGlobals.KEY_FIELD)));
@@ -1459,4 +1476,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                   JOptionPane.WARNING_MESSAGE);
       }
   }
+  
+
 }

@@ -29,9 +29,12 @@
 //
 // modified : r.nagel 23.08.2004
 //               - insert new Menuitem New Database -> New Database from Aux
-
+// modified : juan 10.02.2005
+//               - insert new Menuitem to the Export menu -> Openoffice 
+//                 export filter
 package net.sf.jabref;
 
+import net.sf.jabref.gui.*;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.ExpandEndnoteFilters;
@@ -419,7 +422,7 @@ public class JabRefFrame
 
               }
               public void update() {
-                  prefsDialog.show();
+                  prefsDialog.setVisible(true);
                   output("");
               }
           };
@@ -676,6 +679,8 @@ public JabRefPreferences prefs() {
     return -1;
   }
 
+  public JTabbedPane getTabbedPane() { return tabbedPane; }
+  
   public String getTabTitle(JComponent comp) {
     return tabbedPane.getTitleAt(getTabIndex(comp));
   }
@@ -791,7 +796,7 @@ public JabRefPreferences prefs() {
       if (thisType == null) {
         EntryTypeDialog etd = new EntryTypeDialog(ths);
         Util.placeDialog(etd, ths);
-        etd.show();
+        etd.setVisible(true);
         BibtexEntryType tp = etd.getChoice();
         if (tp == null) {
           return;
@@ -875,7 +880,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    edit.add(test);
+    //edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -940,7 +945,9 @@ public JabRefPreferences prefs() {
 
     options.add(showPrefs);
     AbstractAction customizeAction = new CustomizeEntryTypeAction();
+    AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
     options.add(customizeAction);
+    options.add(genFieldsCustomization);
     options.add(customExpAction);
 
     /*options.add(new AbstractAction("Font") {
@@ -1600,7 +1607,7 @@ class FetchCiteSeerAction
         FromAuxDialog dialog = new FromAuxDialog(ths, "", true, ths.tabbedPane) ;
 
         Util.placeDialog(dialog, ths);
-        dialog.show() ;
+        dialog.setVisible(true) ;
 
         if (dialog.okPressed())
         {
@@ -1626,7 +1633,7 @@ class FetchCiteSeerAction
     {
       public IntegrityCheckAction()
       {
-        super(Globals.lang("Integrity check"), //Globals.lang( "" ),
+        super(Globals.menuTitle("Integrity check"), //Globals.lang( "" ),
                new ImageIcon( GUIGlobals.integrityCheck ) ) ;
                //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
@@ -1642,7 +1649,7 @@ class FetchCiteSeerAction
          if (refBase != null)
          {
              IntegrityWizard wizard = new IntegrityWizard(ths, refBase) ;
-             wizard.show() ;
+             wizard.setVisible(true) ;
          }
        }
       }
@@ -1675,6 +1682,7 @@ class FetchCiteSeerAction
     public CiteSeerPanelAction() {
       super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
       putValue(NAME, "Fetch CiteSeer");
+      //System.out.println(Globals.menuTitle("Fetch CiteSeer"));
       putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
     }
 
@@ -1825,7 +1833,7 @@ class FetchCiteSeerAction
                                      Globals.duplicateThreshold)) {
                     DuplicateResolverDialog drd = new DuplicateResolverDialog
                         (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
-                    drd.show();
+                    drd.setVisible(true);
                     int res = drd.getSelected();
                     if (res == drd.KEEP_LOWER)
                         dupli = true;
@@ -1926,7 +1934,8 @@ class FetchCiteSeerAction
       bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
       modsItem = new JMenuItem(Globals.lang("MODS")),
       rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
-      endnoteItem = new JMenuItem(Globals.lang("Endnote"));
+      endnoteItem = new JMenuItem(Globals.lang("Endnote")),
+      openofficeItem = new JMenuItem("OpenOffice Calc");
 
 
 
@@ -1968,6 +1977,15 @@ class FetchCiteSeerAction
 	  directory = "endnote";
           extension = ".enf";
         }
+	/*    else if (source == openofficeItem) {
+		  lfFileName = "openoffice-csv";
+		  directory = "openoffice";
+		  extension = ".csv";
+		}*/
+       else if (source == openofficeItem) {
+            lfFileName = "oocalc";
+            extension = ".sxc";
+       }
 
         // We need to find out:
         // 1. The layout definition string to use. Or, rather, we
@@ -2023,7 +2041,9 @@ class FetchCiteSeerAction
     menu.add(rtfItem);
     endnoteItem.addActionListener(listener);
     menu.add(endnoteItem);
-
+	openofficeItem.addActionListener(listener);
+	menu.add(openofficeItem);
+	
     menu.add(exportCSV);
     
     menu.addSeparator();
@@ -2276,7 +2296,7 @@ class SaveSessionAction
 
     public void actionPerformed(ActionEvent e) {
       ExportCustomizationDialog ecd = new ExportCustomizationDialog(ths);
-      ecd.show();
+      ecd.setVisible(true);
     }
   }
 
@@ -2304,12 +2324,24 @@ class SaveSessionAction
             putValue(NAME, "Customize entry types");
         }
         public void actionPerformed(ActionEvent e) {
-            JDialog dl = new EntryCustomizationDialog(ths);
+            JDialog dl = new EntryCustomizationDialog2(ths);
             Util.placeDialog(dl, ths);
-            dl.show();
+            dl.setVisible(true);
         }
     }
 
+    class GenFieldsCustomizationAction extends MnemonicAwareAction {
+        public GenFieldsCustomizationAction() {
+            putValue(NAME, "Set up general fields");
+        }
+        public void actionPerformed(ActionEvent e) {
+            GenFieldsCustomizer gf = new GenFieldsCustomizer(ths);
+            Util.placeDialog(gf, ths);
+            gf.setVisible(true);
+
+        }
+    }
+    
   private class MyGlassPane extends JPanel {
 
     public MyGlassPane() {

@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Manuscript
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E
@@ -39,3 +39,4 @@
 %U \url
 %+
 %^
+

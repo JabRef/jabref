@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003 Morten O. Alver, Nizar N. Batada
- *
+ * 
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
  *
@@ -171,7 +171,7 @@ public class JabRef {
         if (!disableGui.isInvoked()) {
             try {
                 ss = new SplashScreen();
-                ss.show();
+                ss.setVisible(true);
             } catch (Throwable ex) {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
@@ -234,7 +234,8 @@ public class JabRef {
                     if (entries != null) {
                         BibtexDatabase base = ImportFormatReader.createDatabase(entries);
                         ParserResult pr = new ParserResult(base, null, new HashMap());
-                        pr.setFile(new File(data[0]));
+                        
+                        //pr.setFile(new File(data[0]));
                         loaded.add(pr);
                     }
                 } catch (IOException ex) {
@@ -508,6 +509,11 @@ public class JabRef {
                 if (lnf != null) {
                     try {
                         UIManager.setLookAndFeel(lnf);
+                        
+                        if (!Globals.ON_WIN) {
+                            UIManager.put("SimpleInternalFrame.activeTitleBackground", GUIGlobals.gradientBlue);
+                            //UIManager.put("TabbedPane.selected", Color.red);
+                        }
                     } catch (Throwable ex) {
                         ex.printStackTrace();
                         System.err.println("Trying to set system default Look&Feel...");
@@ -540,7 +546,7 @@ lastEdLoop:
                     for (int j = 0; j < loaded.size(); j++) {
                         ParserResult pr = (ParserResult) loaded.elementAt(j);
 
-                        if (pr.getFile().equals(fileToOpen))
+                        if ((pr.getFile() != null) &&pr.getFile().equals(fileToOpen))
                             continue lastEdLoop;
                     }
 

@@ -103,7 +103,7 @@ public class GroupSelector extends SidePaneComponent implements
     public GroupSelector(JabRefFrame frame, BasePanel panel,
             GroupTreeNode groupsRoot, SidePaneManager manager,
             JabRefPreferences prefs) {
-        super(manager);
+        super(manager, GUIGlobals.groupsIconFile, Globals.lang("Groups"));
         this.prefs = prefs;
         this.groupsRoot = groupsRoot;
         final JabRefPreferences _prefs = prefs;
@@ -143,6 +143,17 @@ public class GroupSelector extends SidePaneComponent implements
                 _prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
             }
         });
+        groupModeIndependent.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                _prefs.putBoolean("groupSubgroupIndependent", groupModeIndependent.isSelected());
+            }
+        });
+        groupModeIntersection.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                _prefs.putBoolean("groupSubgroupIntersection", groupModeIntersection.isSelected());
+            }
+        });
+        
         if (prefs.getBoolean("groupFloatSelections")) {
             floatCb.setSelected(true);
             highlCb.setSelected(false);
@@ -157,6 +168,24 @@ public class GroupSelector extends SidePaneComponent implements
             orCb.setSelected(true);
             andCb.setSelected(false);
         }
+        //defaults.put("groupSubgroupIndependent", Boolean.FALSE);
+        //defaults.put("groupSubgroupIntersection", Boolean.TRUE);
+        if (prefs.getBoolean("groupSubgroupIndependent")) {
+            groupModeIndependent.setSelected(true);
+            groupModeIntersection.setSelected(false);
+            groupModeUnion.setSelected(false);
+        } else {
+            groupModeIndependent.setSelected(false);
+            if (prefs.getBoolean("groupSubgroupIntersection")) {
+                groupModeIntersection.setSelected(true);
+                groupModeUnion.setSelected(false);
+            } else {
+                groupModeIntersection.setSelected(false);
+                groupModeUnion.setSelected(true);
+            }
+                
+        }
+        
         invCb.setSelected(prefs.getBoolean("groupInvertSelections"));
         select.setSelected(prefs.getBoolean("groupSelectMatches"));
         openset.setMargin(new Insets(0, 0, 0, 0));
@@ -217,22 +246,22 @@ public class GroupSelector extends SidePaneComponent implements
         });
         Dimension butDim = new Dimension(20, 20);
         Dimension butDim2 = new Dimension(40, 20);
-        // newButton.setPreferredSize(butDim);
-        // newButton.setMinimumSize(butDim);
-        // refresh.setPreferredSize(butDim);
-        // refresh.setMinimumSize(butDim);
-        // helpButton.setPreferredSize(butDim);
-        // helpButton.setMinimumSize(butDim);
-        // autoGroup.setPreferredSize(butDim);
-        // autoGroup.setMinimumSize(butDim);
+        newButton.setPreferredSize(butDim);
+        newButton.setMinimumSize(butDim);
+        refresh.setPreferredSize(butDim);
+        refresh.setMinimumSize(butDim);
+        helpButton.setPreferredSize(butDim);
+        helpButton.setMinimumSize(butDim);
+        autoGroup.setPreferredSize(butDim);
+        autoGroup.setMinimumSize(butDim);
         openset.setPreferredSize(butDim2);
-        // openset.setMinimumSize(butDim2);
+        openset.setMinimumSize(butDim2);
         expand.setPreferredSize(butDim);
-        // expand.setMinimumSize(butDim);
+        expand.setMinimumSize(butDim);
         reduce.setPreferredSize(butDim);
-        // reduce.setMinimumSize(butDim);
+        reduce.setMinimumSize(butDim);
         Insets butIns = new Insets(0, 0, 0, 0);
-        // helpButton.setMargin(butIns);
+        helpButton.setMargin(butIns);
         reduce.setMargin(butIns);
         expand.setMargin(butIns);
         openset.setMargin(butIns);
@@ -270,30 +299,31 @@ public class GroupSelector extends SidePaneComponent implements
         bgr.add(orCb);
         visMode.add(floatCb);
         visMode.add(highlCb);
-        setLayout(gbl);
-        SidePaneHeader header = new SidePaneHeader("Groups",
+        JPanel main = new JPanel();
+        main.setLayout(gbl);
+        /*SidePaneHeader header = new SidePaneHeader("Groups",
                 GUIGlobals.groupsIconFile, this);
         con.gridwidth = GridBagConstraints.REMAINDER;
-        con.fill = GridBagConstraints.BOTH;
-        con.insets = new Insets(0, 0, 2, 0);
-        con.weightx = 1;
         gbl.setConstraints(header, con);
-        add(header);
+        main.add(header);*/
+        con.fill = GridBagConstraints.BOTH;
+        //con.insets = new Insets(0, 0, 2, 0);
+        con.weightx = 1;
         con.gridwidth = 1;
-        con.insets = new Insets(0, 0, 0, 0);
+        //con.insets = new Insets(1, 1, 1, 1);
         gbl.setConstraints(newButton, con);
-        add(newButton);
+        main.add(newButton);
         gbl.setConstraints(refresh, con);
-        add(refresh);
+        main.add(refresh);
         gbl.setConstraints(autoGroup, con);
-        add(autoGroup);
+        main.add(autoGroup);
         con.gridwidth = GridBagConstraints.REMAINDER;
         HelpAction helpAction = new HelpAction(frame.helpDiag,
                 GUIGlobals.groupsHelp, "Help on groups");
         helpButton.addActionListener(helpAction);
         helpButton.setToolTipText(Globals.lang("Help on groups"));
         gbl.setConstraints(helpButton, con);
-        add(helpButton);
+        main.add(helpButton);
         // header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new JTree();
@@ -325,7 +355,7 @@ public class GroupSelector extends SidePaneComponent implements
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         gbl.setConstraints(sp, con);
-        add(sp);
+        main.add(sp);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
         con.weighty = 0;
@@ -341,7 +371,9 @@ public class GroupSelector extends SidePaneComponent implements
         con.gridwidth = GridBagConstraints.REMAINDER;
         gb.setConstraints(reduce, con);
         pan.add(reduce);
-        add(pan);
+        main.add(pan);
+        main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+        add(main, BorderLayout.CENTER);
         definePopup();
     }
 

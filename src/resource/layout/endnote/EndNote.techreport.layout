@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Report
-%A \format[RemoveBrackets,AuthorLastFirst]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E 
@@ -21,9 +21,9 @@
 %! \shorttitle
 %Z 
 %@ \number
-%( 
+%(
 %)
-%* 
+%*
 %L
 %M
 %1 \pdf

@@ -71,6 +71,7 @@ public class SidePane extends JPanel {
 	//mainPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.yellow));
 	//setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.green));
 	//pan.setBackground(GUIGlobals.lightGray);
+        
 	super.add(pan, BorderLayout.CENTER);
     }
 
@@ -79,7 +80,7 @@ public class SidePane extends JPanel {
       con.anchor = GridBagConstraints.NORTH;
       con.fill = GridBagConstraints.BOTH;
       con.gridwidth = GridBagConstraints.REMAINDER;
-      con.insets = new Insets(0, 0, 3, 1);
+      con.insets = new Insets(0, 0, 1, 1);
       con.gridheight = 1;
       con.weightx = 1;
       con.weighty = 0;

@@ -271,6 +271,45 @@ public abstract class BibtexEntryType implements Comparable
             }
         };
 
+    public static final BibtexEntryType CONFERENCE =
+        new BibtexEntryType()
+        {
+            public String getName()
+            {
+                return "Conference";
+            }
+
+            public String[] getOptionalFields()
+            {
+                return new String[]
+                {
+                    "editor", "volume", "number", "series", "pages",
+		    "address", "month", "organization", "publisher", "note"
+                };
+            }
+
+            public String[] getRequiredFields()
+            {
+                return new String[]
+                {
+                    "author", "title", "booktitle", "year"
+                };
+            }
+
+            public String describeRequiredFields()
+            {
+                return "AUTHOR, TITLE, BOOKTITLE and YEAR";
+            }
+
+            public boolean hasAllRequiredFields(BibtexEntry entry)
+            {
+                return entry.allFieldsPresent(new String[]
+                    {
+			"author", "title", "booktitle", "year" , "bibtexkey"
+                    });
+            }
+        };
+
     public static final BibtexEntryType INPROCEEDINGS =
         new BibtexEntryType()
         {
@@ -665,6 +704,7 @@ public abstract class BibtexEntryType implements Comparable
 	ALL_TYPES.put("book", BOOK);
 	ALL_TYPES.put("booklet", BOOKLET);
 	ALL_TYPES.put("incollection", INCOLLECTION);
+        ALL_TYPES.put("conference", CONFERENCE);
 	ALL_TYPES.put("inproceedings", INPROCEEDINGS);
 	ALL_TYPES.put("proceedings", PROCEEDINGS);
 	ALL_TYPES.put("manual", MANUAL);
@@ -713,7 +753,9 @@ public abstract class BibtexEntryType implements Comparable
     public static void removeType(String name) {
 	//BibtexEntryType type = getType(name);
 	String nm = name.toLowerCase();
+        //System.out.println(ALL_TYPES.size());
 	ALL_TYPES.remove(nm);
+        //System.out.println(ALL_TYPES.size());
 	if (STANDARD_TYPES.get(nm) != null) {
 	    // In this case the user has removed a customized version
 	    // of a standard type. We reinstate the standard type.

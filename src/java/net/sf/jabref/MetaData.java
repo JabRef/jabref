@@ -47,7 +47,7 @@ public class MetaData {
         this();
         boolean groupsTreePresent = false;
         Vector flatGroupsData = null;
-        for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
+        if (inData != null) for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
             data = new StringReader((String) inData.get(key));
             String unit;
@@ -136,25 +136,39 @@ public class MetaData {
     public void writeMetaData(Writer out) throws IOException {
         for (Iterator i = metaData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
+            StringBuffer sb = new StringBuffer();
             Vector orderedData = (Vector) metaData.get(key);
             if (orderedData.size() > 0) {
-                out.write("@comment{" + GUIGlobals.META_FLAG + key + ":");
+                //out.write("@comment{" + GUIGlobals.META_FLAG + key + ":");
+                sb.append("@comment{" + GUIGlobals.META_FLAG + key + ":");
                 for (int j = 0; j < orderedData.size(); j++) {
-                    out.write(Util.quote((String)orderedData.elementAt(j),";",'\\')
-                            + ";");
+                    //out.write(Util.quote((String)orderedData.elementAt(j),";",'\\') + ";");
+                    sb.append(Util.quote((String)orderedData.elementAt(j),";",'\\') + ";");
                 }
-                out.write("}\n\n");
+                //out.write("}\n\n");
+                sb.append("}\n\n");
             }
+            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
+            out.write(sb.toString());
         }
         // write groups if present. skip this if only the root node exists 
         // (which is always the AllEntriesGroup).
         if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
-            out.write("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
-            out.write(Util.quote(groupsRoot.toString(),";",'\\'));
-            out.write("}\n\n");
+            StringBuffer sb = new StringBuffer();
+            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
+            sb.append(Util.quote(groupsRoot.toString(),";",'\\'));
+            sb.append("}\n\n");
+            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
+            out.write(sb.toString());
         }
     }
 
+    private void wrapStringBuffer(StringBuffer sb, int lineLength) {
+        for (int i=lineLength; i<sb.length(); i+=lineLength+1) {
+            sb.insert(i, '\n');
+        }
+    }
+    
     /**
      * Reads the next unit. Units are delimited by ';'. 
      */

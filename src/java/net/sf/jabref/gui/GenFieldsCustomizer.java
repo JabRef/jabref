@@ -1,5 +1,6 @@
-package net.sf.jabref;
+package net.sf.jabref.gui;
 
+import net.sf.jabref.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -31,13 +32,13 @@ public class GenFieldsCustomizer extends JDialog {
   GridBagLayout gridBagLayout2 = new GridBagLayout();
   JabRefFrame parent;
   JButton revert = new JButton();
-  EntryCustomizationDialog diag;
+  //EntryCustomizationDialog diag;
   HelpAction help;
   
-  public GenFieldsCustomizer(JabRefFrame frame, EntryCustomizationDialog diag) {
+  public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
     super(frame, Globals.lang("Set general fields"), false);
     parent = frame;
-    this.diag = diag;
+    //this.diag = diag;
     help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
 	      "Help", GUIGlobals.helpSmallIconFile);
     helpBut = new JButton(Globals.lang("Help"));
@@ -89,11 +90,11 @@ public class GenFieldsCustomizer extends JDialog {
   // Key bindings:
   ActionMap am = jPanel2.getActionMap();
   InputMap im = jPanel2.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-  im.put(parent.prefs.getKey("Close dialog"), "close");
+  im.put(Globals.prefs.getKey("Close dialog"), "close");
   am.put("close", new AbstractAction() {
     public void actionPerformed(ActionEvent e) {
       dispose();
-      diag.requestFocus();
+      //diag.requestFocus();
     }
   });
 
@@ -104,8 +105,26 @@ public class GenFieldsCustomizer extends JDialog {
       int i=0;
       for (; i<lines.length; i++) {
 	  String[] parts = lines[i].split(":");
+          if (parts.length != 2) {
+              // Report error and exit.
+              String field = Globals.lang("field");
+              JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form")+" '"+
+                      Globals.lang("Tabname")+":"+field+"1;"+field+"2;...;"+field+"N'",
+                      Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+              return;
+          }
+          String testString = Util.checkLegalKey(parts[1]);
+          if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
+              // Report error and exit.
+              JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
+                      +"characters")+": # { } ~ , ^ &",
+                      Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
+              
+              return;
+          }
+          
 	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME+i), parts[0]);
-	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS+i), parts[1]);
+	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS+i), parts[1].toLowerCase());
       }
       Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_NAME, i);
       Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_FIELDS, i);
@@ -116,17 +135,17 @@ public class GenFieldsCustomizer extends JDialog {
     parent.prefs.putStringArray("generalFields", Util.delimToStringArray(delimStr, ";"));
       */
 
-      for (int j=0; j<parent.tabbedPane.getTabCount(); j++) {
-	  BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(j);
+      for (int j=0; j<parent.getTabbedPane().getTabCount(); j++) {
+	  BasePanel bp = (BasePanel)parent.getTabbedPane().getComponentAt(j);
 	  bp.entryEditors.clear();
       }
       dispose();
-      diag.requestFocus();
+      //diag.requestFocus();
   }
 
   void cancel_actionPerformed(ActionEvent e) {
     dispose();
-    diag.requestFocus();
+    //diag.requestFocus();
   }
 
     void setFieldsText() {

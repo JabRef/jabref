@@ -28,15 +28,29 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.event.*;
+import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
+import java.net.URL;
 
-public class SidePaneComponent extends JPanel {
+public class SidePaneComponent extends SimpleInternalFrame {
 
+    protected JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
     protected boolean visible = false;
     protected SidePaneManager manager;
 
-    public SidePaneComponent(SidePaneManager manager) {
+    public SidePaneComponent(SidePaneManager manager, URL icon, String title) {
+        super(new ImageIcon(icon), title);
 	this.manager = manager;
-	setBorder(BorderFactory.createEtchedBorder());
+        setSelected(true);
+        JToolBar tlb = new JToolBar();
+        close.setMargin(new Insets(0,0,0,0));
+        //tlb.setOpaque(false);
+        close.setBorder(null);
+        tlb.add(close);
+        close.addActionListener(new CloseButtonListener());
+        setToolBar(tlb);
+	//setBorder(BorderFactory.createEtchedBorder());
 	//setBorder(BorderFactory.createMatteBorder(1,1,1,1,java.awt.Color.green));
 	//setPreferredSize(new java.awt.Dimension
 	//		  (GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 200));
@@ -81,5 +95,11 @@ public class SidePaneComponent extends JPanel {
 
     public Dimension getMinimumSize() {
 	return getPreferredSize();
+    }
+    
+    class CloseButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            hideAway();
+        }
     }
 }

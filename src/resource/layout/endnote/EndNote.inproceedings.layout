@@ -1,9 +1,9 @@
 %0 \endnotereftype
 %0 Conference Proceedings
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E \editor
+%E \format[AuthorLastFirst,RemoveBracketsAddComma]{\editor}
 %B \booktitle
 %C \address
 %I \publisher
@@ -21,9 +21,9 @@
 %! \shorttitle
 %Z 
 %@ \isbn
-%( 
+%(
 %)
-%* 
+%*
 %L
 %M
 %1 \pdf

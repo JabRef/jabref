@@ -60,7 +60,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	super(baseFrame_, true); // Set modal on.
 
 
-	setTitle("Select entry type");
+	setTitle(Globals.lang("Select entry type"));
 
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
@@ -98,7 +98,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	Iterator iter = BibtexEntryType.ALL_TYPES.keySet().iterator();
 	while (iter.hasNext()) {
 	    BibtexEntryType tp = BibtexEntryType.getType((String)iter.next());
-            System.out.println(tp.getName()+"\n"+tp);
+            //System.out.println(tp.getName()+"\n"+tp);
 	    TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
 	    b.setAlignmentX(SwingConstants.LEFT);
 	    b.addActionListener(this);

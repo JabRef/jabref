@@ -50,10 +50,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private JLabel lblManual, lblMastersthesis, lblMisc, lblPhdthesis;
 	private JLabel lblProceedings, lblTechreport, lblUnpublished;
 
-	private JTextField txtArticle, txtBook, txtBooklet, txtConference;
+        private JTextField defaultPat = new JTextField();
+	/*private JTextField txtArticle, txtBook, txtBooklet, txtConference;
 	private JTextField txtInbook, txtIncollection, txtInproceedings;
 	private JTextField txtManual, txtMastersthesis, txtMisc, txtPhdthesis;
-	private JTextField txtProceedings, txtTechreport, txtUnpublished;
+	private JTextField txtProceedings, txtTechreport, txtUnpublished;*/
 
 	private JButton btnArticleDefault, btnBookDefault, btnBookletDefault;
 	private JButton btnConferenceDefault, btnInbookDefault;
@@ -83,7 +84,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 *
 	 */
 	public void storeSettings() {
-	    // first we erase everything!
+            
+            // Set the default value:
+            Globals.prefs.put("defaultLabelPattern", defaultPat.getText());
+            	    
 	    LabelPattern defKeyPattern = _keypatterns.getParent();
 	    _keypatterns = new LabelPattern(defKeyPattern);
 	    
@@ -93,7 +97,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    while (i.hasNext()) {
 		String s = (String)i.next(),
 		    text = ((JTextField)textFields.get(s)).getText();
-		if (!defa.equals(text))
+		if (!"".equals(text.trim())) //(!defa.equals(text))
 		    _keypatterns.addLabelPattern(s, text);
 	    }
 
@@ -159,7 +163,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     }
 
     private void setValue(JTextField tf, String fieldName) {
-	tf.setText(_keypatterns.getValue(fieldName).get(0).toString());
+        if (_keypatterns.isDefaultValue(fieldName))
+            tf.setText("");
+        else
+            tf.setText(_keypatterns.getValue(fieldName).get(0).toString());
     }
 
 	/**
@@ -199,7 +206,16 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    gbl.setConstraints( lblKeyPattern, con );
 	    pan.add( lblKeyPattern );
 
-	    int y = 1;
+            con.gridy = 1;
+            con.gridx = 0;
+            JLabel lab = new JLabel("Default pattern");
+            gbl.setConstraints(lab, con);
+            pan.add(lab);
+            con.gridx = 1;
+            gbl.setConstraints(defaultPat, con);
+            pan.add(defaultPat);
+                        
+	    int y = 2;
 
 	    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
 	    while (i.hasNext()) {
@@ -287,8 +303,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 			    String s = (String)i.next();
 			    //_keypatterns.removeLabelPattern(s);
 			    JTextField tf = (JTextField)textFields.get(s);
-			    tf.setText(_keypatterns.getParent()
-				       .getValue(s).get(0).toString());
+                            tf.setText("");
+    			    /*tf.setText(_keypatterns.getParent()
+				       .getValue(s).get(0).toString());*/
 			}
 
 			return;
@@ -296,8 +313,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
 		    //_keypatterns.removeLabelPattern(evt.getActionCommand());
 		    JTextField tf = (JTextField)textFields.get(evt.getActionCommand());
-		    tf.setText(_keypatterns.getParent()
-			       .getValue(evt.getActionCommand()).get(0).toString());
+                    tf.setText("");
+		    /*tf.setText(_keypatterns.getParent()
+			       .getValue(evt.getActionCommand()).get(0).toString());*/
 		}
 	    
 	}
@@ -307,6 +325,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     }
 
     public void setValues() {
+        defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
 	for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
 	    String name = (String)i.next();
 	    JTextField tf = (JTextField)textFields.get(name);

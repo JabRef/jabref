@@ -7,6 +7,7 @@ public class FocusRequester implements Runnable {
     private Component comp;
 
     public FocusRequester(Component comp) {
+        //System.out.println("FocusRequester: "+comp.toString());
 	this.comp = comp;
 	try {
 	    SwingUtilities.invokeLater(this);

@@ -21,7 +21,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
 	callBack = (CallBack)Spin.over(this);
     }
 
-    public void init() {
+    public void init() throws Throwable {
 
     }
 

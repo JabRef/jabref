@@ -14,8 +14,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
     JabRefFrame _frame;
-    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
-        encodings = new JComboBox(Globals.ENCODINGS);
+    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
     JTextField
 	pdfDir, pdf, ps, html, lyx, winEdt;
     private HelpAction ownerHelp, pdfHelp;
@@ -138,8 +137,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	_prefs.put("htmlviewer", html.getText());
 	_prefs.put("lyxpipe", lyx.getText());
         _prefs.put("winEdtPath", winEdt.getText());
-        _prefs.put("defaultEncoding", (String)encodings.getSelectedItem());
-        
     }
 
     public boolean readyToClose() {

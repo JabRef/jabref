@@ -1,12 +1,12 @@
 %0 \endnotereftype
 %0 Computer Program
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E \organization
+%E
 %B 
 %C \address
-%I
+%I \organization
 %V 
 %6
 %N 
@@ -39,3 +39,4 @@
 %U \url
 %+
 %^
+

@@ -25,6 +25,7 @@
    Version:  $Revision$
              $Date$
              $Author$
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 <project name="JabRef" default="build" basedir=".">
@@ -68,149 +69,144 @@
 
 
 
-        <!-- Build classpath -->
-        <path id="classpath">
-                <pathelement path="${build.classes}" />
-                <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                <pathelement location="${library.directory}/commons-logging.jar" />
-                <fileset dir="${library.directory}">
-                        <include name="*.jar" />
-                </fileset>
-        </path>
+	<!-- Build classpath -->
+	<path id="classpath">
+		<pathelement path="${build.classes}" />
+		<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
+		<pathelement location="${library.directory}/commons-logging.jar" />
+		<fileset dir="${library.directory}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 
-        <!-- Runs project (e.g. in NetBeans 4) -->
-        <target name="run" depends="build">
-                <java jar="${build.lib}/jabref.jar" fork="true" />
-        </target>
+	<!-- Runs project (e.g. in NetBeans 4) -->
+	<target name="run" depends="build">
+		<java jar="${build.lib}/jabref.jar" fork="true" />
+	</target>
 
-        <!-- a complete new build -->
-        <target name="rebuild"
-                depends="clean, unjarlib, jars, build"
-                description="compiles the complete project"/>
+	<!-- Compiles project -->
+	<target name="compile">
+		<mkdir dir="${build.classes}" />
+		<!--deprecation="on"-->
+		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+			<src path="${java.dir}"/>
+			<exclude name="tests/**"/>
+			<classpath>
+				<pathelement path="${build.classes}" />
+				<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
+				<pathelement location="${library.directory}/commons-logging.jar" />
+				<pathelement location="${library.directory}/antlr.jar" />
+				<pathelement location="${library.directory}/looks-1.2.2.jar" />
+				<pathelement location="${library.directory}/forms-1.0.4.jar" />
+				<pathelement location="${library.directory}/spin.jar" />
+			</classpath>
+		</javac>
+	</target>
 
-        <!-- Compiles project -->
-        <target name="compile">
-                <mkdir dir="${build.classes}" />
+	<!-- Compiles only the tests -->
+	<target name="compiletest">
+		<mkdir dir="${build.classes}" />
+		<!--deprecation="on"-->
+		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
+			<classpath>
+				<pathelement path="${build.classes}" />
+				<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
+				<pathelement location="${library.directory}/commons-logging.jar" />
+				<pathelement location="${library.directory}/antlr.jar" />
+				<pathelement location="${library.directory}/looks-1.2.2.jar" />
+				<pathelement location="${library.directory}/spin.jar" />
+			</classpath>
+		</javac>
 
-                <!-- dependences - delete old class files  -->
-               <depend srcdir="${java.dir}" destdir="${build.classes}"
-                       cache="${build.classes}/depcache"
-                       closure="yes"/>
+	</target>	
+	<!-- Builds the OSXAdapter -->
+	<target name="osx">
+		<mkdir dir="${build.classes}" />
 
-                <!--deprecation="on"-->
-                <javac debug="on" destdir="${build.classes}" source="1.4" target="1.4">
-                        <src path="${java.dir}"/>
-                        <exclude name="tests/**"/>
-                        <classpath>
-                                <pathelement path="${build.classes}" />
-                                <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                                <pathelement location="${library.directory}/commons-logging.jar" />
-                                <pathelement location="${library.directory}/antlr.jar" />
-                                <pathelement location="${library.directory}/looks-1.2.2.jar" />
-                                <pathelement location="${library.directory}/forms-1.0.4.jar" />
-                                <pathelement location="${library.directory}/spin.jar" />
-                        </classpath>
-                </javac>
-        </target>
+		<javac srcdir="${osx.dir}" debug="on" destdir="${build.classes}" target="1.4">
+		</javac>
+	</target>
 
-        <!-- Compiles only the tests -->
-        <target name="compiletest">
-                <mkdir dir="${build.classes}" />
-                <!--deprecation="on"-->
-                <javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
-                        <classpath>
-                                <pathelement path="${build.classes}" />
-                                <pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                                <pathelement location="${library.directory}/commons-logging.jar" />
-                                <pathelement location="${library.directory}/antlr.jar" />
-                                <pathelement location="${library.directory}/looks-1.2.2.jar" />
-                                <pathelement location="${library.directory}/spin.jar" />
-                        </classpath>
-                </javac>
+	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
+	<target name="non_osx">
+		<mkdir dir="${build.osx}" />
+		<copy file="${library.directory}/OSXAdapter.class" todir="${build.osx}" />
+	</target>
 
-        </target>
-        <!-- Builds the OSXAdapter -->
-        <target name="osx">
-                <mkdir dir="${build.classes}" />
 
-                <javac srcdir="${osx.dir}" debug="on" destdir="${build.classes}" target="1.4">
-                </javac>
-        </target>
+	<!-- Jars up project -->
+	<target name="jars" depends="compile, unjarlib">
+		<mkdir dir="${build.lib}" />
 
-        <!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
-        <target name="non_osx">
-                <mkdir dir="${build.osx}" />
-                <copy file="${library.directory}/OSXAdapter.class" todir="${build.osx}" />
-        </target>
-
-        <!-- Jars up project -->
-        <target name="jars" depends="compile">
-                <mkdir dir="${build.lib}" />
-
-                <jar destfile="${build.lib}/jabref.jar">
-                        <fileset dir="${build.classes}">
-                           <exclude name="**/depcache/**" />
-                        </fileset>
-                        <fileset dir="${build.tmp}" />
-                        <fileset dir="${src.dir}">
-                                <include name="images/**" />
-                                <include name="help/**" />
-                                <include name="help/de/**" />
-                                <include name="help/no/**" />
-                                <include name="resource/**" />
-                        </fileset>
+		<jar destfile="${build.lib}/jabref.jar">
+			<fileset dir="${build.classes}" />
+			<fileset dir="${build.tmp}" />
+			<fileset dir="${src.dir}">
+				<include name="images/**" />
+				<include name="help/**" />
+				<include name="help/de/**" />
+				<include name="help/no/**" />
+				<include name="resource/**" />
+			</fileset>
                         <fileset dir="${library.directory}">
                             <include name="EndNote.zip" />
                         </fileset>
-                        <fileset dir="${txt.dir}">
-                                <include name="gpl.txt" />
-                                <include name="lesser.txt" />
-                                <include name="apache-license.txt" />
-                                <include name="README" />
-                        </fileset>
-                        <manifest>
-                                <attribute name="Main-Class" value="net.sf.jabref.JabRef" />
-                        </manifest>
-                </jar>
 
-        </target>
+			<fileset dir="${txt.dir}">
+				<include name="gpl.txt" />
+				<include name="lesser.txt" />
+				<include name="apache-license.txt" />
+                                <include name="jgoodies.txt" />
+				<include name="README" />
+			</fileset>
+			<manifest>
+                            <attribute name="Main-Class" value="net.sf.jabref.JabRef" />
+			</manifest>
+		</jar>
 
-        <!-- main build target : it should be fast, for a complete build please
-             use the rebuild target -->
-        <target name="build" depends="jars" description="Build project">
-                <mkdir dir="${build.bin}" />
-                <mkdir dir="${build.resource}" />
-                <copy todir="${build.resource}">
-                        <fileset dir="${resource.dir}">
-                                <include name="*" />
-                        </fileset>
-                </copy>
-                <mkdir dir="${build.images}" />
-                <copy todir="${build.images}">
-                        <fileset dir="${images.dir}">
-                                <include name="*" />
-                        </fileset>
-                </copy>
-                <mkdir dir="${build.help}" />
-                <copy todir="${build.help}">
-                        <fileset dir="${help.dir}">
-                                <!--<include name="*" />-->
-                        </fileset>
-                </copy>
+	</target>
 
-                <mkdir dir="${build.win}" />
-                <copy file="${build.lib}/jabref.jar" todir="${build.win}" />
-                <copy todir="${build.win}">
-                        <fileset dir="${win.dir}">
-                                <include name="*" />
-                        </fileset>
-                </copy>
+	<target name="build" depends="jars" description="Build project">
+		<mkdir dir="${build.bin}" />
+		<!--
+    <copy todir="${build.bin}">
+      <fileset dir="${bin.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+-->
+		<mkdir dir="${build.resource}" />
+		<copy todir="${build.resource}">
+			<fileset dir="${resource.dir}">
+				<include name="*" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.images}" />
+		<copy todir="${build.images}">
+			<fileset dir="${images.dir}">
+				<include name="*" />
+			</fileset>
+		</copy>
+		<mkdir dir="${build.help}" />
+		<copy todir="${build.help}">
+			<fileset dir="${help.dir}">
+				<!--<include name="*" />-->
+			</fileset>
+		</copy>
 
-        </target>
+		<mkdir dir="${build.win}" />
+		<copy file="${build.lib}/jabref.jar" todir="${build.win}" />
+		<copy todir="${build.win}">
+			<fileset dir="${win.dir}">
+				<include name="*" />
+			</fileset>
+		</copy>
+
+	</target>
 
 
-        <!-- Creates all docs -->
-        <target name="docs" depends="javadocs" description="Generates all the documentation" />
+	<!-- Creates all docs -->
+	<target name="docs" depends="javadocs" description="Generates all the documentation" />
 
         <!-- Creates javadocs -->
         <target name="javadocs" depends="compile" description="Generates the javadocs">

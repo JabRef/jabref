@@ -111,6 +111,7 @@ public class AuthorAbbreviator implements LayoutFormatter {
 		}
 		else {
 		    //Its a "complex" name like van Something, Someone Something
+                    //System.out.println(author[1]);
 		    String[] nameParts = author[1].split(" ");
 		    
 		    int i = 0;

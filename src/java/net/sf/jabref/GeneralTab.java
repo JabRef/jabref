@@ -15,7 +15,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JCheckBox autoOpenForm, backup, openLast,
 	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
 	useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder,
-	allowEditing;
+	allowEditing, preserveFormatting;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField, fontSize;
     JabRefPreferences _prefs;
@@ -43,7 +43,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
 	confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
 	saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
-
+        preserveFormatting = new JCheckBox(Globals.lang("Preserve formatting of non-BibTeX fields"));
 	JPanel general = new JPanel();
 	defOwnerField = new JTextField();
         groupField = new JTextField(15);
@@ -63,6 +63,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(openLast); builder.nextLine();
 	builder.append(pan); builder.append(backup); builder.nextLine();
 	builder.append(pan); builder.append(saveInStandardOrder); builder.nextLine();
+        builder.append(pan); builder.append(preserveFormatting); builder.nextLine();
 	//builder.appendSeparator(Globals.lang("Miscellaneous"));
 	//builder.nextLine();
 	builder.appendSeparator(Globals.lang("Entry editor"));
@@ -122,10 +123,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	keyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
 	confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
 	saveInStandardOrder.setSelected(_prefs.getBoolean("saveInStandardOrder"));
-	defOwnerField.setText(_prefs.get("defaultOwner"));
+	preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
+        defOwnerField.setText(_prefs.get("defaultOwner"));
 	groupField.setText(_prefs.get("groupsDefaultField"));
+        
 	String enc = _prefs.get("defaultEncoding");
-	outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
+        outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
 	    if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
 		encodings.setSelectedIndex(i);
 		break outer;
@@ -159,7 +162,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("saveInStandardOrder", saveInStandardOrder.isSelected());
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
-      //_prefs.putBoolean("defaultAutoSort", defSort.isSelected());
+        _prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());
+      //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
 	_prefs.put("defaultOwner", defOwnerField.getText().trim());
 
         _prefs.put("groupsDefaultField", groupField.getText().trim());

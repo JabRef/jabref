@@ -203,7 +203,8 @@ public class EntryTable extends JTable {
                                       panel.updateViewToSelected();
 
                                       // guarantee that the the entry is visible
-                                      scrollToCenter(row, 0) ;
+                                      ensureVisible(row);
+                                      
 
                                       //   setRowSelectionInterval(row, row);
                                       // }
@@ -256,8 +257,10 @@ public class EntryTable extends JTable {
       public void addRowSelectionIntervalQuietly(int row1, int row2) {
           boolean oldState = selectionListenerOn;
           selectionListenerOn = false;
-          super.addRowSelectionInterval(row1, row2);
-          selectionListenerOn = oldState;
+	  //if (row2 < getModel().getRowCount()) {
+	  super.addRowSelectionInterval(row1, row2);
+	  selectionListenerOn = oldState;
+	  //}
       }
 
     /*public boolean surrendersFocusOnKeystroke() {
@@ -440,10 +443,6 @@ public class EntryTable extends JTable {
             return defRenderer; // This should not occur.
         }
 
-        // For testing MARKED feature:
-        if (tableModel.hasField(row, Globals.MARKED)) {
-          return markedRenderer;
-        }
 
         if (!panel.coloringBySearchResults ||
             tableModel.nonZeroField(row, Globals.SEARCH))
@@ -483,6 +482,12 @@ public class EntryTable extends JTable {
           renderer = getDefaultRenderer(Boolean.class);
         else renderer = defRenderer;
         //Util.pr("("+row+","+column+"). "+status+" "+renderer.toString());
+
+        // For MARKED feature:
+        if (tableModel.hasField(row, Globals.MARKED) && (renderer != incRenderer)) {
+          return markedRenderer;
+        }
+        
         return renderer;
 
         /*
@@ -535,50 +540,63 @@ public class EntryTable extends JTable {
         maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground),
         markedRenderer = new Renderer(GUIGlobals.markedEntryBackground);
 
-    private class Renderer extends DefaultTableCellRenderer {
+    private class Renderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
         //private DefaultTableCellRenderer darker;
+        //JLabel label = new AALabel();
+        
         public Renderer(Color c) {
             super();
             setBackground(c);
         }
         public Renderer(Color c, Color fg) {
             this(c);
-            setForeground(fg);
+            //setForeground(fg);
         }
 
+ 
         public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
         public void firePropertyChange(String propertyName, Object old, Object newV) {}
 
         /* For enabling the renderer to handle icons. */
         protected void setValue(Object value) {
+            //System.out.println(""+value);
             if (value instanceof Icon) {
                 setIcon((Icon)value);
-                super.setValue(null);
+                setText(null);
+                //super.setValue(null);
             } else if (value instanceof JLabel) {
               JLabel lab = (JLabel)value;
-              super.setIcon(lab.getIcon());
-              super.setToolTipText(lab.getToolTipText());
+              setIcon(lab.getIcon());
+              setToolTipText(lab.getToolTipText());
               if (lab.getIcon() != null)
-                super.setText(null);
+                setText(null);
             } else {
+                
                 setIcon(null);
-                super.setToolTipText(null);
-                super.setValue(value);
+                setToolTipText(null);
+                if (value != null)
+                    setText(value.toString());
+                else
+                    setText(null);
             }
         }
 
-    public void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D)g;
-        if (antialiasing) {
-            RenderingHints rh = g2.getRenderingHints();
-            rh.put(RenderingHints.KEY_ANTIALIASING,
-                   RenderingHints.VALUE_ANTIALIAS_ON);
-            rh.put(RenderingHints.KEY_RENDERING,
-                   RenderingHints.VALUE_RENDER_QUALITY);
-            g2.setRenderingHints(rh);
-        }
-        ui.update(g2, this);
-      }
+        //private class AALabel extends JLabel {
+            public void paint(Graphics g) {
+                Graphics2D g2 = (Graphics2D)g;
+                
+                if (antialiasing) {
+                    RenderingHints rh = g2.getRenderingHints();
+                    rh.put(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                    rh.put(RenderingHints.KEY_RENDERING,
+                        RenderingHints.VALUE_RENDER_QUALITY);
+                    g2.setRenderingHints(rh);
+                }
+                ui.update(g2, this);
+                //super.paint(g2);
+            }
+        //}
     }
 
     class IncompleteRenderer extends Renderer {
@@ -586,8 +604,7 @@ public class EntryTable extends JTable {
             super(GUIGlobals.tableIncompleteEntryBackground);
         }
         protected void setValue(Object value) {
-            String txt = (String)value;
-            super.setText(txt);
+            super.setValue(value);
             super.setToolTipText(Globals.lang("This entry is incomplete"));
         }
     }

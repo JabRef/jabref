@@ -118,7 +118,7 @@ public class BibtexParser
 			}
 		    }
 		    else if (entryType.toLowerCase().equals("comment")) {
-			StringBuffer comment = parseBracketedText();
+			StringBuffer commentBuf = parseBracketedTextExactly();
 			/**
 			 *
 			 * Metadata are used to store Bibkeeper-specific
@@ -134,7 +134,8 @@ public class BibtexParser
 			 * well. At least for a while. We'll always save with the
 			 * new one.
 			 */
-			
+			String comment = commentBuf.toString().replaceAll("\\n","");
+                        
 			if (comment.substring(0, GUIGlobals.META_FLAG.length())
 			    .equals(GUIGlobals.META_FLAG) ||
 			    comment.substring(0, GUIGlobals.META_FLAG_OLD.length())
@@ -154,6 +155,8 @@ public class BibtexParser
 			    if (pos > 0)
 				_meta.put
 				    (rest.substring(0, pos), rest.substring(pos+1));
+                                    // We remove all line breaks in the metadata - these will have been inserted
+                                    // to prevent too long lines when the file was saved, and are not part of the data.
 			}
 			
 			/**
@@ -371,13 +374,14 @@ public class BibtexParser
 		}
 
 		consume('"');
-
+                
 	    }
 	    else if (c == '{') {
 		// Value is a string enclosed in brackets. There can be pairs
 		// of brackets inside of a field, so we need to count the brackets
 		// to know when the string is finished.
-                if (isStandardBibtexField)
+               
+                if (isStandardBibtexField || !Globals.prefs.getBoolean("preserveFieldFormatting"))
                     value.append(parseBracketedText());
                 else
                     value.append(parseBracketedTextExactly());

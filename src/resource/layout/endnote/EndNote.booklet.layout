@@ -1,6 +1,6 @@
 %0 \endnotereftype
-%0 Book
-%A \format[AuthorLastFirst,RemoveBrackets]{\author}
+%0 Personal Communication
+%A \format[AuthorLastFirst,RemoveBracketsAddComma]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E
@@ -9,7 +9,7 @@
 %I \howpublished
 %V
 %6
-%N
+%N \lastchecked
 %P
 %& 
 %Y 
@@ -20,10 +20,10 @@
 %? 
 %! \shorttitle
 %Z 
-%@ \lastchecked
-%( 
+%@ 
+%(
 %)
-%* 
+%*
 %L
 %M
 %1 \pdf

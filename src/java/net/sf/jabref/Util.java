@@ -843,4 +843,23 @@ public class Util {
         return "\\Q"+s.replaceAll("\\\\E","\\\\E\\\\\\\\E\\\\Q")+"\\E"+bs.toString();
     }
 
+    /*
+     * This method "tidies" up e.g. a keyword string, by alphabetizing the words and
+     * removing all duplicates.
+     */
+    public static String sortWordsAndRemoveDuplicates(String text) {
+        
+        String[] words = text.split(", ");
+        SortedSet set = new TreeSet();
+        for (int i=0; i<words.length; i++)
+            set.add(words[i]);
+        StringBuffer sb = new StringBuffer();
+        for (Iterator i=set.iterator(); i.hasNext();) {
+            sb.append(i.next());
+            sb.append(", ");
+        }
+        if (sb.length() > 2)
+            sb.delete(sb.length()-2, sb.length());
+        return sb.toString();
+    }
 }

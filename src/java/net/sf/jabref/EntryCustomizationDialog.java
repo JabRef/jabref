@@ -36,7 +36,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     BibtexEntryType type;
 
     JScrollPane reqSP, optSP;
-    JButton ok, cancel, helpButton, delete, genFields, importTypes, exportTypes;
+    JButton ok, cancel, helpButton, delete, importTypes, exportTypes;
     JPanel panel=new JPanel(),
 	fieldPanel = new JPanel(),
 	typePanel = new JPanel();
@@ -231,13 +231,13 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	ok = new JButton(Globals.lang("Store"));
 	cancel=new JButton(Globals.lang("Close"));
 	delete = new JButton(Globals.lang("Delete custom"));
-        genFields = new JButton(Globals.lang("Set general fields"));
+        //genFields = new JButton(Globals.lang("Set general fields"));
 	importTypes = new JButton(Globals.lang("Import"));
 	exportTypes = new JButton(Globals.lang("Export"));
         buttonPanel.add( ok );
 	buttonPanel.add(delete);
         buttonPanel.add(Box.createHorizontalStrut(5));
-        buttonPanel.add(genFields);
+        //buttonPanel.add(genFields);
 	buttonPanel.add(importTypes);
 	buttonPanel.add(exportTypes);
         buttonPanel.add(Box.createHorizontalStrut(5));
@@ -252,13 +252,13 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 		    dispose();
 		}
 	    });
-        genFields.addActionListener(new ActionListener() {
+        /*genFields.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(parent, ths);
             Util.placeDialog(gf, parent);
             gf.show();
           }
-        });
+        });*/
 	delete.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    BibtexEntryType type = BibtexEntryType

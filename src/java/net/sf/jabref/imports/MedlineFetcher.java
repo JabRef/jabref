@@ -54,8 +54,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     }
     final int PACING = 20;
     final int MAX_TO_FETCH = 10;
-    SidePaneHeader header = 
-	new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
+    //SidePaneHeader header = 
+	//new SidePaneHeader("Fetch Medline", GUIGlobals.fetchMedlineIcon, this);
     BasePanel panel;
     String idList;
     JTextField tf = new JTextField();
@@ -70,7 +70,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
     HelpAction help;
     
     public MedlineFetcher(BasePanel panel_, SidePaneManager p0) {
-	super(p0);
+	super(p0, GUIGlobals.fetchMedlineIcon, Globals.lang("Fetch Medline"));
 	panel = panel_;
 	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
 	helpBut.addActionListener(help);
@@ -78,33 +78,30 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	//tf.setMinimumSize(new Dimension(1,1));
 	//add(hd, BorderLayout.NORTH);
 	//ok.setToolTipText(Globals.lang("Fetch Medline"));
-	setLayout(gbl);
+        JPanel main = new JPanel();
+    	main.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
-	con.insets = new Insets(0, 0, 2,  0);
+	//con.insets = new Insets(0, 0, 2,  0);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.weightx = 1;
-	con.weighty = 0;
-	gbl.setConstraints(header, con);
-	add(header);
 	con.weighty = 1;
-	con.insets = new Insets(0, 0, 0,  0);
-	//    pan.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	gbl.setConstraints(tf, con);
-	add(tf);
+	main.add(tf);
 	con.weighty = 0;
 	con.gridwidth = 1;
 	gbl.setConstraints(go, con);
-	add(go);
+	main.add(go);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(helpBut, con);
-	add(helpBut);
+	main.add(helpBut);
 	ActionListener listener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    (new Thread(ths)).start(); // Run fetch in thread.
 		}
 	    };
-	
+        main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+	add(main, BorderLayout.CENTER);
 	go.addActionListener(listener);
 	tf.addActionListener(listener);
     }
@@ -121,8 +118,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	Matcher m = p.matcher( idList );
 	if ( m.matches() ) {
 	    panel.frame().output(Globals.lang("Fetching Medline by ID..."));
-	    System.out.println("idList");
-	    System.out.println(idList);
+	    
 	    ArrayList bibs = fetchMedline(idList);
 	    if ((bibs != null) && (bibs.size() > 0)) {
 		//if (panel.prefs().getBoolean("useOwner")) {
@@ -178,7 +174,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
         while ((c=un.read()) != -1) {
           System.out.print((char)c);
         }*/
-
+        
+        
         // Obtain a factory object for creating SAX parsers
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         // Configure the factory object to specify attributes of the parsers it creates

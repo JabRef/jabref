@@ -263,10 +263,10 @@ public class FromAuxDialog
          auxParser.clear();
          notFoundList.setListData(auxParser.generate( auxName, refBase ) ) ;
 
-         statusInfos.append( Globals.lang("keys_in_database") +" " +refBase.getEntryCount() ) ;
-         statusInfos.append( "\n" +Globals.lang("found_in_aux_file") +" "+auxParser.getFoundKeysInAux());
+         statusInfos.append( Globals.lang("keys in database") +" " +refBase.getEntryCount() ) ;
+         statusInfos.append( "\n" +Globals.lang("found in aux file") +" "+auxParser.getFoundKeysInAux());
          statusInfos.append( "\n" +Globals.lang("resolved") +" " +auxParser.getResolvedKeysCount());
-         statusInfos.append( "\n" +Globals.lang("not_found") +" " +auxParser.getNotResolvedKeysCount());
+         statusInfos.append( "\n" +Globals.lang("not found") +" " +auxParser.getNotResolvedKeysCount());
 
          okButton.setEnabled(true);
       }

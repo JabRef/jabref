@@ -88,10 +88,30 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.7...  - Made side pane resizable.
+        - Added standard entry type "conference", similar to "inproceedings".
+        - Added "default" label pattern to avoid the need to set similar patterns manually.
+        - Added line wrapping to metadata in saved .bib file to avoid long lines.
+        - Added "bibtexkey" as implicit fourth sort criterion, to minimize problem with almost
+          similar entries swapping places.
+        - Added OpenOffice.org Calc export filter that exports spreadsheet compatible with the 
+          OpenOffice.org bibliography feature.
+        - Added a couple of previously unsupported publication types in SciFinder.
+        - Added extra shortcuts CTRL-+ and CTRL-- for switching tabs in entry editor, since 
+          original shortcuts CTRL[-SHIFT]-TAB is hijacked by some window managers (at least KDE).
+        - Fixed focus and key binding problems for switching tabs/entries in entry editor
+        - Fixed bug that prevented required fields tab from appearing for entries with only bibtex key
+          as required field.
+        - Fixed bug that prevented the user from changing the default encoding.
+        - Fixed bugs in RIS import.
+        - Fixed bug 1112050; freeze when reading certain author fields with mismatched braces.
 1.7b:	- Changed routine for rearranging author names (Lastname, Firstname) so bracketed
   	  expressions are treated as units.
         - Grouping controls now allow group hierarchies, and now allow explicit and search
           expression groups as well as keyword groups.
+        - Added full customization of general fields tabs
+        - Added option to preserve formatting for non-BibTeX fields.
+        - Added integrity check for database.
         - Added export filters EndNote and Harvard RTF.
 	- Added automatic import format chooser for import (same as wildcard import below).
 	- Added wildcard (*) option for command-line import, to try to automatically

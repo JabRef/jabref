@@ -27,8 +27,8 @@ import net.sf.jabref.HelpAction;
 
 public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionListener {
 
-    SidePaneHeader header = 
-	new SidePaneHeader("Fetch CiteSeer", GUIGlobals.wwwCiteSeerIcon, this);
+    //SidePaneHeader header = 
+	//new SidePaneHeader("Fetch CiteSeer", GUIGlobals.wwwCiteSeerIcon, this);
     BasePanel panel;
     String idList;
     JTextField tf = new JTextField();
@@ -44,7 +44,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     CiteSeerFetcherPanel ths = this;
 
     public CiteSeerFetcherPanel(BasePanel panel_, SidePaneManager p0, final CiteSeerFetcher fetcher) {
-	super(p0);
+	super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
 	panel = panel_;
 	help = new HelpAction(panel.frame().helpDiag, GUIGlobals.medlineHelp, "Help");
 	this.citeSeerFetcher = fetcher;
@@ -53,28 +53,30 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 	//tf.setMinimumSize(new Dimension(1,1));
 	//add(hd, BorderLayout.NORTH);
 	//ok.setToolTipText(Globals.lang("Fetch Medline"));
-	setLayout(gbl);
+        JPanel main = new JPanel();
+	main.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	con.insets = new Insets(0, 0, 2,  0);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.weightx = 1;
 	con.weighty = 0;
-	gbl.setConstraints(header, con);
-	add(header);
+	//gbl.setConstraints(header, con);
+	//add(header);
 	con.weighty = 1;
 	con.insets = new Insets(0, 0, 0,  0);
 	//    pan.setLayout(gbl);
 	con.fill = GridBagConstraints.BOTH;
 	gbl.setConstraints(tf, con);
-	add(tf);
+	main.add(tf);
 	con.weighty = 0;
 	con.gridwidth = 1;
 	gbl.setConstraints(go, con);
-	add(go);
+	main.add(go);
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(helpBut, con);
-	add(helpBut);
-	
+	main.add(helpBut);
+        main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
+	add(main, BorderLayout.CENTER);
 	go.addActionListener(this);
 	tf.addActionListener(this);
     }
