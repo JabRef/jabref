@@ -133,6 +133,24 @@ public class ImportFormatReader {
 	return formats.entrySet();
     }
 
+    public String getImportFormatList() {
+	StringBuffer sb = new StringBuffer();
+    	for (Iterator i=formats.keySet().iterator(); i.hasNext();) {
+	    String format = (String)i.next();
+	    ImportFormat imFo = (ImportFormat)formats.get(format);
+	    int pad = Math.max(0, 14-imFo.getFormatName().length());
+	    sb.append("  ");
+	    sb.append(imFo.getFormatName());
+	    for (int j=0; j<pad; j++)
+		sb.append(" ");
+	    sb.append(" : ");
+	    sb.append(format);
+	    sb.append("\n");
+	}
+	String res = sb.toString();
+	return res;//.substring(0, res.length()-1);
+    }
+
   /**
    * Describe <code>fixAuthor</code> method here.
    * 
@@ -467,7 +485,7 @@ public class ImportFormatReader {
      * with two elements, 0: the name of the format used, 1: a List of entries.
      */
     public Object[] importUnknownFormat(String filename) throws IOException {
-	List entryList = null;
+	Object entryList = null;
 	String usedFormat = null;
 	int bestResult = 0;
 
@@ -479,6 +497,8 @@ public class ImportFormatReader {
 	    try {
 		//System.out.println("Trying format: "+imFo.getFormatName());
 		List entries = importFromFile(imFo, filename);
+		if (entries != null)
+		    purgeEmptyEntries(entries);
 		int entryCount = (entries != null ? entries.size() : 0);
 		//System.out.println("Entries: "+entryCount);
 
@@ -493,6 +513,16 @@ public class ImportFormatReader {
 	    }
 	    
 	}
+
+	// Finally, if all else fails, see if it is a BibTeX file:	
+	if (entryList == null) {
+	    ParserResult pr = loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
+	    if ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0)) {
+		entryList = pr;
+		usedFormat = "BibTeX";
+	    }
+	}
+
 	return new Object[] {usedFormat, entryList};
     }
 

@@ -1451,7 +1451,9 @@ public JabRefPreferences prefs() {
             }
             if (tabbedPane.getTabCount() == 1) {
                 setNonEmptyState();
-            }
+            } else if (tabbedPane.getTabCount() == 2) {
+		setMultiple();
+	    }
             fileToOpen = null;
         }
     }
@@ -1521,19 +1523,10 @@ public JabRefPreferences prefs() {
     }
 
     public void actionPerformed(ActionEvent e) {
-
-      // Create a new, empty, database.
-      BasePanel bp = new BasePanel(ths, prefs);
-      tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), bp);
-      tabbedPane.setSelectedComponent(bp);
-      if (tabbedPane.getTabCount() == 1) {
-        setNonEmptyState();
-      }
-      output(Globals.lang("New database created."));
-
-      /*
-        if (prefs.getBoolean("autoComplete"))
-        db.setCompleters(autoCompleters);*/
+	// Create a new, empty, database.
+	BibtexDatabase database = new BibtexDatabase();
+	addTab(database, null, new HashMap(), true);
+	output(Globals.lang("New database created."));
     }
   }
 
@@ -1965,6 +1958,11 @@ class FetchCiteSeerAction
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
       final boolean intoNew = intoNew_;
       
+      // Add a menu item for autodetecting import format:
+      importMenu.add(new ImportUnknownMenuItem(ths, intoNew));
+
+      importMenu.addSeparator();
+
       // Put in all formatters registered in ImportFormatReader:
       for (Iterator i=Globals.importFormatReader.getImportFormats().iterator(); i.hasNext();) {
 	  ImportFormat imFo = (ImportFormat)((Map.Entry)i.next()).getValue();

@@ -128,7 +128,9 @@ public class JabRef {
     if (helpO.isInvoked()) {
       System.out.println("jabref [options] [bibtex-file]\n") ;
       System.out.println(options.getHelp());
-      System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor, silverplatter.");
+      String importFormats = Globals.importFormatReader.getImportFormatList();
+      System.out.println(Globals.lang("Available import formats")+":\n"+importFormats);
+      // + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor, silverplatter.");
 
       // To specify export formats, we need to take the custom export formats into account.
       // So we iterate through the custom formats and add them.
@@ -559,6 +561,7 @@ public class JabRef {
 
       jrf = new JabRefFrame();
 
+      // Add all loaded databases to the frame:
       if (loaded.size() > 0) {
         for (int i = 0; i < loaded.size(); i++) {
           ParserResult pr = (ParserResult) loaded.elementAt(i);

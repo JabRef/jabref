@@ -9,16 +9,14 @@ import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.AbstractWorker;
 import java.util.List;
 
-public class ImportMenuItem extends JMenuItem implements ActionListener {
+public class ImportUnknownMenuItem extends JMenuItem implements ActionListener {
     
-    ImportFormat importer;
     JabRefFrame frame;
     boolean openInNew;
 
-    public ImportMenuItem(JabRefFrame frame, ImportFormat importer, boolean openInNew) {
-	super(importer.getFormatName());
+    public ImportUnknownMenuItem(JabRefFrame frame, boolean openInNew) {
+	super(Globals.lang("Autodetect format"));
 	this.frame = frame;
-	this.importer = importer;
 	this.openInNew = openInNew;
 	addActionListener(this);
     }
@@ -33,12 +31,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     class MyWorker extends AbstractWorker {
 	String filename = null, formatName = null;
 	java.util.List entries = null;
+	ParserResult bibtexResult = null; // Used for a parsed Bibtex database, if that is the
+	// correct format. Must be handled differently, because it can contain metadata and strings.
 	boolean fileOk = false;
 	public void init() {
 	    filename = frame.getNewFile();
 	    if ((filename != null) && !(new File(filename)).exists()) {
 		JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+": '"+filename+"'",
-					      Globals.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
+					      Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
 	    }
 	    else if (filename != null) {
 		frame.block();
@@ -52,9 +52,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 		return;
 	    
 	    try {
-		entries = Globals.importFormatReader.importFromFile(importer, filename);
-		if (entries != null)
-		    ImportFormatReader.purgeEmptyEntries(entries);
+		Object[] o = Globals.importFormatReader.importUnknownFormat(filename);
+		formatName = (String)o[0];
+		if (o[1] instanceof java.util.List)
+		    entries = (java.util.List)o[1];
+		else if (o[1] instanceof ParserResult)
+		    bibtexResult = (ParserResult)o[1];
 	    } catch (IOException ex) {
 		ex.printStackTrace();
 	    }
@@ -62,19 +65,24 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 	public void update() {
 	    if (!fileOk)
 		return;
-
+	    
 	    if (entries != null) {
 		frame.addBibEntries(entries, filename, openInNew);
-		frame.output(Globals.lang("Imported entries")+": "+entries.size());
-	    } else {
-		JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "
-								  +"using the correct import filter."), Globals.lang("Import failed"),
-					      JOptionPane.ERROR_MESSAGE);
-		frame.output("");
+		frame.output(Globals.lang("Imported entries")+": "+entries.size()
+			     +"  "+Globals.lang("Format used")+": "+formatName);
 	    }
+	    else if (bibtexResult != null) {
+		frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), 
+			     bibtexResult.getMetaData(), true);
+		frame.output(Globals.lang("Opened database") + " '" + filename +
+			     "' " + Globals.lang("with") + " " +
+			     bibtexResult.getDatabase() .getEntryCount() + " " +
+			     Globals.lang("entries") + ".");
+
+	    }
+	    else
+		frame.output(Globals.lang("Could not find a suitable import format."));
 	    frame.unblock();
-	    
 	}
     }
-    
 }
