@@ -66,6 +66,7 @@ public class JabRef {
       // First instantiate preferences and set language.
       // ----------------------------------------------------------------
       JabRefPreferences prefs = new JabRefPreferences();
+      Globals.prefs = prefs;
       BibtexEntryType.loadCustomEntryTypes(prefs);
       Globals.setLanguage(prefs.get("language"), "");
 
@@ -83,8 +84,8 @@ public class JabRef {
       exportFile.setHelpDescriptionSize(80);
 
       options.register("nogui", 'n', Globals.lang("No GUI. Only process command line options."), disableGui);
-      options.register("import", 'i', Globals.lang("Imports file: [bibtexml|endnote|isi|ris,]filename"), importFile);
-      options.register("output", 'o', Globals.lang("Outputs or exports file: [bibtexml|docbook|html|simplehtml,]filename"), exportFile);
+      options.register("import", 'i', Globals.lang("Imports file: filename[,bibtexml|endnote|isi|ris]"), importFile);
+      options.register("output", 'o', Globals.lang("Outputs or exports file: filename[,bibtexml|docbook|html|simplehtml]"), exportFile);
       options.register("help", 'h', Globals.lang("Displays help on command line options"),helpO);
       options.setUseMenu(false);
 

@@ -43,6 +43,8 @@ import java.util.regex.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.CustomExportList;
 import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
 import javax.swing.event.*;
@@ -71,6 +73,9 @@ public class JabRefFrame
 
   LabelMaker labelMaker;
   File fileToOpen = null;
+
+  // Object containing custom export formats:
+  public CustomExportList customExports = new CustomExportList();
 
   // The help window.
   public HelpDialog helpDiag = new HelpDialog(this);
@@ -197,7 +202,11 @@ public class JabRefFrame
                                   "Open URL or DOI",
                                   GUIGlobals.wwwIcon,
                                   prefs.getKey("Open URL or DOI")),
-      dupliCheck = new GeneralAction("dupliCheck", "Find duplicates");
+      dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
+
+
+      customExpAction = new CustomizeExportsAction();
+
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
           prefs.getKey(")),*/
@@ -206,7 +215,8 @@ public class JabRefFrame
   // The menus for importing/appending other formats
   JMenu importMenu = new JMenu(Globals.lang("Import and append")),
       importNewMenu = new JMenu(Globals.lang("Import")),
-      exportMenu = new JMenu(Globals.lang("Export"));
+      exportMenu = new JMenu(Globals.lang("Export")),
+      customExportMenu = new JMenu(Globals.lang("Custom export"));
 
   // The action for adding a new entry of unspecified type.
   NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -413,6 +423,7 @@ public JabRefPreferences prefs() {
       }
 
       fileHistory.storeHistory();
+      customExports.store();
       BibtexEntryType.saveCustomEntryTypes(prefs);
 
       // Let the search interface store changes to prefs.
@@ -736,6 +747,7 @@ public JabRefPreferences prefs() {
     setUpImportMenu(importMenu, false);
     setUpImportMenu(importNewMenu, true);
     setUpExportMenu(exportMenu);
+    setUpCustomExportMenu();
 
     file.add(newDatabaseAction);
     file.add(open); //opendatabaseaction
@@ -747,6 +759,7 @@ public JabRefPreferences prefs() {
     file.add(saveAs);
     file.add(saveSelectedAs);
     file.add(exportMenu);
+    file.add(customExportMenu);
     file.addSeparator();
     file.add(fileHistory);
     //file.addSeparator();
@@ -814,6 +827,7 @@ public JabRefPreferences prefs() {
     tools.add(openFile);
     tools.add(openUrl);
 
+
     mb.add(tools);
 
     options.add(showPrefs);
@@ -824,6 +838,7 @@ public JabRefPreferences prefs() {
         dl.show();
       }
     });
+    options.add(customExpAction);
 
     /*options.add(new AbstractAction("Font") {
      public void actionPerformed(ActionEvent e) {
@@ -1748,6 +1763,19 @@ public JabRefPreferences prefs() {
 
   }
 
+  /**
+   * Interrogates the list of custom export formats defined, and adds them to the custom
+   * export menu.
+   */
+  public void setUpCustomExportMenu() {
+    customExportMenu.removeAll();
+    for (int i=0; i<customExports.size(); i++) {
+      String[] s = customExports.getElementAt(i);
+      customExportMenu.add(new CustomExportAction(s[0], s[2], s[1]));
+    }
+
+  }
+
   class SaveSessionAction
       extends AbstractAction {
     public SaveSessionAction() {
@@ -1797,6 +1825,61 @@ public JabRefPreferences prefs() {
         output(Globals.lang("Saved session") + ".");
       }
 
+    }
+  }
+
+  class CustomExportAction extends AbstractAction {
+
+    String extension, lfFileName, directory;
+
+    public CustomExportAction(String name, String ext, String lf) {
+      super(name);
+      File lfFile = new File(lf);
+      extension = ext;
+      String filename = lfFile.getName();
+
+      lfFileName = filename.substring(0, filename.length()-7);
+      directory = lfFile.getParent()+File.separator;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      // We need to find out:
+      // 1. The layout definition string to use. Or, rather, we
+      //    must provide a Reader for the layout definition.
+      // 2. The preferred extension for the layout format.
+      // 3. The name of the file to use.
+      File outFile = null;
+      String chosenFile = Globals.getNewFile(ths, prefs,
+                                             new File(prefs.get("workingDirectory")),
+                                             extension,
+                                             JFileChooser.SAVE_DIALOG, false);
+
+      if (chosenFile != null)
+        outFile = new File(chosenFile);
+
+      else {
+        return;
+      }
+
+      final String lfName = lfFileName;
+      final File oFile = outFile;
+
+      (new Thread() {
+        public void run() {
+          try {
+            FileActions.exportDatabase
+                (basePanel().database, directory,
+                 lfName, oFile, prefs);
+            output(Globals.lang("Exported database to file") + " '" +
+                   oFile.getPath() + "'.");
+          }
+          catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(ths, ex.getMessage(), Globals.lang("Error"),
+                                          JOptionPane.ERROR_MESSAGE);
+          }
+        }
+      }).start();
     }
   }
 
@@ -1891,6 +1974,17 @@ public JabRefPreferences prefs() {
       } catch (NullPointerException ex) {
         // No component is focused, so we do nothing.
       }
+    }
+  }
+
+  class CustomizeExportsAction extends AbstractAction {
+    public CustomizeExportsAction() {
+      super(Globals.lang("Manage custom exports"));
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      ExportCustomizationDialog ecd = new ExportCustomizationDialog(ths);
+      ecd.show();
     }
   }
 

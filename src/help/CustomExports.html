@@ -1,0 +1,60 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Custom export filters</H1>
+
+JabRef allows you to define and use your own export filters, in the same way as the
+standard export filters are defined. An export filter is defined by one or more
+<i>layout files</i>, which with the help of a collection of built-in formatter
+routines specify the format of the exported files. Your layout files must be prepared
+in a text editor outside of JabRef.
+
+<H2>Adding a custom export filter</H2>
+
+The only requirement for a valid export filter is the existence of a file with
+the extension <b>.layout</b>. To add a new custom export filter, open the
+dialog box <b>Options -> Manage custom exports</b>, and click <b>Add new</b>.
+A new dialog box will appear, allowing you to specify a name for the export filter
+(which will appear in the <b>File -> Custom export</b> menu of the JabRef window),
+the path to the <b>.layout</b> file, and the preferred file extension for the export
+filter (which will be the suggested extension in the file dialog when you use the
+export filter).
+
+<H2>Creating the export filter</H2>
+
+Let us assume that we are creating an HTML export filter.
+
+<P>While the export filter only needs to consist of a single <b>.layout</b> file, which in this case
+could be called <i>html.layout</i>, you may also want to add two files called
+<i>html.begin.layout</i> and <i>html.end.layout</i>. The former contains the header part
+of the output, and the latter the footer part. JabRef will look for these two files whenever
+the export filter is used, and if found, either of these will be copied verbatim to the output
+before or after the individual entries are written.
+
+<P>Note that these files must reside in the same directory as <i>html.layout</i>, and must be
+named by inserting <b>.begin</b> and <b>.end</b>, respectively.
+
+<P>In our example export filter, these could look like the following:
+
+<p><i>html.begin.layout</i>:<br>
+<code>&lt;HTML&gt;<br>
+  &lt;BODY&gt; text="#275856"&gt;<br>
+&lt;basefont size="4" color="#2F4958" face="arial"&gt;</code>
+
+<p><i>html.end.layout</i>:<br>
+<code>&lt;/BODY&gt;<br>
+  &lt;/HTML&gt;</code>
+
+<P>The file <i>html.layout</i> provides the <i>default</i> template for exporting entries. If
+you want to use different templates for different entry types, you can do this by adding entry-specific
+<b>.layout</b> files. These must also reside in the same directory as the main layout file, and
+are named by inserting <b>.entrytype</b> into the name of the main layout file. The entry type name
+must be in all lowercase. In our example, we might want to add a template for book entries, and this
+would go into the file <i>html.book.layout</i>. For a PhD thesis we would add the file
+<i>html.phdthesis.layout</i>, and so on. These files are similar to the default layout file, except that
+they will only be used for entries of the matching type. Note that the default file can easily be made
+general enough to cover most entry types in most export filters.
+
+</HTML>

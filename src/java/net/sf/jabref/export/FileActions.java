@@ -287,34 +287,46 @@ public class FileActions
 
     }
 
+    public static void exportCustomDatabase(BibtexDatabase database, String directory, String lfName,
+                                            File outFile, JabRefPreferences prefs)
+        throws IOException {
+
+      exportDatabase(database, directory, lfName, outFile, prefs);
+    }
+
+
+
     public static void exportDatabase(BibtexDatabase database, String lfName,
-				      File outFile, JabRefPreferences prefs)
-	throws IOException {
+                                      File outFile, JabRefPreferences prefs)
+        throws IOException {
+
+      exportDatabase(database, Globals.LAYOUT_PREFIX, lfName, outFile, prefs);
+    }
+
+    public static void exportDatabase(BibtexDatabase database, String prefix, String lfName,
+                                      File outFile, JabRefPreferences prefs)
+    throws IOException {
 
 	//PrintStream ps=null;
         OutputStreamWriter ps=null;
 
-	try {
+	//try {
 	    Object[] keys = database.getKeySet().toArray();
 	    String key, type;
-	    InputStreamReader reader;
-
+	    Reader reader;
+            int c;
 
             // Trying to change the encoding:
             //ps=new PrintStream(new FileOutputStream(outFile));
             ps=new OutputStreamWriter(new FileOutputStream(outFile), "iso-8859-1");
 
 	    // Print header
-	    URL reso = JabRefFrame.class.getResource
-		(Globals.LAYOUT_PREFIX+lfName+".begin.layout");
-            int c;
-            if (reso != null) {
-                reader = new InputStreamReader(reso.openStream());
-                while ((c = reader.read()) != -1) {
-                    ps.write((char)c);
-                }
-                reader.close();
-	    }
+            reader = getReader(prefix+lfName+".begin.layout");
+            while ((c = reader.read()) != -1) {
+              ps.write((char)c);
+            }
+            reader.close();
+
 
             // Write database entrie; entries will be sorted as they
             // appear on the screen.
@@ -328,60 +340,86 @@ public class FileActions
 				     pri, sec, ter));
 
 	    // Load default layout
-	    reso = JabRefFrame.class.getResource
-		(Globals.LAYOUT_PREFIX+lfName+".layout");
-	    reader = new InputStreamReader(reso.openStream());
+            reader = getReader(prefix+lfName+".layout");
+            //Util.pr(prefix+lfName+".layout");
+
 	    LayoutHelper layoutHelper = new LayoutHelper(reader);
 	    Layout defLayout = layoutHelper.getLayoutFromText();
+            reader.close();
 	    HashMap layouts = new HashMap();
 	    Layout layout;
-	    for (int i=0; i<sorter.getEntryCount(); i++) {
-		// Get the entry
-		key = (String)sorter.getIdAt(i);
-		BibtexEntry entry = database.getEntryById(key);
+            for (int i=0; i<sorter.getEntryCount(); i++) {
+              // Get the entry
 
-		// Get the layout
-		type = entry.getType().getName().toLowerCase();
-		if (layouts.containsKey(type))
-		    layout = (Layout)layouts.get(type);
-		else {
-		    reso = JabRefFrame.class.getResource
-			(Globals.LAYOUT_PREFIX+lfName+"."+type+".layout");
-		    if (reso != null) {
-			reader = new InputStreamReader(reso.openStream());
-			layoutHelper = new LayoutHelper(reader);
-			layout = layoutHelper.getLayoutFromText();
-			layouts.put(type, layout);
-		    } else
-			layout = defLayout;
-		}
-		//Layout layout = layoutHelper.getLayoutFromText();
+              key = (String)sorter.getIdAt(i);
+              BibtexEntry entry = database.getEntryById(key);
 
-		//System.out.println(layout.doLayout(entry));
-                ps.write(layout.doLayout(entry));
-	    }
+              //System.out.println(entry.getType().getName());
 
-	    // Print footer
-	    reso = JabRefFrame.class.getResource
-		(Globals.LAYOUT_PREFIX+lfName+".end.layout");
-	    if (reso != null) {
-		reader = new InputStreamReader(reso.openStream());
-		while ((c = reader.read()) != -1) {
-		    ps.write((char)c);
-		}
-		reader.close();
-	    }
+              // Get the layout
+              type = entry.getType().getName().toLowerCase();
+              if (layouts.containsKey(type))
+                layout = (Layout)layouts.get(type);
+              else {
+                try {
+                  // We try to get a type-specific layout for this entry.
+                  reader = getReader(prefix+lfName+"."+type+".layout");
+                  layoutHelper = new LayoutHelper(reader);
+                  layout = layoutHelper.getLayoutFromText();
+                  layouts.put(type, layout);
+                  reader.close();
+                } catch (IOException ex) {
+                  // The exception indicates that no type-specific layout exists, so we
+                  // go with the default one.
+                  layout = defLayout;
+                }
+            }
+            //Layout layout = layoutHelper.getLayoutFromText();
 
-            ps.flush();
-            ps.close();
-	}
-	catch (IOException ex) {
-	    ex.printStackTrace();
-	}
+            // Write the entry
+            ps.write(layout.doLayout(entry));
+          }
+
+          // Print footer
+          reader = getReader(prefix+lfName+".end.layout");
+          while ((c = reader.read()) != -1) {
+            ps.write((char)c);
+          }
+          reader.close();
+
+          ps.flush();
+          ps.close();
+        }
 
 
+    /**
+     * This method attempts to get a Reader for the file path given, either by
+     * loading it as a resource (from within jar), or as a normal file.
+     * If unsuccessful (e.g. file not found), an IOException is thrown.
+     */
+    private static Reader getReader(String name) throws IOException {
+      Reader reader = null;
+      // Try loading as a resource first. This works for files inside the jar:
+      URL reso = JabRefFrame.class.getResource(name);
+
+      // If that didn't work, try loading as a normal file URL:
+      if (reso != null) {
+        try {
+          reader = new InputStreamReader(reso.openStream());
+        } catch (FileNotFoundException ex) {
+          throw new IOException(Globals.lang("Could not find layout file")+": '"+name+"'.");
+        }
+      } else {
+        File f = new File(name);
+        try {
+          reader = new FileReader(f);
+        } catch (FileNotFoundException ex) {
+          throw new IOException(Globals.lang("Could not find layout file")+": '"+name+"'.");
+        }
+      }
+
+      return reader;
     }
-
 
     /** Returns true iff the entry has a nonzero value in its field.
      */

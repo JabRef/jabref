@@ -163,7 +163,7 @@ public class GUIGlobals {
       doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
       doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
-      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif"),
+      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
       splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash2.png");
 
 
@@ -180,6 +180,7 @@ public class GUIGlobals {
       labelPatternHelp = "LabelPatterns.html",
       ownerHelp = "OwnerHelp.html",
       pdfHelp = "ExternalFiles.html",
+      exportCustomizationHelp = "CustomExports.html",
       aboutPage = "About.html";
 
 
@@ -344,6 +345,13 @@ public class GUIGlobals {
   public static int DEFAULT_FIELD_LENGTH = 100,
       NUMBER_COL_LENGTH = 32,
       WIDTH_ICON_COL = 19;
+
+  // Column widths for export customization dialog table:
+  public static final int
+      EXPORT_DIALOG_COL_0_WIDTH = 50,
+      EXPORT_DIALOG_COL_1_WIDTH = 200,
+      EXPORT_DIALOG_COL_2_WIDTH = 30;
+
   public static final Map FIELD_WEIGHT;
   public static final Map FIELD_EXTRAS, LANGUAGES;
   public static Map fieldLength = new HashMap();

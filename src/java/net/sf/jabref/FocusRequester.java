@@ -3,9 +3,9 @@ package net.sf.jabref;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
 
-class FocusRequester implements Runnable {  
+public class FocusRequester implements Runnable {
     private Component comp;
-    
+
     public FocusRequester(Component comp) {
 	this.comp = comp;
 	try {
@@ -13,7 +13,7 @@ class FocusRequester implements Runnable {
 	} catch(Exception e) {
 	    e.printStackTrace();
 	}
-    }   
+    }
     public void run() {
 	comp.requestFocus();
     }

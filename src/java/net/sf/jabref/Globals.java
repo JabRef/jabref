@@ -56,6 +56,7 @@ public class Globals {
   public static float duplicateThreshold = 0.75f;
 
   public static GlobalFocusListener focusListener = new GlobalFocusListener();
+  public static JabRefPreferences prefs = null;
 
   public static String osName = System.getProperty("os.name", "def");
   public static boolean ON_MAC = (osName.equals(MAC)),
