@@ -198,7 +198,7 @@ public class JabRef {
           } catch (UnsupportedLookAndFeelException ex) {}
         }
 	else if (!Globals.ON_MAC) {
-          try {
+           try {
             //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
             //LookAndFeel lnf = new com.jgoodies.plaf.plastic.PlasticLookAndFeel();
             //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();

@@ -35,6 +35,7 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Vector;
 
 public class SidePane extends JPanel {
 
@@ -68,21 +69,40 @@ public class SidePane extends JPanel {
     public Component add(Component c) {
 	if (pan != null)
 	    mainPanel.remove(pan);
-	con.anchor = GridBagConstraints.NORTH;
-	con.fill = GridBagConstraints.BOTH;
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.insets = new Insets(1, 1, 2, 0);
-	con.gridheight = 1;
-	con.weightx = 1;
-	con.weighty = 1;
-	gbl.setConstraints(c, con);
-	mainPanel.add(c);
+          con.anchor = GridBagConstraints.NORTH;
+          con.fill = GridBagConstraints.BOTH;
+          con.gridwidth = GridBagConstraints.REMAINDER;
+          con.insets = new Insets(1, 1, 2, 0);
+          con.gridheight = 1;
+          con.weightx = 1;
+          con.weighty = 1;
+          gbl.setConstraints(c, con);
+          mainPanel.add(c);
 	pan = new JPanel();
 	//pan.setBackground(GUIGlobals.lightGray);
 	con.gridheight = GridBagConstraints.REMAINDER;
 	gbl.setConstraints(pan, con);
 	//mainPanel.add(pan);
 	return c;
+    }
+
+    public void setComponents(Vector comps) {
+      mainPanel.removeAll();
+      con.anchor = GridBagConstraints.NORTH;
+      con.fill = GridBagConstraints.BOTH;
+      con.gridwidth = GridBagConstraints.REMAINDER;
+      con.insets = new Insets(1, 1, 2, 0);
+      con.gridheight = 1;
+      con.weightx = 1;
+      con.weighty = 1;
+
+      for (int i=0; i<comps.size(); i++) {
+        Component c = (Component)comps.elementAt(i);
+        gbl.setConstraints(c, con);
+        mainPanel.add(c);
+      }
+      revalidate();
+      repaint();
     }
 
     public void remove(Component c) {

@@ -44,7 +44,7 @@ public class GUIGlobals {
    * Static variables for graphics files and keyboard shortcuts.
    */
 
-  // for debugging
+ 	// for debugging
   static int teller = 0;
 
   // HashMap containing refs to all open BibtexDatabases.
@@ -157,6 +157,7 @@ public class GUIGlobals {
       autoGroupIcon = GUIGlobals.class.getResource(pre + "run.png"),
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
+	  fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
       pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
       pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),

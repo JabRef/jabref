@@ -28,6 +28,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import java.awt.*;
@@ -35,6 +38,11 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.undo.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.SAXException;
 
 import net.sf.jabref.export.*;
 import net.sf.jabref.groups.*;
@@ -78,6 +86,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     SearchManager2 searchManager;
     MedlineFetcher medlineFetcher;
+    CiteSeerFetcher citeSeerFetcher;
     RightClickMenu rcm;
 
     BibtexEntry showing = null;
@@ -179,6 +188,50 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		}
 
 	    });
+
+		actions.put("importCiteSeer", new BaseAction() {
+			public void action() {
+				try {
+					int clickedOn = -1;
+					// We demand that one and only one row is selected.
+					int rowCount = entryTable.getSelectedRowCount();
+					if (rowCount == 1) {
+						clickedOn = entryTable.getSelectedRow();
+					} else if (rowCount > 1) {
+						JOptionPane.showMessageDialog(frame(),
+						"The CiteSeer import functionality is currently " +
+						"supported for only one row at a time.",
+						"CiteSeer Import Error",
+						JOptionPane.WARNING_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(frame(),
+						"You must select a row to perform the " +
+						"CiteSeer import operation.",
+						"CiteSeer Import Error",
+						JOptionPane.WARNING_MESSAGE);
+					}
+					if (clickedOn >= 0) {
+						String id =  tableModel.getNameFromNumber(clickedOn);
+						BibtexEntry be = (BibtexEntry) database.getEntryById(id).clone();
+						boolean newValue = citeSeerFetcher.importCiteSeerEntry(be);
+						if (newValue) {
+							database.removeEntry(id);
+							database.insertEntry(be);
+			//				undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
+			//				output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
+			//					   +Globals.lang("entry")+".");
+							refreshTable();
+							int row = tableModel.getNumberFromName(id);
+							entryTable.clearSelection();
+							entryTable.scrollTo(row);
+							markBaseChanged(); // The database just changed.
+						}
+					}
+				} catch(KeyCollisionException ex) {
+				}
+			}
+		});
+
 
 	// The action for saving a database.
 	actions.put("save", new BaseAction() {
@@ -782,12 +835,12 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                     if (importGroups) {
                       Vector newGroups = meta.getData("groups");
                       if (newGroups != null) {
-                        if (groupSelector == null) {
+                        /*if (groupSelector == null) {
                           // The current database has no group selector defined, so we must instantiate one.
                           groupSelector = new GroupSelector
                               (frame, ths, new Vector(), sidePaneManager, prefs);
                           sidePaneManager.register("groups", groupSelector);
-                        }
+                        }*/
 
                         groupSelector.addGroups(newGroups, ce);
                         groupSelector.revalidateList();
@@ -1267,11 +1320,15 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	sidePaneManager = new SidePaneManager
 	    (frame, this, prefs, metaData);
         medlineFetcher = new MedlineFetcher(this, sidePaneManager);
+        citeSeerFetcher = new CiteSeerFetcher(this, sidePaneManager);
         sidePaneManager.register("fetchMedline", medlineFetcher);
         //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
         //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
 	searchManager = new SearchManager2(frame, prefs, sidePaneManager);
 	sidePaneManager.add("search", searchManager);
+        //sidePaneManager.add("CiteSeerProgress", citeSeerFetcher);
+        //sidePaneManager.hideAway("CiteSeerProgress");
+	sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
 	sidePaneManager.populatePanel();
 
 	//mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
@@ -1437,6 +1494,11 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    hideEntryEditor();
 	    showing = null;
 	}
+    }
+
+    public void updateEntryEditorIfShowing() {
+      if (isShowingEditor())
+        ((EntryEditor)splitPane.getBottomComponent()).updateAllFields();
     }
 
     public void markBaseChanged() {

@@ -264,8 +264,10 @@ public class ImportFormatReader
 			String[] fields = entries[i].split("FIELD ");
 			String Type="";
 			hm.clear(); // reset
-			for(int j=0; j<fields.length; j++){
-				String tmp[]=fields[j].split(":");
+			for(int j=0; j<fields.length; j++) if (fields[j].indexOf(":") >= 0) {
+				String tmp[]= new String[2];
+                          tmp[0] = fields[j].substring(0, fields[j].indexOf(":"));
+                          tmp[1] = fields[j].substring(fields[j].indexOf(":")+1);
 				if(tmp.length > 1){//==2
 					if(tmp[0].equals("Author"))
 						hm.put( "author", tmp[1].replaceAll(";"," and ") );

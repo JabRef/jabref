@@ -39,6 +39,7 @@ public class SidePaneManager {
     JabRefPreferences prefs;
     MetaData metaData;
     HashMap components = new HashMap();
+    Vector visible = new Vector();
     private int visibleComponents = 0;
 
     public SidePaneManager(JabRefFrame frame, BasePanel panel,
@@ -53,12 +54,16 @@ public class SidePaneManager {
     public void populatePanel() {
 
 	// Groups
-	if (prefs.getBoolean("groupSelectorVisible")
-	    && (metaData.getData("groups") != null)) {
-
-	    panel.groupSelector = new GroupSelector
-		(frame, panel, metaData.getData("groups"), this, prefs);
-	    add("groups", panel.groupSelector);
+        if (metaData.getData("groups") != null) {
+          panel.groupSelector = new GroupSelector
+              (frame, panel, metaData.getData("groups"), this, prefs);
+          register("groups", panel.groupSelector);
+          if (prefs.getBoolean("groupSelectorVisible"))
+            ensureVisible("groups");
+        } else {
+          panel.groupSelector = new GroupSelector
+              (frame, panel, new Vector(), this, prefs);
+          register("groups", panel.groupSelector);
 	}
 
 	if (components.size() > 0) {
@@ -68,6 +73,20 @@ public class SidePaneManager {
     }
 
     public void togglePanel(String name) {
+      Object o = components.get(name);
+      if (o != null) {
+        if (!visible.contains(o)) {
+          visible.add(o);
+          sidep.setComponents(visible);
+          ((SidePaneComponent)o).componentOpening();
+        } else {
+          visible.remove(o);
+          sidep.setComponents(visible);
+          ((SidePaneComponent)o).componentClosing();
+        }
+
+      } else System.err.println("Side pane component '"+name+"' unknown.");
+      /*
 	if (components.get(name) != null) {
 	    if (!((SidePaneComponent)components.get(name)).isVisible()) {
 		visibleComponents++;
@@ -89,39 +108,70 @@ public class SidePaneManager {
 		(frame, panel, metaData.getData("groups"), this, prefs);
 	    add("groups", panel.groupSelector);
 	}
-
+       */
     }
 
     public synchronized void ensureVisible(String name) {
-	Object o = components.get(name);
+      Object o = components.get(name);
+      if (o != null) {
+        if (!visible.contains(o)) {
+          visible.add(o);
+          sidep.setComponents(visible);
+          ((SidePaneComponent)o).componentOpening();
+        }
+      } else System.err.println("Side pane component '"+name+"' unknown.");
+	/*Object o = components.get(name);
 	if ((o == null) || ((SidePaneComponent)o).hasVisibility())
 	    return;
-	togglePanel(name);
+	togglePanel(name);*/
     }
 
     public synchronized void add(String name, SidePaneComponent comp) {
-	sidep.add(comp);
+      components.put(name, comp);
+      visible.add(comp);
+      sidep.setComponents(visible);
+      comp.componentOpening();
+	/*sidep.add(comp);
 	components.put(name, comp);
 	visibleComponents++;
 	if (visibleComponents == 1)
 	    panel.setLeftComponent(sidep);
-	comp.componentOpening();
-	comp.setVisibility(true);
+          comp.componentOpening();
+	comp.setVisibility(true);*/
     }
 
     public synchronized void register(String name, SidePaneComponent comp) {
-      comp.setVisible(false);
-      sidep.add(comp);
       components.put(name, comp);
+      /*comp.setVisible(false);
+      sidep.add(comp);
+      components.put(name, comp);*/
+    }
+
+    public synchronized boolean hasComponent(String name) {
+      return (components.get("name") != null);
+    }
+
+    public synchronized void hideAway(String name) {
+      Object o = components.get(name);
+      if (o != null) {
+        ((SidePaneComponent)o).componentClosing();
+        if (visible.contains(o)) {
+          visible.remove(o);
+          sidep.setComponents(visible);
+        }
+      } else System.err.println("Side pane component '"+name+"' unknown.");
     }
 
     public synchronized void hideAway(SidePaneComponent comp) {
-	comp.componentClosing();
+      comp.componentClosing();
+      visible.remove(comp);
+      sidep.setComponents(visible);
+	/*comp.componentClosing();
 	comp.setVisible(false);  // Swing method to make component invisible.
 	comp.setVisibility(false); // Our own boolean to keep track of visibility.
 	visibleComponents--;
 	if (visibleComponents == 0)
 	    panel.remove(sidep);
-
+      */
     }
 }

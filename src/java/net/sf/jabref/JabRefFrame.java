@@ -49,6 +49,7 @@ import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
 import javax.swing.event.*;
 
+
 /**
  * The main window of the application.
  */
@@ -99,6 +100,7 @@ public class JabRefFrame
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
                              GUIGlobals.aboutIcon),
+      importCiteSeer = new GeneralAction("importCiteSeer", "Import CiteSeer data"),
       editEntry = new GeneralAction("edit", "Edit entry",
                                "Edit entry", GUIGlobals.editIconFile,
                                prefs.getKey("Edit entry")),
@@ -147,6 +149,7 @@ public class JabRefFrame
       normalSearch = new GeneralAction("search", "Search", "Start",
                                        GUIGlobals.searchIconFile,
                                        prefs.getKey("Search")),
+      fetchCiteSeer = new FetchCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
       fetchAuthorMedline = new FetchAuthorMedlineAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
@@ -812,6 +815,7 @@ public JabRefPreferences prefs() {
     bibtex.add(newSpec);
     bibtex.addSeparator();
     bibtex.add(editEntry);
+    bibtex.add(importCiteSeer);
     bibtex.add(editPreamble);
     bibtex.add(editStrings);
     mb.add(bibtex);
@@ -823,6 +827,7 @@ public JabRefPreferences prefs() {
     tools.add(makeKeyAction);
     tools.add(lyxPushAction);
     tools.add(fetchMedline);
+    tools.add(fetchCiteSeer);
     //tools.add(fetchAuthorMedline);
     tools.add(openFile);
     tools.add(openUrl);
@@ -997,6 +1002,7 @@ public JabRefPreferences prefs() {
     unmark.setEnabled(false);
     unmarkAll.setEnabled(false);
     editEntry.setEnabled(false);
+    importCiteSeer.setEnabled(false);
     selectAll.setEnabled(false);
     copyKey.setEnabled(false);
     copyCiteKey.setEnabled(false);
@@ -1011,6 +1017,7 @@ public JabRefPreferences prefs() {
     importMenu.setEnabled(false);
     exportMenu.setEnabled(false);
     fetchMedline.setEnabled(false);
+    fetchCiteSeer.setEnabled(false);
     openFile.setEnabled(false);
     openUrl.setEnabled(false);
     togglePreview.setEnabled(false);
@@ -1041,6 +1048,7 @@ public JabRefPreferences prefs() {
     unmark.setEnabled(true);
     unmarkAll.setEnabled(true);
     editEntry.setEnabled(true);
+	importCiteSeer.setEnabled(true);
     selectAll.setEnabled(true);
     copyKey.setEnabled(true);
     copyCiteKey.setEnabled(true);
@@ -1055,6 +1063,7 @@ public JabRefPreferences prefs() {
     importMenu.setEnabled(true);
     exportMenu.setEnabled(true);
     fetchMedline.setEnabled(true);
+    fetchCiteSeer.setEnabled(true);
     openFile.setEnabled(true);
     openUrl.setEnabled(true);
     togglePreview.setEnabled(true);
@@ -1337,6 +1346,54 @@ public JabRefPreferences prefs() {
         db.setCompleters(autoCompleters);*/
     }
   }
+
+class FetchCiteSeerAction
+	extends AbstractAction {
+
+		public FetchCiteSeerAction() {
+			super(Globals.lang("Fetch Citations from CiteSeer"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Cited Articles from CiteSeer Database"));
+		}
+
+		public void actionPerformed(ActionEvent e) {
+
+			if(basePanel().citeSeerFetcher.activateFetcher()) {
+                          basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");
+                          (new Thread() {
+                            BasePanel newBp;
+                            BasePanel targetBp;
+                            BibtexDatabase newDatabase;
+                            BibtexDatabase targetDatabase;
+
+                            Runnable updateComponent = new Runnable() {
+                              public void run() {
+                                tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
+                                tabbedPane.setSelectedComponent(newBp);
+                                newBp.refreshTable();
+                                output(Globals.lang("Fetched all citations from target database."));
+                                targetBp.citeSeerFetcher.deactivateFetcher();
+                              }
+                            };
+
+                            public void run() {
+                              try {
+                                newBp = new BasePanel(ths, prefs);
+                                targetBp = (BasePanel) tabbedPane.getSelectedComponent();
+                                newDatabase = newBp.getDatabase();
+                                targetDatabase = targetBp.getDatabase();
+                                basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
+                                SwingUtilities.invokeLater(updateComponent);
+                              }
+                              catch (Exception ex) {
+                                ex.printStackTrace();
+                              }
+                            }
+                          }).start();
+                        } else {
+                          System.out.println("Fetch Currently Active");
+                        }
+                      }
+                    }
 
   class FetchMedlineAction
       extends AbstractAction {

@@ -102,7 +102,10 @@ public class BibtexParser
 		if (tp != null)
                 {
 		    //Util.pr("Found: "+tp.getName());
-		    _db.insertEntry(parseEntry(tp));
+                    BibtexEntry be = parseEntry(tp);
+                    boolean duplicateKey = _db.insertEntry(be);
+                    if (duplicateKey)
+                      _pr.addWarning(Globals.lang("Duplicate BibTeX key")+": "+be.getCiteKey());
 		}
 		else if (entryType.toLowerCase().equals("preamble")) {
 		    _db.setPreamble(parsePreamble());

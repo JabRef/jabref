@@ -1444,7 +1444,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	return false; // Nothing found.
     }
 
-    private void updateAllFields() {
+    public void updateAllFields() {
 	FieldPanel[] panels = new FieldPanel[] {reqPanel, optPanel, genPanel};
 	for (int i=0; i<panels.length; i++) {
 	    Vector fields = panels[i].getFields();
