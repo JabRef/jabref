@@ -44,7 +44,7 @@ or, if you are using the Java Runtime Environment:
 On a Windows system, you can probably run the program by
 double-clicking on the jar file.
 
-The jar file containing JabRef kan be unpacked with the command:
+The jar file containing JabRef can be unpacked with the command:
     jar xf <path to jar>
 or  jar xf <path to jar> <list of files to extract>
 Unpacking the jar file is not necessary to run the program.
