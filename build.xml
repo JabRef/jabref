@@ -42,7 +42,7 @@
   <property name="build.resource" value="${build.dir}/resource"/>
   <property name="build.help" value="${build.dir}/help"/>
   <property name="build.javadocs" value="${build.dir}/docs/API"/>
-  <property name="build.kunststoff.icons.dir" value="${build.dir}/com/incors/plaf/kunststoff/icons"/>
+  <property name="build.kunststoff.icons.dir" value="${build.classes}/com/incors/plaf/kunststoff/icons"/>
 
   <!-- Set the properties for source directories -->
   <property name="src.dir" value="src"/>

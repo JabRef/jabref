@@ -142,6 +142,7 @@ public class EntryTableModel extends AbstractTableModel {
 	      }
 	  }
 	}
+	
 	return o;
     }
 

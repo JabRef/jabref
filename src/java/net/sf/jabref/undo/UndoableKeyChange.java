@@ -29,6 +29,7 @@ package net.sf.jabref.undo;
 import javax.swing.undo.*;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Util;
+import net.sf.jabref.Globals;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -50,11 +51,11 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-	return "Undo: change key";
+	return Globals.lang("Undo")+": "+Globals.lang("change key");
     }
 
     public String getRedoPresentationName() {
-	return "Redo: change key";
+	return Globals.lang("Redo")+": "+Globals.lang("change key");
     }
 
     public void undo() {

@@ -755,7 +755,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    else
 			set = true;
 		}
-
 		if (set) try {
 
 		    // The following statement attempts to write the
@@ -763,7 +762,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		    // cause an IOException if the field is not
 		    // properly formatted. If that happens, the field
 		    // is not stored and the textarea turns red.
-
+		    
 		    if (toSet != null)
 			(new LatexFieldFormatter()).format
 			    (toSet, GUIGlobals.isStandardField(fe.getFieldName()));
@@ -1171,9 +1170,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	       entry = frame.labelMaker.applyRule(entry, panel.database) ;
 
 	       // Store undo information:
-	       panel.undoManager.addEdit(new UndoableFieldChange
-					  (entry, GUIGlobals.KEY_FIELD, oldValue,
-					   entry.getField(GUIGlobals.KEY_FIELD)));
+	       panel.undoManager.addEdit(new UndoableKeyChange
+					 (panel.database, entry.getId(),
+					  (String)oldValue,
+					  (String)entry.getField(GUIGlobals.KEY_FIELD)));
 
             // here we update the field
 	       String bibtexKeyData = (String) entry.getField

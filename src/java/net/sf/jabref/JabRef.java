@@ -75,7 +75,7 @@ public class JabRef {
 	try {
 	    UIManager.setLookAndFeel(new com.incors.plaf.kunststoff.KunststoffLookAndFeel());
 	} catch (UnsupportedLookAndFeelException ex) {}
-
+	
 	JabRefPreferences prefs = new JabRefPreferences();
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
