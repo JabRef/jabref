@@ -21,7 +21,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
         encodings = new JComboBox(Globals.ENCODINGS);
     JTextField
-	pdfDir, pdf, ps, html, lyx;
+	pdfDir, pdf, ps, html, lyx, winEdt;
     private HelpAction ownerHelp, pdfHelp;
 
 
@@ -184,6 +184,7 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
 	ps = new JTextField(_prefs.get("psviewer"), 30);
 	html = new JTextField(_prefs.get("htmlviewer"), 30);
 	lyx = new JTextField(_prefs.get("lyxpipe"), 30);
+        winEdt = new JTextField(_prefs.get("winEdtPath"), 30);
 
         con.gridwidth = 1;
 	con.weightx = 0;
@@ -252,18 +253,33 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
         browse.addActionListener(new BrowseAction(html, false));
         gbl.setConstraints(browse, con);
         external.add(browse);
-	con.gridwidth = 1;
-	con.fill = GridBagConstraints.HORIZONTAL;
-	lab = new JLabel(Globals.lang("Path to LyX pipe")+":");
-	gbl.setConstraints(lab, con);
-	external.add(lab);
+        con.gridwidth = 1;
+        con.fill = GridBagConstraints.HORIZONTAL;
+        lab = new JLabel(Globals.lang("Path to LyX pipe")+":");
+        gbl.setConstraints(lab, con);
+        external.add(lab);
         con.weightx = 1;
-	gbl.setConstraints(lyx, con);
-	external.add(lyx);
+        gbl.setConstraints(lyx, con);
+        external.add(lyx);
         con.weightx = 0;
         con.gridwidth = GridBagConstraints.REMAINDER;
         browse = new JButton(Globals.lang("Browse"));
         browse.addActionListener(new BrowseAction(lyx, false));
+        gbl.setConstraints(browse, con);
+        external.add(browse);
+
+        con.gridwidth = 1;
+        con.fill = GridBagConstraints.HORIZONTAL;
+        lab = new JLabel(Globals.lang("Path to WinEdt.exe")+":");
+        gbl.setConstraints(lab, con);
+        external.add(lab);
+        con.weightx = 1;
+        gbl.setConstraints(winEdt, con);
+        external.add(winEdt);
+        con.weightx = 0;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        browse = new JButton(Globals.lang("Browse"));
+        browse.addActionListener(new BrowseAction(winEdt, false));
         gbl.setConstraints(browse, con);
         external.add(browse);
 
@@ -325,6 +341,7 @@ confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleti
 	_prefs.put("psviewer", ps.getText());
 	_prefs.put("htmlviewer", html.getText());
 	_prefs.put("lyxpipe", lyx.getText());
+        _prefs.put("winEdtPath", winEdt.getText());
         _prefs.put("defaultEncoding", (String)encodings.getSelectedItem());
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {

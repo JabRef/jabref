@@ -591,28 +591,94 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                               message += (1 + rows[i]);
                             }
                             if (citeStr.equals(""))
-                              output("Please define citekey first");
+                              output(Globals.lang("Please define BibTeX key first"));
                             else {
                               citeStr = "LYXCMD:sampleclient:citation-insert:" + citeStr;
                               lyx_out.write(citeStr + "\n");
-                              output("Pushed the citations for the following rows to Lyx: " +
+                              output(Globals.lang("Pushed the citations for the following rows to")+" Lyx: " +
                                      message);
                             }
                             lyx_out.close();
 
                           }
                           catch (IOException excep) {
-                            output("ERROR: unable to write to " + prefs.get("lyxpipe") +
+                            output(Globals.lang("Error")+": "+Globals.lang("unable to write to")+" " + prefs.get("lyxpipe") +
                                    ".in");
                           }
                         }
                       };
                       pushThread.start();
-                      Timeout t = new Timeout(2000, pushThread, Globals.lang("Error: unable to access LyX-pipe"));
+                      Timeout t = new Timeout(2000, pushThread, Globals.lang("Error")+": "+
+                                              Globals.lang("unable to access LyX-pipe"));
                       t.start();
                     }
                   }
 	    });
+
+            actions.put("pushToWinEdt",new BaseAction(){
+              public void action(){
+		    final int[] rows = entryTable.getSelectedRows();
+		    final int numSelected = rows.length;
+		    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to WinEdt");
+
+                    //Util.pr("tre");
+
+		    if( numSelected > 0){
+                      Thread pushThread = new Thread() {
+                        public void run() {
+                          String winEdt = prefs.get("winEdtPath");
+                          try {
+                            StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
+                            String citeKey = "", message = "";
+                            boolean first = true;
+                            for (int i = 0; i < numSelected; i++) {
+                              BibtexEntry bes = database.getEntryById(tableModel.
+                                  getNameFromNumber(rows[
+                                                    i]));
+                              citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
+                              // if the key is empty we give a warning and ignore this entry
+                              if (citeKey == null || citeKey.equals(""))
+                                continue;
+                              if (first) {
+                                toSend.append(citeKey);
+                                first = false;
+                              }
+                              else
+                                toSend.append("," + citeKey);
+
+                              if (i > 0)
+                                message += ", ";
+                              message += (1 + rows[i]);
+
+                            }
+                            if (first)
+                              output(Globals.lang("Please define BibTeX key first"));
+                            else {
+                              toSend.append("}');]\"");
+                              Util.pr(toSend.toString());
+                              Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
+                              output(
+                                  Globals.lang("Pushed the citations for the following rows to")+"WinEdt: " +
+                                  message);
+                            }
+                          }
+
+                          catch (IOException excep) {
+                            output(Globals.lang("Error")+": "+Globals.lang("Could not call executable")+" '"
+                                   +winEdt+"'.");
+                            excep.printStackTrace();
+                          }
+                        }
+                      };
+
+                      pushThread.start();
+                    }
+                  }
+	    });
+
+
+
+
 	// The action for auto-generating keys.
 	actions.put("makeKey", new BaseAction() {
 		public void action() {

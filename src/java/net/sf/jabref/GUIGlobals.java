@@ -118,7 +118,7 @@ public class GUIGlobals {
 
 
   public static URL
-      openIconFile = GUIGlobals.class.getResource(pre + "fileopen2.png"),
+      /*      openIconFile = GUIGlobals.class.getResource(pre + "fileopen2.png"),
       editIconFile = GUIGlobals.class.getResource(pre + "pencil.png"),
       saveIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
       saveAsIconFile = GUIGlobals.class.getResource(pre + "filesave.png"),
@@ -147,6 +147,7 @@ public class GUIGlobals {
       stringsIconFile = GUIGlobals.class.getResource(pre + "strings.png"),
       groupsIconFile = GUIGlobals.class.getResource(pre + "queue.png"),
       closeIconFile = GUIGlobals.class.getResource(pre + "fileclose.png"),
+      close2IconFile = GUIGlobals.class.getResource(pre + "fileclose2.png"),
       refreshSmallIconFile = GUIGlobals.class.getResource(pre + "reload.png"),
       helpSmallIconFile = GUIGlobals.class.getResource(pre + "help.png"),
       helpIconFile = GUIGlobals.class.getResource(pre + "help.png"),
@@ -167,7 +168,59 @@ public class GUIGlobals {
       doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
       doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
       psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
-      incompleteIcon = GUIGlobals.class.getResource(pre + "incomplete.png"),
+      incompleteIcon = GUIGlobals.class.getResource(pre + "incomplete.png"),*/
+      openIconFile = GUIGlobals.class.getResource(pre + "fldr_obj.gif"),
+      editIconFile = GUIGlobals.class.getResource(pre + "edittsk_tsk.gif"),
+      saveIconFile = GUIGlobals.class.getResource(pre + "save_edit.gif"),
+      saveAsIconFile = GUIGlobals.class.getResource(pre + "saveas_edit.gif"),
+      prefsIconFile = GUIGlobals.class.getResource(pre + "configure2.png"),
+      newIconFile = GUIGlobals.class.getResource(pre + "new_page.gif"),
+      undoIconFile = GUIGlobals.class.getResource(pre + "undo_edit.gif"),
+      redoIconFile = GUIGlobals.class.getResource(pre + "redo_edit.gif"),
+      preambleIconFile = GUIGlobals.class.getResource(pre + "preamble.png"),
+      addIconFile = GUIGlobals.class.getResource(pre + "plus.gif"),
+      delRowIconFile = GUIGlobals.class.getResource(pre + "minus.gif"),
+      showReqIconFile = GUIGlobals.class.getResource(pre + "r_icon.gif"),
+      showOptIconFile = GUIGlobals.class.getResource(pre + "o_icon.gif"),
+      showGenIconFile = GUIGlobals.class.getResource(pre + "g_icon.gif"),
+      sourceIconFile = GUIGlobals.class.getResource(pre + "viewsource.gif"),
+      copyIconFile = GUIGlobals.class.getResource(pre + "copy_edit.gif"),
+      cutIconFile = GUIGlobals.class.getResource(pre + "cut_edit.gif"),
+      copyKeyIconFile = GUIGlobals.class.getResource(pre + "copy_edit.gif"),
+      genKeyIconFile = GUIGlobals.class.getResource(pre + "wizard.png"),
+      lyxIconFile = GUIGlobals.class.getResource(pre + "lyx.png"),
+      backIconFile = GUIGlobals.class.getResource(pre + "backward_nav.gif"),
+      forwardIconFile = GUIGlobals.class.getResource(pre + "forward_nav.gif"),
+      contentsIconFile = GUIGlobals.class.getResource(pre + "toc_closed.gif"),
+      removeIconFile = GUIGlobals.class.getResource(pre + "delete_edit.gif"),
+      upIconFile = GUIGlobals.class.getResource(pre + "prev_nav.gif"),
+      downIconFile = GUIGlobals.class.getResource(pre + "next_nav.gif"),
+      stringsIconFile = GUIGlobals.class.getResource(pre + "strings.png"),
+      groupsIconFile = GUIGlobals.class.getResource(pre + "queue.png"),
+      closeIconFile = GUIGlobals.class.getResource(pre + "fileclose.png"),
+      close2IconFile = GUIGlobals.class.getResource(pre + "fileclose2.png"),
+      refreshSmallIconFile = GUIGlobals.class.getResource(pre + "refresh_nav.gif"),
+      helpSmallIconFile = GUIGlobals.class.getResource(pre + "view.gif"),
+      helpIconFile = GUIGlobals.class.getResource(pre + "view.gif"),
+      aboutIcon = GUIGlobals.class.getResource(pre + "view.gif"),
+      helpContentsIconFile = GUIGlobals.class.getResource(pre + "contents2.png"),
+      newSmallIconFile = GUIGlobals.class.getResource(pre + "new_page.gif"),
+      pasteIconFile = GUIGlobals.class.getResource(pre + "paste_edit.gif"),
+      editEntryIconFile = GUIGlobals.class.getResource(pre + "DocumentDraw.gif"),
+      searchIconFile = GUIGlobals.class.getResource(pre + "search.gif"),
+      autoGroupIcon = GUIGlobals.class.getResource(pre + "addtsk_tsk.gif"),
+      wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
+	  wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
+      fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
+	  fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
+      pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
+      pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
+      sheetIcon = GUIGlobals.class.getResource(pre + "defaults_ps.gif"),
+      doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
+      doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
+      psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
+      incompleteIcon = GUIGlobals.class.getResource(pre + "exclamation.gif"),
+      winEdtIcon = GUIGlobals.class.getResource(pre + "winedt.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
       splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png");
 
@@ -206,7 +259,7 @@ public class GUIGlobals {
 //invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
       invalidFieldBackground = new Color(255, 100, 100), // Invalid field backgnd.
       tableBackground = Color.white, // Background color for the entry table.
-      tableReqFieldBackground = new Color(235, 235, 255),
+      tableReqFieldBackground = new Color(230, 235, 255),
       tableOptFieldBackground = new Color(230, 255, 230),
       tableIncompleteEntryBackground = new Color(250, 175, 175),
       maybeIncompleteEntryBackground = new Color(255, 255, 200),
@@ -214,7 +267,11 @@ public class GUIGlobals {
       grayedOutBackground = new Color(210, 210, 210),
       grayedOutText = new Color(40, 40, 40),
       veryGrayedOutBackground = new Color(180, 180, 180),
-      veryGrayedOutText = new Color(40, 40, 40);
+      veryGrayedOutText = new Color(40, 40, 40),
+      gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
+      gradientBlue = new Color(0, 27, 102);  // Title bar gradient color, sidepaneheader
+
+
 
   public static String META_FLAG = "jabref-meta: ";
   public static String META_FLAG_OLD = "bibkeeper-meta: ";
@@ -478,7 +535,7 @@ public class GUIGlobals {
     tableIcons.put("url", lab);
     lab = new JLabel(new ImageIcon(wwwCiteSeerIcon));
     lab.setToolTipText(Globals.lang("Open")+" CiteSeer URL");
-    tableIcons.put("citeseerurl", lab);    
+    tableIcons.put("citeseerurl", lab);
     lab = new JLabel(new ImageIcon(doiSmallIcon));
     lab.setToolTipText(Globals.lang("Open")+" DOI "+Globals.lang("web link"));
     tableIcons.put("doi", lab);

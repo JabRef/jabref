@@ -325,20 +325,17 @@ public class Util {
 
         File file = new File(link);
       if(fieldName.equals("pdf")) {
-//	try
-//        {
-		File f = new File(link);
-		String dir = prefs.get("pdfDirectory");
-		if (!f.exists() && (dir != null))
-		    {
-			if (dir.endsWith(System.getProperty("file.separator")))
-			    link = dir + link;
-			else
-			    link = dir + System.getProperty("file.separator") + link;
-			file = new File(link);
-		}
-//	}
-	}
+        String dir = prefs.get("pdfDirectory");
+        if (!file.exists() && (dir != null))
+        {
+          if (dir.endsWith(System.getProperty("file.separator")))
+            link = dir + link;
+          else
+            link = dir + System.getProperty("file.separator") + link;
+          file = new File(link);
+        }
+      }
+
       if (fieldName.equals("ps") || fieldName.equals("pdf")) {
         // Check that the file exists:
 

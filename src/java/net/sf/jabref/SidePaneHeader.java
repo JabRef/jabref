@@ -35,7 +35,7 @@ import javax.swing.JToolBar;
 
 public class SidePaneHeader extends JPanel implements ActionListener {
 
-  private JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
+  private JButton close = new JButton(new ImageIcon(GUIGlobals.close2IconFile));
     private JLabel nameLabel, imageIcon;
     private SidePaneComponent parent;
     private GridBagLayout gbl = new GridBagLayout();
@@ -51,14 +51,36 @@ public class SidePaneHeader extends JPanel implements ActionListener {
 	addPart(name, image, parent_);
     }
 
+    public void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D)g;
+      Paint oldPaint = g2.getPaint();
+      //g2.setColor(Color.red);
+      int width = getWidth(),
+          height = getHeight();
+      //g2.setPaint(new GradientPaint(0, 0, GUIGlobals.gradientGray,
+     //                              width, height, GUIGlobals.gradientBlue, false));
+     g2.setPaint(new GradientPaint(0, 0, GUIGlobals.gradientGray,
+                                   width, height, GUIGlobals.gradientBlue, false));
+      g2.fillRect(0, 0, width, height);
+      //g2.fillRect(0, 0, 100, 10);
+      g2.setPaint(oldPaint);
+      //super.paintComponent(g);
+    }
+
+    //public boolean isOpaque() { return true; }
+
     private void addPart(String name, URL image, SidePaneComponent parent_) {
 	parent = parent_;
 	setLayout(gbl);
-        setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 20));
-        setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 20));
+        setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
+        setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
 	//imageIcon = new JLabel(new ImageIcon(image));
 	nameLabel = new JLabel(Globals.lang(name), new ImageIcon(image),
 			       SwingConstants.LEFT);
+//        setBackground(new Color(0, 0, 175)); //SystemColor.activeCaption);
+
+        //close.setOpaque(false);
+        nameLabel.setForeground(new Color(230, 230, 230));
 	//nameLabel.setPreferredSize(new Dimension(70, 24));
         /*AbstractAction close = new AbstractAction("Close", new ImageIcon(GUIGlobals.closeIconFile)) {
           public void actionPerformed(ActionEvent e) {
@@ -71,20 +93,25 @@ public class SidePaneHeader extends JPanel implements ActionListener {
         tlb.setMargin(new Insets(0,0,0,0));
         tlb.setSize(20, 20);
         tlb.add(close);*/
-  close.setPreferredSize(new Dimension(20, 20));
-  close.setMaximumSize(new Dimension(20, 20));
-  close.setMinimumSize(new Dimension(20, 20));
+  //close.setMargin(new Insets(0,0,0,0));
+  //close.setRolloverEnabled(true);
+  close.setBorder(null);
+  close.setOpaque(false);
+  close.setPreferredSize(new Dimension(15, 15));
+  close.setMaximumSize(new Dimension(15, 15));
+  close.setMinimumSize(new Dimension(15, 15));
   close.addActionListener(this);
 
 	//setBorder(BorderFactory.createEtchedBorder());
 	//add(imageIcon, BorderLayout.WEST);
-	con.insets = new Insets(2, 0, 0, 0);
+	con.insets = new Insets(1, 1, 1, 1);
 	con.gridwidth = 1;
 	con.anchor = GridBagConstraints.WEST;
 	con.fill = GridBagConstraints.NONE;
 	gbl.setConstraints(nameLabel, con);
 	add(nameLabel);
 	JPanel pan = new JPanel();
+        pan.setOpaque(false);
 	con.fill = GridBagConstraints.HORIZONTAL;
 	con.weightx = 1;
 	gbl.setConstraints(pan, con);

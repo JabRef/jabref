@@ -58,7 +58,7 @@ public class EntryTable extends JTable {
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
 	super(tm_);
 	this.tableModel = tm_;
-
+        sp.setBorder(null);
         panel = panel_;
         // Add the global focus listener, so a menu item can see if this table was focused when
         // an action was called.

@@ -221,6 +221,11 @@ public class JabRefFrame
                                         "push selection to lyx",
                                         GUIGlobals.lyxIconFile,
                                         prefs.getKey("Push to LyX")),
+      winEdtPushAction = new GeneralAction("pushToWinEdt",
+                                        "Insert selected citations into WinEdt",
+                                        "Push selection to WinEdt",
+                                        GUIGlobals.winEdtIcon,
+                                        prefs.getKey("Push to WinEdt")),
       openFile = new GeneralAction("openFile", "Open PDF or PS",
                                    "Open PDF or PS",
                                    GUIGlobals.pdfIcon,
@@ -858,6 +863,7 @@ public JabRefPreferences prefs() {
     tools.addSeparator();
     tools.add(makeKeyAction);
     tools.add(lyxPushAction);
+    tools.add(winEdtPushAction);
     tools.add(fetchMedline);
     tools.add(fetchCiteSeer);
     //tools.add(fetchAuthorMedline);
@@ -947,6 +953,7 @@ public JabRefPreferences prefs() {
 
     tlb.addSeparator();
     tlb.addAction(lyxPushAction);
+    tlb.addAction(winEdtPushAction);
     tlb.addAction(openFile);
     tlb.addAction(openUrl);
 

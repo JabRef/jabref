@@ -128,7 +128,7 @@ public class JabRefPreferences {
         defaults.put("groupsDefaultField", "keywords");
 
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
-
+        defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
 	defaults.put("defaultOwner", System.getProperty("user.name"));
   defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
@@ -144,7 +144,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", new Boolean(false));
         defaults.put("pdfColumn", new Boolean(true));
         defaults.put("urlColumn", new Boolean(true));
-        defaults.put("citeseerColumn", new Boolean(true));        
+        defaults.put("citeseerColumn", new Boolean(true));
         defaults.put("useOwner", new Boolean(true));
         defaults.put("allowTableEditing", new Boolean(false));
         defaults.put("dialogWarningForDuplicateKey", new Boolean(true));
@@ -412,7 +412,8 @@ public class JabRefPreferences {
     }
 
     private void defineDefaultKeyBindings() {
-	defKeyBinds.put("Push to LyX","ctrl L");
+      defKeyBinds.put("Push to LyX","ctrl L");
+      defKeyBinds.put("Push to WinEdt","ctrl shift W");
 	defKeyBinds.put("Quit JabRef", "ctrl Q");
 	defKeyBinds.put("Open database", "ctrl O");
         defKeyBinds.put("Save database", "ctrl S");

@@ -41,7 +41,7 @@ public class SidePaneComponent extends JPanel {
 	//Util.pr(""+GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
     }
 
-    public void hideAway() {	
+    public void hideAway() {
 	manager.hideAway(this);
     }
 

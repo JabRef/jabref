@@ -65,6 +65,7 @@ class SearchManager2 extends SidePaneComponent
     public SearchManager2(JabRefFrame frame, JabRefPreferences prefs_,
 			 SidePaneManager manager) {
 	super(manager);
+
 	this.frame = frame;
 	prefs = prefs_;
 	incSearcher = new IncrementalSearcher(prefs);

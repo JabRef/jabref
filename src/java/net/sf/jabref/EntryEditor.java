@@ -908,6 +908,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		boolean set;
 		if (fe.getText().length() > 0)
 		    toSet = fe.getText();
+
 		// We check if the field has changed, since we don't want to mark the
 		// base as changed unless we have a real change.
 		if (toSet == null) {
