@@ -272,12 +272,14 @@ public class GroupSelector extends SidePaneComponent implements
         ToolTipManager.sharedInstance().registerComponent(groupsTree);
         // JZTODO JZPUWIL: drag and drop...
         DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(
-                groupsTree, DnDConstants.ACTION_MOVE, new DragGestureListener() {
+                groupsTree, DnDConstants.ACTION_MOVE,
+                new DragGestureListener() {
 
                     public void dragGestureRecognized(DragGestureEvent dge) {
                         // TODO Auto-generated method stub
                         System.out.println(dge);
-                    }});
+                    }
+                });
         // groupsTree.setPrototypeCellValue("Suitable length");
         // // The line above decides on the list's preferred width.
         groupsTree.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
@@ -317,12 +319,11 @@ public class GroupSelector extends SidePaneComponent implements
         groupsContextMenu.add(editGroupAction);
         groupsContextMenu.add(removeGroupAndSubgroupsAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsAction);
-        JMenu menu = new JMenu("Move");
-        groupsContextMenu.add(menu);
-        menu.add(moveNodeUp);
-        menu.add(moveNodeDown);
-        menu.add(moveNodeLeft);
-        menu.add(moveNodeRight);
+        groupsContextMenu.add(moveSubmenu);
+        moveSubmenu.add(moveNodeUp);
+        moveSubmenu.add(moveNodeDown);
+        moveSubmenu.add(moveNodeLeft);
+        moveSubmenu.add(moveNodeRight);
         groupsTree.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
@@ -362,20 +363,26 @@ public class GroupSelector extends SidePaneComponent implements
         AbstractGroup group = node.getGroup();
         if (group instanceof AllEntriesGroup) {
             editGroupAction.setEnabled(false);
+            addGroupAction.setEnabled(false);
             removeGroupAndSubgroupsAction.setEnabled(false);
             removeGroupKeepSubgroupsAction.setEnabled(false);
+            moveSubmenu.setEnabled(false);
             moveNodeUp.setEnabled(false);
             moveNodeDown.setEnabled(false);
             moveNodeLeft.setEnabled(false);
             moveNodeRight.setEnabled(false);
         } else {
             editGroupAction.setEnabled(true);
+            addGroupAction.setEnabled(true);
             removeGroupAndSubgroupsAction.setEnabled(true);
             removeGroupKeepSubgroupsAction.setEnabled(true);
             moveNodeUp.setEnabled(node.getPreviousSibling() != null);
             moveNodeDown.setEnabled(node.getNextSibling() != null);
             moveNodeLeft.setEnabled(node.getParent() != groupsRoot);
             moveNodeRight.setEnabled(node.getPreviousSibling() != null);
+            moveSubmenu.setEnabled(moveNodeUp.isEnabled()
+                    || moveNodeDown.isEnabled() || moveNodeLeft.isEnabled()
+                    || moveNodeRight.isEnabled());
         }
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
@@ -689,4 +696,5 @@ public class GroupSelector extends SidePaneComponent implements
                     + node.getGroup().getName() + "'.");
         }
     };
+    JMenu moveSubmenu = new JMenu("Move");
 }
