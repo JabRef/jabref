@@ -169,11 +169,18 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public boolean nonZeroField(int row, String field) {
-	// Returns true iff the entry has a nonzero value in its
-	// 'search' field.
-	BibtexEntry be = db.getEntryById(getNameFromNumber(row));
-	String o = (String)(be.getField(field));
-	return ((o != null) && !o.equals("0"));
+        // Returns true iff the entry has a nonzero value in its
+        // 'search' field.
+        BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+        String o = (String)(be.getField(field));
+        return ((o != null) && !o.equals("0"));
+    }
+
+    public boolean hasField(int row, String field) {
+        // Returns true iff the entry has a nonzero value in its
+        // 'search' field.
+        BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+        return (be.getField(field) != null);
     }
 
     public void remap() {
@@ -196,10 +203,15 @@ public class EntryTableModel extends AbstractTableModel {
 	// then pick the 3 first.
 	Vector fields = new Vector(5,1),
 	    directions = new Vector(5,1);
+
+        // For testing MARKED feature:
+        fields.add(Globals.MARKED);
+        directions.add(new Boolean(true));
+
 	if (panel.showingGroup) {
 	    // Group search has the highest priority if active.
-	    fields.add(Globals.GROUPSEARCH);
-	    directions.add(new Boolean(true));
+            fields.add(Globals.GROUPSEARCH);
+            directions.add(new Boolean(true));
 	}
 	if (panel.showingSearchResults) {
 	    // Normal search has priority over regular sorting.
@@ -216,13 +228,26 @@ public class EntryTableModel extends AbstractTableModel {
 	fields.add(frame.prefs.get("terSort"));
 
 	// Then pick the three highest ranking ones, and go.
-	sorter = db.getSorter(new EntryComparator(
-	    ((Boolean)directions.elementAt(0)).booleanValue(),
-	    ((Boolean)directions.elementAt(1)).booleanValue(),
-	    ((Boolean)directions.elementAt(2)).booleanValue(),
-	    (String)fields.elementAt(0),
-	    (String)fields.elementAt(1),
-	    (String)fields.elementAt(2)));
+        if (directions.size() < 4)
+          sorter = db.getSorter(new EntryComparator(
+        ((Boolean)directions.elementAt(0)).booleanValue(),
+        ((Boolean)directions.elementAt(1)).booleanValue(),
+        ((Boolean)directions.elementAt(2)).booleanValue(),
+        (String)fields.elementAt(0),
+        (String)fields.elementAt(1),
+        (String)fields.elementAt(2)));
+          else
+            sorter = db.getSorter(new EntryComparator(
+          ((Boolean)directions.elementAt(0)).booleanValue(),
+          ((Boolean)directions.elementAt(1)).booleanValue(),
+          ((Boolean)directions.elementAt(2)).booleanValue(),
+          ((Boolean)directions.elementAt(3)).booleanValue(),
+          (String)fields.elementAt(0),
+          (String)fields.elementAt(1),
+          (String)fields.elementAt(2),
+          (String)fields.elementAt(3)));
+
+
 	/*    remapAfterSearch();
 	else
 	remapNormal();*/

@@ -48,6 +48,7 @@
   <property name="src.dir" value="src"/>
   <property name="txt.dir" value="src/txt"/>
   <property name="java.dir" value="${src.dir}/java"/>
+  <property name="osx.dir" value="${src.dir}/osx"/>
   <property name="resource.dir" value="${src.dir}/resource"/>
   <property name="bin.dir" value="${src.dir}/scripts"/>
   <property name="images.dir" value="${src.dir}/images"/>
@@ -83,6 +84,19 @@
     </copy>
 
   </target>
+
+  <!-- Compiles project -->
+  <target name="osx">
+    <mkdir dir="${build.classes}"/>
+
+    <javac srcdir="${osx.dir}"
+           debug="on"
+           destdir="${build.classes}"
+           target="1.4">
+    </javac>
+  </target>
+
+
 
   <!-- Jars up project -->
   <target name="jars" depends="compile">

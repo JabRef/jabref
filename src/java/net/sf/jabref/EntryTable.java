@@ -46,11 +46,13 @@ public class EntryTable extends JTable {
     private boolean antialiasing = true,
         ctrlClick = false;
     //RenderingHints renderingHints;
+    private BasePanel panel;
 
-    public EntryTable(EntryTableModel tm_, JabRefPreferences prefs_) {
+    public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
 	super(tm_);
 	this.tableModel = tm_;
 
+        panel = panel_;
         // Add the global focus listener, so a menu item can see if this table was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
@@ -93,8 +95,8 @@ public class EntryTable extends JTable {
 			public void mouseClicked(MouseEvent e) {
 				if ((e.getButton() == MouseEvent.BUTTON3)
                                     || (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-					if (rightClickMenu != null)
-						rightClickMenu.show(ths, e.getX(), e.getY());
+                                  rightClickMenu = new RightClickMenu(panel, panel.metaData);
+                                  rightClickMenu.show(ths, e.getX(), e.getY());
 				}
 
 			}
@@ -148,6 +150,11 @@ public class EntryTable extends JTable {
 	    Globals.logger("Error happened in getCellRenderer method of EntryTable.");
 	    return defRenderer; // This should not occur.
 	}
+
+        // For testing MARKED feature:
+        if (tableModel.hasField(row, Globals.MARKED)) {
+          return markedRenderer;
+        }
 
 	if (!showingSearchResults ||
 	    tableModel.nonZeroField(row, Globals.SEARCH))
@@ -230,8 +237,8 @@ public class EntryTable extends JTable {
 					 GUIGlobals.grayedOutText),
 	veryGrayedOutRenderer = new Renderer(GUIGlobals.veryGrayedOutBackground,
 					     GUIGlobals.veryGrayedOutText),
-	maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground);
-
+        maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground),
+        markedRenderer = new Renderer(GUIGlobals.markedEntryBackground);
     private class Renderer extends DefaultTableCellRenderer {
 	//private DefaultTableCellRenderer darker;
 	public Renderer(Color c) {

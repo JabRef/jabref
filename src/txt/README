@@ -73,6 +73,7 @@ Change log:
 	- Added menu and toolbar actions for open pdf/ps and url/doi.
 	- Added web lookup of DOI.
 	- Added several new special field markers to the key autogenerator.
+      	- Improved compatibility with Mac OSX.
 	- Made it possible to set custom secondary and tertiary sort fields.
 	- Made the entry number column width customizable.
        	- Fixed bug in selector word removal.

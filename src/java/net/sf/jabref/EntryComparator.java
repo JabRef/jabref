@@ -36,13 +36,21 @@ public class EntryComparator implements Comparator {
     boolean descending;
     EntryComparator next;
 
-    public EntryComparator(boolean priDesc, boolean secDesc, boolean terDesc, String pri, String sec, String ter) {
-	// This constructor creates a three-layered sort rule.
-	next = new EntryComparator(secDesc, terDesc, sec, ter); // Secondary sort field.
-	descending = priDesc;
-	sortField = pri;
+    public EntryComparator(boolean priDesc, boolean secDesc, boolean terDesc, boolean fourthDesc,
+                           String pri, String sec, String ter, String fourth) {
+        // This constructor creates a three-layered sort rule.
+        next = new EntryComparator(secDesc, terDesc, fourthDesc, sec, ter, fourth); // Secondary sort field.
+        descending = priDesc;
+        sortField = pri;
+
     }
 
+    public EntryComparator(boolean priDesc, boolean secDesc, boolean terDesc, String pri, String sec, String ter) {
+        // This constructor creates a three-layered sort rule.
+        next = new EntryComparator(secDesc, terDesc, sec, ter); // Secondary sort field.
+        descending = priDesc;
+        sortField = pri;
+    }
 
     public EntryComparator(boolean priDesc, boolean secDesc, String pri, String sec) {
 	// This constructor creates a two-layered sort rule.
@@ -80,7 +88,7 @@ public class EntryComparator implements Comparator {
           f2 = e2.getType().getName();
         }
 
-	if ((f1 == null) && (f2 == null)) return idCompare(e1, e2);
+	if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
 	if ((f1 != null) && (f2 == null)) return -1;
 	if ((f1 == null) && (f2 != null)) return 1;
 

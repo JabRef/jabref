@@ -46,6 +46,14 @@ public class RightClickMenu extends JPopupMenu
 	panel = panel_;
 	metaData = metaData_;
 
+        // Are multiple entries selected?
+        boolean multiple = (panel.entryTable.getSelectedRowCount() > 1);
+
+        // If only one entry is selected, get a reference to it for adapting the menu.
+        BibtexEntry be = null;
+        if (panel.entryTable.getSelectedRowCount() == 1)
+          be = panel.entryTable.getSelectedEntries()[0];
+
 	addPopupMenuListener(this);
 
 	add(new AbstractAction(Globals.lang("Copy")) {
@@ -70,7 +78,43 @@ public class RightClickMenu extends JPopupMenu
 		}
 	    });
 
-	addSeparator();
+            addSeparator();
+
+        if (multiple) {
+          add(new AbstractAction(Globals.lang("Mark entries")) {
+            public void actionPerformed(ActionEvent e) {
+              try {
+                panel.runCommand("markEntries");
+              } catch (Throwable ex) {}
+            }
+          });
+          add(new AbstractAction(Globals.lang("Unmark entries")) {
+            public void actionPerformed(ActionEvent e) {
+              try {
+                panel.runCommand("unmarkEntries");
+              } catch (Throwable ex) {}
+            }
+          });
+          addSeparator();
+        } else if (be != null) {
+          if (be.getField(Globals.MARKED) == null)
+            add(new AbstractAction(Globals.lang("Mark entry")) {
+               public void actionPerformed(ActionEvent e) {
+                 try {
+                   panel.runCommand("markEntries");
+                 } catch (Throwable ex) {}
+               }
+             });
+           else
+             add(new AbstractAction(Globals.lang("Unmark entry")) {
+               public void actionPerformed(ActionEvent e) {
+                 try {
+                   panel.runCommand("unmarkEntries");
+                 } catch (Throwable ex) {}
+               }
+             });
+           addSeparator();
+        }
 
         add(new AbstractAction(Globals.lang("Open PDF or PS")) {
                 public void actionPerformed(ActionEvent e) {

@@ -827,17 +827,49 @@ public class BasePanel extends JSplitPane implements MouseListener,
                            link = bes[0].getField("pdf");
                            field = "pdf";
                          }
+                         String filepath = null;
                          if (link != null) {
+                           filepath = link.toString();
+                         } else {
+                           // see if we can fall back to a filename based on the bibtex key
+                           String basefile;
+                           Object key = bes[0].getField(Globals.KEY_FIELD);
+                           if(key != null) {
+                             basefile = key.toString();
+                             String dir = prefs.get("pdfDirectory");
+                             if (dir.endsWith(System.getProperty("file.separator"))) {
+                               basefile = dir + basefile;
+                             }
+                             else {
+                               basefile = dir + System.getProperty("file.separator") +
+                                   basefile;
+                             }
+                             final String[] typesToTry = new String[] {
+                                 "html", "ps", "pdf"};
+                             for (int i = 0; i < typesToTry.length; i++) {
+                               File f = new File(basefile + "." + typesToTry[i]);
+                               Util.pr("Checking for "+f);
+                               if (f.exists()) {
+                                 field = typesToTry[i];
+                                 filepath = f.getPath();
+                                 break;
+                               }
+                             }
+                           }
+                         }
+
+                         if (filepath != null) {
                            //output(Globals.lang("Calling external viewer..."));
                            try {
-                             Util.openExternalViewer(link.toString(), field, prefs);
+                             Util.pr("Opening external "+field+" file '"+filepath+"'.");
+                             Util.openExternalViewer(filepath, field, prefs);
                              output(Globals.lang("External viewer called")+".");
                            } catch (IOException ex) {
                              output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
                            }
                          }
                          else
-                             output(Globals.lang("No pdf or ps defined")+".");
+                             output(Globals.lang("No pdf or ps defined, and no file matching Bibtex key found")+".");
                      } else
                        output(Globals.lang("No entries or multiple entries selected."));
                  }
@@ -955,6 +987,25 @@ public class BasePanel extends JSplitPane implements MouseListener,
                   }
                 }
               });
+
+              actions.put("markEntries", new BaseAction() {
+                public void action() {
+                  BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  for (int i=0; i<bes.length; i++)
+                    bes[i].setField(Globals.MARKED, "0");
+                  refreshTable();
+                }
+              });
+
+              actions.put("unmarkEntries", new BaseAction() {
+                public void action() {
+                  BibtexEntry[] bes = entryTable.getSelectedEntries();
+                  for (int i=0; i<bes.length; i++)
+                    bes[i].setField(Globals.MARKED, null);
+                  refreshTable();
+                }
+              });
+
     }
 
     /**
@@ -1052,12 +1103,8 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
     public void setupTable() {
 	tableModel = new EntryTableModel(frame, this, database);
-	entryTable = new EntryTable(tableModel, frame.prefs);
+	entryTable = new EntryTable(tableModel, ths, frame.prefs);
 	entryTable.addMouseListener(this);
-        Util.pr("BasePanel:1053, removed key bindings");
-	//entryTable.getInputMap().put(prefs.getKey("Cut"), "Cut");
-	//entryTable.getInputMap().put(prefs.getKey("Copy"), "Copy");
-	//entryTable.getInputMap().put(prefs.getKey("Paste"), "Paste");
 	entryTable.getActionMap().put("cut", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
 		    try { runCommand("cut");
@@ -1115,7 +1162,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 
 	// Set the right-click menu for the entry table.
-	rcm = new RightClickMenu(this, metaData);
+	//rcm = new RightClickMenu(this, metaData);
 	entryTable.setRightClickMenu(rcm);
 	int pos = splitPane.getDividerLocation();
 	splitPane.setTopComponent(entryTable.getPane());

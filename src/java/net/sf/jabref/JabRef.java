@@ -76,7 +76,9 @@ public class JabRef {
 
 	//String osName = System.getProperty("os.name", "def");
 	if (Globals.osName.equals(Globals.MAC)) {
-	    Util.pr("Disabling Kunststoff look & feel on Mac OS X.");
+          // This property is set to make the Mac OSX Java VM move the menu bar to the top
+          // of the screen, where Mac users expect it to be.
+          System.setProperty("com.apple.laf.useScreenMenuBar", "true");
 	} else {
 	    try {
 		LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();

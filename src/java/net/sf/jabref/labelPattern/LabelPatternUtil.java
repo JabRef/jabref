@@ -137,7 +137,7 @@ public class LabelPatternUtil {
 		val=val.substring(0,_mi);
 	    }
 	    StringBuffer _sbvalue = new StringBuffer();
-	    
+
 	    try {
 		/*if (val.equals("uppercase")) {
 		    forceUpper = true;
@@ -195,12 +195,12 @@ public class LabelPatternUtil {
 		else if(val.equals("veryshorttitle")) {
 		    String ss = _entry.getField("title").toString();
 		    int piv=0;
-		    String[] skipWords = {"a", "an", "the"}; 
+		    String[] skipWords = {"a", "an", "the"};
 		    // sorry for being English-centric. I guess these
 		    // words should really be an editable preference.
-		    
+
 		    for(int _i=0; _i< skipWords.length; _i++) {
-			if(ss.toLowerCase().startsWith(skipWords[_i])) {
+			if(ss.toLowerCase().startsWith(skipWords[_i]+" ")) {
 			    piv=skipWords[_i].length()+1;
 			}
 		    }
@@ -214,7 +214,7 @@ public class LabelPatternUtil {
 			piv++;
 		    }
 		}
-		
+
 
 		// we havent seen any special demands
 		else {

@@ -228,7 +228,7 @@ public class Util {
 	for (int i=0; i<key.length(); i++) {
 	    char c = key.charAt(i);
 	    if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
-                && (c != '}') && (c != '~') && (c != ','))
+                && (c != '}') && (c != '~') && (c != ',') && (c != '^'))
 		newKey.append(c);
 	}
 	return newKey.toString();

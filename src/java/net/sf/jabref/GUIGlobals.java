@@ -309,6 +309,7 @@ public class GUIGlobals {
       tableOptFieldBackground = new Color(230, 255, 230),
       tableIncompleteEntryBackground = new Color(250, 175, 175),
       maybeIncompleteEntryBackground = new Color(255, 255, 200),
+      markedEntryBackground = new Color(255, 255, 150),
       grayedOutBackground = new Color(210, 210, 210),
       grayedOutText = new Color(40, 40, 40),
       veryGrayedOutBackground = new Color(180, 180, 180),
@@ -386,7 +387,9 @@ public class GUIGlobals {
   };
 
   public static String[] NON_WRITABLE_FIELDS = new String[] {
-      "search"
+      Globals.MARKED,
+      Globals.SEARCH,
+      Globals.GROUPSEARCH
   };
 
   public static boolean isWriteableField(String field) {
