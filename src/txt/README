@@ -11,8 +11,7 @@ logical groups, and with a single click limit your view to a single
 group or an intersection or union of several groups. You can customize
 the entry information shown in the main window, and sort by any of the
 standard Bibtex fields. JabRef can autogenerate bibtex keys for your
-entries, and autocomplete words or names in the field types of your
-choosing. Most operations can be done without using the mouse.
+entries. Most operations can be done without using the mouse.
 
 
 License:
@@ -67,16 +66,17 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.2:	- Changed the icon set.
+1.2:	- Replaced the icon set.
 	- Added support for French language.
 	- Added customization of key generation.
 	- Improved HTML export.
 	- Added Replace string feature.
     	- Made a couple of adaptations for Mac OS X users.
 	- Added option in Table Preferences to set current column widths as default.
+    	- Added import filter for BibTeXML.
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
 	- Fixed bug that made selector words added in the dialog to be lowercased.
-    	- Added import of BibTeXML
+	- Fixed bug relating to translated help files.
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.
 	- Added options to display names in harmonised format in the main table.
 	- Added Docbook and (experimental) HTML export.

@@ -86,11 +86,12 @@ public class HelpContent extends JEditorPane {
 	try {
 	    super.setPage(translatedFile);
 	} catch (IOException ex) {
-	    System.err.println("Could not load '"+prefs.get("language")
-			       +"' translated version of "+filename+".");
+	    //System.err.println("Could not load '"+prefs.get("language")
+            //	       +"' translated version of "+filename+".");
 
 	    URL file = /*GUIGlobals.class.*/HelpContent.class.getResource
 		(GUIGlobals.helpPre+filename);
+
 	    setPageOnly(file);
 	    forw.removeAllElements();
 	    if (old != null)
@@ -105,14 +106,16 @@ public class HelpContent extends JEditorPane {
     }
 
     public void setPage(URL url) {
+      File f = new File(url.getPath());
+      setPage(f.getName());
 	//String lang = prefs.get("language");
-	URL old = getPage();
-	setPageOnly(url);        
+	/*URL old = getPage();
+	setPageOnly(url);
 	forw.removeAllElements();
 	if (old != null)
-	    history.push(old);
+	    history.push(old);*/
     }
-    
+
     private void setPageOnly(URL url) {
 	try {
 	    super.setPage(url);
@@ -131,7 +134,7 @@ public class HelpContent extends JEditorPane {
 	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 			    RenderingHints.VALUE_ANTIALIAS_ON);
 	g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-			    RenderingHints.VALUE_RENDER_QUALITY);	
+			    RenderingHints.VALUE_RENDER_QUALITY);
 	super.paintComponent(g2);
     }
 
