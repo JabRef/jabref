@@ -39,16 +39,16 @@ public class Globals {
     public static ResourceBundle messages;
 	
     public static void logger(String s){
-	Logger.global.info(s);
+		Logger.global.info(s);
     }
     
     public static void turnOffLogging(){ // only log exceptions
-	Logger.global.setLevel(java.util.logging.Level.SEVERE); 
+		Logger.global.setLevel(java.util.logging.Level.SEVERE); 
     }
 
     // should be only called ones
     public static void turnOnConsoleLogging(){
-	Logger.global.addHandler( new java.util.logging.ConsoleHandler());
+		Logger.global.addHandler( new java.util.logging.ConsoleHandler());
     }
 
     public static void turnOnFileLogging(){
