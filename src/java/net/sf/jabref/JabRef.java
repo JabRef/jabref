@@ -439,71 +439,77 @@ public class JabRef {
 
       // If we are not on Mac, deal with font sizes and LookAndFeels:
       if (!Globals.ON_MAC) {
-	  int fontSizes = prefs.getInt("menuFontSize");
-          
-	  String defaultLookAndFeel;
-	  if (Globals.ON_WIN)
-	      defaultLookAndFeel = GUIGlobals.windowsDefaultLookAndFeel;
-	  else
-	      defaultLookAndFeel = GUIGlobals.linuxDefaultLookAndFeel;
-
-	  String lookAndFeel = null;
-	  if (!prefs.getBoolean("useDefaultLookAndFeel"))
-	      lookAndFeel = prefs.get("lookAndFeel");
-	  else
-	      lookAndFeel = defaultLookAndFeel;
-
-     	  LookAndFeel lnf = null;
-	  
-	  //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-	  //PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
-	  Object objLnf = null;
-	  //Util.pr(lookAndFeel);
-	  try {
-	      //lnf2 = Class.forName("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel").newInstance();
-	      if (lookAndFeel != null)
-		  objLnf = Class.forName(lookAndFeel).newInstance();
-	      else
-		  objLnf = Class.forName(defaultLookAndFeel).newInstance();
-	  }  catch (Exception ex) {
-	      ex.printStackTrace();
-	      try {
-		  objLnf = Class.forName(defaultLookAndFeel).newInstance();
-	      } catch (Exception ex2) {}
-	  }
-	  
-	  if (objLnf != null)
-	      lnf = (LookAndFeel)objLnf;
-	  
-	  // Set font sizes if we are using a JGoodies look and feel.
-	  if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
-              
-              //MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
-              Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel)lnf;
-              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
-	      
-	  }
-          else if ((lnf != null) && (lnf instanceof ExtWindowsLookAndFeel)) {
-              //System.out.println("ttt");
-              ExtWindowsLookAndFeel plLnf = (ExtWindowsLookAndFeel)lnf;
-              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));     
-	  }	  
-          
-          
-	  if (lnf != null) {
-	      try {
-		  UIManager.setLookAndFeel(lnf);
-	      } catch (UnsupportedLookAndFeelException ex) {
-		  ex.printStackTrace();
-	      }
-	      
-	      
-          //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
-          //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
-          //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
-
-	      
-	  }
+		  int fontSizes = prefs.getInt("menuFontSize");
+	          
+		  String defaultLookAndFeel;
+		  if (Globals.ON_WIN)
+		      defaultLookAndFeel = GUIGlobals.windowsDefaultLookAndFeel;
+		  else
+		      defaultLookAndFeel = GUIGlobals.linuxDefaultLookAndFeel;
+	
+		  String lookAndFeel = null;
+		  if (!prefs.getBoolean("useDefaultLookAndFeel"))
+		      lookAndFeel = prefs.get("lookAndFeel");
+		  else
+		      lookAndFeel = defaultLookAndFeel;
+	
+	     	  LookAndFeel lnf = null;
+		  
+		  //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
+		  //PlasticLookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
+		  Object objLnf = null;
+		  //Util.pr(lookAndFeel);
+		  try {
+		      //lnf2 = Class.forName("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel").newInstance();
+		      if (lookAndFeel != null)
+			  objLnf = Class.forName(lookAndFeel).newInstance();
+		      else
+			  objLnf = Class.forName(defaultLookAndFeel).newInstance();
+		  }  catch (Exception ex) {
+		      ex.printStackTrace();
+		      try {
+			  objLnf = Class.forName(defaultLookAndFeel).newInstance();
+		      } catch (Exception ex2) {}
+		  }
+		  
+		  if (objLnf != null)
+		      lnf = (LookAndFeel)objLnf;
+		  
+		  // Set font sizes if we are using a JGoodies look and feel.
+		  if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
+	              
+	              //MetalLookAndFeel.setCurrentTheme(new com.jgoodies.plaf.plastic.theme.SkyBluer());
+	              Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel)lnf;
+	              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));
+		      
+		  }
+	          else if ((lnf != null) && (lnf instanceof ExtWindowsLookAndFeel)) {
+	              //System.out.println("ttt");
+	              ExtWindowsLookAndFeel plLnf = (ExtWindowsLookAndFeel)lnf;
+	              plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes, fontSizes, fontSizes));     
+		  }	  
+	          
+	          
+		  if (lnf != null) {
+		      try {
+		      	UIManager.setLookAndFeel(lnf);
+		      } catch (Throwable ex) {
+		      	ex.printStackTrace();
+		      	System.err.println("Trying to set system default Look&Feel...");
+		      	// if desired lnf could not be set, try system default
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Throwable e) {
+					e.printStackTrace();
+			    }
+		      }	      
+		      
+	          //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
+	          //Look1AndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+	          //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
+	
+		      
+		  }
       }
 
       // If the option is enabled, open the last edited databases, if any.
