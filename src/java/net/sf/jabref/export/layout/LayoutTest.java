@@ -133,7 +133,7 @@ public class LayoutTest
         {
             e.printStackTrace();
         }
-         catch (IOException e)
+         catch (Exception e)
         {
             e.printStackTrace();
         }

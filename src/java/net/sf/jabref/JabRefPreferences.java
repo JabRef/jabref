@@ -541,4 +541,34 @@ public class JabRefPreferences {
 	    number++;
 	}
     }
+
+    /**
+     * Exports Preferences to an XML file.
+     *
+     * @param filename String File to export to
+     */
+    public void exportPreferences(String filename) throws IOException {
+      File f = new File(filename);
+      OutputStream os = new FileOutputStream(f);
+      try {
+        prefs.exportSubtree(os);
+      } catch (BackingStoreException ex) {
+        throw new IOException(ex.getMessage());
+      }
+    }
+
+      /**
+       * Imports Preferences from an XML file.
+       *
+       * @param filename String File to import from
+       */
+      public void importPreferences(String filename) throws IOException {
+        File f = new File(filename);
+        InputStream is = new FileInputStream(f);
+        try {
+          Preferences.importPreferences(is);
+        } catch (InvalidPreferencesFormatException ex) {
+          throw new IOException(ex.getMessage());
+        }
+      }
 }

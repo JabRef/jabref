@@ -289,7 +289,7 @@ public class FileActions
 
     public static void exportCustomDatabase(BibtexDatabase database, String directory, String lfName,
                                             File outFile, JabRefPreferences prefs)
-        throws IOException {
+        throws Exception {
 
       exportDatabase(database, directory, lfName, outFile, prefs);
     }
@@ -298,14 +298,14 @@ public class FileActions
 
     public static void exportDatabase(BibtexDatabase database, String lfName,
                                       File outFile, JabRefPreferences prefs)
-        throws IOException {
+        throws Exception {
 
       exportDatabase(database, Globals.LAYOUT_PREFIX, lfName, outFile, prefs);
     }
 
     public static void exportDatabase(BibtexDatabase database, String prefix, String lfName,
                                       File outFile, JabRefPreferences prefs)
-    throws IOException {
+    throws Exception {
 
 	//PrintStream ps=null;
         OutputStreamWriter ps=null;

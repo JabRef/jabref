@@ -1740,7 +1740,7 @@ public JabRefPreferences prefs() {
               output(Globals.lang("Exported database to file") + " '" +
                      oFile.getPath() + "'.");
             }
-            catch (IOException ex) {
+            catch (Exception ex) {
               ex.printStackTrace();
             }
           }

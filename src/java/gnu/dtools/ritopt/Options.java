@@ -95,13 +95,13 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      * This boolean defines whether usage should be displayed.
      */
 
-    public static final boolean DEFAULT_DISPLAY_USAGE = true;
+    public static final boolean DEFAULT_DISPLAY_USAGE = false; // Mod. Morten A.
 
     /**
      * This boolean defines whether the menu should be used.
      */
 
-    public static final boolean DEFAULT_USE_MENU = true;
+    public static final boolean DEFAULT_USE_MENU = false; // Mod. Morten A.
 
     /**
      * The default program name that is display in the usage.
@@ -227,11 +227,14 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
 	menuOption = new NotifyOption( menu, "menu", "" );
 	generalModule = new OptionModule( DEFAULT_GENERAL_MODULE_NAME );
 	currentModule = generalModule;
-	register( "help", 'h', "Displays help for each option.", helpOption );
-	register( "version", 'v',
+
+        // Mod. Morten A. ------------------------------------------------
+        register( "version", 'v',
 		  "Displays version information.", versionOption );
+	/*register( "help", 'h', "Displays help for each option.", helpOption );
 	register( "menu", 'm', "Displays the built-in interactive menu.",
-		  menuOption );
+		  menuOption );*/
+        // End mod. Morten A. ------------------------------------------------
     }
 
     /**
@@ -242,7 +245,8 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
 
     public String getHelp() {
 	String retval = (displayUsage ? getUsage() + "\n\n" : "" ) +
-	    "Use --menu to invoke the interactive built-in menu.\n\n" +
+            // Mod. Morten A.
+	    //"Use --menu to invoke the interactive built-in menu.\n\n" +
 	    Option.getHelpHeader() + "\n\n" + generalModule.getHelp();
 	Iterator it = modules.values().iterator();
 	while ( it.hasNext() ) {
@@ -747,7 +751,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
 			currentModule = getModule( moduleName );
 		    }
 		    if ( currentModule == null )
-			throw new OptionProcessingException( "Module '" + 
+			throw new OptionProcessingException( "Module '" +
 							     moduleName +
 							 "' does not exist." );
 		    if ( debugFlag ) {

@@ -27,12 +27,12 @@ public class PreviewPanel extends JEditorPane {
     try {
       readLayout();
     }
-    catch (IOException ex) {
+    catch (Exception ex) {
     }
     update();
   }
 
-  public void readLayout() throws IOException {
+  public void readLayout() throws Exception {
       String entryType = entry.getType().getName().toLowerCase();
       if (layouts.get(entryType) != null) {
 	  layout = (Layout)layouts.get(entryType);
@@ -88,7 +88,7 @@ public class PreviewPanel extends JEditorPane {
     try {
       readLayout();
     }
-    catch (IOException ex) {
+    catch (Exception ex) {
     }
     update();
   }

@@ -82,13 +82,18 @@ public class JabRef {
       NotifyOption helpO = new NotifyOption("");
       NotifyOption disableGui = new NotifyOption("");
       exportFile.setHelpDescriptionSize(80);
+      exportFile.setFileCompleteOptionSize(12);
       NotifyOption loadSess = new NotifyOption("");
+      StringOption exportPrefs = new StringOption("");
+      StringOption importPrefs = new StringOption("");
 
       options.register("nogui", 'n', Globals.lang("No GUI. Only process command line options."), disableGui);
       options.register("import", 'i', Globals.lang("Import file")+": "+Globals.lang("filename")+"[,import format]", importFile);
       options.register("output", 'o', Globals.lang("Output or export file")+": "+Globals.lang("filename")+"[,export format]", exportFile);
       options.register("help", 'h', Globals.lang("Display help on command line options"),helpO);
       options.register("loadsession", 'l', Globals.lang("Load session"), loadSess);
+      options.register("prexport", 'x', Globals.lang("Export preferences to file"), exportPrefs);
+      options.register("primport", 'p', Globals.lang("Import preferences from file"), importPrefs);
       options.setUseMenu(false);
 
       options.process(args);
@@ -240,18 +245,33 @@ public class JabRef {
                 FileActions.exportDatabase(pr.getDatabase(), data[1],
                                            new File(data[0]), prefs);
               }
-              catch (IOException ex) {
-                System.err.println(Globals.lang("Could not export file")+" '"+ data[0]+"': "+ex.getMessage());
-              }
               catch (NullPointerException ex2) {
                 System.err.println(Globals.lang("Unknown export format")+": "+data[1]);
+              }
+              catch (Exception ex) {
+                System.err.println(Globals.lang("Could not export file")+" '"+ data[0]+"': "+ex.getMessage());
               }
             }
           } else System.err.println(Globals.lang("The output option depends on a valid import option."));
         }
 
+        if (exportPrefs.isInvoked()) {
+          try {
+            prefs.exportPreferences(exportPrefs.getStringValue());
+          } catch (IOException ex) {
+            Util.pr(ex.getMessage());
+          }
+        }
 
-        /*
+        if (importPrefs.isInvoked()) {
+           try {
+             prefs.importPreferences(importPrefs.getStringValue());
+           } catch (IOException ex) {
+             Util.pr(ex.getMessage());
+           }
+         }
+
+         /*
 	if(args.length > 0) for (int i=0; i<args.length; i++) {
           if (!args[i].startsWith("-")) {
             // Load a bibtex file:

@@ -30,6 +30,7 @@ import wsi.ra.types.StringInt;
 import java.util.Vector;
 
 import net.sf.jabref.BibtexEntry;
+import java.io.IOException;
 
 
 /**
