@@ -124,67 +124,119 @@ public class LabelPatternUtil {
           field = false;
         }
         else if (field) {
-          try {
-            if (val.equals("uppercase")) {
-              forceUpper = true;
-            }
-            else if (val.equals("lowercase")) {
-              forceLower = true;
-            }
-            else if (val.equals("auth")) {
-              _sb.append(firstAuthor(_entry.getField("author").toString()));
-            }
-            else if (val.equals("edtr")) {
-              _sb.append(firstAuthor(_entry.getField("editor").toString()));
-            }
-            else if (val.equals("authors")) {
-              _sb.append(allAuthors(_entry.getField("author").toString()));
-            }
-            else if (val.equals("editors")) {
-              _sb.append(allAuthors(_entry.getField("editor").toString()));
-            }
-            else if (val.equals("authorIni")) {
-              _sb.append(oneAuthorPlusIni(_entry.getField("author").toString()));
-            }
-            else if (val.equals("editorIni")) {
-              _sb.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
-            }
-            else if (val.equals("firstpage")) {
-              _sb.append(firstPage(_entry.getField("pages").toString()));
-            }
-            else if (val.equals("lastpage")) {
-              _sb.append(lastPage(_entry.getField("pages").toString()));
-            }
-            else if (val.equals("shorttitle")) {
-              String ss = _entry.getField("title").toString();
-              int piv = 0, wrd = 0;
-              while ( (piv < ss.length()) && (wrd < 3)) {
-                if (Character.isWhitespace(ss.charAt(piv))) {
-                  wrd++;
-                }
-                else {
-                  _sb.append(ss.charAt(piv));
-                }
-                piv++;
-              }
-            }
-            else if (val.equals("yy")) {
-              String ss = _entry.getField("year").toString();
-              if (ss.length() > 2) {
-                _sb.append(ss.substring(ss.length() - 2));
-              }
-              else {
-                _sb.append(ss);
-              }
-            }
-            // we havent seen any special demands
-            else {
-              _sb.append(_entry.getField(val).toString());
-            }
-          }
-          catch (Exception ex) {
-            Globals.logger("Key generator warning: field '" + val + "' empty.");
-          }
+	    /* Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 13-Apr-2004
+	       Added new pseudo-fields "shortyear" and "veryshorttitle", and
+	       and ":lower" modifier for all fields (in a way easily extended to other modifiers).
+	       Helpfile help/LabelPatterns.html updated accordingly.
+	    */
+	    // check whether there is a modifier on the end such as ":lower"
+	    String modifier = null;
+	    int _mi = val.indexOf(":");
+	    if(_mi != -1 && _mi != val.length()-1 && _mi != 0) { // ":" is in val and isn't first or last character
+		modifier=val.substring(_mi+1);
+		val=val.substring(0,_mi);
+	    }
+	    StringBuffer _sbvalue = new StringBuffer();
+	    
+	    try {
+		/*if (val.equals("uppercase")) {
+		    forceUpper = true;
+		}
+		else if (val.equals("lowercase")) {
+		    forceLower = true;
+		    }*/
+		if (val.equals("auth")) {
+		    _sbvalue.append(firstAuthor(_entry.getField("author").toString()));
+		}
+		else if (val.equals("edtr")) {
+		    _sbvalue.append(firstAuthor(_entry.getField("editor").toString()));
+		}
+		else if (val.equals("authors")) {
+		    _sbvalue.append(allAuthors(_entry.getField("author").toString()));
+		}
+		else if (val.equals("editors")) {
+		    _sbvalue.append(allAuthors(_entry.getField("editor").toString()));
+		}
+		else if (val.equals("authorIni")) {
+		    _sbvalue.append(oneAuthorPlusIni(_entry.getField("author").toString()));
+		}
+		else if (val.equals("editorIni")) {
+		    _sbvalue.append(oneAuthorPlusIni(_entry.getField("editor").toString()));
+		}
+		else if (val.equals("firstpage")) {
+		    _sbvalue.append(firstPage(_entry.getField("pages").toString()));
+		}
+		else if (val.equals("lastpage")) {
+		    _sbvalue.append(lastPage(_entry.getField("pages").toString()));
+		}
+		else if (val.equals("shorttitle")) {
+		    String ss = _entry.getField("title").toString();
+		    int piv = 0, wrd = 0;
+		    while ( (piv < ss.length()) && (wrd < 3)) {
+			if (Character.isWhitespace(ss.charAt(piv))) {
+			    wrd++;
+			}
+			else {
+			    _sbvalue.append(ss.charAt(piv));
+			}
+			piv++;
+		    }
+		}
+		else if (val.equals("shortyear")) {
+		    String ss = _entry.getField("year").toString();
+		    if (ss.length() > 2) {
+			_sbvalue.append(ss.substring(ss.length() - 2));
+		    }
+		    else {
+			_sbvalue.append(ss);
+		    }
+		}
+
+		else if(val.equals("veryshorttitle")) {
+		    String ss = _entry.getField("title").toString();
+		    int piv=0;
+		    String[] skipWords = {"a", "an", "the"}; 
+		    // sorry for being English-centric. I guess these
+		    // words should really be an editable preference.
+		    
+		    for(int _i=0; _i< skipWords.length; _i++) {
+			if(ss.toLowerCase().startsWith(skipWords[_i])) {
+			    piv=skipWords[_i].length()+1;
+			}
+		    }
+		    // skip multiple whitespaces:
+		    while ((piv<ss.length()) && Character.isWhitespace(ss.charAt(piv))) {
+			piv++;
+		    }
+		    // copy next word:
+		    while ((piv<ss.length()) && !Character.isWhitespace(ss.charAt(piv))) {
+			_sbvalue.append(ss.charAt(piv));
+			piv++;
+		    }
+		}
+		
+
+		// we havent seen any special demands
+		else {
+		    _sbvalue.append(_entry.getField(val).toString());
+		}
+	    }
+	    catch (Exception ex) {
+		Globals.logger("Key generator warning: field '" + val + "' empty.");
+	    }
+	    // apply modifier if present
+	    if(modifier != null) {
+		if(modifier.equals("lower")) {
+		    _sb.append(_sbvalue.toString().toLowerCase());
+		}
+		else {
+		    Globals.logger("Key generator warning: unknown modifier '"+modifier+"'.");
+		}
+	    } else {
+		// no modifier
+		_sb.append(_sbvalue);
+	    }
+
         }
         else {
           _sb.append(val);
@@ -232,94 +284,6 @@ public class LabelPatternUtil {
 
   }
 
-  /**
-   * Generates a BibTeX label according to the pattern for a given entry type, and
-   * returns the <code>Bibtexentry</code> with the unique label.
-   * @param table a <code>LabelPattern</code>
-   * @param database a <code>BibtexDatabase</code>
-   * @param entryId a <code>String</code>
-   * @return modified Bibtexentry
-   */
-  public static BibtexEntry makeLabel_(LabelPattern table,
-                                       BibtexDatabase database,
-                                       BibtexEntry _entry) {
-    _db = database;
-    //BibtexEntry _entry = _db.getEntryById(entryId);
-    ArrayList _al;
-    String _spacer, _label;
-    StringBuffer _sb = new StringBuffer();
-
-    try {
-      // get the type of entry
-      String _type = _entry.getType().getName().toLowerCase();
-      // Get the arrayList corrosponding to the type
-      _al = table.getValue(_type);
-      int _alSize = _al.size();
-      // get the pacer (first item is the string version of the key pattern)
-      // the second is the spacer, the third, fourth and so forth are fields
-      _spacer = _al.get(1).toString();
-
-      for (int i = 2; i < _alSize; i++) {
-        // hmmmm..... the fields have different format...
-        //TODO deal with different format for the fields :-)
-        String _field = _al.get(i).toString();
-
-        if (_field.equals("auth")) {
-          _sb.append(firstAuthor(_entry.getField("author").toString()));
-        }
-        else if (_field.equals("edtr")) {
-          _sb.append(firstAuthor(_entry.getField("editor").toString()));
-        }
-        else if (_field.equals("firstpage")) {
-          _sb.append(firstPage(_entry.getField("pages").toString()));
-        }
-        else if (_field.equals("lastpage")) {
-          _sb.append(lastPage(_entry.getField("pages").toString()));
-        }
-        //else if(_field.equals("title
-        // we havent seen any special demands
-        else {
-          _sb.append(_entry.getField(_al.get(i).toString()).toString());
-        }
-
-        if (i < _alSize - 1) { // It is not the space before the last field
-          _sb.append(_spacer);
-        }
-      }
-    }
-
-    catch (Exception e) {
-      System.err.println(e);
-    }
-
-    /**
-     * Edited by Morten Alver 2004.02.04.
-     *
-     * We now have a system for easing key duplicate prevention, so
-     * I am changing this method to conform to it.
-     *
-
-        // here we make sure the key is unique
-       _label = makeLabelUnique(_sb.toString());
-       _entry.setField(Globals.KEY_FIELD, _label);
-       return _entry;
-     */
-
-    // Remove all illegal characters from the key.
-    _label = Util.checkLegalKey(_sb.toString());
-
-    // Try new keys until we get a unique one:
-    if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {
-      char c = 'b';
-      String modKey = _label + "a";
-      while (_db.setCiteKeyForEntry(_entry.getId(), modKey)) {
-        modKey = _label + ( (char) (c++));
-      }
-    }
-    return _entry;
-    /** End of edit, Morten Alver 2004.02.04.  */
-
-  }
 
   /**
    * This method returns a truely unique label (in the BibtexDatabase), by taking a

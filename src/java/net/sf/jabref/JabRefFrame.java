@@ -871,6 +871,9 @@ public class JabRefFrame extends JFrame {
 			super(Globals.lang("Quit"));
 			putValue(SHORT_DESCRIPTION, Globals.lang("Quit JabRef"));
 			putValue(ACCELERATOR_KEY, prefs.getKey("Quit JabRef"));
+                        //putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+                        //    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -1015,8 +1018,13 @@ public class JabRefFrame extends JFrame {
                         new JFileChooser(new File(prefs.get("workingDirectory")));*/
                     chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
                     int returnVal = chooser.showOpenDialog(ths);
+
+                    /*FileDialog chooser = new FileDialog(ths, "Open", FileDialog.LOAD);
+                    chooser.show();
+                    int returnVal = 0;*/
                     if(returnVal == JFileChooser.APPROVE_OPTION) {
                         fileToOpen = chooser.getSelectedFile();
+                        //fileToOpen = new File(chooser.getFile());
                     }
                 } else {
                     Util.pr(NAME);

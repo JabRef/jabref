@@ -33,13 +33,17 @@ Special field markers:
 <li><b>[<code>firstpage</code>]</b>: The number of the first page of the publication<BR>
 <li><b>[<code>lastpage</code>]</b>: The number of the last page of the publication<BR>
 <li><b>[<code>shorttitle</code>]</b>: The first 3 words of the title<BR>
-<li><b>[<code>yy</code>]</b>: The last 2 digits of the publication year<BR>
-</ul>
-
+<li><b>[<code>shortyear</code>]</b>: The last 2 digits of the publication year<BR>
+<li><b>[<code>veryshorttitle</code>]</b>: The first word of the title,
+discounting 'the', 'a', 'an'.<BR>
+ </ul>
+ 
 <P>
-  To force the key to lowercase or uppercase, add the marker <b>[<code>lowercase</code>]</b> or
-  <b>[<code>uppercase</code>]</b>. These markers apply to the entire key, and can be put in any
-  position.
+A field name (or one of the above pseudo-field names) may optionally
+be followed by a modifier. Currently the only defined modifier is
+<b>:lower</b>, which forces the text inserted by the field marker to
+be in lowercase.  For example, <b>[auth:lower]</b> expands the last
+name of the first author in lowercase.
 
 <P>
 The default key pattern is [auth][year], and this could produce
