@@ -239,7 +239,7 @@ public class BibtexParser
 	skipWhitespace();
 	//Util.pr("Now the contents");
         consume('=');
-	String content = parseFieldContent();
+	String content = parseFieldContent(true);
 	//Util.pr("Now I'm going to consume a }");
 	consume('}',')');
 	//Util.pr("Finished string parsing.");
@@ -275,8 +275,9 @@ public class BibtexParser
 	        char c = (char)peek();
 		if (Character.isWhitespace(c) || (c == '{')
 		    || (c == '\"')) {
-		    String cont = parseFieldContent();
-		    result.setField(ex.getMessage().trim().toLowerCase(), cont);
+                    String fieldName = ex.getMessage().trim().toLowerCase();
+		    String cont = parseFieldContent(GUIGlobals.isStandardField(fieldName));
+		    result.setField(fieldName, cont);
 		} else {
 		    if (key != null)
 			key = key+ex.getMessage()+"=";
@@ -323,7 +324,7 @@ public class BibtexParser
 	//Util.pr("_"+key+"_");
         skipWhitespace();
         consume('=');
-	String content = parseFieldContent();
+	String content = parseFieldContent(GUIGlobals.isStandardField(key));
 	if (content.length() > 0) {
           if (entry.getField(key) == null)
             entry.setField(key, content);
@@ -339,7 +340,7 @@ public class BibtexParser
         }
     }
 
-    private String parseFieldContent() throws IOException
+    private String parseFieldContent(boolean isStandardBibtexField) throws IOException
     {
         skipWhitespace();
 	StringBuffer value = new StringBuffer();
@@ -376,8 +377,10 @@ public class BibtexParser
 		// Value is a string enclosed in brackets. There can be pairs
 		// of brackets inside of a field, so we need to count the brackets
 		// to know when the string is finished.
-
-		value.append(parseBracketedText());
+                if (isStandardBibtexField)
+                    value.append(parseBracketedText());
+                else
+                    value.append(parseBracketedTextExactly());
 	    }
 	    else if (Character.isDigit((char) c))
 	    {
@@ -549,7 +552,38 @@ public class BibtexParser
 	return value;
     }
 
+    private StringBuffer parseBracketedTextExactly() throws IOException
+    {
 
+	StringBuffer value = new StringBuffer();
+
+	consume('{');
+
+	int brackets = 0;
+
+	while (!((peek() == '}') && (brackets == 0)))
+        {
+
+	    int j = read();
+            if ((j == -1) || (j == 65535))
+	    {
+		throw new RuntimeException("Error in line "+line
+					   +": EOF in mid-string");
+	    }
+	    else if (j == '{')
+		brackets++;
+	    else if (j == '}')
+		brackets--;
+            
+            value.append((char) j);
+
+	}
+
+	consume('}');
+
+	return value;
+    }
+    
     private void consume(char expected) throws IOException
     {
         int c = read();

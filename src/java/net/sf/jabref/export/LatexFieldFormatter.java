@@ -62,7 +62,12 @@ public class LatexFieldFormatter implements FieldFormatter {
           if (!ok)
             throw new IllegalArgumentException("Curly braces { and } must be balanced.");
 
-          return "{"+Util.wrap2(text, GUIGlobals.LINE_LENGTH)+"}";
+          sb = new StringBuffer("{");
+          // No formatting at all for these fields, to allow custom formatting?
+          sb.append(text); // Util.wrap2(text, GUIGlobals.LINE_LENGTH)
+          sb.append("}");
+          
+          return sb.toString();
 	}
 
 	sb = new StringBuffer();

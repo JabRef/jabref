@@ -374,7 +374,7 @@ public class GUIGlobals {
       "series",
       "type",
       "address",
-      "annote",
+      //? "annote",
       "booktitle",
       "crossref",
       "howpublished",
