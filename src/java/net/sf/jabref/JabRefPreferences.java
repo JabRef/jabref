@@ -29,6 +29,10 @@ package net.sf.jabref;
 
 import java.io.*;
 import javax.swing.*;
+
+import net.sf.jabref.labelPattern.DefaultLabelPatterns;
+import net.sf.jabref.labelPattern.LabelPattern;
+
 import java.awt.Point;
 import java.awt.Dimension;
 import java.util.prefs.*;
@@ -45,6 +49,8 @@ public class JabRefPreferences {
     HashMap defaults = new HashMap(),
 	keyBinds = new HashMap(),
 	defKeyBinds = new HashMap();
+	private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
+	private static LabelPattern keyPattern = new LabelPattern(KEY_PATTERN);
 
     public JabRefPreferences() {
 
@@ -100,9 +106,12 @@ public class JabRefPreferences {
 	defaults.put("groupsDefaultField", "keywords");
 	//defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
 	defaults.put("historySize", new Integer(5));
+	//defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
+
 	restoreKeyBindings();
 
 	//defaults.put("oooWarning", new Boolean(true));
+
     }
 
     public String get(String key) {
@@ -247,6 +256,14 @@ public class JabRefPreferences {
 	    putStringArray("bindings", bindings);
 	}
     }
+
+	public LabelPattern getKeyPattern(){
+		return keyPattern;
+	}
+	
+	public void putKeyPattern(LabelPattern pattern){
+		keyPattern = pattern;
+	}
 
     private void restoreKeyBindings() {
 	// Define default keybindings.

@@ -73,6 +73,7 @@ public class PrefsDialog2 extends JDialog {
 	tabbed.addTab("General", new GeneralTab(_prefs));
 	tabbed.addTab("Table", new TablePrefsTab(_prefs));
 	tabbed.addTab("External programs", new ExternalProgramsTab(_prefs));
+	tabbed.addTab("Label Pattern", new TabKeyPattern(_prefs));
 
 	JButton 
 	    ok = new JButton("Ok"),
@@ -82,7 +83,7 @@ public class PrefsDialog2 extends JDialog {
 	lower.add(ok);
 	lower.add(cancel);
 
-	setSize(440, 350);
+	setSize(440, 500);
     }
 
     class OkAction extends AbstractAction {
