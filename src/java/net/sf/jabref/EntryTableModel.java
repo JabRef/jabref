@@ -66,7 +66,7 @@ public class EntryTableModel
   int[] nameCols = null;
   boolean namesAsIs, namesFf;
 
-  ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
+    //ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
 
   public EntryTableModel(JabRefFrame frame_,
                          BasePanel panel_,

@@ -1225,6 +1225,7 @@ public class JabRefFrame
 
         }
         catch (Throwable ex) {
+	    ex.printStackTrace();
           JOptionPane.showMessageDialog
               (ths, ex.getMessage(),
                Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);
