@@ -1244,6 +1244,20 @@ public class JabRefFrame extends JFrame {
 				}
 			    });
 			importMenu.add(newMedlineFile_mItem);
+	    //########################################
+			JMenuItem newBibTeXMLFile_mItem = new JMenuItem(Globals.lang("BibTeXML File"));
+			newBibTeXMLFile_mItem.addActionListener(new ActionListener()
+			    {
+				public void actionPerformed(ActionEvent e)
+				{
+				    String tempFilename= getNewFile();
+				    if(tempFilename != null) {
+                        ArrayList bibs = ImportFormatReader.readBibTeXML(tempFilename);
+                        addBibEntries( bibs, tempFilename, intoNew);
+				    }
+				}
+			    });
+			importMenu.add(newBibTeXMLFile_mItem);
 			//##############################
  			/*JMenuItem newMedlineId_mItem = new JMenuItem(Globals.lang("Medline Fetch By ID"));
  			newMedlineId_mItem.addActionListener(new ActionListener()
