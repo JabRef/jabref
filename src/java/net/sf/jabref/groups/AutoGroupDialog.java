@@ -95,6 +95,11 @@ class AutoGroupDialog extends JDialog {
 		    ok_pressed = true;
 		    dispose();
 
+		    Vector added = new Vector(20, 20);
+		    NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
+		    UndoableResetGroups undoableReset = new UndoableResetGroups(gs, groups);
+		    undoableReset.setRevalidate(true);
+		    ce.addEdit(undoableReset);
 		    groups.clear();
 		    HashSet hs = null;
 		    if (nd.isSelected()) {
@@ -104,35 +109,17 @@ class AutoGroupDialog extends JDialog {
 		        hs = Util.findAllWordsInField(panel.getDatabase(), field().toLowerCase().trim(),
 		                remove());
 		    }
-		    Vector added = new Vector(20, 20);
-		    NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
-		    //boolean any = false; // To see if _any_ groups were created.
 		    Iterator i = hs.iterator();
 		    while (i.hasNext()) {
-			String regExp = i.next().toString().toLowerCase();
-			boolean found = false;
-			// Check if a group with this search term already exists.
-			for (int j=GroupSelector.OFFSET+1; j<groups.size();
-			     j += GroupSelector.DIM) {
-
-			    if (regExp.equals(((String)groups.elementAt(j)).toLowerCase()))
-				found = true;
-			}
-			if (!found) {
-			    //any = true; // Ok, at least one was created.
-			    // Add this as a new group.
-			    int index = GroupSelector.findPos
-				(groups, regExp);
-			    added.add(new UndoableAddOrRemoveGroup
-				      (gs, groups, index, true,
-				       field(), Util.nCase(regExp), regExp));
+		        String regExp = i.next().toString().toLowerCase();
+		        int index = GroupSelector.findPos(groups, regExp);
+		        UndoableAddOrRemoveGroup addGroup = new UndoableAddOrRemoveGroup(gs,
+		                groups, index, true, field(), Util.nCase(regExp), regExp);
+		        added.add(addGroup);
 			    groups.add(index, regExp);
 			    groups.add(index, Util.nCase(regExp));
-			    groups.add(index, field());
-			}
-
+			    groups.add(index, field());		    
 		    }
-
 		    if (added.size() > 0) {
 			panel.markBaseChanged();
 			gs.revalidateList(0);//(gd.index()-OFFSET)/DIM +1);

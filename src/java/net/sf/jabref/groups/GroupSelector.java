@@ -34,6 +34,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.jabref.*;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.CompoundEdit;
 
 public class GroupSelector
@@ -56,6 +58,7 @@ public class GroupSelector
 
   Color bgColor = Color.white;
   JList list;
+  JTree tree;
   ListModel listModel;
   JScrollPane sp;
   GridBagLayout gbl = new GridBagLayout();
@@ -279,9 +282,16 @@ public class GroupSelector
     // The line above decides on the list's preferred width.
     list.setVisibleRowCount(prefs.getInt("groupsVisibleRows"));
     list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode(new String("All Entries"));
+    tree = new JTree(root);
+    
     sp = new JScrollPane
         (list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
          JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    /*
+    sp = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    */
     con.gridwidth = GridBagConstraints.REMAINDER;
     con.weighty = 1;
     gbl.setConstraints(sp, con);
