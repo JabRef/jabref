@@ -96,7 +96,7 @@ public class GUIGlobals {
       pre = "/images/",
       helpPre = "/help/";
 
-  /*  public static URL
+    public static URL
     //appIconFile = GUIGlobals.class.getResource(pre+"ikon.jpg"),
      openIconFile = GUIGlobals.class.getResource(pre+"Open.gif"),
    saveIconFile = GUIGlobals.class.getResource(pre+"Save.gif"),
@@ -131,6 +131,7 @@ public class GUIGlobals {
      helpSmallIconFile = GUIGlobals.class.getResource(pre+"HelpSmall.gif"),
      helpIconFile = GUIGlobals.class.getResource(pre+"Help.gif"),
      helpContentsIconFile = GUIGlobals.class.getResource(pre+"HelpIndex.gif"),
+      aboutIcon = GUIGlobals.class.getResource(pre + "Help.gif"),
      newSmallIconFile = GUIGlobals.class.getResource(pre+"NewSmall.gif"),
      pasteIconFile = GUIGlobals.class.getResource(pre+"Paste2.gif"),
      editEntryIconFile = GUIGlobals.class.getResource(pre+"DocumentDraw.gif"),
@@ -141,7 +142,7 @@ public class GUIGlobals {
      sheetIcon = GUIGlobals.class.getResource(pre+"Sheet.gif"),
      jabreflogo = GUIGlobals.class.getResource(pre+"JabRef-Logo.gif");
     //jabreflogo=new ImageIcon(getClass().getResource(pre+"JabRef-Logo.gif")));//.getImage());
-   */
+   /*
   public static URL
       openIconFile = GUIGlobals.class.getResource(pre + "fileopen.png"),
 
@@ -186,7 +187,7 @@ public class GUIGlobals {
       fetchMedlineIcon = GUIGlobals.class.getResource(pre + "www.png"),
       sheetIcon = GUIGlobals.class.getResource(pre + "window_nofullscreen.png"),
       jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo.gif");
-
+*/
 // Help files (in HTML format):
   public static String
       baseFrameHelp = "BaseFrameHelp.html",
