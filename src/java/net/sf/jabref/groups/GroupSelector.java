@@ -804,12 +804,13 @@ public class GroupSelector extends SidePaneComponent implements
         // in all paths that contain the moved node, the previous node
         // (i.e. the previous parent) is removed
         // first update selection
-        selectionPath = new TreePath(removeParent(selectionPath.getPath(),node));
+        selectionPath = new TreePath(node.getPath());
         // then update expanded paths
         Vector newExpandedPaths = new Vector();
         while (expandedPaths.hasMoreElements()) {
             TreePath path = (TreePath) expandedPaths.nextElement();
-            newExpandedPaths.add(new TreePath(removeParent(path.getPath(),node)));
+            newExpandedPaths.add(new TreePath(
+                    ((DefaultMutableTreeNode)path.getLastPathComponent()).getPath()));
         }
         expandedPaths = newExpandedPaths.elements();
         // ...that's it! now revalidate:
@@ -844,12 +845,13 @@ public class GroupSelector extends SidePaneComponent implements
         // in all paths that contain the moved node, the new father (former
         // sibling) is inserted
         // first update selection, which is always required
-        selectionPath = new TreePath(addParent(selectionPath.getPath(),node,newParent));
+        selectionPath = new TreePath(node.getPath());
         // then update expanded paths
         Vector newExpandedPaths = new Vector();
         while (expandedPaths.hasMoreElements()) {
             TreePath path = (TreePath) expandedPaths.nextElement();
-            newExpandedPaths.add(new TreePath(addParent(path.getPath(),node,newParent)));
+            newExpandedPaths.add(new TreePath(
+                    ((DefaultMutableTreeNode)path.getLastPathComponent()).getPath()));
         }
         expandedPaths = newExpandedPaths.elements();
         // ...that's it! now revalidate:
@@ -884,43 +886,6 @@ public class GroupSelector extends SidePaneComponent implements
             setGroups(groupsRoot); 
          }
         validateTree();
-    }
-    
-    /** 
-     * Removes the parent of the specified node from the specified path
-     * and returns a new path, which contains one less node. If node is not
-     * contained in path, the original array is returned. 
-     */
-    private Object[] removeParent(Object[] path, Object node) {
-        Object[] newPath = new Object[path.length - 1];
-        for (int oldIdx = path.length - 1, newIdx = newPath
-                .length - 1; oldIdx >= 0; --oldIdx, --newIdx) {
-            if (newIdx < 0) // node not contained in path
-                return path;
-            newPath[newIdx] = path[oldIdx];
-            if (path[oldIdx] == node) // skip the previous parent
-                --oldIdx;
-        }
-        return newPath;
-    }
-    
-    /** 
-     * Adds the specified newParent to the specified path as a new parent of
-     * (i.e. exactly before) the specified node. If node is not
-     * contained in path, the original array is returned. 
-     */
-    private Object[] addParent(Object[] path, Object node, Object newParent) {
-        Object[] newPath = new Object[path.length + 1];
-        int newIdx = newPath.length - 1;
-        int oldIdx = path.length - 1;
-        for (; oldIdx >= 0; --oldIdx, --newIdx) {
-            newPath[newIdx] = path[oldIdx];
-            if (path[oldIdx] == node) { // add the new parent
-                newPath[--newIdx] = newParent;
-            }
-        }
-        // if both indexes have not met, the node was not found
-        return newIdx != oldIdx ? path : newPath;
     }
 }
 
