@@ -327,7 +327,8 @@ public class Globals {
   public static String SPECIAL_COMMAND_CHARS = "\"`^~'c";
   public static HashMap HTML_CHARS = new HashMap(),
           HTMLCHARS = new HashMap(),
-      XML_CHARS = new HashMap();
+      XML_CHARS = new HashMap(),
+      UNICODE_CHARS = new HashMap();
   static {
 
     // Start the thread that monitors file time stamps.
@@ -339,7 +340,7 @@ public class Globals {
     } catch (Throwable t) {
 
     }
-
+    /*
     HTML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&Auml;");
     HTML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&euml;");
@@ -384,7 +385,7 @@ public class Globals {
     HTML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&Ntilde;");
     HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
     HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
-
+    */
 
     HTMLCHARS.put("\"a", "&auml;");
     HTMLCHARS.put("\"A", "&Auml;");
@@ -432,7 +433,7 @@ public class Globals {
     HTMLCHARS.put("~A", "&Atilde;");
     HTMLCHARS.put("cc", "&ccedil;");
     HTMLCHARS.put("cC", "&Ccedil;");
-
+    /*
     HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
     HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
     HTML_CHARS.put("\\{\\\\\\\"e\\}", "&euml;");
@@ -480,7 +481,7 @@ public class Globals {
 
     HTML_CHARS.put("\\{\\\\c c\\}", "&ccedil;");
     HTML_CHARS.put("\\{\\\\c C\\}", "&Ccedil;");
-
+    */
 
     XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
     XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
@@ -572,6 +573,115 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\~N\\}", "&#x00D1;");
     XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
     XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
+
+    UNICODE_CHARS.put("\u00C0", "A");
+    UNICODE_CHARS.put("\u00C1", "A");
+    UNICODE_CHARS.put("\u00C2", "A");
+    UNICODE_CHARS.put("\u00C3", "A");
+    UNICODE_CHARS.put("\u00C4", "A");
+    UNICODE_CHARS.put("\u00C5", "Aa");
+    UNICODE_CHARS.put("\u00C6", "Ae");
+    UNICODE_CHARS.put("\u00C7", "C");
+    UNICODE_CHARS.put("\u00C8", "E");
+    UNICODE_CHARS.put("\u00C9", "E");
+    UNICODE_CHARS.put("\u00CA", "E");
+    UNICODE_CHARS.put("\u00CB", "E");
+    UNICODE_CHARS.put("\u00CC", "I");
+    UNICODE_CHARS.put("\u00CD", "I");
+    UNICODE_CHARS.put("\u00CE", "I");
+    UNICODE_CHARS.put("\u00CF", "I");
+    UNICODE_CHARS.put("\u00D0", "D");
+    UNICODE_CHARS.put("\u00D1", "N");
+    UNICODE_CHARS.put("\u00D2", "O");
+    UNICODE_CHARS.put("\u00D3", "O");
+    UNICODE_CHARS.put("\u00D4", "O");
+    UNICODE_CHARS.put("\u00D5", "O");
+    UNICODE_CHARS.put("\u00D6", "Oe");
+    UNICODE_CHARS.put("\u00D8", "Oe");
+    UNICODE_CHARS.put("\u00D9", "U");
+    UNICODE_CHARS.put("\u00DA", "U");
+    UNICODE_CHARS.put("\u00DB", "U");
+    UNICODE_CHARS.put("\u00DC", "U"); // U umlaut ..
+    UNICODE_CHARS.put("\u00DD", "Y");
+    UNICODE_CHARS.put("\u00DF", "ss");
+    UNICODE_CHARS.put("\u00E0", "a");
+    UNICODE_CHARS.put("\u00E1", "a");
+    UNICODE_CHARS.put("\u00E2", "a");
+    UNICODE_CHARS.put("\u00E3", "a");
+    UNICODE_CHARS.put("\u00E4", "ae");
+    UNICODE_CHARS.put("\u00E5", "aa");
+    UNICODE_CHARS.put("\u00E6", "ae");
+    UNICODE_CHARS.put("\u00E7", "c");
+    UNICODE_CHARS.put("\u00E8", "e");
+    UNICODE_CHARS.put("\u00E9", "e");
+    UNICODE_CHARS.put("\u00EA", "e");
+    UNICODE_CHARS.put("\u00EB", "e");
+    UNICODE_CHARS.put("\u00EC", "i");
+    UNICODE_CHARS.put("\u00ED", "i");
+    UNICODE_CHARS.put("\u00EE", "i");
+    UNICODE_CHARS.put("\u00EF", "i");
+    UNICODE_CHARS.put("\u00F0", "o");
+    UNICODE_CHARS.put("\u00F1", "n");
+    UNICODE_CHARS.put("\u00F2", "o");
+    UNICODE_CHARS.put("\u00F3", "o");
+    UNICODE_CHARS.put("\u00F4", "o");
+    UNICODE_CHARS.put("\u00F5", "o");
+    UNICODE_CHARS.put("\u00F6", "oe");
+    UNICODE_CHARS.put("\u00F8", "oe");
+    UNICODE_CHARS.put("\u00F9", "u");
+    UNICODE_CHARS.put("\u00FA", "u");
+    UNICODE_CHARS.put("\u00FB", "u");
+    UNICODE_CHARS.put("\u00FC", "u"); // u umlaut...
+    UNICODE_CHARS.put("\u00FD", "y");
+    UNICODE_CHARS.put("\u00FF", "y");
+    UNICODE_CHARS.put("\u0100", "A");
+    UNICODE_CHARS.put("\u0101", "a");
+    UNICODE_CHARS.put("\u0102", "A");
+    UNICODE_CHARS.put("\u0103", "a");
+    UNICODE_CHARS.put("\u0104", "A");
+    UNICODE_CHARS.put("\u0105", "a");
+    UNICODE_CHARS.put("\u0106", "C");
+    UNICODE_CHARS.put("\u0107", "c");
+    UNICODE_CHARS.put("\u0108", "C");
+    UNICODE_CHARS.put("\u0109", "c");
+    UNICODE_CHARS.put("\u010A", "C");
+    UNICODE_CHARS.put("\u010B", "c");
+    UNICODE_CHARS.put("\u010C", "C");
+    UNICODE_CHARS.put("\u010D", "c");
+    UNICODE_CHARS.put("\u010E", "D");
+    UNICODE_CHARS.put("\u010F", "d");
+    UNICODE_CHARS.put("\u0110", "D");
+    UNICODE_CHARS.put("\u0111", "d");
+    UNICODE_CHARS.put("\u0112", "E");
+    UNICODE_CHARS.put("\u0113", "e");
+    UNICODE_CHARS.put("\u0114", "E");
+    UNICODE_CHARS.put("\u0115", "e");
+    UNICODE_CHARS.put("\u0116", "E");
+    UNICODE_CHARS.put("\u0117", "e");
+    UNICODE_CHARS.put("\u0118", "E");
+    UNICODE_CHARS.put("\u0119", "e");
+    UNICODE_CHARS.put("\u011A", "E");
+    UNICODE_CHARS.put("\u011B", "e");
+    UNICODE_CHARS.put("\u011C", "G");
+    UNICODE_CHARS.put("\u011D", "g");
+    UNICODE_CHARS.put("\u011E", "G");
+    UNICODE_CHARS.put("\u011F", "g");
+    UNICODE_CHARS.put("\u0120", "G");
+    UNICODE_CHARS.put("\u0121", "g");
+    UNICODE_CHARS.put("\u0122", "G");
+    UNICODE_CHARS.put("\u0123", "g");
+    UNICODE_CHARS.put("\u0124", "H");
+    UNICODE_CHARS.put("\u0125", "h");
+    UNICODE_CHARS.put("\u0127", "h");
+    UNICODE_CHARS.put("\u0128", "I");
+    UNICODE_CHARS.put("\u0129", "i");
+    UNICODE_CHARS.put("\u012A", "I");
+    UNICODE_CHARS.put("\u012B", "i");
+    UNICODE_CHARS.put("\u012C", "I");
+    UNICODE_CHARS.put("\u012D", "i");
+    //UNICODE_CHARS.put("\u0100", "");
+
+    
 
     //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }

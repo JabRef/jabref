@@ -1958,11 +1958,13 @@ public class BasePanel extends /*JSplitPane*/JPanel implements ClipboardOwner, F
              public void run() {    
                  int rowToScrollTo = 0;
                  entryTable.revalidate();
-                 for (int i=0; i<bes.length; i++) {                     
-                    int row = tableModel.getNumberFromName(bes[i].getId());                    
-                    if (i==toScrollTo)
-                        rowToScrollTo = row;
-                    entryTable.addRowSelectionIntervalQuietly(row, row);
+                 loop: for (int i=0; i<bes.length; i++) {                     
+		     if (bes[i] == null)
+			 continue loop;
+		     int row = tableModel.getNumberFromName(bes[i].getId());                    
+		     if (i==toScrollTo)
+			 rowToScrollTo = row;
+		     entryTable.addRowSelectionIntervalQuietly(row, row);
                  }
                  entryTable.ensureVisible(rowToScrollTo);
                  Component comp = splitPane.getBottomComponent();
