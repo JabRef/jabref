@@ -48,10 +48,11 @@ public class JabRefFrame extends JFrame {
     JMenuBar mb = new JMenuBar();
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
-    JTextField searchField = new JTextField("", 30);
+
     JLabel statusLine = new JLabel("", SwingConstants.LEFT),
 	statusLabel = new JLabel(Globals.lang("Status")+":",
 				 SwingConstants.LEFT);
+    SearchManager searchManager  = new SearchManager(ths, prefs);
 
     LabelMaker labelMaker;
     File fileToOpen = null;
@@ -184,17 +185,15 @@ public class JabRefFrame extends JFrame {
 	gbl.setConstraints(tlb, con);
 	getContentPane().add(tlb);
 
-	con.anchor = GridBagConstraints.EAST;
-	con.weightx = 0;
-	JLabel lab = new JLabel(Globals.lang("Search")+":");
-	con.fill = GridBagConstraints.NONE;
-	con.anchor = GridBagConstraints.EAST;
-	gbl.setConstraints(lab, con);
-	getContentPane().add(lab);
+	JPanel empt = new JPanel();
+	gbl.setConstraints(empt, con);
+        getContentPane().add(empt); 
 
+	con.anchor = GridBagConstraints.EAST;
+	con.weightx = 0;      
 	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(searchField, con);
-	getContentPane().add(searchField);
+	gbl.setConstraints(searchManager, con);
+	getContentPane().add(searchManager);
 
 	con.weightx = 1;
 	con.weighty = 1;
@@ -349,6 +348,7 @@ public class JabRefFrame extends JFrame {
 	    edit = new JMenu(Globals.lang("Edit")),
 	    bibtex = new JMenu(Globals.lang("BibTeX")),
 	    view = new JMenu(Globals.lang("View")),
+	    tools = new JMenu(Globals.lang("Tools")),
 	    options = new JMenu(Globals.lang("Options")),
 	    newSpec = new JMenu(Globals.lang("New entry..."));
 	file.add(newDatabaseAction);
@@ -380,6 +380,8 @@ public class JabRefFrame extends JFrame {
 	bibtex.add(editPreamble);
 	bibtex.add(editStrings);
 	mb.add(bibtex);
+
+	mb.add(tools);
 
 	options.add(showPrefs);
 	options.add(selectKeys);
@@ -454,6 +456,11 @@ public class JabRefFrame extends JFrame {
 
     public void output(String s) {
 	statusLine.setText(s);
+    }
+
+    public void stopShowingSearchResults() {
+	for (int i=0; i<tabbedPane.getTabCount(); i++)
+	    baseAt(i).stopShowingSearchResults();
     }
 
     protected ParserResult loadDatabase(File fileToOpen) throws IOException {
@@ -551,6 +558,10 @@ public class JabRefFrame extends JFrame {
 			prefs.putStringArray("lastEdited", names);
 		    }
 		}
+
+		// Let the search interface store changes to prefs.
+		searchManager.updatePrefs();
+
 		System.exit(0); // End program.
 	    }
 	}
@@ -677,7 +688,6 @@ public class JabRefFrame extends JFrame {
 	    db.setCompleters(autoCompleters);*/
 	}
     }
-
 
     // The action for opening the preferences dialog.
     AbstractAction showPrefs = new ShowPrefsAction();

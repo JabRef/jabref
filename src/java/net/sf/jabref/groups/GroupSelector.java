@@ -259,7 +259,7 @@ public class GroupSelector extends SidePaneComponent
 		searchOptions.put("option", "dummy");		
 		DatabaseSearch search = new DatabaseSearch
 		    (searchOptions, searchRules, panel,
-		     DatabaseSearch.GROUPSEARCH); 
+		     DatabaseSearch.GROUPSEARCH, true); 
 		search.start(); 
 		frame.output(Globals.lang("Updated group selection")+".");
 		//groups.elementAt(sel*DIM+OFFSET-DIM+1)+"'.");

@@ -30,8 +30,6 @@ import javax.swing.* ;
 import java.awt.* ; 
 import java.util.* ; 
 
-// 1. initially just dump out the number of matches
-// 2. later, do sort and highlight, then indicating the # of matches
 public class DatabaseSearch extends Thread {
 
     BasePanel panel = null ; 
@@ -40,6 +38,7 @@ public class DatabaseSearch extends Thread {
 	Hashtable thisSearchOptions = null ; 
     EntryTableModel thisTableModel = null ; 
     String searchValueField = null;
+    boolean reorder;
 
     public static String
 	SEARCH = "search",
@@ -47,13 +46,15 @@ public class DatabaseSearch extends Thread {
 
     
     public DatabaseSearch(Hashtable searchOptions,SearchRuleSet searchRules,
-			  BasePanel panel, String searchValueField) {
+			  BasePanel panel, String searchValueField,
+			  boolean reorder) {
         this.panel = panel; 
 	thisDatabase = panel.getDatabase() ; 
         thisTableModel = panel.getTableModel() ; 
         thisSearchOptions = searchOptions; 
         thisRuleSet = searchRules ; 
 	this.searchValueField = searchValueField;
+	this.reorder = reorder;
     }
 
     public void run() {
@@ -71,7 +72,8 @@ public class DatabaseSearch extends Thread {
 	for(int row = 0 ; row < numRows ; row++){
 	    // 1. search all required fields using searchString
 	    
-	    bes = thisDatabase.getEntryById(thisTableModel.getNameFromNumber(row));
+	    bes = thisDatabase.getEntryById
+		(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit
 	    searchScore = thisRuleSet.applyRules(thisSearchOptions,bes) ; 
@@ -84,7 +86,11 @@ public class DatabaseSearch extends Thread {
               
 	}
 	 
-	panel.showSearchResults(searchValueField);
+	if (reorder) // Float search.
+	    panel.showSearchResults(searchValueField);
+	else // Highlight search.
+	    panel.selectSearchResults();
+	    
     }
 
 }

@@ -78,9 +78,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
 
-    //SearchPane searchDialog = null;
-    // The search pane.
-
     boolean showingSearchResults = false, 
 	showingGroup = false;
 
@@ -242,8 +239,6 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		public void action() {
 		    BibtexEntry[] bes = entryTable.getSelectedEntries();
 		    
-		    // Entries are copied if only the first or multiple
-		    // columns are selected.
 		    if ((bes != null) && (bes.length > 0)) {
 			TransferableBibtexEntry trbe 
 			    = new TransferableBibtexEntry(bes);
@@ -273,17 +268,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	actions.put("cut", new BaseAction() {
 		public void action() {
 		    runCommand("copy");
-		    int[] 
-			rows = entryTable.getSelectedRows(),
-			cols = entryTable.getSelectedColumns();
+		    BibtexEntry[] bes = entryTable.getSelectedEntries();
 
-		    // Only works if the first column, or all columns, is selected.
-		    if ((((cols.length == 1) && (cols[0] == 0)) 
-			 || (cols.length == tableModel.getColumnCount()))
-			&& (rows.length > 0)) {
+		    if (bes.length > 0) {
 			//&& (database.getEntryCount() > 0) && (entryTable.getSelectedRow() < database.getEntryCount())) {
 			
-
 			/* 
 			   I have removed the confirmation dialog, since I converted
 			   the "remove" action to a "cut". That means the user can
@@ -303,23 +292,21 @@ public class BasePanel extends JSplitPane implements MouseListener,
 
 			// Create a CompoundEdit to make the action undoable.
 			NamedCompound ce = new NamedCompound
-			    (rows.length > 1 ? Globals.lang("delete entries") 
+			    (bes.length > 1 ? Globals.lang("delete entries") 
 			     : Globals.lang("delete entry"));
 			// Loop through the array of entries, and delete them.
-			for (int i=0; i<rows.length; i++) {
-			    String id = tableModel.getNameFromNumber(rows[i]);
-			    BibtexEntry entry = database.getEntryById(id);
-			    database.removeEntry(id);
-			    Object o = entryTypeForms.get(id);
+			for (int i=0; i<bes.length; i++) {
+			    database.removeEntry(bes[i].getId());
+			    Object o = entryTypeForms.get(bes[i].getId());
 			    if (o != null) {
 				((EntryTypeForm)o).dispose();
 			    }
-			    ce.addEdit(new UndoableRemoveEntry(database, entry,
+			    ce.addEdit(new UndoableRemoveEntry(database, bes[i],
 							       entryTypeForms));
 			}
 			entryTable.clearSelection();
 			frame.output(Globals.lang("Cut")+" "+
-				     (rows.length>1 ? rows.length
+				     (bes.length>1 ? bes.length
 				      +" "+ Globals.lang("entries") 
 				      : Globals.lang("entry"))+".");
 			ce.end();
@@ -607,8 +594,12 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	}
     }
 
+    /**
+     * Shows either normal search results or group search, depending
+     * on the searchValueField. This is done by reordering entries and
+     * graying out non-hits.
+     */
     public void showSearchResults(String searchValueField) {
-	//Util.pr("BasePanel: must show search results.");
 	//entryTable.scrollTo(0);
 	
 	if (searchValueField == Globals.SEARCH)
@@ -622,6 +613,22 @@ public class BasePanel extends JSplitPane implements MouseListener,
 	entryTable.scrollTo(0);
 	refreshTable();
 	
+    }
+
+    /**
+     * Selects all entries with a non-zero value in the field
+     * Globals.SEARCH.
+     */
+    public void selectSearchResults() {
+
+	entryTable.clearSelection();
+	for (int i=0; i<entryTable.getRowCount(); i++) {
+	    String value = (String)(database.getEntryById
+				    (tableModel.getNameFromNumber(i)))
+		.getField(Globals.SEARCH);
+	    if ((value != null) && !value.equals("0"))
+		entryTable.addRowSelectionInterval(i, i);	    
+	}
     }
 
     public void stopShowingSearchResults() {

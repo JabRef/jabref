@@ -80,6 +80,8 @@ public class JabRefPreferences {
 	defaults.put("searchOpt", new Boolean(true));
 	defaults.put("searchGen", new Boolean(true));
 	defaults.put("searchAll", new Boolean(false));
+	defaults.put("incrementS", new Boolean(true));
+	defaults.put("selectS", new Boolean(false));
 	defaults.put("regExpSearch", new Boolean(true));
 	defaults.put("searchPanePosX", new Integer(0));
 	defaults.put("searchPanePosY", new Integer(0));

@@ -53,7 +53,9 @@ public class EntryTable extends JTable {
 	getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
 	setShowVerticalLines(true);
 	setShowHorizontalLines(true);
-	setColumnSelectionAllowed(true);
+	//setColumnSelectionAllowed(true);
+	setColumnSelectionAllowed(false);
+	setRowSelectionAllowed(true);
 	setAutoResizeMode(prefs.getInt("autoResizeMode"));
 	DefaultCellEditor dce = new DefaultCellEditor(new JTextField());
 	dce.setClickCountToStart(2);
@@ -169,21 +171,18 @@ public class EntryTable extends JTable {
     public BibtexEntry[] getSelectedEntries() {
 	BibtexEntry[] bes = null;
 	int[] rows = getSelectedRows();
-	int[] cols = getSelectedColumns();	    
+	//int[] cols = getSelectedColumns();	    
+
 	// Entries are selected if only the first or multiple
 	// columns are selected.
-	if (((cols.length == 1) && (cols[0] == 0)) ||
-	    (cols.length > 1)) { // entryTable.getColumnCount())) {
-	    if (rows.length > 0) {
-		bes = new BibtexEntry[rows.length];
-		for (int i=0; i<rows.length; i++) {
-		    bes[i] = tableModel.db.getEntryById(tableModel.getNameFromNumber(rows[i]));
-		}
-		
-
+	//if (((cols.length == 1) && (cols[0] == 0)) ||
+	//(cols.length > 1)) { // entryTable.getColumnCount())) {
+	if (rows.length > 0) {
+	    bes = new BibtexEntry[rows.length];
+	    for (int i=0; i<rows.length; i++) {
+		bes[i] = tableModel.db.getEntryById(tableModel.getNameFromNumber(rows[i]));
 	    }
-	}
-	
+	}		
 	return bes;
     }
 	
