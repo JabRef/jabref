@@ -1,0 +1,51 @@
+<div class="bibtex_entry">
+
+	<div class="bibtex_header">
+		<div class="bibtex_key">
+			<a name="\bibtexkey">\bibtexkey</a>
+		</div>
+		
+		\begin{pdf}
+		<div class="bibtex_pdf">
+			<a href="\pdf">pdf</a>
+		</div>
+		\end{pdf}
+		
+		\begin{url}
+		<div class="bibtex_url">
+			<a href="\url">url</a>
+		</div>
+		\end{url}
+	</div>
+	
+	<div class="bibtex_content">
+
+		\begin{title}
+		<div class="bibtex_title">
+			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\title}
+		</div>
+		\end{title}
+		
+		\begin{author}
+		<div class="bibtex_author">
+			\format[net.sf.jabref.export.layout.format.FixAuthorFirstLast]{\author}
+		</div>
+		\end{author}
+		
+		\begin{publisher}
+		<div class="bibtex_publisher">
+			\format[net.sf.jabref.export.layout.format.RemoveBrackets]{\publisher}
+		</div>,
+		\end{publisher}
+
+		\begin{pages}
+		<div class="bibtex_pages">
+			pp. \pages
+		</div>,
+		\end{pages}
+		
+		<div class="bibtex_year">
+			\year
+		</div>    
+	</div>
+</div>

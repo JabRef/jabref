@@ -101,30 +101,32 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 *
 	 */
 	private void buildGUI(){
+	    String def = Globals.lang("Default");
 		GridBagLayout gbl = new GridBagLayout();
 		GridBagConstraints con = new GridBagConstraints();
 		setLayout(gbl);
 		
 		// The header - can be removed
-		lblEntryType = new JLabel( "Entry type" );
+		lblEntryType = new JLabel(Globals.lang("Entry type"));
+		
 		con.gridx = 0;
 		con.gridy = 0;
 		con.gridwidth = 1;
 		con.gridheight = 1;
 		con.fill = GridBagConstraints.VERTICAL;
 		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,0 );
+		con.insets = new Insets( 0,5,10,0 );
 		gbl.setConstraints( lblEntryType, con );
 		add( lblEntryType );
 
-		lblKeyPattern = new JLabel( "Key pattern" );
+		lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
 		con.gridx = 1;
 		con.gridy = 0;
 		//con.gridwidth = 2;
 		con.gridheight = 1;
 		con.fill = GridBagConstraints.BOTH;
 		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,0 );
+		con.insets = new Insets( 0,5,10,0 );
 		gbl.setConstraints( lblKeyPattern, con );
 		add( lblKeyPattern );
 		
@@ -155,7 +157,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		add( txtArticle );
 		
 
-		btnArticleDefault = new JButton( "Default" );
+		btnArticleDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 1;
 		con.fill = GridBagConstraints.BOTH;
@@ -192,7 +194,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		add( txtBook );
 		
 
-		btnBookDefault = new JButton( "Default" );
+		btnBookDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 2;
 		con.fill = GridBagConstraints.BOTH;
@@ -229,7 +231,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		add( txtBooklet );
 		
 
-		btnBookletDefault = new JButton( "Default" );
+		btnBookletDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 3;
 		con.fill = GridBagConstraints.BOTH;
@@ -265,7 +267,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtConference, con );
 		add( txtConference );
 		
-		btnConferenceDefault = new JButton( "Default" );
+		btnConferenceDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 4;
 		con.fill = GridBagConstraints.BOTH;
@@ -301,7 +303,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtInbook, con );
 		add( txtInbook );
 		
-		btnInbookDefault = new JButton( "Default" );
+		btnInbookDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 5;
 		con.fill = GridBagConstraints.BOTH;
@@ -337,7 +339,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtIncollection, con );
 		add( txtIncollection );
 
-		btnIncollectionDefault = new JButton( "Default" );
+		btnIncollectionDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 6;
 		con.fill = GridBagConstraints.BOTH;
@@ -373,7 +375,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtInproceedings, con );
 		add( txtInproceedings );
 		
-		btnInproceedingsDefault = new JButton( "Default" );
+		btnInproceedingsDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 7;
 		con.fill = GridBagConstraints.BOTH;
@@ -409,7 +411,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtManual, con );
 		add( txtManual );
 		
-		btnManualDefault = new JButton( "Default" );
+		btnManualDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 8;
 		con.fill = GridBagConstraints.BOTH;
@@ -445,7 +447,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtMastersthesis, con );
 		add( txtMastersthesis );
 		
-		btnMastersthesisDefault = new JButton( "Default" );
+		btnMastersthesisDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 9;
 		con.fill = GridBagConstraints.BOTH;
@@ -481,7 +483,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtMisc, con );
 		add( txtMisc );
 		
-		btnMiscDefault = new JButton( "Default" );
+		btnMiscDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 10;
 		con.fill = GridBagConstraints.BOTH;
@@ -517,7 +519,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtPhdthesis, con );
 		add( txtPhdthesis );
 		
-		btnPhdthesisDefault = new JButton( "Default" );
+		btnPhdthesisDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 11;
 		con.fill = GridBagConstraints.BOTH;
@@ -553,7 +555,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtProceedings, con );
 		add( txtProceedings );
 		
-		btnProceedingsDefault = new JButton( "Default" );
+		btnProceedingsDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 12;
 		con.fill = GridBagConstraints.BOTH;
@@ -589,7 +591,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtTechreport, con );
 		add( txtTechreport );
 		
-		btnTechreportDefault = new JButton( "Default" );
+		btnTechreportDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 13;
 		con.fill = GridBagConstraints.BOTH;
@@ -625,7 +627,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		gbl.setConstraints( txtUnpublished, con );
 		add( txtUnpublished );
 		
-		btnUnpublishedDefault = new JButton( "Default" );
+		btnUnpublishedDefault = new JButton( def );
 		con.gridx = 2;
 		con.gridy = 14;
 		con.fill = GridBagConstraints.BOTH;
@@ -652,7 +654,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		hlb.addActionListener(help);
 
 		// And finally a button to reset everything
-		btnDefaultAll = new JButton( "Reset All" );
+		btnDefaultAll = new JButton(Globals.lang("Reset all"));
 		con.gridx = 2;
 		con.gridy = 15;
 		con.fill = GridBagConstraints.BOTH;

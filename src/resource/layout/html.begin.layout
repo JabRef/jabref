@@ -51,7 +51,7 @@ body {
 
 }
 
-.bibtex_journal, .bibtex_year, .bibtex_volume, .bibtex_pages {
+.bibtex_journal, .bibtex_year, .bibtex_volume, .bibtex_pages, .bibtex_publisher {
     display:inline;
 }
 	</style>
