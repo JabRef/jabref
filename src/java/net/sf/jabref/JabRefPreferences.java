@@ -512,7 +512,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Delete", "DELETE");
         defKeyBinds.put("Open PDF or PS", "F4");
         defKeyBinds.put("Open URL or DOI", "F3");
-        defKeyBinds.put("Toggle entry preview", "F9");
+        defKeyBinds.put("Toggle entry preview", "ctrl F9");
+        defKeyBinds.put("Switch preview layout", "F9");
         defKeyBinds.put("Edit entry", "ctrl E");
         defKeyBinds.put("Mark entries", "ctrl M");
         defKeyBinds.put("Unmark entries", "ctrl shift M");

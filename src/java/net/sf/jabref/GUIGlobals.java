@@ -215,6 +215,7 @@ public class GUIGlobals {
       pasteIconFile = GUIGlobals.class.getResource(pre + "paste_edit.gif"),
       editEntryIconFile = GUIGlobals.class.getResource(pre + "DocumentDraw.gif"),
       searchIconFile = GUIGlobals.class.getResource(pre + "search.gif"),
+      previewIconFile = GUIGlobals.class.getResource(pre + "preview.png"),
       autoGroupIcon = GUIGlobals.class.getResource(pre + "addtsk_tsk.gif"),
       wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
           wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),

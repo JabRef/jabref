@@ -196,13 +196,14 @@ settings.add(select);
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(escape,con);
         add(escape) ;
+        con.insets = new Insets(0, 2, 0,  0);
 	gbl.setConstraints(increment, con);
         add(increment);
 	gbl.setConstraints(highlight, con);
         add(highlight);
 	gbl.setConstraints(reorder, con);
         add(reorder);
-
+        con.insets = new Insets(0, 0, 0,  0);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
         gbl.setConstraints(pan, con);

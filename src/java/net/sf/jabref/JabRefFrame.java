@@ -119,7 +119,7 @@ public class JabRefFrame
   // for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
-  public JToggleButton groupToggle, searchToggle;
+  public JToggleButton groupToggle, searchToggle, previewToggle;
 
   AbstractAction
       open = new OpenDatabaseAction(),
@@ -221,9 +221,13 @@ public class JabRefFrame
                                        GUIGlobals.groupsIconFile,
                                        prefs.getKey("Toggle groups interface")),
       togglePreview = new GeneralAction("togglePreview",
-
                                         "Toggle entry preview",
+                                        "Toggle entry preview",
+					GUIGlobals.previewIconFile,
                                         prefs.getKey("Toggle entry preview")),
+      switchPreview = new GeneralAction("switchPreview",
+                                        "Switch preview layout",
+                                        prefs.getKey("Switch preview layout")),
        makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
                                         "Autogenerate BibTeX keys",
                                         GUIGlobals.genKeyIconFile,
@@ -324,7 +328,7 @@ public class JabRefFrame
         if (bp != null) {
           groupToggle.setSelected(bp.sidePaneManager.isPanelVisible("groups"));
           searchToggle.setSelected(bp.sidePaneManager.isPanelVisible("search"));
-
+	  previewToggle.setSelected(bp.previewEnabled);
           Globals.focusListener.setFocused(bp.entryTable);
         }
       }
@@ -834,7 +838,7 @@ public JabRefPreferences prefs() {
     view.add(prevTab);
     view.addSeparator();
     view.add(togglePreview);
-    view.add(toggleGroups);
+    view.add(switchPreview);
     mb.add(view);
 
     bibtex.add(newEntryAction);
@@ -943,6 +947,11 @@ public JabRefPreferences prefs() {
     groupToggle.setText(null);
     groupToggle.setMargin(marg);
     tlb.add(groupToggle);
+
+    previewToggle = new JToggleButton(togglePreview);
+    previewToggle.setText(null);
+    previewToggle.setMargin(marg);
+    tlb.add(previewToggle);
 
     tlb.addSeparator();
     tlb.addAction(lyxPushAction);

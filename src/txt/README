@@ -92,6 +92,8 @@ Change log:
 	- When a single entry is selected, right-click menu now shows a checkbox menu for group
 	  memberships instead of the regular "Add to" and "Remove from" menus.
 	- Improved [shorttitle] and [veryshorttitle] special key pattern fields.
+	- Added formatter "ResolvePDF" to create correct PDF/PS links in HTML export when
+	  relative file names are used.
 	- Added Abstract panel in entry editor.
 	- Added alternate preview with abstract, and made both previews configurable.
 	- Added the option to create a subset of a database based on an .aux file.

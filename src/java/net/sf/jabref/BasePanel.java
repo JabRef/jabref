@@ -1149,25 +1149,34 @@ public class BasePanel extends JSplitPane implements ClipboardOwner, FileUpdateL
               });
 
               actions.put("togglePreview", new BaseAction() {
-                  public void action() {
-                    if (!previewEnabled) {
-                      previewEnabled = true;
-                      activePreview = 0;
-                    } else {
-                      if (activePreview < previewPanel.length-1)
-                        activePreview++;
-                      else
-                        previewEnabled = false;
-                    }
-                    if (!previewEnabled)
-                      hidePreview();
-                    else {
-                      //BibtexEntry[] bes = entryTable.getSelectedEntries();
-                      //if ((bes != null) && (bes.length > 0))
-                      updateViewToSelected();
-                    }
-                  }
-                });
+		      public void action() {
+			  previewEnabled = !previewEnabled;
+			  if (!previewEnabled)
+			      hidePreview();
+			  else {
+			      //BibtexEntry[] bes = entryTable.getSelectedEntries();
+			      //if ((bes != null) && (bes.length > 0))
+			      updateViewToSelected();
+			  }
+		      }
+		  });
+	      
+              actions.put("switchPreview", new BaseAction() {
+		      public void action() {
+			  if (activePreview < previewPanel.length-1)
+			      activePreview++;
+			  else
+			      activePreview = 0;
+		      
+			  if (!previewEnabled)
+			      hidePreview();
+			  else {
+			      //BibtexEntry[] bes = entryTable.getSelectedEntries();
+			      //if ((bes != null) && (bes.length > 0))
+			      updateViewToSelected();
+			  }
+		      }
+		  });
 
 	      actions.put("manageSelectors", new BaseAction() {
 		      public void action() {
