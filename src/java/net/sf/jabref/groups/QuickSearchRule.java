@@ -26,8 +26,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.groups;
 
-import java.util.Hashtable; 
-import java.util.Enumeration ; 
+import java.util.Hashtable;
+import java.util.Enumeration ;
 import java.util.regex.Pattern;
 import net.sf.jabref.SearchRule;
 import net.sf.jabref.BibtexEntry;
@@ -35,41 +35,42 @@ import net.sf.jabref.BibtexEntry;
 public class QuickSearchRule implements SearchRule {
 
     String field;
-    Pattern pattern;
+    Pattern pattern, hardPattern;
 
     public QuickSearchRule(String field, String searchString) {
 	this.field = field.toLowerCase();
 
+        int flags = Pattern.CASE_INSENSITIVE;
+        hardPattern = Pattern.compile(searchString, flags);
         if(!searchString.matches("\\.\\*")){
-            searchString = ".*"+searchString+".*" ; 
+            searchString = ".*"+searchString+".*" ;
         }
-	int flags = Pattern.CASE_INSENSITIVE;
-	pattern = Pattern.compile(searchString, flags);	
+	pattern = Pattern.compile(searchString, flags);
     }
 
     public int applyRule(Hashtable searchOptions, BibtexEntry bibtexEntry) {
 
-        int score =0 ; 
+        int score =0 ;
 
 	String content = (String)bibtexEntry.getField(field);
-	if ((content != null) 
+	if ((content != null)
 	    && (pattern.matcher(content).matches())) {
 	    score = 1;
 	}
-        return score ; 
-    }   
+        return score ;
+    }
 
     /**
      * Removes matches of searchString in the entry's field.
      */
     public void removeMatches(BibtexEntry bibtexEntry) {
-	
 	String content = (String)bibtexEntry.getField(field);
 	StringBuffer sb = new StringBuffer();
 	if (content != null) {
-	    String[] split = pattern.split(content);
-	    for (int i=0; i<split.length; i++)
-		sb.append(split[i]);
+	    String[] split = hardPattern.split(content);
+	    for (int i=0; i<split.length; i++) {
+              sb.append(split[i]);
+            }
 	}
 
 	bibtexEntry.setField(field, (sb.length() > 0 ? sb.toString() : null));

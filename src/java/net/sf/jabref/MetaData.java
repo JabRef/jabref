@@ -44,7 +44,7 @@ public class MetaData {
     /**
      * The MetaData object stores all meta data sets in Vectors. To
      * ensure that the data is written correctly to string, the user
-     * of a meta data Vector must simply make sure the appropriate 
+     * of a meta data Vector must simply make sure the appropriate
      * changes are reflected in the Vector it has been passed.
      */
     public MetaData(HashMap inData) {
@@ -58,7 +58,7 @@ public class MetaData {
 	    // We must allow for ; and \ in escape sequences.
 	    try {
 		while ((unit = getNextUnit(data)) != null) {
-		    orderedData.add(unit);	           
+		    orderedData.add(unit);
 		}
 	    } catch (IOException ex) {
 		System.err.println("Weird error while parsing meta data.");
@@ -70,7 +70,7 @@ public class MetaData {
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    public MetaData() {	
+    public MetaData() {
 	metaData.put(Globals.SELECTOR_META_PREFIX+"keywords", new Vector());
 	metaData.put(Globals.SELECTOR_META_PREFIX+"journal", new Vector());
 	metaData.put(Globals.SELECTOR_META_PREFIX+"publisher", new Vector());
@@ -92,12 +92,14 @@ public class MetaData {
 	for (Iterator i=metaData.keySet().iterator(); i.hasNext();) {
 	    String key = (String)i.next();
 	    Vector orderedData = (Vector)metaData.get(key);
-	    out.write("@comment{"+GUIGlobals.META_FLAG+
-		      key+":");
-	    for (int j=0; j<orderedData.size(); j++) {
-		out.write(makeEscape((String)orderedData.elementAt(j))+";");
-	    }
-	    out.write("}\n\n");
+            if (orderedData.size() > 0) {
+              out.write("@comment{" + GUIGlobals.META_FLAG +
+                        key + ":");
+              for (int j = 0; j < orderedData.size(); j++) {
+                out.write(makeEscape( (String) orderedData.elementAt(j)) + ";");
+              }
+              out.write("}\n\n");
+            }
 	}
     }
 
@@ -127,7 +129,7 @@ public class MetaData {
 	}
 	if (res.length() > 0)
 	    return res.toString();
-	else 
+	else
 	    return null;
     }
 

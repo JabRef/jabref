@@ -1105,9 +1105,9 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
                     if (!previewEnabled)
                       hidePreview();
                     else {
-                      BibtexEntry[] bes = entryTable.getSelectedEntries();
-                      if ((bes != null) && (bes.length > 0))
-                        updateWiewToSelected(bes[0]);
+                      //BibtexEntry[] bes = entryTable.getSelectedEntries();
+                      //if ((bes != null) && (bes.length > 0))
+                      updateWiewToSelected();
                     }
                   }
                 });
@@ -1375,14 +1375,20 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 	    stringDialog.refreshTable();
     }
 
-    public void updateWiewToSelected(BibtexEntry be) {
+    public void updateWiewToSelected() {
       // First, if the entry editor is visible, we should update it to the selected entry.
+      BibtexEntry be = null;
+      BibtexEntry[] bes = entryTable.getSelectedEntries();
+      if ((bes != null) && (bes.length > 0))
+        be = bes[0];
+      else
+        return;
+
       if (showing != null) {
-        BibtexEntry[] bes = entryTable.getSelectedEntries();
-        if ((bes != null) && (bes.length > 0))
-          showEntry(bes[0]);
+        showEntry(be);
         return;
       }
+
       // If no entry editor is visible we must either instantiate a new preview panel or update the one we have.
       if (!previewEnabled) {
         splitPane.setBottomComponent(null);
@@ -1424,8 +1430,13 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		// setting showing to null, and recursively calling this method.
 	        showing = null;
 		showEntry(be);
-	    }
+	    } else {
+              // The correct entry is already being shown. Make sure the editor
+              // is updated.
+              ((EntryEditor)splitPane.getBottomComponent()).updateAllFields();
+            }
 	    return;
+
 	}
 
 	EntryEditor form;
@@ -1474,7 +1485,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       BibtexEntry be = showing;
       showing = null;
       if (be != null) {
-        updateWiewToSelected(be);
+        updateWiewToSelected();
       }
       new FocusRequester(entryTable);
 	/*splitPane.setBottomComponent(previewPanel);
@@ -1679,6 +1690,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
+                updateWiewToSelected();
 	    }
 
 	    output("Appended '"+regexp+"' to the '"
@@ -1733,6 +1745,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		undoManager.addEdit(ce);
 		refreshTable();
 		markBaseChanged();
+                updateWiewToSelected();
 	    }
 
 	    output("Removed '"+regexp+"' from the '"

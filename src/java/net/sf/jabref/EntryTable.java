@@ -125,9 +125,8 @@ public class EntryTable extends JTable {
                 if (getSelectedRowCount() == 1) {
                   int row = getSelectedRow(); //e.getFirstIndex();
                   if (row >= 0) {
-                    panel.updateWiewToSelected(panel.database().getEntryById(
-                        tableModel.
-                        getNameFromNumber(row)));
+                    panel.updateWiewToSelected();//panel.database().getEntryById(
+                        //tableModel.getNameFromNumber(row)));
                   }
                 } else {
                   /* With a multiple selection, there are three alternative behaviours:

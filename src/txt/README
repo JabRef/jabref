@@ -80,9 +80,12 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x	- Added warnings to bibtex parser, and prevented failure to load files with
+1.x	- Added CiteSeer support. (specify more)
+	- Added warnings to bibtex parser, and prevented failure to load files with
 	  duplicate string definitions.
 	- Fixed RIS import bug caused by short lines
+      	- Fixed bug in SciFinder import.
+      	- Fixed bug that made entire field get cleared when removing from group.
 1.4:	- Added advanced search feature.
 	- Added facility for using custom export formats.
 	- Added command line options for importing/exporting files, importing/exporting

@@ -367,7 +367,8 @@ public class EntryTableModel
 
         be.setField(fieldName.toLowerCase(), toSet);
         panel.markBaseChanged();
-        panel.updateEntryEditorIfShowing();
+        panel.updateWiewToSelected();
+        //panel.updateEntryEditorIfShowing();
         // Should the table also be scheduled for repaint?
       }
       catch (IllegalArgumentException ex) {

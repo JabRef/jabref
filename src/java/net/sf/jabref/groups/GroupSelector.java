@@ -332,7 +332,7 @@ public class GroupSelector extends SidePaneComponent
 	if (e.getSource() == autoGroup) {
 	    AutoGroupDialog gd = new AutoGroupDialog
 		(frame, panel, this, groups,
-		 prefs.get("groupsDefaultField"), ".,");
+		 prefs.get("groupsDefaultField"), " .,");
 	    gd.show();
 	    if (gd.okPressed()) {
 

@@ -95,7 +95,7 @@ class AutoGroupDialog extends JDialog {
 
 		    HashSet hs = Util.findAllWordsInField
 			(panel.getDatabase(), field().toLowerCase(),
-			 " "+remove());
+			 remove());
 		    Vector added = new Vector(20, 20);
 		    NamedCompound ce = new NamedCompound(Globals.lang("Autogenerate groups"));
 		    //boolean any = false; // To see if _any_ groups were created.

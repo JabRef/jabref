@@ -61,8 +61,10 @@ public class SidePaneManager {
           if (prefs.getBoolean("groupSelectorVisible"))
             ensureVisible("groups");
         } else {
+          Vector v = new Vector();
+          metaData.putData("groups", v);
           panel.groupSelector = new GroupSelector
-              (frame, panel, new Vector(), this, prefs);
+              (frame, panel, v, this, prefs);
           register("groups", panel.groupSelector);
 	}
 
