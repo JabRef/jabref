@@ -617,7 +617,7 @@ public class ImportFormatReader
 			hm.put("title",val);//Title = val;
 
 		    else if(lab.equals("A1") ||lab.equals("AU")){
-			val = val.substring(0,val.length()-1);
+
 			if( Author.equals("")) // don't add " and " for the first author
 			    Author=val;
 			else
