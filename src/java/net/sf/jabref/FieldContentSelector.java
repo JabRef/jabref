@@ -35,7 +35,14 @@ class FieldContentSelector extends JComponent implements ItemListener {
 
     final String DELIMITER = " ", DELIMITER_2 = "";
     FieldEditor editor;
-    JComboBox list = new JComboBox();
+    JComboBox list = new JComboBox() {
+        public Dimension getPreferredSize() {
+            Dimension parents = super.getPreferredSize();
+            if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)
+                parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+            return parents;
+        }
+    };
     JButton manage;
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -58,6 +65,7 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.HORIZONTAL;
         con.weightx = 1;
+        //list.setPreferredSize(new Dimension(140, list.getPreferredSize().height));
 	gbl.setConstraints(list, con);
 	list.addItemListener(this);
 	add(list);

@@ -49,6 +49,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 
         sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.setMinimumSize(new Dimension(200, 1));
         setLineWrap(true);
         setWrapStyleWord(true);
         fieldName = fieldName_;

@@ -91,6 +91,7 @@ Change log:
         - Added scan option for exact duplicates with automatic removal.
         - Bibtex strings are now sorted automatically.
         - Bibtex strings are now resolved when exporting database.
+        - Fixed problem with field content selector getting too wide. Limited width.
         - Fixed PDF/PS view routine to remove problems with filenames
           containing spaces.
         - Fixed bug that interfered with Fetch Medline by ID, and fixed
