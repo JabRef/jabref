@@ -5,6 +5,12 @@
 			<a name="\bibtexkey">\bibtexkey</a>
 		</div>
 		
+		\begin{doi}
+		<div class="bibtex_doi">
+			<a href="http://dx.doi.org/\doi">doi</a>
+		</div>
+		\end{doi}
+		
 		\begin{pdf}
 		<div class="bibtex_pdf">
 			<a href="\pdf">pdf</a>
