@@ -75,7 +75,7 @@ Change log:
 	- Added option in Table Preferences to set current column widths as default.
 	- Fixed bug that allowed non-lowercase grouping field, leading to problems.
 	- Fixed bug that made selector words added in the dialog to be lowercased.
-    - Added import of BibTeXML
+    	- Added import of BibTeXML
 1.19:	- Entry editor is now opened for an entry that causes an error when saving.
 	- Added options to display names in harmonised format in the main table.
 	- Added Docbook and (experimental) HTML export.

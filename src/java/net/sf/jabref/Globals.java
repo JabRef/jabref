@@ -41,7 +41,9 @@ public class Globals {
     public static Locale locale;
     public static final String FILETYPE_PREFS_EXT = "_dir",
 	SELECTOR_META_PREFIX = "selector_",
-	LAYOUT_PREFIX = "/resource/layout/";
+	LAYOUT_PREFIX = "/resource/layout/",
+	MAC = "Mac OS X";
+
 
     public static void logger(String s){
 		Logger.global.info(s);

@@ -75,7 +75,7 @@ public class JabRef {
 	UIManager.put("Tree.font", fnt);
 
 	String osName = System.getProperty("os.name", "def");
-	if (osName.equals("Mac OS X")) {
+	if (osName.equals(Globals.MAC)) {
 	    Util.pr("Disabling Kunststoff look & feel on Mac OS X.");
 	} else {       
 	    try {
@@ -85,7 +85,7 @@ public class JabRef {
 	    } catch (UnsupportedLookAndFeelException ex) {}
 	}
 
-	JabRefPreferences prefs = new JabRefPreferences();
+	JabRefPreferences prefs = new JabRefPreferences(osName);
 	BibtexEntryType.loadCustomEntryTypes(prefs);
 	Globals.setLanguage(prefs.get("language"), "");
 	GUIGlobals.CURRENTFONT = new Font

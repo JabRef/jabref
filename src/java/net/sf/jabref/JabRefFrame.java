@@ -50,7 +50,8 @@ import net.sf.jabref.undo.UndoableInsertString;
 public class JabRefFrame extends JFrame {
 
     JabRefFrame ths = this;
-    JabRefPreferences prefs = new JabRefPreferences();
+    JabRefPreferences prefs = new JabRefPreferences
+	(System.getProperty("os.name", "def"));
 
     JTabbedPane tabbedPane = new JTabbedPane();
     JToolBar tlb = new JToolBar();

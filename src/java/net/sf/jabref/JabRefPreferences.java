@@ -52,14 +52,21 @@ public class JabRefPreferences {
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
-    public JabRefPreferences() {
+    public JabRefPreferences(String osName) {
 
 	prefs = Preferences.userNodeForPackage(JabRef.class);
 	//Util.pr(prefs.toString());
 
-	defaults.put("pdfviewer","/usr/bin/acroread");
-	defaults.put("psviewer","/usr/X11R6/bin/gv");
-	defaults.put("htmlviewer","/usr/bin/mozilla");
+	if (osName.equals(Globals.MAC)) {
+	    defaults.put("pdfviewer","open /Applications/Preview.app");
+	    defaults.put("psviewer","open /Applications/Preview.app");
+	    defaults.put("htmlviewer","/usr/bin/mozilla");
+	}
+	else {
+	    defaults.put("pdfviewer","/usr/bin/acroread");
+	    defaults.put("psviewer","/usr/X11R6/bin/gv");
+	    defaults.put("htmlviewer","/usr/bin/mozilla");
+	}
 	defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
 	defaults.put("posX", new Integer(0));
 	defaults.put("posY", new Integer(0));
@@ -396,6 +403,7 @@ public class JabRefPreferences {
 	defKeyBinds.put("Previous tab", "ctrl LEFT");
 	defKeyBinds.put("Replace string", "ctrl R");
 	defKeyBinds.put("Delete", "Delete");
+	//defKeyBinds.put("Edit entry", "ctrl E");
     }
 
     private String getNextUnit(Reader data) throws IOException {

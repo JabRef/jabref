@@ -118,10 +118,12 @@ public class FileActions
 
                 //fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
                 fw.write("@STRING{" + bs.getName() + " = ");
-                fw.write((new LatexFieldFormatter()).format(bs.getContent(),
-                        true));
+		if (!bs.getContent().equals(""))
+		    fw.write((new LatexFieldFormatter()).format(bs.getContent(),
+								true));
+		else fw.write("{}");
 
-                //Util.writeField(bs.getName(), bs.getContent(), fw);
+                //Util.writeField(bs.getName(), bs.getContent(), fw) ;
                 fw.write("}\n\n");
             }
 
@@ -130,16 +132,7 @@ public class FileActions
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
             String pri = prefs.get("priSort");
-
-            // Write database entries. Take care, using CrossRefEntry-
-            // Comparator, that referred entries occur after referring
-            // ones. Apart from crossref requirements, entries will be
-            // sorted as they appear on the screen.
             String sec = prefs.get("secSort");
-
-            // Write database entries. Take care, using CrossRefEntry-
-            // Comparator, that referred entries occur after referring
-            // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
             String ter = prefs.get("terSort");
             TreeSet sorter = new TreeSet(new CrossRefEntryComparator(

@@ -908,19 +908,32 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		}
 	    });
 
+	/*
+	entryTable.getInputMap().put(prefs.getKey("Edit entry"), "Edit");
+	entryTable.getActionMap().put("Edit", new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    Util.pr("eueo");
+		    try { runCommand("edit");
+		    } catch (Throwable ex) {
+			ex.printStackTrace();
+		    }
+		}
+	    });
+	*/
+	
 	entryTable.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER){
-					try { runCommand("edit");
-					} catch (Throwable ex) {
-					    ex.printStackTrace();
-					}
-				}
-				else if(e.getKeyCode() == KeyEvent.VK_DELETE){
-					try { runCommand("delete");
-					} catch (Throwable ex) {
-					    ex.printStackTrace();
-					}
+		public void keyPressed(KeyEvent e) {
+		    if (e.getKeyCode() == KeyEvent.VK_ENTER){
+			try { runCommand("edit");
+			} catch (Throwable ex) {
+			    ex.printStackTrace();
+			}
+		    }
+		    else if(e.getKeyCode() == KeyEvent.VK_DELETE){
+			try { runCommand("delete");
+			} catch (Throwable ex) {
+			    ex.printStackTrace();
+			}
 		    }
 		}
 	    });
