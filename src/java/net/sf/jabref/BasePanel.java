@@ -190,54 +190,6 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
 	    });
 
-		actions.put("importCiteSeer", new BaseAction() {
-			public void action() {
-					int clickedOn = -1;
-					// We demand that one and only one row is selected.
-					int rowCount = entryTable.getSelectedRowCount();
-					if (rowCount == 1) {
-						clickedOn = entryTable.getSelectedRow();
-					} else if (rowCount > 1) {
-						JOptionPane.showMessageDialog(frame(),
-						"The CiteSeer import functionality is currently " +
-						"supported for only one row at a time.",
-						"CiteSeer Import Error",
-						JOptionPane.WARNING_MESSAGE);
-					} else {
-						JOptionPane.showMessageDialog(frame(),
-						"You must select a row to perform the " +
-						"CiteSeer import operation.",
-						"CiteSeer Import Error",
-						JOptionPane.WARNING_MESSAGE);
-					}
-					if (clickedOn >= 0) {
-						String id =  tableModel.getNameFromNumber(clickedOn);
-						NamedCompound citeseerNamedCompound =
-							new NamedCompound("CiteSeer Import Fields");
-						BibtexEntry be =
-							(BibtexEntry) database.getEntryById(id);
-						boolean newValue =
-							citeSeerFetcher.importCiteSeerEntry(be, citeseerNamedCompound);
-						if (newValue) {
-							citeseerNamedCompound.end();
-			//				undoManager.addEdit(new UndoableInsertEntry(database, be, ths));
-			//				output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
-			//					   +Globals.lang("entry")+".");
-							undoManager.addEdit(citeseerNamedCompound);
-							refreshTable();
-							updateEntryEditorIfShowing();
-							int row = tableModel.getNumberFromName(id);
-							//entryTable.clearSelection();
-                                                        entryTable.setRowSelectionInterval(row, row);
-							entryTable.scrollTo(row);
-							markBaseChanged(); // The database just changed.
-                                                        updateWiewToSelected();
-						}
-					}
-			}
-		});
-
-
 	// The action for saving a database.
 	actions.put("save", new BaseAction() {
 		public void action() throws Throwable {

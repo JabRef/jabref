@@ -48,7 +48,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	protected SAXParser saxParser;
 	protected HttpURLConnection citeseerCon; 
 	protected HttpClient citeseerHttpClient;
-	boolean fetcherActive;
+	boolean citationFetcherActive;
+	boolean importFetcherActive;
 
 	BasePanel panel;
 	JProgressBar progressBar;
@@ -80,7 +81,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		gbl.setConstraints(progressBar, con);
 		add(progressBar);		
 		try {
-			fetcherActive = false;			
+			citationFetcherActive = false;
+			importFetcherActive = false;
 			parserFactory = SAXParserFactory.newInstance();
 			saxParser = parserFactory.newSAXParser();
 			citeseerHttpClient = new HttpClient();
@@ -147,6 +149,15 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		}		
 	}
 
+	class InitializeProgressBar implements Runnable {	    
+	    public void run() {
+			progressBar.setValue(0);		
+	        progressBar.setMinimum(0);
+			progressBar.setMaximum(100);	    
+		    progressBar.setString(null);		        
+	    }	    
+	}
+	
 	class UpdateProgressBarValue implements Runnable {
 		protected int counter;
 		UpdateProgressBarValue(int newValue) {
@@ -158,22 +169,47 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	}
 			
 	/* End Inner Class Declarations */
+	
+	
 	/***********************************/
 	
-	synchronized public boolean activateFetcher() {
-		if (fetcherActive == true) {
+	synchronized public boolean activateCitationFetcher() {
+		if (citationFetcherActive == true) {
 			return(false);	
 		}	else {
-			fetcherActive = true;
+			citationFetcherActive = true;
 			return(true);	
 		}
 	}
-
-	synchronized public void deactivateFetcher() {
-		fetcherActive = false;
+	synchronized public void deactivateCitationFetcher() {
+		citationFetcherActive = false;
 	}
 
-
+	synchronized public boolean activateImportFetcher() {
+		if (importFetcherActive == true) {
+			return(false);	
+		}	else {
+			importFetcherActive = true;
+			return(true);	
+		}
+	}	
+	synchronized public void deactivateImportFetcher() {
+		importFetcherActive = false;
+	}
+	
+	public void beginImportCiteSeerProgress() {
+	    progressBar.setIndeterminate(true);
+	    progressBar.setString("");
+	    sidePaneManager.ensureVisible("CiteSeerProgress");		
+	}
+	public void endImportCiteSeerProgress() {
+	    progressBar.setIndeterminate(false);
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);	    
+		progressBar.setValue(100);		
+//	    progressBar.setString(null);	
+	}
+	
 
 	/**
 	 * @param newDatabase
@@ -185,8 +221,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		BibtexEntry currentEntry;
 		Enumeration newEntryEnum;
 		Hashtable citationHashTable = new Hashtable();
-		UpdateProgressBarValue updateValue = new UpdateProgressBarValue(0);
-		SwingUtilities.invokeLater(updateValue);		
+		InitializeProgressBar initializeProgressBar = new InitializeProgressBar();
+		SwingUtilities.invokeLater(initializeProgressBar);	
 		while (targetIterator.hasNext()) {
 			currentKey = (String) targetIterator.next();
 			currentEntry = targetDatabase.getEntryById(currentKey);

@@ -30,6 +30,7 @@ import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.imports.*;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
@@ -104,7 +105,6 @@ public class JabRefFrame
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
                              GUIGlobals.aboutIcon),
-      importCiteSeer = new GeneralAction("importCiteSeer", "Import CiteSeer data"),
       editEntry = new GeneralAction("edit", "Edit entry",
                                "Edit entry", GUIGlobals.editIconFile,
                                prefs.getKey("Edit entry")),
@@ -154,6 +154,7 @@ public class JabRefFrame
                                        GUIGlobals.searchIconFile,
                                        prefs.getKey("Search")),
       fetchCiteSeer = new FetchCiteSeerAction(),
+      importCiteSeer = new ImportCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
       fetchAuthorMedline = new FetchAuthorMedlineAction(),
       copyKey = new GeneralAction("copyKey", "Copy BibTeX key"),
@@ -1361,6 +1362,89 @@ public JabRefPreferences prefs() {
     }
   }
 
+class ImportCiteSeerAction
+	extends AbstractAction {
+    
+    public ImportCiteSeerAction() {
+        super(Globals.lang("Import Data from CiteSeer"));
+        putValue(SHORT_DESCRIPTION, Globals.lang("Import Data from CiteSeer Database"));
+        
+	}	
+	
+	public void actionPerformed(ActionEvent e) {
+
+		if(basePanel().citeSeerFetcher.activateImportFetcher()) {
+		    
+				
+			(new Thread() {
+
+				BasePanel currentBp;
+				String id;
+				
+				Runnable updateComponent = new Runnable() {
+					public void run() {
+					    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+						currentBp.refreshTable();
+						currentBp.updateEntryEditorIfShowing();
+						int row = currentBp.tableModel.getNumberFromName(id);
+						currentBp.entryTable.setRowSelectionInterval(row, row);
+						currentBp.entryTable.scrollTo(row);
+						currentBp.markBaseChanged(); // The database just changed.
+						currentBp.updateWiewToSelected();
+						output(Globals.lang("Fetched all citations from target database."));
+						 }
+				};			    
+			    			    
+			    public void run() {
+			        currentBp = (BasePanel) tabbedPane.getSelectedComponent();
+					int clickedOn = -1;
+					// We demand that one and only one row is selected.
+					int rowCount = currentBp.entryTable.getSelectedRowCount();
+					if (rowCount == 1) {
+						clickedOn = currentBp.entryTable.getSelectedRow();
+					} else if (rowCount > 1) {
+						JOptionPane.showMessageDialog(currentBp.frame(),
+						"The CiteSeer import functionality is currently " +
+						"supported for only one row at a time.",
+						"CiteSeer Import Error",
+						JOptionPane.WARNING_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(currentBp.frame(),
+						"You must select a row to perform the " +
+						"CiteSeer import operation.",
+						"CiteSeer Import Error",
+						JOptionPane.WARNING_MESSAGE);
+					} 		
+					if (clickedOn >= 0) {
+					    currentBp.citeSeerFetcher.beginImportCiteSeerProgress();					    
+						id =  currentBp.tableModel.getNameFromNumber(clickedOn);
+						NamedCompound citeseerNamedCompound =
+							new NamedCompound("CiteSeer Import Fields");
+						BibtexEntry be =
+							(BibtexEntry) currentBp.database.getEntryById(id);
+						boolean newValue =
+						    currentBp.citeSeerFetcher.importCiteSeerEntry(be, citeseerNamedCompound);
+						if (newValue) {
+							citeseerNamedCompound.end();
+							currentBp.undoManager.addEdit(citeseerNamedCompound);
+							SwingUtilities.invokeLater(updateComponent);							
+						} else {
+						    currentBp.citeSeerFetcher.endImportCiteSeerProgress();
+						}
+					}
+					basePanel().citeSeerFetcher.deactivateImportFetcher();
+			    }				  
+			}).start();
+		} else {
+			JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
+					"A CiteSeer import operation is currently in progress. " +
+					"  Please wait until it has finished.",
+					"CiteSeer Import Error",
+					JOptionPane.WARNING_MESSAGE);		    
+		}
+	}
+}
+  
 class FetchCiteSeerAction
 	extends AbstractAction {
 
@@ -1371,7 +1455,7 @@ class FetchCiteSeerAction
 
 		public void actionPerformed(ActionEvent e) {
 
-			if(basePanel().citeSeerFetcher.activateFetcher()) {
+			if(basePanel().citeSeerFetcher.activateCitationFetcher()) {
 				basePanel().sidePaneManager.ensureVisible("CiteSeerProgress");
 				(new Thread() {
 					BasePanel newBp;
@@ -1385,7 +1469,7 @@ class FetchCiteSeerAction
 							tabbedPane.setSelectedComponent(newBp);
 							newBp.refreshTable();
 							output(Globals.lang("Fetched all citations from target database."));
-							targetBp.citeSeerFetcher.deactivateFetcher();
+							targetBp.citeSeerFetcher.deactivateCitationFetcher();
 							 }
 					};
 
