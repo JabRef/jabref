@@ -11,6 +11,7 @@ import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.ImportFormatReader;
+import net.sf.jabref.Util;
 
 /**
  * 
@@ -132,14 +133,35 @@ public class LabelPatternUtil {
 				System.err.println(e);
 		}
 		
-		// here we make sure the key is unique		
-			_label = makeLabelUnique(_sb.toString());
-					
-			_entry.setField(Globals.KEY_FIELD, _label);
-		
+		/**
+		 * Edited by Morten Alver 2004.02.04.
+		 *
+		 * We now have a system for easing key duplicate prevention, so
+		 * I am changing this method to conform to it.
+		 *
+
+   		 // here we make sure the key is unique		
+		   _label = makeLabelUnique(_sb.toString());				
+		   _entry.setField(Globals.KEY_FIELD, _label);		
+		   return _entry;
+		*/
+
+		// Remove all illegal characters from the key.
+		_label = Util.checkLegalKey(_sb.toString());
+
+		// Try new keys until we get a unique one:
+		if (_db.setCiteKeyForEntry(_entry.getId(), _label)) {	    
+		    char c = 'b';
+		    String modKey = _label+"a";
+		    while (_db.setCiteKeyForEntry(_entry.getId(), modKey))
+			modKey = _label+((char)(c++));	    
+		}
 		return _entry;
+		/** End of edit, Morten Alver 2004.02.04.  */
+
 	}
 	
+
 	/**
 	 * This method returns a truely unique label (in the BibtexDatabase), by taking a 
 	 * label and add the letters a-z until a unique key is found.
