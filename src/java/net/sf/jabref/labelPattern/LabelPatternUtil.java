@@ -110,7 +110,7 @@ public class LabelPatternUtil {
 		    _al = table.getValue(_type);
 		    int _alSize = _al.size();
 		    boolean field = false;
-		    for(int i = 2; i < _alSize; i++){
+		    for(int i = 1; i < _alSize; i++){
 			String val = _al.get(i).toString();
 			if (val.equals("[")) field = true;
 			else if (val.equals("]")) field = false;
