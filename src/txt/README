@@ -68,15 +68,7 @@ Unpacking the jar file is not necessary to run the program.
 
 
 Building JabRef from source:
-If you have downloaded the source for JabRef, we recommend that you
-build with Ant.  Ant is open source and freely available from
-http://ant.apache.org. The default build target builds JabRef and
-creates the executable jabref.jar in the directory build/lib. The
-jar file requires access to JGoodies Looks 1.2.2 and Antlr 2.7.4
-in your classpath. These are distributed with JabRef in the lib/
-directory, and you can optionally have these unpacked into the JabRef
-jar by running "ant compile unjarlib jars" instead of the default target.
-
+Please see the INSTALL file for instructions for building from source.
 
 Documentation:
 JabRef comes with an online help function, accessed by presing F1 or
