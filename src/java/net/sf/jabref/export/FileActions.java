@@ -141,6 +141,7 @@ public class FileActions
 	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
+            //Writer fw = getWriter(file, "UTF-8");
             FileWriter fw = new FileWriter(file);
 
             // Write signature.
@@ -235,6 +236,7 @@ public class FileActions
             // Define our data stream.
             FileWriter fw = new FileWriter(file);
 
+
             // Write signature.
             fw.write(GUIGlobals.SIGNATURE);
 
@@ -286,6 +288,19 @@ public class FileActions
 	}
 
     }
+
+
+  public static OutputStreamWriter getWriter(File f, String encoding)
+      throws IOException {
+    OutputStreamWriter ow;
+    //try {
+    ow = new OutputStreamWriter(new FileOutputStream(f), encoding);
+    //} catch (UnsupportedEncodingException ex) {
+    //  ow = new OutputStreamWriter(new FileOutputStream(f));
+    //}
+
+    return ow;
+  }
 
     public static void exportCustomDatabase(BibtexDatabase database, String directory, String lfName,
                                             File outFile, JabRefPreferences prefs)

@@ -74,6 +74,9 @@ public class GroupSelector
       highlCb = new JRadioButtonMenuItem(Globals.lang("Highlight"), false);
   JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Globals.lang("Inverted"), false),
       select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
+  //JMenu
+   //   moreRow = new JMenuItem(Globals.lang("Size of groups interface (rows)"));
+      //lessRow = new JMenuItem(Globals.lang("Show one less rows"));
   ButtonGroup bgr = new ButtonGroup(),
       visMode = new ButtonGroup();
   JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
@@ -115,6 +118,9 @@ public class GroupSelector
     settings.add(floatCb);
     settings.addSeparator();
     settings.add(select);
+    settings.addSeparator();
+    //settings.add(moreRow);
+    //settings.add(lessRow);
     openset.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (settings.isVisible()) {

@@ -36,7 +36,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 
     Dimension PREFERRED_SIZE;
     protected JScrollPane sp;
-    protected JLabel label;
+    protected FieldNameLabel label;
     protected String fieldName;
     //protected Completer completer;
 
@@ -53,16 +53,16 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	setWrapStyleWord(true);
 	fieldName = fieldName_;
 
-	label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
+        label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
 	//label.setBorder(BorderFactory.createEtchedBorder
 	//		 (GUIGlobals.lightGray, Color.gray));
-        label.setBorder(BorderFactory.createEtchedBorder());
+        //label.setBorder(BorderFactory.createEtchedBorder());
 	//label.setOpaque(true);
 	//label.setBackground(GUIGlobals.lightGray);
 	//label.setForeground(Color.gray);
 	setBackground(GUIGlobals.validFieldBackground);
 	//if ((content != null) && (content.length() > 0))
-        label.setForeground(GUIGlobals.validFieldColor);
+        //label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.
 	//else
 	//    label.setForeground(GUIGlobals.nullFieldColor);

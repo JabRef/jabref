@@ -42,12 +42,13 @@ public class FieldTextField extends JTextField implements FieldEditor {
         addFocusListener(Globals.focusListener);
 
 	fieldName = fieldName_;
-	label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
+        label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
+	//label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
 	label.setBorder(BorderFactory.createEtchedBorder());
 	setBackground(GUIGlobals.validFieldBackground);
 	//label.setOpaque(true);
 	//if ((content != null) && (content.length() > 0))
-        label.setForeground(GUIGlobals.validFieldColor);
+        //label.setForeground(GUIGlobals.validFieldColor);
 	// At construction time, the field can never have an invalid value.
 	//else label.setForeground(GUIGlobals.nullFieldColor);
     }

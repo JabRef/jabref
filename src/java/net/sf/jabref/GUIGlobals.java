@@ -63,7 +63,8 @@ public class GUIGlobals {
 
   public static Font CURRENTFONT,
       typeNameFont,
-      jabRefFont;
+      jabRefFont,
+      fieldNameFont;
 
   // Signature written at the top of the .bib file.
   public static final String SIGNATURE =
@@ -258,8 +259,8 @@ public class GUIGlobals {
   	FIELD_DISPLAYS = new HashMap();
   	FIELD_DISPLAYS.put("citeseerCitationCount","Popularity");
   }
-  
-  
+
+
 // These are the fields that BibTex might want to treat, so these
 // must conform to BibTex rules.
   public static String[] BIBTEX_STANDARD_FIELDS = new String[] {
@@ -376,7 +377,7 @@ public class GUIGlobals {
     // LANGUAGES contains mappings for supported languages.
     LANGUAGES.put("English", "en");
     LANGUAGES.put("Deutsch", "de");
-    LANGUAGES.put("Français", "fr");
+    LANGUAGES.put("Fran\uFFFDais", "fr");
     LANGUAGES.put("Norsk", "no");
 
     FIELD_EXTRAS = new HashMap();
@@ -431,7 +432,7 @@ public class GUIGlobals {
     fieldWeight.put("comment", MEDIUM_W);
     fieldWeight.put("abstract", LARGE_W);
     fieldWeight.put("citeseerCitationCount", SMALL_W);
-    
+
     FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
   };
 
@@ -460,6 +461,7 @@ public class GUIGlobals {
    */
   public static void init() {
     typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
+    fieldNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 14);
     incompleteLabel = new JLabel(new ImageIcon(GUIGlobals.incompleteIcon));
     incompleteLabel.setToolTipText(Globals.lang("Entry is incomplete"));
     JLabel lab;

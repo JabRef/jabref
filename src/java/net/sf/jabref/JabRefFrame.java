@@ -62,7 +62,18 @@ public class JabRefFrame
 
   JTabbedPane tabbedPane = new JTabbedPane();
   JToolBar tlb = new JToolBar();
-  JMenuBar mb = new JMenuBar();
+  JMenuBar mb = new JMenuBar();/* {
+    public void paintComponent(Graphics g) {
+      Graphics2D g2 = (Graphics2D)g;
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                          RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                          RenderingHints.VALUE_RENDER_QUALITY);
+      super.paintComponent(g2);
+
+    }
+
+  };*/
   GridBagLayout gbl = new GridBagLayout();
   GridBagConstraints con = new GridBagConstraints();
 
@@ -545,7 +556,9 @@ public JabRefPreferences prefs() {
     status.setLayout(gbl);
     con.weighty = 0;
     con.weightx = 0;
-    con.gridwidth = 0;
+    con.gridwidth = 1;
+    con.insets = new Insets(0, 2, 0, 0);
+    gbl.setConstraints(statusLabel, con);
     status.add(statusLabel);
     con.weightx = 1;
     con.insets = new Insets(0, 4, 0, 0);
@@ -553,7 +566,7 @@ public JabRefPreferences prefs() {
     gbl.setConstraints(statusLine, con);
     status.add(statusLine);
     con.gridwidth = GridBagConstraints.REMAINDER;
-    statusLabel.setForeground(GUIGlobals.nullFieldColor.darker());
+    statusLabel.setForeground(GUIGlobals.validFieldColor.darker());
     con.insets = new Insets(0, 0, 0, 0);
     gbl.setConstraints(status, con);
     getContentPane().add(status);

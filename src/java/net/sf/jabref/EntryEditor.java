@@ -243,27 +243,26 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     private class TypeLabel extends JPanel {
-	private String label;
-	public TypeLabel(String type) {
-	    label = type;
-	}
-	public void paint(Graphics g) {
-	    Graphics2D g2 = (Graphics2D)g;
-	    g2.setColor(GUIGlobals.validFieldColor);
-	    g2.setFont(GUIGlobals.typeNameFont);
-	    FontMetrics fm = g2.getFontMetrics();
-	    int width = fm.stringWidth(label);
-	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-	    g2.rotate(-Math.PI/2, 0, 0);
-	    g2.drawString(label,-width-7,28);
+        private String label;
+        public TypeLabel(String type) {
+            label = type;
+        }
+        public void paint(Graphics g) {
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setColor(GUIGlobals.validFieldColor);
+            g2.setFont(GUIGlobals.typeNameFont);
+            FontMetrics fm = g2.getFontMetrics();
+            int width = fm.stringWidth(label);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.rotate(-Math.PI/2, 0, 0);
+            g2.drawString(label,-width-7,28);
 
-	}
-	/*	public Dimension getPreferredSize() {
-	    return new Dimension(22, 30);
-	    }*/
+        }
+        /*	public Dimension getPreferredSize() {
+            return new Dimension(22, 30);
+            }*/
     }
-
 
     private void setupFieldPanels(FieldPanel req, FieldPanel opt, FieldPanel gen) {
 
@@ -305,6 +304,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    con.gridwidth = 1;
 	    con.weightx = 0;
 	    con.weighty = 0;
+            con.anchor = GridBagConstraints.NORTH;
+            con.fill = GridBagConstraints.BOTH;
 	    //con.fill = GridBagConstraints.BOTH;
 	    if (i<rmax) {
 		if ((content = entry.getField(reqFields[i])) != null) {
@@ -380,8 +381,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    // Constraints for the text fields.
 	    con.gridwidth = GridBagConstraints.REMAINDER;
 	    con.weightx = 1;
-
-	    //con.fill = GridBagConstraints.BOTH;
+            //con.fill = GridBagConstraints.NONE;
+	    con.fill = GridBagConstraints.BOTH;
 	    if (i<rmax) {
               if (ex1 != null) con.gridwidth = 1;
               else con.gridwidth = GridBagConstraints.REMAINDER;
