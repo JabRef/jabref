@@ -470,7 +470,7 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    int[] rows = entryTable.getSelectedRows();
 		    int numSelected = rows.length;
 		    BibtexEntry bes = null;
-		    Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
+		    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
 		    // check if lyxpipe is defined
 		    File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
 		    if( !lyxpipe.exists() || !lyxpipe.canWrite()){

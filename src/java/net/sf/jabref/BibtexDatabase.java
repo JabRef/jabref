@@ -246,7 +246,7 @@ public class BibtexDatabase
         // if the newkey already exists and is not the same as oldkey it will give a warning
     // else it will add the newkey to the to set and remove the oldkey
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey, boolean issueWarning){
-      Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
+		// Globals.logger(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
 	boolean duplicate=false;
 	if(oldKey==null){// this is a new entry so don't bother removing oldKey
@@ -281,34 +281,34 @@ public class BibtexDatabase
     // keep track of all the keys to warn if there are duplicates
     //========================================================
     private boolean addKeyToSet(String key){
-	boolean exists=false;
-	if((key == null) || key.equals(""))
-	    return false;//don't put empty key
-	if(allKeys.containsKey(key)){
-	    // warning
-	    exists=true;
-	    allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
-	}else
-	    allKeys.put( key, new Integer(1));
-	return exists;
+		boolean exists=false;
+		if((key == null) || key.equals(""))
+			return false;//don't put empty key
+		if(allKeys.containsKey(key)){
+			// warning
+			exists=true;
+			allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
+		}else
+			allKeys.put( key, new Integer(1));
+		return exists;
     }
     //========================================================
     // reduce the number of keys by 1. if this number goes to zero then remove from the set
     // note: there is a good reason why we should not use a hashset but use hashmap instead
     //========================================================
     private void removeKeyFromSet(String key){
-	if((key == null) || key.equals("")) return;
-	if(allKeys.containsKey(key)){
-	    Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-	    if(tI.intValue()==1)
-		allKeys.remove( key);
-	    else
-		allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
-	}else // ignore, as there is no such key
-	    ;
+		if((key == null) || key.equals("")) return;
+		if(allKeys.containsKey(key)){
+			Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+			if(tI.intValue()==1)
+				allKeys.remove( key);
+			else
+				allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
+		}else // ignore, as there is no such key
+			;
     }
-
-
+	
+	
     /*
     public void setCompleters(Hashtable autoCompleters) {
 	_autoCompleters = autoCompleters;
