@@ -10,9 +10,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Font;
 import java.awt.Container;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.JLabel;
@@ -161,7 +163,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 */
 	private void buildGUI(){
 
-
+	    JPanel pan = new JPanel();
+	    JScrollPane sp = new JScrollPane(pan);	    
+	    pan.setLayout(gbl);
+	    setLayout(gbl);	    
 	    // The header - can be removed
 	    lblEntryType = new JLabel(Globals.lang("Entry type"));
 	    Font f = new Font("plain", Font.BOLD, 12);
@@ -172,9 +177,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    con.gridheight = 1;
 	    con.fill = GridBagConstraints.VERTICAL;
 	    con.anchor = GridBagConstraints.WEST;
-	    con.insets = new Insets( 0,5,10,0 );
+	    con.insets = new Insets( 5,5,10,0 );
 	    gbl.setConstraints( lblEntryType, con );
-	    add( lblEntryType );
+	    pan. add( lblEntryType );
 	    
 	    lblKeyPattern = new JLabel(Globals.lang("Key pattern"));
 	    lblKeyPattern.setFont(f);
@@ -184,555 +189,56 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    con.gridheight = 1;
 	    con.fill = GridBagConstraints.BOTH;
 	    con.anchor = GridBagConstraints.WEST;
-	    con.insets = new Insets( 0,5,10,0 );
+	    con.insets = new Insets( 5,5,10,0 );
 	    gbl.setConstraints( lblKeyPattern, con );
-	    add( lblKeyPattern );
+	    pan.add( lblKeyPattern );
 
 	    int y = 1;
-	    setLayout(gbl);
+
 	    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
 	    while (i.hasNext()) {
 		String s = (String)i.next();
-		textFields.put(s, addEntryType(this, s, y));
+		textFields.put(s, addEntryType(pan, s, y));
 		y++;
 	    }
-		
-		/*
-		//Here's the textfields for the key pattern
-		// They're of the form: label - text field - reset button
-		// The first one is for article 
-		lblArticle = new JLabel( "Article" );
-		con.gridx = 0;
-		con.gridy = 1;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblArticle, con );
-		add( lblArticle );
-		
-		txtArticle = new JTextField();
-		txtArticle.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 1;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtArticle, con );
-		add( txtArticle );
-		
 
-		btnArticleDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 1;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnArticleDefault, con );
-		btnArticleDefault.addActionListener(new buttonHandler());
-		add( btnArticleDefault );		
+	    con.fill = GridBagConstraints.BOTH;
+	    con.gridx = 0;
+	    con.gridy = 1;
+	    con.gridwidth = 3;
+	    con.weightx = 1;
+	    con.weighty = 1;
+	    gbl.setConstraints(sp, con );
+	    add(sp);
 
-		// Then its the  Book 
-		lblBook = new JLabel( "Book" );
-		con.gridx = 0;
-		con.gridy = 2;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblBook, con );
-		add( lblBook );
-		
-		txtBook = new JTextField();
-		txtBook.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 2;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtBook, con );
-		add( txtBook );
-		
-
-		btnBookDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 2;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnBookDefault, con );
-		btnBookDefault.addActionListener(new buttonHandler());
-		add( btnBookDefault );
-
-		// Then its the  Booklet 
-		lblBooklet = new JLabel( "Booklet" );
-		con.gridx = 0;
-		con.gridy = 3;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblBooklet, con );
-		add( lblBooklet );
-		
-		txtBooklet = new JTextField();
-		txtBooklet.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 3;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtBooklet, con );
-		add( txtBooklet );
-		
-
-		btnBookletDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 3;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnBookletDefault, con );
-		btnBookletDefault.addActionListener(new buttonHandler());
-		add( btnBookletDefault );
-
-		// Then its the  Conference 
-		lblConference = new JLabel( "Conference" );
-		con.gridx = 0;
-		con.gridy = 4;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblConference, con );
-		add( lblConference );
-		
-		txtConference = new JTextField();
-		txtConference.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 4;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtConference, con );
-		add( txtConference );
-		
-		btnConferenceDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 4;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnConferenceDefault, con );
-		btnConferenceDefault.addActionListener(new buttonHandler());
-		add( btnConferenceDefault );		
-
-		// Then its the  Inbook 
-		lblInbook = new JLabel( "Inbook" );
-		con.gridx = 0;
-		con.gridy = 5;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblInbook, con );
-		add( lblInbook );
-		
-		txtInbook = new JTextField();
-		txtInbook.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 5;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtInbook, con );
-		add( txtInbook );
-		
-		btnInbookDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 5;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnInbookDefault, con );
-		btnInbookDefault.addActionListener(new buttonHandler());
-		add( btnInbookDefault );
-
-		// Then its the  Incollection 
-		lblIncollection = new JLabel( "Incollection" );
-		con.gridx = 0;
-		con.gridy = 6;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblIncollection, con );
-		add( lblIncollection );
-		
-		txtIncollection = new JTextField();
-		txtIncollection.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 6;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtIncollection, con );
-		add( txtIncollection );
-
-		btnIncollectionDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 6;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnIncollectionDefault, con );
-		btnIncollectionDefault.addActionListener(new buttonHandler());
-		add( btnIncollectionDefault );
-
-		// Then its the  Inproceedings 
-		lblInproceedings = new JLabel( "Inproceedings" );
-		con.gridx = 0;
-		con.gridy = 7;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblInproceedings, con );
-		add( lblInproceedings );
-		
-		txtInproceedings = new JTextField();
-		txtInproceedings.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 7;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtInproceedings, con );
-		add( txtInproceedings );
-		
-		btnInproceedingsDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 7;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnInproceedingsDefault, con );
-		btnInproceedingsDefault.addActionListener(new buttonHandler());
-		add( btnInproceedingsDefault );
-
-		// Then its the  Manual 
-		lblManual = new JLabel( "Manual" );
-		con.gridx = 0;
-		con.gridy = 8;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblManual, con );
-		add( lblManual );
-		
-		txtManual = new JTextField();
-		txtManual.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 8;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtManual, con );
-		add( txtManual );
-		
-		btnManualDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 8;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnManualDefault, con );
-		btnManualDefault.addActionListener(new buttonHandler());
-		add( btnManualDefault );
-
-		// Then its the  Mastersthesis 
-		lblMastersthesis = new JLabel( "Mastersthesis" );
-		con.gridx = 0;
-		con.gridy = 9;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblMastersthesis, con );
-		add( lblMastersthesis );
-		
-		txtMastersthesis = new JTextField();
-		txtMastersthesis.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 9;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtMastersthesis, con );
-		add( txtMastersthesis );
-		
-		btnMastersthesisDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 9;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnMastersthesisDefault, con );
-		btnMastersthesisDefault.addActionListener(new buttonHandler());
-		add( btnMastersthesisDefault );
-		
-		// Then its the  Misc 
-		lblMisc = new JLabel( "Misc" );
-		con.gridx = 0;
-		con.gridy = 10;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblMisc, con );
-		add( lblMisc );
-		
-		txtMisc = new JTextField();
-		txtMisc.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 10;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtMisc, con );
-		add( txtMisc );
-		
-		btnMiscDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 10;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnMiscDefault, con );
-		btnMiscDefault.addActionListener(new buttonHandler());
-		add( btnMiscDefault );
-		
-		// Then its the  Phdthesis 
-		lblPhdthesis = new JLabel( "Phdthesis" );
-		con.gridx = 0;
-		con.gridy = 11;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblPhdthesis, con );
-		add( lblPhdthesis );
-		
-		txtPhdthesis = new JTextField();
-		txtPhdthesis.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 11;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtPhdthesis, con );
-		add( txtPhdthesis );
-		
-		btnPhdthesisDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 11;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnPhdthesisDefault, con );
-		btnPhdthesisDefault.addActionListener(new buttonHandler());
-		add( btnPhdthesisDefault );		
-
-		// Then its the  Proceedings 
-		lblProceedings = new JLabel( "Proceedings" );
-		con.gridx = 0;
-		con.gridy = 12;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblProceedings, con );
-		add( lblProceedings );
-		
-		txtProceedings = new JTextField();
-		txtProceedings.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 12;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtProceedings, con );
-		add( txtProceedings );
-		
-		btnProceedingsDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 12;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnProceedingsDefault, con );
-		btnProceedingsDefault.addActionListener(new buttonHandler());
-		add( btnProceedingsDefault );		
-
-		// Then its the  Techreport 
-		lblTechreport = new JLabel( "Techreport" );
-		con.gridx = 0;
-		con.gridy = 13;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblTechreport, con );
-		add( lblTechreport );
-		
-		txtTechreport = new JTextField();
-		txtTechreport.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 13;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtTechreport, con );
-		add( txtTechreport );
-		
-		btnTechreportDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 13;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnTechreportDefault, con );
-		btnTechreportDefault.addActionListener(new buttonHandler());
-		add( btnTechreportDefault );		
-
-		// Then its the  Unpublished 
-		lblUnpublished = new JLabel( "Unpublished" );
-		con.gridx = 0;
-		con.gridy = 14;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.WEST;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( lblUnpublished, con );
-		add( lblUnpublished );
-		
-		txtUnpublished = new JTextField();
-		txtUnpublished.setColumns( 15 );
-		con.gridx = 1;
-		con.gridy = 14;
-		con.fill = GridBagConstraints.HORIZONTAL;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( txtUnpublished, con );
-		add( txtUnpublished );
-		
-		btnUnpublishedDefault = new JButton( def );
-		con.gridx = 2;
-		con.gridy = 14;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 0,5,0,5 );
-		gbl.setConstraints( btnUnpublishedDefault, con );
-		btnUnpublishedDefault.addActionListener(new buttonHandler());
-		add( btnUnpublishedDefault );		
-		*/
-		// A help button
-		con.gridx = 1;
-		con.gridy = y;
-		con.fill = GridBagConstraints.NONE;
-		con.weightx = 0;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.SOUTHEAST;
-		con.insets = new Insets( 0,5,0,5 );
-		JButton hlb = new JButton(new ImageIcon(GUIGlobals.helpSmallIconFile));
-		hlb.setToolTipText(Globals.lang("Help on key patterns"));
-		gbl.setConstraints( hlb, con );
-		add(hlb);
-		hlb.addActionListener(help);
-
-		// And finally a button to reset everything
-		btnDefaultAll = new JButton(Globals.lang("Reset all"));
-		con.gridx = 2;
-		con.gridy = y;
-		con.fill = GridBagConstraints.BOTH;
-		con.weightx = 1;
-		con.weighty = 0;
-		con.anchor = GridBagConstraints.CENTER;
-		con.insets = new Insets( 20,5,0,5 );
-		gbl.setConstraints( btnDefaultAll, con );
-		btnDefaultAll.addActionListener(new buttonHandler());
-		add( btnDefaultAll );		
+	    // A help button
+	    con.gridwidth = 1;
+	    con.gridx = 1;
+	    con.gridy = 2;
+	    con.fill = GridBagConstraints.HORIZONTAL;
+	    //con.fill = GridBagConstraints.BOTH;
+	    con.weightx = 0;
+	    con.weighty = 0;
+	    con.anchor = GridBagConstraints.SOUTHEAST;
+	    con.insets = new Insets( 0,5,0,5 );
+	    JButton hlb = new JButton(new ImageIcon(GUIGlobals.helpSmallIconFile));
+	    hlb.setToolTipText(Globals.lang("Help on key patterns"));
+	    gbl.setConstraints( hlb, con );
+	    add(hlb);
+	    hlb.addActionListener(help);
+	    
+	    // And finally a button to reset everything
+	    btnDefaultAll = new JButton(Globals.lang("Reset all"));
+	    con.gridx = 2;
+	    con.gridy = 2;
+	    //con.fill = GridBagConstraints.BOTH;
+	    con.weightx = 0;
+	    con.weighty = 0;
+	    con.anchor = GridBagConstraints.SOUTHEAST;
+	    con.insets = new Insets( 20,5,0,5 );
+	    gbl.setConstraints( btnDefaultAll, con );
+	    btnDefaultAll.addActionListener(new buttonHandler());
+	    add( btnDefaultAll );		
 
 	}
 	
@@ -768,74 +274,26 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	class buttonHandler implements ActionListener{
 		public void actionPerformed(ActionEvent evt){
 
-		    _keypatterns.removeLabelPattern(evt.getActionCommand());
+		    if (evt.getSource() == btnDefaultAll) {
+			// All to default
+			Iterator i=textFields.keySet().iterator();
+			while (i.hasNext()) {
+			    String s = (String)i.next();
+			    //_keypatterns.removeLabelPattern(s);
+			    JTextField tf = (JTextField)textFields.get(s);
+			    tf.setText(_keypatterns.getParent()
+				       .getValue(s).get(0).toString());
+			}
+
+			return;
+		    }
+
+		    //_keypatterns.removeLabelPattern(evt.getActionCommand());
 		    JTextField tf = (JTextField)textFields.get(evt.getActionCommand());
-		    tf.setText(_keypatterns.getValue(evt.getActionCommand()).get(0).toString());
-			// we know its a button, so casting is quite OK
-			//JButton button = (JButton)evt.getSource();			
-			/*
-			// is the calling button the 'btnArticleDefault'?
-			if(button.equals(btnArticleDefault)){
-				// because of the structure or KeyPatterns with a default as a very parent
-				// resetting a pattern really just means to remove the pattern from the child
-				_keypatterns.removeLabelPattern("article");
-			}
-//		is the calling button the 'btnBookDefault'?
-			else if(button.equals(btnBookDefault)){
-				_keypatterns.removeLabelPattern("book");
-			}
-			else if(button.equals(btnBookletDefault)){
-				_keypatterns.removeLabelPattern("booklet");
-			}
-			else if(button.equals(btnConferenceDefault)){
-				_keypatterns.removeLabelPattern("conference");
-			}
-			else if(button.equals(btnInbookDefault)){
-				_keypatterns.removeLabelPattern("inbook");
-			}
-			else if(button.equals(btnIncollectionDefault)){
-				_keypatterns.removeLabelPattern("incollection");
-			}
-			else if(button.equals(btnInproceedingsDefault)){
-				_keypatterns.removeLabelPattern("inproceedings");
-			}
-			else if(button.equals(btnManualDefault)){
-				_keypatterns.removeLabelPattern("manual");
-			}
-			else if(button.equals(btnMastersthesisDefault)){
-				_keypatterns.removeLabelPattern("mastersthesis");
-			}
-			else if(button.equals(btnMiscDefault)){
-				_keypatterns.removeLabelPattern("misc");
-			}
-			else if(button.equals(btnPhdthesisDefault)){
-				_keypatterns.removeLabelPattern("phdthesis");
-			}
-			else if(button.equals(btnProceedingsDefault)){
-				_keypatterns.removeLabelPattern("proceedings");
-			}
-			else if(button.equals(btnTechreportDefault)){
-				_keypatterns.removeLabelPattern("techreport");
-			}
-			else if(button.equals(btnUnpublishedDefault)){
-				_keypatterns.removeLabelPattern("unpublished");
-			}
-			else if(button.equals(btnDefaultAll)){
-				LabelPattern defKeyPattern = _keypatterns.getParent();
-				_keypatterns = new LabelPattern(defKeyPattern);
-			}
-			// This one should never be fired! If it is, then someone added a button
-			// but did not add any action for it....
-			else{
-				System.err.println("Danger Will Robinson! " +
-										"If you see this something is very wrong!\n" +
-										"Ask someone clever to look at the method \'actionPerformed\' " +
-										" in \'TabLabelPattern\' - I think a line is missing");
-			}
-			fillTextfields();
-			*/
+		    tf.setText(_keypatterns.getParent()
+			       .getValue(evt.getActionCommand()).get(0).toString());
 		}
-		
+	    
 	}
 
 }
