@@ -393,6 +393,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               req.add(ta1.getPane());
               if (ex1 != null) {
                 con.gridwidth = GridBagConstraints.REMAINDER;
+                con.anchor = GridBagConstraints.NORTH;
+                con.fill = GridBagConstraints.HORIZONTAL;
                 con.weightx = 0;
                 gbl.setConstraints(ex1, con);
                 req.add(ex1);
@@ -402,11 +404,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               if (ex2 != null) con.gridwidth = 1;
               else con.gridwidth = GridBagConstraints.REMAINDER;
               con.weighty = GUIGlobals.getFieldWeight(optFields[i]);
+              con.fill = GridBagConstraints.BOTH;
               optW += con.weighty;
               gbl.setConstraints(ta2.getPane(),con);
               opt.add(ta2.getPane());
               if (ex2 != null) {
                 con.gridwidth = GridBagConstraints.REMAINDER;
+                con.anchor = GridBagConstraints.NORTH;
+                con.fill = GridBagConstraints.HORIZONTAL;
                 con.weightx = 0;
                 gbl.setConstraints(ex2, con);
                 opt.add(ex2);
@@ -415,6 +420,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    if (i<gmax) {
               if (ex3 != null) con.gridwidth = 1;
               else con.gridwidth = GridBagConstraints.REMAINDER;
+              con.fill = GridBagConstraints.BOTH;
               con.weighty = GUIGlobals.getFieldWeight(genFields[i]);
               genW += con.weighty;
               gbl.setConstraints(ta3.getPane(),con);
@@ -424,7 +430,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 con.weightx = 0;
                 //con.weighty = 1;
                 con.fill = GridBagConstraints.HORIZONTAL;
-                con.anchor = GridBagConstraints.WEST;
+                con.anchor = GridBagConstraints.NORTH;
                 gbl.setConstraints(ex3, con);
                 con.fill = GridBagConstraints.BOTH;
                 gen.add(ex3);
@@ -439,8 +445,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	con.gridwidth = 1;
 	con.weighty = 0;
 	con.weightx = 0;
+        con.fill = GridBagConstraints.HORIZONTAL;
 	con.anchor = GridBagConstraints.SOUTHWEST;
-	con.fill = GridBagConstraints.NONE;
 	tf = new FieldTextField(KEY_PROPERTY,
 				(String)entry.getField(KEY_PROPERTY));
 	gbl.setConstraints(tf.getLabel(),con);
@@ -448,7 +454,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	//	con.anchor = GridBagConstraints.WEST;
 	con.weightx = 1;
-	con.fill = GridBagConstraints.HORIZONTAL;
+
 	setupJTextComponent(tf);
 	gbl.setConstraints(tf,con);
 	req.add(tf);

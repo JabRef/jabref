@@ -56,12 +56,12 @@ class FieldContentSelector extends JComponent implements ItemListener {
 	//    list = new JComboBox(items.toArray());
 	con.gridwidth = GridBagConstraints.REMAINDER;
 	con.fill = GridBagConstraints.HORIZONTAL;
+        con.weightx = 1;
 	gbl.setConstraints(list, con);
 	list.addItemListener(this);
 	add(list);
 
 	manage = new JButton(Globals.lang("Manage"));
-	//manage.setBackground(GUIGlobals.lightGray);
 	gbl.setConstraints(manage, con);
 	add(manage);
 

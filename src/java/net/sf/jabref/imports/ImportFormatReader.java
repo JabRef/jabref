@@ -946,9 +946,67 @@ public class ImportFormatReader
 
 	return bibitems;
     }
+
     //==================================================
-    //
+    // Set a field, unless the string to set is empty.
     //==================================================
+    private static void setIfNecessary(BibtexEntry be, String field, String content) {
+      if (!content.equals(""))
+        be.setField(field, content);
+    }
+
+    //==================================================
+    // Import a file in the JStor format
+    //==================================================
+    public static ArrayList readJStorFile(String filename) {
+      ArrayList bibitems = new ArrayList();
+      File f = new File(filename);
+      if (!f.exists() || !f.canRead() || !f.isFile()) {
+        System.err.println("Error: " + filename + " is not a valid file and|or is not readable.");
+        return null;
+      }
+
+      String s = "";
+      try {
+        BufferedReader in = new BufferedReader(new FileReader(filename));
+
+        while (!s.startsWith("Item Type"))
+          s = in.readLine();
+
+        mainloop: while ((s = in.readLine()) != null) {
+          if (s.equals(""))
+            continue;
+          if (s.startsWith("-----------------------------"))
+            break mainloop;
+          String[] fields = s.split("\t");
+          BibtexEntry be = new BibtexEntry(Util.createNeutralId());
+          try {
+            if (fields[0].equals("FLA"))
+              be.setType(BibtexEntryType.getType("article"));
+            setIfNecessary(be, "title", fields[2]);
+            setIfNecessary(be, "author", fields[4].replaceAll("; ", " and "));
+            setIfNecessary(be, "journal", fields[7]);
+            setIfNecessary(be, "volume", fields[9]);
+            setIfNecessary(be, "number", fields[10]);
+            String[] datefield = fields[12].split(" ");
+            setIfNecessary(be, "year", datefield[datefield.length-1]);
+            //for (int i=0; i<fields.length; i++)
+            //  Util.pr(i+": "+fields[i]);
+            setIfNecessary(be, "pages", fields[13].replaceAll("-", "--"));
+            setIfNecessary(be, "url", fields[14]);
+            setIfNecessary(be, "issn", fields[15]);
+            setIfNecessary(be, "abstract", fields[16]);
+            setIfNecessary(be, "keywords", fields[17]);
+            setIfNecessary(be, "copyright", fields[21]);
+          } catch (ArrayIndexOutOfBoundsException ex) {}
+          bibitems.add(be);
+        }
+
+      } catch (IOException ex) {
+        Util.pr("Err: "+s);
+      }
+      return bibitems;
+    }
 
     /**
      * Imports a Biblioscape Tag File. The format is described on
@@ -1157,19 +1215,19 @@ public static ParserResult loadDatabase(File fileToOpen, String encoding) throws
       // reader. Then close the old one.
       reader = getReader(fileToOpen, suppliedEncoding);
       oldReader.close();
-      System.out.println("Using encoding: "+suppliedEncoding);
+      //System.out.println("Using encoding: "+suppliedEncoding);
     } catch (IOException ex) {
       reader = oldReader; // The supplied encoding didn't work out, so we keep our
       // existing reader.
 
-      System.out.println("Error, using default encoding.");
+      //System.out.println("Error, using default encoding.");
     }
   } else {
     // We couldn't find a supplied encoding. Since we don't know far into the file we read,
     // we start a new reader.
     reader.close();
     reader = getReader(fileToOpen, encoding);
-    System.out.println("No encoding supplied, or supplied encoding equals default. Using default encoding.");
+    //System.out.println("No encoding supplied, or supplied encoding equals default. Using default encoding.");
   }
 
 
@@ -1178,6 +1236,7 @@ public static ParserResult loadDatabase(File fileToOpen, String encoding) throws
   BibtexParser bp = new BibtexParser(reader);
 
   ParserResult pr = bp.parse();
+  pr.setEncoding(encoding);
 
   return pr;
 }
@@ -1215,6 +1274,8 @@ public static BibtexDatabase importFile(String format, String filename) throws I
     bibentries = readReferenceManager10(filename);
   else if (format.equals("scifinder"))
     bibentries = readScifinder(filename);
+  else if (format.equals("jstor"))
+    bibentries = readJStorFile(filename);
   else
     throw new IOException(Globals.lang("Could not resolve import format")+" '"+format+"'");
 

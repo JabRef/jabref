@@ -1323,6 +1323,7 @@ public JabRefPreferences prefs() {
 
           BasePanel bp = new BasePanel(ths, db, fileToOpen,
                                        meta, prefs);
+          bp.encoding = pr.getEncoding(); // Keep track of which encoding was used for loading.
           /*
             if (prefs.getBoolean("autoComplete")) {
             db.setCompleters(autoCompleters);
@@ -1601,6 +1602,13 @@ class FetchCiteSeerAction
 
   private void addBibEntries(ArrayList bibentries, String filename,
                              boolean intoNew) {
+    if (bibentries.size() == 0) {
+      // No entries found. We need a message for this.
+      JOptionPane.showMessageDialog(ths, Globals.lang("No entries found. Please make sure you are "
+                                                      +"using the correct import filter."), Globals.lang("Import failed"),
+                                    JOptionPane.ERROR_MESSAGE);
+      return;
+    }
     // Set owner field:
     if (prefs.getBoolean("useOwner"))
       Util.setDefaultOwner( bibentries, prefs.get("defaultOwner"));
@@ -1850,6 +1858,22 @@ class FetchCiteSeerAction
       }
     });
     importMenu.add(newBiblioscapeTagFile_mItem);
+
+    //########################################
+    JMenuItem newJStorFile_mItem = new JMenuItem(Globals.lang("JStor file"));
+    newJStorFile_mItem.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e)
+      {
+        String tempFilename = getNewFile();
+        if( tempFilename != null )
+        {
+          ArrayList bibs=ImportFormatReader.readJStorFile(tempFilename);
+
+          addBibEntries( bibs, tempFilename, intoNew);
+        }
+      }
+    });
+    importMenu.add(newJStorFile_mItem);
 
   }
 

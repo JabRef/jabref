@@ -62,6 +62,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
     // The database shown in this panel.
     File file = null,
 	fileToOpen = null; // The filename of the database.
+    String encoding = null;
 
     //Hashtable autoCompleters = new Hashtable();
     // Hashtable that holds as keys the names of the fields where
@@ -166,7 +167,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      * base frame through runCommand(). runCommand() finds the
      * appropriate BaseAction object, and runs its action() method.
      */
-    abstract class BaseAction {
+    abstract class BaseAction {//implements Runnable {
 	abstract void action() throws Throwable;
     }
 
@@ -557,14 +558,21 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 		    // check if lyxpipe is defined
 		    File lyxpipe = new File( prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
 		    if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-			output("ERROR: verify that LyX is running and that the lyxpipe is valid. [" + prefs.get("lyxpipe") +"]");
+			output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
+                               +". [" + prefs.get("lyxpipe") +"]");
 			return;
 		    }
+                    Util.pr("tre");
 		    if( numSelected > 0){
 			try {
-	 		    BufferedWriter lyx_out = new BufferedWriter(new FileWriter(lyxpipe));
+                          Util.pr("fil");
+                          FileWriter fw = new FileWriter(lyxpipe);
+                                                    Util.pr("fil pluss");
+	 		    BufferedWriter lyx_out = new BufferedWriter(fw);
+                             Util.pr("fem");
 			    String citeStr="", citeKey="", message="";
 			    for(int i=0; i< numSelected; i++){
+                              Util.pr(":"+i);
 				bes = database.getEntryById( tableModel.getNameFromNumber( rows[i] ));
 				citeKey= (String)bes.getField(GUIGlobals.KEY_FIELD);
 				// if the key is empty we give a warning and ignore this entry
@@ -1095,10 +1103,19 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      *
      * @param command The name of the command to run.
     */
-    public void runCommand(String command) throws Throwable {
-	if (actions.get(command) == null)
-	    Util.pr("No action defined for'"+command+"'");
-	else ((BaseAction)actions.get(command)).action();
+    public void runCommand(String _command) throws Throwable {
+      final String command = _command;
+      //(new Thread() {
+      //  public void run() {
+          if (actions.get(command) == null)
+            Util.pr("No action defined for'" + command + "'");
+            else try {
+              ( (BaseAction) actions.get(command)).action();
+            } catch (Throwable ex) {
+
+            }
+      //  }
+      //}).start();
     }
 
     private void saveDatabase(File file, boolean selectedOnly) throws SaveException {

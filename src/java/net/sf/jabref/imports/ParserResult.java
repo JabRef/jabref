@@ -37,6 +37,7 @@ public class ParserResult {
     private HashMap metaData;
     private File file = null;
     private Vector warnings = new Vector();
+    private String encoding = null; // Which encoding was used?
 
     public ParserResult(BibtexDatabase base, HashMap metaData) {
 	this.base = base;
@@ -57,6 +58,23 @@ public class ParserResult {
 
     public void setFile(File f) {
       file = f;
+    }
+
+    /**
+     * Sets the variable indicating which encoding was used during parsing.
+     *
+     * @param enc String the name of the encoding.
+     */
+    public void setEncoding(String enc) {
+      encoding = enc;
+    }
+
+    /**
+     * Returns the name of the encoding used during parsing, or null if not specified
+     * (indicates that prefs.get("defaultEncoding") was used).
+     */
+    public String getEncoding() {
+      return encoding;
     }
 
     /**

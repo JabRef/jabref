@@ -260,7 +260,8 @@ settings.add(select);
 	    return;
 	}
 	if (!searchField.hasFocus()) {
-	    searchField.setText("");
+	    //searchField.setText("");
+            searchField.selectAll();
 	    searchField.requestFocus();
 	} else {
 	    if (increment.isSelected())

@@ -103,7 +103,7 @@ public class JabRef {
 
       if (helpO.isInvoked()) {
         System.out.println(options.getHelp());
-        System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack.");
+        System.out.println(Globals.lang("Available import formats") + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid, ris, scifinder, sixpack, jstor.");
 
         // To specify export formats, we need to take the custom export formats into account.
         // So we iterate through the custom formats and add them.
@@ -200,9 +200,9 @@ public class JabRef {
 	else if (!Globals.ON_MAC) {
            try {
             //Class plastic = Class.forName("com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-            //LookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
+            LookAndFeel lnf = new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
             //LookAndFeel lnf = new com.sun.java.swing.plaf.gtk.GTKLookAndFeel();
-            LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
+            //LookAndFeel lnf = new com.incors.plaf.kunststoff.KunststoffLookAndFeel();
             //com.incors.plaf.kunststoff.KunststoffLookAndFeel.setCurrentTheme(new com.incors.plaf.kunststoff.themes.KunststoffDesktopTheme());
             UIManager.setLookAndFeel(lnf);
           } catch (UnsupportedLookAndFeelException ex) {}

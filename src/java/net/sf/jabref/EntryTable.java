@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.io.*;
 import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicTableUI;
 
 public class EntryTable extends JTable {
 
@@ -245,10 +246,12 @@ public class EntryTable extends JTable {
       public void mouseClicked(MouseEvent e) {
 
         // First find the column on which the user has clicked.
-        int col = columnAtPoint(e.getPoint());
+        final int col = columnAtPoint(e.getPoint()),
+            row = rowAtPoint(e.getPoint());
+
 
 	// A double click on an entry should open the entry's editor.
-        if ((col == 0) && (e.getClickCount() == 2)) {
+        if (/*(col == 0)*/!isCellEditable(row, col) && (e.getClickCount() == 2)) {
           try{ panel.runCommand("edit");
           } catch (Throwable ex) {
             ex.printStackTrace();
@@ -266,7 +269,6 @@ public class EntryTable extends JTable {
         if (tableModel.getCellStatus(0, col) == EntryTableModel.ICON_COL) {
 
           // Get the row number also:
-          final int row = rowAtPoint(e.getPoint());
           Object value = getValueAt(row, col);
           if (value == null) return; // No icon here, so we do nothing.
           /*Util.pr("eouaeou");
@@ -431,6 +433,7 @@ public class EntryTable extends JTable {
 					     GUIGlobals.veryGrayedOutText),
         maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground),
         markedRenderer = new Renderer(GUIGlobals.markedEntryBackground);
+
     private class Renderer extends DefaultTableCellRenderer {
 	//private DefaultTableCellRenderer darker;
 	public Renderer(Color c) {
@@ -450,6 +453,11 @@ public class EntryTable extends JTable {
 	    setForeground(fg);
 	}
 
+        public void firePropertyChange(String propertyName, boolean old, boolean newV) {
+        }
+        public void firePropertyChange(String propertyName, Object old, Object newV) {
+        }
+
 	/* For enabling the renderer to handle icons. */
         protected void setValue(Object value) {
             if (value instanceof Icon) {
@@ -467,7 +475,8 @@ public class EntryTable extends JTable {
             }
 	}
 
-    public void paintComponent(Graphics g) {
+    //public void paintComponent(Graphics g) {
+    public void paint(Graphics g) {
 	//Util.pr("her");
 
 	Graphics2D g2 = (Graphics2D)g;
@@ -484,9 +493,11 @@ public class EntryTable extends JTable {
 		   RenderingHints.VALUE_RENDER_QUALITY);
 	    g2.setRenderingHints(rh);
 	}
-	//g2.drawString(getText(), 3, f.getSize());
-	super.paintComponent(g2);
-	}
+
+        ui.update(g2, this);
+
+	//super.paintComponent(g2);
+      }
 
 	//public DefaultTableCellRenderer darker() { return darker; }
     }
@@ -580,4 +591,75 @@ public class EntryTable extends JTable {
       setRowHeight(GUIGlobals.TABLE_ROW_PADDING+GUIGlobals.CURRENTFONT.getSize());
   }
 
-}
+  public void updateUI() {
+      super.updateUI();
+      setUI(new CustomTableUI());
+  }
+
+
+
+  class CustomTableUI extends BasicTableUI {
+    public void installUI(JComponent c) {
+      super.installUI(c);
+      c.remove(rendererPane);
+      rendererPane = new CustomCellRendererPane();
+      c.add(rendererPane);
+    }
+
+    /**
+     * Overrides paintComponent to NOT clone the Graphics
+     * passed in and NOT validate the Component passed in.
+     */
+    private class CustomCellRendererPane extends CellRendererPane {
+        private Rectangle tmpRect = new Rectangle();
+
+        public void repaint() {
+        }
+
+        public void repaint(int x, int y, int width, int height) {
+        }
+
+        public void paintComponent(Graphics g, Component c, Container p,
+                                   int x, int y, int w, int h,
+                                   boolean shouldValidate) {
+          if (c == null) {
+            if (p != null) {
+              Color oldColor = g.getColor();
+              g.setColor(p.getBackground());
+              g.fillRect(x, y, w, h);
+              g.setColor(oldColor);
+            }
+            return;
+          }
+          if (c.getParent() != this) {
+            this.add(c);
+          }
+
+          c.setBounds(x, y, w, h);
+
+          boolean wasDoubleBuffered = false;
+          JComponent jc = (c instanceof JComponent) ? (JComponent)c : null;
+          if (jc != null && jc.isDoubleBuffered()) {
+            wasDoubleBuffered = true;
+            jc.setDoubleBuffered(false);
+          }
+
+          // Don't create a new Graphics, reset the clip and translate
+          // the origin.
+          Rectangle clip = g.getClipBounds(tmpRect);
+          g.clipRect(x, y, w, h);
+          g.translate(x, y);
+          c.paint(g);
+          g.translate(-x, -y);
+          g.setClip(clip.x, clip.y, clip.width, clip.height);
+          if (wasDoubleBuffered) {
+            jc.setDoubleBuffered(true);
+          }
+          c.setBounds(-w, -h, 0, 0);
+        }
+      }
+
+    }
+
+  }
+

@@ -1,5 +1,5 @@
 <font face="arial">
-<b><i>\bibtextype</i><a name="\bibtexkey"> (\bibtexkey)</a></b>
+<b><i>\bibtextype</i><a name="\bibtexkey">\begin{bibtexkey} (\bibtexkey)</a>\end{bibtexkey}</b>
 <br>
 \begin{author} \format[HTMLChars,AuthorLastFirst]{\author}<BR>\end{author}
 \begin{editor} \format[HTMLChars,AuthorLastFirst]{\editor} <i>(ed.)</i><BR>\end{editor}

@@ -88,6 +88,7 @@ Change log:
 	- Added CiteSeer support. (specify more)
 	- Added warnings to bibtex parser, and prevented failure to load files with
 	  duplicate string definitions.
+	- Numerous interface improvements.
 	- Fixed RIS import bug caused by short lines
       	- Fixed bug in SciFinder import.
       	- Fixed bug that made entire field get cleared when removing from group.
