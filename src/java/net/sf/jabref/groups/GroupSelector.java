@@ -474,6 +474,8 @@ public class GroupSelector extends SidePaneComponent implements
     /** Clear selection, maintain expansion state */
     public void revalidateGroups(TreePath[] selectionPaths, 
             Enumeration expandedNodes) {
+        // JZTODO: calls to this method may modify the current selection and
+        // expasion state in an undesirable way. this must be checked and fixed...
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -488,6 +490,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
     
     public void revalidateGroups() {
+        // JZTODO: calls to this method may modify the current selection and
+        // expasion state in an undesirable way. this must be checked and fixed...
         revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
     }
 

@@ -125,9 +125,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
             }
             if (source.isNodeChild(target)) {
                 dtde.rejectDrop();
-                // JZTODO invokeLater: error message
+                // JZTODO invokeLater: error message; e.g. status line
                 return;
             }
+            // JZTODO: the actual moving should be done by the GroupSelector
             target.add(source);
             dtde.getDropTargetContext().dropComplete(true);
             groupSelector.revalidateGroups(); // JZTODO : layout has
