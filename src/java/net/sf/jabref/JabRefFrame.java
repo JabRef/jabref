@@ -1626,17 +1626,24 @@ class FetchCiteSeerAction
                                                         newBp.refreshTable();
                                                         output(Globals.lang("Fetched all citations from target database."));
                                                         targetBp.citeSeerFetcher.deactivateCitationFetcher();
-                                                         }
+                                                }
                                         };
 
                                   public void run() {
                                         try {
-                                        newBp = new BasePanel(ths, prefs);
-                                                targetBp = (BasePanel) tabbedPane.getSelectedComponent();
-                                                newDatabase = newBp.getDatabase();
-                                                targetDatabase = targetBp.getDatabase();
-                                                basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
-                                                SwingUtilities.invokeLater(updateComponent);
+                                        	newBp = new BasePanel(ths, prefs);
+                                        	int errorCode;
+                                        	targetBp = (BasePanel) tabbedPane.getSelectedComponent();
+                                        	newDatabase = newBp.getDatabase();
+                                        	targetDatabase = targetBp.getDatabase();
+                                        	errorCode = basePanel().citeSeerFetcher.populate(newDatabase, targetDatabase);
+                                        	if (newDatabase.getEntryCount() > 0) {
+                                        		SwingUtilities.invokeLater(updateComponent);
+                                        	} else if(errorCode == 0) {
+                                        		SwingUtilities.invokeLater(basePanel().citeSeerFetcher.getEmptyFetchSetDialog());
+                                            } else {
+                                            	targetBp.citeSeerFetcher.deactivateCitationFetcher();
+                                            }
                                         }
                                         catch (Exception ex) {
                                           ex.printStackTrace();
