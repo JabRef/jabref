@@ -91,7 +91,7 @@ class SearchManager2 extends SidePaneComponent
 	reorder = new JRadioButton(Globals.lang("Float"), false);
         select = new JCheckBox(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
-        highlight.setToolTipText(Globals.lang("Select matching entries"));
+        highlight.setToolTipText(Globals.lang("Gray out non-matching entries"));
         reorder.setToolTipText(Globals.lang("Move matching entries to the top"));
 
 	// Add an item listener that makes sure we only listen for key events

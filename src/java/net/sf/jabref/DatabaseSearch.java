@@ -82,11 +82,11 @@ public class DatabaseSearch extends Thread {
 		hits++;
 	}
         panel.entryTable.invalidate();
-        panel.showSearchResults(searchValueField, reorder, grayOut);
-	if (select) { // Select matches.
+        panel.showSearchResults(searchValueField, reorder, grayOut, select);
+	/*if (select) { // Select matches.
           panel.selectResults(searchValueField);
           new FocusRequester(panel.entryTable);
-        }
+        }*/
 
 	if ((searchValueField == null)
 	    || (searchValueField == Globals.SEARCH))

@@ -1349,6 +1349,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
 
     public void updateWiewToSelected() {
       // First, if the entry editor is visible, we should update it to the selected entry.
+
       BibtexEntry be = null;
       BibtexEntry[] bes = entryTable.getSelectedEntries();
       if ((bes != null) && (bes.length > 0))
@@ -1373,6 +1374,7 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
       splitPane.setBottomComponent(previewPanel);
       splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT);
       previewPanel.repaint();
+      //throw new NullPointerException("..");
     }
 
     /**
@@ -1528,9 +1530,10 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      * Globals.GROUPSEARCH.
      *
      */
-    public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut) {
+    public void showSearchResults(String searchValueField, boolean reorder, boolean grayOut, boolean select) {
 	//entryTable.scrollTo(0);
 
+        entryTable.invalidate();
 	if (searchValueField == Globals.SEARCH) {
           sortingBySearchResults = reorder;
           coloringBySearchResults = grayOut;
@@ -1540,28 +1543,24 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
           coloringByGroup = grayOut;
         }
 
-	/*entryTable.setShowingSearchResults(showingSearchResults,
-					   showingGroup);*/
-	entryTable.clearSelection();
-	entryTable.scrollTo(0);
-	refreshTable();
-
-    }
-
-    /**
-     * Selects all entries with a non-zero value in the field
-     * Globals.SEARCH.
-     */
-    public void selectSearchResults() {
-
+        //tableModel.remap();
         entryTable.clearSelection();
-        for (int i=0; i<entryTable.getRowCount(); i++) {
-            String value = (String)(database.getEntryById
-                                    (tableModel.getNameFromNumber(i)))
-                .getField(Globals.SEARCH);
-            if ((value != null) && !value.equals("0"))
-                entryTable.addRowSelectionInterval(i, i);
+        refreshTable();
+
+        if (select) {
+
+          selectResults(searchValueField);
+
         }
+        else {
+          entryTable.clearSelection();
+        }
+
+        if (reorder)
+          entryTable.scrollTo(0);
+
+        //entryTable.revalidate();
+        //entryTable.repaint();
 
     }
 
@@ -1570,14 +1569,33 @@ public class BasePanel extends JSplitPane implements ClipboardOwner {
      * @param <code>String</code> field name.
      */
     public void selectResults(String field) {
-        entryTable.clearSelection();
-        for (int i=0; i<entryTable.getRowCount(); i++) {
-            String value = (String)(database.getEntryById
-                                    (tableModel.getNameFromNumber(i)))
-                .getField(field);
-            if ((value != null) && !value.equals("0"))
-                entryTable.addRowSelectionInterval(i, i);
+      LinkedList intervals = new LinkedList();
+      int prevStart = -1, prevToSel = 0;
+      // First we build a list of intervals to select, without touching the table.
+      for (int i = 0; i < entryTable.getRowCount(); i++) {
+        String value = (String) (database.getEntryById
+                                 (tableModel.getNameFromNumber(i)))
+            .getField(field);
+        if ( (value != null) && !value.equals("0")) {
+          if (prevStart < 0)
+            prevStart = i;
+          prevToSel = i;
         }
+        else if (prevStart >= 0) {
+          intervals.add(new int[] {prevStart, prevToSel});
+          prevStart = -1;
+        }
+      }
+      // Then select those intervals, if any.
+      if (intervals.size() > 0) {
+        entryTable.setSelectionListenerEnabled(false);
+        entryTable.clearSelection();
+        for (Iterator i=intervals.iterator(); i.hasNext();) {
+          int[] interval = (int[])i.next();
+          entryTable.addRowSelectionInterval(interval[0], interval[1]);
+        }
+        entryTable.setSelectionListenerEnabled(true);
+      }
     }
 
     /**

@@ -160,9 +160,30 @@ public class EntryTable extends JTable {
        * row selection is adjusted.
        */
       public void setRowSelectionInterval(int row1, int row2) {
+        boolean oldState = selectionListenerOn;
         selectionListenerOn = false;
         super.setRowSelectionInterval(row1, row2);
-        selectionListenerOn = true;
+        selectionListenerOn = oldState;
+      }
+
+      /**
+       * This method overrides the superclass' to disable the selection listener while the
+       * selection is cleared.
+       */
+      public void clearSelection() {
+        boolean oldState = selectionListenerOn;
+        selectionListenerOn = false;
+        super.clearSelection();
+        selectionListenerOn = oldState;
+      }
+
+      /**
+       * Enables or disables the selectionlistener. Useful if the selection needs to be
+       * updated in several steps, without the table responding between each.
+       * @param enabled boolean
+       */
+      public void setSelectionListenerEnabled(boolean enabled) {
+        selectionListenerOn = enabled;
       }
 
       /**
