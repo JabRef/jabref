@@ -193,9 +193,10 @@ public class JabRefFrame extends JFrame {
 		if (fileToOpen.exists()) {
 		    //Util.pr("Opening last edited file:"
 		    //+fileToOpen.getName());
-		    openDatabaseAction.openIt();
+		    openDatabaseAction.openIt(i == 0);
 		}
 	    }
+	    output("");
 	}
 	//JFrame.setDefaultLookAndFeelDecorated(true); 
 	try { 
@@ -827,14 +828,14 @@ public class JabRefFrame extends JFrame {
 	    if (fileToOpen != null) {
 		(new Thread() {
 			public void run() {
-			    openIt();
+			    openIt(true);
 			}
 		    }).start();
 		fileHistory.newFile(fileToOpen.getPath());
 	    }
 	}
 	
-	public void openIt() {
+	public void openIt(boolean raisePanel) {
 	    if ((fileToOpen != null) && (fileToOpen.exists())) {
 		try {
 		    prefs.put("workingDirectory", fileToOpen.getPath());
@@ -852,7 +853,8 @@ public class JabRefFrame extends JFrame {
 		      }
 		    */
 		    tabbedPane.add(fileToOpen.getName(), bp);
-		    tabbedPane.setSelectedComponent(bp);
+		    if (raisePanel)
+			tabbedPane.setSelectedComponent(bp);
 		    if (tabbedPane.getTabCount() == 1)
 			setNonEmptyState();
 		    output("Opened database '"+fileToOpen.getPath()+"' with "+
