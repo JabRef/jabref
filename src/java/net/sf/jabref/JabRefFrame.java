@@ -2124,7 +2124,9 @@ class FetchCiteSeerAction
       simpleHtmlItem = new JMenuItem(Globals.lang("Simple HTML")),
       //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
       docbookItem = new JMenuItem(Globals.lang("Docbook")),
-      bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML"));
+      bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
+      modsItem = new JMenuItem(Globals.lang("MODS"));
+
 
   private void setUpExportMenu(JMenu menu) {
     ActionListener listener = new ActionListener() {
@@ -2147,6 +2149,10 @@ class FetchCiteSeerAction
         }
         else if (source == bibtexmlItem) {
           lfFileName = "bibtexml";
+          extension = ".xml";
+        }
+        else if (source == modsItem) {
+          lfFileName = "mods";
           extension = ".xml";
         }
 
@@ -2199,6 +2205,8 @@ class FetchCiteSeerAction
     menu.add(bibtexmlItem);
     docbookItem.addActionListener(listener);
     menu.add(docbookItem);
+    modsItem.addActionListener(listener);
+    menu.add(modsItem);
 
     menu.add(exportCSV);
 
