@@ -14,6 +14,10 @@ standard Bibtex fields. JabRef can autogenerate bibtex keys for your
 entries. JabRef also lets you easily link to PDF or web sources for your
 reference entries.
 
+JabRef can import from and export to several formats, and you can
+customize export filters. JabRef can be run as a command line application
+to convert from any import format to any export format.
+
 
 License:
 JabRef is free open source software, distributed under the GNU General

@@ -84,8 +84,8 @@ public class JabRef {
       //exportFile.setHelpDescriptionSize(80);
       //exportFile.setFileCompleteOptionSize(12);
       BooleanOption loadSess = new BooleanOption();
-      StringOption exportPrefs = new StringOption("");
-      StringOption importPrefs = new StringOption("");
+      StringOption exportPrefs = new StringOption("jabref_prefs.xml");
+      StringOption importPrefs = new StringOption("jabref_prefs.xml");
 
       options.register("nogui", 'n', Globals.lang("No GUI. Only process command line options."), disableGui);
       options.register("import", 'i', Globals.lang("Import file")+": "+Globals.lang("filename")+"[,import format]", importFile);
