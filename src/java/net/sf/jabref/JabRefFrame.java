@@ -80,6 +80,12 @@ public class JabRefFrame extends JFrame {
 	incrementalSearch = new IncrementalSearchAction(),
 	normalSearch = new SearchAction(),
 	newDatabaseAction = new NewDatabaseAction(),
+	help = new HelpAction("JabRef help", helpDiag, 
+			      GUIGlobals.baseFrameHelp, "JabRef help"),
+	contents = new HelpAction("Help contents", helpDiag, 
+				  GUIGlobals.helpContents, "Help contents"),
+	about = new HelpAction("About JabRef", helpDiag, 
+			       GUIGlobals.aboutPage, "About JabRef"),
 	save = new GeneralAction("save", "Save database",
 				 "Save database", GUIGlobals.saveIconFile,
 				 prefs.getKey("Save")),
@@ -150,7 +156,6 @@ public class JabRefFrame extends JFrame {
     };
 
     public JabRefFrame() {
-
 	//Globals.setLanguage("no", "");
 	setTitle(GUIGlobals.frameTitle);	       
 	setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -183,7 +188,10 @@ public class JabRefFrame extends JFrame {
 		}
 	    }
 	}
-	
+	//JFrame.setDefaultLookAndFeelDecorated(true); 
+	try { 
+	    UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName()); 
+	} catch (Exception e) { } 
 	setVisible(true);
 	if (tabbedPane.getTabCount() > 0) {
 	    tabbedPane.setSelectedIndex(0);
@@ -424,7 +432,8 @@ public class JabRefFrame extends JFrame {
 	    view = new JMenu(Globals.lang("View")),
 	    tools = new JMenu(Globals.lang("Tools")),
 	    options = new JMenu(Globals.lang("Options")),
-	    newSpec = new JMenu(Globals.lang("New entry..."));
+	    newSpec = new JMenu(Globals.lang("New entry...")),
+	    helpMenu = new JMenu(Globals.lang("Help"));
 	JMenu importMenu = new JMenu(Globals.lang("Import"));
 
 	setUpImportMenu(importMenu);
@@ -482,6 +491,12 @@ public class JabRefFrame extends JFrame {
 	options.add(showPrefs);
 	options.add(selectKeys);
 	mb.add(options);
+
+	helpMenu.add(help);
+	helpMenu.add(contents);
+	helpMenu.addSeparator();
+	helpMenu.add(about);
+	mb.add(helpMenu);
     }
 
     private void createToolBar() {
