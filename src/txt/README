@@ -1,6 +1,6 @@
 
-JabRef 1.6
-----------
+JabRef 1.7 beta
+---------------
 
 
 Introduction:
@@ -88,13 +88,18 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:	- Changed routine for rearranging author names (Lastname, Firstname) so bracketed
+1.7b:	- Changed routine for rearranging author names (Lastname, Firstname) so bracketed
   	  expressions are treated as units.
+        - Grouping controls now allow group hierarchies, and now allow explicit and search
+          expression groups as well as keyword groups.
+        - Added export filters EndNote and Harvard RTF.
 	- Added automatic import format chooser for import (same as wildcard import below).
 	- Added wildcard (*) option for command-line import, to try to automatically
 	  determine the correct format.
 	- Improved layout of Preferences dialog.
+        - Improved several import filters.
 	- Added authIniN/edtrIniN key formatters.
+        - Marked entries now float to the top when no searching or grouping reordering is active.
 	- Fixed problem with opening file dialog on Win NT - AWT dialog is now opened if
 	  Swing dialog fails.
 1.6:    - Improved handling of entry selection in various ways. E.g. selected entry is now scrolled

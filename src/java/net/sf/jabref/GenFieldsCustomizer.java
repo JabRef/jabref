@@ -18,6 +18,7 @@ public class GenFieldsCustomizer extends JDialog {
   JPanel jPanel2 = new JPanel();
   JButton ok = new JButton();
   JButton cancel = new JButton();
+  JButton helpBut = new JButton();
   TitledBorder titledBorder1;
   TitledBorder titledBorder2;
   JLabel jLabel1 = new JLabel();
@@ -31,11 +32,16 @@ public class GenFieldsCustomizer extends JDialog {
   JabRefFrame parent;
   JButton revert = new JButton();
   EntryCustomizationDialog diag;
-
+  HelpAction help;
+  
   public GenFieldsCustomizer(JabRefFrame frame, EntryCustomizationDialog diag) {
     super(frame, Globals.lang("Set general fields"), false);
     parent = frame;
     this.diag = diag;
+    help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
+	      "Help", GUIGlobals.helpSmallIconFile);
+    helpBut = new JButton(Globals.lang("Help"));
+    helpBut.addActionListener(help);
     try {
       jbInit();
       setSize(new Dimension(400, 200));
@@ -67,6 +73,8 @@ public class GenFieldsCustomizer extends JDialog {
     jPanel2.add(ok, null);
     jPanel2.add(revert, null);
     jPanel2.add(cancel, null);
+    jPanel2.add(Box.createHorizontalStrut(10));
+    jPanel2.add(helpBut, null);
     this.getContentPane().add(jPanel3, BorderLayout.CENTER);
     jPanel3.add(jLabel1,    new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));

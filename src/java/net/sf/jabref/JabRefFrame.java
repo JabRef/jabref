@@ -887,7 +887,7 @@ public JabRefPreferences prefs() {
     edit.add(delete);
     edit.add(copyKey);
     edit.add(copyCiteKey);
-    edit.add(exportToClipboard);
+    //edit.add(exportToClipboard);
     edit.addSeparator();
     edit.add(mark);
     edit.add(unmark);

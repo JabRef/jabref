@@ -53,7 +53,7 @@ public class GUIGlobals {
   // Frame titles.
   public static String
       frameTitle = "JabRef",
-      version = "1.6",
+      version = "1.7b",
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",
@@ -269,6 +269,7 @@ public class GUIGlobals {
       pdfHelp = "ExternalFiles.html",
       exportCustomizationHelp = "CustomExports.html",
       medlineHelp = "MedlineHelp.html",
+      generalFieldsHelp = "GeneralFields.html",
 //      searchHelp = "SearchHelp.html",
       aboutPage = "About.html",
       shortPlainImport="ShortPlainImport.html";
