@@ -53,7 +53,8 @@ public class EntryTableModel extends AbstractTableModel {
 	REQ_STRING = 1,
 	REQ_NUMBER = 2,
 	OPT_STRING = 3,
-	OTHER = 3;
+	OTHER = 3,
+	PADLEFT = 2;
 
     public EntryTableModel(JabRefFrame frame_,
 			   BasePanel panel_, 
@@ -70,11 +71,19 @@ public class EntryTableModel extends AbstractTableModel {
 	//	entryIDs = db.getKeySet().toArray(); // Temporary
     }
 
+    /*public void numberRows() { 
+         for(int r=0; r < model.getRowCount(); r++) 
+                 model.setValueAt(r+1 + "", r, 0); 
+		 } */
+
+
     public String getColumnName(int col) { 
 	if (col == 0)
+	    return GUIGlobals.NUMBER_COL;
+	else if (col == 1)
 	    return Util.nCase(TYPE);
 	else {
-	    return Util.nCase(columns[col-1]); 
+	    return Util.nCase(columns[col-PADLEFT]); 
 	}
     }
 
@@ -85,16 +94,17 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() { 
-	return 1+columns.length;
+	return PADLEFT+columns.length;
     }
 
     public Class getColumnClass(int column) {
+	return String.class;
+
+	/*
 	if (column == 0)
 	    return String.class;
 	else
-	    return String.class;
-
-		/*((ObjectType)(FieldTypes.GLOBAL_FIELD_TYPES.get
+	 ((ObjectType)(FieldTypes.GLOBAL_FIELD_TYPES.get
 				 (GUIGlobals.ALL_FIELDS
 				  [(frame.prefs.getByteArray("columnNames"))[column-1]])))
 				  .getValueClass();*/
@@ -105,21 +115,23 @@ public class EntryTableModel extends AbstractTableModel {
 	// corresponding to the row.
 	Object o;
 	BibtexEntry be = db.getEntryById(getNameFromNumber(row));
-	if (col == 0) 
+	if (col == 0)
+	    o = ""+row;
+	else if (col == 1) 
 	    o = be.getType().getName();
 	else {
-	    o = be.getField(columns[col-1]);
+	    o = be.getField(columns[col-PADLEFT]);
 	}
 	return o;
     }
 
     public int getCellStatus(int row, int col) {
-	if (col == 0) return OTHER;
+	if ((col == 0)  || (col == 1)) return OTHER;
 	BibtexEntryType type = (db.getEntryById(getNameFromNumber(row)))
 	    .getType();
 	if (columns[col-1].equals(GUIGlobals.KEY_FIELD) 
-	    || type.isRequired(columns[col-1])) return REQUIRED;
-	if (type.isOptional(columns[col-1])) return OPTIONAL;
+	    || type.isRequired(columns[col-PADLEFT])) return REQUIRED;
+	if (type.isOptional(columns[col-PADLEFT])) return OPTIONAL;
 	return OTHER;
     }
 
@@ -206,7 +218,7 @@ public class EntryTableModel extends AbstractTableModel {
     }
 
     public boolean isCellEditable(int row, int col) {
-	if (col == 0) return false;
+	if (col <= PADLEFT) return false;
 	// getColumnClass will throw a NullPointerException if there is no
 	// entry in FieldTypes.GLOBAL_FIELD_TYPES for the column.
 	try {

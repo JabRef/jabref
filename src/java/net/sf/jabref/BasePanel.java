@@ -591,10 +591,11 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		refreshTable();
 		markBaseChanged(); // The database just changed.
 		if (prefs.getBoolean("autoOpenForm")) {
-		    EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
-		    Util.placeDialog(etf, frame);
-		    etf.setVisible(true);
-		    entryTypeForms.put(id, etf);
+		    showEntry(be);
+		    //EntryTypeForm etf = new EntryTypeForm(frame, ths, be, prefs);
+		    //Util.placeDialog(etf, frame);
+		    //etf.setVisible(true);
+		    //entryTypeForms.put(id, etf);
 		}
 	    } catch (KeyCollisionException ex) {
 		Util.pr(ex.getMessage());

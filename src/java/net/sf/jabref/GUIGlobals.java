@@ -299,6 +299,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	INDENT = 4,
 	LINE_LENGTH = 65; // Maximum
 
+    public static String NUMBER_COL = "#";
     public static int DEFAULT_FIELD_LENGTH = 100;
     public static final Map FIELD_LENGTH, FIELD_WEIGHT;
     static {
@@ -313,6 +314,7 @@ invalidFieldBackground = new Color(141,0,61), // Invalid field backgnd.
 	fieldLength.put("number", new Integer(60));
 	fieldLength.put("entrytype", new Integer(75));
 	fieldLength.put("search", new Integer(75));
+	fieldLength.put(NUMBER_COL, new Integer(32));
 
 	FIELD_LENGTH = Collections.unmodifiableMap(fieldLength);
 
