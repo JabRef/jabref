@@ -65,19 +65,31 @@ public class ImportFormatReader
      // output format string: FN LN [and FN LN]*
      */
     public static String fixAuthor_nocomma(String in){
-	StringBuffer sb=new StringBuffer();
-	String[] authors = in.split(" and ");
-	for(int i=0; i<authors.length; i++){
-	    //System.out.println(authors[i]);
-	    authors[i]=authors[i].trim();
-	    String[] t = authors[i].split(" ");
-	    sb.append( t[1].trim() + " " + t[0].trim());
-	    if(i==authors.length-1)
-		sb.append(".");
-	    else
-		sb.append(" and ");
-	}
-	return sb.toString();
+
+      // Check if we have cached this particular name string before:
+      Object old = Globals.nameCache.get(in);
+      if (old != null)
+        return (String)old;
+
+      StringBuffer sb=new StringBuffer();
+      String[] authors = in.split(" and ");
+      for(int i=0; i<authors.length; i++){
+        //System.out.println(authors[i]);
+        authors[i]=authors[i].trim();
+        String[] t = authors[i].split(" ");
+        sb.append( t[1].trim() + " " + t[0].trim());
+        if(i==authors.length-1)
+          sb.append(".");
+        else
+          sb.append(" and ");
+      }
+
+      String fixed = sb.toString();
+
+      // Add the fixed name string to the cache.
+      Globals.nameCache.put(in, fixed);
+
+      return fixed;
     }
 
 
@@ -88,6 +100,12 @@ public class ImportFormatReader
     //========================================================
 
     public static String fixAuthor(String in){
+
+      // Check if we have cached this particular name string before:
+      Object old = Globals.nameCache.get(in);
+      if (old != null)
+        return (String)old;
+
 	//Util.pr("firstnamefirst");
 	StringBuffer sb=new StringBuffer();
 	//System.out.println("FIX AUTHOR: in= " + in);
@@ -101,7 +119,13 @@ public class ImportFormatReader
 	    if(i != authors.length-1 ) // put back the " and "
 		sb.append(" and ");
 	}
-	return sb.toString();
+
+        String fixed = sb.toString();
+
+        // Add the fixed name string to the cache.
+        Globals.nameCache.put(in, fixed);
+
+	return fixed;
     }
 
     //========================================================
@@ -110,65 +134,76 @@ public class ImportFormatReader
     // output format string: LN, FN [and LN, FN]*
     //========================================================
     public static String fixAuthor_lastnameFirst(String in){
-	//Util.pr("lastnamefirst: in");
-	StringBuffer sb=new StringBuffer();
 
-	String[] authors = in.split(" and ");
-	for(int i=0; i<authors.length; i++){
-          int comma = authors[i].indexOf(',');
-          test:if (comma >= 0) {
-            // There is a comma, so we assume it's ok.
+      // Check if we have cached this particular name string before:
+      Object old = Globals.nameCache.get(in);
+      if (old != null)
+        return (String)old;
+
+      //Util.pr("lastnamefirst: in");
+      StringBuffer sb=new StringBuffer();
+
+      String[] authors = in.split(" and ");
+      for(int i=0; i<authors.length; i++){
+        int comma = authors[i].indexOf(',');
+        test:if (comma >= 0) {
+          // There is a comma, so we assume it's ok.
+          sb.append(authors[i]);
+        }
+        else {
+          // The name is without a comma, so it must be rearranged.
+          int pos = authors[i].lastIndexOf(' ');
+          if (pos == -1) {
+            // No spaces. Give up and just add the name.
             sb.append(authors[i]);
+            break test;
           }
-          else {
-            // The name is without a comma, so it must be rearranged.
-            int pos = authors[i].lastIndexOf(' ');
+          String surname = authors[i].substring(pos+1);
+          if (surname.equalsIgnoreCase("jr.")) {
+            pos = authors[i].lastIndexOf(' ', pos - 1);
             if (pos == -1) {
-              // No spaces. Give up and just add the name.
+              // Only last name and jr?
               sb.append(authors[i]);
               break test;
             }
-            String surname = authors[i].substring(pos+1);
-            if (surname.equalsIgnoreCase("jr.")) {
-              pos = authors[i].lastIndexOf(' ', pos - 1);
-              if (pos == -1) {
-                // Only last name and jr?
-                sb.append(authors[i]);
-                break test;
-              }
-              else
-                surname = authors[i].substring(pos+1);
-            }
-            // Ok, we've isolated the last name. Put together the rearranged name:
-            sb.append(surname + ", ");
-            sb.append(authors[i].substring(0, pos));
-
+            else
+              surname = authors[i].substring(pos+1);
           }
-          if (i != authors.length - 1)
-            sb.append(" and ");
+          // Ok, we've isolated the last name. Put together the rearranged name:
+          sb.append(surname + ", ");
+          sb.append(authors[i].substring(0, pos));
+
         }
-	    /*String[] t = authors[i].split(",");
-	    if(t.length < 2) {
-		// The name is without a comma, so it must be rearranged.
-		t = authors[i].split(" ");
-		if (t.length > 1) {
-		    sb.append(t[t.length - 1]+ ","); // Last name
-		    for (int j=0; j<t.length-1; j++)
-			sb.append(" "+t[j]);
-		} else if (t.length > 0)
+        if (i != authors.length - 1)
+          sb.append(" and ");
+      }
+      /*String[] t = authors[i].split(",");
+            if(t.length < 2) {
+         // The name is without a comma, so it must be rearranged.
+         t = authors[i].split(" ");
+         if (t.length > 1) {
+             sb.append(t[t.length - 1]+ ","); // Last name
+             for (int j=0; j<t.length-1; j++)
+          sb.append(" "+t[j]);
+         } else if (t.length > 0)
                   sb.append(t[0]);
-	    }
-	    else {
-		// The name is written with last name first, so it's ok.
-		sb.append(authors[i]);
-	    }
+            }
+            else {
+         // The name is written with last name first, so it's ok.
+         sb.append(authors[i]);
+            }
 
             if(i !=authors.length-1)
-		sb.append(" and ");
+         sb.append(" and ");
 
-	}*/
-	//Util.pr(in+" -> "+sb.toString());
-	return sb.toString();
+        }*/
+      //Util.pr(in+" -> "+sb.toString());
+      String fixed = sb.toString();
+
+      // Add the fixed name string to the cache.
+      Globals.nameCache.put(in, fixed);
+
+      return fixed;
     }
 
 

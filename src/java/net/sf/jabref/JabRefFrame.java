@@ -1063,6 +1063,7 @@ public JabRefPreferences prefs() {
     toggleGroups.setEnabled(false);
     makeKeyAction.setEnabled(false);
     lyxPushAction.setEnabled(false);
+    winEdtPushAction.setEnabled(false);
     normalSearch.setEnabled(false);
     incrementalSearch.setEnabled(false);
     replaceAll.setEnabled(false);
@@ -1109,6 +1110,7 @@ public JabRefPreferences prefs() {
     toggleGroups.setEnabled(true);
     makeKeyAction.setEnabled(true);
     lyxPushAction.setEnabled(true);
+    winEdtPushAction.setEnabled(true);
     normalSearch.setEnabled(true);
     incrementalSearch.setEnabled(true);
     replaceAll.setEnabled(true);
