@@ -89,7 +89,8 @@ public class JabRefPreferences {
 	defaults.put("autoCompFields", new byte[] {0, 1, 28});
 	defaults.put("groupSelectorVisible", new Boolean(true));
 	defaults.put("groupsDefaultField", "keywords");
-	
+	defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
+	defaults.put("historySize", new Integer(5));
 	restoreKeyBindings();
 
 	//defaults.put("oooWarning", new Boolean(true));

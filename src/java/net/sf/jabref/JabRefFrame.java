@@ -181,11 +181,12 @@ public class JabRefFrame extends JFrame {
 	fillMenu();
 	createToolBar();
 	getContentPane().setLayout(gbl);
-	con.fill = GridBagConstraints.BOTH;
+	con.fill = GridBagConstraints.HORIZONTAL;
 	con.anchor = GridBagConstraints.WEST;
 	con.weightx = 1;
 	con.weighty = 0;
 	con.gridwidth = GridBagConstraints.REMAINDER;
+	mb.setMinimumSize(mb.getPreferredSize());
 	gbl.setConstraints(mb, con);
 	getContentPane().add(mb);
 
@@ -371,6 +372,7 @@ public class JabRefFrame extends JFrame {
 	file.add(open);
 	file.add(save);
 	file.add(saveAs);
+	file.add(new FileHistory(prefs));
 	file.addSeparator();
 	file.add(close);
 	file.add(quit);
