@@ -552,6 +552,18 @@ public class BasePanel extends JSplitPane implements MouseListener,
 		    runCommand("paste");
 		}
 	    });
+	
+	entryTable.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+					runCommand("edit");
+				}
+				else if(e.getKeyCode() == KeyEvent.VK_DELETE){
+					runCommand("delete");
+		    }
+		}
+	    });
+
 
 	// Set the right-click menu for the entry table.
 	RightClickMenu rcm = new RightClickMenu(this, metaData);
