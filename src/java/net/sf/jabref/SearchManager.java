@@ -170,10 +170,13 @@ class SearchManager extends JPanel
     }
 
     public void actionPerformed(ActionEvent e) {
-	if (e.getSource() == escape)
-	    frame.basePanel().stopShowingSearchResults();
+	if (e.getSource() == escape) {
+	    if (frame.basePanel() != null)
+		frame.basePanel().stopShowingSearchResults();
+	}
 	else if ((e.getSource() == searchField) 
-		 && !increment.isSelected()) {
+		 && !increment.isSelected()
+		 && (frame.basePanel() != null)) {
 	    updatePrefs(); // Make sure the user's choices are recorded.
 
 	    // Setup search parameters common to both highlight and float.
