@@ -272,9 +272,7 @@ public class Util {
         static public String wrap2(String in, int wrapAmount){
         // The following line cuts out all whitespace except line breaks, and replaces
         // with single spaces. Line breaks are padded with a tab character:
-        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+"," ")
-            .replaceAll("\n", "\n\t"));
-
+        StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+"," "));
 
         int p = 0;
         //int lastInserted = -1;
@@ -285,6 +283,8 @@ public class Util {
             int lbreak = out.indexOf("\n", p);
             //System.out.println(lbreak);
             if ((lbreak > p) && (lbreak < q)) {
+                if ((out.length() > lbreak+1) && !(out.charAt(lbreak+1)=='\t'))
+                    out.insert(lbreak+1, '\t');
                 p = lbreak+1;
             }
             else {
@@ -294,7 +294,7 @@ public class Util {
                 p = q+1;
             }
         }
-        return out.toString();
+        return out.toString();//.replaceAll("\n", "\n\t");
     }
 
     public static HashSet findDeliminatedWordsInField(BibtexDatabase db,
@@ -391,7 +391,7 @@ public class Util {
             BrowserLauncher.openURL(fileurl.toString());
             return;
         }catch (MalformedURLException mue){
-            mue.printStackTrace();
+            //mue.printStackTrace();
         }
 
         File file;

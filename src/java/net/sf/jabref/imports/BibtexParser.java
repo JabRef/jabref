@@ -82,6 +82,40 @@ public class BibtexParser
         }
     }
 
+    private String skipAndRecordWhitespace(int j) throws IOException
+    {
+        int c;
+        StringBuffer sb = new StringBuffer();
+        if (j != ' ')
+            sb.append((char)j);
+        while (true)
+        {
+            c = read();
+            if ((c == -1) || (c == 65535))
+            {
+                _eof = true;
+                return sb.toString();
+            }
+
+	    if (Character.isWhitespace((char) c))
+            {
+                if (c != ' ')
+                    sb.append((char)c);
+                continue;
+            }
+	    else
+            // found non-whitespace char
+	    //Util.pr("SkipWhitespace, stops: "+c);
+        unread(c);
+	    /*	    try {
+		Thread.currentThread().sleep(500);
+		} catch (InterruptedException ex) {}*/
+            break;
+        }
+        return sb.toString();
+    }
+
+
     public ParserResult parse() throws IOException {
 
         _db = new BibtexDatabase(); // Bibtex related contents.
@@ -544,9 +578,23 @@ public class BibtexParser
 
 	    // If we encounter whitespace of any kind, read it as a
 	    // simple space, and ignore any others that follow immediately.
-	    if (Character.isWhitespace((char)j)) {
-		value.append(' ');
-		skipWhitespace();
+        /*if (j == '\n') {
+            if (peek() == '\n')
+                value.append('\n');
+        }
+	    else*/ if (Character.isWhitespace((char)j)) {
+            String whs = skipAndRecordWhitespace(j);
+            //System.out.println(":"+whs+":");
+		    if (!whs.equals("") && !whs.equals("\n\t")) { // && !whs.equals("\n"))
+                if (whs.endsWith("\t"))
+                    value.append(whs.substring(0, whs.length()-1));
+                else
+                    value.append(whs);
+            }
+            else
+                value.append(' ');
+
+
 	    } else
 		value.append((char) j);
 
