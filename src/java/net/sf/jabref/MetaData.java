@@ -125,6 +125,7 @@ public class MetaData {
                     version);
         } catch (Exception e) {
             // we cannot really do anything about this here
+            System.err.println(e);
         }
     }
     
