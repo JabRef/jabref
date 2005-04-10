@@ -911,6 +911,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       
   }
 
+
+    /**
+     * Makes sure the current edit is stored.
+     */
+    public void storeCurrentEdit() {
+        Component comp = Globals.focusListener.getFocused();
+        if (comp instanceof FieldEditor) {
+            storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
+        }
+    }
+    
   /**
    * Sets all the text areas according to the shown entry.
    */

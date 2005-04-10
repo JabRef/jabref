@@ -209,7 +209,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening an entry editor.
         actions.put("edit", new BaseAction() {
                 public void action() {
-		    frame.block();
+                    if (isShowingEditor()) {
+                        new FocusRequester(splitPane.getBottomComponent());
+                        return;
+                    }
+                    
+		            frame.block();
                   //(new Thread() {
                   //public void run() {
                   int clickedOn = -1;
@@ -815,6 +820,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() {
                     BibtexEntry[] bes = entryTable.getSelectedEntries();
                     if ((bes != null) && (bes.length > 0)) {
+                        storeCurrentEdit();
                         //String[] keys = new String[bes.length];
                         Vector keys = new Vector();
                         // Collect all non-null keys.
@@ -852,6 +858,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() {
                     BibtexEntry[] bes = entryTable.getSelectedEntries();
                     if ((bes != null) && (bes.length > 0)) {
+                        storeCurrentEdit();
                         //String[] keys = new String[bes.length];
                         Vector keys = new Vector();
                         // Collect all non-null keys.
@@ -2035,6 +2042,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else
           editor.updateAllFields();
       }
+    }
+
+    /**
+     * If an entry editor is showing, make sure its currently focused field
+     * stores its changes, if any.
+     */
+    public void storeCurrentEdit() {
+        if (isShowingEditor()) {
+            EntryEditor editor = (EntryEditor)splitPane.getBottomComponent();
+            editor.storeCurrentEdit();
+        }
+
     }
 
     /**

@@ -586,10 +586,10 @@ public class BibtexParser
             String whs = skipAndRecordWhitespace(j);
             //System.out.println(":"+whs+":");
 		    if (!whs.equals("") && !whs.equals("\n\t")) { // && !whs.equals("\n"))
-                if (whs.endsWith("\t"))
-                    value.append(whs.substring(0, whs.length()-1));
-                else
-                    value.append(whs);
+                whs = whs.replaceAll("\t", ""); // Remove tabulators.
+                //while (whs.endsWith("\t"))
+                //    whs = whs.substring(0, whs.length()-1);
+                value.append(whs);
             }
             else
                 value.append(' ');

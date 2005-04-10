@@ -107,7 +107,7 @@ public class HTMLChars implements LayoutFormatter {
   }
 
   private String firstFormat(String s) {
-    return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
+    return s.replaceAll("&|\\\\&","&amp;").replaceAll("[\\n]{2,}","<p>");//.replaceAll("--", "&mdash;");
   }
 
   private IntAndString getPart(String text, int i) {
