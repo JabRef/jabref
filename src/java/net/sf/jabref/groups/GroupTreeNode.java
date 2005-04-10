@@ -275,34 +275,6 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         return (AbstractGroup[]) matchingGroups.toArray(matchingGroupsArray);
     }
 
-    /**
-     * Imports old (flat) groups data and converts it to a 2-level tree with an
-     * AllEntriesGroup at the root.
-     * 
-     * @return the root of the generated tree.
-     */
-    public static GroupTreeNode importFlatGroups(Vector groups) {
-        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
-        final int number = groups.size() / 3;
-        String name, field, regexp;
-        for (int i = 0; i < number; ++i) {
-            field = (String) groups.elementAt(3 * i + 0);
-            name = (String) groups.elementAt(3 * i + 1);
-            regexp = (String) groups.elementAt(3 * i + 2);
-            try {
-                root.add(new GroupTreeNode(
-                        new KeywordGroup(name, field, regexp)));
-            } catch (IllegalArgumentException iae) {
-                // TODO this should show a message.
-                // however, since we're so far away from JabRefFrame,
-                // I (JZ) think it would be best to create a global
-                // static method in JabRefFrame for showing error messages,
-                // rather than propagating the error all the way up there.
-            }
-        }
-        return root;
-    }
-
     public boolean canMoveUp() {
         return getPreviousSibling() != null
                 && !(getGroup() instanceof AllEntriesGroup);

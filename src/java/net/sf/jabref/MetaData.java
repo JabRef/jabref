@@ -28,9 +28,8 @@ package net.sf.jabref;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.*;
 
 public class MetaData {
     private HashMap metaData = new HashMap();
@@ -69,8 +68,9 @@ public class MetaData {
                 putData(key, orderedData);
             }
         }
-        if (!groupsTreePresent && flatGroupsData != null)
-            groupsRoot = GroupTreeNode.importFlatGroups(flatGroupsData);
+        if (!groupsTreePresent && flatGroupsData != null) {
+            groupsRoot = Versioning.importFlatGroups(flatGroupsData);
+        }
     }
 
     /**
