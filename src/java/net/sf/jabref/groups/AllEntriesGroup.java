@@ -38,12 +38,17 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         super("All Entries");
     }
     
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
                             + s + "\"");
-        return new AllEntriesGroup();
+        switch (version) {
+        case 0:
+            return new AllEntriesGroup();
+        default:
+            throw new UnsupportedVersionException("AllEntriesGroup", version); 
+        }
     }
 
     public SearchRule getSearchRule() {

@@ -52,7 +52,7 @@ public abstract class AbstractGroup {
     public abstract SearchRule getSearchRule();
 
     /**
-     * Re-create a group instance.
+     * Re-create a group instance from a textual representation.
      * 
      * @param s
      *            The result from the group's toString() method.
@@ -61,16 +61,16 @@ public abstract class AbstractGroup {
      *             If an error occured and a group could not be created, e.g.
      *             due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, BibtexDatabase db)
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version)
             throws Exception {
         if (s.startsWith(KeywordGroup.ID))
-            return KeywordGroup.fromString(s);
+            return KeywordGroup.fromString(s, db, version);
         if (s.startsWith(AllEntriesGroup.ID))
-            return AllEntriesGroup.fromString(s);
+            return AllEntriesGroup.fromString(s, db, version);
         if (s.startsWith(SearchGroup.ID))
-            return SearchGroup.fromString(s);
+            return SearchGroup.fromString(s, db, version);
         if (s.startsWith(ExplicitGroup.ID))
-            return ExplicitGroup.fromString(s, db);
+            return ExplicitGroup.fromString(s, db, version);
         return null; // unknown group
     }
 

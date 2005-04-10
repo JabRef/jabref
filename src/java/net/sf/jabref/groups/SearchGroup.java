@@ -108,25 +108,30 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
      *            The String representation obtained from
      *            SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: SearchGroup cannot be created from \"" + s
                             + "\"");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
-        String name = tok.nextToken();
-        String expression = tok.nextToken();
-        boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-        boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-        boolean searchAllFields = Integer.parseInt(tok.nextToken()) == 1;
-        boolean searchRequiredFields = Integer.parseInt(tok.nextToken()) == 1;
-        boolean searchOptionalFields = Integer.parseInt(tok.nextToken()) == 1;
-        boolean searchGeneralFields = Integer.parseInt(tok.nextToken()) == 1;
-        return new SearchGroup(Util.unquote(name, QUOTE_CHAR), Util.unquote(
-                expression, QUOTE_CHAR), caseSensitive, regExp,
-                searchAllFields, searchRequiredFields, searchOptionalFields,
-                searchGeneralFields);
+        switch (version) {
+        case 0:
+            String name = tok.nextToken();
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            boolean searchAllFields = Integer.parseInt(tok.nextToken()) == 1;
+            boolean searchRequiredFields = Integer.parseInt(tok.nextToken()) == 1;
+            boolean searchOptionalFields = Integer.parseInt(tok.nextToken()) == 1;
+            boolean searchGeneralFields = Integer.parseInt(tok.nextToken()) == 1;
+            return new SearchGroup(Util.unquote(name, QUOTE_CHAR), Util.unquote(
+                    expression, QUOTE_CHAR), caseSensitive, regExp,
+                    searchAllFields, searchRequiredFields, searchOptionalFields,
+                    searchGeneralFields);
+        default:
+            throw new UnsupportedVersionException("SearchGroup",version);
+        }
     }
 
     /**

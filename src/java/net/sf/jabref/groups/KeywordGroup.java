@@ -1,24 +1,24 @@
 /*
-All programs in this directory and subdirectories are published under the 
-GNU General Public License as described below.
+ All programs in this directory and subdirectories are published under the 
+ GNU General Public License as described below.
 
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the Free 
-Software Foundation; either version 2 of the License, or (at your option) 
-any later version.
+ This program is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU General Public License as published by the Free 
+ Software Foundation; either version 2 of the License, or (at your option) 
+ any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT 
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
-more details.
+ This program is distributed in the hope that it will be useful, but WITHOUT 
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+ more details.
 
-You should have received a copy of the GNU General Public License along 
-with this program; if not, write to the Free Software Foundation, Inc., 59 
-Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ You should have received a copy of the GNU General Public License along 
+ with this program; if not, write to the Free Software Foundation, Inc., 59 
+ Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
-*/
+ Further information about the GNU GPL is available at:
+ http://www.gnu.org/copyleft/gpl.ja.html
+ */
 
 package net.sf.jabref.groups;
 
@@ -72,18 +72,25 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      *            The String representation obtained from
      *            KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s, BibtexDatabase db,
+            int version) throws Exception {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
                             + s + "\"");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
-        String name = tok.nextToken();
-        String field = tok.nextToken();
-        String expression = tok.nextToken();
-        return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util.unquote(
-                field, QUOTE_CHAR), Util.unquote(expression, QUOTE_CHAR));
+        switch (version) {
+        case 0:
+            String name = tok.nextToken();
+            String field = tok.nextToken();
+            String expression = tok.nextToken();
+            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
+                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
+                    QUOTE_CHAR));
+        default:
+            throw new UnsupportedVersionException("KeywordGroup", version);
+        }
     }
 
     /**
@@ -144,42 +151,43 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     return null;
             }
         }
-        
+
         BibtexEntry[] entries = basePanel.getSelectedEntries();
         AbstractUndoableEdit undo = addSelection(entries);
-        
+
         if (entries.length > 0) // JZTODO: translation
             basePanel.output("Appended '" + m_searchExpression + "' to the '"
                     + m_searchField + "' field of " + entries.length + " entr"
                     + (entries.length > 1 ? "ies." : "y."));
-        
+
         return undo;
     }
-    
+
     public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
         if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound("add to group");
             boolean modified = false;
             for (int i = 0; i < entries.length; i++) {
                 if (applyRule(null, entries[i]) == 0) {
-                    String oldContent = (String) entries[i].getField(m_searchField), pre = " ", post = "";
+                    String oldContent = (String) entries[i]
+                            .getField(m_searchField), pre = " ", post = "";
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + m_searchExpression + post;
                     entries[i].setField(m_searchField, newContent);
 
                     // Store undo information.
-                    ce.addEdit(new UndoableFieldChange(entries[i], m_searchField,
-                            oldContent, newContent));
+                    ce.addEdit(new UndoableFieldChange(entries[i],
+                            m_searchField, oldContent, newContent));
                     modified = true;
                 }
             }
             if (modified)
                 ce.end();
- 
+
             return modified ? ce : null;
         }
-        
+
         return null;
     }
 
@@ -222,11 +230,11 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         AbstractUndoableEdit undo = removeSelection(entries);
         if (entries.length > 0)
             basePanel.output("Removed '" + m_searchExpression + "' from the '"
-                    + m_searchField + "' field of " + entries.length
-                    + " entr" + (entries.length > 1 ? "ies." : "y."));
+                    + m_searchField + "' field of " + entries.length + " entr"
+                    + (entries.length > 1 ? "ies." : "y."));
         return undo;
     }
-    
+
     public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
         if ((entries != null) && (entries.length > 0)) {
             NamedCompound ce = new NamedCompound("remove from group");
@@ -245,12 +253,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
             }
             if (modified)
                 ce.end();
-            
+
             return modified ? ce : null;
         }
-        
+
         return null;
-    }    
+    }
 
     public boolean equals(Object o) {
         if (!(o instanceof KeywordGroup))

@@ -44,7 +44,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         m_database = db;
     }
 
-    public static AbstractGroup fromString(String s, BibtexDatabase db)
+    public static AbstractGroup fromString(String s, BibtexDatabase db, int version)
             throws Exception {
         if (!s.startsWith(ID))
             throw new Exception(
@@ -52,15 +52,20 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
                             + s + "\"");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
-        ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), db);
-        BibtexEntry[] entries;
-        while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
-                    QUOTE_CHAR));
-            for (int i = 0; i < entries.length; ++i)
-                newGroup.m_entries.add(entries[i]);
+        switch (version) {
+        case 0:
+            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), db);
+            BibtexEntry[] entries;
+            while (tok.hasMoreTokens()) {
+                entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
+                        QUOTE_CHAR));
+                for (int i = 0; i < entries.length; ++i)
+                    newGroup.m_entries.add(entries[i]);
+            }
+            return newGroup;
+        default:
+            throw new UnsupportedVersionException("ExplicitGroup", version);
         }
-        return newGroup;
     }
 
     public SearchRule getSearchRule() {

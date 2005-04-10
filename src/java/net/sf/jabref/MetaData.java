@@ -66,7 +66,7 @@ public class MetaData {
                 if (orderedData.size() >= 1)
                     groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString()); 
             } else if (key.equals("groupstree")) {
-                // JZTODO possibly handle import
+                // this possibly handles import of a previous groups version
                 putGroups(orderedData,db);
                 groupsTreePresent = true;
             } else if (key.equals("groups")) {
@@ -76,7 +76,7 @@ public class MetaData {
             }
         }
         if (!groupsTreePresent && flatGroupsData != null) {
-            groupsRoot = Versioning.importFlatGroups(flatGroupsData);
+            groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
         }
     }
 
@@ -112,15 +112,11 @@ public class MetaData {
     }
     
     private void putGroups(Vector orderedData, BibtexDatabase db) {
-        // JZTODO add groups version!!!
-        
         try {
-            // version 1: orderedData contains exactly 1 element
-            groupsRoot = GroupTreeNode.fromString((String) orderedData.firstElement(),db);
+            groupsRoot = VersionHandling.importGroups(orderedData, db, 
+                    groupsVersionOnDisk);
         } catch (Exception e) {
-            // JZTODO: what now? should never happen, unless 
-            // metadata was edited directly in the file
-            e.printStackTrace();
+            // we cannot really do anything about this here
         }
     }
     
@@ -164,7 +160,7 @@ public class MetaData {
             StringBuffer sb = new StringBuffer();
             // write version first
             sb.append("@comment{" + GUIGlobals.META_FLAG + "groupsversion:");
-            sb.append(""+Versioning.CURRENT_VERSION+";");
+            sb.append(""+VersionHandling.CURRENT_VERSION+";");
             sb.append("}\n\n");
             out.write(sb.toString());
             
