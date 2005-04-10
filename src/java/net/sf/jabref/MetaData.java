@@ -35,6 +35,9 @@ public class MetaData {
     private HashMap metaData = new HashMap();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
+    /** The first version (0) lacked a version specification, thus
+     * this value defaults to 0. */
+    private int groupsVersionOnDisk = 0;
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -59,7 +62,11 @@ public class MetaData {
             } catch (IOException ex) {
                 System.err.println("Weird error while parsing meta data.");
             }
-            if (key.equals("groupstree")) {
+            if (key.equals("groupsversion")) {
+                if (orderedData.size() >= 1)
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString()); 
+            } else if (key.equals("groupstree")) {
+                // JZTODO possibly handle import
                 putGroups(orderedData,db);
                 groupsTreePresent = true;
             } else if (key.equals("groups")) {
@@ -155,10 +162,17 @@ public class MetaData {
         // (which is always the AllEntriesGroup).
         if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
             StringBuffer sb = new StringBuffer();
+            // write version first
+            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupsversion:");
+            sb.append(""+Versioning.CURRENT_VERSION+";");
+            sb.append("}\n\n");
+            out.write(sb.toString());
+            
+            // now write actual groups
+            sb = new StringBuffer();
             sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
             sb.append(Util.quote(groupsRoot.toString(),";",'\\'));
             sb.append("}\n\n");
-            
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             out.write(sb.toString());
         }
@@ -193,16 +207,4 @@ public class MetaData {
             return res.toString();
         return null;
     }
-//
-//    private String makeEscape(String s, String specials) {
-//        StringBuffer sb = new StringBuffer();
-//        int c;
-//        for (int i = 0; i < s.length(); i++) {
-//            c = s.charAt(i);
-//            if ((c == '\\') || specials.indexOf(c) >= 0)
-//                sb.append('\\');
-//            sb.append((char) c);
-//        }
-//        return sb.toString();
-//    }
 }
