@@ -35,9 +35,6 @@ public class MetaData {
     private HashMap metaData = new HashMap();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
-    /** The first version (0) lacked a version specification, thus
-     * this value defaults to 0. */
-    private int groupsVersionOnDisk = 0;
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -49,6 +46,11 @@ public class MetaData {
         this();
         boolean groupsTreePresent = false;
         Vector flatGroupsData = null;
+        Vector treeGroupsData = null;
+        // The first version (0) lacked a version specification, 
+        // thus this value defaults to 0.
+        int groupsVersionOnDisk = 0;
+        
         if (inData != null) for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
             data = new StringReader((String) inData.get(key));
@@ -64,17 +66,23 @@ public class MetaData {
             }
             if (key.equals("groupsversion")) {
                 if (orderedData.size() >= 1)
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString()); 
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.firstElement().toString());
             } else if (key.equals("groupstree")) {
-                // this possibly handles import of a previous groups version
-                putGroups(orderedData,db);
                 groupsTreePresent = true;
+                treeGroupsData = orderedData; // save for later user
+                // actual import operation is handled later because "groupsversion"
+                // tag might not yet have been read
             } else if (key.equals("groups")) {
                 flatGroupsData = orderedData;
             } else {
                 putData(key, orderedData);
             }
         }
+        
+        // this possibly handles import of a previous groups version
+        if (groupsTreePresent)
+            putGroups(treeGroupsData, db, groupsVersionOnDisk);
+        
         if (!groupsTreePresent && flatGroupsData != null) {
             groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
         }
@@ -111,10 +119,10 @@ public class MetaData {
         metaData.put(key, orderedData);
     }
     
-    private void putGroups(Vector orderedData, BibtexDatabase db) {
+    private void putGroups(Vector orderedData, BibtexDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db, 
-                    groupsVersionOnDisk);
+                    version);
         } catch (Exception e) {
             // we cannot really do anything about this here
         }
