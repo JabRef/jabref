@@ -31,7 +31,7 @@ import java.util.Vector;
  * @author jzieren (10.04.2005)
  */
 public class Versioning {
-    public static final int CURRENT_VERSION = 1;
+    public static final int CURRENT_VERSION = 0;
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
