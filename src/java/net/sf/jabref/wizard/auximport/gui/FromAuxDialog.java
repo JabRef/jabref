@@ -269,7 +269,7 @@ public class FromAuxDialog
 
          int nested = auxParser.getNestedAuxCounter() ;
          if (nested > 0)
-           statusInfos.append( "\n" +Globals.lang("nested aux files") +" " +nested);
+           statusInfos.append( "\n" +Globals.lang("nested_aux_files") +" " +nested);
 
 
          okButton.setEnabled(true);

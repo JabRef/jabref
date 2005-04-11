@@ -235,7 +235,6 @@ public class AuxSubGenerator
               if (!fileList.contains( str ) )
               {
                  fileList.add(str);   // insert file into filelist
-//                 System.out.println("add #" +str +"#") ;
               }
             }
           }
