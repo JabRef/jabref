@@ -67,6 +67,10 @@ public class AuxCommandLine
                             auxParser.getNotResolvedKeysCount() ) ;
         System.out.println( returnValue ) ;
       }
+      int nested = auxParser.getNestedAuxCounter() ;
+      if (nested > 0)
+        System.out.println( Globals.lang("nested aux files") +" " +nested);
+
     }
     return back ;
   }

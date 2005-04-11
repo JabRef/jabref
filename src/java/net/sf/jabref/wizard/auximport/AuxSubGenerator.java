@@ -25,19 +25,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 
-// created by : r.nagel 23.08.2004
-//
-// modified :
-
-package net.sf.jabref.wizard.auximport ;
-
-import java.io.* ;
-import java.util.regex.* ;
-import java.util.* ;
-
-import net.sf.jabref.* ;
-import net.sf.jabref.imports.* ;
-
 /**
  * <p>Title: Latex Aux to Bibtex</p>
  *
@@ -52,9 +39,24 @@ import net.sf.jabref.imports.* ;
  * @author r.nagel
  *
  * @todo Redesign of dialog structure for an assitent like feeling....
- *   Now the unknown bibtex entries cannot inserted into the reference database
- *   without closing the dialog.
+ *   Now - the unknown bibtex entries cannot inserted into the reference
+ *   database without closing the dialog.
  */
+
+// created by : r.nagel 23.08.2004
+//
+// modified : - 11.04.2005
+//              handling \\@input{file.aux} tag in aux files (nested aux files)
+
+
+package net.sf.jabref.wizard.auximport ;
+
+import java.io.* ;
+import java.util.regex.* ;
+import java.util.* ;
+
+import net.sf.jabref.* ;
+import net.sf.jabref.imports.* ;
 
 public class AuxSubGenerator
 {
@@ -65,6 +67,8 @@ public class AuxSubGenerator
 
   private BibtexDatabase db ; // reference database
   private BibtexDatabase auxDB ; // contains only the bibtex keys who found in aux file
+
+  private int nestedAuxCounter ;  // counts the nested aux files
 
 
   public AuxSubGenerator(BibtexDatabase refDBase)
@@ -81,11 +85,42 @@ public class AuxSubGenerator
 
   /**
    * parseAuxFile
-   * read the Aux file and fill up some intern data structures
+   * read the Aux file and fill up some intern data structures.
+   * Nested aux files (latex \\include) supported!
    *
    * @param filename String : Path to LatexAuxFile
    * @return boolean, true = no error occurs
    */
+
+  // found at comp.text.tex
+  //  > Can anyone tell be the information held within a .aux file?  Is there a
+  //  > specific format to this file?
+  //
+  // I don't think there is a particular format. Every package, class
+  // or document can write to the aux file. The aux file consists of LaTeX macros
+  // and is read at the \begin{document} and again at the \end{document}.
+  //
+  // It usually contains information about existing labels
+  //  \\newlabel{sec:Intro}{{1}{1}}
+  // and citations
+  //  \citation{hiri:conv:1993}
+  // and macros to write information to other files (like toc, lof or lot files)
+  //  \@writefile{toc}{\contentsline {section}{\numberline
+  // {1}Intro}{1}}
+  // but as I said, there can be a lot more
+
+  // aux file :
+  //
+  // \\citation{x}  x = used reference of bibtex library entry
+  //
+  // \\@input{x}  x = nested aux file
+  //
+  // the \\bibdata{x} directive contains information about the
+  // bibtex library file -> x = name of bib file
+  //
+  // \\bibcite{x}{y}
+  //   x is a label for an item and y is the index in bibliography
+
   public final boolean parseAuxFile(String filename)
   {
     // regular expressions
@@ -98,79 +133,128 @@ public class AuxSubGenerator
     // return value -> default: no error
     boolean back = true ;
 
+    // fileopen status
+    boolean loopFileOpen = false ;
+
     // the important tag
     pattern = Pattern.compile( "\\\\citation\\{.+\\}" ) ;
 
     // input-file-buffer
     BufferedReader br = null ;
 
-    try
-    {
-      br = new BufferedReader( new FileReader( filename ) ) ;
-      weiter = true ;
-    }
-    catch ( FileNotFoundException fnfe )
-    {
-      System.out.println( "Cannot locate input file! " + fnfe.getMessage() ) ;
-      // System.exit( 0 ) ;
-      back = false ;
-    }
+    // filelist, used for nested aux files
+    Vector fileList = new Vector(5) ;
+    fileList.add( filename );
 
-    while ( weiter )
+    // get the file path
+    File dummy = new File( filename ) ;
+    String path = dummy.getParent() ;
+    if (path != null)
+      path = path + dummy.separator ;
+    else
+      path = "" ;
+
+    nestedAuxCounter = -1 ;  // count only the nested reads
+
+    // index of current file in list
+    int fileIndex = 0 ;
+
+    while (fileIndex < fileList.size())
     {
-      String line ;
+      String fName = (String) fileList.elementAt( fileIndex ) ;
       try
       {
-        line = br.readLine() ;
+//        System.out.println("read #"+fName +"#") ;
+        br = new BufferedReader( new FileReader( fName ) ) ;
+        weiter = true ;
+        loopFileOpen = true ;
       }
-      catch ( IOException ioe )
+      catch ( FileNotFoundException fnfe )
       {
-        line = null ;
+        System.out.println( "Cannot locate input file! " + fnfe.getMessage() ) ;
+        // System.exit( 0 ) ;
+        back = false ;
         weiter = false ;
+        loopFileOpen = false ;
       }
 
-      if ( line != null )
+      while ( weiter )
       {
-        matcher = pattern.matcher(line) ;
-
-        while ( matcher.find() )
+        String line ;
+        try
         {
-          // extract the bibtex-key(s) XXX from \citation{XXX} string
-          int len = matcher.end() - matcher.start() ;
-          if ( len > 11 )
+          line = br.readLine() ;
+        }
+        catch ( IOException ioe )
+        {
+          line = null ;
+          weiter = false ;
+        }
+
+        if ( line != null )
+        {
+          matcher = pattern.matcher( line ) ;
+
+          while ( matcher.find() )
           {
-            String str = matcher.group().substring( matcher.start() + 10,
-                                                    matcher.end() - 1 ) ;
-            // could be an comma separated list of keys
-            String keys[] = str.split(",") ;
-            if (keys != null)
+            // extract the bibtex-key(s) XXX from \citation{XXX} string
+            int len = matcher.end() - matcher.start() ;
+            if ( len > 11 )
             {
-              int keyCount = keys.length ;
-              for ( int t = 0 ; t < keyCount ; t++ )
+              String str = matcher.group().substring( matcher.start() + 10,
+                  matcher.end() - 1 ) ;
+              // could be an comma separated list of keys
+              String keys[] = str.split( "," ) ;
+              if ( keys != null )
               {
-                String dummyStr = keys[t] ;
-                if (dummyStr != null)
+                int keyCount = keys.length ;
+                for ( int t = 0 ; t < keyCount ; t++ )
                 {
-                  // delete all unnecessary blanks and save key into an set
-                  mySet.add( dummyStr.trim() ) ;
+                  String dummyStr = keys[t] ;
+                  if ( dummyStr != null )
+                  {
+                    // delete all unnecessary blanks and save key into an set
+                    mySet.add( dummyStr.trim() ) ;
 //                System.out.println("found " +str +" in AUX") ;
+                  }
                 }
               }
             }
           }
-        }
-      }
-      else weiter = false ;
-    }  // end of while
+          // try to find a nested aux file
+          int index = line.indexOf( "\\@input{" ) ;
+          if ( index >= 0 )
+          {
+            int start = index + 8 ;
+            int end = line.indexOf( "}", start ) ;
+            if ( end > start )
+            {
+              String str = path + line.substring( index + 8, end ) ;
 
-    if (back) // only close, if open sucessful
-    {
-      try
+              // if filename already in filelist
+              if (!fileList.contains( str ) )
+              {
+                 fileList.add(str);   // insert file into filelist
+//                 System.out.println("add #" +str +"#") ;
+              }
+            }
+          }
+        } // line != null
+        else weiter = false ;
+      } // end of while
+
+      if ( loopFileOpen ) // only close, if open sucessful
       {
-        br.close() ;
+        try
+        {
+          br.close() ;
+          nestedAuxCounter++ ;
+        }
+        catch ( IOException ioe )
+        {}
       }
-      catch ( IOException ioe )
-      {}
+
+      fileIndex++ ; // load next file
     }
 
     return back ;
@@ -249,11 +333,12 @@ public class AuxSubGenerator
     return notFoundList.size() ;
   }
 
-  /** reset used all datastructures */
+  /** reset all used datastructures */
   public final void clear()
   {
     mySet.clear() ;
     notFoundList.clear();
+    // db = null ;  ???
   }
 
   /** returns a vector off all not resolved bibtex entries found in auxfile */
@@ -262,4 +347,26 @@ public class AuxSubGenerator
     return notFoundList ;
   }
 
+  /** returns the number of nested aux files, read by the last call of
+   *  generate method */
+  public int getNestedAuxCounter()
+  {
+    return this.nestedAuxCounter ;
+  }
+
+/*
+  public class FileNameString extends String
+  {
+    public boolean equals(Object anObject)
+    {
+      if (anObject == null)
+        return false ;
+
+      if (anObject.hashCode() == this.hashCode())
+        return true ;
+
+      return false ;
+    }
+  }
+*/
 }

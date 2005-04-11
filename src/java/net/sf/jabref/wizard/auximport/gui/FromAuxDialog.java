@@ -225,7 +225,7 @@ public class FromAuxDialog
     statusPanel.add( listScrollPane) ;
 
     statusInfos = new JTextArea("", 5, 20) ;
-    statusInfos.setBorder(BorderFactory.createEtchedBorder()); 
+    statusInfos.setBorder(BorderFactory.createEtchedBorder());
     statusInfos.setEditable(false);
     con.gridheight = 1 ;
     gbl.setConstraints(statusInfos, con);
@@ -266,6 +266,11 @@ public class FromAuxDialog
          statusInfos.append( "\n" +Globals.lang("found in aux file") +" "+auxParser.getFoundKeysInAux());
          statusInfos.append( "\n" +Globals.lang("resolved") +" " +auxParser.getResolvedKeysCount());
          statusInfos.append( "\n" +Globals.lang("not found") +" " +auxParser.getNotResolvedKeysCount());
+
+         int nested = auxParser.getNestedAuxCounter() ;
+         if (nested > 0)
+           statusInfos.append( "\n" +Globals.lang("nested aux files") +" " +nested);
+
 
          okButton.setEnabled(true);
       }

@@ -93,7 +93,8 @@ public class EntryTable extends JTable {
         dce.setClickCountToStart(2);
         setDefaultEditor(String.class, dce);
         getTableHeader().addMouseListener(new MouseAdapter() {
-          public void mouseClicked(MouseEvent e) {
+          public void mouseClicked(MouseEvent e)
+          {
             int col = getTableHeader().columnAtPoint(e.getPoint());
             if (col >= tableModel.padleft) { // A valid column, but not the first.
               String s = tableModel.getFieldName(col);
@@ -204,7 +205,7 @@ public class EntryTable extends JTable {
 
                                       // guarantee that the the entry is visible
                                       ensureVisible(row);
-                                      
+
 
                                       //   setRowSelectionInterval(row, row);
                                       // }
@@ -267,10 +268,10 @@ public class EntryTable extends JTable {
       public void addRowSelectionIntervalQuietly(int row1, int row2) {
           boolean oldState = selectionListenerOn;
           selectionListenerOn = false;
-	  //if (row2 < getModel().getRowCount()) {
-	  super.addRowSelectionInterval(row1, row2);
-	  selectionListenerOn = oldState;
-	  //}
+          //if (row2 < getModel().getRowCount()) {
+          super.addRowSelectionInterval(row1, row2);
+          selectionListenerOn = oldState;
+          //}
       }
 
     /*public boolean surrendersFocusOnKeystroke() {
@@ -497,7 +498,7 @@ public class EntryTable extends JTable {
         if (tableModel.hasField(row, Globals.MARKED) && (renderer != incRenderer)) {
           return markedRenderer;
         }
-        
+
         return renderer;
 
         /*
@@ -553,7 +554,7 @@ public class EntryTable extends JTable {
     private class Renderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
         //private DefaultTableCellRenderer darker;
         //JLabel label = new AALabel();
-        
+
         public Renderer(Color c) {
             super();
             setBackground(c);
@@ -563,7 +564,7 @@ public class EntryTable extends JTable {
             //setForeground(fg);
         }
 
- 
+
         public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
         public void firePropertyChange(String propertyName, Object old, Object newV) {}
 
@@ -581,7 +582,7 @@ public class EntryTable extends JTable {
               if (lab.getIcon() != null)
                 setText(null);
             } else {
-                
+
                 setIcon(null);
                 setToolTipText(null);
                 if (value != null)
@@ -594,7 +595,7 @@ public class EntryTable extends JTable {
         //private class AALabel extends JLabel {
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D)g;
-                
+
                 if (antialiasing) {
                     RenderingHints rh = g2.getRenderingHints();
                     rh.put(RenderingHints.KEY_ANTIALIASING,
