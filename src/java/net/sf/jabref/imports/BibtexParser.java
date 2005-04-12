@@ -42,6 +42,7 @@ public class BibtexParser
     private HashMap _meta, entryTypes;
     private boolean _eof = false;
     private int line = 1;
+    private FieldContentParser fieldContentParser = new FieldContentParser();
 
     public BibtexParser(Reader in)
     {
@@ -416,8 +417,12 @@ public class BibtexParser
 		// of brackets inside of a field, so we need to count the brackets
 		// to know when the string is finished.
                
-                if (isStandardBibtexField || !Globals.prefs.getBoolean("preserveFieldFormatting"))
-                    value.append(parseBracketedText());
+                if (isStandardBibtexField || !Globals.prefs.getBoolean("preserveFieldFormatting")) {
+                    // value.append(parseBracketedText());
+                    // TEST TEST TEST TEST TEST
+                    StringBuffer text = parseBracketedTextExactly();
+                    value.append(fieldContentParser.format(text));
+                }
                 else
                     value.append(parseBracketedTextExactly());
 	    }
