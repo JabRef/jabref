@@ -16,12 +16,26 @@ public class PreviewPanel extends JEditorPane {
   public String CONTENT_TYPE = "text/html";
       //LAYOUT_FILE = "simplehtml";
   BibtexEntry entry;
+  BibtexDatabase database = null;
+    // If a database is set, the preview will attempt to resolve strings in the previewed
+    // entry using that database.
+
   Layout layout;
   String prefix = "", postfix = "";
   Dimension DIM = new Dimension(650, 110);
   HashMap layouts = new HashMap();
   String layoutFile;
   JScrollPane sp;
+
+    public PreviewPanel(BibtexDatabase db, String layoutFile) {
+        this(layoutFile);
+        this.database = db;
+    }
+
+    public PreviewPanel(BibtexDatabase db, BibtexEntry be, String layoutFile) {
+        this(be, layoutFile);
+        this.database = db;
+    }
 
   public PreviewPanel(BibtexEntry be, String layoutFile) {
     entry = be;
@@ -51,6 +65,10 @@ public class PreviewPanel extends JEditorPane {
     init();
     //setText("<HTML></HTML>");
   }
+
+   public void setDatabase(BibtexDatabase db) {
+       database = db;
+   }
 
   private void init() {
     setEditable(false);
@@ -144,7 +162,7 @@ public class PreviewPanel extends JEditorPane {
 
     //StringBuffer sb = new StringBuffer(prefix);
     StringBuffer sb = new StringBuffer();
-    sb.append(layout.doLayout(entry, null));
+    sb.append(layout.doLayout(entry, database));
     //sb.append(postfix);
     setText(sb.toString());
     invalidate();

@@ -58,9 +58,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     BasePanel ths = this;
     JSplitPane splitPane;
     //BibtexEntry testE = new BibtexEntry("tt");
-    PreviewPanel[] previewPanel = new PreviewPanel[]
-        {new PreviewPanel(Globals.prefs.get("preview0")),
-        new PreviewPanel(Globals.prefs.get("preview1"))};
+    PreviewPanel[] previewPanel = null;
     int activePreview = 1;
     boolean previewActive = true;
 
@@ -150,6 +148,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       metaData = new MetaData();
       this.frame = frame;
       this.prefs = prefs;
+      instantiatePreviews();
       setupActions();
       setupMainPanel();
     }
@@ -165,6 +164,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         parseMetaData(meta);
       else
         metaData = new MetaData();
+      instantiatePreviews();
       setupActions();
       setupMainPanel();
       /*if (prefs.getBoolean("autoComplete")) {
@@ -182,6 +182,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    private void instantiatePreviews() {
+        previewPanel = new PreviewPanel[]
+            {new PreviewPanel(database, Globals.prefs.get("preview0")),
+             new PreviewPanel(database, Globals.prefs.get("preview1"))};
+    }
+
     public BibtexDatabase database() { return database; }
     public MetaData metaData() { return metaData; }
     public File file() { return file; }
@@ -192,8 +198,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void setEncoding(String encoding) { 
 	this.encoding = encoding;
     }
-
-  
 
     public void output(String s) {
 	//Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
@@ -1819,7 +1823,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return; // Do nothing if previews are disabled.
       }
       if (previewPanel[activePreview] == null) {
-        previewPanel[activePreview] = new PreviewPanel(be, prefs.get("preview"+activePreview));
+            previewPanel[activePreview] = new PreviewPanel(database, be, prefs.get("preview"+activePreview));
 
       } else
         previewPanel[activePreview].setEntry(be);

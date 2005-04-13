@@ -89,7 +89,8 @@ Change log:
           processes such as Medline search.
         - [KEEP?] Removed options to search only Required, Optional and/or General fields,
           in order to simplify search interface.
-1.7?    - Removed unnecessary stack traces when opening external viewer.
+        - Fixed entry preview to resolve string references.
+1.7.1   - Removed unnecessary stack traces when opening external viewer.
         - Fixed bug that made Ctrl-E destroy current edit in entry editor.
         - Fixed problem when copying modified BibTeX key gave old value.
         - Fixed missing 'booktitle' import in CONF entries in RIS import.

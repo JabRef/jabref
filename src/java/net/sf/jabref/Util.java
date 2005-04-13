@@ -269,7 +269,11 @@ public class Util {
         return out.toString();
     }
 
-        static public String wrap2(String in, int wrapAmount){
+    static public String wrap2(String in, int wrapAmount) {
+        return net.sf.jabref.imports.FieldContentParser.wrap(in, wrapAmount);
+    }
+
+    static public String __wrap2(String in, int wrapAmount){
         // The following line cuts out all whitespace except line breaks, and replaces
         // with single spaces. Line breaks are padded with a tab character:
         StringBuffer out = new StringBuffer(in.replaceAll("[ \\t\\r]+"," "));
@@ -283,9 +287,11 @@ public class Util {
             int lbreak = out.indexOf("\n", p);
             //System.out.println(lbreak);
             if ((lbreak > p) && (lbreak < q)) {
-                if ((out.length() > lbreak+1) && !(out.charAt(lbreak+1)=='\t'))
-                    out.insert(lbreak+1, '\t');
                 p = lbreak+1;
+                int piv = lbreak+1;
+                if ((out.length() > piv) && !(out.charAt(piv)=='\t'))
+                    out.insert(piv, "\n\t");
+
             }
             else {
                 //System.out.println(q+" "+out.length());

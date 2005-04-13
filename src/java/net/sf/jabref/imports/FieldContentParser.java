@@ -41,7 +41,7 @@ public class FieldContentParser {
                         i++;
                     }
                 }
-                if ((content.length()>i+3) && (content.charAt(i+1)=='\t')
+                else if ((content.length()>i+3) && (content.charAt(i+1)=='\t')
                     && (content.charAt(i+2)==' ')
                     && !Character.isWhitespace(content.charAt(i+3))) {
                     // We have \n\t followed by ' ' followed by non-whitespace, which indicates
@@ -57,11 +57,21 @@ public class FieldContentParser {
                 else if ((content.length()>i+3) && (content.charAt(i+1)=='\t')
                         && (content.charAt(i+2)=='\n') && (content.charAt(i+3)=='\t')) {
                     // We have \n\t\n\t, which looks like a JabRef-formatted empty line.
-                    // Remove the tabs and keep the line breaks:
-                    content.deleteCharAt(i+1);
-                    content.deleteCharAt(i+2); // i+3 is now i+2 since we removed one char.
+                    // Remove the tabs and keep one of the line breaks:
+                    content.deleteCharAt(i+1); // \t
+                    content.deleteCharAt(i+1); // \n
+                    content.deleteCharAt(i+1); // \t
                     // Skip past the line breaks:
-                    i += 2;
+                    i++;
+
+                    // Now, if more \n\t pairs are following, keep each line break. This
+                    // preserves several line breaks properly. Repeat until done:
+                    while ((content.length()>i+1) && (content.charAt(i)=='\n')
+                        && (content.charAt(i+1)=='\t')) {
+
+                        content.deleteCharAt(i+1);
+                        i++;
+                    }
                 }
                 else
                     i++;
@@ -74,5 +84,50 @@ public class FieldContentParser {
         }
 
         return content;
+    }
+
+    /**
+     * Formats field contents for output. Must be "symmetric" with the parse method above,
+     * so stored and reloaded fields are not mangled.
+     * @param in
+     * @param wrapAmount
+     * @return
+     */
+    public static String wrap(String in, int wrapAmount){
+
+        String[] lines = in.split("\n");
+        StringBuffer res = new StringBuffer();
+        addWrappedLine(res, lines[0], wrapAmount);
+        for (int i=1; i<lines.length; i++) {
+
+            if (!lines[i].trim().equals("")) {
+                res.append("\n\t\n\t");
+                addWrappedLine(res, lines[i], wrapAmount);
+            } else
+                res.append("\n\t");
+        }
+        return res.toString();
+    }
+
+    private static void addWrappedLine(StringBuffer res, String line, int wrapAmount) {
+        // Set our pointer to the beginning of the new line in the StringBuffer:
+        int p = res.length();
+        // Add the line, unmodified:
+        res.append(line);
+
+        while (p < res.length()){
+            int q = res.indexOf(" ", p+wrapAmount);
+            if ((q < 0) || (q >= res.length()))
+                break;
+
+            res.deleteCharAt(q);
+            res.insert(q, "\n\t");
+            p = q+1;
+
+        }
+    }
+
+    static class Indents {
+        //int hyp
     }
 }
