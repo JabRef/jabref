@@ -36,7 +36,7 @@ public class FieldContentParser {
                     content.deleteCharAt(i); // \t
                     // Add space only if necessary:
                     if ((i>0) && !Character.isWhitespace(content.charAt(i-1))) {
-                        content.insert(i-1, ' ');
+                        content.insert(i, ' ');
                         // Increment i because of the inserted character:
                         i++;
                     }
