@@ -545,8 +545,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Save session", "F11");
         defKeyBinds.put("Load session", "F12");
         defKeyBinds.put("Copy \\cite{BibTeX key}", "ctrl K");
-        defKeyBinds.put("Next tab", "ctrl RIGHT");
-        defKeyBinds.put("Previous tab", "ctrl LEFT");
+        defKeyBinds.put("Next tab", "ctrl PAGE_DOWN");
+        defKeyBinds.put("Previous tab", "ctrl PAGE_UP");
         defKeyBinds.put("Replace string", "ctrl R");
         defKeyBinds.put("Delete", "DELETE");
         defKeyBinds.put("Open PDF or PS", "F4");

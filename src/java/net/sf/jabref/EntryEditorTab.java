@@ -235,7 +235,12 @@ public class EntryEditorTab {
 	am.put("help", parent.helpAction);
 	im.put(Globals.prefs.getKey("Save database"), "save");
 	am.put("save", parent.saveDatabaseAction);
-	
+	im.put(Globals.prefs.getKey("Next tab"), "nexttab");
+    am.put("nexttab", parent.frame.nextTab);
+    im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+    am.put("prevtab", parent.frame.prevTab);
+        
+
 	try {
 	    HashSet keys =
 		new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
