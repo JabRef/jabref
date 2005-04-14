@@ -42,21 +42,26 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     public static final int GROUP_INTERSECTION_PARENT = 1;
     public static final int GROUP_ITSELF = 2;
     
-    public static DataFlavor flavor;
-    public static DataFlavor[] flavors;
+    public static final DataFlavor flavor;
+    public static final DataFlavor[] flavors;
+    
+    static {
+        DataFlavor df = null;
+        try {
+            df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
+                    + ";class=net.sf.jabref.groups.GroupTreeNode");
+        } catch (ClassNotFoundException e) {
+            // never happens
+        }
+        flavor = df;
+        flavors = new DataFlavor[] { flavor };
+    }
 
     /**
      * Creates this node and associates the specified group with it.
      */
     public GroupTreeNode(AbstractGroup group) {
         setGroup(group);
-        try {
-            flavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=net.sf.jabref.groups.GroupTreeNode");
-            flavors = new DataFlavor[] { flavor };
-        } catch (ClassNotFoundException e) {
-            // never happens
-        }
     }
 
     /**
