@@ -83,7 +83,7 @@ Change log:
 1.x
         - [UNFINISHED] Improved wrapping and formatting of bib files, to preserve
           paragraph separator (empty line).
-        - [UNFINISHED] Added test buttons for customization of preview layouts.
+        - [FINISHED?] Added test buttons for customization of preview layouts.
         - [UNFINISHED] Added inspection dialog for previewing and generating keys for imported entries,
           and deciding which ones to keep and discard. The dialog allows inspection during long import
           processes such as Medline search.

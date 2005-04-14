@@ -106,7 +106,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		public void actionPerformed(ActionEvent e) {
             initTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, layout1.getText());
-            JOptionPane.showMessageDialog(null, testPanel);
+            testPanel.setPreferredSize(new Dimension(500, 300));
+            JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
 		}
 	    });
 
@@ -114,7 +115,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		public void actionPerformed(ActionEvent e) {
             initTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, layout2.getText());
-            JOptionPane.showMessageDialog(null, testPanel);
+            testPanel.setPreferredSize(new Dimension(500, 300));
+            JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
 		}
 	    });
     }
@@ -136,7 +138,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         entry.setField("volume", "52");
         entry.setField("pdf", "alba04.pdf");
         entry.setField("url", "http://thereferencedatabase.com/10011101.html");
-        
+        entry.setField("abstract", "The JabRef project was started by Morten Alver and Nizar Batada after "+
+                "they decided to work together rather than each working on their own separate project "+
+                "(Bibkeeper and JBibtexManager). JabRef initially combined the best features of both "+
+                "predecessors, and in the time to come evolved far beyond them.");
     }
 
     public void setValues() {
