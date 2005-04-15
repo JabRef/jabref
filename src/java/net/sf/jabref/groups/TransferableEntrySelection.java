@@ -80,7 +80,10 @@ public class TransferableEntrySelection implements Transferable {
             throw new UnsupportedFlavorException(someFlavor);
         if (someFlavor.equals(flavorInternal))
             return this;
-        return new ByteArrayInputStream(selectedEntriesCiteKeys.getBytes(
+        String s = includeCiteKeyword ?
+                "\\cite{" + selectedEntriesCiteKeys + "}" 
+                : selectedEntriesCiteKeys;
+        return new ByteArrayInputStream(s.getBytes(
                 flavorExternal.getParameter("charset").trim()));
     }
 
