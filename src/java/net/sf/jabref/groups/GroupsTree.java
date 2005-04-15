@@ -179,13 +179,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
                         source.getPath()) }, refreshPaths(expandedPaths));
                 groupSelector.concludeMoveGroup(undo, source);
             } else if (transferable
-                    .isDataFlavorSupported(TransferableEntrySelection.flavor)) {
+                    .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
                 if (!target.getGroup().supportsAdd()) {
                     dtde.rejectDrop();
                     return;
                 }
                 TransferableEntrySelection selection = (TransferableEntrySelection) transferable
-                        .getTransferData(TransferableEntrySelection.flavor);
+                        .getTransferData(TransferableEntrySelection.flavorInternal);
                 target.getGroup().addSelection(selection.getSelection());
                 dtde.getDropTargetContext().dropComplete(true);
                 groupSelector.revalidateGroups();
