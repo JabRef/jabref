@@ -28,13 +28,17 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.*;
-import java.io.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTableUI;
+import javax.swing.table.*;
+
+import net.sf.jabref.groups.TransferableEntrySelection;
 
 public class EntryTable extends JTable {
 
@@ -52,7 +56,6 @@ public class EntryTable extends JTable {
     JabRefPreferences prefs;
     protected boolean showingSearchResults = false,
         showingGroup = false;
-    protected EntryTable ths = this;
     private boolean antialiasing = true,
         ctrlClick = false,
         selectionListenerOn = true,
@@ -61,7 +64,7 @@ public class EntryTable extends JTable {
     private BasePanel panel;
 
     private ListSelectionListener previewListener = null;
-
+    
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
         super(tm_);
         this.tableModel = tm_;
@@ -375,7 +378,7 @@ public class EntryTable extends JTable {
           if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
             setRowSelectionInterval(row, row);
           rightClickMenu = new RightClickMenu(panel, panel.metaData);
-          rightClickMenu.show(ths, e.getX(), e.getY());
+          rightClickMenu.show(EntryTable.this, e.getX(), e.getY());
         }
 
         // Check if the user has clicked on an icon cell to open url or pdf.
@@ -780,6 +783,6 @@ public class EntryTable extends JTable {
       }
 
     }
-
-  }
+    
+}
 
