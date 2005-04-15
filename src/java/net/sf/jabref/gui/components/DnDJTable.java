@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.components;
 
-import java.awt.*;
-import java.awt.datatransfer.Transferable;
+import java.awt.Point;
 import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
@@ -12,7 +11,7 @@ import javax.swing.table.*;
 public abstract class DnDJTable extends JTable implements DragGestureListener,
         DragSourceListener {
 
-    private int[] selectionToDrag = new int[0];
+    protected int[] selectionToDrag = new int[0];
 
     public DnDJTable() {
         super();
@@ -105,22 +104,22 @@ public abstract class DnDJTable extends JTable implements DragGestureListener,
     }*/
     
     public void dragEnter(DragSourceDragEvent dsde) {
-        // ignore
+        // to be implemented by subclass if required
     }
 
     public void dragOver(DragSourceDragEvent dsde) {
-        // ignore
+        // to be implemented by subclass if required
     }
 
     public void dropActionChanged(DragSourceDragEvent dsde) {
-        // ignore
+        // to be implemented by subclass if required
     }
 
     public void dragDropEnd(DragSourceDropEvent dsde) {
-        // JZTODO
+        // to be implemented by subclass if required
     }
 
     public void dragExit(DragSourceEvent dse) {
-        // ignore
+        // to be implemented by subclass if required
     }
 }
