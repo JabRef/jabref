@@ -44,7 +44,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private static long lastDragAutoscroll = 0L;
     /** minimum interval between two autoscroll events (for limiting speed). */
     private static final long minAutoscrollInterval = 50L;
-    /** the point on which the cursor is currently idling during a drag operation. */
+    /**
+     * the point on which the cursor is currently idling during a drag
+     * operation.
+     */
     private Point idlePoint;
     /** time since which cursor is idling. */
     private long idleStartTime = 0L;
@@ -106,7 +109,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
     public void dragOver(DropTargetDragEvent dtde) {
         final Point cursor = dtde.getLocation();
         final long currentTime = System.currentTimeMillis();
-        
+        if (idlePoint == null)
+            idlePoint = cursor;
+
         // autoscrolling
         if (currentTime - lastDragAutoscroll < minAutoscrollInterval)
             return;
@@ -125,7 +130,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             r.translate(+dragScrollDistance, 0);
         scrollRectToVisible(r);
         lastDragAutoscroll = currentTime;
-        
+
         // auto open
         if (Math.abs(cursor.x - idlePoint.x) < idleMargin
                 && Math.abs(cursor.y - idlePoint.y) < idleMargin) {
@@ -148,14 +153,15 @@ public class GroupsTree extends JTree implements DragSourceListener,
     public void drop(DropTargetDropEvent dtde) {
         try {
             // initializations common to all flavors
-            Transferable transferable = dtde.getTransferable();
-            Point p = dtde.getLocation();
-            TreePath path = getPathForLocation(p.x, p.y);
+            final Transferable transferable = dtde.getTransferable();
+            final Point p = dtde.getLocation();
+            final TreePath path = getPathForLocation(p.x, p.y);
             if (path == null) {
                 dtde.rejectDrop();
                 return;
             }
-            GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
+            final GroupTreeNode target = (GroupTreeNode) path
+                    .getLastPathComponent();
             // check supported flavors
             if (transferable.isDataFlavorSupported(GroupTreeNode.flavor)) {
                 GroupTreeNode source = (GroupTreeNode) transferable
@@ -181,6 +187,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
                 if (!target.getGroup().supportsAdd()) {
+                    System.out.println("drop rejected"); // JZTODO
                     dtde.rejectDrop();
                     return;
                 }
@@ -211,7 +218,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
             return; // nothing to transfer (select manually?)
         Cursor cursor = DragSource.DefaultMoveDrop;
         dragNode = selectedNode;
-        idlePoint = new Point(dge.getDragOrigin());
         dge.getDragSource().startDrag(dge, cursor, selectedNode, this);
     }
 
