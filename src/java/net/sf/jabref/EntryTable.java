@@ -28,7 +28,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.*;
-import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.IOException;
 
@@ -38,7 +37,7 @@ import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.*;
 
-import net.sf.jabref.groups.TransferableEntrySelection;
+import net.sf.jabref.groups.EntryTableTransferHandler;
 
 public class EntryTable extends JTable {
 
@@ -74,6 +73,9 @@ public class EntryTable extends JTable {
         // an action was called.
         addFocusListener(Globals.focusListener);
 
+        // enable DnD
+        setDragEnabled(true);
+        setTransferHandler(new EntryTableTransferHandler(this));
 
   //renderingHints = g2.getRenderingHints();
          //renderingHints.put(RenderingHints.KEY_ANTIALIASING,
