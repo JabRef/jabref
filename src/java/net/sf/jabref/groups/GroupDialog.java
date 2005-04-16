@@ -89,7 +89,8 @@ class GroupDialog extends JDialog {
     private JComboBox m_typeSelector = new JComboBox();
     private JButton m_ok = new JButton(Globals.lang("Ok"));
     private JButton m_cancel = new JButton(Globals.lang("Cancel"));
-    private JPanel m_mainPanel, lowerPanel;
+    private JPanel m_mainPanel, lowerPanel, m_descriptionPanel;
+    private JTextArea m_description = new JTextArea(8,80);
 
     private boolean m_okPressed = false;
     private final JabRefFrame m_parent;
@@ -217,6 +218,16 @@ class GroupDialog extends JDialog {
         m_searchGroupPanel.add(sgGen);
         m_searchGroupPanel.add(Box.createVerticalGlue());
         */
+        
+        layout = new FormLayout
+        ("left:pref, 4dlu, fill:130dlu","");
+        builder = new DefaultFormBuilder(layout);
+        m_description.setEditable(false);
+        m_description.setWrapStyleWord(true);
+        m_description.setLineWrap(true);
+        JScrollPane sp = new JScrollPane(m_description);
+        builder.append(sp);
+        m_descriptionPanel = builder.getPanel();
 
         m_keywordGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         m_searchGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -249,10 +260,11 @@ class GroupDialog extends JDialog {
         buttons.add(m_cancel);
 
         Container cp = getContentPane();
-        cp.setLayout(new BorderLayout());
-        cp.add(m_mainPanel, BorderLayout.NORTH);
-        cp.add(lowerPanel, BorderLayout.CENTER);
-        cp.add(buttons, BorderLayout.SOUTH);
+        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+        cp.add(m_mainPanel);
+        cp.add(lowerPanel);
+        cp.add(m_descriptionPanel);
+        cp.add(buttons);
         //cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
         //cp.add(m_mainPanel);
@@ -416,26 +428,35 @@ class GroupDialog extends JDialog {
     private void updateComponents() {
         // all groups need a name
         boolean okEnabled = m_name.getText().trim().length() > 0;
-        String s;
+        String s1, s2;
         switch (m_typeSelector.getSelectedIndex()) {
         case INDEX_KEYWORDGROUP:
-            s = m_searchField.getText().trim();
-            okEnabled = okEnabled && s.length() > 0 && s.indexOf(' ') < 0;
-            s = m_kgSearchExpression.getText().trim();
-            okEnabled = okEnabled && s.length() > 0;
+            s1 = m_searchField.getText().trim();
+            okEnabled = okEnabled && s1.length() > 0 && s1.indexOf(' ') < 0;
+            s2 = m_kgSearchExpression.getText().trim();
+            okEnabled = okEnabled && s2.length() > 0;
+            if (!okEnabled) {
+                m_description.setText("Please enter the field to search (e.g. \"keywords\") and the term to search it for (e.g. \"electrical\").");
+                break;
+            }
             if (m_kgIsRegExp.isSelected()) {
                 try {
-                    Pattern.compile(s);
+                    Pattern.compile(s2);
                 } catch (Exception e) {
                     okEnabled = false;
+                    m_description.setText("The regular expression \"" + s2 + "\" is invalid ("
+                            + e.getMessage() + ").");
+                    break;
                 }
             }
+            m_description.setText(getDescriptionForKeywordGroup(s1, s2,
+                    m_kgCaseSensitive.isSelected(), m_kgIsRegExp.isSelected()));
             break;
         case INDEX_SEARCHGROUP:
-            s = m_sgSearchExpression.getText().trim();
-            okEnabled = okEnabled & s.length() > 0;
+            s2 = m_sgSearchExpression.getText().trim();
+            okEnabled = okEnabled & s2.length() > 0;
             boolean advancedSearch = SearchExpressionParser.isValidSyntax(
-                    s, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
+                    s2, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
             m_searchType.setText(advancedSearch ? "Advanced Search"
                     : "Plaintext Search");
             m_searchAllFields.setEnabled(!advancedSearch);
@@ -446,8 +467,10 @@ class GroupDialog extends JDialog {
             m_searchGeneralFields.setEnabled(!advancedSearch
                     && !m_searchAllFields.isSelected());
             validate();
+            m_description.setText(getDescriptionForSearchGroup());
             break;
         case INDEX_EXPLICITGROUP:
+            m_description.setText(getDescriptionForExplicitGroup());
             break;
         }
         m_ok.setEnabled(okEnabled);
@@ -479,5 +502,42 @@ class GroupDialog extends JDialog {
             if (m_editedGroup.contains(entry))
                 ((ExplicitGroup) m_resultingGroup).addEntry(entry);
         }
+    }
+    
+    private String getDescriptionForExplicitGroup() {
+        return "This group contains entries based on explicit assignment. "
+        + "Entries can be assigned to this group by selecting them "
+        + "then using either drag and drop or the context menu. "
+        + "Entries can be removed from this group by selecting them "
+        + "then using the context menu."
+        ;
+    }
+    
+    private String getDescriptionForKeywordGroup(String field,
+            String expr, boolean caseSensitive, boolean regExp) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("This group contains entries whose \"" + field 
+                + "\" field ");
+        sb.append(regExp ? "matches the regular expression "
+                : "contains the term ");
+        sb.append("\"" + expr + "\"");
+        sb.append(caseSensitive ? " (case sensitive). " : " (case insensitive). ");
+        sb.append(regExp ? 
+                "Entries cannot be explicitly assigned to or removed from this group."
+                : "Additionally, entries whose \"" + field + "\" field does not contain "
+                    + "\"" + expr + "\" can be assigned to this group by selecting them "
+                    + "then using either drag and drop or the context menu. "
+                    + "This process adds the term \"" + expr + "\" to "
+                    + "each entry's \"" + field + "\" field. "
+                    + "Entries can be removed from this group by selecting them "
+                    + "then using the context menu. "
+                    + "This process removes the term \"" + expr + "\" from "
+                    + "each  entry's \"" + field + "\" field. "
+                    );
+        return sb.toString();
+    }
+    
+    private String getDescriptionForSearchGroup() {
+        return "serach group...";
     }
 }

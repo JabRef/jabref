@@ -855,13 +855,14 @@ public class GroupSelector extends SidePaneComponent implements
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            if (frame.sidePaneManager.isPanelVisible("groups"))
-                frame.sidePaneManager.togglePanel("groups");
+            frame.sidePaneManager.ensureNotVisible("groups");
             return;
         }
         MetaData metaData = panel.metaData();
         if (metaData.getGroups() != null) {
             setGroups(metaData.getGroups());
+            if (!groupsRoot.isLeaf()) // groups were defined
+                frame.sidePaneManager.ensureVisible("groups");
         }
         else {
             GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
