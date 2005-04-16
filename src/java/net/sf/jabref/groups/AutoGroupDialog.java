@@ -101,9 +101,9 @@ class AutoGroupDialog extends JDialog {
                 }
                 Iterator i = hs.iterator();
                 while (i.hasNext()) {
-                    String regExp = i.next().toString().toLowerCase();
-                    KeywordGroup group = new KeywordGroup(regExp, field(), Util
-                            .quoteMeta(regExp));
+                    String keyword = i.next().toString().toLowerCase();
+                    KeywordGroup group = new KeywordGroup(keyword, field(),
+                            keyword, false, false);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 

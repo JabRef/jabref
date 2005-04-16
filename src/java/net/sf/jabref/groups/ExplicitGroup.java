@@ -54,6 +54,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
                 .length()), SEPARATOR, QUOTE_CHAR);
         switch (version) {
         case 0:
+        case 1:
             ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), db);
             BibtexEntry[] entries;
             while (tok.hasMoreTokens()) {

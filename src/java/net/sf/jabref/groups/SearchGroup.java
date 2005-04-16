@@ -117,6 +117,7 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
                 .length()), SEPARATOR, QUOTE_CHAR);
         switch (version) {
         case 0:
+        case 1:
             String name = tok.nextToken();
             String expression = tok.nextToken();
             boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;

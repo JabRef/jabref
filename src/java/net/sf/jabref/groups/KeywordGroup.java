@@ -37,32 +37,32 @@ import net.sf.jabref.util.QuotedStringTokenizer;
  */
 public class KeywordGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "KeywordGroup:";
-    private String m_searchField;
-    private String m_searchExpression;
-    private Pattern m_pattern;
-    private boolean m_expressionMatchesItself = false;
+    private final String m_searchField;
+    private final String m_searchExpression;
+    private final boolean m_caseSensitive;
+    private final boolean m_regExp;
+
+    private Pattern m_pattern = null;
 
     /**
      * Creates a KeywordGroup with the specified properties.
      */
-    public KeywordGroup(String name, String searchField, String searchExpression)
+    public KeywordGroup(String name, String searchField,
+            String searchExpression, boolean caseSensitive, boolean regExp)
             throws IllegalArgumentException, PatternSyntaxException {
         super(name);
         m_searchField = searchField;
         m_searchExpression = searchExpression;
-        compilePattern();
+        m_caseSensitive = caseSensitive;
+        m_regExp = regExp;
+        if (m_regExp)
+            compilePattern();
     }
 
-    private void compilePattern() throws IllegalArgumentException,
+    protected void compilePattern() throws IllegalArgumentException,
             PatternSyntaxException {
-        m_pattern = Pattern.compile(m_searchExpression,
-                Pattern.CASE_INSENSITIVE);
-        // this is required to decide whether entries can be added
-        // to this group by adding m_searchExpression to the m_searchField
-        // (it's quite a hack, but the only solution would be to disable
-        // add/remove completely for keyword groups)
-        m_expressionMatchesItself = m_pattern.matcher(m_searchExpression)
-                .matches();
+        m_pattern = m_caseSensitive ? Pattern.compile(m_searchExpression)
+                : Pattern.compile(m_searchExpression, Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -81,13 +81,25 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
         switch (version) {
-        case 0:
+        case 0: {
             String name = tok.nextToken();
             String field = tok.nextToken();
             String expression = tok.nextToken();
+            // assume caseSensitive=false and regExp=true for old groups
             return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
                     .unquote(field, QUOTE_CHAR), Util.unquote(expression,
-                    QUOTE_CHAR));
+                    QUOTE_CHAR), false, true);
+        }
+        case 1: {
+            String name = tok.nextToken();
+            String field = tok.nextToken();
+            String expression = tok.nextToken();
+            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+            return new KeywordGroup(Util.unquote(name, QUOTE_CHAR), Util
+                    .unquote(field, QUOTE_CHAR), Util.unquote(expression,
+                    QUOTE_CHAR), caseSensitive, regExp);
+        }
         default:
             throw new UnsupportedVersionException("KeywordGroup", version);
         }
@@ -108,33 +120,16 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         return ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
                 + Util.quote(m_searchField, SEPARATOR, QUOTE_CHAR) + SEPARATOR
                 + Util.quote(m_searchExpression, SEPARATOR, QUOTE_CHAR)
-                + SEPARATOR;
-    }
-
-    public String getSearchField() {
-        return m_searchField;
-    }
-
-    public void setSearchField(String field) {
-        m_searchField = field;
-    }
-
-    public String getSearchExpression() {
-        return m_searchExpression;
-    }
-
-    public void setSearchExpression(String expression)
-            throws IllegalArgumentException, PatternSyntaxException {
-        m_searchExpression = expression;
-        compilePattern();
+                + SEPARATOR + (m_caseSensitive ? "1" : "0") + SEPARATOR
+                + (m_regExp ? "1" : "0") + SEPARATOR;
     }
 
     public boolean supportsAdd() {
-        return m_expressionMatchesItself;
+        return !m_regExp;
     }
 
     public boolean supportsRemove() {
-        return true;
+        return !m_regExp;
     }
 
     public AbstractUndoableEdit addSelection(BasePanel basePanel) {
@@ -266,7 +261,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         KeywordGroup other = (KeywordGroup) o;
         return m_name.equals(other.m_name)
                 && m_searchField.equals(other.m_searchField)
-                && m_searchExpression.equals(other.m_searchExpression);
+                && m_searchExpression.equals(other.m_searchExpression)
+                && m_caseSensitive == other.m_caseSensitive
+                && m_regExp == other.m_regExp;
     }
 
     /*
@@ -281,9 +278,14 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 
     public boolean contains(BibtexEntry entry) {
         String content = (String) entry.getField(m_searchField);
-        if ((content != null) && (m_pattern.matcher(content).find()))
-            return true;
-        return false;
+        if (content == null)
+            return false;
+        if (m_regExp)
+            return m_pattern.matcher(content).find();
+        if (m_caseSensitive)
+            return content.indexOf(m_searchExpression) >= 0;
+        content = content.toLowerCase();
+        return content.indexOf(m_searchExpression.toLowerCase()) >= 0;
     }
 
     /**
@@ -306,7 +308,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 
     public AbstractGroup deepCopy() {
         try {
-            return new KeywordGroup(m_name, m_searchField, m_searchExpression);
+            return new KeywordGroup(m_name, m_searchField, m_searchExpression,
+                    m_caseSensitive, m_regExp);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -314,5 +317,21 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     + " in KeywordGroup.deepCopy()");
             return null;
         }
+    }
+
+    public boolean isCaseSensitive() {
+        return m_caseSensitive;
+    }
+
+    public boolean isRegExp() {
+        return m_regExp;
+    }
+    
+    public String getSearchExpression() {
+        return m_searchExpression;
+    }
+
+    public String getSearchField() {
+        return m_searchField;
     }
 }

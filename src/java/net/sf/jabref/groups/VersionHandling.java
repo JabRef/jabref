@@ -34,7 +34,7 @@ import net.sf.jabref.BibtexDatabase;
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
-    public static final int CURRENT_VERSION = 0;
+    public static final int CURRENT_VERSION = 1;
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
@@ -51,7 +51,8 @@ public class VersionHandling {
             field = (String) groups.elementAt(3 * i + 0);
             name = (String) groups.elementAt(3 * i + 1);
             regexp = (String) groups.elementAt(3 * i + 2);
-            root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp)));
+            root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
+                    false, true)));
         }
         return root;
     }
@@ -60,8 +61,9 @@ public class VersionHandling {
             BibtexDatabase db, int version) throws Exception {
         switch (version) {
         case 0:
-            return Version0.fromString((String) orderedData.firstElement(),
-                    db);
+        case 1:
+            return Version0_1.fromString((String) orderedData.firstElement(),
+                    db, version);
         default: // JZTODO translation
             throw new IllegalArgumentException(
                     "Failed to read groups data (version: " + version
@@ -70,7 +72,7 @@ public class VersionHandling {
     }
 
     /** Imports groups version 0. */
-    private static class Version0 {
+    private static class Version0_1 {
         /**
          * Parses the textual representation obtained from
          * GroupTreeNode.toString() and recreates that node and all of its
@@ -79,8 +81,8 @@ public class VersionHandling {
          * @throws Exception
          *             When a group could not be recreated
          */
-        private static GroupTreeNode fromString(String s, BibtexDatabase db)
-                throws Exception {
+        private static GroupTreeNode fromString(String s, BibtexDatabase db,
+                int version) throws Exception {
             GroupTreeNode root = null;
             GroupTreeNode newNode;
             int i;
@@ -88,7 +90,7 @@ public class VersionHandling {
             while (s.length() > 0) {
                 if (s.startsWith("(")) {
                     String subtree = getSubtree(s);
-                    newNode = fromString(subtree, db);
+                    newNode = fromString(subtree, db, version);
                     // continue after this subtree by removing it
                     // and the leading/trailing braces, and
                     // the comma (that makes 3) that always trails it
@@ -103,7 +105,7 @@ public class VersionHandling {
                     else
                         s = "";
                     newNode = new GroupTreeNode(AbstractGroup.fromString(Util
-                            .unquote(g, '\\'), db, 0)); // version 0
+                            .unquote(g, '\\'), db, version));
                 }
                 if (root == null) // first node will be root
                     root = newNode;

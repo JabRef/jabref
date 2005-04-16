@@ -45,6 +45,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
                             + s + "\"");
         switch (version) {
         case 0:
+        case 1:
             return new AllEntriesGroup();
         default:
             throw new UnsupportedVersionException("AllEntriesGroup", version); 
