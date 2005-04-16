@@ -31,8 +31,9 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
+import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.TransferableBibtexEntry;
+import net.sf.jabref.Globals;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -59,6 +60,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private GroupSelector groupSelector;
     private GroupTreeNode dragNode = null;
 
+    private final GroupTreeCellRenderer cellRenderer = new GroupTreeCellRenderer();
+
     public GroupsTree(GroupSelector groupSelector) {
         this.groupSelector = groupSelector;
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
@@ -67,21 +70,24 @@ public class GroupsTree extends JTree implements DragSourceListener,
         // Eliminates right mouse clicks as valid actions
         dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
         DropTarget dropTarget = new DropTarget(this, this);
+        setCellRenderer(cellRenderer);
     }
 
     public void dragEnter(DragSourceDragEvent dsde) {
         // ignore
     }
 
+    /** This is for moving of nodes within myself */
     public void dragOver(DragSourceDragEvent dsde) {
-        Point p = dsde.getLocation(); // screen coordinates!
+        final Point p = dsde.getLocation(); // screen coordinates!
         SwingUtilities.convertPointFromScreen(p, this);
-        TreePath path = getPathForLocation(p.x, p.y);
+        final TreePath path = getPathForLocation(p.x, p.y);
         if (path == null) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
             return;
         }
-        GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
+        final GroupTreeNode target = (GroupTreeNode) path
+                .getLastPathComponent();
         if (target == null || dragNode.isNodeDescendant(target)
                 || dragNode == target) {
             dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
@@ -106,11 +112,56 @@ public class GroupsTree extends JTree implements DragSourceListener,
         // ignore
     }
 
+    /** This handles dragging of nodes (from myself) or entries (from the table) */
     public void dragOver(DropTargetDragEvent dtde) {
         final Point cursor = dtde.getLocation();
         final long currentTime = System.currentTimeMillis();
         if (idlePoint == null)
             idlePoint = cursor;
+
+        // determine node over which the user is dragging
+        final TreePath path = getPathForLocation(cursor.x, cursor.y);
+        final GroupTreeNode target = path == null ? null : (GroupTreeNode) path
+                .getLastPathComponent();
+        cellRenderer.setTargetCell(target);
+        repaint();
+
+        // accept or reject
+        if (dtde.isDataFlavorSupported(GroupTreeNode.flavor)) {
+            // accept: move nodes within tree
+            dtde.acceptDrag(DnDConstants.ACTION_MOVE);
+        } else if (dtde
+                .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
+            // check if node accepts explicit assignment
+            if (path == null) {
+                dtde.rejectDrag();
+            } else {
+                // this would be the place to check if the dragging entries
+                // maybe are in this group already, but I think that's not
+                // worth the bother... it might even be irritating to the user.
+                if (target.getGroup().supportsAdd()) {
+                    // accept: assignment from EntryTable
+                    dtde.acceptDrag(DnDConstants.ACTION_LINK);
+                } else {
+                    dtde.rejectDrag();
+                }
+            }
+        } else {
+            dtde.rejectDrag();
+        }
+
+        // auto open
+        if (Math.abs(cursor.x - idlePoint.x) < idleMargin
+                && Math.abs(cursor.y - idlePoint.y) < idleMargin) {
+            if (currentTime - idleStartTime >= idleTimeToExpandNode) {
+                if (path != null) {
+                    expandPath(path);
+                }
+            }
+        } else {
+            idlePoint = cursor;
+            idleStartTime = currentTime;
+        }
 
         // autoscrolling
         if (currentTime - lastDragAutoscroll < minAutoscrollInterval)
@@ -130,20 +181,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
             r.translate(+dragScrollDistance, 0);
         scrollRectToVisible(r);
         lastDragAutoscroll = currentTime;
-
-        // auto open
-        if (Math.abs(cursor.x - idlePoint.x) < idleMargin
-                && Math.abs(cursor.y - idlePoint.y) < idleMargin) {
-            if (currentTime - idleStartTime >= idleTimeToExpandNode) {
-                TreePath path = getPathForLocation(cursor.x, cursor.y);
-                if (path != null) {
-                    expandPath(path);
-                }
-            }
-        } else {
-            idlePoint = cursor;
-            idleStartTime = currentTime;
-        }
     }
 
     public void dropActionChanged(DropTargetDragEvent dtde) {
@@ -151,6 +188,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void drop(DropTargetDropEvent dtde) {
+        cellRenderer.setTargetCell(null);
+        repaint();
         try {
             // initializations common to all flavors
             final Transferable transferable = dtde.getTransferable();
@@ -186,17 +225,21 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 groupSelector.concludeMoveGroup(undo, source);
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.flavorInternal)) {
-                if (!target.getGroup().supportsAdd()) {
-                    System.out.println("drop rejected"); // JZTODO
+                final AbstractGroup group = target.getGroup();
+                if (!group.supportsAdd()) {
+                    // this should never happen, because the same condition
+                    // is checked in dragOver already
                     dtde.rejectDrop();
                     return;
                 }
-                TransferableEntrySelection selection = (TransferableEntrySelection) transferable
+                final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
                         .getTransferData(TransferableEntrySelection.flavorInternal);
-                target.getGroup().addSelection(selection.getSelection());
+                AbstractUndoableEdit undo = group.addSelection(selection.getSelection());
+                if (undo instanceof UndoableChangeAssignment)
+                    ((UndoableChangeAssignment) undo).setEditedNode(target);
                 dtde.getDropTargetContext().dropComplete(true);
                 groupSelector.revalidateGroups();
-                // JZTODO working...
+                groupSelector.concludeAssignment(undo,target,selection.getSelection().length);
             } else {
                 dtde.rejectDrop();
                 return;
@@ -209,7 +252,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragExit(DropTargetEvent dte) {
-        // ignore
+        cellRenderer.setTargetCell(null);
+        repaint();
     }
 
     public void dragGestureRecognized(DragGestureEvent dge) {

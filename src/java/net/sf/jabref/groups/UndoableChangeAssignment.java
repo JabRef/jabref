@@ -40,14 +40,27 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     /** The root of the global groups tree */
     private GroupTreeNode m_groupsRootHandle = null;
 
+    /** Constructor for use in a group itself, where the enclosing
+     * node is unknown. The node must be set using setEditedNode()
+     * before this instance may be used. 
+     * @param previousAssignment
+     * @param currentAssignment
+     */
     public UndoableChangeAssignment(Set previousAssignment,
             Set currentAssignment) {
         m_previousAssignmentBackup = new HashSet(previousAssignment);
         m_newAssignmentBackup = new HashSet(currentAssignment);
     }
+    
+    public UndoableChangeAssignment(Set previousAssignment,
+            Set currentAssignment, GroupTreeNode node) {
+        this(previousAssignment, currentAssignment);
+        setEditedNode(node);
+    }
 
     /**
-     * Sets the node of the group that was edited. This method has to be called
+     * Sets the node of the group that was edited. If this node was not
+     * specified at construction time, this method has to be called
      * before this instance may be used.
      * 
      * @param node

@@ -322,7 +322,6 @@ public class GroupSelector extends SidePaneComponent implements
         // header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new GroupsTree(this);
-        groupsTree.setCellRenderer(new GroupTreeCellRenderer());
         groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
         ToolTipManager.sharedInstance().registerComponent(groupsTree);
@@ -830,6 +829,15 @@ public class GroupSelector extends SidePaneComponent implements
         panel.markBaseChanged();
         frame.output(Globals.lang("Moved group") + " '"
                 + node.getGroup().getName() + "'.");
+    }
+    
+    public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int numberOfEntries) {
+        panel.undoManager.addEdit(undo);
+        panel.markBaseChanged();
+        frame.output("Assigned " + numberOfEntries + " "
+                + (numberOfEntries == 1 ? "entry" : "entries")
+                + " to group \"" + node.getGroup().getName() + "\""); 
+        // JZTODO translation
     }
     
     JMenu moveSubmenu = new JMenu("Move");

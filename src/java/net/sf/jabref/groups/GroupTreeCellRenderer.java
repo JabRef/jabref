@@ -35,9 +35,13 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author jzieren
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
+    /** The cell over which the user is currently dragging */
+    protected Object targetCell = null;
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
             boolean hasFocus) {
+        if (value == targetCell)
+            selected = true; // show as selected
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
@@ -48,4 +52,12 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         return c;
     }
+    /** For use when dragging: The sepcified cell is always rendered as
+     * selected. 
+     * @param targetCell The cell over which the user is currently dragging.
+     */ 
+    public void setTargetCell(Object targetCell) {
+        this.targetCell = targetCell;
+    }
+    
 }
