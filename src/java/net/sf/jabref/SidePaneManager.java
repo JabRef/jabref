@@ -100,20 +100,27 @@ public class SidePaneManager implements ChangeListener {
     }
 
     public synchronized void ensureVisible(String name) {
-      Object o = components.get(name);
-      if (o != null) {
-        if (!visible.contains(o)) {
-          visible.add(o);
-          //sidep.setComponents(visible);
-          updateView();
-          ((SidePaneComponent)o).componentOpening();
-        }
-      } else System.err.println("Side pane component '"+name+"' unknown.");
-	/*Object o = components.get(name);
-	if ((o == null) || ((SidePaneComponent)o).hasVisibility())
-	    return;
-	togglePanel(name);*/
-    }
+        Object o = components.get(name);
+        if (o != null) {
+          if (!visible.contains(o)) {
+            visible.add(o);
+            //sidep.setComponents(visible);
+            updateView();
+            ((SidePaneComponent)o).componentOpening();
+          }
+        } else System.err.println("Side pane component '"+name+"' unknown.");
+      }
+
+    public synchronized void ensureNotVisible(String name) {
+        Object o = components.get(name);
+        if (o != null) {
+          if (visible.contains(o)) {
+            visible.remove(o);
+            updateView();
+            ((SidePaneComponent)o).componentOpening();
+          }
+        } else System.err.println("Side pane component '"+name+"' unknown.");
+      }
 
     public synchronized void add(String name, SidePaneComponent comp) {
       components.put(name, comp);
