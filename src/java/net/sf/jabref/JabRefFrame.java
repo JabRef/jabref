@@ -384,7 +384,7 @@ public class JabRefFrame
     //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
     //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
 
-    sidePaneManager.add("search", searchManager);
+    sidePaneManager.register("search", searchManager);
     sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
     sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
     sidePaneManager.populatePanel();
@@ -660,8 +660,7 @@ public JabRefPreferences prefs() {
     getContentPane().add(contentPane);
     contentPane.setRightComponent(tabbedPane);
     contentPane.setLeftComponent(sidePaneManager.getPanel());
-    //gbl.setConstraints(tabbedPane, con);
-    //getContentPane().add(tabbedPane);
+    sidePaneManager.updateView();
 
     JPanel status = new JPanel();
     status.setLayout(gbl);
@@ -2038,7 +2037,7 @@ class FetchCiteSeerAction
        else if (source == endnoteItem) {
           lfFileName = "EndNote";
 	  directory = "endnote";
-          extension = ".enf";
+          extension = ".txt";
         }
 	/*    else if (source == openofficeItem) {
 		  lfFileName = "openoffice-csv";

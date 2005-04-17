@@ -186,7 +186,7 @@ public class SidePaneManager implements ChangeListener {
         }
     }
 
-    private void updateView() {
+    public void updateView() {
       Vector toShow = new Vector();
 
       for (Iterator i = components.keySet().iterator(); i.hasNext(); ) {

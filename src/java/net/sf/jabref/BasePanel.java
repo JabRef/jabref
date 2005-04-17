@@ -33,6 +33,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
@@ -731,16 +732,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
-		int[] rows;
+		//int[] rows;
+        List entries;
 		int numSelected;
+        boolean cancelled = false;
 
 		// Run first, in EDT:
 		public void init() {
 
-                    rows = entryTable.getSelectedRows() ;
-                    numSelected = rows.length ;
+                    entries = new ArrayList(Arrays.asList(getSelectedEntries()));
+                    //rows = entryTable.getSelectedRows() ;
+                    //numSelected = rows.length ;
 
-                    if (numSelected == 0) { // None selected. Inform the user to select entries first.
+                    if (entries.size() == 0) { // None selected. Inform the user to select entries first.
                         JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),
                                                       Globals.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
                         return ;
@@ -757,21 +761,51 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     NamedCompound ce = new NamedCompound("autogenerate keys");
                     //BibtexEntry be;
                     Object oldValue;
-                    for(int i = 0 ; i < numSelected ; i++){
-                        bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
-                        oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-                        database.setCiteKeyForEntry(bes.getId(), null);
-                        ce.addEdit(new UndoableKeyChange
-                                   (database, bes.getId(), (String)oldValue, null));
+                    boolean hasShownWarning = false;
+                    // First check if any entries have keys set already. If so, possibly remove
+                    // them from consideration, or warn about overwriting keys.
+                    loop: for (Iterator i=entries.iterator(); i.hasNext();) {
+                        bes = (BibtexEntry)i.next();
+                        if (bes.getField(GUIGlobals.KEY_FIELD) != null) {
+                            if (prefs.getBoolean("avoidOverwritingKey"))
+                                // Rmove the entry, because its key is already set:
+                                i.remove();
+                            else if (prefs.getBoolean("warnBeforeOverwritingKey")) {
+                                // Ask if the user wants to cancel the operation:
+                                CheckBoxMessage cbm = new CheckBoxMessage(Globals.lang("One or more keys will be overwritten. Continue?"),
+                                        Globals.lang("Disable this confirmation dialog"), false);
+                                int answer = JOptionPane.showConfirmDialog(frame, cbm, Globals.lang("Overwrite keys"),
+                                        JOptionPane.YES_NO_OPTION);
+                                if (cbm.isSelected())
+                                    prefs.putBoolean("warnBeforeOverwritingKey", false);
+                                if (answer == JOptionPane.NO_OPTION) {
+                                    // Ok, break off the operation.
+                                    cancelled = true;
+                                    return;
+                                }
+                                // No need to check more entries, because the user has already confirmed
+                                // that it's ok to overwrite keys:
+                                break loop;
+                            }
+                        }
                     }
-                    //System.out.println("..");
-                    for(int i = 0 ; i < numSelected ; i++){
-                        bes = database.getEntryById(tableModel.getNameFromNumber(rows[i]));
-                        oldValue = bes.getField(GUIGlobals.KEY_FIELD);
-                        //bes = frame.labelMaker.applyRule(bes, database) ;
+
+                    HashMap oldvals = new HashMap();
+                    // Iterate again, removing already set keys. This is skipped if overwriting
+                    // is disabled, since all entries with keys set will have been removed.
+                    if (!prefs.getBoolean("avoidOverwritingKey")) for (Iterator i=entries.iterator(); i.hasNext();) {
+                        bes = (BibtexEntry)i.next();
+                        // Store the old value:
+                        oldvals.put(bes, bes.getField(GUIGlobals.KEY_FIELD));
+                        database.setCiteKeyForEntry(bes.getId(), null);
+                    }
+
+                    // Finally, set the new keys:
+                    for (Iterator i=entries.iterator(); i.hasNext();) {
+                        bes = (BibtexEntry)i.next();
                         bes = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), database, bes);
                         ce.addEdit(new UndoableKeyChange
-                                   (database, bes.getId(), (String)oldValue,
+                                   (database, bes.getId(), (String)oldvals.get(bes),
                                     (String)bes.getField(GUIGlobals.KEY_FIELD)));
                     }
                     ce.end();
@@ -780,14 +814,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 		// Run third, on EDT:
 		public void update() {
-                    markBaseChanged() ;
-                    refreshTable() ;
-                    output(Globals.lang("Generated BibTeX key for")+" "+
-                           numSelected+" "+(numSelected>1 ? Globals.lang("entries")
-                                            : Globals.lang("entry")));
-		    frame.unblock();
-                }
-            });
+            if (cancelled) {
+                frame.unblock();
+                return;
+            }
+            markBaseChanged() ;
+            refreshTable() ;
+            numSelected = entries.size();
+            output(Globals.lang("Generated BibTeX key for")+" "+
+               numSelected+" "+(numSelected!=1 ? Globals.lang("entries")
+                                    : Globals.lang("entry")));
+            frame.unblock();
+        }
+    });
 
         actions.put("search", new BaseAction() {
                 public void action() {
