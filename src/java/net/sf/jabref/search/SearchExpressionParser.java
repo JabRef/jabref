@@ -28,8 +28,8 @@ public class SearchExpressionParser extends antlr.LLkParser       implements Sea
 	public boolean caseSensitive = false;
     public boolean regex = true;
 	/** Creates a parser and lexer instance and tests the specified String.
-	  * Returns true if s is in valid syntax for advanced field search, false otherwise. */
-	public static boolean isValidSyntax(String s, boolean caseSensitive, boolean regex) {
+	  * Returns the AST if s is in valid syntax for advanced field search, null otherwise. */
+	public static AST checkSyntax(String s, boolean caseSensitive, boolean regex) {
 		// JZTODO: Is there some way to prevent instance creation here?
 		// How can a parser and/or lexer be reused?
 		SearchExpressionParser parser = new SearchExpressionParser(new SearchExpressionLexer(
@@ -38,9 +38,9 @@ public class SearchExpressionParser extends antlr.LLkParser       implements Sea
 		parser.regex = regex;
 		try {
 			parser.searchExpression();
-			return true;
+			return parser.getAST();
 		} catch (Exception e) {
-			return false;
+			return null;
 		}
 	}
 

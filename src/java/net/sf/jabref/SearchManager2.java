@@ -494,10 +494,10 @@ settings.add(select);
 	/** Updates the text on the search button to reflect
       * the type of search that will happen on click. */
     private void updateSearchButtonText() {
-        search.setText(SearchExpressionParser.isValidSyntax(
+        search.setText(SearchExpressionParser.checkSyntax(
                 searchField.getText(),
                 caseSensitive.isSelected(),
-                regExpSearch.isSelected()) 
+                regExpSearch.isSelected()) != null 
                 ? Globals.lang("Search Specified Field(s)") 
                 : Globals.lang("Search All Fields"));
     }
