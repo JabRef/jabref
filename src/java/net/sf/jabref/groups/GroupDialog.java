@@ -28,7 +28,6 @@ package net.sf.jabref.groups;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.StringReader;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
@@ -36,11 +35,13 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.components.*;
+import net.sf.jabref.gui.components.JPanelYBoxPreferredWidth;
 import net.sf.jabref.search.*;
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.builder.*;
+import net.sf.jabref.search.SearchExpressionParser;
+import antlr.collections.AST;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -428,12 +429,12 @@ class GroupDialog extends JDialog {
         case INDEX_SEARCHGROUP:
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & s1.length() > 0;
-            boolean advancedSearch = SearchExpressionParser.isValidSyntax(
+            AST ast = SearchExpressionParser.checkSyntax(
                     s1, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
-            m_searchType.setText(advancedSearch ? "Advanced Search"
+            m_searchType.setText(ast != null ? "Advanced Search"
                     : "Plaintext Search");
             validate();
-            m_description.setText(getDescriptionForSearchGroup(s1, advancedSearch,
+            m_description.setText(getDescriptionForSearchGroup(s1, ast,
                     m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected()));
             break;
         case INDEX_EXPLICITGROUP:
@@ -504,8 +505,84 @@ class GroupDialog extends JDialog {
         return sb.toString();
     }
     
-    private String getDescriptionForSearchGroup(String expr, boolean adv, 
+    private String getDescriptionForSearchGroup(String expr, AST ast, 
             boolean caseSensitive, boolean regExp) {
-        return "search group...";
+        StringBuffer sb = new StringBuffer();
+        if (ast == null) {
+            sb.append("This group contains entries in which any field ");
+            sb.append(regExp ? "matches the regular expression "
+                    : "contains the term ");
+            sb.append("\"" + expr + "\" " 
+                    + (caseSensitive ? "(case sensitive). "
+                            : "(case insensitive). "));
+            sb.append("Entries cannot be explicitly assigned to or removed from this group.");
+            return sb.toString();
+        }
+        // describe advanced search expression
+        // JZTODO: prelude and outro still to be done...
+        return describeNode(ast, regExp, false, false, false);
+    }
+    
+    private String describeNode(AST node, boolean regExp, boolean not, boolean and, boolean or) {
+        StringBuffer sb = new StringBuffer();
+        switch (node.getType()) {
+        case SearchExpressionTreeParserTokenTypes.And:
+            if (not)
+                sb.append("not ");
+            // if there was an "or" in this subtree so far, braces may be needed
+            if (or || not)
+                sb.append("(");
+            sb.append(describeNode(node.getFirstChild(),regExp,false,true,false)
+                    + " and " 
+                    + describeNode(node.getFirstChild().getNextSibling(),
+                            regExp,false,true,false));
+            if (or || not)
+                sb.append(")");
+            return sb.toString();
+        case SearchExpressionTreeParserTokenTypes.Or:
+            if (not)
+                sb.append("not ");
+            // if there was an "and" in this subtree so far, braces may be needed
+            if (and || not)
+                sb.append("(");
+            sb.append(describeNode(node.getFirstChild(),regExp,false,false,true)
+                    + " or " 
+                    + describeNode(node.getFirstChild().getNextSibling(),
+                            regExp,false,false,true));
+            if (and || not)
+                sb.append(")");
+            return sb.toString();
+        case SearchExpressionTreeParserTokenTypes.Not:
+            return describeNode(node.getFirstChild(), regExp, true, and, or);
+        default:
+            node = node.getFirstChild();
+            String field = node.getText();
+            node = node.getNextSibling();
+            String matchType;
+            switch (node.getType()) {
+            case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
+            case SearchExpressionTreeParserTokenTypes.EQUAL:
+                matchType = not ? "doesn't contain" : "contains";
+                break;
+            case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
+            case SearchExpressionTreeParserTokenTypes.EEQUAL:
+                matchType = not ? "doesn't match" : "matches";
+                break;
+            case SearchExpressionTreeParserTokenTypes.NEQUAL:
+                matchType = "doesn't contain";
+                break;
+            default:
+                matchType = "?"; // this should never happen
+            }
+            node = node.getNextSibling();
+            String term = node.getText();
+            boolean regExpFieldSpec = !Pattern.matches("\\w+",field);
+            sb.append(regExpFieldSpec ? "any field that matches the regular expression"
+                    : "the field");
+            sb.append(" \"" + field + "\" " + matchType); 
+            sb.append((regExp ? " the regular expression"
+                    : " the term") + " \"" + term + "\"");
+            return sb.toString();
+        }
     }
 }
