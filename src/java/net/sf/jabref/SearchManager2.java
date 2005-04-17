@@ -350,18 +350,10 @@ settings.add(select);
 	    SearchRule rule1;
 	    if (Globals.prefs.getBoolean("regExpSearch"))
 	        rule1 = new RegExpRule(
-                    Globals.prefs.getBoolean("caseSensitiveSearch"),
-                    Globals.prefs.getBoolean("searchAll"),
-                    Globals.prefs.getBoolean("searchReq"),
-                    Globals.prefs.getBoolean("searchOpt"),
-                    Globals.prefs.getBoolean("searchGen"));
+                    Globals.prefs.getBoolean("caseSensitiveSearch"));
 	    else
 	        rule1 = new SimpleSearchRule(
-                    Globals.prefs.getBoolean("caseSensitiveSearch"),
-                    Globals.prefs.getBoolean("searchAll"),
-                    Globals.prefs.getBoolean("searchReq"),
-                    Globals.prefs.getBoolean("searchOpt"),
-                    Globals.prefs.getBoolean("searchGen"));
+                    Globals.prefs.getBoolean("caseSensitiveSearch"));
 
 		try {
 			// this searches specified fields if specified, 

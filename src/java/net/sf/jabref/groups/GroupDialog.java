@@ -73,13 +73,6 @@ class GroupDialog extends JDialog {
     private JLabel m_searchExpressionLabel = new JLabel("Search expression:");
     private JPanel m_searchGroupPanel;
     private JLabel m_searchType = new JLabel("Plaintext Search");
-    private JCheckBox m_searchAllFields = new JCheckBox("Search All Fields");
-    private JCheckBox m_searchRequiredFields = new JCheckBox(
-            "Search Required Fields");
-    private JCheckBox m_searchOptionalFields = new JCheckBox(
-            "Search Optional Fields");
-    private JCheckBox m_searchGeneralFields = new JCheckBox(
-            "Search General Fields");
     private SearchExpressionParser m_parser;
     // JZTODO: translations...
 
@@ -180,14 +173,6 @@ class GroupDialog extends JDialog {
         builder.append(m_sgCaseSensitive);
         builder.nextLine();
         builder.append(m_sgIsRegExp);
-        builder.nextLine();
-        builder.append(m_searchAllFields);
-        builder.nextLine();
-        builder.append(m_searchRequiredFields);
-        builder.nextLine();
-        builder.append(m_searchOptionalFields);
-        builder.nextLine();
-        builder.append(m_searchGeneralFields);
 
         m_searchGroupPanel = builder.getPanel();
         /*JPanel sgExpression = new JPanelXBoxPreferredHeight();
@@ -319,10 +304,6 @@ class GroupDialog extends JDialog {
                         m_resultingGroup = new SearchGroup(m_name.getText()
                                 .trim(), m_sgSearchExpression.getText().trim(),
                                 m_sgCaseSensitive.isSelected(), m_sgIsRegExp
-                                        .isSelected(), m_searchAllFields
-                                        .isSelected(), m_searchRequiredFields
-                                        .isSelected(), m_searchOptionalFields
-                                        .isSelected(), m_searchGeneralFields
                                         .isSelected());
                     } catch (Exception e1) {
                         // should never happen
@@ -353,10 +334,6 @@ class GroupDialog extends JDialog {
         m_sgSearchExpression.addCaretListener(caretListener);
         m_sgIsRegExp.addItemListener(itemListener);
         m_sgCaseSensitive.addItemListener(itemListener);
-        m_searchAllFields.addItemListener(itemListener);
-        m_searchRequiredFields.addItemListener(itemListener);
-        m_searchOptionalFields.addItemListener(itemListener);
-        m_searchGeneralFields.addItemListener(itemListener);
 
         // configure for current type
         if (editedGroup instanceof KeywordGroup) {
@@ -373,10 +350,6 @@ class GroupDialog extends JDialog {
             m_sgSearchExpression.setText(group.getSearchExpression());
             m_sgCaseSensitive.setSelected(group.isCaseSensitive());
             m_sgIsRegExp.setSelected(group.isRegExp());
-            m_searchAllFields.setSelected(group.searchAllFields());
-            m_searchRequiredFields.setSelected(group.searchRequiredFields());
-            m_searchOptionalFields.setSelected(group.searchOptionalFields());
-            m_searchGeneralFields.setSelected(group.searchGeneralFields());
             m_typeSelector.setSelectedIndex(INDEX_SEARCHGROUP);
         } else if (editedGroup instanceof ExplicitGroup) {
             m_name.setText(editedGroup.getName());
@@ -453,21 +426,15 @@ class GroupDialog extends JDialog {
                     m_kgCaseSensitive.isSelected(), m_kgIsRegExp.isSelected()));
             break;
         case INDEX_SEARCHGROUP:
-            s2 = m_sgSearchExpression.getText().trim();
-            okEnabled = okEnabled & s2.length() > 0;
+            s1 = m_sgSearchExpression.getText().trim();
+            okEnabled = okEnabled & s1.length() > 0;
             boolean advancedSearch = SearchExpressionParser.isValidSyntax(
-                    s2, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
+                    s1, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
             m_searchType.setText(advancedSearch ? "Advanced Search"
                     : "Plaintext Search");
-            m_searchAllFields.setEnabled(!advancedSearch);
-            m_searchRequiredFields.setEnabled(!advancedSearch
-                    && !m_searchAllFields.isSelected());
-            m_searchOptionalFields.setEnabled(!advancedSearch
-                    && !m_searchAllFields.isSelected());
-            m_searchGeneralFields.setEnabled(!advancedSearch
-                    && !m_searchAllFields.isSelected());
             validate();
-            m_description.setText(getDescriptionForSearchGroup());
+            m_description.setText(getDescriptionForSearchGroup(s1, advancedSearch,
+                    m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected()));
             break;
         case INDEX_EXPLICITGROUP:
             m_description.setText(getDescriptionForExplicitGroup());
@@ -537,7 +504,8 @@ class GroupDialog extends JDialog {
         return sb.toString();
     }
     
-    private String getDescriptionForSearchGroup() {
-        return "serach group...";
+    private String getDescriptionForSearchGroup(String expr, boolean adv, 
+            boolean caseSensitive, boolean regExp) {
+        return "search group...";
     }
 }
