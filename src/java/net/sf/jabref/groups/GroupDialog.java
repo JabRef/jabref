@@ -37,7 +37,6 @@ import javax.swing.event.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.components.JPanelYBoxPreferredWidth;
 import net.sf.jabref.search.*;
-import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -56,7 +55,7 @@ class GroupDialog extends JDialog {
     private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
     private JLabel m_nameLabel = new JLabel(Globals.lang("Group name") + ":");
     // for KeywordGroup
-    private JTextField m_kgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
+    private FieldTextField m_kgSearchExpression = new FieldTextField("keywords","");
     private JTextField m_searchField = new JTextField(TEXTFIELD_LENGTH);
     private JLabel m_keywordLabel = new JLabel(Globals.lang("Search term")
             + ":");
@@ -74,7 +73,6 @@ class GroupDialog extends JDialog {
     private JLabel m_searchExpressionLabel = new JLabel("Search expression:");
     private JPanel m_searchGroupPanel;
     private JLabel m_searchType = new JLabel("Plaintext Search");
-    private SearchExpressionParser m_parser;
     // JZTODO: translations...
 
     // for all types
@@ -145,6 +143,8 @@ class GroupDialog extends JDialog {
         builder.nextLine();
         builder.append(m_keywordLabel);
         builder.append(m_kgSearchExpression);
+        builder.append(new FieldContentSelector(m_parent,m_basePanel,this,
+                m_kgSearchExpression,m_basePanel.metaData(), null));
         builder.nextLine();
         builder.append(m_kgCaseSensitive);
         builder.nextLine();
