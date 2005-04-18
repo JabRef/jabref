@@ -432,6 +432,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     public void valueChanged(TreeSelectionEvent e) {
+        if (panel == null) // sorry, we're closed!
+            return; // ignore this event
         final TreePath[] selection = groupsTree.getSelectionPaths();
         if (selection == null
                 || selection.length == 0
@@ -861,8 +863,10 @@ public class GroupSelector extends SidePaneComponent implements
         MetaData metaData = panel.metaData();
         if (metaData.getGroups() != null) {
             setGroups(metaData.getGroups());
-            if (!groupsRoot.isLeaf()) // groups were defined
+            if (!groupsRoot.isLeaf()) { // groups were defined
                 frame.sidePaneManager.ensureVisible("groups");
+                frame.groupToggle.setSelected(true);
+            }
         }
         else {
             GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
