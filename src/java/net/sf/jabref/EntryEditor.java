@@ -326,7 +326,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       return null;
     } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
           + editor.getFieldName()) != null) {
-      FieldContentSelector ws = new FieldContentSelector(this, editor, panel.metaData);
+      FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, 
+              panel.metaData, storeFieldAction);
       contentSelectors.add(ws);
 
       return ws;
