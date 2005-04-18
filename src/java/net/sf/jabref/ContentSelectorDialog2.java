@@ -51,29 +51,42 @@ public class ContentSelectorDialog2 extends JDialog {
     HashMap wordListModels = new HashMap();
     ArrayList removedFields = new ArrayList();
 
-    public ContentSelectorDialog2(JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
-				  String fieldName) {
-	super(frame, Globals.lang("Setup selectors"), modal);
-	this.metaData = metaData;
-	this.frame = frame;
-	this.panel = panel;
-	this.currentField = fieldName;
-
-	//help = new JButton(Globals.lang("Help"));
-	//help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help"));
-	//help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
-	initLayout();
-	//	wordSelector.addItem(WORD_EMPTY_TEXT);
-
-	setupFieldSelector();
-	setupWordSelector();
-	setupActions();
-	int fieldInd = fieldListModel.indexOf(currentField);
-	if (fieldInd >= 0)
-	    fieldList.setSelectedIndex(fieldInd);
-
-	pack();
-	//System.out.println("eee");
+    public ContentSelectorDialog2(Frame owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
+              String fieldName) {
+        super(owner, Globals.lang("Setup selectors"), modal);
+        this.metaData = metaData;
+        this.frame = frame;
+        this.panel = panel;
+        this.currentField = fieldName;
+        doInit();
+    }
+    
+    public ContentSelectorDialog2(Dialog owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
+              String fieldName) {
+        super(owner, Globals.lang("Setup selectors"), modal);
+        this.metaData = metaData;
+        this.frame = frame;
+        this.panel = panel;
+        this.currentField = fieldName;
+        doInit();
+    }
+    
+    /** Called from constructors */
+    private void doInit() {
+        //help = new JButton(Globals.lang("Help"));
+        //help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help"));
+        //help = new HelpAction(frame.helpDiag, GUIGlobals.contentSelectorHelp, "Help");
+        initLayout();
+        //  wordSelector.addItem(WORD_EMPTY_TEXT);
+    
+        setupFieldSelector();
+        setupWordSelector();
+        setupActions();
+        int fieldInd = fieldListModel.indexOf(currentField);
+        if (fieldInd >= 0)
+            fieldList.setSelectedIndex(fieldInd);
+    
+        pack();
     }
 
 
