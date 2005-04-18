@@ -516,14 +516,19 @@ class GroupDialog extends JDialog {
                     + (caseSensitive ? "(case sensitive). "
                             : "(case insensitive). "));
             sb.append("Entries cannot be explicitly assigned to or removed from this group.");
+            sb.append("\n\nHint: To search specific fields only, type for example:\n"
+                    + "author=miller and title=electrical");
             return sb.toString();
         }
         // describe advanced search expression
-        // JZTODO: prelude and outro still to be done...
-        return describeNode(ast, regExp, false, false, false);
+        sb.append("This group contains entries in which ");
+        sb.append(describeSearchGroupNode(ast, regExp, false, false, false));
+        sb.append(". The search is " + (caseSensitive ? "case sensitive" 
+                : "case insensitive") + ".");
+        return sb.toString();
     }
     
-    private String describeNode(AST node, boolean regExp, boolean not, boolean and, boolean or) {
+    private String describeSearchGroupNode(AST node, boolean regExp, boolean not, boolean and, boolean or) {
         StringBuffer sb = new StringBuffer();
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:
@@ -532,9 +537,9 @@ class GroupDialog extends JDialog {
             // if there was an "or" in this subtree so far, braces may be needed
             if (or || not)
                 sb.append("(");
-            sb.append(describeNode(node.getFirstChild(),regExp,false,true,false)
+            sb.append(describeSearchGroupNode(node.getFirstChild(),regExp,false,true,false)
                     + " and " 
-                    + describeNode(node.getFirstChild().getNextSibling(),
+                    + describeSearchGroupNode(node.getFirstChild().getNextSibling(),
                             regExp,false,true,false));
             if (or || not)
                 sb.append(")");
@@ -545,15 +550,15 @@ class GroupDialog extends JDialog {
             // if there was an "and" in this subtree so far, braces may be needed
             if (and || not)
                 sb.append("(");
-            sb.append(describeNode(node.getFirstChild(),regExp,false,false,true)
+            sb.append(describeSearchGroupNode(node.getFirstChild(),regExp,false,false,true)
                     + " or " 
-                    + describeNode(node.getFirstChild().getNextSibling(),
+                    + describeSearchGroupNode(node.getFirstChild().getNextSibling(),
                             regExp,false,false,true));
             if (and || not)
                 sb.append(")");
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Not:
-            return describeNode(node.getFirstChild(), regExp, true, and, or);
+            return describeSearchGroupNode(node.getFirstChild(), regExp, true, and, or);
         default:
             node = node.getFirstChild();
             String field = node.getText();
