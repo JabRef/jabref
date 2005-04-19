@@ -26,11 +26,14 @@
  */
 package net.sf.jabref;
 
+import net.sf.jabref.export.layout.format.RemoveBrackets;
+
 import java.util.*;
 
 public class SimpleSearchRule implements SearchRule {
 
     final boolean m_caseSensitiveSearch;
+    static RemoveBrackets removeBrackets = new RemoveBrackets();
 
     public SimpleSearchRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;
@@ -50,7 +53,7 @@ public class SimpleSearchRule implements SearchRule {
             fieldContentAsObject = bibtexEntry.getField(fields[i].toString()); 
             if (fieldContentAsObject != null)
                 try {
-                    fieldContent = fieldContentAsObject.toString();
+                    fieldContent = removeBrackets.format(fieldContentAsObject.toString());
                     if (!m_caseSensitiveSearch)
                         fieldContent = fieldContent.toLowerCase();
                     counter = fieldContent.indexOf(searchString, counter);

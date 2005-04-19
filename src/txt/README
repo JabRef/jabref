@@ -80,7 +80,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x
+1.x     - Added optional warning before overwriting keys, and option not to overwrite keys.
         - [UNFINISHED] Improved wrapping and formatting of bib files, to preserve
           paragraph separator (empty line).
         - [FINISHED?] Added test buttons for customization of preview layouts.

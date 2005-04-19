@@ -29,6 +29,7 @@ package net.sf.jabref;
 import javax.swing.* ;
 import java.awt.* ;
 import java.util.* ;
+import java.util.regex.PatternSyntaxException;
 
 public class DatabaseSearch extends Thread {
 
@@ -39,11 +40,14 @@ public class DatabaseSearch extends Thread {
     EntryTableModel thisTableModel = null ;
     String searchValueField = null;
     boolean reorder, select, grayOut;
+    ErrorMessageDisplay errorDisplay;
 
-    public DatabaseSearch(Hashtable searchOptions,SearchRuleSet searchRules,
+    public DatabaseSearch(ErrorMessageDisplay errorDisplay, Hashtable searchOptions,
+                          SearchRuleSet searchRules,
 			  BasePanel panel, String searchValueField,
 			  boolean reorder, boolean grayOut, boolean select) {
         this.panel = panel;
+        this.errorDisplay = errorDisplay;
 	thisDatabase = panel.getDatabase() ;
         thisTableModel = panel.getTableModel() ;
         thisSearchOptions = searchOptions;
@@ -76,8 +80,13 @@ public class DatabaseSearch extends Thread {
 		//(thisTableModel.getNameFromNumber(row));
 
 	    // 2. add score per each hit
-	    searchScore = thisRuleSet.applyRule(thisSearchOptions,bes) ;
-            
+        try {
+	        searchScore = thisRuleSet.applyRule(thisSearchOptions,bes) ;
+        } catch (PatternSyntaxException ex) {
+            // There is something wrong with the regexp pattern.
+            errorDisplay.reportError("Malformed regular expression", ex);
+            return;
+        }
             // When using float search, it messes up the sort order if we retain
             // graded search scores, because the table is sorted by the score.
             // To prevent this, we let the search score saturate at 1.

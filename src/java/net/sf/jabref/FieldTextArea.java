@@ -31,14 +31,18 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 //import java.awt.Color;
 import java.awt.event.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
-public class FieldTextArea extends JTextArea implements FieldEditor {
+public class FieldTextArea extends JTextArea implements FieldEditor, KeyListener {
 
     Dimension PREFERRED_SIZE;
     protected JScrollPane sp;
     protected FieldNameLabel label;
     protected String fieldName;
     //protected Completer completer;
+    static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
+    static Pattern indent = Pattern.compile("\\s+.*");
 
     public FieldTextArea(String fieldName_, String content) {
         super(content);
@@ -72,6 +76,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
         FieldTextMenu popMenu = new FieldTextMenu(this) ;
         this.addMouseListener( popMenu );
         label.addMouseListener( popMenu);
+        //this.addKeyListener(this);
     }
 
     /*
@@ -87,6 +92,9 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     public Dimension getPreferredScrollableViewportSize() {
         return PREFERRED_SIZE;
     }
+
+
+
 
   public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
@@ -119,4 +127,68 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
     }
 
 
+    public void keyPressed(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+            // Consume; we will handle this ourselves:
+            event.consume();
+            autoWrap();
+
+        }
+
+    }
+
+    private void autoWrap() {
+        int pos = getCaretPosition();
+        int posAfter = pos+1;
+        StringBuffer sb = new StringBuffer(getText());
+        // First insert the line break:
+        sb.insert(pos, '\n');
+
+        // We want to investigate the beginning of the last line:
+        //int end = sb.length();
+
+        //System.out.println("."+sb.substring(0, pos)+".");
+
+        // Find 0 or the last line break before our current position:
+        int idx = sb.substring(0, pos).lastIndexOf("\n") +1;
+        String prevLine = sb.substring(idx, pos);
+        if (bull.matcher(prevLine).matches()) {
+            int id = findFirstNonWhitespace(prevLine);
+            if (id >= 0) {
+                sb.insert(posAfter, prevLine.substring(0, id));
+                posAfter += id;
+            }
+        }
+        else if (indent.matcher(prevLine).matches()) {
+            int id = findFirstNonWhitespace(prevLine);
+            if (id >= 0) {
+                sb.insert(posAfter, prevLine.substring(0, id));
+                posAfter += id;
+            }
+        }
+        /*if (prevLine.startsWith(" ")) {
+            sb.insert(posAfter, " ");
+            posAfter++;
+        } */
+
+
+        setText(sb.toString());
+        setCaretPosition(posAfter);
+    }
+
+    private int findFirstNonWhitespace(String s) {
+        for (int i=0; i<s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i)))
+                return i;
+        }
+        return -1;
+    }
+
+    public void keyReleased(KeyEvent event) {
+
+    }
+
+    public void keyTyped(KeyEvent event) {
+    }
 }

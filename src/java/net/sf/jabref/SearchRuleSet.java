@@ -27,6 +27,7 @@
 package net.sf.jabref;
 
 import java.util.*;
+import java.util.regex.PatternSyntaxException;
 
 public class SearchRuleSet implements SearchRule {
     protected Vector ruleSet = new Vector();
@@ -39,7 +40,7 @@ public class SearchRuleSet implements SearchRule {
         ruleSet.clear();
     }
 
-    public int applyRule(Map searchString, BibtexEntry bibtexEntry) {
+    public int applyRule(Map searchString, BibtexEntry bibtexEntry) throws PatternSyntaxException{
         int score = 0;
         Enumeration e = ruleSet.elements();
         while (e.hasMoreElements()) {

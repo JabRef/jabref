@@ -26,18 +26,22 @@
  */
 package net.sf.jabref;
 
+import net.sf.jabref.export.layout.format.RemoveBrackets;
+
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class RegExpRule implements SearchRule {
 
     final boolean m_caseSensitiveSearch;
+    static RemoveBrackets removeBrackets = new RemoveBrackets();
 
     public RegExpRule(boolean caseSensitive) {
         m_caseSensitiveSearch = caseSensitive;
     }
 
-    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) throws PatternSyntaxException {
 
         int score = 0;
         Iterator e = searchStrings.values().iterator();
@@ -50,6 +54,7 @@ public class RegExpRule implements SearchRule {
         int flags = 0;
         if (!m_caseSensitiveSearch)
             flags = Pattern.CASE_INSENSITIVE; // testing
+
         Pattern pattern = Pattern.compile(searchString, flags);
 
         Object[] fields = bibtexEntry.getAllFields();
@@ -64,11 +69,14 @@ public class RegExpRule implements SearchRule {
         if (fields != null) {
             for (int i = 0; i < fields.length; i++) {
                 try {
-                    if (pattern.matcher(
-                            String.valueOf(bibtexEntry.getField(fields[i]
-                                    .toString()))).matches()) {
-                        score++;
+                    Object value = bibtexEntry.getField((String)fields[i]);
+                    if (value != null) {
+
+                        if (pattern.matcher(
+                                removeBrackets.format((String)value)).matches()) {
+                            score++;
                         // Util.pr(String.valueOf(bibtexEntry.getField(fields[i].toString())));
+                        }
                     }
                 }
 

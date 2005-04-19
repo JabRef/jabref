@@ -38,7 +38,7 @@ import net.sf.jabref.search.*;
 import net.sf.jabref.search.SearchExpression;
 
 class SearchManager2 extends SidePaneComponent
-    implements ActionListener, KeyListener, ItemListener, CaretListener {
+    implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
 
     GridBagLayout gbl = new GridBagLayout() ;
     GridBagConstraints con = new GridBagConstraints() ;
@@ -378,14 +378,14 @@ settings.add(select);
 	    if (reorder.isSelected()) {
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
-		    (searchOptions,searchRules, panel,
+		    (this, searchOptions,searchRules, panel,
 		     Globals.SEARCH, true, true/*Globals.Globals.prefs.getBoolean("grayOutNonHits")*/, select.isSelected());
 		search.start() ;
 	    }
 	    else if (highlight.isSelected()) {
 		// Highlight search.
 		DatabaseSearch search = new DatabaseSearch
-		    (searchOptions,searchRules, panel,
+		    (this, searchOptions,searchRules, panel,
 		     Globals.SEARCH, false, true, select.isSelected());
 		search.start() ;
 	    }
@@ -502,4 +502,22 @@ settings.add(select);
                 : Globals.lang("Search All Fields"));
     }
 
+    /**
+     * This method is required by the ErrorMessageDisplay interface, and lets this class
+     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
+     * @param errorMessage
+     */
+    public void reportError(String errorMessage) {
+        JOptionPane.showMessageDialog(panel, errorMessage, Globals.lang("Search error"),
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * This method is required by the ErrorMessageDisplay interface, and lets this class
+     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
+     * @param errorMessage
+     */
+    public void reportError(String errorMessage, Exception exception) {
+        reportError(errorMessage);
+    }
 }

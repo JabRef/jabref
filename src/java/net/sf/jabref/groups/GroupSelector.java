@@ -39,7 +39,7 @@ import javax.swing.undo.*;
 import net.sf.jabref.*;
 
 public class GroupSelector extends SidePaneComponent implements
-        TreeSelectionListener, ActionListener {    
+        TreeSelectionListener, ActionListener, ErrorMessageDisplay {
     JButton newButton = new JButton(new ImageIcon(GUIGlobals.newSmallIconFile)),
             helpButton = new JButton(
                     new ImageIcon(GUIGlobals.helpSmallIconFile)),
@@ -459,7 +459,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
-        DatabaseSearch search = new DatabaseSearch(searchOptions, searchRules,
+        DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
                 panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
                         .getBoolean("grayOutNonHits"),
                 /* true, */select.isSelected());
@@ -874,6 +874,25 @@ public class GroupSelector extends SidePaneComponent implements
             setGroups(newGroupsRoot);
          }
         validateTree();
+    }
+
+
+    /**
+     * This method is required by the ErrorMessageDisplay interface, and lets this class
+     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
+     * @param errorMessage
+     */
+    public void reportError(String errorMessage) {
+        System.out.println("Error in group search: "+errorMessage);
+    }
+
+    /**
+     * This method is required by the ErrorMessageDisplay interface, and lets this class
+     * serve as a callback for regular expression exceptions happening in DatabaseSearch.
+     * @param errorMessage
+     */
+    public void reportError(String errorMessage, Exception exception) {
+        reportError(errorMessage);
     }
 }
 
