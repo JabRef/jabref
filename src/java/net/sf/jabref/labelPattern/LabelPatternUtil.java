@@ -338,8 +338,7 @@ public class LabelPatternUtil {
         }
 
         if (!modKey.equals(oldKey))  {
-            System.out.println("LabelPatternUtil: "+modKey);
-            System.out.println(_db.setCiteKeyForEntry(_entry.getId(), modKey));
+            _db.setCiteKeyForEntry(_entry.getId(), modKey);
         }
     }
 

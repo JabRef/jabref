@@ -14,17 +14,14 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JToolBar;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.ImageIcon;
-import javax.swing.BorderFactory;
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
 
 /**
  * This is the panel for the key pattern definition tab in 'Preferences'. So far
@@ -44,6 +41,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private JabRefPreferences _prefs;
 	private LabelPattern _keypatterns;
 	
+    private JCheckBox dontOverwrite = new JCheckBox("Do not overwrite existing keys"),
+        warnBeforeOverwriting = new JCheckBox("Warn before overwriting existing keys");
+
+    
 	private JLabel lblEntryType, lblKeyPattern;
 
     private JTextField defaultPat = new JTextField();
@@ -62,7 +63,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp,
 				      "Help on key patterns");
 		buildGUI();
-		//fillTextfields();
+        //fillTextfields();
 	}
 
 	/**
@@ -74,6 +75,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
          // Set the default value:
          Globals.prefs.put("defaultLabelPattern", defaultPat.getText());
+
+         Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
+         Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
+
+
          LabelPatternUtil.updateDefaultPattern();
 
 
@@ -237,7 +243,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    con.gridx = 1;
 	    con.gridy = 2;
 	    con.fill = GridBagConstraints.HORIZONTAL;
-	    //con.fill = GridBagConstraints.BOTH;
+	    //
 	    con.weightx = 0;
 	    con.weighty = 0;
 	    con.anchor = GridBagConstraints.SOUTHEAST;
@@ -261,6 +267,36 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    btnDefaultAll.addActionListener(new buttonHandler());
 	    add( btnDefaultAll );
 
+
+        // Build a panel for checkbox settings:
+        FormLayout layout = new FormLayout
+	        ("1dlu, 8dlu, left:pref", "");
+        pan = new JPanel();
+	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        builder.appendSeparator(Globals.lang("Key generator settings"));
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(warnBeforeOverwriting);
+        builder.nextLine();
+        //builder.nextColumn();
+        builder.append(pan);
+        builder.append(dontOverwrite);
+        builder.nextLine();
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        con.gridx = 0;
+	    con.gridy = 3;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.weightx = 1;
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(builder.getPanel(), con);
+        add(builder.getPanel());
+
+        dontOverwrite.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                // Warning before overwriting is only relevant if overwriting can happen:
+                warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
+            }
+        });
 	}
 	
 	/**
@@ -325,10 +361,14 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
     public void setValues() {
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
-	for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
-	    String name = (String)i.next();
-	    JTextField tf = (JTextField)textFields.get(name);
-	    setValue(tf, name);
-	}
+        dontOverwrite.setSelected(Globals.prefs.getBoolean("avoidOverwritingKey"));
+        warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
+        // Warning before overwriting is only relevant if overwriting can happen:
+        warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
+	    for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
+    	    String name = (String)i.next();
+    	    JTextField tf = (JTextField)textFields.get(name);
+    	    setValue(tf, name);
+    	}
     }
 }
