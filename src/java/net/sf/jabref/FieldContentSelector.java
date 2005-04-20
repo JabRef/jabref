@@ -32,6 +32,8 @@ import java.util.Vector;
 
 import javax.swing.*;
 
+import com.jgoodies.forms.layout.Sizes;
+
 public class FieldContentSelector extends JComponent implements ActionListener {
 
     protected final String DELIMITER = " ", DELIMITER_2 = "";
@@ -49,9 +51,10 @@ public class FieldContentSelector extends JComponent implements ActionListener {
     GridBagConstraints con = new GridBagConstraints();
     protected final MetaData m_metaData;
     protected final JabRefFrame m_frame;
-    protected final Window m_owner;
+    protected final Window m_owner; 
     protected final BasePanel m_panel;
     protected final AbstractAction m_action;
+    protected final boolean m_horizontalLayout;
 
     /**
      * @param action
@@ -60,13 +63,14 @@ public class FieldContentSelector extends JComponent implements ActionListener {
      */
     public FieldContentSelector(JabRefFrame frame, BasePanel panel,
             Dialog owner, FieldEditor editor, MetaData data,
-            AbstractAction action) {
+            AbstractAction action, boolean horizontalLayout) {
         m_editor = editor;
         m_metaData = data;
         m_action = action;
         m_frame = frame;
         m_panel = panel;
         m_owner = owner;
+        m_horizontalLayout = horizontalLayout;
         doInit();
     }
 
@@ -77,13 +81,14 @@ public class FieldContentSelector extends JComponent implements ActionListener {
      */
     public FieldContentSelector(JabRefFrame frame, BasePanel panel,
             Frame owner, FieldEditor editor, MetaData data,
-            AbstractAction action) {
+            AbstractAction action, boolean horizontalLayout) {
         m_editor = editor;
         m_metaData = data;
         m_action = action;
         m_frame = frame;
         m_panel = panel;
         m_owner = owner;
+        m_horizontalLayout = horizontalLayout;
         doInit();
     }
 
@@ -100,7 +105,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         updateList();
         // else
         // list = new JComboBox(items.toArray());
-        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.gridwidth = m_horizontalLayout ? 3 : GridBagConstraints.REMAINDER;
         con.fill = GridBagConstraints.HORIZONTAL;
         con.weightx = 1;
         // list.setPreferredSize(new Dimension(140,
@@ -109,6 +114,9 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         list.addActionListener(this);
 
         add(list);
+        
+        if (m_horizontalLayout)
+            add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2,this)));
 
         manage = new JButton(Globals.lang("Manage"));
         gbl.setConstraints(manage, con);
@@ -117,7 +125,8 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         manage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // m_owner is either a Frame or a Dialog
-                ContentSelectorDialog2 csd = m_owner instanceof Frame ? new ContentSelectorDialog2(
+                ContentSelectorDialog2 csd = m_owner instanceof Frame ? 
+                        new ContentSelectorDialog2(
                         (Frame) m_owner, m_frame, m_panel, false, m_metaData,
                         m_editor.getFieldName())
                         : new ContentSelectorDialog2((Dialog) m_owner, m_frame,
@@ -125,7 +134,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
                                         .getFieldName());
                 Util.placeDialog(csd, m_frame);
                 csd.show();
-                // updateList();
+                updateList();
             }
         });
     }
