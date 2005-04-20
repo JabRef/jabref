@@ -118,10 +118,10 @@ public class ContentSelectorDialog2 extends JDialog {
                     wordListModel.remove(index);
                     wordListModel.add((newIndex <= index ? newIndex : newIndex-1),
                       newVal);
-		} else
+                } else
                     wordListModel.add(newIndex, newVal);
 		    
-		wordEditField.selectAll();
+                wordEditField.selectAll();
             }
 	};
         wordEditField.addActionListener(wordEditFieldListener);
@@ -215,6 +215,10 @@ public class ContentSelectorDialog2 extends JDialog {
 
 	apply.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+            // Store if an entry is currently being edited:
+            if (!wordEditField.getText().equals("")) {
+                wordEditFieldListener.actionPerformed(null);
+            }
 		    applyChanges();
 		}
 	    });
@@ -239,13 +243,6 @@ public class ContentSelectorDialog2 extends JDialog {
     private void applyChanges() {
 	boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
 
-        // Store if an entry is currently being edited:
-        if (!wordEditField.getText().equals("")) {
-            wordEditFieldListener.actionPerformed(null);
-        }
-        
-
-        
 	// First remove the mappings for fields that have been deleted.
 	// If these were re-added, they will be added below, so it doesn't
 	// cause any harm to remove them here.
