@@ -36,13 +36,14 @@ public class FieldTextField extends JTextField implements FieldEditor {
     protected String fieldName;
     protected JLabel label;
 
-    public FieldTextField(String fieldName_, String content) {
+    public FieldTextField(String fieldName_, String content, boolean changeColorOnFocus) {
         super(content);
 
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         addFocusListener(Globals.focusListener);
-        addFocusListener(new FieldEditorFocusListener());
+        if (changeColorOnFocus)
+            addFocusListener(new FieldEditorFocusListener());
         fieldName = fieldName_;
         label = new FieldNameLabel(" "+Util.nCase(fieldName)+" ");
         //label = new JLabel(" "+Util.nCase(fieldName)+" ", JLabel.CENTER);
