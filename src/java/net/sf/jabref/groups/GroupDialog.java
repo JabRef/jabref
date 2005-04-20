@@ -129,7 +129,7 @@ class GroupDialog extends JDialog {
                 "right:pref, 4dlu, fill:100dlu, 2dlu, left:pref");
         DefaultFormBuilder builderKG = new DefaultFormBuilder(layoutKG);
         builderKG.append("Field");
-        builderKG.append(m_kgSearchField,1);
+        builderKG.append(m_kgSearchField);
         builderKG.nextLine();
         builderKG.append("Term");
         builderKG.append(m_kgSearchTerm);
@@ -152,14 +152,18 @@ class GroupDialog extends JDialog {
         builderSG.append(m_sgRegExp,3);
         m_optionsPanel.add(builderSG.getPanel(),""+INDEX_SEARCHGROUP);
         // ... for buttons panel
-//        FormLayout layoutBP = new FormLayout(
-//                "") JZPUWIL
+        FormLayout layoutBP = new FormLayout(
+                "pref, 4dlu, pref", "p");
+        layoutBP.setColumnGroups(new int[][]{{1, 3}});
+        DefaultFormBuilder builderBP = new DefaultFormBuilder(layoutBP);
+        builderBP.append(m_ok);
+        builderBP.add(m_cancel);
 
         // create layout
         FormLayout layoutAll = new FormLayout(
                 "right:pref, 4dlu, fill:500px, 4dlu, fill:pref",
                 "p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, " +
-                "p, 3dlu, p, 3dlu, top:80dlu");
+                "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, , 9dlu, p");
 
         // ...for keyword group
         DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
@@ -197,6 +201,14 @@ class GroupDialog extends JDialog {
             }
         };
         builderAll.append(sp,5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.appendSeparator();
+        builderAll.nextLine();
+        builderAll.nextLine();
+        CellConstraints cc = new CellConstraints();
+        builderAll.add(builderBP.getPanel(), 
+                cc.xyw(builderAll.getColumn(), builderAll.getRow(), 5, "center, fill"));
         
         Container cp = getContentPane();
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
