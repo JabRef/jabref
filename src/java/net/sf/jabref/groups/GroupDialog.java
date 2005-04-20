@@ -63,14 +63,16 @@ class GroupDialog extends JDialog {
 
     // for KeywordGroup
     private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
-    private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "");
+    private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "", false);
     private JCheckBox m_kgCaseSensitive = new JCheckBox("Case sensitive");
     private JCheckBox m_kgRegExp = new JCheckBox("Regular Expression");
+    private JCheckBox m_kgIgnoreBraces = new JCheckBox("Ignore curly braces {} in field content");
     // for SearchGroup
     // JZTODO translation
     private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
     private JCheckBox m_sgCaseSensitive = new JCheckBox("Case sensitive");
     private JCheckBox m_sgRegExp = new JCheckBox("Regular Expression");
+    private JCheckBox m_sgIgnoreBraces = new JCheckBox("Ignore curly braces {} in field content");
 
     // for all types
     private JButton m_ok = new JButton(Globals.lang("Ok"));
@@ -120,6 +122,7 @@ class GroupDialog extends JDialog {
         groupType.add(m_keywordsRadioButton);
         groupType.add(m_searchRadioButton);
         m_description.setVerticalAlignment(JLabel.TOP);
+        getRootPane().setDefaultButton(m_ok);
         
         // build individual layout cards for each group
         m_optionsPanel.setLayout(m_optionsLayout);
@@ -127,10 +130,10 @@ class GroupDialog extends JDialog {
         m_optionsPanel.add(new JPanel(),""+INDEX_EXPLICITGROUP);
         // ... for keyword group
         FormLayout layoutKG = new FormLayout(
-                "right:pref, 4dlu, fill:100dlu, 2dlu, left:pref");
+                "right:pref, 4dlu, fill:1dlu:grow, 2dlu, left:pref");
         DefaultFormBuilder builderKG = new DefaultFormBuilder(layoutKG);
         builderKG.append("Field");
-        builderKG.append(m_kgSearchField);
+        builderKG.append(m_kgSearchField,3);
         builderKG.nextLine();
         builderKG.append("Term");
         builderKG.append(m_kgSearchTerm);
@@ -140,10 +143,12 @@ class GroupDialog extends JDialog {
         builderKG.append(m_kgCaseSensitive,3);
         builderKG.nextLine();
         builderKG.append(m_kgRegExp,3);
+        builderKG.nextLine();
+        builderKG.append(m_kgIgnoreBraces,3);
         m_optionsPanel.add(builderKG.getPanel(),""+INDEX_KEYWORDGROUP);
         // ... for search group
         FormLayout layoutSG = new FormLayout(
-            "right:pref, 4dlu, fill:190dlu");
+            "right:pref, 4dlu, fill:1dlu:grow");
         DefaultFormBuilder builderSG = new DefaultFormBuilder(layoutSG);
         builderSG.append("Expression");
         builderSG.append(m_sgSearchExpression);
@@ -151,6 +156,8 @@ class GroupDialog extends JDialog {
         builderSG.append(m_sgCaseSensitive,3);
         builderSG.nextLine();
         builderSG.append(m_sgRegExp,3);
+        builderSG.nextLine();
+        builderSG.append(m_sgIgnoreBraces,3);
         m_optionsPanel.add(builderSG.getPanel(),""+INDEX_SEARCHGROUP);
         // ... for buttons panel
         FormLayout layoutBP = new FormLayout(
@@ -293,9 +300,11 @@ class GroupDialog extends JDialog {
         m_kgSearchTerm.addCaretListener(caretListener);
         m_kgCaseSensitive.addItemListener(itemListener);
         m_kgRegExp.addItemListener(itemListener);
+        m_kgIgnoreBraces.addItemListener(itemListener);
         m_sgSearchExpression.addCaretListener(caretListener);
         m_sgRegExp.addItemListener(itemListener);
         m_sgCaseSensitive.addItemListener(itemListener);
+        m_sgIgnoreBraces.addItemListener(itemListener);
 
         // configure for current type
         if (editedGroup instanceof KeywordGroup) {
@@ -305,6 +314,7 @@ class GroupDialog extends JDialog {
             m_kgSearchTerm.setText(group.getSearchExpression());
             m_kgCaseSensitive.setSelected(group.isCaseSensitive());
             m_kgRegExp.setSelected(group.isRegExp());
+            // JZTODO curly braces...
             m_keywordsRadioButton.setSelected(true);
         } else if (editedGroup instanceof SearchGroup) {
             SearchGroup group = (SearchGroup) editedGroup;
@@ -313,6 +323,7 @@ class GroupDialog extends JDialog {
             m_sgCaseSensitive.setSelected(group.isCaseSensitive());
             m_sgRegExp.setSelected(group.isRegExp());
             m_searchRadioButton.setSelected(true);
+            // JZTODO curly braces...
         } else if (editedGroup instanceof ExplicitGroup) {
             m_name.setText(editedGroup.getName());
             m_explicitRadioButton.setSelected(true);
@@ -420,7 +431,8 @@ class GroupDialog extends JDialog {
                 + "Entries can be assigned to this group by selecting them "
                 + "then using either drag and drop or the context menu. "
                 + "Entries can be removed from this group by selecting them "
-                + "then using the context menu.";
+                + "then using the context menu. Every entry assigned to this group " 
+                + "must have a unique key.";
     }
 
     private String getDescriptionForKeywordGroup(String field, String expr,
