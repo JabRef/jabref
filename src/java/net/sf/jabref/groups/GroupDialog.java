@@ -368,6 +368,9 @@ class GroupDialog extends JDialog {
                         okEnabled = false;
                         setDescription(formatRegExException(s2,e));
                     }
+                } else {
+                    setDescription(getDescriptionForKeywordGroup(s1, s2,
+                            m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected()));
                 }
             }
         } else if (m_searchRadioButton.isSelected()) {
