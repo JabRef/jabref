@@ -35,12 +35,11 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.gui.components.JPanelYBoxPreferredWidth;
 import net.sf.jabref.search.*;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.*;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -53,43 +52,45 @@ class GroupDialog extends JDialog {
     private static final int TEXTFIELD_LENGTH = 30;
     // for all types
     private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
-    private JLabel m_nameLabel = new JLabel(Globals.lang("Group name") + ":");
+    // JZTODO better descriptions
+    private JRadioButton m_explicitRadioButton = new JRadioButton(
+            "Assign entries to this group explicitly");
+    private JRadioButton m_keywordsRadioButton = new JRadioButton(
+            "Group entries by keywords");
+    private JRadioButton m_searchRadioButton = new JRadioButton(
+            "Group entries by search expression");
+
     // for KeywordGroup
-    private FieldTextField m_kgSearchExpression = new FieldTextField("keywords","");
-    private JTextField m_searchField = new JTextField(TEXTFIELD_LENGTH);
-    private JLabel m_keywordLabel = new JLabel(Globals.lang("Search term")
-            + ":");
-    private JLabel m_searchFieldLabel = new JLabel(Globals
-            .lang("Field to search")
-            + ":");
+    private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
+    private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "");
     private JCheckBox m_kgCaseSensitive = new JCheckBox("Case sensitive");
-    private JCheckBox m_kgIsRegExp = new JCheckBox("Regular Expression");
-    private JPanel m_keywordGroupPanel;
+    private JCheckBox m_kgRegExp = new JCheckBox("Regular Expression");
     // for SearchGroup
     // JZTODO translation
     private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
     private JCheckBox m_sgCaseSensitive = new JCheckBox("Case sensitive");
-    private JCheckBox m_sgIsRegExp = new JCheckBox("Regular Expression");
-    private JLabel m_searchExpressionLabel = new JLabel("Search expression:");
-    private JPanel m_searchGroupPanel;
-    private JLabel m_searchType = new JLabel("Plaintext Search");
-    // JZTODO: translations...
+    private JCheckBox m_sgRegExp = new JCheckBox("Regular Expression");
 
     // for all types
-    private DefaultComboBoxModel m_types = new DefaultComboBoxModel();
-    private JLabel m_typeLabel = new JLabel("Assign entries based on:");
-    private JComboBox m_typeSelector = new JComboBox();
     private JButton m_ok = new JButton(Globals.lang("Ok"));
     private JButton m_cancel = new JButton(Globals.lang("Cancel"));
-    private JPanel m_mainPanel, lowerPanel, m_descriptionPanel;
-    private JTextArea m_description = new JTextArea(8,80);
+    private JPanel m_optionsPanel = new JPanel();
+    private JLabel m_description = new JLabel() {
+        public Dimension getPreferredSize() {
+            Dimension d = super.getPreferredSize();
+            // width must be smaller than width of enclosing JScrollPane
+            // to prevent a horizontal scroll bar
+            d.width = 1; 
+            return d;
+        }
+    };
 
     private boolean m_okPressed = false;
     private final JabRefFrame m_parent;
     private final BasePanel m_basePanel;
     private AbstractGroup m_resultingGroup;
     private final AbstractGroup m_editedGroup;
-    private CardLayout lowerLayout = new CardLayout();
+    private CardLayout m_optionsLayout = new CardLayout();
 
     /**
      * Shows a group add/edit dialog.
@@ -110,160 +111,112 @@ class GroupDialog extends JDialog {
         m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
-        m_searchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
+        m_kgSearchField.setText(jabrefFrame.prefs().get("groupsDefaultField"));
 
         // configure elements
-        m_types.addElement("Explicit");
-        m_types.addElement("Keywords");
-        m_types.addElement("Search Expression");
-        m_typeSelector.setModel(m_types);
+        ButtonGroup groupType = new ButtonGroup();
+        groupType.add(m_explicitRadioButton);
+        groupType.add(m_keywordsRadioButton);
+        groupType.add(m_searchRadioButton);
+        m_description.setVerticalAlignment(JLabel.TOP);
+        
+        // build individual layout cards for each group
+        m_optionsPanel.setLayout(m_optionsLayout);
+        // ... for explicit group
+        m_optionsPanel.add(new JPanel(),""+INDEX_EXPLICITGROUP);
+        // ... for keyword group
+        FormLayout layoutKG = new FormLayout(
+                "right:pref, 4dlu, fill:100dlu, 2dlu, left:pref");
+        DefaultFormBuilder builderKG = new DefaultFormBuilder(layoutKG);
+        builderKG.append("Field");
+        builderKG.append(m_kgSearchField,1);
+        builderKG.nextLine();
+        builderKG.append("Term");
+        builderKG.append(m_kgSearchTerm);
+        builderKG.append(new FieldContentSelector(m_parent, m_basePanel, this,
+                m_kgSearchTerm, m_basePanel.metaData(), null));
+        builderKG.nextLine();
+        builderKG.append(m_kgCaseSensitive,3);
+        builderKG.nextLine();
+        builderKG.append(m_kgRegExp,3);
+        m_optionsPanel.add(builderKG.getPanel(),""+INDEX_KEYWORDGROUP);
+        // ... for search group
+        FormLayout layoutSG = new FormLayout(
+            "right:pref, 4dlu, fill:190dlu");
+        DefaultFormBuilder builderSG = new DefaultFormBuilder(layoutSG);
+        builderSG.append("Expression");
+        builderSG.append(m_sgSearchExpression);
+        builderSG.nextLine();
+        builderSG.append(m_sgCaseSensitive,3);
+        builderSG.nextLine();
+        builderSG.append(m_sgRegExp,3);
+        m_optionsPanel.add(builderSG.getPanel(),""+INDEX_SEARCHGROUP);
+        // ... for buttons panel
+//        FormLayout layoutBP = new FormLayout(
+//                "") JZPUWIL
 
         // create layout
-
-        m_mainPanel = new JPanelYBoxPreferredWidth();
-
-
-        /*JPanel namePanel = new JPanelXBoxPreferredHeight();
-        namePanel.add(m_nameLabel);
-        namePanel.add(Box.createHorizontalGlue());
-        namePanel.add(new JPanelXBoxPreferredSize(m_name));
-        JPanel typePanel = new JPanelXBoxPreferredHeight();
-        typePanel.add(m_typeLabel);
-        typePanel.add(Box.createHorizontalGlue());
-        typePanel.add(new JPanelXBoxPreferredSize(m_typeSelector));
-        */
+        FormLayout layoutAll = new FormLayout(
+                "right:pref, 4dlu, fill:500px, 4dlu, fill:pref",
+                "p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, " +
+                "p, 3dlu, p, 3dlu, top:80dlu");
 
         // ...for keyword group
-        FormLayout layout = new FormLayout
-	    ("left:pref, 4dlu, fill:130dlu","");
-	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        //builder.appendSeparator(Globals.lang("Keyword"));
-        builder.append(m_searchFieldLabel);
-        builder.append(m_searchField);
-        builder.nextLine();
-        builder.append(m_keywordLabel);
-        builder.append(m_kgSearchExpression);
-        builder.append(new FieldContentSelector(m_parent,m_basePanel,this,
-                m_kgSearchExpression,m_basePanel.metaData(), null));
-        builder.nextLine();
-        builder.append(m_kgCaseSensitive);
-        builder.nextLine();
-        builder.append(m_kgIsRegExp);
-        /*m_keywordGroupPanel = new JPanelYBox();
-        JPanel kgField = new JPanelXBoxPreferredHeight();
-        kgField.add(m_searchFieldLabel);
-        kgField.add(Box.createHorizontalGlue());
-        kgField.add(new JPanelXBoxPreferredSize(m_searchField));
-        JPanel kgExpression = new JPanelXBoxPreferredHeight();
-        kgExpression.add(m_keywordLabel);
-        kgExpression.add(Box.createHorizontalGlue());
-        kgExpression.add(new JPanelXBoxPreferredSize(m_kgSearchExpression));
-        m_keywordGroupPanel.add(kgField);
-        m_keywordGroupPanel.add(kgExpression);
-        m_keywordGroupPanel.add(Box.createVerticalGlue());
-        */
-        m_keywordGroupPanel = builder.getPanel();
-        // ...for search group
-        layout = new FormLayout
-	    ("left:pref, 4dlu, fill:130dlu","");
-	    builder = new DefaultFormBuilder(layout);
-        //builder.appendSeparator(Globals.lang("Search Expression"));
-        builder.append(m_searchExpressionLabel);
-        builder.append(m_sgSearchExpression);
-        builder.nextLine();
-        builder.append(m_sgCaseSensitive);
-        builder.nextLine();
-        builder.append(m_sgIsRegExp);
-
-        m_searchGroupPanel = builder.getPanel();
-        /*JPanel sgExpression = new JPanelXBoxPreferredHeight();
-        sgExpression.add(m_searchExpressionLabel);
-        sgExpression.add(Box.createHorizontalGlue());
-        sgExpression.add(new JPanelXBoxPreferredSize(m_sgSearchExpression));
-        JPanel sgSearchType = new JPanelXBoxPreferredHeight(m_searchType);
-        sgSearchType.add(Box.createHorizontalGlue());
-        JPanel sgCaseSensitive = new JPanelXBoxPreferredHeight(m_caseSensitive);
-        JPanel sgRegExp = new JPanelXBoxPreferredHeight(m_isRegExp);
-        JPanel sgAll = new JPanelXBoxPreferredHeight(m_searchAllFields);
-        JPanel sgReq = new JPanelXBoxPreferredHeight(m_searchRequiredFields);
-        JPanel sgOpt = new JPanelXBoxPreferredHeight(m_searchOptionalFields);
-        JPanel sgGen = new JPanelXBoxPreferredHeight(m_searchGeneralFields);
-        sgCaseSensitive.add(Box.createHorizontalGlue());
-        sgRegExp.add(Box.createHorizontalGlue());
-        sgAll.add(Box.createHorizontalGlue());
-        sgReq.add(Box.createHorizontalGlue());
-        sgOpt.add(Box.createHorizontalGlue());
-        sgGen.add(Box.createHorizontalGlue());
-        m_searchGroupPanel.add(sgExpression);
-        m_searchGroupPanel.add(sgSearchType);
-        m_searchGroupPanel.add(sgCaseSensitive);
-        m_searchGroupPanel.add(sgRegExp);
-        m_searchGroupPanel.add(sgAll);
-        m_searchGroupPanel.add(sgReq);
-        m_searchGroupPanel.add(sgOpt);
-        m_searchGroupPanel.add(sgGen);
-        m_searchGroupPanel.add(Box.createVerticalGlue());
-        */
+        DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
+        builderAll.setDefaultDialogBorder();
+        builderAll.appendSeparator("General");
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append("Name");
+        builderAll.append(m_name);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(m_explicitRadioButton,5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(m_keywordsRadioButton,5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(m_searchRadioButton,5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.appendSeparator("Options");
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(m_optionsPanel,5);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.appendSeparator("Description");
+        builderAll.nextLine();
+        builderAll.nextLine();
+        JScrollPane sp = new JScrollPane(m_description, 
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
+            public Dimension getPreferredSize() {
+                return getMaximumSize();
+            }
+        };
+        builderAll.append(sp,5);
         
-        layout = new FormLayout
-        ("left:pref, 4dlu, fill:130dlu","");
-        builder = new DefaultFormBuilder(layout);
-        m_description.setEditable(false);
-        m_description.setWrapStyleWord(true);
-        m_description.setLineWrap(true);
-        JScrollPane sp = new JScrollPane(m_description);
-        builder.append(sp);
-        m_descriptionPanel = builder.getPanel();
-
-        m_keywordGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        m_searchGroupPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        lowerPanel = new JPanel();
-        lowerPanel.setLayout(lowerLayout);
-        lowerPanel.add(new JPanel(), String.valueOf(INDEX_EXPLICITGROUP));
-        lowerPanel.add(m_keywordGroupPanel, String.valueOf(INDEX_KEYWORDGROUP));
-        lowerPanel.add(m_searchGroupPanel, String.valueOf(INDEX_SEARCHGROUP));
-
-        layout = new FormLayout
-	    ("left:pref, 4dlu, fill:80dlu","");
-	    builder = new DefaultFormBuilder(layout);
-        builder.append(m_nameLabel);
-        builder.append(m_name);
-        builder.nextLine();
-        builder.append(m_typeLabel);
-        builder.append(m_typeSelector);
-        //builder.nextLine();
-        //builder.append(lowerPanel);
-
-        m_mainPanel = builder.getPanel();
-        m_mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        lowerPanel.setBorder(BorderFactory.createEtchedBorder());//createEmptyBorder(2, 2, 2, 2));
-        //m_mainPanel.add(namePanel);
-        //m_mainPanel.add(typePanel);
-
-        JPanel buttons = new JPanel();//XBoxPreferredHeight();
-        buttons.add(m_ok);
-        //buttons.add(Box.createHorizontalStrut(5));
-        buttons.add(m_cancel);
-
         Container cp = getContentPane();
         cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-        cp.add(m_mainPanel);
-        cp.add(lowerPanel);
-        cp.add(m_descriptionPanel);
-        cp.add(buttons);
-        //cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-
-        //cp.add(m_mainPanel);
-        //cp.add(Box.createVerticalGlue());
-        //cp.add(buttons);
+        cp.add(builderAll.getPanel());
+        pack();
+        setResizable(false);
+        updateComponents();
+        setLayoutForSelectedGroup();
+        Util.placeDialog(this, m_parent);
 
         // add listeners
-        m_typeSelector.addItemListener(new ItemListener() {
+        ItemListener radioButtonItemListener = new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                setLayoutForGroup(m_typeSelector.getSelectedIndex());
+                setLayoutForSelectedGroup();
                 updateComponents();
             }
-        });
+        };
+        m_explicitRadioButton.addItemListener(radioButtonItemListener);
+        m_keywordsRadioButton.addItemListener(radioButtonItemListener);
+        m_searchRadioButton.addItemListener(radioButtonItemListener);
 
         m_cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -274,8 +227,7 @@ class GroupDialog extends JDialog {
         m_ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 m_okPressed = true;
-                switch (m_typeSelector.getSelectedIndex()) {
-                case INDEX_EXPLICITGROUP:
+                if (m_explicitRadioButton.isSelected()) {
                     if (m_editedGroup instanceof ExplicitGroup) {
                         // keep assignments from possible previous ExplicitGroup
                         m_resultingGroup = m_editedGroup.deepCopy();
@@ -283,33 +235,29 @@ class GroupDialog extends JDialog {
                     } else {
                         m_resultingGroup = new ExplicitGroup(m_name.getText()
                                 .trim(), m_basePanel.database());
-                        if (m_editedGroup == null)
-                            break; // do not perform the below conversion
-                        addPreviousEntries();
+                        if (m_editedGroup != null)
+                            addPreviousEntries();
                     }
-                    break;
-                case INDEX_KEYWORDGROUP:
+                } else if (m_keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     m_resultingGroup = new KeywordGroup(
-                            m_name.getText().trim(), m_searchField.getText()
-                                    .trim(), m_kgSearchExpression.getText()
-                                    .trim(), m_kgCaseSensitive.isSelected(), 
-                                    m_kgIsRegExp.isSelected());
-                    break;
-                case INDEX_SEARCHGROUP:
+                            m_name.getText().trim(), m_kgSearchField.getText()
+                                    .trim(), m_kgSearchTerm.getText().trim(),
+                            m_kgCaseSensitive.isSelected(), m_kgRegExp
+                                    .isSelected());
+                } else if (m_searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
                         m_resultingGroup = new SearchGroup(m_name.getText()
                                 .trim(), m_sgSearchExpression.getText().trim(),
-                                m_sgCaseSensitive.isSelected(), m_sgIsRegExp
+                                m_sgCaseSensitive.isSelected(), m_sgRegExp
                                         .isSelected());
                     } catch (Exception e1) {
                         // should never happen
                     }
-                    break;
                 }
                 dispose();
             }
@@ -328,43 +276,34 @@ class GroupDialog extends JDialog {
         };
 
         m_name.addCaretListener(caretListener);
-        m_searchField.addCaretListener(caretListener);
-        m_kgSearchExpression.addCaretListener(caretListener);
+        m_kgSearchField.addCaretListener(caretListener);
+        m_kgSearchTerm.addCaretListener(caretListener);
         m_kgCaseSensitive.addItemListener(itemListener);
-        m_kgIsRegExp.addItemListener(itemListener);
+        m_kgRegExp.addItemListener(itemListener);
         m_sgSearchExpression.addCaretListener(caretListener);
-        m_sgIsRegExp.addItemListener(itemListener);
+        m_sgRegExp.addItemListener(itemListener);
         m_sgCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
         if (editedGroup instanceof KeywordGroup) {
             KeywordGroup group = (KeywordGroup) editedGroup;
             m_name.setText(group.getName());
-            m_searchField.setText(group.getSearchField());
-            m_kgSearchExpression.setText(group.getSearchExpression());
+            m_kgSearchField.setText(group.getSearchField());
+            m_kgSearchTerm.setText(group.getSearchExpression());
             m_kgCaseSensitive.setSelected(group.isCaseSensitive());
-            m_kgIsRegExp.setSelected(group.isRegExp());
-            m_typeSelector.setSelectedIndex(INDEX_KEYWORDGROUP);
+            m_kgRegExp.setSelected(group.isRegExp());
+            m_keywordsRadioButton.setSelected(true);
         } else if (editedGroup instanceof SearchGroup) {
             SearchGroup group = (SearchGroup) editedGroup;
             m_name.setText(group.getName());
             m_sgSearchExpression.setText(group.getSearchExpression());
             m_sgCaseSensitive.setSelected(group.isCaseSensitive());
-            m_sgIsRegExp.setSelected(group.isRegExp());
-            m_typeSelector.setSelectedIndex(INDEX_SEARCHGROUP);
+            m_sgRegExp.setSelected(group.isRegExp());
+            m_searchRadioButton.setSelected(true);
         } else if (editedGroup instanceof ExplicitGroup) {
             m_name.setText(editedGroup.getName());
-            m_typeSelector.setSelectedIndex(INDEX_EXPLICITGROUP);
+            m_explicitRadioButton.setSelected(true);
         }
-
-        pack();
-        //setSize(350, 300);
-        setResizable(true);
-
-        updateComponents();
-        setLayoutForGroup(m_typeSelector.getSelectedIndex());
-
-        Util.placeDialog(this, m_parent);
     }
 
     public boolean okPressed() {
@@ -375,71 +314,49 @@ class GroupDialog extends JDialog {
         return m_resultingGroup;
     }
 
-    private void setLayoutForGroup(int index) {
-        lowerLayout.show(lowerPanel, String.valueOf(index));
-        /*switch (index) {
-        case INDEX_KEYWORDGROUP:
-            m_mainPanel.remove(m_searchGroupPanel);
-            m_mainPanel.add(m_keywordGroupPanel);
-            validate();
-            repaint();
-            break;
-        case INDEX_SEARCHGROUP:
-            m_mainPanel.remove(m_keywordGroupPanel);
-            m_mainPanel.add(m_searchGroupPanel);
-            validate();
-            repaint();
-            break;
-        case INDEX_EXPLICITGROUP:
-            m_mainPanel.remove(m_searchGroupPanel);
-            m_mainPanel.remove(m_keywordGroupPanel);
-            validate();
-            repaint();
-            break;
-        } */
+    private void setLayoutForSelectedGroup() {
+        if (m_explicitRadioButton.isSelected())
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(INDEX_EXPLICITGROUP));
+        else if (m_keywordsRadioButton.isSelected())
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(INDEX_KEYWORDGROUP));
+        else if (m_searchRadioButton.isSelected())
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(INDEX_SEARCHGROUP));
     }
 
     private void updateComponents() {
         // all groups need a name
         boolean okEnabled = m_name.getText().trim().length() > 0;
         String s1, s2;
-        switch (m_typeSelector.getSelectedIndex()) {
-        case INDEX_KEYWORDGROUP:
-            s1 = m_searchField.getText().trim();
+        if (m_keywordsRadioButton.isSelected()) {
+            s1 = m_kgSearchField.getText().trim();
             okEnabled = okEnabled && s1.length() > 0 && s1.indexOf(' ') < 0;
-            s2 = m_kgSearchExpression.getText().trim();
+            s2 = m_kgSearchTerm.getText().trim();
             okEnabled = okEnabled && s2.length() > 0;
             if (!okEnabled) {
-                m_description.setText("Please enter the field to search (e.g. \"keywords\") and the term to search it for (e.g. \"electrical\").");
-                break;
-            }
-            if (m_kgIsRegExp.isSelected()) {
-                try {
-                    Pattern.compile(s2);
-                } catch (Exception e) {
-                    okEnabled = false;
-                    m_description.setText("The regular expression \"" + s2 + "\" is invalid ("
-                            + e.getMessage() + ").");
-                    break;
+                setDescription("Please enter the field to search (e.g. \"keywords\") and the term to search it for (e.g. \"electrical\").");
+            } else {
+                if (m_kgRegExp.isSelected()) {
+                    try {
+                        Pattern.compile(s2);
+                    } catch (Exception e) {
+                        okEnabled = false;
+                        setDescription("The regular expression \"" + s2
+                                + "\" is invalid (" + e.getMessage() + ").");
+                    }
                 }
+                setDescription(getDescriptionForKeywordGroup(s1, s2,
+                        m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected()));
             }
-            m_description.setText(getDescriptionForKeywordGroup(s1, s2,
-                    m_kgCaseSensitive.isSelected(), m_kgIsRegExp.isSelected()));
-            break;
-        case INDEX_SEARCHGROUP:
+        } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & s1.length() > 0;
-            AST ast = SearchExpressionParser.checkSyntax(
-                    s1, m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected());
-            m_searchType.setText(ast != null ? "Advanced Search"
-                    : "Plaintext Search");
+            AST ast = SearchExpressionParser.checkSyntax(s1, m_sgCaseSensitive
+                    .isSelected(), m_sgRegExp.isSelected());
             validate();
-            m_description.setText(getDescriptionForSearchGroup(s1, ast,
-                    m_sgCaseSensitive.isSelected(), m_sgIsRegExp.isSelected()));
-            break;
-        case INDEX_EXPLICITGROUP:
-            m_description.setText(getDescriptionForExplicitGroup());
-            break;
+            setDescription(getDescriptionForSearchGroup(s1, ast,
+                    m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected()));
+        } else if (m_explicitRadioButton.isSelected()) {
+            setDescription(getDescriptionForExplicitGroup());
         }
         m_ok.setEnabled(okEnabled);
     }
@@ -453,7 +370,7 @@ class GroupDialog extends JDialog {
         // JZTODO in general, this should create undo information
         // because it might affect the entries. currently, it is only
         // used for ExplicitGroups; the undo information for this case is
-        // contained completely in the UndoableModifyGroup object. 
+        // contained completely in the UndoableModifyGroup object.
         // JZTODO lyrics...
         int i = JOptionPane
                 .showConfirmDialog(
@@ -471,64 +388,78 @@ class GroupDialog extends JDialog {
                 ((ExplicitGroup) m_resultingGroup).addEntry(entry);
         }
     }
-    
+
     private String getDescriptionForExplicitGroup() {
         return "This group contains entries based on explicit assignment. "
-        + "Entries can be assigned to this group by selecting them "
-        + "then using either drag and drop or the context menu. "
-        + "Entries can be removed from this group by selecting them "
-        + "then using the context menu."
-        ;
+                + "Entries can be assigned to this group by selecting them "
+                + "then using either drag and drop or the context menu. "
+                + "Entries can be removed from this group by selecting them "
+                + "then using the context menu.";
     }
-    
-    private String getDescriptionForKeywordGroup(String field,
-            String expr, boolean caseSensitive, boolean regExp) {
+
+    private String getDescriptionForKeywordGroup(String field, String expr,
+            boolean caseSensitive, boolean regExp) {
         StringBuffer sb = new StringBuffer();
-        sb.append("This group contains entries whose \"" + field 
-                + "\" field ");
+        sb.append("This group contains entries whose <b>" + field + "</b> field ");
         sb.append(regExp ? "matches the regular expression "
                 : "contains the term ");
-        sb.append("\"" + expr + "\"");
-        sb.append(caseSensitive ? " (case sensitive). " : " (case insensitive). ");
-        sb.append(regExp ? 
-                "Entries cannot be explicitly assigned to or removed from this group."
-                : "Additionally, entries whose \"" + field + "\" field does not contain "
-                    + "\"" + expr + "\" can be assigned to this group by selecting them "
-                    + "then using either drag and drop or the context menu. "
-                    + "This process adds the term \"" + expr + "\" to "
-                    + "each entry's \"" + field + "\" field. "
-                    + "Entries can be removed from this group by selecting them "
-                    + "then using the context menu. "
-                    + "This process removes the term \"" + expr + "\" from "
-                    + "each  entry's \"" + field + "\" field. "
-                    );
+        sb.append("<b>" + expr + "</b>");
+        sb.append(caseSensitive ? " (case sensitive). "
+                : " (case insensitive). ");
+        sb
+                .append(regExp ? "Entries cannot be explicitly assigned to or removed from this group."
+                        : "Additionally, entries whose <b>"
+                                + field
+                                + "</b> field does not contain "
+                                + "<b>"
+                                + expr
+                                + "</b> can be assigned to this group by selecting them "
+                                + "then using either drag and drop or the context menu. "
+                                + "This process adds the term <b>"
+                                + expr
+                                + "</b> to "
+                                + "each entry's <b>"
+                                + field
+                                + "</b> field. "
+                                + "Entries can be removed from this group by selecting them "
+                                + "then using the context menu. "
+                                + "This process removes the term <b>" + expr
+                                + "</b> from " + "each  entry's <b>" + field
+                                + "</b> field. ");
         return sb.toString();
     }
-    
-    private String getDescriptionForSearchGroup(String expr, AST ast, 
+
+    private String getDescriptionForSearchGroup(String expr, AST ast,
             boolean caseSensitive, boolean regExp) {
         StringBuffer sb = new StringBuffer();
         if (ast == null) {
             sb.append("This group contains entries in which any field ");
             sb.append(regExp ? "matches the regular expression "
                     : "contains the term ");
-            sb.append("\"" + expr + "\" " 
+            sb.append("<b>"
+                    + expr
+                    + "</b> "
                     + (caseSensitive ? "(case sensitive). "
                             : "(case insensitive). "));
-            sb.append("Entries cannot be explicitly assigned to or removed from this group.");
-            sb.append("\n\nHint: To search specific fields only, type for example:\n"
-                    + "author=miller and title=electrical");
+            sb
+                    .append("Entries cannot be explicitly assigned to or removed from this group.");
+            sb
+                    .append("<p><i>Hint: To search specific fields only, type for example:</i>"
+                            + "<p><tt>author=miller and title=electrical</tt>");
             return sb.toString();
         }
         // describe advanced search expression
         sb.append("This group contains entries in which ");
         sb.append(describeSearchGroupNode(ast, regExp, false, false, false));
-        sb.append(". The search is " + (caseSensitive ? "case sensitive" 
-                : "case insensitive") + ".");
+        sb
+                .append(". The search is "
+                        + (caseSensitive ? "case sensitive"
+                                : "case insensitive") + ".");
         return sb.toString();
     }
-    
-    private String describeSearchGroupNode(AST node, boolean regExp, boolean not, boolean and, boolean or) {
+
+    private String describeSearchGroupNode(AST node, boolean regExp,
+            boolean not, boolean and, boolean or) {
         StringBuffer sb = new StringBuffer();
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:
@@ -537,28 +468,32 @@ class GroupDialog extends JDialog {
             // if there was an "or" in this subtree so far, braces may be needed
             if (or || not)
                 sb.append("(");
-            sb.append(describeSearchGroupNode(node.getFirstChild(),regExp,false,true,false)
-                    + " and " 
-                    + describeSearchGroupNode(node.getFirstChild().getNextSibling(),
-                            regExp,false,true,false));
+            sb.append(describeSearchGroupNode(node.getFirstChild(), regExp,
+                    false, true, false)
+                    + " and "
+                    + describeSearchGroupNode(node.getFirstChild()
+                            .getNextSibling(), regExp, false, true, false));
             if (or || not)
                 sb.append(")");
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Or:
             if (not)
                 sb.append("not ");
-            // if there was an "and" in this subtree so far, braces may be needed
+            // if there was an "and" in this subtree so far, braces may be
+            // needed
             if (and || not)
                 sb.append("(");
-            sb.append(describeSearchGroupNode(node.getFirstChild(),regExp,false,false,true)
-                    + " or " 
-                    + describeSearchGroupNode(node.getFirstChild().getNextSibling(),
-                            regExp,false,false,true));
+            sb.append(describeSearchGroupNode(node.getFirstChild(), regExp,
+                    false, false, true)
+                    + " or "
+                    + describeSearchGroupNode(node.getFirstChild()
+                            .getNextSibling(), regExp, false, false, true));
             if (and || not)
                 sb.append(")");
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Not:
-            return describeSearchGroupNode(node.getFirstChild(), regExp, true, and, or);
+            return describeSearchGroupNode(node.getFirstChild(), regExp, true,
+                    and, or);
         default:
             node = node.getFirstChild();
             String field = node.getText();
@@ -581,13 +516,18 @@ class GroupDialog extends JDialog {
             }
             node = node.getNextSibling();
             String term = node.getText();
-            boolean regExpFieldSpec = !Pattern.matches("\\w+",field);
-            sb.append(regExpFieldSpec ? "any field that matches the regular expression"
-                    : "the field");
-            sb.append(" \"" + field + "\" " + matchType); 
-            sb.append((regExp ? " the regular expression"
-                    : " the term") + " \"" + term + "\"");
+            boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
+            sb
+                    .append(regExpFieldSpec ? "any field that matches the regular expression"
+                            : "the field");
+            sb.append(" <b>" + field + "</b> " + matchType);
+            sb.append((regExp ? " the regular expression" : " the term")
+                    + " <b>" + term + "</b>");
             return sb.toString();
         }
+    }
+    
+    protected void setDescription(String description) {
+        m_description.setText("<html>" + description);
     }
 }
