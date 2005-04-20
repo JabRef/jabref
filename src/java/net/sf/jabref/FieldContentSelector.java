@@ -127,10 +127,10 @@ public class FieldContentSelector extends JComponent implements ActionListener {
                 // m_owner is either a Frame or a Dialog
                 ContentSelectorDialog2 csd = m_owner instanceof Frame ? 
                         new ContentSelectorDialog2(
-                        (Frame) m_owner, m_frame, m_panel, false, m_metaData,
+                        (Frame) m_owner, m_frame, m_panel, true, m_metaData,
                         m_editor.getFieldName())
                         : new ContentSelectorDialog2((Dialog) m_owner, m_frame,
-                                m_panel, false, m_metaData, m_editor
+                                m_panel, true, m_metaData, m_editor
                                         .getFieldName());
                 Util.placeDialog(csd, m_frame);
                 csd.show();
@@ -147,7 +147,6 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         if ((items != null) && (items.size() > 0)) {
             for (int i = 0; i < items.size(); i++)
                 list.addItem(items.elementAt(i));
-            // list = new JComboBox();
         }
     }
 
