@@ -29,6 +29,7 @@ package net.sf.jabref.groups;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
+import java.util.regex.*;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -195,7 +196,7 @@ class GroupDialog extends JDialog {
         builderAll.nextLine();
         JScrollPane sp = new JScrollPane(m_description, 
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
             public Dimension getPreferredSize() {
                 return getMaximumSize();
             }
@@ -345,28 +346,41 @@ class GroupDialog extends JDialog {
             s2 = m_kgSearchTerm.getText().trim();
             okEnabled = okEnabled && s2.length() > 0;
             if (!okEnabled) {
-                setDescription("Please enter the field to search (e.g. \"keywords\") and the term to search it for (e.g. \"electrical\").");
+                setDescription("Please enter the field to search (e.g. <b>keywords</b>) and the term to search it for (e.g. <b>electrical</b>).");
             } else {
                 if (m_kgRegExp.isSelected()) {
                     try {
                         Pattern.compile(s2);
+                        setDescription(getDescriptionForKeywordGroup(s1, s2,
+                                m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected()));
                     } catch (Exception e) {
                         okEnabled = false;
-                        setDescription("The regular expression \"" + s2
-                                + "\" is invalid (" + e.getMessage() + ").");
+                        setDescription(formatRegExException(s2,e));
                     }
                 }
-                setDescription(getDescriptionForKeywordGroup(s1, s2,
-                        m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected()));
             }
         } else if (m_searchRadioButton.isSelected()) {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & s1.length() > 0;
-            AST ast = SearchExpressionParser.checkSyntax(s1, m_sgCaseSensitive
-                    .isSelected(), m_sgRegExp.isSelected());
-            validate();
-            setDescription(getDescriptionForSearchGroup(s1, ast,
-                    m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected()));
+            if (!okEnabled) {
+                setDescription("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>" +
+                        "<tt>smith</tt><p>" +
+                        "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>" +
+                        "<tt>author=smith and title=electrical</tt>");
+            } else {
+                AST ast = SearchExpressionParser.checkSyntax(s1, m_sgCaseSensitive
+                        .isSelected(), m_sgRegExp.isSelected());
+                setDescription(getDescriptionForSearchGroup(s1, ast,
+                        m_sgCaseSensitive.isSelected(), m_sgRegExp.isSelected()));
+                if (m_sgRegExp.isSelected()) {
+                    try {
+                        Pattern.compile(s1);
+                    } catch (Exception e) {
+                        okEnabled = false;
+                        setDescription(formatRegExException(s1,e));
+                    }
+                }
+            }
         } else if (m_explicitRadioButton.isSelected()) {
             setDescription(getDescriptionForExplicitGroup());
         }
@@ -456,8 +470,8 @@ class GroupDialog extends JDialog {
             sb
                     .append("Entries cannot be explicitly assigned to or removed from this group.");
             sb
-                    .append("<p><i>Hint: To search specific fields only, type for example:</i>"
-                            + "<p><tt>author=miller and title=electrical</tt>");
+                    .append("<p><br>Hint: To search specific fields only, enter for example:"
+                            + "<p><tt>author=smith and title=electrical</tt>");
             return sb.toString();
         }
         // describe advanced search expression
@@ -540,6 +554,20 @@ class GroupDialog extends JDialog {
     }
     
     protected void setDescription(String description) {
-        m_description.setText("<html>" + description);
+        m_description.setText("<html>" + description + "</html>");
+    }
+    
+    protected String formatRegExException(String regExp, Exception e) {
+        String s = "The regular expression <b>" + regExp
+                + "</b> is invalid:<p><tt>" 
+                + e.getMessage().replaceAll("\\n","<br>");
+        if (!(e instanceof PatternSyntaxException))
+            return s;
+        int lastNewline = s.lastIndexOf("<br>");
+        int hat = s.lastIndexOf("^");
+        if (lastNewline >=0  && hat >= 0 && hat > lastNewline)
+            return s.substring(0,lastNewline+4) 
+            + s.substring(lastNewline+4).replaceAll(" ", "&nbsp;");
+        return s;
     }
 }
