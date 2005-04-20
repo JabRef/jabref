@@ -27,7 +27,6 @@
 package net.sf.jabref.groups;
 
 import java.awt.*;
-import java.awt.dnd.*;
 import java.awt.event.*;
 import java.util.*;
 
