@@ -327,6 +327,8 @@ class GroupDialog extends JDialog {
         } else if (editedGroup instanceof ExplicitGroup) {
             m_name.setText(editedGroup.getName());
             m_explicitRadioButton.setSelected(true);
+        } else { // creating new group -> default to explicit! 
+            m_explicitRadioButton.setSelected(true);
         }
     }
 
