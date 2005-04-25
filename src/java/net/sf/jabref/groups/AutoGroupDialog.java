@@ -29,7 +29,11 @@ package net.sf.jabref.groups;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.event.CaretListener;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 
@@ -37,7 +41,7 @@ import net.sf.jabref.undo.NamedCompound;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class AutoGroupDialog extends JDialog {
+class AutoGroupDialog extends JDialog implements CaretListener {
     JTextField remove = new JTextField(60), field = new JTextField(60),
             deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
@@ -74,20 +78,11 @@ class AutoGroupDialog extends JDialog {
         deliminator.setText(defaultDeliminator);
         ActionListener okListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Check that there are no empty strings.
-                if (field.getText().equals("")) {
-                    JOptionPane.showMessageDialog(frame, Globals
-                            .lang("You must provide a field name "
-                                    + "as basis for the group creation."),
-                            Globals.lang("Automatically create groups"),
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 ok_pressed = true;
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup("Automatically created groups", panel
+                        new ExplicitGroup(Globals.lang("Automatically created groups"), panel
                                 .database()));
                 HashSet hs = null;
                 if (nd.isSelected()) {
@@ -125,6 +120,7 @@ class AutoGroupDialog extends JDialog {
         };
         remove.addActionListener(okListener);
         field.addActionListener(okListener);
+        field.addCaretListener(this);
         AbstractAction cancelAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -187,6 +183,7 @@ class AutoGroupDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(opt, BorderLayout.SOUTH);
         // pack();
+        updateComponents();
         setSize(400, 200);
         Util.placeDialog(this, frame);
     }
@@ -209,5 +206,14 @@ class AutoGroupDialog extends JDialog {
 
     public String remove() {
         return remove.getText();
+    }
+
+    public void caretUpdate(CaretEvent e) {
+        updateComponents();
+    }
+    
+    protected void updateComponents() {
+        String groupField = field.getText().trim();
+        ok.setEnabled(groupField.matches("\\w+"));
     }
 }
