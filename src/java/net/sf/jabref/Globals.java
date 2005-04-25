@@ -207,15 +207,21 @@ public class Globals {
                   sb.append(c);
               } else {
                   b = false;
-                  if (c == '%') {
-                      sb.append(c); // quoted %
-                  } else {
-                      try {
-                          int index = Integer.parseInt(String.valueOf(c));
-                          if (params != null && index >= 0 && index <= params.length)
-                              sb.append(params[index]);
-                      } catch (NumberFormatException e) {
-                          // treat this as ""
+                  try {
+                      int index = Integer.parseInt(String.valueOf(c));
+                      if (params != null && index >= 0 && index <= params.length)
+                          sb.append(params[index]);
+                  } catch (NumberFormatException e) {
+                      // append literally (for quoting) or insert special symbol
+                      switch (c) {
+                      case 'c': // colon
+                          sb.append(':');
+                          break;
+                      case 'e': // equal
+                          sb.append('=');
+                          break;
+                      default: // anything else, e.g. %
+                          sb.append(c);
                       }
                   }
               } 
