@@ -55,24 +55,22 @@ class GroupDialog extends JDialog {
     private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
     // JZTODO better descriptions
     private JRadioButton m_explicitRadioButton = new JRadioButton(
-            "Assign entries to this group explicitly");
+            Globals.lang("Statically group entries by manual assignment"));
     private JRadioButton m_keywordsRadioButton = new JRadioButton(
-            "Group entries by keywords");
+            Globals.lang("Dynamically group entries by searching a field for a keyword"));
     private JRadioButton m_searchRadioButton = new JRadioButton(
-            "Group entries by search expression");
+            Globals.lang("Dynamically group entries by a free-form search expression"));
 
     // for KeywordGroup
     private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
     private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "", false);
-    private JCheckBox m_kgCaseSensitive = new JCheckBox("Case sensitive");
-    private JCheckBox m_kgRegExp = new JCheckBox("Regular Expression");
-    private JCheckBox m_kgIgnoreBraces = new JCheckBox("Ignore curly braces {} in field content");
+    private JCheckBox m_kgCaseSensitive = new JCheckBox(Globals.lang("Case sensitive"));
+    private JCheckBox m_kgRegExp = new JCheckBox(Globals.lang("Regular Expression"));
     // for SearchGroup
     // JZTODO translation
     private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
-    private JCheckBox m_sgCaseSensitive = new JCheckBox("Case sensitive");
-    private JCheckBox m_sgRegExp = new JCheckBox("Regular Expression");
-    private JCheckBox m_sgIgnoreBraces = new JCheckBox("Ignore curly braces {} in field content");
+    private JCheckBox m_sgCaseSensitive = new JCheckBox(Globals.lang("Case sensitive"));
+    private JCheckBox m_sgRegExp = new JCheckBox(Globals.lang("Regular Expression"));
 
     // for all types
     private JButton m_ok = new JButton(Globals.lang("Ok"));
@@ -132,10 +130,10 @@ class GroupDialog extends JDialog {
         FormLayout layoutKG = new FormLayout(
                 "right:pref, 4dlu, fill:1dlu:grow, 2dlu, left:pref");
         DefaultFormBuilder builderKG = new DefaultFormBuilder(layoutKG);
-        builderKG.append("Field");
+        builderKG.append(Globals.lang("Field"));
         builderKG.append(m_kgSearchField,3);
         builderKG.nextLine();
-        builderKG.append("Term");
+        builderKG.append(Globals.lang("Keyword"));
         builderKG.append(m_kgSearchTerm);
         builderKG.append(new FieldContentSelector(m_parent, m_basePanel, this,
                 m_kgSearchTerm, m_basePanel.metaData(), null, true));
@@ -143,21 +141,17 @@ class GroupDialog extends JDialog {
         builderKG.append(m_kgCaseSensitive,3);
         builderKG.nextLine();
         builderKG.append(m_kgRegExp,3);
-        builderKG.nextLine();
-        builderKG.append(m_kgIgnoreBraces,3);
         m_optionsPanel.add(builderKG.getPanel(),""+INDEX_KEYWORDGROUP);
         // ... for search group
         FormLayout layoutSG = new FormLayout(
             "right:pref, 4dlu, fill:1dlu:grow");
         DefaultFormBuilder builderSG = new DefaultFormBuilder(layoutSG);
-        builderSG.append("Expression");
+        builderSG.append(Globals.lang("Search expression"));
         builderSG.append(m_sgSearchExpression);
         builderSG.nextLine();
         builderSG.append(m_sgCaseSensitive,3);
         builderSG.nextLine();
         builderSG.append(m_sgRegExp,3);
-        builderSG.nextLine();
-        builderSG.append(m_sgIgnoreBraces,3);
         m_optionsPanel.add(builderSG.getPanel(),""+INDEX_SEARCHGROUP);
         // ... for buttons panel
         FormLayout layoutBP = new FormLayout(
@@ -173,13 +167,12 @@ class GroupDialog extends JDialog {
                 "p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, " +
                 "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, , 9dlu, p");
 
-        // ...for keyword group
         DefaultFormBuilder builderAll = new DefaultFormBuilder(layoutAll);
         builderAll.setDefaultDialogBorder();
-        builderAll.appendSeparator("General");
+        builderAll.appendSeparator(Globals.lang("General"));
         builderAll.nextLine();
         builderAll.nextLine();
-        builderAll.append("Name");
+        builderAll.append(Globals.lang("Name"));
         builderAll.append(m_name);
         builderAll.nextLine();
         builderAll.nextLine();
@@ -192,13 +185,13 @@ class GroupDialog extends JDialog {
         builderAll.append(m_searchRadioButton,5);
         builderAll.nextLine();
         builderAll.nextLine();
-        builderAll.appendSeparator("Options");
+        builderAll.appendSeparator(Globals.lang("Options"));
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.append(m_optionsPanel,5);
         builderAll.nextLine();
         builderAll.nextLine();
-        builderAll.appendSeparator("Description");
+        builderAll.appendSeparator(Globals.lang("Description"));
         builderAll.nextLine();
         builderAll.nextLine();
         JScrollPane sp = new JScrollPane(m_description, 
@@ -300,11 +293,9 @@ class GroupDialog extends JDialog {
         m_kgSearchTerm.addCaretListener(caretListener);
         m_kgCaseSensitive.addItemListener(itemListener);
         m_kgRegExp.addItemListener(itemListener);
-        m_kgIgnoreBraces.addItemListener(itemListener);
         m_sgSearchExpression.addCaretListener(caretListener);
         m_sgRegExp.addItemListener(itemListener);
         m_sgCaseSensitive.addItemListener(itemListener);
-        m_sgIgnoreBraces.addItemListener(itemListener);
 
         // configure for current type
         if (editedGroup instanceof KeywordGroup) {
@@ -314,7 +305,6 @@ class GroupDialog extends JDialog {
             m_kgSearchTerm.setText(group.getSearchExpression());
             m_kgCaseSensitive.setSelected(group.isCaseSensitive());
             m_kgRegExp.setSelected(group.isRegExp());
-            // JZTODO curly braces...
             m_keywordsRadioButton.setSelected(true);
         } else if (editedGroup instanceof SearchGroup) {
             SearchGroup group = (SearchGroup) editedGroup;
@@ -323,7 +313,6 @@ class GroupDialog extends JDialog {
             m_sgCaseSensitive.setSelected(group.isCaseSensitive());
             m_sgRegExp.setSelected(group.isRegExp());
             m_searchRadioButton.setSelected(true);
-            // JZTODO curly braces...
         } else if (editedGroup instanceof ExplicitGroup) {
             m_name.setText(editedGroup.getName());
             m_explicitRadioButton.setSelected(true);
@@ -352,6 +341,11 @@ class GroupDialog extends JDialog {
     private void updateComponents() {
         // all groups need a name
         boolean okEnabled = m_name.getText().trim().length() > 0;
+        if (!okEnabled) {
+            setDescription(Globals.lang("Please enter a name for the group."));
+            m_ok.setEnabled(false);
+            return;
+        }
         String s1, s2;
         if (m_keywordsRadioButton.isSelected()) {
             s1 = m_kgSearchField.getText().trim();
@@ -359,7 +353,7 @@ class GroupDialog extends JDialog {
             s2 = m_kgSearchTerm.getText().trim();
             okEnabled = okEnabled && s2.length() > 0;
             if (!okEnabled) {
-                setDescription("Please enter the field to search (e.g. <b>keywords</b>) and the term to search it for (e.g. <b>electrical</b>).");
+                setDescription(Globals.lang("Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
             } else {
                 if (m_kgRegExp.isSelected()) {
                     try {
@@ -379,10 +373,11 @@ class GroupDialog extends JDialog {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & s1.length() > 0;
             if (!okEnabled) {
-                setDescription("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>" +
+                setDescription(Globals.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter%c<p>" +
                         "<tt>smith</tt><p>" +
-                        "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>" +
-                        "<tt>author=smith and title=electrical</tt>");
+                        "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>" +
+                        "<tt>author%esmith and title%eelectrical</tt>"));
+//                setDescription(Globals.lang("Please_enter_a_search_term...","="));
             } else {
                 AST ast = SearchExpressionParser.checkSyntax(s1, m_sgCaseSensitive
                         .isSelected(), m_sgRegExp.isSelected());
@@ -417,8 +412,8 @@ class GroupDialog extends JDialog {
         int i = JOptionPane
                 .showConfirmDialog(
                         m_basePanel.frame(),
-                        "Assign all entries that matched the previous group to this group?",
-                        "Conversion to an Explicit Group",
+                        Globals.lang("Assign the previous group's entries to this group?"),
+                        Globals.lang("Change of Grouping Method"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (i == JOptionPane.NO_OPTION)
             return;
@@ -432,43 +427,33 @@ class GroupDialog extends JDialog {
     }
 
     private String getDescriptionForExplicitGroup() {
-        return "This group contains entries based on explicit assignment. "
+        return "This group contains entries based on manual assignment. "
                 + "Entries can be assigned to this group by selecting them "
                 + "then using either drag and drop or the context menu. "
                 + "Entries can be removed from this group by selecting them "
                 + "then using the context menu. Every entry assigned to this group " 
-                + "must have a unique key.";
+                + "must have a unique key. The key may be changed at any time " 
+                + "as long as it remains unique.";
     }
 
     private String getDescriptionForKeywordGroup(String field, String expr,
             boolean caseSensitive, boolean regExp) {
         StringBuffer sb = new StringBuffer();
-        sb.append("This group contains entries whose <b>" + field + "</b> field ");
-        sb.append(regExp ? "matches the regular expression "
-                : "contains the term ");
-        sb.append("<b>" + expr + "</b>");
-        sb.append(caseSensitive ? " (case sensitive). "
-                : " (case insensitive). ");
+        sb.append(regExp ? 
+                Globals.lang("This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",field,expr)
+                : Globals.lang("This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",field,expr));
+        sb.append(" (" + (caseSensitive ? Globals.lang("case sensitive") : Globals.lang("case insensitive")) + "). ");
         sb
-                .append(regExp ? "Entries cannot be explicitly assigned to or removed from this group."
-                        : "Additionally, entries whose <b>"
-                                + field
-                                + "</b> field does not contain "
-                                + "<b>"
-                                + expr
-                                + "</b> can be assigned to this group by selecting them "
+                .append(regExp ? Globals.lang("Entries cannot be manually assigned to or removed from this group.")
+                        : Globals.lang("Additionally, entries whose <b>%0</b> field does not contain "
+                                + "<b>%1</b> can be assigned manually to this group by selecting them "
                                 + "then using either drag and drop or the context menu. "
-                                + "This process adds the term <b>"
-                                + expr
-                                + "</b> to "
-                                + "each entry's <b>"
-                                + field
-                                + "</b> field. "
-                                + "Entries can be removed from this group by selecting them "
+                                + "This process adds the term <b>%1</b> to "
+                                + "each entry's <b>%0</b> field. "
+                                + "Entries can be removed manually from this group by selecting them "
                                 + "then using the context menu. "
-                                + "This process removes the term <b>" + expr
-                                + "</b> from " + "each  entry's <b>" + field
-                                + "</b> field. ");
+                                + "This process removes the term <b>%1</b> from " 
+                                + "each entry's <b>%0</b> field.",field,expr));
         return sb.toString();
     }
 
@@ -476,28 +461,20 @@ class GroupDialog extends JDialog {
             boolean caseSensitive, boolean regExp) {
         StringBuffer sb = new StringBuffer();
         if (ast == null) {
-            sb.append("This group contains entries in which any field ");
-            sb.append(regExp ? "matches the regular expression "
-                    : "contains the term ");
-            sb.append("<b>"
-                    + expr
-                    + "</b> "
-                    + (caseSensitive ? "(case sensitive). "
-                            : "(case insensitive). "));
-            sb
-                    .append("Entries cannot be explicitly assigned to or removed from this group.");
-            sb
-                    .append("<p><br>Hint: To search specific fields only, enter for example:"
-                            + "<p><tt>author=smith and title=electrical</tt>");
+            sb.append(regExp ? Globals.lang("This group contains entries in which any field contains the regular expression <b>%0</b>",expr)
+                    : Globals.lang("This group contains entries in which any field contains the term <b>%0</b>",expr));
+            sb.append(" (" + (caseSensitive ? Globals.lang("case sensitive") : Globals.lang("case insensitive")) + "). ");
+            sb.append(Globals.lang("Entries cannot be manually assigned to or removed from this group."));
+            sb.append("<p><br>" + Globals.lang("Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>"));
             return sb.toString();
         }
         // describe advanced search expression
-        sb.append("This group contains entries in which ");
+        sb.append(Globals.lang("This group contains entries in which") + " ");
         sb.append(describeSearchGroupNode(ast, regExp, false, false, false));
-        sb
-                .append(". The search is "
-                        + (caseSensitive ? "case sensitive"
-                                : "case insensitive") + ".");
+        sb.append(". ");
+        sb.append(caseSensitive ? 
+                Globals.lang("The search is case sensitive.")
+                : Globals.lang("The search is case insensitive."));
         return sb.toString();
     }
 
@@ -507,13 +484,13 @@ class GroupDialog extends JDialog {
         switch (node.getType()) {
         case SearchExpressionTreeParserTokenTypes.And:
             if (not)
-                sb.append("not ");
+                sb.append(Globals.lang("not") + " ");
             // if there was an "or" in this subtree so far, braces may be needed
             if (or || not)
                 sb.append("(");
             sb.append(describeSearchGroupNode(node.getFirstChild(), regExp,
                     false, true, false)
-                    + " and "
+                    + " " + Globals.lang("and") + " "
                     + describeSearchGroupNode(node.getFirstChild()
                             .getNextSibling(), regExp, false, true, false));
             if (or || not)
@@ -521,14 +498,14 @@ class GroupDialog extends JDialog {
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Or:
             if (not)
-                sb.append("not ");
+                sb.append(Globals.lang("not") + " ");
             // if there was an "and" in this subtree so far, braces may be
             // needed
             if (and || not)
                 sb.append("(");
             sb.append(describeSearchGroupNode(node.getFirstChild(), regExp,
                     false, false, true)
-                    + " or "
+                    + " " + Globals.lang("or") + " "
                     + describeSearchGroupNode(node.getFirstChild()
                             .getNextSibling(), regExp, false, false, true));
             if (and || not)
@@ -539,34 +516,32 @@ class GroupDialog extends JDialog {
                     and, or);
         default:
             node = node.getFirstChild();
-            String field = node.getText();
+            final String field = node.getText();
+            final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
             node = node.getNextSibling();
-            String matchType;
-            switch (node.getType()) {
+            final int type = node.getType(); 
+            node = node.getNextSibling();
+            final String term = node.getText();
+            final String fieldSpec = regExpFieldSpec ?
+                    Globals.lang("any field that matches the regular expression <b>%0</b>", field)
+                    : Globals.lang("the field <b>%0</b>", field);
+            final String termSpec = regExp ? 
+                    Globals.lang("the regular expression <b>%0</b>",term)
+                    : Globals.lang("the term <b>%0</b>",term);
+            switch (type) {
             case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
             case SearchExpressionTreeParserTokenTypes.EQUAL:
-                matchType = not ? "doesn't contain" : "contains";
-                break;
+                return not ? Globals.lang("%0 doesn't contain %1", fieldSpec, termSpec)
+                        : Globals.lang("%0 contains %1", fieldSpec, termSpec);
             case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
             case SearchExpressionTreeParserTokenTypes.EEQUAL:
-                matchType = not ? "doesn't match" : "matches";
-                break;
+                return not ? Globals.lang("%0 doesn't match %1", fieldSpec, termSpec)
+                        : Globals.lang("%0 matches %1", fieldSpec, termSpec);
             case SearchExpressionTreeParserTokenTypes.NEQUAL:
-                matchType = "doesn't contain";
-                break;
+                return Globals.lang("%0 doesn't contain %1", fieldSpec, termSpec);
             default:
-                matchType = "?"; // this should never happen
+                return "?"; // this should never happen
             }
-            node = node.getNextSibling();
-            String term = node.getText();
-            boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
-            sb
-                    .append(regExpFieldSpec ? "any field that matches the regular expression"
-                            : "the field");
-            sb.append(" <b>" + field + "</b> " + matchType);
-            sb.append((regExp ? " the regular expression" : " the term")
-                    + " <b>" + term + "</b>");
-            return sb.toString();
         }
     }
     
@@ -575,9 +550,8 @@ class GroupDialog extends JDialog {
     }
     
     protected String formatRegExException(String regExp, Exception e) {
-        String s = "The regular expression <b>" + regExp
-                + "</b> is invalid:<p><tt>" 
-                + e.getMessage().replaceAll("\\n","<br>");
+        String s = Globals.lang("The regular expression <b>%0</b> is invalid:",regExp) 
+            + "<p><tt>%1</tt>" + e.getMessage().replaceAll("\\n","<br>");
         if (!(e instanceof PatternSyntaxException))
             return s;
         int lastNewline = s.lastIndexOf("<br>");
