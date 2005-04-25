@@ -36,6 +36,7 @@ import javax.swing.tree.*;
 import javax.swing.undo.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
@@ -832,12 +833,20 @@ public class GroupSelector extends SidePaneComponent implements
                 + node.getGroup().getName() + "'.");
     }
     
-    public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int numberOfEntries) {
+    public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
+        if (undo == null) {
+            frame.output(Globals.lang("The group \"%0\" already contains the selection.",
+                    new String[]{node.getGroup().getName()}));
+            return;
+        }
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
-        frame.output("Assigned " + numberOfEntries + " "
-                + (numberOfEntries == 1 ? "entry" : "entries")
-                + " to group \"" + node.getGroup().getName() + "\""); 
+        final String groupName = node.getGroup().getName();
+        if (assignedEntries == 1)
+            frame.output(Globals.lang("Assigned 1 entry to group \"%0\".", groupName));
+        else
+            frame.output(Globals.lang("Assigned %0 entries to group \"%1\".", 
+                    String.valueOf(assignedEntries), groupName));
         // JZTODO translation
     }
     
