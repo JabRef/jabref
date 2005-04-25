@@ -181,7 +181,7 @@ public class Globals {
       //System.out.println(tableCache.size());
   }
 
-  public static String lang(String key) {
+  public static String lang(String key, String[] params) {
     String translation = null;
     try {
       if (Globals.messages != null) {
@@ -190,16 +190,56 @@ public class Globals {
     }
     catch (MissingResourceException ex) {
       translation = key;
-
       logger("Warning: could not get translation for \""
                          + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
-      return translation.replaceAll("_", " ");
+      translation = translation.replaceAll("_", " ");
+      StringBuffer sb = new StringBuffer();
+      boolean b = false;
+      char c;
+      for (int i = 0; i < translation.length(); ++i) {
+          c = translation.charAt(i);
+          if (c == '%') {
+              b = true;
+          } else {
+              if (!b) {
+                  sb.append(c);
+              } else {
+                  b = false;
+                  if (c == '%') {
+                      sb.append(c); // quoted %
+                  } else {
+                      try {
+                          int index = Integer.parseInt(String.valueOf(c));
+                          if (params != null && index >= 0 && index <= params.length)
+                              sb.append(params[index]);
+                      } catch (NumberFormatException e) {
+                          // treat this as ""
+                      }
+                  }
+              } 
+          }
+      }
+      return sb.toString();
     }
-    else {
-      return key;
-    }
+    return key;
+  }
+  
+  public static String lang(String key) {
+      return lang(key, (String[])null);
+  }
+  
+  public static String lang(String key, String s1) {
+      return lang(key, new String[]{s1});
+  }
+
+  public static String lang(String key, String s1, String s2) {
+      return lang(key, new String[]{s1, s2});
+  }
+
+  public static String lang(String key, String s1, String s2, String s3) {
+      return lang(key, new String[]{s1, s2, s3});
   }
 
   public static String menuTitle(String key) {
