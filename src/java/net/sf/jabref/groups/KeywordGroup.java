@@ -150,17 +150,18 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         BibtexEntry[] entries = basePanel.getSelectedEntries();
         AbstractUndoableEdit undo = addSelection(entries);
 
-        if (entries.length > 0) // JZTODO: translation
-            basePanel.output("Appended '" + m_searchExpression + "' to the '"
-                    + m_searchField + "' field of " + entries.length + " entr"
-                    + (entries.length > 1 ? "ies." : "y."));
+        /*if (entries.length > 0) // JZTODO: translation
+            basePanel.output(Globals.lang("Appended \"%1\" to the \"%2\""
+                    + "field of %3 entr"
+                    + (entries.length > 1 ? "ies." : "y."), new String[]{
+                    m_searchExpression, m_searchField, ""+entries.length}));*/
 
         return undo;
     }
 
     public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
         if ((entries != null) && (entries.length > 0)) {
-            NamedCompound ce = new NamedCompound("add to group");
+            NamedCompound ce = new NamedCompound("add to group"); // JZTODO translation
             boolean modified = false;
             for (int i = 0; i < entries.length; i++) {
                 if (applyRule(null, entries[i]) == 0) {
