@@ -35,7 +35,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "AllEntriesGroup:";
 
     public AllEntriesGroup() {
-        super("All Entries");
+        super(Globals.lang("All Entries"));
     }
     
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version) throws Exception {
