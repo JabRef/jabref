@@ -33,8 +33,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
-import net.sf.jabref.Globals;
+import net.sf.jabref.BibtexEntry;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -72,6 +71,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
         DropTarget dropTarget = new DropTarget(this, this);
         setCellRenderer(cellRenderer);
+        setFocusable(false);
     }
 
     public void dragEnter(DragSourceDragEvent dsde) {
