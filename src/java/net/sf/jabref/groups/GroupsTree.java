@@ -138,7 +138,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else {
                 // this would be the place to check if the dragging entries
                 // maybe are in this group already, but I think that's not
-                // worth the bother... it might even be irritating to the user.
+                // worth the bother (DropTargetDragEvent does not provide
+                // access to the drag object)... 
+                // it might even be irritating to the user.
                 if (target.getGroup().supportsAdd()) {
                     // accept: assignment from EntryTable
                     dtde.acceptDrag(DnDConstants.ACTION_LINK);
