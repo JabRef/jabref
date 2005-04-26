@@ -136,8 +136,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     public AbstractUndoableEdit addSelection(BasePanel basePanel) {
         if (!supportsAdd()) {
             // this should never happen
-            basePanel.output("The group \"" + getName()
-                    + "\" does not support the adding of entries.");
+            basePanel.output(Globals.lang(
+                    "The group \"%0\" does not support the adding of entries.",
+                    getName()));
             return null;
         }
         for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
@@ -151,18 +152,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         BibtexEntry[] entries = basePanel.getSelectedEntries();
         AbstractUndoableEdit undo = addSelection(entries);
 
-        /*if (entries.length > 0) // JZTODO: translation
-            basePanel.output(Globals.lang("Appended \"%1\" to the \"%2\""
-                    + "field of %3 entr"
-                    + (entries.length > 1 ? "ies." : "y."), new String[]{
-                    m_searchExpression, m_searchField, ""+entries.length}));*/
-
         return undo;
     }
 
     public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
         if ((entries != null) && (entries.length > 0)) {
-            NamedCompound ce = new NamedCompound("add to group"); // JZTODO translation
+            NamedCompound ce = new NamedCompound(Globals.lang("add entries to group"));
             boolean modified = false;
             for (int i = 0; i < entries.length; i++) {
                 if (applyRule(null, entries[i]) == 0) {
@@ -195,15 +190,21 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
      * @return true if the user chose to proceed, false otherwise.
      */
     private boolean showWarningDialog(BasePanel basePanel) {
-        String message = "This action will modify the \""
-                + m_searchField
-                + "\" field "
-                + "of your entries.\nThis could cause undesired changes to "
-                + "your entries, so it\nis recommended that you change the field "
-                + "in your group\ndefinition to \"keywords\" or a non-standard name."
-                + "\n\nDo you still want to continue?";
+        // JZFIXME this is not always shown when required
+//        String message = "This action will modify the \""
+//            + m_searchField
+//            + "\" field "
+//            + "of your entries.\nThis could cause undesired changes to "
+//            + "your entries, so it\nis recommended that you change the field "
+//            + "in your group\ndefinition to \"keywords\" or a non-standard name."
+//            + "\n\nDo you still want to continue?";
+        String message = Globals.lang("This action will modify the \"%0\" field "
+            + "of your entries.\nThis could cause undesired changes to "
+            + "your entries, so it\nis recommended that you change the field "
+            + "in your group\ndefinition to \"keywords\" or a non-standard name."
+            + "\n\nDo you still want to continue?", m_searchField);
         int choice = JOptionPane.showConfirmDialog(basePanel, message,
-                "Warning", JOptionPane.YES_NO_OPTION,
+                Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
     }
@@ -211,8 +212,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
         if (!supportsRemove()) {
             // this should never happen
-            basePanel.output("The group \"" + getName()
-                    + "\" does not support the removal of entries.");
+            basePanel.output(Globals.lang(
+                    "The group \"%0\" does not support the removal of entries.",
+                    getName()));
             return null;
         }
         for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; i++) {

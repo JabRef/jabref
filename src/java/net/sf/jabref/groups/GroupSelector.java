@@ -36,7 +36,6 @@ import javax.swing.tree.*;
 import javax.swing.undo.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
@@ -508,8 +507,8 @@ public class GroupSelector extends SidePaneComponent implements
                         UndoableAddOrRemoveGroup.ADD_NODE);
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Globals.lang("Created group") + " '"
-                        + newGroup.getName() + "'.");
+                frame.output(Globals.lang("Created_group_\"%0\".",
+                        newGroup.getName()));
             }
         } else if (e.getSource() == autoGroup) {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
@@ -571,8 +570,8 @@ public class GroupSelector extends SidePaneComponent implements
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Globals.lang("Modified group") + " '"
-                        + newGroup.getName() + "'.");
+                frame.output(Globals.lang("Modified group \"%0\".",
+                        newGroup.getName()));
             }
         }
     };
@@ -598,7 +597,8 @@ public class GroupSelector extends SidePaneComponent implements
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
-            frame.output("Added group '" + newGroup.getName() + "'.");
+            frame.output(Globals.lang("Added group \"%0\".",
+                    newGroup.getName()));
         }
     };
 
@@ -622,7 +622,8 @@ public class GroupSelector extends SidePaneComponent implements
             // Store undo information.
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged();
-            frame.output("Added group '" + newGroup.getName() + "'.");
+            frame.output(Globals.lang("Added group \"%0\".",
+                    newGroup.getName()));
         }
     };
 
@@ -633,9 +634,8 @@ public class GroupSelector extends SidePaneComponent implements
                     .getSelectionPath().getLastPathComponent();
             final AbstractGroup group = node.getGroup();
             int conf = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("Remove group")
-                    + " '" + group.getName() + "' and its subgroups?", Globals
-                    .lang("Remove group and subgroups"),
+                    .lang("Remove group \"%0\" and its subgroups?",group.getName()), 
+                    Globals.lang("Remove group and subgroups"),
                     JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
@@ -646,8 +646,8 @@ public class GroupSelector extends SidePaneComponent implements
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Globals.lang("Removed group") + " '"
-                        + group.getName() + "' and its subgroups.");
+                frame.output(Globals.lang("Removed group \"%0\" and its subgroups.",
+                        group.getName()));
             }
         }
     };
@@ -659,8 +659,7 @@ public class GroupSelector extends SidePaneComponent implements
                     .getSelectionPath().getLastPathComponent();
             final AbstractGroup group = node.getGroup();
             int conf = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("Remove group")
-                    + " '" + group.getName() + "'?", Globals
+                    .lang("Remove group \"%0\"?", group.getName()), Globals
                     .lang("Remove group"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
@@ -676,8 +675,8 @@ public class GroupSelector extends SidePaneComponent implements
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
-                frame.output(Globals.lang("Removed group") + " '"
-                        + group.getName() + "' and its subgroups.");
+                frame.output(Globals.lang("Removed group \"%0\".",
+                        group.getName()));
             }
         }
     };
@@ -686,7 +685,7 @@ public class GroupSelector extends SidePaneComponent implements
         return groupsTree.getSelectionPath();
     }
     
-    AbstractAction moveNodeUpAction = new AbstractAction("Up") {
+    AbstractAction moveNodeUpAction = new AbstractAction(Globals.lang("Up")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -696,7 +695,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeDownAction = new AbstractAction("Down") {
+    AbstractAction moveNodeDownAction = new AbstractAction(Globals.lang("Down")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -706,7 +705,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeLeftAction = new AbstractAction("Left") {
+    AbstractAction moveNodeLeftAction = new AbstractAction(Globals.lang("Left")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -716,7 +715,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeRightAction = new AbstractAction("Right") {
+    AbstractAction moveNodeRightAction = new AbstractAction(Globals.lang("Right")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -738,8 +737,8 @@ public class GroupSelector extends SidePaneComponent implements
         }
         AbstractUndoableEdit undo = null;
         if (!node.canMoveUp() || (undo = node.moveUp(GroupSelector.this)) == null) {
-            frame.output(Globals.lang("Cannot move group") + " '" // JZTODO: translation...
-                    + node.getGroup().getName() + "' " + Globals.lang("up."));
+            frame.output(Globals.lang(
+                    "Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
         }
         // update of selection/expansion state not required
@@ -761,8 +760,8 @@ public class GroupSelector extends SidePaneComponent implements
         }
         AbstractUndoableEdit undo = null;
         if (!node.canMoveDown() || (undo = node.moveDown(GroupSelector.this)) == null) {
-            frame.output(Globals.lang("Cannot move group") + " '"
-                    + node.getGroup().getName() + "' down.");
+            frame.output(Globals.lang(
+                    "Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
         }
         // update of selection/expansion state not required
@@ -785,8 +784,8 @@ public class GroupSelector extends SidePaneComponent implements
         AbstractUndoableEdit undo = null;
         Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
-            frame.output(Globals.lang("Cannot move group") + " '"
-                    + node.getGroup().getName() + "' left.");
+            frame.output(Globals.lang(
+                    "Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
@@ -809,8 +808,8 @@ public class GroupSelector extends SidePaneComponent implements
         AbstractUndoableEdit undo = null;
         Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
-            frame.output(Globals.lang("Cannot move group") + " '"
-                    + node.getGroup().getName() + "' right.");
+            frame.output(Globals.lang(
+                    "Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
@@ -829,8 +828,8 @@ public class GroupSelector extends SidePaneComponent implements
     public void concludeMoveGroup(AbstractUndoableEdit undo, GroupTreeNode node) {
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
-        frame.output(Globals.lang("Moved group") + " '"
-                + node.getGroup().getName() + "'.");
+        frame.output(Globals.lang("Moved group \"%0\".", 
+                node.getGroup().getName()));
     }
     
     public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
@@ -850,7 +849,7 @@ public class GroupSelector extends SidePaneComponent implements
         // JZTODO translation
     }
     
-    JMenu moveSubmenu = new JMenu("Move");
+    JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
 
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
@@ -891,7 +890,11 @@ public class GroupSelector extends SidePaneComponent implements
      * @param errorMessage
      */
     public void reportError(String errorMessage) {
-        System.out.println("Error in group search: "+errorMessage);
+        // this should never happen, since regular expressions are checked for
+        // correctness by the edit group dialog, and no other errors should
+        // occur in a search
+        System.err.println("Error in group search: "+errorMessage
+                + ". Please report this on www.sf.net/projects/jabref");
     }
 
     /**

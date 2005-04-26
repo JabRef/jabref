@@ -410,7 +410,7 @@ class GroupDialog extends JDialog {
         int i = JOptionPane
                 .showConfirmDialog(
                         m_basePanel.frame(),
-                        Globals.lang("Assign the previous group's entries to this group?"),
+                        Globals.lang("Assign the original group's entries to this group?"),
                         Globals.lang("Change of Grouping Method"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (i == JOptionPane.NO_OPTION)
