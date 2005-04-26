@@ -236,7 +236,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 
     public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
         if ((entries != null) && (entries.length > 0)) {
-            NamedCompound ce = new NamedCompound("remove from group");
+            NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
             boolean modified = false;
             for (int i = 0; i < entries.length; ++i) {
                 if (applyRule(null, entries[i]) > 0) {

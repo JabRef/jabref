@@ -118,10 +118,10 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
 		    public void run() {
 			citeSeerFetcher.beginImportCiteSeerProgress();
 			NamedCompound undoEdit =
-			    new NamedCompound("CiteSeer import entries"),
+			    new NamedCompound(Globals.lang("CiteSeer import entries")),
 			    // Use a dummy UndoEdit to avoid storing the information on
 			    // every field change, since we are importing new entries:
-			    dummyCompound = new NamedCompound("Ok");
+			    dummyCompound = new NamedCompound(Globals.lang("Ok"));
 			BooleanAssign overwriteAll = new BooleanAssign(true),
 			    overwriteNone = new BooleanAssign(false),
 			    newValue = new BooleanAssign(false);			

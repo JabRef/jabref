@@ -36,7 +36,7 @@ public class NamedCompound extends CompoundEdit {
 
     public NamedCompound(String name) {
 	super();
-	this.name = Globals.lang(name);
+	this.name = name;
     }
 
     public String getUndoPresentationName() {

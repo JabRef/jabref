@@ -427,7 +427,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database)
 	 {
 		try {
-			NamedCompound dummyNamedCompound = new NamedCompound("Import Data from CiteSeer Database");
+			NamedCompound dummyNamedCompound = new NamedCompound(Globals.lang("Import Data from CiteSeer Database"));
 			BooleanAssign dummyBoolean = new BooleanAssign(false);
 			if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			    int citationCounter=0;

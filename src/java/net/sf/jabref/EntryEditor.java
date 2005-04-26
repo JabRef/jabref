@@ -800,7 +800,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       if (db.getEntryCount() < 1)
         throw new Exception("No entries found.");
 
-      NamedCompound compound = new NamedCompound("source edit");
+      NamedCompound compound = new NamedCompound(Globals.lang("source edit"));
       BibtexEntry nu = db.getEntryById((String) db.getKeySet().iterator().next());
       String id = entry.getId();
       String 

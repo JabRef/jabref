@@ -265,7 +265,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
         }
 
         ImportInspectionDialog diag = new ImportInspectionDialog(panel.frame(), panel,
-                GUIGlobals.DEFAULT_INSPECTION_FIELDS, "Fetch Medline", false);
+                GUIGlobals.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch Medline"), false);
         Util.placeDialog(diag, panel.frame());
         // diag.setProgress(0, count);
         diag.setVisible(true);

@@ -405,7 +405,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if ((bes != null) && (bes.length > 0)) {
                         // Create a CompoundEdit to make the action undoable.
                         NamedCompound ce = new NamedCompound
-                            (bes.length > 1 ? "cut entries" : "cut entry");
+                        (Globals.lang(bes.length > 1 ? "cut entries" : "cut entry"));
                         // Loop through the array of entries, and delete them.
                         for (int i=0; i<bes.length; i++) {
                             database.removeEntry(bes[i].getId());
@@ -450,7 +450,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       else {
                           // Create a CompoundEdit to make the action undoable.
                           NamedCompound ce = new NamedCompound
-                              (bes.length > 1 ? "delete entries" : "delete entry");
+                              (Globals.lang(bes.length > 1 ? "delete entries" : "delete entry"));
                           // Loop through the array of entries, and delete them.
                           for (int i = 0; i < bes.length; i++) {
                               database.removeEntry(bes[i].getId());
@@ -564,7 +564,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // or were parsed from a string
                         if ((bes != null) && (bes.length > 0)) {
                           NamedCompound ce = new NamedCompound
-                              (bes.length > 1 ? "paste entries" : "paste entry");
+                              (Globals.lang(bes.length > 1 ? "paste entries" : "paste entry"));
                           for (int i=0; i<bes.length; i++) {
                             try {
                               BibtexEntry be = (BibtexEntry)(bes[i].clone());
@@ -757,7 +757,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 		// Run second, on a different thread:
                 public void run() {
                     BibtexEntry bes = null ;
-                    NamedCompound ce = new NamedCompound("autogenerate keys");
+                    NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
                     //BibtexEntry be;
                     Object oldValue;
                     boolean hasShownWarning = false;
@@ -976,7 +976,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
                     BibtexDatabase db = pr.getDatabase();
                     MetaData meta = new MetaData(pr.getMetaData(),database());
-                    NamedCompound ce = new NamedCompound("Append database");
+                    NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
 
                     if (importEntries) { // Add entries
                       Iterator i = db.getKeySet().iterator();
@@ -1146,7 +1146,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       if (!rsd.okPressed())
                           return;
                       int counter = 0;
-                      NamedCompound ce = new NamedCompound("Replace string");
+                      NamedCompound ce = new NamedCompound(Globals.lang("Replace string"));
                       if (!rsd.selOnly()) {
                           for (Iterator i=database.getKeySet().iterator();
                                i.hasNext();)
@@ -1252,7 +1252,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   private int besLength = -1;
                 public void run() {
 
-                  NamedCompound ce = new NamedCompound("Mark entries");
+                  NamedCompound ce = new NamedCompound(Globals.lang("Mark entries"));
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
                   besLength = bes.length;
 		  if (bes == null)
@@ -1280,7 +1280,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
               actions.put("unmarkEntries", new BaseAction() {
                 public void action() {
                     try {
-                  NamedCompound ce = new NamedCompound("Unmark entries");
+                  NamedCompound ce = new NamedCompound(Globals.lang("Unmark entries"));
                   BibtexEntry[] bes = entryTable.getSelectedEntries();
 		  if (bes == null)
 		      return;
@@ -1300,7 +1300,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
               actions.put("unmarkAll", new BaseAction() {
                 public void action() {
-                  NamedCompound ce = new NamedCompound("Unmark all");
+                  NamedCompound ce = new NamedCompound(Globals.lang("Unmark all"));
                   Set keySet = database.getKeySet();
                   for (Iterator i = keySet.iterator(); i.hasNext(); ) {
                     BibtexEntry be = database.getEntryById( (String) i.next());
@@ -2339,7 +2339,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
         }
 
-        NamedCompound ce = new NamedCompound("change type");
+        NamedCompound ce = new NamedCompound(Globals.lang("change type"));
         for (int i=0; i<bes.length; i++) {
             ce.addEdit(new UndoableChangeType(bes[i],
                                               bes[i].getType(),

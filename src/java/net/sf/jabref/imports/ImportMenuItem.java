@@ -72,7 +72,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
             }
             String[] fields = new String[] {"author", "title", "year" };
             ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, fields,
-                    "Import", openInNew);
+                    Globals.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.addCallBack(ImportMenuItem.this);
             diag.entryListComplete();

@@ -1549,7 +1549,7 @@ class ImportCiteSeerAction
                                         if (clickedOn != null) {
                                                 citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =
-                                                        new NamedCompound("CiteSeer Import Fields");
+                                                        new NamedCompound(Globals.lang("CiteSeer Import Fields"));
                                                 boolean newValues = citeSeerFetcher.importCiteSeerEntries(clickedOn, citeseerNamedCompound);
                                                 if (newValues) {
                                                         citeseerNamedCompound.end();
@@ -1878,7 +1878,7 @@ class FetchCiteSeerAction
       BasePanel basePanel = basePanel();
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
-      NamedCompound ce = new NamedCompound("Import entries");
+      NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
       Iterator it = bibentries.iterator();
       mainLoop: while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();

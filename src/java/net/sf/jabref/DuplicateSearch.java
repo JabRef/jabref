@@ -109,7 +109,7 @@ public void run() {
         int answer = drd.getSelected() ;
         if ( answer == DuplicateResolverDialog.KEEP_UPPER )
         {
-          if ( ce == null ) ce = new NamedCompound( "duplicate removal" ) ;
+          if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
           panel.database.removeEntry( be[1].getId() ) ;
           panel.refreshTable() ;
           panel.markBaseChanged() ;
@@ -117,7 +117,7 @@ public void run() {
         }
         else if ( answer == DuplicateResolverDialog.KEEP_LOWER )
         {
-          if ( ce == null ) ce = new NamedCompound( "duplicate removal" ) ;
+          if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
           panel.database.removeEntry( be[0].getId() ) ;
           panel.refreshTable() ;
           panel.markBaseChanged() ;
