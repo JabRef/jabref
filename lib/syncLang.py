@@ -152,19 +152,43 @@ def findNewKeysInJavaCode(mainFile, dir, update):
 	
 	
 	
-####### Main part ###################3
-if (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
+####### Main part ###################
+
+if len(sys.argv) == 1:
+	print """This program must be run from the "src" directory right below the jabref base directory.
+	
+Usage: syncLang.py option	
+Option can be one of the following:
+	-s [-u]: Search the Java source files for language keys. All keys that are found in the source files
+		but not in "JabRef_en.properties" are listed. If the -u option is specified, these keys will
+		automatically be added to "JabRef_en.properties".
+		
+		The program will also list "Not terminated" keys. These are keys that are concatenated over 
+		more than one line, that the program is not (currently) able to resolve.
+		
+		Finally, the program will list "Possible redundant keys". These are keys that are present in
+		"JabRef_en.properties", but could not be found in the Java source code. Note that the 
+		"Not terminated" keys will be likely to appear here, since they were not resolved.
+		
+	-t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other 
+		language files. The program will list for all the other files which keys from the English
+		file are missing.
+		
+		If the -u option is specified, all missing keys will automatically be added to the files.
+"""
+	
+elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
 	if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
 		update = 1
 	else:
 		update = 0
 	findNewKeysInJavaCode("resource/JabRef_en.properties", ".", update)
 	
-else:					
-	if (len(sys.argv) < 2) or not (sys.argv[1] == "-u"):
-		changeFiles = 0
-	else:
+elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
+	if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
 		changeFiles = 1
+	else:
+		changeFiles = 0
 		
 	handleFileSet("resource/JabRef_en.properties", ("resource/JabRef_de.properties", "resource/JabRef_fr.properties",\
 		"resource/JabRef_no.properties"), changeFiles)
