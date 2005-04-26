@@ -105,7 +105,7 @@ public class LabelPatternUtil {
    * returns the <code>Bibtexentry</code> with the unique label.
    * @param table a <code>LabelPattern</code>
    * @param database a <code>BibtexDatabase</code>
-   * @param entryId a <code>String</code>
+   * @param _entry a <code>BibtexEntry</code>
    * @return modified Bibtexentry
    */
   public static BibtexEntry makeLabel(LabelPattern table,
@@ -391,11 +391,11 @@ public class LabelPatternUtil {
    * @param key a <code>String</code>
    * @return a unique label
    */
-  public static String makeLabelUnique(String label) {
+  public static String makeLabelUnique(String key) {
     // First I tried to make this recursive, but had to give up. I needed to
     // do too many chacks of different kinds.
-    String _orgLabel = label;
-    String _newLabel = label;
+    String _orgLabel = key;
+    String _newLabel = key;
     int lettersSize = letters.size();
 
     for (int i = 0; i < lettersSize; i++) {
@@ -592,8 +592,8 @@ public class LabelPatternUtil {
     else
       return author.toString().substring(0, n);
   }
+      
 
-	
   /**
    * Split the pages field into two and return the first one
    * @param pages a <code>String</code>

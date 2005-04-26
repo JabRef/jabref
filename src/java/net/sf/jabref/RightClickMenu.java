@@ -232,7 +232,7 @@ public class RightClickMenu extends JPopupMenu
       insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false);
     }
     
-    private void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, boolean add) {
+    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, boolean add) {
         final AbstractAction action = getAction(node,selection,add);
         
         if (node.getChildCount() == 0) {

@@ -357,7 +357,7 @@ public class EntryTable extends JTable {
    * events, like opening an entry editor, the context menu or a pdf file.
    */
   class TableClickListener extends MouseAdapter {
-      public void mouseClicked(MouseEvent e) {
+      public void mousePressed(MouseEvent e) {
 
         // First find the column on which the user has clicked.
         final int col = columnAtPoint(e.getPoint()),
@@ -373,9 +373,9 @@ public class EntryTable extends JTable {
         }
 
         // Check if the user has right-clicked. If so, open the right-click menu.
-        //if (e.isPopupTrigger()) {
-        if ( (e.getButton() == MouseEvent.BUTTON3) ||
-             (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+        if (e.isPopupTrigger()) {
+        //if ( (e.getButton() == MouseEvent.BUTTON3) ||
+        //     (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
           int selRow = getSelectedRow();
           if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
             setRowSelectionInterval(row, row);

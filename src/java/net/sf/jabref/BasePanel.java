@@ -95,7 +95,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 
 
-    RightClickMenu rcm;
+    public RightClickMenu rcm;
 
     BibtexEntry showing = null;
     // To indicate which entry is currently shown.
@@ -125,8 +125,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 	hidingNonHits = false,
         sortingByGroup = false,
         sortingByCiteSeerResults = false,
-        coloringByGroup = false,
-        previewEnabled = true;
+        coloringByGroup = false;
+        //previewEnabled = Globals.prefs.getBoolean("previewEnabled");
     int lastSearchHits = -1; // The number of hits in the latest search.
     // Potential use in hiding non-hits completely.
 
@@ -1318,15 +1318,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
               actions.put("togglePreview", new BaseAction() {
                       public void action() {
-                          previewEnabled = !previewEnabled;
-                          if (!previewEnabled)
+                          boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
+                          Globals.prefs.putBoolean("previewEnabled", enabled);
+                          if (!enabled)
                               hidePreview();
                           else {
-                              //BibtexEntry[] bes = entryTable.getSelectedEntries();
-                              //if ((bes != null) && (bes.length > 0))
                               updateViewToSelected();
                           }
-                          frame.previewToggle.setSelected(previewEnabled);
+                          frame.previewToggle.setSelected(enabled);
                       }
                   });
 
@@ -1337,7 +1336,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           else
                               activePreview = 0;
 
-                          if (!previewEnabled)
+                          if (!Globals.prefs.getBoolean("previewEnabled"))
                               hidePreview();
                           else {
                               //BibtexEntry[] bes = entryTable.getSelectedEntries();
@@ -1864,7 +1863,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
 
       // If no entry editor is visible we must either instantiate a new preview panel or update the one we have.
-      if (!previewEnabled || be==null) {
+      if (!Globals.prefs.getBoolean("previewEnabled") || be==null) {
         splitPane.setBottomComponent(null);
         return; // Do nothing if previews are disabled.
       }
@@ -1927,8 +1926,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * a preview is in fact visible before doing anything rash.
      */
     public void hidePreview() {
-      previewEnabled = false;
-      //previewPanel[activePreview] = null;
+        Globals.prefs.putBoolean("previewEnabled", false);
+
       Component c = splitPane.getBottomComponent();
       if ((c != null) && !(c instanceof EntryEditor))
         splitPane.setBottomComponent(null);
@@ -2422,9 +2421,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Method pertaining to the ClipboardOwner interface.
     public void lostOwnership(Clipboard clipboard, Transferable contents) {}
 
-  public boolean previewEnabled() {
-    return previewEnabled;
-  }
 
   public void setEntryEditorEnabled(boolean enabled) {
     if ((showing != null) && (splitPane.getBottomComponent() instanceof EntryEditor)) {

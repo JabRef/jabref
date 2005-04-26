@@ -1,23 +1,28 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.AllEntriesGroup;
+import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.imports.ImportFormatReader;
 
 import javax.swing.*;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import java.util.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -45,13 +50,19 @@ public class ImportInspectionDialog extends JDialog {
     private String undoName;
     private ArrayList callBacks = new ArrayList();
     private boolean newDatabase;
+    private JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
+    private JPopupMenu popup = new JPopupMenu();
     private JButton selectAll = new JButton(Globals.lang("Select all"));
     private JButton deselectAll = new JButton(Globals.lang("Deselect all"));
     private JButton stop = new JButton(Globals.lang("Stop"));
+    private JButton delete = new JButton(Globals.lang("Delete"));
+    private JButton help = new JButton(Globals.lang("Help"));
     private PreviewPanel preview = new PreviewPanel(Globals.prefs.get("preview1"));
     private ListSelectionListener previewListener = null;
     private boolean generatedKeys = false;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
+    private Map groupAdditions = new HashMap();
+
 
     /**
      * Creates a dialog that displays the given set of fields in the table.
@@ -78,13 +89,14 @@ public class ImportInspectionDialog extends JDialog {
                     ((Integer)o).intValue();
             table.getColumnModel().getColumn(i+1).setPreferredWidth(width);
         }
-        table.getColumnModel().getColumn(0).setPreferredWidth(25);
+        table.getColumnModel().getColumn(0).setPreferredWidth(55);
+        table.getColumnModel().getColumn(0).setMaxWidth(55);
         table.setRowSelectionAllowed(true);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         //table.setCellSelectionEnabled(false);
         previewListener = new TableSelectionListener();
         table.getSelectionModel().addListSelectionListener(previewListener);
-
+        table.addMouseListener(new TableClickListener());
         getContentPane().setLayout(new BorderLayout());
         progressBar.setIndeterminate(true);
         JPanel centerPan = new JPanel();
@@ -94,7 +106,13 @@ public class ImportInspectionDialog extends JDialog {
 
         centerPan.add(contentPane, BorderLayout.CENTER);
         centerPan.add(progressBar, BorderLayout.SOUTH);
-        
+
+        if (!newDatabase) {
+            GroupTreeNode node = panel.metaData().getGroups();
+            groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
+            insertNodes(groupsAdd, node, true);
+            popup.add(groupsAdd);
+        }
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
 
@@ -103,13 +121,16 @@ public class ImportInspectionDialog extends JDialog {
         bb.addGridded(ok);
         bb.addGridded(stop);
         bb.addGridded(cancel);
-
+        bb.addRelatedGap();
+        bb.addGridded(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addGridded(selectAll);
         builder.addGridded(deselectAll);
+        builder.addRelatedGap();
+        builder.addGridded(delete);
         builder.addRelatedGap();
         builder.addGridded(generate);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
@@ -123,6 +144,8 @@ public class ImportInspectionDialog extends JDialog {
         stop.addActionListener(new StopListener());
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
+        delete.addActionListener(new DeleteListener());
+        help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         setSize(new Dimension(650, 650));
         //contentPane.setDividerLocation(0.6f);
@@ -137,21 +160,39 @@ public class ImportInspectionDialog extends JDialog {
 
     /**
      * Add a List of entries to the table view. The table will update to show the
-     * added entries.
+     * added entries. Synchronizes on this.entries to avoid conflict with the delete button
+     * which removes entries.
      * @param entries
      */
     public void addEntries(List entries) {
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)i.next();
-            this.entries.add(entry);
-            Object[] values = new Object[tableModel.getColumnCount()];
-            values[0] = Boolean.TRUE;
-            for (int j=0; j<fields.length; j++)
-                values[1+j] = entry.getField(fields[j]);
-            tableModel.addRow(values);
+        synchronized (this.entries) {
+            for (Iterator i=entries.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry)i.next();
+                this.entries.add(entry);
+                Object[] values = new Object[tableModel.getColumnCount()];
+                values[0] = Boolean.TRUE;
+                for (int j=0; j<fields.length; j++)
+                    values[1+j] = entry.getField(fields[j]);
+                tableModel.addRow(values);
+            }
         }
+    }
 
+    /**
+     * Removes all selected entries from the table. Synchronizes on this.entries to prevent
+     * conflict with addition of new entries.
+     */
+    public void removeSelectedEntries() {
+        synchronized (this.entries) {
+            int[] rows = table.getSelectedRows();
+            if (rows.length > 0) {
+                for (int i=rows.length-1; i>=0; i--) {
+                    tableModel.removeRow(rows[i]);
+                    this.entries.remove(rows[i]);
 
+                }
+            }
+        }
     }
 
     /**
@@ -224,6 +265,89 @@ public class ImportInspectionDialog extends JDialog {
         tableModel.addColumn("Bibtexkey", keys.toArray());
     }
 
+    public void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
+            final AbstractAction action = getAction(node,add);
+
+            if (node.getChildCount() == 0) {
+                menu.add(action);
+                if (action.isEnabled())
+                    menu.setEnabled(true);
+                return;
+            }
+
+            JMenu submenu = null;
+            if (node.getGroup() instanceof AllEntriesGroup) {
+                for (int i = 0; i < node.getChildCount(); ++i) {
+                    insertNodes(menu,(GroupTreeNode) node.getChildAt(i), add);
+                }
+            } else {
+                submenu = new JMenu("["+node.getGroup().getName()+"]");
+                // setEnabled(true) is done above/below if at least one menu
+                // entry (item or submenu) is enabled
+                submenu.setEnabled(action.isEnabled());
+                submenu.add(action);
+                submenu.add(new JPopupMenu.Separator());
+                for (int i = 0; i < node.getChildCount(); ++i)
+                    insertNodes(submenu,(GroupTreeNode) node.getChildAt(i), add);
+                menu.add(submenu);
+                if (submenu.isEnabled())
+                    menu.setEnabled(true);
+            }
+        }
+
+        private AbstractAction getAction(GroupTreeNode node, boolean add) {
+            AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
+                    : (AbstractAction) new RemoveFromGroupAction(node);
+            AbstractGroup group = node.getGroup();
+            action.setEnabled(/*add ? */group.supportsAdd());// && !group.containsAll(selection)
+            //        : group.supportsRemove() && group.containsAny(selection));
+            return action;
+        }
+
+    /**
+     * Stores the information about the selected entries being scheduled for addition
+     * to this group. The entries are *not* added to the group at this time.
+     *
+     * Synchronizes on this.entries to prevent
+     * conflict with threads that modify the entry list.
+     */
+    class AddToGroupAction extends AbstractAction {
+        private GroupTreeNode node;
+        public AddToGroupAction(GroupTreeNode node) {
+            super(node.getGroup().getName());
+            this.node = node;
+        }
+        public void actionPerformed(ActionEvent event) {
+            synchronized (entries) {
+                int[] rows = table.getSelectedRows();
+                if (rows.length == 0)
+                    return;
+
+                for (int i=0; i<rows.length; i++) {
+                    BibtexEntry entry = (BibtexEntry) entries.get(rows[i]);
+                    // We store the groups this entry should be added to in a Set in the Map:
+                    Set groups = (Set) groupAdditions.get(entry);
+                    if (groups == null) {
+                        // No previous definitions, so we create the Set now:
+                        groups = new HashSet();
+                        groupAdditions.put(entry, groups);
+                    }
+                    // Add the group:
+                    groups.add(node);
+                }
+            }
+        }
+    }
+
+    class RemoveFromGroupAction extends AbstractAction {
+        private GroupTreeNode node;
+        public RemoveFromGroupAction(GroupTreeNode node) {
+            this.node = node;
+        }
+        public void actionPerformed(ActionEvent event) {
+        }
+    }
+
     public void addCallBack(CallBack cb) {
         callBacks.add(cb);
     }
@@ -246,7 +370,36 @@ public class ImportInspectionDialog extends JDialog {
 
             for (Iterator i=selected.iterator(); i.hasNext();) {
                 BibtexEntry entry = (BibtexEntry)i.next();
-                entry.clone();
+                //entry.clone();
+
+                // If this entry should be added to any groups, do it now:
+                Set groups = (Set) groupAdditions.get(entry);
+                if (groups != null) {
+                    if (entry.getField(Globals.KEY_FIELD) == null) {
+                        // The entry has no key, so it can't be added to the group.
+                        // The best course of ation is probably to ask the user if a key should be generated
+                        // immediately.
+                        
+                    }
+
+                    // If the key was set, or has been set now, go ahead:
+                    if (entry.getField(Globals.KEY_FIELD) == null) {
+                        for (Iterator i2=groups.iterator(); i2.hasNext();) {
+                            GroupTreeNode node = (GroupTreeNode)i2.next();
+                            if (node.getGroup().supportsAdd()) {
+                                // Add the entry:
+                                AbstractUndoableEdit undo = node.getGroup().addSelection(new BibtexEntry[] {entry});
+                                if (undo instanceof UndoableChangeAssignment)
+                                    ((UndoableChangeAssignment) undo).setEditedNode(node);
+                                ce.addEdit(undo);
+
+                            } else {
+                                // Shouldn't happen...
+                            }
+                        }
+                    }
+                }
+
                 try {
                 entry.setId(Util.createId(entry.getType(), panel.database()));
                     panel.database().insertEntry(entry);
@@ -305,6 +458,11 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
+    class DeleteListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+             removeSelectedEntries();
+        }
+    }
 
     class MyTable extends JTable {
         public MyTable(TableModel model) {
@@ -343,6 +501,8 @@ public class ImportInspectionDialog extends JDialog {
         public void valueChanged(ListSelectionEvent event) {
             if (event.getValueIsAdjusting())
                 return;
+            if (table.getSelectedRowCount() > 1)
+                return; // No soup for you!
             int row = table.getSelectedRow();
             if (row < 0)
                 return;
@@ -355,7 +515,26 @@ public class ImportInspectionDialog extends JDialog {
             });
             
         }
+
     }
+
+    /**
+       * This class handles clicks on the table that should trigger specific
+       * events, like opening the popup menu.
+       */
+      class TableClickListener extends MouseAdapter {
+          public void mousePressed(MouseEvent e) {
+
+            // Check if the user has right-clicked. If so, open the right-click menu.
+            if (e.isPopupTrigger()) {
+            //if ( (e.getButton() == MouseEvent.BUTTON3) ||
+            //     (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+              int[] rows = table.getSelectedRows();
+              popup.show(table, e.getX(), e.getY());
+            }
+        }
+    }
+
 
     public static interface CallBack {
         // This method is called by the dialog when the user has selected the

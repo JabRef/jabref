@@ -411,7 +411,7 @@ public class JabRefFrame
         if (bp != null) {
           groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
           searchToggle.setSelected(sidePaneManager.isPanelVisible("search"));
-          previewToggle.setSelected(bp.previewEnabled);
+          previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
           Globals.focusListener.setFocused(bp.entryTable);
           new FocusRequester(bp.entryTable);
         }

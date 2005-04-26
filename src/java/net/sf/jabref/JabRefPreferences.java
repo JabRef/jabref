@@ -197,7 +197,7 @@ public class JabRefPreferences {
         defaults.put("confirmDelete", Boolean.TRUE);
         defaults.put("grayOutNonHits", Boolean.TRUE);
         defaults.put("defaultLabelPattern", "[auth][year]");
-
+        defaults.put("previewEnabled", Boolean.TRUE);
         defaults.put("preview0", "<font face=\"arial\">"
                      +"<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                      +"\\end{bibtexkey}</b><br>__NEWLINE__"

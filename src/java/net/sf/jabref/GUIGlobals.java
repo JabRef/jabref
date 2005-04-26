@@ -279,6 +279,7 @@ public class GUIGlobals {
 //      searchHelp = "SearchHelp.html",
       aboutPage = "About.html",
       shortPlainImport="ShortPlainImport.html",
+      importInspectionHelp = "ImportInspectionDialog.html",
       shortIntegrityCheck="ShortIntegrityCheck.html";
 
 

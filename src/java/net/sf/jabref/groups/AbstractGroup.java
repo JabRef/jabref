@@ -104,7 +104,7 @@ public abstract class AbstractGroup {
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
+    public abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
 
     /**
      * Adds the selected entries to this group.
@@ -113,7 +113,7 @@ public abstract class AbstractGroup {
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    abstract AbstractUndoableEdit addSelection(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit addSelection(BibtexEntry[] entries);
 
     /**
      * Removes the selected entries from this group. This method is to be called

@@ -58,22 +58,25 @@ public class FileActions
 	    File back = new File(path, name + GUIGlobals.backupExt);
 
 	    if (back.exists()) {
-		back.renameTo(temp);
-	    }
+            Util.copyFile(back, temp, true);
+            //back.renameTo(temp);
+        }
 
 	    if (file.exists())
-            {
-		file.renameTo(back);
+        {
+            Util.copyFile(file, back, true);
+		    //file.renameTo(back);
 	    }
 
 	    if (temp.exists())
-            {
-		temp.delete();
+        {
+		    temp.delete();
 	    }
 	}
 	else {
 	    if (file.exists()) {
-		file.renameTo(temp);
+            Util.copyFile(file, temp, true);
+		    //file.renameTo(temp);
 	    }
 	}
     }
@@ -107,7 +110,7 @@ public class FileActions
 	}
     }
 
-    public static void repairAfterError(File file) {
+    public static void repairAfterError(File file) throws IOException {
 	// Repair the file with our temp file since saving failed.
 	String name = file.getName();
 
@@ -121,10 +124,14 @@ public class FileActions
 	}
 
 	if (temp.exists()) {
-	    temp.renameTo(file);
+        Util.copyFile(temp, file, true);
+        temp.delete();
+	    //temp.renameTo(file);
 	}
 	else {
-	    back.renameTo(file);
+        Util.copyFile(back, file, true);
+        back.delete();
+	    //back.renameTo(file);
 	}
     }
 
@@ -227,8 +234,16 @@ public class FileActions
         }
          catch (Throwable ex)
         {
-	    ex.printStackTrace();
-	    repairAfterError(file);
+	        ex.printStackTrace();
+            try {
+	            repairAfterError(file);
+            } catch (IOException e) {
+                // Argh, another error? Can we do anything?
+                e.printStackTrace();
+                throw new SaveException(ex.getMessage()+"\n"+
+                        Globals.lang("Warning: could not complete file repair; your file may "
+                        +"have been corrupted. Error message: ")+e.getMessage());
+            }
             throw new SaveException(ex.getMessage(), be);
 	}
 
@@ -333,7 +348,15 @@ public class FileActions
         }
          catch (Throwable ex)
         {
-	    repairAfterError(file);
+            try {
+                repairAfterError(file);
+            } catch (IOException e) {
+                // Argh, another error? Can we do anything?
+                e.printStackTrace();
+                throw new SaveException(ex.getMessage()+"\n"+
+                        Globals.lang("Warning: could not complete file repair; your file may "
+                        +"have been corrupted. Error message: ")+e.getMessage());
+            }
             throw new SaveException(ex.getMessage(), be);
 	}
 
