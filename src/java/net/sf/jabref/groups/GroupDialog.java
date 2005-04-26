@@ -53,7 +53,6 @@ class GroupDialog extends JDialog {
     private static final int TEXTFIELD_LENGTH = 30;
     // for all types
     private JTextField m_name = new JTextField(TEXTFIELD_LENGTH);
-    // JZTODO better descriptions
     private JRadioButton m_explicitRadioButton = new JRadioButton(
             Globals.lang("Statically group entries by manual assignment"));
     private JRadioButton m_keywordsRadioButton = new JRadioButton(
@@ -349,7 +348,7 @@ class GroupDialog extends JDialog {
         String s1, s2;
         if (m_keywordsRadioButton.isSelected()) {
             s1 = m_kgSearchField.getText().trim();
-            okEnabled = okEnabled && s1.length() > 0 && s1.indexOf(' ') < 0;
+            okEnabled = okEnabled && s1.matches("\\w+");
             s2 = m_kgSearchTerm.getText().trim();
             okEnabled = okEnabled && s2.length() > 0;
             if (!okEnabled) {
@@ -377,7 +376,6 @@ class GroupDialog extends JDialog {
                         "<tt>smith</tt><p>" +
                         "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter%c<p>" +
                         "<tt>author%esmith and title%eelectrical</tt>"));
-//                setDescription(Globals.lang("Please_enter_a_search_term...","="));
             } else {
                 AST ast = SearchExpressionParser.checkSyntax(s1, m_sgCaseSensitive
                         .isSelected(), m_sgRegExp.isSelected());
@@ -427,13 +425,13 @@ class GroupDialog extends JDialog {
     }
 
     private String getDescriptionForExplicitGroup() {
-        return "This group contains entries based on manual assignment. "
+        return Globals.lang("This group contains entries based on manual assignment. "
                 + "Entries can be assigned to this group by selecting them "
                 + "then using either drag and drop or the context menu. "
                 + "Entries can be removed from this group by selecting them "
                 + "then using the context menu. Every entry assigned to this group " 
                 + "must have a unique key. The key may be changed at any time " 
-                + "as long as it remains unique.";
+                + "as long as it remains unique.");
     }
 
     private String getDescriptionForKeywordGroup(String field, String expr,
@@ -512,7 +510,7 @@ class GroupDialog extends JDialog {
                 sb.append(")");
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Not:
-            return describeSearchGroupNode(node.getFirstChild(), regExp, true,
+            return describeSearchGroupNode(node.getFirstChild(), regExp, true,//JZFIXME
                     and, or);
         default:
             node = node.getFirstChild();
@@ -525,20 +523,27 @@ class GroupDialog extends JDialog {
             final String fieldSpec = regExpFieldSpec ?
                     Globals.lang("any field that matches the regular expression <b>%0</b>", field)
                     : Globals.lang("the field <b>%0</b>", field);
-            final String termSpec = regExp ? 
-                    Globals.lang("the regular expression <b>%0</b>",term)
-                    : Globals.lang("the term <b>%0</b>",term);
             switch (type) {
             case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
             case SearchExpressionTreeParserTokenTypes.EQUAL:
-                return not ? Globals.lang("%0 doesn't contain %1", fieldSpec, termSpec)
-                        : Globals.lang("%0 contains %1", fieldSpec, termSpec);
+                if (regExp)
+                    return not ? Globals.lang("%0 doesn't contain the Regular Expression <b>%1</b>", 
+                            fieldSpec, term)
+                            : Globals.lang("%0 contains the Regular Expression <b>%1</b>", fieldSpec, term);
+                return not ? Globals.lang("%0 doesn't contain the term <b>%1</b>", 
+                        fieldSpec, term)
+                        : Globals.lang("%0 contains the term <b>%1</b>", fieldSpec, term);
             case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
             case SearchExpressionTreeParserTokenTypes.EEQUAL:
-                return not ? Globals.lang("%0 doesn't match %1", fieldSpec, termSpec)
-                        : Globals.lang("%0 matches %1", fieldSpec, termSpec);
+                if (regExp)
+                    return not ? Globals.lang("%0 doesn't match the Regular Expression <b>%1</b>", fieldSpec, term)
+                            : Globals.lang("%0 matches the Regular Expression <b>%1</b>", fieldSpec, term);
+                return not ? Globals.lang("%0 doesn't match the term <b>%1</b>", fieldSpec, term)
+                        : Globals.lang("%0 matches the term <b>%1</b>", fieldSpec, term);
             case SearchExpressionTreeParserTokenTypes.NEQUAL:
-                return Globals.lang("%0 doesn't contain %1", fieldSpec, termSpec);
+                if (regExp)
+                    return Globals.lang("%0 doesn't contain the Regular Expression <b>%1</b>", fieldSpec, term);
+                return Globals.lang("%0 doesn't contain the term <b>%1</b>", fieldSpec, term);
             default:
                 return "?"; // this should never happen
             }
@@ -550,8 +555,8 @@ class GroupDialog extends JDialog {
     }
     
     protected String formatRegExException(String regExp, Exception e) {
-        String s = Globals.lang("The regular expression <b>%0</b> is invalid:",regExp) 
-            + "<p><tt>%1</tt>" + e.getMessage().replaceAll("\\n","<br>");
+        String s = Globals.lang("The regular expression <b>%0</b> is invalid%c",regExp) 
+            + "<p><tt>" + e.getMessage().replaceAll("\\n","<br>") + "</tt>";
         if (!(e instanceof PatternSyntaxException))
             return s;
         int lastNewline = s.lastIndexOf("<br>");
