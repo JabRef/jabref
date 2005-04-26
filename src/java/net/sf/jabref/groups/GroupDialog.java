@@ -510,7 +510,7 @@ class GroupDialog extends JDialog {
                 sb.append(")");
             return sb.toString();
         case SearchExpressionTreeParserTokenTypes.Not:
-            return describeSearchGroupNode(node.getFirstChild(), regExp, true,//JZFIXME
+            return describeSearchGroupNode(node.getFirstChild(), regExp, !not,
                     and, or);
         default:
             node = node.getFirstChild();
@@ -542,10 +542,13 @@ class GroupDialog extends JDialog {
                         : Globals.lang("%0 matches the term <b>%1</b>", fieldSpec, term);
             case SearchExpressionTreeParserTokenTypes.NEQUAL:
                 if (regExp)
-                    return Globals.lang("%0 doesn't contain the Regular Expression <b>%1</b>", fieldSpec, term);
-                return Globals.lang("%0 doesn't contain the term <b>%1</b>", fieldSpec, term);
+                    return not ? Globals.lang("%0 contains the Regular Expression <b>%1</b>", fieldSpec, term)
+                            : Globals.lang("%0 doesn't contain the Regular Expression <b>%1</b>", fieldSpec, term);
+                return not ? Globals.lang("%0 contains the term <b>%1</b>", fieldSpec, term)
+                        : Globals.lang("%0 doesn't contain the term <b>%1</b>", fieldSpec, term);
             default:
-                return "?"; // this should never happen
+                return "Internal error: Unknown AST node type. " +
+                        "Please report this on www.sf.net/projects/jabref"; // this should never happen
             }
         }
     }
