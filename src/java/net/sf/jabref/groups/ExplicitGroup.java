@@ -49,7 +49,8 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
-                            + s + "\"");
+                            + s + "\". " 
+                            + "Please report this on www.sf.net/projects/jabref");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
         switch (version) {

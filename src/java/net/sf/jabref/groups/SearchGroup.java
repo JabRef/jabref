@@ -101,7 +101,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: SearchGroup cannot be created from \"" + s
-                            + "\"");
+                            + "\". "
+                            + "Please report this on www.sf.net/projects/jabref");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
         switch (version) {
@@ -215,7 +216,8 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
             System.err.println("Internal error: Exception " + t
-                    + " in SearchGroup.deepCopy()");
+                    + " in SearchGroup.deepCopy(). "
+                    + "Please report this on www.sf.net/projects/jabref");
             return null;
         }
     }

@@ -42,7 +42,8 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
-                            + s + "\"");
+                            + s + "\". "
+                            + "Please report this on www.sf.net/projects/jabref");
         switch (version) {
         case 0:
         case 1:
