@@ -1,0 +1,78 @@
+<HTML>
+
+<BODY text="#275856">
+
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Anpassen der automatischen Erstellung von BibTeX-Keys</H1>
+
+Im Tab "Key-Muster" im Dialog "Einstellungen" kann man  die Felder bestimmen, die
+zur automatischen Generierung der BibTeX-Labels (bibtexkey) herangezogen werden.
+Das Muster kann f&uuml;r jeden der vorgegebenen Eintragstypen bestimmt werden.
+<P>
+Das Muster kann beliebigen Text enthalten, unabh&auml;ngig von und zus&auml;tzlich zu
+den Feldmarken, die angeben, dass ein bestimmtes Feld des Eintrags an dieser Stelle des
+Keys eingef&uuml;gt werden soll. Eine Feldmarke besteht gew&ouml;hnlich aus dem
+Feldnamen in eckigen Klammern, z.B. <b>[volume]</b>. Wenn dieses Feld zum Zeitpunkt
+der Erstellung des Keys leer ist, wird kein Text eingef&uuml;gt.
+<P>
+Es gibt au&szlig;erdem mehrere spezielle Feldmarken, die nur einen bestimmten Teil aus einem
+Feld extrahieren. Sie werden unten aufgelistet. Nat&uuml;rlich k&ouml;nnen Sie auch neue
+spezielle Feldmarken vorschlagen.
+
+<P>
+Spezielle Feldmarken:
+<ul>
+<li><b>[<code>auth</code>]</b>: Der Nachname des ersten Autors.<BR>
+<li><b>[<code>authors</code>]</b>: Die Nachnamen aller Autoren.<BR>
+<li><b>[<code>authIniN</code>]</b>: Der Anfang des Nachnamens von jedem Autoren,
+	wobei nicht mehr als N Buchstaben verwendet werden.<BR>
+<li><b>[<code>authorIni</code>]</b>: Die ersten 5 Buchstaben des Nachnamens des ersten Autors
+	und die Initialen der Nachnamen der restlichen Autoren.<BR>
+<li><b>[<code>authN</code>]</b>: Die ersten N Buchstaben des Nachnamens des ersten Autors.<BR>
+<li><b>[<code>authN_M</code>]</b>: Die ersten N Buchstaben des Nachnamens des M. Autors.<BR>
+<li><b>[<code>auth.auth.ea</code>]</b>: Die Nachnamen der beiden ersten Autoren und ".ea", falls
+	es mehr als zwei Autoren sind.<BR>
+<li><b>[<code>edtr</code>]</b>: Der Nachname des ersten Editors.<BR>
+<li><b>[<code>editors</code>]</b>: Die Nachnamen aller Editoren.<BR>
+<li><b>[<code>edtrIniN</code>]</b>: Der Anfang des Nachnamens von jedem Editor,
+	wobei nicht mehr als N Buchstaben verwendet werden.<BR>
+<li><b>[<code>editorIni</code>]</b>: Die ersten 5 Buchstaben des Nachnamens des Editors
+	und die Initialen der Nachnamen der restlichen Editoren.<BR>
+<li><b>[<code>edtrN</code>]</b>: Die ersten N Buchstaben des Nachnamens des ersten Editors.<BR>
+<li><b>[<code>edtrN_M</code>]</b>: Die ersten N Buchstaben des Nachnamens des M. Editors.<BR>
+<li><b>[<code>edtr.edtr.ea</code>]</b>: Der Nachname der ersten beiden Editoren 
+	und ".ea", falls es mehr als zwei Editoren sind.<BR>
+<li><b>[<code>firstpage</code>]</b>: Die erste Seitenzahl einer Ver&ouml;ffentlichung (pages).<BR>
+<li><b>[<code>lastpage</code>]</b>: Die letzte Seitenzahl einer Ver&ouml;ffentlichung (pages).<BR>
+<li><b>[<code>shorttitle</code>]</b>: Die ersten 3 Worte eines Titels (title).<BR>
+<li><b>[<code>shortyear</code>]</b>: Die letzten 2 Ziffern des Jahrgangs (year).<BR>
+<li><b>[<code>veryshorttitle</code>]</b>: Die ersten beiden Worte des Titels (title), wobei 'the', 'a' und 
+	'an' ausgelassen werden.<BR>
+ </ul>
+
+<P>
+Hinter einem Feldnamen (oder einem der oben aufgef&uuml;hrten Pseudo-Feldnamen) kann ein
+Modifikator stehen. Momentan ist der einzige definierte Modifikator <b>:lower</b>, der den
+von der Feldmarke eingef&uuml;gten Text in Kleinbuchstaben wandelt. So wird beispielsweise
+bei <b>[auth:lower]</b> der Nachname des ersten Autors in Kleinbuchstaben ausgegeben.
+
+<P>
+Wenn Sie keine Key-Muster f&uuml;r einen bestimmten Eintragstyp angeben, wird das vorgegebene
+Muster (default pattern) verwendet. Sie k&ouml;nnen das vorgegebene Muster nat&uuml;rlich ebenfalls
+anpassen - seine Einstellung befindet sich &uuml;ber der Liste der Eintragstypen im Tab <b>Key-Muster</b>
+des Dialogs <b>Einstellungen</b>.
+
+<P>
+Das vorgegebene Key-Muster ist [auth][year], das Keys wie z.B. <code>Yared1998</code> generiert.
+Falls der Key in der ge&ouml;ffneten Datei nicht eindeutig sein sollte, wird einer der Buchstaben
+a-z angef&uuml;gt, bis ein eindeutiger Key gefunden ist. Dementsprechend k&ouml;nnten die Labels
+wie folgt aussehen:
+
+<blockquote> <code>Yared1998</code><BR> <code>Yared1998a</code><BR>
+<code>Yared1998b</code> </blockquote>
+
+
+</font>
+</BODY>
+</HTML>
