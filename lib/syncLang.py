@@ -29,7 +29,6 @@ def appendMissingKeys(filename, keys):
 	file.write("\n")
 	for key in keys:
 		file.write(key+"=\n")
-		
 
 def handleFileSet(mainFile, files, changeFiles):
 	f1 = open(mainFile)
@@ -46,16 +45,31 @@ def handleFileSet(mainFile, files, changeFiles):
 		
 		print "\n\nFile '"+files[i]+"'\n"
 		if len(missing) == 0:
-			print "-> No missing keys."
+			print "----> No missing keys."
 		else:
-			print "-> Missing keys:"
+			print "----> Missing keys:"
 			for key in missing:
-				print key+"="
+				print key
 
 			if changeFiles == 1:
 				print "Update file?",
 				if raw_input() in ['y', 'Y']:
 					appendMissingKeys(files[i], missing)
+			print ""
+		
+		# See if this file has keys that are not in the main file:
+		redundant = findMissingKeys(keysPresent[i], keys)
+		if len(redundant) > 0:
+			print "----> Possible redundant keys (not in English language file):"
+			for key in redundant:
+				print key
+				
+			#if changeFiles == 1:
+			#	print "Update file?",
+			#	if raw_input() in ['y', 'Y']:
+			#		removeRedundantKeys(files[i], redundant)
+			print ""
+		
 				
 def handleJavaCode(filename, lines, keyList, notTermList):
 	
@@ -204,9 +218,11 @@ Option can be one of the following:
 		
 	-t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other 
 		language files. The program will list for all the other files which keys from the English
-		file are missing.
+		file are missing. Additionally, the program will list keys in the other files which are
+		not present in the English file - possible redundant keys.
 		
 		If the -u option is specified, all missing keys will automatically be added to the files.
+		There is currently no option to remove redundant keys automatically.
 """
 	
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
