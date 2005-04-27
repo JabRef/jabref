@@ -48,12 +48,14 @@ def handleFileSet(mainFile, files, changeFiles):
 		if len(missing) == 0:
 			print "-> No missing keys."
 		else:
-			if changeFiles == 1:
-				appendMissingKeys(files[i], missing)
 			print "-> Missing keys:"
 			for key in missing:
 				print key+"="
 
+			if changeFiles == 1:
+				print "Update file?",
+				if raw_input() in ['y', 'Y']:
+					appendMissingKeys(files[i], missing)
 				
 def handleJavaCode(filename, lines, keyList, notTermList):
 	
@@ -152,6 +154,7 @@ def findNewKeysInJavaCode(mainFile, dir, update):
 	
 	
 def lookForDuplicates(file):
+	duplicount = 0
 	f1 = open(file)
 	lines = f1.readlines()
 	f1.close()
@@ -164,12 +167,16 @@ def lookForDuplicates(file):
 			value = line[index+1:].strip()
 			if key in mappings:
 				mappings[key].append(value)
+				duplicount += 1
 				print "Duplicate: "+file+": "+key+" =",
 				print mappings[key]
 			else:
 				mappings[key] = [value]
+				if value == "":
+					print "Empty value: "+file+": "+key
 				#print "New: "+value
-	
+	if duplicount == 0:
+		print file+": No duplicates found."
 		
 		
 ############# Main part ###################
@@ -179,8 +186,10 @@ if len(sys.argv) == 1:
 	
 Usage: syncLang.py option	
 Option can be one of the following:
-	-d:	Search the language files for duplicate translations. For each duplicate set found, a list will
-		be printed showing the various translations for the same key. 
+	-d:	Search the language files for empty and duplicate translations. 
+		For each duplicate set found, a list will be printed showing the various 
+		translations for the same key. There is currently to option to remove duplicates
+		automatically.
 		
 	-s [-u]: Search the Java source files for language keys. All keys that are found in the source files
 		but not in "JabRef_en.properties" are listed. If the -u option is specified, these keys will
@@ -219,7 +228,9 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
 		"resource/Menu_no.properties"), changeFiles)
 		
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-d"):
-	files = ("resource/JabRef_en.properties", "resource/Menu_de.properties",\
+	files = ("resource/JabRef_en.properties", "resource/JabRef_de.properties",\
+		"resource/JabRef_fr.properties", "resource/JabRef_no.properties",
+		"resource/Menu_en.properties", "resource/Menu_de.properties",\
 		"resource/Menu_fr.properties", "resource/Menu_no.properties")
 	for file in files:
 		lookForDuplicates(file)
