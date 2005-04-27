@@ -355,8 +355,8 @@ public class BibtexDatabase
         for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
             BibtexString string = (BibtexString)_strings.get(i.next());
 
-	    //Util.pr(": "+string.getName());
-            if (string.getName().equals(label)) {
+	        Util.pr(label+" : "+string.getName());
+            if (string.getName().toLowerCase().equals(label.toLowerCase())) {
 
 		// First check if this string label has been resolved
 		// earlier in this recursion. If so, we have a
@@ -393,7 +393,8 @@ public class BibtexDatabase
     }
 
     private String resolveContent(String res, HashSet usedIds) {
-	if (res.matches(".*#[\\w]+#.*")) {
+	//if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
+    if (res.matches(".*#[^#]+#.*")) {
 	    StringBuffer newRes = new StringBuffer();
 	    int piv = 0, next = 0;
 	    while ((next=res.indexOf("#", piv)) >= 0) {

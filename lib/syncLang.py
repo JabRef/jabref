@@ -152,7 +152,7 @@ def findNewKeysInJavaCode(mainFile, dir, update):
 	
 	
 	
-####### Main part ###################
+############# Main part ###################
 
 if len(sys.argv) == 1:
 	print """This program must be run from the "src" directory right below the jabref base directory.
