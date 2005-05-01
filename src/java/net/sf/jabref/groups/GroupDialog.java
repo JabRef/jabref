@@ -66,7 +66,6 @@ class GroupDialog extends JDialog {
     private JCheckBox m_kgCaseSensitive = new JCheckBox(Globals.lang("Case sensitive"));
     private JCheckBox m_kgRegExp = new JCheckBox(Globals.lang("Regular Expression"));
     // for SearchGroup
-    // JZTODO translation
     private JTextField m_sgSearchExpression = new JTextField(TEXTFIELD_LENGTH);
     private JCheckBox m_sgCaseSensitive = new JCheckBox(Globals.lang("Case sensitive"));
     private JCheckBox m_sgRegExp = new JCheckBox(Globals.lang("Regular Expression"));

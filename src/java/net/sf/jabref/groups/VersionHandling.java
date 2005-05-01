@@ -64,14 +64,14 @@ public class VersionHandling {
         case 1:
             return Version0_1.fromString((String) orderedData.firstElement(),
                     db, version);
-        default: // JZTODO translation
-            throw new IllegalArgumentException(
-                    "Failed to read groups data (version: " + version
-                            + " is not supported)");
+        default:
+            throw new IllegalArgumentException(Globals.lang(
+                    "Failed to read groups data (unsupported version: %0)",
+                    "" + version));
         }
     }
 
-    /** Imports groups version 0. */
+    /** Imports groups version 0 and 1. */
     private static class Version0_1 {
         /**
          * Parses the textual representation obtained from

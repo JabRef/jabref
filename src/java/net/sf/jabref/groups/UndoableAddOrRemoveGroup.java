@@ -28,6 +28,8 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.Globals;
+
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     /** The root of the global groups tree */
     private final GroupTreeNode m_groupsRootHandle;
@@ -86,23 +88,23 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return "Undo: " + getName();
+        return Globals.lang("Undo") + ": " + getName();
     }
 
     public String getName() {
         switch (m_editType) {
         case ADD_NODE:
-            return "add group";
+            return Globals.lang("add group");
         case REMOVE_NODE_KEEP_CHILDREN:
-            return "remove group (keep subgroups)";
+            return Globals.lang("remove group (keep subgroups)");
         case REMOVE_NODE_AND_CHILDREN:
-            return "remove group and subgroups";
+            return Globals.lang("remove group and subgroups");
         }
-        return "? (unknown edit)";
+        return "? (" + Globals.lang("unknown edit") + ")";
     }
 
     public String getRedoPresentationName() {
-        return "Redo: " + getName();
+        return Globals.lang("Redo") + ": " + getName();
     }
 
     public void undo() {

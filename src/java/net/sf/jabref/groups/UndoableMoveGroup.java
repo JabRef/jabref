@@ -24,6 +24,8 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.Globals;
+
 /**
  * @author jzieren
  * 
@@ -60,11 +62,13 @@ public class UndoableMoveGroup extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return "Undo: move group";
+        return Globals.lang("Undo") + ": " 
+            + Globals.lang("move group");
     }
 
     public String getRedoPresentationName() {
-        return "Redo: move group";
+        return Globals.lang("Redo") + ": " 
+            + Globals.lang("move group");
     }
 
     public void undo() {

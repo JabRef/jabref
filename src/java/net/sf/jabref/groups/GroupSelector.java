@@ -731,7 +731,6 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public boolean moveNodeUp(GroupTreeNode node) {
         if (groupsTree.getSelectionCount() != 1) {
-            // JZTODO: translations
             frame.output(Globals.lang("Please select exactly one group to move."));
             return false; // not possible
         }
@@ -754,7 +753,6 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public boolean moveNodeDown(GroupTreeNode node) {
         if (groupsTree.getSelectionCount() != 1) {
-            // JZTODO: translations
             frame.output(Globals.lang("Please select exactly one group to move."));
             return false; // not possible
         }
@@ -777,7 +775,6 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public boolean moveNodeLeft(GroupTreeNode node) {
         if (groupsTree.getSelectionCount() != 1) {
-            // JZTODO: translations
             frame.output(Globals.lang("Please select exactly one group to move."));
             return false; // not possible
         }
@@ -801,7 +798,6 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public boolean moveNodeRight(GroupTreeNode node) {
         if (groupsTree.getSelectionCount() != 1) {
-            // JZTODO: translations
             frame.output(Globals.lang("Please select exactly one group to move."));
             return false; // not possible
         }
@@ -846,7 +842,6 @@ public class GroupSelector extends SidePaneComponent implements
         else
             frame.output(Globals.lang("Assigned %0 entries to group \"%1\".", 
                     String.valueOf(assignedEntries), groupName));
-        // JZTODO translation
     }
     
     JMenu moveSubmenu = new JMenu(Globals.lang("Move"));

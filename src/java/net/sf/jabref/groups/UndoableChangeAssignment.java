@@ -26,7 +26,7 @@ import java.util.*;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.*;
 
 /**
  * @author jzieren
@@ -40,9 +40,11 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     /** The root of the global groups tree */
     private GroupTreeNode m_groupsRootHandle = null;
 
-    /** Constructor for use in a group itself, where the enclosing
-     * node is unknown. The node must be set using setEditedNode()
-     * before this instance may be used. 
+    /**
+     * Constructor for use in a group itself, where the enclosing node is
+     * unknown. The node must be set using setEditedNode() before this instance
+     * may be used.
+     * 
      * @param previousAssignment
      * @param currentAssignment
      */
@@ -51,7 +53,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         m_previousAssignmentBackup = new HashSet(previousAssignment);
         m_newAssignmentBackup = new HashSet(currentAssignment);
     }
-    
+
     public UndoableChangeAssignment(Set previousAssignment,
             Set currentAssignment, GroupTreeNode node) {
         this(previousAssignment, currentAssignment);
@@ -60,8 +62,8 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
     /**
      * Sets the node of the group that was edited. If this node was not
-     * specified at construction time, this method has to be called
-     * before this instance may be used.
+     * specified at construction time, this method has to be called before this
+     * instance may be used.
      * 
      * @param node
      *            The node whose assignments were edited.
@@ -72,11 +74,13 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return "Undo: (de)assign entries";
+        return Globals.lang("Undo") + ": "
+                + Globals.lang("change assignment of entries");
     }
 
     public String getRedoPresentationName() {
-        return "Redo: (de)assign entries";
+        return Globals.lang("Redo") + ": "
+                + Globals.lang("change assignment of entries");
     }
 
     public void undo() {

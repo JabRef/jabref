@@ -28,6 +28,8 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.Globals;
+
 class UndoableResetGroups extends AbstractUndoableEdit {
     /** A backup of the groups before the modification */
     private final GroupTreeNode m_groupsBackup;
@@ -44,11 +46,13 @@ class UndoableResetGroups extends AbstractUndoableEdit {
     }
 
     public String getUndoPresentationName() {
-        return "Undo: clear all groups";
+        return Globals.lang("Undo") + ": " 
+            + Globals.lang("clear all groups");
     }
 
     public String getRedoPresentationName() {
-        return "Redo: clear all groups";
+        return Globals.lang("Redo") + ": " 
+            + Globals.lang("clear all groups");
     }
 
     public void undo() {
