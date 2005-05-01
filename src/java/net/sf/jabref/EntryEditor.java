@@ -1473,6 +1473,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   private void warnDuplicateBibtexkey() {
         panel.output(Globals.lang("Warning") + ": "
                 + Globals.lang("duplicate BibTeX key."));
+        
+        // JZFIXME: This warning should always be displayed!
 
         if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
@@ -1486,11 +1488,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
             // JZTODO lyrics
             if (containedInExplicitGroup(entry)) {
-                JOptionPane.showMessageDialog(
+                String[] options = new String[] {"Generate Unique Key", "Keep Duplicate Key"};
+                int choice = JOptionPane.showOptionDialog(
                                 frame,
-                                "Groups assignment for this entry cannot be restored after next load due to duplicate key",
+                                Globals.lang("Due to the duplicate BibTeX key, the groups assignment(s) for this entry\n" +
+                                        "cannot be restored correctly when reopening this database. It is recommended\n" +
+                                        "that you have JabRef generate a unique key now to prevent this problem."),
                                 Globals.lang("Warning"),
-                                JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE,
+                                null,
+                                options, options[0]);
+                if (choice == 0)
+                    generateKeyAction.actionPerformed(null);
             }
         }
     }
