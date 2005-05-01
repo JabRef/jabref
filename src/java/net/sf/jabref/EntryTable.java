@@ -357,6 +357,23 @@ public class EntryTable extends JTable {
    * events, like opening an entry editor, the context menu or a pdf file.
    */
   class TableClickListener extends MouseAdapter {
+      public void mouseReleased(MouseEvent e) {
+          // First find the column on which the user has clicked.
+          final int col = columnAtPoint(e.getPoint()),
+              row = rowAtPoint(e.getPoint());
+          // Check if the user has right-clicked. If so, open the right-click menu.
+          if (e.isPopupTrigger()) {
+            processPopupTrigger(e, row, col);
+            return;
+          }
+      }
+      protected void processPopupTrigger(MouseEvent e, int row, int col) {
+          int selRow = getSelectedRow();
+          if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
+            setRowSelectionInterval(row, row);
+          rightClickMenu = new RightClickMenu(panel, panel.metaData);
+          rightClickMenu.show(EntryTable.this, e.getX(), e.getY());
+      }
       public void mousePressed(MouseEvent e) {
 
         // First find the column on which the user has clicked.
@@ -374,13 +391,8 @@ public class EntryTable extends JTable {
 
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger()) {
-        //if ( (e.getButton() == MouseEvent.BUTTON3) ||
-        //     (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-          int selRow = getSelectedRow();
-          if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
-            setRowSelectionInterval(row, row);
-          rightClickMenu = new RightClickMenu(panel, panel.metaData);
-          rightClickMenu.show(EntryTable.this, e.getX(), e.getY());
+          processPopupTrigger(e, row, col);
+          return;
         }
 
         // Check if the user has clicked on an icon cell to open url or pdf.
