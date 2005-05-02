@@ -1,0 +1,129 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Hilfe zu den <em>Gruppen</em></H1>
+<em>Zugriff &uuml;ber den Gruppendialog im linken Seitenbereich.
+Den Gruppendialog k&ouml;nnen Sie mit STRG-SHIFT-G ein- und ausblenden.</em>
+
+<p>Mit dem Feature <em>Gruppen</em> k&ouml;nnen Sie Ihre <em>BibTeX</em>-Datei 
+in logischen Gruppen organisieren. Die Gruppen sind auf einfache Art implementiert;
+sobald Sie eine oder mehrere Gruppen ausw&auml;hlen, durchsucht JabRef ein Feld
+pro Gruppe (das in der Gruppendefinition angegeben wurde) und &uuml;berpr&uuml;ft,
+ob dieses Feld den regul&auml;ren Ausdruck der Gruppe enth&auml;lt. Es werden dann
+entweder die Eintr&auml;ge angezeigt, die zu allen ausgew&auml;hlten Gruppen geh&ouml;ren 
+(Schnittmenge), oder diejenigen, die zu einer der ausgew&auml;hlten Gruppen geh&ouml;ren
+(Vereinigung).
+
+<p>Die Auswahl <em>All entries</em> (Alle Eintr&auml;ge) steht immer am Beginn der 
+Gruppenliste. Bei einem Mausklick darauf wird die Auswahl aller anderen Gruppen aufgehoben.
+Die Auswahl wird ebenfalls aufgehoben, wenn Sie den Gruppendialog ausblenden.
+
+<p>Die Gruppendefinitionen gelten nur f&uuml;r die jeweilige Datei und werden deshalb
+in der .bib-Datei gespeichert. Die Informationen werden in einem @COMMENT-Abschnitt abgelegt,
+der von <em>BibTeX</em> ignoriert wird. Das manuelle &Auml;ndern dieses Abschnitts kann
+(nat&uuml;rlich) eine Ver&auml;nderung oder den Verlust der Gruppendefinitionen zur Folge haben.
+
+<H2>Wie man <em>Gruppen</em> verwenden kann</H2>
+
+<p>Die Gruppenfunktionen erscheinen anfangs vielleicht ein bisschen verwirrend. Sie wurden mit
+der gr&ouml;&szlig;tm&ouml;glichen Flexibilit&auml;t angelegt.
+
+<p>Wenn Sie Ihre Gruppierungen transparent halten wollen, k&ouml;nnen Sie Ihre Gruppen definieren,
+indem Sie ein Feld benutzen, das es normalerweise nicht gibt, und ihm den Namen 'supersnill' oder 
+irgend einen anderen geben. Benutzen Sie dann einfach die Funktionen <em>Zur Gruppe hinzuf&uuml;gen</em>
+und <em>Aus der Gruppe entfernen</em>, um Ihre Eintr&auml;ge den Gruppen zuzuordnen.
+
+<p>M&ouml;glicherweise verf&uuml;gt Ihre Datei aber bereits &uuml;ber geeignete Stichw&ouml;rter, so dass
+Sie Ihre Gruppen mit Hilfe des Feldes 'keywords' definieren k&ouml;nnen.
+
+<p>Eine dritte M&ouml;glichkeit besteht darin, Gruppen mit Hilfe von Standardfeldern festzulegen - um damit
+z.B. eine Schnellsuche nach bestimmten Autoren zu erm&ouml;glichen, die f&uuml;r Sie wichtig sind. Dabei
+sollten Sie nicht die Funktionen <em>Zur Gruppe hinzuf&uuml;gen</em> und <em>Aus der Gruppe entfernen</em>
+verwenden, da Sie das entsprechende Feld wahrscheinlich nicht ver&auml;ndern wollen. In diesem Fall
+wird eine Warnung ausgegeben.
+
+<H2>Gruppen ansehen und durchsuchen</H2>
+
+<p>Um sich die Eintr&auml;ge einer Gruppe anzusehen, klicken Sie einfach auf den Gruppennamen. Wenn der
+Gruppendialog ausgew&auml;hlt ist, k&ouml;nnen Sie mit den Pfeiltasten zwischen den Gruppen hin- und herwechseln.
+Mit SHIFT und STRG k&ouml;nnen Sie mehrere Gruppen auf einmal selektieren. Die Auswahlk&auml;stchen <em>Schnittmenge</em>
+und <em>Vereinigung</em> im Men&uuml; <em>Einstellungen</em> des Gruppendialogs bestimmen die Art und Weise,
+wie JabRef mit der Auswahl mehrerer Gruppen umgeht.
+
+<p>Das Anzeigen einer Gruppe ist im Grunde so &auml;hnlich wie das Durchf&uuml;hren einer Suche. Das bedeutet auch,
+dass das Anzeigen einer Gruppe nicht automatisch aktualisiert wird. Wenn Sie einer Gruppe neue Eintr&auml;ge 
+hinzugef&uuml;gt haben, m&uuml;ssen Sie die Gruppe(n) noch einmal
+ausw&auml;hlen oder auf das Symbol <em>Ansicht aktualisieren</em> im Gruppendialog klicken,
+damit diese neuen Eintr&auml;ge als Teil der Gruppe angezeigt werden.
+
+<p>Die Gruppen k&ouml;nnen auch mit einer normalen Suche kombiniert werden; alle Suchvorg&auml;nge werden auf die
+Eintr&auml;ge beschr&auml;nkt, die durch Ihre Gruppenauswahl festgelegt sind. Sie k&ouml;nnen auch eine Suche
+durchf&uuml;hren und dabei die Gruppenauswahl &auml;ndern oder sich alle Eintr&auml;ge anzeigen lassen; die Tabelle
+wird dann aktualisiert und zeigt die Suchtreffer der aktuellen Gruppenauswahl.
+
+<p>Sie k&ouml;nnen jederzeit eine <em>BibTeX</em>-Datei exportieren, die lediglich die Eintr&auml;ge Ihrer
+Gruppenauswahl und/oder Ihres Suchergebnisses enth&auml;lt, indem Sie im Men&uuml; <em>Datei -> Auswahl speichern</em>
+ausw&auml;hlen.
+
+<H2>Eine neue Gruppe erstellen</H2>
+
+<p>Um eine neue Gruppe zu definieren, klicken Sie auf die Schaltfl&auml;che <em>Neue Gruppe</em>
+im Gruppendialog. Es erscheint ein Dialogfenster, in dem Sie einen Gruppennamen, einen
+regul&auml;ren Ausdruck und einen Feldnamen angeben sollen. Der Feldname hat einen Standardwert,
+der im Dialog <em>Einstellungen</em> ge&auml;ndert werden kann. Um das Erstellen einer neuen Gruppe
+abzuschlie&szlig;en, dr&uuml;cken Sie ENTER in einem der Textfelder oder klicken auf <em>OK</em>.
+Mit ESCAPE oder einem Mausklick auf <em>Abbrechen</em> k&ouml;nnen Sie das Dialogfenster schlie&szlig;en,
+ohne eine neue Gruppe zu erstellen.
+
+<H2>Das Bearbeiten einer bestehenden Gruppendefinition</H2>
+
+<p>Um eine bestehende Gruppendefinition zu bearbeiten, doppelklicken Sie den Gruppennamen im 
+Gruppendialog oder klicken mit der rechten Maustaste darauf und w&auml;hlen <em>Gruppe bearbeiten</em>.
+Es erscheint dasselbe Dialogfenster wie zum Erstellen einer Gruppe, in dem Sie die entsprechenden
+&Auml;nderungen vornehmen k&ouml;nnen.
+
+<H2>Eintr&auml;ge einer Gruppe zuordnen</H2>
+
+<p>Die Frage, ob ein Eintrag zu einer Gruppe geh&ouml;rt, wird dadurch entschieden, ob in dem
+festgelegten Feld eine &Uuml;bereinstimmung mit dem regul&auml;ren Ausdruck der Gruppe besteht.
+Um einen Eintrag einer bestimmten Gruppe hinzuzuf&uuml;gen, m&uuml;ssen Sie also nur daf&uuml;r 
+sorgen, dass dies der Fall ist.
+
+<p>Anstatt den Eintrag manuell zu &auml;ndern, k&ouml;nnen Sie die Eintr&auml;ge, die Sie hinzuf&uuml;gen
+m&ouml;chten, ausw&auml;hlen und mit der rechten Maustaste darauf klicken, um sich das Kontextmen&uuml; 
+anzeigen zu lassen. Darin w&auml;hlen Sie <em>Zur Gruppe hinzuf&uuml;gen</em> und anschlie&szlig;end 
+die entsprechende Gruppe. Dadurch werden die Eintr&auml;ge, die sich noch nicht in der Gruppe befanden,
+entsprechend ver&auml;ndert.
+
+<H2>Eintr&auml;ge aus einer Gruppe entfernen</H2>
+
+<p>F&uuml;r das Entfernen von Eintr&auml;gen aus einer Gruppe gilt dasselbe Prinzip wie f&uuml;r das
+Hinzuf&uuml;gen von Eintr&auml;gen. L&ouml;schen Sie alle &Uuml;bereinstimmungen mit dem regul&auml;ren
+Ausdruck der Gruppe im festgelegten Feld oder benutzen Sie die Funktion <em>Aus der Gruppe entfernen</em>.
+
+<H2>Das L&ouml;schen einer Gruppe</H2>
+
+<p>Wollen Sie eine Gruppe l&ouml;schen, klicken Sie mit der rechten Maustaste auf den Gruppennamen und
+w&auml;hlen <em>Gruppe l&ouml;schen</em>. Sie m&uuml;ssen diesen Vorgang noch einmal best&auml;tigen.
+
+<H2>Gruppen automatisch generieren</H2>
+
+<p>Wenn Sie im Gruppendialog auf die Schaltfl&auml;che <em>Automatisch Gruppen f&uuml;r die Datei
+anlegen</em> klicken, erhalten Sie ein Set von Gruppen f&uuml;r Ihre Datei. Diese Funktion
+erfasst alle W&ouml;rter, die in einem bestimmten Feld Ihrer Wahl gefunden werden, und 
+erstellt f&uuml;r jedes Wort eine Gruppe. Dies ist besonders dann hilfreich, wenn Ihre Datei
+z.B. im Feld <em>keywords</em> Stichworte f&uuml;r alle Eintr&auml;ge enth&auml;lt. Mit dem
+automatischen Erstellen von Gruppen auf der Basis des Felds <em>keywords</em> sollten Sie
+ohne M&uuml;he ein passendes Set von Gruppen erhalten.
+
+<p>Sie k&ouml;nnen auch Zeichen festlegen, die ignoriert werden sollen, z.B. Kommas, die Sie
+zwischen Stichw&ouml;rtern benutzt haben. Die ignorierten Zeichen werden als Worttrenner
+behandelt, nicht als Teile des Wortes. Diese Funktion kann nicht benutzt werden, um ganze
+W&ouml;rter auszuschlie&szlig;en.
+
+<p>Das automatische Erstellen von Gruppen wird wie auch die &uuml;brigen Gruppenfunktionen
+in k&uuml;nftigen Versionen von JabRef verbessert.
+
+</HTML>

@@ -1,0 +1,53 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>CiteSeer-Import</H1>
+
+<H2>Importieren eines Eintrags von CiteSeer</H2>
+
+JabRef kann Informationen &uuml;ber eine bestimmte Literaturangabe aus der CiteSeer-Datenbank
+herunterladen. Um diesen Vorgang zu starten, f&uuml;gen Sie Ihrer Datei einen neuen Eintrag hinzu
+und belegen das Feld <em>citeseerurl</em> mit einem Link zur entsprechenden Inhaltsseite auf
+CiteSeer. Das Feld <em>citeseerurl</em> muss in einem der folgenden Formate eingegeben werden:
+
+<p>http://citeseer.ist.psu.edu/DDDDDD[.html], oder <br>
+oai:CiteSeerPSU:DDDDDD, oder <br>
+DDDDDD
+
+<p>wobei DDDDDD eine Ziffernfolge darstellt. Um diese Ziffernfolge (DDDDDD) f&uuml;r einen CiteSeer-Eintrag
+zu finden, gehen Sie auf die Dokumentseite der Literaturangabe des Formats
+http://citeseer.ist.psu.edu/<i>nameYearTitle</i>.html und klicken den (Update)-Link f&uuml;r diese
+Literaturangabe. Die URL f&uuml;r den Update-Link beinhaltet die numerische ID f&uuml;r diese
+Literaturangabe.
+
+<p>Sobald Sie das Feld <em>citeseerurl</em> belegt haben, k&ouml;nnen Sie die CiteSeer-Felder herunterladen,
+indem Sie <b>BibTeX -> Felder von CiteSeer importieren</b> ausw&auml;hlen. Achten Sie darauf, dass
+Sie die Zeile(n) ausgew&auml;hlt haben, die Sie aktualisieren wollen.
+
+<H2>Generating a Citation Database</H2>
+
+Hinweis des &Uuml;bersetzers: Offen gesagt habe ich diesen Absatz nicht verstanden, was daran liegen mag,
+dass ich CiteSeer nicht kenne und deshalb auch die Funktionsweise nicht nachvollziehen kann.
+F&uuml;r Hinweise, Erkl&auml;rungen oder eine fertige &Uuml;bersetzung w&auml;re ich deshalb dankbar.
+Damit die Informationen f&uuml;r deutsche Benutzer nicht verloren gehen, habe ich Sie im Original belassen:
+
+<blockquote>
+Given a set of references, you can generate a list of documents that cite the elements of this set.
+To facilitate this feature, each citation in a database must have a citeseerurl field with the format specified
+in <b>Importing An Entry From CiteSeer</b>.  To use this feature, select <b>Tools -> Fetch Citations
+from CiteSeer</b>.
+</blockquote>
+
+<H2>Benutzung eines Proxy-Servers</H2>
+
+Wenn Sie einen HTTP-Proxy-Server benutzen m&uuml;ssen, &uuml;bergeben Sie den Servernamen und die Portnummer
+an Java. Diese Umgebungseinstellungen sind dokumentiert unter
+ <p> http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html
+
+<p><code>java -Dhttp.proxyHost="hostname" -Dhttp.proxyPort="portnumber"</code>
+
+<p>&nbsp;
+
+</HTML>
