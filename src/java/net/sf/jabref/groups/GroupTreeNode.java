@@ -272,20 +272,20 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     /** Adds the selected entries to this node's group. */
-    public AbstractUndoableEdit addSelectionToGroup(BasePanel basePanel) {
+    public AbstractUndoableEdit addToGroup(BibtexEntry[] entries) {
         if (getGroup() == null)
             return null; // paranoia
-        AbstractUndoableEdit undo = getGroup().addSelection(basePanel.getSelectedEntries());
+        AbstractUndoableEdit undo = getGroup().add(entries);
         if (undo instanceof UndoableChangeAssignment)
             ((UndoableChangeAssignment) undo).setEditedNode(this);
         return undo;
     }
 
     /** Removes the selected entries from this node's group. */
-    public AbstractUndoableEdit removeSelectionFromGroup(BasePanel basePanel) {
+    public AbstractUndoableEdit removeFromGroup(BibtexEntry[] entries) {
         if (getGroup() == null)
             return null; // paranoia
-        AbstractUndoableEdit undo = getGroup().removeSelection(basePanel.getSelectedEntries());
+        AbstractUndoableEdit undo = getGroup().remove(entries);
         if (undo instanceof UndoableChangeAssignment)
             ((UndoableChangeAssignment) undo).setEditedNode(this);
         return undo;

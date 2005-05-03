@@ -388,7 +388,7 @@ public class ImportInspectionDialog extends JDialog {
                             GroupTreeNode node = (GroupTreeNode)i2.next();
                             if (node.getGroup().supportsAdd()) {
                                 // Add the entry:
-                                AbstractUndoableEdit undo = node.getGroup().addSelection(new BibtexEntry[] {entry});
+                                AbstractUndoableEdit undo = node.getGroup().add(new BibtexEntry[] {entry});
                                 if (undo instanceof UndoableChangeAssignment)
                                     ((UndoableChangeAssignment) undo).setEditedNode(node);
                                 ce.addEdit(undo);

@@ -97,42 +97,22 @@ public abstract class AbstractGroup {
     public abstract boolean supportsRemove();
 
     /**
-     * Adds the selected entries to this group. This method is to be called
-     * by GroupTreeNode. The BasePanel instance is required for user feedback.
-     * 
-     * @return If this group or one or more entries was/were modified as a
-     *         result of this operation, an object is returned that allows to
-     *         undo this change. null is returned otherwise.
-     */
-    public abstract AbstractUndoableEdit addSelection(BasePanel basePanel);
-
-    /**
-     * Adds the selected entries to this group.
+     * Adds the specified entries to this group.
      *  
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit addSelection(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit add(BibtexEntry[] entries);
 
     /**
-     * Removes the selected entries from this group. This method is to be called
-     * by GroupTreeNode. The BasePanel instance is required for user feedback.
+     * Removes the specified entries from this group.
      * 
      * @return If this group or one or more entries was/were modified as a
      *         result of this operation, an object is returned that allows to
      *         undo this change. null is returned otherwise.
      */
-    abstract AbstractUndoableEdit removeSelection(BasePanel basePanel);
-
-    /**
-     * Removes the selected entries from this group.
-     * 
-     * @return If this group or one or more entries was/were modified as a
-     *         result of this operation, an object is returned that allows to
-     *         undo this change. null is returned otherwise.
-     */
-    abstract AbstractUndoableEdit removeSelection(BibtexEntry[] entries);
+    public abstract AbstractUndoableEdit remove(BibtexEntry[] entries);
 
     /**
      * @param searchOptions

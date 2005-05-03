@@ -82,7 +82,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return true;
     }
 
-    public AbstractUndoableEdit addSelection(BibtexEntry[] entries) {
+    public AbstractUndoableEdit add(BibtexEntry[] entries) {
         if (entries.length == 0)
             return null; // nothing to do
 
@@ -93,15 +93,11 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
     }
     
-    public AbstractUndoableEdit addSelection(BasePanel basePanel) {
-        return addSelection(basePanel.getSelectedEntries());
-    }
-    
     public boolean addEntry(BibtexEntry entry) {
         return m_entries.add(entry);
     }
 
-    public AbstractUndoableEdit removeSelection(BibtexEntry[] entries) {
+    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
         if (entries.length == 0)
             return null; // nothing to do
 
@@ -110,10 +106,6 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             m_entries.remove(entries[i]);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
-    }
-
-    public AbstractUndoableEdit removeSelection(BasePanel basePanel) {
-        return removeSelection(basePanel.getSelectedEntries());
     }
 
     public boolean removeEntry(BibtexEntry entry) {
