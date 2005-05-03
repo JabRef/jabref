@@ -925,12 +925,16 @@ public class Util {
      * acceptable unless they affect a standard field (such as "author") besides
      * the "keywords" field.
      * 
+     * @param parent 
+     *         The Component used as a parent when displaying a 
+     *         confirmation dialog.
+     * 
      * @return true if the assignment has no undesired side effects, or the user
      *         chose to perform it anyway. false otherwise (this indicates that
      *         the user has aborted the assignment).
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup group,
-            BasePanel basePanel) {
+            Component parent) {
         if (!(group instanceof KeywordGroup))
             return true; // no side effects, or not possible anyway
         KeywordGroup kg = (KeywordGroup) group;
@@ -940,7 +944,7 @@ public class Util {
         for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
             if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
                 // show a warning, then return
-                String message = Globals
+                String message = Globals // JZTODO lyrics...
                         .lang(
                                 "This action will modify the \"%0\" field "
                                         + "of your entries.\nThis could cause undesired changes to "
@@ -948,7 +952,7 @@ public class Util {
                                         + "in your group\ndefinition to \"keywords\" or a non-standard name."
                                         + "\n\nDo you still want to continue?",
                                 field);
-                int choice = JOptionPane.showConfirmDialog(basePanel, message,
+                int choice = JOptionPane.showConfirmDialog(parent, message,
                         Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE);
                 return choice != JOptionPane.NO_OPTION;
