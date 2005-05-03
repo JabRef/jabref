@@ -313,7 +313,12 @@ public class RightClickMenu extends JPopupMenu
                         return;
                 }
             }
-            AbstractUndoableEdit undo = m_node.addSelectionToGroup(panel);
+            
+            // warn if assignment has undesired side effects (modifies a field != keywords)
+            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),panel.frame))
+                return; // user aborted operation
+            
+            AbstractUndoableEdit undo = m_node.addToGroup(panel.getSelectedEntries());
             if (undo == null)
                 return; // no changed made
             
@@ -332,7 +337,11 @@ public class RightClickMenu extends JPopupMenu
             m_node = node;
         }
         public void actionPerformed(ActionEvent evt) {
-            AbstractUndoableEdit undo = m_node.removeSelectionFromGroup(panel);
+            // warn if assignment has undesired side effects (modifies a field != keywords)
+            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),panel.frame))
+                return; // user aborted operation
+            
+            AbstractUndoableEdit undo = m_node.removeFromGroup(panel.getSelectedEntries());
             if (undo == null)
                 return; // no changed made
             
