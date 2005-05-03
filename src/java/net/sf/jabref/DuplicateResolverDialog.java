@@ -111,8 +111,10 @@ public class DuplicateResolverDialog extends JDialog {
     options.add(first);
     options.add(second);
     options.add(both);
-    options.add(Box.createHorizontalStrut(5));
-    options.add(cancel);
+    if (type == DUPLICATE_SEARCH) {
+        options.add(Box.createHorizontalStrut(5));
+        options.add(cancel);
+    }
 
     first.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

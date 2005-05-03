@@ -989,8 +989,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 && e.isControlDown())) {
               JPopupMenu typeMenu = new JPopupMenu();
 
-              //typeMenu.add(new JLabel(Globals.lang("Set entry
-              // type")));
+              
               //typeMenu.addSeparator();
               for (Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator();
                   i.hasNext();)

@@ -708,7 +708,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                               //tmp = !tmp;
 
-                              System.out.println("Running command: "+winEdt + " " + toSend.toString());
+                              //System.out.println("Running command: "+winEdt + " " + toSend.toString());
                               Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
                               output(
                                   Globals.lang("Pushed the citations for the following rows to")+"WinEdt: " +
@@ -2031,12 +2031,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
              public void run() {                                          
                  entryTable.revalidate();
                  int row = tableModel.getNumberFromName(be.getId());
-                 //System.out.println("eee:"+row);
-                 entryTable.setRowSelectionInterval(row, row);
-                 entryTable.ensureVisible(row);
-                 Component comp = splitPane.getBottomComponent();
-                 if (comp instanceof EntryEditor)
-                     comp.requestFocus();
+
+                 if (row >= 0) {
+                    entryTable.setRowSelectionInterval(row, row);
+                    entryTable.ensureVisible(row);
+                    Component comp = splitPane.getBottomComponent();
+                    if (comp instanceof EntryEditor)
+                         comp.requestFocus();
+                 }
              }
         });
     }

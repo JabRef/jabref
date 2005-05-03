@@ -355,7 +355,7 @@ public class BibtexDatabase
         for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
             BibtexString string = (BibtexString)_strings.get(i.next());
 
-	        Util.pr(label+" : "+string.getName());
+	        //Util.pr(label+" : "+string.getName());
             if (string.getName().toLowerCase().equals(label.toLowerCase())) {
 
 		// First check if this string label has been resolved

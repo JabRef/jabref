@@ -1815,23 +1815,27 @@ class FetchCiteSeerAction
      * @param intoNew Determines if the entries will be put in a new database or in the current
      * one.
      */
-  public void addBibEntries(java.util.List bibentries, String filename,
+  public int addBibEntries(java.util.List bibentries, String filename,
                              boolean intoNew) {
           if (bibentries == null || bibentries.size() == 0) {
+
       // No entries found. We need a message for this.
       JOptionPane.showMessageDialog(ths, Globals.lang("No entries found. Please make sure you are "
                                                       +"using the correct import filter."), Globals.lang("Import failed"),
                                     JOptionPane.ERROR_MESSAGE);
-      return;
+      return 0;
     }
+
+      int addedEntries = 0;
+
     // Set owner field:
     if (prefs.getBoolean("useOwner"))
       Util.setDefaultOwner( bibentries, prefs.get("defaultOwner"));
 
     // check if bibentries is null
     if (bibentries == null) {
-      output(Globals.lang("Ne entries imported."));
-      return;
+      output(Globals.lang("No entries imported."));
+      return 0;
     }
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.
@@ -1859,7 +1863,7 @@ class FetchCiteSeerAction
             db.setCompleters(autoCompleters);
             }
        */
-
+      addedEntries = database.getEntryCount();
       tabbedPane.add(Globals.lang("untitled"), bp);
       bp.markBaseChanged();
       tabbedPane.setSelectedComponent(bp);
@@ -1880,6 +1884,7 @@ class FetchCiteSeerAction
       int oldCount = database.getEntryCount();
       NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
       Iterator it = bibentries.iterator();
+
       mainLoop: while (it.hasNext()) {
         BibtexEntry entry = (BibtexEntry) it.next();
         boolean dupli = false;
@@ -1894,8 +1899,9 @@ class FetchCiteSeerAction
                         (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                     drd.setVisible(true);
                     int res = drd.getSelected();
-                    if (res == drd.KEEP_LOWER)
+                    if (res == drd.KEEP_LOWER)   {
                         dupli = true;
+                    }
                     else if (res == drd.KEEP_UPPER) {
                         database.removeEntry(existingEntry.getId());
                         ce.addEdit(new UndoableRemoveEntry
@@ -1914,6 +1920,7 @@ class FetchCiteSeerAction
                 database.insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry
                            (database, entry, basePanel));
+                addedEntries++;
             }
             catch (KeyCollisionException ex) {
                 //ignore
@@ -1921,20 +1928,21 @@ class FetchCiteSeerAction
             }
         }
       }
-      ce.end();
-      basePanel.undoManager.addEdit(ce);
-      basePanel.markBaseChanged();
-      basePanel.refreshTable();
-      if (filename != null)
-          output(Globals.lang("Imported database") + " '" + filename + "' " +
-                 Globals.lang("with") + " " +
-                 (database.getEntryCount() - oldCount) + " " +
-                 Globals.lang("entries into new database") + ".");
-
-
+        if (addedEntries > 0) {
+            ce.end();
+            basePanel.undoManager.addEdit(ce);
+            basePanel.markBaseChanged();
+            basePanel.refreshTable();
+            if (filename != null)
+                output(Globals.lang("Imported database") + " '" + filename + "' " +
+                     Globals.lang("with") + " " +
+                     (database.getEntryCount() - oldCount) + " " +
+                     Globals.lang("entries into new database") + ".");
+        }
 
     }
 
+    return addedEntries;
   }
 
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {

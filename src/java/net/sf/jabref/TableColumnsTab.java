@@ -216,8 +216,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 return;
             }
             for (int i=0; i<rows.length; i++) {
-                if (rows[i]+i < tableRows.size())
-                    tableRows.add(Math.max(1, rows[i]+i), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+                if (rows[i]+i-1 < tableRows.size())
+                    tableRows.add(Math.max(0, rows[i]+i-1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
             }
             rowCount += rows.length;
             if (rows.length > 1) colSetup.clearSelection();

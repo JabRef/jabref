@@ -141,7 +141,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		    }
 		    }*/
 		//ce.end();
-		panel.frame().addBibEntries(bibs, null, false);
+		int importedEntries = panel.frame().addBibEntries(bibs, null, false);
+        if (importedEntries == 0) {
+            return; // Nothing to refresh!
+        }
         panel.markBaseChanged();
 		panel.refreshTable();
         if (bibs.size() > 0) {

@@ -95,6 +95,7 @@ Change log:
           in order to simplify search interface.
         - Changed keys for Next and Previous tab to CTRL-PGDN and CTRL-PGUP to match shortcuts in a
           certain popular web browser.
+        - Fixed bug occuring when choosing not to import duplicate imported entry.
         - Fixed problem with detecting popup trigger on Mac OSX with one button mouse.
         - Fixed entry preview to resolve string references.
 1.7.1   - Removed unnecessary stack traces when opening external viewer.
