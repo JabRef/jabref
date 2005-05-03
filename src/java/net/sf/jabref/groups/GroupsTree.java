@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.*;
 import net.sf.jabref.BibtexEntry;
 
 public class GroupsTree extends JTree implements DragSourceListener,
@@ -243,7 +244,12 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     if (!target.getGroup().contains(entries[i]))
                         ++assignedEntries;
                 }
-                AbstractUndoableEdit undo = group.addSelection(selection.getSelection());
+                
+                // warn if assignment has undesired side effects (modifies a field != keywords)
+                if (!Util.warnAssignmentSideEffects(group,groupSelector.frame))
+                    return; // user aborted operation
+                
+                AbstractUndoableEdit undo = group.add(selection.getSelection());
                 if (undo instanceof UndoableChangeAssignment)
                     ((UndoableChangeAssignment) undo).setEditedNode(target);
                 dtde.getDropTargetContext().dropComplete(true);
