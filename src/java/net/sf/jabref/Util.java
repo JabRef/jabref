@@ -33,6 +33,8 @@ import java.net.*;
 import java.util.*;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import net.sf.ext.BrowserLauncher;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.groups.*;
@@ -912,5 +914,46 @@ public class Util {
         if (sb.length() > 2)
             sb.delete(sb.length()-2, sb.length());
         return sb.toString();
+    }
+    
+    /**
+     * Warns the user of undesired side effects of an explicit
+     * assignment/removal of entries to/from this group. Currently there are
+     * four types of groups: AllEntriesGroup, SearchGroup - do not support
+     * explicit assignment. ExplicitGroup - never modifies entries. KeywordGroup -
+     * only this modifies entries upon assignment/removal. Modifications are
+     * acceptable unless they affect a standard field (such as "author") besides
+     * the "keywords" field.
+     * 
+     * @return true if the assignment has no undesired side effects, or the user
+     *         chose to perform it anyway. false otherwise (this indicates that
+     *         the user has aborted the assignment).
+     */
+    public static boolean warnAssignmentSideEffects(AbstractGroup group,
+            BasePanel basePanel) {
+        if (!(group instanceof KeywordGroup))
+            return true; // no side effects, or not possible anyway
+        KeywordGroup kg = (KeywordGroup) group;
+        String field = kg.getSearchField().toLowerCase();
+        if (field.equals("keywords")) 
+            return true; // this is not undesired
+        for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+            if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+                // show a warning, then return
+                String message = Globals
+                        .lang(
+                                "This action will modify the \"%0\" field "
+                                        + "of your entries.\nThis could cause undesired changes to "
+                                        + "your entries, so it\nis recommended that you change the field "
+                                        + "in your group\ndefinition to \"keywords\" or a non-standard name."
+                                        + "\n\nDo you still want to continue?",
+                                field);
+                int choice = JOptionPane.showConfirmDialog(basePanel, message,
+                        Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                return choice != JOptionPane.NO_OPTION;
+            }
+        }
+        return true; // found no side effects
     }
 }
