@@ -1755,15 +1755,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
           splitPane.setBottomComponent(previewPanel[activePreview].getPane());
           if ((previewPanel[activePreview] != null) && previewPanel[activePreview].hasEntry()) {
             //splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_HEIGHT[activePreview]);
-            final int prevSize = Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPreferredSize().height
-                                          + GUIGlobals.PREVIEW_PANEL_PADDING);
+            final int prevSize = GUIGlobals.PREVIEW_PANEL_HEIGHT;
+
+                    //Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPreferredSize().height
+                    //                      + GUIGlobals.PREVIEW_PANEL_PADDING);
             //            Util.pr(""+prevSize+" "+(splitPane.getHeight()/2)+" "+previewPanel[activePreview].getPreferredSize().height);
+
+
             splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
-            /*SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
-              }
-            });*/
+
 
           } else
             splitPane.setBottomComponent(null);
@@ -1867,7 +1867,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         splitPane.setBottomComponent(null);
         return; // Do nothing if previews are disabled.
       }
-      if (previewPanel[activePreview] == null) {
+//      if (previewPanel[activePreview] == null) {
+        boolean newPreviewPanel = previewPanel[activePreview] == null;
+        if (newPreviewPanel) {
             previewPanel[activePreview] = new PreviewPanel(database, be, prefs.get("preview"+activePreview));
 
       } else
@@ -1882,22 +1884,36 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //splitPane.resetToPreferredSizes();
       //previewPanel[activePreview].getPane().invalidate();
 
-    splitPane.setBottomComponent(previewPanel[activePreview].getPane());
-
-    int prevSize = Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPane().getPreferredSize().height
-                            + GUIGlobals.PREVIEW_PANEL_PADDING);
-  //  int prevSize = 130;
-
-          splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
-
-/*      SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-
+        boolean resizePreview = false;
+        if(splitPane.getBottomComponent()==null
+                ||splitPane.getBottomComponent()!=previewPanel[activePreview].getPane()) {
+            resizePreview = true;
+            splitPane.setBottomComponent(previewPanel[activePreview].getPane());
         }
-      });*/
 
-      //previewPanel[activePreview].repaint();
-      //throw new NullPointerException("..");
+        if(!resizePreview) resizePreview = previewPanel[activePreview].getPane().getPreferredSize().height>=splitPane.getHeight();
+        if(!resizePreview) {
+            if(splitPane.getDividerLocation()<=0) {
+                resizePreview = true;
+            }
+        }
+       if(newPreviewPanel||resizePreview) {
+          int prevSize;
+          //if(resizePreview) //prevSize = splitPane.getHeight()/2;
+          //else {
+              prevSize = GUIGlobals.PREVIEW_PANEL_HEIGHT;
+                 //Math.max(150, previewPanel[activePreview].getPane().getPreferredSize().height)
+                //GUIGlobals.PREVIEW_PANEL_PADDING;
+          //}
+           splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+      }
+
+        /*int prevSize = Math.min(splitPane.getHeight()/2, previewPanel[activePreview].getPane().getPreferredSize().height
+                            + GUIGlobals.PREVIEW_PANEL_PADDING);*/
+
+     //splitPane.setDividerLocation(splitPane.getHeight() - prevSize);
+
+
     }
 
     /**

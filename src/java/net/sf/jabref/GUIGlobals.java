@@ -91,6 +91,7 @@ public class GUIGlobals {
       KEYBIND_COL_0 = 200,
       KEYBIND_COL_1 = 80, // Added to the font size when determining table
       PREVIEW_PANEL_PADDING = 15, // Extra room given to the preview editor, in addition to its own
+      PREVIEW_PANEL_HEIGHT = 200,
       MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
   // calculated preferred size
   //public static final int[] PREVIEW_HEIGHT = {115, 300};
