@@ -156,7 +156,7 @@ public class LayoutEntry
                 }
                 else
                 {
-                    System.err.println(
+                    System.out.println(
                         "Nested field entries are not implemented !!!");
                 }
             }
@@ -194,7 +194,7 @@ public class LayoutEntry
     {
         if (type == LayoutHelper.IS_LAYOUT_TEXT)
         {
-            return text; 
+            return text;
         }
         else if (type == LayoutHelper.IS_SIMPLE_FIELD)
         {
@@ -248,7 +248,7 @@ public class LayoutEntry
                             if (layoutEntries[i + 1].doLayout(bibtex, database).trim()
                                                         .length() == 0)
                             {
-                                //sb.append("MISSING");
+                                //System.out.println("MISSING: "+bibtex);
                                 i++;
                                 previousSkipped = true;
 

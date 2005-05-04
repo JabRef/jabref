@@ -85,8 +85,10 @@ public class Layout
                 }
                 else
                 {
-                    System.err.println(
+                    System.out.println(
                         "Nested field entries are not implemented !!!");
+                    //System.out.println("..."+blockStart+"..."+si.s+"...");
+                    Thread.dumpStack();
                 }
             }
             else if (si.i == LayoutHelper.IS_GROUP_START)
@@ -104,8 +106,10 @@ public class Layout
                     blockEntries = null;
                 } else
                 {
-                    System.err.println(
-                    "Nested field entries are not implemented !!!");                    
+                    System.out.println(
+                        "Nested field entries are not implemented !!!");
+                    Thread.dumpStack();
+
                 }                
             }
             else if (si.i == LayoutHelper.IS_OPTION_FIELD)
@@ -154,8 +158,13 @@ public class Layout
         {
             fieldText = layoutEntries[i].doLayout(bibtex, database);
 
-            //System.out.println("'" + fieldText + "'");
+            // 2005.05.05 M. Alver
+            // The following change means we treat null fields as "". This is to fix the
+            // problem of whitespace disappearing after missing fields. Hoping there are
+            // no side effects.
             if (fieldText == null)
+                fieldText = "";
+            /*if (fieldText == null)
             {
                 if ((i + 1) < layoutEntries.length)
                 {
@@ -169,7 +178,7 @@ public class Layout
                     }
                 }
             }
-            else
+            else*/
             {
                 // if previous was skipped --> remove leading line breaks
                 if (previousSkipped)

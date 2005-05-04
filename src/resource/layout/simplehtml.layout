@@ -9,9 +9,7 @@
 \begin{school} <em>\format[HTMLChars]{\school}, </em>\end{school}
 \begin{institution} <em>\format[HTMLChars]{\institution}, </em>\end{institution}
 \begin{publisher} <em>\format[HTMLChars]{\publisher}, </em>\end{publisher}
-\begin{year}<b>\year</b>\end{year}
-\begin{volume}<i>, \volume</i>\end{volume}
-\begin{pages}, \format[FormatPagesForHTML]{\pages} \end{pages}
+\begin{year}<b>\year</b>\end{year}\begin{volume}<i>, \volume</i>\end{volume}\begin{pages}, \format[FormatPagesForHTML]{\pages} \end{pages}
 </dd>
 <p></p>
 </font>

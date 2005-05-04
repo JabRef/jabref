@@ -308,6 +308,7 @@ public class LayoutHelper
 
         StringBuffer buffer = null;
         int previous = -1;
+        boolean justParsedTag = false;
 
         while (!_eof)
         {
@@ -324,21 +325,27 @@ public class LayoutHelper
                 return null;
             }
 
-            if ((c == '\\') && (peek() != '\\') && (previous != '\\'))
+            if ((c == '\\') && (peek() != '\\') && (justParsedTag || (previous != '\\')))
             {
                 if (buffer != null)
                 {
                     parsedEntries.add(new StringInt(buffer.toString(),
                             IS_LAYOUT_TEXT));
-
-                    //System.out.println("aha: " + buffer.toString());
+                    
                     buffer = null;
                 }
 
                 parseField();
+
+                // To make sure the next character, if it is a backslash, doesn't get ignored,
+                // since "previous" now holds a backslash:
+                justParsedTag = true;
+
             }
             else
             {
+                justParsedTag = false;
+
                 if (buffer == null)
                 {
                     buffer = new StringBuffer(100);

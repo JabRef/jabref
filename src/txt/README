@@ -95,6 +95,9 @@ Change log:
           in order to simplify search interface.
         - Changed keys for Next and Previous tab to CTRL-PGDN and CTRL-PGUP to match shortcuts in a
           certain popular web browser.
+        - Minor change to Preferences -> Table columns to enable insertion of column in position 2.
+        - Fixed export bug that made "\begin" tags fail if encountered immediately after an "\end" tag. 
+        - Fixed export bug that made whitespace disappear after empty field values.
         - Fixed bug occuring when choosing not to import duplicate imported entry.
         - Fixed problem with detecting popup trigger on Mac OSX with one button mouse.
         - Fixed entry preview to resolve string references.
