@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.io.IOException;
+import java.io.File;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener {
 
@@ -13,9 +14,10 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
   BasePanel panel;
   JabRefFrame frame;
   SidePaneManager manager;
-  
+  JLabel message;
+
   public FileUpdatePanel(JabRefFrame frame, BasePanel panel,
-                         SidePaneManager manager, JabRefPreferences prefs) {
+                         SidePaneManager manager, File file) {
     super(manager, GUIGlobals.saveIconFile, Globals.lang("File changed"));
     this.panel = panel;
     this.frame = frame;
@@ -23,10 +25,12 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     
     JPanel main = new JPanel();
     main.setLayout(new BorderLayout());
-    JLabel lab = new JLabel("<html><center>Your file has<BR>been modified<BR>by another process!</center></html>",
+
+    message = new JLabel("<html><center>"+Globals.lang("The file<BR>'%0'<BR>has been modified<BR>externally!", file.getName())
+            +"</center></html>",
             JLabel.CENTER);
-    
-    main.add(lab, BorderLayout.CENTER);
+
+    main.add(message, BorderLayout.CENTER);
     main.add(test, BorderLayout.SOUTH);
     main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
     

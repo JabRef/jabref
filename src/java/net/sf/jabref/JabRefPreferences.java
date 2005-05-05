@@ -209,7 +209,7 @@ public class JabRefPreferences {
                      +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
                      +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
                      +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                     +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
+                     +"\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
                      +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}"
                      +"</dd>__NEWLINE__<p></p></font>");
 
@@ -224,7 +224,7 @@ public class JabRefPreferences {
                        +"\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
                        +"\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
                        +"\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                       +"\\begin{year}<b>\\year</b>\\end{year} \\begin{volume}<i>, \\volume</i>\\end{volume} "
+                       +"\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
                        +"\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
                        +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");

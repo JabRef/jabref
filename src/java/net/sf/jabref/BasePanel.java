@@ -2461,7 +2461,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       // thread:
       Thread t = new Thread() {
         public void run() {
-          FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, Globals.prefs);
+          FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, file);
           sidePaneManager.add("fileUpdate", pan);
         }
       };
