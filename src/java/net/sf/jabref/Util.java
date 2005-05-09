@@ -407,14 +407,19 @@ public class Util {
         if (fieldName.equals("pdf")){
             String dir = prefs.get("pdfDirectory");
             file = expandFilename(link, dir);
-        }else file = new File(link);
+        } else if (fieldName.equals("ps")) {
+    	    String dir = prefs.get("psDirectory");
+            file = expandFilename(link, dir);
+	    } else file = new File(link);
+
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")){
             // Check that the file exists:
 
             if ((file == null) || !file.exists()){ throw new IOException(
-                    Globals.lang("File not found") + ": '" + link + "'."); }
-
+                    //Globals.lang("File not found") + ": '" + link + "'."); }
+                    Globals.lang("File not found") +" ("+fieldName+"): '" + link + "'.");
+            }
             link = file.getPath();
 
             // Use the correct viewer even if pdf and ps are mixed up:
@@ -541,12 +546,12 @@ public class Util {
      * Searches the given directory and subdirectories for a pdf file with name
      * as given + ".pdf"
      */
-    public static String findPdf(String key, String pdfDir) {
-        String filename = key + ".pdf";
-        if (!pdfDir.endsWith(System.getProperty("file.separator"))) pdfDir += System
+    public static String findPdf(String key, String extension, String directory) {
+        String filename = key + "."+extension;
+        if (!directory.endsWith(System.getProperty("file.separator"))) directory += System
                 .getProperty("file.separator");
-        String found = findInDir(filename, pdfDir);
-        if (found != null) return found.substring(pdfDir.length());
+        String found = findInDir(filename, directory);
+        if (found != null) return found.substring(directory.length());
         else return null;
     }
 

@@ -45,6 +45,8 @@ import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.*;
+import net.sf.jabref.external.ExternalFilePanel;
+import net.sf.jabref.external.ExternalFilePanel;
 
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
@@ -56,7 +58,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
 
   // A reference to the entry this object works on.
-  BibtexEntry entry;
+  public BibtexEntry entry;
   BibtexEntryType type;
   CloseAction closeAction;
 
@@ -73,7 +75,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   AbstractAction prevEntryAction = new PrevEntryAction();
 
   // Actions for switching to next/previous entry.
-  StoreFieldAction storeFieldAction;
+  public StoreFieldAction storeFieldAction;
 
   // The action concerned with storing a field value.
   SwitchLeftAction switchLeftAction = new SwitchLeftAction();
@@ -367,169 +369,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
       return but;
     } else if ((s != null) && s.equals("browsePdf")) {
-      JPanel pan = new JPanel();
-      pan.setLayout(new GridLayout(3, 1));
-
-      JButton but = new JButton(Globals.lang("Browse"));
-      JButton download = new JButton(Globals.lang("Download")),
-        auto = new JButton( Globals.lang( "Auto" ) ) ;
-      ((JComponent) editor).addMouseListener(new ExternalViewerListener());
-
-      //but.setBackground(GUIGlobals.lightGray);
-      but.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            String pdfDir = prefs.get("pdfDirectory");
-            String dir = ed.getText();
-
-            if (dir.equals("") || !(new File(dir)).isAbsolute()) {
-              if (pdfDir != null)
-                dir = pdfDir;
-              else
-                dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
-            }
-
-            String chosenFile =
-              Globals.getNewFile(frame, prefs, new File(dir), ".pdf",
-                JFileChooser.OPEN_DIALOG, false);
-
-            if (chosenFile != null) {
-              File newFile = new File(chosenFile);
-              String position = newFile.getParent();
-
-              if ((pdfDir != null) && position.startsWith(pdfDir)) {
-                // Construct path relative to pdf base dir
-                String relPath =
-                  position.substring(pdfDir.length(), position.length()) + File.separator
-                  + newFile.getName();
-
-                // Remove leading path separator
-                if (relPath.startsWith(File.separator)) {
-                  relPath = relPath.substring(File.separator.length(), relPath.length());
-
-                  // Set relative path as field value
-                }
-
-                ed.setText(relPath);
-              } else
-                ed.setText(newFile.getPath());
-
-              prefs.put(fieldName + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-              storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
-            }
-          }
-        });
-      download.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            String res =
-              JOptionPane.showInputDialog((Component) ed,
-                Globals.lang("Enter URL to download"));
-
-            if (res != null) {
-                class Downloader extends Thread {
-                    String res;
-                    public Downloader(String res) {
-                        this.res = res;
-                    }
-                    public void run() {
-                        URL url;
-                        try {
-                            url = new URL(res);
-                  
-                            String plannedName = null;
-                            if (entry.getField(Globals.KEY_FIELD) != null)
-                                plannedName = entry.getField(Globals.KEY_FIELD) + ".pdf";
-                            else {
-                                plannedName = JOptionPane.showInputDialog((Component) ed,
-                                    Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));     
-                                if (plannedName == null)
-                                    return;
-                                if (!plannedName.substring(4).equals(".pdf"))
-                                    plannedName += ".pdf";
-                            }
-                            File file = new File(new File(prefs.get("pdfDirectory")), plannedName);
-                            
-                            URLDownload udl = new URLDownload((Component) ed, url, file);
-                            frame.output(Globals.lang("Downloading..."));
-                            
-                            try {
-                                udl.download();
-                            } catch (IOException e2) {
-                                JOptionPane.showMessageDialog((Component) ed, Globals.lang("Invalid URL"),
-                                  Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                                logger.log(java.util.logging.Level.WARNING,
-                                       "Error while downloading " + url.toString(), e2);
-                            }
-
-                            frame.output(Globals.lang("Download completed"));
-                            String filename = file.getPath();
-                            System.out.println(filename);
-                            String pdfDir = prefs.get("pdfDirectory");
-                            if (filename.startsWith(pdfDir)) {
-                                // Construct path relative to pdf base dir
-                                String relPath = filename.substring(pdfDir.length(), filename.length());
-                                
-                                // Remove leading path separator
-                                if (relPath.startsWith(File.separator)) {
-                                    relPath = relPath.substring(File.separator.length(), relPath.length());
-                                }
-                                filename = relPath;
-                            }
-                            
-                            //ed.setText(file.toURL().toString());
-                            ed.setText(filename);
-                            SwingUtilities.invokeLater(new Thread() {
-                                public void run() {
-                                    updateField(ed);
-                                }
-                            });
-                        } catch (MalformedURLException e1) {
-                            JOptionPane.showMessageDialog((Component) ed, "Invalid URL",
-                                "Download file", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                };
-                
-                (new Downloader(res)).start();
-                      
-            }
-        }  
-        });
-
-      auto.addActionListener(
-        new ActionListener() { 
-          public void actionPerformed( ActionEvent e ) {
-            Object o = entry.getField( Globals.KEY_FIELD );
-            if ( ( o == null ) || (prefs.get( "pdfDirectory" ) == null ) ) { 
-                frame.output( Globals.lang("You must set both bibtex key and PDF directory" ) + "." );
-                return ; 
-            }
-            panel.output( Globals.lang( "Searching for PDF file" ) + " '" + o +
-                ".pdf'..." ) ; 
-            (new Thread() { 
-                public void run() {
-                    Object o = entry.getField( Globals.KEY_FIELD ) ;
-                    String found = Util.findPdf((String )o, prefs.get( "pdfDirectory"));
-                    if (found != null) {
-                        ed.setText( found ) ; 
-                        updateField(ed);
-                        panel.output(Globals.lang("PDF field set" ) + "." ) ;
-                    } else { 
-                        panel.output( Globals.lang( "No PDF found" ) + "." );
-                    } 
-                } 
-            }).start();
-          }
-      });
-             
-      pan.add(but);
-      pan.add( auto ) ;
-      pan.add(download);
-
-      // Add drag and drop support to the field
-      ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
-          DnDConstants.ACTION_NONE, new UrlDragDrop(this, frame, editor)));
-
-      return pan;
+        ExternalFilePanel pan = new ExternalFilePanel(frame, this, "pdf", ed);
+        return pan;
+    }
+    else if ((s != null) && s.equals("browsePs")) {
+        ExternalFilePanel pan = new ExternalFilePanel(frame, this, "ps", ed);
+        return pan;
     } else if ((s != null) && s.equals("url")) {
       ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
           DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
@@ -1098,7 +943,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
   }
 
-  class StoreFieldAction extends AbstractAction {
+  public class StoreFieldAction extends AbstractAction {
     public StoreFieldAction() {
       super("Store field value");
       putValue(SHORT_DESCRIPTION, "Store field value");

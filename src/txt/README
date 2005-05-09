@@ -89,6 +89,7 @@ Change log:
         - [UNFINISHED] Added inspection dialog for previewing and generating keys for imported entries,
           and deciding which ones to keep and discard. The dialog allows inspection during long import
           processes such as Medline search.
+        - Added PS directory with similar options as PDF.
         - Made the program remember preview enable setting.
         - Improved handling of illegal regular expressions in search.
         - Removed options to search only Required, Optional and/or General fields,
@@ -100,6 +101,7 @@ Change log:
         - Fixed export bug that made whitespace disappear after empty field values.
         - Fixed bug occuring when choosing not to import duplicate imported entry.
         - Fixed problem with detecting popup trigger on Mac OSX with one button mouse.
+        - Fixed erroneous relative paths for PDF files when PDF directory is not set.
         - Fixed entry preview to resolve string references.
 1.7.1   - Removed unnecessary stack traces when opening external viewer.
         - Fixed bug that made Ctrl-E destroy current edit in entry editor.

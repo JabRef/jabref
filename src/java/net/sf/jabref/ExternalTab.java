@@ -16,7 +16,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
     JTextField
-	pdfDir, pdf, ps, html, lyx, winEdt;
+	pdfDir, psDir, pdf, ps, html, lyx, winEdt;
     private HelpAction ownerHelp, pdfHelp;
 
 
@@ -28,6 +28,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
 				 "Help", GUIGlobals.helpSmallIconFile);
 
+        psDir = new JTextField(30);
         pdfDir = new JTextField(30);
         pdf = new JTextField(30);
 	ps = new JTextField(30);
@@ -50,6 +51,14 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	builder.append(lab);
 	builder.append(pdfDir);
 	browse = new BrowseAction(pdfDir, true);
+	builder.append(new JButton(browse)); builder.nextLine();
+    builder.appendSeparator(Globals.lang("PS links"));
+	pan = new JPanel();
+	builder.append(pan);
+	lab = new JLabel(Globals.lang("Main PS directory")+":");
+	builder.append(lab);
+	builder.append(psDir);
+	browse = new BrowseAction(psDir, true);
 	builder.append(new JButton(browse)); builder.nextLine();
 	builder.appendSeparator(Globals.lang("External programs"));
 
@@ -121,6 +130,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
     public void setValues() {
        pdfDir.setText(_prefs.get("pdfDirectory"));
+       psDir.setText(_prefs.get("psDirectory"));
        pdf.setText(_prefs.get("pdfviewer"));
        ps.setText(_prefs.get("psviewer"));
        html.setText(_prefs.get("htmlviewer"));
@@ -132,6 +142,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	// We should maybe do some checking on the validity of the contents?
         _prefs.put("pdfDirectory", pdfDir.getText());
+        _prefs.put("psDirectory", psDir.getText());
         _prefs.put("pdfviewer", pdf.getText());
 	_prefs.put("psviewer", ps.getText());
 	_prefs.put("htmlviewer", html.getText());
