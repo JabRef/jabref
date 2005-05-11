@@ -81,8 +81,8 @@ public class HelpContent extends JEditorPane {
     public void setPage(String filename) {
         String middle = prefs.get("language")+"/";
         if (middle.equals("en/")) middle = ""; // english in base help dir.
-        URL old = getPage(),
-            translatedFile = JabRef.class.getResource
+        URL old = getPage() ;
+        URL translatedFile = JabRef.class.getResource
             (GUIGlobals.helpPre+middle+filename);
         try {
             super.setPage(translatedFile);
