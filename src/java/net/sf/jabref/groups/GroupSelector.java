@@ -321,16 +321,7 @@ public class GroupSelector extends SidePaneComponent implements
         // header.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new GroupsTree(this);
-        groupsTree.setToggleClickCount(0);
         groupsTree.addTreeSelectionListener(this);
-        ToolTipManager.sharedInstance().registerComponent(groupsTree);
-        // drag'n'drop is enabled in GroupsTree.java
-        groupsTree.setShowsRootHandles(false);
-        // groupsTree.setPrototypeCellValue("Suitable length");
-        // // The line above decides on the list's preferred width.
-        groupsTree.setVisibleRowCount(Globals.prefs.getInt("groupsVisibleRows"));
-        groupsTree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
         sp = new JScrollPane(groupsTree,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
