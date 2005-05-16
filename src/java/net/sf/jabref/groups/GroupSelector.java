@@ -983,6 +983,9 @@ public class GroupSelector extends SidePaneComponent implements
         reportError(errorMessage);
     }
     
+    /**
+     * Highlight all groups that contain any/all of the specified entries. 
+     */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
         GroupTreeNode node;
         AbstractGroup group;
@@ -992,15 +995,11 @@ public class GroupSelector extends SidePaneComponent implements
             group = node.getGroup();
             for (int i = 0; i < entries.length; ++i) {
                 if (requireAll) {
-                    if (!group.contains(entries[i])) {
-                        System.out.println("NOT adding node: " + group.getName());
+                    if (!group.contains(entries[i]))
                         break;
-                    }
                 } else {
-                    if (group.contains(entries[i])) {
-                        System.out.println("adding node: " + group.getName());
+                    if (group.contains(entries[i]))
                         vec.add(node);
-                    }
                 } 
             }
         }
