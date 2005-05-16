@@ -91,7 +91,9 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     .unquote(field, QUOTE_CHAR), Util.unquote(expression,
                     QUOTE_CHAR), false, true);
         }
-        case 1: {
+        case 1: 
+        case 2: 
+        {
             String name = tok.nextToken();
             String field = tok.nextToken();
             String expression = tok.nextToken();
