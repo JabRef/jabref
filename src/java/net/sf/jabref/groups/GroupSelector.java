@@ -353,12 +353,27 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void definePopup() {
+        // These key bindings are just to have the shortcuts displayed
+        // in the popup menu. The actual keystroke processing is in 
+        // BasePanel (entryTable.addKeyListener(...)).
+        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, 
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
+        moveNodeDownAction.putValue(Action.ACCELERATOR_KEY, 
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK));
+        moveNodeLeftAction.putValue(Action.ACCELERATOR_KEY, 
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
+        moveNodeRightAction.putValue(Action.ACCELERATOR_KEY, 
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
         groupsContextMenu.add(addGroupAction);
         groupsContextMenu.add(addSubgroupAction);
         groupsContextMenu.add(editGroupAction);
         groupsContextMenu.add(removeGroupAndSubgroupsAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsAction);
         groupsContextMenu.add(moveSubmenu);
+        groupsContextMenu.add(expandSubtreeAction);
+        groupsContextMenu.add(collapseSubtreeAction);
+        groupsContextMenu.add(showOverlappingGroupsAction);
+        groupsContextMenu.add(clearHighlightAction);
         moveSubmenu.add(moveNodeUpAction);
         moveSubmenu.add(moveNodeDownAction);
         moveSubmenu.add(moveNodeLeftAction);
@@ -393,31 +408,40 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     private void showPopup(MouseEvent e) {
-        TreePath path = groupsTree.getPathForLocation(e.getPoint().x, e
+        final TreePath path = groupsTree.getPathForLocation(e.getPoint().x, e
                 .getPoint().y);
-        if (path == null)
-            return;
-        groupsTree.setSelectionPath(path);
-        GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-        AbstractGroup group = node.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            editGroupAction.setEnabled(false);
-            addGroupAction.setEnabled(false);
-            removeGroupAndSubgroupsAction.setEnabled(false);
-            removeGroupKeepSubgroupsAction.setEnabled(false);
-        } else {
-            editGroupAction.setEnabled(true);
-            addGroupAction.setEnabled(true);
-            removeGroupAndSubgroupsAction.setEnabled(true);
-            removeGroupKeepSubgroupsAction.setEnabled(true);
+        addGroupAction.setEnabled(path != null);
+        addSubgroupAction.setEnabled(path != null);
+        editGroupAction.setEnabled(path != null);
+        removeGroupAndSubgroupsAction.setEnabled(path != null);
+        removeGroupKeepSubgroupsAction.setEnabled(path != null);
+        moveSubmenu.setEnabled(path != null);
+        expandSubtreeAction.setEnabled(path != null);
+        collapseSubtreeAction.setEnabled(path != null);
+        showOverlappingGroupsAction.setEnabled(path != null);
+        if (path != null) { // some path dependent enabling/disabling
+            groupsTree.setSelectionPath(path);
+            GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            AbstractGroup group = node.getGroup();
+            if (group instanceof AllEntriesGroup) {
+                editGroupAction.setEnabled(false);
+                addGroupAction.setEnabled(false);
+                removeGroupAndSubgroupsAction.setEnabled(false);
+                removeGroupKeepSubgroupsAction.setEnabled(false);
+            } else {
+                editGroupAction.setEnabled(true);
+                addGroupAction.setEnabled(true);
+                removeGroupAndSubgroupsAction.setEnabled(true);
+                removeGroupKeepSubgroupsAction.setEnabled(true);
+            }
+            moveNodeUpAction.setEnabled(node.canMoveUp());
+            moveNodeDownAction.setEnabled(node.canMoveDown());
+            moveNodeLeftAction.setEnabled(node.canMoveLeft());
+            moveNodeRightAction.setEnabled(node.canMoveRight());
+            moveSubmenu.setEnabled(moveNodeUpAction.isEnabled()
+                    || moveNodeDownAction.isEnabled() || moveNodeLeftAction.isEnabled()
+                    || moveNodeRightAction.isEnabled());
         }
-        moveNodeUpAction.setEnabled(node.canMoveUp());
-        moveNodeDownAction.setEnabled(node.canMoveDown());
-        moveNodeLeftAction.setEnabled(node.canMoveLeft());
-        moveNodeRightAction.setEnabled(node.canMoveRight());
-        moveSubmenu.setEnabled(moveNodeUpAction.isEnabled()
-                || moveNodeDownAction.isEnabled() || moveNodeLeftAction.isEnabled()
-                || moveNodeRightAction.isEnabled());
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
 
@@ -544,7 +568,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     /** This action can also be evoked by double-clicking, thus it's a field. */
-    AbstractAction editGroupAction = new AbstractAction(Globals
+    final AbstractAction editGroupAction = new AbstractAction(Globals
             .lang("Edit group")) {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
@@ -567,7 +591,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction addGroupAction = new AbstractAction(Globals
+    final AbstractAction addGroupAction = new AbstractAction(Globals
             .lang("Add Group")) {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
@@ -593,7 +617,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction addSubgroupAction = new AbstractAction(Globals
+    final AbstractAction addSubgroupAction = new AbstractAction(Globals
             .lang("Add Subgroup")) {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
@@ -618,7 +642,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction removeGroupAndSubgroupsAction = new AbstractAction(Globals
+    final AbstractAction removeGroupAndSubgroupsAction = new AbstractAction(Globals
             .lang("Remove group and subgroups")) {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
@@ -643,7 +667,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction removeGroupKeepSubgroupsAction = new AbstractAction(Globals
+    final AbstractAction removeGroupKeepSubgroupsAction = new AbstractAction(Globals
             .lang("Remove group, keep subgroups")) {
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNode node = (GroupTreeNode) groupsTree
@@ -676,7 +700,74 @@ public class GroupSelector extends SidePaneComponent implements
         return groupsTree.getSelectionPath();
     }
     
-    AbstractAction moveNodeUpAction = new AbstractAction(Globals.lang("Up")) {
+//  JZTODO lyrics
+    public final AbstractAction showOverlappingGroupsAction = new AbstractAction(Globals.lang("Show overlapping groups")) {
+        public void actionPerformed(ActionEvent ae) {
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode selectedNode = (GroupTreeNode) path.getLastPathComponent();
+            GroupTreeNode node;
+            BibtexEntry entry;
+            Vector vec = new Vector();
+            final Collection entries = panel.getDatabase().getEntries();
+            for (Enumeration e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
+                node = (GroupTreeNode) e.nextElement();
+                for (Iterator it = entries.iterator(); it.hasNext(); ) {
+                    entry = (BibtexEntry) it.next(); 
+                    if (node.getGroup().contains(entry) && 
+                            selectedNode.getGroup().contains(entry)) {
+                        vec.add(node);
+                        break;
+                    }
+                }
+            }
+            TreeCellRenderer renderer = groupsTree.getCellRenderer();
+            if (!(renderer instanceof GroupTreeCellRenderer))
+                return; // paranoia
+            ((GroupTreeCellRenderer)renderer).setHighlight2Cells(vec.toArray());
+        }
+    };
+    
+//  JZTODO lyrics
+    public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
+        public void actionPerformed(ActionEvent ae) {
+            TreeCellRenderer renderer = groupsTree.getCellRenderer();
+            if (renderer instanceof GroupTreeCellRenderer) // paranoia
+                ((GroupTreeCellRenderer)renderer).setHighlight2Cells(null);
+        }
+    };
+    
+    final AbstractAction expandSubtreeAction = new AbstractAction(Globals.lang("Expand subtree")) {
+        public void actionPerformed(ActionEvent ae) {
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements(); ) {
+                groupsTree.expandPath(new TreePath(
+                        ((GroupTreeNode)e.nextElement()).getPath()));
+            }
+            revalidateGroups();
+        }
+    };
+    
+//  JZTODO lyrics
+    final AbstractAction collapseSubtreeAction = new AbstractAction(Globals.lang("Collapse subtree")) {
+        public void actionPerformed(ActionEvent ae) {
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements(); ) {
+                groupsTree.collapsePath(new TreePath(
+                        ((GroupTreeNode)e.nextElement()).getPath()));
+            }
+            revalidateGroups();
+        }
+    };
+    
+    final AbstractAction moveNodeUpAction = new AbstractAction(Globals.lang("Up")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -686,7 +777,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeDownAction = new AbstractAction(Globals.lang("Down")) {
+    final AbstractAction moveNodeDownAction = new AbstractAction(Globals.lang("Down")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -696,7 +787,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeLeftAction = new AbstractAction(Globals.lang("Left")) {
+    final AbstractAction moveNodeLeftAction = new AbstractAction(Globals.lang("Left")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -706,7 +797,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
     };
 
-    AbstractAction moveNodeRightAction = new AbstractAction(Globals.lang("Right")) {
+    final AbstractAction moveNodeRightAction = new AbstractAction(Globals.lang("Right")) {
         public void actionPerformed(ActionEvent e) {
             final TreePath path = getSelectionPath();
             if (path == null)
@@ -890,6 +981,40 @@ public class GroupSelector extends SidePaneComponent implements
      */
     public void reportError(String errorMessage, Exception exception) {
         reportError(errorMessage);
+    }
+    
+    public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
+        GroupTreeNode node;
+        AbstractGroup group;
+        Vector vec = new Vector();
+        for (Enumeration e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
+            node = (GroupTreeNode) e.nextElement();
+            group = node.getGroup();
+            for (int i = 0; i < entries.length; ++i) {
+                if (requireAll) {
+                    if (!group.contains(entries[i])) {
+                        System.out.println("NOT adding node: " + group.getName());
+                        break;
+                    }
+                } else {
+                    if (group.contains(entries[i])) {
+                        System.out.println("adding node: " + group.getName());
+                        vec.add(node);
+                    }
+                } 
+            }
+        }
+        TreeCellRenderer renderer = groupsTree.getCellRenderer();
+        if (!(renderer instanceof GroupTreeCellRenderer))
+            return; // paranoia
+        ((GroupTreeCellRenderer)renderer).setHighlight2Cells(vec.toArray());
+        // ensure that all highlighted nodes are visible
+        for (int i = 0; i < vec.size(); ++i) {
+            node = (GroupTreeNode)((GroupTreeNode)vec.elementAt(i)).getParent();
+            if (node != null)
+                groupsTree.expandPath(new TreePath(node.getPath()));
+        }
+        groupsTree.revalidate();
     }
 }
 
