@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
@@ -37,7 +39,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.BibtexEntry;
 
 public class GroupsTree extends JTree implements DragSourceListener,
-        DropTargetListener, DragGestureListener {
+        DropTargetListener, DragGestureListener, TreeExpansionListener {
     /** distance from component borders from which on autoscrolling starts. */
     private static final int dragScrollActivationMargin = 10;
     /** number of pixels to scroll each time handler is called. */
@@ -73,6 +75,31 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DropTarget dropTarget = new DropTarget(this, this);
         setCellRenderer(cellRenderer);
         setFocusable(false);
+        setToggleClickCount(0);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        setShowsRootHandles(false);
+        setVisibleRowCount(Globals.prefs.getInt("groupsVisibleRows"));
+        getSelectionModel().setSelectionMode(
+                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        addTreeExpansionListener(this);
+    }
+    
+    public void setModel(TreeModel newModel) {
+        super.setModel(newModel);
+        // set expansion state
+        Object root = newModel.getRoot();
+        if (root == null)
+            return;
+        GroupTreeNode cursor;
+        // might be a dummy (instanceof DefaultMutableTreeNode)
+        if (!(root instanceof GroupTreeNode))
+            return; 
+        for (Enumeration e = ((GroupTreeNode)root).preorderEnumeration(); 
+                e.hasMoreElements(); ) {
+            cursor = (GroupTreeNode)e.nextElement();
+            if (cursor.isExpanded)
+                expandPath(new TreePath(cursor.getPath()));
+        }
     }
 
     public void dragEnter(DragSourceDragEvent dsde) {
@@ -141,7 +168,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // this would be the place to check if the dragging entries
                 // maybe are in this group already, but I think that's not
                 // worth the bother (DropTargetDragEvent does not provide
-                // access to the drag object)... 
+                // access to the drag object)...
                 // it might even be irritating to the user.
                 if (target.getGroup().supportsAdd()) {
                     // accept: assignment from EntryTable
@@ -244,9 +271,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     if (!target.getGroup().contains(entries[i]))
                         ++assignedEntries;
                 }
-                
-                // warn if assignment has undesired side effects (modifies a field != keywords)
-                if (!Util.warnAssignmentSideEffects(group,groupSelector.frame))
+
+                // warn if assignment has undesired side effects (modifies a
+                // field != keywords)
+                if (!Util.warnAssignmentSideEffects(group, 
+                        selection.getSelection(), 
+                        groupSelector.getActiveBasePanel().getDatabase(),
+                        groupSelector.frame))
                     return; // user aborted operation
                 
                 AbstractUndoableEdit undo = group.add(selection.getSelection());
@@ -254,7 +285,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     ((UndoableChangeAssignment) undo).setEditedNode(target);
                 dtde.getDropTargetContext().dropComplete(true);
                 groupSelector.revalidateGroups();
-                groupSelector.concludeAssignment(undo,target,assignedEntries);
+                groupSelector.concludeAssignment(undo, target, assignedEntries);
             } else {
                 dtde.rejectDrop();
                 return;
@@ -304,5 +335,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
                             .getLastPathComponent()).getPath()));
         }
         return freshPaths.elements();
+    }
+
+    public void treeCollapsed(TreeExpansionEvent event) {
+        ((GroupTreeNode)event.getPath().getLastPathComponent()).isExpanded = false;
+    }
+
+    public void treeExpanded(TreeExpansionEvent event) {
+        ((GroupTreeNode)event.getPath().getLastPathComponent()).isExpanded = true;
     }
 }
