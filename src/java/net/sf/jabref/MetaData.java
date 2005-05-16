@@ -176,7 +176,7 @@ public class MetaData {
             sb = new StringBuffer();
             sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:\n");
             // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.toString(),"\n");
+            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(),"\n");
             while (tok.hasMoreTokens()) {
                 StringBuffer s = 
                     new StringBuffer(Util.quote(tok.nextToken(), ";", '\\') + ";");

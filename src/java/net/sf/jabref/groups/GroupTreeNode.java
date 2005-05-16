@@ -86,7 +86,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * representations of the group associated with each node. It thus allows a
      * complete reconstruction of this object and its children.
      */
-    public String toString() {
+    public String getTreeAsString() {
         StringBuffer sb = new StringBuffer();
         Enumeration e = preorderEnumeration();
         GroupTreeNode cursor;
