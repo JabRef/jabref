@@ -181,6 +181,28 @@ public class RightClickMenu extends JPopupMenu
             });
 
         addSeparator();
+        add(new AbstractAction(Globals.lang("Show groups matching any")) // JZTODO lyrics
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        panel.getGroupSelector().showMatchingGroups(
+                                panel.getSelectedEntries(), false);
+                    }
+                });
+        add(new AbstractAction(Globals.lang("Show groups matching all")) // JZTODO lyrics
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        panel.getGroupSelector().showMatchingGroups(
+                                panel.getSelectedEntries(), true);
+                    }
+                });
+        add(new AbstractAction(Globals.lang("Clear highlighted groups")) // JZTODO lyrics
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        panel.getGroupSelector().clearHighlightAction.
+                            actionPerformed(null);
+                    }
+                });
+        addSeparator();
 //        add(groupMenu);
 //        add(groupRemoveMenu);
     }
