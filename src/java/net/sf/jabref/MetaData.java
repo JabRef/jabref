@@ -146,18 +146,17 @@ public class MetaData {
      * method.
      */
     public void writeMetaData(Writer out) throws IOException {
+        // write all meta data except groups
         for (Iterator i = metaData.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
             StringBuffer sb = new StringBuffer();
             Vector orderedData = (Vector) metaData.get(key);
             if (orderedData.size() > 0) {
-                //out.write("@comment{" + GUIGlobals.META_FLAG + key + ":");
                 sb.append("@comment{" + GUIGlobals.META_FLAG + key + ":");
                 for (int j = 0; j < orderedData.size(); j++) {
-                    //out.write(Util.quote((String)orderedData.elementAt(j),";",'\\') + ";");
-                    sb.append(Util.quote((String)orderedData.elementAt(j),";",'\\') + ";");
+                    sb.append(Util.quote((String)orderedData.elementAt(j),";",'\\') 
+                            + ";");
                 }
-                //out.write("}\n\n");
                 sb.append("}\n\n");
             }
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
@@ -175,10 +174,16 @@ public class MetaData {
             
             // now write actual groups
             sb = new StringBuffer();
-            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
-            sb.append(Util.quote(groupsRoot.toString(),";",'\\'));
+            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:\n");
+            // GroupsTreeNode.toString() uses "\n" for separation
+            StringTokenizer tok = new StringTokenizer(groupsRoot.toString(),"\n");
+            while (tok.hasMoreTokens()) {
+                StringBuffer s = 
+                    new StringBuffer(Util.quote(tok.nextToken(), ";", '\\') + ";");
+                wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
+                sb.append(s + "\n");
+            }
             sb.append("}\n\n");
-            wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             out.write(sb.toString());
         }
     }
