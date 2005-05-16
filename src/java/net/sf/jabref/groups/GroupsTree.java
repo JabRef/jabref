@@ -152,7 +152,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         final TreePath path = getPathForLocation(cursor.x, cursor.y);
         final GroupTreeNode target = path == null ? null : (GroupTreeNode) path
                 .getLastPathComponent();
-        cellRenderer.setTargetCell(target);
+        cellRenderer.setHighlight1Cell(target);
         repaint();
 
         // accept or reject
@@ -219,7 +219,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void drop(DropTargetDropEvent dtde) {
-        cellRenderer.setTargetCell(null);
+        cellRenderer.setHighlight1Cell(null);
         repaint();
         try {
             // initializations common to all flavors
@@ -298,7 +298,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragExit(DropTargetEvent dte) {
-        cellRenderer.setTargetCell(null);
+        cellRenderer.setHighlight1Cell(null);
         repaint();
     }
 
