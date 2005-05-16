@@ -939,28 +939,41 @@ public class Util {
      *         the user has aborted the assignment).
      */
     public static boolean warnAssignmentSideEffects(AbstractGroup group,
-            Component parent) {
-        if (!(group instanceof KeywordGroup))
-            return true; // no side effects, or not possible anyway
-        KeywordGroup kg = (KeywordGroup) group;
-        String field = kg.getSearchField().toLowerCase();
-        if (field.equals("keywords")) 
-            return true; // this is not undesired
-        for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
-            if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
-                // show a warning, then return
-                String message = Globals // JZTODO lyrics...
-                        .lang(
-                                "This action will modify the \"%0\" field "
-                                        + "of your entries.\nThis could cause undesired changes to "
-                                        + "your entries, so it\nis recommended that you change the field "
-                                        + "in your group\ndefinition to \"keywords\" or a non-standard name."
-                                        + "\n\nDo you still want to continue?",
-                                field);
-                int choice = JOptionPane.showConfirmDialog(parent, message,
-                        Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-                return choice != JOptionPane.NO_OPTION;
+            BibtexEntry[] entries, BibtexDatabase db, Component parent) {
+        if (group instanceof KeywordGroup) {
+            KeywordGroup kg = (KeywordGroup) group;
+            String field = kg.getSearchField().toLowerCase();
+            if (field.equals("keywords")) 
+                return true; // this is not undesired
+            for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+                if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+                    // show a warning, then return
+                    String message = Globals // JZTODO lyrics...
+                            .lang(
+                                    "This action will modify the \"%0\" field "
+                                            + "of your entries.\nThis could cause undesired changes to "
+                                            + "your entries, so it\nis recommended that you change the field "
+                                            + "in your group\ndefinition to \"keywords\" or a non-standard name."
+                                            + "\n\nDo you still want to continue?",
+                                    field);
+                    int choice = JOptionPane.showConfirmDialog(parent, message,
+                            Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    return choice != JOptionPane.NO_OPTION;
+                }
+            }
+        } else if (group instanceof ExplicitGroup) {
+            ExplicitGroup eg = (ExplicitGroup)group;
+            boolean noKey = false;
+            boolean duplicateKey = false;
+            String s;
+            for (int i = 0; i < entries.length && !(noKey && duplicateKey); ++i) {
+                s = entries[i].getCiteKey();
+                if (s == null || s == "")
+                    noKey = true;
+                //else if (group)
+                    // JZPUWIL: check for dupes in database, but where to get
+                    // database from??
             }
         }
         return true; // found no side effects

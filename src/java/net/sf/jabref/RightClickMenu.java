@@ -315,7 +315,10 @@ public class RightClickMenu extends JPopupMenu
             }
             
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),panel.frame))
+            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),
+                    panel.getSelectedEntries(),
+                    panel.getDatabase(),
+                    panel.frame))
                 return; // user aborted operation
             
             AbstractUndoableEdit undo = m_node.addToGroup(panel.getSelectedEntries());
@@ -338,7 +341,10 @@ public class RightClickMenu extends JPopupMenu
         }
         public void actionPerformed(ActionEvent evt) {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),panel.frame))
+            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),
+                    panel.getSelectedEntries(),
+                    panel.getDatabase(),
+                    panel.frame))
                 return; // user aborted operation
             
             AbstractUndoableEdit undo = m_node.removeFromGroup(panel.getSelectedEntries());
