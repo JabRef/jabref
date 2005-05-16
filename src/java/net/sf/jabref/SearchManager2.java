@@ -61,7 +61,6 @@ class SearchManager2 extends SidePaneComponent
     private JRadioButton increment, highlight, reorder;
     private JCheckBoxMenuItem select;
     private ButtonGroup types = new ButtonGroup();
-    private SearchManager2 ths = this;
     private boolean incSearch = false;
 
     private int incSearchPos = -1; // To keep track of where we are in
@@ -255,7 +254,7 @@ settings.add(select);
 	searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
 	searchField.getActionMap().put("escape", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    ths.actionPerformed(new ActionEvent(escape, 0, ""));
+		    SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
 		}
 	    });
     setSearchButtonSizes();
@@ -398,11 +397,15 @@ settings.add(select);
 
     public void itemStateChanged(ItemEvent e) {
 	if (e.getSource() == increment) {
+        updateSearchButtonText();
 	    if (increment.isSelected())
-		searchField.addKeyListener(ths);
+		searchField.addKeyListener(this);
 	    else
-		searchField.removeKeyListener(ths);
+		searchField.removeKeyListener(this);
+    } else if (e.getSource() == highlight) {
+        updateSearchButtonText();
 	} else if (e.getSource() == reorder) {
+        updateSearchButtonText();
 	    // If this search type is disabled, remove reordering from
 	    // all databases.
 	    if (!reorder.isSelected()) {
@@ -494,7 +497,8 @@ settings.add(select);
 	/** Updates the text on the search button to reflect
       * the type of search that will happen on click. */
     private void updateSearchButtonText() {
-        search.setText(SearchExpressionParser.checkSyntax(
+        search.setText(!increment.isSelected() 
+                && SearchExpressionParser.checkSyntax(
                 searchField.getText(),
                 caseSensitive.isSelected(),
                 regExpSearch.isSelected()) != null 
