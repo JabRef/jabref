@@ -46,20 +46,20 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if (c instanceof JLabel) { // sanity check
-            JLabel label = (JLabel)c;
-            if (highlight2Cells != null) {
-                for (int i = 0; i < highlight2Cells.length; ++i) {
-                    if (highlight2Cells[i] == value) {
-                        label.setForeground(Color.RED);
-                        break;
-                    }
+        if (group == null || !(c instanceof JLabel))
+            return c; // sanity check
+        JLabel label = (JLabel)c;
+        if (highlight2Cells != null) {
+            for (int i = 0; i < highlight2Cells.length; ++i) {
+                if (highlight2Cells[i] == value) {
+                    label.setForeground(Color.RED);
+                    break;
                 }
             }
-            label.setText(group.getName());
-            label.setToolTipText(group.getName());
-            label.setIcon(null); // save some space
         }
+        label.setText(group.getName());
+        label.setToolTipText(group.getName());
+        label.setIcon(null); // save some space
         return c;
     }
     /** For use when dragging: The sepcified cell is always rendered as
