@@ -169,7 +169,7 @@ public class BibtexParser
 			 * well. At least for a while. We'll always save with the
 			 * new one.
 			 */
-			String comment = commentBuf.toString().replaceAll("\\n","");
+			String comment = commentBuf.toString().replaceAll("[\\x0d\\x0a]","");
                         
 			if (comment.substring(0, GUIGlobals.META_FLAG.length())
 			    .equals(GUIGlobals.META_FLAG) ||
@@ -190,8 +190,8 @@ public class BibtexParser
 			    if (pos > 0)
 				_meta.put
 				    (rest.substring(0, pos), rest.substring(pos+1));
-                                    // We remove all line breaks in the metadata - these will have been inserted
-                                    // to prevent too long lines when the file was saved, and are not part of the data.
+                    // We remove all line breaks in the metadata - these will have been inserted
+                    // to prevent too long lines when the file was saved, and are not part of the data.
 			}
 			
 			/**
