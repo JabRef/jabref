@@ -22,7 +22,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.groups;
 
-import java.awt.Component;
+import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -36,28 +36,41 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     /** The cell over which the user is currently dragging */
-    protected Object targetCell = null;
+    protected Object highlight1Cell = null;
+    protected Object[] highlight2Cells = null;
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
             boolean hasFocus) {
-        if (value == targetCell)
+        if (value == highlight1Cell)
             selected = true; // show as selected
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
         if (c instanceof JLabel) { // sanity check
-            ((JLabel) c).setText(group.getName());
-            ((JLabel) c).setToolTipText(group.getName());
-            ((JLabel) c).setIcon(null); // save some space
+            JLabel label = (JLabel)c;
+            if (highlight2Cells != null) {
+                for (int i = 0; i < highlight2Cells.length; ++i) {
+                    if (highlight2Cells[i] == value) {
+                        label.setForeground(Color.RED);
+                        break;
+                    }
+                }
+            }
+            label.setText(group.getName());
+            label.setToolTipText(group.getName());
+            label.setIcon(null); // save some space
         }
         return c;
     }
     /** For use when dragging: The sepcified cell is always rendered as
      * selected. 
-     * @param targetCell The cell over which the user is currently dragging.
+     * @param cell The cell over which the user is currently dragging.
      */ 
-    public void setTargetCell(Object targetCell) {
-        this.targetCell = targetCell;
+    public void setHighlight1Cell(Object cell) {
+        this.highlight1Cell = cell;
     }
     
+    public void setHighlight2Cells(Object[] cells) {
+        this.highlight2Cells = cells;
+    }
 }
