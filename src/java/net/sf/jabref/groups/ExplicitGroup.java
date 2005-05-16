@@ -56,6 +56,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         switch (version) {
         case 0:
         case 1:
+        case 2:
             ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), db);
             BibtexEntry[] entries;
             while (tok.hasMoreTokens()) {
@@ -148,10 +149,15 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         StringBuffer sb = new StringBuffer();
         sb.append(ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR);
         String s;
+        // write entries in well-defined order for CVS compatibility
+        Set sortedKeys = new TreeSet();
         for (Iterator it = m_entries.iterator(); it.hasNext();) {
             s = ((BibtexEntry) it.next()).getCiteKey();
-            if (s != null && !s.equals(""))
-                sb.append(Util.quote(s, SEPARATOR, QUOTE_CHAR) + SEPARATOR);
+            if (s != null && !s.equals("")) // entries without a key are lost
+                sortedKeys.add(s);
+        }
+        for (Iterator it = sortedKeys.iterator(); it.hasNext(); ) {
+            sb.append(Util.quote((String) it.next(), SEPARATOR, QUOTE_CHAR) + SEPARATOR);
         }
         return sb.toString();
     }
