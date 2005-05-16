@@ -1975,10 +1975,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         EntryEditor form;
-        int divLoc = -1, visPan = -1;
-        if (showing != null)
-            visPan = ((EntryEditor)splitPane.getBottomComponent()).
-                getVisiblePanel();
+        int divLoc = -1;
+        String visName = null;
+        if (showing != null) {
+            visName = ((EntryEditor)splitPane.getBottomComponent()).
+                getVisiblePanelName();
+        }
         if (showing != null)
             divLoc = splitPane.getDividerLocation();
 
@@ -1987,15 +1989,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             form = (EntryEditor)entryEditors.get
                 ((be.getType().getName()));
             form.switchTo(be);
-            if (visPan >= 0)
-              form.setVisiblePanel(visPan);
+            if (visName != null)
+                form.setVisiblePanel(visName);
             splitPane.setBottomComponent(form);
             highlightEntry(be);
         } else {
             // We must instantiate a new editor for this type.
             form = new EntryEditor(frame, BasePanel.this, be);
-            if (visPan >= 0)
-                form.setVisiblePanel(visPan);
+            if (visName != null)
+                form.setVisiblePanel(visName);
             splitPane.setBottomComponent(form);            
             
             highlightEntry(be);

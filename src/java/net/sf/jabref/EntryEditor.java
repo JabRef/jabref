@@ -171,7 +171,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     List fieldList = null;
     if (fields != null)
         fieldList = java.util.Arrays.asList(fields);
-    reqPan = new EntryEditorTab(fieldList, this, true);
+    reqPan = new EntryEditorTab(fieldList, this, true, Globals.lang("Required fields"));
     tabbed.addTab(Globals.lang("Required fields"),
           new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
           Globals.lang("Show required fields"));
@@ -179,7 +179,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	//}
 
 	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
-	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this, false);
+	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), 
+                this, false, Globals.lang("Optional fields"));
 	    tabbed.addTab(Globals.lang("Optional fields"),
 			  new ImageIcon(GUIGlobals.showOptIconFile), optPan.getPane(),
 			  Globals.lang("Show optional fields"));
@@ -188,7 +189,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	
 	EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
 	for (int i=0; i<tabList.getTabCount(); i++) {
-	    EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i), this, false);
+	    EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i), 
+                this, false, tabList.getTabName(i));
 	    tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
 	    tabs.add(newTab);
 	}
@@ -208,6 +210,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
 		      absPan.getPane(), Globals.lang("Show abstract"));
 		      tabs.add(absPan);*/
+    srcPanel.setName(Globals.lang("BibTeX source"));
 	tabbed.addTab(Globals.lang("BibTeX source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
 		      Globals.lang("Show/edit BibTeX source"));
@@ -510,9 +513,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	    ((EntryEditorTab)activeTab).activate();
 	else
         new FocusRequester(source);
-	    //((JComponent)activeTab).requestFocus();
+        //((JComponent)activeTab).requestFocus();
     }
-
+  
   /**
    * Reports the enabled status of the editor, as set by setEnabled()
    */
@@ -580,6 +583,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   public int getVisiblePanel() {
     return tabbed.getSelectedIndex();
   }
+  
+  /** Returns the name of the currently selected component. */
+  public String getVisiblePanelName() {
+      return tabbed.getSelectedComponent().getName();
+  }
 
   /**
    * Sets the panel with the given index visible.
@@ -588,14 +596,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    *          an <code>int</code> value
    */
   public void setVisiblePanel(int i) {
-    if (i < tabbed.getTabCount())
-      tabbed.setSelectedIndex(i);
-    else {
-      while (i >= tabbed.getTabCount())
-        i--;
-
-      tabbed.setSelectedIndex(i);
-    }
+      tabbed.setSelectedIndex(Math.min(i, tabbed.getTabCount() - 1));
+  }
+  
+  public void setVisiblePanel(String name) {
+      for (int i = 0; i < tabbed.getTabCount(); ++i) {
+          if (name.equals(tabbed.getComponent(i).getName())) {
+              tabbed.setSelectedIndex(i);
+              return;
+          }          
+      }
+      if (tabbed.getTabCount() > 0)
+          tabbed.setSelectedIndex(0);
   }
 
   /**
@@ -613,8 +625,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     panel.showing = be;
 
     activateVisible();
-  }
-
+        }
+    
   /**
    * Returns false if the contents of the source panel has not been validated,
    * true othervise.

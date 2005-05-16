@@ -46,13 +46,13 @@ public class EntryEditorTab {
     private JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     //    private BibtexEntry entry;
 
-    public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField) {
+    public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField, String name) {
         if (fields != null)
 	        this.fields = (String[])fields.toArray(ARRAY);
         else
             this.fields = new String[] {};
         this.parent = parent;
-	    setupPanel(addKeyField);
+	    setupPanel(addKeyField, name);
 
         // The following line makes sure focus cycles inside tab instead of being lost
         // to other parts of the frame:
@@ -60,7 +60,7 @@ public class EntryEditorTab {
     }
 
 
-    private final void setupPanel(boolean addKeyField) {
+    private final void setupPanel(boolean addKeyField, String title) {
 	GridBagLayout gbl = new GridBagLayout();
 	GridBagConstraints con = new GridBagConstraints();
 	panel.setLayout(gbl);
@@ -117,6 +117,7 @@ public class EntryEditorTab {
 		gbl.setConstraints(ex, con);
 		panel.add(ex);
 	    }
+        panel.setName(title);
 	}
 
 	// Add the edit field for Bibtex-key.
