@@ -45,6 +45,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     public static final DataFlavor flavor;
     public static final DataFlavor[] flavors;
     
+    public boolean isExpanded = false;
+    
     static {
         DataFlavor df = null;
         try {
@@ -86,14 +88,13 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (getChildCount() > 0)
-            sb.append("(");
-        sb.append(Util.quote(getGroup().toString(), "(),;", '\\'));
-        for (int i = 0; i < getChildCount(); ++i) {
-            sb.append("," + getChildAt(i).toString());
+        Enumeration e = preorderEnumeration();
+        GroupTreeNode cursor;
+        while (e.hasMoreElements()) {
+            cursor = (GroupTreeNode)e.nextElement();
+            sb.append(cursor.getLevel() + " " + (cursor.isExpanded ? "-" : "+") + " "
+                    + cursor.getGroup().toString() + "\n");
         }
-        if (getChildCount() > 0)
-            sb.append(")");
         return sb.toString();
     }
 

@@ -22,10 +22,10 @@
 
 package net.sf.jabref.groups;
 
+import java.io.*;
 import java.util.Vector;
 
 import net.sf.jabref.*;
-import net.sf.jabref.BibtexDatabase;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
@@ -34,7 +34,7 @@ import net.sf.jabref.BibtexDatabase;
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
-    public static final int CURRENT_VERSION = 1;
+    public static final int CURRENT_VERSION = 2;
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
@@ -64,6 +64,8 @@ public class VersionHandling {
         case 1:
             return Version0_1.fromString((String) orderedData.firstElement(),
                     db, version);
+        case 2:
+            return Version2.fromString(orderedData, db, version);
         default:
             throw new IllegalArgumentException(Globals.lang(
                     "Failed to read groups data (unsupported version: %0)",
@@ -167,6 +169,44 @@ public class VersionHandling {
             }
             return -1;
         }
-
+    }
+    
+    private static class Version2 {
+        private static GroupTreeNode fromString(Vector data, BibtexDatabase db,
+                int version) throws Exception {
+            GroupTreeNode cursor = null;
+            GroupTreeNode root = null;
+            GroupTreeNode newNode;
+            AbstractGroup group;
+            int spaceIndex;
+            int level;
+            boolean expanded;
+            String s;
+            for (int i = 0; i < data.size(); ++i) {
+                s = data.elementAt(i).toString();
+                spaceIndex = s.indexOf(' ');
+                if (spaceIndex <= 0)
+                    throw new Exception("bad format"); // JZTODO lyrics
+                level = Integer.parseInt(s.substring(0, spaceIndex));
+                expanded = s.charAt(spaceIndex+1) == '-';
+                spaceIndex += 2; // skip expansion state indicator and following space
+                group = AbstractGroup.fromString(s.substring(spaceIndex + 1),
+                        db, version);
+                newNode = new GroupTreeNode(group);
+                newNode.isExpanded = expanded;
+                if (cursor == null) {
+                    // create new root
+                    cursor = newNode;
+                    root = cursor;
+                } else {
+                    // insert at desired location
+                    while (level <= cursor.getLevel())
+                        cursor = (GroupTreeNode) cursor.getParent();
+                    cursor.add(newNode);
+                    cursor = newNode;
+                }
+            }
+            return root;
+        }
     }
 }
