@@ -82,6 +82,10 @@ public class SidePaneComponent extends SimpleInternalFrame {
     public void setActiveBasePanel(BasePanel panel) {
         this.panel = panel;
     }
+    
+    public BasePanel getActiveBasePanel() {
+        return panel;
+    }
 
     /**
      * Override this method if the component needs to make any changes
