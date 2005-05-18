@@ -722,19 +722,14 @@ public class GroupSelector extends SidePaneComponent implements
                     }
                 }
             }
-            TreeCellRenderer renderer = groupsTree.getCellRenderer();
-            if (!(renderer instanceof GroupTreeCellRenderer))
-                return; // paranoia
-            ((GroupTreeCellRenderer)renderer).setHighlight2Cells(vec.toArray());
+            groupsTree.setHighlight2Cells(vec.toArray());
         }
     };
     
 //  JZTODO lyrics
     public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
         public void actionPerformed(ActionEvent ae) {
-            TreeCellRenderer renderer = groupsTree.getCellRenderer();
-            if (renderer instanceof GroupTreeCellRenderer) // paranoia
-                ((GroupTreeCellRenderer)renderer).setHighlight2Cells(null);
+            groupsTree.setHighlight2Cells(null);
         }
     };
     
@@ -1003,10 +998,7 @@ public class GroupSelector extends SidePaneComponent implements
                 } 
             }
         }
-        TreeCellRenderer renderer = groupsTree.getCellRenderer();
-        if (!(renderer instanceof GroupTreeCellRenderer))
-            return; // paranoia
-        ((GroupTreeCellRenderer)renderer).setHighlight2Cells(vec.toArray());
+        groupsTree.setHighlight2Cells(vec.toArray());
         // ensure that all highlighted nodes are visible
         for (int i = 0; i < vec.size(); ++i) {
             node = (GroupTreeNode)((GroupTreeNode)vec.elementAt(i)).getParent();

@@ -62,15 +62,19 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         label.setIcon(null); // save some space
         return c;
     }
-    /** For use when dragging: The sepcified cell is always rendered as
+    /** 
+     * For use when dragging: The sepcified cell is always rendered as
      * selected. 
      * @param cell The cell over which the user is currently dragging.
      */ 
-    public void setHighlight1Cell(Object cell) {
+    void setHighlight1Cell(Object cell) {
         this.highlight1Cell = cell;
     }
-    
-    public void setHighlight2Cells(Object[] cells) {
+    /**
+     * Highlights the specified cells (in red), or disables highlight if cells ==
+     * null.
+     */ 
+    void setHighlight2Cells(Object[] cells) {
         this.highlight2Cells = cells;
     }
 }

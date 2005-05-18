@@ -152,8 +152,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         final TreePath path = getPathForLocation(cursor.x, cursor.y);
         final GroupTreeNode target = path == null ? null : (GroupTreeNode) path
                 .getLastPathComponent();
-        cellRenderer.setHighlight1Cell(target);
-        repaint();
+        setHighlight1Cell(target);
 
         // accept or reject
         if (dtde.isDataFlavorSupported(GroupTreeNode.flavor)) {
@@ -219,8 +218,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void drop(DropTargetDropEvent dtde) {
-        cellRenderer.setHighlight1Cell(null);
-        repaint();
+        setHighlight1Cell(null);
         try {
             // initializations common to all flavors
             final Transferable transferable = dtde.getTransferable();
@@ -298,8 +296,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void dragExit(DropTargetEvent dte) {
-        cellRenderer.setHighlight1Cell(null);
-        repaint();
+        setHighlight1Cell(null);
     }
 
     public void dragGestureRecognized(DragGestureEvent dge) {
@@ -343,5 +340,17 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     public void treeExpanded(TreeExpansionEvent event) {
         ((GroupTreeNode)event.getPath().getLastPathComponent()).isExpanded = true;
+    }
+    
+    /** Highlights the specified cell or disables highlight if cell == null */
+    public void setHighlight1Cell(Object cell) {
+        cellRenderer.setHighlight1Cell(cell);
+        repaint();
+    }
+    
+    /** Highlights the specified cells or disables highlight if cells == null */
+    public void setHighlight2Cells(Object[] cells) {
+        cellRenderer.setHighlight2Cells(cells);
+        repaint();
     }
 }
