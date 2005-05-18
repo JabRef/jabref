@@ -30,6 +30,7 @@ public class AttachFileDialog extends JDialog {
     JPanel main;
     JButton browse = new JButton(Globals.lang("Browse")),
         download = new JButton(Globals.lang("Download")),
+        auto = new JButton(Globals.lang("Auto")),
         ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
     BibtexEntry entry;
@@ -67,6 +68,12 @@ public class AttachFileDialog extends JDialog {
             }
         });
 
+        auto.addActionListener(new ActionListener () {
+                    public void actionPerformed(ActionEvent event) {
+                        extPan.autoSetFile(fieldName, editor);
+                    }
+                });
+
 
         ok.addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent event) {
@@ -90,6 +97,8 @@ public class AttachFileDialog extends JDialog {
         builder.append(browse);
         builder.nextLine();
         builder.append(download);
+        builder.nextLine();
+        builder.append(auto);
         main = builder.getPanel();
 
         main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));

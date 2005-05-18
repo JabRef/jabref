@@ -56,105 +56,13 @@ public class ExternalFilePanel extends JPanel {
         });
         download.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String res =
-                        JOptionPane.showInputDialog((Component) editor,
-                                Globals.lang("Enter URL to download"));
-
-                if (res != null) {
-                    class Downloader extends Thread {
-                        String res;
-
-                        public Downloader(String res) {
-                            this.res = res;
-                        }
-
-                        public void run() {
-                            URL url;
-                            try {
-                                url = new URL(res);
-
-                                String plannedName = null;
-                                if (getKey() != null)
-                                    plannedName = getKey() + "."+fieldName;
-                                else {
-                                    plannedName = JOptionPane.showInputDialog((Component) editor,
-                                            Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
-                                    if (plannedName == null)
-                                        return;
-                                    if (!plannedName.substring(4).equals("."+fieldName))
-                                        plannedName += "."+fieldName;
-                                }
-                                File file = new File(new File(Globals.prefs.get(fieldName+"Directory")), plannedName);
-
-                                URLDownload udl = new URLDownload((Component) editor, url, file);
-                                output(Globals.lang("Downloading..."));
-
-                                try {
-                                    udl.download();
-                                } catch (IOException e2) {
-                                    JOptionPane.showMessageDialog((Component) editor, Globals.lang("Invalid URL"),
-                                            Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                                    Globals.logger("Error while downloading " + url.toString());
-                                }
-
-                                output(Globals.lang("Download completed"));
-                                String filename = file.getPath();
-                                System.out.println(filename);
-                                String directory = Globals.prefs.get(fieldName+"Directory");
-                                if (filename.startsWith(directory)) {
-                                    // Construct path relative to pdf base dir
-                                    String relPath = filename.substring(directory.length(), filename.length());
-
-                                    // Remove leading path separator
-                                    if (relPath.startsWith(File.separator)) {
-                                        relPath = relPath.substring(File.separator.length(), relPath.length());
-                                    }
-                                    filename = relPath;
-                                }
-
-                                //ed.setText(file.toURL().toString());
-                                editor.setText(filename);
-                                SwingUtilities.invokeLater(new Thread() {
-                                    public void run() {
-                                        entryEditor.updateField(editor);
-                                    }
-                                });
-                            } catch (MalformedURLException e1) {
-                                JOptionPane.showMessageDialog((Component) editor, "Invalid URL",
-                                        "Download file", JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    }
-                    ;
-
-                    (new Downloader(res)).start();
-
-                }
+                downLoadFile(fieldName, editor, frame);
             }
         });
 
         auto.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Object o = getKey();
-                if ((o == null) || (Globals.prefs.get(fieldName+"Directory") == null)) {
-                    output(Globals.lang("You must set both bibtex key and %0 directory", fieldName.toUpperCase()) + ".");
-                    return;
-                }
-                output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o +
-                        "."+fieldName+"'...");
-                (new Thread() {
-                    public void run() {
-                        Object o = getKey();
-                        String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"));
-                        if (found != null) {
-                            editor.setText(found);
-                            entryEditor.updateField(editor);
-                            output(Globals.lang("%0 field set", fieldName.toUpperCase()) + ".");
-                        } else {
-                            output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");
-                        }
-                    }
-                }).start();
+                autoSetFile(fieldName, editor);
             }
         });
 
@@ -299,5 +207,28 @@ public class ExternalFilePanel extends JPanel {
         }
     }
 
+    public void autoSetFile(final String fieldName, final FieldEditor editor) {
+        Object o = getKey();
+        if ((o == null) || (Globals.prefs.get(fieldName+"Directory") == null)) {
+            output(Globals.lang("You must set both bibtex key and %0 directory", fieldName.toUpperCase()) + ".");
+            return;
+        }
+        output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o +
+                "."+fieldName+"'...");
+        (new Thread() {
+            public void run() {
+                Object o = getKey();
+                String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"));
+                if (found != null) {
+                    editor.setText(found);
+                    entryEditor.updateField(editor);
+                    output(Globals.lang("%0 field set", fieldName.toUpperCase()) + ".");
+                } else {
+                    output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");
+                }
+            }
+        }).start();
+
+    }
 
 }
