@@ -105,7 +105,7 @@ public class EndnoteImporter implements ImportFormat {
 		}else if (prefix.equals("Y")){
 		    if (Editor.equals("")) Editor = val;
 		    else Editor += " and " + val;
-		}else if (prefix.equals("T")) hm.put("title", Globals
+		}else if (prefix.equals("T")) hm.put("title", Util
 						     .putBracesAroundCapitals(val));
 		else if (prefix.equals("0")){
 		    if (val.indexOf("Journal") == 0) Type = "article";

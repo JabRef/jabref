@@ -267,6 +267,7 @@ public class EntryTable extends JTable {
             // Maybe try to remap the entry table:
             tableModel.remap();
             clearSelection();
+            selectionListenerOn = oldState;
         }
       }
 
@@ -274,9 +275,18 @@ public class EntryTable extends JTable {
           boolean oldState = selectionListenerOn;
           selectionListenerOn = false;
           //if (row2 < getModel().getRowCount()) {
-          super.addRowSelectionInterval(row1, row2);
-          selectionListenerOn = oldState;
-          //}
+          try {
+            super.addRowSelectionInterval(row1, row2);
+            selectionListenerOn = oldState;
+          } catch (IllegalArgumentException ex) {
+              ex.printStackTrace();
+              System.out.println("Error occured. Trying to recover...");
+            // Maybe try to remap the entry table:
+            tableModel.remap();
+            clearSelection();
+              selectionListenerOn = oldState;
+          }
+
       }
 
     /*public boolean surrendersFocusOnKeystroke() {

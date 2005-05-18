@@ -32,6 +32,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
@@ -977,5 +979,25 @@ public class Util {
             }
         }
         return true; // found no side effects
+    }
+
+    //========================================================
+    // lot of abreviations in medline
+    // PKC etc convert to {PKC} ...
+    //========================================================
+    static Pattern titleCapitalPattern = Pattern.compile("[A-Z]+");
+
+    public static String putBracesAroundCapitals(String title) {
+      StringBuffer buf = new StringBuffer();
+
+      Matcher mcr = titleCapitalPattern.matcher(title.substring(1));
+      boolean found = false;
+      while ( (found = mcr.find())) {
+        String replaceStr = mcr.group();
+        mcr.appendReplacement(buf, "{" + replaceStr + "}");
+      }
+      mcr.appendTail(buf);
+      String titleCap = title.substring(0, 1) + buf.toString();
+      return titleCap;
     }
 }

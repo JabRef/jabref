@@ -942,10 +942,14 @@ public class GroupSelector extends SidePaneComponent implements
         MetaData metaData = panel.metaData();
         if (metaData.getGroups() != null) {
             setGroups(metaData.getGroups());
+            /* Morten Alver (2005-05-12): commenting out the following, to avoid group interface
+              popping up when changing tabs. I'm not sure if this was put in by someone,
+              or if it is just a remainder of <=1.7.1 code. If the former, we can discuss it :)
+
             if (!groupsRoot.isLeaf()) { // groups were defined
                 frame.sidePaneManager.ensureVisible("groups");
                 frame.groupToggle.setSelected(true);
-            }
+            }  */
         }
         else {
             GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());

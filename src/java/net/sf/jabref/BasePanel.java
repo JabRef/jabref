@@ -471,8 +471,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           // Reselect the entry in the first prev. selected position:
                           if (row0 >= entryTable.getRowCount())
                               row0 = entryTable.getRowCount()-1;
-                          if (row0 >= 0)
-                            entryTable.addRowSelectionInterval(row0, row0);
+                          if (row0 >= 0) {
+                             final int toSel = row0;
+                            //
+                              SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    entryTable.addRowSelectionInterval(toSel, toSel);
+                                    //entryTable.ensureVisible(toSel);
+                                }
+                              });
+
+                          }
 
                       }
                   }

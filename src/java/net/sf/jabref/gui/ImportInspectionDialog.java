@@ -16,6 +16,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 import java.util.*;
 import java.util.List;
 import java.awt.*;
@@ -36,10 +37,11 @@ import com.jgoodies.uif_lite.component.UIFSplitPane;
  * To change this template use File | Settings | File Templates.
  */
 public class ImportInspectionDialog extends JDialog {
+    private ImportInspectionDialog ths = this;
     private BasePanel panel;
     private JabRefFrame frame;
     private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
-    private DefaultTableModel tableModel = new MyTableModel();
+    private MyTableModel tableModel = new MyTableModel();
     private JTable table = new MyTable(tableModel);
     private String[] fields;
     private JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
@@ -113,6 +115,10 @@ public class ImportInspectionDialog extends JDialog {
             insertNodes(groupsAdd, node, true);
             popup.add(groupsAdd);
         }
+
+        // Add "Attach file" menu choices to right click menu:
+        popup.add(new AttachFile("pdf"));
+
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
 
@@ -476,12 +482,15 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     class MyTableModel extends DefaultTableModel {
+
+
         public Class getColumnClass(int i) {
             if (i==0)
                 return Boolean.class;
             else
                 return String.class;
         }
+
     }
 
     class SelectionButton implements ActionListener {
@@ -535,6 +544,30 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
+    class AttachFile extends JMenuItem implements ActionListener {
+        String fileType;
+        public AttachFile(String fileType) {
+            super(Globals.lang("Attach %0", new String[] {fileType.toUpperCase()}));
+            this.fileType = fileType;
+            addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent event) {
+            int[] rows = table.getSelectedRows();
+            if (rows.length != 1)
+                return;
+            BibtexEntry entry = (BibtexEntry)entries.get(rows[0]);
+            // Call up a dialog box that provides Browse, Download and auto buttons:
+            AttachFileDialog diag = new AttachFileDialog(ths, entry, fileType);
+            Util.placeDialog(diag, ths);
+            diag.setVisible(true);
+            // After the dialog has closed, if it wasn't cancelled, set the field:
+            if (!diag.cancelled()) {
+                entry.setField(fileType, diag.getValue());
+            }
+
+        }
+    }
 
     public static interface CallBack {
         // This method is called by the dialog when the user has selected the

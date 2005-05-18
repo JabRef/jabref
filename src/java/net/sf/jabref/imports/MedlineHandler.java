@@ -141,7 +141,7 @@ public class MedlineHandler extends DefaultHandler
 			}
 			//################################## 09/23/03  put {} around capitals
 
-			title=Globals.putBracesAroundCapitals(title);
+			title=Util.putBracesAroundCapitals(title);
 			//##############################
 			// Sort keywords and remove duplicates. Add pubmedid as keyword (user request)
                         keyword=Util.sortWordsAndRemoveDuplicates(descriptorName)+", "+pubmedid;
