@@ -91,6 +91,8 @@ Change log:
           processes such as Medline search.
         - Restructured layout to use a common side pane with all tabs.
         - Added PS directory with similar options as PDF.
+	- Added [authshort] and [edtrshort] key field markers. Patch submitted by
+	  Kolja Brix.
         - Made the program remember preview enable setting.
         - Improved handling of illegal regular expressions in search.
         - Removed options to search only Required, Optional and/or General fields,

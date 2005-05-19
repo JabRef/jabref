@@ -172,6 +172,9 @@ public class LabelPatternUtil {
 				  else if (val.equals("auth.auth.ea")) {
                     _sbvalue.append(authAuthEa(_entry.getField("author").toString()));
                   }
+                  else if (val.equals("authshort")) {
+                    _sbvalue.append(authshort(_entry.getField("author").toString()));
+                  }
                   else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
                     _sbvalue.append(authN_M(_entry.getField("author").toString(),
@@ -214,6 +217,9 @@ public class LabelPatternUtil {
                   }
                   else if (val.equals("edtr.edtr.ea")) {
                     _sbvalue.append(authAuthEa(_entry.getField("editor").toString()));
+                  }
+                  else if (val.equals("edtrshort")) {
+                    _sbvalue.append(authshort(_entry.getField("editor").toString()));
                   }
                   // authN.  First N chars of the first author's last name.
                   else if (val.matches("edtr\\d+")) {
@@ -554,6 +560,45 @@ public class LabelPatternUtil {
       return lastName.substring(0, n);
   }
 
+  /**
+   * authshort format:
+   * added by Kolja Brix, kbx@users.sourceforge.net
+   *
+   * given author names
+   *   Isaac Newton and James Maxwell and Albert Einstein and N. Bohr
+   *   Isaac Newton and James Maxwell and Albert Einstein 
+   *   Isaac Newton and James Maxwell 
+   *   Isaac Newton 
+   * yield
+   *   NME+
+   *   NME
+   *   NM
+   *   Newton
+   */
+  private static String authshort(String authorField) {
+    authorField = ImportFormatReader.fixAuthor_lastnameFirst(authorField);
+    StringBuffer author = new StringBuffer();
+    String[] tokens = authorField.split("\\band\\b");
+    int i = 0;
+
+    if (tokens.length == 1) {
+
+      author.append(authN_M(authorField,authorField.length(),0));
+
+    } else if (tokens.length >= 2) {
+    
+      while (tokens.length > i && i<3) {
+        author.append(authN_M(authorField,1,i));
+        i++;
+      }
+      
+      if (tokens.length > 3) 
+        author.append("+");
+      
+    }
+
+    return author.toString();
+  }
 
   /**
    * authIniN format:
