@@ -289,6 +289,7 @@ public class JabRefFrame
       exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
+        autoSetPdf = new GeneralAction("autoSetPdf", "Autoset PDF field for selected entries"),
       test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -995,6 +996,9 @@ public JabRefPreferences prefs() {
     tools.addSeparator();
     tools.add(newSubDatabaseAction);
     tools.add(integrityCheckAction) ;
+
+      tools.addSeparator();
+      tools.add(autoSetPdf);
 
     mb.add(tools);
 

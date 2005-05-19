@@ -76,6 +76,14 @@ public class ExternalFilePanel extends JPanel {
                     DnDConstants.ACTION_NONE, new UrlDragDrop(entryEditor, frame, editor)));
     }
 
+    /**
+     * Change which entry this panel is operating on. This is used only when this panel
+     * is not attached to an entry editor.
+     */
+    public void setEntry(BibtexEntry entry) {
+        this.entry = entry;
+    }
+
     protected Object getKey() {
         return (entry != null ? entry.getField(Globals.KEY_FIELD) :
             entryEditor.entry.getField(Globals.KEY_FIELD));
@@ -207,27 +215,41 @@ public class ExternalFilePanel extends JPanel {
         }
     }
 
-    public void autoSetFile(final String fieldName, final FieldEditor editor) {
+    /**
+     * Starts a thread that searches the external file directory for the given field name,
+     * including subdirectories, and looks for files named after the current entry's bibtex
+     * key. Returns a reference to the thread for callers that may want to wait for the thread
+     * to finish (using join()).
+     *
+     * @param fieldName The field to set.
+     * @param editor An EntryEditor instance where to set the value found.
+     * @return A reference to the Thread that performs the operation.
+     */
+    public Thread autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
         if ((o == null) || (Globals.prefs.get(fieldName+"Directory") == null)) {
-            output(Globals.lang("You must set both bibtex key and %0 directory", fieldName.toUpperCase()) + ".");
-            return;
+            output(Globals.lang("You must set both BibTeX key and %0 directory", fieldName.toUpperCase()) + ".");
+            return null;
         }
         output(Globals.lang("Searching for %0 file", fieldName.toUpperCase()) + " '" + o +
                 "."+fieldName+"'...");
-        (new Thread() {
+        Thread t = (new Thread() {
             public void run() {
                 Object o = getKey();
                 String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"));
                 if (found != null) {
                     editor.setText(found);
-                    entryEditor.updateField(editor);
+                    if (entryEditor != null)
+                        entryEditor.updateField(editor);
                     output(Globals.lang("%0 field set", fieldName.toUpperCase()) + ".");
                 } else {
                     output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");
                 }
             }
-        }).start();
+        });
+
+        t.start();
+        return t;
 
     }
 

@@ -41,6 +41,7 @@ import javax.swing.undo.*;
 import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.PushToLyx;
+import net.sf.jabref.external.AutoSetExternalFileForEntries;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -1448,6 +1449,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
 		  });
 
+
+        actions.put("autoSetPdf", new AutoSetExternalFileForEntries(this, "pdf"));
+
     }
 
     /**
@@ -2085,13 +2089,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                  entryTable.revalidate();
                  entryTable.clearSelection();
                  loop: for (int i=0; i<bes.length; i++) {
-		     if (bes[i] == null)
-			 continue loop;
-		     int row = tableModel.getNumberFromName(bes[i].getId());                    
-		     if (i==toScrollTo)
-			 rowToScrollTo = row;
-             //System.out.println("Adding: "+row+"\t'"+bes[i].getId()+"'");
-		     entryTable.addRowSelectionIntervalQuietly(row, row);
+		            if (bes[i] == null)
+			            continue loop;
+		            int row = tableModel.getNumberFromName(bes[i].getId());
+		            if (i==toScrollTo)
+			        rowToScrollTo = row;
+                    if (row >= 0)
+		                entryTable.addRowSelectionIntervalQuietly(row, row);
                  }
                  entryTable.ensureVisible(rowToScrollTo);
                  Component comp = splitPane.getBottomComponent();
