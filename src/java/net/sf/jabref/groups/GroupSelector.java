@@ -992,7 +992,8 @@ public class GroupSelector extends SidePaneComponent implements
         for (Enumeration e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
             node = (GroupTreeNode) e.nextElement();
             group = node.getGroup();
-            for (int i = 0; i < entries.length; ++i) {
+            int i;
+            for (i = 0; i < entries.length; ++i) {
                 if (requireAll) {
                     if (!group.contains(entries[i]))
                         break;
@@ -1001,6 +1002,8 @@ public class GroupSelector extends SidePaneComponent implements
                         vec.add(node);
                 } 
             }
+            if (requireAll && i >= entries.length) // did not break from loop
+                vec.add(node);
         }
         groupsTree.setHighlight2Cells(vec.toArray());
         // ensure that all highlighted nodes are visible
