@@ -96,7 +96,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 }
                 Iterator i = hs.iterator();
                 while (i.hasNext()) {
-                    String keyword = i.next().toString().toLowerCase();
+                    String keyword = i.next().toString();
                     KeywordGroup group = new KeywordGroup(keyword, field(),
                             keyword, false, false);
                     autoGroupsRoot.add(new GroupTreeNode(group));
