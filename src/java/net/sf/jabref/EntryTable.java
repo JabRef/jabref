@@ -147,7 +147,8 @@ public class EntryTable extends JTable {
               else prefs.putBoolean("priDescending",
                                     !prefs.getBoolean("priDescending"));
               tableModel.remap();
-              repaint();
+              panel.refreshTable();
+              //repaint();
             }
           }
         });

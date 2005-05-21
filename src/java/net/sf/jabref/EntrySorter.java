@@ -52,6 +52,9 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public void index() {
 
+        if (changing)
+            return;
+            //System.out.println("...changing..."+Thread.currentThread().toString());
         while (changing) {
             // The boolean "changing" is true in the situation that an entry is about to change,
             // and has temporarily been removed from the entry set in this sorter. So, if we index
@@ -59,9 +62,11 @@ public class EntrySorter implements DatabaseChangeListener {
             // the indexed array. So we have no other choice than to wait for the entry to be readded.
             // The Thread.sleep() may not be a very good choice, but it should be safe.
 
-            System.out.println("...changing...");
+
+
             try {
                 Thread.sleep(10);
+
             } catch (InterruptedException e) {
                 // Nothing.
             }
@@ -123,7 +128,7 @@ public class EntrySorter implements DatabaseChangeListener {
 	        }
 	        else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
 	            set.remove(e.getEntry());
-                //System.out.println("CHANGING: "+e.getEntry().getCiteKey());
+                //System.out.println("CHANGING: "+Thread.currentThread().toString());
                 //Thread.dumpStack();
                 changing = true;
 	        }

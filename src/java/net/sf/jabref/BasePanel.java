@@ -1831,7 +1831,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void refreshTable() {
-
+        //System.out.println("hiding="+hidingNonHits+"\tlastHits="+lastSearchHits);
         // This method is called by EntryTypeForm when a field value is
         // stored. The table is scheduled for repaint.
         entryTable.assureNotEditing();

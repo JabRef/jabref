@@ -24,7 +24,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextField secField, terField, fontSize;
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
-    //menuFontButton = new JButton(Globals.lang("Set application font"));
+    
     private boolean tableChanged = false;
     private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
