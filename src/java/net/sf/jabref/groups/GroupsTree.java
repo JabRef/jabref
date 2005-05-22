@@ -35,6 +35,8 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import junit.runner.ReloadingTestSuiteLoader;
+
 import net.sf.jabref.*;
 import net.sf.jabref.BibtexEntry;
 
@@ -339,6 +341,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     public void treeExpanded(TreeExpansionEvent event) {
+        // JZTODO remove this...
         ((GroupTreeNode)event.getPath().getLastPathComponent()).isExpanded = true;
     }
     
@@ -352,5 +355,32 @@ public class GroupsTree extends JTree implements DragSourceListener,
     public void setHighlight2Cells(Object[] cells) {
         cellRenderer.setHighlight2Cells(cells);
         repaint();
+    }
+    
+    /** Sort immediate children of the specified node alphabetically. */
+    public void sort(GroupTreeNode node, boolean recursive) {
+        GroupTreeNode child1, child2;
+        int j = node.getChildCount() - 1; 
+        int lastModified;
+        while (j > 0) {
+            lastModified = j + 1;
+            j = -1;
+            for (int i = 1; i < lastModified; ++i) {
+                child1 = (GroupTreeNode)node.getChildAt(i-1);
+                child2 = (GroupTreeNode)node.getChildAt(i);
+                if (child2.getGroup().getName().compareToIgnoreCase(
+                        child1.getGroup().getName()) < 0) {
+                    node.remove(child1);
+                    node.insert(child1, i);
+                    j = i;
+                }
+            }
+        }
+        if (recursive) {
+            for (int i = 0; i < node.getChildCount(); ++i) {
+                sort((GroupTreeNode) node.getChildAt(i), true);
+            }
+        }
+        groupSelector.revalidateGroups();
     }
 }

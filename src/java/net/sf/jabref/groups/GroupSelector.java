@@ -372,8 +372,12 @@ public class GroupSelector extends SidePaneComponent implements
         groupsContextMenu.add(moveSubmenu);
         groupsContextMenu.add(expandSubtreeAction);
         groupsContextMenu.add(collapseSubtreeAction);
-        groupsContextMenu.add(showOverlappingGroupsAction);
-        groupsContextMenu.add(clearHighlightAction);
+        overlappingGroupsSubmenu.add(showOverlappingGroupsAction);
+        overlappingGroupsSubmenu.add(clearHighlightAction);
+        groupsContextMenu.add(overlappingGroupsSubmenu);
+        sortSubmenu.add(sortDirectSubgroups);
+        sortSubmenu.add(sortAllSubgroups);
+        groupsContextMenu.add(sortSubmenu);
         moveSubmenu.add(moveNodeUpAction);
         moveSubmenu.add(moveNodeDownAction);
         moveSubmenu.add(moveNodeLeftAction);
@@ -727,6 +731,34 @@ public class GroupSelector extends SidePaneComponent implements
     };
     
 //  JZTODO lyrics
+    public final AbstractAction sortDirectSubgroups = new AbstractAction(
+            Globals.lang("This group's immediate subgroups")) {
+        public void actionPerformed(ActionEvent ae) {
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            groupsTree.sort(node, false);
+            panel.markBaseChanged();
+            // JZTODO undo
+        }
+    };
+    
+//  JZTODO lyrics
+    public final AbstractAction sortAllSubgroups = new AbstractAction(
+            Globals.lang("All subgroups (recursively)")) {
+        public void actionPerformed(ActionEvent ae) {
+            final TreePath path = getSelectionPath();
+            if (path == null)
+                return;
+            final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            groupsTree.sort(node, true);
+            panel.markBaseChanged();
+            // JZTODO undo
+        }
+    };
+    
+//  JZTODO lyrics
     public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
         public void actionPerformed(ActionEvent ae) {
             groupsTree.setHighlight2Cells(null);
@@ -922,6 +954,8 @@ public class GroupSelector extends SidePaneComponent implements
     }
     
     JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
+    JMenu overlappingGroupsSubmenu = new JMenu("Overlapping groups"); // JZTODO lyrics
+    JMenu sortSubmenu = new JMenu("Sort alphabetically"); // JZTODO lyrics
 
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
