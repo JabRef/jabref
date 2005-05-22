@@ -52,27 +52,13 @@ public class EntrySorter implements DatabaseChangeListener {
 
     public void index() {
 
+        // The boolean "changing" is true in the situation that an entry is about to change,
+        // and has temporarily been removed from the entry set in this sorter. So, if we index
+        // now, we will cause exceptions other places because one entry has been left out of
+        // the indexed array. Simply waiting foth this to change can lead to deadlocks,
+        // so we have no other choice than to return without indexing.
         if (changing)
             return;
-            //System.out.println("...changing..."+Thread.currentThread().toString());
-        while (changing) {
-            // The boolean "changing" is true in the situation that an entry is about to change,
-            // and has temporarily been removed from the entry set in this sorter. So, if we index
-            // now, we will cause exceptions other places because one entry has been left out of
-            // the indexed array. So we have no other choice than to wait for the entry to be readded.
-            // The Thread.sleep() may not be a very good choice, but it should be safe.
-
-
-
-            try {
-                Thread.sleep(10);
-
-            } catch (InterruptedException e) {
-                // Nothing.
-            }
-            //Thread.dumpStack();
-            //System.exit(0);
-        }
 
         synchronized(set) {
             // Create an array of IDs for quick access, since getIdAt() is called by

@@ -1,9 +1,6 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.FieldTextField;
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFilePanel;
 
 import javax.swing.*;
@@ -35,6 +32,15 @@ public class AttachFileDialog extends JDialog {
         cancel = new JButton(Globals.lang("Cancel"));
     BibtexEntry entry;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
+
+    public AttachFileDialog(Frame parent, BibtexEntry entry, String fieldName) {
+        super(parent, true);
+        this.entry = entry;
+        this.fieldName = fieldName;
+        this.editor = new FieldTextField(fieldName, (String)entry.getField(fieldName), false);
+
+        initGui();
+    }
 
     public AttachFileDialog(Dialog parent, BibtexEntry entry, String fieldName) {
         super(parent, true);
@@ -89,16 +95,16 @@ public class AttachFileDialog extends JDialog {
             }
         });
 
-        FormLayout layout = new FormLayout("left:pref, 4dlu, fill:160dlu","");
+        FormLayout layout = new FormLayout("fill:pref, 4dlu, fill:160dlu","");
 	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.append(fieldName);//(editor.getLabel());
-        builder.append(editor.getTextComponent());
-        builder.nextLine();
         builder.append(browse);
         builder.nextLine();
         builder.append(download);
         builder.nextLine();
         builder.append(auto);
+        builder.nextLine();
+        builder.append(Util.nCase(fieldName));//(editor.getLabel());
+        builder.append(editor.getTextComponent());
         main = builder.getPanel();
 
         main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
