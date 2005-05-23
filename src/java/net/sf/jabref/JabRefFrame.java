@@ -289,7 +289,7 @@ public class JabRefFrame
       exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
-        autoSetPdf = new GeneralAction("autoSetPdf", "Autoset PDF field for selected entries"),
+        autoSetPdf = new GeneralAction("autoSetPdf", "Synchronize PDF links"),
       test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",

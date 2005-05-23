@@ -7,6 +7,13 @@ import net.sf.jabref.undo.UndoableFieldChange;
 
 import javax.swing.*;
 import java.io.File;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -18,12 +25,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     private String fieldName;
     private BasePanel panel;
     private BibtexEntry[] sel = null;
+    private OptionsDialog optDiag = null;
 
     Object[] brokenLinkOptions =
         { Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
-            Globals.lang("Cancel")};
+            Globals.lang("Quit synchronization")};
 
-    private boolean goOn = true, overWriteAllowed = true, checkExisting = true;
+    private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
 
     private int skipped=0, entriesChanged=0, brokenLinks=0;
 
@@ -34,17 +42,28 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     public void init() {
 
-        // Get selected entries, and make sure there are selected entries:
-        sel = panel.getSelectedEntries();
+        // Get all entries, and make sure there are selected entries:
+        panel.database().getEntries();
+        sel = (BibtexEntry[])panel.database().getEntries().toArray(new BibtexEntry[0]);
         if (sel.length < 1) {
             goOn = false;
             return;
         }
 
         // Ask about rules for the operation:
+        if (optDiag == null)
+            optDiag = new OptionsDialog(panel.frame(), fieldName);
+        Util.placeDialog(optDiag, panel.frame());
+        optDiag.setVisible(true);
+        if (optDiag.canceled()) {
+            goOn = false;
+            return;
+        }
+        autoSet = !optDiag.autoSetNone.isSelected();
+        overWriteAllowed = optDiag.autoSetAll.isSelected();
+        checkExisting = optDiag.checkLinks.isSelected();
 
-
-        panel.output(Globals.lang("Autosetting %0 field...", fieldName));
+        panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
     }
 
     public void run() {
@@ -58,21 +77,53 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
         ExternalFilePanel extPan = new ExternalFilePanel(fieldName, null);
         FieldTextField editor = new FieldTextField(fieldName, "", false);
-        mainLoop: for (int i=0; i<sel.length; i++) {
-            //System.out.println("Checking: "+sel[i].getField("author"));
-            final Object old = sel[i].getField(fieldName);
-            // Check if a key is already entriesChanged:
-            if ((old != null) && !((String)old).equals("")) {
-                // Should we check if the file exists?
-                if (checkExisting) {
-                    File file = new File((String)old);
-                    if (!file.exists()) {
-                        System.out.println("Broken link: "+file.getPath());
+        String dir = Globals.prefs.get(fieldName+"Directory");
+
+        // First we try to autoset fields
+        if (autoSet) {
+            for (int i=0; i<sel.length; i++) {
+                final Object old = sel[i].getField(fieldName);
+
+                // Check if a link is already set, and if so, if we are allowed to overwrite it:
+                if ((old != null) && !old.equals("") && !overWriteAllowed)
+                    continue;
+
+                extPan.setEntry(sel[i]);
+                editor.setText((old != null) ? (String)old : "");
+                Thread t = extPan.autoSetFile(fieldName, editor);
+                // Wait for the autoset process to finish:
+                if (t != null)
+                    try {
+                        t.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                // If something was found, entriesChanged it:
+                if (!editor.getText().equals("") && !editor.getText().equals(old)) {
+                    // Store an undo edit:
+                    //System.out.println("Setting: "+sel[i].getCiteKey()+" "+editor.getText());
+                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, editor.getText()));
+                    sel[i].setField(fieldName, editor.getText());
+                    entriesChanged++;
+                }
+            }
+        }
+
+        // The following loop checks all external links that are already set.
+        if (checkExisting) {
+            mainLoop: for (int i=0; i<sel.length; i++) {
+                final Object old = sel[i].getField(fieldName);
+                // Check if a link is set:
+                if ((old != null) && !((String)old).equals("")) {
+                    // Get an absolute path representation:
+                    File file = Util.expandFilename((String)old, dir);
+
+                    if ((file == null) || !file.exists()) {
 
                         int answer =
                             JOptionPane.showOptionDialog(panel.frame(),
                             Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                new String[] {file.getPath(), sel[i].getCiteKey()}),
+                                new String[] {(String)old, sel[i].getCiteKey()}),
                                     Globals.lang("Broken link"),
                                     JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
@@ -103,33 +154,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
                     continue;
                 }
-                // Otherwise, should we be allowed to overwrite the old link?
-                else if (!overWriteAllowed) {
-                    skipped++;
-                    continue;
-                }
-            }
-            else {
-                // Ok, do it:
-                extPan.setEntry(sel[i]);
-                editor.setText((old != null) ? (String)old : "");
-                Thread t = extPan.autoSetFile(fieldName, editor);
-                // Wait for the autoset process to finish:
-                if (t != null)
-                    try {
-                        t.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                // If something was found, entriesChanged it:
-                if (!editor.getText().equals("") && !editor.getText().equals(old)) {
-                    // Store an undo edit:
-                    //System.out.println("Setting: "+sel[i].getCiteKey()+" "+editor.getText());
-                    ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old, editor.getText()));
-                    sel[i].setField(fieldName, editor.getText());
-                    entriesChanged++;
-                }
-
             }
         }
 
@@ -144,11 +168,75 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         if (!goOn)
             return;
 
-        panel.output(Globals.lang("Finished autosetting %0 field. Entries changed: %1.",
-                new String[] {fieldName, String.valueOf(entriesChanged)}));
+        panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed: %1.",
+                new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
         if (entriesChanged > 0) {
             panel.markBaseChanged();
             panel.refreshTable();
+        }
+    }
+
+    static class OptionsDialog extends JDialog {
+        JRadioButton autoSetUnset, autoSetAll, autoSetNone;
+        JCheckBox checkLinks;
+        JButton ok = new JButton(Globals.lang("Ok")),
+            cancel = new JButton(Globals.lang("Cancel"));
+        private boolean canceled = true;
+
+        public OptionsDialog(JFrame parent, String fieldName) {
+            super(parent, Globals.lang("Synchronize "), true);
+
+            ok.addActionListener(new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                    canceled = false;
+                    dispose();
+                }
+            });
+            cancel.addActionListener(new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                    dispose();
+                }
+            });
+            fieldName = fieldName.toUpperCase();
+            autoSetUnset =  new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fieldName), true);
+            autoSetAll =  new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fieldName), false);
+            autoSetNone =  new JRadioButton(Globals.lang("Do not autoset"), false);
+            checkLinks = new JCheckBox(Globals.lang("Check existing %0 links", fieldName), true);
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(autoSetUnset);
+            bg.add(autoSetNone);
+            bg.add(autoSetAll);
+            FormLayout layout = new FormLayout("fill:pref","");
+	        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+            builder.append(checkLinks);
+            builder.nextLine();
+            builder.appendSeparator();
+            builder.append(autoSetUnset);
+            builder.nextLine();
+            builder.append(autoSetAll);
+            builder.nextLine();
+            builder.append(autoSetNone);
+            builder.nextLine();
+
+            JPanel main = builder.getPanel();
+            main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+            ButtonBarBuilder bb = new ButtonBarBuilder();
+            bb.addGridded(ok);
+            bb.addGridded(cancel);
+            getContentPane().add(main, BorderLayout.CENTER);
+            getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+            pack();
+        }
+
+        public void setVisible(boolean visible) {
+            if (visible)
+                canceled = true;
+            super.setVisible(visible);
+        }
+
+        public boolean canceled() {
+            return canceled;
         }
     }
 }

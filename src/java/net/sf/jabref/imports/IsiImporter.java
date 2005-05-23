@@ -139,7 +139,7 @@ public class IsiImporter implements ImportFormat {
         } else if (beg.equals("TI"))
           hm.put("title", value.replaceAll("EOLEOL", " "));
         else if (beg.equals("SO"))
-          hm.put("journal", value);
+          hm.put("journal", value.replaceAll("EOLEOL", " "));
         else if (beg.equals("ID"))
           hm.put("keywords", value.replaceAll("EOLEOL", " "));
         else if (beg.equals("AB"))

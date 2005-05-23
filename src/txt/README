@@ -100,8 +100,10 @@ Change log:
         - Changed keys for Next and Previous tab to CTRL-PGDN and CTRL-PGUP to match shortcuts in a
           certain popular web browser.
         - Minor change to Preferences -> Table columns to enable insertion of column in position 2.
+        - Fixed bug in entry editor that caused the source edit panel to remove marking from entries.
         - Fixed export bug that made "\begin" tags fail if encountered immediately after an "\end" tag. 
         - Fixed export bug that made whitespace disappear after empty field values.
+        - Fixed ISI import bug that handled SO fields with line breaks wrong.
         - Fixed bug occuring when choosing not to import duplicate imported entry.
         - Fixed problem with detecting popup trigger on Mac OSX with one button mouse.
         - Fixed erroneous relative paths for PDF files when PDF directory is not set.

@@ -35,7 +35,7 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import junit.runner.ReloadingTestSuiteLoader;
+//import junit.runner.ReloadingTestSuiteLoader;
 
 import net.sf.jabref.*;
 import net.sf.jabref.BibtexEntry;

@@ -676,7 +676,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       Object[] fields = entry.getAllFields();
 
       for (int i = 0; i < fields.length; i++) {
-        if (GUIGlobals.isWriteableField(fields[i].toString())) {
+        if (GUIGlobals.isDisplayableField(fields[i].toString())) {
           if (nu.getField(fields[i].toString()) == null) {
             compound.addEdit(new UndoableFieldChange(entry, fields[i].toString(),
                 entry.getField(fields[i].toString()), (Object) null));
