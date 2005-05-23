@@ -14,19 +14,19 @@ Es gibt drei verschiedene Suchmethoden in JabRef.
 
 <H2>Direkte Suche</H2>
 
-Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg. Mit den Tastaturkürzeln wird das Programm dazu veranlasst, nach dem nächsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie darüber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken Sie ESC oder klicken Sie auf &bdquo;Zurücksetzen&ldquo;.
+Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg. Mit den Tastaturkürzeln wird das Programm dazu veranlasst, nach dem nächsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie darüber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken Sie ESC oder klicken Sie auf "Zurücksetzen".
 
 <H2>Suche mit Markierung</H2>
 
-Wenn Sie die Suchoption &bdquo;Markieren&ldquo; wählen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER drücken. Alle Treffer werden ausgewählt.
+Wenn Sie die Suchoption "Markieren" wählen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER drücken. Alle Treffer werden ausgewählt.
 
 <H2>Float-Suche</H2>
 
-Die Suche mit der Option &bdquo;Float&ldquo; ist ähnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgewählt, sondern an den Anfang der Tabelle sortiert werden. Einträge, die nicht mit dem Suchbegriff übereinstimmen, werden unter den Treffern aufgelistet und zusätzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, drücken Sie ESC oder klicken auf &bdquo;Zurücksetzen&ldquo;.
+Die Suche mit der Option "Float" ist ähnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgewählt, sondern an den Anfang der Tabelle sortiert werden. Einträge, die nicht mit dem Suchbegriff übereinstimmen, werden unter den Treffern aufgelistet und zusätzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, drücken Sie ESC oder klicken auf "Zurücksetzen".
 
 <H2>Feldbezeichner und logische Operatoren</H2>
 
-Um nur einige bestimmte Felder zu durchsuchen und/oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach Einträgen mit dem Autor &bdquo;Miller&ldquo; zu suchen, geben Sie
+Um nur einige bestimmte Felder zu durchsuchen und/oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach Einträgen mit dem Autor "Miller" zu suchen, geben Sie
 <p>
 author = miller
 <p>
@@ -34,17 +34,17 @@ in das Suchfeld ein (Achtung! Das funktioniert nicht bei der direkten Suche!). F
 <p>
 title|keywords = "Karl der Große"
 <p>
-Sie können &bdquo;and&ldquo;, &bdquo;or&ldquo;, &bdquo;not&ldquo; und Klammern verwenden:
+Sie können "and", "or", "not" und Klammern verwenden:
 <p>
 (author = miller or title|keywords = "Karl der Große") and not author = brown
 <p>
-... sucht nach Einträgen, in denen entweder der Autor &bdquo;Miller&ldquo; heißt oder im title- oder keywords-Feld der Begriff &bdquo;Karl der Große&ldquo; steht; gleichzeitig werden die Einträge mit dem Autor &bdquo;Brown&ldquo; nicht angezeigt.
+... sucht nach Einträgen, in denen entweder der Autor "Miller" heißt oder im title- oder keywords-Feld der Begriff "Karl der Große" steht; gleichzeitig werden die Einträge mit dem Autor "Brown" nicht angezeigt.
 <p>
-Das &bdquo;=&ldquo;-Zeichen ist eigentlich eine Abkürzung für &bdquo;enthält&ldquo; (&ldquo;contains&rdquo;). Wenn man nach genauen Treffern suchen möchte, muss man &bdquo;==&ldquo; oder &ldquo;matches&rdquo; (&bdquo;übereinstimmen&ldquo;) eingeben. &bdquo;!=&ldquo; sucht nach Einträgen, bei denen der Suchbegriff <i>nicht</i> enthalten ist. Die Auswahl von Feldern, die durchsucht werden sollen (benötigte, optionale, allgemeine Felder), wird ignoriert, wenn man im Suchausdruck Feldbezeichner verwendet. Um nach Einträgen eines bestimmten Typs zu suchen, gibt es ein Pseudofeld namens &bdquo;entrytype&ldquo;:
+Das "="-Zeichen ist eigentlich eine Abkürzung für "enthält" ("contains"). Wenn man nach genauen Treffern suchen möchte, muss man "==" oder "matches" ("übereinstimmen") eingeben. "!=" sucht nach Einträgen, bei denen der Suchbegriff <i>nicht</i> enthalten ist. Die Auswahl von Feldern, die durchsucht werden sollen (benötigte, optionale, allgemeine Felder), wird ignoriert, wenn man im Suchausdruck Feldbezeichner verwendet. Um nach Einträgen eines bestimmten Typs zu suchen, gibt es ein Pseudofeld namens "entrytype":
 <p>
 entrytype = thesis
 <p>
-&hellip; findet z.B. Einträge, deren Typ (wie in der Spalte &bdquo;Entrytype&ldquo; dargestellt) das Wort &bdquo;thesis&ldquo; enthält (z.B. &bdquo;phdthesis&ldquo; und &bdquo;mastersthesis&ldquo;).
+&hellip; findet z.B. Einträge, deren Typ (wie in der Spalte "Entrytype" dargestellt) das Wort "thesis" enthält (z.B. "phdthesis" und "mastersthesis").
 
 <H2>Suchoptionen</H2>
 
