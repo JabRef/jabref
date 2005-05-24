@@ -181,11 +181,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         JCheckBox checkLinks;
         JButton ok = new JButton(Globals.lang("Ok")),
             cancel = new JButton(Globals.lang("Cancel"));
+        JLabel description;
         private boolean canceled = true;
 
         public OptionsDialog(JFrame parent, String fieldName) {
-            super(parent, Globals.lang("Synchronize "), true);
-
+            super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
+            final String fn = fieldName.toUpperCase();
             ok.addActionListener(new ActionListener () {
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
@@ -197,33 +198,55 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                     dispose();
                 }
             });
+
             fieldName = fieldName.toUpperCase();
-            autoSetUnset =  new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fieldName), true);
-            autoSetAll =  new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fieldName), false);
+            autoSetUnset =  new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
+            autoSetAll =  new JRadioButton(Globals.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
             autoSetNone =  new JRadioButton(Globals.lang("Do not autoset"), false);
-            checkLinks = new JCheckBox(Globals.lang("Check existing %0 links", fieldName), true);
+            checkLinks = new JCheckBox(Globals.lang("Check existing %0 links", fn), true);
             ButtonGroup bg = new ButtonGroup();
             bg.add(autoSetUnset);
             bg.add(autoSetNone);
             bg.add(autoSetAll);
             FormLayout layout = new FormLayout("fill:pref","");
 	        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-            builder.append(checkLinks);
+            description = new JLabel("<HTML>"+
+                    Globals.lang(//"This function helps you keep your external %0 links up-to-date." +
+                            "Attempt to autoset %0 links for your entries. Autoset works if "
+                            +"a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
+                    +"</HTML>");
+            //            description.setVerticalAlignment(JLabel.TOP);
+            builder.appendSeparator(Globals.lang("Autoset"));
+            builder.append(description);
             builder.nextLine();
-            builder.appendSeparator();
             builder.append(autoSetUnset);
             builder.nextLine();
             builder.append(autoSetAll);
             builder.nextLine();
             builder.append(autoSetNone);
             builder.nextLine();
+            builder.appendSeparator(Globals.lang("Check links"));
+
+            description = new JLabel("<HTML>"+
+                    Globals.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will "
+                                    +"be given options<BR>to resolve the problem.", fn)
+                +"</HTML>");
+            builder.append(description);
+            builder.nextLine();
+            builder.append(checkLinks);
+            builder.nextLine();
+            builder.appendSeparator();
+
+
 
             JPanel main = builder.getPanel();
             main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
             ButtonBarBuilder bb = new ButtonBarBuilder();
+            bb.addGlue();
             bb.addGridded(ok);
             bb.addGridded(cancel);
+            bb.addGlue();
             getContentPane().add(main, BorderLayout.CENTER);
             getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
             pack();
