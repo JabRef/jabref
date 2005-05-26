@@ -93,6 +93,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = (GroupTreeNode) e.nextElement();
+            // JZTODO remove "expaneded?" info
             sb.append(cursor.getLevel() + " " + (cursor.isExpanded ? "-" : "+")
                     + " " + cursor.getGroup().toString() + "\n");
         }
@@ -317,5 +318,24 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         if (!isDataFlavorSupported(someFlavor))
             throw new UnsupportedFlavorException(someFlavor);
         return this;
+    }
+    
+    /**
+     * Recursively compares this node's group and all subgroups.
+     */
+    public boolean equals(Object other) {
+        if (!(other instanceof GroupTreeNode))
+            return false;
+        final GroupTreeNode otherNode = (GroupTreeNode) other;
+        if (getChildCount() != otherNode.getChildCount())
+            return false;
+        if (!getGroup().equals(otherNode.getGroup()))
+            return false;
+        for (int i = 0; i < getChildCount(); ++i) {
+            if (!((GroupTreeNode)getChildAt(i)).getGroup()
+                    .equals(((GroupTreeNode)otherNode.getChildAt(i)).getGroup()))
+                return false;
+        }
+        return true;
     }
 }
