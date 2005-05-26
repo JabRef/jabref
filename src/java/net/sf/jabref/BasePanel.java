@@ -1018,8 +1018,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           
                           // ensure that there is always only one AllEntriesGroup
                           if (newGroups.getGroup() instanceof AllEntriesGroup)
-                              newGroups.setGroup(new ExplicitGroup("Imported Groups",
-                                      database)); // dummy group
+                              newGroups.setGroup(new ExplicitGroup("Imported Groups")); // dummy group
                           
                         // groupsSelector is always created, even when no groups
                         // have been defined. therefore, no check for null is

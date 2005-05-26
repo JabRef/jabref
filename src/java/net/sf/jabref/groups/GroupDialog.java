@@ -245,7 +245,7 @@ class GroupDialog extends JDialog {
                         m_resultingGroup.setName(m_name.getText().trim());
                     } else {
                         m_resultingGroup = new ExplicitGroup(m_name.getText()
-                                .trim(), m_basePanel.database());
+                                .trim());
                         if (m_editedGroup != null)
                             addPreviousEntries();
                     }

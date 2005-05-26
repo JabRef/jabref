@@ -36,12 +36,10 @@ import net.sf.jabref.util.QuotedStringTokenizer;
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
     public static final String ID = "ExplicitGroup:";
     private final Set m_entries;
-    private final BibtexDatabase m_database;
 
-    public ExplicitGroup(String name, BibtexDatabase db) {
+    public ExplicitGroup(String name) {
         super(name);
         m_entries = new HashSet();
-        m_database = db;
     }
 
     public static AbstractGroup fromString(String s, BibtexDatabase db, int version)
@@ -57,7 +55,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         case 0:
         case 1:
         case 2:
-            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), db);
+            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken());
             BibtexEntry[] entries;
             while (tok.hasMoreTokens()) {
                 entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
@@ -126,7 +124,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
     }
 
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(m_name, m_database);
+        ExplicitGroup copy = new ExplicitGroup(m_name);
         copy.m_entries.addAll(m_entries);
         return copy;
     }
@@ -135,8 +133,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         if (!(o instanceof ExplicitGroup))
             return false;
         ExplicitGroup other = (ExplicitGroup) o;
-        return other.m_name.equals(m_name) && other.m_entries.equals(m_entries)
-                && other.m_database == m_database;
+        return other.m_name.equals(m_name) && other.m_entries.equals(m_entries);
     }
 
     /**

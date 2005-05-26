@@ -82,8 +82,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup(Globals.lang("Automatically created groups"), panel
-                                .database()));
+                        new ExplicitGroup(Globals.lang("Automatically created groups")));
                 HashSet hs = null;
                 if (nd.isSelected()) {
                     hs = Util
