@@ -22,7 +22,6 @@
 
 package net.sf.jabref.groups;
 
-import java.io.*;
 import java.util.Vector;
 
 import net.sf.jabref.*;
