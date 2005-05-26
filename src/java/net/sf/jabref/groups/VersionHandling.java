@@ -180,7 +180,6 @@ public class VersionHandling {
             AbstractGroup group;
             int spaceIndex;
             int level;
-            boolean expanded;
             String s;
             for (int i = 0; i < data.size(); ++i) {
                 s = data.elementAt(i).toString();
@@ -188,12 +187,9 @@ public class VersionHandling {
                 if (spaceIndex <= 0)
                     throw new Exception("bad format"); // JZTODO lyrics
                 level = Integer.parseInt(s.substring(0, spaceIndex));
-                expanded = s.charAt(spaceIndex+1) == '-';
-                spaceIndex += 2; // skip expansion state indicator and following space
                 group = AbstractGroup.fromString(s.substring(spaceIndex + 1),
                         db, version);
                 newNode = new GroupTreeNode(group);
-                newNode.isExpanded = expanded;
                 if (cursor == null) {
                     // create new root
                     cursor = newNode;

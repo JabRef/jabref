@@ -46,8 +46,6 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
     public static final DataFlavor flavor;
     public static final DataFlavor[] flavors;
 
-    public boolean isExpanded = false;
-
     static {
         DataFlavor df = null;
         try {
@@ -93,9 +91,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
             cursor = (GroupTreeNode) e.nextElement();
-            // JZTODO remove "expaneded?" info
-            sb.append(cursor.getLevel() + " " + (cursor.isExpanded ? "-" : "+")
-                    + " " + cursor.getGroup().toString() + "\n");
+            sb.append(cursor.getLevel() + " " + cursor.getGroup().toString() + "\n");
         }
         return sb.toString();
     }
