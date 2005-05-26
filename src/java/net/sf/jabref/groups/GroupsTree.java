@@ -256,6 +256,11 @@ public class GroupsTree extends JTree implements DragSourceListener,
                         groupSelector.frame))
                     return; // user aborted operation
                 
+                // if an editor is showing, its fields must be updated
+                // after the assignment, and before that, the current
+                // edit has to be stored:
+                groupSelector.getActiveBasePanel().storeCurrentEdit();
+                
                 AbstractUndoableEdit undo = group.add(selection.getSelection());
                 if (undo instanceof UndoableChangeAssignment)
                     ((UndoableChangeAssignment) undo).setEditedNode(target);

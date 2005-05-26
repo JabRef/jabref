@@ -984,6 +984,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
+        panel.updateEntryEditorIfShowing(); 
         final String groupName = node.getGroup().getName();
         if (assignedEntries == 1)
             frame.output(Globals.lang("Assigned 1 entry to group \"%0\".", groupName));
