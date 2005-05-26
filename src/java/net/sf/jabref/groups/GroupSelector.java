@@ -738,8 +738,8 @@ public class GroupSelector extends SidePaneComponent implements
             if (path == null)
                 return;
             final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-            final UndoableSortSubgroups undo = new UndoableSortSubgroups(
-                    GroupSelector.this, node);
+            final UndoableModifySubtree undo = new UndoableModifySubtree(
+                    GroupSelector.this, node, Globals.lang("sort subgroups"));
             groupsTree.sort(node, false);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged(); // JZTODO lyrics
@@ -755,8 +755,8 @@ public class GroupSelector extends SidePaneComponent implements
             if (path == null)
                 return;
             final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-            final UndoableSortSubgroups undo = new UndoableSortSubgroups(
-                    GroupSelector.this, node);
+            final UndoableModifySubtree undo = new UndoableModifySubtree(
+                    GroupSelector.this, node, Globals.lang("sort subgroups"));
             groupsTree.sort(node, true);
             panel.undoManager.addEdit(undo);
             panel.markBaseChanged(); // JZTODO lyrics

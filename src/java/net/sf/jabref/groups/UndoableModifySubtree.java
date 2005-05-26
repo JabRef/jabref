@@ -32,7 +32,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.Globals;
 
-class UndoableSortSubgroups extends AbstractUndoableEdit {
+public class UndoableModifySubtree extends AbstractUndoableEdit {
     /** A backup of the groups before the modification */
     private final GroupTreeNode m_subtreeBackup;
     /** The path to the global groups root node */
@@ -41,6 +41,7 @@ class UndoableSortSubgroups extends AbstractUndoableEdit {
     /** This holds the new subtree (the root's modified children) to allow redo. */
     private Vector m_modifiedSubtree = new Vector();
     private boolean m_revalidate = true;
+    private final String m_name;
 
     /**
      * 
@@ -48,20 +49,21 @@ class UndoableSortSubgroups extends AbstractUndoableEdit {
      *            The root node of the subtree that was modified (this node may
      *            not be modified, it is just used as a convenience handle).
      */
-    public UndoableSortSubgroups(GroupSelector groupSelector,
-            GroupTreeNode subtree) {
-        this.m_subtreeBackup = subtree.deepCopy();
-        this.m_subtreeRootPath = subtree.getIndexedPath();
-        this.m_groupSelector = groupSelector;
+    public UndoableModifySubtree(GroupSelector groupSelector,
+            GroupTreeNode subtree, String name) {
+        m_subtreeBackup = subtree.deepCopy();
+        m_subtreeRootPath = subtree.getIndexedPath();
+        m_groupSelector = groupSelector;
+        m_name = name;
     }
 
     public String getUndoPresentationName() {
-        return Globals.lang("Undo") + ": " + Globals.lang("sort subgroups");
+        return Globals.lang("Undo") + ": " + m_name;
         // JZTODO lyrics
     }
 
     public String getRedoPresentationName() {
-        return Globals.lang("Redo") + ": " + Globals.lang("sort subgroups");
+        return Globals.lang("Redo") + ": " + m_name;
     }
 
     public void undo() {
