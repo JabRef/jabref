@@ -325,11 +325,14 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
         final GroupTreeNode otherNode = (GroupTreeNode) other;
         if (getChildCount() != otherNode.getChildCount())
             return false;
-        if (!getGroup().equals(otherNode.getGroup()))
+        AbstractGroup g1 = getGroup();
+        AbstractGroup g2 = otherNode.getGroup();
+        if ((g1 == null && g2 != null) || (g1 != null && g2 == null))
+            return false;
+        if (g1 != null && g2 != null && !g1.equals(g2))
             return false;
         for (int i = 0; i < getChildCount(); ++i) {
-            if (!((GroupTreeNode)getChildAt(i)).getGroup()
-                    .equals(((GroupTreeNode)otherNode.getChildAt(i)).getGroup()))
+            if (!getChildAt(i).equals(otherNode.getChildAt(i)))
                 return false;
         }
         return true;
