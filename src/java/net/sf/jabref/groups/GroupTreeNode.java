@@ -37,16 +37,17 @@ import net.sf.jabref.*;
  * 
  * @author jzieren
  */
-public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
+public class GroupTreeNode extends DefaultMutableTreeNode implements
+        Transferable {
     public static final int GROUP_UNION_CHILDREN = 0;
     public static final int GROUP_INTERSECTION_PARENT = 1;
     public static final int GROUP_ITSELF = 2;
-    
+
     public static final DataFlavor flavor;
     public static final DataFlavor[] flavors;
-    
+
     public boolean isExpanded = false;
-    
+
     static {
         DataFlavor df = null;
         try {
@@ -91,9 +92,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         Enumeration e = preorderEnumeration();
         GroupTreeNode cursor;
         while (e.hasMoreElements()) {
-            cursor = (GroupTreeNode)e.nextElement();
-            sb.append(cursor.getLevel() + " " + (cursor.isExpanded ? "-" : "+") + " "
-                    + cursor.getGroup().toString() + "\n");
+            cursor = (GroupTreeNode) e.nextElement();
+            sb.append(cursor.getLevel() + " " + (cursor.isExpanded ? "-" : "+")
+                    + " " + cursor.getGroup().toString() + "\n");
         }
         return sb.toString();
     }
@@ -123,6 +124,17 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         for (int i = 1; i < path.length; ++i)
             indexedPath[i - 1] = path[i - 1].getIndex(path[i]);
         return indexedPath;
+    }
+
+    /**
+     * Returns the node indicated by the specified indexedPath, which contains
+     * child indices obtained e.g. by getIndexedPath().
+     */
+    public GroupTreeNode getNode(int[] indexedPath) {
+        GroupTreeNode cursor = this;
+        for (int i = 0; i < indexedPath.length; ++i)
+            cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
+        return cursor;
     }
 
     /**
@@ -300,7 +312,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         return someFlavor.equals(GroupTreeNode.flavor);
     }
 
-    public Object getTransferData(DataFlavor someFlavor) throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor someFlavor)
+            throws UnsupportedFlavorException, IOException {
         if (!isDataFlavorSupported(someFlavor))
             throw new UnsupportedFlavorException(someFlavor);
         return this;

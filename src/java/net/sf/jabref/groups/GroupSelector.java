@@ -732,15 +732,18 @@ public class GroupSelector extends SidePaneComponent implements
     
 //  JZTODO lyrics
     public final AbstractAction sortDirectSubgroups = new AbstractAction(
-            Globals.lang("This group's immediate subgroups")) {
+            Globals.lang("Immediate subgroups")) {
         public void actionPerformed(ActionEvent ae) {
             final TreePath path = getSelectionPath();
             if (path == null)
                 return;
             final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            final UndoableSortSubgroups undo = new UndoableSortSubgroups(
+                    GroupSelector.this, node);
             groupsTree.sort(node, false);
-            panel.markBaseChanged();
-            // JZTODO undo
+            panel.undoManager.addEdit(undo);
+            panel.markBaseChanged(); // JZTODO lyrics
+            frame.output(Globals.lang("Sorted immediate subgroups."));
         }
     };
     
@@ -752,9 +755,12 @@ public class GroupSelector extends SidePaneComponent implements
             if (path == null)
                 return;
             final GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            final UndoableSortSubgroups undo = new UndoableSortSubgroups(
+                    GroupSelector.this, node);
             groupsTree.sort(node, true);
-            panel.markBaseChanged();
-            // JZTODO undo
+            panel.undoManager.addEdit(undo);
+            panel.markBaseChanged(); // JZTODO lyrics
+            frame.output(Globals.lang("Sorted all subgroups recursively."));
         }
     };
     
