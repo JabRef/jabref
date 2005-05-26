@@ -343,6 +343,11 @@ public class RightClickMenu extends JPopupMenu
                     panel.frame))
                 return; // user aborted operation
             
+            // if an editor is showing, its fields must be updated
+            // after the assignment, and before that, the current
+            // edit has to be stored:
+            panel.storeCurrentEdit();
+            
             AbstractUndoableEdit undo = m_node.addToGroup(panel.getSelectedEntries());
             if (undo == null)
                 return; // no changed made
