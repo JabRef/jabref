@@ -396,11 +396,27 @@ public class ChangeScanner extends Thread {
         return null;
     }
     
+    /**
+     * This method only detects wheter a change took place or not. It does not
+     * determine the type of change. This would be possible, but difficult to do
+     * properly, so I rather only report the change. 
+     */
     public void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
-        // JZTODO
-//        GroupTreeNode vInMem = inMem.getGroups();
-//        GroupTreeNode vOnTmp = onTmp.getGroups();
-//        GroupTreeNode vOnDisk = onDisk.getGroups();
+        final GroupTreeNode groupsMem = inMem.getGroups();
+        final GroupTreeNode groupsTmp = onTmp.getGroups();
+        final GroupTreeNode groupsDisk = onDisk.getGroups();
+        if (groupsTmp == null && groupsDisk == null)
+            return;
+        if ((groupsTmp != null && groupsDisk == null) 
+                || (groupsTmp == null && groupsDisk != null)) {
+            changes.add(new GroupChange(groupsDisk));
+            return;
+        }
+        if (groupsTmp.equals(groupsDisk))
+            return;
+        changes.add(new GroupChange(groupsDisk));
+        return;
+        
 //        
 //        if (((vOnTmp == null) || (vOnTmp.size()==0)) && ((vOnDisk == null) || (vOnDisk.size()==0))) {
 //            // No groups defined in either the tmp or disk version.
