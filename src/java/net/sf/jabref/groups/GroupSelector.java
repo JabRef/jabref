@@ -364,17 +364,22 @@ public class GroupSelector extends SidePaneComponent implements
                 KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY, 
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
+        groupsContextMenu.add(editGroupAction);
         groupsContextMenu.add(addGroupAction);
         groupsContextMenu.add(addSubgroupAction);
-        groupsContextMenu.add(editGroupAction);
+        groupsContextMenu.addSeparator();
         groupsContextMenu.add(removeGroupAndSubgroupsAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsAction);
-        groupsContextMenu.add(moveSubmenu);
+        groupsContextMenu.add(removeSubgroupsAction);
+        groupsContextMenu.addSeparator();
         groupsContextMenu.add(expandSubtreeAction);
         groupsContextMenu.add(collapseSubtreeAction);
+        groupsContextMenu.addSeparator();
         overlappingGroupsSubmenu.add(showOverlappingGroupsAction);
         overlappingGroupsSubmenu.add(clearHighlightAction);
         groupsContextMenu.add(overlappingGroupsSubmenu);
+        groupsContextMenu.addSeparator();
+        groupsContextMenu.add(moveSubmenu);
         sortSubmenu.add(sortDirectSubgroups);
         sortSubmenu.add(sortAllSubgroups);
         groupsContextMenu.add(sortSubmenu);
@@ -423,6 +428,8 @@ public class GroupSelector extends SidePaneComponent implements
         expandSubtreeAction.setEnabled(path != null);
         collapseSubtreeAction.setEnabled(path != null);
         showOverlappingGroupsAction.setEnabled(path != null);
+        removeSubgroupsAction.setEnabled(path != null);
+        sortSubmenu.setEnabled(path != null);
         if (path != null) { // some path dependent enabling/disabling
             groupsTree.setSelectionPath(path);
             GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
@@ -438,6 +445,7 @@ public class GroupSelector extends SidePaneComponent implements
                 removeGroupAndSubgroupsAction.setEnabled(true);
                 removeGroupKeepSubgroupsAction.setEnabled(true);
             }
+            removeSubgroupsAction.setEnabled(!node.isLeaf());
             moveNodeUpAction.setEnabled(node.canMoveUp());
             moveNodeDownAction.setEnabled(node.canMoveDown());
             moveNodeLeftAction.setEnabled(node.canMoveLeft());
@@ -666,6 +674,31 @@ public class GroupSelector extends SidePaneComponent implements
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Globals.lang("Removed group \"%0\" and its subgroups.",
+                        group.getName()));
+            }
+        }
+    };
+
+    final AbstractAction removeSubgroupsAction = new AbstractAction(Globals
+            .lang("Remove all subgroups")) { // JZTODO lyrics
+        public void actionPerformed(ActionEvent e) {
+            final GroupTreeNode node = (GroupTreeNode) groupsTree
+                    .getSelectionPath().getLastPathComponent();
+            final AbstractGroup group = node.getGroup();
+            int conf = JOptionPane.showConfirmDialog(frame, Globals
+                    .lang("Remove all subgroups of \"%0\"?",group.getName()), 
+                    Globals.lang("Remove all subgroups"),
+                    JOptionPane.YES_NO_OPTION);
+            if (conf == JOptionPane.YES_OPTION) {
+                final UndoableModifySubtree undo = new UndoableModifySubtree(
+                        GroupSelector.this, node,
+                        "Remove all subgroups");
+                node.removeAllChildren();
+                revalidateGroups();
+                // Store undo information.
+                panel.undoManager.addEdit(undo);
+                panel.markBaseChanged();
+                frame.output(Globals.lang("Removed all subgroups of group \"%0\".",
                         group.getName()));
             }
         }
