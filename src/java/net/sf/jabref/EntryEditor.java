@@ -1328,46 +1328,36 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   
   private void warnDuplicateBibtexkey() {
         panel.output(Globals.lang("Warning") + ": "
-                + Globals.lang("duplicate BibTeX key."));
+                + Globals.lang("Duplicate BibTeX key."));
         
-        // JZFIXME: This warning should always be displayed!
-
         if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
+            // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
-                    + ": " + Globals.lang("duplicate BibTeX key."), Globals
-                    .lang("Disable this warning dialog"), false);
+                    + ": " + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."), 
+                    Globals.lang("Disable this warning dialog"), false);
             JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
                     JOptionPane.WARNING_MESSAGE);
 
             if (jcb.isSelected())
                 prefs.putBoolean("dialogWarningForDuplicateKey", false);
-
-            // JZTODO lyrics
-            if (containedInExplicitGroup(entry)) {
-                String[] options = new String[] {"Generate Unique Key", "Keep Duplicate Key"};
-                int choice = JOptionPane.showOptionDialog(
-                                frame,
-                                Globals.lang("Due to the duplicate BibTeX key, the groups assignment(s) for this entry\n" +
-                                        "cannot be restored correctly when reopening this database. It is recommended\n" +
-                                        "that you have JabRef generate a unique key now to prevent this problem."),
-                                Globals.lang("Warning"),
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.WARNING_MESSAGE,
-                                null,
-                                options, options[0]);
-                if (choice == 0)
-                    generateKeyAction.actionPerformed(null);
-            }
         }
     }
 
   private void warnEmptyBibtexkey() {
       // JZTODO lyrics
-      if (containedInExplicitGroup(entry)) {
-          JOptionPane.showMessageDialog(frame, 
-                  "Groups assignment for this entry cannot be restored after next load due to lacking key", 
-                  Globals.lang("Warning"),
+      panel.output(Globals.lang("Warning") + ": "
+              + Globals.lang("Empty BibTeX key."));
+      
+      if (prefs.getBoolean("dialogWarningForEmptyKey")) {
+          // JZTODO lyrics
+          CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
+                  + ": " + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."), 
+                  Globals.lang("Disable this warning dialog"), false);
+          JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
                   JOptionPane.WARNING_MESSAGE);
+
+          if (jcb.isSelected())
+              prefs.putBoolean("dialogWarningForEmptyKey", false);
       }
   }
 
