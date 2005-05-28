@@ -221,8 +221,13 @@ public class BibtexParser
 		    //Util.pr("Found: "+tp.getName());
                     BibtexEntry be = parseEntry(tp);
                     boolean duplicateKey = _db.insertEntry(be);
-                    if (duplicateKey)
-                      _pr.addWarning(Globals.lang("Duplicate BibTeX key")+": "+be.getCiteKey());
+                    if (duplicateKey) // JZTODO lyrics
+                      _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
+                              + " (" + "Grouping may not work for this entry." + ")");
+                    else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
+                        _pr.addWarning(Globals.lang("empty BibTeX key")+": "+be.getAuthorTitleYear(40)
+                                + " (" + "Grouping may not work for this entry." + ")");
+                    }
 		}
 
                 skipWhitespace();
