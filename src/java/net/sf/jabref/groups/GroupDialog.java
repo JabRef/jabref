@@ -427,6 +427,9 @@ class GroupDialog extends JDialog {
         if (vec.size() > 0) {
             BibtexEntry[] entries = new BibtexEntry[vec.size()];
             vec.toArray(entries);
+            if (!Util.warnAssignmentSideEffects(m_resultingGroup,
+                    entries, m_basePanel.getDatabase(), this))
+                return;
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
             if (!(m_resultingGroup instanceof ExplicitGroup))
