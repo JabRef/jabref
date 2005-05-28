@@ -325,6 +325,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     String s = (String) o;
 
     if ((s != null) && s.equals("external")) {
+
       // Add external viewer listener for "pdf" and "url" fields.
       ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
@@ -352,15 +353,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               Globals.getNewFile(frame, prefs, new File(dir), "." + fieldName,
                 JFileChooser.OPEN_DIALOG, false);
 
-            /*
-             * JabRefFileChooser chooser = new JabRefFileChooser (new
-             * File(ed.getText())); if (ed.getText().equals("")) {
-             * chooser.setCurrentDirectory(new File(prefs.get(fieldName +
-             * Globals.FILETYPE_PREFS_EXT, ""))); }
-             * //chooser.addChoosableFileFilter(new OpenFileFilter()); //nb nov2
-             * int returnVal = chooser.showOpenDialog(null); if (returnVal ==
-             * JFileChooser.APPROVE_OPTION) {
-             */
             if (chosenFile != null) {
               File newFile = new File(chosenFile); //chooser.getSelectedFile();
               ed.setText(newFile.getPath());
@@ -371,14 +363,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         });
 
       return but;
-    } else if ((s != null) && s.equals("browsePdf")) {
-        ExternalFilePanel pan = new ExternalFilePanel(frame, this, "pdf", ed);
+    //} else if ((s != null) && s.equals("browsePdf")) {
+    } else if ((s != null) && (s.equals("browseDoc") || s.equals("browseDocZip"))) {
+
+        final String ext = "."+fieldName.toLowerCase();
+        final OpenFileFilter off;
+        if (s.equals("browseDocZip"))
+            off = new OpenFileFilter(new String[] { ext, ext+".gz", ext+".bz2" });
+        else
+            off = new OpenFileFilter(new String[] { ext });
+
+        ExternalFilePanel pan = new ExternalFilePanel(frame, this, fieldName, off, ed);
         return pan;
     }
-    else if ((s != null) && s.equals("browsePs")) {
-        ExternalFilePanel pan = new ExternalFilePanel(frame, this, "ps", ed);
+    /*else if ((s != null) && s.equals("browsePs")) {
+        ExternalFilePanel pan = new ExternalFilePanel(frame, this, "ps", off, ed);
         return pan;
-    } else if ((s != null) && s.equals("url")) {
+    }*/
+    else if ((s != null) && s.equals("url")) {
       ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
           DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
 

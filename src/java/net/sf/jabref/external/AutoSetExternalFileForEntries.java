@@ -75,7 +75,10 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         entriesChanged=0;
         brokenLinks=0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
-        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, null);
+
+        final OpenFileFilter off = Util.getFileFilterForField(fieldName);
+
+        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, null, off);
         FieldTextField editor = new FieldTextField(fieldName, "", false);
         String dir = Globals.prefs.get(fieldName+"Directory");
 

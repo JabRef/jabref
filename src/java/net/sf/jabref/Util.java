@@ -395,63 +395,40 @@ public class Util {
      */
     public static void openExternalViewer(String link, String fieldName,
             JabRefPreferences prefs) throws IOException {
-        //try first with an URL
-        /*try{
-            URL fileurl = new URL(link);
-            BrowserLauncher.openURL(fileurl.toString());
-            return;
-        }catch (MalformedURLException mue){
-            //mue.printStackTrace();
-        } */
-
-        File file;
-
-        if (fieldName.equals("pdf")){
-            String dir = prefs.get("pdfDirectory");
-            file = expandFilename(link, dir);
-        } else if (fieldName.equals("ps")) {
-    	    String dir = prefs.get("psDirectory");
-            file = expandFilename(link, dir);
-	    } else file = new File(link);
-
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")){
-            // Check that the file exists:
+            File file = expandFilename(link, prefs.get(fieldName+"Directory"));
 
+            // Check that the file exists:
             if ((file == null) || !file.exists()){ throw new IOException(
-                    //Globals.lang("File not found") + ": '" + link + "'."); }
                     Globals.lang("File not found") +" ("+fieldName+"): '" + link + "'.");
             }
             link = file.getPath();
 
             // Use the correct viewer even if pdf and ps are mixed up:
             String[] split = file.getName().split("\\.");
-            if ((split.length >= 2)
-                    && (split[split.length - 1].equalsIgnoreCase("pdf"))) fieldName = "pdf";
-            else if ((split.length >= 2)
-                    && (split[split.length - 1].equalsIgnoreCase("ps"))) fieldName = "ps";
-        }
-        String cmdArray[] = new String[2];
-        // check html first since browser can invoke viewers
-        if (fieldName.equals("doi")){
-            //cmdArray[0] = prefs.get("htmlviewer");
-            //cmdArray[1] = Globals.DOI_LOOKUP_PREFIX+link;
-            //Process child = Runtime.getRuntime().exec(cmdArray[0]+"
-            // "+cmdArray[1]);
+	    if (split.length >= 2) {
+	      if (split[split.length - 1].equalsIgnoreCase("pdf"))
+		fieldName = "pdf";
+	      else if (split[split.length - 1].equalsIgnoreCase("ps") ||
+		  (split.length>=3 && split[split.length - 2].equalsIgnoreCase("ps")) )
+		fieldName = "ps";
+	    }
+        } else if (fieldName.equals("doi")){
             fieldName = "url";
             link = Globals.DOI_LOOKUP_PREFIX + link;
-            //String[] cmd = {"/usr/bin/open", "-a", prefs.get("htmlviewer"),
-            //                Globals.DOI_LOOKUP_PREFIX+link};
-            //Process child = Runtime.getRuntime().exec(cmd);
-        }
+        } else if (fieldName.equals("citeseerurl")) {
+	    fieldName = "url";
 
-        if (fieldName.equals("url") || fieldName.equals("citeseerurl")){ // html
+	    String canonicalLink = CiteSeerFetcher.generateCanonicalURL(link);
+	    if (canonicalLink != null)
+	      link = canonicalLink;
+	}
+
+	String cmdArray[] = new String[2];
+        if (fieldName.equals("url")) { // html
             try{
-                if (fieldName.equals("citeseerurl")){
-                    String canonicalLink = CiteSeerFetcher
-                            .generateCanonicalURL(link);
-                    if (canonicalLink != null) link = canonicalLink;
-                }
+
                 // First check if the url is enclosed in \\url{}. If so, remove
                 // the wrapper.
                 if (link.startsWith("\\url{") && link.endsWith("}")) link = link
@@ -480,8 +457,6 @@ public class Util {
             }
         }else if (fieldName.equals("ps")){
             try{
-                //System.err.println("Starting external viewer: "
-                //		   + prefs.get("psviewer") + " " + link);
                 if (Globals.ON_MAC){
                     String[] cmd = { "/usr/bin/open", "-a",
                             prefs.get("psviewer"), link };
@@ -502,8 +477,6 @@ public class Util {
             }
         }else if (fieldName.equals("pdf")){
             try{
-                System.err.println("Starting external viewer: "
-                        + prefs.get("pdfviewer") + " " + link);
                 if (Globals.ON_MAC){
                     String[] cmd = { "/usr/bin/open", "-a",
                             prefs.get("pdfviewer"), link };
@@ -548,14 +521,18 @@ public class Util {
      * Searches the given directory and subdirectories for a pdf file with name
      * as given + ".pdf"
      */
-    public static String findPdf(String key, String extension, String directory) {
-        String filename = key + "."+extension;
+    public static String findPdf(String key, String extension, String directory, OpenFileFilter off) {
+        //String filename = key + "."+extension;
         if (!directory.endsWith(System.getProperty("file.separator"))) directory += System
                 .getProperty("file.separator");
-        String found = findInDir(filename, directory);
+
+        String found = findInDir(key, directory, off);
+
         if (found != null) return found.substring(directory.length());
         else return null;
     }
+
+
 
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
@@ -577,20 +554,31 @@ public class Util {
         }else return file;
     }
 
-    private static String findInDir(String file, String dir) {
-        File f = new File(dir, file);
-        if (f.exists()) return f.getPath();
-        f = new File(dir);
+    private static String findInDir(String key, String dir, OpenFileFilter off) {
+        File f = new File(dir);
         File[] all = f.listFiles();
-        if (all == null) return null; // An error occured. We may not have
-                                      // permission to list the files.
-        String found = null;
-        int i = 0;
-        while ((i < all.length) && (found == null)){
-            if (all[i].isDirectory()) found = findInDir(file, all[i].getPath());
-            i++;
+        if (all == null)
+	  return null;  // An error occured. We may not have
+			// permission to list the files.
+
+	int numFiles = all.length;
+
+	for (int i=0; i<numFiles; i++) {
+	  File curFile = all[i];
+
+	  if (curFile.isFile()) {
+	    String name = curFile.getName();
+	    if (name.startsWith(key+".") &&
+		off.accept(name))
+	      return curFile.getPath();
+
+	  } else if (curFile.isDirectory()) {
+	    String found = findInDir(key, curFile.getPath(), off);
+	    if (found!=null)
+	      return found;
+	  }
         }
-        return found;
+        return null;
     }
 
     /**
@@ -986,5 +974,22 @@ public class Util {
       mcr.appendTail(buf);
       String titleCap = title.substring(0, 1) + buf.toString();
       return titleCap;
+    }
+
+    /**
+     * This method looks up what kind of external binding is used for the given field,
+     * and constructs on OpenFileFilter suitable for browsing for an external file.
+     * @param fieldName The BibTeX field in question.
+     * @return The file filter.
+     */
+    public static OpenFileFilter getFileFilterForField(String fieldName) {
+        String s = (String)GUIGlobals.FIELD_EXTRAS.get(fieldName);
+        final String ext = "."+fieldName.toLowerCase();
+        final OpenFileFilter off;
+        if (s.equals("browseDocZip"))
+            off = new OpenFileFilter(new String[] { ext, ext+".gz", ext+".bz2" });
+        else
+            off = new OpenFileFilter(new String[] { ext });
+        return off;
     }
 }

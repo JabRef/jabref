@@ -26,18 +26,19 @@ public class ExternalFilePanel extends JPanel {
     private JButton browseBut, download, auto;
     private EntryEditor entryEditor;
     private JabRefFrame frame;
-
+    private OpenFileFilter off;
     private BibtexEntry entry = null;
 
-    public ExternalFilePanel(final String fieldName, final BibtexEntry entry) {
-        this(null, null, fieldName, null);
+    public ExternalFilePanel(final String fieldName, final BibtexEntry entry, final OpenFileFilter off) {
+        this(null, null, fieldName, off, null);
         this.entry = entry;
     }
 
     public ExternalFilePanel(final JabRefFrame frame, final EntryEditor entryEditor,
-                             final String fieldName, final FieldEditor editor) {
+                             final String fieldName, final OpenFileFilter off, final FieldEditor editor) {
 
         this.frame = frame;
+        this.off = off;
         this.entryEditor = entryEditor;
 
         setLayout(new GridLayout(3, 1));
@@ -158,16 +159,21 @@ public class ExternalFilePanel extends JPanel {
                     try {
                         url = new URL(res);
 
+                        String suffix = off.getSuffix(res);
+			            if (suffix == null)
+			            suffix = "."+fieldName.toLowerCase();
+
                         String plannedName = null;
                         if (getKey() != null)
-                            plannedName = getKey() + "."+fieldName;
+                            plannedName = getKey() + suffix;
                         else {
                             plannedName = JOptionPane.showInputDialog(parent,
                                     Globals.lang("BibTeX key not set. Enter a name for the downloaded file"));
                             if (plannedName == null)
                                 return;
-                            if (!plannedName.substring(4).equals("."+fieldName))
-                                plannedName += "."+fieldName;
+
+                            if (!off.accept(plannedName))
+                                plannedName += suffix;
                         }
                         File file = new File(new File(Globals.prefs.get(fieldName+"Directory")), plannedName);
 
@@ -236,7 +242,7 @@ public class ExternalFilePanel extends JPanel {
         Thread t = (new Thread() {
             public void run() {
                 Object o = getKey();
-                String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"));
+                String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"), off);
                 if (found != null) {
                     editor.setText(found);
                     if (entryEditor != null)

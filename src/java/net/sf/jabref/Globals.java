@@ -104,7 +104,7 @@ public class Globals {
   public static boolean ON_MAC = (osName.equals(MAC)),
       ON_WIN = (osName.startsWith("Windows"));
 
-  public static String[] SKIP_WORDS = {"a", "an", "the", "for"};
+  public static String[] SKIP_WORDS = {"a", "an", "the", "for", "on"};
     public static SidePaneManager sidePaneManager;
 
     public static void logger(String s) {
@@ -328,6 +328,14 @@ public class Globals {
                       updateWorkingDirectory, false);
   }
 
+  public static String getNewFile(JFrame owner, JabRefPreferences prefs,
+                                  File directory, String extension, OpenFileFilter off,
+                                  int dialogType,
+                                  boolean updateWorkingDirectory) {
+    return getNewFile(owner, prefs, directory, extension, off, dialogType,
+                      updateWorkingDirectory, false);
+  }
+
   public static String getNewDir(JFrame owner, JabRefPreferences prefs,
                                  File directory, String extension,
                                  int dialogType, boolean updateWorkingDirectory) {
@@ -342,13 +350,21 @@ public class Globals {
                                    boolean dirOnly) {
 
     OpenFileFilter off = null;
-    if (extension == null) {
+
+    if (extension == null) 
       off = new OpenFileFilter();
-    }
-    else if (!extension.equals(NONE)) {
+    else if (!extension.equals(NONE))
       off = new OpenFileFilter(extension);
 
-    }
+    return getNewFile(owner, prefs, directory, extension, off, dialogType, updateWorkingDirectory, dirOnly);
+  }
+
+  private static String getNewFile(JFrame owner, JabRefPreferences prefs,
+                                   File directory, String extension, OpenFileFilter off,
+                                   int dialogType,
+                                   boolean updateWorkingDirectory,
+                                   boolean dirOnly) {
+
     if (ON_MAC) {
       return getNewFileForMac(owner, prefs, directory, extension, dialogType,
                               updateWorkingDirectory, dirOnly, off);
@@ -395,9 +411,10 @@ public class Globals {
     // If this is a save dialog, and the user has not chosen "All files" as filter
     // we enforce the given extension.
     if ( (dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
-        !selectedFile.getPath().endsWith(extension)) {
+        !off.accept(selectedFile)) {
 
-      selectedFile = new File(selectedFile.getPath() + extension);
+      // add the first extension if there are multiple extensions
+      selectedFile = new File(selectedFile.getPath() + extension.split("[, ]+",0)[0]);
     }
 
     if (updateWorkingDirectory) {

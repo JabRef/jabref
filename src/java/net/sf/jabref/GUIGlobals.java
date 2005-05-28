@@ -486,8 +486,8 @@ public class GUIGlobals {
     FIELD_EXTRAS = new HashMap();
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    FIELD_EXTRAS.put("pdf", "browsePdf");
-    FIELD_EXTRAS.put("ps", "browsePs");
+    FIELD_EXTRAS.put("pdf", "browseDoc");
+    FIELD_EXTRAS.put("ps", "browseDocZip");
     FIELD_EXTRAS.put("url", "external");
     FIELD_EXTRAS.put("citeseerurl", "external");
     FIELD_EXTRAS.put("doi", "external");

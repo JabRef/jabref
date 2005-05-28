@@ -84,6 +84,8 @@ public class ImportInspectionDialog extends JDialog {
 
         tableModel.addColumn(Globals.lang("Keep"));
 
+        DeleteListener deleteListener = new DeleteListener();
+
         for (int i=0; i<fields.length; i++) {
             tableModel.addColumn(Util.nCase(fields[i]));
             Object o = GUIGlobals.fieldLength.get(fields[i]);
@@ -109,6 +111,8 @@ public class ImportInspectionDialog extends JDialog {
         centerPan.add(contentPane, BorderLayout.CENTER);
         centerPan.add(progressBar, BorderLayout.SOUTH);
 
+        popup.add(deleteListener);
+        popup.addSeparator();
         if (!newDatabase) {
             GroupTreeNode node = panel.metaData().getGroups();
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
@@ -150,7 +154,7 @@ public class ImportInspectionDialog extends JDialog {
         stop.addActionListener(new StopListener());
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
-        delete.addActionListener(new DeleteListener());
+        delete.addActionListener(deleteListener);
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         setSize(new Dimension(650, 650));
@@ -464,7 +468,12 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
-    class DeleteListener implements ActionListener {
+    class DeleteListener extends JMenuItem implements ActionListener {
+        public DeleteListener() {
+            super(Globals.lang("Delete"));
+            addActionListener(this);
+        }
+
         public void actionPerformed(ActionEvent event) {
              removeSelectedEntries();
         }

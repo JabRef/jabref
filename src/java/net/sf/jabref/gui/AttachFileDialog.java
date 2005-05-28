@@ -61,7 +61,9 @@ public class AttachFileDialog extends JDialog {
 
     private void initGui() {
 
-        final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, entry);
+        final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, entry,
+                      Util.getFileFilterForField(fieldName));
+
         browse.addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent event) {
                 extPan.browseFile(fieldName, editor);
@@ -95,23 +97,31 @@ public class AttachFileDialog extends JDialog {
             }
         });
 
-        FormLayout layout = new FormLayout("fill:pref, 4dlu, fill:160dlu","");
+        FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref","");
 	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.append(browse);
-        builder.nextLine();
-        builder.append(download);
-        builder.nextLine();
-        builder.append(auto);
-        builder.nextLine();
-        builder.append(Util.nCase(fieldName));//(editor.getLabel());
+        //builder.append(Util.nCase(fieldName));//(editor.getLabel());
+        builder.appendSeparator(Util.nCase(fieldName));
         builder.append(editor.getTextComponent());
+        builder.append(browse);
+
+        ButtonBarBuilder bb = new ButtonBarBuilder();
+        bb.addGridded(download);
+        bb.addGridded(auto);
+        //builder.append(Globals.lang("Advanced options for setting..."));
+        builder.nextLine();
+        builder.append(bb.getPanel());
+        builder.nextLine();
+        builder.appendSeparator();
+
         main = builder.getPanel();
 
         main.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        ButtonBarBuilder bb = new ButtonBarBuilder();
+        bb = new ButtonBarBuilder();
+        bb.addGlue();
         bb.addGridded(ok);
         bb.addGridded(cancel);
+        bb.addGlue();
 
 
         getContentPane().add(main, BorderLayout.CENTER);

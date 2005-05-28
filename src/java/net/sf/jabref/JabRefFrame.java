@@ -290,6 +290,7 @@ public class JabRefFrame
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", "Synchronize PDF links"),
+        autoSetPs = new GeneralAction("autoSetPs", "Synchronize PS links"),
       test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -999,6 +1000,7 @@ public JabRefPreferences prefs() {
 
       tools.addSeparator();
       tools.add(autoSetPdf);
+      tools.add(autoSetPs);
 
     mb.add(tools);
 

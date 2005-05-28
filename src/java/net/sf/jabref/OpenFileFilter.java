@@ -1,50 +1,101 @@
 package net.sf.jabref;
-import java.io.File;
+
+import java.util.*;
 import java.io.*;
+
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-    String filetype;
-    boolean specific = false;
+  HashSet extSet = new HashSet();
+  String desc;
 
-    public OpenFileFilter() {}
+  public OpenFileFilter(String[] extensions) {
+    StringBuffer buf = new StringBuffer();
+    int numExt = extensions.length;
 
-    /**
-     * Creates a new <code>OpenFileFilter</code> instance which only accepts
-     * one specific extension.
-     *
-     * @param s The extension of the file, e.g. ".bib" or ".html".
-     */
-    public OpenFileFilter(String s) {
-	filetype = s;
-	specific = true;
+    if (numExt>0) {
+      buf.append('*');
+      buf.append(extensions[0]);
+
+      extSet.add(extensions[0]);
     }
 
+    for(int curExt = 1; curExt<numExt; curExt++) {
+      buf.append(", *");
+      buf.append(extensions[curExt]);
 
+      extSet.add(extensions[curExt]);
+    }
 
-    public boolean accept(File file){
-	String filenm = file.getName();
-	if (!specific)
-	    return (filenm.endsWith(".bib")
-		    || file.isDirectory()
-                    || filenm.endsWith(".dat") // silverplatter ending
-		    || filenm.endsWith(".txt")
-		    || filenm.endsWith(".ris")
-		    || filenm.endsWith(".ref") // refer/endnote format
-		    || filenm.endsWith(".fcgi") // default for pubmed
-		    || filenm.endsWith(".bibx") // default for BibTeXML
-		    || filenm.endsWith(".xml"));// windows puts ".txt" extentions and for scifinder
-	else
-	    return (filenm.endsWith(filetype)
-		    || file.isDirectory());
-    }
-    public String getDescription(){
-	if (!specific)
-	    return "*.bib, *.bibx, *.dat, *.txt, *.xml, *.ref, *.ris or *.fcgi";
-	else
-	    return "*"+filetype;
-    }
+    desc = buf.toString();
+  }
+
+  public OpenFileFilter() {
+    this( new String[] {
+      ".bib",
+      ".dat",  // silverplatter ending
+      ".txt",  // windows puts ".txt" extentions and for scifinder
+      ".ris",
+      ".ref",  // refer/endnote format
+      ".fcgi", // default for pubmed
+      ".bibx", // default for BibTeXML
+      ".xml"
+    });
+  }
+
+  public OpenFileFilter(String s) {
+    this(s.split("[, ]+",0));
+  }
+
+  public boolean accept(File file){
+    if (file.isDirectory())
+      return true;
+
+    return accept(file.getName());
+  }
+
+  public boolean accept(String filenm){
+
+    int dotPos = filenm.lastIndexOf(".");
+
+    if (dotPos==-1)
+      return false;
+
+    int dotDotPos = filenm.lastIndexOf(".", dotPos-1); // for dot.dot extensions
+
+    return extSet.contains(filenm.substring(dotPos)) ||
+      (dotDotPos>=0 && extSet.contains(filenm.substring(dotDotPos)));
+  }
+
+  public String getSuffix(String filenm) {
+
+    int dotPos;
+    String suffix;
+    
+    dotPos = filenm.lastIndexOf(".");
+    if (dotPos==-1)
+      return null;
+
+    suffix = filenm.substring(dotPos);
+    if (extSet.contains(suffix))
+      return suffix;
+
+    dotPos = filenm.lastIndexOf(".", dotPos-1); // for dot.dot extensions
+    if (dotPos==-1)
+      return null;
+
+    suffix = filenm.substring(dotPos);
+    if (extSet.contains(suffix))
+      return suffix;
+
+    return null;
+  }
+
+  public String getDescription(){
+    return desc;
+  }
 
   public boolean accept(File dir, String name) {
     return accept(new File(dir.getPath()+name));
   }
 }
+
