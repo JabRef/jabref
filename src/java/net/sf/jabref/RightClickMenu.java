@@ -304,33 +304,6 @@ public class RightClickMenu extends JPopupMenu
             m_node = node;
         }
         public void actionPerformed(ActionEvent evt) {
-            if (m_node.getGroup() instanceof ExplicitGroup) {
-                // warn if any entry has an empty or duplicate key
-                BibtexEntry[] entries = panel.getSelectedEntries();
-                String key;
-                int entriesWithoutKey = 0;
-                int entriesWithDuplicateKey = 0;
-                for (int i = 0; i < entries.length; ++i) {
-                    key = entries[i].getCiteKey();
-                    if (key == null)
-                        key = "";
-                    if (key.equals(""))
-                        ++entriesWithoutKey;
-                    else if (panel.database().getEntriesByKey(key).length > 1)
-                        ++entriesWithDuplicateKey;
-                }
-                if (entriesWithoutKey > 0 || entriesWithDuplicateKey > 0) {
-                    // JZTODO lyrics...
-                    int i = JOptionPane.showConfirmDialog(panel.frame,"no key: " + entriesWithoutKey
-                            + ", dupe key: " + entriesWithDuplicateKey,
-                            "Warning",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-                    if (i == JOptionPane.CANCEL_OPTION)
-                        return;
-                }
-            }
-            
             // warn if assignment has undesired side effects (modifies a field != keywords)
             if (!Util.warnAssignmentSideEffects(m_node.getGroup(),
                     panel.getSelectedEntries(),
@@ -351,6 +324,7 @@ public class RightClickMenu extends JPopupMenu
             panel.refreshTable();
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
+            panel.getGroupSelector().valueChanged(null);
             panel.updateViewToSelected();
         }
     }
@@ -377,6 +351,7 @@ public class RightClickMenu extends JPopupMenu
             panel.refreshTable();
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
+            panel.getGroupSelector().valueChanged(null);
             panel.updateViewToSelected();
         }
     }
