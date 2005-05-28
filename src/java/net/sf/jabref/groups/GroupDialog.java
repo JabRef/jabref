@@ -258,7 +258,9 @@ class GroupDialog extends JDialog {
                                     .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
                                     .isSelected());
-                    if (m_editedGroup != null && m_resultingGroup.supportsAdd()) {
+                    if ((m_editedGroup instanceof ExplicitGroup
+                            || m_editedGroup instanceof SearchGroup) 
+                            && m_resultingGroup.supportsAdd()) {
                         addPreviousEntries();
                     }
                 } else if (m_searchRadioButton.isSelected()) {
