@@ -225,6 +225,7 @@ public class RightClickMenu extends JPopupMenu
      */
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
       BibtexEntry[] bes = panel.entryTable.getSelectedEntries();
+      panel.storeCurrentEdit();
       GroupTreeNode groups = metaData.getGroups();
       if (groups == null) {
         groupAddMenu.setEnabled(false);
@@ -236,12 +237,6 @@ public class RightClickMenu extends JPopupMenu
       groupRemoveMenu.setEnabled(true);
       groupAddMenu.removeAll();
       groupRemoveMenu.removeAll();
-      
-      // JZ: I think having a special menu for only one selected entry
-      // is rather non-intuitive because the user cannot see wheter a
-      // certain menu item will add or remove the entry to/from
-      // that group. IMHO, it is more consistent when the menu is always
-      // the same.
       
       if (bes == null)
         return;
