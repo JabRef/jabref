@@ -985,15 +985,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     String encoding = Globals.prefs.get("defaultEncoding");
                     ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
                     BibtexDatabase db = pr.getDatabase();
-                    MetaData meta = new MetaData(pr.getMetaData(),database());
+                    MetaData meta = new MetaData(pr.getMetaData(),pr.getDatabase());
                     NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
+                    Vector appendedEntries = new Vector();
+                    Vector originalEntries = new Vector();
+                    BibtexEntry originalEntry;
 
                     if (importEntries) { // Add entries
                       Iterator i = db.getKeySet().iterator();
                       while (i.hasNext()) {
-                        BibtexEntry be = (BibtexEntry)(db.getEntryById((String)i.next()).clone());
+                        originalEntry = db.getEntryById((String)i.next());
+                        BibtexEntry be = (BibtexEntry)(originalEntry.clone());
                         be.setId(Util.createNeutralId());
                         database.insertEntry(be);
+                        appendedEntries.add(be);
+                        originalEntries.add(originalEntry);
                         ce.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
                       }
                     }
@@ -1017,14 +1023,37 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       if (newGroups != null) {
                           
                           // ensure that there is always only one AllEntriesGroup
-                          if (newGroups.getGroup() instanceof AllEntriesGroup)
-                              newGroups.setGroup(new ExplicitGroup("Imported Groups")); // dummy group
+                          if (newGroups.getGroup() instanceof AllEntriesGroup) {
+                              // create a dummy group
+                              ExplicitGroup group = new ExplicitGroup("Imported"); // JZTODO lyrics 
+                              newGroups.setGroup(group);
+                              for (int i = 0; i < appendedEntries.size(); ++i)
+                                  group.addEntry((BibtexEntry) appendedEntries.elementAt(i));
+                          }
                           
                         // groupsSelector is always created, even when no groups
                         // have been defined. therefore, no check for null is
                         // required here
                         frame.groupSelector.addGroups(newGroups, ce);
-                        // JZTODO: this should handle ExplicitGroups!!!
+                        // for explicit groups, the entries copied to the mother db have to 
+                        // be "reassigned", i.e. the old reference is removed and the reference
+                        // to the new db is added.
+                        GroupTreeNode node;
+                        ExplicitGroup group;
+                        BibtexEntry entry;
+                        for (Enumeration e = newGroups.preorderEnumeration(); e.hasMoreElements(); ) {
+                            node = (GroupTreeNode) e.nextElement();
+                            if (!(node.getGroup() instanceof ExplicitGroup))
+                                continue;
+                            group = (ExplicitGroup) node.getGroup();
+                            for (int i = 0; i < originalEntries.size(); ++i) {
+                                entry = (BibtexEntry) originalEntries.elementAt(i);
+                                if (group.contains(entry)) {
+                                    group.removeEntry(entry);
+                                    group.addEntry((BibtexEntry) appendedEntries.elementAt(i));
+                                }                                   
+                            }
+                        }
                         frame.groupSelector.revalidateGroups();
                       }
                     }
