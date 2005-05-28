@@ -14,8 +14,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, backup, openLast,
 	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-	useOwner, keyWarningDialog, confirmDelete, saveInStandardOrder,
-	allowEditing, preserveFormatting;
+	useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog,
+    confirmDelete, saveInStandardOrder, allowEditing, preserveFormatting;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField, fontSize;
     JabRefPreferences _prefs;
@@ -40,7 +40,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
 	useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name")+":");
-	keyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
+    keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
+    keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
 	confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
 	saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
         preserveFormatting = new JCheckBox(Globals.lang("Preserve formatting of non-BibTeX fields"));
@@ -75,7 +76,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(allowEditing); builder.nextLine();
 	builder.append(pan); builder.append(ctrlClick); builder.nextLine();
 	builder.append(pan); builder.append(confirmDelete); builder.nextLine();
-	builder.append(pan); builder.append(keyWarningDialog); builder.nextLine();
+    builder.append(pan); builder.append(keyDuplicateWarningDialog); builder.nextLine();
+    builder.append(pan); builder.append(keyEmptyWarningDialog); builder.nextLine();
 	// Create a new panel with its own FormLayout for the last items:
 	FormLayout layout2 = new FormLayout
 	    ("left:pref, 8dlu, fill:60dlu, 4dlu, fill:pref", "");                
@@ -120,7 +122,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	ctrlClick.setSelected(_prefs.getBoolean("ctrlClick"));
 	disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
 	useOwner.setSelected(_prefs.getBoolean("useOwner"));
-	keyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
+    keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
+    keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
 	confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
 	saveInStandardOrder.setSelected(_prefs.getBoolean("saveInStandardOrder"));
 	preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
@@ -157,7 +160,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
-        _prefs.putBoolean("dialogWarningForDuplicateKey", keyWarningDialog.isSelected());
+        _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
+        _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
         _prefs.putBoolean("saveInStandardOrder", saveInStandardOrder.isSelected());
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());

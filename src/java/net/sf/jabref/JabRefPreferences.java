@@ -192,6 +192,7 @@ public class JabRefPreferences {
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("allowTableEditing", Boolean.FALSE);
         defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
+        defaults.put("dialogWarningForEmptyKey", Boolean.TRUE);
         defaults.put("avoidOverwritingKey", Boolean.FALSE);
         defaults.put("warnBeforeOverwritingKey", Boolean.TRUE);
         defaults.put("confirmDelete", Boolean.TRUE);
