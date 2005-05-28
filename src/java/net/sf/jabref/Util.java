@@ -396,13 +396,13 @@ public class Util {
     public static void openExternalViewer(String link, String fieldName,
             JabRefPreferences prefs) throws IOException {
         //try first with an URL
-        try{
+        /*try{
             URL fileurl = new URL(link);
             BrowserLauncher.openURL(fileurl.toString());
             return;
         }catch (MalformedURLException mue){
             //mue.printStackTrace();
-        }
+        } */
 
         File file;
 
