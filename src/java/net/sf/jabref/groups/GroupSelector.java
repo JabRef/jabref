@@ -582,9 +582,9 @@ public class GroupSelector extends SidePaneComponent implements
      * </b> are inserted directly, i.e. they are not deepCopy()'d.
      */
     public void addGroups(GroupTreeNode newGroups, CompoundEdit ce) {
-        // ensure that there are never two instances of AllEntriesGroup
+        // paranoia: ensure that there are never two instances of AllEntriesGroup
         if (newGroups.getGroup() instanceof AllEntriesGroup)
-            return; // JZTODO: output something...
+            return; // this should be impossible anyway
         groupsRoot.add(newGroups);
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
                 groupsRoot, newGroups, UndoableAddOrRemoveGroup.ADD_NODE);
