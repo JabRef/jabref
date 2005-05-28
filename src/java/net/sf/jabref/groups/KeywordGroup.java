@@ -77,7 +77,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         if (!s.startsWith(ID))
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
-                            + s + "\". "
+                            + s
+                            + "\". "
                             + "Please report this on www.sf.net/projects/jabref");
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
                 .length()), SEPARATOR, QUOTE_CHAR);
@@ -91,9 +92,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                     .unquote(field, QUOTE_CHAR), Util.unquote(expression,
                     QUOTE_CHAR), false, true);
         }
-        case 1: 
-        case 2: 
-        {
+        case 1:
+        case 2: {
             String name = tok.nextToken();
             String field = tok.nextToken();
             String expression = tok.nextToken();
@@ -136,8 +136,11 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     public AbstractUndoableEdit add(BibtexEntry[] entries) {
+        if (!supportsAdd())
+            return null;
         if ((entries != null) && (entries.length > 0)) {
-            NamedCompound ce = new NamedCompound(Globals.lang("add entries to group"));
+            NamedCompound ce = new NamedCompound(Globals
+                    .lang("add entries to group"));
             boolean modified = false;
             for (int i = 0; i < entries.length; i++) {
                 if (applyRule(null, entries[i]) == 0) {
@@ -164,8 +167,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+        if (!supportsRemove())
+            return null;
+        
         if ((entries != null) && (entries.length > 0)) {
-            NamedCompound ce = new NamedCompound(Globals.lang("remove from group"));
+            NamedCompound ce = new NamedCompound(Globals
+                    .lang("remove from group"));
             boolean modified = false;
             for (int i = 0; i < entries.length; ++i) {
                 if (applyRule(null, entries[i]) > 0) {
@@ -222,17 +229,35 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     }
 
     /**
-     * Removes matches of searchString in the entry's field.
+     * Removes matches of searchString in the entry's field. This is only
+     * possible if the search expression is not a regExp.
      */
     private void removeMatches(BibtexEntry entry) {
         String content = (String) entry.getField(m_searchField);
-        StringBuffer sb = new StringBuffer();
-        if (content != null) {
-            String[] split = m_pattern.split(content);
-            for (int i = 0; i < split.length; ++i)
-                sb.append(split[i]);
+        if (content == null)
+            return; // nothing to modify
+        StringBuffer sbOrig = new StringBuffer(content);
+        StringBuffer sbLower = new StringBuffer(content.toLowerCase());
+        StringBuffer haystack = m_caseSensitive ? sbOrig : sbLower;
+        String needle = m_caseSensitive ? m_searchExpression 
+                : m_searchExpression.toLowerCase();
+        int i, j, k;
+        while ((i = haystack.indexOf(needle)) >= 0) {
+            sbOrig.replace(i, i + needle.length(), "");
+            sbLower.replace(i, i + needle.length(), "");
+            // reduce spaces at i to 1
+            j = i;
+            k = i;
+            while (j - 1 >= 0 && haystack.charAt(j - 1) == ' ')
+                --j;
+            while (k < haystack.length() && haystack.charAt(k) == ' ')
+                ++k;
+            sbOrig.replace(j, k, " ");
+            sbLower.replace(j, k, " ");
         }
-        entry.setField(m_searchField, (sb.length() > 0 ? sb.toString() : null));
+        
+        String result = sbOrig.toString().trim();
+        entry.setField(m_searchField, (result.length() > 0 ? result : null));
     }
 
     public int applyRule(Map searchOptions, BibtexEntry entry) {
@@ -260,7 +285,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
     public boolean isRegExp() {
         return m_regExp;
     }
-    
+
     public String getSearchExpression() {
         return m_searchExpression;
     }
