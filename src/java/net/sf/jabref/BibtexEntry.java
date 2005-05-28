@@ -368,5 +368,24 @@ public class BibtexEntry
     public String toString() {
 	return getType().getName()+":"+getField(Globals.KEY_FIELD);
     }
-
+    
+    /**
+     * @param maxCharacters The maximum number of characters (additional
+     * characters are replaced with "..."). Set to 0 to disable truncation.
+     * @return A short textual description of the entry in the format:
+     * Author1, Author2: Title (Year)
+     */
+    public String getAuthorTitleYear(int maxCharacters) {
+        String[] s = new String[] {
+                (String) getField("author"),
+                (String) getField("title"),
+                (String) getField("year")};
+        for (int i = 0; i < s.length; ++i)
+            if (s[i] == null)
+                s[i] = "N/A";
+        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ")";
+        if (maxCharacters <= 0 || text.length() <= maxCharacters)
+            return text;
+        return text.substring(0, maxCharacters + 1) + "...";
+    }
 }
