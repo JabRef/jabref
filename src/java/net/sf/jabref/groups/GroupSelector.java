@@ -265,6 +265,14 @@ public class GroupSelector extends SidePaneComponent implements
         orCb.addActionListener(this);
         invCb.addActionListener(this);
         autoGroup.addActionListener(this);
+        groupModeIndependent.addActionListener(this);
+        groupModeIntersection.addActionListener(this);
+        groupModeUnion.addActionListener(this);
+        floatCb.addActionListener(this);
+        highlCb.addActionListener(this);
+        select.addActionListener(this);
+        hideNonHits.addActionListener(this);
+        grayOut.addActionListener(this);
         newButton.setToolTipText(Globals.lang("New group"));
         refresh.setToolTipText(Globals.lang("Refresh view"));
         andCb.setToolTipText(Globals
@@ -544,6 +552,10 @@ public class GroupSelector extends SidePaneComponent implements
             gd.show();
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {
+            valueChanged(null);
+        } else if (e.getSource() instanceof JCheckBoxMenuItem) {
+            valueChanged(null);
+        } else if (e.getSource() instanceof JRadioButtonMenuItem) {
             valueChanged(null);
         }
     }
