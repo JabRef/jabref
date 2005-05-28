@@ -36,6 +36,7 @@ import javax.swing.tree.*;
 import javax.swing.undo.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
@@ -602,12 +603,22 @@ public class GroupSelector extends SidePaneComponent implements
             gd.show();
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
+                AbstractUndoableEdit undoAddPreviousEntries
+                    = gd.getUndoForAddPreviousEntries(); 
                 UndoableModifyGroup undo = new UndoableModifyGroup(
                         GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
                 revalidateGroups();
                 // Store undo information.
-                panel.undoManager.addEdit(undo);
+                if (undoAddPreviousEntries == null) {
+                    panel.undoManager.addEdit(undo);
+                } else {
+                    NamedCompound nc = new NamedCompound("Modify Group"); // JZTODO lyrics
+                    nc.addEdit(undo);
+                    nc.addEdit(undoAddPreviousEntries);
+                    nc.end();
+                    panel.undoManager.addEdit(nc);
+                }
                 panel.markBaseChanged();
                 frame.output(Globals.lang("Modified group \"%0\".",
                         newGroup.getName()));

@@ -28,12 +28,12 @@ package net.sf.jabref.groups;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
+import java.util.*;
 import java.util.regex.*;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.search.*;
@@ -88,6 +88,7 @@ class GroupDialog extends JDialog {
     private final JabRefFrame m_parent;
     private final BasePanel m_basePanel;
     private AbstractGroup m_resultingGroup;
+    private AbstractUndoableEdit m_undoAddPreviousEntires = null;
     private final AbstractGroup m_editedGroup;
     private CardLayout m_optionsLayout = new CardLayout();
 
@@ -257,6 +258,9 @@ class GroupDialog extends JDialog {
                                     .trim(), m_kgSearchTerm.getText().trim(),
                             m_kgCaseSensitive.isSelected(), m_kgRegExp
                                     .isSelected());
+                    if (m_editedGroup != null && m_resultingGroup.supportsAdd()) {
+                        addPreviousEntries();
+                    }
                 } else if (m_searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
@@ -401,10 +405,6 @@ class GroupDialog extends JDialog {
      * added to the new group.
      */
     private void addPreviousEntries() {
-        // JZTODO in general, this should create undo information
-        // because it might affect the entries. currently, it is only
-        // used for ExplicitGroups; the undo information for this case is
-        // contained completely in the UndoableModifyGroup object.
         // JZTODO lyrics...
         int i = JOptionPane
                 .showConfirmDialog(
@@ -415,11 +415,20 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION)
             return;
         BibtexEntry entry;
+        Vector vec = new Vector();
         for (Iterator it = m_basePanel.database().getEntries().iterator(); it
                 .hasNext();) {
             entry = (BibtexEntry) it.next();
             if (m_editedGroup.contains(entry))
-                ((ExplicitGroup) m_resultingGroup).addEntry(entry);
+                vec.add(entry);
+        }
+        if (vec.size() > 0) {
+            BibtexEntry[] entries = new BibtexEntry[vec.size()];
+            vec.toArray(entries);
+            // the undo information for a conversion to an ExplicitGroup is
+            // contained completely in the UndoableModifyGroup object.
+            if (!(m_resultingGroup instanceof ExplicitGroup))
+                m_undoAddPreviousEntires = m_resultingGroup.add(entries);
         }
     }
 
@@ -567,5 +576,11 @@ class GroupDialog extends JDialog {
             return s.substring(0,lastNewline+4) 
             + s.substring(lastNewline+4).replaceAll(" ", "&nbsp;");
         return s;
+    }
+    
+    /** Returns an undo object for adding the edited group's entries
+     * to the new group, or null if this did not occur. */
+    public AbstractUndoableEdit getUndoForAddPreviousEntries() {
+        return m_undoAddPreviousEntires;
     }
 }
