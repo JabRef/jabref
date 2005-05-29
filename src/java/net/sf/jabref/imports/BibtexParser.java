@@ -134,7 +134,7 @@ public class BibtexParser
 		String entryType = parseTextToken();
 		BibtexEntryType tp = BibtexEntryType.getType(entryType);
 		boolean isEntry = (tp != null);
-	       
+	    //Util.pr(tp.getName());
 		if (!isEntry) {
 		    // The entry type name was not recognized. This can mean
 		    // that it is a string, preamble, or comment. If so,
@@ -218,8 +218,7 @@ public class BibtexParser
 
 		if (isEntry) // True if not comment, preamble or string.
                 {
-		    //Util.pr("Found: "+tp.getName());
-                    BibtexEntry be = parseEntry(tp);
+	                BibtexEntry be = parseEntry(tp);
                     boolean duplicateKey = _db.insertEntry(be);
                     if (duplicateKey) // JZTODO lyrics
                       _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
@@ -260,7 +259,7 @@ public class BibtexParser
 	int c = _in.read();
 	if (c == '\n')
 	    line++;
-	return c;
+    return c;
     }
 
     private void unread(int c) throws IOException
@@ -298,10 +297,10 @@ public class BibtexParser
 
     public BibtexEntry parseEntry(BibtexEntryType tp) throws IOException
     {
-	String id = Util.createId(tp, _db);
-	BibtexEntry result = new BibtexEntry(id, tp);
 
-	skipWhitespace();
+	String id = Util.createNeutralId();//createId(tp, _db);
+    BibtexEntry result = new BibtexEntry(id, tp);
+    skipWhitespace();
 	consume('{','(');
 	skipWhitespace();
 	String key = null;
@@ -321,7 +320,7 @@ public class BibtexParser
 		    || (c == '\"')) {
                     String fieldName = ex.getMessage().trim().toLowerCase();
 		    String cont = parseFieldContent(GUIGlobals.isStandardField(fieldName));
-		    result.setField(fieldName, cont);
+            result.setField(fieldName, cont);
 		} else {
 		    if (key != null)
 			key = key+ex.getMessage()+"=";
@@ -334,8 +333,7 @@ public class BibtexParser
 	if ((key != null) && key.equals(""))
 	    key = null;
 	if(result!=null)result.setField(GUIGlobals.KEY_FIELD, key);
-//System.out.println(key+"");
-	skipWhitespace();
+    skipWhitespace();
 
 	while (true)
 	{
@@ -359,7 +357,7 @@ public class BibtexParser
 	}
 
 	consume('}',')');
-	return result;
+    return result;
     }
 
     private void parseField(BibtexEntry entry) throws IOException
@@ -369,6 +367,8 @@ public class BibtexParser
         skipWhitespace();
         consume('=');
 	String content = parseFieldContent(GUIGlobals.isStandardField(key));
+        //System.out.println(content);
+
 	if (content.length() > 0) {
           if (entry.getField(key) == null)
             entry.setField(key, content);

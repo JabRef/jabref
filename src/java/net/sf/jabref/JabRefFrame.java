@@ -1851,7 +1851,7 @@ class FetchCiteSeerAction
         BibtexEntry entry = (BibtexEntry) it.next();
 
         try {
-          entry.setId(Util.createId(entry.getType(), database));
+          entry.setId(Util.createNeutralId());
           database.insertEntry(entry);
         }
         catch (KeyCollisionException ex) {
@@ -1922,7 +1922,7 @@ class FetchCiteSeerAction
 
         if (!dupli) {
             try {
-                entry.setId(Util.createId(entry.getType(), database));
+                entry.setId(Util.createNeutralId());
                 database.insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry
                            (database, entry, basePanel));

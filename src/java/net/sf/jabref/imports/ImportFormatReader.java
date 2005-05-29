@@ -156,7 +156,7 @@ public class ImportFormatReader {
       BibtexEntry entry = (BibtexEntry) i.next();
 
       try {
-        entry.setId(Util.createId(entry.getType(), database));
+        entry.setId(Util.createNeutralId());
         database.insertEntry(entry);
       } catch (KeyCollisionException ex) {
         //ignore

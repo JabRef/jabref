@@ -86,19 +86,10 @@ public class Util {
         else return s;
     }
 
-    public static String createId(BibtexEntryType type, BibtexDatabase database) {
-        String s;
-        do{
-            s = type.getName()
-                    + (new Integer((int) (Math.random() * 10000))).toString();
-        }while (database.getEntryById(s) != null);
-        return s;
-    }
-
     private static int idCounter = 0;
 
     public synchronized static String createNeutralId() {
-        return "" + (idCounter++);
+        return String.valueOf(idCounter++);
     }
 
     /**

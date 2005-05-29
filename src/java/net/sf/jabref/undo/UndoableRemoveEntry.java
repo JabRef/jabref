@@ -62,7 +62,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
 
 	// Revert the change.
 	try {
-	    String id = Util.createId(entry.getType(), base);
+	    String id = Util.createNeutralId();
 	    entry.setId(id);
 	    base.insertEntry(entry);
 	} catch (Throwable ex) {

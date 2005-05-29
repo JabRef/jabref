@@ -433,7 +433,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 			    int citationCounter=0;
 			    for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
 			        String key = (String) e.nextElement();
-					String id = Util.createId(BibtexEntryType.ARTICLE, database);
+					String id = Util.createNeutralId();
 					BibtexEntry newEntry = new BibtexEntry(id);
 					StringBuffer citeseerURLString = new StringBuffer();
 					citeseerURLString.append(OAI_URL);

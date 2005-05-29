@@ -411,7 +411,7 @@ public class ImportInspectionDialog extends JDialog {
                 }
 
                 try {
-                entry.setId(Util.createId(entry.getType(), panel.database()));
+                entry.setId(Util.createNeutralId());
                     panel.database().insertEntry(entry);
                     ce.addEdit(new UndoableInsertEntry(panel.database(), entry,  panel));
                 } catch (KeyCollisionException e) {
