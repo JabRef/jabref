@@ -35,6 +35,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTableUI;
+import javax.swing.plaf.ComponentUI;
 import javax.swing.table.*;
 
 import net.sf.jabref.groups.EntryTableTransferHandler;
@@ -567,80 +568,22 @@ public class EntryTable extends JTable {
     // to visualize which fields are needed for each entry.
     private 	IconStringRenderer incompleteEntryRenderer = new IconStringRenderer
         (Globals.lang("This entry is incomplete"));
-    private Renderer defRenderer = new Renderer(GUIGlobals.tableBackground),
-        reqRenderer = new Renderer(GUIGlobals.tableReqFieldBackground),
-        optRenderer = new Renderer(GUIGlobals.tableOptFieldBackground),
-        incRenderer = new IncompleteRenderer(),//new Renderer(GUIGlobals.tableIncompleteEntryBackground),
+    private GeneralRenderer defRenderer = new GeneralRenderer(this, GUIGlobals.tableBackground, antialiasing),
+        reqRenderer = new GeneralRenderer(this, GUIGlobals.tableReqFieldBackground, antialiasing),
+        optRenderer = new GeneralRenderer(this, GUIGlobals.tableOptFieldBackground, antialiasing),
+        incRenderer = new IncompleteRenderer(this, antialiasing),
+            //new Renderer(GUIGlobals.tableIncompleteEntryBackground),
             //Globals.lang("This entry is incomplete")),
-        grayedOutRenderer = new Renderer(GUIGlobals.grayedOutBackground,
-                                         GUIGlobals.grayedOutText),
-        veryGrayedOutRenderer = new Renderer(GUIGlobals.veryGrayedOutBackground,
-                                             GUIGlobals.veryGrayedOutText),
-        maybeIncRenderer = new Renderer(GUIGlobals.maybeIncompleteEntryBackground),
-        markedRenderer = new Renderer(GUIGlobals.markedEntryBackground);
+        grayedOutRenderer = new GeneralRenderer(this, GUIGlobals.grayedOutBackground,
+                                         GUIGlobals.grayedOutText, antialiasing),
+        veryGrayedOutRenderer = new GeneralRenderer(this, GUIGlobals.veryGrayedOutBackground,
+                                             GUIGlobals.veryGrayedOutText, antialiasing),
+        maybeIncRenderer = new GeneralRenderer(this, GUIGlobals.maybeIncompleteEntryBackground, antialiasing),
+        markedRenderer = new GeneralRenderer(this, GUIGlobals.markedEntryBackground, antialiasing);
 
-    private class Renderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
-        //private DefaultTableCellRenderer darker;
-        //JLabel label = new AALabel();
-
-        public Renderer(Color c) {
-            super();
-            setBackground(c);
-        }
-        public Renderer(Color c, Color fg) {
-            this(c);
-            //setForeground(fg);
-        }
-
-
-        public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
-        public void firePropertyChange(String propertyName, Object old, Object newV) {}
-
-        /* For enabling the renderer to handle icons. */
-        protected void setValue(Object value) {
-            //System.out.println(""+value);
-            if (value instanceof Icon) {
-                setIcon((Icon)value);
-                setText(null);
-                //super.setValue(null);
-            } else if (value instanceof JLabel) {
-              JLabel lab = (JLabel)value;
-              setIcon(lab.getIcon());
-              setToolTipText(lab.getToolTipText());
-              if (lab.getIcon() != null)
-                setText(null);
-            } else {
-
-                setIcon(null);
-                setToolTipText(null);
-                if (value != null)
-                    setText(value.toString());
-                else
-                    setText(null);
-            }
-        }
-
-        //private class AALabel extends JLabel {
-            public void paint(Graphics g) {
-                Graphics2D g2 = (Graphics2D)g;
-
-                if (antialiasing) {
-                    RenderingHints rh = g2.getRenderingHints();
-                    rh.put(RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON);
-                    rh.put(RenderingHints.KEY_RENDERING,
-                        RenderingHints.VALUE_RENDER_QUALITY);
-                    g2.setRenderingHints(rh);
-                }
-                ui.update(g2, this);
-                //super.paint(g2);
-            }
-        //}
-    }
-
-    class IncompleteRenderer extends Renderer {
-        public IncompleteRenderer() {
-            super(GUIGlobals.tableIncompleteEntryBackground);
+    class IncompleteRenderer extends GeneralRenderer {
+        public IncompleteRenderer(JTable table, boolean antialiasing) {
+            super(table, GUIGlobals.tableIncompleteEntryBackground, antialiasing);
         }
         protected void setValue(Object value) {
             super.setValue(value);

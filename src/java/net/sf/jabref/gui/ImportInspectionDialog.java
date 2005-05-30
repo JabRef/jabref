@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 import java.util.*;
 import java.util.List;
 import java.awt.*;
@@ -64,7 +65,8 @@ public class ImportInspectionDialog extends JDialog {
     private boolean generatedKeys = false;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private Map groupAdditions = new HashMap();
-
+    private Icon pdfIcon = new ImageIcon(GUIGlobals.pdfIcon);
+    private Icon psIcon = new ImageIcon(GUIGlobals.psIcon);
 
     /**
      * Creates a dialog that displays the given set of fields in the table.
@@ -83,20 +85,20 @@ public class ImportInspectionDialog extends JDialog {
         this.newDatabase = newDatabase;
 
         tableModel.addColumn(Globals.lang("Keep"));
-
+        tableModel.addColumn("");
+        tableModel.addColumn("");
         DeleteListener deleteListener = new DeleteListener();
 
         for (int i=0; i<fields.length; i++) {
             tableModel.addColumn(Util.nCase(fields[i]));
-            Object o = GUIGlobals.fieldLength.get(fields[i]);
-            int width = o==null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
-                    ((Integer)o).intValue();
-            table.getColumnModel().getColumn(i+1).setPreferredWidth(width);
         }
-        table.getColumnModel().getColumn(0).setPreferredWidth(55);
-        table.getColumnModel().getColumn(0).setMaxWidth(55);
+
+        setWidths();
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        GeneralRenderer renderer = new GeneralRenderer(table, Color.white, true);
+        table.setDefaultRenderer(JLabel.class, renderer);
+        table.setDefaultRenderer(String.class, renderer);
         //table.setCellSelectionEnabled(false);
         previewListener = new TableSelectionListener();
         table.getSelectionModel().addListSelectionListener(previewListener);
@@ -122,7 +124,7 @@ public class ImportInspectionDialog extends JDialog {
 
         // Add "Attach file" menu choices to right click menu:
         popup.add(new AttachFile("pdf"));
-
+        popup.add(new AttachFile("ps"));
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
 
@@ -181,8 +183,10 @@ public class ImportInspectionDialog extends JDialog {
                 this.entries.add(entry);
                 Object[] values = new Object[tableModel.getColumnCount()];
                 values[0] = Boolean.TRUE;
+                values[1] = null;
+                values[2] = null;
                 for (int j=0; j<fields.length; j++)
-                    values[1+j] = entry.getField(fields[j]);
+                    values[3+j] = entry.getField(fields[j]);
                 tableModel.addRow(values);
             }
         }
@@ -215,6 +219,7 @@ public class ImportInspectionDialog extends JDialog {
         ok.setEnabled(true);
         if (!generatedKeys)
             generate.setEnabled(true);
+        stop.setEnabled(false);
     }
 
 
@@ -273,6 +278,7 @@ public class ImportInspectionDialog extends JDialog {
         }
         // Add a column to the table for displaying the generated keys:
         tableModel.addColumn("Bibtexkey", keys.toArray());
+        setWidths();
     }
 
     public void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
@@ -446,6 +452,29 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
+    private void setWidths() {
+        int padleft = 3;
+        DeleteListener deleteListener = new DeleteListener();
+        TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(55);
+        cm.getColumn(0).setMinWidth(55);
+        cm.getColumn(0).setMaxWidth(55);
+        for (int i=1; i<padleft; i++) {
+          // Lock the width of icon columns.
+          cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+          cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+          cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        }
+
+        for (int i=0; i<fields.length; i++) {
+            Object o = GUIGlobals.fieldLength.get(fields[i]);
+            int width = o==null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
+                    ((Integer)o).intValue();
+            table.getColumnModel().getColumn(i+padleft).setPreferredWidth(width);
+        }
+    }
+
+
     class StopListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             signalStopFetching();
@@ -556,7 +585,7 @@ public class ImportInspectionDialog extends JDialog {
     class AttachFile extends JMenuItem implements ActionListener {
         String fileType;
         public AttachFile(String fileType) {
-            super(Globals.lang("Attach %0", new String[] {fileType.toUpperCase()}));
+            super(Globals.lang("Attach %0 file", new String[] {fileType.toUpperCase()}));
             this.fileType = fileType;
             addActionListener(this);
         }
@@ -573,6 +602,15 @@ public class ImportInspectionDialog extends JDialog {
             // After the dialog has closed, if it wasn't cancelled, set the field:
             if (!diag.cancelled()) {
                 entry.setField(fileType, diag.getValue());
+                // Add a marker to the table:
+                int column = (fileType.equals("pdf") ? 1 : 2);
+                JLabel lab = new JLabel(new ImageIcon((column == 1 ? GUIGlobals.pdfIcon
+                            : GUIGlobals.psIcon)));
+                lab.setToolTipText((String)entry.getField(fileType));
+                tableModel.setValueAt(lab, rows[0], column);
+                //tableModel.setValueAt((fileType.equals("pdf") ? pdfIcon : psIcon), rows[0], 1);
+
+                //tableModel.setValueAt(entry.getField(fileType), rows[0], column);
             }
 
         }
