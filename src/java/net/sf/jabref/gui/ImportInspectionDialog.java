@@ -87,6 +87,7 @@ public class ImportInspectionDialog extends JDialog {
         tableModel.addColumn(Globals.lang("Keep"));
         tableModel.addColumn("");
         tableModel.addColumn("");
+        tableModel.addColumn("");
         DeleteListener deleteListener = new DeleteListener();
 
         for (int i=0; i<fields.length; i++) {
@@ -125,6 +126,7 @@ public class ImportInspectionDialog extends JDialog {
         // Add "Attach file" menu choices to right click menu:
         popup.add(new AttachFile("pdf"));
         popup.add(new AttachFile("ps"));
+        popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
 
@@ -183,10 +185,30 @@ public class ImportInspectionDialog extends JDialog {
                 this.entries.add(entry);
                 Object[] values = new Object[tableModel.getColumnCount()];
                 values[0] = Boolean.TRUE;
-                values[1] = null;
-                values[2] = null;
+                // pdf:
+                if (entry.getField("pdf") != null) {
+                    JLabel lab = new JLabel(new ImageIcon(GUIGlobals.pdfIcon));
+                    lab.setToolTipText((String)entry.getField("pdf"));
+                    values[1] = lab;
+                }
+                else values[1] = null;
+                // ps:
+                if (entry.getField("ps") != null) {
+                    JLabel lab = new JLabel(new ImageIcon(GUIGlobals.psIcon));
+                    lab.setToolTipText((String)entry.getField("ps"));
+                    values[2] = lab;
+                }
+                else values[2] = null;
+                // url:
+                if (entry.getField("url") != null) {
+                    JLabel lab = new JLabel(new ImageIcon(GUIGlobals.wwwIcon));
+                    lab.setToolTipText((String)entry.getField("url"));
+                    values[3] = lab;
+                }
+                else values[3] = null;
+
                 for (int j=0; j<fields.length; j++)
-                    values[3+j] = entry.getField(fields[j]);
+                    values[4+j] = entry.getField(fields[j]);
                 tableModel.addRow(values);
             }
         }
@@ -453,7 +475,7 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     private void setWidths() {
-        int padleft = 3;
+        int padleft = 4;
         DeleteListener deleteListener = new DeleteListener();
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(55);
@@ -581,6 +603,34 @@ public class ImportInspectionDialog extends JDialog {
             }
         }
     }
+
+    class AttachUrl extends JMenuItem implements ActionListener {
+        public AttachUrl() {
+            super(Globals.lang("Attach URL"));
+            addActionListener(this);
+        }
+        public void actionPerformed(ActionEvent event) {
+            int[] rows = table.getSelectedRows();
+                        if (rows.length != 1)
+                            return;
+                        BibtexEntry entry = (BibtexEntry)entries.get(rows[0]);
+            String result = JOptionPane.showInputDialog(ths, Globals.lang("Enter URL"), entry.getField("url"));
+            if (result != null) {
+                if (result.equals("")) {
+                    entry.clearField("url");
+                    tableModel.setValueAt(null, rows[0], 3);
+                }
+                else {
+                    entry.setField("url", result);
+                    JLabel lab = new JLabel(new ImageIcon(GUIGlobals.wwwIcon));
+                    lab.setToolTipText(result);
+                    tableModel.setValueAt(lab, rows[0], 3);
+                }
+            }
+
+        }
+    }
+
 
     class AttachFile extends JMenuItem implements ActionListener {
         String fileType;

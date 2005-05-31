@@ -315,7 +315,29 @@ public class Globals {
      */
   }
 
+    /**
+     * This method provides the correct opening brace to use when writing a field
+     * to BibTeX format.
+     * @return A String containing the braces to use.
+     */
+    public static String getOpeningBrace() {
+        if (prefs.getBoolean("autoDoubleBraces"))
+            return "{{";
+        else
+            return "{";
+    }
 
+    /**
+     * This method provides the correct closing brace to use when writing a field
+     * to BibTeX format.
+     * @return A String containing the braces to use.
+     */
+    public static String getClosingBrace() {
+        if (prefs.getBoolean("autoDoubleBraces"))
+            return "}}";
+        else
+            return "}";
+    }
 
     /*    public static void setupKeyBindings(JabRefPreferences prefs) {
     }*/

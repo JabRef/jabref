@@ -14,7 +14,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     private JCheckBox autoOpenForm, backup, openLast,
 	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
-	useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog,
+	useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, preserveFormatting;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField, fontSize;
@@ -44,13 +44,15 @@ public class GeneralTab extends JPanel implements PrefsTab {
     keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
 	confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
 	saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
-        preserveFormatting = new JCheckBox(Globals.lang("Preserve formatting of non-BibTeX fields"));
+    preserveFormatting = new JCheckBox(Globals.lang("Preserve formatting of non-BibTeX fields"));
+    autoDoubleBraces = new JCheckBox("<HTML>"+Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
+        +"Double braces signal that BibTeX should preserve character case.")+"</HTML>");
 	JPanel general = new JPanel();
 	defOwnerField = new JTextField();
         groupField = new JTextField(15);
 	ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
 				   "Help", GUIGlobals.helpSmallIconFile);
-
+    
 	 // Font sizes:
 	 fontSize = new JTextField();	 	
         
@@ -64,7 +66,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(openLast); builder.nextLine();
 	builder.append(pan); builder.append(backup); builder.nextLine();
 	builder.append(pan); builder.append(saveInStandardOrder); builder.nextLine();
-        builder.append(pan); builder.append(preserveFormatting); builder.nextLine();
+    builder.append(pan); builder.append(preserveFormatting); builder.nextLine();
+    builder.append(pan); builder.append(autoDoubleBraces); builder.nextLine();
 	//builder.appendSeparator(Globals.lang("Miscellaneous"));
 	//builder.nextLine();
 	builder.appendSeparator(Globals.lang("Entry editor"));
@@ -127,7 +130,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
 	saveInStandardOrder.setSelected(_prefs.getBoolean("saveInStandardOrder"));
 	preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
-        defOwnerField.setText(_prefs.get("defaultOwner"));
+    autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
+    defOwnerField.setText(_prefs.get("defaultOwner"));
 	groupField.setText(_prefs.get("groupsDefaultField"));
         
 	String enc = _prefs.get("defaultEncoding");
@@ -167,6 +171,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
         _prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());
+        _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
       //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
 	_prefs.put("defaultOwner", defOwnerField.getText().trim());
 

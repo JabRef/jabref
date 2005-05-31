@@ -458,6 +458,15 @@ public class BibtexParser
 	    skipWhitespace();
 	}
 	//Util.pr("Returning field content: "+value.toString());
+
+        // Check if we are to strip extra pairs of braces before returning:
+        if (Globals.prefs.getBoolean("autoDoubleBraces")) {
+            // Do it:
+            while ((value.charAt(0) == '{') && (value.charAt(value.length()-1) == '}')) {
+                value.deleteCharAt(value.length()-1);
+                value.deleteCharAt(0);
+            }
+        }
 	return value.toString();
 
     }
