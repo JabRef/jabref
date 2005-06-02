@@ -74,16 +74,8 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
             if (!openInNew) {
                 panel = (BasePanel)frame.getTabbedPane().getSelectedComponent();
             }
-            String[] fields = new String[] {"author", "title", "year" };
-            ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, fields,
-                    Globals.lang("Import"), openInNew);
-            diag.addEntries(entries);
-            diag.addCallBack(ImportUnknownMenuItem.this);
-            diag.entryListComplete();
-            Util.placeDialog(diag, frame);
-            diag.setVisible(true);
-
-		    //frame.addBibEntries(entries, filename, openInNew);
+            frame.addImportedEntries(panel, entries, filename, openInNew, ImportUnknownMenuItem.this);
+            
 
 	    }
 	    else if (bibtexResult != null) {

@@ -11,14 +11,18 @@ import java.util.*;
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
+
 import java.io.*;
+
 import net.sf.jabref.HelpAction;
+import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
+ *
  * @author not attributable
  * @version 1.0
  */
@@ -35,150 +39,142 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     AuthorDialog authorDialog;
     JFrame jFrame; // invisible dialog holder
     JButton go = new JButton(Globals.lang("Fetch")),
-	helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
     HelpAction help;
     CiteSeerFetcherPanel ths = this;
 
     public CiteSeerFetcherPanel(SidePaneManager p0, final CiteSeerFetcher fetcher) {
-	super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
+        super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
 
-	help = new HelpAction(Globals.helpDiag, GUIGlobals.citeSeerHelp, "Help");
+        help = new HelpAction(Globals.helpDiag, GUIGlobals.citeSeerHelp, "Help");
 
-	this.citeSeerFetcher = fetcher;
-	helpBut.addActionListener(help);
-	helpBut.setMargin(new Insets(0,0,0,0));        
-	//tf.setMinimumSize(new Dimension(1,1));
-	//add(hd, BorderLayout.NORTH);
-	//ok.setToolTipText(Globals.lang("Fetch Medline"));
+        this.citeSeerFetcher = fetcher;
+        helpBut.addActionListener(help);
+        helpBut.setMargin(new Insets(0, 0, 0, 0));
+        //tf.setMinimumSize(new Dimension(1,1));
+        //add(hd, BorderLayout.NORTH);
+        //ok.setToolTipText(Globals.lang("Fetch Medline"));
         JPanel main = new JPanel();
-	main.setLayout(gbl);
-	con.fill = GridBagConstraints.BOTH;
-	con.insets = new Insets(0, 0, 2,  0);
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.weightx = 1;
-	con.weighty = 0;
-	//gbl.setConstraints(header, con);
-	//add(header);
-	con.weighty = 1;
-	con.insets = new Insets(0, 0, 0,  0);
-	//    pan.setLayout(gbl);
-	con.fill = GridBagConstraints.BOTH;
-	gbl.setConstraints(tf, con);
-	main.add(tf);
-	con.weighty = 0;
-	con.gridwidth = 1;
-	gbl.setConstraints(go, con);
-	main.add(go);
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(helpBut, con);
-	main.add(helpBut);
-        main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
-	add(main, BorderLayout.CENTER);
-	go.addActionListener(this);
-	tf.addActionListener(this);
+        main.setLayout(gbl);
+        con.fill = GridBagConstraints.BOTH;
+        con.insets = new Insets(0, 0, 2, 0);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.weightx = 1;
+        con.weighty = 0;
+        //gbl.setConstraints(header, con);
+        //add(header);
+        con.weighty = 1;
+        con.insets = new Insets(0, 0, 0, 0);
+        //    pan.setLayout(gbl);
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(tf, con);
+        main.add(tf);
+        con.weighty = 0;
+        con.gridwidth = 1;
+        gbl.setConstraints(go, con);
+        main.add(go);
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        gbl.setConstraints(helpBut, con);
+        main.add(helpBut);
+        main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        add(main, BorderLayout.CENTER);
+        go.addActionListener(this);
+        tf.addActionListener(this);
     }
-    
+
     public JTextField getTextField() {
         return tf;
     }
-    
+
     public void actionPerformed(ActionEvent e) {
-	if(citeSeerFetcher.activateImportFetcher()) {
-	    (new Thread() {
-		    
-		    BibtexEntry entry;
-		    
-		    class UpdateComponent implements Runnable {
-			Set addedEntries;
-			
-			UpdateComponent(Set addedEntries) {
-                this.addedEntries = addedEntries;
-			}
-			
-			public void run() {
-			    citeSeerFetcher.endImportCiteSeerProgress();
-			    if (addedEntries != null)
-				    panel.markBaseChanged();
-			        panel.refreshTable();
-                    // Select the entries that were added:
-                    if (addedEntries.size() > 0) {
-                         BibtexEntry[] toSelect = new BibtexEntry[addedEntries.size()];
-                         toSelect = (BibtexEntry[])addedEntries.toArray(toSelect);
+        if (citeSeerFetcher.activateImportFetcher()) {
+            (new Thread() {
 
-                        panel.selectEntries(toSelect, 0);
-                        if (toSelect.length == 1)
-                            panel.showEntry(toSelect[0]);
-                        //else
-                        //    panel.updateViewToSelected();
-                     }
-    		        panel.output(Globals.lang("Completed Import Fields from CiteSeer."));
-			}
-		    };
-		    
-		    public void run() {
-			citeSeerFetcher.beginImportCiteSeerProgress();
-			NamedCompound undoEdit =
-			    new NamedCompound(Globals.lang("CiteSeer import entries")),
-			    // Use a dummy UndoEdit to avoid storing the information on
-			    // every field change, since we are importing new entries:
-			    dummyCompound = new NamedCompound(Globals.lang("Ok"));
-			BooleanAssign overwriteAll = new BooleanAssign(true),
-			    overwriteNone = new BooleanAssign(false),
-			    newValue = new BooleanAssign(false);			
-			Hashtable rejectedEntries = new Hashtable();
-			String text = tf.getText().replaceAll(",", ";");
-			String[] ids = text.split(";");
-			BibtexEntry[] entries = new BibtexEntry[ids.length];
-			for (int i=0; i<entries.length; i++) {
-			    // Create the entry:
-			    entries[i] = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
-			    // Set its citeseerurl field:
-			    entries[i].setField("citeseerurl", ids[i].trim());
-			    // Try to import based on the id:
-			    boolean newValues = citeSeerFetcher.importCiteSeerEntry
-				(entries[i], dummyCompound, overwriteAll, overwriteNone,
-				 newValue, rejectedEntries);
+                BibtexEntry entry;
 
-			}
+                class Update implements ImportInspectionDialog.CallBack {
 
-            Set addedEntries = new HashSet();
-			if (rejectedEntries.size() < entries.length) {
+                    // This method is called by the dialog when the user has selected the
+                    // wanted entries, and clicked Ok. The callback object can update status
+                    // line etc.
+                    public void done(int entriesImported) {
+                        if (entriesImported > 0)
+                            panel.output(Globals.lang("Completed import from CiteSeer."));
+                        else
+                            panel.output(Globals.lang("No entries imported."));
+                    }
 
-			    for (int i=0; i<entries.length; i++) {
-				if (rejectedEntries.contains(entries[i]))
-				    continue;
+                    public void stopFetching() {
+                    }
 
-				try {
-				    panel.database().insertEntry(entries[i]);
-				    //System.out.println(entries[i]);
-				    UndoableInsertEntry undoItem = new UndoableInsertEntry
-					(panel.database(), entries[i], panel);
-				    undoEdit.addEdit(undoItem);
-                    addedEntries.add(entries[i]);
-				} catch (KeyCollisionException ex) {
-				    ex.printStackTrace();
-				}
+                    /*public void run() {
+                        citeSeerFetcher.endImportCiteSeerProgress();
+                        if (addedEntries != null)
+                            panel.markBaseChanged();
+                        panel.refreshTable();
+// Select the entries that were added:
+                        if (addedEntries.size() > 0) {
+                            BibtexEntry[] toSelect = new BibtexEntry[addedEntries.size()];
+                            toSelect = (BibtexEntry[]) addedEntries.toArray(toSelect);
 
-			    }
-			    undoEdit.end();
-			    panel.undoManager.addEdit(undoEdit);
+                            panel.selectEntries(toSelect, 0);
+                            if (toSelect.length == 1)
+                                panel.showEntry(toSelect[0]);
+//else
+//    panel.updateViewToSelected();
+                        }
+                        panel.output(Globals.lang("Completed Import Fields from CiteSeer."));
+                    } */
 
+                };
 
-			}
-			UpdateComponent updateComponent = new UpdateComponent
-			    (addedEntries.size() > 0 ? addedEntries : null);
-			SwingUtilities.invokeLater(updateComponent);
-		    
-			citeSeerFetcher.deactivateImportFetcher();
-		    }
-		}).start();
-	} else {
-	    JOptionPane.showMessageDialog(panel.frame(),
-					  Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
-					  Globals.lang("Please wait until it has finished."),
-					  Globals.lang("CiteSeer Import Error"),
-					  JOptionPane.WARNING_MESSAGE);
-	}
+                public void run() {
+
+                    // Open the inspection dialog... we will fill it as the entries come in:
+                    ImportInspectionDialog diag = new ImportInspectionDialog(panel.frame(), panel,
+                            GUIGlobals.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch CiteSeer"), false);
+                    diag.addCallBack(new Update());
+                    Util.placeDialog(diag, panel.frame());
+                    diag.setVisible(true);
+
+                    NamedCompound undoEdit =
+                            new NamedCompound(Globals.lang("CiteSeer import entries")),
+                            // Use a dummy UndoEdit to avoid storing the information on
+                            // every field change, since we are importing new entries:
+                            dummyCompound = new NamedCompound(Globals.lang("Ok"));
+                    BooleanAssign overwriteAll = new BooleanAssign(true),
+                            overwriteNone = new BooleanAssign(false),
+                            newValue = new BooleanAssign(false);
+                    Hashtable rejectedEntries = new Hashtable();
+                    String text = tf.getText().replaceAll(",", ";");
+                    String[] ids = text.split(";");
+                    BibtexEntry[] entries = new BibtexEntry[ids.length];
+                    citeSeerFetcher.activateImportFetcher();
+                    diag.setProgress(0, entries.length);
+                    for (int i = 0; i < entries.length; i++) {
+                        // Create the entry:
+                        entries[i] = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
+                        // Set its citeseerurl field:
+                        entries[i].setField("citeseerurl", ids[i].trim());
+                        // Try to import based on the id:
+                        boolean newValues = citeSeerFetcher.importCiteSeerEntry
+                                (entries[i], dummyCompound, overwriteAll, overwriteNone,
+                                        newValue, rejectedEntries);
+                        diag.addEntry(entries[i]);
+                        diag.setProgress(i+1, entries.length);
+                    }
+                    citeSeerFetcher.deactivateImportFetcher();
+                    // Signal that we are done. The ImportInspectionDialog will add the entries for us.
+                    diag.entryListComplete();
+                }
+            }).start();
+        } else {
+            JOptionPane.showMessageDialog(panel.frame(),
+                    Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
+                    Globals.lang("Please wait until it has finished."),
+                    Globals.lang("CiteSeer Import Error"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }
 }
 

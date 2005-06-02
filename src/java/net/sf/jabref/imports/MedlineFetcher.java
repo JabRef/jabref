@@ -27,7 +27,8 @@ import net.sf.jabref.gui.ImportInspectionDialog;
  * @version 1.0
  */
 
-public class MedlineFetcher extends SidePaneComponent implements Runnable {
+public class MedlineFetcher extends SidePaneComponent implements Runnable,
+        ImportInspectionDialog.CallBack {
 
     /**@class SearchResult
      *        nested class.
@@ -141,6 +142,10 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 		    }
 		    }*/
 		//ce.end();
+
+        panel.frame().addImportedEntries(panel, bibs, null, false, this);
+
+        /*
 		int importedEntries = panel.frame().addBibEntries(bibs, null, false);
         if (importedEntries == 0) {
             return; // Nothing to refresh!
@@ -154,9 +159,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
                 panel.showEntry(entries[0]);
             //else
             //    panel.updateViewToSelected();
-        }
-		panel.output(Globals.lang("Medline entries fetched")+": "+bibs.size());
-	
+        }*/
+
 		//panel.undoManager.addEdit(ce);
 	    } else
 		panel.output(Globals.lang("No Medline entries found."));
@@ -442,6 +446,19 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable {
 	//   result.append("\tAuthor: "+matcher.group(1));
 	return result.toString();
     }
-    
- 
+
+    // This method is called by the dialog when the user has selected the
+    // wanted entries, and clicked Ok. The callback object can update status
+    // line etc.
+    public void done(int entriesImported) {
+        panel.output(Globals.lang("Medline entries fetched")+": "+entriesImported);
+    }
+
+    // This method is called by the dialog when the user has cancelled or
+    // signalled a stop. It is expected that any long-running fetch operations
+    // will stop after this method is called.
+    public void stopFetching() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

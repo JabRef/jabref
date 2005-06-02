@@ -70,15 +70,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
             if (!openInNew) {
                 panel = (BasePanel)frame.getTabbedPane().getSelectedComponent();
             }
-            String[] fields = new String[] {"author", "title", "year" };
-            ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, fields,
-                    Globals.lang("Import"), openInNew);
-            diag.addEntries(entries);
-            diag.addCallBack(ImportMenuItem.this);
-            diag.entryListComplete();
-            Util.placeDialog(diag, frame);
-            diag.setVisible(true);
-            //frame.addBibEntries(entries, filename, openInNew);
+
+            frame.addImportedEntries(panel, entries, filename, openInNew, ImportMenuItem.this);
+            
 
 	    } else {
 		JOptionPane.showMessageDialog(frame, Globals.lang("No entries found. Please make sure you are "

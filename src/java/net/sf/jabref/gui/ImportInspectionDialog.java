@@ -47,8 +47,8 @@ public class ImportInspectionDialog extends JDialog {
     private String[] fields;
     private JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
     private JButton ok = new JButton(Globals.lang("Ok")),
-        cancel = new JButton(Globals.lang("Cancel")),
-        generate = new JButton(Globals.lang("Generate keys"));
+    cancel = new JButton(Globals.lang("Cancel")),
+    generate = new JButton(Globals.lang("Generate keys"));
     private List entries = new ArrayList();
     private String undoName;
     private ArrayList callBacks = new ArrayList();
@@ -72,6 +72,7 @@ public class ImportInspectionDialog extends JDialog {
      * Creates a dialog that displays the given set of fields in the table.
      * The dialog allows another process to add entries dynamically while the dialog
      * is shown.
+     *
      * @param frame
      * @param panel
      * @param fields
@@ -90,7 +91,7 @@ public class ImportInspectionDialog extends JDialog {
         tableModel.addColumn("");
         DeleteListener deleteListener = new DeleteListener();
 
-        for (int i=0; i<fields.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             tableModel.addColumn(Util.nCase(fields[i]));
         }
 
@@ -138,7 +139,7 @@ public class ImportInspectionDialog extends JDialog {
         bb.addRelatedGap();
         bb.addGridded(help);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addGridded(selectAll);
@@ -147,7 +148,7 @@ public class ImportInspectionDialog extends JDialog {
         builder.addGridded(delete);
         builder.addRelatedGap();
         builder.addGridded(generate);
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         centerPan.add(builder.getPanel(), BorderLayout.WEST);
 
         ok.setEnabled(false);
@@ -173,42 +174,54 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     /**
+     * Wrapper for addEntries(List) that takes a single entry.
+     *
+     * @param entry The entry to add.
+     */
+    public void addEntry(BibtexEntry entry) {
+        List list = new ArrayList();
+        list.add(entry);
+        addEntries(list);
+    }
+
+    /**
      * Add a List of entries to the table view. The table will update to show the
      * added entries. Synchronizes on this.entries to avoid conflict with the delete button
      * which removes entries.
+     *
      * @param entries
      */
     public void addEntries(List entries) {
         synchronized (this.entries) {
-            for (Iterator i=entries.iterator(); i.hasNext();) {
-                BibtexEntry entry = (BibtexEntry)i.next();
+            for (Iterator i = entries.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry) i.next();
                 this.entries.add(entry);
                 Object[] values = new Object[tableModel.getColumnCount()];
                 values[0] = Boolean.TRUE;
                 // pdf:
                 if (entry.getField("pdf") != null) {
                     JLabel lab = new JLabel(new ImageIcon(GUIGlobals.pdfIcon));
-                    lab.setToolTipText((String)entry.getField("pdf"));
+                    lab.setToolTipText((String) entry.getField("pdf"));
                     values[1] = lab;
-                }
-                else values[1] = null;
+                } else
+                    values[1] = null;
                 // ps:
                 if (entry.getField("ps") != null) {
                     JLabel lab = new JLabel(new ImageIcon(GUIGlobals.psIcon));
-                    lab.setToolTipText((String)entry.getField("ps"));
+                    lab.setToolTipText((String) entry.getField("ps"));
                     values[2] = lab;
-                }
-                else values[2] = null;
+                } else
+                    values[2] = null;
                 // url:
                 if (entry.getField("url") != null) {
                     JLabel lab = new JLabel(new ImageIcon(GUIGlobals.wwwIcon));
-                    lab.setToolTipText((String)entry.getField("url"));
+                    lab.setToolTipText((String) entry.getField("url"));
                     values[3] = lab;
-                }
-                else values[3] = null;
+                } else
+                    values[3] = null;
 
-                for (int j=0; j<fields.length; j++)
-                    values[4+j] = entry.getField(fields[j]);
+                for (int j = 0; j < fields.length; j++)
+                    values[4 + j] = entry.getField(fields[j]);
                 tableModel.addRow(values);
             }
         }
@@ -222,7 +235,7 @@ public class ImportInspectionDialog extends JDialog {
         synchronized (this.entries) {
             int[] rows = table.getSelectedRows();
             if (rows.length > 0) {
-                for (int i=rows.length-1; i>=0; i--) {
+                for (int i = rows.length - 1; i >= 0; i--) {
                     tableModel.removeRow(rows[i]);
                     this.entries.remove(rows[i]);
 
@@ -248,12 +261,13 @@ public class ImportInspectionDialog extends JDialog {
     /**
      * This method returns a List containing all entries that are selected
      * (checkbox checked).
+     *
      * @return
      */
     public List getSelectedEntries() {
         List selected = new ArrayList();
-        for (int i=0; i<table.getRowCount(); i++) {
-            Boolean sel = (Boolean)table.getValueAt(i, 0);
+        for (int i = 0; i < table.getRowCount(); i++) {
+            Boolean sel = (Boolean) table.getValueAt(i, 0);
             if (sel.booleanValue()) {
                 selected.add(entries.get(i));
             }
@@ -277,15 +291,15 @@ public class ImportInspectionDialog extends JDialog {
         List keys = new ArrayList(entries.size());
         // Iterate over the entries, add them to the database we are working with,
         // and generate unique keys:
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)i.next();
+        for (Iterator i = entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry) i.next();
             //if (newDatabase) {
-                try {
-                    entry.setId(Util.createNeutralId());
-                    database.insertEntry(entry);
-                } catch (KeyCollisionException ex) {
-                    ex.printStackTrace();
-                }
+            try {
+                entry.setId(Util.createNeutralId());
+                database.insertEntry(entry);
+            } catch (KeyCollisionException ex) {
+                ex.printStackTrace();
+            }
             //}
             LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
             // Add the generated key to our list:
@@ -294,8 +308,8 @@ public class ImportInspectionDialog extends JDialog {
         // Remove the entries from the database again, since they are not supposed to
         // added yet. They only needed to be in it while we generated the keys, to keep
         // control over key uniqueness.
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)i.next();
+        for (Iterator i = entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry) i.next();
             database.removeEntry(entry.getId());
         }
         // Add a column to the table for displaying the generated keys:
@@ -304,64 +318,66 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     public void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
-            final AbstractAction action = getAction(node,add);
+        final AbstractAction action = getAction(node, add);
 
-            if (node.getChildCount() == 0) {
-                menu.add(action);
-                if (action.isEnabled())
-                    menu.setEnabled(true);
-                return;
-            }
-
-            JMenu submenu = null;
-            if (node.getGroup() instanceof AllEntriesGroup) {
-                for (int i = 0; i < node.getChildCount(); ++i) {
-                    insertNodes(menu,(GroupTreeNode) node.getChildAt(i), add);
-                }
-            } else {
-                submenu = new JMenu("["+node.getGroup().getName()+"]");
-                // setEnabled(true) is done above/below if at least one menu
-                // entry (item or submenu) is enabled
-                submenu.setEnabled(action.isEnabled());
-                submenu.add(action);
-                submenu.add(new JPopupMenu.Separator());
-                for (int i = 0; i < node.getChildCount(); ++i)
-                    insertNodes(submenu,(GroupTreeNode) node.getChildAt(i), add);
-                menu.add(submenu);
-                if (submenu.isEnabled())
-                    menu.setEnabled(true);
-            }
+        if (node.getChildCount() == 0) {
+            menu.add(action);
+            if (action.isEnabled())
+                menu.setEnabled(true);
+            return;
         }
 
-        private AbstractAction getAction(GroupTreeNode node, boolean add) {
-            AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
-                    : (AbstractAction) new RemoveFromGroupAction(node);
-            AbstractGroup group = node.getGroup();
-            action.setEnabled(/*add ? */group.supportsAdd());// && !group.containsAll(selection)
-            //        : group.supportsRemove() && group.containsAny(selection));
-            return action;
+        JMenu submenu = null;
+        if (node.getGroup() instanceof AllEntriesGroup) {
+            for (int i = 0; i < node.getChildCount(); ++i) {
+                insertNodes(menu, (GroupTreeNode) node.getChildAt(i), add);
+            }
+        } else {
+            submenu = new JMenu("[" + node.getGroup().getName() + "]");
+            // setEnabled(true) is done above/below if at least one menu
+            // entry (item or submenu) is enabled
+            submenu.setEnabled(action.isEnabled());
+            submenu.add(action);
+            submenu.add(new JPopupMenu.Separator());
+            for (int i = 0; i < node.getChildCount(); ++i)
+                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i), add);
+            menu.add(submenu);
+            if (submenu.isEnabled())
+                menu.setEnabled(true);
         }
+    }
+
+    private AbstractAction getAction(GroupTreeNode node, boolean add) {
+        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
+                : (AbstractAction) new RemoveFromGroupAction(node);
+        AbstractGroup group = node.getGroup();
+        action.setEnabled(/*add ? */group.supportsAdd());// && !group.containsAll(selection)
+        //        : group.supportsRemove() && group.containsAny(selection));
+        return action;
+    }
 
     /**
      * Stores the information about the selected entries being scheduled for addition
      * to this group. The entries are *not* added to the group at this time.
-     *
+     * <p/>
      * Synchronizes on this.entries to prevent
      * conflict with threads that modify the entry list.
      */
     class AddToGroupAction extends AbstractAction {
         private GroupTreeNode node;
+
         public AddToGroupAction(GroupTreeNode node) {
             super(node.getGroup().getName());
             this.node = node;
         }
+
         public void actionPerformed(ActionEvent event) {
             synchronized (entries) {
                 int[] rows = table.getSelectedRows();
                 if (rows.length == 0)
                     return;
 
-                for (int i=0; i<rows.length; i++) {
+                for (int i = 0; i < rows.length; i++) {
                     BibtexEntry entry = (BibtexEntry) entries.get(rows[i]);
                     // We store the groups this entry should be added to in a Set in the Map:
                     Set groups = (Set) groupAdditions.get(entry);
@@ -379,9 +395,11 @@ public class ImportInspectionDialog extends JDialog {
 
     class RemoveFromGroupAction extends AbstractAction {
         private GroupTreeNode node;
+
         public RemoveFromGroupAction(GroupTreeNode node) {
             this.node = node;
         }
+
         public void actionPerformed(ActionEvent event) {
         }
     }
@@ -393,63 +411,62 @@ public class ImportInspectionDialog extends JDialog {
     class OkListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             final List selected = getSelectedEntries();
-            if (selected.size() == 0) {
-                dispose();
-                return;
-            }
 
-            NamedCompound ce = new NamedCompound(undoName);
+            if (selected.size() > 0) {
 
-            if (newDatabase) {
-                // Create a new BasePanel for the entries:
-                BibtexDatabase base = new BibtexDatabase();
-                panel = new BasePanel(frame, base,  null, new HashMap(), Globals.prefs);
-            }
+                NamedCompound ce = new NamedCompound(undoName);
 
-            for (Iterator i=selected.iterator(); i.hasNext();) {
-                BibtexEntry entry = (BibtexEntry)i.next();
-                //entry.clone();
+                if (newDatabase) {
+                    // Create a new BasePanel for the entries:
+                    BibtexDatabase base = new BibtexDatabase();
+                    panel = new BasePanel(frame, base, null, new HashMap(), Globals.prefs);
+                }
 
-                // If this entry should be added to any groups, do it now:
-                Set groups = (Set) groupAdditions.get(entry);
-                if (groups != null) {
-                    if (entry.getField(Globals.KEY_FIELD) == null) {
-                        // The entry has no key, so it can't be added to the group.
-                        // The best course of ation is probably to ask the user if a key should be generated
-                        // immediately.
-                        
-                    }
+                for (Iterator i = selected.iterator(); i.hasNext();) {
+                    BibtexEntry entry = (BibtexEntry) i.next();
+                    //entry.clone();
 
-                    // If the key was set, or has been set now, go ahead:
-                    if (entry.getField(Globals.KEY_FIELD) == null) {
-                        for (Iterator i2=groups.iterator(); i2.hasNext();) {
-                            GroupTreeNode node = (GroupTreeNode)i2.next();
-                            if (node.getGroup().supportsAdd()) {
-                                // Add the entry:
-                                AbstractUndoableEdit undo = node.getGroup().add(new BibtexEntry[] {entry});
-                                if (undo instanceof UndoableChangeAssignment)
-                                    ((UndoableChangeAssignment) undo).setEditedNode(node);
-                                ce.addEdit(undo);
+                    // If this entry should be added to any groups, do it now:
+                    Set groups = (Set) groupAdditions.get(entry);
+                    if (groups != null) {
+                        if (entry.getField(Globals.KEY_FIELD) == null) {
+                            // The entry has no key, so it can't be added to the group.
+                            // The best course of ation is probably to ask the user if a key should be generated
+                            // immediately.
 
-                            } else {
-                                // Shouldn't happen...
+                        }
+
+                        // If the key was set, or has been set now, go ahead:
+                        if (entry.getField(Globals.KEY_FIELD) == null) {
+                            for (Iterator i2 = groups.iterator(); i2.hasNext();) {
+                                GroupTreeNode node = (GroupTreeNode) i2.next();
+                                if (node.getGroup().supportsAdd()) {
+                                    // Add the entry:
+                                    AbstractUndoableEdit undo = node.getGroup().add(new BibtexEntry[]{entry});
+                                    if (undo instanceof UndoableChangeAssignment)
+                                        ((UndoableChangeAssignment) undo).setEditedNode(node);
+                                    ce.addEdit(undo);
+
+                                } else {
+                                    // Shouldn't happen...
+                                }
                             }
                         }
                     }
+
+                    try {
+                        entry.setId(Util.createNeutralId());
+                        panel.database().insertEntry(entry);
+                        ce.addEdit(new UndoableInsertEntry(panel.database(), entry, panel));
+                    } catch (KeyCollisionException e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                try {
-                entry.setId(Util.createNeutralId());
-                    panel.database().insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(panel.database(), entry,  panel));
-                } catch (KeyCollisionException e) {
-                    e.printStackTrace();
-                }
+                ce.end();
+                panel.undoManager.addEdit(ce);
             }
-
-            ce.end();
-            panel.undoManager.addEdit(ce);
-
+            
             dispose();
             SwingUtilities.invokeLater(new Thread() {
                 public void run() {
@@ -458,8 +475,8 @@ public class ImportInspectionDialog extends JDialog {
                     }
                     panel.markBaseChanged();
                     panel.refreshTable();
-                    for (Iterator i=callBacks.iterator(); i.hasNext();) {
-                        ((CallBack)i.next()).done(selected.size());
+                    for (Iterator i = callBacks.iterator(); i.hasNext();) {
+                        ((CallBack) i.next()).done(selected.size());
                     }
                 }
             });
@@ -469,8 +486,8 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     private void signalStopFetching() {
-        for (Iterator i=callBacks.iterator(); i.hasNext();) {
-            ((CallBack)i.next()).stopFetching();
+        for (Iterator i = callBacks.iterator(); i.hasNext();) {
+            ((CallBack) i.next()).stopFetching();
         }
     }
 
@@ -481,18 +498,18 @@ public class ImportInspectionDialog extends JDialog {
         cm.getColumn(0).setPreferredWidth(55);
         cm.getColumn(0).setMinWidth(55);
         cm.getColumn(0).setMaxWidth(55);
-        for (int i=1; i<padleft; i++) {
-          // Lock the width of icon columns.
-          cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-          cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-          cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        for (int i = 1; i < padleft; i++) {
+            // Lock the width of icon columns.
+            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
-        for (int i=0; i<fields.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             Object o = GUIGlobals.fieldLength.get(fields[i]);
-            int width = o==null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
-                    ((Integer)o).intValue();
-            table.getColumnModel().getColumn(i+padleft).setPreferredWidth(width);
+            int width = o == null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
+                    ((Integer) o).intValue();
+            table.getColumnModel().getColumn(i + padleft).setPreferredWidth(width);
         }
     }
 
@@ -526,7 +543,7 @@ public class ImportInspectionDialog extends JDialog {
         }
 
         public void actionPerformed(ActionEvent event) {
-             removeSelectedEntries();
+            removeSelectedEntries();
         }
     }
 
@@ -537,7 +554,7 @@ public class ImportInspectionDialog extends JDialog {
         }
 
         public boolean isCellEditable(int row, int col) {
-            return col==0;
+            return col == 0;
         }
     }
 
@@ -545,7 +562,7 @@ public class ImportInspectionDialog extends JDialog {
 
 
         public Class getColumnClass(int i) {
-            if (i==0)
+            if (i == 0)
                 return Boolean.class;
             else
                 return String.class;
@@ -559,8 +576,9 @@ public class ImportInspectionDialog extends JDialog {
         public SelectionButton(boolean enable) {
             this.enable = new Boolean(enable);
         }
+
         public void actionPerformed(ActionEvent event) {
-            for (int i=0; i<table.getRowCount(); i++) {
+            for (int i = 0; i < table.getRowCount(); i++) {
                 table.setValueAt(enable, i, 0);
             }
         }
@@ -575,31 +593,31 @@ public class ImportInspectionDialog extends JDialog {
             int row = table.getSelectedRow();
             if (row < 0)
                 return;
-            preview.setEntry((BibtexEntry)entries.get(row));
+            preview.setEntry((BibtexEntry) entries.get(row));
             contentPane.setDividerLocation(0.5f);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     preview.scrollRectToVisible(toRect);
                 }
             });
-            
+
         }
 
     }
 
     /**
-       * This class handles clicks on the table that should trigger specific
-       * events, like opening the popup menu.
-       */
-      class TableClickListener extends MouseAdapter {
-          public void mousePressed(MouseEvent e) {
+     * This class handles clicks on the table that should trigger specific
+     * events, like opening the popup menu.
+     */
+    class TableClickListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
 
             // Check if the user has right-clicked. If so, open the right-click menu.
             if (e.isPopupTrigger()) {
-            //if ( (e.getButton() == MouseEvent.BUTTON3) ||
-            //     (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
-              int[] rows = table.getSelectedRows();
-              popup.show(table, e.getX(), e.getY());
+                //if ( (e.getButton() == MouseEvent.BUTTON3) ||
+                //     (ctrlClick && (e.getButton() == MouseEvent.BUTTON1) && e.isControlDown())) {
+                int[] rows = table.getSelectedRows();
+                popup.show(table, e.getX(), e.getY());
             }
         }
     }
@@ -609,18 +627,18 @@ public class ImportInspectionDialog extends JDialog {
             super(Globals.lang("Attach URL"));
             addActionListener(this);
         }
+
         public void actionPerformed(ActionEvent event) {
             int[] rows = table.getSelectedRows();
-                        if (rows.length != 1)
-                            return;
-                        BibtexEntry entry = (BibtexEntry)entries.get(rows[0]);
+            if (rows.length != 1)
+                return;
+            BibtexEntry entry = (BibtexEntry) entries.get(rows[0]);
             String result = JOptionPane.showInputDialog(ths, Globals.lang("Enter URL"), entry.getField("url"));
             if (result != null) {
                 if (result.equals("")) {
                     entry.clearField("url");
                     tableModel.setValueAt(null, rows[0], 3);
-                }
-                else {
+                } else {
                     entry.setField("url", result);
                     JLabel lab = new JLabel(new ImageIcon(GUIGlobals.wwwIcon));
                     lab.setToolTipText(result);
@@ -634,8 +652,9 @@ public class ImportInspectionDialog extends JDialog {
 
     class AttachFile extends JMenuItem implements ActionListener {
         String fileType;
+
         public AttachFile(String fileType) {
-            super(Globals.lang("Attach %0 file", new String[] {fileType.toUpperCase()}));
+            super(Globals.lang("Attach %0 file", new String[]{fileType.toUpperCase()}));
             this.fileType = fileType;
             addActionListener(this);
         }
@@ -644,7 +663,7 @@ public class ImportInspectionDialog extends JDialog {
             int[] rows = table.getSelectedRows();
             if (rows.length != 1)
                 return;
-            BibtexEntry entry = (BibtexEntry)entries.get(rows[0]);
+            BibtexEntry entry = (BibtexEntry) entries.get(rows[0]);
             // Call up a dialog box that provides Browse, Download and auto buttons:
             AttachFileDialog diag = new AttachFileDialog(ths, entry, fileType);
             Util.placeDialog(diag, ths);
@@ -655,8 +674,8 @@ public class ImportInspectionDialog extends JDialog {
                 // Add a marker to the table:
                 int column = (fileType.equals("pdf") ? 1 : 2);
                 JLabel lab = new JLabel(new ImageIcon((column == 1 ? GUIGlobals.pdfIcon
-                            : GUIGlobals.psIcon)));
-                lab.setToolTipText((String)entry.getField(fileType));
+                        : GUIGlobals.psIcon)));
+                lab.setToolTipText((String) entry.getField(fileType));
                 tableModel.setValueAt(lab, rows[0], column);
                 //tableModel.setValueAt((fileType.equals("pdf") ? pdfIcon : psIcon), rows[0], 1);
 
@@ -671,6 +690,7 @@ public class ImportInspectionDialog extends JDialog {
         // wanted entries, and clicked Ok. The callback object can update status
         // line etc.
         public void done(int entriesImported);
+
         // This method is called by the dialog when the user has cancelled or
         // signalled a stop. It is expected that any long-running fetch operations
         // will stop after this method is called.

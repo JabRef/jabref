@@ -1755,7 +1755,7 @@ class FetchCiteSeerAction
       if (tabbedPane.getTabCount() > 0) {
 	  sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
 	  if (sidePaneManager.isPanelVisible("CiteSeerPanel"))
-          new FocusRequester(medlineFetcher.getTextField());
+          new FocusRequester(citeSeerFetcherPanel.getTextField());
         //}
       }
     }
@@ -1812,7 +1812,32 @@ class FetchCiteSeerAction
     }
   }
 
-
+  /**
+   * This method does the job of adding imported entries into the active database, or into a new one.
+   * It shows the ImportInspectionDialog if preferences indicate it should be used. Otherwise it imports
+   * directly.
+   * @param panel The BasePanel to add to.
+   * @param entries The entries to add.
+   * @param filename Name of the file where the import came from.
+   * @param openInNew Should the entries be imported into a new database?
+   * @param callBack The callback for the ImportInspectionDialog to use.
+   */
+  public void addImportedEntries(BasePanel panel, List entries, String filename, boolean openInNew,
+                                  ImportInspectionDialog.CallBack callBack) {
+      if (Globals.prefs.getBoolean("useImportInspectionDialog")) {
+                String[] fields = new String[] {"author", "title", "year" };
+                ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel, fields,
+                        Globals.lang("Import"), openInNew);
+                diag.addEntries(entries);
+                diag.addCallBack(callBack);
+                diag.entryListComplete();
+                Util.placeDialog(diag, ths);
+                diag.setVisible(true);
+            } else {
+		        ths.addBibEntries(entries, filename, openInNew);
+           }
+  }
+    
     /**
      * Adds the entries to the database, possibly checking for duplicates first.
      * @param filename If non-null, a message is printed to the status line describing
