@@ -15,7 +15,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JCheckBox autoOpenForm, backup, openLast,
 	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
 	useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
-    confirmDelete, saveInStandardOrder, allowEditing, preserveFormatting;
+    confirmDelete, saveInStandardOrder, allowEditing, preserveFormatting, useImportInspector;
     private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField, fontSize;
     JabRefPreferences _prefs;
@@ -47,6 +47,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     preserveFormatting = new JCheckBox(Globals.lang("Preserve formatting of non-BibTeX fields"));
     autoDoubleBraces = new JCheckBox("<HTML>"+Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
         +"Double braces signal that BibTeX should preserve character case.")+"</HTML>");
+    useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
 	JPanel general = new JPanel();
 	defOwnerField = new JTextField();
         groupField = new JTextField(15);
@@ -76,7 +77,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(defSource); builder.nextLine();
 	builder.append(pan); builder.append(disableOnMultiple); builder.nextLine();
 	builder.appendSeparator(Globals.lang("Miscellaneous"));
-	builder.append(pan); builder.append(allowEditing); builder.nextLine();
+    builder.append(pan); builder.append(useImportInspector); builder.nextLine();
+    builder.append(pan); builder.append(allowEditing); builder.nextLine();
 	builder.append(pan); builder.append(ctrlClick); builder.nextLine();
 	builder.append(pan); builder.append(confirmDelete); builder.nextLine();
     builder.append(pan); builder.append(keyDuplicateWarningDialog); builder.nextLine();
@@ -133,7 +135,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
     defOwnerField.setText(_prefs.get("defaultOwner"));
 	groupField.setText(_prefs.get("groupsDefaultField"));
-        
+    useImportInspector.setSelected(_prefs.getBoolean("useImportInspectionDialog"));
+
 	String enc = _prefs.get("defaultEncoding");
         outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
 	    if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
@@ -172,6 +175,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
         _prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());
         _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
+        _prefs.putBoolean("useImportInspectionDialog", useImportInspector.isSelected());
+        
       //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
 	_prefs.put("defaultOwner", defOwnerField.getText().trim());
 
