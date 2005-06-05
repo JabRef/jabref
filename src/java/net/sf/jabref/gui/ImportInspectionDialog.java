@@ -422,22 +422,30 @@ public class ImportInspectionDialog extends JDialog {
                     panel = new BasePanel(frame, base, null, new HashMap(), Globals.prefs);
                 }
 
+                boolean groupingCanceled = false;
+
                 for (Iterator i = selected.iterator(); i.hasNext();) {
                     BibtexEntry entry = (BibtexEntry) i.next();
                     //entry.clone();
 
                     // If this entry should be added to any groups, do it now:
                     Set groups = (Set) groupAdditions.get(entry);
-                    if (groups != null) {
+                    if (!groupingCanceled && (groups != null)) {
                         if (entry.getField(Globals.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the group.
                             // The best course of ation is probably to ask the user if a key should be generated
                             // immediately.
-
+                           int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
+                                   Globals.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                    Globals.lang("Add to group"), JOptionPane.YES_NO_OPTION);
+                            if (answer == JOptionPane.YES_OPTION) {
+                                generateKeys();
+                            } else
+                                groupingCanceled = true;
                         }
 
                         // If the key was set, or has been set now, go ahead:
-                        if (entry.getField(Globals.KEY_FIELD) == null) {
+                        if (entry.getField(Globals.KEY_FIELD) != null) {
                             for (Iterator i2 = groups.iterator(); i2.hasNext();) {
                                 GroupTreeNode node = (GroupTreeNode) i2.next();
                                 if (node.getGroup().supportsAdd()) {
@@ -525,6 +533,9 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             signalStopFetching();
             dispose();
+            for (Iterator i = callBacks.iterator(); i.hasNext();) {
+                ((CallBack) i.next()).cancelled();
+            }
         }
     }
 
@@ -690,6 +701,9 @@ public class ImportInspectionDialog extends JDialog {
         // wanted entries, and clicked Ok. The callback object can update status
         // line etc.
         public void done(int entriesImported);
+
+        // This method is called by the dialog when the user has cancelled the import.
+        public void cancelled();
 
         // This method is called by the dialog when the user has cancelled or
         // signalled a stop. It is expected that any long-running fetch operations

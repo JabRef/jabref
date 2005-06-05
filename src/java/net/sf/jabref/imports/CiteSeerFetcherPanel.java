@@ -104,6 +104,10 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                             panel.output(Globals.lang("No entries imported."));
                     }
 
+                    public void cancelled() {
+                        panel.output(Globals.lang("%0 import cancelled.", "CiteSeer"));
+                    }
+                    
                     public void stopFetching() {
                     }
 
@@ -131,12 +135,15 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                 public void run() {
 
                     // Open the inspection dialog... we will fill it as the entries come in:
-                    ImportInspectionDialog diag = new ImportInspectionDialog(panel.frame(), panel,
+                    ImportInspectionDialog diag = null;
+                    if (Globals.prefs.getBoolean("useImportInspectionDialog")) {
+                        diag = new ImportInspectionDialog(panel.frame(), panel,
                             GUIGlobals.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch CiteSeer"), false);
-                    diag.addCallBack(new Update());
-                    Util.placeDialog(diag, panel.frame());
-                    diag.setVisible(true);
-
+                        diag.addCallBack(new Update());
+                        Util.placeDialog(diag, panel.frame());
+                        diag.setVisible(true);
+                        diag.setProgress(0, 1);
+                    }
                     NamedCompound undoEdit =
                             new NamedCompound(Globals.lang("CiteSeer import entries")),
                             // Use a dummy UndoEdit to avoid storing the information on
@@ -150,7 +157,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                     String[] ids = text.split(";");
                     BibtexEntry[] entries = new BibtexEntry[ids.length];
                     citeSeerFetcher.activateImportFetcher();
-                    diag.setProgress(0, entries.length);
+
                     for (int i = 0; i < entries.length; i++) {
                         // Create the entry:
                         entries[i] = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
@@ -160,12 +167,24 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                         boolean newValues = citeSeerFetcher.importCiteSeerEntry
                                 (entries[i], dummyCompound, overwriteAll, overwriteNone,
                                         newValue, rejectedEntries);
-                        diag.addEntry(entries[i]);
-                        diag.setProgress(i+1, entries.length);
+
+                        // What we do with the entry depends on whether we are using the inspection window:
+                        if (diag != null) {
+                            diag.addEntry(entries[i]);
+                            diag.setProgress(i+1, entries.length);
+                        } else {
+                            // Do nothing. We will add the entries afterwards (?)
+                        }
                     }
                     citeSeerFetcher.deactivateImportFetcher();
-                    // Signal that we are done. The ImportInspectionDialog will add the entries for us.
-                    diag.entryListComplete();
+
+                    if (diag != null) {
+                        // Signal that we are done. The ImportInspectionDialog will add the entries for us.
+                        diag.entryListComplete();
+                    } else {
+                        panel.frame().addBibEntries(Arrays.asList(entries), null, false);
+                        (new Update()).done(entries.length);
+                    }
                 }
             }).start();
         } else {

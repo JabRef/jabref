@@ -100,6 +100,10 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
         }
     }
 
+    public void cancelled() {
+        frame.output(Globals.lang("Import cancelled."));
+    }
+
 
     // This method is called by the dialog when the user has cancelled or
     // signalled a stop. It is expected that any long-running fetch operations

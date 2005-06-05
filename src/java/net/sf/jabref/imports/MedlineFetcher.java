@@ -287,6 +287,11 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
                  panel.output(Globals.lang("No Medline entries found."));
             }
 
+             public void cancelled() {
+                 panel.output(Globals.lang("%0 import cancelled.", "Medline"));
+             }
+
+
              public void stopFetching() {
                 // Make sure the fetch loop exits at next iteration.
                 keepOn = false;
@@ -453,6 +458,11 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
     public void done(int entriesImported) {
         panel.output(Globals.lang("Medline entries fetched")+": "+entriesImported);
     }
+
+    public void cancelled() {
+        panel.output(Globals.lang("%0 import cancelled.", "Medline"));
+    }
+
 
     // This method is called by the dialog when the user has cancelled or
     // signalled a stop. It is expected that any long-running fetch operations

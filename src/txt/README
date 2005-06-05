@@ -1,6 +1,6 @@
 
-JabRef 1.x
-----------
+JabRef 1.8 beta
+---------------
 
 
 Introduction:
@@ -80,12 +80,12 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x
+1.8b:   - Added option to store bib file with double braces.
         - Follow @input tags in aux files to indicate nested aux files for
           generating subdatabases
         - Improved wrapping and formatting of bib files, to preserve paragraph separator (empty line).
         - Added test buttons for customization of preview layouts.
-        - [UNFINISHED] Added inspection dialog for previewing and generating keys for imported entries,
+        - Added inspection dialog for previewing and generating keys for imported entries,
           and deciding which ones to keep and discard. The dialog allows inspection during long import
           processes such as Medline search.
         - Restructured layout to use a common side pane with all tabs.
@@ -99,6 +99,7 @@ Change log:
         - Changed keys for Next and Previous tab to CTRL-PGDN and CTRL-PGUP to match shortcuts in a
           certain popular web browser.
         - Minor change to Preferences -> Table columns to enable insertion of column in position 2.
+        - Fixed parser bug that caused problems for files with >10000 entries.
         - Fixed bug in entry editor that caused the source edit panel to remove marking from entries.
         - Fixed export bug that made "\begin" tags fail if encountered immediately after an "\end" tag. 
         - Fixed export bug that made whitespace disappear after empty field values.
