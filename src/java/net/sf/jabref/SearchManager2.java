@@ -254,7 +254,8 @@ settings.add(select);
 	searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
 	searchField.getActionMap().put("escape", new AbstractAction() {
 		public void actionPerformed(ActionEvent e) {
-		    SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
+            hideAway();
+		    //SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
 		}
 	    });
     setSearchButtonSizes();

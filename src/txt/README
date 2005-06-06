@@ -89,6 +89,7 @@ Change log:
           and deciding which ones to keep and discard. The dialog allows inspection during long import
           processes such as Medline search.
         - Restructured layout to use a common side pane with all tabs.
+        - Added import filter for Cambridge Scientific Abstracts (CSA) format.
         - Added PS directory with similar options as PDF.
 	    - Added [authshort] and [edtrshort] key field markers. Patch submitted by
 	      Kolja Brix.

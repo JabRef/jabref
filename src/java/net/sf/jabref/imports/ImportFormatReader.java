@@ -84,6 +84,7 @@ public class ImportFormatReader {
   public ImportFormatReader() {
     // Add all our importers to the TreeMap. The map is used to build the import
     // menus, and to resolve command-line import instructions.
+    formats.put("csa", new CsaImporter());   
     formats.put("isi", new IsiImporter());
     formats.put("refer", new EndnoteImporter());
     formats.put("medline", new MedlineImporter());
