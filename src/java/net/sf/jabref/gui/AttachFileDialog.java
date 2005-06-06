@@ -83,19 +83,26 @@ public class AttachFileDialog extends JDialog {
                 });
 
 
-        ok.addActionListener(new ActionListener () {
+        ActionListener okListener = new ActionListener () {
             public void actionPerformed(ActionEvent event) {
                 cancelled = false;
                 dispose();
             }
-        });
+        };
 
-        cancel.addActionListener(new ActionListener () {
+        ok.addActionListener(okListener);
+        ((JTextField)editor.getTextComponent()).addActionListener(okListener);
+
+        AbstractAction cancelListener = new AbstractAction () {
             public void actionPerformed(ActionEvent event) {
                 cancelled = true;
                 dispose();
             }
-        });
+        };
+
+        cancel.addActionListener(cancelListener);
+        editor.getTextComponent().getInputMap().put(Globals.prefs.getKey("Close dialog"), "close");
+	    editor.getTextComponent().getActionMap().put("close", cancelListener);
 
         FormLayout layout = new FormLayout("fill:160dlu, 4dlu, fill:pref","");
 	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
