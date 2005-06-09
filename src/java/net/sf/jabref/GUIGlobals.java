@@ -53,7 +53,8 @@ public class GUIGlobals {
   // Frame titles.
   public static String
       frameTitle = "JabRef",
-      version = "1.8b",
+//      version = "1.8b",
+      version = Globals.VERSION,
       stringsTitle = "Strings for database",
       //untitledStringsTitle = stringsTitle + Globals.lang("untitled"),
       untitledTitle = "untitled",

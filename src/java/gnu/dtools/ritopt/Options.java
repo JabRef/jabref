@@ -9,6 +9,7 @@ package gnu.dtools.ritopt;
 
 import java.util.*;
 import java.io.*;
+import net.sf.jabref.*;
 
 /**
  * This class functions as a repository for options and their modules. It
@@ -404,7 +405,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      */
 
     public void displayVersion() {
-        System.err.println( getVersion() );
+        System.err.println( getVersion() +" (build " +Globals.BUILD +")");
     }
 
     /**

@@ -37,6 +37,7 @@ import java.awt.*;
 import javax.swing.*;
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.util.*;
 
 public class Globals {
 
@@ -50,6 +51,7 @@ public class Globals {
   private static String resourcePrefix = "resource/JabRef",
                         menuResourcePrefix = "resource/Menu",
                         integrityResourcePrefix = "resource/IntegrityMessage";
+  private static final String buildInfos = "/resource/build.properties" ;
   private static String logfile = "jabref.log";
   public static ResourceBundle messages, menuTitles, intMessages ;
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
@@ -58,6 +60,19 @@ public class Globals {
 
 
     private final static Map tableCache = new WeakHashMap();
+
+  public static String VERSION,
+                       BUILD,
+                       BUILD_DATE ;
+
+  static
+  {
+    TBuildInfo bi = new TBuildInfo(buildInfos) ;
+    VERSION = bi.getBUILD_VERSION() ;
+    BUILD = bi.getBUILD_NUMBER() ;
+    BUILD_DATE = bi.getBUILD_DATE() ;
+  }
+
 
 
   //public static ResourceBundle preferences = ResourceBundle.getBundle("resource/defaultPrefs");
@@ -224,18 +239,18 @@ public class Globals {
                           sb.append(c);
                       }
                   }
-              } 
+              }
           }
       }
       return sb.toString();
     }
     return key;
   }
-  
+
   public static String lang(String key) {
       return lang(key, (String[])null);
   }
-  
+
   public static String lang(String key, String s1) {
       return lang(key, new String[]{s1});
   }
@@ -373,7 +388,7 @@ public class Globals {
 
     OpenFileFilter off = null;
 
-    if (extension == null) 
+    if (extension == null)
       off = new OpenFileFilter();
     else if (!extension.equals(NONE))
       off = new OpenFileFilter(extension);
