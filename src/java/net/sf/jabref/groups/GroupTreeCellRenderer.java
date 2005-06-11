@@ -27,6 +27,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.*;
+
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its
@@ -57,9 +59,43 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 }
             }
         }
-        label.setText(group.getName());
-        label.setToolTipText(group.getName());
-        label.setIcon(null); // save some space
+        if (!label.getText().equals(group.getName())) {
+        	label.setText(group.getName());
+        	label.setToolTipText("<html>" + group.getShortDescription()
+        			+ "</html>");
+        }
+        if (Globals.prefs.getBoolean("groupShowIcons")) {
+	        switch (group.getHierarchicalContext()) {
+	        case AbstractGroup.REFINING:
+	        	if (label.getIcon() != GUIGlobals.groupRefiningIcon)
+	        		label.setIcon(GUIGlobals.groupRefiningIcon);
+	        	break;
+	        case AbstractGroup.INCLUDING:
+	        	if (label.getIcon() != GUIGlobals.groupIncludingIcon)
+	        		label.setIcon(GUIGlobals.groupIncludingIcon);
+	        	break;
+	        default:
+	        	if (label.getIcon() != GUIGlobals.groupRegularIcon)
+	        		label.setIcon(GUIGlobals.groupRegularIcon);
+	        	break;
+	        }
+        } else {
+        	label.setIcon(null);
+        }
+        if (Globals.prefs.getBoolean("groupShowDynamic")) {
+        	Font f = label.getFont();
+        	if (group.isDynamic()) {
+	        	if (!f.isItalic()) {
+	        		f = f.deriveFont(Font.ITALIC);
+	        		label.setFont(f);
+	        	}
+        	} else {
+	        	if (f.isItalic()) {
+	        		f = f.deriveFont(Font.PLAIN);
+	        		label.setFont(f);
+	        	}
+        	}
+        }
         return c;
     }
     /** 
