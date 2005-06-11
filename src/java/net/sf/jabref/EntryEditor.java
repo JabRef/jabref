@@ -428,7 +428,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     srcPanel.add(sp);
   }
 
-  private void updateSource() {
+  public void updateSource() {
     if (updateSource) {
       StringWriter sw = new StringWriter(200);
 
@@ -720,7 +720,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
        */
       if (duplicateWarning) {
         warnDuplicateBibtexkey();
-      } else if (emptyWarning) {
+      } else if (emptyWarning && showError) {
         warnEmptyBibtexkey();
       } else {
         panel.output(Globals.lang("Stored entry") + ".");
@@ -790,14 +790,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * Sets all the text areas according to the shown entry.
    */
   public void updateAllFields() {
-
-      for (Iterator i=tabs.iterator(); i.hasNext();) {
-	  Object o = i.next();
-	  if (o instanceof EntryEditorTab) {
-	      ((EntryEditorTab)o).setEntry(entry);
-	  }
+	  for (Iterator i=tabs.iterator(); i.hasNext();) {
+		  Object o = i.next();
+		  if (o instanceof EntryEditorTab) {
+		      ((EntryEditorTab)o).setEntry(entry);
+		  }
       }
-
   }
 
   /**
