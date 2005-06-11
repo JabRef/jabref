@@ -281,6 +281,8 @@ public class EntryTableModel
     // Returns true iff the entry has a nonzero value in its
     // 'search' field.
     BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+    if (be == null)
+    	return false; // TODO: JZ: I think this should never happen, but it does 
     String o = (String) (be.getField(field));
     return ( (o != null) && !o.equals("0"));
   }
