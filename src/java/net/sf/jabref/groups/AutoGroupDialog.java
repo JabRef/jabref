@@ -46,8 +46,9 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             deliminator = new JTextField(60);
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
-    JCheckBox nd = new JCheckBox(Globals.lang("Use the following deliminator")
-            + ":");
+    JCheckBox nd = new JCheckBox(Globals.lang(
+    		"Use the following deliminator character(s)")
+            + ":"); // JZTODO lyrics
     JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
             .lang("Cancel"));
     JPanel main = new JPanel(), opt = new JPanel();
@@ -76,13 +77,15 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.setText(defaultField);
         remove.setText(defaultRemove);
         deliminator.setText(defaultDeliminator);
+        nd.setSelected(true);
         ActionListener okListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ok_pressed = true;
                 dispose();
 
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                        new ExplicitGroup(Globals.lang("Automatically created groups")));
+                        new ExplicitGroup(Globals.lang("Automatically created groups"),
+                        		AbstractGroup.INCLUDING));
                 HashSet hs = null;
                 if (nd.isSelected()) {
                     hs = Util
@@ -97,7 +100,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 while (i.hasNext()) {
                     String keyword = i.next().toString();
                     KeywordGroup group = new KeywordGroup(keyword, field(),
-                            keyword, false, false);
+                            keyword, false, false, AbstractGroup.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 
