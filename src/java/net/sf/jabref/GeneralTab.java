@@ -16,7 +16,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	defSource, editSource,defSort, ctrlClick, disableOnMultiple,
 	useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, preserveFormatting, useImportInspector;
-    private JTextField groupField = new JTextField(15);
     private JTextField defOwnerField, fontSize;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
@@ -50,7 +49,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
     useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
 	JPanel general = new JPanel();
 	defOwnerField = new JTextField();
-        groupField = new JTextField(15);
 	ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
 				   "Help", GUIGlobals.helpSmallIconFile);
     
@@ -78,7 +76,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	builder.append(pan); builder.append(disableOnMultiple); builder.nextLine();
 	builder.appendSeparator(Globals.lang("Miscellaneous"));
     builder.append(pan); builder.append(useImportInspector); builder.nextLine();
-    builder.append(pan); builder.append(allowEditing); builder.nextLine();
+	builder.append(pan); builder.append(allowEditing); builder.nextLine();
 	builder.append(pan); builder.append(ctrlClick); builder.nextLine();
 	builder.append(pan); builder.append(confirmDelete); builder.nextLine();
     builder.append(pan); builder.append(keyDuplicateWarningDialog); builder.nextLine();
@@ -92,9 +90,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24,24));
 	builder2.append(hlp); builder2.nextLine();
-	JLabel lab = new JLabel(Globals.lang("Default grouping field")+":");
-	builder2.append(lab);
-	builder2.append(groupField); builder2.nextLine();
+	JLabel lab;
         lab = new JLabel(Globals.lang("Language")+":");
 	builder2.append(lab); 
 	builder2.append(language); builder2.nextLine();
@@ -134,9 +130,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
 	preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
     autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
     defOwnerField.setText(_prefs.get("defaultOwner"));
-	groupField.setText(_prefs.get("groupsDefaultField"));
     useImportInspector.setSelected(_prefs.getBoolean("useImportInspectionDialog"));
-
+        
 	String enc = _prefs.get("defaultEncoding");
         outer: for (int i=0; i<Globals.ENCODINGS.length; i++) {
 	    if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
@@ -180,7 +175,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
       //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
 	_prefs.put("defaultOwner", defOwnerField.getText().trim());
 
-        _prefs.put("groupsDefaultField", groupField.getText().trim());
         _prefs.put("defaultEncoding", (String)encodings.getSelectedItem());
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
