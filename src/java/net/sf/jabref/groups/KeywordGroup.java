@@ -216,7 +216,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 				&& m_searchField.equals(other.m_searchField)
 				&& m_searchExpression.equals(other.m_searchExpression)
 				&& m_caseSensitive == other.m_caseSensitive
-				&& m_regExp == other.m_regExp;
+				&& m_regExp == other.m_regExp
+                && getHierarchicalContext() == other.getHierarchicalContext();
 	}
 
 	/*

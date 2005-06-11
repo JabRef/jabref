@@ -34,185 +34,187 @@ import net.sf.jabref.util.QuotedStringTokenizer;
  * 
  */
 public class ExplicitGroup extends AbstractGroup implements SearchRule {
-	public static final String ID = "ExplicitGroup:";
+    public static final String ID = "ExplicitGroup:";
 
-	private final Set m_entries;
+    private final Set m_entries;
 
-	public ExplicitGroup(String name, int context) {
-		super(name, context);
-		m_entries = new HashSet();
-	}
+    public ExplicitGroup(String name, int context) {
+        super(name, context);
+        m_entries = new HashSet();
+    }
 
-	public static AbstractGroup fromString(String s, BibtexDatabase db,
-			int version) throws Exception {
-		if (!s.startsWith(ID))
-			throw new Exception(
-					"Internal error: ExplicitGroup cannot be created from \""
-							+ s + "\". "
-							+ "Please report this on www.sf.net/projects/jabref");
-		QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
-				.length()), SEPARATOR, QUOTE_CHAR);
-		switch (version) {
-		case 0:
-		case 1:
-		case 2: {
-			ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(),
-					AbstractGroup.INDEPENDENT);
-			newGroup.addEntries(tok, db);
-			return newGroup;
-		}
-		case 3: {
-			String name = tok.nextToken();
-			int context = Integer.parseInt(tok.nextToken());
-			ExplicitGroup newGroup = new ExplicitGroup(name, context);
-			newGroup.addEntries(tok, db);
-			return newGroup;
-		}
-		default:
-			throw new UnsupportedVersionException("ExplicitGroup", version);
-		}
-	}
+    public static AbstractGroup fromString(String s, BibtexDatabase db,
+            int version) throws Exception {
+        if (!s.startsWith(ID))
+            throw new Exception(
+                    "Internal error: ExplicitGroup cannot be created from \""
+                            + s
+                            + "\". "
+                            + "Please report this on www.sf.net/projects/jabref");
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ID
+                .length()), SEPARATOR, QUOTE_CHAR);
+        switch (version) {
+        case 0:
+        case 1:
+        case 2: {
+            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(),
+                    AbstractGroup.INDEPENDENT);
+            newGroup.addEntries(tok, db);
+            return newGroup;
+        }
+        case 3: {
+            String name = tok.nextToken();
+            int context = Integer.parseInt(tok.nextToken());
+            ExplicitGroup newGroup = new ExplicitGroup(name, context);
+            newGroup.addEntries(tok, db);
+            return newGroup;
+        }
+        default:
+            throw new UnsupportedVersionException("ExplicitGroup", version);
+        }
+    }
 
-	/** Called only when created fromString */
-	protected void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
-		BibtexEntry[] entries;
-		while (tok.hasMoreTokens()) {
-			entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
-					QUOTE_CHAR));
-			for (int i = 0; i < entries.length; ++i)
-				m_entries.add(entries[i]);
-		}
-	}
+    /** Called only when created fromString */
+    protected void addEntries(QuotedStringTokenizer tok, BibtexDatabase db) {
+        BibtexEntry[] entries;
+        while (tok.hasMoreTokens()) {
+            entries = db.getEntriesByKey(Util.unquote(tok.nextToken(),
+                    QUOTE_CHAR));
+            for (int i = 0; i < entries.length; ++i)
+                m_entries.add(entries[i]);
+        }
+    }
 
-	public SearchRule getSearchRule() {
-		return this;
-	}
+    public SearchRule getSearchRule() {
+        return this;
+    }
 
-	public boolean supportsAdd() {
-		return true;
-	}
+    public boolean supportsAdd() {
+        return true;
+    }
 
-	public boolean supportsRemove() {
-		return true;
-	}
+    public boolean supportsRemove() {
+        return true;
+    }
 
-	public AbstractUndoableEdit add(BibtexEntry[] entries) {
-		if (entries.length == 0)
-			return null; // nothing to do
+    public AbstractUndoableEdit add(BibtexEntry[] entries) {
+        if (entries.length == 0)
+            return null; // nothing to do
 
-		HashSet entriesBeforeEdit = new HashSet(m_entries);
-		for (int i = 0; i < entries.length; ++i)
-			m_entries.add(entries[i]);
+        HashSet entriesBeforeEdit = new HashSet(m_entries);
+        for (int i = 0; i < entries.length; ++i)
+            m_entries.add(entries[i]);
 
-		return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
-	}
+        return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
+    }
 
-	public boolean addEntry(BibtexEntry entry) {
-		return m_entries.add(entry);
-	}
+    public boolean addEntry(BibtexEntry entry) {
+        return m_entries.add(entry);
+    }
 
-	public AbstractUndoableEdit remove(BibtexEntry[] entries) {
-		if (entries.length == 0)
-			return null; // nothing to do
+    public AbstractUndoableEdit remove(BibtexEntry[] entries) {
+        if (entries.length == 0)
+            return null; // nothing to do
 
-		HashSet entriesBeforeEdit = new HashSet(m_entries);
-		for (int i = 0; i < entries.length; ++i)
-			m_entries.remove(entries[i]);
+        HashSet entriesBeforeEdit = new HashSet(m_entries);
+        for (int i = 0; i < entries.length; ++i)
+            m_entries.remove(entries[i]);
 
-		return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
-	}
+        return new UndoableChangeAssignment(entriesBeforeEdit, m_entries);
+    }
 
-	public boolean removeEntry(BibtexEntry entry) {
-		return m_entries.remove(entry);
-	}
+    public boolean removeEntry(BibtexEntry entry) {
+        return m_entries.remove(entry);
+    }
 
-	public boolean contains(BibtexEntry entry) {
-		return m_entries.contains(entry);
-	}
+    public boolean contains(BibtexEntry entry) {
+        return m_entries.contains(entry);
+    }
 
-	public boolean contains(Map searchOptions, BibtexEntry entry) {
-		return contains(entry);
-	}
+    public boolean contains(Map searchOptions, BibtexEntry entry) {
+        return contains(entry);
+    }
 
-	public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
-		return contains(searchStrings, bibtexEntry) ? 1 : 0;
-	}
+    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
+        return contains(searchStrings, bibtexEntry) ? 1 : 0;
+    }
 
-	public AbstractGroup deepCopy() {
-		ExplicitGroup copy = new ExplicitGroup(m_name, m_context);
-		copy.m_entries.addAll(m_entries);
-		return copy;
-	}
+    public AbstractGroup deepCopy() {
+        ExplicitGroup copy = new ExplicitGroup(m_name, m_context);
+        copy.m_entries.addAll(m_entries);
+        return copy;
+    }
 
-	public boolean equals(Object o) {
-		if (!(o instanceof ExplicitGroup))
-			return false;
-		ExplicitGroup other = (ExplicitGroup) o;
-		return other.m_name.equals(m_name) && other.m_entries.equals(m_entries);
-	}
+    public boolean equals(Object o) {
+        if (!(o instanceof ExplicitGroup))
+            return false;
+        ExplicitGroup other = (ExplicitGroup) o;
+        return other.m_name.equals(m_name) && other.m_entries.equals(m_entries)
+                && other.getHierarchicalContext() == getHierarchicalContext();
+    }
 
-	/**
-	 * Returns a String representation of this group and its entries. Entries
-	 * are referenced by their Bibtexkey. Entries that do not have a Bibtexkey
-	 * are not included in the representation and will thus not be available
-	 * upon recreation.
-	 */
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
-				+ m_context + SEPARATOR);
-		String s;
-		// write entries in well-defined order for CVS compatibility
-		Set sortedKeys = new TreeSet();
-		for (Iterator it = m_entries.iterator(); it.hasNext();) {
-			s = ((BibtexEntry) it.next()).getCiteKey();
-			if (s != null && !s.equals("")) // entries without a key are lost
-				sortedKeys.add(s);
-		}
-		for (Iterator it = sortedKeys.iterator(); it.hasNext();) {
-			sb.append(Util.quote((String) it.next(), SEPARATOR, QUOTE_CHAR)
-					+ SEPARATOR);
-		}
-		return sb.toString();
-	}
+    /**
+     * Returns a String representation of this group and its entries. Entries
+     * are referenced by their Bibtexkey. Entries that do not have a Bibtexkey
+     * are not included in the representation and will thus not be available
+     * upon recreation.
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
+                + m_context + SEPARATOR);
+        String s;
+        // write entries in well-defined order for CVS compatibility
+        Set sortedKeys = new TreeSet();
+        for (Iterator it = m_entries.iterator(); it.hasNext();) {
+            s = ((BibtexEntry) it.next()).getCiteKey();
+            if (s != null && !s.equals("")) // entries without a key are lost
+                sortedKeys.add(s);
+        }
+        for (Iterator it = sortedKeys.iterator(); it.hasNext();) {
+            sb.append(Util.quote((String) it.next(), SEPARATOR, QUOTE_CHAR)
+                    + SEPARATOR);
+        }
+        return sb.toString();
+    }
 
-	/** Remove all assignments, resulting in an empty group. */
-	public void clearAssignments() {
-		m_entries.clear();
-	}
+    /** Remove all assignments, resulting in an empty group. */
+    public void clearAssignments() {
+        m_entries.clear();
+    }
 
-	public boolean isDynamic() {
-		return false;
-	}
-	
-	public String getDescription() {
-		return getDescriptionForPreview();
-	}
+    public boolean isDynamic() {
+        return false;
+    }
 
-	public static String getDescriptionForPreview() {
-		return Globals
-		.lang("This group contains entries based on manual assignment. "
-				+ "Entries can be assigned to this group by selecting them "
-				+ "then using either drag and drop or the context menu. "
-				+ "Entries can be removed from this group by selecting them "
-				+ "then using the context menu. Every entry assigned to this group "
-				+ "must have a unique key. The key may be changed at any time "
-				+ "as long as it remains unique.");
-	}
+    public String getDescription() {
+        return getDescriptionForPreview();
+    }
 
-	public String getShortDescription() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("<b>" + getName() + "</b> - static group");
-		switch (getHierarchicalContext()) {
-		case AbstractGroup.INCLUDING:
-			sb.append(", includes subgroups");
-			break;
-		case AbstractGroup.REFINING:
-			sb.append(", refines supergroup");
-			break;
-		default:
-			break;
-		}
-		return sb.toString();
-	}
+    public static String getDescriptionForPreview() {
+        return Globals
+                .lang("This group contains entries based on manual assignment. "
+                        + "Entries can be assigned to this group by selecting them "
+                        + "then using either drag and drop or the context menu. "
+                        + "Entries can be removed from this group by selecting them "
+                        + "then using the context menu. Every entry assigned to this group "
+                        + "must have a unique key. The key may be changed at any time "
+                        + "as long as it remains unique.");
+    }
+
+    public String getShortDescription() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<b>" + getName() + "</b> - static group");
+        switch (getHierarchicalContext()) {
+        case AbstractGroup.INCLUDING:
+            sb.append(", includes subgroups");
+            break;
+        case AbstractGroup.REFINING:
+            sb.append(", refines supergroup");
+            break;
+        default:
+            break;
+        }
+        return sb.toString();
+    }
 }
