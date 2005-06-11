@@ -1025,7 +1025,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           // ensure that there is always only one AllEntriesGroup
                           if (newGroups.getGroup() instanceof AllEntriesGroup) {
                               // create a dummy group
-                              ExplicitGroup group = new ExplicitGroup("Imported"); // JZTODO lyrics 
+                              ExplicitGroup group = new ExplicitGroup("Imported", 
+                            		  AbstractGroup.INDEPENDENT); // JZTODO lyrics 
                               newGroups.setGroup(group);
                               for (int i = 0; i < appendedEntries.size(); ++i)
                                   group.addEntry((BibtexEntry) appendedEntries.elementAt(i));
@@ -2153,8 +2154,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
           // The entry has changed type, so we must get a new editor.
           showing = null;
           showEntry(editor.entry);
-        } else
+        } else {
           editor.updateAllFields();
+          editor.updateSource();
+        }
       }
     }
 
