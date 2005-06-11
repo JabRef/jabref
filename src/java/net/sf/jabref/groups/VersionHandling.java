@@ -33,7 +33,7 @@ import net.sf.jabref.*;
  * @author jzieren (10.04.2005)
  */
 public class VersionHandling {
-    public static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 3;
 
     /**
      * Imports old (flat) groups data and converts it to a 2-level tree with an
@@ -51,7 +51,7 @@ public class VersionHandling {
             name = (String) groups.elementAt(3 * i + 1);
             regexp = (String) groups.elementAt(3 * i + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
-                    false, true)));
+                    false, true, AbstractGroup.INDEPENDENT)));
         }
         return root;
     }
@@ -64,7 +64,8 @@ public class VersionHandling {
             return Version0_1.fromString((String) orderedData.firstElement(),
                     db, version);
         case 2:
-            return Version2.fromString(orderedData, db, version);
+        case 3:
+            return Version2_3.fromString(orderedData, db, version);
         default:
             throw new IllegalArgumentException(Globals.lang(
                     "Failed to read groups data (unsupported version: %0)",
@@ -170,7 +171,7 @@ public class VersionHandling {
         }
     }
     
-    private static class Version2 {
+    private static class Version2_3 {
         private static GroupTreeNode fromString(Vector data, BibtexDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
