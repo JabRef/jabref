@@ -151,10 +151,15 @@ public class JabRefPreferences {
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
         defaults.put("groupInvertSelections", Boolean.FALSE);
+        defaults.put("groupShowOverlapping", Boolean.FALSE);
         defaults.put("groupSelectMatches", Boolean.FALSE);
         defaults.put("groupsDefaultField", "keywords");
-        defaults.put("groupSubgroupIndependent", Boolean.FALSE);
-        defaults.put("groupSubgroupIntersection", Boolean.TRUE);
+        defaults.put("groupShowIcons", Boolean.TRUE);
+        defaults.put("groupShowDynamic", Boolean.TRUE);
+        defaults.put("groupExpandTree", Boolean.TRUE);
+        defaults.put("groupAutoShow", Boolean.TRUE);
+        defaults.put("groupAutoHide", Boolean.TRUE);
+        defaults.put("groupKeywordSeparator", ", ");
         
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
