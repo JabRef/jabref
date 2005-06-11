@@ -2,7 +2,7 @@
 package net.sf.jabref;
 
 
-interface PrefsTab {
+public interface PrefsTab {
 
     /**
      * This method is called when the dialog is opened, or if it is made
