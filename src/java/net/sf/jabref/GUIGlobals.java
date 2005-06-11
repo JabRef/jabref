@@ -255,6 +255,11 @@ public class GUIGlobals {
       integrityWarn = GUIGlobals.class.getResource(pre +"messageWarn.png"),
       integrityFail = GUIGlobals.class.getResource(pre +"messageFail.png")
       ;
+  
+  public static ImageIcon
+  	groupRefiningIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupRefining.png")),
+  	groupIncludingIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupIncluding.png")),
+  	groupRegularIcon = null;
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
     static {
