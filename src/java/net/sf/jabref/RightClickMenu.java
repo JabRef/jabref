@@ -26,8 +26,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -43,6 +44,7 @@ public class RightClickMenu extends JPopupMenu
     MetaData metaData;
     JMenu groupAddMenu = new JMenu(Globals.lang("Add to group")),
         groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
+        groupMoveMenu = new JMenu("Assign exclusively to group"), // JZTODO lyrics
         typeMenu = new JMenu(Globals.lang("Change entry type"));
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
@@ -181,14 +183,14 @@ public class RightClickMenu extends JPopupMenu
             });
 
         addSeparator();
-        add(new AbstractAction(Globals.lang("Show groups matching any")) // JZTODO lyrics
+        add(new AbstractAction(Globals.lang("Highlight groups matching any")) // JZTODO lyrics
                 {
                     public void actionPerformed(ActionEvent e) {
                         panel.getGroupSelector().showMatchingGroups(
                                 panel.getSelectedEntries(), false);
                     }
                 });
-        add(new AbstractAction(Globals.lang("Show groups matching all")) // JZTODO lyrics
+        add(new AbstractAction(Globals.lang("Highlight groups matching all")) // JZTODO lyrics
                 {
                     public void actionPerformed(ActionEvent e) {
                         panel.getGroupSelector().showMatchingGroups(
@@ -229,67 +231,112 @@ public class RightClickMenu extends JPopupMenu
       GroupTreeNode groups = metaData.getGroups();
       if (groups == null) {
         groupAddMenu.setEnabled(false);
+        groupMoveMenu.setEnabled(false);
         groupRemoveMenu.setEnabled(false);
         return;
       }
       
       groupAddMenu.setEnabled(true);
+      groupMoveMenu.setEnabled(true);
       groupRemoveMenu.setEnabled(true);
       groupAddMenu.removeAll();
+      groupMoveMenu.removeAll();
       groupRemoveMenu.removeAll();
       
       if (bes == null)
         return;
       add(groupAddMenu);
+      add(groupMoveMenu);
       add(groupRemoveMenu);
 
       groupAddMenu.setEnabled(false);
+      groupMoveMenu.setEnabled(false);
       groupRemoveMenu.setEnabled(false);
-      insertNodes(groupAddMenu,metaData.getGroups(),bes,true);
-      insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false);
+      insertNodes(groupAddMenu,metaData.getGroups(),bes,true,false);
+      insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
+      insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);
     }
     
-    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, boolean add) {
-        final AbstractAction action = getAction(node,selection,add);
+    /**
+     * @param move For add: if true, remove from previous groups
+     */
+    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, 
+    		boolean add, boolean move) {
+        final AbstractAction action = getAction(node,selection,add,move);
         
         if (node.getChildCount() == 0) {
-            menu.add(action);
+            JMenuItem menuItem = new JMenuItem(action);
+            setGroupFontAndIcon(menuItem, node.getGroup());
+            menu.add(menuItem);            
             if (action.isEnabled())
-                menu.setEnabled(true);
+            	menu.setEnabled(true);
             return;
         }
         
         JMenu submenu = null;
         if (node.getGroup() instanceof AllEntriesGroup) {
             for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu,(GroupTreeNode) node.getChildAt(i), selection, add);
+                insertNodes(menu,(GroupTreeNode) node.getChildAt(i), selection, add, move);
             }
         } else {
             submenu = new JMenu("["+node.getGroup().getName()+"]");
+            setGroupFontAndIcon(submenu, node.getGroup());
             // setEnabled(true) is done above/below if at least one menu 
             // entry (item or submenu) is enabled
             submenu.setEnabled(action.isEnabled()); 
-            submenu.add(action);
+            JMenuItem menuItem = new JMenuItem(action);
+            setGroupFontAndIcon(menuItem, node.getGroup());
+            submenu.add(menuItem);
             submenu.add(new Separator());
             for (int i = 0; i < node.getChildCount(); ++i)
-                insertNodes(submenu,(GroupTreeNode) node.getChildAt(i), selection, add);
+                insertNodes(submenu,(GroupTreeNode) node.getChildAt(i), selection, add, move);
             menu.add(submenu);
             if (submenu.isEnabled())
                 menu.setEnabled(true);
         }
     }
     
-    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection, boolean add) {
-        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
+    /** Sets the font and icon to be used, depending on the group */
+    private void setGroupFontAndIcon(JMenuItem menuItem, AbstractGroup group) {
+        if (Globals.prefs.getBoolean("groupShowDynamic")) {
+        	menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ? 
+        			Font.ITALIC : Font.PLAIN));
+        }
+    	if (Globals.prefs.getBoolean("groupShowIcons")) {
+    		switch (group.getHierarchicalContext()) {
+    		case AbstractGroup.INCLUDING:
+    			menuItem.setIcon(GUIGlobals.groupIncludingIcon);
+    			break;
+    		case AbstractGroup.REFINING:
+    			menuItem.setIcon(GUIGlobals.groupRefiningIcon);
+    			break;
+    		default:
+    			menuItem.setIcon(GUIGlobals.groupRegularIcon);
+				break;
+    		}
+    	}
+    }
+    
+    /**
+     * @param move For add: if true, remove from all previous groups
+     */
+    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection, 
+    		boolean add, boolean move) {
+        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node, move)
                 : (AbstractAction) new RemoveFromGroupAction(node);
         AbstractGroup group = node.getGroup();
-        action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
-                : group.supportsRemove() && group.containsAny(selection));
+        if (!move) {
+	        action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
+	                : group.supportsRemove() && group.containsAny(selection));
+        } else {
+        	action.setEnabled(group.supportsAdd());
+        }
         return action;
     }
 
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
       remove(groupAddMenu);
+      remove(groupMoveMenu);
       remove(groupRemoveMenu);
     }
 
@@ -298,29 +345,77 @@ public class RightClickMenu extends JPopupMenu
     }
 
     class AddToGroupAction extends AbstractAction {
-        GroupTreeNode m_node;
-        public AddToGroupAction(GroupTreeNode node) {
+        final GroupTreeNode m_node;
+        final boolean m_move;
+        /**
+         * @param move If true, remove node from all other groups.
+         */
+        public AddToGroupAction(GroupTreeNode node, boolean move) {
             super(node.getGroup().getName());
             m_node = node;
+            m_move = move;
         }
         public void actionPerformed(ActionEvent evt) {
-            // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),
-                    panel.getSelectedEntries(),
-                    panel.getDatabase(),
-                    panel.frame))
-                return; // user aborted operation
-            
+        	final BibtexEntry[] entries = panel.getSelectedEntries();
+    		final Vector removeGroupsNodes = new Vector(); // used only when moving
+    		
+        	if (m_move) {
+        		// collect warnings for removal
+        		Enumeration e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
+        		GroupTreeNode node;
+        		while (e.hasMoreElements()) {
+        			node = (GroupTreeNode) e.nextElement();
+        			if (!node.getGroup().supportsRemove())
+        				continue;
+        			for (int i = 0; i < entries.length; ++i) {
+        				if (node.getGroup().contains(entries[i]))
+        					removeGroupsNodes.add(node);
+        			}
+        		}
+        		// warning for all groups from which the entries are removed, and 
+        		// for the one to which they are added! hence the magical +1
+        		AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size()+1];
+        		for (int i = 0; i < removeGroupsNodes.size(); ++i)
+        			groups[i] = ((GroupTreeNode) removeGroupsNodes.elementAt(i)).getGroup();
+        		groups[groups.length-1] = m_node.getGroup();
+	            if (!Util.warnAssignmentSideEffects(groups,
+	            		entries, panel.getDatabase(), panel.frame))
+	                return; // user aborted operation
+        	} else {
+	            // warn if assignment has undesired side effects (modifies a field != keywords)
+	            if (!Util.warnAssignmentSideEffects(new AbstractGroup[]{m_node.getGroup()},
+	            		entries, panel.getDatabase(), panel.frame))
+	                return; // user aborted operation
+        	}
+        	
             // if an editor is showing, its fields must be updated
             // after the assignment, and before that, the current
             // edit has to be stored:
             panel.storeCurrentEdit();
             
-            AbstractUndoableEdit undo = m_node.addToGroup(panel.getSelectedEntries());
-            if (undo == null)
-                return; // no changed made
+            NamedCompound undoAll = new NamedCompound(Globals.lang("change assignment of entries")); 
             
-            panel.undoManager.addEdit(undo);
+            if (m_move) {
+            	// first remove
+            	for (int i = 0; i < removeGroupsNodes.size(); ++i) {
+            		GroupTreeNode node = (GroupTreeNode) removeGroupsNodes.elementAt(i);
+        			if (node.getGroup().containsAny(entries))
+        				undoAll.addEdit(node.removeFromGroup(entries));
+            	}
+            	// then add
+                AbstractUndoableEdit undoAdd = m_node.addToGroup(entries);
+                if (undoAdd != null)
+                	undoAll.addEdit(undoAdd);
+            } else {
+                AbstractUndoableEdit undoAdd = m_node.addToGroup(entries);
+                if (undoAdd == null)
+                    return; // no changed made
+                undoAll.addEdit(undoAdd);
+            }
+            
+            undoAll.end();
+            
+            panel.undoManager.addEdit(undoAll);
             panel.refreshTable();
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
@@ -337,7 +432,7 @@ public class RightClickMenu extends JPopupMenu
         }
         public void actionPerformed(ActionEvent evt) {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(m_node.getGroup(),
+            if (!Util.warnAssignmentSideEffects(new AbstractGroup[]{m_node.getGroup()},
                     panel.getSelectedEntries(),
                     panel.getDatabase(),
                     panel.frame))
