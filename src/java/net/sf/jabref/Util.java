@@ -307,9 +307,9 @@ public class Util {
             Object o = be.getField(field);
             if (o != null){
                 String fieldValue = o.toString().trim();
-                String[] resultSet = fieldValue.split(deliminator);
-                for (int index = 0; index < resultSet.length; index++)
-                    res.add(resultSet[index].trim());
+                StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
+                while (tok.hasMoreTokens())
+                	res.add(tok.nextToken().trim());
             }
         }
         return res;
@@ -919,32 +919,68 @@ public class Util {
      *         chose to perform it anyway. false otherwise (this indicates that
      *         the user has aborted the assignment).
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup group,
+    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups,
             BibtexEntry[] entries, BibtexDatabase db, Component parent) {
-        if (group instanceof KeywordGroup) {
-            KeywordGroup kg = (KeywordGroup) group;
-            String field = kg.getSearchField().toLowerCase();
-            if (field.equals("keywords")) 
-                return true; // this is not undesired
-            for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
-                if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
-                    // show a warning, then return
-                    String message = Globals // JZTODO lyrics...
-                            .lang(
-                                    "This action will modify the \"%0\" field "
-                                            + "of your entries.\nThis could cause undesired changes to "
-                                            + "your entries, so it is\nrecommended that you change the grouping field "
-                                            + "in your group\ndefinition to \"keywords\" or a non-standard name."
-                                            + "\n\nDo you still want to continue?",
-                                    field);
-                    int choice = JOptionPane.showConfirmDialog(parent, message,
-                            Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-                    return choice != JOptionPane.NO_OPTION;
+    	Vector affectedFields = new Vector();
+    	for (int k = 0; k < groups.length; ++k) {
+            if (groups[k] instanceof KeywordGroup) {
+                KeywordGroup kg = (KeywordGroup) groups[k];
+                String field = kg.getSearchField().toLowerCase();
+                if (field.equals("keywords")) 
+                    continue; // this is not undesired
+                for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+                    if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+                    	affectedFields.add(field);
+                    	break;
+                    }
                 }
             }
-        }
-        return true; // found no side effects
+    	}
+    	if (affectedFields.size() == 0)
+    		return true; // no side effects
+    	
+        // show a warning, then return
+        StringBuffer message = // JZTODO lyrics...
+                        new StringBuffer("This action will modify the following field(s)\n" +
+                        		"in at least one entry each:\n");
+        for (int i = 0; i < affectedFields.size(); ++i)
+        	message.append(affectedFields.elementAt(i) + "\n");
+        message.append("This could cause undesired changes to "
+                + "your entries, so it is\nrecommended that you change the grouping field "
+                + "in your group\ndefinition to \"keywords\" or a non-standard name."
+                + "\n\nDo you still want to continue?");
+        int choice = JOptionPane.showConfirmDialog(parent, message,
+                Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        return choice != JOptionPane.NO_OPTION;
+    	
+    	
+    	
+    	
+//        if (groups instanceof KeywordGroup) {
+//            KeywordGroup kg = (KeywordGroup) groups;
+//            String field = kg.getSearchField().toLowerCase();
+//            if (field.equals("keywords")) 
+//                return true; // this is not undesired
+//            for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
+//                if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+//                    // show a warning, then return
+//                    String message = Globals // JZTODO lyrics...
+//                            .lang(
+//                                    "This action will modify the \"%0\" field "
+//                                            + "of your entries.\nThis could cause undesired changes to "
+//                                            + "your entries, so it is\nrecommended that you change the grouping field "
+//                                            + "in your group\ndefinition to \"keywords\" or a non-standard name."
+//                                            + "\n\nDo you still want to continue?",
+//                                    field);
+//                    int choice = JOptionPane.showConfirmDialog(parent, message,
+//                            Globals.lang("Warning"), JOptionPane.YES_NO_OPTION,
+//                            JOptionPane.WARNING_MESSAGE);
+//                    return choice != JOptionPane.NO_OPTION;
+//                }
+//            }
+//        }
+//        return true; // found no side effects
     }
 
     //========================================================
@@ -982,5 +1018,38 @@ public class Util {
         else
             off = new OpenFileFilter(new String[] { ext });
         return off;
+    }
+    
+    public static String wrapHTML(String s, final int lineWidth) {
+    	StringBuffer sb = new StringBuffer();
+    	StringTokenizer tok = new StringTokenizer(s);
+    	int charsLeft = lineWidth;
+    	while (tok.hasMoreTokens()) {
+    		String word = tok.nextToken();
+    		if (charsLeft == lineWidth) { // fresh line
+    			sb.append(word);    			
+    			charsLeft -= word.length();
+    			if (charsLeft <= 0) {
+    				sb.append("<br>\n");
+    				charsLeft = lineWidth;
+    			}
+    		} else { // continue previous line
+    			if (charsLeft < word.length() + 1) {
+    				sb.append("<br>\n");
+    				sb.append(word);
+    				if (word.length() >= lineWidth - 1) {
+    					sb.append("<br>\n");
+    					charsLeft = lineWidth;
+    				} else {
+    					sb.append(" ");
+    					charsLeft = lineWidth - word.length() - 1;
+    				}
+    			} else {
+    				sb.append(" " + word);
+    				charsLeft -= word.length() + 1;
+    			}
+    		}
+    	}
+    	return sb.toString();
     }
 }
