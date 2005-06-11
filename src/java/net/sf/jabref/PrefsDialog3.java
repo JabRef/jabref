@@ -28,14 +28,14 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.*;
-import java.io.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.swing.event.*;
+
+import net.sf.jabref.groups.GroupsPrefsTab;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined
@@ -78,6 +78,7 @@ public class PrefsDialog3 extends JDialog {
         // ----------------------------------------------------------------
 	String
 	    GEN = Globals.lang("General"),
+	    GRP = Globals.lang("Groups"), // JZTODO lyrics
 	    EXT = Globals.lang("External programs"),
 	    APP = Globals.lang("Entry table"),
 	    COL = Globals.lang("Entry table columns"),
@@ -87,6 +88,7 @@ public class PrefsDialog3 extends JDialog {
 
 	ArrayList al = new ArrayList();
 	al.add(GEN);
+	al.add(GRP);
 	al.add(EXT);
 	al.add(APP);
 	al.add(COL);
@@ -104,10 +106,11 @@ public class PrefsDialog3 extends JDialog {
 
 
 	
-        main.add(new ExternalTab(frame, _prefs), EXT);
+	    main.add(new GroupsPrefsTab(_prefs), GRP);
+	    main.add(new ExternalTab(frame, _prefs), EXT);
         main.add(new TablePrefsTab(_prefs, parent), APP);
         main.add(new TableColumnsTab(_prefs, parent), COL);
-	main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
+        main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
         main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
 
 
@@ -250,6 +253,7 @@ public class PrefsDialog3 extends JDialog {
 			    return;
 			setVisible(false);
 			frame.setupAllTables();
+			frame.groupSelector.revalidateGroups(); // icons may have changed
 			frame.output(Globals.lang("Preferences recorded."));
 		    }
 		};
