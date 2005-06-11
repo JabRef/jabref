@@ -250,7 +250,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(group, 
+                if (!Util.warnAssignmentSideEffects(
+                		new AbstractGroup[]{group}, 
                         selection.getSelection(), 
                         groupSelector.getActiveBasePanel().getDatabase(),
                         groupSelector.frame))
@@ -331,6 +332,14 @@ public class GroupsTree extends JTree implements DragSourceListener,
     
     /** Sort immediate children of the specified node alphabetically. */
     public void sort(GroupTreeNode node, boolean recursive) {
+    	sortWithoutRevalidate(node, recursive);
+        groupSelector.revalidateGroups();
+    }
+    
+    /** This sorts without revalidation of groups*/
+    protected void sortWithoutRevalidate(GroupTreeNode node, boolean recursive) {
+    	if (node.isLeaf())
+    		return; // nothing to sort
         GroupTreeNode child1, child2;
         int j = node.getChildCount() - 1; 
         int lastModified;
@@ -350,9 +359,20 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
         if (recursive) {
             for (int i = 0; i < node.getChildCount(); ++i) {
-                sort((GroupTreeNode) node.getChildAt(i), true);
+                sortWithoutRevalidate((GroupTreeNode) node.getChildAt(i), true);
             }
         }
-        groupSelector.revalidateGroups();
     }
+	
+	/** Expand this node and all its children. */
+	public void expandSubtree(GroupTreeNode node) {
+        for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements(); )
+            expandPath(new TreePath(((GroupTreeNode)e.nextElement()).getPath()));
+	}
+	
+	/** Collapse this node and all its children. */
+	public void collapseSubtree(GroupTreeNode node) {
+        for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements(); )
+            collapsePath(new TreePath(((GroupTreeNode)e.nextElement()).getPath()));
+	}
 }
