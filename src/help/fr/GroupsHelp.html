@@ -3,165 +3,133 @@
 <BODY text="#275856">
 <basefont size="4" color="#2F4958" face="arial">
 
-<H1>Utilisation des <em>Groupes</em></H1>
-<em>Cette fonction est accessible depuis l'interface des groupes du panneau lat&eacute;ral.
-L'interface des groupes peut &ecirc;tre activ&eacute;e et d&eacute;sactiv&eacute;e en appuyant sur CTRL-SHIFT-G.
-[NdT: mais aussi par le menu Affichage ainsi que par une icône de la barre d'outils]</em>
+<H1>Les groupes</H1>
 
-<p>Les <em>Groupes</em> sont une fonction qui permet d'organiser votre base
-de donn&eacute;es <em>BibTeX</em> en groupes logiques. Les groupes sont impl&eacute;ment&eacute;s
-d'une mani&egrave;re tr&egrave;s simple&nbsp;: une fois que vous avez s&eacute;lectionn&eacute; un ou plusieurs
-groupes, JabRef traite un champ par entr&eacute;e (ce champ est configur&eacute; dans la d&eacute;finition des
-groupes) et v&eacute;rifie s'il contient l'expression r&eacute;guli&egrave;re du groupe [NdT: pas tr&egrave;s clair...],
-puis vous affiche soit les entr&eacute;es appartenant aux groupes s&eacute;lectionn&eacute;s
-(intersection de groupes), soit les entr&eacute;es appartenant &agrave; n'importe
-lequel des groupes s&eacute;lectionn&eacute;s (union de groupes).
+Les groupes permettent de structurer une base de données BibTeX selon une arborescence rappelant l'organisation des fichiers sur un disque dur dans des répertoires et sous-répertoires. Les deux principales différences sont&nbsp;:
 
-<p>Le choix <em>All Entries</em> [NdT: actuellement non traduit dans JabRef] sera toujours en t&ecirc;te de la liste
-des groupes. Cliquez sur ce choix pour d&eacute;s&eacute;lectionner les autres groupes.
-Vos groupes s&eacute;lectionn&eacute;s seront aussi d&eacute;s&eacute;lectionn&eacute;s si vous fermez
-l'interface des groupes.
+<ul>
+<li> Alors qu'un fichier est toujours localisé dans un seul répertoire, une entrée peut être incluse dans plus d'un groupe.
+<li> Les groupes peuvent utiliser certains critères pour définir dynamiquement leur contenu. Les nouvelles entrées qui correspondent à ses critères sont automatiquement incluses à ces groupes. Cette caractéristique n'est pas disponible dans les systèmes de fichiers habituels, mais est présente dans certains logiciels de messagerie électronique (tel que Thunderbird et Opera).
+</ul>
 
-<p>Puisque vos d&eacute;finitions de groupes seront sp&eacute;cifiques &agrave; chaque base
-de donn&eacute;es, elles sont sauvegard&eacute;es dans votre fichier .bib. Cette
-information sera incluse dans un bloc @COMMENT de BibTeX 
-qui sera alors ignor&eacute; par le programme <em>BibTeX</em>.
-Changer le contenu de ce bloc manuellement pourrait (bien entendu)
-causer la perte ou la modification de vos d&eacute;finitions de groupes.
-
-<H2>Diff&eacute;rentes fa&ccedil;ons d'utiliser les <em>groupes</em></H2>
-
-<p>La fonction Groupes pourrait sembler un peu d&eacute;routante
-au d&eacute;but. Elle est construite de fa&ccedil;on &agrave; assurer autant
-de flexibilit&eacute; que possible&nbsp;: 
-
-<p>Si vous voulez que vos groupes soient clairs et simples, vous pouvez
-d&eacute;finir vos groupes en utilisant un nom de champ non-standard, tel
-que 'supersnill' [NdT: supersnill?] ou n'importe quoi d'autre, et simplement utiliser
-les fonctions <em>Ajouter au groupe</em> et <em>Supprimer du groupe</em>
-pour assigner des entr&eacute;es &agrave; ces groupes.
-
-<p>Cependant, si votre base de donn&eacute;es poss&egrave;de d&eacute;j&agrave; des mots-clefs
-pertinents, vous pourriez vouloir d&eacute;finir certains groupes en
-utilisant le champ 'keywords'. Votre base de donn&eacute;es peut
-alors &ecirc;tre group&eacute;e pour vous.
-
-<p>Une troisi&egrave;me option est de d&eacute;finir certains groupes &agrave; partir
-de champs habituels - par exemple, pour d&eacute;finir des recherches
-rapides sur des auteurs particuliers et importants pour
-votre travail. Si vous fa&icirc;tes cela, vous devrez &eacute;viter d'utiliser
-les fonctions <em>Ajouter au groupe</em> et <em>Supprimer du
-groupe</em>, puisque vous ne voulez probablement pas que le champ
-soit modifi&eacute;. Un avertissement sera affich&eacute; si vous tentez
-cette op&eacute;ration.
-
-<H2>Afficher et chercher dans les groupes</H2>
-
-<p>Pour voir les entr&eacute;es d'un groupe, cliquez sur le nom du groupe.
-Quand l'interface des groupes est accessible au clavier, vous
-pouvez naviguer entre les groupes en utilisant les fl&egrave;ches du
-clavier HAUT et BAS. En utilisant MAJ et CONTROL, vous pouvez
-s&eacute;lectionner plusieurs groupes &agrave; la fois. Les menus &agrave; coches
-<em>Intersection</em> et <em>Union</em> d&eacute;terminent la fa&ccedil;on
-dont une s&eacute;lection de plusieurs groupes est trait&eacute;e [NdT: Quid
-des autres &eacute;l&eacute;ments du menu Param&egrave;tres ?].
- 
-<p>Notez qu'afficher un groupe est en fait une action
-similaire &agrave; une recherche. Cela signifie que si vous ajoutez 
-de nouvelles entr&eacute;es &agrave; un groupe, vous devrez mettre &agrave; jour
-la recherche afin que les entr&eacute;es soient affich&eacute;es comme faisant
-partie du groupe. Par exemple, vous devrez res&eacute;lectionner vos
-groupes actuels, ou cliquer sur le bouton <em>Rafra&icirc;chir
-la vue</em>.
-
-<p>La fonction Groupes peut &ecirc;tre combin&eacute;e avec les recherches
-ordinaires&nbsp;; toutes les recherches seront alors limit&eacute;es
-aux entr&eacute;es appartenant &agrave; votre s&eacute;lection de groupes. Lorsqu'une
-recherche est active, vous pouvez naviguez entre les groupes ou
-affichez toutes les entr&eacute;es&nbsp;; le tableau sera mis &agrave; jour
-pour montrer les correspondances &agrave; l'int&eacute;rieur des groupes
-actuellement s&eacute;lectionn&eacute;s.
-
-<p>A tout moment, vous pouvez exporter une base de donn&eacute;es
-<em>BibTeX</em> contenant uniquement les entr&eacute;es appartenant
-aux groupes s&eacute;lectionn&eacute;s et/ou &agrave; la recherche en cours en 
-choisissant dans le menu <em>Fichier -> Sauvegarde sp&eacute;ciale</em>
-[NdT menu <em>Fichier -> Sauvegarder la s&eacute;lection sous...</em>&nbsp;?].
-
-<H2>Cr&eacute;er un nouveau groupe</H2>
-
+Sélectionner un groupe montre les entrées contenues dans ce groupe. Sélectionner plusieurs groupes montre les entrées contenues dans au moins un des groupes (union) ou dans tous les groupes (intersection), selon le paramétrage actuel. Tout ceci est expliqué en détail ci-dessous.
 <p>
-[NdT: l'interface de cr&eacute;ation des groupes a chang&eacute; depuis la version 1.7b]
-</p>
+Les définitions de groupes sont spécifiques à chaque base de données&nbsp;; Elles sont sauvées comme un bloc <tt>@COMMENT</tt> dans le fichier <tt>.bib</tt> et sont communes à tous les utilisateurs (des futures versions de JabRef pourrait supporter des groupes dépendants des utilisateurs).
 
-<p>Pour d&eacute;finir un groupe, appuyer sur le bouton <em>Nouveau groupe</em> 
-dans l'interface des groupes. Une fen&ecirc;tre de dialogue appara&icirc;t,
-&agrave; l'int&eacute;rieur de laquelle vous pouvez entrer le nom du groupe,
-une expression r&eacute;guli&egrave;re, et un nom de champ. Le nom du champ
-sera initialis&eacute; &agrave; une valeur par d&eacute;faut qui peut &ecirc;tre chang&eacute;e
-dans le menu <em>Options -> Pr&eacute;f&eacute;rences</em> [NdT: puis dans G&eacute;n&eacute;ral].
-Pour terminer la cr&eacute;ation de votre nouveau groupe, appuyez sur Entr&eacute;e
-dans un des champs de texte, ou cliquez sur <em>Ok</em>. Pour quitter
-sans cr&eacute;er le groupe, appuyer sur ESCAPE ou cliquer sur <em>Annuler</em>.
+<H2>Interface</H2>
 
-<H2>Modifier la d&eacute;finition d'un groupe existant</H2>
+L'interface des groupes se trouve dans le panneau latéral sur la gauche de l'écran. Il peut être affiché ou masqué en appuyant sur <tt>CTRL-SHIFT-G</tt> ou sur le bouton des groupes dans la barre d'outils. L'interface a plusieurs boutons, mais la plupart des fonctions sont accessibles par un menu contextuel ("click droit"). La fonction Glisser-Déplacer est aussi disponible.
+<p>
 
-<p>Pour modifier la d&eacute;finition d'un groupe existant, double-cliquez
-sur le nom du groupe dans l'interface des groupes, ou faites
-un clic droit sur son nom et choisissez <em>Editer le groupe</em>.
-La bo&icirc;te de dialogue utilis&eacute;e pour cr&eacute;er de nouveaux groupes 
-s'affichera, vous permettant de modifier le nom du groupe. Le nom
-de champ et l'expression r&eacute;guli&egrave;re ne peuvent pas &ecirc;tre modifi&eacute;s
-apr&egrave;s la cr&eacute;ation du groupe (cette restriction sera probablement
-lev&eacute;e une fois que nous aurons trouv&eacute; une m&eacute;thode qui puisse
-mettre &agrave; jour les entr&eacute;es de groupe pour vous, pour &eacute;viter que les 
-entr&eacute;es ne sortent du groupe modifi&eacute; [NdT: cela a l'air op&eacute;rationnel &agrave; pr&eacute;sent]).
+<table cellspacing=0 cellpadding=5 border=0 bgcolor=#c0ffc0>
+<tr><td>
+<h2>Quelques exemples rapides</h2>
 
-<H2>Ajouter des entr&eacute;es &agrave; un groupe</H2>
+Vous pourriez vouloir...
 
-<p>L'appartenance d'une entr&eacute;e &agrave; un groupe d&eacute;pend de la correspondance entre
-l'expression r&eacute;guli&egrave;re du groupe et le contenu du champ sp&eacute;cifi&eacute; de cette entr&eacute;e.
-Ainsi, pour ajouter une entr&eacute;e &agrave; un groupe, vous devez simplement vous
-assurer que c'est le cas.
+<h3>...uniquement créer un groupe et lui assigner quelques entrées.</h3>
 
-<p>Au lieu d'&eacute;diter le champ manuellement, vous pouvez s&eacute;lectionner
-les entr&eacute;es que vous souhaitez ajouter, et faire un clic droit pour
-afficher le menu contextuel. Dans ce menu, choisissez
-<em>Ajouter au groupe</em> et s&eacute;lectionner ensuite le groupe d&eacute;sir&eacute;&nbsp;;
-les entr&eacute;es qui ne sont pas encore incluses dans le groupe seront
-ajout&eacute;es pour vous.
+Assurez-vous que l'interface des groupes est visible. Appuyez sur le bouton <b>Nouveau Groupe</b>, entrez un nom pour ce groupe puis appuyez sur OK en conservant les valeurs par défaut. Maintenant, sélectionnez les entrées qui doivent être assignées à ce groupe et utiliser un Glisser-Déplacer vers le groupe, ou l'option <b>Ajouter au groupe</b> du menu contextuel. Enfin, sélectionnez le groupe pour voir son contenu (qui doit correspondre aux entrées que vous venez de lui assigner).
 
-<H2>Supprimer des entr&eacute;es d'un groupe</H2>
+<h3>...utiliser le champ <tt>keywords</tt> pour grouper les entrées</h3>
 
-<p>Le principe utilis&eacute; pour l'ajout d'entr&eacute;es s'applique pour
-les supprimer. Supprimez toutes correspondances pour l'expression
-r&eacute;guli&egrave;re du groupe &agrave; partir du champ sp&eacute;cifi&eacute;, ou utilisez la
-fonction <em>Supprimer du groupe</em>.
+Assurez-vous que l'interface des groupes est visible. Appuyez sur le bouton <b>Nouveau Groupe</b>, entrez un nom pour ce groupe et sélectionner l'option qui groupe dynamiquement les entrées en cherchant un mot-clef dans un champ. Entrez le mot-clef à rechercher, puis cliquer sur OK. Enfin, sélectionnez le groupe pour voir son contenu (qui doit correspondre aux entrées dont le champ <tt>keywords</tt> contient le mot-clef que vous avez spécifié).
 
-<H2>Supprimer un groupe</H2>
+<h3>...utiliser une expression de recherche de forme libre pour définir un groupe</h3>
 
-<p>Pour supprimer un groupe, faites un clic droit sur ce groupe et choisissez
-<em>Supprimez les groupes</em>. Une fen&ecirc;tre vous demandera de confirmer
-votre action.
+Assurez-vous que l'interface des groupes est visible. Appuyez sur le bouton <b>Nouveau Groupe</b>, entrez un nom pour ce groupe et sélectionner l'option qui groupe dynamiquement les entrées en utilisant une expression de recherche de forme libre. Entrez <tt>author=smith</tt> comme expression de recherche (remplacez <tt>smith</tt> avec un nom d'auteur présent dans votre base et cliquez sur OK. Enfin, sélectionnez le groupe pour voir son contenu (qui doit correspondre aux entrées dont le champ <tt>author</tt> contient le nom que vous avez spécifié).
 
-<H2>G&eacute;n&eacute;ration automatique des groupes</H2>
+<h3>...combiner plusieurs groupes</h3>
 
-<p>En cliquant sur le bouton <em>Cr&eacute;er automatiquement des groupes pour
-la base</em>, vous pouvez rapidement avoir une s&eacute;rie de groupes
-appropri&eacute;s pour votre base de donn&eacute;es. Cette fonction va collecter
-tous les mots trouv&eacute;s dans le champ que vous sp&eacute;cifiez et cr&eacute;er
-un groupe pour chaque mot. Ceci est utile par exemple si votre
-base de donn&eacute;es contient des mots clefs pertinents pour toutes
-ses entr&eacute;es. En g&eacute;n&eacute;rant automatiquement des groupes bas&eacute;s
-sur le champ <em>keywords</em>, vous devriez obtenir sans effort une
-s&eacute;rie de groupes appropri&eacute;s. 
+Créez deux groupes différents (par exemple, tel que décrit ci-dessus). Cliquez sur le bouton <b>Paramètres</b> et assurez-vous que <b>Union</b> est sélectionné. Maintenant, sélectionnez les deux groupes. Vous devriez voir uniquement les entrées appartenant aux deux groupes (ce qui peut en faire aucune ou exactement les mêmes entrées que précédemment si les deux groupes contiennent les mêmes entrées).
 
-<p>Vous pouvez aussi sp&eacute;cifier des caract&egrave;res &agrave; ignorer, par exemple
-les virgules utilis&eacute;es entre les mots clefs. Ces caract&egrave;res seront
-alors trait&eacute;s comme des s&eacute;parateurs de mots et non comme faisant
-partie d'eux. Vous ne pouvez pas utiliser cette option pour
-supprimer des mots entiers.
+<h3>...identifier les groupes se chevauchant</h3>
 
-<p>La fonction d'autog&eacute;n&eacute;ration sera am&eacute;lior&eacute;e par de futurs d&eacute;veloppements.
+JabRef vous permet d'identifier facilement les groupes qui se chevauchent parmi les groupes actuellement sélectionnés (c-à-d ceux qui contiennent au moins une entrée qui est aussi contenu dans les groupes actuellement sélectionnés). Cliquez sur le bouton <b>Paramètres</b> et activé l'option pour montrer les groupes qui se chevauchent [NdT: apparemment c'est plutôt le menu contextuel...]. Ensuite sélectionnez un groupe qui chevauche d'autres groupes. Les autres groupes devraient être surlignés.
+ 
+</tr></td>
+</table>
+<p>
+
+<H2>Les types de groupes</H2>
+
+Dans JabRef 1.8, il y a quatre types de groupes différents&nbsp;:
+
+<ol>
+<li> Le groupe <b>Toutes les entrées</b>, qui -- comme son nom le suggère -- contient toutes les entrées, est toujours présent et ne peut pas être édité ou supprimé.
+<li> <b>Les groupes manuels</b> se comportent comme les répertoires d'un disque et contiennent uniquement les entrées que vous leur avez explicitement assignées. 
+<li> <b>Les groupes dynamiques basés sur la recherche d'un mot-clef</b> contiennent des entrées pour lesquelles un champ BibTeX donné (par ex. <tt>keywords</tt>) contient un certain mot-clef (par ex. <tt>électrique</tt>). Cette méthode ne nécessite pas d'assignation manuelle des entrées, mais utilise les informations qui sont déjà présentes dans la base de données. Si toutes les entrées de votre base de données ont des mots-clefs pertinents dans leur champ <tt>keywords</tt>, utiliser ce type de groupe pourrait être votre meilleur choix.
+<li> <b>Les groupes dynamiques basés sur des expressions de recherche de forme libre</b> contiennent les entrées qui correspondent à l'expression de recherche spécifiée et suivant la même syntaxe que <a href="SearchHelp.html">l'interface de recherche</a> dans le panneau latéral. Cette <a href="SearchHelp.html#advanced">syntaxe</a> supportent les opérateurs logiques (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) et permet de spécifier un ou plusieurs champs BibTeX pour la recherche, autorisant des définitions de groupes plus flexibles que la recherche d'un mot-clef (par ex. <tt>author=smith and title=électrique</tt>).
+</ol>
+
+Chaque groupe que vous créez fait partie de ces trois derniers types. La fenêtre d'édition des groupes, qui s'ouvre en double-cliquant sur un groupe, montre une description succincte (en français de tous les jours) de la définition du groupe sélectionné/édité. 
+
+<H2>La structure des groupes, créer et supprimer des groupes</H2>
+
+Comme pour les répertoires, les groupes sont structurés selon une arborescence, avec le groupe <b>Toutes les entrées</b> à la racine. En faisant un clic droit sur un groupe, vous pouvez ajoutez un nouveau groupe à l'arbre, soit au même niveau que le groupe sélectionné, soit comme un sous-groupe. Le bouton <b>Nouveau groupe</b> vous permet de créer un nouveau sous-groupe au groupe <b>Toutes les entrées</b>, quelque soit le(s) groupe(s) actuellement sélectionné(s). Le menu contextuel vous permet de supprimer des groupes et/ou des sous-groupes, de trier les sous-groupes par ordre alphabétique ou de déplacer des groupes au sein de l'arbre. Cette dernière fonction peut aussi être réalisées par Glisser-Déplacer, avec la limitation que le Glisser-Déplacer ne permet pas de changer l'ordre des sous-groupes d'un groupe.
+<p>
+Annuler et Répéter fonctionnent pour toutes les éditions.
+
+<H3>Les groupes manuels</h3>
+
+Les groupes manuels sont alimentés uniquement par l'assignation explicite des entrées. Après avoir créer un groupe manuel, vous sélectionnez les entrées à lui assigner et utilisez soit un Glisser-Déplacer soit le menu contextuel de la table des entrées. Il n'y a pas d'options à configurer.
+<p>
+Cette méthode de groupement nécessite que toutes les entrées aient une clef BibTeX unique. Dans le cas de clefs BibTeX manquantes ou dupliquées, l'assignation de ces entrées ne pourra pas être correctement rétablie lors de futures sessions.
+
+<H3>Les groupes dynamiques</h3>
+
+Le contenu d'un groupe dynamique est défini par une condition logique. Uniquement les entrées qui remplissent cette condition sont contenues dans le groupe. Cette méthode utilise des informations stockées dans la base de données elle-même et s'actualise dynamiquement dès que la base de données est modifiée.
+<p>
+Deux types de conditions logiques peuvent être utilisées&nbsp;:
+<dl>
+<dt><b>Recherche d'un mot-clef dans un champ</b></dt>
+<dd>
+Cette méthode groupe les entrées dans lesquelles un champ BibTeX spécifié (par ex. <tt>keywords</tt>) contient le terme de recherche spécifié (par ex. <tt>électrique</tt>). Évidemment, pour que cela fonctionne, le champ doit être présent dans toutes les entrées et son contenu doit être pertinent. L'exemple ci-dessus regroupera toutes les entrées qui font références à électrique. Utiliser le champ <tt>author</tt> permet de grouper les entrées d'un auteur donné, etc. Le mot-clef à rechercher peut être du texte brut ou une expression régulière. Dans le premier cas, JabRef permet l'assignation/la suppression manuelle des entrées d'un groupe en modifiant/supprimant simplement le terme de recherche du contenu du champ de groupement [NdT: pas bien compris...]. C'est pertinent uniquement pour le champ <tt>keywords</tt> ou pour les champs autodéfinis mais, évidemment, pas pour les champs tels que <tt>author</tt> ou <tt>year</tt>.
+</dd>
+<dt><b>Utiliser une expression de recherche de forme libre</b></dt>
+<dd>
+Ceci est similaire à ce qui est décrit ci-dessus mais, au lieu de rechercher dans un seul champ pour un unique terme de recherche, la <a href="SearchHelp.html#advanced">syntaxe des expressions de recherche</a>  peut être utilisées, autorisant l'emploi d'opérateurs logiques (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) et permettant les recherches sur plusieurs champs BibTeX. Par exemple, l'expression de recherche <tt>keywords=régression and not keywords=linéaire</tt> groupe les entrées concernant la régression non-linéaire.
+</dd>
+</dl>
+
+Dans le panneau des groupes, les groupes dynamiques sont par défaut affichés en <i>italique</i>. Cela peut être modifié dans les préférences [NdT: où ça ?].
+
+<h3>Contexte hiérarchique</h3>
+
+Par défaut, un groupe est <b>indépendant</b> de sa position dans l'arbre des groupes&nbsp;: lorsqu'il est sélectionné, uniquement son contenu est affiché. Cependant, particulièrement lors de l'utilisation de groupes dynamiques, il est souvent utile de définir un sous-groupe qui <b>raffine son sur-groupe</b>, c-à-d que, lorsqu'il est sélectionné, les entrées contenues dans les deux groupes sont affichées. Par exemple, créez un sur-groupe contenant les entrées possédant le mot-clef <tt>distribution</tt> et un sous-groupe contenant les entrées possédant le mot-clef <tt>gauss</tt> raffinant ce sur-groupe. Sélectionner le sous-groupe affichera les entrées correspondant aux deux conditions, c-à-d celles qui concerneront les distributions gaussiennes. En ajoutant au sur-groupe original un autre sous-groupe recherchant le terme <tt>laplace</tt>, le groupement peut facilement être étendu. Dans un arbre de groupes, les groupes raffinants ont un icône spécial (cela peut-être annulé dans les préférences).
+<p>
+Le complément logique au groupe raffinant est un groupe qui <b>inclut ses sous-groupes</b>, c-à-d qu'en le sélectionnant, ce ne sont pas uniquement les propres entrées du groupe mais aussi les entrées de ses sous-groupes qui sont affichées. Dans l'arbre des groupes, ce type de groupe possède un icône spécial (cela peut-être annulé dans les préférences).
+
+<h2>Afficher les entrées d'un groupe, combiner plusieurs groupes</H2>
+
+Sélectionner un groupe montre les entrées contenues dans ce groupe en les surlignant et, selon le paramétrage (accessible en cliquant sur le bouton <b>Paramètres</b>), les déplacent au sommet de la liste et/ou les sélectionnent. Ces options sont identiques à celles disponibles habituellement pour la recherche.
+<p>
+Quand plusieurs groupes sont sélectionnés, soit l'union soit l'intersection de leurs contenus est affiché en fonction de paramétrage choisi. Cela permet de combiner rapidement plusieurs conditions. Par exemple, si vous avez un groupe manuel <tt>Extrêmement Important</tt> auquel vous assignez toutes les entrées extrêmement importantes, vous pouvez voir les entrées extrêmement importantes dans tout autre groupe en sélectionnant les deux groupes (cela nécessite d'avoir <b>Intersection</b> sélectionné dans les paramètres).
+
+<h2>Groupes et recherche</h2>
+
+Lors de l'affichage de contenu d'un ou plusieurs groupes, une recherche peut être effectuée à l'intérieur de ce contenu en utilisant la technique de recherche habituelle.
+
+<h2>Surligner les groupes se chevauchant</h2>
+
+Le bouton <b>Paramètres</b> offre une option de surlignement des groupes se chevauchant [NdT: Ce ne serait pas plutôt dans le menu contextuel ?]. Si elle est activée, lors de la sélection d'un ou plusieurs groupes, tous les groupes contenant au moins une des entrées appartenant au(x) groupe(s) sélectionné(s) sont surlignés. Cela identifie rapidement les chevauchements entre les contenus des groupes. Vous pourriez, par exemple, créer un groupe <tt>A lire</tt> qui contient toutes les entrées que vous comptez lire. A présent, dès que vous sélectionne n'importe quel groupe, le groupe <tt>A lire</tt> sera surligné si le groupe sélectionné contient des entrées que vous comptez lire.
+
+<h2>Caractéristiques avancées</h2>
+
+Une fois que vous maîtriserez les concepts de groupe décrits ci-dessus, les caractéristiques avancées suivantes pourraient vous être utile.
+
+<h3>Création automatique de groupes dynamiques</h3>
+
+En cliquant sur le bouton <b>Créer automatiquement des groupes pour la base de données</b> [Ndt: où est le bouton ?], vous pouvez facilement créer une série de groupes pertinents pour votre base de données. Ce dispositif collectera tous les mots trouvés dans le champ que vous aurez spécifié et créera un groupe pour chaque mot. C'est utile si, par exemple, votre base contient des mots-clefs pertinents for toutes les entrées. En générant automatiquement les groupes en se basant sur le champ <tt>keywords</tt>, vous devriez avoir une série de groupes sans effort.
+<p>
+Vous pouvez aussi spécifiés des caractères à ignorer, par exemple les virgules utilisées entre les mots-clefs. Ils seront traités comme des séparateurs de mots et non comme en faisant partie. Cette étape est importante pour que les mots-clefs composés tels que <tt>distribution de Laplace</tt> soient reconnus comme une unique entité sémantique (vous ne pouvez pas utiliser cette option pour supprimer des mots complets. Pour cela, supprimer manuellement les groupes non voulus à la suite de leur création automatique.
+
+<h3>Rafraîchir l'affichage des groupes</h3>
+
+Le bouton <b>Rafraîchir</b> met à jour la table des entrées pour refléter la sélection actuelle des groupes. Habituellement, cela s'effectue automatiquement, mais, dans quelques occasions (par exemple après un Annuler/Répéter en rapport avec les groupes), un rafraîchissement manuel est nécessaire.
+
+<h3>Combiner des groupes raffinants avec des groupes incluants</h3>
+
+Si un groupe raffinant est le sous-groupe d'un groupe qui inclue ses sous-groupes -- les frères du groupe raffinant --, les frères sont ignorés quand le groupe raffinant est sélectionné.
 
 </HTML> 
