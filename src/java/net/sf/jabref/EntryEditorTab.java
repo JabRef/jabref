@@ -168,7 +168,17 @@ public class EntryEditorTab {
 	if (activeField != null)
 	    activeField.requestFocus();
 
+
 	//System.out.println("Activate, hurra");
+    }
+
+    public void updateAll() {
+        // Test: make sure all fields are correct:
+        setEntry(parent.entry);
+        /*for (int i=0; i<fields.length; i++) {
+            FieldEditor fe = (FieldEditor)editors.get(fields[i]);
+            fe.setText(e);
+        }  */
     }
 
     public void setEntry(BibtexEntry entry) {

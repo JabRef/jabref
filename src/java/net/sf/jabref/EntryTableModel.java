@@ -98,7 +98,7 @@ public class EntryTableModel
       return GUIGlobals.NUMBER_COL;
     }
     else if (getIconTypeForColumn(col) != null) {
-      return "";
+      return getIconTypeForColumn(col)[0];
     }
     return columns[col - padleft];
   }
@@ -255,7 +255,7 @@ public class EntryTableModel
     if (getIconTypeForColumn(col) != null) {
       return ICON_COL;
     }
-    BibtexEntryType type = (db.getEntryById(getNameFromNumber(row)))
+    BibtexEntryType type = (db.getEntryById(getIdForRow(row)))
         .getType();
     if (columns[col - padleft].equals(GUIGlobals.KEY_FIELD)
         || type.isRequired(columns[col - padleft])) {
@@ -268,19 +268,19 @@ public class EntryTableModel
   }
 
   public boolean isComplete(int row) {
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
-    return be.hasAllRequiredFields();
+    BibtexEntry be = db.getEntryById(getIdForRow(row));
+    return (be != null ? be.hasAllRequiredFields() : false);
   }
 
   public boolean hasCrossRef(int row) {
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+    BibtexEntry be = db.getEntryById(getIdForRow(row));
     return (be.getField("crossref") != null);
   }
 
   public boolean nonZeroField(int row, String field) {
     // Returns true iff the entry has a nonzero value in its
     // 'search' field.
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+    BibtexEntry be = db.getEntryById(getIdForRow(row));
     if (be == null)
     	return false; // TODO: JZ: I think this should never happen, but it does 
     String o = (String) (be.getField(field));
@@ -290,8 +290,8 @@ public class EntryTableModel
   public boolean hasField(int row, String field) {
     // Returns true iff the entry has a nonzero value in its
     // 'search' field.
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
-    return (be.getField(field) != null);
+    BibtexEntry be = db.getEntryById(getIdForRow(row));
+    return ((be != null) && (be.getField(field) != null));
   }
 
   private void updateSorter() {
@@ -330,27 +330,33 @@ public class EntryTableModel
     // Build a vector of prioritized search objectives,
     // then pick the 3 first.
     List fields = new ArrayList(6),
-        directions = new ArrayList(6);
+        directions = new ArrayList(6),
+        binary = new ArrayList(6); // Signifies whether the sort criterion should only separate on/off or
+                                    // also sort within set field values.
 
     // For testing MARKED feature. With this IF clause, the marked entries will only float to the top when
     // no sorting/grouping reordering is active.
     if  (!panel.sortingBySearchResults && !panel.sortingByCiteSeerResults && !panel.sortingByGroup) {
         fields.add(Globals.MARKED);
-        directions.add(new Boolean(true));
+        directions.add(Boolean.TRUE);
+        binary.add(Boolean.FALSE);
     }
     if (panel.sortingByGroup) {
       // Group search has the highest priority if active.
       fields.add(Globals.GROUPSEARCH);
-      directions.add(new Boolean(true));
+      directions.add(Boolean.TRUE);
+        binary.add(Boolean.FALSE);
     }
     if (panel.sortingBySearchResults) {
       // Normal search has priority over regular sorting.
       fields.add(Globals.SEARCH);
-      directions.add(new Boolean(true));
+      directions.add(Boolean.TRUE);
+        binary.add(Boolean.FALSE);
     }
     if(panel.sortingByCiteSeerResults) {
         fields.add("citeseercitationcount");
-        directions.add(new Boolean(true));
+        directions.add(Boolean.TRUE);
+        binary.add(Boolean.FALSE);
     }
 
     // Then the sort options:
@@ -360,33 +366,35 @@ public class EntryTableModel
     fields.add(frame.prefs.get("priSort"));
     fields.add(frame.prefs.get("secSort"));
     fields.add(frame.prefs.get("terSort"));
+    binary.add(new Boolean(Globals.prefs.getBoolean("priBinary"))); // TRUE if we are sorting on an icon.
+    binary.add(Boolean.FALSE);
+    binary.add(Boolean.FALSE);
 
     // Remove the old sorter as change listener for the database:
     if (sorter != null)
 	db.removeDatabaseChangeListener(sorter);
 
-    // Then pick the three highest ranking ones, and go.
-    if (directions.size() < 4) {
-      sorter = db.getSorter(new EntryComparator(
-          ( (Boolean) directions.get(0)).booleanValue(),
-          ( (Boolean) directions.get(1)).booleanValue(),
-          ( (Boolean) directions.get(2)).booleanValue(),
-          (String) fields.get(0),
-          (String) fields.get(1),
-          (String) fields.get(2)));
-    }
-    else {
-      sorter = db.getSorter(new EntryComparator(
-          ( (Boolean) directions.get(0)).booleanValue(),
-          ( (Boolean) directions.get(1)).booleanValue(),
-          ( (Boolean) directions.get(2)).booleanValue(),
-          ( (Boolean) directions.get(3)).booleanValue(),
-          (String) fields.get(0),
-          (String) fields.get(1),
-          (String) fields.get(2),
-          (String) fields.get(3)));
+    // Then pick the up to four highest ranking ones, and go.
+      int piv = Math.min(directions.size()-1, 3);
+      EntryComparator comp = new EntryComparator(
+              ((Boolean)binary.get(piv)).booleanValue(),
+              ((Boolean)directions.get(piv)).booleanValue(),
+              (String)fields.get(piv));
+      piv--;
+      while (piv >= 0) {
+          // Loop down towards the highest ranking criterion, wrapping new sorters around the
+          // ones we have:
+          comp = new EntryComparator(
+                  ((Boolean)binary.get(piv)).booleanValue(),
+                  ((Boolean)directions.get(piv)).booleanValue(),
+                  (String)fields.get(piv),
+                  comp);
+          piv--;
+      }
 
-    }
+      sorter = db.getSorter(comp);
+
+
   }
 
     /**
@@ -463,7 +471,7 @@ public class EntryTableModel
     // Called by the table cell editor when the user has edited a
     // field. From here the edited value is stored.
 
-    BibtexEntry be = db.getEntryById(getNameFromNumber(row));
+    BibtexEntry be = db.getEntryById(getIdForRow(row));
     boolean set = false;
     String toSet = null,
         fieldName = getFieldName(col),
@@ -511,12 +519,26 @@ public class EntryTableModel
     }
   }
 
-  public String getNameFromNumber(int number) {
+   /**
+    * Returns the internal ID of the entry at the given row.
+    * @param number The row number.
+    * @return The ID for the entry at the given row.
+    */
+  public String getIdForRow(int number) {
     // Return the name of the Entry corresponding to the row. The
     // Entry will be retrieved from a DatabaseQuery. This is just
     // a temporary implementation.
     return sorter.getIdAt(number);
     //entryIDs[number].toString();
+  }
+
+    /**
+     * Returns the entry currently displayed at the given row.
+     * @param row The row.
+     * @return The entry at the given row.
+     */
+  public BibtexEntry getEntryForRow(int row) {
+      return sorter.getEntryAt(row);
   }
 
   public int getNumberFromName(String name) {

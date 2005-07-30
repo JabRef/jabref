@@ -129,7 +129,9 @@ public class BibtexParser
         {
             while (!_eof)
             {
-		consumeUncritically('@');
+                boolean found = consumeUncritically('@');
+                if (!found)
+                    break;
 		skipWhitespace();
 		String entryType = parseTextToken();
 		BibtexEntryType tp = BibtexEntryType.getType(entryType);
@@ -218,7 +220,8 @@ public class BibtexParser
 
 		if (isEntry) // True if not comment, preamble or string.
                 {
-	                BibtexEntry be = parseEntry(tp);
+                    BibtexEntry be = parseEntry(tp);
+                    
                     boolean duplicateKey = _db.insertEntry(be);
                     if (duplicateKey) // JZTODO lyrics
                       _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
@@ -297,8 +300,7 @@ public class BibtexParser
 
     public BibtexEntry parseEntry(BibtexEntryType tp) throws IOException
     {
-
-	String id = Util.createNeutralId();//createId(tp, _db);
+    String id = Util.createNeutralId();//createId(tp, _db);
     BibtexEntry result = new BibtexEntry(id, tp);
     skipWhitespace();
 	consume('{','(');
@@ -332,6 +334,7 @@ public class BibtexParser
  
 	if ((key != null) && key.equals(""))
 	    key = null;
+        //System.out.println("Key: "+key);
 	if(result!=null)result.setField(GUIGlobals.KEY_FIELD, key);
     skipWhitespace();
 
@@ -363,7 +366,7 @@ public class BibtexParser
     private void parseField(BibtexEntry entry) throws IOException
     {
         String key = parseTextToken().toLowerCase();
-	//Util.pr("_"+key+"_");
+	    //Util.pr("Field: _"+key+"_");
         skipWhitespace();
         consume('=');
 	String content = parseFieldContent(GUIGlobals.isStandardField(key));
@@ -422,14 +425,14 @@ public class BibtexParser
 		// of brackets inside of a field, so we need to count the brackets
 		// to know when the string is finished.
                
-                if (isStandardBibtexField || !Globals.prefs.getBoolean("preserveFieldFormatting")) {
+                //if (isStandardBibtexField || !Globals.prefs.getBoolean("preserveFieldFormatting")) {
                     // value.append(parseBracketedText());
                     // TEST TEST TEST TEST TEST
-                    StringBuffer text = parseBracketedTextExactly();
-                    value.append(fieldContentParser.format(text));
-                }
-                else
-                    value.append(parseBracketedTextExactly());
+                StringBuffer text = parseBracketedTextExactly();
+                value.append(fieldContentParser.format(text));
+                //}
+                //else
+                //    value.append(parseBracketedTextExactly());
 	    }
 	    else if (Character.isDigit((char) c))
 	    {
@@ -462,7 +465,7 @@ public class BibtexParser
         // Check if we are to strip extra pairs of braces before returning:
         if (Globals.prefs.getBoolean("autoDoubleBraces")) {
             // Do it:
-            while ((value.charAt(0) == '{') && (value.charAt(value.length()-1) == '}')) {
+            while ((value.length()>1) && (value.charAt(0) == '{') && (value.charAt(value.length()-1) == '}')) {
                 value.deleteCharAt(value.length()-1);
                 value.deleteCharAt(0);
             }
@@ -669,12 +672,15 @@ public class BibtexParser
 
     }
 
-    private void consumeUncritically(char expected) throws IOException
+    private boolean consumeUncritically(char expected) throws IOException
     {
 	int c;
 	while (((c = read()) != expected) && (c != -1) && (c != 65535));
 	if ((c == -1) || (c == 65535))
 	    _eof = true;
+
+        // Return true if we actually found the character we were looking for:
+        return c == expected;
     }
 
     private void consume(char expected1, char expected2) throws IOException

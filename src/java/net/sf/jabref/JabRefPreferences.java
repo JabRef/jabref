@@ -112,6 +112,7 @@ public class JabRefPreferences {
         defaults.put("language", "en");
         defaults.put("priSort", "author");
         defaults.put("priDescending", Boolean.FALSE);
+        defaults.put("priBinary", Boolean.FALSE);
         defaults.put("secSort", "year");
         defaults.put("secDescending", Boolean.TRUE);
         defaults.put("terSort", "author");
@@ -132,6 +133,7 @@ public class JabRefPreferences {
         defaults.put("stringsSizeX", new Integer(600));
         defaults.put("stringsSizeY", new Integer(400));
         defaults.put("defaultShowSource", Boolean.FALSE);
+        defaults.put("showSource", Boolean.TRUE);
         defaults.put("defaultAutoSort", Boolean.FALSE);
         defaults.put("enableSourceEditing", Boolean.TRUE);
         defaults.put("caseSensitiveSearch", Boolean.FALSE);
@@ -139,7 +141,7 @@ public class JabRefPreferences {
         defaults.put("searchOpt", Boolean.TRUE);
         defaults.put("searchGen", Boolean.TRUE);
         defaults.put("searchAll", Boolean.FALSE);
-        defaults.put("incrementS", Boolean.TRUE);
+        defaults.put("incrementS", Boolean.FALSE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
@@ -160,7 +162,10 @@ public class JabRefPreferences {
         defaults.put("groupAutoShow", Boolean.TRUE);
         defaults.put("groupAutoHide", Boolean.TRUE);
         defaults.put("groupKeywordSeparator", ", ");
-        
+        defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
+        defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
+        defaults.put("searchPanelVisible", Boolean.FALSE);
+
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
@@ -198,6 +203,7 @@ public class JabRefPreferences {
         defaults.put("allowTableEditing", Boolean.FALSE);
         defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
         defaults.put("dialogWarningForEmptyKey", Boolean.TRUE);
+        defaults.put("displayKeyWarningDialogAtStartup", Boolean.TRUE);
         defaults.put("avoidOverwritingKey", Boolean.FALSE);
         defaults.put("warnBeforeOverwritingKey", Boolean.TRUE);
         defaults.put("confirmDelete", Boolean.TRUE);
@@ -236,6 +242,10 @@ public class JabRefPreferences {
                        +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
+        defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
+        defaults.put("generateKeysAfterInspection", Boolean.TRUE);
+        defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
+
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 
@@ -570,6 +580,10 @@ public class JabRefPreferences {
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
+        defKeyBinds.put("Synchronize PDF", "shift F4");
+        defKeyBinds.put("Synchronize PS", "ctrl F4");
+        
+
         //defKeyBinds.put("Select value", "ctrl B");
     }
 

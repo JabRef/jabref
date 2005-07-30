@@ -1,0 +1,38 @@
+# Developers
+Morten O. Alver
+Nizar N. Batada
+Michel Baylac
+Guillaume Gardey
+Cyrille d'Haese
+Raik Nagel
+Ellen Reitmayr
+Michael Spiegel
+Ulrik Stervbo
+Dominik Waßenhoven
+Joerg K. Wegner
+Michael Wrighton
+Egon Willighagen
+Jörg Zieren
+
+# Contributions from
+Kolja Brix
+Frédéric Darboux
+Fabrice Dessaint
+Nathan Dunn
+Alexis Gallagher
+Sascha Hunold
+Bernd Kalbfuss
+Martin Kähmer
+Alex Montgomery
+John Relph
+Moritz Ringler
+Rudolf Seemann
+Mike Smoot
+Martin Stolle
+David Weitzman
+Seb Wills
+
+# Thanks to
+Samin Muhammad Ridwanul Karim
+Stefan Robert
+

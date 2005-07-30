@@ -47,7 +47,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     JLabel nf = new JLabel(Globals.lang("Field to group by") + ":"),
             nr = new JLabel(Globals.lang("Characters to ignore") + ":");
     JCheckBox nd = new JCheckBox(Globals.lang(
-    		"Use the following deliminator character(s)")
+    		"Use the following delimiter character(s)")
             + ":"); // JZTODO lyrics
     JButton ok = new JButton(Globals.lang("Ok")), cancel = new JButton(Globals
             .lang("Cancel"));

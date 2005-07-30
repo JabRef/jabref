@@ -364,6 +364,7 @@ public class SimpleInternalFrame extends JPanel {
      * @return the color of the header's background
      */
     protected Color getHeaderBackground() {
+        
         Color c =
             UIManager.getColor("SimpleInternalFrame.activeTitleBackground");
         if (c != null)

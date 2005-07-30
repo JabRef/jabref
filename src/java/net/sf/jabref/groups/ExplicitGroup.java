@@ -149,7 +149,29 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         if (!(o instanceof ExplicitGroup))
             return false;
         ExplicitGroup other = (ExplicitGroup) o;
-        return other.m_name.equals(m_name) && other.m_entries.equals(m_entries)
+        // compare entries assigned to both groups
+        if (m_entries.size() != other.m_entries.size())
+            return false; // add/remove
+        HashSet keys = new HashSet();
+        BibtexEntry entry;
+        String key;
+        // compare bibtex keys for all entries that have one
+        for (Iterator it = m_entries.iterator(); it.hasNext(); ) {
+            entry = (BibtexEntry) it.next();
+            key = entry.getCiteKey();
+            if (key != null)
+                keys.add(key);
+        }
+        for (Iterator it = other.m_entries.iterator(); it.hasNext(); ) {
+            entry = (BibtexEntry) it.next();
+            key = entry.getCiteKey();
+            if (key != null)
+                if (!keys.remove(key))
+                    return false;
+        }
+        if (!keys.isEmpty())
+            return false;
+        return other.m_name.equals(m_name)
                 && other.getHierarchicalContext() == getHierarchicalContext();
     }
 

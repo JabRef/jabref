@@ -27,6 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.undo;
 
 import javax.swing.undo.*;
+import javax.swing.*;
 
 import net.sf.jabref.BasePanel;
 
@@ -47,15 +48,28 @@ public class CountingUndoManager extends UndoManager {
     }
     
     public synchronized void undo() throws CannotUndoException {
-	super.undo();
-	current--;
-	panel.updateViewToSelected();
+	    super.undo();
+	    current--;
+        panel.updateEntryEditorIfShowing();
+        //panel.updateViewToSelected();
+        /*SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                panel.updateViewToSelected();
+            }
+        });*/
+
     }
 
     public synchronized void redo() throws CannotUndoException {
-	super.redo();
-	current++;
-	panel.updateViewToSelected();
+	    super.redo();
+	    current++;
+        panel.updateEntryEditorIfShowing();
+        //panel.updateViewToSelected();
+        /*SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                panel.updateViewToSelected();
+            }
+        });*/
     }
 
     public synchronized void markUnchanged() {

@@ -63,11 +63,13 @@ public class JabRef {
         boolean graphicFailure = false;
 
         System.setProperty("sun.awt.noerasebackground", "true");
-
+        
         //System.out.println(java.awt.Toolkit.getDefaultToolkit().getDesktopProperty("awt.dynamicLayoutSupported"));
         // Make sure of a proper cleanup when quitting (e.g. deleting temporary
         // files).
         System.runFinalizersOnExit(true);
+
+        //Util.pr(": Starting");
 
         // ----------------------------------------------------------------
         // First instantiate preferences and set language.
@@ -78,25 +80,26 @@ public class JabRef {
         //Globals.turnOnFileLogging(); 
         Globals.setLanguage(prefs.get("language"), "");
 
+        //Util.pr(": Language set");
         // ----------------------------------------------------------------
         // Option processing using RitOpt
         // ----------------------------------------------------------------
         Options options = new Options("JabRef "); // Create an options repository.
         options.setVersion(GUIGlobals.version);
-
         StringOption importFile = new StringOption("");
         importFile.setDescription("imopoepuoeu"); //Globals.lang);
 
         StringOption exportFile = new StringOption("");
         BooleanOption helpO = new BooleanOption();
         BooleanOption disableGui = new BooleanOption();
-
+        BooleanOption blank = new BooleanOption();
         //exportFile.setHelpDescriptionSize(80);
         //exportFile.setFileCompleteOptionSize(12);
         BooleanOption loadSess = new BooleanOption();
         StringOption exportPrefs = new StringOption("jabref_prefs.xml");
         StringOption importPrefs = new StringOption("jabref_prefs.xml");
         StringOption auxImExport = new StringOption("");
+
 
         options.register("nogui", 'n',
             Globals.lang("No GUI. Only process command line options."), disableGui);
@@ -116,9 +119,12 @@ public class JabRef {
         options.register("aux", 'a',
             Globals.lang("Subdatabase from aux") + ": " + Globals.lang("file")+"[.aux]" + ","+Globals.lang("new")+"[.bib]",
             auxImExport);
+        options.register("blank", 'b', Globals.lang("Do not open any files at startup"), blank);
         options.setUseMenu(false);
 
         String[] leftOver = options.process(args);
+
+        //Util.pr(": Options processed");
 
         if (helpO.isInvoked()) {
             System.out.println("jabref [options] [bibtex-file]\n");
@@ -182,7 +188,7 @@ public class JabRef {
         // Vector to put imported/loaded database(s) in.
         Vector loaded = new Vector();
 
-        if (leftOver.length > 0) {
+        if (!blank.isInvoked() && (leftOver.length > 0))  {
             for (int i = 0; i < leftOver.length; i++) {
                 // Leftover arguments are interpreted as bib files to open.
                 ParserResult pr = openBibFile(leftOver[i]);
@@ -192,7 +198,9 @@ public class JabRef {
             }
         }
 
-        if (importFile.isInvoked()) {
+        //Util.pr(": Checked blank");
+
+        if (!blank.isInvoked() && importFile.isInvoked()) {
             String[] data = importFile.getStringValue().split(",");
 
             if (data.length == 1) {
@@ -204,11 +212,10 @@ public class JabRef {
             } else if (data.length == 2) {
                 // Import a database in a certain format.
                 try {
-                    List entries;
 
                     if (!"*".equals(data[1])) {
                         System.out.println(Globals.lang("Importing") + ": " + data[0]);
-                        entries =
+                        List entries =
                             Globals.importFormatReader.importFromFile(data[1],
                                 data[0].replaceAll("~", System.getProperty("user.home")));
                     } else {
@@ -220,29 +227,39 @@ public class JabRef {
                             Globals.importFormatReader.importUnknownFormat(data[0]
                                 .replaceAll("~", System.getProperty("user.home")));
                         String formatName = (String) o[0];
-                        entries = (java.util.List) o[1];
 
-                        if (entries != null)
-                            System.out.println(Globals.lang("Format used") + ": "
-                                + formatName);
-                        else
-                            System.out.println(Globals.lang(
-                                    "Could not find a suitable import format."));
-                    }
+                        if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
+                            ParserResult pr = (ParserResult)o[1];
+                            loaded.add(pr);  
 
-                    if (entries != null) {
-                        BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                        ParserResult pr = new ParserResult(base, null, new HashMap());
+                        }
+                        else {
+                            List entries = (java.util.List) o[1];
+                            if (entries != null)
+                                System.out.println(Globals.lang("Format used") + ": "
+                                    + formatName);
+                            else
+                                System.out.println(Globals.lang(
+                                        "Could not find a suitable import format."));
+
+                            if (entries != null) {
+                                BibtexDatabase base = ImportFormatReader.createDatabase(entries);
+                                ParserResult pr = new ParserResult(base, null, new HashMap());
                         
-                        //pr.setFile(new File(data[0]));
-                        loaded.add(pr);
+                                //pr.setFile(new File(data[0]));
+                                loaded.add(pr);
+                            }
+                        }
                     }
                 } catch (IOException ex) {
                     System.err.println(Globals.lang("Error opening file") + " '"
                         + data[0] + "': " + ex.getMessage());
                 }
             }
+
         }
+
+        //Util.pr(": Finished import");
 
         if (exportFile.isInvoked()) {
             if (loaded.size() > 0) {
@@ -322,6 +339,8 @@ public class JabRef {
                         "The output option depends on a valid import option."));
         }
 
+        //Util.pr(": Finished export");
+
         if (exportPrefs.isInvoked()) {
             try {
                 prefs.exportPreferences(exportPrefs.getStringValue());
@@ -341,7 +360,7 @@ public class JabRef {
 	    }
 	}
 
-        if (auxImExport.isInvoked()) {
+        if (!blank.isInvoked() && auxImExport.isInvoked()) {
             boolean usageMsg = false;
 
             if (loaded.size() > 0) // bibtex file loaded
@@ -390,6 +409,9 @@ public class JabRef {
             }
         }
 
+
+        //Util.pr(": Finished aux");
+
         //openGui = false;
         if (!graphicFailure && !disableGui.isInvoked()) {
             // Call the method performCompatibilityUpdate(), which does any
@@ -397,6 +419,7 @@ public class JabRef {
             // Jabref version.
             Util.performCompatibilityUpdate();
 
+            //Util.pr(": Finished compatibility");
             //Font fnt = new Font("plain", Font.PLAIN, 12);
             /*
              * Font fnt = new Font (prefs.get("menuFontFamily"),
@@ -471,7 +494,7 @@ public class JabRef {
                 // com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
                 Object objLnf = null;
 
-                //Util.pr(lookAndFeel);
+                //Util.pr(": LnF: "+lookAndFeel);
                 try {
                     //lnf2 =
                     // Class.forName("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel").newInstance();
@@ -535,7 +558,7 @@ public class JabRef {
             }
 
             // If the option is enabled, open the last edited databases, if any.
-            if (prefs.getBoolean("openLastEdited") && (prefs.get("lastEdited") != null)) {
+            if (!blank.isInvoked() && prefs.getBoolean("openLastEdited") && (prefs.get("lastEdited") != null)) {
                 // How to handle errors in the databases to open?
                 String[] names = prefs.getStringArray("lastEdited");
 lastEdLoop: 
@@ -563,6 +586,7 @@ lastEdLoop:
                 new Font(prefs.get("fontFamily"), prefs.getInt("fontStyle"),
                     prefs.getInt("fontSize"));
 
+            //Util.pr(": Initializing frame");
             jrf = new JabRefFrame();
 
             // Add all loaded databases to the frame:
@@ -580,7 +604,26 @@ lastEdLoop:
             if (ss != null) // do this only if splashscreen was actually created 
                 ss.dispose();
 
+            //Util.pr(": Showing frame");
             jrf.setVisible(true);
+
+            for (int i = 0; i < loaded.size(); i++) {
+                ParserResult pr = (ParserResult) loaded.elementAt(i);
+                if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
+                    String[] wrns = pr.warnings();
+                    StringBuffer wrn = new StringBuffer();
+                    for (int j = 0; j<wrns.length; j++)
+                        wrn.append((j + 1) + ". " + wrns[j] + "\n");
+                    if (wrn.length() > 0)
+                        wrn.deleteCharAt(wrn.length() - 1);
+                    jrf.showBaseAt(i);
+                    JOptionPane.showMessageDialog(jrf, wrn.toString(),
+                        Globals.lang("Warnings"),
+                        JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
+            //Util.pr(": Finished adding panels");
 
             if (loaded.size() > 0) {
                 jrf.tabbedPane.setSelectedIndex(0);
@@ -602,6 +645,7 @@ lastEdLoop:
                 String[] warn = pr.warnings();
                 for (int i=0; i<warn.length; i++)
                     System.out.println(Globals.lang("Warning")+": "+warn[i]);
+
             }
             return pr;
         } catch (Throwable ex) {

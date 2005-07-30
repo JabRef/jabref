@@ -92,16 +92,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 	JLabel lab;
 	JPanel pan = new JPanel();
-	builder.appendSeparator("Special table columns");
+	builder.appendSeparator(Globals.lang("Special table columns"));
 	builder.nextLine();
 	builder.append(pan); builder.append(pdfColumn); builder.nextLine();
 	builder.append(pan); builder.append(urlColumn); builder.nextLine();
 	builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
-	builder.appendSeparator("Format of author and editor names");
+	builder.appendSeparator(Globals.lang("Format of author and editor names"));
 	builder.append(pan); builder.append(namesAsIs); builder.nextLine();
 	builder.append(pan); builder.append(namesFf); builder.nextLine();
 	builder.append(pan); builder.append(namesFl); builder.nextLine();
-	builder.appendSeparator("Sort options");
+	builder.appendSeparator(Globals.lang("Sort options"));
 	// Create a new panel with its own FormLayout for these items:
 	FormLayout layout2 = new FormLayout
 	    ("left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");             
@@ -121,7 +121,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	builder.append(pan);
 	builder.append(builder2.getPanel());
 	builder.nextLine();
-	builder.appendSeparator("Table appearance");
+	builder.appendSeparator(Globals.lang("Table appearance"));
 	builder.append(pan); builder.append(colorCodes); builder.nextLine();
 	builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
 	builder.append(pan); builder.append(antialias); builder.nextLine();

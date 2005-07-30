@@ -40,6 +40,8 @@ import net.sf.jabref.search.SearchExpression;
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
 
+    private JabRefFrame frame;
+
     GridBagLayout gbl = new GridBagLayout() ;
     GridBagConstraints con = new GridBagConstraints() ;
 
@@ -68,9 +70,10 @@ class SearchManager2 extends SidePaneComponent
 				   // that the search is inactive.
 
 
-    public SearchManager2(SidePaneManager manager) {
+    public SearchManager2(JabRefFrame frame, SidePaneManager manager) {
 	super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
 
+        this.frame = frame;
 	incSearcher = new IncrementalSearcher(Globals.prefs);
 
 
@@ -318,7 +321,9 @@ settings.add(select);
 	    }
 	    increment.revalidate();
 	    increment.repaint();
-	    searchField.requestFocus();
+
+        searchField.requestFocus();
+
 	}
     }
 
@@ -455,12 +460,12 @@ settings.add(select);
 		    if (incSearchPos < 0)
 			incSearchPos = 0;
 		    BibtexEntry be = panel.getDatabase().getEntryById
-			(panel.tableModel.getNameFromNumber(incSearchPos));
+			(panel.tableModel.getIdForRow(incSearchPos));
 		    while (!incSearcher.search(text, be)) {
 			incSearchPos++;
 			if (incSearchPos < panel.getDatabase().getEntryCount())
 			    be = panel.getDatabase().getEntryById
-				(panel.tableModel.getNameFromNumber(incSearchPos));
+				(panel.tableModel.getIdForRow(incSearchPos));
 			else {
 			    panel.output("'"+text+"' : "+Globals.lang
 					 ("Incremental search failed. Repeat to search from top."));
@@ -474,13 +479,14 @@ settings.add(select);
 			panel.output("'"+text+"' "+Globals.lang
 
 				     ("found")+".");
+                
 		    }
 		}
 	    });
     }
 
     public void componentClosing() {
-	panel.frame.searchToggle.setSelected(false);
+	frame.searchToggle.setSelected(false);
 	if (panel != null)
 	    panel.stopShowingSearchResults();
     }

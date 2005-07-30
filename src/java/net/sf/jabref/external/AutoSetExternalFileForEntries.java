@@ -86,7 +86,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         if (autoSet) {
             for (int i=0; i<sel.length; i++) {
                 final Object old = sel[i].getField(fieldName);
-
+                //System.out.println(sel[i].getField("bibtexkey"));
                 // Check if a link is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
@@ -171,7 +171,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         if (!goOn)
             return;
 
-        panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed: %1.",
+        panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
                 new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
         if (entriesChanged > 0) {
             panel.markBaseChanged();
@@ -196,11 +196,20 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                     dispose();
                 }
             });
-            cancel.addActionListener(new ActionListener () {
+
+            Action closeAction = new AbstractAction () {
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
-            });
+            };
+
+
+            cancel.addActionListener(closeAction);
+
+            InputMap im = cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	        ActionMap am = cancel.getActionMap();
+            im.put(Globals.prefs.getKey("Close dialog"), "close");
+	        am.put("close", closeAction);
 
             fieldName = fieldName.toUpperCase();
             autoSetUnset =  new JRadioButton(Globals.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
@@ -258,7 +267,10 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         public void setVisible(boolean visible) {
             if (visible)
                 canceled = true;
+
+            new FocusRequester(ok);
             super.setVisible(visible);
+
         }
 
         public boolean canceled() {

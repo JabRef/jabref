@@ -156,7 +156,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     setupSourcePanel();
     add(tabbed, BorderLayout.CENTER);
     tabbed.addChangeListener(tabListener);
-    if (prefs.getBoolean("defaultShowSource"))
+    if (prefs.getBoolean("showSource") && prefs.getBoolean("defaultShowSource"))
       tabbed.setSelectedIndex(sourceIndex);
 
     updateAllFields();
@@ -211,10 +211,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		      absPan.getPane(), Globals.lang("Show abstract"));
 		      tabs.add(absPan);*/
     srcPanel.setName(Globals.lang("BibTeX source"));
-	tabbed.addTab(Globals.lang("BibTeX source"),
+    if (Globals.prefs.getBoolean("showSource")) {
+	    tabbed.addTab(Globals.lang("BibTeX source"),
 		      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
 		      Globals.lang("Show/edit BibTeX source"));
-	tabs.add(srcPanel);
+	    tabs.add(srcPanel);
+    }
 	sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
     srcPanel.setFocusCycleRoot(true);	
     }
@@ -573,8 +575,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     // same dialog, and updating it.
     if (entry.getType() == be.getType())
       switchTo(be);
-    else
+    else {
       panel.showEntry(be);
+      panel.moveFocusToEntryEditor();
+    }
   }
 
   /**
@@ -625,8 +629,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     validateAllFields();
     updateSource();
     panel.showing = be;
-
-    activateVisible();
+    //activateVisible();
         }
     
   /**
@@ -790,6 +793,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * Sets all the text areas according to the shown entry.
    */
   public void updateAllFields() {
+      //System.out.println("EntryEditor.updateAllFields()");
 	  for (Iterator i=tabs.iterator(); i.hasNext();) {
 		  Object o = i.next();
 		  if (o instanceof EntryEditorTab) {
@@ -891,7 +895,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class TabListener implements ChangeListener {
     public void stateChanged(ChangeEvent e) {
-	activateVisible();
+	    activateVisible();
+
+        // After the initial event train has finished, we tell the editor tab to update all
+        // its fields. This makes sure they are updated even if the tab we just left contained one
+        // or more of the same fields as this one:
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Object activeTab = tabs.get(tabbed.getSelectedIndex());
+                if (activeTab instanceof EntryEditorTab)
+                    ((EntryEditorTab)activeTab).updateAll();
+        }
+     });
     }
   }
 
@@ -1052,6 +1067,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             || ((oldValue != null) && (newValue != null) && oldValue.equals(newValue)))
           return; // No change.
 
+        // Make sure the key is legal:
+        String cleaned = Util.checkLegalKey(newValue);
+        if ((cleaned != null) && !cleaned.equals(newValue)) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Invalid BibTeX key"),
+              Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+            fe.setBackground(GUIGlobals.invalidFieldBackground);
+            return;
+        } else {
+            fe.setBackground(/*fe.getTextComponent().hasFocus() ?
+                    GUIGlobals.activeEditor :*/
+                    GUIGlobals.validFieldBackground);
+        }
+
         boolean isDuplicate = panel.database.setCiteKeyForEntry(entry.getId(), newValue);
 
         if (newValue != null) {
@@ -1137,7 +1165,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         return; // newRow is still -1, so we can assume the database
 
       // has only one entry.
-      id = panel.tableModel.getNameFromNumber(newRow);
+      id = panel.tableModel.getIdForRow(newRow);
       switchTo(id);
 
       final int nr = newRow;
@@ -1169,7 +1197,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         return; // newRow is still -1, so we can assume the database
 
       // has only one entry.
-      id = panel.tableModel.getNameFromNumber(newRow);
+      id = panel.tableModel.getIdForRow(newRow);
       switchTo(id);
 
       final int nr = newRow;

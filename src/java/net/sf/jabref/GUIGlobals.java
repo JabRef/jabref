@@ -86,7 +86,7 @@ public class GUIGlobals {
 
   // Divider size for BaseFrame split pane. 0 means non-resizable.
   public static final int
-      SPLIT_PANE_DIVIDER_SIZE = 2,
+      SPLIT_PANE_DIVIDER_SIZE = 4,
       SPLIT_PANE_DIVIDER_LOCATION = 145,
       TABLE_ROW_PADDING = 4,
       KEYBIND_COL_0 = 200,
@@ -112,7 +112,8 @@ public class GUIGlobals {
       extension = ".gif",
       ex = imageSize + extension,
       pre = "/images/",
-      helpPre = "/help/";
+      helpPre = "/help/",
+      fontPath = "/images/font/";
 
     static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
     // further below.
@@ -215,6 +216,8 @@ public class GUIGlobals {
       downIconFile = GUIGlobals.class.getResource(pre + "next_nav.gif"),
       stringsIconFile = GUIGlobals.class.getResource(pre + "strings.png"),
       groupsIconFile = GUIGlobals.class.getResource(pre + "queue.png"),
+      groupsHighlightMatchingAnyFile = GUIGlobals.class.getResource(pre + "groupsHighlightAny.png"),
+      groupsHighlightMatchingAllFile = GUIGlobals.class.getResource(pre + "groupsHighlightAll.png"),
       closeIconFile = GUIGlobals.class.getResource(pre + "fileclose.png"),
       close2IconFile = GUIGlobals.class.getResource(pre + "fileclose2.png"),
       refreshSmallIconFile = GUIGlobals.class.getResource(pre + "refresh_nav.gif"),
@@ -253,7 +256,8 @@ public class GUIGlobals {
       integrityCheck = GUIGlobals.class.getResource(pre +"integrity.png"),
       integrityInfo = GUIGlobals.class.getResource(pre +"messageInfo.png"),
       integrityWarn = GUIGlobals.class.getResource(pre +"messageWarn.png"),
-      integrityFail = GUIGlobals.class.getResource(pre +"messageFail.png")
+      integrityFail = GUIGlobals.class.getResource(pre +"messageFail.png"),
+        duplicateIcon = GUIGlobals.class.getResource(pre +"duplicate.png")
       ;
   
   public static ImageIcon

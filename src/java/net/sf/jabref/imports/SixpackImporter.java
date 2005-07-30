@@ -70,7 +70,8 @@ public class SixpackImporter implements ImportFormat {
 	fI.put("ty", "type");
 	fI.put("url", "url");
 	fI.put("cr", "crossref");
-	
+    fI.put("fi", "file");
+
 	ArrayList bibitems = new ArrayList();
 	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 	in.readLine();
@@ -104,6 +105,14 @@ public class SixpackImporter implements ImportFormat {
 																			  " and "));
 			else if (fld.equals("pages")) ImportFormatReader.setIfNecessary(entry, fld, fields[i]
 							       .replaceAll("-", "--"));
+            else if (fld.equals("file")) {
+                String fieldName = "pdf"; // We set pdf as default.
+                if (fields[i].endsWith("ps") || fields[i].endsWith("ps.gz"))
+                    fieldName = "ps";
+                else if (fields[i].endsWith("html"))
+                    fieldName = "url";
+                ImportFormatReader.setIfNecessary(entry, fieldName, fields[i]);
+            }
 			else ImportFormatReader.setIfNecessary(entry, fld, fields[i]);
 		    }
 		}
@@ -112,7 +121,7 @@ public class SixpackImporter implements ImportFormat {
 		Globals.logger("Problem parsing Sixpack entry, ignoring entry.");
 	    }
 	}
-    
+
 	return bibitems;
     }
 }

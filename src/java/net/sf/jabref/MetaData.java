@@ -93,6 +93,7 @@ public class MetaData {
      */
     public MetaData() {
         metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector());
         metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector());
         metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector());
     }

@@ -26,7 +26,7 @@ public class JstorImporter implements ImportFormat {
      * Return the name of this import format.
      */
     public String getFormatName() {
-	return "JStor";
+	return "JStor (tab delimited)";
     }
 
     /**
@@ -62,6 +62,11 @@ public class JstorImporter implements ImportFormat {
 		ImportFormatReader.setIfNecessary(be, "number", fields[10]);
 		String[] datefield = fields[12].split(" ");
 		ImportFormatReader.setIfNecessary(be, "year", datefield[datefield.length - 1]);
+        if (datefield.length > 1) {
+            if (datefield[0].endsWith(","))
+                datefield[0] = datefield[0].substring(0, datefield[0].length()-1);
+            ImportFormatReader.setIfNecessary(be, "month", datefield[0]);
+        }
 		//for (int i=0; i<fields.length; i++)
 		//  Util.pr(i+": "+fields[i]);
 		ImportFormatReader.setIfNecessary(be, "pages", fields[13].replaceAll("-", "--"));

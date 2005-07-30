@@ -26,7 +26,6 @@ public class FieldContentParser {
 
             int c = content.charAt(i);
             if (c == '\n') {
-
                 if ((content.length()>i+2) && (content.charAt(i+1)=='\t')
                     && !Character.isWhitespace(content.charAt(i+2))) {
                     // We have \n\t followed by non-whitespace, which indicates
@@ -73,10 +72,32 @@ public class FieldContentParser {
                         i++;
                     }
                 }
+                else if ((content.length()>i+1) && (content.charAt(i+1)!='\n')) {
+                    // We have a line break not followed by another line break. This is probably a normal
+                    // line break made by whatever other editor, so we will remove the line break.
+                    content.deleteCharAt(i);
+                    // If the line break is not accompanied by other whitespace we must add a space:
+                    if (!Character.isWhitespace(content.charAt(i)) &&  // No whitespace after?
+                            (i>0) && !Character.isWhitespace(content.charAt(i-1))) // No whitespace before?
+                        content.insert(i, ' ');
+                }
+
+                //else if ((content.length()>i+1) && (content.charAt(i+1)=='\n'))
                 else
                     i++;
                 //content.deleteCharAt(i);
             }
+            else if (c == ' ') {
+                //if ((content.length()>i+2) && (content.charAt(i+1)==' ')) {
+                if ((i>0) && (content.charAt(i-1)==' ')) {
+                    // We have two spaces in a row. Don't include this one.
+                    content.deleteCharAt(i);
+                }
+                else
+                    i++;
+            } else if (c == '\t')
+                // Remove all tab characters that aren't associated with a line break.
+                content.deleteCharAt(i);
             else
                 i++;
             prev = c;
@@ -94,6 +115,10 @@ public class FieldContentParser {
      * @return
      */
     public static String wrap(String in, int wrapAmount){
+        // JZ: due to the formatting/wrapping bug, I temporarily disabled
+        // the below code to prevent JabRef from modifying .bib files in
+        // a way that may require manual correction.
+        //return in;
 
         String[] lines = in.split("\n");
         StringBuffer res = new StringBuffer();

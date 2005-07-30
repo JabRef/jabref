@@ -19,15 +19,15 @@ import com.jgoodies.forms.layout.FormLayout;
 
 // JZTODO lyrics
 public class GroupsPrefsTab extends JPanel implements PrefsTab {
-	private final JCheckBox showIcons = new JCheckBox("Show icons for groups");
+	private final JCheckBox showIcons = new JCheckBox(Globals.lang("Show icons for groups"));
 	private final JCheckBox showDynamic = new JCheckBox(
-			"<html>Show dynamic groups in <i>italics</i></html>");
+			"<html>"+Globals.lang("Show dynamic groups in <i>italics</i>")+"</html>");
 	private final JCheckBox expandTree = new JCheckBox(
-			"Initially show groups tree expanded");
+			Globals.lang("Initially show groups tree expanded"));
 	private final JCheckBox autoShow = new JCheckBox(
-			"Automatically show groups interface when switching to a database that contains groups");
+			Globals.lang("Automatically show groups interface when switching to a database that contains groups"));
 	private final JCheckBox autoHide = new JCheckBox(
-			"Automatically hide groups interface when switching to a database that contains no groups");
+			Globals.lang("Automatically hide groups interface when switching to a database that contains no groups"));
 	private JTextField groupingField = new JTextField(20);
 	private JTextField keywordSeparator = new JTextField(2);
 
@@ -49,7 +49,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 				"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, " +
 				"p, 3dlu, p");
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-		builder.appendSeparator("View");
+		builder.appendSeparator(Globals.lang("View"));
 		builder.nextLine();
 		builder.nextLine();
 		builder.nextColumn();
@@ -72,7 +72,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 		builder.append(autoHide);
 		builder.nextLine();
 		builder.nextLine();
-		builder.appendSeparator("Dynamic Groups");
+		builder.appendSeparator(Globals.lang("Dynamic groups"));
 		builder.nextLine();
 		builder.nextLine();
 		builder.nextColumn();
@@ -84,7 +84,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 			builder2.append(groupingField);
 			builder2.nextLine();
 			builder2.nextLine();
-			builder2.append(new JLabel("When adding/removing keywords, separate them by:"));
+			builder2.append(new JLabel(Globals.lang("When adding/removing keywords, separate them by")+":"));
 			builder2.append(keywordSeparator);
 		builder.append(builder2.getPanel());
 

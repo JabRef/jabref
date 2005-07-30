@@ -774,7 +774,7 @@ public class GroupSelector extends SidePaneComponent implements
 //  JZTODO lyrics
     public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
         public void actionPerformed(ActionEvent ae) {
-            groupsTree.setHighlight2Cells(null);
+            groupsTree.setHighlight3Cells(null);
         }
     };
     
@@ -960,7 +960,7 @@ public class GroupSelector extends SidePaneComponent implements
     }
     
     JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
-    JMenu sortSubmenu = new JMenu("Sort alphabetically"); // JZTODO lyrics
+    JMenu sortSubmenu = new JMenu(Globals.lang("Sort alphabetically")); // JZTODO lyrics
 
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
@@ -1025,9 +1025,15 @@ public class GroupSelector extends SidePaneComponent implements
     }
     
     /**
-     * Highlight all groups that contain any/all of the specified entries. 
+     * Highlight all groups that contain any/all of the specified entries.
+     * If entries is null, highlight is cleared. 
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
+        if (entries == null) { // nothing selected
+            groupsTree.setHighlight3Cells(null);
+            groupsTree.revalidate();
+            return;
+        }
         GroupTreeNode node;
         AbstractGroup group;
         Vector vec = new Vector();
@@ -1047,7 +1053,7 @@ public class GroupSelector extends SidePaneComponent implements
             if (requireAll && i >= entries.length) // did not break from loop
                 vec.add(node);
         }
-        groupsTree.setHighlight2Cells(vec.toArray());
+        groupsTree.setHighlight3Cells(vec.toArray());
         // ensure that all highlighted nodes are visible
         for (int i = 0; i < vec.size(); ++i) {
             node = (GroupTreeNode)((GroupTreeNode)vec.elementAt(i)).getParent();

@@ -28,7 +28,8 @@ public class DuplicateResolverDialog extends JDialog {
 	KEEP_LOWER = 2,
 	BREAK      = 5,  // close
 	DUPLICATE_SEARCH = 1,
-	IMPORT_CHECK = 2;
+	IMPORT_CHECK = 2,
+    INSPECTION = 3;
 
     final Dimension DIM = new Dimension(650, 600);
     
@@ -49,15 +50,22 @@ public class DuplicateResolverDialog extends JDialog {
   public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two, int type) {
     super(frame, Globals.lang("Possible duplicate entries"), true);
 
-    if (type == DUPLICATE_SEARCH) {
-	first = new JButton(Globals.lang("Keep upper"));
-	second = new JButton(Globals.lang("Keep lower"));
-	both = new JButton(Globals.lang("Keep both"));
-    } else {
-	first = new JButton(Globals.lang("Import and remove old entry"));
-	second = new JButton(Globals.lang("Do not import entry"));
-	both = new JButton(Globals.lang("Import and keep old entry"));
-    }
+      switch (type) {
+          case DUPLICATE_SEARCH:
+              first = new JButton(Globals.lang("Keep upper"));
+              second = new JButton(Globals.lang("Keep lower"));
+              both = new JButton(Globals.lang("Keep both"));
+              break;
+          case INSPECTION:
+              first = new JButton(Globals.lang("Remove old entry"));
+              second = new JButton(Globals.lang("Remove entry from import"));
+              both = new JButton(Globals.lang("Keep both"));
+              break;
+          default:
+              first = new JButton(Globals.lang("Import and remove old entry"));
+	          second = new JButton(Globals.lang("Do not import entry"));
+	          both = new JButton(Globals.lang("Import and keep old entry"));
+      }
 
     String layout = Globals.prefs.get("preview0");
     p1 = new PreviewPanel(one, layout);
@@ -111,7 +119,7 @@ public class DuplicateResolverDialog extends JDialog {
     options.add(first);
     options.add(second);
     options.add(both);
-    if (type == DUPLICATE_SEARCH) {
+    if (type != IMPORT_CHECK) {
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
     }

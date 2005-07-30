@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     clickedOn = entryTable.getSelectedRow();
                   }
                   if (clickedOn >= 0) {
-                    String id = tableModel.getNameFromNumber(clickedOn);
+                    String id = tableModel.getIdForRow(clickedOn);
                     BibtexEntry be = database.getEntryById(id);
                     showEntry(be);
                     
@@ -689,7 +689,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             boolean first = true;
                             for (int i = 0; i < numSelected; i++) {
                               BibtexEntry bes = database.getEntryById(tableModel.
-                                  getNameFromNumber(rows[
+                                      getIdForRow(rows[
                                                     i]));
                               citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
                               // if the key is empty we give a warning and ignore this entry
@@ -984,96 +984,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Should this be done _after_ we know it was successfully opened?
                     String encoding = Globals.prefs.get("defaultEncoding");
                     ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
-                    BibtexDatabase db = pr.getDatabase();
-                    MetaData meta = new MetaData(pr.getMetaData(),pr.getDatabase());
-                    NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
-                    Vector appendedEntries = new Vector();
-                    Vector originalEntries = new Vector();
-                    BibtexEntry originalEntry;
-
-                    if (importEntries) { // Add entries
-                      Iterator i = db.getKeySet().iterator();
-                      while (i.hasNext()) {
-                        originalEntry = db.getEntryById((String)i.next());
-                        BibtexEntry be = (BibtexEntry)(originalEntry.clone());
-                        be.setId(Util.createNeutralId());
-                        database.insertEntry(be);
-                        appendedEntries.add(be);
-                        originalEntries.add(originalEntry);
-                        ce.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
-                      }
-                    }
-
-                    if (importStrings) {
-                      BibtexString bs;
-                      int pos = 0;
-                      Iterator i = db.getStringKeySet().iterator();
-                      for (; i.hasNext();) {
-                        bs = (BibtexString)(db.getString(i.next()).clone());
-                        if (!database.hasStringLabel(bs.getName())) {
-                            //pos = database.getStringCount();
-                            database.addString(bs);
-                            ce.addEdit(new UndoableInsertString(BasePanel.this, database, bs));
-                        }
-                      }
-                    }
-
-                    if (importGroups) {
-                      GroupTreeNode newGroups = meta.getGroups();
-                      if (newGroups != null) {
-                          
-                          // ensure that there is always only one AllEntriesGroup
-                          if (newGroups.getGroup() instanceof AllEntriesGroup) {
-                              // create a dummy group
-                              ExplicitGroup group = new ExplicitGroup("Imported", 
-                            		  AbstractGroup.INDEPENDENT); // JZTODO lyrics 
-                              newGroups.setGroup(group);
-                              for (int i = 0; i < appendedEntries.size(); ++i)
-                                  group.addEntry((BibtexEntry) appendedEntries.elementAt(i));
-                          }
-                          
-                        // groupsSelector is always created, even when no groups
-                        // have been defined. therefore, no check for null is
-                        // required here
-                        frame.groupSelector.addGroups(newGroups, ce);
-                        // for explicit groups, the entries copied to the mother db have to 
-                        // be "reassigned", i.e. the old reference is removed and the reference
-                        // to the new db is added.
-                        GroupTreeNode node;
-                        ExplicitGroup group;
-                        BibtexEntry entry;
-                        for (Enumeration e = newGroups.preorderEnumeration(); e.hasMoreElements(); ) {
-                            node = (GroupTreeNode) e.nextElement();
-                            if (!(node.getGroup() instanceof ExplicitGroup))
-                                continue;
-                            group = (ExplicitGroup) node.getGroup();
-                            for (int i = 0; i < originalEntries.size(); ++i) {
-                                entry = (BibtexEntry) originalEntries.elementAt(i);
-                                if (group.contains(entry)) {
-                                    group.removeEntry(entry);
-                                    group.addEntry((BibtexEntry) appendedEntries.elementAt(i));
-                                }                                   
-                            }
-                        }
-                        frame.groupSelector.revalidateGroups();
-                      }
-                    }
-
-                    if (importSelectorWords) {
-                      Iterator i=meta.iterator();
-                      while (i.hasNext()) {
-                        String s = (String)i.next();
-                        if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-                          metaData.putData(s, meta.getData(s));
-                        }
-                      }
-                    }
-
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    refreshTable();
-                    output("Imported from database '"+fileToOpen.getPath()+"':");
+                    mergeFromBibtex(pr, importEntries, importStrings, importGroups, importSelectorWords);
+                    output(Globals.lang("Imported from database")+" '"+fileToOpen.getPath()+"'");
                     fileToOpen = null;
                   } catch (Throwable ex) {
                     ex.printStackTrace();
@@ -1119,7 +1031,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                            "html", "ps", "pdf"};
                        for (int i = 0; i < typesToTry.length; i++) {
                          File f = new File(basefile + "." + typesToTry[i]);
-                         Util.pr("Checking for " + f);
                          if (f.exists()) {
                            field = typesToTry[i];
                            filepath = f.getPath();
@@ -1195,6 +1106,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           for (int i=0; i<bes.length; i++)
                               counter += rsd.replace(bes[i], ce);
                       }
+
                       output(Globals.lang("Replaced")+" "+counter+" "+
                              Globals.lang(counter==1?"occurence":"occurences")+".");
                       if (counter > 0) {
@@ -1367,6 +1279,32 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           frame.previewToggle.setSelected(enabled);
                       }
                   });
+              
+              actions.put("toggleHighlightGroupsMatchingAny", new BaseAction() {
+                public void action() {
+                    boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAny");
+                    Globals.prefs.putBoolean("highlightGroupsMatchingAny", enabled);
+                    frame.highlightAny.setSelected(enabled);
+                    if (enabled) {
+                        frame.highlightAll.setSelected(false);
+                        Globals.prefs.putBoolean("highlightGroupsMatchingAll", false);
+                    }
+                    entryTable.groupsHighlightListener.valueChanged(null);
+                }
+              });
+
+              actions.put("toggleHighlightGroupsMatchingAll", new BaseAction() {
+                  public void action() {
+                      boolean enabled = !Globals.prefs.getBoolean("highlightGroupsMatchingAll");
+                      Globals.prefs.putBoolean("highlightGroupsMatchingAll", enabled);
+                      frame.highlightAll.setSelected(enabled);
+                      if (enabled) {
+                          frame.highlightAny.setSelected(false);
+                          Globals.prefs.putBoolean("highlightGroupsMatchingAny", false);
+                      }
+                      entryTable.groupsHighlightListener.valueChanged(null);
+                  }
+                });
 
               actions.put("switchPreview", new BaseAction() {
                       public void action() {
@@ -1600,7 +1538,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 refreshTable();
                 final int row = tableModel.getNumberFromName(id);
                 //Util.pr(""+row);
-                entryTable.clearSelection();                
+
+                //entryTable.clearSelection();
+                highlightEntry(be);
+
                 markBaseChanged(); // The database just changed.
                 if (prefs.getBoolean("autoOpenForm")) {
                     showEntry(be);
@@ -1624,6 +1565,102 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         }
     }
+
+        public void mergeFromBibtex(ParserResult pr,
+                                    boolean importEntries, boolean importStrings,
+                                    boolean importGroups, boolean importSelectorWords)
+                throws KeyCollisionException {
+
+            BibtexDatabase fromDatabase = pr.getDatabase();
+            ArrayList appendedEntries = new ArrayList();
+            ArrayList originalEntries = new ArrayList();
+            BibtexEntry originalEntry;
+            NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
+            MetaData meta = new MetaData(pr.getMetaData(), pr.getDatabase());
+
+            if (importEntries) { // Add entries
+                Iterator i = fromDatabase.getKeySet().iterator();
+                while (i.hasNext()) {
+                    originalEntry = fromDatabase.getEntryById((String) i.next());
+                    BibtexEntry be = (BibtexEntry) (originalEntry.clone());
+                    be.setId(Util.createNeutralId());
+                    database.insertEntry(be);
+                    appendedEntries.add(be);
+                    originalEntries.add(originalEntry);
+                    ce.addEdit(new UndoableInsertEntry(database, be, this));
+                }
+            }
+
+            if (importStrings) {
+                BibtexString bs;
+                int pos = 0;
+                Iterator i = fromDatabase.getStringKeySet().iterator();
+                for (; i.hasNext();) {
+                    bs = (BibtexString) (fromDatabase.getString(i.next()).clone());
+                    if (!database.hasStringLabel(bs.getName())) {
+                        //pos = toDatabase.getStringCount();
+                        database.addString(bs);
+                        ce.addEdit(new UndoableInsertString(this, database, bs));
+                    }
+                }
+            }
+
+            if (importGroups) {
+                GroupTreeNode newGroups = metaData().getGroups();
+                if (newGroups != null) {
+
+                    // ensure that there is always only one AllEntriesGroup
+                    if (newGroups.getGroup() instanceof AllEntriesGroup) {
+                        // create a dummy group
+                        ExplicitGroup group = new ExplicitGroup("Imported",
+                                AbstractGroup.INDEPENDENT); // JZTODO lyrics
+                        newGroups.setGroup(group);
+                        for (int i = 0; i < appendedEntries.size(); ++i)
+                            group.addEntry((BibtexEntry) appendedEntries.get(i));
+                    }
+
+                    // groupsSelector is always created, even when no groups
+                    // have been defined. therefore, no check for null is
+                    // required here
+                    frame.groupSelector.addGroups(newGroups, ce);
+                    // for explicit groups, the entries copied to the mother fromDatabase have to
+                    // be "reassigned", i.e. the old reference is removed and the reference
+                    // to the new fromDatabase is added.
+                    GroupTreeNode node;
+                    ExplicitGroup group;
+                    BibtexEntry entry;
+                    for (Enumeration e = newGroups.preorderEnumeration(); e.hasMoreElements();) {
+                        node = (GroupTreeNode) e.nextElement();
+                        if (!(node.getGroup() instanceof ExplicitGroup))
+                            continue;
+                        group = (ExplicitGroup) node.getGroup();
+                        for (int i = 0; i < originalEntries.size(); ++i) {
+                            entry = (BibtexEntry) originalEntries.get(i);
+                            if (group.contains(entry)) {
+                                group.removeEntry(entry);
+                                group.addEntry((BibtexEntry) appendedEntries.get(i));
+                            }
+                        }
+                    }
+                    frame.groupSelector.revalidateGroups();
+                }
+            }
+
+            if (importSelectorWords) {
+                Iterator i = meta.iterator();
+                while (i.hasNext()) {
+                    String s = (String) i.next();
+                    if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+                        metaData().putData(s, meta.getData(s));
+                    }
+                }
+            }
+
+            ce.end();
+            undoManager.addEdit(ce);
+            markBaseChanged();
+            refreshTable();
+        }
 
 
     /**
@@ -1894,14 +1931,23 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             stringDialog.refreshTable();
     }
 
+    public void updateEntryPreviewToRow(BibtexEntry e) {
+
+    }
+
     public void updateViewToSelected() {
-      // First, if the entry editor is visible, we should update it to the selected entry.
-      BibtexEntry be = null;
-      BibtexEntry[] bes = entryTable.getSelectedEntries();
+       // First, if the entry editor is visible, we should update it to the selected entry.
+      BibtexEntry be = entryTable.getActiveEntry();
+      /*BibtexEntry[] bes = entryTable.getSelectedEntries();
       if ((bes != null) && (bes.length > 0))
-        be = bes[0];
-      else if (showing != null)
+        be = bes[0];*/
+
+      //System.out.println("BasePanel.updateViewToSelected(): be="+be);
+
+      if (be == null)
         return;
+
+      //System.out.println("BasePanel.updateViewToSelected(): showing="+showing);
 
       if (showing != null) {
         showEntry(be);
@@ -2038,7 +2084,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (visName != null)
                 form.setVisiblePanel(visName);
             splitPane.setBottomComponent(form);
-            highlightEntry(be);
+            //highlightEntry(be);
         } else {
             // We must instantiate a new editor for this type.
             form = new EntryEditor(frame, BasePanel.this, be);
@@ -2046,7 +2092,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 form.setVisiblePanel(visName);
             splitPane.setBottomComponent(form);            
             
-            highlightEntry(be);
+            //highlightEntry(be);
             entryEditors.put(be.getType().getName(), form);
            
         }
@@ -2098,10 +2144,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                  if (row >= 0) {
                     entryTable.setRowSelectionInterval(row, row);
+                    //entryTable.setActiveRow(row);
                     entryTable.ensureVisible(row);
                     Component comp = splitPane.getBottomComponent();
-                    if (comp instanceof EntryEditor)
-                         comp.requestFocus();
+                    //if (comp instanceof EntryEditor)
+                    //     comp.requestFocus();
                  }
              }
         });
@@ -2299,7 +2346,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       // First we build a list of intervals to select, without touching the table.
       for (int i = 0; i < entryTable.getRowCount(); i++) {
         String value = (String) (database.getEntryById
-                                 (tableModel.getNameFromNumber(i)))
+                                 (tableModel.getIdForRow(i)))
             .getField(field);
         if ( (value != null) && !value.equals("0")) {
           if (prevStart < 0)
@@ -2511,8 +2558,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       // thread:
       Thread t = new Thread() {
         public void run() {
-          FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, file);
+            // Test: running scan automatically in background
+            ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this);
+            scanner.changeScan(BasePanel.this.file());
+            try {
+                scanner.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (scanner.changesFound()) {
+                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, file, scanner);
           sidePaneManager.add("fileUpdate", pan);
+                setUpdatedExternally(false);
+                //scanner.displayResult();
+            } else {
+                setUpdatedExternally(false);
+                //System.out.println("No changes found.");
+        }
+
         }
       };
       SwingUtilities.invokeLater(t);

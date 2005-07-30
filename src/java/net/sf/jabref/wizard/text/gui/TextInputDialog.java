@@ -37,6 +37,9 @@
 //              the cancel option doesn't work well
 //
 // modified :
+//            28.07.2005
+//            - fix: insert button doesnt work
+//            - append a author with "and"
 //            04.11.2004
 //            - experimental: text-input-area with underlying infotext
 //            02.11.2004
@@ -47,22 +50,19 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
-import java.net.* ;
 import java.io.* ;
-import java.util.* ;
+import java.net.* ;
 
 import java.awt.* ;
 import java.awt.event.* ;
-import java.awt.datatransfer.* ;
 import javax.swing.* ;
-import javax.swing.text.* ;
 import javax.swing.border.* ;
 import javax.swing.event.* ;
+import javax.swing.text.* ;
 
 import net.sf.jabref.* ;
-import net.sf.jabref.wizard.text.* ;
-import net.sf.jabref.wizard.integrity.* ;
 import net.sf.jabref.wizard.integrity.gui.* ;
+import net.sf.jabref.wizard.text.* ;
 
 public class TextInputDialog
     extends JDialog implements ActionListener
@@ -492,7 +492,12 @@ public class TextInputDialog
           // merge old and selected text
           if ( old != null )
           {
-            entry.setField( type, old + txt ) ;
+            // insert a new author with an additional "and"
+            if (type.hashCode() == "author".hashCode())
+            {
+              entry.setField(type, old +" and " +txt);
+            }
+            else entry.setField( type, old + txt ) ;
           }
           else // "null"+"txt" Strings forbidden
           {
@@ -529,7 +534,7 @@ public class TextInputDialog
     {
       dispose() ;
     }
-    else if (source == this.cancelButton)
+    else if (source == this.insertButton)
     {
       insertTextForTag() ;
     }

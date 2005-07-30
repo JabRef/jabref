@@ -90,6 +90,8 @@ public class FieldTextMenu implements MouseListener
     {
       if (myFieldName != null)
       {
+          myFieldName.requestFocus();
+
         // enable/disable copy to clipboard if selected text available
         String txt = myFieldName.getSelectedText() ;
         boolean cStat = false ;

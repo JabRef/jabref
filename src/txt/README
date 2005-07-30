@@ -1,6 +1,6 @@
 
-JabRef 1.8 beta
----------------
+JabRef 1.8
+----------
 
 
 Introduction:
@@ -80,9 +80,35 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.8:    - Search panel now starts visible if it was visible at last shutdown.
+        - Added option to disable import inspection window when only one entry is being imported.
+        - Fixed parser bug that caused problems for bib files containing extra characters after the
+          last entry.
+        - Fixed missing month in JStor import.
+	- Fixed some bugs in "new from plain-text" wizard
+1.8b2:  - Changed handling of external updates so the notification is suppressed when there are
+          no actual changes.
+        - Changed autodetecting import so BibTeX files are handled more similarly to other formats.
+        - Enabled sorting by icon columns.
+        - Added option to remove BibTeX source panel from entry editor.
+        - Added command line option to not load any files at startup. Will override any autoloading
+          or other command line options that normally load or import files.
+        - Added handling of duplicates to import inspection window.
+        - Made entry preview be updated whenever the selection is expanded by one row, to make
+          it more useful while selecting a set of entries.
+        - Changed BibTeX field parsing to avoid inserting line breaks at wrong places.
+        - Improved handling of page numbers in Medline import.
+        - Fixed import of file links when importing SixPack files.
+        - Fixed bug that prevented closing of search interface when no databases are open.
+        - Fixed OpenOffice Calc export to be compatible with OpenOffice.org 2.0 beta.
+        - Fixed bugs in Refer/Endnote import filter. 
+        - Fixed bug that caused changes to be lost in some cases when the same field is present
+          in multiple entry editor tabs.
+        - Fixed bug that prevented command line autodetecting import from working with BibTeX files.
+        - Fixed minor bug in routine for removing double braces.
 1.8b:   - Added option to store bib file with double braces.
         - Follow @input tags in aux files to indicate nested aux files for
-          generating subdatabases
+          generating subdatabases.
         - Improved wrapping and formatting of bib files, to preserve paragraph separator (empty line).
         - Added test buttons for customization of preview layouts.
         - Added inspection dialog for previewing and generating keys for imported entries,

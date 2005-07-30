@@ -30,6 +30,8 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -62,8 +64,12 @@ public class EntryTable extends JTable {
         tableColorCodes = true;
     //RenderingHints renderingHints;
     private BasePanel panel;
+    Set lastSelection = new HashSet();
 
     private ListSelectionListener previewListener = null;
+    private int activeRow = -1;
+    
+    ListSelectionListener groupsHighlightListener;
     
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
         super(tm_);
@@ -102,14 +108,8 @@ public class EntryTable extends JTable {
           public void mouseClicked(MouseEvent e)
           {
             int col = getTableHeader().columnAtPoint(e.getPoint());
-            if (col >= tableModel.padleft) { // A valid column, but not the first.
+            if (col >= 1) { //tableModel.padleft) { // A valid column, but not the first.
               String s = tableModel.getFieldName(col);
-              if (s.equals("")) {
-                // The user has clicked a column with an empty header, such as the icon columns.
-                // We could add sorting for these columns, but currently we do nothing.
-                return;
-              }
-
               /*
                * If the user adjusts the header size the sort event is
                * always triggered.
@@ -141,9 +141,16 @@ public class EntryTable extends JTable {
                   }
               }
 
-
-              if (!s.equals(prefs.get("priSort")))
+              if (!s.equals(prefs.get("priSort"))) {
                 prefs.put("priSort", s);
+                  // Now, if the selected column is an icon column, set the sort to binary mode,
+                  // meaning that it only separates set fields from empty fields, and does no
+                  // internal sorting of set fields:
+                  if (tableModel.getIconTypeForColumn(col) == null)
+                      prefs.putBoolean("priBinary", false);
+                  else
+                      prefs.putBoolean("priBinary", true);
+              }
                 // ... or change sort direction
               else prefs.putBoolean("priDescending",
                                     !prefs.getBoolean("priDescending"));
@@ -171,13 +178,79 @@ public class EntryTable extends JTable {
 
         addSelectionListener(); // Add the listener that responds to new entry selection.
 
-
-
+        groupsHighlightListener = new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (Globals.prefs.getBoolean("highlightGroupsMatchingAny"))
+                    panel.getGroupSelector().showMatchingGroups(
+                            panel.getSelectedEntries(), false);
+                else if (Globals.prefs.getBoolean("highlightGroupsMatchingAll"))
+                    panel.getGroupSelector().showMatchingGroups(
+                            panel.getSelectedEntries(), true);
+                else // no highlight
+                    panel.getGroupSelector().showMatchingGroups(null, true);
+            }
+        };
+        getSelectionModel().addListSelectionListener(groupsHighlightListener);
+        
         // (to update entry editor or preview)
         setWidths();
         sp.getViewport().setBackground(GUIGlobals.tableBackground);
         updateFont();
       }
+
+    /**
+     * Get the row number for the row that is active, in the sense that the preview or
+     * entry editor should show the corresponding entry.
+     * @return The active row number, or -1 if no row is active.
+     */
+    public int getActiveRow() {
+        return activeRow;
+    }
+
+
+    /**
+     * Get the active entry, in the sense that the preview or entry editor should
+     * show it.
+     * @return The active entry, or null if no row is active.
+     */
+
+    public BibtexEntry getActiveEntry() {
+        //System.out.println("EntryTable.getActiveEntry: "+activeRow);
+        return ((activeRow >= 0) && (activeRow < getRowCount())) ? tableModel.getEntryForRow(activeRow) : null;
+    }
+
+
+    /**
+     * Updates our Set containing the last row selection. Ckecks which rows were ADDED
+     * to the selection, to see what new entry should be previewed.
+     * Returns the number of the row that should be considered active, or -1 if none.
+     *
+     * This method may have some potential for optimization.
+     *
+     * @param rows
+     * @return
+     */
+    private int resolveNewSelection(int[] rows) {
+        HashSet newSel = new HashSet();
+        for (int i=0; i<rows.length; i++) {
+            Integer row = new Integer(rows[i]);
+            newSel.add(row);
+        }
+        // Store a clone of this Set:
+        HashSet tmp = new HashSet(newSel);
+        newSel.removeAll(lastSelection);
+        // Set the new selection as the last:
+        lastSelection = tmp;
+        // We return an appropriate row number if a single additional entry was selected:
+        int result = -1;
+        if (newSel.size()==1)
+            result = ((Integer)newSel.iterator().next()).intValue();
+
+        // .. or if the current selection is only one entry:
+        if ((result<0) && (rows.length == 1))
+            result = rows[0];
+        return result;
+    }
 
       /**
        * A ListSelectionListener for updating the preview panel when the user selects an
@@ -198,30 +271,19 @@ public class EntryTable extends JTable {
                   // putting the updating based on table selection behind it in the event queue.
                   SwingUtilities.invokeLater(new Thread() {
                           public void run() {
+                              // If a single new row was selected, set it as the active row:
+                              activeRow = resolveNewSelection(getSelectedRows());
+
                               if (getSelectedRowCount() == 1) {
-                                  int row = getSelectedRow(); //e.getFirstIndex();
-                                  if (row >= 0) {
-                                      //System.out.println(""+panel.validateEntryEditor());
+                                  //int row = getSelectedRow(); //e.getFirstIndex();
+                                  //if (row >= 0) {
+                                      // Update the value for which entry is shown:
+                                    //  activeRow = row;
 
-                                      /*
-                                       * Can't call validateEntryEditor, before the FocusLost beats us to it and
-                                       * makes the entry editor store its source. So we need to find out if the
-                                       * entry editor is happy. But can we prevent the selection?
-                                       */
-                                      panel.updateViewToSelected();
+                                    panel.updateViewToSelected();
+                                    // guarantee that the the entry is visible
+                                    ensureVisible(activeRow);
 
-                                      // guarantee that the the entry is visible
-                                      ensureVisible(row);
-
-
-                                      //   setRowSelectionInterval(row, row);
-                                      // }
-                                      // else {
-                                      // Oops, an error occured.
-                                      // }
-                                      //panel.database().getEntryById(
-                                      //tableModel.getNameFromNumber(row)));
-                                  }
                               } else {
                                   /* With a multiple selection, there are three alternative behaviours:
                                      1. Disable the entry editor. Do not update it.
@@ -234,6 +296,12 @@ public class EntryTable extends JTable {
                                   if (prefs.getBoolean("disableOnMultipleSelection")) { // 1.
                                       panel.setEntryEditorEnabled(false);
                                   }
+                                  // We want the entry preview to update when the user expands the
+                                  // selection one entry at a time:
+                                  //if ((e.getLastIndex()-e.getFirstIndex()) <= 1) {
+                                  if (activeRow >= 0)
+                                    panel.updateViewToSelected();
+                                  //}
                                   // 2. Do nothing.
                               }
                           }
@@ -262,6 +330,7 @@ public class EntryTable extends JTable {
         // that occurs sometimes (20050405 M. Alver):
         try {
             super.setRowSelectionInterval(row1, row2);
+            activeRow = resolveNewSelection(getSelectedRows());
             selectionListenerOn = oldState;
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
@@ -396,6 +465,12 @@ public class EntryTable extends JTable {
         // A double click on an entry should open the entry's editor.
         if (/*(col == 0)*/!isCellEditable(row, col) && (e.getClickCount() == 2)) {
           try{ panel.runCommand("edit");
+              return;
+              /*showEntry(be);
+
+                    if (splitPane.getBottomComponent() != null) {
+                        new FocusRequester(splitPane.getBottomComponent());
+                    }                                                      */
           } catch (Throwable ex) {
             ex.printStackTrace();
           }
@@ -443,7 +518,7 @@ public class EntryTable extends JTable {
             public void run() {
               panel.output(Globals.lang("External viewer called") + ".");
               BibtexEntry be = panel.database().getEntryById(tableModel.
-                  getNameFromNumber(row));
+                      getIdForRow(row));
               if (be == null) {
                 Globals.logger("Error: could not find entry.");
                 return;
@@ -556,7 +631,7 @@ public class EntryTable extends JTable {
         if (rows.length > 0) {
             bes = new BibtexEntry[rows.length];
             for (int i=0; i<rows.length; i++) {
-                bes[i] = tableModel.db.getEntryById(tableModel.getNameFromNumber(rows[i]));
+                bes[i] = tableModel.db.getEntryById(tableModel.getIdForRow(rows[i]));
             }
         }
         return bes;
@@ -751,6 +826,6 @@ public class EntryTable extends JTable {
       }
 
     }
-    
+
 }
 

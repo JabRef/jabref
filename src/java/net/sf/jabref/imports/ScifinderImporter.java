@@ -73,7 +73,7 @@ public class ScifinderImporter implements ImportFormat {
 			else if (tmp[0].equals("Supplementary Terms")) hm.put("keywords",
 									      tmp[1]);
 			else if (tmp[0].equals("Document Type")) {
-                                if (tmp[1].startsWith("Journal"))
+                                if (tmp[1].startsWith("Journal") || tmp[1].startsWith("Review"))
                                     Type = "article";
                                 else if (tmp[1].equals("Dissertation"))
                                     Type = "phdthesis";

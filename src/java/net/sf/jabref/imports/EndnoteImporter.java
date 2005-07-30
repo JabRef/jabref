@@ -102,19 +102,24 @@ public class EndnoteImporter implements ImportFormat {
 		if (prefix.equals("A")){
 		    if (Author.equals("")) Author = val;
 		    else Author += " and " + val;
-		}else if (prefix.equals("Y")){
+		}else if (prefix.equals("E")){
 		    if (Editor.equals("")) Editor = val;
 		    else Editor += " and " + val;
 		}else if (prefix.equals("T")) hm.put("title", Util
 						     .putBracesAroundCapitals(val));
 		else if (prefix.equals("0")){
 		    if (val.indexOf("Journal") == 0) Type = "article";
+		    else if ((val.indexOf("Book Section") == 0)) Type = "incollection";
 		    else if ((val.indexOf("Book") == 0)
 			     || (val.indexOf("Edited Book") == 0)) Type = "book";
 		    else if (val.indexOf("Conference") == 0) // Proceedings
 			Type = "inproceedings";
 		    else if (val.indexOf("Report") == 0) // Techreport
 			Type = "techreport";
+		    else if (val.indexOf("Review") == 0)
+		        Type = "article";
+		    else if (val.indexOf("Thesis") == 0)
+		        Type = "phdthesis";
 		    else Type = "misc"; //
 		}else if (prefix.equals("7")) hm.put("edition", val);
 		else if (prefix.equals("C")) hm.put("address", val);
@@ -132,8 +137,14 @@ public class EndnoteImporter implements ImportFormat {
 										  "series", val);
 		    else /* if (Type.equals("inproceedings")) */
 			hm.put("booktitle", val);
-		}else if (prefix.equals("I")) hm.put("publisher", val);
-		else if (prefix.equals("P")) hm.put("pages", val);
+		}else if (prefix.equals("I")) {
+		    if (Type.equals("phdthesis"))
+		        hm.put("school", val);
+		    else
+ 		        hm.put("publisher", val);
+		}
+	        // replace single dash page ranges (23-45) with double dashes (23--45):
+		else if (prefix.equals("P")) hm.put("pages", val.replaceAll("([0-9]) *- *([0-9])","$1--$2"));
 		else if (prefix.equals("V")) hm.put("volume", val);
 		else if (prefix.equals("N")) hm.put("number", val);
 		else if (prefix.equals("U")) hm.put("url", val);
@@ -143,6 +154,7 @@ public class EndnoteImporter implements ImportFormat {
 		else if (prefix.equals("9")){
 		    //Util.pr(val);
 		    if (val.indexOf("Ph.D.") == 0) Type = "phdthesis";
+		    if (val.indexOf("Masters") == 0) Type = "mastersthesis";
 		}else if (prefix.equals("F")) hm.put(Globals.KEY_FIELD, Util
 						     .checkLegalKey(val));
 	    }

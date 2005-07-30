@@ -1,14 +1,12 @@
 package net.sf.jabref.imports;
 
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.io.File;
-
 import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
-import java.util.List;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
         ImportInspectionDialog.CallBack {
@@ -79,12 +77,23 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
 
 	    }
 	    else if (bibtexResult != null) {
-		frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), 
-			     bibtexResult.getMetaData(), true);
-		frame.output(Globals.lang("Opened database") + " '" + filename +
-			     "' " + Globals.lang("with") + " " +
-			     bibtexResult.getDatabase() .getEntryCount() + " " +
-			     Globals.lang("entries") + ".");
+            if (!openInNew) {
+                BasePanel panel = (BasePanel)frame.getTabbedPane().getSelectedComponent();
+                try {
+                    panel.mergeFromBibtex(bibtexResult, true, true, false, false);
+                    frame.output(Globals.lang("Imported from database")+" '"+filename+"'");
+                } catch (KeyCollisionException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+		        frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
+			        bibtexResult.getMetaData(), true);
+		        frame.output(Globals.lang("Opened database") + " '" + filename +
+			        "' " + Globals.lang("with") + " " +
+			        bibtexResult.getDatabase() .getEntryCount() + " " +
+			        Globals.lang("entries") + ".");
+            }
 
 	    }
 	    else
@@ -111,4 +120,6 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
     public void stopFetching() {
         // No process to stop.
     }
+
+
 }

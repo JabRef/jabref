@@ -116,11 +116,12 @@ public class AuthorAbbreviator implements LayoutFormatter {
 		    
 		    int i = 0;
 		    
-		    for(i=0;i<nameParts.length;i++) {
-			c = nameParts[i].charAt(0);
+		    for(i=0;i<nameParts.length;i++)
+                if (nameParts[i].length() > 0) {
+			        c = nameParts[i].charAt(0);
 			//			System.out.println("Char c: " + c + " Name: " + nameParts[i]);
-			sb.append(c + ".");								
-		    }
+			        sb.append(c + ".");
+		        }
 		}
 	    }
 	    //Replaces each "part of the name" for the corresponding Letter Dot Space format:

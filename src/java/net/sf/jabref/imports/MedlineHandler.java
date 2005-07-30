@@ -121,8 +121,9 @@ public class MedlineHandler extends DefaultHandler
     }
     String makeBibtexString(){
 		String out  = "";
+                // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
 		out= "article{,\n" + " author = { " + author + " },\n title = { " + title + "},\n journal ={ " + journal + "},\n year = " + year +
-			"},\n volume = { " + volume + "},\n number = { "+ number + "},\n pages = { " + page + "},\n abstract = { " + abstractText + "},\n}";
+			"},\n volume = { " + volume + "},\n number = { "+ number + "},\n pages = { " + fixPageRange(page) + "},\n abstract = { " + abstractText + "},\n}";
 		return out;
     }
     public void endElement( String uri, String localName, String qName ) {
@@ -144,13 +145,12 @@ public class MedlineHandler extends DefaultHandler
 			title=Util.putBracesAroundCapitals(title);
 			//##############################
 			// Sort keywords and remove duplicates. Add pubmedid as keyword (user request)
-                        keyword=Util.sortWordsAndRemoveDuplicates(descriptorName)+", "+pubmedid;
-// 	    Bibitem b =  new Bibitem(author, title, journal,
-// 				     key, year, page, volume,
-// 				     type, series, editor, booktitle,
-// 				     address, number, keyword, url, abstractText.replaceAll("%","\\\\%"), Globals.nextKey(),""+rowNum++ );
-// 	    if(b.getType().length() > 0)
-
+            StringBuffer sb = new StringBuffer(Util.sortWordsAndRemoveDuplicates(descriptorName));
+            if (sb.length()>0)
+                sb.append(", ");
+            sb.append(pubmedid);
+            keyword = sb.toString();
+            
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
 			if (!author.equals("")) { 
@@ -160,7 +160,8 @@ public class MedlineHandler extends DefaultHandler
 			if (!title.equals("")) b.setField("title",title);
 			if (!journal.equals("")) b.setField("journal",journal);
 			if (!year.equals("")) b.setField("year",year);
-			if (!page.equals("")) b.setField("pages",page);
+                        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
+			if (!page.equals("")) b.setField("pages",fixPageRange(page));
 			if (!volume.equals("")) b.setField("volume",volume);
 			if (!abstractText.equals("")) b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
 			if (!keyword.equals("")) b.setField("keywords",keyword);
@@ -175,6 +176,13 @@ public class MedlineHandler extends DefaultHandler
 			if(!pii.equals(""))
 			    b.setField("pii",pii);
 
+                        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
+                        // Older references do not have doi entries, but every
+                        // medline entry has a unique pubmed ID (aka primary ID).
+                        // Add a bibtex field for the pubmed ID for future use.
+                        if (!pubmedid.equals(""))
+                            b.setField("pmid",pubmedid);
+                        
 			bibitems.add( b  );
 
 			abstractText = "";
@@ -260,5 +268,25 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineDate){ MedlineDate += new String(data,start,length);}
 		else if(inDoi){ doi=new String(data,start,length);}
 		else if(inPii){ pii=new String(data,start,length);}
+    }
+
+    // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added fixPageRange method
+    //   Convert medline page ranges from short form to full form.
+    //   Medline reports page ranges in a shorthand format. 
+    //   The last page is reported using only the digits which
+    //   differ from the first page. 
+    //      i.e. 12345-51 refers to the actual range 12345-12351
+    public String fixPageRange(String pageRange) {
+        int minusPos = pageRange.indexOf('-');
+        if (minusPos < 0) {
+            return pageRange;
+        }
+        String first = pageRange.substring(0, minusPos).trim();
+        String last = pageRange.substring(minusPos+1).trim();
+        int llast = last.length(), lfirst = first.length();
+        if (llast < lfirst) {
+            last = first.substring(0, lfirst-llast) + last;
+        }
+        return first + "--" + last;
     }
 }

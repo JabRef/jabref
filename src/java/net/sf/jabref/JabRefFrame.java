@@ -30,11 +30,12 @@
 // modified : r.nagel 23.08.2004
 //               - insert new Menuitem New Database -> New Database from Aux
 // modified : juan 10.02.2005
-//               - insert new Menuitem to the Export menu -> Openoffice 
+//               - insert new Menuitem to the Export menu -> Openoffice
 //                 export filter
 package net.sf.jabref;
 
 import net.sf.jabref.gui.*;
+//import net.sf.jabref.about.*;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.ExpandEndnoteFilters;
@@ -72,6 +73,8 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.GroupSelector;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
+import com.jgoodies.plaf.HeaderStyle;
+import com.jgoodies.plaf.Options;
 
 /**
  * The main window of the application.
@@ -90,7 +93,7 @@ public class JabRefFrame
     public SidePaneManager sidePaneManager;
 
     JTabbedPane tabbedPane = new JTabbedPane();
-  final Insets marg = new Insets(0,0,0,0);
+  final Insets marg = new Insets(1,0,2,0);
   class ToolBar extends JToolBar {
     void addAction(Action a) {
       JButton b = new JButton(a);
@@ -137,7 +140,8 @@ public class JabRefFrame
   // for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
-  public JToggleButton groupToggle, searchToggle, previewToggle;
+  public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,
+      highlightAll;
 
   OpenDatabaseAction
       open = new OpenDatabaseAction(this, true);
@@ -154,9 +158,12 @@ public class JabRefFrame
       contents = new HelpAction("Help contents", helpDiag,
                                 GUIGlobals.helpContents, "Help contents",
                                 GUIGlobals.helpContentsIconFile),
+/* old about*/
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
                              GUIGlobals.aboutIcon),
+/**/
+  //    about2 = new NewAboutAction(),
       editEntry = new GeneralAction("edit", "Edit entry",
                                "Edit entry", GUIGlobals.editIconFile,
                                prefs.getKey("Edit entry")),
@@ -253,6 +260,14 @@ public class JabRefFrame
                                         "Toggle entry preview",
                                         GUIGlobals.previewIconFile,
                                         prefs.getKey("Toggle entry preview")),
+      toggleHighlightAny = new GeneralAction("toggleHighlightGroupsMatchingAny",
+                                        "Highlight groups matching any selected entry",
+                                        "Highlight groups matching any selected entry",
+                                        GUIGlobals.groupsHighlightMatchingAnyFile),
+      toggleHighlightAll = new GeneralAction("toggleHighlightGroupsMatchingAll",
+                                        "Highlight groups matching all selected entries",
+                                        "Highlight groups matching all selected entries",
+                                        GUIGlobals.groupsHighlightMatchingAllFile),
       switchPreview = new GeneralAction("switchPreview",
                                         "Switch preview layout",
                                         prefs.getKey("Switch preview layout")),
@@ -289,8 +304,8 @@ public class JabRefFrame
       exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
-        autoSetPdf = new GeneralAction("autoSetPdf", "Synchronize PDF links"),
-        autoSetPs = new GeneralAction("autoSetPs", "Synchronize PS links"),
+        autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
+        autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
       test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -302,7 +317,7 @@ public class JabRefFrame
     CiteSeerFetcher citeSeerFetcher;
     CiteSeerFetcherPanel citeSeerFetcherPanel;
     SearchManager2 searchManager;
-    GroupSelector groupSelector;
+    public GroupSelector groupSelector;
 
   // The menus for importing/appending other formats
   JMenu importMenu = subMenu("Import and append"),
@@ -314,7 +329,8 @@ public class JabRefFrame
 
   // The action for adding a new entry of unspecified type.
   NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
-  NewEntryAction[] newSpecificEntryAction = new NewEntryAction[] {
+  NewEntryAction[] newSpecificEntryAction = new NewEntryAction[]
+  {
       new NewEntryAction("article", prefs.getKey("New article")),
       new NewEntryAction("book", prefs.getKey("New book")),
       new NewEntryAction("phdthesis", prefs.getKey("New phdthesis")),
@@ -359,14 +375,14 @@ public class JabRefFrame
     initLabelMaker();
 
     sidePaneManager = new SidePaneManager(this);
-    
+
     Globals.sidePaneManager = this.sidePaneManager;
     Globals.helpDiag = this.helpDiag;
 
     medlineFetcher = new MedlineFetcher(sidePaneManager);
     citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
     citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager, (CiteSeerFetcher)citeSeerFetcher);
-    searchManager = new SearchManager2(sidePaneManager);
+    searchManager = new SearchManager2(this, sidePaneManager);
       // Groups
       /*if (metaData.getGroups() != null) {
           panel.groupSelector = new GroupSelector(frame, panel, metaData
@@ -387,6 +403,9 @@ public class JabRefFrame
     //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
 
     sidePaneManager.register("search", searchManager);
+      // Show the search panel if it was visible at last shutdown:
+    if (Globals.prefs.getBoolean("searchPanelVisible"))
+        sidePaneManager.ensureVisible("search");
     sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
     sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
     sidePaneManager.populatePanel();
@@ -414,12 +433,30 @@ public class JabRefFrame
           groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
           searchToggle.setSelected(sidePaneManager.isPanelVisible("search"));
           previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
+          highlightAny.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
+          highlightAll.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
           Globals.focusListener.setFocused(bp.entryTable);
           new FocusRequester(bp.entryTable);
         }
       }
     });
   }
+
+// -------------------- !!!! NECESSARY ???? OBSOLETE ??? ----------------------
+  AboutAction aboutAction = new AboutAction();
+  class AboutAction
+      extends AbstractAction {
+    public AboutAction() {
+      super(Globals.lang("About JabRef"));
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      about();
+    }
+  }
+
+  // -------------------- !!!! NECESSARY ???? OBSOLETE ??? ----------------------
   // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
   // is selected from the application menu.
   public void about() {
@@ -465,12 +502,12 @@ public class JabRefFrame
       AbstractWorker worker = new AbstractWorker() {
               public void run() {
                   output(Globals.lang("Opening preferences..."));
-		  if (prefsDialog == null) {
-		      prefsDialog = new PrefsDialog3(ths, prefs);
-		      Util.placeDialog(prefsDialog, ths);
-		  }
-		  else
-		      prefsDialog.setValues();
+                  if (prefsDialog == null) {
+                      prefsDialog = new PrefsDialog3(ths, prefs);
+                      Util.placeDialog(prefsDialog, ths);
+                  }
+                  else
+                      prefsDialog.setValues();
 
               }
               public void update() {
@@ -533,6 +570,7 @@ public JabRefPreferences prefs() {
       prefs.putInt("posY", ths.getLocation().y);
       prefs.putInt("sizeX", ths.getSize().width);
       prefs.putInt("sizeY", ths.getSize().height);
+      prefs.putBoolean("searchPanelVisible", sidePaneManager.isPanelVisible("search"));
 
       if (prefs.getBoolean("openLastEdited")) {
         // Here we store the names of allcurrent filea. If
@@ -615,7 +653,7 @@ public JabRefPreferences prefs() {
     fillMenu();
     createToolBar();
     getContentPane().setLayout(gbl);
-      contentPane.setDividerSize(1);
+      contentPane.setDividerSize(2);
       contentPane.setBorder(null);
     //getContentPane().setBackground(GUIGlobals.lightGray);
     con.fill = GridBagConstraints.HORIZONTAL;
@@ -706,6 +744,10 @@ public JabRefPreferences prefs() {
     return (BasePanel) tabbedPane.getComponentAt(i);
   }
 
+  public void showBaseAt(int i) {
+      tabbedPane.setSelectedIndex(i);
+  }
+
   /**
    * Returns the currently viewed BasePanel.
    */
@@ -737,7 +779,7 @@ public JabRefPreferences prefs() {
   }
 
   public JTabbedPane getTabbedPane() { return tabbedPane; }
-  
+
   public String getTabTitle(JComponent comp) {
     return tabbedPane.getTitleAt(getTabIndex(comp));
   }
@@ -890,6 +932,8 @@ public JabRefPreferences prefs() {
     }*/
 
   private void fillMenu() {
+    //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+      mb.setBorder(null);
     JMenu file = subMenu("File"),
         edit = subMenu("Edit"),
         bibtex = subMenu("BibTeX"),
@@ -963,6 +1007,9 @@ public JabRefPreferences prefs() {
     view.add(toggleGroups);
     view.add(togglePreview);
     view.add(switchPreview);
+    view.addSeparator();
+    view.add(toggleHighlightAny);
+    view.add(toggleHighlightAll);
     mb.add(view);
 
     bibtex.add(newEntryAction);
@@ -1039,6 +1086,7 @@ public JabRefPreferences prefs() {
     helpMenu.add(help);
     helpMenu.add(contents);
     helpMenu.addSeparator();
+//old about    helpMenu.add(about);
     helpMenu.add(about);
     mb.add(helpMenu);
   }
@@ -1058,7 +1106,8 @@ public JabRefPreferences prefs() {
     }
 
   private void createToolBar() {
-
+    tlb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+    tlb.setBorder(null);
     tlb.setRollover(true);
 
     //tlb.setBorderPainted(true);
@@ -1095,17 +1144,30 @@ public JabRefPreferences prefs() {
         searchToggle.setMargin(marg);
     tlb.add(searchToggle);
 
+    previewToggle = new JToggleButton(togglePreview);
+    previewToggle.setText(null);
+    if (!Globals.ON_MAC)
+        previewToggle.setMargin(marg);
+    tlb.add(previewToggle);
+    tlb.addSeparator();
+
     groupToggle = new JToggleButton(toggleGroups);
     groupToggle.setText(null);
     if (!Globals.ON_MAC)
         groupToggle.setMargin(marg);
     tlb.add(groupToggle);
 
-    previewToggle = new JToggleButton(togglePreview);
-    previewToggle.setText(null);
+
+    highlightAny = new JToggleButton(toggleHighlightAny);
+    highlightAny.setText(null);
     if (!Globals.ON_MAC)
-        previewToggle.setMargin(marg);
-    tlb.add(previewToggle);
+        highlightAny.setMargin(marg);
+    tlb.add(highlightAny);
+    highlightAll = new JToggleButton(toggleHighlightAll);
+    highlightAll.setText(null);
+    if (!Globals.ON_MAC)
+        highlightAll.setMargin(marg);
+    tlb.add(highlightAll);
 
     tlb.addSeparator();
     tlb.addAction(lyxPushAction);
@@ -1242,6 +1304,9 @@ public JabRefPreferences prefs() {
     togglePreview.setEnabled(false);
     dupliCheck.setEnabled(false);
     strictDupliCheck.setEnabled(false);
+    highlightAll.setEnabled(false);
+    highlightAny.setEnabled(false);
+    citeSeerPanelAction.setEnabled(false);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(false);
     }
@@ -1249,6 +1314,11 @@ public JabRefPreferences prefs() {
     plainTextImport.setEnabled(false);
     closeDatabaseAction.setEnabled(false);
     switchPreview.setEnabled(false);
+    integrityCheckAction.setEnabled(false);
+    autoSetPdf.setEnabled(false);
+    autoSetPs.setEnabled(false);
+    toggleHighlightAny.setEnabled(false);
+    toggleHighlightAll.setEnabled(false);
   }
 
     /**
@@ -1295,6 +1365,9 @@ public JabRefPreferences prefs() {
     togglePreview.setEnabled(true);
     dupliCheck.setEnabled(true);
     strictDupliCheck.setEnabled(true);
+    highlightAll.setEnabled(true);
+    highlightAny.setEnabled(true);
+    citeSeerPanelAction.setEnabled(true);
     for (int i = 0; i < newSpecificEntryAction.length; i++) {
       newSpecificEntryAction[i].setEnabled(true);
     }
@@ -1302,6 +1375,11 @@ public JabRefPreferences prefs() {
     plainTextImport.setEnabled(true);
     closeDatabaseAction.setEnabled(true);
     switchPreview.setEnabled(true);
+    integrityCheckAction.setEnabled(true);
+    autoSetPdf.setEnabled(true);
+    autoSetPs.setEnabled(true);
+    toggleHighlightAny.setEnabled(true);
+    toggleHighlightAll.setEnabled(true);
   }
 
     /**
@@ -1361,16 +1439,16 @@ public JabRefPreferences prefs() {
   }
 
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
-	tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
-		       bp);
-	if (raisePanel) {
-	    tabbedPane.setSelectedComponent(bp);
-	}
-	if (tabbedPane.getTabCount() == 1) {
-	    setNonEmptyState();
-	} else if (tabbedPane.getTabCount() == 2) {
-	    setMultiple();
-	}
+        tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
+                       bp);
+        if (raisePanel) {
+            tabbedPane.setSelectedComponent(bp);
+        }
+        if (tabbedPane.getTabCount() == 1) {
+            setNonEmptyState();
+        } else if (tabbedPane.getTabCount() == 2) {
+            setMultiple();
+        }
     }
 
   class SelectKeysAction
@@ -1551,7 +1629,7 @@ class ImportCiteSeerAction
                                                 Globals.lang("CiteSeer Import Error"),
                                                 JOptionPane.WARNING_MESSAGE);
                                         }
-                                        toShow = currentBp.database().getEntryById(currentBp.getTableModel().getNameFromNumber(clickedOn[0]));
+                                        toShow = currentBp.database().getEntryById(currentBp.getTableModel().getIdForRow(clickedOn[0]));
                                         if (clickedOn != null) {
                                                 citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =
@@ -1753,8 +1831,8 @@ class FetchCiteSeerAction
 
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
-	  sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
-	  if (sidePaneManager.isPanelVisible("CiteSeerPanel"))
+          sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
+          if (sidePaneManager.isPanelVisible("CiteSeerPanel"))
           new FocusRequester(citeSeerFetcherPanel.getTextField());
         //}
       }
@@ -1799,19 +1877,6 @@ class FetchCiteSeerAction
     }
   }
 
-  AboutAction aboutAction = new AboutAction();
-  class AboutAction
-      extends AbstractAction {
-    public AboutAction() {
-      super(Globals.lang("About JabRef"));
-
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      about();
-    }
-  }
-
   /**
    * This method does the job of adding imported entries into the active database, or into a new one.
    * It shows the ImportInspectionDialog if preferences indicate it should be used. Otherwise it imports
@@ -1822,9 +1887,12 @@ class FetchCiteSeerAction
    * @param openInNew Should the entries be imported into a new database?
    * @param callBack The callback for the ImportInspectionDialog to use.
    */
-  public void addImportedEntries(BasePanel panel, List entries, String filename, boolean openInNew,
+  public void addImportedEntries(final BasePanel panel, List entries, String filename, boolean openInNew,
                                   ImportInspectionDialog.CallBack callBack) {
-      if (Globals.prefs.getBoolean("useImportInspectionDialog")) {
+      // Use the import inspection dialog if it is enabled in preferences, and (there are more than
+      // one entry or the inspection dialog is also enabled for single entries):
+      if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
+              (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
                 String[] fields = new String[] {"author", "title", "year" };
                 ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel, fields,
                         Globals.lang("Import"), openInNew);
@@ -1833,11 +1901,21 @@ class FetchCiteSeerAction
                 diag.entryListComplete();
                 Util.placeDialog(diag, ths);
                 diag.setVisible(true);
-            } else {
-		        ths.addBibEntries(entries, filename, openInNew);
-           }
+        } else {
+            ths.addBibEntries(entries, filename, openInNew);
+          if ((panel != null) && (entries.size() == 1)) {
+              panel.highlightEntry((BibtexEntry)entries.get(0));
+              SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                        panel.updateViewToSelected();
+                  }
+              });
+
+              //panel.showEntry((BibtexEntry)entries.get(0));
+          }
+       }
   }
-    
+
     /**
      * Adds the entries to the database, possibly checking for duplicates first.
      * @param filename If non-null, a message is printed to the status line describing
@@ -2024,7 +2102,7 @@ class FetchCiteSeerAction
   }
 
     public FileHistory getFileHistory() {
-	return fileHistory;
+        return fileHistory;
     }
 
   JMenuItem
@@ -2070,19 +2148,19 @@ class FetchCiteSeerAction
         }
         else if (source == rtfItem) {
           lfFileName = "harvard";
-	  directory = "harvard";
+          directory = "harvard";
           extension = ".rtf";
         }
        else if (source == endnoteItem) {
           lfFileName = "EndNote";
-	  directory = "endnote";
+          directory = "endnote";
           extension = ".txt";
         }
-	/*    else if (source == openofficeItem) {
-		  lfFileName = "openoffice-csv";
-		  directory = "openoffice";
-		  extension = ".csv";
-		}*/
+        /*    else if (source == openofficeItem) {
+                  lfFileName = "openoffice-csv";
+                  directory = "openoffice";
+                  extension = ".csv";
+                }*/
        else if (source == openofficeItem) {
             lfFileName = "oocalc";
             extension = ".sxc";
@@ -2096,8 +2174,8 @@ class FetchCiteSeerAction
         File outFile = null;
         String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
                                                extension, JFileChooser.SAVE_DIALOG, false);
-	final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
-			 Globals.LAYOUT_PREFIX+directory+"/");
+        final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
+                         Globals.LAYOUT_PREFIX+directory+"/");
 
          if (chosenFile != null)
            outFile = new File(chosenFile);
@@ -2142,11 +2220,11 @@ class FetchCiteSeerAction
     menu.add(rtfItem);
     endnoteItem.addActionListener(listener);
     menu.add(endnoteItem);
-	openofficeItem.addActionListener(listener);
-	menu.add(openofficeItem);
-	
+        openofficeItem.addActionListener(listener);
+        menu.add(openofficeItem);
+
     menu.add(exportCSV);
-    
+
     menu.addSeparator();
     menu.add(expandEndnoteZip);
 
@@ -2182,7 +2260,7 @@ class FetchCiteSeerAction
         //	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
     }
 
-    
+
 
 class SaveSessionAction
       extends MnemonicAwareAction {
@@ -2294,6 +2372,7 @@ class SaveSessionAction
 
   class LoadSessionAction
       extends MnemonicAwareAction {
+      boolean running = false;
     public LoadSessionAction() {
       super(new ImageIcon(GUIGlobals.openIconFile));
       putValue(NAME, "Load session");
@@ -2305,13 +2384,17 @@ class SaveSessionAction
         output(Globals.lang("No saved session found."));
         return;
       }
+      if (running)
+          return;
+      else running = true;
       output(Globals.lang("Loading session..."));
       (new Thread() {
         public void run() {
           HashSet currentFiles = new HashSet();
           if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-              currentFiles.add(baseAt(i).file.getPath());
+                if (baseAt(i).file != null)
+                    currentFiles.add(baseAt(i).file.getPath());
             }
           }
           int i0 = tabbedPane.getTabCount();
@@ -2328,6 +2411,7 @@ class SaveSessionAction
           }
           output(Globals.lang("Files opened") + ": " +
                  (tabbedPane.getTabCount() - i0));
+          running = false;
         }
       }).start();
 
@@ -2442,7 +2526,7 @@ class SaveSessionAction
 
         }
     }
-    
+
   private class MyGlassPane extends JPanel {
 
     public MyGlassPane() {

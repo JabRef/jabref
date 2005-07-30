@@ -6,7 +6,6 @@
 <H1>Searching</H1>
 
 
-
 There are three different search modes in JabRef.
 
 <p>
@@ -54,7 +53,7 @@ Both the field specification and the search term support regular expressions. If
 <p>
 title|keywords = "image processing"
 <p>
-You can use "and", "or", "not", and braces as expected:
+You can use "and", "or", "not", and braces as intuitively expected:
 <p>
 (author = miller or title|keywords = "image processing") and not author = brown
 <p>
@@ -62,20 +61,13 @@ The "=" sign is actually a shorthand for "contains". Searching for an exact matc
 <p>
 entrytype = thesis
 <p>
-This finds entries whose type (as displayed in the "Entrytype" column) contains the word "thesis" (which would be "phdthesis" and "mastersthesis"). 
+This finds entries whose type (as displayed in the "Entrytype" column) contains the word "thesis" (which would be "phdthesis" and "mastersthesis"). Another pseudo field "bibtexkey" allows to search for citation keys, e.g.
+<p>
+bibtexkey = miller2005
 
 <H2>Search settings</H2>
 
- The <em>Settings</em> button opens a menu showing the settings for
- your search. Settings include limiting which fields are searched,
- deciding whether your search string should be interpreted as a
- regular expression, and deciding whether the search should be
- case-sensitive.
-
-<!--
-<p>You can at any time export a <em>bibtex</em> database containing
-only the entries in your currently shown group and/or search, by
-choosing <em>File -> Save special</em> in the menu. -->
+ The <em>Settings</em> button opens a menu that allows to toggle case sensitivity and use of regular expressions in the search, and whether search results should be selected in the table. 
 
 </BODY>
 </HTML>

@@ -30,38 +30,33 @@ package net.sf.jabref;
 import java.util.Comparator;
 import net.sf.jabref.imports.ImportFormatReader;
 
+/**
+ * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef.
+ * It is structured as a node in a linked list of comparators, where each node can contain a link to a
+ * new comparator that decides the ordering (by recursion) if this one can't find a difference. The next
+ * node, if any, is given at construction time, and an arbitrary number of nodes can be included.
+ * If the entries are equal by this comparator, and there is no next entry, the entries' unique IDs will
+ * decide the ordering. Consequently, this comparator can never return 0 unless the entries are the same
+ * object.
+ */
 public class EntryComparator implements Comparator {
 
-    String key, sortField;
-    boolean descending;
+    String sortField;
+    boolean descending, binary=false;
     EntryComparator next;
 
-    public EntryComparator(boolean priDesc, boolean secDesc, boolean terDesc, boolean fourthDesc,
-                           String pri, String sec, String ter, String fourth) {
-        // This constructor creates a three-layered sort rule.
-        next = new EntryComparator(secDesc, terDesc, fourthDesc, sec, ter, fourth); // Secondary sort field.
-        descending = priDesc;
-        sortField = pri;
-
+    public EntryComparator(boolean binary, boolean desc, String field, EntryComparator next) {
+        this.binary = binary;
+        this.sortField = field;
+        this.descending = desc;
+        this.next = next;
     }
 
-    public EntryComparator(boolean priDesc, boolean secDesc, boolean terDesc, String pri, String sec, String ter) {
-        // This constructor creates a three-layered sort rule.
-        next = new EntryComparator(secDesc, terDesc, sec, ter); // Secondary sort field.
-        descending = priDesc;
-        sortField = pri;
-    }
-
-    public EntryComparator(boolean priDesc, boolean secDesc, String pri, String sec) {
-	// This constructor creates a two-layered sort rule.
-	next = new EntryComparator(secDesc, sec); // Secondary sort field.
-	descending = priDesc;
-	sortField = pri;
-    }
-
-    public EntryComparator(boolean priDesc, String pri) {
-	descending = priDesc;
-	sortField = pri;
+    public EntryComparator(boolean binary, boolean desc, String field) {
+        this.binary = binary;
+        this.sortField = field;
+        this.descending = desc;
+        this.next = null;
     }
 
     public int compare(Object o1, Object o2) throws ClassCastException {
@@ -84,7 +79,17 @@ public class EntryComparator implements Comparator {
 	//Util.pr("EntryComparator: "+e1+" : "+e2);
 	Object f1 = e1.getField(sortField),
 	    f2 = e2.getField(sortField);
-	
+
+    if (binary) {
+        // We just separate on set and unset fields:
+        if (f1 != null)
+            return (f2 == null) ? -1 :
+                    (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+        else
+            return (f2 == null) ? (next != null ? next.compare(o1, o2) : idCompare(e1, e2))
+                    : 1;
+    }
+
 	// If the field is author or editor, we rearrange names so they are
 	// sorted according to last name.
 	if (sortField.equals("author") || sortField.equals("editor")) {

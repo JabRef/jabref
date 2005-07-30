@@ -330,6 +330,12 @@ public class GroupsTree extends JTree implements DragSourceListener,
         repaint();
     }
     
+    /** Highlights the specified cells or disables highlight if cells == null */
+    public void setHighlight3Cells(Object[] cells) {
+        cellRenderer.setHighlight3Cells(cells);
+        repaint();
+    }
+    
     /** Sort immediate children of the specified node alphabetically. */
     public void sort(GroupTreeNode node, boolean recursive) {
     	sortWithoutRevalidate(node, recursive);

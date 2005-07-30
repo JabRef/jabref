@@ -27,7 +27,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -50,7 +50,7 @@ public class RightClickMenu extends JPopupMenu
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
         metaData = metaData_;
-
+        
         // Are multiple entries selected?
         boolean multiple = (panel.entryTable.getSelectedRowCount() > 1);
 
@@ -181,32 +181,7 @@ public class RightClickMenu extends JPopupMenu
                     } catch (Throwable ex) {}
                 }
             });
-
-        addSeparator();
-        add(new AbstractAction(Globals.lang("Highlight groups matching any")) // JZTODO lyrics
-                {
-                    public void actionPerformed(ActionEvent e) {
-                        panel.getGroupSelector().showMatchingGroups(
-                                panel.getSelectedEntries(), false);
-                    }
-                });
-        add(new AbstractAction(Globals.lang("Highlight groups matching all")) // JZTODO lyrics
-                {
-                    public void actionPerformed(ActionEvent e) {
-                        panel.getGroupSelector().showMatchingGroups(
-                                panel.getSelectedEntries(), true);
-                    }
-                });
-        add(new AbstractAction(Globals.lang("Clear highlighted groups")) // JZTODO lyrics
-                {
-                    public void actionPerformed(ActionEvent e) {
-                        panel.getGroupSelector().clearHighlightAction.
-                            actionPerformed(null);
-                    }
-                });
-        addSeparator();
-//        add(groupMenu);
-//        add(groupRemoveMenu);
+        addSeparator(); // for "add/move/remove to/from group" entries (appended here)
     }
 
     /**
@@ -463,5 +438,5 @@ public class RightClickMenu extends JPopupMenu
       public void actionPerformed(ActionEvent evt) {
         panel.changeType(type);
       }
-}
+    }
 }

@@ -68,6 +68,7 @@ import java.util.regex.*;
  */
 public class ImportFormatReader {
 
+    public static String BIBTEX_FORMAT = "BibTeX";
     private final static String SPACE_MARKER = "__SPC__";
     private final static Pattern bracketsPattern = Pattern.compile("\\{.*\\}"),
 	spaceMarkerPattern = Pattern.compile(SPACE_MARKER);
@@ -664,7 +665,8 @@ found:
 	    if ((pr.getDatabase().getEntryCount() > 0)
 		|| (pr.getDatabase().getStringCount() > 0)) {
 		entryList = pr;
-		usedFormat = "BibTeX";
+        pr.setFile(new File(filename));
+		usedFormat = BIBTEX_FORMAT;
 	    }
 	} catch (Throwable ex) {
 	    //ex.printStackTrace();

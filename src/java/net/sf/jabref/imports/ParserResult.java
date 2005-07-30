@@ -30,13 +30,14 @@ import java.util.HashMap;
 import java.io.File;
 import net.sf.jabref.*;
 import java.util.Vector;
+import java.util.ArrayList;
 
 public class ParserResult {
 
     private BibtexDatabase base;
     private HashMap metaData, entryTypes;
     private File file = null;
-    private Vector warnings = new Vector();
+    private ArrayList warnings = new ArrayList();
     private String encoding = null; // Which encoding was used?
 
     public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
@@ -85,10 +86,11 @@ public class ParserResult {
     /**
      * Add a parser warning.
      *
-     * @param s String Warning text. Must be pretranslated.
+     * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-      warnings.add(s);
+        if (!warnings.contains(s))
+            warnings.add(s);
     }
 
     public boolean hasWarnings() {
@@ -98,7 +100,7 @@ public class ParserResult {
     public String[] warnings() {
       String[] s = new String[warnings.size()];
       for (int i=0; i<warnings.size(); i++)
-        s[i] = (String)warnings.elementAt(i);
+        s[i] = (String)warnings.get(i);
       return s;
     }
 

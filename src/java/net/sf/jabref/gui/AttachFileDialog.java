@@ -114,7 +114,6 @@ public class AttachFileDialog extends JDialog {
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGridded(download);
         bb.addGridded(auto);
-        //builder.append(Globals.lang("Advanced options for setting..."));
         builder.nextLine();
         builder.append(bb.getPanel());
         builder.nextLine();

@@ -543,7 +543,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 		while (clickedIterator.hasNext() && !abortOperation) {
 			int currentIndex = ((Integer) clickedIterator.next()).intValue();
-			String id =  panel.getTableModel().getNameFromNumber(currentIndex);
+			String id =  panel.getTableModel().getIdForRow(currentIndex);
 			BooleanAssign newValue = new BooleanAssign(false);			
 			BibtexEntry be =
 				(BibtexEntry) panel.getDatabase().getEntryById(id);

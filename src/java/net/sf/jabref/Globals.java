@@ -25,19 +25,17 @@
  */
 package net.sf.jabref;
 
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import javax.swing.JFileChooser;
-import java.util.logging.*;
-import java.io.IOException;
-import java.awt.Font;
-import java.io.*;
-import java.awt.*;
-import javax.swing.*;
-import net.sf.jabref.collab.FileUpdateMonitor;
-import net.sf.jabref.imports.ImportFormatReader;
-import net.sf.jabref.util.*;
+import java.io.* ;
+import java.util.* ;
+import java.util.logging.* ;
+import java.util.logging.Filter ;
+
+import java.awt.* ;
+import javax.swing.* ;
+
+import net.sf.jabref.collab.* ;
+import net.sf.jabref.imports.* ;
+import net.sf.jabref.util.* ;
 
 public class Globals {
 
@@ -87,8 +85,10 @@ public class Globals {
   public static float duplicateThreshold = 0.75f;
   private static Handler consoleHandler = new java.util.logging.ConsoleHandler();
   public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
-      "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257", "ISO8859_2",
-      "ISO8859_4", "ISO8859_5", "ISO8859_7"};
+      "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
+      "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
+      "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
+      "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
 
   // String array that maps from month number to month string label:
   public static String[] MONTHS = new String[] {"jan", "feb", "mar", "apr", "may", "jun",

@@ -28,6 +28,8 @@
 package net.sf.jabref;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -35,7 +37,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 import net.sf.ext.BrowserLauncher;
 import net.sf.jabref.export.LatexFieldFormatter;
@@ -514,6 +519,15 @@ public class Util {
      */
     public static String findPdf(String key, String extension, String directory, OpenFileFilter off) {
         //String filename = key + "."+extension;
+
+        /* Simon Fischer's patch for replacing a regexp in keys before converting to filename:
+
+        String regex = Globals.prefs.get("basenamePatternRegex");
+        if ((regex != null) && (regex.trim().length() > 0)) {
+            String replacement = Globals.prefs.get("basenamePatternReplacement");
+            key = key.replaceAll(regex, replacement);
+        }
+        */
         if (!directory.endsWith(System.getProperty("file.separator"))) directory += System
                 .getProperty("file.separator");
 
@@ -601,6 +615,25 @@ public class Util {
         }else{
             return (req >= threshold);
         }
+    }
+
+    /**
+     * Goes through all entries in the given database, and if at least one of
+     * them is a duplicate of the given entry, as per Util.isDuplicate(BibtexEntry, BibtexEntry),
+     * the duplicate is returned. The search is terminated when the first duplicate is found.
+     *
+     * @param database The database to search.
+     * @param entry The entry of which we are looking for duplicates.
+     * @return The first duplicate entry found. null if no duplicates are found.
+     */
+    public static BibtexEntry containsDuplicate(BibtexDatabase database, BibtexEntry entry) {
+        Collection entries = database.getEntries();
+        for (Iterator i=entries.iterator(); i.hasNext();) {
+            BibtexEntry other = (BibtexEntry)i.next();
+            if (isDuplicate(entry, other, Globals.duplicateThreshold))
+                return other; // Duplicate found.
+        }
+        return null; // No duplicate found.
     }
 
     private static float compareFieldSet(String[] fields, BibtexEntry one,
@@ -899,7 +932,8 @@ public class Util {
         }
         if (sb.length() > 2)
             sb.delete(sb.length()-2, sb.length());
-        return sb.toString();
+        String result = sb.toString();
+        return result.length()>2 ? result : "";
     }
     
     /**
@@ -1019,7 +1053,55 @@ public class Util {
             off = new OpenFileFilter(new String[] { ext });
         return off;
     }
-    
+
+    /**
+     * This method can be used to display a "rich" error dialog which offers the entire
+     * stack trace for an exception.
+     *
+     * @param parent
+     * @param e
+     */
+    public static void showQuickErrorDialog(JFrame parent, String title, Exception e) {
+        // create and configure a text area - fill it with exception text.
+        final JPanel pan = new JPanel(),
+                details = new JPanel();
+        final CardLayout crd = new CardLayout();
+        pan.setLayout(crd);
+        final JTextArea textArea = new JTextArea();
+        textArea.setFont(new Font("Sans-Serif", Font.PLAIN, 10));
+        textArea.setEditable(false);
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        textArea.setText(writer.toString());
+        JLabel lab = new JLabel(e.getMessage());
+        JButton flip = new JButton(Globals.lang("Details"));
+
+        FormLayout layout = new FormLayout("left:pref","");
+	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(Box.createVerticalGlue());
+        builder.nextLine();
+        builder.append(flip);
+        final JPanel simple = builder.getPanel();
+
+        // stuff it in a scrollpane with a controlled size.
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(350, 150));
+        details.setLayout(new BorderLayout());
+        details.add(scrollPane, BorderLayout.CENTER);
+
+        flip.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                crd.show(pan, "details");
+            }
+        });
+        pan.add(simple, "simple");
+        pan.add(details, "details");
+        // pass the scrollpane to the joptionpane.
+        JOptionPane.showMessageDialog(parent, pan, title, JOptionPane.ERROR_MESSAGE);
+    }
+
     public static String wrapHTML(String s, final int lineWidth) {
     	StringBuffer sb = new StringBuffer();
     	StringTokenizer tok = new StringTokenizer(s);
@@ -1052,4 +1134,5 @@ public class Util {
     	}
     	return sb.toString();
     }
+
 }

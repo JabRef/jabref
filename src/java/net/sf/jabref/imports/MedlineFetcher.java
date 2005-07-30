@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -106,6 +108,13 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 	add(main, BorderLayout.CENTER);
 	go.addActionListener(listener);
 	tf.addActionListener(listener);
+        tf.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent event) {
+                if (!event.isTemporary() && (tf.getText().length()>0)) {
+                    tf.selectAll();
+                }
+            }
+        });
     }
     
     public JTextField getTextField() {

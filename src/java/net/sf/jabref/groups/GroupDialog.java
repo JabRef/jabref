@@ -60,11 +60,11 @@ class GroupDialog extends JDialog {
 	private JRadioButton m_searchRadioButton = new JRadioButton(Globals
 			.lang("Dynamically group entries by a free-form search expression"));
 	private JRadioButton m_independentButton = new JRadioButton( // JZTODO lyrics
-			"Independent group: When selected, view only this group's entries");
+			Globals.lang("Independent group: When selected, view only this group's entries"));
 	private JRadioButton m_intersectionButton = new JRadioButton( // JZTODO lyrics
-			"Refine supergroup: When selected, view entries contained in both this group and its supergroup");
+			Globals.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
 	private JRadioButton m_unionButton = new JRadioButton( // JZTODO lyrics
-			"Include subgroups: When selected, view entries contained in this group or its subgroups");
+			Globals.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
 	// for KeywordGroup
 	private JTextField m_kgSearchField = new JTextField(TEXTFIELD_LENGTH);
 	private FieldTextField m_kgSearchTerm = new FieldTextField("keywords", "",
@@ -544,4 +544,5 @@ class GroupDialog extends JDialog {
 			return;
 		}
 	}
+
 }

@@ -282,10 +282,10 @@ public class FileActions
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
 	    String pri, sec, ter;
-	    boolean priD, secD, terD;
+	    boolean priD, secD, terD, priBinary=false;
 	    if (!prefs.getBoolean("saveInStandardOrder")) {
 		// The setting is to save according to the current table order.
-
+            priBinary = prefs.getBoolean("priBinary");
 		pri = prefs.get("priSort");
 		sec = prefs.get("secSort");
 		// sorted as they appear on the screen.
@@ -302,8 +302,12 @@ public class FileActions
 		secD = false;
 		terD = true;
 	    }
-            TreeSet sorter = new TreeSet(new CrossRefEntryComparator
-					 (new EntryComparator(priD, secD, terD, pri, sec, ter)));
+            EntryComparator comp = new EntryComparator(false, false, Globals.KEY_FIELD);
+            comp = new EntryComparator(false, terD, ter, comp);
+            comp = new EntryComparator(false, secD, sec, comp);
+            comp = new EntryComparator(priBinary, priD, pri, comp);
+            TreeSet sorter = new TreeSet(new CrossRefEntryComparator(comp));
+
 	    if ((bes != null) && (bes.length > 0))
 		for (int i=0; i<bes.length; i++) {
 		    sorter.add(bes[i]);
@@ -623,10 +627,10 @@ public class FileActions
      */
     protected static TreeSet getSortedEntries(BibtexDatabase database, Set keySet, boolean isSaveOperation) {
 	String pri, sec, ter;
-	boolean priD, secD, terD;
+	boolean priD, secD, terD, priBinary=false;
         if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
 	    // The setting is to save according to the current table order.
-	    
+	    priBinary = Globals.prefs.getBoolean("priBinary");
 	    pri = Globals.prefs.get("priSort");
 	    sec = Globals.prefs.get("secSort");
 	    // sorted as they appear on the screen.
@@ -643,8 +647,14 @@ public class FileActions
 	    secD = false;
 	    terD = true;
 	}
-	TreeSet sorter = new TreeSet(new CrossRefEntryComparator
-				     (new EntryComparator(priD, secD, terD, false, pri, sec, ter, Globals.KEY_FIELD)));
+
+        EntryComparator comp = new EntryComparator(false, false, Globals.KEY_FIELD);
+        comp = new EntryComparator(false, terD, ter, comp);
+        comp = new EntryComparator(false, secD, sec, comp);
+        comp = new EntryComparator(priBinary, priD, pri, comp);
+        TreeSet sorter = new TreeSet(new CrossRefEntryComparator(comp));
+
+
 	if (keySet == null)
 	    keySet = database.getKeySet();
 	

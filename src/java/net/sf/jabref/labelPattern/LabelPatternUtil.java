@@ -24,9 +24,10 @@ import net.sf.jabref.export.layout.format.RemoveLatexCommands;
  * @author Ulrik Stervbo (ulriks AT ruc.dk)
  */
 public class LabelPatternUtil {
-  //this is SO crappy, but i have no idea of converting unicode into a String
-  // the content of the AL is build with the buildLetters()
-  private static ArrayList letters = builtLetters();
+
+  // All single characters that we can use for extending a key to make it unique:
+  private static String CHARS = "abcdefghijklmnopqrstuvwxyz";
+
   public static ArrayList DEFAULT_LABELPATTERN;
   static {
       updateDefaultPattern();
@@ -329,6 +330,22 @@ public class LabelPatternUtil {
     else {
 
         // The key is already in use, so we must modify it.
+        int number = 0;
+
+        String moddedKey = _label+getAddition(number);
+        occurences = _db.getNumberOfKeyOccurences(moddedKey);
+        if ((oldKey != null) && oldKey.equals(moddedKey))
+            occurences--;
+        while (occurences > 0) {
+            number++;
+            moddedKey = _label+getAddition(number);
+
+            occurences = _db.getNumberOfKeyOccurences(moddedKey);
+            if ((oldKey != null) && oldKey.equals(moddedKey))
+                occurences--;
+        }
+
+        /*
         char c = 'b';
         String modKey = _label + "a";
         occurences = _db.getNumberOfKeyOccurences(modKey);
@@ -342,9 +359,10 @@ public class LabelPatternUtil {
             if ((oldKey != null) && oldKey.equals(modKey))
                 occurences--;
         }
+        */
 
-        if (!modKey.equals(oldKey))  {
-            _db.setCiteKeyForEntry(_entry.getId(), modKey);
+        if (!moddedKey.equals(oldKey))  {
+            _db.setCiteKeyForEntry(_entry.getId(), moddedKey);
         }
     }
 
@@ -353,8 +371,23 @@ public class LabelPatternUtil {
 
   }
 
+    /**
+     * Computes an appendix to a BibTeX key that could make it unique. We use a-z for numbers
+     * 0-25, and then aa-az, ba-bz, etc.
+     * @param number The appendix number.
+     * @return The String to append.
+     */
+    private static String getAddition(int number) {
+        String s = "";
+        if (number >= CHARS.length()) {
+            int lastChar = number % CHARS.length();
+            return getAddition(number/CHARS.length()-1) + CHARS.substring(lastChar, lastChar+1);
+        } else
+            return CHARS.substring(number, number+1);
+    }
 
-  static String getTitleWords(int number, BibtexEntry _entry) {
+
+    static String getTitleWords(int number, BibtexEntry _entry) {
     String ss = (new RemoveLatexCommands()).format(_entry.getField("title").toString());
     StringBuffer _sbvalue = new StringBuffer(),
         current;
@@ -391,32 +424,6 @@ public class LabelPatternUtil {
     return _sbvalue.toString();
   }
 
-  /**
-   * This method returns a truely unique label (in the BibtexDatabase), by taking a
-   * label and add the letters a-z until a unique key is found.
-   * @param key a <code>String</code>
-   * @return a unique label
-   */
-  public static String makeLabelUnique(String key) {
-    // First I tried to make this recursive, but had to give up. I needed to
-    // do too many chacks of different kinds.
-    String _orgLabel = key;
-    String _newLabel = key;
-    int lettersSize = letters.size();
-
-    for (int i = 0; i < lettersSize; i++) {
-      if (isLabelUnique(_newLabel)) {
-        // Hurray! the key is unique! lets get outta here
-        break;
-      }
-      else {
-        // though luck! lets add a new letter...
-        _newLabel = _orgLabel + letters.get(i).toString();
-      }
-    }
-    return _newLabel;
-
-  }
 
   /**
    * Tests whether a given label is unique.
@@ -659,39 +666,4 @@ public class LabelPatternUtil {
     return _pages[1];
   }
 
-  /**
-   * I <b>HATE</b> this method!! I looked and looked but couldn't find a way to
-   * turn 61 (or in real unicode 0061) into the letter 'a' - crap!
-   * @return an <code>ArrayList</code> which shouldn't be!!
-   */
-  private static ArrayList builtLetters() {
-    ArrayList _letters = new ArrayList();
-    _letters.add("a");
-    _letters.add("b");
-    _letters.add("c");
-    _letters.add("d");
-    _letters.add("e");
-    _letters.add("f");
-    _letters.add("g");
-    _letters.add("h");
-    _letters.add("i");
-    _letters.add("j");
-    _letters.add("k");
-    _letters.add("l");
-    _letters.add("m");
-    _letters.add("n");
-    _letters.add("o");
-    _letters.add("p");
-    _letters.add("q");
-    _letters.add("r");
-    _letters.add("s");
-    _letters.add("t");
-    _letters.add("u");
-    _letters.add("v");
-    _letters.add("x");
-    _letters.add("y");
-    _letters.add("z");
-
-    return _letters;
-  }
 }
