@@ -35,7 +35,7 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.*;
-//import net.sf.jabref.about.*;
+import net.sf.jabref.about.*;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.ExpandEndnoteFilters;

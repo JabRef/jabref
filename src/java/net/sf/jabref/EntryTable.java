@@ -58,7 +58,7 @@ public class EntryTable extends JTable {
     JabRefPreferences prefs;
     protected boolean showingSearchResults = false,
         showingGroup = false;
-    private boolean antialiasing = true,
+    private boolean antialiasing = Globals.prefs.getBoolean("antialias"),
         ctrlClick = false,
         selectionListenerOn = true,
         tableColorCodes = true;
@@ -90,7 +90,8 @@ public class EntryTable extends JTable {
         //renderingHints.put(RenderingHints.KEY_RENDERING,
         //		   RenderingHints.VALUE_RENDER_QUALITY);
         prefs = prefs_;
-        antialiasing = prefs.getBoolean("antialias");
+        //antialiasing =
+        //System.out.println(antialiasing);
         ctrlClick = prefs.getBoolean("ctrlClick");
         tableColorCodes = prefs.getBoolean("tableColorCodesOn");
         getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.

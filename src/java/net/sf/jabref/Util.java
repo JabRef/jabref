@@ -393,6 +393,7 @@ public class Util {
             JabRefPreferences prefs) throws IOException {
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")){
+            System.out.println(expandFilename(link, prefs.get(fieldName+"Directory")));
             File file = expandFilename(link, prefs.get(fieldName+"Directory"));
 
             // Check that the file exists:
@@ -544,16 +545,23 @@ public class Util {
      * null if the file does not exist.
      */
     public static File expandFilename(String name, String dir) {
+        System.out.println("expandFilename: name="+name+"\t dir="+dir);
+
         File file = new File(name);
         if (!file.exists() && (dir != null)){
             if (dir.endsWith(System.getProperty("file.separator"))) name = dir
                     + name;
             else name = dir + System.getProperty("file.separator") + name;
+
+            System.out.println("expanded to: "+name);
+            //if (name.startsWith("ftp"))
+
             file = new File(name);
             if (file.exists()) return file;
             // Ok, try to fix / and \ problems:
             if (Globals.ON_WIN) name = name.replaceAll("/", "\\");
             else name = name.replaceAll("\\\\", "/");
+            System.out.println("expandFilename: "+name);
             file = new File(name);
             return (file.exists() ? file : null);
         }else return file;

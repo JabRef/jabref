@@ -59,7 +59,7 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
 
       public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-
+        //System.out.println(antialiasing);
         if (antialiasing) {
             RenderingHints rh = g2.getRenderingHints();
             rh.put(RenderingHints.KEY_ANTIALIASING,

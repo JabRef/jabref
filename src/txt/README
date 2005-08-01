@@ -80,6 +80,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+1.x:    - Fixed bug that made it impossible to disable table antialiasing.
 1.8:    - Search panel now starts visible if it was visible at last shutdown.
         - Added option to disable import inspection window when only one entry is being imported.
         - Fixed parser bug that caused problems for bib files containing extra characters after the
