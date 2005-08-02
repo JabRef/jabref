@@ -80,13 +80,16 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Fixed bug that made it impossible to disable table antialiasing.
+1.x:    - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
+          for presentation and sorting purposes.
+        - Fixed bug that made it impossible to disable table antialiasing.
+        - Fixed AuthorAndsCommaReplacer.
 1.8:    - Search panel now starts visible if it was visible at last shutdown.
         - Added option to disable import inspection window when only one entry is being imported.
         - Fixed parser bug that caused problems for bib files containing extra characters after the
           last entry.
         - Fixed missing month in JStor import.
-	- Fixed some bugs in "new from plain-text" wizard
+	    - Fixed some bugs in "new from plain-text" wizard
 1.8b2:  - Changed handling of external updates so the notification is suppressed when there are
           no actual changes.
         - Changed autodetecting import so BibTeX files are handled more similarly to other formats.

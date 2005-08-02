@@ -94,9 +94,11 @@ public class EntryComparator implements Comparator {
 	// sorted according to last name.
 	if (sortField.equals("author") || sortField.equals("editor")) {
 	    if (f1 != null)
-		f1 = ImportFormatReader.fixAuthor_lastnameFirst((String)f1);
+		f1 = ImportFormatReader.fixAuthorForAlphabetization((String)f1);
+                //ImportFormatReader.fixAuthor_lastnameFirst((String)f1);
 	    if (f2 != null)
-		f2 = ImportFormatReader.fixAuthor_lastnameFirst((String)f2);
+		f2 = ImportFormatReader.fixAuthorForAlphabetization((String)f2);
+                //ImportFormatReader.fixAuthor_lastnameFirst((String)f2);
 	} else if (sortField.equals(GUIGlobals.TYPE_HEADER)) {
           // Sort by type.
           f1 = e1.getType().getName();

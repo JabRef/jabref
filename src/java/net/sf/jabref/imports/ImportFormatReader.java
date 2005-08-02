@@ -98,6 +98,8 @@ public class ImportFormatReader {
     formats.put("ris", new RisImporter());
     formats.put("jstor", new JstorImporter());
     formats.put("silverplatter", new SilverPlatterImporter());
+    formats.put("biomail", new BiomailImporter());
+      
   }
 
     public static void clearNameCache() {
@@ -253,9 +255,9 @@ public class ImportFormatReader {
 
       String in = inOrig;
 
-      // Check if we have cached this particular name string before: 
+      // Check if we have cached this particular name string before:
       Object old = nameCacheLastFirst.get(in); if (old != null) return (String)old;
-      
+
       if (in.indexOf("{") >= 0) {
 	  StringBuffer tmp = new StringBuffer();
 	  int start = -1, end = 0;
@@ -282,78 +284,254 @@ public class ImportFormatReader {
     String[] authors = in.split(" and ");
 
     for (int i = 0; i < authors.length; i++) {
-      authors[i] = authors[i].trim();
-
-      int comma = authors[i].indexOf(",");
-test: 
-      if (comma >= 0) {
-          // There is a comma, so we assume it's ok. Fix it so there is no white
-          // space in front of the comma, and one space after:
-          String[] parts = authors[i].split(",");
-          sb.append(parts[0].trim());
-          for (int part=1; part<parts.length; part++) {
-              sb.append(", ");
-              sb.append(parts[part].trim());
-          }
-          //sb.append(authors[i]);
-      }
-      else {
-        // The name is without a comma, so it must be rearranged.
-        int pos = authors[i].lastIndexOf(' ');
-
-        if (pos == -1) {
-          // No spaces. Give up and just add the name.
-          sb.append(authors[i]);
-
-          break test;
-        }
-
-        String surname = authors[i].substring(pos + 1).trim();
-
-        if (surname.equalsIgnoreCase("jr.")) {
-          pos = authors[i].lastIndexOf(' ', pos - 1);
-
-          if (pos == -1) {
-            // Only last name and jr?
-            sb.append(authors[i]);
-
-            break test;
-          } else
-            surname = authors[i].substring(pos + 1);
-        }
-
-        // Ok, we've isolated the last name. Put together the rearranged name:
-        sb.append(surname + ", ");
-        sb.append(authors[i].substring(0, pos).trim());
-      }
-
-      if (i != (authors.length - 1))
-        sb.append(" and ");
+        authors[i] = authors[i].trim();
+        sb.append(fixSingleAuthor_lastNameFirst(authors[i]));
+        if (i != (authors.length - 1))
+          sb.append(" and ");
     }
 
-    /*
-     * String[] t = authors[i].split(","); if(t.length < 2) { // The name is
-     * without a comma, so it must be rearranged. t = authors[i].split(" "); if
-     * (t.length > 1) { sb.append(t[t.length - 1]+ ","); // Last name for (int
-     * j=0; j <t.length-1; j++) sb.append(" "+t[j]); } else if (t.length > 0)
-     * sb.append(t[0]); } else { // The name is written with last name first, so
-     * it's ok. sb.append(authors[i]); }
-     *
-     * if(i !=authors.length-1) sb.append(" and ");
-     *  }
-     */
-
-    //Util.pr(in+" -> "+sb.toString());
     String fixed = sb.toString();
-
     if (spaceMarkerPattern.matcher(fixed).find())
-	fixed = fixed.replaceAll(SPACE_MARKER, " ");
+    fixed = fixed.replaceAll(SPACE_MARKER, " ");
 
     // Cache this transformation so we don't have to repeat it unnecessarily:
     nameCacheLastFirst.put(inOrig, fixed);
 
     return fixed;
+}
+
+
+public static String fixAuthorForAlphabetization(final String inOrig) {
+
+    String in = inOrig;
+
+    if (in.indexOf("{") >= 0) {
+    StringBuffer tmp = new StringBuffer();
+    int start = -1, end = 0;
+    while ((start = in.indexOf("{", end)) > -1) {
+            tmp.append(in.substring(end, start));
+        end = in.indexOf("}", start);
+        if (end > 0) {
+        tmp.append(in.substring(start, end).replaceAll(" ", SPACE_MARKER));
+        } else if (end < 0) {
+                // The braces are mismatched, so give up this.
+                tmp.append(in.substring(start));
+                break;
+            }
+    }
+    if ((end > 0) && (end < in.length()))
+        tmp.append(in.substring(end));
+
+    in = tmp.toString();
+
+    }
+
+  StringBuffer sb = new StringBuffer();
+
+  String[] authors = in.split(" and ");
+
+  for (int i = 0; i < authors.length; i++) {
+      authors[i] = authors[i].trim();
+      sb.append(getSortableNameForm(authors[i]));
+      if (i != (authors.length - 1))
+        sb.append(" and ");
   }
+
+  String fixed = sb.toString();
+  if (spaceMarkerPattern.matcher(fixed).find())
+  fixed = fixed.replaceAll(SPACE_MARKER, " ");
+
+  return fixed;
+
+}
+    /*
+int comma = authors[i].indexOf(",");
+test: 
+if (comma >= 0) {
+// There is a comma, so we assume it's ok. Fix it so there is no white
+// space in front of the comma, and one space after:
+String[] parts = authors[i].split(",");
+sb.append(parts[0].trim());
+for (int part=1; part<parts.length; part++) {
+sb.append(", ");
+sb.append(parts[part].trim());
+}
+//sb.append(authors[i]);
+}
+else {
+// The name is without a comma, so it must be rearranged.
+int pos = authors[i].lastIndexOf(' ');
+
+if (pos == -1) {
+// No spaces. Give up and just add the name.
+sb.append(authors[i]);
+
+break test;
+}
+
+String surname = authors[i].substring(pos + 1).trim();
+
+if (surname.equalsIgnoreCase("jr.")) {
+pos = authors[i].lastIndexOf(' ', pos - 1);
+
+if (pos == -1) {
+// Only last name and jr?
+sb.append(authors[i]);
+
+break test;
+} else
+surname = authors[i].substring(pos + 1);
+}
+
+// Ok, we've isolated the last name. Put together the rearranged name:
+sb.append(surname + ", ");
+sb.append(authors[i].substring(0, pos).trim());
+}                    */
+
+
+    public static boolean isVonParticle(String name) {
+        return Globals.NAME_PARTICLES.contains(name);
+    }
+
+    /**
+     * Rearranges a single name to "Lastname, Firstname" format. Particles like "von" and
+     * "de la" are considered part of the last name, and placed in front.
+     * @param name The name to rearrange.
+     * @return The rearranged name.
+     */
+    private static String fixSingleAuthor_lastNameFirst(String name) {
+        int commaPos = name.indexOf(',');
+        if (commaPos == -1) {
+            // No comma: name in "Firstname Lastname" form.
+            String[] parts = name.split(" ");
+            int piv = parts.length - 1;
+
+            if (piv < 0)
+                return name; // Empty name...
+
+            StringBuffer sb = new StringBuffer();
+
+            // Add "jr" particle(s) if any:
+            while (Globals.JUNIOR_PARTICLES.contains(parts[piv])) {
+                if (sb.length() > 0)
+                    sb.insert(0, ' ');
+                sb.insert(0, parts[piv]);
+                piv--;
+            }
+
+            // Add the last name:
+            if (sb.length() > 0)
+                sb.insert(0, ' ');
+            sb.insert(0, parts[piv]);
+            piv--;
+
+            // Then add the ones before, as long as they are von particles:
+            while ((piv > 0) && isVonParticle(parts[piv])) {
+                sb.insert(0, ' ');
+                sb.insert(0, parts[piv]);
+                piv--;
+            }
+            // Add a comma, a space and the first name(s):
+            if (piv >= 0)
+                sb.append(",");
+            for (int i=0; i<=piv; i++) {
+                sb.append(' ');
+                sb.append(parts[i]);
+            }
+            return sb.toString();
+        } else {
+            int splitPos = Math.min(name.length()-1, commaPos+1);
+            StringBuffer sb = new StringBuffer(name.substring(0, splitPos));
+            //System.out.println("'"+sb.toString()+"'");
+            String[] restParts = name.substring(splitPos).trim().split(" ");
+            int piv = restParts.length - 1;
+            while ((piv > 0) && isVonParticle(restParts[piv])) {
+                sb.insert(0, ' ');
+                sb.insert(0, restParts[piv]);
+                piv--;
+            }
+            //System.out.println("'"+sb.toString()+"'");
+            for (int i=0; i<=piv; i++) {
+                sb.append(' ');
+                sb.append(restParts[i]);
+            }
+            return sb.toString();
+        }
+
+    }
+
+    /**
+     * Rearranges a single name to sortable "Lastname, Firstname" format.
+     * Particles like "von" and "de la" are placed behind the first name, as they are
+     * not to disturb sorting of names.
+     * @param name The name to rearrange.
+     * @return The rearranged name.
+     */
+    private static String getSortableNameForm(String name) {
+        int commaPos = name.indexOf(',');
+        if (commaPos == -1) {
+            // No comma: name in "Firstname Lastname" form.
+            String[] parts = name.split(" ");
+            int piv = parts.length - 1;
+            if (piv < 0)
+                return name;
+
+            // Count down past "jr" particle(s), if any:
+            while (Globals.JUNIOR_PARTICLES.contains(parts[piv])) {
+                piv--;
+            }
+
+            // Add the last name, including any "jr" particle(s):
+            StringBuffer sb = new StringBuffer(parts[piv]);
+            for (int i=piv+1; i<parts.length; i++) {
+                sb.append(' ');
+                sb.append(parts[i]);
+            }
+
+            piv--;
+
+            // Add a comma, a space and the first name(s):
+            if (piv >= 0)
+                sb.append(",");
+            for (int i=0; i<=piv; i++) {
+                sb.append(' ');
+                sb.append(parts[i]);
+            }
+            return sb.toString();
+        } else {
+            String[] lnParts = name.substring(0, commaPos).split(" ");
+            // Count past any von particles in the last name:
+            int piv = 0;
+            while ((piv < lnParts.length-1) && isVonParticle(lnParts[piv]))
+                piv++;
+
+            // Start building the name, with the last name:
+            StringBuffer sb = new StringBuffer(lnParts[piv]);
+            // Add more lastnames if there are any:
+            for (int i=piv+1; i<lnParts.length; i++) {
+                sb.append(' ');
+                sb.append(lnParts[i]);
+            }
+            // Add a comma:
+            sb.append(',');
+
+            // Add the first name(s):
+            int splitPos = Math.min(name.length()-1, commaPos+1);
+            String[] fnParts = name.substring(splitPos).trim().split(" ");
+            for (int i=0; i<fnParts.length; i++) {
+                sb.append(' ');
+                sb.append(fnParts[i]);
+            }
+            // If we counted past any von particles earlier, add them now:
+            if (piv > 0) for (int i=0; i<piv; i++) {
+                sb.append(' ');
+                sb.append(lnParts[i]);
+            }
+            // Done.
+            return sb.toString();
+        }
+
+    }
 
     /**
      * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.

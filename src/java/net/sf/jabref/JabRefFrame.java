@@ -1204,6 +1204,7 @@ public JabRefPreferences prefs() {
                           RenderingHints.VALUE_ANTIALIAS_ON);
       g2.drawString(label, getWidth() - width - 7, getHeight() - 10);
 
+     
     }
   }
 
@@ -1646,7 +1647,7 @@ class ImportCiteSeerAction
                             }
                         }).start();
                 } else {
-                        JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
+                        JOptionPane.showMessageDialog(tabbedPane.getSelectedComponent(),
                                         Globals.lang("A CiteSeer import operation is currently in progress.") + "  " +
                                         Globals.lang("Please wait until it has finished."),
                                         Globals.lang("CiteSeer Import Error"),
@@ -1718,7 +1719,7 @@ class FetchCiteSeerAction
                                   }
                                 }).start();
                         } else {
-                            JOptionPane.showMessageDialog((BasePanel) tabbedPane.getSelectedComponent(),
+                            JOptionPane.showMessageDialog(tabbedPane.getSelectedComponent(),
                                                 Globals.lang("A CiteSeer fetch operation is currently in progress.") + "  " +
                                                 Globals.lang("Please wait until it has finished."),
                                                 Globals.lang("CiteSeer Fetch Error"),
@@ -1941,11 +1942,6 @@ class FetchCiteSeerAction
     if (prefs.getBoolean("useOwner"))
       Util.setDefaultOwner( bibentries, prefs.get("defaultOwner"));
 
-    // check if bibentries is null
-    if (bibentries == null) {
-      output(Globals.lang("No entries imported."));
-      return 0;
-    }
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.
       BibtexDatabase database = new BibtexDatabase();
@@ -2008,14 +2004,14 @@ class FetchCiteSeerAction
                         (ths, existingEntry, entry, DuplicateResolverDialog.IMPORT_CHECK);
                     drd.setVisible(true);
                     int res = drd.getSelected();
-                    if (res == drd.KEEP_LOWER)   {
+                    if (res == DuplicateResolverDialog.KEEP_LOWER)   {
                         dupli = true;
                     }
-                    else if (res == drd.KEEP_UPPER) {
+                    else if (res == DuplicateResolverDialog.KEEP_UPPER) {
                         database.removeEntry(existingEntry.getId());
                         ce.addEdit(new UndoableRemoveEntry
                                    (database, existingEntry, basePanel));
-                    } else if (res == drd.BREAK) {
+                    } else if (res == DuplicateResolverDialog.BREAK) {
                         break mainLoop;
                     }
                     break loop;
@@ -2171,7 +2167,7 @@ class FetchCiteSeerAction
         //    must provide a Reader for the layout definition.
         // 2. The preferred extension for the layout format.
         // 3. The name of the file to use.
-        File outFile = null;
+        File outFile;
         String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
                                                extension, JFileChooser.SAVE_DIALOG, false);
         final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
@@ -2202,7 +2198,6 @@ class FetchCiteSeerAction
 
       }
     };
-    JMenuItem item;
 
     htmlItem.addActionListener(listener);
     menu.add(htmlItem);
@@ -2335,7 +2330,7 @@ class SaveSessionAction
       //    must provide a Reader for the layout definition.
       // 2. The preferred extension for the layout format.
       // 3. The name of the file to use.
-      File outFile = null;
+      File outFile;
       String chosenFile = Globals.getNewFile(ths, prefs,
                                              new File(prefs.get("workingDirectory")),
                                              extension,
