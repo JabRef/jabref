@@ -12,13 +12,15 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     JPanel pan = new JPanel();
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
+    HelpAction helpAction = new HelpAction(Globals.helpDiag, "PreviewHelp.html");
 
     JTextArea layout1 = new JTextArea("", 1, 1),
     layout2 = new JTextArea("", 1, 1);
     JButton def1 = new JButton(Globals.lang("Default")),
 	    def2 = new JButton(Globals.lang("Default")),
         test1 = new JButton(Globals.lang("Test")),
-        test2 = new JButton(Globals.lang("Test"));
+        test2 = new JButton(Globals.lang("Test")),
+        help = new JButton(Globals.lang("Help"));
     JPanel p1 = new JPanel(),
 	p2 = new JPanel();
     JScrollPane sp1 = new JScrollPane(layout1),
@@ -29,11 +31,12 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	_prefs = prefs;
  	p1.setLayout(gbl);
  	p2.setLayout(gbl);
-	p1.setBorder(BorderFactory.createTitledBorder
-		     (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 1"));
-	p2.setBorder(BorderFactory.createTitledBorder
-		     (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 2"));
-	setLayout(new GridLayout(2,1));
+    help.addActionListener(helpAction);
+    /*p1.setBorder(BorderFactory.createTitledBorder
+              (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 1"));
+     p2.setBorder(BorderFactory.createTitledBorder
+              (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 2")); */
+	setLayout(gbl);//new GridLayout(2,1));
 	JLabel lab;
 	lab = new JLabel(Globals.lang("Preview")+" 1");
 	con.anchor = GridBagConstraints.WEST;
@@ -76,13 +79,37 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	p2.add(test2);
 	gbl.setConstraints(def2, con);
 	p2.add(def2);
-    con.gridwidth = GridBagConstraints.REMAINDER;
+    con.gridwidth = 1;
     pan = new JPanel();
     con.weightx = 1;
     gbl.setConstraints(pan, con);
     p2.add(pan);
-	add(p1);
-	add(p2);
+    con.weightx = 0;
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    gbl.setConstraints(help, con);
+    p2.add(help);
+
+
+    con.weightx=1;
+    con.weighty=0;
+    con.fill=GridBagConstraints.BOTH;
+    con.gridwidth=GridBagConstraints.REMAINDER;
+    lab = new JLabel(Globals.lang("Preview")+" 1");
+    gbl.setConstraints(lab, con);
+    add(lab);
+    con.weighty=1;
+    gbl.setConstraints(p1, con);
+    add(p1);
+    lab = new JLabel(Globals.lang("Preview")+" 2");
+    con.weighty=0;
+    JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+    gbl.setConstraints(sep, con);
+    add(sep);
+    gbl.setConstraints(lab, con);
+    add(lab);
+    con.weighty=1;
+    gbl.setConstraints(p2, con);
+    add(p2);
 
 	def1.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {

@@ -469,9 +469,37 @@ public class BibtexParser
                 value.deleteCharAt(value.length()-1);
                 value.deleteCharAt(0);
             }
+            // Problem: if the field content is "{DNA} blahblah {EPA}", one pair too much will be removed.
+            // Check if this is the case, and re-add as many pairs as needed.
+            while (hasNegativeBraceCount(value.toString())) {
+                value.insert(0, '{');
+                value.append('}');
+            }
+
         }
 	return value.toString();
 
+    }
+
+    /**
+     * Check if a string at any point has had more ending braces (}) than opening ones ({).
+     * Will e.g. return true for the string "DNA} blahblal {EPA"
+     * @param s The string to check.
+     * @return true if at any index the brace count is negative.
+     */
+    private boolean hasNegativeBraceCount(String s) {
+        //System.out.println(s);
+        int i=0, count=0;
+        while (i<s.length()) {
+            if (s.charAt(i) == '{')
+                count++;
+            else if (s.charAt(i) == '}')
+                count--;
+            if (count < 0)
+                return true;
+            i++;
+        }
+        return false;
     }
 
     /**
