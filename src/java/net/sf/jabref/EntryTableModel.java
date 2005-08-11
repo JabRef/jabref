@@ -255,6 +255,7 @@ public class EntryTableModel
     if (getIconTypeForColumn(col) != null) {
       return ICON_COL;
     }
+
     BibtexEntryType type = (db.getEntryById(getIdForRow(row)))
         .getType();
     if (columns[col - padleft].equals(GUIGlobals.KEY_FIELD)

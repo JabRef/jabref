@@ -31,26 +31,34 @@ import java.util.*;
 
 public class EntrySorter implements DatabaseChangeListener {
 
-    TreeSet set;
+    //TreeSet set;
+    ArrayList set;
+    Comparator comp;
     String[] idArray;
     BibtexEntry[] entryArray;
     //static BibtexEntry[] DUMMY = new BibtexEntry[0];
     private boolean outdated = false;
-    private boolean changing = false;
+    private boolean changed = false;
 
     public EntrySorter(Map entries, Comparator comp) {
-	set = new TreeSet(comp);
-	Set keySet = entries.keySet();
-	if (keySet != null) {
-	    Iterator i = keySet.iterator();
-	    while (i.hasNext()) {
-		set.add(entries.get(i.next()));
+	    //set = new TreeSet(comp);
+        set = new ArrayList();
+        this.comp = comp;
+        Set keySet = entries.keySet();
+	    if (keySet != null) {
+    	    Iterator i = keySet.iterator();
+    	    while (i.hasNext()) {
+    		    set.add(entries.get(i.next()));
+            }
+            //Collections.sort(set, comp);
+            changed = true;
+            index();
 	    }
-	    index();
-	}
     }
 
     public void index() {
+
+        /*  Old version, from when set was a TreeSet.
 
         // The boolean "changing" is true in the situation that an entry is about to change,
         // and has temporarily been removed from the entry set in this sorter. So, if we index
@@ -59,8 +67,17 @@ public class EntrySorter implements DatabaseChangeListener {
         // so we have no other choice than to return without indexing.
         if (changing)
             return;
+        */
+
 
         synchronized(set) {
+
+            // Resort if necessary:
+            if (changed) {
+                Collections.sort(set, comp);
+                changed = false;
+            }
+
             // Create an array of IDs for quick access, since getIdAt() is called by
             // getValueAt() in EntryTableModel, which *has* to be efficient.
 
@@ -108,25 +125,46 @@ public class EntrySorter implements DatabaseChangeListener {
         synchronized(set) {
 	        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
 	            set.add(e.getEntry());
+                changed = true;
+                //Collections.sort(set, comp);
+            }
+	        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
+	            set.remove(e.getEntry());
+                changed = true;
+            }
+	        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
+                // Entry changed. Resort list:
+                //Collections.sort(set, comp);
+                changed = true;
+            }
+
+    	}
+
+    }
+
+/* Old version, from when set was a TreeSet.
+
+        public void databaseChanged(DatabaseChangeEvent e) {
+        synchronized(set) {
+	        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
+	            set.add(e.getEntry());
 	        }
 	        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
 	            set.remove(e.getEntry());
 	        }
 	        else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
 	            set.remove(e.getEntry());
-                //System.out.println("CHANGING: "+Thread.currentThread().toString());
-                //Thread.dumpStack();
                 changing = true;
 	        }
 	        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
 	            // Remove and re-add the entry, to make sure it is in the
 	            // correct sort position.
         	    set.add(e.getEntry());
-                //System.out.println("CHANGED: "+e.getEntry().getCiteKey());
                 changing = false;
             }
 
     	}
 
     }
+    */
 }

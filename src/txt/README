@@ -80,9 +80,11 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
+1.x:    - Added Help button in Preferences -> Entry preview
+        - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
           for presentation and sorting purposes. Key generation now should always use the genuine last
           name, and not produce keys like "de2001".
+        - Fixed bug that prevented command line import with explicit format.
         - Fixed bug that made it impossible to disable table antialiasing.
         - Fixed AuthorAndsCommaReplacer.
 1.8:    - Search panel now starts visible if it was visible at last shutdown.

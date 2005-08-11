@@ -85,9 +85,14 @@ public class RightClickMenu extends JPopupMenu
 
         add(new AbstractAction(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile)) {
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        panel.runCommand("delete");
-                    } catch (Throwable ex) {}
+                    /*SwingUtilities.invokeLater(new Runnable () {
+                        public void run() {*/
+                            try {
+                                panel.runCommand("delete");
+                            } catch (Throwable ex) {}
+                        /*}
+                    }); */
+
                 }
             });
             addSeparator();
@@ -161,7 +166,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-        add(new AbstractAction(Globals.lang("Copy \\cite{BibTeX key}"), new ImageIcon(GUIGlobals.copyKeyIconFile)) {
+        add(new AbstractAction(Globals.lang("Copy")+" \\cite{"+Globals.lang("BibTeX key")+"}", new ImageIcon(GUIGlobals.copyKeyIconFile)) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copyCiteKey");

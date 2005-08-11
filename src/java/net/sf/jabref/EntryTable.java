@@ -181,6 +181,7 @@ public class EntryTable extends JTable {
 
         groupsHighlightListener = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+                /*
                 if (Globals.prefs.getBoolean("highlightGroupsMatchingAny"))
                     panel.getGroupSelector().showMatchingGroups(
                             panel.getSelectedEntries(), false);
@@ -189,6 +190,7 @@ public class EntryTable extends JTable {
                             panel.getSelectedEntries(), true);
                 else // no highlight
                     panel.getGroupSelector().showMatchingGroups(null, true);
+                    */
             }
         };
         getSelectionModel().addListSelectionListener(groupsHighlightListener);
@@ -305,6 +307,15 @@ public class EntryTable extends JTable {
                                   //}
                                   // 2. Do nothing.
                               }
+
+                              if (Globals.prefs.getBoolean("highlightGroupsMatchingAny"))
+                                panel.getGroupSelector().showMatchingGroups(
+                                    panel.getSelectedEntries(), false);
+                            else if (Globals.prefs.getBoolean("highlightGroupsMatchingAll"))
+                                panel.getGroupSelector().showMatchingGroups(
+                                    panel.getSelectedEntries(), true);
+                            else // no highlight
+                                panel.getGroupSelector().showMatchingGroups(null, true);
                           }
                       });
               }
@@ -451,8 +462,11 @@ public class EntryTable extends JTable {
       }
       protected void processPopupTrigger(MouseEvent e, int row, int col) {
           int selRow = getSelectedRow();
-          if (selRow == -1 || !isRowSelected(rowAtPoint(e.getPoint())))
+          if (selRow == -1 ||// (getSelectedRowCount() == 0))
+                  !isRowSelected(rowAtPoint(e.getPoint()))) {
             setRowSelectionInterval(row, row);
+            panel.updateViewToSelected();  
+          }
           rightClickMenu = new RightClickMenu(panel, panel.metaData);
           rightClickMenu.show(EntryTable.this, e.getX(), e.getY());
       }

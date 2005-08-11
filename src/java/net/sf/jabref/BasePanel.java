@@ -458,6 +458,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               ensureNotShowing(bes[i]);
                               ce.addEdit(new UndoableRemoveEntry(database, bes[i], BasePanel.this));
                           }
+                          refreshTable();
+                          markBaseChanged();
                           frame.output(Globals.lang("Deleted") + " " +
                                        (bes.length > 1 ? bes.length
                                         + " " + Globals.lang("entries")
@@ -466,8 +468,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           undoManager.addEdit(ce);
                           //entryTable.clearSelection();
 
-                          refreshTable();
-                          markBaseChanged();
+
 
                           // Reselect the entry in the first prev. selected position:
                           if (row0 >= entryTable.getRowCount())

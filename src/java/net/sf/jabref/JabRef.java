@@ -219,6 +219,10 @@ public class JabRef {
                         List entries =
                             Globals.importFormatReader.importFromFile(data[1],
                                 data[0].replaceAll("~", System.getProperty("user.home")));
+                        BibtexDatabase base = ImportFormatReader.createDatabase(entries);
+                        ParserResult pr = new ParserResult(base, null, new HashMap());
+                        loaded.add(pr);
+                        
                     } else {
                         // * means "guess the format":
                         System.out.println(Globals.lang("Importing in unknown format")

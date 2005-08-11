@@ -69,11 +69,6 @@ public class BibtexDatabase
                 throws PropertyVetoException
             {
 		if (pce.getPropertyName() == null)
-		    // A nulled changeevent like this just signals that the entry
-		    // is about to change. The signal enables listeners to
-		    // prepare. This is needed for EntrySorter which must remove
-		    // the entry from its TreeMap before it changes, and re-add it
-		    // afterwards to keep it in the correct sort position.
 		    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
                 else if ("id".equals(pce.getPropertyName()))
                 {
