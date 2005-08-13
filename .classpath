@@ -5,8 +5,6 @@
 	<classpathentry kind="lib" path="lib/aelfred-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/ccl.jar"/>
-	<classpathentry kind="lib" path="lib/commons-httpclient-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/jalopy-1.0b10.jar"/>
 	<classpathentry kind="lib" path="lib/jalopy-ant-0.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/javancss.jar"/>
@@ -26,5 +24,5 @@
 	<classpathentry kind="lib" path="lib/forms-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.9.jar"/>
-	<classpathentry kind="output" path="out"/>
+	<classpathentry kind="output" path="build"/>
 </classpath>
