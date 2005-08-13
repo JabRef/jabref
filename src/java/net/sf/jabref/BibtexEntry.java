@@ -311,7 +311,7 @@ public class BibtexEntry
         out.write("@"+_type.getName().toUpperCase()+"{");
 
         String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
-        out.write(((str == null) ? "" : str.toString())+",\n");
+        out.write(((str == null) ? "" : str.toString())+","+Globals.NEWLINE);
         HashMap written = new HashMap();
         written.put(GUIGlobals.KEY_FIELD, null);
         // Write required fields first.
@@ -339,7 +339,7 @@ public class BibtexEntry
             writeField((String)i.next(),out,ff);
 
         // Finally, end the entry.
-        out.write("}\n");
+        out.write("}"+Globals.NEWLINE);
     }
 
     private void writeField(String name, Writer out,
@@ -356,7 +356,7 @@ public class BibtexEntry
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
             }
             //Util.writeField(name, o, out);
-            out.write(",\n");
+            out.write(","+Globals.NEWLINE);
         }
     }
 

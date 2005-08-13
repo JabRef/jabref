@@ -1,5 +1,7 @@
 package net.sf.jabref.imports;
 
+import net.sf.jabref.Globals;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -10,18 +12,27 @@ import java.util.regex.Matcher;
  */
 public class FieldContentParser {
 
-    private static Pattern wrap = Pattern.compile("\\n\\t");
-
     /**
      * Performs the reformatting
      * @param content StringBuffer containing the field to format.
      * @return The formatted field content. NOTE: the StringBuffer returned may
      * or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer content) {
+    public StringBuffer format(StringBuffer oldContent) {
 
         int prev = -1;
         int i=0;
+
+        // Replace platform-specific newlines by the single \n:
+        StringBuffer content = new StringBuffer(oldContent.toString().replaceAll(Globals.NEWLINE,"\n"));
+
+        /*while (i<content.length()) {
+            if (content.charAt(i) == '\r')
+                content.deleteCharAt(i);
+            else i++;
+        }
+
+        i=0;*/
         while (i<content.length()) {
 
             int c = content.charAt(i);
@@ -126,10 +137,15 @@ public class FieldContentParser {
         for (int i=1; i<lines.length; i++) {
 
             if (!lines[i].trim().equals("")) {
-                res.append("\n\t\n\t");
+                res.append(Globals.NEWLINE);
+                res.append('\t');
+                res.append(Globals.NEWLINE);
+                res.append('\t');
                 addWrappedLine(res, lines[i], wrapAmount);
-            } else
-                res.append("\n\t");
+            } else {
+                res.append(Globals.NEWLINE);
+                res.append('\t');
+            }
         }
         return res.toString();
     }
@@ -146,7 +162,7 @@ public class FieldContentParser {
                 break;
 
             res.deleteCharAt(q);
-            res.insert(q, "\n\t");
+            res.insert(q, Globals.NEWLINE+"\t");
             p = q+1;
 
         }

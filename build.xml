@@ -46,7 +46,7 @@
 
         <!-- some version information -->
         <property name="jabref.bin" value="jabref" />
-        <property name="jabref.version" value="1.8b2" />
+        <property name="jabref.version" value="1.8.1" />
         <property name="jabref.placeholder.version" value="@version@" /> <!-- used by replace task -->
 
 
@@ -118,7 +118,7 @@
         <target name="compile">
                 <mkdir dir="${build.classes}" />
                 <!--deprecation="on"-->
-                <javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+                <javac debug="off" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
                         <src path="${java.dir}"/>
                         <exclude name="tests/**"/>
                         <classpath>

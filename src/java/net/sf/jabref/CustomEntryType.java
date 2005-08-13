@@ -86,7 +86,7 @@ public class CustomEntryType extends BibtexEntryType {
 		sb.append(";");
 	}
 	out.write(sb.toString());
-	out.write("]}\n");
+	out.write("]}"+Globals.NEWLINE);
     }
 
     public static CustomEntryType parseEntryType(String comment) { 

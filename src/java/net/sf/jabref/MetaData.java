@@ -158,7 +158,9 @@ public class MetaData {
                     sb.append(Util.quote((String)orderedData.elementAt(j),";",'\\') 
                             + ";");
                 }
-                sb.append("}\n\n");
+                sb.append("}");
+                sb.append(Globals.NEWLINE);
+                sb.append(Globals.NEWLINE);
             }
             wrapStringBuffer(sb, Globals.METADATA_LINE_LENGTH);
             out.write(sb.toString());
@@ -170,28 +172,34 @@ public class MetaData {
             // write version first
             sb.append("@comment{" + GUIGlobals.META_FLAG + "groupsversion:");
             sb.append(""+VersionHandling.CURRENT_VERSION+";");
-            sb.append("}\n\n");
+            sb.append("}");
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             out.write(sb.toString());
             
             // now write actual groups
             sb = new StringBuffer();
-            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:\n");
+            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
+            sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(),"\n");
+            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(),Globals.NEWLINE);
             while (tok.hasMoreTokens()) {
                 StringBuffer s = 
                     new StringBuffer(Util.quote(tok.nextToken(), ";", '\\') + ";");
                 wrapStringBuffer(s, Globals.METADATA_LINE_LENGTH);
-                sb.append(s + "\n");
+                sb.append(s);
+                sb.append(Globals.NEWLINE);
             }
-            sb.append("}\n\n");
+            sb.append("}");
+            sb.append(Globals.NEWLINE);
+            sb.append(Globals.NEWLINE);
             out.write(sb.toString());
         }
     }
 
     private void wrapStringBuffer(StringBuffer sb, int lineLength) {
         for (int i=lineLength; i<sb.length(); i+=lineLength+1) {
-            sb.insert(i, '\n');
+            sb.insert(i, Globals.NEWLINE);
         }
     }
     

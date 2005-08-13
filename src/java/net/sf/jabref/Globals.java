@@ -132,6 +132,8 @@ public class Globals {
 
   public static String[] SKIP_WORDS = {"a", "an", "the", "for", "on"};
     public static SidePaneManager sidePaneManager;
+  public static final String NEWLINE = System.getProperty("line.separator");
+    
 
     public static void logger(String s) {
     Logger.global.info(s);

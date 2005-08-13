@@ -26,16 +26,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export;
 
-import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.awt.datatransfer.*;
-import java.awt.Toolkit;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -85,7 +81,7 @@ public class FileActions
 	if (preamble != null) {
 	    fw.write("@PREAMBLE{");
 	    fw.write(preamble);
-	    fw.write("}\n\n");
+	    fw.write("}"+Globals.NEWLINE +Globals.NEWLINE);
 	}
     }
 
@@ -98,7 +94,6 @@ public class FileActions
 	for (Iterator i=strings.iterator(); i.hasNext();) {
 	    BibtexString bs = (BibtexString)i.next();
 
-	    //fw.write("@STRING{"+bs.getName()+" = \""+bs.getContent()+"\"}\n\n");
 	    fw.write("@STRING{" + bs.getName() + " = ");
 	    if (!bs.getContent().equals(""))
 		fw.write((new LatexFieldFormatter()).format(bs.getContent(),
@@ -106,7 +101,7 @@ public class FileActions
 	    else fw.write("{}");
 
 	    //Util.writeField(bs.getName(), bs.getContent(), fw) ;
-	    fw.write("}\n\n");
+	    fw.write("}"+Globals.NEWLINE +Globals.NEWLINE);
 	}
     }
 
@@ -142,7 +137,7 @@ public class FileActions
      */
     private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
       out.write(GUIGlobals.SIGNATURE);
-      out.write(" "+GUIGlobals.version+".\n"+GUIGlobals.encPrefix+encoding+"\n\n");
+      out.write(" "+GUIGlobals.version+"."+Globals.NEWLINE +GUIGlobals.encPrefix+encoding+Globals.NEWLINE +Globals.NEWLINE);
     }
 
     /**
@@ -210,7 +205,7 @@ public class FileActions
                 if (write)
                 {
                     be.write(fw, ff, true);
-                    fw.write("\n");
+                    fw.write(Globals.NEWLINE);
                 }
             }
 
@@ -225,7 +220,7 @@ public class FileActions
 		for (Iterator i=types.keySet().iterator(); i.hasNext();) {
 		    CustomEntryType tp = (CustomEntryType)types.get(i.next());
 		    tp.save(fw);
-		    fw.write("\n");
+		    fw.write(Globals.NEWLINE);
 		}
 
 	    }
@@ -328,7 +323,7 @@ public class FileActions
 		}
 
 		be.write(fw, ff, true);
-		fw.write("\n");
+		fw.write(Globals.NEWLINE);
 	    }
 
             // Write meta data.
@@ -342,7 +337,7 @@ public class FileActions
 		for (Iterator i=types.keySet().iterator(); i.hasNext();) {
 		    CustomEntryType tp = (CustomEntryType)types.get(i.next());
 		    tp.save(fw);
-		    fw.write("\n");
+		    fw.write(Globals.NEWLINE);
 		}
 
 	    }
@@ -544,7 +539,7 @@ public class FileActions
 	for (int i=1; i<o.length; i++) {
 	    out.write(SEPARATOR+(String)o[i]);
 	}
-	out.write("\n");
+	out.write(Globals.NEWLINE);
 
 	for (Iterator i=sorted.iterator(); i.hasNext();) {
 	    BibtexEntry entry = (BibtexEntry)i.next();
@@ -553,7 +548,7 @@ public class FileActions
 		out.write(SEPARATOR);
 		writeField(database, entry, (String)o[j], fieldFormatters, out);
 	    }
-	    out.write("\n");
+	    out.write(Globals.NEWLINE);
 	}
 
 
