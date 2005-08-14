@@ -1153,7 +1153,11 @@ public class Util {
     	return sb.toString();
     }
 
-
+    /**
+     * Creates a String containing the current date (and possibly time), formatted
+     * according to the format set in preferences under the key "timeStampFormat".
+     * @return The date string.
+     */
     public static String easyDateFormat () {
         String format = Globals.prefs.get("timeStampFormat");
         Date today = new Date();
@@ -1162,4 +1166,6 @@ public class Util {
         return  datenewformat;
     }
 
+
+   
 }

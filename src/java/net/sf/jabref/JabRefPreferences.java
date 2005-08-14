@@ -249,6 +249,9 @@ public class JabRefPreferences {
         defaults.put("timeStampFormat", "yyyy.MM.dd");
         defaults.put("timeStampField", "timestamp");
 
+        defaults.put("useRemoteServer", Boolean.FALSE);
+        defaults.put("remoteServerPort", new Integer(6050));
+        
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 

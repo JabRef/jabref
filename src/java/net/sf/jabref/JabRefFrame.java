@@ -741,7 +741,7 @@ public JabRefPreferences prefs() {
   /**
    * Returns the currently viewed BasePanel.
    */
-  BasePanel basePanel() {
+  public BasePanel basePanel() {
     return (BasePanel) tabbedPane.getSelectedComponent();
   }
 

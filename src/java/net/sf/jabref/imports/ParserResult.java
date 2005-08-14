@@ -39,11 +39,24 @@ public class ParserResult {
     private File file = null;
     private ArrayList warnings = new ArrayList();
     private String encoding = null; // Which encoding was used?
+    private boolean toOpenTab = false;
 
     public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
 	this.base = base;
 	this.metaData = metaData;
 	this.entryTypes = entryTypes;
+    }
+
+    /**
+     * Check if this base is marked to be added to the currently open tab. Default is false.
+     * @return
+     */
+    public boolean toOpenTab() {
+        return toOpenTab;
+    }
+
+    public void setToOpenTab(boolean toOpenTab) {
+        this.toOpenTab = toOpenTab;
     }
 
     public BibtexDatabase getDatabase() {

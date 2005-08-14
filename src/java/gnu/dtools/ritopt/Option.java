@@ -96,7 +96,7 @@ public abstract class Option implements OptionModifiable {
      * The default width of the option field when the help usage is displayed.
      */
 
-    public static final int DEFAULT_HELP_OPTION_SIZE = 15;
+    public static final int DEFAULT_HELP_OPTION_SIZE = 22;
 
     /**
      * The default width of the type name field when the help usage is
