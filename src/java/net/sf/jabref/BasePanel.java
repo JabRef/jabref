@@ -1528,10 +1528,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             BibtexEntry be = new BibtexEntry(id, type);
             try {
                 database.insertEntry(be);
-            // Create new Bibtex entry
-            // Set owner field to default value
-            if (prefs.getBoolean("useOwner"))
-              be.setField(Globals.OWNER, prefs.get("defaultOwner") );
+
+                // Set owner/timestamp if options are enabled:
+                ArrayList list = new ArrayList();
+                list.add(be);
+                Util.setAutomaticFields(list);
+
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
                 output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "

@@ -245,6 +245,9 @@ public class JabRefPreferences {
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
+        defaults.put("useTimeStamp", Boolean.TRUE);
+        defaults.put("timeStampFormat", "yyyy.MM.dd");
+        defaults.put("timeStampField", "timestamp");
 
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));

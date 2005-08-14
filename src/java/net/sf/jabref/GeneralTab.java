@@ -18,13 +18,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
     defSource, editSource, defSort, ctrlClick, disableOnMultiple,
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, /*preserveFormatting, */useImportInspector,
-    useImportInspectorForSingle, inspectionWarnDupli;
-    private JTextField defOwnerField, fontSize;
+    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
+    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
     encodings = new JComboBox(Globals.ENCODINGS);
-    private HelpAction ownerHelp, pdfHelp;
+    private HelpAction ownerHelp, timeStampHelp;
     private int oldMenuFontSize;
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -43,6 +43,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
+        useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
+            +Globals.lang("Date format")+ ":");
         keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
         keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
@@ -53,8 +55,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
         useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported.")); 
         JPanel general = new JPanel();
         defOwnerField = new JTextField();
+        timeStampFormat = new JTextField();
+        timeStampField = new JTextField();
         ownerHelp = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp,
                 "Help", GUIGlobals.helpSmallIconFile);
+        timeStampHelp = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp, "Help",
+                GUIGlobals.helpSmallIconFile);
         inspectionWarnDupli = new JCheckBox(Globals.lang("Warn about unresolved duplicates when closing inspection window"));
 
         Insets marg = new Insets(0,12,3,0);
@@ -148,11 +154,20 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.nextLine();
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
-                ("left:pref, 8dlu, fill:60dlu, 4dlu, fill:pref", "");
+                ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
         builder2.append(useOwner);
         builder2.append(defOwnerField);
         JButton hlp = new JButton(ownerHelp);
+        hlp.setText(null);
+        hlp.setPreferredSize(new Dimension(24, 24));
+        builder2.append(hlp);
+        builder2.nextLine();
+        builder2.append(useTimeStamp);
+        builder2.append(timeStampFormat);
+        builder2.append(Globals.lang("Field name")+":");
+        builder2.append(timeStampField);
+        hlp = new JButton(timeStampHelp);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
         builder2.append(hlp);
@@ -192,6 +207,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         ctrlClick.setSelected(_prefs.getBoolean("ctrlClick"));
         disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
         useOwner.setSelected(_prefs.getBoolean("useOwner"));
+        useTimeStamp.setSelected(_prefs.getBoolean("useTimeStamp"));
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
         confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
@@ -199,6 +215,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
         defOwnerField.setText(_prefs.get("defaultOwner"));
+        timeStampFormat.setText(_prefs.get("timeStampFormat"));
+        timeStampField.setText(_prefs.get("timeStampField"));
         useImportInspector.setSelected(_prefs.getBoolean("useImportInspectionDialog"));
         useImportInspectorForSingle.setSelected(_prefs.getBoolean("useImportInspectionDialogForSingle"));
         inspectionWarnDupli.setSelected(_prefs.getBoolean("warnAboutDuplicatesInInspection"));
@@ -238,6 +256,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
         _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
+        _prefs.putBoolean("useTimeStamp", useTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
@@ -251,7 +270,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("warnAboutDuplicatesInInspection", inspectionWarnDupli.isSelected());
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
         _prefs.put("defaultOwner", defOwnerField.getText().trim());
-
+        _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
+        _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());
 
         // We want to know if the following setting has been modified:

@@ -118,7 +118,7 @@
         <target name="compile">
                 <mkdir dir="${build.classes}" />
                 <!--deprecation="on"-->
-                <javac debug="off" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+                <javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
                         <src path="${java.dir}"/>
                         <exclude name="tests/**"/>
                         <classpath>

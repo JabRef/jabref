@@ -35,42 +35,31 @@
 package net.sf.jabref;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.about.*;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
 import net.sf.jabref.export.ExpandEndnoteFilters;
 import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.auximport.* ;
 import net.sf.jabref.wizard.auximport.gui.*;
-import net.sf.jabref.wizard.integrity.*;
 
 import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.io.*;
 import java.net.URL;
-import java.util.regex.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.export.ExportCustomizationDialog;
-import net.sf.jabref.export.CustomExportList;
-import javax.swing.text.DefaultEditorKit;
 import java.lang.reflect.*;
 import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.GroupSelector;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import com.jgoodies.plaf.HeaderStyle;
@@ -531,7 +520,7 @@ public JabRefPreferences prefs() {
     boolean close = true;
     Vector filenames = new Vector();
     if (tabbedPane.getTabCount() > 0) {
-      for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+      loop: for (int i = 0; i < tabbedPane.getTabCount(); i++) {
         if (baseAt(i).baseChanged) {
           tabbedPane.setSelectedIndex(i);
           int answer = JOptionPane.showConfirmDialog
@@ -544,6 +533,7 @@ public JabRefPreferences prefs() {
           if ( (answer == JOptionPane.CANCEL_OPTION) ||
               (answer == JOptionPane.CLOSED_OPTION)) {
             close = false; // The user has cancelled.
+              return;
           }
           if (answer == JOptionPane.YES_OPTION) {
             // The user wants to save.
@@ -1938,9 +1928,8 @@ class FetchCiteSeerAction
 
       int addedEntries = 0;
 
-    // Set owner field:
-    if (prefs.getBoolean("useOwner"))
-      Util.setDefaultOwner( bibentries, prefs.get("defaultOwner"));
+    // Set owner and timestamp fields:
+    Util.setAutomaticFields(bibentries);
 
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.

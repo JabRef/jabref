@@ -496,6 +496,10 @@ public class ImportInspectionDialog extends JDialog {
 
                 boolean groupingCanceled = false;
 
+                // Set owner/timestamp if options are enabled:
+                Util.setAutomaticFields(selected);
+
+
                 for (Iterator i = selected.iterator(); i.hasNext();) {
                     BibtexEntry entry = (BibtexEntry) i.next();
                     //entry.clone();

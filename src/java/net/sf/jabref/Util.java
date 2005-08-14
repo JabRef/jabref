@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.text.SimpleDateFormat;
 
 import javax.swing.*;
 import com.jgoodies.forms.layout.FormLayout;
@@ -723,26 +724,35 @@ public class Util {
 
     /**
      * Sets empty or non-existing owner fields of bibtex entries inside an array
-     * to a specified default value.
+     * to a specified default value. Timestamp field is also set. Preferences are
+     * checked to see if these options are enabled.
      * 
-     * @param bibs
-     *            array of bibtex entries
-     * @param defaultOwner
-     *            default owner of bibtex entries
+     * @param bibs List of bibtex entries
+     *
      */
-    public static void setDefaultOwner(List bibs, String defaultOwner) {
+    public static void setAutomaticFields(List bibs) {
 
+        String defaultOwner = Globals.prefs.get("defaultOwner");
+        String timestamp = easyDateFormat();
         // Iterate through all entries
         for (int i = 0; i < bibs.size(); i++){
             // Get current entry
             BibtexEntry curEntry = (BibtexEntry) bibs.get(i);
-            // No or empty owner field?
-            if (curEntry.getField(Globals.OWNER) == null
-                    || ((String) curEntry.getField(Globals.OWNER)).length() == 0){
-                // Set owner field to default value
-                curEntry.setField(Globals.OWNER, defaultOwner);
+
+            // Set owner field if this option is enabled:
+            if (Globals.prefs.getBoolean("useOwner")) {
+                // No or empty owner field?
+                if (curEntry.getField(Globals.OWNER) == null
+                        || ((String) curEntry.getField(Globals.OWNER)).length() == 0){
+                    // Set owner field to default value
+                    curEntry.setField(Globals.OWNER, defaultOwner);
+                }
             }
+
+            if (Globals.prefs.getBoolean("useTimeStamp"))
+                curEntry.setField(Globals.prefs.get("timeStampField"), timestamp);
         }
+
     }
 
     public static void printEntry(BibtexEntry entry) {
@@ -1141,6 +1151,15 @@ public class Util {
     		}
     	}
     	return sb.toString();
+    }
+
+
+    public static String easyDateFormat () {
+        String format = Globals.prefs.get("timeStampFormat");
+        Date today = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        String datenewformat = formatter.format(today);
+        return  datenewformat;
     }
 
 }
