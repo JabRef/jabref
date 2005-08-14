@@ -129,6 +129,14 @@ public class HelpAction extends MnemonicAwareAction {
               Util.pr("9. HelpAction: "+helpFile+" "+helpfile);
     }
 */
+
+    public JButton getIconButton() {
+        JButton hlp = new JButton(this);
+        hlp.setText(null);
+        hlp.setPreferredSize(new Dimension(24, 24));
+        return hlp;
+    }
+
     public void actionPerformed(ActionEvent e) {
 	diag.showPage(helpFile);
     }

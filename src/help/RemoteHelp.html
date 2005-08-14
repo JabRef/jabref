@@ -1,0 +1,25 @@
+<HTML>
+
+<BODY text="#275856">
+<basefont size="4" color="#2F4958" face="arial">
+
+<H1>Remote operation</H1>
+
+This feature can be toggled and configured under <b>Preferences -> Advanced</b>.
+
+<p>If listening for remote operation is enabled, JabRef will at startup attempt to start listening
+to a specific port. This means that other applications can send information to JabRef through
+this port.
+<p>
+It also means that a second JabRef instance will notice that the first one is running, because
+    the port is busy. In this case, unless specifically instructed to run in stand-alone mode,
+    the second JabRef instance will pass its command line options through the port to the first
+    JabRef instance, and then immediately quit.
+
+<p>The first JabRef instance will read the command line options, and perform the indicated actions,
+    such as reading or importing a file, or importing a file to the currently shown database.
+
+
+
+</BODY>
+</HTML>

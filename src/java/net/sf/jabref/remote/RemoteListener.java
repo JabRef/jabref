@@ -29,6 +29,7 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
     private JabRef jabref;
     private ServerSocket socket;
     private boolean active = true, toStop = false;
+    private final String IDENTIFIER = "jabref";
 
     public RemoteListener(JabRef jabref, ServerSocket socket) {
         this.jabref = jabref;
@@ -55,12 +56,19 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                 }
                 //System.out.println("Connection...");
 
+                /*OutputStream out = newSocket.getOutputStream();
+                out.write(IDENTIFIER.getBytes());
+                out.close();
+                System.out.println("aaa");*/
                 InputStream in = newSocket.getInputStream();
+                //System.out.println("aaaa");
                 int c;
                 StringBuffer sb = new StringBuffer();
                 while ((c = in.read()) >= 0) {
                     sb.append((char)c);
                 }
+                //System.out.println("Bbbb");*
+
                 //System.out.println("Received: '"+sb.toString()+"'");
                 String[] args = sb.toString().split("\n");
                 Vector loaded = jabref.processArguments(args, false);
@@ -108,6 +116,16 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
         try {
             InetAddress local = InetAddress.getByName("localhost");
             Socket socket = new Socket(local, Globals.prefs.getInt("remoteServerPort"));
+
+            /*InputStream in = socket.getInputStream();
+            int c;
+            StringBuffer sb = new StringBuffer();
+            while ((c = in.read()) >= 0) {
+                sb.append((char)c);
+            }
+            in.close();
+            System.out.println("Received: "+sb.toString());*/
+
             OutputStream out = socket.getOutputStream();
             for (int i=0; i<args.length; i++) {
                 byte[] bytes = args[i].getBytes();

@@ -15,6 +15,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     HelpDialog helpDiag;
+    HelpAction remoteHelp;
     JPanel pan = new JPanel(),
         lnf = new JPanel();
     JLabel lab;
@@ -32,7 +33,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs = prefs;
 
 
-
+    remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
+                GUIGlobals.helpSmallIconFile);
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
     useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
     remoteServerPort = new JTextField();
@@ -81,6 +83,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel p = new JPanel();
     p.add(useRemoteServer);
     p.add(remoteServerPort);
+    p.add(remoteHelp.getIconButton());
     builder.append(p);
 
     pan = builder.getPanel();
@@ -119,7 +122,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("useRemoteServer", useRemoteServer.isSelected());
         if (useRemoteServer.isSelected() && (JabRef.remoteListener == null)) {
             // Start the listener now.
-            
+
             JabRef.remoteListener = RemoteListener.openRemoteListener(JabRef.ths);
             if (JabRef.remoteListener != null) {
                 JabRef.remoteListener.start();
