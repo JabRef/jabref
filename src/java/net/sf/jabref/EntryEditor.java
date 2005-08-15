@@ -734,7 +734,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       lastSourceAccepted = true;
       updateSource = true;
 
-      panel.refreshTable();
+        panel.tableModel.remap();
+        panel.entryTable.repaint();
+      //panel.refreshTable();
       panel.markBaseChanged();
 
       return true;
