@@ -89,7 +89,7 @@ public class JabRef {
 
 	    // Unless we are alone, try to contact already running JabRef:
 	    if (remoteListener == null) {
-		if (RemoteListener.sendToActiveJabRefInstance(args));
+		if (RemoteListener.sendToActiveJabRefInstance(args))
                 System.exit(0);
 	    }
 	}
@@ -286,7 +286,7 @@ public class JabRef {
         }
 
 
-        if (!initialStartup && !blank.isInvoked() && importToOpenBase.isInvoked()) {
+        if (/*!initialStartup && */!blank.isInvoked() && importToOpenBase.isInvoked()) {
             String[] data = importToOpenBase.getStringValue().split(",");
 
             if (data.length == 1) {
