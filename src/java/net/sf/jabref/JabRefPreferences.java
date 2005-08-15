@@ -424,6 +424,14 @@ public class JabRefPreferences {
         return defKeyBinds;
     }
 
+    public void flush() {
+	try {
+	    prefs.flush();
+	} catch (BackingStoreException ex) {
+	    ex.printStackTrace();
+	}
+    }
+
     /**
      * Stores new key bindings into Preferences, provided they
      * actually differ from the old ones.

@@ -86,13 +86,13 @@ public class JabRef {
                 remoteListener.start();
             }
 
-        }
-        // Unless we are alone, try to contact already running JabRef:
-        if (remoteListener == null) {
-            if (RemoteListener.sendToActiveJabRefInstance(args));
-                System.exit(0);
 
-        }
+	    // Unless we are alone, try to contact already running JabRef:
+	    if (remoteListener == null) {
+		if (RemoteListener.sendToActiveJabRefInstance(args));
+                System.exit(0);
+	    }
+	}
 
         //System.setProperty("sun.awt.noerasebackground", "true");
         
