@@ -18,13 +18,13 @@ public class FieldContentParser {
      * @return The formatted field content. NOTE: the StringBuffer returned may
      * or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer oldContent) {
+    public StringBuffer format(StringBuffer content) {
 
         int prev = -1;
         int i=0;
 
-        // Replace platform-specific newlines by the single \n:
-        StringBuffer content = new StringBuffer(oldContent.toString().replaceAll(Globals.NEWLINE,"\n"));
+        // Remove windows newlines and insert unix ones:
+        content = new StringBuffer(content.toString().replaceAll("\r\n","\n"));
 
         /*while (i<content.length()) {
             if (content.charAt(i) == '\r')

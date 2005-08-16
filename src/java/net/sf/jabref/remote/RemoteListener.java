@@ -6,10 +6,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.imports.ParserResult;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
@@ -50,11 +47,14 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
             try {
                 Socket newSocket = socket.accept();
 
+                newSocket.setSoTimeout(1000);
+
                 if (toStop) {
                     active = false;
                     return;
                 }
-                //System.out.println("Connection...");
+                //byte[] address = socket.getInetAddress().getAddress();
+                //System.out.println("Connection: "+address[0]+" "+address[1]+" "+address[2]+" "+address[3]);
 
                 OutputStream out = newSocket.getOutputStream();
                 InputStream in = newSocket.getInputStream();
@@ -64,37 +64,46 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
 
                 int c;
                 StringBuffer sb = new StringBuffer();
-                while ((c = in.read()) != '\0') {
-                    sb.append((char)c);
-                }
+                try {
+                    while ((c = in.read()) != '\0') {
+                        sb.append((char)c);
+                    }
 
-                String[] args = sb.toString().split("\n");
-                Vector loaded = jabref.processArguments(args, false);
+                    String[] args = sb.toString().split("\n");
+                    Vector loaded = jabref.processArguments(args, false);
 
-                for (int i=0; i<loaded.size(); i++) {
-                    ParserResult pr = (ParserResult) loaded.elementAt(i);
-                    if (!pr.toOpenTab()) {
-                        jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
-                    } else {
-                        // Add the entries to the open tab.
-                        BasePanel panel = jabref.jrf.basePanel();
-                        if (panel == null) {
-                            // There is no open tab to add to, so we create a new tab:
+                    for (int i=0; i<loaded.size(); i++) {
+                        ParserResult pr = (ParserResult) loaded.elementAt(i);
+                        if (!pr.toOpenTab()) {
                             jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
                         } else {
-                            List entries = new ArrayList(pr.getDatabase().getEntries());
-                            jabref.jrf.addImportedEntries(panel, entries, "", false, this);
+                            // Add the entries to the open tab.
+                            BasePanel panel = jabref.jrf.basePanel();
+                            if (panel == null) {
+                                // There is no open tab to add to, so we create a new tab:
+                                jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
+                            } else {
+                                List entries = new ArrayList(pr.getDatabase().getEntries());
+                                jabref.jrf.addImportedEntries(panel, entries, "", false, this);
+                            }
                         }
                     }
+                    in.close();
+                    out.close();
+                    newSocket.close();
+
+                } catch (SocketTimeoutException ex) {
+                    //System.out.println("timeout");
+                    in.close();
+                    out.close();
+                    newSocket.close();
                 }
-                //System.out.println("Loaded: "+loaded.size());
-                in.close();
-                out.close();
-                newSocket.close();
-                //socket.close();
-                //socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"));
+
+
+
             } catch (SocketException ex) {
-                active = false;
+                //active = false;
+                ex.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -103,7 +112,8 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
 
     public static RemoteListener openRemoteListener(JabRef jabref) {
         try {
-            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"));
+            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"), 1,
+                    InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
             RemoteListener listener = new RemoteListener(jabref, socket);
             return listener;
         } catch (IOException e) {

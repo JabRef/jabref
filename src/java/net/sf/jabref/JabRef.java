@@ -90,8 +90,10 @@ public class JabRef {
 	    // Unless we are alone, try to contact already running JabRef:
 	    if (remoteListener == null) {
 		if (RemoteListener.sendToActiveJabRefInstance(args))
-                System.exit(0);
-	    }
+            // We have successfully sent our command line options through the socket to
+            // another JabRef instance. So we assume it's all taken care of, and quit.
+            System.exit(0);
+        }
 	}
 
         //System.setProperty("sun.awt.noerasebackground", "true");
@@ -192,8 +194,6 @@ public class JabRef {
         // that the GUI
         // should not be opened. This is used to decide whether we should show the
         // splash screen or not.
-
-
         if (initialStartup && !disableGui.isInvoked()) {
             try {
 
