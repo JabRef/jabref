@@ -79,15 +79,13 @@ public class JabRef {
         BibtexEntryType.loadCustomEntryTypes(prefs);
         //Globals.turnOnFileLogging();
         Globals.setLanguage(prefs.get("language"), "");
-
         if (Globals.prefs.getBoolean("useRemoteServer")) {
             remoteListener = RemoteListener.openRemoteListener(this);
             if (remoteListener != null) {
                 remoteListener.start();
             }
 
-
-	    // Unless we are alone, try to contact already running JabRef:
+        // Unless we are alone, try to contact already running JabRef:
 	    if (remoteListener == null) {
 		if (RemoteListener.sendToActiveJabRefInstance(args))
             // We have successfully sent our command line options through the socket to
@@ -103,9 +101,9 @@ public class JabRef {
         // files).
         System.runFinalizersOnExit(true);
 
-
         Vector loaded = processArguments(args, true);
         openWindow(loaded);
+        //System.out.println("1");
     }
 
     private void setupOptions() {
@@ -225,17 +223,17 @@ public class JabRef {
         if (!blank.isInvoked() && importFile.isInvoked()) {
             String[] data = importFile.getStringValue().split(",");
 
-            if (data.length == 1) {
+            /*if (data.length == 1) {
                 // Load a bibtex file:
                 ParserResult pr = openBibFile(data[0]);
 
                 if (pr != null)
                     loaded.add(pr);
-            } else if (data.length == 2) {
+            } else if (data.length == 2) {*/
                 // Import a database in a certain format.
                 try {
 
-                    if (!"*".equals(data[1])) {
+                    if ((data.length > 1) && !"*".equals(data[1])) {
                         System.out.println(Globals.lang("Importing") + ": " + data[0]);
                         List entries =
                             Globals.importFormatReader.importFromFile(data[1],
@@ -281,7 +279,7 @@ public class JabRef {
                     System.err.println(Globals.lang("Error opening file") + " '"
                         + data[0] + "': " + ex.getMessage());
                 }
-            }
+
 
         }
 
@@ -289,7 +287,7 @@ public class JabRef {
         if (/*!initialStartup && */!blank.isInvoked() && importToOpenBase.isInvoked()) {
             String[] data = importToOpenBase.getStringValue().split(",");
 
-            if (data.length == 1) {
+            /*if (data.length == 1) {
                 // Load a bibtex file:
                 ParserResult pr = openBibFile(data[0]);
 
@@ -297,11 +295,11 @@ public class JabRef {
                     pr.setToOpenTab(true);
                     loaded.add(pr);
                 }
-            } else if (data.length == 2) {
+            } else if (data.length == 2) {*/
                 // Import a database in a certain format.
                 try {
 
-                    if (!"*".equals(data[1])) {
+                    if ((data.length > 1) && !"*".equals(data[1])) {
                         System.out.println(Globals.lang("Importing") + ": " + data[0]);
                         List entries =
                             Globals.importFormatReader.importFromFile(data[1],
@@ -350,7 +348,7 @@ public class JabRef {
                     System.err.println(Globals.lang("Error opening file") + " '"
                         + data[0] + "': " + ex.getMessage());
                 }
-            }
+
 
         }
         //Util.pr(": Finished import");

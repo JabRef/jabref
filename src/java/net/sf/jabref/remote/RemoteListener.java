@@ -65,10 +65,12 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                 int c;
                 StringBuffer sb = new StringBuffer();
                 try {
-                    while ((c = in.read()) != '\0') {
+                    while (((c = in.read()) != '\0') && (c >= 0)) {
                         sb.append((char)c);
                     }
-
+                    if (sb.length() == 0) {
+                        continue;
+                    }
                     String[] args = sb.toString().split("\n");
                     Vector loaded = jabref.processArguments(args, false);
 
@@ -102,8 +104,8 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
 
 
             } catch (SocketException ex) {
-                //active = false;
-                ex.printStackTrace();
+                active = false;
+                //ex.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -112,12 +114,15 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
 
     public static RemoteListener openRemoteListener(JabRef jabref) {
         try {
-            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"), 1,
-                    InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
+            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"));//, 1,
+                    //InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
             RemoteListener listener = new RemoteListener(jabref, socket);
             return listener;
         } catch (IOException e) {
+            if (!e.getMessage().startsWith("Address already in use"))
+                e.printStackTrace();
             return null;
+
         }
 
     }
@@ -131,17 +136,22 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
         try {
             InetAddress local = InetAddress.getByName("localhost");
             Socket socket = new Socket(local, Globals.prefs.getInt("remoteServerPort"));
+            socket.setSoTimeout(2000);
 
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
             int c;
             StringBuffer sb = new StringBuffer();
-            while ((c = in.read()) != '\0') {
-                sb.append((char)c);
+            try {
+                while (((c = in.read()) != '\0') && (c >= 0)) {
+                    sb.append((char)c);
+                }
+            } catch (SocketTimeoutException ex) {
+                 System.out.println("Connection timed out.");
             }
 
             if (!IDENTIFIER.equals(sb.toString())) {
-                String error = Globals.lang("Cannot use port %0 for remote operation; another"
+                String error = Globals.lang("Cannot use port %0 for remote operation; another "
                     +"application may be using it. Try specifying another port.",
                         new String[] {String.valueOf(Globals.prefs.getInt("remoteServerPort"))});
                 System.out.println(error);
@@ -159,7 +169,8 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
             out.close();
             socket.close();
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

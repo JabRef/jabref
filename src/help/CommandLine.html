@@ -35,8 +35,10 @@ This option causes JabRef to load the saved session, if any, before opening the 
 
 <H2>Import file: -i filename[,format]</H2>
 
-This option causes JabRef to import or load the specified file. If only a filename is specified, it will
-be loaded as a BibTeX file. If the filename is followed by a comma and an import format, the given import
+This option causes JabRef to import or load the specified file. If only a filename is specified, or
+the filename is followed by a comma and a * character, JabRef will attempt to detect the file format
+automatically. This should work for all BibTeX files and files in any import format supported by JabRef.
+If the filename is followed by a comma and the name of an import format, the given import
 filter will be used. Use the <code>-h</code> option to get a list of availiable import formats.
 
 <P>If an output option is also specified, an import will always be processed before it, and the imported or

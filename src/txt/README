@@ -87,6 +87,7 @@ Change log:
         - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
           for presentation and sorting purposes. Key generation now should always use the genuine last
           name, and not produce keys like "de2001".
+        - Fixed bug that made regexp search fail for fields containing newline characters.
         - Fixed platform-dependent handling of newline characters.
         - Fixed bug that prevented command line import with explicit format.
         - Fixed bug that made it impossible to disable table antialiasing.
