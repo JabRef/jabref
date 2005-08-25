@@ -114,8 +114,8 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
 
     public static RemoteListener openRemoteListener(JabRef jabref) {
         try {
-            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"));//, 1,
-                    //InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
+            ServerSocket socket = new ServerSocket(Globals.prefs.getInt("remoteServerPort"), 1,
+                    InetAddress.getByAddress(new byte[] {127, 0, 0, 1}));
             RemoteListener listener = new RemoteListener(jabref, socket);
             return listener;
         } catch (IOException e) {

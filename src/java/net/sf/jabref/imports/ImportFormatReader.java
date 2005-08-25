@@ -632,7 +632,15 @@ sb.append(authors[i].substring(0, pos).trim());
     // Temporary (old method):
     //FileLoader fl = new FileLoader();
     //BibtexDatabase db = fl.load(fileToOpen.getPath());
+
+    // First we make a quick check to see if this looks like a BibTeX file:
     Reader reader = getReader(fileToOpen, encoding);
+    if (!BibtexParser.isRecognizedFormat(reader))
+        return null;
+
+    // The file looks promising. Reinitialize the reader and go on:
+    reader = getReader(fileToOpen, encoding);
+
     String suppliedEncoding = null;
     StringBuffer headerText = new StringBuffer();
     try {

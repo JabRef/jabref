@@ -55,6 +55,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
 
   public boolean accept(String filenm){
 
+    filenm = filenm.toLowerCase();
     int dotPos = filenm.lastIndexOf(".");
 
     if (dotPos==-1)

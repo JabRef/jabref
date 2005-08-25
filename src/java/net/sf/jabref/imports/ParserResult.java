@@ -34,6 +34,7 @@ import java.util.ArrayList;
 
 public class ParserResult {
 
+    public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     private BibtexDatabase base;
     private HashMap metaData, entryTypes;
     private File file = null;

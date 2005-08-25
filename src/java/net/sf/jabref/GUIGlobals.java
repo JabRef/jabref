@@ -30,10 +30,7 @@
 
 package net.sf.jabref;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
 import java.awt.*;
-import javax.swing.KeyStroke;
 import java.util.*;
 import java.net.URL;
 import javax.swing.*;
@@ -455,7 +452,9 @@ public class GUIGlobals {
     return false;
   }
 
-  public static double DEFAULT_FIELD_WEIGHT = 1;
+  public static double DEFAULT_FIELD_WEIGHT = 1,
+        MAX_FIELD_WEIGHT = 2;
+
   public static Double
       SMALL_W = new Double(0.30),
       MEDIUM_W = new Double(0.5),
@@ -519,39 +518,39 @@ public class GUIGlobals {
     fieldLength.put("citeseercitationcount", new Integer(75));
     fieldLength.put(NUMBER_COL, new Integer(32));
 
-    Map fieldWeight = new HashMap();
-    fieldWeight.put("author", MEDIUM_W);
-    fieldWeight.put("year", SMALL_W);
-    fieldWeight.put("pages", SMALL_W);
-    fieldWeight.put("month", SMALL_W);
-    fieldWeight.put("url", SMALL_W);
-    fieldWeight.put("citeseerurl", SMALL_W);
-    fieldWeight.put("crossref", SMALL_W);
-    fieldWeight.put("note", MEDIUM_W);
-    fieldWeight.put("publisher", MEDIUM_W);
-    fieldWeight.put("journal", SMALL_W);
-    fieldWeight.put("volume", SMALL_W);
-    fieldWeight.put("edition", SMALL_W);
-    fieldWeight.put("keywords", SMALL_W);
-    fieldWeight.put("doi", SMALL_W);
-    fieldWeight.put("eid", SMALL_W);
-    fieldWeight.put("pdf", SMALL_W);
-    fieldWeight.put("number", SMALL_W);
-    fieldWeight.put("chapter", SMALL_W);
-    fieldWeight.put("editor", MEDIUM_W);
-    fieldWeight.put("series", SMALL_W);
-    fieldWeight.put("type", SMALL_W);
-    fieldWeight.put("address", SMALL_W);
-    fieldWeight.put("howpublished", MEDIUM_W);
-    fieldWeight.put("institution", MEDIUM_W);
-    fieldWeight.put("organization", MEDIUM_W);
-    fieldWeight.put("school", MEDIUM_W);
-    fieldWeight.put("comment", MEDIUM_W);
-    fieldWeight.put("abstract", LARGE_W);
-    fieldWeight.put("annote", MEDIUM_W);
-    fieldWeight.put("citeseercitationcount", SMALL_W);
+    FIELD_WEIGHT = new HashMap();
+    FIELD_WEIGHT.put("author", MEDIUM_W);
+    FIELD_WEIGHT.put("year", SMALL_W);
+    FIELD_WEIGHT.put("pages", SMALL_W);
+    FIELD_WEIGHT.put("month", SMALL_W);
+    FIELD_WEIGHT.put("url", SMALL_W);
+    FIELD_WEIGHT.put("citeseerurl", SMALL_W);
+    FIELD_WEIGHT.put("crossref", SMALL_W);
+    FIELD_WEIGHT.put("note", MEDIUM_W);
+    FIELD_WEIGHT.put("publisher", MEDIUM_W);
+    FIELD_WEIGHT.put("journal", SMALL_W);
+    FIELD_WEIGHT.put("volume", SMALL_W);
+    FIELD_WEIGHT.put("edition", SMALL_W);
+    FIELD_WEIGHT.put("keywords", SMALL_W);
+    FIELD_WEIGHT.put("doi", SMALL_W);
+    FIELD_WEIGHT.put("eid", SMALL_W);
+    FIELD_WEIGHT.put("pdf", SMALL_W);
+    FIELD_WEIGHT.put("number", SMALL_W);
+    FIELD_WEIGHT.put("chapter", SMALL_W);
+    FIELD_WEIGHT.put("editor", MEDIUM_W);
+    FIELD_WEIGHT.put("series", SMALL_W);
+    FIELD_WEIGHT.put("type", SMALL_W);
+    FIELD_WEIGHT.put("address", SMALL_W);
+    FIELD_WEIGHT.put("howpublished", MEDIUM_W);
+    FIELD_WEIGHT.put("institution", MEDIUM_W);
+    FIELD_WEIGHT.put("organization", MEDIUM_W);
+    FIELD_WEIGHT.put("school", MEDIUM_W);
+    FIELD_WEIGHT.put("comment", MEDIUM_W);
+    FIELD_WEIGHT.put("abstract", LARGE_W);
+    FIELD_WEIGHT.put("annote", MEDIUM_W);
+    FIELD_WEIGHT.put("citeseercitationcount", SMALL_W);
 
-    FIELD_WEIGHT = Collections.unmodifiableMap(fieldWeight);
+    //FIELD_WEIGHT = Collections.unmodifiableMap(FIELD_WEIGHT);
   };
 
   /*
@@ -570,6 +569,10 @@ public class GUIGlobals {
       l = ( (Double) o).doubleValue();
     }
     return l;
+  }
+
+  public static void setFieldWeight(String fieldName, double weight) {
+      FIELD_WEIGHT.put(fieldName, new Double(weight));
   }
 
   /** returns the path to language independent help files */

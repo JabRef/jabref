@@ -49,6 +49,7 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.util.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.FieldWeightDialog;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
@@ -1015,31 +1016,28 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                      filepath = link.toString();
                    }
                    else {
+
                      // see if we can fall back to a filename based on the bibtex key
                      String basefile;
                      Object key = bes[0].getField(Globals.KEY_FIELD);
                      if (key != null) {
                        basefile = key.toString();
-                       String dir = prefs.get("pdfDirectory");
-                       if (dir.endsWith(System.getProperty("file.separator"))) {
-                         basefile = dir + basefile;
-                       }
-                       else {
-                         basefile = dir + System.getProperty("file.separator") +
-                             basefile;
-                       }
-                       final String[] typesToTry = new String[] {
-                           "html", "ps", "pdf"};
-                       for (int i = 0; i < typesToTry.length; i++) {
-                         File f = new File(basefile + "." + typesToTry[i]);
-                         if (f.exists()) {
-                           field = typesToTry[i];
-                           filepath = f.getPath();
-                           break;
-                         }
-                       }
+                        final String[] types = new String[] {"pdf", "ps"};
+                        final String sep = System.getProperty("file.separator");
+                        for (int i = 0; i < types.length; i++) {
+                            String dir = prefs.get(types[i]+"Directory");
+                            if (dir.endsWith(sep)) {
+                                dir = dir.substring(0, dir.length()-sep.length());
+                            }
+                            String found = Util.findPdf(basefile, types[i], dir, new OpenFileFilter("."+types[i]));
+                            if (found != null) {
+                                filepath = dir+sep+found;
+                                break;
+                            }
+                        }
                      }
                    }
+
 
                    if (filepath != null) {
                      //output(Globals.lang("Calling external viewer..."));
@@ -1410,7 +1408,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
               actions.put("test", new AbstractWorker() {
         	      public void init() {
-                    output("Downloading.");
+                      new FieldWeightDialog(frame).setVisible(true);
+                    //output("Downloading.");
 		          }
 		          public void run() {
                     //net.sf.jabref.journals.JournalList.downloadJournalList(frame);

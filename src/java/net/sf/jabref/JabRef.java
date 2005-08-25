@@ -207,21 +207,33 @@ public class JabRef {
         //Util.pr("JabRef "+GUIGlobals.version);
         // Vector to put imported/loaded database(s) in.
         Vector loaded = new Vector();
-
+        Vector toImport = new Vector();
         if (!blank.isInvoked() && (leftOver.length > 0))  {
             for (int i = 0; i < leftOver.length; i++) {
                 // Leftover arguments are interpreted as bib files to open.
+
                 ParserResult pr = openBibFile(leftOver[i]);
 
-                if (pr != null)
-                    loaded.add(pr);
+                if (pr != null) {
+                    if (pr == ParserResult.INVALID_FORMAT)
+                        // We will try to import this file instead:
+                        toImport.add(leftOver[i]);
+                    else
+                        loaded.add(pr);
+                } else {
+
+                }
             }
         }
 
         //Util.pr(": Checked blank");
 
         if (!blank.isInvoked() && importFile.isInvoked()) {
-            String[] data = importFile.getStringValue().split(",");
+            toImport.add(importFile.getStringValue());
+        }
+
+        if (toImport.size() > 0) for (int i=0; i<toImport.size(); i++) {
+            String[] data = ((String)toImport.elementAt(i)).split(",");
 
             /*if (data.length == 1) {
                 // Load a bibtex file:
@@ -252,7 +264,10 @@ public class JabRef {
                                 .replaceAll("~", System.getProperty("user.home")));
                         String formatName = (String) o[0];
 
-                        if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
+                        if (formatName == null) {
+                            System.err.println(Globals.lang("Error opening file")+" '"+data[0]+"'");    
+                        }
+                        else if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
                             ParserResult pr = (ParserResult)o[1];
                             loaded.add(pr);  
 
@@ -695,6 +710,8 @@ lastEdLoop:
             File file = new File(name);
             String encoding = Globals.prefs.get("defaultEncoding");
             ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
+            if (pr == null)
+                return ParserResult.INVALID_FORMAT;
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 String[] warn = pr.warnings();

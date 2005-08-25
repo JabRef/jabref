@@ -39,7 +39,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     private HashMap textFields = new HashMap();
 
 	private JabRefPreferences _prefs;
-	private LabelPattern _keypatterns;
+	private LabelPattern _keypatterns = null;
 	
     private JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys")),
         warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
@@ -62,7 +62,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	 */
 	public TabLabelPattern(JabRefPreferences prefs, HelpDialog helpDiag) {
 		_prefs = prefs;
-		_keypatterns = _prefs.getKeyPattern();
+		//_keypatterns = _prefs.getKeyPattern();
 		help = new HelpAction(helpDiag, GUIGlobals.labelPatternHelp,
 				      "Help on key patterns");
 		buildGUI();
@@ -102,23 +102,6 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    }
 
 	    _prefs.putKeyPattern(_keypatterns);
-
-		/*
-		_keypatterns.addLabelPattern("article", 			txtArticle.getText());
-		_keypatterns.addLabelPattern("book", 					txtBook.getText());
-		_keypatterns.addLabelPattern("booklet", 			txtBooklet.getText());
-		_keypatterns.addLabelPattern("conference", 		txtConference.getText());
-		_keypatterns.addLabelPattern("inbook", 				txtInbook.getText());
-		_keypatterns.addLabelPattern("incollection", 	txtIncollection.getText());
-		_keypatterns.addLabelPattern("inproceedings",	txtInproceedings.getText());
-		_keypatterns.addLabelPattern("manual", 				txtManual.getText());
-		_keypatterns.addLabelPattern("mastersthesis",	txtMastersthesis.getText());
-		_keypatterns.addLabelPattern("misc",					txtMisc.getText());
-		_keypatterns.addLabelPattern("phdthesis", 		txtPhdthesis.getText());
-		_keypatterns.addLabelPattern("proceedings", 	txtProceedings.getText());
-		_keypatterns.addLabelPattern("techreport", 		txtTechreport.getText());
-		_keypatterns.addLabelPattern("unpublished", 	txtUnpublished.getText());
-		*/		
 
 	}
 	
@@ -165,8 +148,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     private void setValue(JTextField tf, String fieldName) {
         if (_keypatterns.isDefaultValue(fieldName))
             tf.setText("");
-        else
+        else {
+            //System.out.println(":: "+_keypatterns.getValue(fieldName).get(0).toString());
             tf.setText(_keypatterns.getValue(fieldName).get(0).toString());
+        }
     }
 
 	/**
@@ -390,14 +375,15 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     }
 
     public void setValues() {
+        _keypatterns = _prefs.getKeyPattern();
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
         dontOverwrite.setSelected(Globals.prefs.getBoolean("avoidOverwritingKey"));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
 	    for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
-    	    String name = (String)i.next();
-    	    JTextField tf = (JTextField)textFields.get(name);
+            String name = (String)i.next();
+            JTextField tf = (JTextField)textFields.get(name);
     	    setValue(tf, name);
     	}
 

@@ -456,11 +456,9 @@ public class JabRefPreferences {
         }
     }
 
+
         public LabelPattern getKeyPattern(){
-            // Lazy initialization..... Read overridden definitions from Preferences
-            // and add these.
-            if (keyPattern != null)
-                return keyPattern;
+            
             keyPattern = new LabelPattern(KEY_PATTERN);
             Preferences pre = Preferences.userNodeForPackage
                 (net.sf.jabref.labelPattern.LabelPattern.class);

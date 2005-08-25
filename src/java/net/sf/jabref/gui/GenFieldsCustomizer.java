@@ -135,10 +135,7 @@ public class GenFieldsCustomizer extends JDialog {
     parent.prefs.putStringArray("generalFields", Util.delimToStringArray(delimStr, ";"));
       */
 
-      for (int j=0; j<parent.getTabbedPane().getTabCount(); j++) {
-	  BasePanel bp = (BasePanel)parent.getTabbedPane().getComponentAt(j);
-	  bp.entryEditors.clear();
-      }
+      parent.removeCachedEntryEditors();
       dispose();
       //diag.requestFocus();
   }

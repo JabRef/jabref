@@ -971,7 +971,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    //edit.add(test);
+    edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -2226,6 +2226,13 @@ class FetchCiteSeerAction
     }
 
   }
+
+   public void removeCachedEntryEditors() {
+       for (int j=0; j<tabbedPane.getTabCount(); j++) {
+	        BasePanel bp = (BasePanel)tabbedPane.getComponentAt(j);
+	        bp.entryEditors.clear();
+       }
+   }
 
 
     /**

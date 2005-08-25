@@ -27,12 +27,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.imports;
 
-import java.io.IOException;
-import java.io.PushbackReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.*;
 
 public class BibtexParser
@@ -54,6 +54,29 @@ public class BibtexParser
         _in = new PushbackReader(in);
 
     }
+
+    /**
+   * Check whether the source is in the correct format for this importer.
+   */
+  public static boolean isRecognizedFormat(Reader inOrig)
+    throws IOException {
+    // Our strategy is to look for the "PY <year>" line.
+    BufferedReader in =
+      new BufferedReader(inOrig);
+
+    //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
+    Pattern pat1 = Pattern.compile("@[a-zA-Z]*\\{");
+
+    String str;
+
+    while ((str = in.readLine()) != null) {
+
+      if (pat1.matcher(str).find())
+        return true;
+    }
+
+    return false;
+  }
 
     private void skipWhitespace() throws IOException
     {
@@ -172,10 +195,9 @@ public class BibtexParser
 			 * new one.
 			 */
 			String comment = commentBuf.toString().replaceAll("[\\x0d\\x0a]","");
-                        
-			if (comment.substring(0, GUIGlobals.META_FLAG.length())
+            if (comment.substring(0, Math.min(comment.length(), GUIGlobals.META_FLAG.length()))
 			    .equals(GUIGlobals.META_FLAG) ||
-			    comment.substring(0, GUIGlobals.META_FLAG_OLD.length())
+			    comment.substring(0, Math.min(comment.length(), GUIGlobals.META_FLAG_OLD.length()))
 			    .equals(GUIGlobals.META_FLAG_OLD)) {
 			    
 			    String rest;
@@ -199,7 +221,7 @@ public class BibtexParser
 			/**
 			 * A custom entry type can also be stored in a @comment:
 			 */
-			if (comment.substring(0, GUIGlobals.ENTRYTYPE_FLAG.length())
+			if (comment.substring(0, Math.min(comment.length(), GUIGlobals.ENTRYTYPE_FLAG.length()))
 			    .equals(GUIGlobals.ENTRYTYPE_FLAG)) {
 			    
 			    CustomEntryType typ = CustomEntryType.parseEntryType(comment.toString());

@@ -75,8 +75,12 @@ public class SixpackImporter implements ImportFormat {
 	ArrayList bibitems = new ArrayList();
 	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 	in.readLine();
-	String[] fieldDef = in.readLine().split(",");
-	String s = null;
+    String ln = in.readLine();
+    if (ln == null)
+        return null;
+    String[] fieldDef = ln.split(",");
+
+    String s = null;
 	BibtexEntry entry = null;
 	lines: while ((s = in.readLine()) != null){
 	    try{

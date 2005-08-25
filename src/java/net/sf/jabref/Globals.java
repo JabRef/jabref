@@ -88,6 +88,7 @@ public class Globals {
   public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
       "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
       "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
+      "Big5", "Big5_HKSCS", "GBK", 
       "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
       "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
 
