@@ -87,7 +87,7 @@ public class OOCalcDatabase {
             
             Element body = result.createElement("office:body"),
                     table = result.createElement("table:table");
-            table.setAttribute("table.name", "Bibliography");
+            table.setAttribute("table:name", "Bibliography");
             table.setAttribute("table.style-name", "ta1");
             
             Element row = result.createElement("table:table-row");

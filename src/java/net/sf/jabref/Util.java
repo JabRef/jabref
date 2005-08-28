@@ -394,7 +394,7 @@ public class Util {
             JabRefPreferences prefs) throws IOException {
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")){
-            System.out.println(expandFilename(link, prefs.get(fieldName+"Directory")));
+            //System.out.println(expandFilename(link, prefs.get(fieldName+"Directory")));
             File file = expandFilename(link, prefs.get(fieldName+"Directory"));
 
             // Check that the file exists:

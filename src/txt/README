@@ -88,6 +88,7 @@ Change log:
         - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
           for presentation and sorting purposes. Key generation now should always use the genuine last
           name, and not produce keys like "de2001".
+        - Fixed setting of sheet name in OpenOffice.org Calc export.
         - Fixed bug that prevented PDF/PS opening by F4 from automatically finding files in
           subdirectories below the main PDF/PS dir.
         - Fixed BibTeX parser bug that made it choke on short comment strings.

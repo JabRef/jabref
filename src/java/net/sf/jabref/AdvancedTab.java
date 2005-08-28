@@ -36,8 +36,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
                 GUIGlobals.helpSmallIconFile);
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
-    useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
-    remoteServerPort = new JTextField();
+    //useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
+    //remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
     useDefault.addChangeListener(new ChangeListener() {
@@ -77,7 +77,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     lab = new JLabel(Globals.lang("and the class must be available in your classpath next time you start JabRef."));
     builder.append(lab);
     builder.nextLine();
-    builder.appendSeparator(Globals.lang("Remote operation"));
+    /*builder.appendSeparator(Globals.lang("Remote operation"));
     builder.nextLine();
     builder.append(new JPanel());
     JPanel p = new JPanel();
@@ -85,7 +85,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     p.add(remoteServerPort);
     p.add(remoteHelp.getIconButton());
     builder.append(p);
-
+    */
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setLayout(new BorderLayout());
@@ -99,22 +99,22 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useDefault.setSelected(!oldUseDef);
     className.setText(oldLnf);
     className.setEnabled(!oldUseDef);
-        useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
-        oldPort = _prefs.getInt("remoteServerPort");
-        remoteServerPort.setText(String.valueOf(oldPort));
+        //useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
+        //oldPort = _prefs.getInt("remoteServerPort");
+        //remoteServerPort.setText(String.valueOf(oldPort));
     }
 
     public void storeSettings() {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
-         try {
+         /*try {
             int port = Integer.parseInt(remoteServerPort.getText());
             if (port != oldPort) {
                 _prefs.putInt("remoteServerPort", port);
                 /*JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
                         + "You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
                         JOptionPane.WARNING_MESSAGE);*/
-            }
+         /*   }
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
@@ -131,7 +131,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
             JabRef.remoteListener.disable();
             JabRef.remoteListener = null;
         }
-
+           */
         if ((useDefault.isSelected() == oldUseDef) ||
             !oldLnf.equals(className.getText())) {
             JOptionPane.showMessageDialog(null, Globals.lang("You have changed the look and feel setting. "

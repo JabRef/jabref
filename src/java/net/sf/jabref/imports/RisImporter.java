@@ -69,7 +69,7 @@ public class RisImporter implements ImportFormat {
         
 	
 	for (int i = 0; i < entries.length - 1; i++){
-            String Type = "", Author = "", StartPage = "", EndPage = "";
+            String Type = "", Author = "", Editor = "", StartPage = "", EndPage = "";
             HashMap hm = new HashMap();
 		    
 	    String[] fields = entries[i].split("\n");
@@ -96,21 +96,25 @@ public class RisImporter implements ImportFormat {
                         else if (val.equals("UNPB")) Type = "unpublished";
                         else if (val.equals("RPRT")) Type = "techreport";
                         else if (val.equals("CONF")) Type = "inproceedings";
-                        else if (val.equals("CHAP")) Type = "inbook";
+                        else if (val.equals("CHAP")) Type = "incollection";//"inbook";
                         
 			else Type = "other";
 		    }else if (lab.equals("T1") || lab.equals("TI")) hm.put("title", val);//Title
 		    // =
 		    // val;
-		    else if (lab.equals("T3") || lab.equals("BT")) {
+		    else if (lab.equals("T2") || lab.equals("T3") || lab.equals("BT")) {
                 hm.put("booktitle", val);
             }
 		    else if (lab.equals("A1") || lab.equals("AU")){
-			
-			if (Author.equals("")) // don't add " and " for the first author
-			    Author = val;
-			else Author += " and " + val;
-		    }else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
+		        if (Author.equals("")) // don't add " and " for the first author
+			        Author = val;
+			    else Author += " and " + val;
+		    }
+            else if (lab.equals("A2")){
+		        if (Editor.equals("")) // don't add " and " for the first editor
+			        Editor = val;
+			    else Editor += " and " + val;
+		    } else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
                 if (Type.equals("inproceedings"))
                     hm.put("booktitle", val);
                 else
@@ -118,10 +122,10 @@ public class RisImporter implements ImportFormat {
             }
 
 		    else if (lab.equals("SP")) StartPage = val;
-                    else if (lab.equals("PB"))
-                        hm.put("publisher", val);
-                    else if (lab.equals("AD"))
-                        hm.put("address", val);
+            else if (lab.equals("PB"))
+                hm.put("publisher", val);
+            else if (lab.equals("AD") || lab.equals("CY"))
+                hm.put("address", val);
 		    else if (lab.equals("EP")) EndPage = val;
                     else if (lab.equals("SN"))
                         hm.put("issn", val);
@@ -153,13 +157,18 @@ public class RisImporter implements ImportFormat {
 			    hm.put("keywords", kw + ", " + val);
 			}
 		    }
-		}
+            else if (lab.equals("U1") || lab.equals("U2") || lab.equals("N1")) {
+                hm.put("comment", val);
+            }
+        }
 	    }
 	    // fix authors
 	    Author = ImportFormatReader.fixAuthor_lastnameFirst(Author);
 	    hm.put("author", Author);
-	    
-	    hm.put("pages", StartPage + "--" + EndPage);
+	    Editor = ImportFormatReader.fixAuthor_lastnameFirst(Editor);
+        hm.put("editor", Editor);
+
+        hm.put("pages", StartPage + "--" + EndPage);
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType(Type)); // id assumes an existing database so don't
 	    // create one here

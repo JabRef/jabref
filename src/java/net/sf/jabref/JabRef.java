@@ -79,6 +79,7 @@ public class JabRef {
         BibtexEntryType.loadCustomEntryTypes(prefs);
         //Globals.turnOnFileLogging();
         Globals.setLanguage(prefs.get("language"), "");
+        /*
         if (Globals.prefs.getBoolean("useRemoteServer")) {
             remoteListener = RemoteListener.openRemoteListener(this);
             if (remoteListener != null) {
@@ -93,7 +94,8 @@ public class JabRef {
             System.exit(0);
         }
 	}
-
+          */
+        
         //System.setProperty("sun.awt.noerasebackground", "true");
         
         //System.out.println(java.awt.Toolkit.getDefaultToolkit().getDesktopProperty("awt.dynamicLayoutSupported"));
