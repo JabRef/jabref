@@ -119,7 +119,7 @@ public class Globals {
  public static HelpDialog helpDiag = null;
   public static String osName = System.getProperty("os.name", "def");
   public static boolean ON_MAC = (osName.equals(MAC)),
-      ON_WIN = (osName.startsWith("Windows"));
+      ON_WIN = osName.startsWith("Windows");
 
   // The following set of name parts are treated as part of the last name for
   // display purposes, and as part of the first name for sorting purposes:
