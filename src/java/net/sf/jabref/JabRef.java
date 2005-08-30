@@ -145,7 +145,7 @@ public class JabRef {
             auxImExport);
         options.register("blank", 'b', Globals.lang("Do not open any files at startup"), blank);
 
-        options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
+        //options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
 
         options.setUseMenu(false);
     }

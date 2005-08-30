@@ -163,11 +163,14 @@ public class RisImporter implements ImportFormat {
         }
 	    }
 	    // fix authors
-	    Author = ImportFormatReader.fixAuthor_lastnameFirst(Author);
-	    hm.put("author", Author);
-	    Editor = ImportFormatReader.fixAuthor_lastnameFirst(Editor);
-        hm.put("editor", Editor);
-
+        if (Author.length() > 0) {
+            Author = ImportFormatReader.fixAuthor_lastnameFirst(Author);
+	        hm.put("author", Author);
+        }
+        if (Editor.length() > 0) {
+            Editor = ImportFormatReader.fixAuthor_lastnameFirst(Editor);
+            hm.put("editor", Editor);
+        }
         hm.put("pages", StartPage + "--" + EndPage);
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType(Type)); // id assumes an existing database so don't
