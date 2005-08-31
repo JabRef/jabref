@@ -141,7 +141,8 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     }
 
     public boolean readyToClose() {
-        try {
+	   return true;
+        /*try {
             int size = Integer.parseInt(remoteServerPort.getText());
             return true; // Ok, the number was legal.
         } catch (NumberFormatException ex) {
@@ -150,7 +151,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                     Globals.lang("Remote server port") + "'", Globals.lang("Remote server port"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
-        }
+        }*/
 
     }
 
