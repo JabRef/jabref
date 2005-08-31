@@ -52,10 +52,18 @@ discounting 'the', 'a', 'an'.<BR>
 
 <P>
 A field name (or one of the above pseudo-field names) may optionally
-be followed by a modifier. Currently the only defined modifier is
-<b>:lower</b>, which forces the text inserted by the field marker to
-be in lowercase.  For example, <b>[auth:lower]</b> expands the last
-name of the first author in lowercase.
+be followed by one or more modifiers. Modifiers are applied in the order they are
+specified.
+<ul>
+    <li><b>:abbr</b>: Abbreviates the text produced by the field name or spcial field
+        marker. Only the first character and subsequent characters following white space
+        will be included. For example, <b>[journal:abbr]</b> would from the journal name
+        "Journal of Fish Biology" produce "JoFB".<br>
+    <li><b>:lower</b>: Forces the text inserted by the field marker to
+        be in lowercase.  For example, <b>[auth:lower]</b> expands the last
+        name of the first author in lowercase.<br>
+</ul>
+
 
 <P>
 If you haven't defined a key pattern for a certain entry type, the <b>Default

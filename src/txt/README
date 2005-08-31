@@ -83,8 +83,11 @@ Change log:
 1.8.1:  - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
         - Added automatic timestamp with configurable format for entries.
+        - Added new key generator modifier ":abbr" to abbreviate field contents.
         - Added Help button in Preferences -> Entry preview
         - Added Big5, Big5_HKSCS and GBK encodings for Chinese.
+        - [unfinished] Improved marking feature. Username is now used for marking, so different users can mark
+          entries separately without interference.
         - Improved handling of names such as "Firstname de la Lastname jr.", with different handling
           for presentation and sorting purposes. Key generation now should always use the genuine last
           name, and not produce keys like "de2001".

@@ -48,6 +48,8 @@ import net.sf.ext.BrowserLauncher;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
 
 /**
  * Describe class <code>Util</code> here.
@@ -225,7 +227,8 @@ public class Util {
         StringBuffer newKey = new StringBuffer();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{')
+            if (!Character.isWhitespace(c) && (c != '#') && (c != '{')  && (c != '\\')
+                    && (c != '"')
                     && (c != '}') && (c != '~') && (c != ',') && (c != '^')) newKey
                     .append(c);
         }
@@ -1178,4 +1181,42 @@ public class Util {
     }
 
 
+    public static void markEntry(BibtexEntry be, NamedCompound ce) {
+        Object o = be.getField(Globals.MARKED);
+        if ((o != null) && (o.toString().indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0))
+            return;
+        String newValue;
+        if (o == null) {
+            newValue = Globals.prefs.WRAPPED_USERNAME;
+        } else {
+            StringBuffer sb = new StringBuffer(o.toString());
+            //sb.append(' ');
+            sb.append(Globals.prefs.WRAPPED_USERNAME);
+            newValue = sb.toString();
+        }
+        ce.addEdit(new UndoableFieldChange(be, Globals.MARKED,
+                                          be.getField(Globals.MARKED), newValue));
+        be.setField(Globals.MARKED, newValue);
+    }
+
+    public static void unmarkEntry(BibtexEntry be, NamedCompound ce) {
+        Object o = be.getField(Globals.MARKED);
+        if (o != null) {
+            String s = o.toString();
+            int piv=0, hit;
+            StringBuffer sb = new StringBuffer();
+            while ((hit = s.indexOf(Globals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
+                if (hit > 0)
+                    sb.append(s.substring(piv, hit));
+                piv = hit+Globals.prefs.WRAPPED_USERNAME.length();
+            }
+            if (piv < s.length()-1) {
+                sb.append(s.substring(piv));
+            }
+            String newVal = sb.length()>0 ? sb.toString() : null;
+            ce.addEdit(new UndoableFieldChange(be, Globals.MARKED,
+                be.getField(Globals.MARKED), newVal));
+            be.setField(Globals.MARKED, newVal);
+        }
+    }
 }

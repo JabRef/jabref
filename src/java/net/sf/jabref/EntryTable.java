@@ -614,7 +614,7 @@ public class EntryTable extends JTable {
         //Util.pr("("+row+","+column+"). "+status+" "+renderer.toString());
 
         // For MARKED feature:
-        if (tableModel.hasField(row, Globals.MARKED) && (renderer != incRenderer)) {
+        if (tableModel.isMarked(row) && (renderer != incRenderer)) {
           return markedRenderer;
         }
 

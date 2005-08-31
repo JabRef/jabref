@@ -140,12 +140,14 @@ public class LabelPatternUtil {
 	       Helpfile help/LabelPatterns.html updated accordingly.
 	    */
 	    // check whether there is a modifier on the end such as ":lower"
-	    String modifier = null;
-	    int _mi = val.indexOf(":");
-	    if(_mi != -1 && _mi != val.length()-1 && _mi != 0) { // ":" is in val and isn't first or last character
-		modifier=val.substring(_mi+1);
-		val=val.substring(0,_mi);
-	    }
+	    //String modifier = null;
+        String[] parts = val.split(":");
+        val = parts[0];
+        //int _mi = val.indexOf(":");
+	    //if(_mi != -1 && _mi != val.length()-1 && _mi != 0) { // ":" is in val and isn't first or last character
+		//modifier=val.substring(_mi+1);
+		//val=val.substring(0,_mi);
+	    //}
 	    StringBuffer _sbvalue = new StringBuffer();
 
 	    try {
@@ -267,17 +269,30 @@ public class LabelPatternUtil {
 		Globals.logger("Key generator warning: field '" + val + "' empty.");
 	    }
 	    // apply modifier if present
-	    if(modifier != null) {
-		if(modifier.equals("lower")) {
-		    _sb.append(_sbvalue.toString().toLowerCase());
-		}
-		else {
-		    Globals.logger("Key generator warning: unknown modifier '"+modifier+"'.");
-		}
-	    } else {
-		// no modifier
-		_sb.append(_sbvalue);
+        if (parts.length > 1) for (int j=1; j<parts.length; j++) {
+            String modifier = parts[j];
+
+            if(modifier.equals("lower")) {
+                String tmp = _sbvalue.toString().toLowerCase();
+                _sbvalue = new StringBuffer(tmp);
+		    }
+            else if (modifier.equals("abbr")) {
+                // Abbreviate - that is,
+                //System.out.println(_sbvalue.toString());
+                StringBuffer abbr = new StringBuffer();
+                String[] words = _sbvalue.toString().split("\\b");
+                for (int word=0; word<words.length; word++)
+                    if (words[word].length() > 0)
+                        abbr.append(words[word].charAt(0));
+                _sbvalue = abbr;
+            }
+            else {
+		        Globals.logger("Key generator warning: unknown modifier '"+modifier+"'.");
+		    }
 	    }
+
+        _sb.append(_sbvalue);
+
 
         }
         else {

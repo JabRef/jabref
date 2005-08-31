@@ -269,7 +269,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("useImportInspectionDialogForSingle", useImportInspectorForSingle.isSelected());
         _prefs.putBoolean("warnAboutDuplicatesInInspection", inspectionWarnDupli.isSelected());
         //_prefs.putBoolean("defaultAutoSort", defSorrrt.isSelected());
-        _prefs.put("defaultOwner", defOwnerField.getText().trim());
+        String owner = defOwnerField.getText().trim();
+        _prefs.put("defaultOwner", owner);
+        _prefs.WRAPPED_USERNAME = "["+owner+"]";
         _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
         _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());

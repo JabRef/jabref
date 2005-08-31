@@ -50,6 +50,9 @@ public class JabRefPreferences {
 	CUSTOM_TAB_NAME = "customTabName_",
 	CUSTOM_TAB_FIELDS = "customTabFields_";
 
+    public String WRAPPED_USERNAME;
+
+
     Preferences prefs;
     public HashMap defaults = new HashMap(),
         keyBinds = new HashMap(),
@@ -263,6 +266,7 @@ public class JabRefPreferences {
 
         //defaults.put("oooWarning", Boolean.TRUE);
 
+        WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
     }
 
 

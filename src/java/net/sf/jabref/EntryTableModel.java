@@ -555,4 +555,20 @@ public class EntryTableModel
     return res;
   }
 
+    /**
+     * Returns true iff the entry's Globals.MARKED field contains the
+     * current user's wrapped username.
+     * @param row The table row where the entry is.
+     * @return true if the MARKED field contains the wrapped username.
+     */
+    public boolean isMarked(int row) {
+        BibtexEntry be = db.getEntryById(getIdForRow(row));
+        if (be == null)
+            return false;
+        Object fieldVal = be.getField(Globals.MARKED);
+        if (fieldVal == null)
+            return false;
+        String s = (String)fieldVal;
+        return (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0);
+    }
 }

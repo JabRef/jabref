@@ -69,7 +69,8 @@ public class RisImporter implements ImportFormat {
         
 	
 	for (int i = 0; i < entries.length - 1; i++){
-            String Type = "", Author = "", Editor = "", StartPage = "", EndPage = "";
+            String Type = "", Author = "", Editor = "", StartPage = "", EndPage = "",
+                comment = "";
             HashMap hm = new HashMap();
 		    
 	    String[] fields = entries[i].split("\n");
@@ -158,7 +159,9 @@ public class RisImporter implements ImportFormat {
 			}
 		    }
             else if (lab.equals("U1") || lab.equals("U2") || lab.equals("N1")) {
-                hm.put("comment", val);
+                if (comment.length() > 0)
+                    comment = comment+"\n";
+                comment = comment+val;
             }
         }
 	    }
@@ -171,6 +174,10 @@ public class RisImporter implements ImportFormat {
             Editor = ImportFormatReader.fixAuthor_lastnameFirst(Editor);
             hm.put("editor", Editor);
         }
+        if (comment.length() > 0) {
+            hm.put("comment", comment);
+        }
+
         hm.put("pages", StartPage + "--" + EndPage);
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType(Type)); // id assumes an existing database so don't
