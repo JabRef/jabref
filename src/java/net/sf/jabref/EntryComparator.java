@@ -43,9 +43,9 @@ public class EntryComparator implements Comparator {
 
     String sortField;
     boolean descending, binary=false;
-    EntryComparator next;
+    Comparator next;
 
-    public EntryComparator(boolean binary, boolean desc, String field, EntryComparator next) {
+    public EntryComparator(boolean binary, boolean desc, String field, Comparator next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = desc;

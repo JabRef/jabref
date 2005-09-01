@@ -377,7 +377,7 @@ public class EntryTableModel
 
     // Then pick the up to four highest ranking ones, and go.
       int piv = Math.min(directions.size()-1, 3);
-      EntryComparator comp = new EntryComparator(
+      Comparator comp = new EntryComparator(
               ((Boolean)binary.get(piv)).booleanValue(),
               ((Boolean)directions.get(piv)).booleanValue(),
               (String)fields.get(piv));
@@ -385,10 +385,15 @@ public class EntryTableModel
       while (piv >= 0) {
           // Loop down towards the highest ranking criterion, wrapping new sorters around the
           // ones we have:
-          comp = new EntryComparator(
+          String field = (String)fields.get(piv);
+          if (field.equals(Globals.MARKED)) {
+                comp = new MarkedComparator(comp);
+          }
+          else
+            comp = new EntryComparator(
                   ((Boolean)binary.get(piv)).booleanValue(),
                   ((Boolean)directions.get(piv)).booleanValue(),
-                  (String)fields.get(piv),
+                  field,
                   comp);
           piv--;
       }
@@ -565,10 +570,7 @@ public class EntryTableModel
         BibtexEntry be = db.getEntryById(getIdForRow(row));
         if (be == null)
             return false;
-        Object fieldVal = be.getField(Globals.MARKED);
-        if (fieldVal == null)
-            return false;
-        String s = (String)fieldVal;
-        return (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0);
+        return Util.isMarked(be);
+
     }
 }

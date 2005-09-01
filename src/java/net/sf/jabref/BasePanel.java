@@ -512,6 +512,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             // We have determined that the clipboard data is a set of entries.
                             try {
                                 bes = (BibtexEntry[])(content.getTransferData(TransferableBibtexEntry.entryFlavor));
+
                             } catch (UnsupportedFlavorException ex) {
                                 ex.printStackTrace();
                             } catch (IOException ex) {
@@ -1230,7 +1231,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 		  if (bes == null)
 		      return;
                   for (int i=0; i<bes.length; i++) {
-                      Util.unmarkEntry(bes[i], ce);
+                      Util.unmarkEntry(bes[i], database, ce);
                   }
                   ce.end();
                   undoManager.addEdit(ce);
@@ -1247,7 +1248,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   Set keySet = database.getKeySet();
                   for (Iterator i = keySet.iterator(); i.hasNext(); ) {
                     BibtexEntry be = database.getEntryById( (String) i.next());
-                    Util.unmarkEntry(be, ce);
+                    Util.unmarkEntry(be, database, ce);
                     
                   }
                   ce.end();

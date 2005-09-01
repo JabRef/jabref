@@ -1199,10 +1199,15 @@ public class Util {
         be.setField(Globals.MARKED, newValue);
     }
 
-    public static void unmarkEntry(BibtexEntry be, NamedCompound ce) {
+    public static void unmarkEntry(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
         Object o = be.getField(Globals.MARKED);
         if (o != null) {
             String s = o.toString();
+            if (s.equals("0")) {
+                unmarkOldStyle(be, database, ce);
+                return;
+            }
+
             int piv=0, hit;
             StringBuffer sb = new StringBuffer();
             while ((hit = s.indexOf(Globals.prefs.WRAPPED_USERNAME, piv)) >= 0) {
@@ -1218,5 +1223,47 @@ public class Util {
                 be.getField(Globals.MARKED), newVal));
             be.setField(Globals.MARKED, newVal);
         }
+    }
+
+    /**
+     * An entry is marked with a "0", not in the new style with user names. We want to
+     * unmark it as transparently as possible. Since this shouldn't happen too often,
+     * we do it by scanning the "owner" fields of the entire database, collecting all
+     * user names. We then mark the entry for all users except the current one. Thus
+     * only the user who unmarks will see that it is unmarked, and we get rid of the
+     * old-style marking.
+     * @param be
+     * @param ce
+     */
+    private static void unmarkOldStyle(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
+        TreeSet owners = new TreeSet();
+        for (Iterator i=database.getEntries().iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry)i.next();
+            Object o = entry.getField(Globals.OWNER);
+            if (o != null)
+                owners.add(o);
+            //System.out.println("Owner: "+entry.getField(Globals.OWNER));
+        }
+        owners.remove(Globals.prefs.get("defaultOwner"));
+        StringBuffer sb = new StringBuffer();
+        for (Iterator i=owners.iterator(); i.hasNext();) {
+            sb.append('[');
+            sb.append(i.next().toString());
+            sb.append(']');
+        }
+        String newVal = sb.toString();
+        if (newVal.length() == 0)
+            newVal = null;
+        ce.addEdit(new UndoableFieldChange(be, Globals.MARKED, be.getField(Globals.MARKED), newVal));
+        be.setField(Globals.MARKED, newVal);
+
+    }
+
+    public static boolean isMarked(BibtexEntry be) {
+        Object fieldVal = be.getField(Globals.MARKED);
+        if (fieldVal == null)
+            return false;
+        String s = (String)fieldVal;
+        return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
     }
 }
