@@ -445,6 +445,11 @@ public class ImportInspectionDialog extends JDialog {
             // are unresolved duplicates, and warn if yes.
             if (Globals.prefs.getBoolean("warnAboutDuplicatesInInspection")) {
                 for (int i=0; i<tableModel.getRowCount(); i++) {
+                    // Only check entries that are to be imported:
+                    Boolean sel = (Boolean) table.getValueAt(i, 0);
+                    if (!sel.booleanValue())
+                        continue;
+
                     if (tableModel.getValueAt(i, DUPL_COL) != null) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
                                 Globals.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
@@ -459,7 +464,6 @@ public class ImportInspectionDialog extends JDialog {
                     }
                 }
             }
-
 
             // The compund undo action used to contain all changes made by this dialog.
             NamedCompound ce = new NamedCompound(undoName);
@@ -790,8 +794,8 @@ public class ImportInspectionDialog extends JDialog {
             if (!diag.cancelled()) {
                 entry.setField(fileType, diag.getValue());
                 // Add a marker to the table:
-                int column = (fileType.equals("pdf") ? 1 : 2);
-                JLabel lab = new JLabel(new ImageIcon((column == 1 ? GUIGlobals.pdfIcon
+                int column = (fileType.equals("pdf") ? PDF_COL : PS_COL);
+                JLabel lab = new JLabel(new ImageIcon((column == PDF_COL ? GUIGlobals.pdfIcon
                         : GUIGlobals.psIcon)));
                 lab.setToolTipText((String) entry.getField(fileType));
                 tableModel.setValueAt(lab, rows[0], column);
