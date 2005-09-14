@@ -1153,13 +1153,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                   if (tidialog.okPressed())
                   {
+                      Util.setAutomaticFields(Arrays.asList(new BibtexEntry[] {bibEntry}));
                     insertEntry(bibEntry) ;
                   }
                 }
               });
 
               // The action starts the "import from plain text" dialog
-              actions.put("importPlainText", new BaseAction() {
+              /*actions.put("importPlainText", new BaseAction() {
                       public void action()
                       {
                         BibtexEntry bibEntry = null ;
@@ -1198,7 +1199,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                       }
                   });
-
+                */
               actions.put("markEntries", new AbstractWorker() {
                   private int besLength = -1;
                 public void run() {

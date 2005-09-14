@@ -402,7 +402,7 @@ public class Util {
                 throw new IOException(
                         Globals.lang("File not found") + " (" + fieldName + "): '" + link + "'.");
             }
-            link = file.getPath();
+            link = file.getCanonicalPath();
 
             // Use the correct viewer even if pdf and ps are mixed up:
             String[] split = file.getName().split("\\.");
@@ -542,6 +542,7 @@ public class Util {
             }
             link = sb.toString();
         }
+
         String cmd = "cmd.exe /c start " + link;
         Process child = Runtime.getRuntime().exec(cmd);
     }

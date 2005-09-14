@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
 import java.io.File;
+import java.text.SimpleDateFormat;
 
 import com.jgoodies.forms.layout.*;
 import com.jgoodies.forms.factories.*;
@@ -314,15 +315,26 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
     public boolean readyToClose() {
         try {
+            // Test if font size is a number:
             int size = Integer.parseInt(fontSize.getText());
-            return true; // Ok, the number was legal.
+
+            // Test if date format is legal:
+            SimpleDateFormat sdf = new SimpleDateFormat(timeStampFormat.getText());
+
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
                     Globals.lang("Menu and label font size") + "'", Globals.lang("Changed font settings"),
                             JOptionPane.ERROR_MESSAGE);
             return false;
+        } catch (IllegalArgumentException ex2) {
+            JOptionPane.showMessageDialog
+                    (null, Globals.lang("The chosen date format for new entries is not valid"),
+                            Globals.lang("Invalid date format"),
+                            JOptionPane.ERROR_MESSAGE);
+            return false;
         }
+        return true;
     }
 
 }

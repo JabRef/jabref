@@ -156,7 +156,10 @@ public class ExternalFilePanel extends JPanel {
 
                 public void run() {
                     URL url;
+                    String textToSet = editor.getText();
+                    editor.setEnabled(false);
                     try {
+                        editor.setText(Globals.lang("Downloading..."));
                         url = new URL(res);
 
                         String suffix = off.getSuffix(res);
@@ -183,7 +186,7 @@ public class ExternalFilePanel extends JPanel {
                         try {
                             udl.download();
                         } catch (IOException e2) {
-                            JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"),
+                            JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL: "+e2.getMessage()),
                                     Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                             Globals.logger("Error while downloading " + url.toString());
                         }
@@ -202,16 +205,20 @@ public class ExternalFilePanel extends JPanel {
                             }
                             filename = relPath;
                         }
-
-                       editor.setText(filename);
+                        textToSet = filename;
+                       //editor.setText(filename);
                         SwingUtilities.invokeLater(new Thread() {
                             public void run() {
-                                entryEditor.updateField(editor);
+                                if (entryEditor != null)
+                                    entryEditor.updateField(editor);
                             }
                         });
                     } catch (MalformedURLException e1) {
-                        JOptionPane.showMessageDialog(parent, "Invalid URL",
+                        JOptionPane.showMessageDialog(parent, "Invalid URL: "+e1.getMessage(),
                                 "Download file", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        editor.setText(textToSet);
+                        editor.setEnabled(true);
                     }
                 }
             }
@@ -251,6 +258,7 @@ public class ExternalFilePanel extends JPanel {
                 } else {
                     output(Globals.lang("No %0 found", fieldName.toUpperCase()) + ".");
                 }
+
             }
         });
 
