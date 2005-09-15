@@ -547,9 +547,10 @@ public class GUIGlobals {
     FIELD_WEIGHT.put("school", MEDIUM_W);
     FIELD_WEIGHT.put("comment", MEDIUM_W);
     FIELD_WEIGHT.put("abstract", LARGE_W);
-    FIELD_WEIGHT.put("annote", MEDIUM_W);
+    FIELD_WEIGHT.put("annote", LARGE_W);
     FIELD_WEIGHT.put("citeseercitationcount", SMALL_W);
-
+    FIELD_WEIGHT.put("owner", SMALL_W);
+    FIELD_WEIGHT.put("timestamp", SMALL_W);
     //FIELD_WEIGHT = Collections.unmodifiableMap(FIELD_WEIGHT);
   };
 

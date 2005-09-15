@@ -80,9 +80,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.8.1:  - Added functionality for new JabRef instances to detect a running instance, and send
-          command line parameters to the running instance for processing.
-        - Added automatic timestamp with configurable format for entries.
+1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.
         - Added Help button in Preferences -> Entry preview
         - Added Big5, Big5_HKSCS and GBK encodings for Chinese.

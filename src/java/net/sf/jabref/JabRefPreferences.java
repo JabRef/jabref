@@ -120,8 +120,8 @@ public class JabRefPreferences {
         defaults.put("secDescending", Boolean.TRUE);
         defaults.put("terSort", "author");
         defaults.put("terDescending", Boolean.FALSE);
-        defaults.put("columnNames", "entrytype;author;title;year;journal;owner;bibtexkey");
-        defaults.put("columnWidths","75;280;400;60;100;100;100");
+        defaults.put("columnNames", "entrytype;author;title;year;journal;owner;timestamp;bibtexkey");
+        defaults.put("columnWidths","75;280;400;60;100;100;100;100");
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
@@ -181,7 +181,7 @@ public class JabRefPreferences {
 	// Entry editor tab 0:
 	defaults.put(CUSTOM_TAB_NAME+"0", Globals.lang("General"));
         defaults.put(CUSTOM_TAB_FIELDS+"0", "crossref;keywords;doi;url;citeseerurl;"+
-                     "pdf;comment;owner");
+                     "pdf;comment;owner;timestamp");
 
 	// Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS+"1", "abstract");

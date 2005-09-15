@@ -564,9 +564,7 @@ public class Util {
         */
         if (!directory.endsWith(System.getProperty("file.separator"))) directory += System
                 .getProperty("file.separator");
-
         String found = findInDir(key, directory, off);
-
         if (found != null) return found.substring(directory.length());
         else return null;
     }

@@ -81,16 +81,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         ExternalFilePanel extPan = new ExternalFilePanel(fieldName, null, off);
         FieldTextField editor = new FieldTextField(fieldName, "", false);
         String dir = Globals.prefs.get(fieldName+"Directory");
-
         // First we try to autoset fields
         if (autoSet) {
             for (int i=0; i<sel.length; i++) {
                 final Object old = sel[i].getField(fieldName);
-                //System.out.println(sel[i].getField("bibtexkey"));
                 // Check if a link is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
-
                 extPan.setEntry(sel[i]);
                 editor.setText((old != null) ? (String)old : "");
                 Thread t = extPan.autoSetFile(fieldName, editor);
@@ -111,7 +108,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 }
             }
         }
-
+        //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             mainLoop: for (int i=0; i<sel.length; i++) {
@@ -186,10 +183,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             cancel = new JButton(Globals.lang("Cancel"));
         JLabel description;
         private boolean canceled = true;
+        private String fieldName;
 
         public OptionsDialog(JFrame parent, String fieldName) {
             super(parent, Globals.lang("Synchronize %0 links", fieldName.toUpperCase()), true);
             final String fn = fieldName.toUpperCase();
+            this.fieldName = fieldName;
             ok.addActionListener(new ActionListener () {
                 public void actionPerformed(ActionEvent e) {
                     canceled = false;
@@ -261,12 +260,27 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             bb.addGlue();
             getContentPane().add(main, BorderLayout.CENTER);
             getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+
             pack();
         }
 
         public void setVisible(boolean visible) {
             if (visible)
                 canceled = true;
+
+            String dir = Globals.prefs.get(fieldName+"Directory");
+            if ((dir == null) || (dir.trim().length() == 0)) {
+
+                autoSetNone.setSelected(true);
+                autoSetNone.setEnabled(false);
+                autoSetAll.setEnabled(false);
+                autoSetUnset.setEnabled(false);
+            }
+            else {
+                autoSetNone.setEnabled(true);
+                autoSetAll.setEnabled(true);
+                autoSetUnset.setEnabled(true);
+            }
 
             new FocusRequester(ok);
             super.setVisible(visible);

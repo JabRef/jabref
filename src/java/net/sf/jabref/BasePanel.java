@@ -1079,7 +1079,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                   Util.openExternalViewer(link.toString(), field, prefs);
                                   output(Globals.lang("External viewer called")+".");
                                 } catch (IOException ex) {
-                                  output(Globals.lang("Error: check your External viewer settings in Preferences")+".");
+                                    output(Globals.lang("Error") + ": " + ex.getMessage());
                                 }
                               }
                               else
