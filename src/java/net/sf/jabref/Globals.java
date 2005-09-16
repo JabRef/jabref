@@ -37,6 +37,7 @@ import javax.swing.* ;
 import net.sf.jabref.collab.* ;
 import net.sf.jabref.imports.* ;
 import net.sf.jabref.util.* ;
+import net.sf.jabref.journals.JournalAbbreviations;
 
 public class Globals {
 
@@ -88,7 +89,7 @@ public class Globals {
   public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
       "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
       "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
-      "Big5", "Big5_HKSCS", "GBK", 
+      "Big5", "Big5_HKSCS", "GBK",
       "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
       "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
 
@@ -209,6 +210,9 @@ public class Globals {
       tableCache.put(text, textProcessed);
       //System.out.println(tableCache.size());
   }
+
+    public static JournalAbbreviations journalAbbrev;
+
 
   public static String lang(String key, String[] params) {
     String translation = null;
@@ -512,6 +516,17 @@ public class Globals {
       UNICODE_CHARS = new HashMap(),
       RTFCHARS = new HashMap();
   static {
+
+      // Read built-in journal list:
+      journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
+
+      //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", true));
+      //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", false));
+      //System.out.println(journalAbbrev.getFullName("Aquaculture Eng."));
+      /*for (Iterator i=journalAbbrev.fullNameIterator(); i.hasNext();) {
+          String s = (String)i.next();
+          System.out.println(journalAbbrev.getFullName(s)+" : "+journalAbbrev.getAbbreviatedName(s, true));
+      } */
 
     // Start the thread that monitors file time stamps.
     //Util.pr("Starting FileUpdateMonitor thread. Globals line 293.");

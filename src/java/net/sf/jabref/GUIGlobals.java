@@ -502,6 +502,7 @@ public class GUIGlobals {
     FIELD_EXTRAS.put("url", "external");
     FIELD_EXTRAS.put("citeseerurl", "external");
     FIELD_EXTRAS.put("doi", "external");
+    FIELD_EXTRAS.put("journal", "journalNames");
     //FIELD_EXTRAS.put("keywords", "selector");
 
 

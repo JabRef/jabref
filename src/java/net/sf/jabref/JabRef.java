@@ -79,7 +79,7 @@ public class JabRef {
         BibtexEntryType.loadCustomEntryTypes(prefs);
         //Globals.turnOnFileLogging();
         Globals.setLanguage(prefs.get("language"), "");
-        /*
+
         if (Globals.prefs.getBoolean("useRemoteServer")) {
             remoteListener = RemoteListener.openRemoteListener(this);
             if (remoteListener != null) {
@@ -94,7 +94,7 @@ public class JabRef {
             System.exit(0);
         }
 	}
-          */
+        
         
         //System.setProperty("sun.awt.noerasebackground", "true");
         
@@ -145,7 +145,7 @@ public class JabRef {
             auxImExport);
         options.register("blank", 'b', Globals.lang("Do not open any files at startup"), blank);
 
-        //options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
+        options.register("importToOpen", '\0', Globals.lang("Import to open tab"), importToOpenBase);
 
         options.setUseMenu(false);
     }

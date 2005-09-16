@@ -41,7 +41,7 @@ public class ExternalFilePanel extends JPanel {
         this.off = off;
         this.entryEditor = entryEditor;
 
-        setLayout(new GridLayout(3, 1));
+        setLayout(new GridLayout(2, 1));
 
         browseBut = new JButton(Globals.lang("Browse"));
         download = new JButton(Globals.lang("Download"));
@@ -67,9 +67,12 @@ public class ExternalFilePanel extends JPanel {
             }
         });
 
+        JPanel pan = new JPanel();
+        pan.setLayout(new GridLayout(1,2));
         add(browseBut);
-        add(auto);
-        add(download);
+        pan.add(auto);
+        pan.add(download);
+        add(pan);
 
         // Add drag and drop support to the field
         if (editor != null)

@@ -295,7 +295,14 @@ public class JabRefFrame
       expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
-      test = new GeneralAction("test", "Test");
+
+    abbreviate = new GeneralAction("abbreviate", "Abbreviate journal names",
+                Globals.lang("Abbreviate journal names of the selected entries")),
+
+    unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
+                    Globals.lang("Unabbreviate journal names of the selected entries")),
+
+    test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
@@ -810,6 +817,11 @@ public JabRefPreferences prefs() {
       putValue(ACCELERATOR_KEY, key);
     }
 
+    public GeneralAction(String command, String text, String description) {
+      this.command = command;
+      putValue(NAME, text);
+      putValue(SHORT_DESCRIPTION, Globals.lang(description));
+    }
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
         try {
@@ -1038,6 +1050,8 @@ public JabRefPreferences prefs() {
       tools.addSeparator();
       tools.add(autoSetPdf);
       tools.add(autoSetPs);
+      tools.add(abbreviate);
+      tools.add(unabbreviate);
 
     mb.add(tools);
 

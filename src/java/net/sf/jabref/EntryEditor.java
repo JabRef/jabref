@@ -332,7 +332,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       ((JComponent) editor).addMouseListener(new ExternalViewerListener());
 
       return null;
-    } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
+    }
+    else if ((s != null) && s.equals("journalNames")) {
+        // Add controls for switching between abbreviated and full journal names.
+        // If this field also has a FieldContentSelector, we need to combine these.
+        JPanel controls = new JPanel();
+        controls.setLayout(new BorderLayout());
+        if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
+          + editor.getFieldName()) != null) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
+              panel.metaData, storeFieldAction, false);
+            contentSelectors.add(ws);
+            controls.add(ws, BorderLayout.NORTH);
+        }
+        controls.add(Globals.journalAbbrev.getNameSwitcher(this, editor, panel.undoManager),
+                BorderLayout.SOUTH);
+        return controls;
+    }
+    else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
           + editor.getFieldName()) != null) {
       FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, 
               panel.metaData, storeFieldAction, false);
@@ -387,7 +404,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
 
       return null;
-    } else
+    }
+
+    else
       return null;
   }
 

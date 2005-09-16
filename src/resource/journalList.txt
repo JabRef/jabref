@@ -1,0 +1,9 @@
+Aquacultural Engineering = Aquacult. Eng.
+Journal of Fish Biology = J. Fish Biol.
+Marine Ecology Progress Series = Mar. Ecol. Prog. Ser.
+Ecological Modelling = Ecol. Model.
+Aquaculture = Aquaculture
+Aquaculture International = Aquacult. Int.
+Aquaculture Research = Aquacult. Res.
+Mathematical Biosciences = Math. Biosc.
+Aquaculture Nutrition = Aquacult. Nutr.
