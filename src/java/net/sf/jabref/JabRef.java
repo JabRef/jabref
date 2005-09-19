@@ -77,6 +77,8 @@ public class JabRef {
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
         BibtexEntryType.loadCustomEntryTypes(prefs);
+        // Read list(s) of journal names and abbreviations:
+        Globals.initializeJournalNames();
         //Globals.turnOnFileLogging();
         Globals.setLanguage(prefs.get("language"), "");
 
@@ -94,7 +96,20 @@ public class JabRef {
             System.exit(0);
         }
 	}
-        
+
+      /**
+       * See if the user has a personal journal list set up. If so, add these
+       * journal names and abbreviations to the list:
+       */
+      String personalJournalList = prefs.get("personalJournalList");
+      if (personalJournalList != null) {
+          try {
+              Globals.journalAbbrev.readJournalList(new File(personalJournalList));
+          } catch (FileNotFoundException e) {
+              e.printStackTrace();
+          }
+      }
+
         
         //System.setProperty("sun.awt.noerasebackground", "true");
         

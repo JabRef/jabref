@@ -516,10 +516,7 @@ public class Globals {
       UNICODE_CHARS = new HashMap(),
       RTFCHARS = new HashMap();
   static {
-
-      // Read built-in journal list:
-      journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
-
+      
       //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", true));
       //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", false));
       //System.out.println(journalAbbrev.getFullName("Aquaculture Eng."));
@@ -922,5 +919,18 @@ public class Globals {
 
     //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }
+
+    public static void initializeJournalNames() {
+        // Read built-in journal list:
+        journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
+        if (prefs.get("personalJournalList") != null) {
+            try {
+                journalAbbrev.readJournalList(new File(prefs.get("personalJournalList")));
+            } catch (FileNotFoundException e) {
+                Globals.logger("Personal journal list file '"+prefs.get("personalJournalList")+
+                    "' not found.");
+            }
+        }
+    }
 
 }

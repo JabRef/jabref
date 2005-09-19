@@ -112,6 +112,7 @@ public class JabRefPreferences {
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
+        defaults.put("namesLastOnly", Boolean.TRUE);
         defaults.put("language", "en");
         defaults.put("priSort", "author");
         defaults.put("priDescending", Boolean.FALSE);
@@ -254,7 +255,9 @@ public class JabRefPreferences {
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", new Integer(6050));
-        
+
+        defaults.put("personalJournalList", null);
+
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 
@@ -598,7 +601,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
         defKeyBinds.put("Synchronize PDF", "shift F4");
         defKeyBinds.put("Synchronize PS", "ctrl F4");
-        
+        defKeyBinds.put("Abbreviate", "ctrl alt A");
+        defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
 
         //defKeyBinds.put("Select value", "ctrl B");
     }

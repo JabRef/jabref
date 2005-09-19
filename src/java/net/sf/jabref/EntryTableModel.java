@@ -71,7 +71,7 @@ public class EntryTableModel
   // special columns (number column or icon column).
   private HashMap iconCols = new HashMap();
   int[] nameCols = null;
-  boolean namesAsIs, namesFf;
+  boolean namesAsIs, namesFf, namesLastOnly;
 
 
     //ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
@@ -208,8 +208,10 @@ public class EntryTableModel
             if (namesFf) {
               return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
             }
-            else {
-              return ImportFormatReader.fixAuthor_lastnameFirst( (String) o);
+            else if (!namesLastOnly) {
+                return ImportFormatReader.fixAuthor_lastnameFirst( (String) o);
+            } else {
+                return ImportFormatReader.fixAuthor_lastnameOnly( (String) o);
             }
           }
         }
@@ -325,9 +327,9 @@ public class EntryTableModel
     for (int i = 0; i < nameCols.length; i++) {
       nameCols[i] = ( (Integer) tmp.elementAt(i)).intValue();
     }
-    namesAsIs = panel.prefs.getBoolean("namesAsIs");
-    namesFf = panel.prefs.getBoolean("namesFf");
-
+    namesAsIs = Globals.prefs.getBoolean("namesAsIs");
+    namesFf = Globals.prefs.getBoolean("namesFf");
+    namesLastOnly = Globals.prefs.getBoolean("namesLastOnly"); 
     // Build a vector of prioritized search objectives,
     // then pick the 3 first.
     List fields = new ArrayList(6),

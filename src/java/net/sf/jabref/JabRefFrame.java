@@ -297,10 +297,12 @@ public class JabRefFrame
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
 
     abbreviate = new GeneralAction("abbreviate", "Abbreviate journal names",
-                Globals.lang("Abbreviate journal names of the selected entries")),
+                Globals.lang("Abbreviate journal names of the selected entries"),
+                Globals.prefs.getKey("Abbreviate")),
 
     unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
-                    Globals.lang("Unabbreviate journal names of the selected entries")),
+                    Globals.lang("Unabbreviate journal names of the selected entries"),
+            Globals.prefs.getKey("Unabbreviate")),
 
     test = new GeneralAction("test", "Test");
 
@@ -822,6 +824,13 @@ public JabRefPreferences prefs() {
       putValue(NAME, text);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
+    public GeneralAction(String command, String text, String description, KeyStroke key) {
+      this.command = command;
+      putValue(NAME, text);
+      putValue(SHORT_DESCRIPTION, Globals.lang(description));
+        putValue(ACCELERATOR_KEY, key);
+    }
+
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
         try {

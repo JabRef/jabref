@@ -300,6 +300,58 @@ public class ImportFormatReader {
     return fixed;
 }
 
+    public static String fixAuthor_lastnameOnly(final String inOrig) {
+
+          String in = inOrig;
+
+          // // Check if we have cached this particular name string before:
+          //Object old = nameCacheLastFirst.get(in); if (old != null) return (String)old;
+
+          if (in.indexOf("{") >= 0) {
+          StringBuffer tmp = new StringBuffer();
+          int start = -1, end = 0;
+          while ((start = in.indexOf("{", end)) > -1) {
+                  tmp.append(in.substring(end, start));
+              end = in.indexOf("}", start);
+              if (end > 0) {
+              tmp.append(in.substring(start, end).replaceAll(" ", SPACE_MARKER));
+              } else if (end < 0) {
+                      // The braces are mismatched, so give up this.
+                      tmp.append(in.substring(start));
+                      break;
+                  }
+          }
+          if ((end > 0) && (end < in.length()))
+              tmp.append(in.substring(end));
+
+          in = tmp.toString();
+
+          }
+
+        StringBuffer sb = new StringBuffer();
+
+        String[] authors = in.split(" and ");
+
+        for (int i = 0; i < authors.length; i++) {
+            authors[i] = authors[i].trim();
+            sb.append(fixSingleAuthor_lastNameOnly(authors[i]));
+            if (i < (authors.length - 2))
+                sb.append(", ");
+            else if (i == authors.length-2)
+                sb.append(" and ");
+        }
+
+        String fixed = sb.toString();
+        if (spaceMarkerPattern.matcher(fixed).find())
+        fixed = fixed.replaceAll(SPACE_MARKER, " ");
+
+        // // Cache this transformation so we don't have to repeat it unnecessarily:
+        // nameCacheLastFirst.put(inOrig, fixed);
+
+        return fixed;
+    }
+
+
 
 public static String fixAuthorForAlphabetization(final String inOrig) {
 
@@ -459,6 +511,63 @@ sb.append(authors[i].substring(0, pos).trim());
         }
 
     }
+
+
+    /**
+      * Rearranges a single name to "Lastname" format. Particles like "von" and
+      * "de la" are considered part of the last name, and placed in front.
+      * @param name The name to rearrange.
+      * @return The rearranged name.
+      */
+     private static String fixSingleAuthor_lastNameOnly(String name) {
+         int commaPos = name.indexOf(',');
+         if (commaPos == -1) {
+             // No comma: name in "Firstname Lastname" form.
+             String[] parts = name.split(" ");
+             int piv = parts.length - 1;
+
+             if (piv < 0)
+                 return name; // Empty name...
+
+             StringBuffer sb = new StringBuffer();
+
+             // Add "jr" particle(s) if any:
+             while (Globals.JUNIOR_PARTICLES.contains(parts[piv])) {
+                 if (sb.length() > 0)
+                     sb.insert(0, ' ');
+                 sb.insert(0, parts[piv]);
+                 piv--;
+             }
+
+             // Add the last name:
+             if (sb.length() > 0)
+                 sb.insert(0, ' ');
+             sb.insert(0, parts[piv]);
+             piv--;
+
+             // Then add the ones before, as long as they are von particles:
+             while ((piv > 0) && isVonParticle(parts[piv])) {
+                 sb.insert(0, ' ');
+                 sb.insert(0, parts[piv]);
+                 piv--;
+             }
+
+             return sb.toString();
+
+         } else {
+             StringBuffer sb = new StringBuffer(name.substring(0, commaPos));
+             String[] restParts = name.substring(commaPos).trim().split(" ");
+             int piv = restParts.length - 1;
+             while ((piv > 0) && isVonParticle(restParts[piv])) {
+                 sb.insert(0, ' ');
+                 sb.insert(0, restParts[piv]);
+                 piv--;
+             }
+
+             return sb.toString();
+         }
+
+     }
 
     /**
      * Rearranges a single name to sortable "Lastname, Firstname" format.

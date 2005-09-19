@@ -8,6 +8,8 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.undo.UndoableFieldChange;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.CompoundEdit;
 import java.io.*;
@@ -223,6 +225,19 @@ public class JournalAbbreviations {
         });
 
         return button;
+    }
+
+    public TableModel getTableModel() {
+        Object[][] cells = new Object[fullNameKeyed.size()][2];
+        int row = 0;
+        for (Iterator i=fullNameIterator(); i.hasNext();) {
+            String name = (String)i.next();
+            cells[row][0] = getFullName(name);
+            cells[row][1] = getAbbreviatedName(name, true);
+            row++;
+        }
+        return new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
+            Globals.lang("Abbreviation")});
     }
 
 }

@@ -80,7 +80,10 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Added functionality for new JabRef instances to detect a running instance, and send
+1.x:    - Added option to show only last names in main table.
+        - [UNFINISHED] Added toggling of abbreviated and full journal names, based on a built-in
+          journal list, extendable by linking to an external text file.          
+        - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
 1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.
