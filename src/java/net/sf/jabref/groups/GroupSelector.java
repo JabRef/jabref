@@ -417,8 +417,10 @@ public class GroupSelector extends SidePaneComponent implements
                 removeGroupAndSubgroupsAction.setEnabled(true);
                 removeGroupKeepSubgroupsAction.setEnabled(true);
             }
-            expandSubtreeAction.setEnabled(!node.isLeaf());
-            collapseSubtreeAction.setEnabled(!node.isLeaf());
+			expandSubtreeAction.setEnabled(groupsTree.isCollapsed(path) ||
+					groupsTree.hasCollapsedDescendant(path));
+			collapseSubtreeAction.setEnabled(groupsTree.isExpanded(path) ||
+					groupsTree.hasExpandedDescendant(path));
             sortSubmenu.setEnabled(!node.isLeaf());
             removeSubgroupsAction.setEnabled(!node.isLeaf());
             moveNodeUpAction.setEnabled(node.canMoveUp());
