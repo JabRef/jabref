@@ -13,9 +13,7 @@ import javax.swing.table.TableModel;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.CompoundEdit;
 import java.io.*;
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Iterator;
+import java.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.net.URL;
@@ -33,6 +31,7 @@ public class JournalAbbreviations {
             +"<BR>"+Globals.lang("if the journal name is known. Go to (...............)")+"</HTML>";
     TreeMap fullNameKeyed = new TreeMap();
     HashMap abbrNameKeyed = new HashMap();
+    TreeMap all = new TreeMap();
     CaseChanger caseChanger = new CaseChanger();
 
     public JournalAbbreviations() {
@@ -69,14 +68,13 @@ public class JournalAbbreviations {
      * if only the first character should be.
      * @return The abbreviated name, or null if it couldn't be found.
      */
-    public String getAbbreviatedName(String journalName, boolean titleCase) {
+    public String getAbbreviatedName(String journalName) {
         String s = journalName.toLowerCase();
         Object o = fullNameKeyed.get(s);
         if (o == null)
             return null;
         s = (String)o;
-        return titleCase ? caseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST)
-                    : caseChanger.changeCase(s, CaseChanger.UPPER_FIRST);
+        return s;
     }
 
     /**
@@ -125,12 +123,15 @@ public class JournalAbbreviations {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
-                    String fullName = parts[0].trim().toLowerCase();
-                    String abbrName = parts[1].trim().toLowerCase();
+                    String fullName = parts[0].trim();
+                    String fullNameLC = fullName.toLowerCase();
+                    String abbrName = parts[1].trim();
+                    String abbrNameLC = abbrName.toLowerCase();
                     if ((fullName.length()>0) && (abbrName.length()>0)) {
                         //System.out.println("'"+fullName+"' : '"+abbrName+"'");
-                        fullNameKeyed.put(fullName, abbrName);
-                        abbrNameKeyed.put(abbrName, fullName);
+                        fullNameKeyed.put(fullNameLC, abbrName);
+                        abbrNameKeyed.put(abbrNameLC, fullName);
+                        all.put(fullName, abbrName);
                     }
                 }
             }
@@ -154,13 +155,13 @@ public class JournalAbbreviations {
      * @param ce If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibtexEntry entry, String fieldName, boolean titleCase, CompoundEdit ce) {
+    public boolean abbreviate(BibtexEntry entry, String fieldName, CompoundEdit ce) {
         Object o = entry.getField(fieldName);
         if (o == null)
             return false;
         String text = (String)o;
         if (isKnownName(text) && !isAbbreviatedName(text)) {
-            String newText = getAbbreviatedName(text, titleCase);
+            String newText = getAbbreviatedName(text);
             if (newText == null)
                 return false;
             entry.setField(fieldName, newText);
@@ -194,6 +195,10 @@ public class JournalAbbreviations {
     }
 
 
+    public Map getJournals() {
+        return Collections.unmodifiableMap(all);
+    }
+
     /**
      * Create a control panel for the entry editor's journal field, to toggle
      * abbreviated/full journal name
@@ -212,7 +217,7 @@ public class JournalAbbreviations {
                     if (isAbbreviatedName(text))
                         s = getFullName(text);
                     else
-                        s = getAbbreviatedName(text, true);
+                        s = getAbbreviatedName(text);
 
                     if (s != null) {
                         editor.setText(s);
@@ -233,11 +238,12 @@ public class JournalAbbreviations {
         for (Iterator i=fullNameIterator(); i.hasNext();) {
             String name = (String)i.next();
             cells[row][0] = getFullName(name);
-            cells[row][1] = getAbbreviatedName(name, true);
+            cells[row][1] = getAbbreviatedName(name);
             row++;
         }
-        return new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
+        DefaultTableModel tableModel = new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
             Globals.lang("Abbreviation")});
+        return tableModel;
     }
 
 }

@@ -61,6 +61,7 @@ import java.lang.reflect.*;
 import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
 import net.sf.jabref.groups.GroupSelector;
+import net.sf.jabref.journals.ManageJournalsAction;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import com.jgoodies.plaf.HeaderStyle;
 import com.jgoodies.plaf.Options;
@@ -303,6 +304,7 @@ public class JabRefFrame
     unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
                     Globals.lang("Unabbreviate journal names of the selected entries"),
             Globals.prefs.getKey("Unabbreviate")),
+    manageJournals = new ManageJournalsAction(this),
 
     test = new GeneralAction("test", "Test");
 
@@ -1070,28 +1072,29 @@ public JabRefPreferences prefs() {
     options.add(customizeAction);
     options.add(genFieldsCustomization);
     options.add(customExpAction);
+    options.add(manageJournals);
 
     /*options.add(new AbstractAction("Font") {
-     public void actionPerformed(ActionEvent e) {
-         // JDialog dl = new EntryCustomizationDialog(ths);
-         Font f=new FontSelectorDialog
-       (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
-      if(f==null)
-       return;
-      else
-       GUIGlobals.CURRENTFONT=f;
-      // updatefont
-      prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
-      prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
-      prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
-      if (tabbedPane.getTabCount() > 0) {
-       for (int i=0; i<tabbedPane.getTabCount(); i++) {
-        baseAt(i).entryTable.updateFont();
-        baseAt(i).refreshTable();
-       }
+    public void actionPerformed(ActionEvent e) {
+        // JDialog dl = new EntryCustomizationDialog(ths);
+        Font f=new FontSelectorDialog
+      (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
+     if(f==null)
+      return;
+     else
+      GUIGlobals.CURRENTFONT=f;
+     // updatefont
+     prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+     prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
+     prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
+     if (tabbedPane.getTabCount() > 0) {
+      for (int i=0; i<tabbedPane.getTabCount(); i++) {
+       baseAt(i).entryTable.updateFont();
+       baseAt(i).refreshTable();
       }
      }
-     });*/
+    }
+    });*/
 
     //options.add(selectKeys);
     mb.add(options);

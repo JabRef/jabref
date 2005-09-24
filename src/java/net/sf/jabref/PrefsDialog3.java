@@ -36,7 +36,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.jabref.groups.GroupsPrefsTab;
-import net.sf.jabref.journals.JournalsTab;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined
@@ -85,7 +84,7 @@ public class PrefsDialog3 extends JDialog {
         COL = Globals.lang("Entry table columns"),
         KEY = Globals.lang("Key pattern"),
         PRE = Globals.lang("Entry preview"),
-        JOU = Globals.lang("Journal names"),
+        //JOU = Globals.lang("Journal names"),
         ADV = Globals.lang("Advanced");
 
     ArrayList al = new ArrayList();
@@ -95,7 +94,7 @@ public class PrefsDialog3 extends JDialog {
     al.add(APP);
     al.add(COL);
     al.add(KEY);
-    al.add(JOU);
+    //al.add(JOU);
     al.add(PRE);
 
     main.setLayout(cardLayout);
@@ -115,7 +114,7 @@ public class PrefsDialog3 extends JDialog {
         main.add(new TableColumnsTab(_prefs, parent), COL);
         main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
         main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
-        main.add(new JournalsTab(frame), JOU);
+        //main.add(new ManageJournalsPanel(frame), JOU);
 
     upper.setBorder(BorderFactory.createEtchedBorder());
 

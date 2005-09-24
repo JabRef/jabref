@@ -1414,7 +1414,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                      NamedCompound ce = new NamedCompound("Abbreviate journal names");
                       int count = 0;
                       for (int i=0; i<entries.length; i++) {
-                          if (Globals.journalAbbrev.abbreviate(entries[i], "journal", true, ce))
+                          if (Globals.journalAbbrev.abbreviate(entries[i], "journal", ce))
                             count++;
                       }
                       if (count > 0) {
