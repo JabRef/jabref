@@ -38,7 +38,7 @@ public class SaveException extends Throwable
     //~ Instance fields ////////////////////////////////////////////////////////
 
     private BibtexEntry entry;
-
+    private int status;
     //~ Constructors ///////////////////////////////////////////////////////////
 
     public SaveException(String message)
@@ -47,6 +47,14 @@ public class SaveException extends Throwable
         entry = null;
     }
 
+    public SaveException(String message, int status)
+        {
+            super(message);
+            entry = null;
+            this.status = status;
+        }
+
+
     public SaveException(String message, BibtexEntry entry)
     {
         super(message);
@@ -54,6 +62,10 @@ public class SaveException extends Throwable
     }
 
     //~ Methods ////////////////////////////////////////////////////////////////
+
+    public int getStatus() {
+        return status;
+    }
 
     public BibtexEntry getEntry()
     {

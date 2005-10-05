@@ -171,6 +171,7 @@ public class ManageJournalsPanel extends JPanel{
             } finally {
                 if (fw != null)
                     try {
+                        //fw.flush();
                         fw.close();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -179,10 +180,10 @@ public class ManageJournalsPanel extends JPanel{
 
 
         }
-        if (!personalFile.getText().trim().equals(Globals.prefs.get("personalJournalList"))) {
+        //(!personalFile.getText().trim().equals(Globals.prefs.get("personalJournalList"))) {
             Globals.prefs.put("personalJournalList", personalFile.getText());
             Globals.initializeJournalNames();
-        }
+        //}
 
     }
 
@@ -285,16 +286,17 @@ public class ManageJournalsPanel extends JPanel{
 
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == add) {
-                int sel = userTable.getSelectedRow();
-                if (sel < 0)
-                    sel = 0;
-                journals.add(sel, new JournalEntry("", ""));
+                //int sel = userTable.getSelectedRow();
+                //if (sel < 0)
+                //    sel = 0;
+
                 nameTf.setText("");
                 abbrTf.setText("");
                 if (JOptionPane.showConfirmDialog(dialog, journalEditPanel, Globals.lang("Edit journal"),
                         JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                    setValueAt(nameTf.getText(), sel, 0);
-                    setValueAt(abbrTf.getText(), sel, 1);
+                    journals.add(new JournalEntry(nameTf.getText(), abbrTf.getText()));
+                    //setValueAt(nameTf.getText(), sel, 0);
+                    //setValueAt(abbrTf.getText(), sel, 1);
                     Collections.sort(journals);
                     fireTableDataChanged();
                 }

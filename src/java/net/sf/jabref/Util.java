@@ -815,8 +815,11 @@ public class Util {
         BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(dest));
         int el;
-        while ((el = in.read()) >= 0) out.write(el);
-
+        //int tell = 0;
+        while ((el = in.read()) >= 0) {
+            out.write(el);
+        }
+        out.flush(); // Will this make a difference? 2005.09.30
         in.close();
         out.close();
         return true;

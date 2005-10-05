@@ -42,39 +42,48 @@ import net.sf.jabref.mods.*;
 public class FileActions
 {
 
+    private static final int NOTHING=0,
+        COPIED_TO_TEMP = 1,
+        COPIED_TO_BACKUP = 2,
+        INIT_OK = 3;
+
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    private static void initFile(File file, boolean backup) throws IOException {
-	String name = file.getName();
-	String path = file.getParent();
-	File temp = new File(path, name + GUIGlobals.tempExt);
+    private static int initFile(File file, boolean backup) throws SaveException {
+        int status = NOTHING;
+        try {
+            String name = file.getName();
+            String path = file.getParent();
+            File temp = new File(path, name + GUIGlobals.tempExt);
 
-	if (backup)
-        {
-	    File back = new File(path, name + GUIGlobals.backupExt);
+            if (backup) {
+                File back = new File(path, name + GUIGlobals.backupExt);
 
-	    if (back.exists()) {
-            Util.copyFile(back, temp, true);
-            //back.renameTo(temp);
+                if (back.exists()) {
+                    Util.copyFile(back, temp, true);
+                    //back.renameTo(temp);
+                }
+                status = COPIED_TO_TEMP;
+
+                if (file.exists()) {
+                    Util.copyFile(file, back, true);
+                    //file.renameTo(back);
+                }
+                status = COPIED_TO_BACKUP;
+
+                if (temp.exists()) {
+                    temp.delete();
+                }
+            } else {
+                if (file.exists()) {
+                    Util.copyFile(file, temp, true);
+                    //file.renameTo(temp);
+                }
+            }
+        } catch (IOException e) {
+            throw new SaveException(e.getMessage(), status);
         }
-
-	    if (file.exists())
-        {
-            Util.copyFile(file, back, true);
-		    //file.renameTo(back);
-	    }
-
-	    if (temp.exists())
-        {
-		    temp.delete();
-	    }
-	}
-	else {
-	    if (file.exists()) {
-            Util.copyFile(file, temp, true);
-		    //file.renameTo(temp);
-	    }
-	}
+        return INIT_OK;
     }
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
@@ -105,7 +114,7 @@ public class FileActions
 	}
     }
 
-    public static void repairAfterError(File file) throws IOException {
+    public static void repairAfterError(File file, boolean backup, int status) throws IOException {
 	// Repair the file with our temp file since saving failed.
 	String name = file.getName();
 
@@ -114,7 +123,35 @@ public class FileActions
 	File temp = new File(path, name + GUIGlobals.tempExt);
 	File back = new File(path, name + GUIGlobals.backupExt);
 
-	if (file.exists()) {
+    if (status == NOTHING) {
+        // Nothing has happened except for possibly creating the temp file.
+        if (temp.exists())
+            temp.delete();
+    }  else if (status == COPIED_TO_TEMP) {
+        // We may have begun copying to the backup file. Try to restore it from temp:
+        if (temp.exists()) {
+            Util.copyFile(temp, back, true);
+            temp.delete();
+        }
+
+    } else if (status == COPIED_TO_BACKUP) {
+        // Seems we couldn't delete the temp file. This is probably a very unlikely scenario.
+        // Try to copy back:
+        Util.copyFile(back, file, true);
+        Util.copyFile(temp, back, true);
+
+    } else { // INIT_OK
+        // Something happened after initializing, when saving. Try to restore the file from the
+        // backup (if active) or temp file:
+        if (backup) {
+            Util.copyFile(back, file, true);
+        } else {
+            Util.copyFile(temp, file, true);
+            temp.delete();
+        }
+    }
+    /*
+    if (file.exists()) {
 	    file.delete();
 	}
 
@@ -127,7 +164,7 @@ public class FileActions
         Util.copyFile(back, file, true);
         back.delete();
 	    //back.renameTo(file);
-	}
+	}   */
     }
 
     /**
@@ -154,9 +191,25 @@ public class FileActions
         BibtexEntry be = null;
 	TreeMap types = new TreeMap(); // Map to collect entry type definitions
 	// that we must save along with entries using them.
+
+        boolean backup = prefs.getBoolean("backup");
+        // Make room for the save:
+        int status = NOTHING;
+        try {
+            initFile(file, backup);
+            status = INIT_OK;
+        } catch (SaveException e) {
+            status = e.getStatus();
+            try {
+                repairAfterError(file, backup, status);
+                throw e;
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+        }
+
         try
         {
-	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
             Writer fw = getWriter(file, encoding);
@@ -231,7 +284,7 @@ public class FileActions
         {
 	        ex.printStackTrace();
             try {
-	            repairAfterError(file);
+	            repairAfterError(file, backup, INIT_OK);
             } catch (IOException e) {
                 // Argh, another error? Can we do anything?
                 e.printStackTrace();
@@ -255,10 +308,19 @@ public class FileActions
 	TreeMap types = new TreeMap(); // Map to collect entry type definitions
 	// that we must save along with entries using them.
         BibtexEntry be = null;
+        int status = NOTHING;
+        boolean backup = prefs.getBoolean("backup");
+        status = initFile(file, backup);
+        if (status != INIT_OK) {
+           try {
+               repairAfterError(file, backup, status);
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+        }
 
         try
         {
-	    initFile(file, prefs.getBoolean("backup"));
 
             // Define our data stream.
             Writer fw = getWriter(file, encoding);
@@ -348,7 +410,7 @@ public class FileActions
          catch (Throwable ex)
         {
             try {
-                repairAfterError(file);
+                repairAfterError(file, backup, status);
             } catch (IOException e) {
                 // Argh, another error? Can we do anything?
                 e.printStackTrace();

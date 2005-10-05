@@ -229,14 +229,26 @@ public class ChangeScanner extends Thread {
             }
 
         }
-        
+
         // Finally, look if there are still untouched entries in the disk database. These
-        // can be assumed to have been added.
+        // mayhave been added.
         if (used.size() < disk.getEntryCount()) {
             for (int i=0; i<disk.getEntryCount(); i++) {
                 if (!used.contains(""+i)) {
-                    EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
-                    changes.add(ec);
+
+                    // See if there is an identical dupe in the mem database:
+                    boolean hasAlready = false;
+                    for (int j = 0; j < mem.getEntryCount(); j++) {
+                        if (Util.compareEntriesStrictly(mem.getEntryAt(j),
+                            disk.getEntryAt(i)) >= 1) {
+                            hasAlready = true;
+                            break;
+                        }
+                    }
+                    if (!hasAlready) {
+                        EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
+                        changes.add(ec);
+                    }
           /*NamedCompound ce = new NamedCompound("Added entry");
           ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
           ce.end();
