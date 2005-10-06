@@ -121,6 +121,7 @@ public class JournalAbbreviations {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
+                //System.out.println(line);
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
                     String fullName = parts[0].trim();
@@ -205,19 +206,19 @@ public class JournalAbbreviations {
      * @param editor The FieldEditor for the journal field.
      * @return The control panel for the entry editor.
      */
-    public JComponent getNameSwitcher(final EntryEditor entryEditor, final FieldEditor editor,
+    public static JComponent getNameSwitcher(final EntryEditor entryEditor, final FieldEditor editor,
                                       final UndoManager undoManager) {
         JButton button = new JButton(Globals.lang("Toggle abbreviation"));
         button.setToolTipText(TOOLTIPTEXT);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String text = editor.getText();
-                if (isKnownName(text)) {
+                if (Globals.journalAbbrev.isKnownName(text)) {
                     String s = null;
-                    if (isAbbreviatedName(text))
-                        s = getFullName(text);
+                    if (Globals.journalAbbrev.isAbbreviatedName(text))
+                        s = Globals.journalAbbrev.getFullName(text);
                     else
-                        s = getAbbreviatedName(text);
+                        s = Globals.journalAbbrev.getAbbreviatedName(text);
 
                     if (s != null) {
                         editor.setText(s);

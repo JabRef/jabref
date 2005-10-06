@@ -132,7 +132,6 @@ public class ManageJournalsPanel extends JPanel{
     }
 
     public void setValues() {
-        System.out.println("Ju");
         personalFile.setText(Globals.prefs.get("personalJournalList"));
         JournalAbbreviations userAbbr = new JournalAbbreviations();
         if (Globals.prefs.get("personalJournalList") != null) {
@@ -171,7 +170,6 @@ public class ManageJournalsPanel extends JPanel{
             } finally {
                 if (fw != null)
                     try {
-                        //fw.flush();
                         fw.close();
                     } catch (IOException e) {
                         e.printStackTrace();

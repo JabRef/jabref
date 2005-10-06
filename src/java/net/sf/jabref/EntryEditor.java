@@ -47,6 +47,7 @@ import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.ExternalFilePanel;
+import net.sf.jabref.journals.JournalAbbreviations;
 
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
@@ -140,7 +141,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     prefs = Globals.prefs;
     type = entry.getType();
 
-    
+
     entry.addPropertyChangeListener(this);
 
     helpAction = new HelpAction(frame.helpDiag, GUIGlobals.entryEditorHelp, "Help");
@@ -163,9 +164,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
     private void setupFieldPanels() {
-	tabbed.removeAll();
-	tabs.clear();
-	String[] fields = entry.getRequiredFields();
+    tabbed.removeAll();
+    tabs.clear();
+    String[] fields = entry.getRequiredFields();
 
 
     List fieldList = null;
@@ -176,49 +177,49 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
           Globals.lang("Show required fields"));
     tabs.add(reqPan);
-	//}
+    //}
 
-	if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
-	    optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), 
+    if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
+        optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()),
                 this, false, Globals.lang("Optional fields"));
-	    tabbed.addTab(Globals.lang("Optional fields"),
-			  new ImageIcon(GUIGlobals.showOptIconFile), optPan.getPane(),
-			  Globals.lang("Show optional fields"));
-	    tabs.add(optPan);
-	}
-	
-	EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-	for (int i=0; i<tabList.getTabCount(); i++) {
-	    EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i), 
+        tabbed.addTab(Globals.lang("Optional fields"),
+              new ImageIcon(GUIGlobals.showOptIconFile), optPan.getPane(),
+              Globals.lang("Show optional fields"));
+        tabs.add(optPan);
+    }
+
+    EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+    for (int i=0; i<tabList.getTabCount(); i++) {
+        EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i),
                 this, false, tabList.getTabName(i));
-	    tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
-	    tabs.add(newTab);
-	}
-	/*
-	if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1)) {
+        tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
+        tabs.add(newTab);
+    }
+    /*
+     if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1)) {
 	    
-	    genPan = new EntryEditorTab(java.util.Arrays.asList(entry.getGeneralFields()), this, false);
+         genPan = new EntryEditorTab(java.util.Arrays.asList(entry.getGeneralFields()), this, false);
 	    
-	    tabbed.addTab(Globals.lang("General fields"),
-			  new ImageIcon(GUIGlobals.showGenIconFile), genPan.getPane(),
-			  Globals.lang("Show general fields"));
-	    tabs.add(genPan);    
-	}
+         tabbed.addTab(Globals.lang("General fields"),
+               new ImageIcon(GUIGlobals.showGenIconFile), genPan.getPane(),
+               Globals.lang("Show general fields"));
+         tabs.add(genPan);
+     }
 	
-	String[] absFields = new String[] {"abstract", "annote"};
-	absPan = new EntryEditorTab(java.util.Arrays.asList(absFields), this, false);	
-	tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
-		      absPan.getPane(), Globals.lang("Show abstract"));
-		      tabs.add(absPan);*/
+     String[] absFields = new String[] {"abstract", "annote"};
+     absPan = new EntryEditorTab(java.util.Arrays.asList(absFields), this, false);
+     tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
+               absPan.getPane(), Globals.lang("Show abstract"));
+               tabs.add(absPan);*/
     srcPanel.setName(Globals.lang("BibTeX source"));
     if (Globals.prefs.getBoolean("showSource")) {
-	    tabbed.addTab(Globals.lang("BibTeX source"),
-		      new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
-		      Globals.lang("Show/edit BibTeX source"));
-	    tabs.add(srcPanel);
+        tabbed.addTab(Globals.lang("BibTeX source"),
+              new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
+              Globals.lang("Show/edit BibTeX source"));
+        tabs.add(srcPanel);
     }
-	sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
-    srcPanel.setFocusCycleRoot(true);	
+    sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
+    srcPanel.setFocusCycleRoot(true);
     }
 
   public BibtexEntryType getType() {
@@ -306,7 +307,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     repaint();
   }
 
- 
+
   /**
    * getExtra checks the field name against GUIGlobals.FIELD_EXTRAS. If the name
    * has an entry, the proper component to be shown is created and returned.
@@ -345,13 +346,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
         }
-        controls.add(Globals.journalAbbrev.getNameSwitcher(this, editor, panel.undoManager),
+        controls.add(JournalAbbreviations.getNameSwitcher(this, editor, panel.undoManager),
                 BorderLayout.SOUTH);
         return controls;
     }
     else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
           + editor.getFieldName()) != null) {
-      FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, 
+      FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
               panel.metaData, storeFieldAction, false);
       contentSelectors.add(ws);
 
@@ -473,13 +474,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       * NOTE: This method is only used for the source panel, not for the other tabs. Look at
       * EntryEditorTab for the setup of text components in the other tabs.
       */
-      
+
     /*
-     * if ((ta instanceof FieldTextArea) && (prefs.getBoolean("autoComplete"))) {
-     * FieldTextArea fta = (FieldTextArea)ta; Completer comp =
-     * baseFrame.getAutoCompleter(fta.getFieldName()); if (comp != null)
-     * fta.setAutoComplete(comp); }
-     */
+    * if ((ta instanceof FieldTextArea) && (prefs.getBoolean("autoComplete"))) {
+    * FieldTextArea fta = (FieldTextArea)ta; Completer comp =
+    * baseFrame.getAutoCompleter(fta.getFieldName()); if (comp != null)
+    * fta.setAutoComplete(comp); }
+    */
 
     // Set up key bindings and focus listener for the FieldEditor.
     InputMap im = ta.getInputMap(JComponent.WHEN_FOCUSED);
@@ -489,15 +490,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     //am.put("close", closeAction);
     im.put(prefs.getKey("Entry editor, store field"), "store");
     am.put("store", storeFieldAction);
-    
+
     im.put(prefs.getKey("Entry editor, next panel"), "right");
     im.put(prefs.getKey("Entry editor, next panel 2"), "right");
     am.put("right", switchRightAction);
-    
+
     im.put(prefs.getKey("Entry editor, previous panel"), "left");
     im.put(prefs.getKey("Entry editor, previous panel 2"), "left");
     am.put("left", switchLeftAction);
-    
+
     im.put(prefs.getKey("Help"), "help");
     am.put("help", helpAction);
     im.put(prefs.getKey("Save database"), "save");
@@ -530,15 +531,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
     private void activateVisible() {
-	Object activeTab = tabs.get(tabbed.getSelectedIndex());
+    Object activeTab = tabs.get(tabbed.getSelectedIndex());
 
-	if (activeTab instanceof EntryEditorTab)
-	    ((EntryEditorTab)activeTab).activate();
-	else
+    if (activeTab instanceof EntryEditorTab)
+        ((EntryEditorTab)activeTab).activate();
+    else
         new FocusRequester(source);
         //((JComponent)activeTab).requestFocus();
     }
-  
+
   /**
    * Reports the enabled status of the editor, as set by setEnabled()
    */
@@ -551,10 +552,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   public void setEnabled(boolean enabled) {
       for (Iterator i=tabs.iterator(); i.hasNext();) {
-	  Object o = i.next();
-	  if (o instanceof EntryEditorTab) {
-	      ((EntryEditorTab)o).setEnabled(enabled);
-	  }
+      Object o = i.next();
+      if (o instanceof EntryEditorTab) {
+          ((EntryEditorTab)o).setEnabled(enabled);
+      }
       }
       source.setEnabled(enabled);
 
@@ -581,7 +582,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   private void switchTo(String id) {
     // Make sure the current edit is stored.
-    
+
     Object activeTab = tabs.get(tabbed.getSelectedIndex());
     if (activeTab instanceof EntryEditorTab) {
         updateField(((EntryEditorTab)activeTab).getActive());
@@ -608,7 +609,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   public int getVisiblePanel() {
     return tabbed.getSelectedIndex();
   }
-  
+
   /** Returns the name of the currently selected component. */
   public String getVisiblePanelName() {
       return tabbed.getSelectedComponent().getName();
@@ -623,13 +624,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   public void setVisiblePanel(int i) {
       tabbed.setSelectedIndex(Math.min(i, tabbed.getTabCount() - 1));
   }
-  
+
   public void setVisiblePanel(String name) {
       for (int i = 0; i < tabbed.getTabCount(); ++i) {
           if (name.equals(tabbed.getComponent(i).getName())) {
               tabbed.setSelectedIndex(i);
               return;
-          }          
+          }
       }
       if (tabbed.getTabCount() > 0)
           tabbed.setSelectedIndex(0);
@@ -650,7 +651,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     panel.showing = be;
     //activateVisible();
         }
-    
+
   /**
    * Returns false if the contents of the source panel has not been validated,
    * true othervise.
@@ -684,12 +685,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       NamedCompound compound = new NamedCompound(Globals.lang("source edit"));
       BibtexEntry nu = db.getEntryById((String) db.getKeySet().iterator().next());
       String id = entry.getId();
-      String 
+      String
       //oldKey = entry.getCiteKey(),
       newKey = nu.getCiteKey();
       boolean anyChanged = false;
       boolean duplicateWarning = false;
-      boolean emptyWarning = newKey == null || newKey.equals(""); 
+      boolean emptyWarning = newKey == null || newKey.equals("");
 
       if (panel.database.setCiteKeyForEntry(id, newKey)) {
         duplicateWarning = true;
@@ -747,7 +748,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       } else {
         panel.output(Globals.lang("Stored entry") + ".");
       }
-      
+
       lastSourceStringAccepted = source.getText();
       updateAllFields();
       lastSourceAccepted = true;
@@ -789,14 +790,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 
   public void setField(String fieldName, String newFieldData) {
-      
+
       for (Iterator i=tabs.iterator(); i.hasNext();) {
-	  Object o = i.next();
-	  if (o instanceof EntryEditorTab) {
-	      ((EntryEditorTab)o).updateField(fieldName, newFieldData);
-	  }
+      Object o = i.next();
+      if (o instanceof EntryEditorTab) {
+          ((EntryEditorTab)o).updateField(fieldName, newFieldData);
       }
-      
+      }
+
   }
 
 
@@ -809,17 +810,17 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
         }
     }
-    
+
   /**
    * Sets all the text areas according to the shown entry.
    */
   public void updateAllFields() {
       //System.out.println("EntryEditor.updateAllFields()");
-	  for (Iterator i=tabs.iterator(); i.hasNext();) {
-		  Object o = i.next();
-		  if (o instanceof EntryEditorTab) {
-		      ((EntryEditorTab)o).setEntry(entry);
-		  }
+      for (Iterator i=tabs.iterator(); i.hasNext();) {
+          Object o = i.next();
+          if (o instanceof EntryEditorTab) {
+              ((EntryEditorTab)o).setEntry(entry);
+          }
       }
   }
 
@@ -828,10 +829,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   public void validateAllFields() {
       for (Iterator i=tabs.iterator(); i.hasNext();) {
-	  Object o = i.next();
-	  if (o instanceof EntryEditorTab) {
-	      ((EntryEditorTab)o).validateAllFields();
-	  }
+      Object o = i.next();
+      if (o instanceof EntryEditorTab) {
+          ((EntryEditorTab)o).validateAllFields();
+      }
       }
   }
 
@@ -871,10 +872,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 && e.isControlDown())) {
               JPopupMenu typeMenu = new JPopupMenu();
 
-              
+
               //typeMenu.addSeparator();
               for (Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator();
-                  i.hasNext();)
+                   i.hasNext();)
                 typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(
                       (String) i.next()), panel));
 
@@ -916,7 +917,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class TabListener implements ChangeListener {
     public void stateChanged(ChangeEvent e) {
-	    activateVisible();
+        activateVisible();
 
         // After the initial event train has finished, we tell the editor tab to update all
         // its fields. This makes sure they are updated even if the tab we just left contained one
@@ -1173,7 +1174,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-      
+
       int thisRow = panel.tableModel.getNumberFromName(entry.getId());
       String id = null;
       int newRow = -1;
@@ -1251,10 +1252,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         // this updates the table automatically, on close, but not
         // within the tab
         Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
-        
+
         //entry = frame.labelMaker.applyRule(entry, panel.database) ;
         entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
-        
+
         // Store undo information:
         panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
             (String) oldValue, (String) entry.getField(GUIGlobals.KEY_FIELD)));
@@ -1307,19 +1308,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
       public void actionPerformed(ActionEvent e) {
-	  Object activeTab = tabs.get(tabbed.getSelectedIndex());
-	  if (activeTab instanceof EntryEditorTab) {
-	      // Normal panel.
-	      EntryEditorTab fp = (EntryEditorTab)activeTab;
-	      updateField(fp.getActive());
-	  } else
-	      // Source panel.
-	      updateField(activeTab);
-	  
-	  try {
-	      panel.runCommand("save");
-	  } catch (Throwable ex) {
-	  }
+      Object activeTab = tabs.get(tabbed.getSelectedIndex());
+      if (activeTab instanceof EntryEditorTab) {
+          // Normal panel.
+          EntryEditorTab fp = (EntryEditorTab)activeTab;
+          updateField(fp.getActive());
+      } else
+          // Source panel.
+          updateField(activeTab);
+
+      try {
+          panel.runCommand("save");
+      } catch (Throwable ex) {
+      }
       }
   }
 
@@ -1359,7 +1360,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       panel.changeType(entry, type);
     }
   }
-  
+
   /**
    * Scans all groups.
    * @return true if the specified entry is contained in any ExplicitGroup,
@@ -1374,15 +1375,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       }
       return false;
   }
-  
+
   private void warnDuplicateBibtexkey() {
         panel.output(Globals.lang("Warning") + ": "
                 + Globals.lang("Duplicate BibTeX key."));
-        
+
         if (prefs.getBoolean("dialogWarningForDuplicateKey")) {
             // JZTODO lyrics
             CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
-                    + ": " + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."), 
+                    + ": " + Globals.lang("Duplicate BibTeX key. Grouping may not work for this entry."),
                     Globals.lang("Disable this warning dialog"), false);
             JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
                     JOptionPane.WARNING_MESSAGE);
@@ -1396,11 +1397,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       // JZTODO lyrics
       panel.output(Globals.lang("Warning") + ": "
               + Globals.lang("Empty BibTeX key."));
-      
+
       if (prefs.getBoolean("dialogWarningForEmptyKey")) {
           // JZTODO lyrics
           CheckBoxMessage jcb = new CheckBoxMessage(Globals.lang("Warning")
-                  + ": " + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."), 
+                  + ": " + Globals.lang("Empty BibTeX key. Grouping may not work for this entry."),
                   Globals.lang("Disable this warning dialog"), false);
           JOptionPane.showMessageDialog(frame, jcb, Globals.lang("Warning"),
                   JOptionPane.WARNING_MESSAGE);
