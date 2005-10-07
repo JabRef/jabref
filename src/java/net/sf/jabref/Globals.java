@@ -383,6 +383,7 @@ public class Globals {
                       updateWorkingDirectory, false);
   }
 
+    
   public static String getNewFile(JFrame owner, JabRefPreferences prefs,
                                   File directory, String extension, OpenFileFilter off,
                                   int dialogType,
