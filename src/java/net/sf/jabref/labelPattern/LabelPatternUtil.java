@@ -192,6 +192,9 @@ public class LabelPatternUtil {
                       num = fa.length();
                     _sbvalue.append(fa.substring(0,num));
                   }
+                  else if (val.matches("authors\\d+")) {
+                    _sbvalue.append(NAuthors(_entry.getField("author").toString(),Integer.parseInt(val.substring(7))));
+                  }
 
                   else {
                     // This "auth" business was a dead end, so just use it literally:
@@ -248,14 +251,17 @@ public class LabelPatternUtil {
                 }
                 else if (val.equals("shortyear")) {
                   String ss = _entry.getField("year").toString();
-                  if (ss.length() > 2) {
+                  if (ss.startsWith("in") || ss.startsWith("sub")) {
+                    _sbvalue.append("IP");
+                  }
+                  else if (ss.length() > 2) {
                     _sbvalue.append(ss.substring(ss.length() - 2));
                   }
                   else {
                     _sbvalue.append(ss);
                   }
                 }
-
+                
                 else if(val.equals("veryshorttitle")) {
                   _sbvalue.append(getTitleWords(1, _entry));
                 }
@@ -506,6 +512,28 @@ public class LabelPatternUtil {
       i++;
     }
     return author;
+  }
+
+  /**
+   * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+   * @param authorField a <code>String</code>
+   * @param int n the number of desired authors
+   * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+   */
+  private static String NAuthors(String authorField, int n) {
+	    String author = "";
+	    // This code was part of 'ApplyRule' in 'ArticleLabelRule'
+	    String[] tokens = ImportFormatReader.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+	    int i = 0;
+	    while (tokens.length > i && i < n) {
+	      // convert lastname, firstname to firstname lastname
+	      String[] firstAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
+	      // lastname, firstname
+	      author += firstAuthor[0];
+	      i++;
+	    }
+	    if (tokens.length <= n) return author;
+	    return author += "EtAl";
   }
 
   /**

@@ -124,8 +124,11 @@ public class EntrySorter implements DatabaseChangeListener {
     public void databaseChanged(DatabaseChangeEvent e) {
         synchronized(set) {
 	        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
-	            set.add(e.getEntry());
-                changed = true;
+                int pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
+                set.add(pos, e.getEntry());
+                //addEntry(e.getEntry());
+                //set.add(e.getEntry());
+                //changed = true;
                 //Collections.sort(set, comp);
             }
 	        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
@@ -135,36 +138,51 @@ public class EntrySorter implements DatabaseChangeListener {
 	        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
                 // Entry changed. Resort list:
                 //Collections.sort(set, comp);
-                changed = true;
+                int pos = Collections.binarySearch(set, e.getEntry(), comp);
+                int posOld = set.indexOf(e.getEntry());
+                if (pos < 0) {
+                    set.remove(posOld);
+                    set.add(-pos-1, e.getEntry());
+                }
+                //changed = true;
             }
 
     	}
 
+    }
+
+    /** Add an entry to the sorted set, making sure it is put in the right position
+     *
+     * @param entry The entry to add
+     */
+    private void addEntry(BibtexEntry entry) {
+        int pos = -Collections.binarySearch(set, entry, comp) - 1;
+        set.add(pos, entry);
     }
 
 /* Old version, from when set was a TreeSet.
 
-        public void databaseChanged(DatabaseChangeEvent e) {
-        synchronized(set) {
-	        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
-	            set.add(e.getEntry());
-	        }
-	        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
-	            set.remove(e.getEntry());
-	        }
-	        else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
-	            set.remove(e.getEntry());
-                changing = true;
-	        }
-	        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
-	            // Remove and re-add the entry, to make sure it is in the
-	            // correct sort position.
-        	    set.add(e.getEntry());
-                changing = false;
-            }
-
-    	}
+    public void databaseChanged(DatabaseChangeEvent e) {
+    synchronized(set) {
+        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
+            set.add(e.getEntry());
+        }
+        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
+            set.remove(e.getEntry());
+        }
+        else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
+            set.remove(e.getEntry());
+            changing = true;
+        }
+        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
+            // Remove and re-add the entry, to make sure it is in the
+            // correct sort position.
+            set.add(e.getEntry());
+            changing = false;
+        }
 
     }
-    */
+
+}
+*/
 }
