@@ -34,8 +34,7 @@ import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.export.CustomExportList;
-import java.awt.Point;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.prefs.*;
 import java.util.*;
 import java.awt.event.*;
@@ -196,6 +195,18 @@ public class JabRefPreferences {
         defaults.put("menuFontFamily", "Times");
         defaults.put("menuFontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("menuFontSize", new Integer(11));
+        // Main table color settings:
+        defaults.put("tableBackground", "255:255:255");
+        defaults.put("tableReqFieldBackground", "230:235:255");
+        defaults.put("tableOptFieldBackground", "230:255:230");
+        defaults.put("tableText", "0:0:0");
+        defaults.put("gridColor", "210:210:210");
+        defaults.put("grayedOutBackground", "210:210:210");
+        defaults.put("grayedOutText", "40:40:40");
+        defaults.put("veryGrayedOutBackground", "180:180:180");
+        defaults.put("veryGrayedOutText", "40:40:40");
+        defaults.put("markedEntryBackground", "255:255:180");
+        defaults.put("incompleteEntryBackground", "250:175:175");
 
         defaults.put("antialias", Boolean.TRUE);
         defaults.put("ctrlClick", Boolean.FALSE);
@@ -367,6 +378,52 @@ public class JabRefPreferences {
             res[i] = (String)arr.elementAt(i);
 
         return res;
+    }
+
+    /**
+     * Looks up a color definition in preferences, and returns the Color object.
+     * @param key The key for this setting.
+     * @return The color corresponding to the setting.
+     */
+    public Color getColor(String key) {
+        String value = get(key);
+        int[] rgb = getRgb(value);
+        return new Color(rgb[0], rgb[1], rgb[2]);
+    }
+
+    public Color getDefaultColor(String key) {
+        String value = (String)defaults.get(key);
+        int[] rgb = getRgb(value);
+        return new Color(rgb[0], rgb[1], rgb[2]);
+    }
+
+    /**
+     * Stores a color in preferences.
+     * @param key The key for this setting.
+     * @param color The Color to store.
+     */
+    public void putColor(String key, Color color) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(String.valueOf(color.getRed()));
+        sb.append(':');
+        sb.append(String.valueOf(color.getGreen()));
+        sb.append(':');
+        sb.append(String.valueOf(color.getBlue()));
+        put(key, sb.toString());
+    }
+
+    /**
+     * Looks up a color definition in preferences, and returns an array containing the RGB values.
+     * @param key The key for this setting.
+     * @return The RGB values corresponding to this color setting.
+     */
+    public int[] getRgb(String value) {
+        String[] elements = value.split(":");
+        int[] values = new int[3];
+        values[0] = Integer.parseInt(elements[0]);
+        values[1] = Integer.parseInt(elements[1]);
+        values[2] = Integer.parseInt(elements[2]);
+        return values;
     }
 
     /**

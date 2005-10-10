@@ -49,6 +49,7 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
+import net.sf.jabref.gui.ColorSetupPanel;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
@@ -233,7 +234,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     showEntry(be);
                     
                     if (splitPane.getBottomComponent() != null) {
-                        new FocusRequester(splitPane.getBottomComponent());  
+                        new FocusRequester(splitPane.getBottomComponent());
                     }
                       
                   }
@@ -1402,30 +1403,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   String message = "";
                   public void init() {
                     //  new FieldWeightDialog(frame).setVisible(true);
-                    output("Abbreviating...");
+
 		          }
 		          public void run() {
                     //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
+                      ColorSetupPanel pan = new ColorSetupPanel();
+                      JOptionPane.showMessageDialog(frame, pan);
+                      pan.storeSettings();
+                      frame.setupAllTables();
 
-
-                    BibtexEntry[] entries = entryTable.getSelectedEntries();
-                      if (entries == null)
-                        return;
-                     NamedCompound ce = new NamedCompound("Abbreviate journal names");
-                      int count = 0;
-                      for (int i=0; i<entries.length; i++) {
-                          if (Globals.journalAbbrev.abbreviate(entries[i], "journal", ce))
-                            count++;
-                      }
-                      if (count > 0) {
-                          ce.end();
-                          undoManager.addEdit(ce);
-                          refreshTable();
-                          markBaseChanged();
-                          message = Globals.lang("Abbreviated %0 journal names.", String.valueOf(count));
-                      } else {
-                          message = Globals.lang("No journal names could be abbreviated.");
-                      }
                 }
                   public void update() {
                     output(message);
@@ -1563,7 +1549,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 markBaseChanged(); // The database just changed.
                 if (prefs.getBoolean("autoOpenForm")) {
-                    showEntry(be);
+
+                   showEntry(be);
+                    runCommand("edit");
                     /*
                     SwingUtilities.invokeLater(new Thread() {
                         public void run() {

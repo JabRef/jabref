@@ -151,7 +151,7 @@ public class StringDialog extends JDialog {
 	    TableColumnModel cm = getColumnModel();
 	    cm.getColumn(0).setPreferredWidth(800);
 	    cm.getColumn(1).setPreferredWidth(2000);
-	    sp.getViewport().setBackground(GUIGlobals.tableBackground);
+	    sp.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
 	    // getInputMap().remove(GUIGlobals.exitDialog);
 	    getInputMap().put(frame.prefs.getKey("Close dialog"), "close");
 	    getActionMap().put("close", closeAction);

@@ -95,7 +95,7 @@ public class EntryTable extends JTable {
         ctrlClick = prefs.getBoolean("ctrlClick");
         tableColorCodes = prefs.getBoolean("tableColorCodesOn");
         getTableHeader().setReorderingAllowed(false); // To prevent color bugs. Must be fixed.
-        setGridColor(GUIGlobals.gridColor);
+        setGridColor(Globals.prefs.getColor("gridColor"));
         setShowVerticalLines(true);
         setShowHorizontalLines(true);
         //setColumnSelectionAllowed(true);
@@ -197,7 +197,7 @@ public class EntryTable extends JTable {
         
         // (to update entry editor or preview)
         setWidths();
-        sp.getViewport().setBackground(GUIGlobals.tableBackground);
+        sp.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
         updateFont();
       }
 
@@ -658,22 +658,23 @@ public class EntryTable extends JTable {
     // to visualize which fields are needed for each entry.
     private 	IconStringRenderer incompleteEntryRenderer = new IconStringRenderer
         (Globals.lang("This entry is incomplete"));
-    private GeneralRenderer defRenderer = new GeneralRenderer(this, GUIGlobals.tableBackground, antialiasing),
-        reqRenderer = new GeneralRenderer(this, GUIGlobals.tableReqFieldBackground, antialiasing),
-        optRenderer = new GeneralRenderer(this, GUIGlobals.tableOptFieldBackground, antialiasing),
+    private GeneralRenderer defRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableBackground"),
+            Globals.prefs.getColor("tableText"), antialiasing),
+        reqRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
+        optRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
         incRenderer = new IncompleteRenderer(this, antialiasing),
             //new Renderer(GUIGlobals.tableIncompleteEntryBackground),
             //Globals.lang("This entry is incomplete")),
-        grayedOutRenderer = new GeneralRenderer(this, GUIGlobals.grayedOutBackground,
-                                         GUIGlobals.grayedOutText, antialiasing),
-        veryGrayedOutRenderer = new GeneralRenderer(this, GUIGlobals.veryGrayedOutBackground,
-                                             GUIGlobals.veryGrayedOutText, antialiasing),
-        maybeIncRenderer = new GeneralRenderer(this, GUIGlobals.maybeIncompleteEntryBackground, antialiasing),
-        markedRenderer = new GeneralRenderer(this, GUIGlobals.markedEntryBackground, antialiasing);
+        grayedOutRenderer = new GeneralRenderer(this, Globals.prefs.getColor("grayedOutBackground"),
+                                         Globals.prefs.getColor("grayedOutText"), antialiasing),
+        veryGrayedOutRenderer = new GeneralRenderer(this, Globals.prefs.getColor("veryGrayedOutBackground"),
+                                             Globals.prefs.getColor("veryGrayedOutText"), antialiasing),
+        markedRenderer = new GeneralRenderer(this, Globals.prefs.getColor("markedEntryBackground"),
+                Globals.prefs.getColor("tableText"), antialiasing);
 
     class IncompleteRenderer extends GeneralRenderer {
         public IncompleteRenderer(JTable table, boolean antialiasing) {
-            super(table, GUIGlobals.tableIncompleteEntryBackground, antialiasing);
+            super(table, Globals.prefs.getColor("incompleteEntryBackground"), antialiasing);
         }
         protected void setValue(Object value) {
             super.setValue(value);

@@ -295,7 +295,6 @@ public class GUIGlobals {
 
 // Colors.
   public static Color
-      gridColor = new Color(210, 210, 210),
       lightGray = new Color(230, 30, 30), // Light gray background
       validFieldColor = new Color(100, 100, 150), // Empty field, blue.
       nullFieldColor = new Color(75, 130, 95), // Valid field, green.
@@ -304,16 +303,6 @@ public class GUIGlobals {
       validFieldBackground = Color.white, // Valid field backgnd.
 //invalidFieldBackground = new Color(210, 70, 70), // Invalid field backgnd.
       invalidFieldBackground = new Color(255, 100, 100), // Invalid field backgnd.
-      tableBackground = Color.white, // Background color for the entry table.
-      tableReqFieldBackground = new Color(230, 235, 255),
-      tableOptFieldBackground = new Color(230, 255, 230),
-      tableIncompleteEntryBackground = new Color(250, 175, 175),
-      maybeIncompleteEntryBackground = new Color(255, 255, 200),
-      markedEntryBackground = new Color(255, 255, 180),
-      grayedOutBackground = new Color(210, 210, 210),
-      grayedOutText = new Color(40, 40, 40),
-      veryGrayedOutBackground = new Color(180, 180, 180),
-      veryGrayedOutText = new Color(40, 40, 40),
       gradientGray = new Color(112, 121, 165),  // Title bar gradient color, sidepaneheader
       gradientBlue = new Color(0, 27, 102),  // Title bar gradient color, sidepaneheader
       //activeTabbed = Color.black,  // active Database (JTabbedPane)

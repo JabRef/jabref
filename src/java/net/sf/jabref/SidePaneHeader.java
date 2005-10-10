@@ -31,7 +31,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.net.URL;
-import javax.swing.JToolBar;
 
 public class SidePaneHeader extends JPanel implements ActionListener {
 
@@ -48,13 +47,13 @@ public class SidePaneHeader extends JPanel implements ActionListener {
 			  }*/
 
     public SidePaneHeader(String name, URL image, SidePaneComponent parent_) {
-	addPart(name, image, parent_);
+    addPart(name, image, parent_);
     }
 
     public void paintComponent(Graphics g) {
       Graphics2D g2 = (Graphics2D)g;
       Paint oldPaint = g2.getPaint();
-      //g2.setColor(Color.red);
+      //g2.putColor(Color.red);
       Insets ins = getInsets();
       int width = getWidth() - ins.left - ins.right,
           height = getHeight() - ins.top - ins.bottom;
@@ -71,18 +70,18 @@ public class SidePaneHeader extends JPanel implements ActionListener {
     //public boolean isOpaque() { return true; }
 
     private void addPart(String name, URL image, SidePaneComponent parent_) {
-	parent = parent_;
-	setLayout(gbl);
+    parent = parent_;
+    setLayout(gbl);
         //setPreferredSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
         //setMinimumSize(new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 18));
-	//imageIcon = new JLabel(new ImageIcon(image));
-	nameLabel = new JLabel(Globals.lang(name), new ImageIcon(image),
-			       SwingConstants.LEFT);
+    //imageIcon = new JLabel(new ImageIcon(image));
+    nameLabel = new JLabel(Globals.lang(name), new ImageIcon(image),
+                   SwingConstants.LEFT);
 //        setBackground(new Color(0, 0, 175)); //SystemColor.activeCaption);
 
         //close.setOpaque(false);
         nameLabel.setForeground(new Color(230, 230, 230));
-	//nameLabel.setPreferredSize(new Dimension(70, 24));
+    //nameLabel.setPreferredSize(new Dimension(70, 24));
         /*AbstractAction close = new AbstractAction("Close", new ImageIcon(GUIGlobals.closeIconFile)) {
           public void actionPerformed(ActionEvent e) {
             parent.hideAway();
@@ -105,27 +104,27 @@ public class SidePaneHeader extends JPanel implements ActionListener {
 
   //setBorder(BorderFactory.createEtchedBorder());
   //setBorder(BorderFactory.createMatteBorder(1,1,1,2,new Color(150,150,150)));
-	//add(imageIcon, BorderLayout.WEST);
-	con.insets = new Insets(1, 1, 1, 1);
-	con.gridwidth = 1;
-	con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.NONE;
-	gbl.setConstraints(nameLabel, con);
-	add(nameLabel);
-	JPanel pan = new JPanel();
+    //add(imageIcon, BorderLayout.WEST);
+    con.insets = new Insets(1, 1, 1, 1);
+    con.gridwidth = 1;
+    con.anchor = GridBagConstraints.WEST;
+    con.fill = GridBagConstraints.NONE;
+    gbl.setConstraints(nameLabel, con);
+    add(nameLabel);
+    JPanel pan = new JPanel();
         pan.setOpaque(false);
-	con.fill = GridBagConstraints.HORIZONTAL;
-	con.weightx = 1;
-	gbl.setConstraints(pan, con);
-	add(pan);
-	con.weightx = 0;
-	con.fill = GridBagConstraints.NONE;
-	con.gridwidth = GridBagConstraints.REMAINDER;
+    con.fill = GridBagConstraints.HORIZONTAL;
+    con.weightx = 1;
+    gbl.setConstraints(pan, con);
+    add(pan);
+    con.weightx = 0;
+    con.fill = GridBagConstraints.NONE;
+    con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(close, con);
-	add(close);
+    add(close);
     }
 
     public void actionPerformed(ActionEvent e) {
-	parent.hideAway(); //setVisible(false);
+    parent.hideAway(); //setVisible(false);
     }
 }

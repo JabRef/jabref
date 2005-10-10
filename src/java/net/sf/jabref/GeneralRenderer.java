@@ -25,7 +25,7 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
 
     public GeneralRenderer(JTable table, Color c, Color fg, boolean antialiasing) {
         this(table, c, antialiasing);
-        //setForeground(fg)????
+        setForeground(fg);
     }
 
     public void firePropertyChange(String propertyName, boolean old, boolean newV) {}
