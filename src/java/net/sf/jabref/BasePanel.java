@@ -1408,9 +1408,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 		          public void run() {
                     //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
                       ColorSetupPanel pan = new ColorSetupPanel();
-                      JOptionPane.showMessageDialog(frame, pan);
-                      pan.storeSettings();
-                      frame.setupAllTables();
+                      int answer = JOptionPane.showConfirmDialog(frame, pan, Globals.lang("Color setup"), JOptionPane.OK_CANCEL_OPTION);
+                      if (answer == JOptionPane.OK_OPTION) {
+                        pan.storeSettings();
+                        frame.setupAllTables();
+                      }
 
                 }
                   public void update() {

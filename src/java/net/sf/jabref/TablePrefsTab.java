@@ -8,6 +8,7 @@ import java.awt.event.*;
 import com.jgoodies.forms.layout.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.builder.*;
+import net.sf.jabref.gui.ColorSetupPanel;
 
 class TablePrefsTab extends JPanel implements PrefsTab {
 
@@ -15,16 +16,16 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-	antialias, pdfColumn, urlColumn, citeseerColumn;
+    antialias, pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl, namesLastOnly;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
-	secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
-	terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
+    secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
+    terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
     private JTextField secField, terField, fontSize;
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
-    
+    private ColorSetupPanel colorPanel = new ColorSetupPanel();
     private boolean tableChanged = false;
     private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
@@ -36,20 +37,20 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      * @param prefs a <code>JabRefPreferences</code> value
      */
     public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
-	_prefs = prefs;
-	this.frame = frame;
-	setLayout(new BorderLayout());
+    _prefs = prefs;
+    this.frame = frame;
+    setLayout(new BorderLayout());
 
 
 
-	colorCodes = new JCheckBox(Globals.lang
-				   ("Color codes for required and optional fields"));
-	antialias = new JCheckBox(Globals.lang
-				  ("Use antialiasing font in table"));
-	autoResizeMode = new JCheckBox(Globals.lang
-				       ("Fit table horizontally on screen"));
-	namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
-	namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
+    colorCodes = new JCheckBox(Globals.lang
+                   ("Color codes for required and optional fields"));
+    antialias = new JCheckBox(Globals.lang
+                  ("Use antialiasing font in table"));
+    autoResizeMode = new JCheckBox(Globals.lang
+                       ("Fit table horizontally on screen"));
+    namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
+    namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
         namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
         namesLastOnly = new JRadioButton(Globals.lang("Show last name only"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
@@ -79,225 +80,227 @@ class TablePrefsTab extends JPanel implements PrefsTab {
           }
         });
 
-	ButtonGroup bg = new ButtonGroup();
-	bg.add(namesAsIs);
-	bg.add(namesFf);
-	bg.add(namesFl);
+    ButtonGroup bg = new ButtonGroup();
+    bg.add(namesAsIs);
+    bg.add(namesFf);
+    bg.add(namesFl);
     bg.add(namesLastOnly);
 
     secDesc = new JCheckBox(Globals.lang("Descending"));
-	terDesc = new JCheckBox(Globals.lang("Descending"));
+    terDesc = new JCheckBox(Globals.lang("Descending"));
 
-	FormLayout layout = new FormLayout
-	    ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
-	     "");                
-	DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-	JLabel lab;
-	JPanel pan = new JPanel();
-	builder.appendSeparator(Globals.lang("Special table columns"));
-	builder.nextLine();
-	builder.append(pan); builder.append(pdfColumn); builder.nextLine();
-	builder.append(pan); builder.append(urlColumn); builder.nextLine();
-	builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
-	builder.appendSeparator(Globals.lang("Format of author and editor names"));
-	builder.append(pan); builder.append(namesAsIs); builder.nextLine();
-	builder.append(pan); builder.append(namesFf); builder.nextLine();
-	builder.append(pan); builder.append(namesFl); builder.nextLine();
+    FormLayout layout = new FormLayout
+        ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
+         "");
+    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+    JLabel lab;
+    JPanel pan = new JPanel();
+    builder.appendSeparator(Globals.lang("Special table columns"));
+    builder.nextLine();
+    builder.append(pan); builder.append(pdfColumn); builder.nextLine();
+    builder.append(pan); builder.append(urlColumn); builder.nextLine();
+    builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
+    builder.appendSeparator(Globals.lang("Format of author and editor names"));
+    builder.append(pan); builder.append(namesAsIs); builder.nextLine();
+    builder.append(pan); builder.append(namesFf); builder.nextLine();
+    builder.append(pan); builder.append(namesFl); builder.nextLine();
     builder.append(pan); builder.append(namesLastOnly); builder.nextLine();
     builder.appendSeparator(Globals.lang("Sort options"));
-	// Create a new panel with its own FormLayout for these items:
-	FormLayout layout2 = new FormLayout
-	    ("left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");             
-	DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
-	lab = new JLabel(Globals.lang("Secondary sort criterion"));
-	builder2.append(lab);
-	builder2.append(secSort);
-	builder2.append(secField);
-	builder2.append(secDesc);
-	builder2.nextLine();
-	lab = new JLabel(Globals.lang("Tertiary sort criterion"));
-	builder2.append(lab);
-	builder2.append(terSort);
-	builder2.append(terField);
-	builder2.append(terDesc);
-	builder.nextLine();
-	builder.append(pan);
-	builder.append(builder2.getPanel());
-	builder.nextLine();
-	builder.appendSeparator(Globals.lang("Table appearance"));
-	builder.append(pan); builder.append(colorCodes); builder.nextLine();
-	builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
-	builder.append(pan); builder.append(antialias); builder.nextLine();
-	builder.append(pan); builder.append(fontButton); builder.nextLine();
-	//	builder.append(pan); builder.append(); builder.nextLine();
+    // Create a new panel with its own FormLayout for these items:
+    FormLayout layout2 = new FormLayout
+        ("left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
+    DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
+    lab = new JLabel(Globals.lang("Secondary sort criterion"));
+    builder2.append(lab);
+    builder2.append(secSort);
+    builder2.append(secField);
+    builder2.append(secDesc);
+    builder2.nextLine();
+    lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+    builder2.append(lab);
+    builder2.append(terSort);
+    builder2.append(terField);
+    builder2.append(terDesc);
+    builder.nextLine();
+    builder.append(pan);
+    builder.append(builder2.getPanel());
+    builder.nextLine();
+    builder.appendSeparator(Globals.lang("Table appearance"));
+    builder.append(pan); builder.append(colorCodes); builder.nextLine();
+    builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
+    builder.append(pan); builder.append(antialias); builder.nextLine();
+    builder.append(pan); builder.append(fontButton); builder.nextLine();
+    builder.append(pan); builder.append(colorPanel);
+    //	builder.append(pan); builder.append(); builder.nextLine();
 
-	JPanel upper = new JPanel(),
-	    sort = new JPanel(),
-	    namesp = new JPanel(),
+    JPanel upper = new JPanel(),
+        sort = new JPanel(),
+        namesp = new JPanel(),
             iconCol = new JPanel();
-	upper.setLayout(gbl);
-	sort.setLayout(gbl);
+    upper.setLayout(gbl);
+    sort.setLayout(gbl);
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
-	/*
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.NONE;
-	con.anchor = GridBagConstraints.WEST;
-	gbl.setConstraints(colorCodes, con);
-	upper.add(colorCodes);
-	gbl.setConstraints(autoResizeMode, con);
-	upper.add(autoResizeMode);
-        gbl.setConstraints(antialias, con);
-        upper.add(antialias);
-        con.gridwidth = 1;
-	lab = new JLabel(Globals.lang("Menu and label font size"));
-	gbl.setConstraints(lab, con);
-	upper.add(lab);
-	Insets old = con.insets;
-	con.insets = new Insets(0, 5, 0, 5);
-	gbl.setConstraints(fontSize, con);
-	upper.add(fontSize);
-	con.insets = old;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-	lab = new JLabel("("+Globals.lang("non-Mac only")+")");
-	gbl.setConstraints(lab, con);
-	upper.add(lab);
-	//gbl.setConstraints(menuFontButton, con);
-	//upper.add(menuFontButton);
-	//con.anchor = GridBagConstraints.EAST;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(fontButton, con);
-	upper.add(fontButton);
-	con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.BOTH;
-        con.gridwidth = 1;
-        con.gridheight = 2;
-	gbl.setConstraints(upper, con);
-	//add(upper);
-        con.gridheight = 1;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        gbl.setConstraints(pdfColumn, con);
-        iconCol.add(pdfColumn);
-        gbl.setConstraints(urlColumn, con);
-        iconCol.add(urlColumn);
-        gbl.setConstraints(citeseerColumn, con);
-        iconCol.add(citeseerColumn);
-        con.fill = GridBagConstraints.BOTH;
-        gbl.setConstraints(iconCol, con);
-	add(iconCol);
+    /*
+     con.gridwidth = GridBagConstraints.REMAINDER;
+     con.fill = GridBagConstraints.NONE;
+     con.anchor = GridBagConstraints.WEST;
+     gbl.setConstraints(colorCodes, con);
+     upper.add(colorCodes);
+     gbl.setConstraints(autoResizeMode, con);
+     upper.add(autoResizeMode);
+         gbl.setConstraints(antialias, con);
+         upper.add(antialias);
+         con.gridwidth = 1;
+     lab = new JLabel(Globals.lang("Menu and label font size"));
+     gbl.setConstraints(lab, con);
+     upper.add(lab);
+     Insets old = con.insets;
+     con.insets = new Insets(0, 5, 0, 5);
+     gbl.setConstraints(fontSize, con);
+     upper.add(fontSize);
+     con.insets = old;
+         con.gridwidth = GridBagConstraints.REMAINDER;
+     lab = new JLabel("("+Globals.lang("non-Mac only")+")");
+     gbl.setConstraints(lab, con);
+     upper.add(lab);
+     //gbl.setConstraints(menuFontButton, con);
+     //upper.add(menuFontButton);
+     //con.anchor = GridBagConstraints.EAST;
+         con.gridwidth = GridBagConstraints.REMAINDER;
+     gbl.setConstraints(fontButton, con);
+     upper.add(fontButton);
+     con.anchor = GridBagConstraints.WEST;
+     con.fill = GridBagConstraints.BOTH;
+         con.gridwidth = 1;
+         con.gridheight = 2;
+     gbl.setConstraints(upper, con);
+     //add(upper);
+         con.gridheight = 1;
+         con.gridwidth = GridBagConstraints.REMAINDER;
+         gbl.setConstraints(pdfColumn, con);
+         iconCol.add(pdfColumn);
+         gbl.setConstraints(urlColumn, con);
+         iconCol.add(urlColumn);
+         gbl.setConstraints(citeseerColumn, con);
+         iconCol.add(citeseerColumn);
+         con.fill = GridBagConstraints.BOTH;
+         gbl.setConstraints(iconCol, con);
+     add(iconCol);
 
 
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.NONE;
-	con.anchor = GridBagConstraints.WEST;
-	gbl.setConstraints(namesAsIs, con);
-	namesp.add(namesAsIs);
-	gbl.setConstraints(namesFf, con);
-	namesp.add(namesFf);
-	gbl.setConstraints(namesFl, con);
-	namesp.add(namesFl);
-        con.fill = GridBagConstraints.BOTH;
-        gbl.setConstraints(namesp, con);
-	add(namesp);*/
+     con.gridwidth = GridBagConstraints.REMAINDER;
+     con.fill = GridBagConstraints.NONE;
+     con.anchor = GridBagConstraints.WEST;
+     gbl.setConstraints(namesAsIs, con);
+     namesp.add(namesAsIs);
+     gbl.setConstraints(namesFf, con);
+     namesp.add(namesFf);
+     gbl.setConstraints(namesFl, con);
+     namesp.add(namesFl);
+         con.fill = GridBagConstraints.BOTH;
+         gbl.setConstraints(namesp, con);
+     add(namesp);*/
 
 
 
-	// Set the correct value for the primary sort JComboBox.
-	/*String sec = prefs.get("secSort"),
-	    ter = prefs.get("terSort");
-	for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-	    if (sec.equals(GUIGlobals.ALL_FIELDS[i]))
-		secSort.setSelectedIndex(i);
-	    if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
-		terSort.setSelectedIndex(i);
-	}
+    // Set the correct value for the primary sort JComboBox.
+    /*String sec = prefs.get("secSort"),
+         ter = prefs.get("terSort");
+     for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
+         if (sec.equals(GUIGlobals.ALL_FIELDS[i]))
+         secSort.setSelectedIndex(i);
+         if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
+         terSort.setSelectedIndex(i);
+     }
 
-	lab = new JLabel(Globals.lang("Secondary sort criterion"));
-	con.gridwidth = 1;
-	con.insets = new Insets(0,5,0,0);
-	gbl.setConstraints(lab, con);
-	sort.add(lab);
-	con.weightx = 1;
-	gbl.setConstraints(secSort, con);
-	sort.add(secSort);
-        gbl.setConstraints(secField, con);
-        sort.add(secField);
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(secDesc, con);
-	sort.add(secDesc);
+     lab = new JLabel(Globals.lang("Secondary sort criterion"));
+     con.gridwidth = 1;
+     con.insets = new Insets(0,5,0,0);
+     gbl.setConstraints(lab, con);
+     sort.add(lab);
+     con.weightx = 1;
+     gbl.setConstraints(secSort, con);
+     sort.add(secSort);
+         gbl.setConstraints(secField, con);
+         sort.add(secField);
+     con.gridwidth = GridBagConstraints.REMAINDER;
+     gbl.setConstraints(secDesc, con);
+     sort.add(secDesc);
 
-	con.gridwidth = 1;
+     con.gridwidth = 1;
 
- 	lab = new JLabel(Globals.lang("Tertiary sort criterion"));
-	gbl.setConstraints(lab, con);
-	sort.add(lab);
-	con.weightx = 0;
-	//con.insets = new Insets(0,5,0,0);
-        gbl.setConstraints(terSort, con);
-        sort.add(terSort);
-        gbl.setConstraints(terField, con);
-        sort.add(terField);
-	con.weightx = 1;
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	gbl.setConstraints(terDesc, con);
-	sort.add(terDesc);*/
+      lab = new JLabel(Globals.lang("Tertiary sort criterion"));
+     gbl.setConstraints(lab, con);
+     sort.add(lab);
+     con.weightx = 0;
+     //con.insets = new Insets(0,5,0,0);
+         gbl.setConstraints(terSort, con);
+         sort.add(terSort);
+         gbl.setConstraints(terField, con);
+         sort.add(terField);
+     con.weightx = 1;
+     con.gridwidth = GridBagConstraints.REMAINDER;
+     gbl.setConstraints(terDesc, con);
+     sort.add(terDesc);*/
 
 
-	fontButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    // JDialog dl = new EntryCustomizationDialog(ths);
-		    Font f=new FontSelectorDialog
-				(null, GUIGlobals.CURRENTFONT).getSelectedFont();
-			if(f==null)
-			    return;
-			else
-			    font = f;
-		}
-	    });
-	/*menuFontButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    Font f=new FontSelectorDialog
-				(null, menuFont).getSelectedFont();
-			if(f==null)
-			    return;
-			else
-			    menuFont = f;
-		}
-		});*/
+    fontButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            // JDialog dl = new EntryCustomizationDialog(ths);
+            Font f=new FontSelectorDialog
+                (null, GUIGlobals.CURRENTFONT).getSelectedFont();
+            if(f==null)
+                return;
+            else
+                font = f;
+        }
+        });
+    /*menuFontButton.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+             Font f=new FontSelectorDialog
+                 (null, menuFont).getSelectedFont();
+             if(f==null)
+                 return;
+             else
+                 menuFont = f;
+         }
+         });*/
 
-	pan = builder.getPanel();
-	pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-	add(pan, BorderLayout.CENTER);
+    pan = builder.getPanel();
+    pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    add(pan, BorderLayout.CENTER);
     }
 
     public void setValues() {
-	menuFont = new Font
-	    (_prefs.get("menuFontFamily"), _prefs.getInt("menuFontStyle"),
-	     _prefs.getInt("menuFontSize"));
-	colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
-	antialias.setSelected(_prefs.getBoolean("antialias"));
-	autoResizeMode.setSelected((_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
-	pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
-	urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
-	citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
+    menuFont = new Font
+        (_prefs.get("menuFontFamily"), _prefs.getInt("menuFontStyle"),
+         _prefs.getInt("menuFontSize"));
+    colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
+    antialias.setSelected(_prefs.getBoolean("antialias"));
+    autoResizeMode.setSelected((_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
+    pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
+    urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
+    citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
 
-	secField.setText(_prefs.get("secSort"));
-	terField.setText(_prefs.get("terSort"));
+    secField.setText(_prefs.get("secSort"));
+    terField.setText(_prefs.get("terSort"));
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
-	if (_prefs.getBoolean("namesAsIs"))
-	    namesAsIs.setSelected(true);
-	else {
-	    if (_prefs.getBoolean("namesFf"))
-		    namesFf.setSelected(true);
-	    else if (_prefs.getBoolean("namesLastOnly"))
+    if (_prefs.getBoolean("namesAsIs"))
+        namesAsIs.setSelected(true);
+    else {
+        if (_prefs.getBoolean("namesFf"))
+            namesFf.setSelected(true);
+        else if (_prefs.getBoolean("namesLastOnly"))
             namesLastOnly.setSelected(true);
         else
             namesFl.setSelected(true);
-	}
-	secDesc.setSelected(_prefs.getBoolean("secDescending"));
-	terDesc.setSelected(_prefs.getBoolean("terDescending"));
+    }
+    secDesc.setSelected(_prefs.getBoolean("secDescending"));
+    terDesc.setSelected(_prefs.getBoolean("terDescending"));
+        colorPanel.setValues();
     }
 
     /**
@@ -307,37 +310,38 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public void storeSettings() {
 
-	_prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
-	_prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
+    _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
+    _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
     _prefs.putBoolean("namesFf", namesFf.isSelected() && !namesLastOnly.isSelected());
     _prefs.putBoolean("namesLastOnly", namesLastOnly.isSelected());
         _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
         _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
-	_prefs.putInt("autoResizeMode",
-		      autoResizeMode.isSelected() ?
-		      JTable.AUTO_RESIZE_ALL_COLUMNS :
-		      JTable.AUTO_RESIZE_OFF);
-	_prefs.putBoolean("secDescending", secDesc.isSelected());
-	_prefs.putBoolean("terDescending", terDesc.isSelected());
-	//_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
-	//_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
+    _prefs.putInt("autoResizeMode",
+              autoResizeMode.isSelected() ?
+              JTable.AUTO_RESIZE_ALL_COLUMNS :
+              JTable.AUTO_RESIZE_OFF);
+    _prefs.putBoolean("secDescending", secDesc.isSelected());
+    _prefs.putBoolean("terDescending", terDesc.isSelected());
+    //_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
+    //_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
         _prefs.put("secSort", secField.getText().toLowerCase().trim());
         _prefs.put("terSort", terField.getText().toLowerCase().trim());
-	// updatefont
-	_prefs.put("fontFamily", font.getFamily());
-	_prefs.putInt("fontStyle", font.getStyle());
-	_prefs.putInt("fontSize", font.getSize());
-	//_prefs.put("menuFontFamily", menuFont.getFamily());
-	//_prefs.putInt("menuFontStyle", menuFont.getStyle());
-	//_prefs.putInt("menuFontSize", menuFont.getSize());
+    // updatefont
+    _prefs.put("fontFamily", font.getFamily());
+    _prefs.putInt("fontStyle", font.getStyle());
+    _prefs.putInt("fontSize", font.getSize());
+    //_prefs.put("menuFontFamily", menuFont.getFamily());
+    //_prefs.putInt("menuFontStyle", menuFont.getStyle());
+    //_prefs.putInt("menuFontSize", menuFont.getSize());
 
-	GUIGlobals.CURRENTFONT = font;
+    GUIGlobals.CURRENTFONT = font;
+        colorPanel.storeSettings();
     }
 
     public boolean readyToClose() {
-	return true;
+    return true;
     }
 
 }

@@ -22,22 +22,21 @@ import net.sf.jabref.Globals;
 public class ColorSetupPanel extends JPanel {
 
     private final static int ICON_WIDTH=30, ICON_HEIGHT=20;
-    private ColorButton tableText, tableBackground, gridColor;
     private ArrayList buttons = new ArrayList();
 
     public ColorSetupPanel() {
 
         FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
+                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         buttons.add(new ColorButton("tableText", Globals.lang("Table text color")));
         buttons.add(new ColorButton("tableBackground", Globals.lang("Table background color")));
-        buttons.add(new ColorButton("gridColor", Globals.lang("Table grid color")));
         buttons.add(new ColorButton("tableReqFieldBackground", Globals.lang("Background color for required fields")));
         buttons.add(new ColorButton("tableOptFieldBackground", Globals.lang("Background color for optional fields")));
         buttons.add(new ColorButton("markedEntryBackground", Globals.lang("Background color for marked entries")));
         buttons.add(new ColorButton("incompleteEntryBackground", Globals.lang("Color for marking incomplete entries")));
+        buttons.add(new ColorButton("gridColor", Globals.lang("Table grid color")));
 
 
 
@@ -46,24 +45,12 @@ public class ColorSetupPanel extends JPanel {
             builder.append(but);
             builder.append(but.getDefaultButton());
             builder.append(but.getName());
-            builder.nextLine();
             but.addActionListener(new ColorButtonListener(but));
 
         }
 
-        /*
-        builder.append(tableText);
-        builder.append(tableText.getName());
-        builder.append(tableBackground);
-        builder.append(tableBackground.getName());
-        builder.append(gridColor);
-        builder.append(gridColor.getName());
-          */
         setLayout(new BorderLayout());
         add(builder.getPanel(), BorderLayout.CENTER);
-
-        //tableText.addActionListener(new ColorButtonListener(tableText));
-        //tableBackground.addActionListener(new ColorButtonListener( tableBackground));
 
         setValues();
 
@@ -98,7 +85,10 @@ public class ColorSetupPanel extends JPanel {
         }
     }
 
-
+    /**
+     * A button to display the chosen color, and hold key information about a color setting.
+     * Includes a method to produce a Default button for this setting.
+     */
     class ColorButton extends JButton implements Icon {
         private Color color = Color.white;
         private String key, name;
