@@ -210,6 +210,8 @@ public class PrefsDialog3 extends JDialog {
             try {
             _prefs.importPreferences(filename);
             setValues();
+                BibtexEntryType.loadCustomEntryTypes(_prefs);
+                frame.removeCachedEntryEditors();
             } catch (IOException ex) {
             JOptionPane.showMessageDialog
                 (ths, Globals.lang("Could not import preferences")+": "+ex.getMessage(), Globals.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
