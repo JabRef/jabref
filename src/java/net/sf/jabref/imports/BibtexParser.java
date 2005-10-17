@@ -65,7 +65,7 @@ public class BibtexParser
       new BufferedReader(inOrig);
 
     //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
-    Pattern pat1 = Pattern.compile("@[a-zA-Z]*\\{");
+    Pattern pat1 = Pattern.compile("@[a-zA-Z]*\\s*\\{");
 
     String str;
 
