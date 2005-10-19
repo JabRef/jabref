@@ -11,7 +11,7 @@ import net.sf.jabref.undo.NamedCompound;
  * User: alver
  * Date: Sep 17, 2005
  * Time: 12:48:23 AM
- * To change this template use File | Settings | File Templates.
+ * To browseOld this template use File | Settings | File Templates.
  */
 public class UnabbreviateAction extends AbstractWorker {
     BasePanel panel;

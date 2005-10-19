@@ -465,8 +465,8 @@ public class Globals {
     }
 
     // If this is a save dialog, and the user has not chosen "All files" as filter
-    // we enforce the given extension.
-    if ( (dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
+    // we enforce the given extension. But only if extension is not null.
+    if ((extension != null) && (dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
         !off.accept(selectedFile)) {
 
       // add the first extension if there are multiple extensions

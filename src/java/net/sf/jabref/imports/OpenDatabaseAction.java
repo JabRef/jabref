@@ -78,6 +78,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
                 ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
+		if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+		    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file"+" '"+fileName+"'"),
+						  Globals.lang("Error"),
+						  JOptionPane.ERROR_MESSAGE);
+
+		    return;
+		}
+		 
                 BibtexDatabase db = pr.getDatabase();
                 HashMap meta = pr.getMetaData();
 

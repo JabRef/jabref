@@ -23,7 +23,7 @@ import java.net.URL;
  * User: alver
  * Date: Sep 16, 2005
  * Time: 10:49:08 PM
- * To change this template use File | Settings | File Templates.
+ * To browseOld this template use File | Settings | File Templates.
  */
 public class JournalAbbreviations {
 
@@ -31,6 +31,7 @@ public class JournalAbbreviations {
             +"<BR>"+Globals.lang("if the journal name is known. Go to (...............)")+"</HTML>";
     TreeMap fullNameKeyed = new TreeMap();
     HashMap abbrNameKeyed = new HashMap();
+    HashMap abbrNoDotsToAbbr = new HashMap();
     TreeMap all = new TreeMap();
     CaseChanger caseChanger = new CaseChanger();
 
@@ -52,29 +53,41 @@ public class JournalAbbreviations {
 
     public boolean isKnownName(String journalName) {
         String s = journalName.toLowerCase();
-        return ((fullNameKeyed.get(s) != null) || (abbrNameKeyed.get(s) != null));
+        return ((fullNameKeyed.get(s) != null) || (abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
     public boolean isAbbreviatedName(String journalName) {
         String s = journalName.toLowerCase();
-        return (abbrNameKeyed.get(s) != null);
+        return ((abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
     /**
      * Attempts to get the abbreviated name of the journal given. Returns null if no
      * abbreviated name is known.
      * @param journalName The journal name to abbreviate.
-     * @param titleCase true if the first character of every word should be capitalized, false
+     * @param withDots True if the abbreviation should have dots.
      * if only the first character should be.
      * @return The abbreviated name, or null if it couldn't be found.
      */
-    public String getAbbreviatedName(String journalName) {
+    public String getAbbreviatedName(String journalName, boolean withDots) {
         String s = journalName.toLowerCase();
-        Object o = fullNameKeyed.get(s);
-        if (o == null)
+        String abbr;
+        if (fullNameKeyed.containsKey(s)) {
+            abbr = (String)fullNameKeyed.get(s);
+        }
+        else if (abbrNameKeyed.containsKey(s)) {
+            abbr = journalName;
+        }
+        else if (abbrNoDotsToAbbr.containsKey(s)) {
+            abbr = (String)abbrNoDotsToAbbr.get(s);
+        } else
             return null;
-        s = (String)o;
-        return s;
+
+        if (!withDots) {
+            abbr = abbr.replaceAll("\\.", "");
+        }
+
+        return abbr;
     }
 
     /**
@@ -84,7 +97,8 @@ public class JournalAbbreviations {
      * @return The full name, or null if it couldn't be found.
      */
     public String getFullName(String journalName) {
-        String s = journalName.toLowerCase();
+        // Normalize name first:
+        String s = getAbbreviatedName(journalName, true).toLowerCase();
         Object o = abbrNameKeyed.get(s);
         if (o == null) {
             if (fullNameKeyed.containsKey(s))
@@ -128,10 +142,14 @@ public class JournalAbbreviations {
                     String fullNameLC = fullName.toLowerCase();
                     String abbrName = parts[1].trim();
                     String abbrNameLC = abbrName.toLowerCase();
+                    String abbrNoDots = abbrName.replaceAll("\\.","");
+                    String abbrNoDotsLC = abbrNoDots.toLowerCase();
+                    //System.out.println(abbrNoDots);
                     if ((fullName.length()>0) && (abbrName.length()>0)) {
                         //System.out.println("'"+fullName+"' : '"+abbrName+"'");
                         fullNameKeyed.put(fullNameLC, abbrName);
                         abbrNameKeyed.put(abbrNameLC, fullName);
+                        abbrNoDotsToAbbr.put(abbrNoDotsLC, abbrName);
                         all.put(fullName, abbrName);
                     }
                 }
@@ -152,17 +170,17 @@ public class JournalAbbreviations {
      * Abbreviate the journal name of the given entry.
      * @param entry The entry to be treated.
      * @param fieldName The field name (e.g. "journal")
-     * @param titleCase true if every part should start with a capital.
      * @param ce If the entry is changed, add an edit to this compound.
+     * @param withDots True if the abbreviations should have dots.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibtexEntry entry, String fieldName, CompoundEdit ce) {
+    public boolean abbreviate(BibtexEntry entry, String fieldName, CompoundEdit ce, boolean withDots) {
         Object o = entry.getField(fieldName);
         if (o == null)
             return false;
         String text = (String)o;
         if (isKnownName(text) && !isAbbreviatedName(text)) {
-            String newText = getAbbreviatedName(text);
+            String newText = getAbbreviatedName(text, withDots);
             if (newText == null)
                 return false;
             entry.setField(fieldName, newText);
@@ -211,14 +229,24 @@ public class JournalAbbreviations {
         JButton button = new JButton(Globals.lang("Toggle abbreviation"));
         button.setToolTipText(TOOLTIPTEXT);
         button.addActionListener(new ActionListener() {
+            boolean withDots = true;
             public void actionPerformed(ActionEvent actionEvent) {
                 String text = editor.getText();
                 if (Globals.journalAbbrev.isKnownName(text)) {
-                    String s = null;
-                    if (Globals.journalAbbrev.isAbbreviatedName(text))
-                        s = Globals.journalAbbrev.getFullName(text);
-                    else
-                        s = Globals.journalAbbrev.getAbbreviatedName(text);
+                    String s;
+                    if (Globals.journalAbbrev.isAbbreviatedName(text)) {
+                        //System.out.println(withDots);
+                        if (!withDots) {
+                            s = Globals.journalAbbrev.getAbbreviatedName(text, false);
+                            withDots = true;
+                        } else {
+                            s = Globals.journalAbbrev.getFullName(text);
+                        }
+                    }
+                    else {
+                        s = Globals.journalAbbrev.getAbbreviatedName(text, true);
+                        withDots = false;
+                    }
 
                     if (s != null) {
                         editor.setText(s);
@@ -239,11 +267,17 @@ public class JournalAbbreviations {
         for (Iterator i=fullNameIterator(); i.hasNext();) {
             String name = (String)i.next();
             cells[row][0] = getFullName(name);
-            cells[row][1] = getAbbreviatedName(name);
+            cells[row][1] = getAbbreviatedName(name, true);
             row++;
         }
         DefaultTableModel tableModel = new DefaultTableModel(cells, new Object[] {Globals.lang("Full name"),
-            Globals.lang("Abbreviation")});
+            Globals.lang("Abbreviation")}) {
+
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
         return tableModel;
     }
 

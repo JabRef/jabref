@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -28,7 +29,7 @@ import java.util.Collections;
  * User: alver
  * Date: Sep 19, 2005
  * Time: 7:57:29 PM
- * To change this template use File | Settings | File Templates.
+ * To browseOld this template use File | Settings | File Templates.
  */
 public class ManageJournalsPanel extends JPanel{
 
@@ -39,24 +40,35 @@ public class ManageJournalsPanel extends JPanel{
     JPanel userPanel = new JPanel(),
         journalEditPanel;
     JTextField nameTf = new JTextField(),
+        newNameTf = new JTextField(),
         abbrTf = new JTextField();
     JDialog dialog;
+    JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
+        oldFile = new JRadioButton("Existing file");
+
     JButton add = new JButton(new ImageIcon(GUIGlobals.addIconFile)),
         remove = new JButton(new ImageIcon(GUIGlobals.removeIconFile)),
         ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel")),
-        change = new JButton(Globals.lang("Change")),
-        newFile = new JButton(Globals.lang("New"));
+        browseOld = new JButton(Globals.lang("Browse")),
+        browseNew = new JButton(Globals.lang("Browse"));
+
 
     public ManageJournalsPanel(final JabRefFrame frame) {
         this.frame = frame;
 
         personalFile.setEditable(false);
 
+        ButtonGroup group = new ButtonGroup();
+        group.add(newFile);
+        group.add(oldFile);
+
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, fill:250dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "40dlu, 20dlu, 200dlu, 200dlu");
+                ("1dlu, 8dlu, left:pref, 4dlu, fill:250dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                        "40dlu, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, 200dlu");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+
+        CellConstraints cc = new CellConstraints();
 
         JPanel pan = new JPanel();
 
@@ -64,34 +76,33 @@ public class ManageJournalsPanel extends JPanel{
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
             +"you may need to add your own definitions.")+"</HTML>");
 
-        builder.append(pan);
-        builder.append(description);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(personalFile);
+        builder.add(description, cc.xyw(2,1,6));
+        builder.add(newFile, cc.xy(3,2));
+        builder.add(newNameTf, cc.xy(5,2));
+        builder.add(browseNew, cc.xy(7,2));
+        builder.add(oldFile, cc.xy(3,3));
+        builder.add(personalFile, cc.xy(5,3));
         //BrowseAction action = new BrowseAction(personalFile, false);
         //JButton browse = new JButton(Globals.lang("Browse"));
         //browse.addActionListener(action);
-        builder.append(change);
-        builder.nextLine();
+        builder.add(browseOld, cc.xy(7,3));
 
         userPanel.setLayout(new BorderLayout());
         builtInTable = new JTable(Globals.journalAbbrev.getTableModel());
-        builder.append(pan);
-        builder.append(new JScrollPane(userPanel));
+        builder.add(new JScrollPane(userPanel), cc.xyw(2,4,4));
         ButtonStackBuilder butBul = new ButtonStackBuilder();
         butBul.addGridded(add);
         butBul.addGridded(remove);
 
         butBul.addGlue();
-        builder.append(butBul.getPanel());
+        builder.add(butBul.getPanel(), cc.xy(7,4));
 
-        builder.nextLine();
+        builder.addSeparator(Globals.lang("Built-in abbreviations"), cc.xyw(2,6,6));
 
-        builder.append(pan);
-        builder.append(new JScrollPane(builtInTable));
+        builder.add(new JScrollPane(builtInTable), cc.xyw(2,8,6));
 
         setLayout(new BorderLayout());
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         add(builder.getPanel(), BorderLayout.CENTER);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -116,7 +127,21 @@ public class ManageJournalsPanel extends JPanel{
         builder2.append(abbrTf);
         journalEditPanel = builder2.getPanel();
 
-        change.addActionListener(new ActionListener() {
+        browseNew.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                File old = null;
+                if (!newNameTf.getText().equals(""))
+                    old = new File(newNameTf.getText());
+                String name = Globals.getNewFile(frame, Globals.prefs, old, null, JFileChooser.SAVE_DIALOG, false);
+                if (name != null) {
+                    if ((old != null) && (tableModel.getRowCount() > 0)) {
+                    }
+                    newNameTf.setText(name);
+                    newFile.setSelected(true);
+                }
+            }
+        });
+        browseOld.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 File old = null;
                 if (!personalFile.getText().equals(""))
@@ -124,9 +149,10 @@ public class ManageJournalsPanel extends JPanel{
                 String name = Globals.getNewFile(frame, Globals.prefs, old, null, JFileChooser.OPEN_DIALOG, false);
                 if (name != null) {
                     if ((old != null) && (tableModel.getRowCount() > 0)) {
-                        //int answer = JOptionPane.showConfirmDialog(dialog, Globals.lang("Do you want to "))
                     }
                     personalFile.setText(name);
+                    oldFile.setSelected(true);
+                    oldFile.setEnabled(true);
                     setupUserTable();
                 }
             }
@@ -135,8 +161,10 @@ public class ManageJournalsPanel extends JPanel{
 
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                storeSettings();
-                dialog.dispose();
+                if (readyToClose()) {
+                    storeSettings();
+                    dialog.dispose();
+                }
             }
         });
         cancel.addActionListener(new ActionListener() {
@@ -159,6 +187,13 @@ public class ManageJournalsPanel extends JPanel{
 
     public void setValues() {
         personalFile.setText(Globals.prefs.get("personalJournalList"));
+        if (personalFile.getText().length() == 0) {
+            newFile.setSelected(true);
+            oldFile.setEnabled(false);
+        } else {
+            oldFile.setSelected(true);
+            oldFile.setEnabled(true);
+        }
         setupUserTable();
     }
 
@@ -179,35 +214,64 @@ public class ManageJournalsPanel extends JPanel{
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
 
-    public void storeSettings() {
-        if (personalFile.getText().length() > 0) {
-            File f = new File(personalFile.getText());
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(f, false);
-                for (Iterator i=tableModel.getJournals().iterator(); i.hasNext();) {
-                    JournalEntry entry = (JournalEntry)i.next();
-                    fw.write(entry.name);
-                    fw.write(" = ");
-                    fw.write(entry.abbreviation);
-                    fw.write(Globals.NEWLINE);
+    public boolean readyToClose() {
+        File f;
+        if (newFile.isSelected()) {
+            if (newNameTf.getText().length() > 0) {
+                f = new File(newNameTf.getText());
+                return (!f.exists() ||
+                    (JOptionPane.showConfirmDialog
+                     (this, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                      Globals.lang("Store journal abbreviations"), JOptionPane.OK_CANCEL_OPTION)
+                     == JOptionPane.OK_OPTION));
+            } else {
+                if (tableModel.getRowCount() > 0) {
+                    JOptionPane.showMessageDialog(this, Globals.lang("You must choose a file name to store journal abbreviations"),
+                            Globals.lang("Store journal abbreviations"), JOptionPane.ERROR_MESSAGE);
+                        return false;
                 }
+                else return true;
 
-            } catch (IOException e) {
-                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 
-            } finally {
-                if (fw != null)
-                    try {
-                        fw.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+    public void storeSettings() {
+        File f;
+        if (newFile.isSelected()) {
+            if (newNameTf.getText().length() > 0) {
+                f = new File(newNameTf.getText());
+            } else {
+                return; // Nothing to do.
+            }
+        } else
+            f = new File(personalFile.getText());
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(f, false);
+            for (Iterator i=tableModel.getJournals().iterator(); i.hasNext();) {
+                JournalEntry entry = (JournalEntry)i.next();
+                fw.write(entry.name);
+                fw.write(" = ");
+                fw.write(entry.abbreviation);
+                fw.write(Globals.NEWLINE);
             }
 
+        } catch (IOException e) {
+            e.printStackTrace();
 
+        } finally {
+            if (fw != null)
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
-        String filename = personalFile.getText().trim();
+
+        String filename = f.getPath();
         if (filename.equals(""))
             filename = null;
         Globals.prefs.put("personalJournalList", filename);

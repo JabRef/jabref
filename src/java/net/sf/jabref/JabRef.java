@@ -660,8 +660,15 @@ lastEdLoop:
                     if (fileToOpen.exists()) {
                         ParserResult pr = openBibFile(names[i]);
 
-                        if (pr != null)
-                            loaded.add(pr);
+                        if (pr != null) {
+
+			    if (pr == ParserResult.INVALID_FORMAT) {
+				System.out.println(Globals.lang("Error opening file")+" '"+fileToOpen.getPath()+"'");
+			    }
+			    else
+				loaded.add(pr);
+
+			}
                     }
                 }
             }
@@ -675,10 +682,12 @@ lastEdLoop:
             jrf = new JabRefFrame();
 
             // Add all loaded databases to the frame:
+	    boolean first = true;
             if (loaded.size() > 0) {
-                for (int i = 0; i < loaded.size(); i++) {
-                    ParserResult pr = (ParserResult) loaded.elementAt(i);
-                    jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
+                for (Iterator i=loaded.iterator(); i.hasNext();) {
+                    ParserResult pr = (ParserResult)i.next();
+		    jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), first);
+		    first = false;
                 }
             }
 

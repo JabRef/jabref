@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
  * User: alver
  * Date: Sep 22, 2005
  * Time: 10:45:02 PM
- * To change this template use File | Settings | File Templates.
+ * To browseOld this template use File | Settings | File Templates.
  */
 public class ManageJournalsAction extends AbstractAction {
 

@@ -11,7 +11,7 @@ import net.sf.jabref.undo.NamedCompound;
  * User: alver
  * Date: Sep 17, 2005
  * Time: 12:48:23 AM
- * To change this template use File | Settings | File Templates.
+ * To browseOld this template use File | Settings | File Templates.
  */
 public class AbbreviateAction extends AbstractWorker {
     BasePanel panel;
@@ -37,7 +37,7 @@ public class AbbreviateAction extends AbstractWorker {
         NamedCompound ce = new NamedCompound("Abbreviate journal names");
         int count = 0;
         for (int i = 0; i < entries.length; i++) {
-            if (Globals.journalAbbrev.abbreviate(entries[i], "journal", ce))
+            if (Globals.journalAbbrev.abbreviate(entries[i], "journal", ce, true))
                 count++;
         }
         if (count > 0) {
