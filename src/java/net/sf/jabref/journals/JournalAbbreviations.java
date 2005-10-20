@@ -61,6 +61,10 @@ public class JournalAbbreviations {
         return ((abbrNameKeyed.get(s) != null) || (abbrNoDotsToAbbr.get(s) != null));
     }
 
+    public String dotsToNodots(String name) {
+        return name.replaceAll("\\.", " ").replaceAll("  ", " ").trim();
+    }
+
     /**
      * Attempts to get the abbreviated name of the journal given. Returns null if no
      * abbreviated name is known.
@@ -84,7 +88,7 @@ public class JournalAbbreviations {
             return null;
 
         if (!withDots) {
-            abbr = abbr.replaceAll("\\.", "");
+            abbr = dotsToNodots(abbr);
         }
 
         return abbr;
@@ -142,11 +146,11 @@ public class JournalAbbreviations {
                     String fullNameLC = fullName.toLowerCase();
                     String abbrName = parts[1].trim();
                     String abbrNameLC = abbrName.toLowerCase();
-                    String abbrNoDots = abbrName.replaceAll("\\.","");
+                    String abbrNoDots = dotsToNodots(abbrName);
                     String abbrNoDotsLC = abbrNoDots.toLowerCase();
                     //System.out.println(abbrNoDots);
                     if ((fullName.length()>0) && (abbrName.length()>0)) {
-                        //System.out.println("'"+fullName+"' : '"+abbrName+"'");
+                        //System.out.println("'"+fullName+"' : '"+abbrNoDots+"'");
                         fullNameKeyed.put(fullNameLC, abbrName);
                         abbrNameKeyed.put(abbrNameLC, fullName);
                         abbrNoDotsToAbbr.put(abbrNoDotsLC, abbrName);

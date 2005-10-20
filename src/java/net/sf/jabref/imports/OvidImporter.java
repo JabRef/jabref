@@ -62,7 +62,8 @@ public class OvidImporter implements ImportFormat {
 		sb.append("__NEWFIELD__");
 	    }
 	    sb.append(line);
-	}
+        sb.append('\n');
+    }
 
 	String items[] = sb.toString().split("<[0-9]+>");
 	
@@ -70,34 +71,48 @@ public class OvidImporter implements ImportFormat {
 	    HashMap h = new HashMap();
 	    String[] fields = items[i].split("__NEWFIELD__");
 	    for (int j = 0; j < fields.length; j++){
-		fields[j] = fields[j].trim();
-		if (fields[j].indexOf("Author") == 0
-		    && fields[j].indexOf("Author Keywords") == -1
-		    && fields[j].indexOf("Author e-mail") == -1){
-		    String author;
-		    boolean isComma = false;
-		    if (fields[j].indexOf(";") > 0){ //LN FN; [LN FN;]*
-			author = fields[j].substring(7, fields[j].length()).replaceAll(
-										       "[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and ");
-		    }else{// LN FN. [LN FN.]*
-			isComma = true;
-			author = fields[j].substring(7, fields[j].length()).replaceAll(
-										       "\\.", " and").replaceAll(" and$", "");
-			
-		    }
-		    if (author.split(" and ").length > 1){ // single author or no ";"
-			h.put("author", ImportFormatReader.fixAuthor_lastnameFirst(author));
-			/*
-			 * if(isComma==false)
-			 * 
-			 * else h.put("author", fixAuthor_nocomma( author) );
-			 */
-		    }else h.put("author", author);
-		}else if (fields[j].indexOf("Title") == 0) h.put("title", fields[j]
-								 .substring(6, fields[j].length()).replaceAll("\\[.+\\]", ""));
-		else if (fields[j].indexOf("Source") == 0){
+            int linebreak = fields[j].indexOf('\n');
+            String fieldName = fields[j].substring(0, linebreak).trim();
+            String content = fields[j].substring(linebreak).trim();
+            //fields[j] = fields[j].trim();
+		    if (fieldName.indexOf("Author") == 0
+		        && fieldName.indexOf("Author Keywords") == -1
+		        && fieldName.indexOf("Author e-mail") == -1){
+		        String author;
+                String[] names;
+                if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
+			        names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").split(";");
+		        }else{// LN FN. [LN FN.]*
+			        //author = content.replaceAll("\\.", " and").replaceAll(" and$", "");
+                    names = content.split("  ");
+                }
+
+                StringBuffer buf = new StringBuffer();
+                for (int ii=0; ii<names.length; ii++) {
+                    names[ii] = names[ii].trim();
+                    int space = names[ii].indexOf(' ');
+                    if (space >= 0) {
+                        buf.append(names[ii].substring(0, space));
+                        buf.append(',');
+                        buf.append(names[ii].substring(space));
+                    } else {
+                        buf.append(names[ii]);
+                    }
+                    if (ii < names.length-1)
+                        buf.append(" and ");
+                }
+                h.put("author", buf.toString());
+
+                //    author = content.replaceAll("  ", " and ").replaceAll(" and $", "");
+
+            
+		    //h.put("author", ImportFormatReader.fixAuthor_lastnameFirst(author));
+
+		}else if (fieldName.indexOf("Title") == 0) h.put("title",
+                       content.replaceAll("\\[.+\\]", ""));
+		else if (fieldName.indexOf("Source") == 0){
 		    //System.out.println(fields[j]);
-		    String s = fields[j];
+		    String s = content;
 		    Matcher matcher = ovid_src_pat.matcher(s);
 		    boolean matchfound = matcher.find();
 		    if (matchfound){
@@ -117,11 +132,12 @@ public class OvidImporter implements ImportFormat {
 			}
 		    }
 		    
-		}else if (fields[j].indexOf("Abstract") == 0) h.put("abstract",
-								    fields[j].substring(9, fields[j].length()));
-		//else if(fields[j].indexOf("References")==0)
-		//	h.put("references", fields[j].substring( 11,fields[j].length()));
-	    }
+		}else
+            if (fieldName.equals("Abstract")) {
+                System.out.println("'"+content+"'");
+                h.put("abstract", content);
+            }
+        }
 	    BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
 					    .getEntryType("article")); // id assumes an existing database so
 	    // don't create one here

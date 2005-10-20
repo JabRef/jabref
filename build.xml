@@ -99,7 +99,7 @@
         </path>
 
     <!-- Runs project (e.g. in NetBeans 4) -->
-    <target name="run" depends="build">
+    <target name="run" depends="jars">
         <java classname="net.sf.jabref.JabRef" fork="true">
         <classpath>
             <pathelement location="${build.lib}/jabref.jar"/>

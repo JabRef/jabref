@@ -241,7 +241,10 @@ public class GUIGlobals {
       incompleteIcon = GUIGlobals.class.getResource(pre + "exclamation.gif"),
       winEdtIcon = GUIGlobals.class.getResource(pre + "winedt.png"),
       //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
-      jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
+
+    jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
+    //jabreflogo = GUIGlobals.class.getResource(pre + "test.svg"),
+
       //splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
 
       completeTagIcon = GUIGlobals.class.getResource(pre +"completeItem.png"),
