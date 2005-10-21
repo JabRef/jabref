@@ -111,8 +111,12 @@ public class JabRefPreferences {
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
-        defaults.put("namesLastOnly", Boolean.TRUE);
+	    defaults.put("namesLf", Boolean.FALSE);
+        defaults.put("namesNatbib", Boolean.TRUE);
+        defaults.put("abbrAuthorNames", Boolean.TRUE);
+	//        defaults.put("namesLastOnly", Boolean.TRUE);
         defaults.put("language", "en");
+        defaults.put("showShort", Boolean.TRUE);
         defaults.put("priSort", "author");
         defaults.put("priDescending", Boolean.FALSE);
         defaults.put("priBinary", Boolean.FALSE);

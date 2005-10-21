@@ -243,7 +243,7 @@ public class GUIGlobals {
       //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-Logo-small.gif"),
 
     jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
-    //jabreflogo = GUIGlobals.class.getResource(pre + "test.svg"),
+    //jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon3.png"),
 
       //splashScreenImage = GUIGlobals.class.getResource(pre + "JabRef-splash.png"),
 

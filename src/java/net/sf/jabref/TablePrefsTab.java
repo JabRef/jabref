@@ -16,8 +16,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-    antialias, pdfColumn, urlColumn, citeseerColumn;
-    private JRadioButton namesAsIs, namesFf, namesFl, namesLastOnly;
+    antialias, pdfColumn, urlColumn, citeseerColumn, abbrNames;
+    private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -37,22 +37,24 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      * @param prefs a <code>JabRefPreferences</code> value
      */
     public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
-    _prefs = prefs;
-    this.frame = frame;
-    setLayout(new BorderLayout());
+        _prefs = prefs;
+        this.frame = frame;
+        setLayout(new BorderLayout());
 
 
 
-    colorCodes = new JCheckBox(Globals.lang
+        colorCodes = new JCheckBox(Globals.lang
                    ("Color codes for required and optional fields"));
-    antialias = new JCheckBox(Globals.lang
+        antialias = new JCheckBox(Globals.lang
                   ("Use antialiasing font in table"));
-    autoResizeMode = new JCheckBox(Globals.lang
+        autoResizeMode = new JCheckBox(Globals.lang
                        ("Fit table horizontally on screen"));
-    namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
-    namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
+
+        namesAsIs = new JRadioButton(Globals.lang("Show names unchanged"));
+        namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
         namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
-        namesLastOnly = new JRadioButton(Globals.lang("Show last name only"));
+        namesNatbib = new JRadioButton(Globals.lang("Natbib style"));
+        abbrNames = new JCheckBox(Globals.lang("Abbreviate names"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
@@ -82,9 +84,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     ButtonGroup bg = new ButtonGroup();
     bg.add(namesAsIs);
+    bg.add(namesNatbib);
     bg.add(namesFf);
     bg.add(namesFl);
-    bg.add(namesLastOnly);
 
     secDesc = new JCheckBox(Globals.lang("Descending"));
     terDesc = new JCheckBox(Globals.lang("Descending"));
@@ -104,7 +106,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     builder.append(pan); builder.append(namesAsIs); builder.nextLine();
     builder.append(pan); builder.append(namesFf); builder.nextLine();
     builder.append(pan); builder.append(namesFl); builder.nextLine();
-    builder.append(pan); builder.append(namesLastOnly); builder.nextLine();
+    builder.append(pan); builder.append(namesNatbib); builder.nextLine();
+    builder.append(pan); builder.append(abbrNames); builder.nextLine();
     builder.appendSeparator(Globals.lang("Sort options"));
     // Create a new panel with its own FormLayout for these items:
     FormLayout layout2 = new FormLayout
@@ -290,14 +293,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     if (_prefs.getBoolean("namesAsIs"))
         namesAsIs.setSelected(true);
-    else {
-        if (_prefs.getBoolean("namesFf"))
-            namesFf.setSelected(true);
-        else if (_prefs.getBoolean("namesLastOnly"))
-            namesLastOnly.setSelected(true);
-        else
-            namesFl.setSelected(true);
-    }
+    else if (_prefs.getBoolean("namesFf"))
+        namesFf.setSelected(true);
+    else if (_prefs.getBoolean("namesNatbib"))
+        namesNatbib.setSelected(true);
+    else
+        namesFl.setSelected(true);
+    abbrNames.setSelected(_prefs.getBoolean("abbrAuthorNames"));
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
         colorPanel.setValues();
@@ -312,8 +314,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
     _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
-    _prefs.putBoolean("namesFf", namesFf.isSelected() && !namesLastOnly.isSelected());
-    _prefs.putBoolean("namesLastOnly", namesLastOnly.isSelected());
+    _prefs.putBoolean("namesFf", namesFf.isSelected());
+    _prefs.putBoolean("namesNatbib", namesNatbib.isSelected());
+    _prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
+
         _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());

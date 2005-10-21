@@ -71,8 +71,8 @@ public class EntryTableModel
   // special columns (number column or icon column).
   private HashMap iconCols = new HashMap();
   int[] nameCols = null;
-  boolean namesAsIs, namesFf, namesLastOnly;
-
+  boolean showShort, namesNatbib;                               //MK:
+  boolean namesAsIs, namesFf, namesLf, abbr_names;              //MK:
 
     //ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
 
@@ -197,28 +197,32 @@ public class EntryTableModel
     //  o = ""+(row+1);
     //}
     else {
-        
-      o = be.getField(columns[col - padleft]);
-      for (int i = 0; i < nameCols.length; i++) {
-        if (col - padleft == nameCols[i]) {
-          if (o == null) {
-            return null;
+      
+    //MK:vvv
+    o = null; if (showShort) o = be.getField("short"+columns[col-padleft]);   //MK:vvv
+       if (o==null) {
+         o = be.getField(columns[col - padleft]);
+         for (int i = 0; i < nameCols.length; i++) {
+           if (col - padleft == nameCols[i]) {
+             if (o == null) { return null; }
+             if (namesAsIs) return o;
+             if (namesNatbib) o = ImportFormatReader.fixAuthor_Natbib((String)o);
+             if (namesFf) o = ImportFormatReader.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
+             if (namesLf) o = ImportFormatReader.fixAuthor_lastnameFirstCommas((String) o, abbr_names);
+             return o;
+ //            if (!namesAsIs) {
+ //              if (namesFf) {
+ //                return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
+ //              }
+ //              else {
+ //                return ImportFormatReader.fixAuthor_lastnameFirst( (String)o);
+ //              }
+ //            }
+  //MK:^^^
           }
-          if (!namesAsIs) {
-            if (namesFf) {
-              return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
-            }
-            else if (!namesLastOnly) {
-                return ImportFormatReader.fixAuthor_lastnameFirst( (String) o);
-            } else {
-                return ImportFormatReader.fixAuthor_lastnameOnly( (String) o);
-            }
-          }
-        }
-      }
-
+	 }
+       }
     }
-    
     /*if (o != null) {
         String processed = Globals.getCached((String)o);
         if (processed == null) {
@@ -326,10 +330,14 @@ public class EntryTableModel
     nameCols = new int[tmp.size()];
     for (int i = 0; i < nameCols.length; i++) {
       nameCols[i] = ( (Integer) tmp.elementAt(i)).intValue();
+    showShort = panel.prefs.getBoolean("showShort");        //MK:
+    namesNatbib = panel.prefs.getBoolean("namesNatbib");    //MK:
     }
     namesAsIs = Globals.prefs.getBoolean("namesAsIs");
+    abbr_names = panel.prefs.getBoolean("abbrAuthorNames"); //MK:
     namesFf = Globals.prefs.getBoolean("namesFf");
-    namesLastOnly = Globals.prefs.getBoolean("namesLastOnly"); 
+    namesLf = !(namesAsIs || namesFf || namesNatbib); // None of the above.
+        //namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
     // Build a vector of prioritized search objectives,
     // then pick the 3 first.
     List fields = new ArrayList(6),
