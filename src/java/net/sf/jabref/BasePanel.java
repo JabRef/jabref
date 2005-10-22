@@ -1615,7 +1615,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             if (importGroups) {
-                GroupTreeNode newGroups = metaData().getGroups();
+                GroupTreeNode newGroups = meta.getGroups();
                 if (newGroups != null) {
 
                     // ensure that there is always only one AllEntriesGroup
