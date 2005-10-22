@@ -71,6 +71,7 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 			Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 			Pattern valueSpec = ((RegExNode)var_v).getPattern();
 			int pseudoField = 0;
+            boolean noSuchField = true;
 			// this loop iterates over all regular keys, then over pseudo keys like "type"
 			for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
 				String content;
@@ -85,6 +86,7 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 							continue;
 						content = (String)bibtexEntry.getField(searchKeys[i].toString());
 				}
+                noSuchField = false;
 				if (content == null)
 					continue; // paranoia
 				Matcher matcher = valueSpec.matcher(content);
@@ -100,6 +102,8 @@ tExpressionSearch returns [ boolean ret = false; ] throws PatternSyntaxException
 					break;
 				}
 			}
+            if (noSuchField && matchType == MATCH_DOES_NOT_CONTAIN)
+                ret = true; // special case
 		}
 	)
 	;
