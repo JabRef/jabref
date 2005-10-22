@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050128): "Parser.g" -> "SearchExpressionParser.java"$
+// $ANTLR : "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
 import java.io.StringReader;
@@ -151,10 +151,10 @@ public SearchExpressionParser(ParserSharedInputState state) {
 		ASTPair currentAST = new ASTPair();
 		AST condition_AST = null;
 		
-		boolean synPredMatched6 = false;
+		boolean synPredMatched80 = false;
 		if (((_tokenSet_0.member(LA(1))) && (_tokenSet_1.member(LA(2))) && (_tokenSet_1.member(LA(3))))) {
-			int _m6 = mark();
-			synPredMatched6 = true;
+			int _m80 = mark();
+			synPredMatched80 = true;
 			inputState.guessing++;
 			try {
 				{
@@ -164,12 +164,12 @@ public SearchExpressionParser(ParserSharedInputState state) {
 				}
 			}
 			catch (RecognitionException pe) {
-				synPredMatched6 = false;
+				synPredMatched80 = false;
 			}
-			rewind(_m6);
-			inputState.guessing--;
+			rewind(_m80);
+inputState.guessing--;
 		}
-		if ( synPredMatched6 ) {
+		if ( synPredMatched80 ) {
 			expression();
 			astFactory.addASTChild(currentAST, returnAST);
 			match(LITERAL_and);
@@ -186,10 +186,10 @@ public SearchExpressionParser(ParserSharedInputState state) {
 			condition_AST = (AST)currentAST.root;
 		}
 		else {
-			boolean synPredMatched8 = false;
+			boolean synPredMatched82 = false;
 			if (((_tokenSet_0.member(LA(1))) && (_tokenSet_1.member(LA(2))) && (_tokenSet_1.member(LA(3))))) {
-				int _m8 = mark();
-				synPredMatched8 = true;
+				int _m82 = mark();
+				synPredMatched82 = true;
 				inputState.guessing++;
 				try {
 					{
@@ -199,12 +199,12 @@ public SearchExpressionParser(ParserSharedInputState state) {
 					}
 				}
 				catch (RecognitionException pe) {
-					synPredMatched8 = false;
+					synPredMatched82 = false;
 				}
-				rewind(_m8);
-				inputState.guessing--;
+				rewind(_m82);
+inputState.guessing--;
 			}
-			if ( synPredMatched8 ) {
+			if ( synPredMatched82 ) {
 				expression();
 				astFactory.addASTChild(currentAST, returnAST);
 				match(LITERAL_or);

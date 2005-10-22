@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050128): "Parser.g" -> "SearchExpressionParser.java"$
+// $ANTLR : "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
 import java.io.StringReader;

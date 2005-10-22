@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050128): "TreeParser.g" -> "SearchExpressionTreeParser.java"$
+// $ANTLR : "TreeParser.g" -> "SearchExpressionTreeParser.java"$
 
 package net.sf.jabref.search;
 import java.util.*;
@@ -53,7 +53,7 @@ public SearchExpressionTreeParser() {
 			switch ( _t.getType()) {
 			case And:
 			{
-				AST __t2 = _t;
+				AST __t87 = _t;
 				AST tmp1_AST_in = (AST)_t;
 				match(_t,And);
 				_t = _t.getFirstChild();
@@ -75,14 +75,14 @@ public SearchExpressionTreeParser() {
 				}
 				
 				}
-				_t = __t2;
+				_t = __t87;
 				_t = _t.getNextSibling();
 				ret = a && b;
 				break;
 			}
 			case Or:
 			{
-				AST __t4 = _t;
+				AST __t89 = _t;
 				AST tmp3_AST_in = (AST)_t;
 				match(_t,Or);
 				_t = _t.getFirstChild();
@@ -104,20 +104,20 @@ public SearchExpressionTreeParser() {
 				}
 				
 				}
-				_t = __t4;
+				_t = __t89;
 				_t = _t.getNextSibling();
 				ret = a || b;
 				break;
 			}
 			case Not:
 			{
-				AST __t6 = _t;
+				AST __t91 = _t;
 				AST tmp5_AST_in = (AST)_t;
 				match(_t,Not);
 				_t = _t.getFirstChild();
 				a=tSearchExpression(_t);
 				_t = _retTree;
-				_t = __t6;
+				_t = __t91;
 				_t = _t.getNextSibling();
 				ret = !a;
 				break;
@@ -153,7 +153,7 @@ public SearchExpressionTreeParser() {
 		
 		
 		try {      // for error handling
-			AST __t9 = _t;
+			AST __t94 = _t;
 			AST tmp6_AST_in = (AST)_t;
 			match(_t,ExpressionSearch);
 			_t = _t.getFirstChild();
@@ -169,6 +169,7 @@ public SearchExpressionTreeParser() {
 						Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 						Pattern valueSpec = ((RegExNode)var_v).getPattern();
 						int pseudoField = 0;
+			boolean noSuchField = true;
 						// this loop iterates over all regular keys, then over pseudo keys like "type"
 						for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
 							String content;
@@ -183,6 +184,7 @@ public SearchExpressionTreeParser() {
 										continue;
 									content = (String)bibtexEntry.getField(searchKeys[i].toString());
 							}
+			noSuchField = false;
 							if (content == null)
 								continue; // paranoia
 							Matcher matcher = valueSpec.matcher(content);
@@ -198,8 +200,10 @@ public SearchExpressionTreeParser() {
 								break;
 							}
 						}
+			if (noSuchField && matchType == MATCH_DOES_NOT_CONTAIN)
+			ret = true; // special case
 					
-			_t = __t9;
+			_t = __t94;
 			_t = _t.getNextSibling();
 		}
 		catch (RecognitionException ex) {

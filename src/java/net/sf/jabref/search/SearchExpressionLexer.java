@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050128): "Lexer.g" -> "SearchExpressionLexer.java"$
+// $ANTLR : "Lexer.g" -> "SearchExpressionLexer.java"$
 
 package net.sf.jabref.search;
 
@@ -247,13 +247,13 @@ tryAgain:
 		mQUOTE(false);
 		text.setLength(_saveIndex);
 		{
-		_loop11:
+		_loop28:
 		do {
 			if ((_tokenSet_1.member(LA(1)))) {
 				matchNot('"');
 			}
 			else {
-				break _loop11;
+				break _loop28;
 			}
 			
 		} while (true);
@@ -290,17 +290,17 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt16=0;
-		_loop16:
+		int _cnt33=0;
+		_loop33:
 		do {
 			if ((_tokenSet_0.member(LA(1)))) {
 				mLETTER(false);
 			}
 			else {
-				if ( _cnt16>=1 ) { break _loop16; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt33>=1 ) { break _loop33; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt16++;
+			_cnt33++;
 		} while (true);
 		}
 		_ttype = testLiteralsTable(_ttype);
