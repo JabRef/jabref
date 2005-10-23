@@ -1,18 +1,15 @@
 package net.sf.jabref.imports;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.AuthorList;
+
 import java.util.regex.Pattern;
 
 /**
@@ -86,10 +83,10 @@ public class SilverPlatterImporter implements ImportFormat {
 		    if (frest.trim().endsWith("(ed)")){
 			String ed = frest.trim();
 			ed = ed.substring(0, ed.length() - 4);
-			h.put("editor", ImportFormatReader.fixAuthor_lastnameFirst(ed.replaceAll(",-", ", ")
-								.replaceAll(";", " and ")));
-		    }else h.put("author", ImportFormatReader.fixAuthor_lastnameFirst(frest.replaceAll(
-										   ",-", ", ").replaceAll(";", " and ")));
+			h.put("editor", AuthorList.fixAuthor_lastNameFirst(ed.replaceAll(",-", ", ")
+                                .replaceAll(";", " and ")));
+		    }else h.put("author", AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(
+                                           ",-", ", ").replaceAll(";", " and ")));
 		}else if (f3.equals("AB")) h.put("abstract", frest);
 		else if (f3.equals("DE")){
 		    String kw = frest.replaceAll("-;", ",").toLowerCase();

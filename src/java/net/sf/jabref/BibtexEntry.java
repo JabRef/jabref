@@ -200,9 +200,7 @@ public class BibtexEntry
      * Sets the given field to the given value.
      */
     public void setField(HashMap fields){
-        _fields.putAll(fields); 	//_fields=fields.clone();
-        // clone slows up things but...
-        // if you don't clone then client has pointer to _field and can change it behind the scenes
+        _fields.putAll(fields); 
     }
 
     public void setField(String name, Object value) {

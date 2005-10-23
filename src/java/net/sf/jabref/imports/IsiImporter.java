@@ -2,6 +2,7 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.AuthorList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -129,7 +130,7 @@ public class IsiImporter implements ImportFormat {
           hm.put("booktitle", value);
         else if (beg.equals("AU")) {
 	    String author = isiAuthorConvert(
-            ImportFormatReader.fixAuthor_lastnameFirst(value.replaceAll("EOLEOL", " and ")));
+            AuthorList.fixAuthor_lastNameFirst(value.replaceAll("EOLEOL", " and ")));
 
           // if there is already someone there then append with "and"
           if (hm.get("author") != null)

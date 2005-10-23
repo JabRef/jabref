@@ -80,12 +80,14 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Added option to show only last names in main table.
+1.x:    - Added new options for name formatting in main table.
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
         - [UNFINISHED] Added toggling of abbreviated and full journal names, based on a built-in
           journal list, extendable by linking to an external text file.          
         - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
+        - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
+        - Fixed bug in Ovid import.
         - Fixed bug related to multi-line fields in RIS import.
 1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.

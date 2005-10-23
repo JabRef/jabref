@@ -5,14 +5,8 @@ package net.sf.jabref.labelPattern;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.imports.ImportFormatReader;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.export.layout.format.RemoveLatexCommands;
 
 /**
@@ -484,8 +478,8 @@ public class LabelPatternUtil {
   private static String firstAuthor(String authorField) {
     String author = "";
     // This code was part of 'ApplyRule' in 'ArticleLabelRule'
-    //String[] tokens = ImportFormatReader.fixAuthor_lastnameFirst(authorField).split("\\band\\b");
-      String[] tokens = ImportFormatReader.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+    //String[] tokens = ImportFormatReader.fixAuthor_lastNameFirst(authorField).split("\\band\\b");
+      String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
     if (tokens.length > 0) { // if author is empty
       String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").split(" ");
       author += firstAuthor[0];
@@ -502,7 +496,7 @@ public class LabelPatternUtil {
   private static String allAuthors(String authorField) {
     String author = "";
     // This code was part of 'ApplyRule' in 'ArticleLabelRule'
-    String[] tokens = ImportFormatReader.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+    String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
     int i = 0;
     while (tokens.length > i) {
       // convert lastname, firstname to firstname lastname
@@ -523,7 +517,7 @@ public class LabelPatternUtil {
   private static String NAuthors(String authorField, int n) {
 	    String author = "";
 	    // This code was part of 'ApplyRule' in 'ArticleLabelRule'
-	    String[] tokens = ImportFormatReader.fixAuthorForAlphabetization(authorField).split("\\band\\b");
+	    String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\band\\b");
 	    int i = 0;
 	    while (tokens.length > i && i < n) {
 	      // convert lastname, firstname to firstname lastname
@@ -545,7 +539,7 @@ public class LabelPatternUtil {
    */
   private static String oneAuthorPlusIni(String authorField) {
     final int CHARS_OF_FIRST = 5;
-    authorField = ImportFormatReader.fixAuthorForAlphabetization(authorField);
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
     String author = "";
     // This code was part of 'ApplyRule' in 'ArticleLabelRule'
     String[] tokens = authorField.split("\\band\\b");
@@ -575,7 +569,7 @@ public class LabelPatternUtil {
    * Newton.Maxwell
    */
   private static String authAuthEa(String authorField) {
-    authorField = ImportFormatReader.fixAuthorForAlphabetization(authorField);
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
     StringBuffer author = new StringBuffer();
 
     String[] tokens = authorField.split("\\band\\b");
@@ -595,7 +589,7 @@ public class LabelPatternUtil {
    * The first N characters of the Mth author/editor.
    */
   private static String authN_M(String authorField, int n, int m) {
-    authorField = ImportFormatReader.fixAuthorForAlphabetization(authorField);
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
     StringBuffer author = new StringBuffer();
 
     String[] tokens = authorField.split("\\band\\b");
@@ -626,7 +620,7 @@ public class LabelPatternUtil {
    *   Newton
    */
   private static String authshort(String authorField) {
-    authorField = ImportFormatReader.fixAuthorForAlphabetization(authorField);
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
     StringBuffer author = new StringBuffer();
     String[] tokens = authorField.split("\\band\\b");
     int i = 0;
@@ -663,7 +657,7 @@ public class LabelPatternUtil {
    * E.g. authIni4 gives: a) NMEB, b) NeME, c) NeMa, d) Newt
    */
   private static String authIniN(String authorField, int n) {
-    authorField = ImportFormatReader.fixAuthorForAlphabetization(authorField);
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
     StringBuffer author = new StringBuffer();
     String[] tokens = authorField.split("\\band\\b");
     int i = 0;

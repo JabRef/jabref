@@ -11,16 +11,16 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.AuthorList;
 
 /**
  *
  * @author mkovtun
  */
 public class AuthorFirstLastCommas implements LayoutFormatter {
-    
+
     public String format(String fieldText) {
-        return ImportFormatReader.fixAuthor_firstNameFirstCommas(fieldText, false);
+        return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, false);
     }
-    
+
 }

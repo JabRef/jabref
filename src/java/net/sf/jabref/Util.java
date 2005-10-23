@@ -31,7 +31,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,9 +41,7 @@ import javax.swing.*;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-import net.sf.ext.BrowserLauncher;
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
@@ -699,9 +696,9 @@ public class Util {
         if (field.equals("author") || field.equals("editor")) {
             // Specific for name fields.
             // Harmonise case:
-            String[] aus1 = ImportFormatReader.fixAuthor_lastnameFirst(s1)
-                    .split(" and "), aus2 = ImportFormatReader
-                    .fixAuthor_lastnameFirst(s2).split(" and "), au1 = aus1[0]
+            String[] aus1 = AuthorList.fixAuthor_lastNameFirst(s1)
+                    .split(" and "), aus2 = AuthorList
+                    .fixAuthor_lastNameFirst(s2).split(" and "), au1 = aus1[0]
                     .split(","), au2 = aus2[0].split(",");
 
             // Can check number of authors, all authors or only the first.
@@ -807,7 +804,7 @@ public class Util {
         // Check if the file already exists.
         if (dest.exists()) {
             if (!deleteIfExists) return false;
-            else dest.delete();
+            //else dest.delete();
         }
 
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(

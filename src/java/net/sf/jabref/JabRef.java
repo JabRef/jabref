@@ -73,6 +73,16 @@ public class JabRef {
     }
 
     public JabRef(String[] args) {
+
+        /*
+        String aut = "{Bill and Bob Alver}, Jr., Morten Omholt and Alfredsen, Jo A. and Øie, G. and Yngvar von Olsen";
+        System.out.println("lastnameFirst: "+ImportFormatReader.fixAuthor_lastNameFirst(aut));
+        System.out.println("lastnameFirstCommas: "+ImportFormatReader.fixAuthor_lastNameFirstCommas(aut,false));
+        System.out.println("lastnameFirstCommas (abbr): "+ImportFormatReader.fixAuthor_lastNameFirstCommas(aut,true));
+        System.out.println("firstNameFirst: "+ImportFormatReader.fixAuthor_firstNameFirst(aut));
+        System.out.println("firstNameFirstCommas: "+ImportFormatReader.fixAuthor_firstNameFirstCommas(aut, false));
+        System.out.println("forAlphabetization: "+ImportFormatReader.fixAuthorForAlphabetization(aut));
+        */
         ths = this;
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
@@ -398,9 +408,15 @@ public class JabRef {
 
                         try {
                             System.out.println(Globals.lang("Saving") + ": " + data[0]);
-                            FileActions.saveDatabase(pr.getDatabase(),
+                            SaveSession session = FileActions.saveDatabase(pr.getDatabase(),
                                 new MetaData(pr.getMetaData(),pr.getDatabase()), new File(data[0]), Globals.prefs,
                                 false, false, Globals.prefs.get("defaultEncoding"));
+                            // Show just a warning message if encoding didn't work for all characters:
+                            if (!session.getWriter().couldEncodeAll())
+                                System.err.println(Globals.lang("Warning")+": "+
+                                    Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                                    session.getEncoding())+session.getWriter().getProblemCharacters());
+                            session.commit();
                         } catch (SaveException ex) {
                             System.err.println(Globals.lang("Could not save file") + " '"
                                 + data[0] + "': " + ex.getMessage());
@@ -506,9 +522,15 @@ public class JabRef {
                             try {
                                 System.out.println(Globals.lang("Saving") + ": "
                                     + subName);
-                                FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
+                                SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
                                     new File(subName), Globals.prefs, false, false,
                                     Globals.prefs.get("defaultEncoding"));
+                                // Show just a warning message if encoding didn't work for all characters:
+                                if (!session.getWriter().couldEncodeAll())
+                                    System.err.println(Globals.lang("Warning")+": "+
+                                        Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                                        session.getEncoding())+session.getWriter().getProblemCharacters());
+                                session.commit();
                             } catch (SaveException ex) {
                                 System.err.println(Globals.lang("Could not save file")
                                     + " '" + subName + "': " + ex.getMessage());

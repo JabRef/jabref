@@ -23,7 +23,7 @@
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.AuthorList;
 
 /**
  * Changes {\^o} or {\^{o}} to \uFFFD
@@ -36,9 +36,9 @@ public class AuthorFirstFirst implements LayoutFormatter
     //~ Methods ////////////////////////////////////////////////////////////////
     public String format(String fieldText)
     {
-	//ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
-	//return conv.format(ImportFormatReader.fixAuthor_lastnameFirst(fieldText));
-        return ImportFormatReader.fixAuthor_firstNameFirst(fieldText);
+    //ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
+    //return conv.format(ImportFormatReader.fixAuthor_lastNameFirst(fieldText));
+        return AuthorList.fixAuthor_firstNameFirst(fieldText);
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

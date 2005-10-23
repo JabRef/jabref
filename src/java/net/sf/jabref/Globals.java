@@ -122,15 +122,6 @@ public class Globals {
   public static boolean ON_MAC = (osName.equals(MAC)),
       ON_WIN = osName.startsWith("Windows");
 
-  // The following set of name parts are treated as part of the last name for
-  // display purposes, and as part of the first name for sorting purposes:
-  public static Set NAME_PARTICLES = new HashSet(Arrays.asList(
-          new String[] {"von", "van", "der", "de", "la", "da", "di"}));
-  // The following set of name parts are treated as the trailing part of
-  // the last name for both sorting and display purposes:
-  public static Set JUNIOR_PARTICLES = new HashSet(Arrays.asList(
-          new String[] {"Jr", "jr", "Jr.", "jr."}));
-
 
   public static String[] SKIP_WORDS = {"a", "an", "the", "for", "on"};
     public static SidePaneManager sidePaneManager;
@@ -145,7 +136,7 @@ public class Globals {
     Logger.global.setLevel(java.util.logging.Level.SEVERE);
   }
 
-  // should be only called ones
+  // should be only called once
   public static void turnOnConsoleLogging() {
     Logger.global.addHandler(consoleHandler);
 

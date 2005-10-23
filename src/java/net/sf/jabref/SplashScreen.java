@@ -31,7 +31,7 @@ public class SplashScreen extends Window {
             mt.waitForID(0);
         } catch(InterruptedException ie) {}
 
-
+                                                                                
         // Center the window on the screen.
         int imgWidth = splashImage.getWidth(this);
         int imgHeight = splashImage.getHeight(this);  

@@ -1478,13 +1478,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
+        SaveSession session=null;
         try {
             if (!selectedOnly)
-              FileActions.saveDatabase(database, metaData, file,
-                                         prefs, false, false, prefs.get("defaultEncoding"));
+                session = FileActions.saveDatabase(database, metaData, file,
+                                           prefs, false, false, prefs.get("defaultEncoding"));
             else
-                FileActions.savePartOfDatabase(database, metaData, file,
-                                               prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
+                session = FileActions.savePartOfDatabase(database, metaData, file,
+                                           prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
                 // Error occured during processing of
@@ -1508,6 +1509,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                  JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         }
+
+        boolean commit = true;
+        if (!session.getWriter().couldEncodeAll()) {
+              String warning = Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                      session.getEncoding())+session.getWriter().getProblemCharacters()
+                      +"\nDo you want to continue?";
+            int answer = JOptionPane.showConfirmDialog(frame, warning, Globals.lang("Save database"),
+                    JOptionPane.YES_NO_OPTION);
+            if (answer != JOptionPane.YES_OPTION)
+                commit = false;
+          }
+
+        try {
+            if (commit)
+                session.commit();
+            else
+                session.cancel();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

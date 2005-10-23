@@ -29,12 +29,7 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import javax.swing.table.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import net.sf.jabref.export.LatexFieldFormatter;
-import java.util.*;
-import java.util.StringTokenizer;
-import net.sf.jabref.imports.ImportFormatReader;
 import java.util.*;
 
 public class EntryTableModel
@@ -47,10 +42,10 @@ public class EntryTableModel
   private EntrySorter sorter;
   private int visibleRows = 0;
 
-    
+
   // Testing something:
   Object[][] allCache = null;
-    
+
   //private Object[] entryIDs; // Temporary
 
   // Constants used to define how a cell should be rendered.
@@ -65,7 +60,7 @@ public class EntryTableModel
   public static final String[]
       PDF = {"pdf", "ps"},
       URL_ = {"url", "doi"},
-  	  CITESEER = {"citeseerurl"};
+        CITESEER = {"citeseerurl"};
 
   public int padleft = -1; // padleft indicates how many columns (starting from left) are
   // special columns (number column or icon column).
@@ -104,24 +99,24 @@ public class EntryTableModel
   }
 
   public String getColumnName(int col) {
-  	if (col == 0) {
+      if (col == 0) {
       return GUIGlobals.NUMBER_COL;
     }
     else if (getIconTypeForColumn(col) != null) {
       return "";
     }
     else if(GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]) != null) {
-    	return((String) GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]));
+        return((String) GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]));
     }
     return Util.nCase(columns[col - padleft]);
   }
 
     public void showAllEntries() {
-	visibleRows = sorter.getEntryCount();
+    visibleRows = sorter.getEntryCount();
     }
 
     public void setRowCount(int rows) {
-	visibleRows = rows;
+    visibleRows = rows;
     }
 
   public int getRowCount() {
@@ -136,18 +131,18 @@ public class EntryTableModel
   }
 
   public Class getColumnClass(int column) {
-     
+
     //return (getIconTypeForColumn(column) != null ? Icon.class : String.class);
       if (column == 0)
-	  return Boolean.class;
+      return Boolean.class;
       else
-	  return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
+      return (getIconTypeForColumn(column) != null ? JLabel.class : String.class);
   }
 
   public Object getValueAt_(int row, int col) {
       return allCache[row][col];
   }
-  
+
   public void updateAllCache() {
       /*long start = System.currentTimeMillis();
       int rows = getRowCount();
@@ -158,7 +153,7 @@ public class EntryTableModel
               allCache[row][col] = getValueAt_old(row, col);
       Globals.logger("Time spent: "+(System.currentTimeMillis()-start));*/
   }
-  
+
   public Object getValueAt(int row, int col) {
     // Return the field named frame.prefs.columnNames[col] from the Entry
     // corresponding to the row.
@@ -197,7 +192,7 @@ public class EntryTableModel
     //  o = ""+(row+1);
     //}
     else {
-      
+
     //MK:vvv
     o = null; if (showShort) o = be.getField("short"+columns[col-padleft]);   //MK:vvv
        if (o==null) {
@@ -206,21 +201,21 @@ public class EntryTableModel
            if (col - padleft == nameCols[i]) {
              if (o == null) { return null; }
              if (namesAsIs) return o;
-             if (namesNatbib) o = ImportFormatReader.fixAuthor_Natbib((String)o);
-             if (namesFf) o = ImportFormatReader.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
-             if (namesLf) o = ImportFormatReader.fixAuthor_lastnameFirstCommas((String) o, abbr_names);
+             if (namesNatbib) o = AuthorList.fixAuthor_Natbib((String)o);
+             if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
+             if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names);
              return o;
  //            if (!namesAsIs) {
  //              if (namesFf) {
  //                return ImportFormatReader.fixAuthor_firstNameFirst( (String) o);
  //              }
  //              else {
- //                return ImportFormatReader.fixAuthor_lastnameFirst( (String)o);
+ //                return ImportFormatReader.fixAuthor_lastNameFirst( (String)o);
  //              }
  //            }
   //MK:^^^
           }
-	 }
+     }
        }
     }
     /*if (o != null) {
@@ -289,7 +284,7 @@ public class EntryTableModel
     // 'search' field.
     BibtexEntry be = db.getEntryById(getIdForRow(row));
     if (be == null)
-    	return false; // JZTODO: I think this should never happen, but it does 
+        return false; // TODO: JZ: I think this should never happen, but it does
     String o = (String) (be.getField(field));
     return ( (o != null) && !o.equals("0"));
   }
@@ -383,7 +378,7 @@ public class EntryTableModel
 
     // Remove the old sorter as change listener for the database:
     if (sorter != null)
-	db.removeDatabaseChangeListener(sorter);
+    db.removeDatabaseChangeListener(sorter);
 
     // Then pick the up to four highest ranking ones, and go.
       int piv = Math.min(directions.size()-1, 3);
@@ -417,11 +412,11 @@ public class EntryTableModel
      * Remaps and resorts the table model.
      */
     public void remap() {
-	updateSorter();
-	showAllEntries(); // Update the visible row count.
+    updateSorter();
+    showAllEntries(); // Update the visible row count.
         updateAllCache();
-	fireTableDataChanged();
-        
+    fireTableDataChanged();
+
     }
 
     /**
@@ -429,10 +424,10 @@ public class EntryTableModel
      * as directed.
      */
     public void remap(int rows) {
-	updateSorter();
-	setRowCount(rows);
+    updateSorter();
+    setRowCount(rows);
         updateAllCache();
-	fireTableDataChanged();
+    fireTableDataChanged();
     }
 
     /**
@@ -440,11 +435,11 @@ public class EntryTableModel
      * those that require a changed sort regime.
      */
     public void update() {
-	sorter.index();
-	showAllEntries();
+    sorter.index();
+    showAllEntries();
         updateAllCache();
-	fireTableDataChanged();
-        
+    fireTableDataChanged();
+
     }
 
     /**
@@ -453,10 +448,10 @@ public class EntryTableModel
      * Restricts the row number as directed.
      */
     public void update(int rows) {
-	sorter.index();
-	setRowCount(rows);
+    sorter.index();
+    setRowCount(rows);
         updateAllCache();
-	fireTableDataChanged();
+    fireTableDataChanged();
     }
 
   public boolean isCellEditable(int row, int col) {

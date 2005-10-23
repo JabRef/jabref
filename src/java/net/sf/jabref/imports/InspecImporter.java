@@ -1,18 +1,15 @@
 package net.sf.jabref.imports;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.AuthorList;
+
 import java.util.regex.Pattern;
 
 /**
@@ -84,8 +81,8 @@ public class InspecImporter implements ImportFormat {
 		if (f3.equals("TI")) h.put("title", frest);
 		else if (f3.equals("PY")) h.put("year", frest);
 		else if (f3.equals("AU")) h.put("author",
-						ImportFormatReader.fixAuthor_lastnameFirst(frest.replaceAll(",-", ", ").replaceAll(
-														";", " and ")));
+						AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(
+                                                        ";", " and ")));
 		else if (f3.equals("AB")) h.put("abstract", frest);
 		else if (f3.equals("ID")) h.put("keywords", frest);
 		else if (f3.equals("SO")){

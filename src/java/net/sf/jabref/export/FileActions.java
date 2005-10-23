@@ -42,49 +42,6 @@ import net.sf.jabref.mods.*;
 public class FileActions
 {
 
-    private static final int NOTHING=0,
-        COPIED_TO_TEMP = 1,
-        COPIED_TO_BACKUP = 2,
-        INIT_OK = 3;
-
-    //~ Methods ////////////////////////////////////////////////////////////////
-
-    private static int initFile(File file, boolean backup) throws SaveException {
-        int status = NOTHING;
-        try {
-            String name = file.getName();
-            String path = file.getParent();
-            File temp = new File(path, name + GUIGlobals.tempExt);
-
-            if (backup) {
-                File back = new File(path, name + GUIGlobals.backupExt);
-
-                if (back.exists()) {
-                    Util.copyFile(back, temp, true);
-                    //back.renameTo(temp);
-                }
-                status = COPIED_TO_TEMP;
-
-                if (file.exists()) {
-                    Util.copyFile(file, back, true);
-                    //file.renameTo(back);
-                }
-                status = COPIED_TO_BACKUP;
-
-                if (temp.exists()) {
-                    temp.delete();
-                }
-            } else {
-                if (file.exists()) {
-                    Util.copyFile(file, temp, true);
-                    //file.renameTo(temp);
-                }
-            }
-        } catch (IOException e) {
-            throw new SaveException(e.getMessage(), status);
-        }
-        return INIT_OK;
-    }
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
 	if (preamble != null) {
@@ -114,58 +71,6 @@ public class FileActions
 	}
     }
 
-    public static void repairAfterError(File file, boolean backup, int status) throws IOException {
-	// Repair the file with our temp file since saving failed.
-	String name = file.getName();
-
-	// Repair the file with our temp file since saving failed.
-	String path = file.getParent();
-	File temp = new File(path, name + GUIGlobals.tempExt);
-	File back = new File(path, name + GUIGlobals.backupExt);
-
-    if (status == NOTHING) {
-        // Nothing has happened except for possibly creating the temp file.
-        if (temp.exists())
-            temp.delete();
-    }  else if (status == COPIED_TO_TEMP) {
-        // We may have begun copying to the backup file. Try to restore it from temp:
-        if (temp.exists()) {
-            Util.copyFile(temp, back, true);
-            temp.delete();
-        }
-
-    } else if (status == COPIED_TO_BACKUP) {
-        // Seems we couldn't delete the temp file. This is probably a very unlikely scenario.
-        // Try to copy back:
-        Util.copyFile(back, file, true);
-        Util.copyFile(temp, back, true);
-
-    } else { // INIT_OK
-        // Something happened after initializing, when saving. Try to restore the file from the
-        // backup (if active) or temp file:
-        if (backup) {
-            Util.copyFile(back, file, true);
-        } else {
-            Util.copyFile(temp, file, true);
-            temp.delete();
-        }
-    }
-    /*
-    if (file.exists()) {
-	    file.delete();
-	}
-
-	if (temp.exists()) {
-        Util.copyFile(temp, file, true);
-        temp.delete();
-	    //temp.renameTo(file);
-	}
-	else {
-        Util.copyFile(back, file, true);
-        back.delete();
-	    //back.renameTo(file);
-	}   */
-    }
 
     /**
      * Writes the JabRef signature and the encoding.
@@ -184,35 +89,28 @@ public class FileActions
      * saved. This can be used to let the user save only the results of
      * a search. False and false means all entries are saved.
      */
-    public static void saveDatabase(BibtexDatabase database, MetaData metaData,
+    public static SaveSession saveDatabase(BibtexDatabase database, MetaData metaData,
         File file, JabRefPreferences prefs, boolean checkSearch,
         boolean checkGroup, String encoding) throws SaveException
     {
         BibtexEntry be = null;
-	TreeMap types = new TreeMap(); // Map to collect entry type definitions
-	// that we must save along with entries using them.
+	    TreeMap types = new TreeMap(); // Map to collect entry type definitions
+	    // that we must save along with entries using them.
 
         boolean backup = prefs.getBoolean("backup");
-        // Make room for the save:
-        int status = NOTHING;
+
+        SaveSession session;
         try {
-            initFile(file, backup);
-            status = INIT_OK;
-        } catch (SaveException e) {
-            status = e.getStatus();
-            try {
-                repairAfterError(file, backup, status);
-                throw e;
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            }
+            session = new SaveSession(file, encoding, backup);
+        } catch (IOException e) {
+            throw new SaveException(e.getMessage());
         }
 
         try
         {
 
-            // Define our data stream.
-            Writer fw = getWriter(file, encoding);
+            // Get our data stream. This stream writes only to a temporary file, until committed.
+            VerifyingWriter fw = session.getWriter();
 
             // Write signature.
             writeBibFileHeader(fw, encoding);
@@ -221,13 +119,13 @@ public class FileActions
             writePreamble(fw, database.getPreamble());
 
             // Write strings if there are any.
-	    writeStrings(fw, database);
+	        writeStrings(fw, database);
 
             // Write database entries. Take care, using CrossRefEntry-
             // Comparator, that referred entries occur after referring
             // ones. Apart from crossref requirements, entries will be
             // sorted as they appear on the screen.
-	    Set sorter = getSortedEntries(database, null, true);
+	        Set sorter = getSortedEntries(database, null, true);
 
             FieldFormatter ff = new LatexFieldFormatter();
 
@@ -278,13 +176,15 @@ public class FileActions
 
 	    }
 
+
             fw.close();
         }
          catch (Throwable ex)
         {
 	        ex.printStackTrace();
             try {
-	            repairAfterError(file, backup, INIT_OK);
+                session.cancel();
+                //repairAfterError(file, backup, INIT_OK);
             } catch (IOException e) {
                 // Argh, another error? Can we do anything?
                 e.printStackTrace();
@@ -295,35 +195,38 @@ public class FileActions
             throw new SaveException(ex.getMessage(), be);
 	}
 
+    return session;
+
     }
 
     /**
      * Saves the database to file, including only the entries included
      * in the supplied input array bes.
+     *
+     * @return A List containing warnings, if any.
      */
-    public static void savePartOfDatabase(BibtexDatabase database, MetaData metaData,
+    public static SaveSession savePartOfDatabase(BibtexDatabase database, MetaData metaData,
         File file, JabRefPreferences prefs, BibtexEntry[] bes, String encoding) throws SaveException
     {
 
 	TreeMap types = new TreeMap(); // Map to collect entry type definitions
 	// that we must save along with entries using them.
+
         BibtexEntry be = null;
-        int status = NOTHING;
         boolean backup = prefs.getBoolean("backup");
-        status = initFile(file, backup);
-        if (status != INIT_OK) {
-           try {
-               repairAfterError(file, backup, status);
-           } catch (IOException e) {
-               e.printStackTrace();
-           }
+
+        SaveSession session;
+        try {
+            session = new SaveSession(file, encoding, backup);
+        } catch (IOException e) {
+            throw new SaveException(e.getMessage());
         }
 
         try
         {
 
             // Define our data stream.
-            Writer fw = getWriter(file, encoding);
+            VerifyingWriter fw = getWriter(file, encoding);
 
             // Write signature.
             writeBibFileHeader(fw, encoding);
@@ -404,13 +307,13 @@ public class FileActions
 
 	    }
 
-
             fw.close();
         }
          catch (Throwable ex)
         {
             try {
-                repairAfterError(file, backup, status);
+                session.cancel();
+                //repairAfterError(file, backup, status);
             } catch (IOException e) {
                 // Argh, another error? Can we do anything?
                 e.printStackTrace();
@@ -421,14 +324,16 @@ public class FileActions
             throw new SaveException(ex.getMessage(), be);
 	}
 
+        return session;
+
     }
 
 
-  public static OutputStreamWriter getWriter(File f, String encoding)
+  public static VerifyingWriter getWriter(File f, String encoding)
       throws IOException {
-    OutputStreamWriter ow;
+    VerifyingWriter ow;
 
-    ow = new OutputStreamWriter(new FileOutputStream(f), encoding);
+    ow = new VerifyingWriter(new FileOutputStream(f), encoding);
 
     return ow;
   }
