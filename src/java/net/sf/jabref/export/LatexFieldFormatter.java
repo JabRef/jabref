@@ -27,7 +27,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.export;
 
-import java.io.*;
 import java.text.StringCharacterIterator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
@@ -39,12 +38,16 @@ public class LatexFieldFormatter implements FieldFormatter {
     int col; // First line usually starts about so much further to the right.
     final int STARTCOL = 4;
 
-    public String format(String text, boolean standardBibtex)
+    public String format(String text, String fieldName)
 	throws IllegalArgumentException {
 
-	// If the field is non-standard, we will just append braces,
+        if (Globals.prefs.putBracesAroundCapitals(fieldName)) {
+            text = Util.putBracesAroundCapitals(text);
+        }
+
+    // If the field is non-standard, we will just append braces,
 	// wrap and write.
-	if (!standardBibtex) {
+	if (!GUIGlobals.isStandardField(fieldName)) {
           int brc = 0;
           boolean ok = true;
           for (int i=0; i<text.length(); i++) {

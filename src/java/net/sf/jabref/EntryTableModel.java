@@ -506,7 +506,7 @@ public class EntryTableModel
       try {
         if (toSet != null) {
           (new LatexFieldFormatter()).format
-              (toSet, GUIGlobals.isStandardField(fieldName));
+              (toSet, fieldName);
         }
 
         // Store this change in the UndoManager to facilitate undo.

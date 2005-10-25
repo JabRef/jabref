@@ -1051,19 +1051,31 @@ public class Util {
     // PKC etc convert to {PKC} ...
     //========================================================
     static Pattern titleCapitalPattern = Pattern.compile("[A-Z]+");
+    static Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
 
-    public static String putBracesAroundCapitals(String title) {
+    public static String putBracesAroundCapitals(String s) {
+        if (s.length() == 0) return s; // Protect against ArrayIndexOutOf....
         StringBuffer buf = new StringBuffer();
 
-        Matcher mcr = titleCapitalPattern.matcher(title.substring(1));
-        boolean found = false;
-        while ((found = mcr.find())) {
+        Matcher mcr = titleCapitalPattern.matcher(s.substring(1));
+        while (mcr.find()) {
             String replaceStr = mcr.group();
             mcr.appendReplacement(buf, "{" + replaceStr + "}");
         }
         mcr.appendTail(buf);
-        String titleCap = title.substring(0, 1) + buf.toString();
-        return titleCap;
+        return s.substring(0, 1) + buf.toString();
+    }
+
+    public static String removeBracesAroundCapitals(String s) {
+        StringBuffer buf = new StringBuffer();
+
+        Matcher mcr = bracedTitleCapitalPattern.matcher(s);
+        while (mcr.find()) {
+            String replaceStr = mcr.group();
+            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length()-1));
+        }
+        mcr.appendTail(buf);
+        return buf.toString();
     }
 
     /**
@@ -1265,4 +1277,6 @@ public class Util {
         String s = (String)fieldVal;
         return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
     }
+
+
 }

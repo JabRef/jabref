@@ -62,8 +62,7 @@ public class FileActions
 
 	    fw.write("@STRING{" + bs.getName() + " = ");
 	    if (!bs.getContent().equals(""))
-		fw.write((new LatexFieldFormatter()).format(bs.getContent(),
-							    true));
+		fw.write((new LatexFieldFormatter()).format(bs.getContent(), "__dummy"));
 	    else fw.write("{}");
 
 	    //Util.writeField(bs.getName(), bs.getContent(), fw) ;
@@ -226,7 +225,7 @@ public class FileActions
         {
 
             // Define our data stream.
-            VerifyingWriter fw = getWriter(file, encoding);
+            VerifyingWriter fw = session.getWriter();
 
             // Write signature.
             writeBibFileHeader(fw, encoding);
@@ -328,15 +327,6 @@ public class FileActions
 
     }
 
-
-  public static VerifyingWriter getWriter(File f, String encoding)
-      throws IOException {
-    VerifyingWriter ow;
-
-    ow = new VerifyingWriter(new FileOutputStream(f), encoding);
-
-    return ow;
-  }
 
     public static void exportCustomDatabase(BibtexDatabase database, String directory, String lfName,
                                             File outFile)

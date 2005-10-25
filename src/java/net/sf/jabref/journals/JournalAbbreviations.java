@@ -145,6 +145,10 @@ public class JournalAbbreviations {
                     String fullName = parts[0].trim();
                     String fullNameLC = fullName.toLowerCase();
                     String abbrName = parts[1].trim();
+                    if (abbrName.indexOf(';') >= 0) {
+                        String[] restParts = abbrName.split(";");
+                        abbrName = restParts[0];
+                    }
                     String abbrNameLC = abbrName.toLowerCase();
                     String abbrNoDots = dotsToNodots(abbrName);
                     String abbrNoDotsLC = abbrNoDots.toLowerCase();

@@ -2,8 +2,6 @@ package net.sf.jabref.imports;
 
 import net.sf.jabref.Globals;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -20,7 +18,6 @@ public class FieldContentParser {
      */
     public StringBuffer format(StringBuffer content) {
 
-        int prev = -1;
         int i=0;
 
         // Remove windows newlines and insert unix ones:
@@ -111,7 +108,6 @@ public class FieldContentParser {
                 content.deleteCharAt(i);
             else
                 i++;
-            prev = c;
 
         }
 
@@ -123,7 +119,7 @@ public class FieldContentParser {
      * so stored and reloaded fields are not mangled.
      * @param in
      * @param wrapAmount
-     * @return
+     * @return the wrapped String.
      */
     public static String wrap(String in, int wrapAmount){
         // JZ: due to the formatting/wrapping bug, I temporarily disabled

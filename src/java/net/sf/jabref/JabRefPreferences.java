@@ -56,6 +56,7 @@ public class JabRefPreferences {
     public HashMap defaults = new HashMap(),
         keyBinds = new HashMap(),
         defKeyBinds = new HashMap();
+    private HashSet putBracesAroundCapitalsFields = new HashSet(4);
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
@@ -260,6 +261,7 @@ public class JabRefPreferences {
                        +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
+        defaults.put("putBracesAroundCapitals","");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
@@ -283,11 +285,23 @@ public class JabRefPreferences {
         customExports = new CustomExportList(this, new ExportComparator());
 
         //defaults.put("oooWarning", Boolean.TRUE);
-
+        updatePutBracesAroundCapitalsFields();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
     }
 
+    public boolean putBracesAroundCapitals(String fieldName) {
+        return putBracesAroundCapitalsFields.contains(fieldName);
+    }
 
+    public void updatePutBracesAroundCapitalsFields() {
+        putBracesAroundCapitalsFields.clear();
+        String fieldString = get("putBracesAroundCapitals");
+        if (fieldString.length() > 0) {
+            String[] fields = fieldString.split(";");
+            for (int i=0; i<fields.length; i++)
+                putBracesAroundCapitalsFields.add(fields[i]);
+        }
+    }
 
     public String get(String key) {
         return prefs.get(key, (String)defaults.get(key));

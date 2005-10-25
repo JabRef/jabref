@@ -307,7 +307,7 @@ public class BibtexParser
 	skipWhitespace();
 	//Util.pr("Now the contents");
         consume('=');
-	String content = parseFieldContent(true);
+	String content = parseFieldContent();
 	//Util.pr("Now I'm going to consume a }");
 	consume('}',')');
 	//Util.pr("Finished string parsing.");
@@ -343,7 +343,7 @@ public class BibtexParser
 		if (Character.isWhitespace(c) || (c == '{')
 		    || (c == '\"')) {
                     String fieldName = ex.getMessage().trim().toLowerCase();
-		    String cont = parseFieldContent(GUIGlobals.isStandardField(fieldName));
+		    String cont = parseFieldContent();
             result.setField(fieldName, cont);
 		} else {
 		    if (key != null)
@@ -391,10 +391,13 @@ public class BibtexParser
 	    //Util.pr("Field: _"+key+"_");
         skipWhitespace();
         consume('=');
-	String content = parseFieldContent(GUIGlobals.isStandardField(key));
-        //System.out.println(content);
-
-	if (content.length() > 0) {
+	    String content = parseFieldContent();
+        // Now, if the field in question is set up to be fitted automatically with braces around
+        // capitals, we should remove those now when reading the field:
+        if (Globals.prefs.putBracesAroundCapitals(key)) {
+            content = Util.removeBracesAroundCapitals(content);
+        }
+    if (content.length() > 0) {
           if (entry.getField(key) == null)
             entry.setField(key, content);
           else {
@@ -409,7 +412,7 @@ public class BibtexParser
         }
     }
 
-    private String parseFieldContent(boolean isStandardBibtexField) throws IOException
+    private String parseFieldContent() throws IOException
     {
         skipWhitespace();
 	StringBuffer value = new StringBuffer();

@@ -35,7 +35,7 @@ public interface FieldFormatter
 {
     //~ Methods ////////////////////////////////////////////////////////////////
 
-    public String format(String s, boolean standardBibtex)
+    public String format(String s, String fieldName)
         throws IllegalArgumentException;
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -321,8 +321,10 @@ public class BibtexEntry
         // Then optional fields.
         s = getOptionalFields();
         if (s != null) for (int i=0; i<s.length; i++) {
-            writeField(s[i], out, ff);
-            written.put(s[i], null);
+            if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
+                writeField(s[i], out, ff);
+                written.put(s[i], null);
+            }
         }
         // Then write remaining fields in alphabetic order.
         TreeSet remainingFields = new TreeSet();
@@ -347,8 +349,7 @@ public class BibtexEntry
             out.write("  "+name+" = ");
 
             try {
-                out.write(ff.format(o.toString(),
-                                    GUIGlobals.isStandardField(name)));
+                out.write(ff.format(o.toString(), name));
             } catch (Throwable ex) {
                 throw new IOException
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());

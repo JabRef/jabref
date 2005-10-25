@@ -59,9 +59,7 @@ public class Globals {
 
 
 
-    private final static Map tableCache = new WeakHashMap();
-
-  public static String VERSION,
+   public static String VERSION,
                        BUILD,
                        BUILD_DATE ;
 
@@ -186,21 +184,6 @@ public class Globals {
     javax.swing.JComponent.setDefaultLocale(locale);
   }
 
-  /**
-   * Returns the cached value from the tableChache WeakHashMap.
-   */
-  public static String getCached(String text) {
-      Object res = tableCache.get(text);
-      return (String)res;
-  }
-
-  /**
-   * Caches a new value in the tableCache WeakHashMap.
-   */
-  public static void cache(String text, String textProcessed) {
-      tableCache.put(text, textProcessed);
-      //System.out.println(tableCache.size());
-  }
 
     public static JournalAbbreviations journalAbbrev;
 

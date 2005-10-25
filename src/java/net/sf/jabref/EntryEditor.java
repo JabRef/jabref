@@ -30,7 +30,6 @@ import java.awt.dnd.*;
 import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,9 +42,7 @@ import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.undo.*;
-import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
 
@@ -719,8 +716,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           String toSet = (String) nu.getField(fields[i].toString());
 
           // Test if the field is legally set.
-          (new LatexFieldFormatter()).format(toSet,
-            GUIGlobals.isStandardField(fields[i].toString()));
+          (new LatexFieldFormatter()).format(toSet, fields[i].toString());
 
           compound.addEdit(new UndoableFieldChange(entry, fields[i].toString(),
               entry.getField(fields[i].toString()), toSet));
@@ -927,8 +923,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof EntryEditorTab)
                     ((EntryEditorTab)activeTab).updateAll();
-        }
-     });
+            }
+        });
+
     }
   }
 
@@ -1036,8 +1033,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // properly formatted. If that happens, the field
             // is not stored and the textarea turns red.
             if (toSet != null)
-              (new LatexFieldFormatter()).format(toSet,
-                GUIGlobals.isStandardField(fe.getFieldName()));
+              (new LatexFieldFormatter()).format(toSet, fe.getFieldName());
 
             Object oldValue = entry.getField(fe.getFieldName());
 

@@ -252,7 +252,7 @@ public class StringDialog extends JDialog {
 
 		if (!((String)value).equals(subject.getContent())) {
                     try {
-                        (new LatexFieldFormatter()).format((String)value, true);
+                        (new LatexFieldFormatter()).format((String)value, "__dummy");
                     } catch (IllegalArgumentException ex) {
                         return;
                     }

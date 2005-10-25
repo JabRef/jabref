@@ -89,7 +89,7 @@ public class ManageJournalsPanel extends JPanel{
 
         userPanel.setLayout(new BorderLayout());
         builtInTable = new JTable(Globals.journalAbbrev.getTableModel());
-        builder.add(new JScrollPane(userPanel), cc.xyw(2,4,4));
+        builder.add(userPanel, cc.xyw(2,4,4));
         ButtonStackBuilder butBul = new ButtonStackBuilder();
         butBul.addGridded(add);
         butBul.addGridded(remove);
