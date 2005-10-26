@@ -27,7 +27,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.export;
 
-import java.text.StringCharacterIterator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.GUIGlobals;
 import java.util.Vector;
@@ -77,8 +76,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 	}
 
 	sb = new StringBuffer();
-	int pivot = 0, pos1 = -1, pos2 = -1;
-	int tell = 0;
+	int pivot = 0, pos1, pos2;
 	col = STARTCOL;
 	// Here we assume that the user encloses any bibtex strings in #, e.g.:
 	// #jan# - #feb#
@@ -145,8 +143,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 		sb.append("\\&");
 	    else
 		sb.append(c);
-	    if (c == '\\') escape = true;
-	    else escape = false;
+        escape = (c == '\\');
 	}
 	sb.append(Globals.getClosingBrace());
     }
@@ -163,67 +160,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 	sb.append(Util.wrap2(s, GUIGlobals.LINE_LENGTH));
     }
 
-    private void oldwrap(String s) {
-	// the old wrap algorithm. It doesn't correctly handle long
-	// words. Util.wrap2() is used instead.
-	boolean whitesp = false, last = false, cont = true;
-	int lastWh = -1,
-	    lastWhCol = -1;
-	StringCharacterIterator it = new StringCharacterIterator(s);
-	char c = it.first();
-	String toSetIn = "";
-	while (cont) {
-	    toSetIn = "";
-	    if ((Character.isWhitespace(c))) { /* ||
-		((col > GUIGlobals.LINE_LENGTH)
-		&& (it.getIndex() == it.getEndIndex()-1))) {*/
-		if (!whitesp) {
-		    whitesp = true;
-		    if ((col >= GUIGlobals.LINE_LENGTH)
-			&& (lastWhCol > GUIGlobals.LINE_LENGTH)) {
-
-			//if ((it.getIndex() - lastWh) >= GUIGlobals.LINE_LENGTH)
-			if (sb.charAt(sb.length()-it.getIndex()+lastWh-1) != '\n') {
-			    // This IF clause prevents us from going back if the last word
-			    // is also the first in this line. Going back in this situation
-			    // leads the algorithm into an endless loop.
-			    sb.delete(sb.length()-it.getIndex()+lastWh,
-				      sb.length());
-			    it.setIndex(lastWh);
-			}
-			col = 0;
-			toSetIn = "\n\t";
-
-		    } else {
-			lastWh = it.getIndex();
-			lastWhCol = col;
-			toSetIn = " ";
-			col++;
-		    }
-		} else {
-		    lastWh++;
-		}
-	    } else {
-		toSetIn = ""+c;
-		whitesp = false;
-		col++;
-	    }
-
-	    sb.append(toSetIn);
-
-	    /*if (last)
-	      cont = false;*/
-	    if (it.getIndex() < it.getEndIndex()-1) {
-		c = it.next();
-		Util.pr("'"+c+"'");
-	    }
-	    else {
-		//c = ' ';
-		cont = false;
-		//last = true;
-	    }
-	}
-    }
 
     private void checkBraces(String text) throws IllegalArgumentException {
 
@@ -249,8 +185,6 @@ public class LatexFieldFormatter implements FieldFormatter {
 	if (left.size() != right.size())
 	    throw new IllegalArgumentException
 		("Braces don't match.");
-	if (left.size() == 0)
-	    return;
 
     }
 

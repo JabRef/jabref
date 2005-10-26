@@ -261,7 +261,7 @@ public class JabRefPreferences {
                        +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
-        defaults.put("putBracesAroundCapitals","");
+        defaults.put("putBracesAroundCapitals","title");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);

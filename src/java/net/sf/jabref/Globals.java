@@ -328,10 +328,16 @@ public class Globals {
      * @return A String containing the braces to use.
      */
     public static String getOpeningBrace() {
+        return "{";
+        /*
+            As of version 2.0, storing all fields with double braces is no longer supported, because
+            it causes problems with e.g. the author field.
+
         if (prefs.getBoolean("autoDoubleBraces"))
             return "{{";
         else
             return "{";
+        */
     }
 
     /**
@@ -340,10 +346,16 @@ public class Globals {
      * @return A String containing the braces to use.
      */
     public static String getClosingBrace() {
+        return "}";
+        /*
+            As of version 2.0, storing all fields with double braces is no longer supported, because
+            it causes problems with e.g. the author field.
+
         if (prefs.getBoolean("autoDoubleBraces"))
             return "}}";
         else
-            return "}";
+        */
+
     }
 
     /*    public static void setupKeyBindings(JabRefPreferences prefs) {

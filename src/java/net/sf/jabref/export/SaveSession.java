@@ -22,7 +22,7 @@ import java.io.FileOutputStream;
 public class SaveSession {
 
     private static final String TEMP_PREFIX = "jabref";
-    private static final String TEMP_SUFFIX = "save";
+    private static final String TEMP_SUFFIX = "save.bib";
     File file, tmp, backupFile;
     String encoding;
     boolean backup;

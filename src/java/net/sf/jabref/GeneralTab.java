@@ -20,7 +20,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
-    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField;
+    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField, bracesAroundCapitalsFields;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
@@ -50,8 +50,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
         saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
-        autoDoubleBraces = new JCheckBox("<HTML>" + Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
-                + "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
+        autoDoubleBraces = new JCheckBox(
+                //+ Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
+                //+ "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
+                Globals.lang("Remove double braces around BibTeX fields when loading."));
         useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
         useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported.")); 
         JPanel general = new JPanel();
@@ -71,7 +73,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setMargin(marg);
         // Font sizes:
         fontSize = new JTextField();
-
+        bracesAroundCapitalsFields = new JTextField(30);
         // We need a listener on showSource to enable and disable the source panel-related choices:
         showSource.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
@@ -111,6 +113,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
         //builder.nextLine();
         //builder.append(pan);
         builder.append(autoDoubleBraces);
+        builder.nextLine();
+        JLabel label = new JLabel(Globals.lang("Store the following fields with braces around capital letters")+":");
+        JPanel panel = new JPanel();
+        panel.add(label);
+        panel.add(bracesAroundCapitalsFields);
+        builder.append(pan);
+        builder.append(panel);
         builder.nextLine();
         //builder.appendSeparator(Globals.lang("Miscellaneous"));
         //builder.nextLine();
@@ -226,7 +235,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         editSource.setEnabled(showSource.isSelected());
         useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
         inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
-
+        bracesAroundCapitalsFields.setText(_prefs.get("putBracesAroundCapitals"));
         String enc = _prefs.get("defaultEncoding");
         outer: for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
@@ -276,7 +285,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
         _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());
-
+        if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
+            _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
+            _prefs.updatePutBracesAroundCapitalsFields();
+        }
         // We want to know if the following setting has been modified:
         boolean oldShowSource = _prefs.getBoolean("showSource");
         _prefs.putBoolean("showSource", showSource.isSelected());

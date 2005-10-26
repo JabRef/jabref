@@ -87,7 +87,11 @@ Change log:
         - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
         - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
+        - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
+          when loading. Added option to put braces around capital letters of a chosen set of fields.
+        - Fixed multiplying authors bug when author/editor field appears both in Required and Optional tabs.
         - Fixed bug in Ovid import.
+        - Fixed startup freeze when trying to load certain malformed bib files.
         - Fixed bug related to multi-line fields in RIS import.
 1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.

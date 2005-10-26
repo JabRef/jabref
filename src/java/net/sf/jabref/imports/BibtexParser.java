@@ -73,6 +73,8 @@ public class BibtexParser
 
       if (pat1.matcher(str).find())
         return true;
+      else if (str.startsWith(GUIGlobals.SIGNATURE))
+        return true;
     }
 
     return false;
@@ -391,7 +393,7 @@ public class BibtexParser
 	    //Util.pr("Field: _"+key+"_");
         skipWhitespace();
         consume('=');
-	    String content = parseFieldContent();
+        String content = parseFieldContent();
         // Now, if the field in question is set up to be fitted automatically with braces around
         // capitals, we should remove those now when reading the field:
         if (Globals.prefs.putBracesAroundCapitals(key)) {

@@ -139,8 +139,7 @@ public class Util {
         if (hash == -1) hash = end;
         if (wr1 == -1) wr1 = end;
         if (wr2 == -1) wr2 = end;
-        if (((wr1 == end) && (wr2 == end)) || (hash < Math.min(wr1, wr2))) string = true;
-        else string = false;
+        string = ((wr1 == end) && (wr2 == end)) || (hash < Math.min(wr1, wr2));
 
         //System.out.println("FileLoader: "+content+" "+string+" "+hash+"
         // "+wr1+" "+wr2);
@@ -174,10 +173,10 @@ public class Util {
         // and end, and removing (at most) one pair of braces or " surrounding
         // it.
         if (s == null) return null;
-        char ch = 0, ch2 = 0;
+        char ch, ch2;
         int beg = 0, end = s.length();
         // We start out assuming nothing will be removed.
-        boolean begok = false, endok = false, braok = false;
+        boolean begok = false, endok = false;
         while (!begok) {
             if (beg < s.length()) {
                 ch = s.charAt(beg);
@@ -194,7 +193,6 @@ public class Util {
             } else endok = true;
         }
 
-        //	while (!braok) {
         if (end > beg + 1) {
             ch = s.charAt(beg);
             ch2 = s.charAt(end - 1);
@@ -202,22 +200,15 @@ public class Util {
                 beg++;
                 end--;
             }
-        } //else
-        //braok = true;
-
-        //  } else
-        //braok = true;
-        //}
-
+        }
         s = s.substring(beg, end);
         //Util.pr(s);
         return s;
     }
 
     /**
-     * This method returns a String similar to the one passed in, except all
-     * whitespace and '#' characters are removed. These characters make a key
-     * unusable by bibtex.
+     * This method returns a String similar to the one passed in, except that it is
+     * molded into a form that is acceptable for bibtex.
      */
     public static String checkLegalKey(String key) {
         if (key == null) return null;
@@ -778,15 +769,6 @@ public class Util {
 
     }
 
-    public static void printEntry(BibtexEntry entry) {
-        StringWriter sw = new StringWriter();
-        try {
-            entry.write(sw, new LatexFieldFormatter(), false);
-        } catch (IOException ex) {
-        }
-        pr(sw.toString());
-    }
-
     /**
      * Copies a file.
      *
@@ -795,7 +777,7 @@ public class Util {
      * @param deleteIfExists boolean Determines whether the copy goes on even if the file
      *                       exists.
      * @throws IOException
-     * @returns boolean Whether the copy succeeded, or was stopped due to the
+     * @return boolean Whether the copy succeeded, or was stopped due to the
      * file already existing.
      */
     public static boolean copyFile(File source, File dest,
@@ -834,7 +816,7 @@ public class Util {
         //pr(genFields+"\t"+genFields.indexOf("abstract"));
         if (genFields.indexOf("abstract") >= 0) {
             //pr(genFields+"\t"+genFields.indexOf("abstract"));
-            String newGen = null;
+            String newGen;
             if (genFields.equals("abstract")) newGen = "";
             else if (genFields.indexOf(";abstract;") >= 0) {
                 newGen = genFields.replaceAll(";abstract;", ";");
@@ -1051,7 +1033,6 @@ public class Util {
     // PKC etc convert to {PKC} ...
     //========================================================
     static Pattern titleCapitalPattern = Pattern.compile("[A-Z]+");
-    static Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
 
     public static String putBracesAroundCapitals(String s) {
         if (s.length() == 0) return s; // Protect against ArrayIndexOutOf....
@@ -1066,10 +1047,31 @@ public class Util {
         return s.substring(0, 1) + buf.toString();
     }
 
-    public static String removeBracesAroundCapitals(String s) {
-        StringBuffer buf = new StringBuffer();
+    static Pattern bracedTitleCapitalPattern = Pattern.compile("\\{[A-Z]+\\}");
 
+    /**
+     * This method looks for occurences of capital letters enclosed in an arbitrary number of
+     * pairs of braces, e.g. "{AB}" or "{{T}}". All of these pairs of braces are removed.
+     * @param s The String to analyze.
+     * @return A new String with braces removed.
+     */
+    public static String removeBracesAroundCapitals(String s) {
+        String previous = s;
+        while ((s = removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
+            previous = s;
+        }
+        return s;
+    }
+
+    /**
+     * This method looks for occurences of capital letters enclosed in one pair of braces, e.g. "{AB}".
+     * All these are replaced by only the capitals in between the braces.
+     * @param s The String to analyze.
+     * @return A new String with braces removed.
+     */
+    public static String removeSingleBracesAroundCapitals(String s) {
         Matcher mcr = bracedTitleCapitalPattern.matcher(s);
+        StringBuffer buf = new StringBuffer();
         while (mcr.find()) {
             String replaceStr = mcr.group();
             mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length()-1));
@@ -1169,7 +1171,7 @@ public class Util {
                         charsLeft = lineWidth - word.length() - 1;
                     }
                 } else {
-                    sb.append(" " + word);
+                    sb.append(' ').append(word);
                     charsLeft -= word.length() + 1;
                 }
             }
@@ -1187,8 +1189,7 @@ public class Util {
         String format = Globals.prefs.get("timeStampFormat");
         Date today = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat(format);
-        String datenewformat = formatter.format(today);
-        return datenewformat;
+        return formatter.format(today);
     }
 
 
