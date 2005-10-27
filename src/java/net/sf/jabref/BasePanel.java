@@ -244,72 +244,90 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             });
 
         // The action for saving a database.
-        actions.put("save", new BaseAction() {
-                public void action() throws Throwable {
-                    
-                    if (file == null)
-                        runCommand("saveAs");
-                    else {
-                        
-                      if (updatedExternally || Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
-                          String[] opts = new String[] {Globals.lang("Review changes"), Globals.lang("Save"),
-                            Globals.lang("Cancel") };
-                          int answer = JOptionPane.showOptionDialog(frame, Globals.lang("File has been updated externally. "
-                          +"What do you want to do?"), Globals.lang("File updated externally"),
-                          JOptionPane.YES_NO_CANCEL_OPTION,  JOptionPane.QUESTION_MESSAGE,
-                          null, opts, opts[0]);
-                         /*  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
-                            +"Are you sure you want to save?"), Globals.lang("File updated externally"),
-                                                                   JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
+        actions.put("save", new AbstractWorker() {
+            private boolean success = false;
+            public void init() throws Throwable {
+                success = false;
+                if (file == null)
+                    runCommand("saveAs");
+                else {
+
+                    if (updatedExternally || Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
+                        String[] opts = new String[]{Globals.lang("Review changes"), Globals.lang("Save"),
+                                Globals.lang("Cancel")};
+                        int answer = JOptionPane.showOptionDialog(frame, Globals.lang("File has been updated externally. "
+                                + "What do you want to do?"), Globals.lang("File updated externally"),
+                                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                                null, opts, opts[0]);
+                        /*  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
++"Are you sure you want to save?"), Globals.lang("File updated externally"),
+                       JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
                         if (answer == JOptionPane.CANCEL_OPTION)
                             return;
                         else if (answer == JOptionPane.YES_OPTION) {
                             ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this); //, panel.database(), panel.metaData());
                             //try {
-                                scanner.changeScan(file());
-                                setUpdatedExternally(false);
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        sidePaneManager.hideAway("fileUpdate");
-                                    }
-                                });
+                            scanner.changeScan(file());
+                            setUpdatedExternally(false);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    sidePaneManager.hideAway("fileUpdate");
+                                }
+                            });
 
                             //} catch (IOException ex) {
                             //    ex.printStackTrace();
                             //}
-                            
+
                             return;
                         }
-                      }
+                    }
 
-                      saving = true;
-                      saveDatabase(file, false);
+                    frame.output(Globals.lang("Saving database") + "...");
+                    saving = true;
+                }
+            }
 
-                      //Util.pr("Testing resolve string... BasePanel line 237");
-                      //Util.pr("Resolve aq: "+database.resolveString("aq"));
-                      //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
-    
-                      try {
+            public void update() {
+                if (success) {
+                    frame.setTabTitle(BasePanel.this, file.getName());
+                    frame.output(Globals.lang("Saved database")+" '"
+                             +file.getPath()+"'.");
+                } else {
+                    frame.output(Globals.lang("Save failed"));
+                }
+            }
+
+            public void run() {
+
+                try {
+                    saveDatabase(file, false);
+
+                    //Util.pr("Testing resolve string... BasePanel line 237");
+                    //Util.pr("Resolve aq: "+database.resolveString("aq"));
+                    //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
+
+                    try {
                         Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
-                      } catch (IllegalArgumentException ex) {
+                    } catch (IllegalArgumentException ex) {
                         // This means the file has not yet been registered, which is the case
                         // when doing a "Save as". Maybe we should change the monitor so no
                         // exception is cast.
-                      }
-                      saving = false;
-                      undoManager.markUnchanged();
-                      // (Only) after a successful save the following
-                      // statement marks that the base is unchanged
-                      // since last save:
-                      nonUndoableChange = false;
-                      baseChanged = false;
-                      updatedExternally = false;
-                      frame.setTabTitle(BasePanel.this, file.getName());
-                      frame.output(Globals.lang("Saved database")+" '"
-                                   +file.getPath()+"'.");
                     }
+                    saving = false;
+                    success = true;
+                    undoManager.markUnchanged();
+                    // (Only) after a successful save the following
+                    // statement marks that the base is unchanged
+                    // since last save:
+                    nonUndoableChange = false;
+                    baseChanged = false;
+                    updatedExternally = false;
+                } catch (SaveException ex2) {
+                    ex2.printStackTrace();
                 }
-            });
+            }
+        });
 
         actions.put("saveAs", new BaseAction () {
                 public void action() throws Throwable {
@@ -1478,7 +1496,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
-        SaveSession session=null;
+        SaveSession session;
+        frame.block();
         try {
             if (!selectedOnly)
                 session = FileActions.saveDatabase(database, metaData, file,
@@ -1486,6 +1505,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             else
                 session = FileActions.savePartOfDatabase(database, metaData, file,
                                            prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
+            
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
                 // Error occured during processing of
@@ -1508,6 +1528,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                  Globals.lang("Save database"),
                  JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
+
+        } finally {
+            frame.unblock();
         }
 
         boolean commit = true;
