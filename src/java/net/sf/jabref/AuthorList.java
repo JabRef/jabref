@@ -224,6 +224,11 @@ public class AuthorList {
         return authors.getAuthorsLastFirstAnds();
     }
 
+    public static String fixAuthor_lastNameOnlyCommas(final String inOrig) {
+        AuthorList authors = new AuthorList(inOrig);
+        return authors.getAuthorsLastOnly();
+    }
+
     public static String fixAuthorForAlphabetization(final String inOrig) {
       AuthorList authors = new AuthorList(inOrig);
       return authors.getAuthorsForAlphabetization();
@@ -454,6 +459,35 @@ public class AuthorList {
                 res.append(" et al.");
             };
         }
+        return res.toString();
+    }
+        /**
+     * Returns the list of authors separated by commas with last name only;
+     * If the list consists of three or more authors, "and" is inserted before
+     * the last author's name.
+     * <p>
+     * "John Smith" ==> "Smith";
+     * "John Smith and Black Brown, Peter" ==> "Smith and Black Brown" ;
+     * "John von Neumann and John Smith and Black Brown, Peter" ==>
+     * "von Neumann, Smith and Black Brown".
+     * @return formatted list of authors.
+     */
+    public String getAuthorsLastOnly() {
+        StringBuilder res = new StringBuilder();
+        if (size()>0) {
+            res.append(getAuthor(0).getLast());
+            int i = 1;
+            while (i < size()-1) {
+                res.append(", ");
+                res.append(getAuthor(i).getLast());
+                i++;
+            };
+            if (size() > 2) res.append(",");
+            if (size() > 1) {
+                res.append(" and ");
+                res.append(getAuthor(i).getLast());
+            }
+        };
         return res.toString();
     }
     /**

@@ -115,7 +115,7 @@ public class JabRefPreferences {
 	    defaults.put("namesLf", Boolean.FALSE);
         defaults.put("namesNatbib", Boolean.TRUE);
         defaults.put("abbrAuthorNames", Boolean.TRUE);
-	//        defaults.put("namesLastOnly", Boolean.TRUE);
+	    defaults.put("namesLastOnly", Boolean.TRUE);
         defaults.put("language", "en");
         defaults.put("showShort", Boolean.TRUE);
         defaults.put("priSort", "author");
@@ -261,7 +261,7 @@ public class JabRefPreferences {
                        +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}"
                        +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
-        defaults.put("putBracesAroundCapitals","title");
+        defaults.put("putBracesAroundCapitals","");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);

@@ -66,7 +66,7 @@ public class EntryTableModel
   // special columns (number column or icon column).
   private HashMap iconCols = new HashMap();
   int[] nameCols = null;
-  boolean showShort, namesNatbib;                               //MK:
+  boolean showShort, namesNatbib, namesLastOnly;                               //MK:
   boolean namesAsIs, namesFf, namesLf, abbr_names;              //MK:
 
     //ImageIcon pdfIcon = new ImageIcon(GUIGlobals.pdfSmallIcon);
@@ -202,8 +202,10 @@ public class EntryTableModel
              if (o == null) { return null; }
              if (namesAsIs) return o;
              if (namesNatbib) o = AuthorList.fixAuthor_Natbib((String)o);
-             if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
-             if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names);
+             else if (namesLastOnly) o = AuthorList.fixAuthor_lastNameOnlyCommas((String)o);
+             else if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
+             else if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names);
+
              return o;
  //            if (!namesAsIs) {
  //              if (namesFf) {
@@ -325,13 +327,15 @@ public class EntryTableModel
     nameCols = new int[tmp.size()];
     for (int i = 0; i < nameCols.length; i++) {
       nameCols[i] = ( (Integer) tmp.elementAt(i)).intValue();
+    }
     showShort = panel.prefs.getBoolean("showShort");        //MK:
     namesNatbib = panel.prefs.getBoolean("namesNatbib");    //MK:
-    }
+    namesLastOnly = panel.prefs.getBoolean("namesLastOnly");
+
     namesAsIs = Globals.prefs.getBoolean("namesAsIs");
     abbr_names = panel.prefs.getBoolean("abbrAuthorNames"); //MK:
     namesFf = Globals.prefs.getBoolean("namesFf");
-    namesLf = !(namesAsIs || namesFf || namesNatbib); // None of the above.
+    namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
         //namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
     // Build a vector of prioritized search objectives,
     // then pick the 3 first.

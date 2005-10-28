@@ -16,8 +16,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     private String[] _choices;
     private Boolean[] _sel;
     private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-    antialias, pdfColumn, urlColumn, citeseerColumn, abbrNames;
-    private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib;
+    antialias, pdfColumn, urlColumn, citeseerColumn;
+    private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames, lastNamesOnly;
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
@@ -54,7 +54,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         namesFf = new JRadioButton(Globals.lang("Show 'Firstname Lastname'"));
         namesFl = new JRadioButton(Globals.lang("Show 'Lastname, Firstname'"));
         namesNatbib = new JRadioButton(Globals.lang("Natbib style"));
-        abbrNames = new JCheckBox(Globals.lang("Abbreviate names"));
+        noAbbrNames = new JRadioButton(Globals.lang("Do not abbreviate names"));
+        abbrNames = new JRadioButton(Globals.lang("Abbreviate names"));
+        lastNamesOnly = new JRadioButton("Show last names only");
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
@@ -87,7 +89,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     bg.add(namesNatbib);
     bg.add(namesFf);
     bg.add(namesFl);
-
+    ButtonGroup bg2 = new ButtonGroup();
+    bg2.add(lastNamesOnly);
+    bg2.add(abbrNames);
+    bg2.add(noAbbrNames);
     secDesc = new JCheckBox(Globals.lang("Descending"));
     terDesc = new JCheckBox(Globals.lang("Descending"));
 
@@ -103,11 +108,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     builder.append(pan); builder.append(urlColumn); builder.nextLine();
     builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
     builder.appendSeparator(Globals.lang("Format of author and editor names"));
-    builder.append(pan); builder.append(namesAsIs); builder.nextLine();
-    builder.append(pan); builder.append(namesFf); builder.nextLine();
-    builder.append(pan); builder.append(namesFl); builder.nextLine();
+    builder.append(pan); builder.append(namesAsIs); builder.append(noAbbrNames); builder.nextLine();
+    builder.append(pan); builder.append(namesFf); builder.append(abbrNames); builder.nextLine();
+    builder.append(pan); builder.append(namesFl); builder.append(lastNamesOnly); builder.nextLine();
     builder.append(pan); builder.append(namesNatbib); builder.nextLine();
-    builder.append(pan); builder.append(abbrNames); builder.nextLine();
+    //builder.append(pan); builder.append(noAbbrNames); builder.nextLine();
+    //builder.append(pan); builder.append(abbrNames); builder.nextLine();
+    //builder.append(pan); builder.append(lastNamesOnly); builder.nextLine();
     builder.appendSeparator(Globals.lang("Sort options"));
     // Create a new panel with its own FormLayout for these items:
     FormLayout layout2 = new FormLayout
@@ -144,108 +151,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     sort.setLayout(gbl);
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
-    /*
-     con.gridwidth = GridBagConstraints.REMAINDER;
-     con.fill = GridBagConstraints.NONE;
-     con.anchor = GridBagConstraints.WEST;
-     gbl.setConstraints(colorCodes, con);
-     upper.add(colorCodes);
-     gbl.setConstraints(autoResizeMode, con);
-     upper.add(autoResizeMode);
-         gbl.setConstraints(antialias, con);
-         upper.add(antialias);
-         con.gridwidth = 1;
-     lab = new JLabel(Globals.lang("Menu and label font size"));
-     gbl.setConstraints(lab, con);
-     upper.add(lab);
-     Insets old = con.insets;
-     con.insets = new Insets(0, 5, 0, 5);
-     gbl.setConstraints(fontSize, con);
-     upper.add(fontSize);
-     con.insets = old;
-         con.gridwidth = GridBagConstraints.REMAINDER;
-     lab = new JLabel("("+Globals.lang("non-Mac only")+")");
-     gbl.setConstraints(lab, con);
-     upper.add(lab);
-     //gbl.setConstraints(menuFontButton, con);
-     //upper.add(menuFontButton);
-     //con.anchor = GridBagConstraints.EAST;
-         con.gridwidth = GridBagConstraints.REMAINDER;
-     gbl.setConstraints(fontButton, con);
-     upper.add(fontButton);
-     con.anchor = GridBagConstraints.WEST;
-     con.fill = GridBagConstraints.BOTH;
-         con.gridwidth = 1;
-         con.gridheight = 2;
-     gbl.setConstraints(upper, con);
-     //add(upper);
-         con.gridheight = 1;
-         con.gridwidth = GridBagConstraints.REMAINDER;
-         gbl.setConstraints(pdfColumn, con);
-         iconCol.add(pdfColumn);
-         gbl.setConstraints(urlColumn, con);
-         iconCol.add(urlColumn);
-         gbl.setConstraints(citeseerColumn, con);
-         iconCol.add(citeseerColumn);
-         con.fill = GridBagConstraints.BOTH;
-         gbl.setConstraints(iconCol, con);
-     add(iconCol);
 
-
-     con.gridwidth = GridBagConstraints.REMAINDER;
-     con.fill = GridBagConstraints.NONE;
-     con.anchor = GridBagConstraints.WEST;
-     gbl.setConstraints(namesAsIs, con);
-     namesp.add(namesAsIs);
-     gbl.setConstraints(namesFf, con);
-     namesp.add(namesFf);
-     gbl.setConstraints(namesFl, con);
-     namesp.add(namesFl);
-         con.fill = GridBagConstraints.BOTH;
-         gbl.setConstraints(namesp, con);
-     add(namesp);*/
-
-
-
-    // Set the correct value for the primary sort JComboBox.
-    /*String sec = prefs.get("secSort"),
-         ter = prefs.get("terSort");
-     for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++) {
-         if (sec.equals(GUIGlobals.ALL_FIELDS[i]))
-         secSort.setSelectedIndex(i);
-         if (ter.equals(GUIGlobals.ALL_FIELDS[i]))
-         terSort.setSelectedIndex(i);
-     }
-
-     lab = new JLabel(Globals.lang("Secondary sort criterion"));
-     con.gridwidth = 1;
-     con.insets = new Insets(0,5,0,0);
-     gbl.setConstraints(lab, con);
-     sort.add(lab);
-     con.weightx = 1;
-     gbl.setConstraints(secSort, con);
-     sort.add(secSort);
-         gbl.setConstraints(secField, con);
-         sort.add(secField);
-     con.gridwidth = GridBagConstraints.REMAINDER;
-     gbl.setConstraints(secDesc, con);
-     sort.add(secDesc);
-
-     con.gridwidth = 1;
-
-      lab = new JLabel(Globals.lang("Tertiary sort criterion"));
-     gbl.setConstraints(lab, con);
-     sort.add(lab);
-     con.weightx = 0;
-     //con.insets = new Insets(0,5,0,0);
-         gbl.setConstraints(terSort, con);
-         sort.add(terSort);
-         gbl.setConstraints(terField, con);
-         sort.add(terField);
-     con.weightx = 1;
-     con.gridwidth = GridBagConstraints.REMAINDER;
-     gbl.setConstraints(terDesc, con);
-     sort.add(terDesc);*/
 
 
     fontButton.addActionListener(new ActionListener() {
@@ -299,7 +205,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         namesNatbib.setSelected(true);
     else
         namesFl.setSelected(true);
-    abbrNames.setSelected(_prefs.getBoolean("abbrAuthorNames"));
+    if (_prefs.getBoolean("abbrAuthorNames"))
+        abbrNames.setSelected(true);
+    else if (_prefs.getBoolean("namesLastOnly"))
+        lastNamesOnly.setSelected(true);
+    else
+        noAbbrNames.setSelected(true);
+
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
         colorPanel.setValues();
@@ -316,6 +228,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
     _prefs.putBoolean("namesFf", namesFf.isSelected());
     _prefs.putBoolean("namesNatbib", namesNatbib.isSelected());
+    _prefs.putBoolean("namesLastOnly", lastNamesOnly.isSelected());
     _prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
 
         _prefs.putBoolean("antialias", antialias.isSelected());
