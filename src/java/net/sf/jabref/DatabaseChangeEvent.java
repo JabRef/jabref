@@ -1,7 +1,7 @@
 package net.sf.jabref;
 
 
-class DatabaseChangeEvent {
+public class DatabaseChangeEvent {
 
     static class ChangeType {
     }

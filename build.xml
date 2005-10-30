@@ -46,7 +46,7 @@
 
         <!-- some version information -->
         <property name="jabref.bin" value="jabref" />
-        <property name="jabref.version" value="1.8.1" />
+        <property name="jabref.version" value="2.0 alpha" />
         <property name="jabref.placeholder.version" value="@version@" /> <!-- used by replace task -->
 
 
@@ -109,6 +109,7 @@
             <pathelement location="${library.directory}/looks-1.2.2.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin.jar" />
+            <pathelement location="${library.directory}/glazedlists-1.0.0.jar" />
         </classpath>
          </java>
     </target>
@@ -129,6 +130,7 @@
                                 <pathelement location="${library.directory}/looks-1.2.2.jar" />
                                 <pathelement location="${library.directory}/forms-1.0.4.jar" />
                                 <pathelement location="${library.directory}/spin.jar" />
+                            <pathelement location="${library.directory}/glazedlists-1.0.0.jar" />
                         </classpath>
                 </javac>
         </target>
@@ -297,7 +299,9 @@ version=${jabref.version}</echo>
                 <unjar src="${library.directory}/looks-1.2.2.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
-                <delete dir="${build.tmp}/META-INF"/>
+                <unjar src="${library.directory}/glazedlists-1.0.0.jar" dest="${build.tmp}" />
+
+            <delete dir="${build.tmp}/META-INF"/>
         </target>
 
 

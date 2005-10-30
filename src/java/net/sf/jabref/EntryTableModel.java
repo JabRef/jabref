@@ -522,7 +522,7 @@ public class EntryTableModel
 
         be.setField(fieldName, toSet);
         panel.markBaseChanged();
-        panel.updateViewToSelected();
+        //panel.updateViewToSelected();
         //panel.updateEntryEditorIfShowing();
         // Should the table also be scheduled for repaint?
       }
@@ -582,4 +582,6 @@ public class EntryTableModel
         return Util.isMarked(be);
 
     }
+
+
 }

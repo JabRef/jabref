@@ -7,6 +7,9 @@ public class FocusRequester implements Runnable {
     private Component comp;
 
     public FocusRequester(Component comp) {
+       if (comp == null)
+               Thread.dumpStack();
+
         //System.out.println("FocusRequester: "+comp.toString());
 	this.comp = comp;
 	try {
@@ -16,6 +19,7 @@ public class FocusRequester implements Runnable {
 	}
     }
     public void run() {
-	comp.requestFocus();
+
+    comp.requestFocus();
     }
 }

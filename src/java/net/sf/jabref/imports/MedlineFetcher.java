@@ -291,7 +291,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
                  if (entriesImported > 0) {
                  panel.output(Globals.lang("Medline entries fetched")+": "+entriesImported);
                  panel.markBaseChanged();
-                 panel.refreshTable();
              } else
                  panel.output(Globals.lang("No Medline entries found."));
             }

@@ -9,7 +9,6 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
-import net.sf.jabref.imports.ImportFormatReader;
 
 import javax.swing.*;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -17,7 +16,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import java.util.*;
 import java.util.List;
@@ -79,7 +77,7 @@ public class ImportInspectionDialog extends JDialog {
     
 
     /**
-     * Creates a dialog that displays the given set of fields in the table.
+     * Creates a dialog that displays the given list of fields in the table.
      * The dialog allows another process to add entries dynamically while the dialog
      * is shown.
      *
@@ -110,7 +108,7 @@ public class ImportInspectionDialog extends JDialog {
         setWidths();
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        GeneralRenderer renderer = new GeneralRenderer(table, Color.white, true);
+        GeneralRenderer renderer = new GeneralRenderer(Color.white, true);
         table.setDefaultRenderer(JLabel.class, renderer);
         table.setDefaultRenderer(String.class, renderer);
         //table.setCellSelectionEnabled(false);
@@ -524,7 +522,7 @@ public class ImportInspectionDialog extends JDialog {
                                 groupingCanceled = true;
                         }
 
-                        // If the key was set, or has been set now, go ahead:
+                        // If the key was list, or has been list now, go ahead:
                         if (entry.getField(Globals.KEY_FIELD) != null) {
                             for (Iterator i2 = groups.iterator(); i2.hasNext();) {
                                 GroupTreeNode node = (GroupTreeNode) i2.next();
@@ -562,7 +560,6 @@ public class ImportInspectionDialog extends JDialog {
                         frame.addTab(panel, null, true);
                     }
                     panel.markBaseChanged();
-                    panel.refreshTable();
                     for (Iterator i = callBacks.iterator(); i.hasNext();) {
                         ((CallBack) i.next()).done(selected.size());
                     }
@@ -790,7 +787,7 @@ public class ImportInspectionDialog extends JDialog {
             AttachFileDialog diag = new AttachFileDialog(ths, entry, fileType);
             Util.placeDialog(diag, ths);
             diag.setVisible(true);
-            // After the dialog has closed, if it wasn't cancelled, set the field:
+            // After the dialog has closed, if it wasn't cancelled, list the field:
             if (!diag.cancelled()) {
                 entry.setField(fileType, diag.getValue());
                 // Add a marker to the table:

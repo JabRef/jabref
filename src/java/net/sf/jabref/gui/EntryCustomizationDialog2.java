@@ -164,7 +164,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     
     protected void applyChanges() {
         valueChanged(new ListSelectionEvent(new JList(), 0, 0, false));
-        // Iterate over our map of required fields, and set those types if necessary:
+        // Iterate over our map of required fields, and list those types if necessary:
         
         List types = typeComp.getFields();
         boolean globalChangesMade = false;
@@ -329,7 +329,6 @@ private void updateTables() {
     Iterator iter;
     for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
         BasePanel bp = (BasePanel)frame.getTabbedPane().getComponentAt(i);
-        bp.refreshTable();
         //bp.markBaseChanged();
     }
     

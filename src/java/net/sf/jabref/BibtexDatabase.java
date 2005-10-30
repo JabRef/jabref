@@ -133,6 +133,12 @@ public class BibtexDatabase
     }
 
     /**
+     * Just temporary, for testing purposes....
+     * @return
+     */
+    public Map getEntryMap() { return _entries; }
+
+    /**
      * Returns the entry with the given ID (-> entry_type + hashcode).
      */
     public synchronized BibtexEntry getEntryById(String id)

@@ -111,7 +111,6 @@ public void run() {
         {
           if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
           panel.database.removeEntry( be[1].getId() ) ;
-          panel.refreshTable() ;
           panel.markBaseChanged() ;
           ce.addEdit( new UndoableRemoveEntry( panel.database, be[1], panel ) ) ;
         }
@@ -119,7 +118,6 @@ public void run() {
         {
           if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
           panel.database.removeEntry( be[0].getId() ) ;
-          panel.refreshTable() ;
           panel.markBaseChanged() ;
           ce.addEdit( new UndoableRemoveEntry( panel.database, be[0], panel ) ) ;
         }

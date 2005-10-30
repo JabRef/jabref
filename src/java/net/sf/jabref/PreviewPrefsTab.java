@@ -25,7 +25,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 	p2 = new JPanel();
     JScrollPane sp1 = new JScrollPane(layout1),
 	sp2 = new JScrollPane(layout2);
-    private BibtexEntry entry;
+    private static BibtexEntry entry;
 
     public PreviewPrefsTab(JabRefPreferences prefs, HelpDialog diag) {
 	_prefs = prefs;
@@ -131,7 +131,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     test1.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            initTestEntry();
+            getTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, layout1.getText());
             testPanel.setPreferredSize(new Dimension(800, 350));
             JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
@@ -140,20 +140,17 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     test2.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-            initTestEntry();
+            getTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, layout2.getText());
             testPanel.setPreferredSize(new Dimension(800, 350));
             JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
 		}
 	    });
     }
-
-    /**
-     * Create the BibtexEntry that will be used to test the previews.
-     */
-    private void initTestEntry() {
+   
+    public static BibtexEntry getTestEntry() {
         if (entry != null)
-            return;
+            return entry;
         entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
         entry.setField(Globals.KEY_FIELD, "conceicao1997");
         entry.setField("author", "L. E. C. Conceic{\\~a}o and T. van der Meeren and J. A. J. Verreth and M. S. Evjen and D. F. Houlihan and H. J. Fyhn");
@@ -187,6 +184,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 "protein degradation might daily remove and return, respectively, the equivalent of up to 20 and 10 "+
                 "times the size of the FAA pool. In an early phase (Day 11) high growth rates were associated with a "+
                 "relatively low protein turnover, while at a later stage (Day 17), a much higher turnover was observed.");
+        return entry;
     }
 
     public void setValues() {

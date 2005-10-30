@@ -36,6 +36,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import net.sf.jabref.groups.GroupsPrefsTab;
+import net.sf.jabref.gui.MainTable;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined
@@ -256,6 +257,7 @@ public class PrefsDialog3 extends JDialog {
             if (!ready)
                 return;
             setVisible(false);
+            MainTable.updateRenderers();
             frame.setupAllTables();
             frame.groupSelector.revalidateGroups(); // icons may have changed
             frame.output(Globals.lang("Preferences recorded."));

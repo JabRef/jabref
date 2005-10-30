@@ -51,7 +51,7 @@ public class FieldWeightDialog extends JDialog {
 
         builder.appendSeparator(Globals.lang("Field sizes"));
 
-        // We use this set to build an alphabetical list of field names:
+        // We use this list to build an alphabetical list of field names:
         TreeSet fields = new TreeSet();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
@@ -104,7 +104,7 @@ public class FieldWeightDialog extends JDialog {
         for (Iterator i=sliders.keySet().iterator(); i.hasNext();) {
             JSlider slider = (JSlider)i.next();
             SliderInfo sInfo = (SliderInfo)sliders.get(slider);
-            // Only set the value if it has changed:
+            // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
                 double weight = GUIGlobals.MAX_FIELD_WEIGHT*((double)slider.getValue())/100d;
                 GUIGlobals.setFieldWeight(sInfo.fieldName, weight);

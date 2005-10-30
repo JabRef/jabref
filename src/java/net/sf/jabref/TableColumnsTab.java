@@ -236,11 +236,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         public void actionPerformed(ActionEvent e) {
             BasePanel panel = frame.basePanel();
             if (panel == null) return;
-            TableColumnModel colMod = panel.entryTable.getColumnModel();
+            TableColumnModel colMod = panel.mainTable.getColumnModel();
             colSetup.setValueAt(""+colMod.getColumn(0).getWidth(), 0, 1);
             for (int i=1; i<colMod.getColumnCount(); i++) {
             try {
-                String name = panel.entryTable.getColumnName(i).toLowerCase();
+                String name = panel.mainTable.getColumnName(i).toLowerCase();
                 int width = colMod.getColumn(i).getWidth();
                 //Util.pr(":"+((String)colSetup.getValueAt(i-1, 0)).toLowerCase());
                 //Util.pr("-"+name);

@@ -435,8 +435,8 @@ public class JabRefFrame
           previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
           highlightAny.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
           highlightAll.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
-          Globals.focusListener.setFocused(bp.entryTable);
-          new FocusRequester(bp.entryTable);
+          Globals.focusListener.setFocused(bp.mainTable);
+          new FocusRequester(bp.mainTable);
         }
       }
     });
@@ -1432,20 +1432,10 @@ public JabRefPreferences prefs() {
 
       // Update tables:
       if (bf.database != null) {
-        bf.entryTable.updateFont();
-        bf.setupTable();
+        bf.setupMainPanel();
+
       }
 
-      // Reread layout for previews:
-      for (int j=0; j<bf.previewPanel.length; j++)
-        if (bf.previewPanel[j] != null)
-          try {
-            bf.previewPanel[j].readLayout(prefs.get("preview"+j));
-            //bf.previewPanel[j].update();
-          } catch (Exception ex) {
-            ex.printStackTrace();
-          }
-      bf.updateViewToSelected();
     }
   }
 
@@ -1626,7 +1616,6 @@ class ImportCiteSeerAction
                                             citeSeerFetcher.endImportCiteSeerProgress();
                                             if (changesMade)
                                                     currentBp.markBaseChanged();
-                                                currentBp.refreshTable();
                                                 //for(int i=0; i < clickedOn.length; i++)
                                                 //        currentBp.entryTable.addRowSelectionInterval(i,i);
                                                 //currentBp.showEntry(toShow);
@@ -1637,16 +1626,17 @@ class ImportCiteSeerAction
                             public void run() {
                                 currentBp = (BasePanel) tabbedPane.getSelectedComponent();
                                         // We demand that at least one row is selected.
-                                        int rowCount = currentBp.entryTable.getSelectedRowCount();
+
+                                        int rowCount = currentBp.mainTable.getSelectedRowCount();
                                         if (rowCount >= 1) {
-                                                clickedOn = currentBp.entryTable.getSelectedRows();
+                                                clickedOn = currentBp.mainTable.getSelectedRows();
                                         } else {
                                                 JOptionPane.showMessageDialog(currentBp.frame(),
                                                 Globals.lang("You must select at least one row to perform this operation."),
                                                 Globals.lang("CiteSeer Import Error"),
                                                 JOptionPane.WARNING_MESSAGE);
                                         }
-                                        toShow = currentBp.database().getEntryById(currentBp.getTableModel().getIdForRow(clickedOn[0]));
+                                        toShow = (BibtexEntry)currentBp.mainTable.getSelected().get(0);
                                         if (clickedOn != null) {
                                                 citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =
@@ -1707,7 +1697,6 @@ class FetchCiteSeerAction
                                                         setSortingByCitationCount();
                                                         tabbedPane.add(Globals.lang(GUIGlobals.untitledTitle), newBp);
                                                         tabbedPane.setSelectedComponent(newBp);
-                                                        newBp.refreshTable();
                                                         output(Globals.lang("Fetched all citations from target database."));
                                                         citeSeerFetcher.deactivateCitationFetcher();
                                                 }
@@ -1922,13 +1911,7 @@ class FetchCiteSeerAction
             ths.addBibEntries(entries, filename, openInNew);
           if ((panel != null) && (entries.size() == 1)) {
               panel.highlightEntry((BibtexEntry)entries.get(0));
-              SwingUtilities.invokeLater(new Runnable() {
-                  public void run() {
-                        panel.updateViewToSelected();
-                  }
-              });
 
-              //panel.showEntry((BibtexEntry)entries.get(0));
           }
        }
   }
@@ -2052,7 +2035,6 @@ class FetchCiteSeerAction
             ce.end();
             basePanel.undoManager.addEdit(ce);
             basePanel.markBaseChanged();
-            basePanel.refreshTable();
             if (filename != null)
                 output(Globals.lang("Imported database") + " '" + filename + "' " +
                      Globals.lang("with") + " " +

@@ -92,7 +92,7 @@ public class AuthorAbbreviator implements LayoutFormatter {
 		// last word.
 		author = string.split(" ");
 		if (author.length > 1) {
-		    for (int i=0; i<author.length-1; i++) {
+		    for (int i=0; i<author.length-1; i++) if (author[i].length() > 0) {
 			c = author[i].charAt(0);
 			sb.append(c + ".");
 		    }

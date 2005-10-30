@@ -77,7 +77,6 @@ public class StrictDuplicateSearch extends Thread {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {                
                 panel.markBaseChanged();
-                panel.refreshTable();                
             }
         });
 

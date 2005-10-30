@@ -252,14 +252,15 @@ public class BibtexEntry
            throw new IllegalArgumentException("The field name '" + name +
                                               "' is reserved");
        }
-
+       Object oldValue = _fields.get(name);
+       _fields.remove(name);
        try {
-           firePropertyChangedEvent(name, _fields.get(name), "");
+           firePropertyChangedEvent(name, oldValue, "");
        } catch (PropertyVetoException pve) {
            throw new IllegalArgumentException("Change rejected: " + pve);
        }
 
-        _fields.remove(name);
+
     }
 
     protected boolean allFieldsPresent(String[] fields) {

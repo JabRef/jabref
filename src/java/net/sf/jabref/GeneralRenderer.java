@@ -12,19 +12,17 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
-    private JTable table;
     private boolean antialiasing;
 
-    public GeneralRenderer(JTable entryTable, Color c, boolean antialiasing) {
+    public GeneralRenderer(Color c, boolean antialiasing) {
         super();
-        this.table = entryTable;
         this.antialiasing = antialiasing;
         setBackground(c);
     }
 
 
-    public GeneralRenderer(JTable table, Color c, Color fg, boolean antialiasing) {
-        this(table, c, antialiasing);
+    public GeneralRenderer(Color c, Color fg, boolean antialiasing) {
+        this(c, antialiasing);
         setForeground(fg);
     }
 

@@ -36,7 +36,6 @@ public class DatabaseSearch extends Thread {
 	BibtexDatabase thisDatabase = null;
 	SearchRuleSet thisRuleSet = null;
 	Hashtable thisSearchOptions = null;
-	EntryTableModel thisTableModel = null;
 	String searchValueField = null;
 	boolean reorder, select, grayOut;
 	ErrorMessageDisplay errorDisplay;
@@ -48,7 +47,6 @@ public class DatabaseSearch extends Thread {
 		this.panel = panel;
 		this.errorDisplay = errorDisplay;
 		thisDatabase = panel.getDatabase();
-		thisTableModel = panel.getTableModel();
 		thisSearchOptions = searchOptions;
 		thisRuleSet = searchRules;
 		this.searchValueField = searchValueField;
@@ -96,18 +94,9 @@ public class DatabaseSearch extends Thread {
 		final int outputHits = hits;
 		SwingUtilities.invokeLater(new Thread() {
 			public void run() {
-				// System.out.println("DatabaseSearch: grayOut="+grayOut);
-				// System.out.println("DatabaseSearch: reorder="+reorder);
-				// System.out.println("DatabaseSearch: outputHits="+outputHits);
-				panel.entryTable.invalidate();
-				panel.showSearchResults(searchValueField, reorder, grayOut,
-						select, outputHits);
-				if ((searchValueField == null)
-						|| (searchValueField == Globals.SEARCH))
-					panel.output(Globals
-							.lang("Searched database. Global number of hits")
-							+ ": " + outputHits);
-				new FocusRequester(panel.entryTable);
+				panel.output(Globals
+                    .lang("Searched database. Global number of hits")
+                    + ": " + outputHits);
 			}
 		});
 	}

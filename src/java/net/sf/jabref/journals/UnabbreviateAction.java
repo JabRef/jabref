@@ -31,7 +31,7 @@ public class UnabbreviateAction extends AbstractWorker {
         //net.sf.jabref.journals.JournalList.downloadJournalList(frame);
 
 
-        BibtexEntry[] entries = panel.entryTable.getSelectedEntries();
+        BibtexEntry[] entries = panel.getSelectedEntries();
         if (entries == null)
             return;
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
@@ -43,7 +43,6 @@ public class UnabbreviateAction extends AbstractWorker {
         if (count > 0) {
             ce.end();
             panel.undoManager.addEdit(ce);
-            panel.refreshTable();
             panel.markBaseChanged();
             message = Globals.lang("Unabbreviated %0 journal names.", String.valueOf(count));
         } else {

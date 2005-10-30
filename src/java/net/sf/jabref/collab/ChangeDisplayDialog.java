@@ -79,8 +79,6 @@ public class ChangeDisplayDialog extends JDialog implements TreeSelectionListene
         ce.end();
         panel.undoManager.addEdit(ce);
         panel.markBaseChanged();
-        panel.refreshTable();
-        panel.updateViewToSelected();
         panel.setUpdatedExternally(false);
         dispose();
       }

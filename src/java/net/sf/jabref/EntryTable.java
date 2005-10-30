@@ -37,7 +37,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTableUI;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.table.*;
 
 import net.sf.jabref.groups.EntryTableTransferHandler;
@@ -156,8 +155,7 @@ public class EntryTable extends JTable {
               else prefs.putBoolean("priDescending",
                                     !prefs.getBoolean("priDescending"));
               tableModel.remap();
-              panel.refreshTable();
-              //repaint();
+              
             }
           }
         });
@@ -283,7 +281,7 @@ public class EntryTable extends JTable {
                                       // Update the value for which entry is shown:
                                     //  activeRow = row;
 
-                                    panel.updateViewToSelected();
+                                    //panel.updateViewToSelected();
                                     // guarantee that the the entry is visible
                                     ensureVisible(activeRow);
 
@@ -302,8 +300,8 @@ public class EntryTable extends JTable {
                                   // We want the entry preview to update when the user expands the
                                   // selection one entry at a time:
                                   //if ((e.getLastIndex()-e.getFirstIndex()) <= 1) {
-                                  if (activeRow >= 0)
-                                    panel.updateViewToSelected();
+                                  //if (activeRow >= 0)
+                                    //panel.updateViewToSelected();
                                   //}
                                   // 2. Do nothing.
                               }
@@ -465,7 +463,7 @@ public class EntryTable extends JTable {
           if (selRow == -1 ||// (getSelectedRowCount() == 0))
                   !isRowSelected(rowAtPoint(e.getPoint()))) {
             setRowSelectionInterval(row, row);
-            panel.updateViewToSelected();  
+            //panel.updateViewToSelected();
           }
           rightClickMenu = new RightClickMenu(panel, panel.metaData);
           rightClickMenu.show(EntryTable.this, e.getX(), e.getY());
@@ -656,25 +654,23 @@ public class EntryTable extends JTable {
     // The following classes define the renderers used to render required
     // and optional fields in the table. The purpose of these renderers is
     // to visualize which fields are needed for each entry.
-    private 	IconStringRenderer incompleteEntryRenderer = new IconStringRenderer
-        (Globals.lang("This entry is incomplete"));
-    private GeneralRenderer defRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableBackground"),
+   private GeneralRenderer defRenderer = new GeneralRenderer(Globals.prefs.getColor("tableBackground"),
             Globals.prefs.getColor("tableText"), antialiasing),
-        reqRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
-        optRenderer = new GeneralRenderer(this, Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
+        reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
+        optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing),
         incRenderer = new IncompleteRenderer(this, antialiasing),
             //new Renderer(GUIGlobals.tableIncompleteEntryBackground),
             //Globals.lang("This entry is incomplete")),
-        grayedOutRenderer = new GeneralRenderer(this, Globals.prefs.getColor("grayedOutBackground"),
+        grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
                                          Globals.prefs.getColor("grayedOutText"), antialiasing),
-        veryGrayedOutRenderer = new GeneralRenderer(this, Globals.prefs.getColor("veryGrayedOutBackground"),
+        veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
                                              Globals.prefs.getColor("veryGrayedOutText"), antialiasing),
-        markedRenderer = new GeneralRenderer(this, Globals.prefs.getColor("markedEntryBackground"),
+        markedRenderer = new GeneralRenderer(Globals.prefs.getColor("markedEntryBackground"),
                 Globals.prefs.getColor("tableText"), antialiasing);
 
     class IncompleteRenderer extends GeneralRenderer {
         public IncompleteRenderer(JTable table, boolean antialiasing) {
-            super(table, Globals.prefs.getColor("incompleteEntryBackground"), antialiasing);
+            super(Globals.prefs.getColor("incompleteEntryBackground"), antialiasing);
         }
         protected void setValue(Object value) {
             super.setValue(value);

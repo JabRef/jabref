@@ -45,6 +45,7 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.gui.MainTableSelectionListener;
 
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
@@ -99,6 +100,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   TypeLabel typeLabel;
   JabRefFrame frame;
   BasePanel panel;
+  MainTableSelectionListener selectionListener;
   EntryEditor ths = this;
   HashSet contentSelectors = new HashSet();
   Logger logger = Logger.getLogger(EntryEditor.class.getName());
@@ -223,7 +225,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     return type;
   }
 
-  private void setupToolBar() {
+    public void setSelectionListener(MainTableSelectionListener selectionListener) {
+        this.selectionListener = selectionListener;
+    }
+
+    public BibtexEntry getEntry() {
+        return entry;
+    }
+
+    private void setupToolBar() {
     tlb = new JToolBar(JToolBar.VERTICAL);
 
     //tlb.setMargin(new Insets(2,2,2,2));
@@ -565,8 +575,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    *          an <code>int</code> value
    */
   private void scrollTo(int row) {
-    panel.entryTable.setRowSelectionInterval(row, row);
-    panel.entryTable.ensureVisible(row);
+    panel.mainTable.setRowSelectionInterval(row, row);
+    panel.mainTable.ensureVisible(row);
   }
 
   /**
@@ -646,8 +656,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     validateAllFields();
     updateSource();
     panel.showing = be;
-    //activateVisible();
-        }
+}
 
   /**
    * Returns false if the contents of the source panel has not been validated,
@@ -750,8 +759,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       lastSourceAccepted = true;
       updateSource = true;
 
-        panel.tableModel.remap();
-        panel.entryTable.repaint();
+        // TODO: does updating work properly after source stored?
+      //  panel.tableModel.remap();
+      //  panel.entryTable.repaint();
       //panel.refreshTable();
       panel.markBaseChanged();
 
@@ -942,10 +952,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       if (!goOn)
         return;
 
-      panel.hideEntryEditor();
+      selectionListener.entryEditorClosing(EntryEditor.this);
       panel.database.removeEntry(entry.getId());
       panel.markBaseChanged();
-      panel.refreshTable();
       panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
       panel.output(Globals.lang("Deleted") + " " + Globals.lang("entry"));
     }
@@ -958,17 +967,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-     /*
-       * Thread t = new Thread() { public void run() { panel.hideEntryEditor(); } };
-       */
-      if (tabbed.getSelectedComponent() == srcPanel) {
-        updateField(source);
-        if (lastSourceAccepted)
-          //SwingUtilities.invokeLater(t);
-          panel.hideEntryEditor();
-      } else
-        //SwingUtilities.invokeLater(t);
-        panel.hideEntryEditor();
+        if (tabbed.getSelectedComponent() == srcPanel) {
+            updateField(source);
+            if (lastSourceAccepted)
+            selectionListener.entryEditorClosing(EntryEditor.this);
+        } else
+            selectionListener.entryEditorClosing(EntryEditor.this);
     }
   }
 
@@ -1054,7 +1058,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             panel.undoManager.addEdit(new UndoableFieldChange(entry, fe.getFieldName(),
                 oldValue, toSet));
             updateSource();
-            panel.refreshTable();
             panel.markBaseChanged();
           } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage(),
@@ -1121,7 +1124,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           fe.setBackground(GUIGlobals.validFieldBackground);
 
         updateSource();
-        panel.refreshTable();
         panel.markBaseChanged();
       } else if ((source.isEditable())
           && (!source.getText().equals(lastSourceStringAccepted))) {
@@ -1171,7 +1173,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     public void actionPerformed(ActionEvent e) {
 
-      int thisRow = panel.tableModel.getNumberFromName(entry.getId());
+      int thisRow = panel.mainTable.findEntry(entry);
       String id = null;
       int newRow = -1;
 
@@ -1180,18 +1182,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       else if (thisRow > 0)
         newRow = 0;
       else
-        return; // newRow is still -1, so we can assume the database
+        return; // newRow is still -1, so we can assume the database has only one entry.
 
-      // has only one entry.
-      id = panel.tableModel.getIdForRow(newRow);
-      switchTo(id);
+      scrollTo(newRow);
+      panel.mainTable.setRowSelectionInterval(newRow, newRow);
 
-      final int nr = newRow;
-      (new Thread() {
-          public void run() {
-            scrollTo(nr);
-          }
-        }).start();
     }
   }
 
@@ -1203,7 +1198,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-      int thisRow = panel.tableModel.getNumberFromName(entry.getId());
+      int thisRow = panel.mainTable.findEntry(entry);
       String id = null;
       int newRow = -1;
 
@@ -1212,18 +1207,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       else if (thisRow != (panel.database.getEntryCount() - 1))
         newRow = panel.database.getEntryCount() - 1;
       else
-        return; // newRow is still -1, so we can assume the database
+        return; // newRow is still -1, so we can assume the database has only one entry.
+      //id = panel.tableModel.getIdForRow(newRow);
+      //switchTo(id);
 
-      // has only one entry.
-      id = panel.tableModel.getIdForRow(newRow);
-      switchTo(id);
-
-      final int nr = newRow;
-      (new Thread() {
-          public void run() {
-            scrollTo(nr);
-          }
-        }).start();
+      scrollTo(newRow);
+      panel.mainTable.setRowSelectionInterval(newRow, newRow);
+      
     }
   }
 
@@ -1263,7 +1253,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         setField(Globals.KEY_FIELD, bibtexKeyData);
         updateSource();
         panel.markBaseChanged();
-        panel.refreshTable();
       } catch (Throwable t) {
         System.err.println("error setting key: " + t);
       }

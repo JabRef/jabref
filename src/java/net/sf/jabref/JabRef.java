@@ -745,7 +745,7 @@ lastEdLoop:
 
             if (loaded.size() > 0) {
                 jrf.tabbedPane.setSelectedIndex(0);
-                new FocusRequester(((BasePanel) jrf.tabbedPane.getComponentAt(0)).entryTable);
+                new FocusRequester(((BasePanel) jrf.tabbedPane.getComponentAt(0)).mainTable);
             }
         } else
             System.exit(0);

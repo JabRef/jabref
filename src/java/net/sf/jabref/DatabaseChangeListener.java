@@ -1,7 +1,7 @@
 package net.sf.jabref;
 
 
-interface DatabaseChangeListener {
+public interface DatabaseChangeListener {
     
     public void databaseChanged(DatabaseChangeEvent e);
 

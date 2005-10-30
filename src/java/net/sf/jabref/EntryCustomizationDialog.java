@@ -396,7 +396,6 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 		    !(base.getEntryById((String)iter.next())).updateType();
 	    }
 	    if (anyChanges) {
-		bp.refreshTable();
 		bp.markBaseChanged();
 	    }
 	}

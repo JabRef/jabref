@@ -36,6 +36,7 @@ import javax.swing.tree.*;
 import javax.swing.undo.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
@@ -457,10 +458,12 @@ public class GroupSelector extends SidePaneComponent implements
 		}
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
+        panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
         DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
                 panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
                         .getBoolean("grayOutNonHits"),
-                /* true, */select.isSelected());
+                //true,
+                select.isSelected());
         search.start();
         if (showOverlappingGroups.isSelected()) {
 	        try {

@@ -52,12 +52,12 @@ public class RightClickMenu extends JPopupMenu
         metaData = metaData_;
         
         // Are multiple entries selected?
-        boolean multiple = (panel.entryTable.getSelectedRowCount() > 1);
+        boolean multiple = (panel.mainTable.getSelectedRowCount() > 1);
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibtexEntry be = null;
-        if (panel.entryTable.getSelectedRowCount() == 1)
-          be = panel.entryTable.getSelectedEntries()[0];
+        if (panel.mainTable.getSelectedRowCount() == 1)
+          be = (BibtexEntry)panel.mainTable.getSelected().get(0);
 
         addPopupMenuListener(this);
 
@@ -206,7 +206,7 @@ public class RightClickMenu extends JPopupMenu
      * Set the dynamic contents of "Add to group ..." submenu.
      */
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-      BibtexEntry[] bes = panel.entryTable.getSelectedEntries();
+      BibtexEntry[] bes = panel.getSelectedEntries();
       panel.storeCurrentEdit();
       GroupTreeNode groups = metaData.getGroups();
       if (groups == null) {
@@ -396,11 +396,9 @@ public class RightClickMenu extends JPopupMenu
             undoAll.end();
             
             panel.undoManager.addEdit(undoAll);
-            panel.refreshTable();
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
             panel.getGroupSelector().valueChanged(null);
-            panel.updateViewToSelected();
         }
     }
     
@@ -423,11 +421,9 @@ public class RightClickMenu extends JPopupMenu
                 return; // no changed made
             
             panel.undoManager.addEdit(undo);
-            panel.refreshTable();
             panel.markBaseChanged();
             panel.updateEntryEditorIfShowing();
             panel.getGroupSelector().valueChanged(null);
-            panel.updateViewToSelected();
         }
     }
 

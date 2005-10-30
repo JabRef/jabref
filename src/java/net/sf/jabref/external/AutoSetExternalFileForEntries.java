@@ -172,7 +172,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
         if (entriesChanged > 0) {
             panel.markBaseChanged();
-            panel.refreshTable();
         }
     }
 

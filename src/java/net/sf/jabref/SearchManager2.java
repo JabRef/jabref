@@ -379,12 +379,16 @@ settings.add(select);
 //		}
 
 	    searchRules.addRule(rule1) ;
-
-	    if (reorder.isSelected()) {
+        panel.setSearchMatcher(new SearchMatcher(searchRules, searchOptions));
+        panel.output(Globals.lang("Searched database. Number of hits")
+                    + ": " + panel.mainTable.getRowCount());
+        /*
+        if (reorder.isSelected()) {
 		// Float search.
 		DatabaseSearch search = new DatabaseSearch
 		    (this, searchOptions,searchRules, panel,
-		     Globals.SEARCH, true, true/*Globals.Globals.prefs.getBoolean("grayOutNonHits")*/, select.isSelected());
+		     Globals.SEARCH, true, true//Globals.Globals.prefs.getBoolean("grayOutNonHits")
+                    , select.isSelected());
 		search.start() ;
 	    }
 	    else if (highlight.isSelected()) {
@@ -394,10 +398,11 @@ settings.add(select);
 		     Globals.SEARCH, false, true, select.isSelected());
 		search.start() ;
 	    }
-
+        */
 	    // Afterwards, select all text in the search field.
 	    searchField.select(0,searchField.getText().length()) ;
 	    //new FocusRequester(frame.basePanel().entryTable);
+
 	}
     }
 
@@ -459,13 +464,11 @@ settings.add(select);
 		    if (searchField.getText().equals("")) return;
 		    if (incSearchPos < 0)
 			incSearchPos = 0;
-		    BibtexEntry be = panel.getDatabase().getEntryById
-			(panel.tableModel.getIdForRow(incSearchPos));
+		    BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
 		    while (!incSearcher.search(text, be)) {
-			incSearchPos++;
-			if (incSearchPos < panel.getDatabase().getEntryCount())
-			    be = panel.getDatabase().getEntryById
-				(panel.tableModel.getIdForRow(incSearchPos));
+			    incSearchPos++;
+			    if (incSearchPos < panel.getDatabase().getEntryCount())
+			        be = panel.mainTable.getEntryAt(incSearchPos);
 			else {
 			    panel.output("'"+text+"' : "+Globals.lang
 					 ("Incremental search failed. Repeat to search from top."));

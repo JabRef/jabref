@@ -515,7 +515,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
                       HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();				
                       saxParser.parse(citeseerConnection.getInputStream(), new CiteSeerCitationHandler(citationHashTable));
                     } else {
-                      int row = panel.getTableModel().getNumberFromName(currentEntry.getId());
+                      int row = panel.mainTable.findEntry(currentEntry);
                       rejectedEntries.put(new Integer(row+1),currentEntry);                     
                     }
 		} catch (SAXException e) {
@@ -543,11 +543,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 		while (clickedIterator.hasNext() && !abortOperation) {
 			int currentIndex = ((Integer) clickedIterator.next()).intValue();
-			String id =  panel.getTableModel().getIdForRow(currentIndex);
-			BooleanAssign newValue = new BooleanAssign(false);			
-			BibtexEntry be =
-				(BibtexEntry) panel.getDatabase().getEntryById(id);
-			abortOperation = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, newValue, rejectedEntries);			
+			BooleanAssign newValue = new BooleanAssign(false);
+			BibtexEntry be = panel.mainTable.getEntryAt(currentIndex);
+			abortOperation = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, newValue, rejectedEntries);
 			if (newValue.getValue())
 				newValues = true;
 		}
@@ -586,7 +584,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 					saxParser.parse(inputStream, handlerBase);
 				} else {
-                    int row = panel.getTableModel().getNumberFromName(be.getId());
+                    int row = panel.mainTable.findEntry(be);
                     rejectedEntries.put(new Integer(row+1), be);                
 				}
 			} catch (IOException e) {

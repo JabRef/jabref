@@ -58,6 +58,7 @@ public class EntryComparator implements Comparator {
         this.next = null;
     }
 
+
     public int compare(Object o1, Object o2) throws ClassCastException {
       //if (o1 == null) Util.pr("o1 == null");
      //if (o2 == null) Util.pr("o2 == null");
@@ -104,34 +105,36 @@ public class EntryComparator implements Comparator {
           f2 = e2.getType().getName();
         }
 
-    if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
-    if ((f1 != null) && (f2 == null)) return -1;
-    if ((f1 == null) && (f2 != null)) return 1;
+	if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+	if ((f1 != null) && (f2 == null)) return -1;
+	if ((f1 == null) && (f2 != null)) return 1;
 
-    int result = 0;
+	int result = 0;
 
-    //String ours = ((String)e1.getField(sortField)).toLowerCase(),
-    //    theirs = ((String)e2.getField(sortField)).toLowerCase();
-    if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-        result = -(((Integer) f1).compareTo((Integer) f2));
-    } else if (f2 instanceof Integer) {
-        Integer f1AsInteger = new Integer(f1.toString());
-        result = -((f1AsInteger).compareTo((Integer) f2));
-    } else if (f1 instanceof Integer) {
-        Integer f2AsInteger = new Integer(f2.toString());
-        result = -(((Integer) f1).compareTo(f2AsInteger));
-    } else {
-        String ours = ((String) f1).toLowerCase(),
-            theirs = ((String) f2).toLowerCase();
-        int comp = ours.compareTo(theirs);
-        result = -comp;
-    }
-    if (result != 0)
-        return (descending ? result : -result); // Primary sort.
-    if (next != null)
-        return next.compare(o1, o2); // Secondary sort if existent.
-    else
+	//String ours = ((String)e1.getField(sortField)).toLowerCase(),
+	//    theirs = ((String)e2.getField(sortField)).toLowerCase();
+	if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
+		result = -(((Integer) f1).compareTo((Integer) f2));
+	} else if (f2 instanceof Integer) {
+		Integer f1AsInteger = new Integer(f1.toString());
+		result = -((f1AsInteger).compareTo((Integer) f2));
+	} else if (f1 instanceof Integer) {
+		Integer f2AsInteger = new Integer(f2.toString());
+		result = -(((Integer) f1).compareTo(f2AsInteger));
+	} else {
+		String ours = ((String) f1).toLowerCase(),
+	    	theirs = ((String) f2).toLowerCase();
+		int comp = ours.compareTo(theirs);
+		result = -comp;
+	}
+	if (result != 0)
+	    return (descending ? result : -result); // Primary sort.
+	if (next != null)
+	    return next.compare(o1, o2); // Secondary sort if existent.
+	else {
+
         return idCompare(e1, e2); // If still equal, we use the unique IDs.
+    }
     }
 
     private int idCompare(BibtexEntry b1, BibtexEntry b2) {
