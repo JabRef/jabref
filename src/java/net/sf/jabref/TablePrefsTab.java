@@ -108,10 +108,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     builder.append(pan); builder.append(urlColumn); builder.nextLine();
     builder.append(pan); builder.append(citeseerColumn); builder.nextLine();
     builder.appendSeparator(Globals.lang("Format of author and editor names"));
-    builder.append(pan); builder.append(namesAsIs); builder.append(noAbbrNames); builder.nextLine();
-    builder.append(pan); builder.append(namesFf); builder.append(abbrNames); builder.nextLine();
-    builder.append(pan); builder.append(namesFl); builder.append(lastNamesOnly); builder.nextLine();
-    builder.append(pan); builder.append(namesNatbib); builder.nextLine();
+    DefaultFormBuilder nameBuilder = new DefaultFormBuilder(
+            new FormLayout("left:pref, 8dlu, left:pref",""));
+
+    nameBuilder.append(namesAsIs); nameBuilder.append(noAbbrNames); nameBuilder.nextLine();
+    nameBuilder.append(namesFf); nameBuilder.append(abbrNames); nameBuilder.nextLine();
+    nameBuilder.append(namesFl); nameBuilder.append(lastNamesOnly); nameBuilder.nextLine();
+    nameBuilder.append(namesNatbib);
+        builder.append(pan); builder.append(nameBuilder.getPanel()); builder.nextLine();
     //builder.append(pan); builder.append(noAbbrNames); builder.nextLine();
     //builder.append(pan); builder.append(abbrNames); builder.nextLine();
     //builder.append(pan); builder.append(lastNamesOnly); builder.nextLine();

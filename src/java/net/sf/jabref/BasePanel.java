@@ -301,7 +301,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void run() {
 
                 try {
-                    saveDatabase(file, false);
+                    saveDatabase(file, false, prefs.get("defaultEncoding"));
 
                     //Util.pr("Testing resolve string... BasePanel line 237");
                     //Util.pr("Resolve aq: "+database.resolveString("aq"));
@@ -374,7 +374,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           Globals.lang("exists. Overwrite file?"),
                           Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                          == JOptionPane.OK_OPTION)) {
-                      saveDatabase(expFile, true);
+                      saveDatabase(expFile, true, prefs.get("defaultEncoding"));
                       //runCommand("save");
                       frame.getFileHistory().newFile(expFile.getPath());
                       frame.output(Globals.lang("Saved selected to")+" '"
@@ -1004,7 +1004,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     prefs.put("workingDirectory", fileToOpen.getPath());
                     // Should this be done _after_ we know it was successfully opened?
                     String encoding = Globals.prefs.get("defaultEncoding");
-                    ParserResult pr = ImportFormatReader.loadDatabase(fileToOpen, encoding);
+                    ParserResult pr = OpenDatabaseAction.loadDatabase(fileToOpen, encoding);
                     mergeFromBibtex(pr, importEntries, importStrings, importGroups, importSelectorWords);
                     output(Globals.lang("Imported from database")+" '"+fileToOpen.getPath()+"'");
                     fileToOpen = null;
@@ -1495,16 +1495,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //}).start();
     }
 
-    private void saveDatabase(File file, boolean selectedOnly) throws SaveException {
+    private void saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
         SaveSession session;
         frame.block();
         try {
             if (!selectedOnly)
                 session = FileActions.saveDatabase(database, metaData, file,
-                                           prefs, false, false, prefs.get("defaultEncoding"));
+                                           prefs, false, false, encoding);
             else
                 session = FileActions.savePartOfDatabase(database, metaData, file,
-                                           prefs, entryTable.getSelectedEntries(), prefs.get("defaultEncoding"));
+                                           prefs, entryTable.getSelectedEntries(), encoding);
             
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
@@ -2392,7 +2392,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     /**
      * Selects all entries with a non-zero value in the field
-     * @param <code>String</code> field name.
+     * @param field <code>String</code> field name.
      */
     public void selectResults(String field) {
       LinkedList intervals = new LinkedList();

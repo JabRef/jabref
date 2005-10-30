@@ -757,7 +757,7 @@ lastEdLoop:
         try {
             File file = new File(name);
             String encoding = Globals.prefs.get("defaultEncoding");
-            ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
+            ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
             if (pr == null)
                 return ParserResult.INVALID_FORMAT;
             pr.setFile(file);

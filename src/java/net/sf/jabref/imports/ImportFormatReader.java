@@ -282,117 +282,15 @@ public class ImportFormatReader {
       be.setField(field, content);
   }
 
-  public static ParserResult loadDatabase(File fileToOpen, String encoding)
-    throws IOException {
-    // Temporary (old method):
-    //FileLoader fl = new FileLoader();
-    //BibtexDatabase db = fl.load(fileToOpen.getPath());
 
-    // First we make a quick check to see if this looks like a BibTeX file:
-    Reader reader = getReader(fileToOpen, encoding);
-    if (!BibtexParser.isRecognizedFormat(reader))
-        return null;
 
-    // The file looks promising. Reinitialize the reader and go on:
-    reader = getReader(fileToOpen, encoding);
+    public static Reader getReader(File f, String encoding)
+      throws IOException {
+      InputStreamReader reader;
+      reader = new InputStreamReader(new FileInputStream(f), encoding);
 
-    String suppliedEncoding = null;
-    StringBuffer headerText = new StringBuffer();
-    try {
-      boolean keepon = true;
-      int piv = 0;
-      int c;
-
-      while (keepon) {
-        c = reader.read();
-        headerText.append((char)c);
-        if (((piv == 0) && Character.isWhitespace((char) c))
-            || (c == GUIGlobals.SIGNATURE.charAt(piv)))
-          piv++;
-        else //if (((char)c) == '@')
-          keepon = false;
-      //System.out.println(headerText.toString());
-found: 
-        if (piv == GUIGlobals.SIGNATURE.length()) {
-          keepon = false;
-
-          //if (headerText.length() > GUIGlobals.SIGNATURE.length())
-          //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
-          // Found the signature. The rest of the line is unknown, so we skip
-          // it:
-          while (reader.read() != '\n')
-            ;
-
-          // Then we must skip the "Encoding: "
-          for (int i = 0; i < GUIGlobals.encPrefix.length(); i++) {
-            if (reader.read() != GUIGlobals.encPrefix.charAt(i))
-              break found; // No,
-                           // it
-                           // doesn't
-                           // seem
-                           // to
-                           // match.
-          }
-
-          // If ok, then read the rest of the line, which should contain the
-          // name
-          // of the encoding:
-          StringBuffer sb = new StringBuffer();
-
-          while ((c = reader.read()) != '\n')
-            sb.append((char) c);
-
-          suppliedEncoding = sb.toString();
-        }
-      }
-    } catch (IOException ex) {
+      return reader;
     }
-
-    if ((suppliedEncoding != null) && (!suppliedEncoding.equalsIgnoreCase(encoding))) {
-      Reader oldReader = reader;
-
-      try {
-        // Ok, the supplied encoding is different from our default, so we must
-        // make a new
-        // reader. Then close the old one.
-        reader = getReader(fileToOpen, suppliedEncoding);
-        oldReader.close();
-
-        //System.out.println("Using encoding: "+suppliedEncoding);
-      } catch (IOException ex) {
-        reader = oldReader; // The supplied encoding didn't work out, so we keep
-                            // our
-
-        // existing reader.
-        //System.out.println("Error, using default encoding.");
-      }
-    } else {
-      // We couldn't find a supplied encoding. Since we don't know far into the
-      // file we read,
-      // we start a new reader.
-      reader.close();
-      reader = getReader(fileToOpen, encoding);
-
-      //System.out.println("No encoding supplied, or supplied encoding equals
-      // default. Using default encoding.");
-    }
-
-    //return null;
-    BibtexParser bp = new BibtexParser(reader);
-
-    ParserResult pr = bp.parse();
-    pr.setEncoding(encoding);
-
-    return pr;
-  }
-
-  public static Reader getReader(File f, String encoding)
-    throws IOException {
-    InputStreamReader reader;
-    reader = new InputStreamReader(new FileInputStream(f), encoding);
-
-    return reader;
-  }
 
   public static Reader getReaderDefaultEncoding(InputStream in)
     throws IOException {
@@ -501,8 +399,7 @@ found:
     // Finally, if all else fails, see if it is a BibTeX file:	
     if (entryList == null) {
 	try {
-	    ParserResult pr =
-		loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
+	    ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
 	    if ((pr.getDatabase().getEntryCount() > 0)
 		|| (pr.getDatabase().getStringCount() > 0)) {
 		entryList = pr;

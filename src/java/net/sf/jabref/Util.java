@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 
 import javax.swing.*;
 
@@ -1279,5 +1281,19 @@ public class Util {
         return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
     }
 
+    /**
+     * Make a list of supported character encodings that can encode all characters in the given String.
+     * @param characters A String of characters that should be supported by the encodings.
+     * @return A List of character encodings
+     */
+    public static List findEncodingsForString(String characters) {
+        List encodings = new ArrayList();
+        for (int i=0; i<Globals.ENCODINGS.length; i++) {
+            CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
+            if (encoder.canEncode(characters))
+                encodings.add(Globals.ENCODINGS[i]);
+        }
+        return encodings;
+    }
 
 }

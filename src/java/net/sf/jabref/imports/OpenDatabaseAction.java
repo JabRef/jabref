@@ -77,7 +77,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
-                ParserResult pr = ImportFormatReader.loadDatabase(file, encoding);
+                ParserResult pr = loadDatabase(file, encoding);
 		if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
 		    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file"+" '"+fileName+"'"),
 						  Globals.lang("Error"),
@@ -171,5 +171,113 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                 */
             }
         }
+    }
+
+      public static ParserResult loadDatabase(File fileToOpen, String encoding)
+    throws IOException {
+
+    // First we make a quick check to see if this looks like a BibTeX file:
+    Reader reader;// = ImportFormatReader.getReader(fileToOpen, encoding);
+    //if (!BibtexParser.isRecognizedFormat(reader))
+    //    return null;
+
+    // The file looks promising. Reinitialize the reader and go on:
+    //reader = getReader(fileToOpen, encoding);
+    Reader utf8Reader = ImportFormatReader.getReader(fileToOpen, "UTF8");
+    String suppliedEncoding = checkForEncoding(utf8Reader);
+    utf8Reader.close();
+    //System.out.println("Result of UTF8 test: "+suppliedEncoding);
+    if (suppliedEncoding == null) {
+        Reader utf16Reader = ImportFormatReader.getReader(fileToOpen, "UTF-16");
+        suppliedEncoding = checkForEncoding(utf16Reader);
+        utf16Reader.close();
+        //System.out.println("Result of UTF-16 test: "+suppliedEncoding);
+    }
+
+    if ((suppliedEncoding != null)) { // && (!suppliedEncoding.equalsIgnoreCase(encoding))) {
+      //Reader oldReader = reader;
+
+      try {
+        // Ok, the supplied encoding is different from our default, so we must
+        // make a new
+        // reader. Then close the old one.
+        reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
+        //oldReader.close();
+
+        //System.out.println("Using encoding: "+suppliedEncoding);
+      } catch (IOException ex) {
+        reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+        //System.out.println("Error, using default encoding.");
+      }
+    } else {
+      // We couldn't find a supplied encoding. Since we don't know far into the
+      // file we read,
+      // we start a new reader.
+       reader = ImportFormatReader.getReader(fileToOpen, encoding);
+
+      //System.out.println("No encoding supplied, or supplied encoding equals
+      // default. Using default encoding.");
+    }
+
+    //return null;
+    BibtexParser bp = new BibtexParser(reader);
+
+    ParserResult pr = bp.parse();
+    pr.setEncoding(encoding);
+
+    return pr;
+  }
+
+    private static String checkForEncoding(Reader reader) {
+        String suppliedEncoding = null;
+        StringBuffer headerText = new StringBuffer();
+        try {
+            boolean keepon = true;
+            int piv = 0;
+            int c;
+
+            while (keepon) {
+                c = reader.read();
+                headerText.append((char) c);
+                if (((piv == 0) && Character.isWhitespace((char) c))
+                        || (c == GUIGlobals.SIGNATURE.charAt(piv)))
+                    piv++;
+                else //if (((char)c) == '@')
+                    keepon = false;
+                //System.out.println(headerText.toString());
+                found:
+                if (piv == GUIGlobals.SIGNATURE.length()) {
+                    keepon = false;
+
+                    //if (headerText.length() > GUIGlobals.SIGNATURE.length())
+                    //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
+                    // Found the signature. The rest of the line is unknown, so we skip
+                    // it:
+                    while (reader.read() != '\n') ;
+
+                    // Then we must skip the "Encoding: "
+                    for (int i = 0; i < GUIGlobals.encPrefix.length(); i++) {
+                        if (reader.read() != GUIGlobals.encPrefix.charAt(i))
+                            break found; // No,
+                        // it
+                        // doesn't
+                        // seem
+                        // to
+                        // match.
+                    }
+
+                    // If ok, then read the rest of the line, which should contain the
+                    // name
+                    // of the encoding:
+                    StringBuffer sb = new StringBuffer();
+
+                    while ((c = reader.read()) != '\n') sb.append((char) c);
+
+                    suppliedEncoding = sb.toString();
+                }
+            }
+        } catch (IOException ex) {
+        }
+        return suppliedEncoding;
     }
 }
