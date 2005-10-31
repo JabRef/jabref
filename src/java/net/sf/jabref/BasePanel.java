@@ -311,9 +311,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             public void run() {
-
                 try {
-                    saveDatabase(file, false, prefs.get("defaultEncoding"));
+                    success = saveDatabase(file, false, prefs.get("defaultEncoding"));
 
                     //Util.pr("Testing resolve string... BasePanel line 237");
                     //Util.pr("Resolve aq: "+database.resolveString("aq"));
@@ -327,14 +326,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // exception is cast.
                     }
                     saving = false;
-                    success = true;
-                    undoManager.markUnchanged();
-                    // (Only) after a successful save the following
-                    // statement marks that the base is unchanged
-                    // since last save:
-                    nonUndoableChange = false;
-                    baseChanged = false;
-                    updatedExternally = false;
+                    if (success) {
+                        undoManager.markUnchanged();
+                        // (Only) after a successful save the following
+                        // statement marks that the base is unchanged
+                        // since last save:
+                        nonUndoableChange = false;
+                        baseChanged = false;
+                        updatedExternally = false;
+                    }
                 } catch (SaveException ex2) {
                     ex2.printStackTrace();
                 }
@@ -1448,7 +1448,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //}).start();
     }
 
-    private void saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
+    private boolean saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
         SaveSession session;
         frame.block();
         try {
@@ -1487,10 +1487,29 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
               String warning = Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
                       session.getEncoding())+session.getWriter().getProblemCharacters()
                       +"\nDo you want to continue?";
-            int answer = JOptionPane.showConfirmDialog(frame, warning, Globals.lang("Save database"),
-                    JOptionPane.YES_NO_OPTION);
-            if (answer != JOptionPane.YES_OPTION)
-                commit = false;
+            //int answer = JOptionPane.showConfirmDialog(frame, warning, Globals.lang("Save database"),
+            //        JOptionPane.YES_NO_OPTION);
+            String message = Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                      session.getEncoding())+session.getWriter().getProblemCharacters()
+                      +"\nWhat do you want to do?";
+            String tryDiff = Globals.lang("Try different encoding");
+            int answer = JOptionPane.showOptionDialog(frame, message, Globals.lang("Save database"),
+                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                    new String[] {Globals.lang("Save"), tryDiff, Globals.lang("Cancel")}, tryDiff);
+
+            if (answer == JOptionPane.NO_OPTION) {
+                // The user wants to use another encoding.
+                Object choice = JOptionPane.showInputDialog(frame, Globals.lang("Select encoding"), Globals.lang("Save database"),
+                        JOptionPane.QUESTION_MESSAGE, null, Globals.ENCODINGS, encoding);
+                if (choice != null) {
+                    String newEncoding = (String)choice;
+                    return saveDatabase(file, selectedOnly, newEncoding);
+                } else
+                    commit = false;
+            } else if (answer == JOptionPane.CANCEL_OPTION)
+                    commit = false;
+
+
           }
 
         try {
@@ -1502,6 +1521,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             e.printStackTrace();
         }
 
+        return commit;
     }
 
 

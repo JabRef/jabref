@@ -52,7 +52,7 @@ public class MainTable extends JTable {
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-
+        setGridColor(Globals.prefs.getColor("gridColor"));
         comparatorChooser = new TableComparatorChooser(this, list, true);
         final EventList selected = getSelected();
 
@@ -334,7 +334,7 @@ public class MainTable extends JTable {
         reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing);
         optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing);
         incRenderer = new IncompleteRenderer(antialiasing);
-        compRenderer = new CompleteRenderer(Color.white, antialiasing);
+        compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"), antialiasing);
         markedNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("markedEntryBackground"), antialiasing);
         grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
                 Globals.prefs.getColor("grayedOutText"), antialiasing);

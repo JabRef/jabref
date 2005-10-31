@@ -87,6 +87,7 @@ Change log:
         - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
         - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
+          Gives options to save, cancel or try a different encoding.
         - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
           when loading. Added option to put braces around capital letters of a chosen set of fields.
         - Fixed problem with loading 16-bit encoded bib files with 8-bit encoding as default, and vice versa.

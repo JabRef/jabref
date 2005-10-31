@@ -173,60 +173,51 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-      public static ParserResult loadDatabase(File fileToOpen, String encoding)
-    throws IOException {
+    public static ParserResult loadDatabase(File fileToOpen, String encoding)
+            throws IOException {
 
-    // First we make a quick check to see if this looks like a BibTeX file:
-    Reader reader;// = ImportFormatReader.getReader(fileToOpen, encoding);
-    //if (!BibtexParser.isRecognizedFormat(reader))
-    //    return null;
+        // First we make a quick check to see if this looks like a BibTeX file:
+        Reader reader;// = ImportFormatReader.getReader(fileToOpen, encoding);
+        //if (!BibtexParser.isRecognizedFormat(reader))
+        //    return null;
 
-    // The file looks promising. Reinitialize the reader and go on:
-    //reader = getReader(fileToOpen, encoding);
-    Reader utf8Reader = ImportFormatReader.getReader(fileToOpen, "UTF8");
-    String suppliedEncoding = checkForEncoding(utf8Reader);
-    utf8Reader.close();
-    //System.out.println("Result of UTF8 test: "+suppliedEncoding);
-    if (suppliedEncoding == null) {
-        Reader utf16Reader = ImportFormatReader.getReader(fileToOpen, "UTF-16");
-        suppliedEncoding = checkForEncoding(utf16Reader);
-        utf16Reader.close();
-        //System.out.println("Result of UTF-16 test: "+suppliedEncoding);
+        // The file looks promising. Reinitialize the reader and go on:
+        //reader = getReader(fileToOpen, encoding);
+
+        // We want to check if there is a JabRef signature in the file, because that would tell us
+        // which character encoding is used. However, to read the signature we must be using a compatible
+        // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
+        // read it regardless of encoding, with either UTF8 or UTF-16. That's the hypothesis, at any rate.
+        // 8 bit is most likely, so we try that first:
+        Reader utf8Reader = ImportFormatReader.getReader(fileToOpen, "UTF8");
+        String suppliedEncoding = checkForEncoding(utf8Reader);
+        utf8Reader.close();
+        // Now if that didn't get us anywhere, we check with the 16 bit encoding:
+        if (suppliedEncoding == null) {
+            Reader utf16Reader = ImportFormatReader.getReader(fileToOpen, "UTF-16");
+            suppliedEncoding = checkForEncoding(utf16Reader);
+            utf16Reader.close();
+            //System.out.println("Result of UTF-16 test: "+suppliedEncoding);
+        }
+
+        if ((suppliedEncoding != null)) {
+           try {
+               reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
+           } catch (IOException ex) {
+                reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+            }
+        } else {
+            // We couldn't find a header with info about encoding. Use default:
+            reader = ImportFormatReader.getReader(fileToOpen, encoding);
+        }
+
+        BibtexParser bp = new BibtexParser(reader);
+
+        ParserResult pr = bp.parse();
+        pr.setEncoding(encoding);
+
+        return pr;
     }
-
-    if ((suppliedEncoding != null)) { // && (!suppliedEncoding.equalsIgnoreCase(encoding))) {
-      //Reader oldReader = reader;
-
-      try {
-        // Ok, the supplied encoding is different from our default, so we must
-        // make a new
-        // reader. Then close the old one.
-        reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
-        //oldReader.close();
-
-        //System.out.println("Using encoding: "+suppliedEncoding);
-      } catch (IOException ex) {
-        reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
-        //System.out.println("Error, using default encoding.");
-      }
-    } else {
-      // We couldn't find a supplied encoding. Since we don't know far into the
-      // file we read,
-      // we start a new reader.
-       reader = ImportFormatReader.getReader(fileToOpen, encoding);
-
-      //System.out.println("No encoding supplied, or supplied encoding equals
-      // default. Using default encoding.");
-    }
-
-    //return null;
-    BibtexParser bp = new BibtexParser(reader);
-
-    ParserResult pr = bp.parse();
-    pr.setEncoding(encoding);
-
-    return pr;
-  }
 
     private static String checkForEncoding(Reader reader) {
         String suppliedEncoding = null;

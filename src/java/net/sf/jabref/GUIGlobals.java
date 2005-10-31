@@ -337,6 +337,7 @@ public class GUIGlobals {
       "series",
       "type",
       "address",
+      "location",
       "annote",
       "booktitle",
       "crossref",
@@ -360,6 +361,7 @@ public class GUIGlobals {
 
   public static final Map FIELD_DISPLAYS;
   static {
+      Arrays.sort(ALL_FIELDS);
           FIELD_DISPLAYS = new HashMap();
           FIELD_DISPLAYS.put("citeseercitationcount","Popularity");
   }
