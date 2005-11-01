@@ -16,9 +16,9 @@ erste Dateiname nicht als Argument einer Option missverstanden werden kann&nbsp;
 Option wie <code>-n</code> oder <code>-l</code> direkt vor einem Dateinamen steht, m&uuml;ssen Sie
 also "true" als Argument angeben. Das Beispielkommando:
 <p><code>jabref -o filetoexport.xml,docbook -n true original.bib</code>
-<p>lädt die Datei <code>original.bib</code>, exportiert sie in das Docbook-Format, speichert sie
+<p>l&auml;dt die Datei <code>original.bib</code>, exportiert sie in das Docbook-Format, speichert sie
 unter dem Namen <code>filetoexport.xml</code>
-und unterdr&uuml;ckt das Laden der grafischen Oberfl&auml;che. Das Word <em>true</em> verhindert, dass der 
+und unterdr&uuml;ckt das Laden der grafischen Oberfl&auml;che. Das Word <em>true</em> verhindert, dass der
 Dateiname als Argument der Option <code>-n</code> interpretiert wird.
 
 <H1>Kommandozeilen-Optionen</H2>
@@ -42,8 +42,7 @@ das Hauptfenster &ouml;ffnet.
 
 <H2>Datei importieren: -i Dateiname[,Importformat]</H2>
 
-Bei dieser Option importiert oder l&auml;dt JabRef eine bestimmte Datei. Wenn nur ein Dateiname angegeben wird,
-wird sie als BibTeX-Datei geladen. Wenn dem Dateinamen ein Komma und ein Importformat folgen, wird der
+Bei dieser Option importiert oder l&auml;dt JabRef eine bestimmte Datei. Wenn nur ein Dateiname angegeben wird oder ein Komma und ein *-Zeichen hinter dem Dateinamen stehen, versucht JabRef, das Dateiformat automatisch zu erkennen. Das sollte bei allen BibTeX-Dateien ebenso funktionieren wie bei Dateien, die in einem der von JabRef unterst&uuml;tzten Importformate vorliegen. Wenn dem Dateinamen ein Komma und ein Importformat folgen, wird der
 angegebene Importfilter benutzt. Mit der Option <code>-h</code> k&ouml;nnen Sie sich eine Liste der
 verf&uuml;gbaren Importformate anzeigen lassen.
 
@@ -58,7 +57,7 @@ im Hauptfenster von JabRef angezeigt.
 
 Diese Option veranlasst JabRef, eine Datei zu speichern oder zu exportieren, die von derselben Kommandozeile geladen
 oder importiert wurde. Wenn eine Datei mit der Option <code>-i</code> importiert wurde, wird diese Datei exportiert.
-Ansonsten wird die Datei exportiert, die <em>zuletzt</em>&nbsp;- ohne die Option <code>-i</code>&nbsp;- 
+Ansonsten wird die Datei exportiert, die <em>zuletzt</em>&nbsp;- ohne die Option <code>-i</code>&nbsp;-
 angegeben (und erfolgreich geladen) wurde.
 
 <P>Wird nur ein Dateiname angegeben, so wird diese Datei im BibTeX-Format gespeichert. Wenn dem Dateinamen ein Komma
@@ -67,7 +66,7 @@ Exportfilter angewendet; wenn der Name sowohl auf einen Standard-Exportfilter, a
 Exportfilter zutrifft, wird der benutzerdefinierte verwendet.
 <P>Mit der Option <code>-h</code> k&ouml;nnen Sie sich eine Liste der verf&uuml;gbaren Exportformate anzeigen lassen.
 
-<P>Falls die Option <code>-n</code> nicht aufgerufen wurde, wird jeder Exportvorgang durchgef&uuml;hrt, bevor das 
+<P>Falls die Option <code>-n</code> nicht aufgerufen wurde, wird jeder Exportvorgang durchgef&uuml;hrt, bevor das
 JabRef-Fenster ge&ouml;ffnet wird. Dort werden dann die importierten Dateien angezeigt.
 
 <p>Die Option <code>-o</code> kann nur einmal angegeben werden und nimmt als Argument maximal eine Datei.

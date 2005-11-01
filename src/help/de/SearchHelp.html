@@ -3,57 +3,54 @@
 <BODY text="#275856">
 <basefont size="4" color="#2F4958" face="arial">
 
-<H1>Suchfunktionen in JabRef</H1>
+<H1>Suchfunktionen</H1>
 
 Es gibt drei verschiedene Suchmethoden in JabRef.
 
 <p>
-<em>STRG-F</em> öffnet oder aktiviert den Suchdialog. Drückt man mehrmals auf <em>STRG-F</em>, so werden die verschiedenen Suchmodi ausgewählt. Bei der direkten Suche springt man mit <em>STRG-F</em> zum nächsten Treffer.
+<em>STRG-F</em> &ouml;ffnet oder aktiviert den Suchdialog. Dr&uuml;ckt man mehrmals auf <em>STRG-F</em>, so werden die verschiedenen Suchmodi ausgew&auml;hlt. Bei der direkten Suche springt man mit <em>STRG-F</em> zum n&auml;chsten Treffer.
 <p>
-<em>STRG-SHIFT-F</em> öffnet oder aktiviert den Suchdialog und wählt die direkte Suche aus. Bei der direkten Suche springt man mit <em>STRG-SHIFT-F</em> ebenfalls zum nächsten Treffer.
+<em>STRG-SHIFT-F</em> &ouml;ffnet oder aktiviert den Suchdialog und w&auml;hlt die direkte Suche aus. Bei der direkten Suche springt man mit <em>STRG-SHIFT-F</em> ebenfalls zum n&auml;chsten Treffer.
 
 <H2>Direkte Suche</H2>
 
-Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg. Mit den Tastaturkürzeln wird das Programm dazu veranlasst, nach dem nächsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie darüber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken Sie ESC oder klicken Sie auf "Zurücksetzen".
+Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie &uuml;ber den Sucherfolg. Mit den Tastaturk&uuml;rzeln wird das Programm dazu veranlasst, nach dem n&auml;chsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie dar&uuml;ber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, dr&uuml;cken Sie ESC oder klicken Sie auf "Zur&uuml;cksetzen".
 
 <H2>Suche mit Markierung</H2>
 
-Wenn Sie die Suchoption "Markieren" wählen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER drücken. Alle Treffer werden ausgewählt.
+Wenn Sie die Suchoption "Markieren" w&auml;hlen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER dr&uuml;cken. Alle Treffer werden ausgew&auml;hlt.
 
 <H2>Float-Suche</H2>
 
-Die Suche mit der Option "Float" ist ähnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgewählt, sondern an den Anfang der Tabelle sortiert werden. Einträge, die nicht mit dem Suchbegriff übereinstimmen, werden unter den Treffern aufgelistet und zusätzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, drücken Sie ESC oder klicken auf "Zurücksetzen".
+Die Suche mit der Option "Float" ist &auml;hnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgew&auml;hlt, sondern an den Anfang der Tabelle sortiert werden. Eintr&auml;ge, die nicht mit dem Suchbegriff &uuml;bereinstimmen, werden unter den Treffern aufgelistet und zus&auml;tzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, dr&uuml;cken Sie ESC oder klicken auf "Zur&uuml;cksetzen".
 
-<H2>Feldbezeichner und logische Operatoren</H2>
+<a name="advanced"><H2>Feldbezeichner und logische Operatoren</H2></a>
 
-Um nur einige bestimmte Felder zu durchsuchen und/oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach Einträgen mit dem Autor "Miller" zu suchen, geben Sie
+Um nur einige bestimmte Felder zu durchsuchen und/oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle Syntax zur Verf&uuml;gung gestellt. Um beispielsweise nach Eintr&auml;gen mit dem Autor "Miller" zu suchen, geben Sie
 <p>
 author = miller
 <p>
-in das Suchfeld ein (Achtung! Das funktioniert nicht bei der direkten Suche!). Falls der Suchbegriff Leerzeichen enthält, schließen Sie ihn in Anführungszeichen ein. Benutzen Sie <i>nie</i> Leerzeichen in dem Feldbezeichner. Um beispielsweise nach Einträgen über Karl den Großen zu suchen, geben Sie folgendes ein:
+in das Suchfeld ein (Achtung! Das funktioniert nicht bei der direkten Suche!). Falls der Suchbegriff Leerzeichen enth&auml;lt, schlie&szlig;en Sie ihn in Anf&uuml;hrungszeichen ein. Benutzen Sie <i>nie</i> Leerzeichen in dem Feldbezeichner. Um beispielsweise nach Eintr&auml;gen &uuml;ber Karl den Gro&szlig;en zu suchen, geben Sie folgendes ein:
 <p>
-title|keywords = "Karl der Große"
+title|keywords = "Karl der Gro&szlig;e"
 <p>
-Sie können "and", "or", "not" und Klammern verwenden:
+Sie k&ouml;nnen "and", "or", "not" und Klammern verwenden:
 <p>
-(author = miller or title|keywords = "Karl der Große") and not author = brown
+(author = miller or title|keywords = "Karl der Gro&szlig;e") and not author = brown
 <p>
-... sucht nach Einträgen, in denen entweder der Autor "Miller" heißt oder im title- oder keywords-Feld der Begriff "Karl der Große" steht; gleichzeitig werden die Einträge mit dem Autor "Brown" nicht angezeigt.
+... sucht nach Eintr&auml;gen, in denen entweder der Autor "Miller" hei&szlig;t oder im title- oder keywords-Feld der Begriff "Karl der Gro&szlig;e" steht; gleichzeitig werden die Eintr&auml;ge mit dem Autor "Brown" nicht angezeigt.
 <p>
-Das "="-Zeichen ist eigentlich eine Abkürzung für "enthält" ("contains"). Wenn man nach genauen Treffern suchen möchte, muss man "==" oder "matches" ("übereinstimmen") eingeben. "!=" sucht nach Einträgen, bei denen der Suchbegriff <i>nicht</i> enthalten ist. Die Auswahl von Feldern, die durchsucht werden sollen (benötigte, optionale, allgemeine Felder), wird ignoriert, wenn man im Suchausdruck Feldbezeichner verwendet. Um nach Einträgen eines bestimmten Typs zu suchen, gibt es ein Pseudofeld namens "entrytype":
+Das "="-Zeichen ist eigentlich eine Abk&uuml;rzung f&uuml;r "enth&auml;lt" ("contains"). Wenn man nach genauen Treffern suchen m&ouml;chte, muss man "==" oder "matches" ("&uuml;bereinstimmen") eingeben. "!=" sucht nach Eintr&auml;gen, bei denen der Suchbegriff <i>nicht</i> enthalten ist. Die Auswahl von Feldern, die durchsucht werden sollen (ben&ouml;tigte, optionale, allgemeine Felder), wird ignoriert, wenn man im Suchausdruck Feldbezeichner verwendet. Um nach Eintr&auml;gen eines bestimmten Typs zu suchen, gibt es ein Pseudofeld namens "entrytype":
 <p>
 entrytype = thesis
 <p>
-&hellip; findet z.B. Einträge, deren Typ (wie in der Spalte "Entrytype" dargestellt) das Wort "thesis" enthält (z.B. "phdthesis" und "mastersthesis").
+&hellip; findet z.B. Eintr&auml;ge, deren Typ (wie in der Spalte "Entrytype" dargestellt) das Wort "thesis" enth&auml;lt (z.B. "phdthesis" und "mastersthesis"). Ebenso erlaubt das Pseudofeld "bibtexkey" die Suche nach BibTeX keys, z.B.:
+<p>
+bibtexkey = miller2005
 
 <H2>Suchoptionen</H2>
 
-Der <em>Einstellungen</em>-Knopf öffnet ein Menü, das die Suchoptionen anzeigt: welche Felder durchsucht werden, ob der Suchbegriff als regulärer Ausdruck interpretiert werden soll und ob nach Groß- und Kleinschreibung unterschieden werden soll oder nicht.
-
-<!--
-<p>You can at any time export a <em>bibtex</em> database containing
-only the entries in your currently shown group and/or search, by
-choosing <em>File -> Save special</em> in the menu. -->
+Der <em>Einstellungen</em>-Knopf &ouml;ffnet ein Men&uuml; mit mehreren Optionen: das Beachten von Gro&szlig;- und Kleinschreibung, das Nutzen regul&auml;rer Ausdr&uuml;cke sowie das Ausw&auml;hlen der Suchergebnisse in der Tabelle.
 
 </BODY>
 </HTML>

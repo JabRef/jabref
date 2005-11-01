@@ -25,6 +25,7 @@ Spezielle Feldmarken:
 <ul>
 <li><b>[<code>auth</code>]</b>: Der Nachname des ersten Autors.<BR>
 <li><b>[<code>authors</code>]</b>: Die Nachnamen aller Autoren.<BR>
+<li><b>[<code>authorsN</code>]</b>: Die Nachnamen von bis zu N Autoren. Falls es mehr Autoren gibt, wird EtAl angeh&auml;ngt.<BR>
 <li><b>[<code>authIniN</code>]</b>: Der Anfang des Nachnamens von jedem Autoren,
 	wobei nicht mehr als N Buchstaben verwendet werden.<BR>
 <li><b>[<code>authorIni</code>]</b>: Die ersten 5 Buchstaben des Nachnamens des ersten Autors
@@ -33,6 +34,7 @@ Spezielle Feldmarken:
 <li><b>[<code>authN_M</code>]</b>: Die ersten N Buchstaben des Nachnamens des M. Autors.<BR>
 <li><b>[<code>auth.auth.ea</code>]</b>: Die Nachnamen der beiden ersten Autoren und ".ea", falls
 	es mehr als zwei Autoren sind.<BR>
+<li><b>[<code>authshort</code>]</b>: Der Nachname bei einem Autor; der erste Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein Autor vorhanden ist. Ein Plus (+) wird angeh&auml;ngt, falls es mehr als drei Autoren gibt.<BR>
 <li><b>[<code>edtr</code>]</b>: Der Nachname des ersten Editors.<BR>
 <li><b>[<code>editors</code>]</b>: Die Nachnamen aller Editoren.<BR>
 <li><b>[<code>edtrIniN</code>]</b>: Der Anfang des Nachnamens von jedem Editor,
@@ -41,22 +43,23 @@ Spezielle Feldmarken:
 	und die Initialen der Nachnamen der restlichen Editoren.<BR>
 <li><b>[<code>edtrN</code>]</b>: Die ersten N Buchstaben des Nachnamens des ersten Editors.<BR>
 <li><b>[<code>edtrN_M</code>]</b>: Die ersten N Buchstaben des Nachnamens des M. Editors.<BR>
-<li><b>[<code>edtr.edtr.ea</code>]</b>: Der Nachname der ersten beiden Editoren 
+<li><b>[<code>edtr.edtr.ea</code>]</b>: Der Nachname der ersten beiden Editoren
 	und ".ea", falls es mehr als zwei Editoren sind.<BR>
+<li><b>[<code>edtrshort</code>]</b>: Der Nachname bei einem Editor; der erste Buchstabe der Nachnamen von bis zu drei Editoren, falls mehr als ein Editor vorhanden ist. Ein Plus (+) wird angeh&auml;ngt, falls es mehr als drei Editoren gibt.<BR>
 <li><b>[<code>firstpage</code>]</b>: Die erste Seitenzahl einer Ver&ouml;ffentlichung (pages).<BR>
 <li><b>[<code>lastpage</code>]</b>: Die letzte Seitenzahl einer Ver&ouml;ffentlichung (pages).<BR>
 <li><b>[<code>shorttitle</code>]</b>: Die ersten 3 Worte eines Titels (title).<BR>
 <li><b>[<code>shortyear</code>]</b>: Die letzten 2 Ziffern des Jahrgangs (year).<BR>
-<li><b>[<code>veryshorttitle</code>]</b>: Die ersten beiden Worte des Titels (title), wobei 'the', 'a' und 
+<li><b>[<code>veryshorttitle</code>]</b>: Die ersten beiden Worte des Titels (title), wobei 'the', 'a' und
 	'an' ausgelassen werden.<BR>
  </ul>
 
 <P>
 Hinter einem Feldnamen (oder einem der oben aufgef&uuml;hrten Pseudo-Feldnamen) kann ein
-Modifikator stehen. Momentan ist der einzige definierte Modifikator <b>:lower</b>, der den
-von der Feldmarke eingef&uuml;gten Text in Kleinbuchstaben wandelt. So wird beispielsweise
-bei <b>[auth:lower]</b> der Nachname des ersten Autors in Kleinbuchstaben ausgegeben.
-
+Modifikator stehen. Modifikatoren werden in der Reihenfolge angewendet, in der sie angegeben wurden.
+<ul>
+<li><b>:abbr</b>: K&uuml;rzt den Text, der von einem Feldnamen oder speziellen Feldmarken gebildet wird. Nur der erste Buchstabe und weitere Buchstaben, die auf ein Leerzeichen folgen, werden ber&uuml;cksichtigt. Zum Beispiel w&uuml;rde <b>[journal:abbr]</b> die Zeitschrift "Jorunal of Fish Biology" zu "JoFB" wandeln.<br>
+<li><b>:lower</b>: Wandelt den von der Feldmarke eingef&uuml;gten Text in Kleinbuchstaben. So wird beispielsweise bei <b>[auth:lower]</b> der Nachname des ersten Autors in Kleinbuchstaben ausgegeben.
 <P>
 Wenn Sie keine Key-Muster f&uuml;r einen bestimmten Eintragstyp angeben, wird das vorgegebene
 Muster (default pattern) verwendet. Sie k&ouml;nnen das vorgegebene Muster nat&uuml;rlich ebenfalls

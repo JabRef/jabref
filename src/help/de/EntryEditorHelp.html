@@ -6,18 +6,18 @@
 <H1>Der Eintrags-Editor</H1>
 
 <em>Ge&ouml;ffnet wird der Eintrags-Editor im Hauptfenster durch einen Doppelklick
-auf die linke Spalte eines Eintrags, oder durch Dr&uuml;cken auf ENTER. Der
+auf die linke Spalte eines Eintrags (bzw. irgendwo auf die Zeile des Eintrags, wenn "Bearbeiten in der Tabelle zulassen" im Dialog <strong>Optionen --> Einstellungen --> Allgemein</strong> nicht ausgew&auml;hlt ist), oder durch Dr&uuml;cken auf ENTER. Der
 Eintrags-Editor wird geschlossen, indem man auf ESC dr&uuml;ckt.</em>
 <P>
 Im Eintrags-Editor k&ouml;nnen Sie alle relevanten Informationen eines Eintrags festlegen.
 Der Editor &uuml;berpr&uuml;ft den Eintragstyp und zeigt alle ben&ouml;tigten und optionalen
-Felder f&uuml;r den Gebrauch mit <em>BibTeX</em> an. Dar&uuml;ber hinaus gibt es 
+Felder f&uuml;r den Gebrauch mit <em>BibTeX</em> an. Dar&uuml;ber hinaus gibt es
 einige Felder, die <em>Allgemeine Felder</em> genannt werden und f&uuml;r alle
 Eintragstypen gelten.
 
-<P>Sie k&ouml;nnen die Felder, die f&uuml;r die einzelnen Eintragstypen als ben&ouml;tigt und optional 
+<P>Sie k&ouml;nnen die Felder, die f&uuml;r die einzelnen Eintragstypen als ben&ouml;tigt und optional
 angesehen werden, und auch die Allgemeinen Felder anpassen. Schlagen Sie unter
-<a href="CustomEntriesHelp.html">Eintragstypen anpassen</a> nach, wenn Sie mehr Informationen 
+<a href="CustomEntriesHelp.html">Eintragstypen anpassen</a> nach, wenn Sie mehr Informationen
 dar&uuml;ber erhalten m&ouml;chten.
 
 <P>N&auml;here Informationen dar&uuml;ber, was in die Felder eingetragen werden soll,
@@ -29,7 +29,7 @@ Der Eintrags-Editor besteht in der Standardeinstellung aus f&uuml;nf Panels: <em
 <em>Optionale Felder</em>, <em>General</em>, <em>Abstract</em> und <em>BibTeX
 Quelltext</em>, wobei <em>General</em> und <em>Abstract</em> vom Benutzer angepasst werden k&ouml;nnen (siehe
 dazu <a href="GeneralFields.html">Allgemeine Felder festlegen</a>).
-In den ersten drei Panels k&ouml;nnen Sie mit TAB und SHIFT-TAB zwischen 
+In den ersten drei Panels k&ouml;nnen Sie mit TAB und SHIFT-TAB zwischen
 den einzelnen Feldern hin- und herwechseln.
 
 <P>Zu einem anderen Panel gelangen Sie, indem Sie auf die Tabs klicken. Mit den folgenden
@@ -38,17 +38,17 @@ CTRL-TAB oder CTRL-PLUS wechselt zum Panel rechts vom aktuellen Panel,
  CTRL-SHIFT-TAB oder CTRL-MINUS wechselt dementsprechend zum Panel
  links vom aktuellen Panel. Au&szlig;erdem k&ouml;nnen Sie zum n&auml;chsten oder
  vorherigen Eintrag wechseln, indem Sie "STRG-SHIFT-Pfeil nach unten" bzw. "STRG-SHIFT-Pfeil nach oben"
- oder die Pfeiltasten in der linken Toolbar dr&uuml;cken. 
+ oder die Pfeiltasten in der linken Toolbar dr&uuml;cken.
 
 <P>Das Panel <em>BibTeX Quelltext</em> zeigt, wie der Eintrag aussehen wird, wenn die Datei
 im <em>bibtex</em>-Format gespeichert wird. Wenn Sie wollen, k&ouml;nnen Sie den
 <em>BibTeX</em> Quelltext direkt bearbeiten. Sobald Sie zu einem anderen Panel wechseln,
 STRG-S dr&uuml;cken oder den Eintrags-Editor schlie&szlig;en, wird JabRef versuchen, den
-Inhalt des Quelltext-Panels zu analysieren. Falls dabei Probleme auftreten, werden Sie benachrichtigt 
+Inhalt des Quelltext-Panels zu analysieren. Falls dabei Probleme auftreten, werden Sie benachrichtigt
 und erhalten die M&ouml;glichkeit, den Eintrag noch einmal zu &uuml;berarbeiten oder den
 vorherigen Inhalt wiederherzustellen.
 
-Wenn in den <strong>Einstellungen</strong> (unter <strong>Allgemein</strong>) die Option 
+Wenn in den <strong>Einstellungen</strong> (unter <strong>Allgemein</strong>) die Option
 <strong>Quelltext standardm&auml;&szlig;ig anzeigen</strong> gew&auml;hlt wurde,
 wird das Quelltext-Panel beim &Ouml;ffnen des Eintrags-Editors als erstes angezeigt. Wenn Sie
 lieber den Quelltext bearbeiten als die anderen Panels zu benutzen, sollten Sie diese Option w&auml;hlen.
@@ -79,13 +79,13 @@ ein- oder ausschalten und ausw&auml;hlen, in welchen Feldern die Autovervollst&a
 aktiviert werden soll.
 <P>Bei aktiver Autovervollst&auml;ndigung zeichnet JabRef alle Worte auf, die in jedem der
 ausgew&auml;hlten Felder der Datei vorkommen. Immer wenn Sie den Anfang eines dieser
-W&ouml;rter schreiben, wird das Wort sichtbar vorgeschlagen. Sie k&ouml;nnen den 
+W&ouml;rter schreiben, wird das Wort sichtbar vorgeschlagen. Sie k&ouml;nnen den
 Vorschlag ignorieren, indem Sie einfach weiterschreiben. Um den Vorschlag anzunehmen,
 dr&uuml;cken Sie entweder auf <em>ENTER</em> oder benutzen die Pfeiltasten oder
 andere Tasten, um die Auswahlbox um die vorgeschlagenen Buchstaben zu entfernen.
 <P><em>Anmerkung:</em> Bei den W&ouml;rtern, die f&uuml;r die Vorschl&auml;ge ber&uuml;cksichtigt
-werden, handelt es sich nur um solche, die in demselben Feld in Eintr&auml;gen der Datei vorkommen, die Sie 
-gerade bearbeiten. Es gibt viele M&ouml;glichkeiten, um dieses Feature zu realisieren, und wenn Sie der 
+werden, handelt es sich nur um solche, die in demselben Feld in Eintr&auml;gen der Datei vorkommen, die Sie
+gerade bearbeiten. Es gibt viele M&ouml;glichkeiten, um dieses Feature zu realisieren, und wenn Sie der
 Meinung sind, das es auf eine andere Art implementiert werden sollte, w&uuml;rden wir gerne Ihre
 Vorschl&auml;ge h&ouml;ren.
 
