@@ -77,13 +77,13 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                     for (int i=0; i<loaded.size(); i++) {
                         ParserResult pr = (ParserResult) loaded.elementAt(i);
                         if (!pr.toOpenTab()) {
-                            jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
+                            jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
                         } else {
                             // Add the entries to the open tab.
                             BasePanel panel = jabref.jrf.basePanel();
                             if (panel == null) {
                                 // There is no open tab to add to, so we create a new tab:
-                                jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), (i == 0));
+                                jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
                             } else {
                                 List entries = new ArrayList(pr.getDatabase().getEntries());
                                 jabref.jrf.addImportedEntries(panel, entries, "", false, this);

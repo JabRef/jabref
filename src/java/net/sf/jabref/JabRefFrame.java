@@ -305,7 +305,7 @@ public class JabRefFrame
                     Globals.lang("Unabbreviate journal names of the selected entries"),
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
-
+    databaseProperties = new DatabasePropertiesAction(),
     test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -976,7 +976,10 @@ public JabRefPreferences prefs() {
     file.add(exportMenu);
     file.add(customExportMenu);
     file.addSeparator();
-    file.add(fileHistory);
+    file.add(databaseProperties);
+      file.addSeparator();
+
+      file.add(fileHistory);
     //file.addSeparator();
     file.add(loadSessionAction);
     file.add(saveSessionAction);
@@ -1336,6 +1339,7 @@ public JabRefPreferences prefs() {
     autoSetPs.setEnabled(false);
     toggleHighlightAny.setEnabled(false);
     toggleHighlightAll.setEnabled(false);
+        databaseProperties.setEnabled(false);
   }
 
     /**
@@ -1397,6 +1401,7 @@ public JabRefPreferences prefs() {
     autoSetPs.setEnabled(true);
     toggleHighlightAny.setEnabled(true);
     toggleHighlightAll.setEnabled(true);
+        databaseProperties.setEnabled(true);
   }
 
     /**
@@ -1439,8 +1444,8 @@ public JabRefPreferences prefs() {
     }
   }
 
-  public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, boolean raisePanel) {
-      BasePanel bp = new BasePanel(ths, db, file, meta, prefs);
+  public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, String encoding, boolean raisePanel) {
+      BasePanel bp = new BasePanel(ths, db, file, meta, encoding);
       addTab(bp, file, raisePanel);
       return bp;
   }
@@ -1578,7 +1583,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        addTab(database, null, new HashMap(), true);
+        addTab(database, null, new HashMap(), Globals.prefs.get("defaultEncoding"), true);
         output(Globals.lang("New database created."));
     }
   }
@@ -1704,7 +1709,7 @@ class FetchCiteSeerAction
 
                                   public void run() {
                                         try {
-                                                newBp = new BasePanel(ths, prefs);
+                                                newBp = new BasePanel(ths);
                                                 int errorCode;
                                                 targetBp = (BasePanel) tabbedPane.getSelectedComponent();
                                                 newDatabase = newBp.getDatabase();
@@ -1760,8 +1765,7 @@ class FetchCiteSeerAction
           BasePanel bp = new BasePanel( ths,
                                         dialog.getGenerateDB(),   // database
                                         null,                     // file
-                                        null,                     // meta data
-                                        prefs ) ;
+                                        null, Globals.prefs.get("defaultEncoding"));                     // meta data
           tabbedPane.add( Globals.lang( GUIGlobals.untitledTitle ), bp ) ;
           tabbedPane.setSelectedComponent( bp ) ;
           if ( tabbedPane.getTabCount() == 1 )
@@ -1959,8 +1963,7 @@ class FetchCiteSeerAction
       HashMap meta = new HashMap();
       // Metadata are only put in bibtex files, so we will not find it
       // in imported files. Instead we pass an empty HashMap.
-      BasePanel bp = new BasePanel(ths, database, null,
-                                   meta, prefs);
+      BasePanel bp = new BasePanel(ths, database, null, meta, Globals.prefs.get("defaultEncoding"));
       /*
             if (prefs.getBoolean("autoComplete")) {
             db.setCompleters(autoCompleters);
@@ -2523,6 +2526,21 @@ class SaveSessionAction
             Util.placeDialog(gf, ths);
             gf.setVisible(true);
 
+        }
+    }
+
+    class DatabasePropertiesAction extends MnemonicAwareAction {
+        DatabasePropertiesDialog propertiesDialog = null;
+        public DatabasePropertiesAction() {
+            putValue(NAME, "Database properties");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (propertiesDialog == null)
+                propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
+            propertiesDialog.setPanel(basePanel());
+            Util.placeDialog(propertiesDialog, JabRefFrame.this);
+            propertiesDialog.setVisible(true);
         }
     }
 

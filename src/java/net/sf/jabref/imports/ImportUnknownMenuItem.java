@@ -88,7 +88,7 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
 
             } else {
 		        frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(),
-			        bibtexResult.getMetaData(), true);
+			        bibtexResult.getMetaData(), Globals.prefs.get("defaultEncoding"), true);
 		        frame.output(Globals.lang("Opened database") + " '" + filename +
 			        "' " + Globals.lang("with") + " " +
 			        bibtexResult.getDatabase() .getEntryCount() + " " +

@@ -279,7 +279,7 @@ public class ImportInspectionDialog extends JDialog {
      * This method returns a List containing all entries that are selected
      * (checkbox checked).
      *
-     * @return
+     * @return a List containing the selected entries.
      */
     public List getSelectedEntries() {
         List selected = new ArrayList();
@@ -493,7 +493,7 @@ public class ImportInspectionDialog extends JDialog {
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
-                    panel = new BasePanel(frame, base, null, new HashMap(), Globals.prefs);
+                    panel = new BasePanel(frame, base, null, new HashMap(), Globals.prefs.get("defaultEncoding"));
                 }
 
                 boolean groupingCanceled = false;

@@ -78,7 +78,7 @@ public class EntryTableModel
     frame = frame_;
     db = db_;
 
-    columns = panel.prefs
+    columns = Globals.prefs
         .getStringArray("columnNames"); // This must be done again if the column
     // preferences get changed.
 
@@ -304,11 +304,11 @@ public class EntryTableModel
     // We add those that are enabled in preferences.
     iconCols.clear();
     int coln = 1;
-    if (panel.prefs.getBoolean("pdfColumn"))
+    if (Globals.prefs.getBoolean("pdfColumn"))
       iconCols.put(new Integer(coln++), PDF);
-    if (panel.prefs.getBoolean("urlColumn"))
+    if (Globals.prefs.getBoolean("urlColumn"))
       iconCols.put(new Integer(coln++), URL_);
-    if (panel.prefs.getBoolean("citeseerColumn"))
+    if (Globals.prefs.getBoolean("citeseerColumn"))
         iconCols.put(new Integer(coln++), CITESEER);
 
     // Add 1 to the number of icon columns to get padleft.
@@ -328,12 +328,12 @@ public class EntryTableModel
     for (int i = 0; i < nameCols.length; i++) {
       nameCols[i] = ( (Integer) tmp.elementAt(i)).intValue();
     }
-    showShort = panel.prefs.getBoolean("showShort");        //MK:
-    namesNatbib = panel.prefs.getBoolean("namesNatbib");    //MK:
-    namesLastOnly = panel.prefs.getBoolean("namesLastOnly");
+    showShort = Globals.prefs.getBoolean("showShort");        //MK:
+    namesNatbib = Globals.prefs.getBoolean("namesNatbib");    //MK:
+    namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");
 
     namesAsIs = Globals.prefs.getBoolean("namesAsIs");
-    abbr_names = panel.prefs.getBoolean("abbrAuthorNames"); //MK:
+    abbr_names = Globals.prefs.getBoolean("abbrAuthorNames"); //MK:
     namesFf = Globals.prefs.getBoolean("namesFf");
     namesLf = !(namesAsIs || namesFf || namesNatbib || namesLastOnly); // None of the above.
         //namesLastOnly = Globals.prefs.getBoolean("namesLastOnly");

@@ -708,7 +708,7 @@ lastEdLoop:
             if (loaded.size() > 0) {
                 for (Iterator i=loaded.iterator(); i.hasNext();) {
                     ParserResult pr = (ParserResult)i.next();
-		    jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), first);
+		    jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), first);
 		    first = false;
                 }
             }

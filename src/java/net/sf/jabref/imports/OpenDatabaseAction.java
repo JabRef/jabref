@@ -111,14 +111,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }).start();
                 }
 
-                BasePanel bp = new BasePanel(frame, db, file,
-                        meta, Globals.prefs);
-                bp.setEncoding(pr.getEncoding()); // Keep track of which encoding was used for loading.
+                BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
+
                 /*
-                  if (Globals.prefs.getBoolean("autoComplete")) {
-                  db.setCompleters(autoCompleters);
-                  }
-                 */
+                 if (Globals.prefs.getBoolean("autoComplete")) {
+                 db.setCompleters(autoCompleters);
+                 }
+                */
 
                 // file is set to null inside the EventDispatcherThread
                 SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
@@ -203,6 +202,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if ((suppliedEncoding != null)) {
            try {
                reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
+               encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
            } catch (IOException ex) {
                 reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
             }
