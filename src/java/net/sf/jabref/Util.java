@@ -405,7 +405,10 @@ public class Util {
             }
         } else if (fieldName.equals("doi")) {
             fieldName = "url";
-            link = Globals.DOI_LOOKUP_PREFIX + link;
+            // Check to see if link field already contains a well formated URL
+            if (!link.startsWith("http://")) {
+                link = Globals.DOI_LOOKUP_PREFIX + link;
+            }
         } else if (fieldName.equals("citeseerurl")) {
             fieldName = "url";
 
