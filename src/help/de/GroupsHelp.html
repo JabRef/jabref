@@ -65,7 +65,7 @@ Jede Gruppe, die Sie erstellen, ist von einer der drei letztgenannten Arten. Der
 
 <H2>Gruppenstrukturen, Erstellen und L&ouml;schen von Gruppen</H2>
 
-Vergleichbar mit Ordnern sind die Gruppen in einer Baumansicht strukturiert, wo die Gruppe <b>Alle Eintr&auml;ge</b> die Wurzel ist. Mit einem Rechtsklick auf eine Gruppe k&ouml;nnen Sie dem Baum eine neue Gruppe hinzuf&uuml;gen, entweder auf derselben Ebene wie die ausgew&auml;hlte Gruppe oder als ihre Untergruppe. Der Button <b>Neue Gruppe</b> erzeugt eine neue Untergruppe der Gruppe <b>Alle Eintr&auml;ge</b>, egal ob Sie gerade Gruppen ausgew&auml;hlt haben oder nicht. Im Kontextmen&uuml; k&ouml;nnen Sie auch Gruppen und/oder Untergruppen l&ouml;schen, Untergruppen alphabetisch sortieren oder Gruppen an eine andere Stelle des Baums verschieben. Letzteres k&ouml;nnen Sie auch mit Drag&nbsp;&amp;&nbsp;Drop machen, allerdings mit der Einschr&auml;nkung, dass bei Drag&nbsp;&amp;&nbsp;Drop die Reihenfolge der Untergruppen einer Gruppe nicht ver&auml;ndert werden kann.
+Vergleichbar mit Ordnern sind die Gruppen in einer Baumansicht strukturiert, wo die Gruppe <b>Alle Eintr&auml;ge</b> das Stammelement ist. Mit einem Rechtsklick auf eine Gruppe k&ouml;nnen Sie dem Baum eine neue Gruppe hinzuf&uuml;gen, entweder auf derselben Ebene wie die ausgew&auml;hlte Gruppe oder als ihre Untergruppe. Der Button <b>Neue Gruppe</b> erzeugt eine neue Untergruppe der Gruppe <b>Alle Eintr&auml;ge</b>, egal ob Sie gerade Gruppen ausgew&auml;hlt haben oder nicht. Im Kontextmen&uuml; k&ouml;nnen Sie auch Gruppen und/oder Untergruppen l&ouml;schen, Untergruppen alphabetisch sortieren oder Gruppen an eine andere Stelle des Baums verschieben. Letzteres k&ouml;nnen Sie auch mit Drag&nbsp;&amp;&nbsp;Drop machen, allerdings mit der Einschr&auml;nkung, dass bei Drag&nbsp;&amp;&nbsp;Drop die Reihenfolge der Untergruppen einer Gruppe nicht ver&auml;ndert werden kann.
 
 <p>
 R&uuml;ckg&auml;ngig und Wiederholen wird f&uuml;r alle Bearbeitungsschritte unterst&uuml;tzt.
@@ -78,25 +78,25 @@ Diese Methode des Gruppierens setzt voraus, dass alle Eintr&auml;ge einen eindeu
 
 <H3>Dynamische Gruppen</h3>
 
-<em>Hinweis des &Uuml;bersetzers: weiter bin ich noch (02.11.2005) nicht gekommen.</em>
-The content of a dynamic group is defined by a logical condition. Only entries that meet this condition are contained in the group. This method uses the information stored in the database itself, and updates dynamically whenever the database changes.
+Der Inhalt einer dynamischen Gruppe wird von einer logischen Bedingung bestimmt. Nur Eintr&auml;ge, die dieser Bedingung entsprechen, geh&ouml;ren zu dieser Gruppe. Diese Methode nutzt die bereits in der Datei vorhandenen Informationen und wird aktualisiert, sobald Sie Ver&auml;nderungen in der Datei vornehmen.
 <p>
-Two types of conditions can be used:
+Es gibt zwei m&ouml;gliche Arten von Bedingungen:
 <dl>
-<dt><b>Searching a field for a keyword</b></dt>
+<dt><b>Ein Feld nach einem Stichwort durchsuchen</b></dt>
 <dd>
-This method groups entries in which a specified BibTeX field (e.g. <tt>keywords</tt>) contains a specified search term (e.g. <tt>electrical</tt>). Obviously, for this to work, the grouping field must be present in every entry, and its content must be accurate. The above example would group all entries referring to something electrical. Using the field <tt>author</tt> allows to group entries by a certain author, etc. The search can either be done as a plain-text or a regular expression search. In the former case, JabRef allows to manually assign/remove entries to/from the group by simply appending/removing the search term to/from the content of the grouping field. This makes sense only for the <tt>keywords</tt> field or for self-defined fields, but obviously not for fields like <tt>author</tt> or <tt>year</tt>.
+Diese Methode gruppiert Eintr&auml;ge, bei denen ein bestimmtes BibTeX Feld (z.B. <tt>keywords</tt>) einen bestimmten Suchausdruck (z.B. <tt>elektrisch</tt>) enth&auml;lt. Damit dies funktioniert, muss das Feld, nach dem sortiert wird, nat&uuml;rlich in jedem Eintrag vorhanden und sein Inhalt fehlerfrei sein. Das obige Beispiel w&uuml;rde alle Eintr&auml;ge zu einer Gruppe zusammenfassen, die sich auf etwas elektrisches beziehen. Benutzt man das Feld <tt>author</tt>, kann man sich Eintr&auml;ge eines bestimmten Autors gruppieren lassen, usw. Die Suche ist als reine Textsuche oder mit einem regul&auml;ren Ausdruck m&ouml;glich. Im ersten Fall erlaubt JabRef das manuelle Zuweisen zu und Entfernen aus einer Gruppe; dazu f&uuml;gt JabRef den Suchausdruck dem entsprechenden Feld zu bzw. entfernt ihn daraus. Das macht nur f&uuml;r das Feld <tt>keywords</tt> oder f&uuml;r selbstdefinierte Felder Sinn, aber offensichtlich nicht f&uuml;r Felder wie <tt>author</tt> oder <tt>year</tt>.
 </dd>
-<dt><b>Using a free-form search expression</b></dt>
+<dt><b>Einen freien Suchausdruck verwenden</b></dt>
 <dd>
-This is similar to the above, but rather than search a single field for a single search term, the <a href="SearchHelp.html#advanced">search expression syntax</a> can be used, which supports logical operators (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) and allows to search multiple BibTeX fields. For example, the search expression <tt>keywords=regression and not keywords=linear</tt> groups entries concerned with non-linear regression.
+Diese Vorgehensweise ist ganz &auml;hnlich wie die eben beschriebene, aber statt nur ein Feld nach einem Suchausdruck zu durchsuchen, kann hierbei die <a href="SearchHelp.html#advanced">Syntax der Suche</a> angewendet werden, die logische Operatoren (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) und die Suche in mehreren Feldern gleichzeitig unterst&uuml;tzt. So fasst z.B. die Suchanfrage <tt>keywords=Regression AND NOT keywords=linear</tt> Eintr&auml;ge, die sich mit nicht-linearer Regression besch&auml;ftigen, zu einer Gruppe zusammen.
 </dd>
 </dl>
 
-In the groups view, dynamic groups are shown in <i>italics</i> by default. This can be turned off in the preferences.
+In der Gruppenansicht werden dynamische Gruppen standardm&auml;&szlig;ig <i>kursiv</i> dargestellt. Dies kann unter <strong>Optionen -> Einstellungen -> Gruppen</strong> abgestellt werden.
 
-<h3>Hierarchical context</h3>
+<h3>Hierarchischer Kontext</h3>
 
+<em>Hinweis des &Uuml;bersetzers: weiter bin ich noch (03.11.2005) nicht gekommen.</em><br>
 By default, a group is <b>independent</b> of its position in the groups tree: When selected, only the group's contents are shown. However, especially when using dynamic groups, it is often useful to define a subgroup that <b>refines its supergroup</b>, i.e., when selected, entries contained in both groups are displayed. For example, create a supergroup containing entries with the keyword <tt>distribution</tt> and a subgroup containing entries with the keyword <tt>gauss</tt> that refines this supergroup. Selecting the subgroup now displays entries that match both conditions, i.e. are concerned with Gaussian distributions. By adding another refining subgroup for <tt>laplace</tt> to the original supergroup, the grouping can easily be extended. In the groups tree, refining groups have a special icon (this can be turned off in the preferences).
 <p>
 The logical complement to a refining group is a group that <b>includes its subgroups</b>, i.e. when selected, not only the group's own entries, but also its subgroups' entries are shown. In the groups tree, this type of group has a special icon (this can be turned off in the preferences).
