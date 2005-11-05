@@ -97,6 +97,9 @@ Change log:
         - Fixed startup freeze when trying to load certain malformed bib files.
         - Fixed bug related to multi-line fields in RIS import.
         - Fixed bug related to looking up a fully qualified DOI
+        - Added review field for research comments, paper reviews, etc.
+        - Included review field to preview panel 1, which shows the abstract
+        - Fixed bug where booktitle field was not displayed in preview for, similar to journal field
 1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.
         - Added Help button in Preferences -> Entry preview
