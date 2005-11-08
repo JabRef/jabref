@@ -52,7 +52,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         {
 
         idList.add(id);
-		if(ids!="")
+		if(!ids.equals(""))
 		    ids += ","+id;
 		else
 		    ids = id;
@@ -270,8 +270,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 					    Integer.toString(result.count));
 	    
 	    // for strCount ...
-	    if(strCount=="")
-		return;
+	    if(strCount.equals(""))
+		    return;
 	    int count;
         try {
             count = Integer.parseInt(strCount);
@@ -283,7 +283,9 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         ImportInspectionDialog diag = new ImportInspectionDialog(panel.frame(), panel,
                 GUIGlobals.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch Medline"), false);
         Util.placeDialog(diag, panel.frame());
-        // diag.setProgress(0, count);
+         diag.setDefaultSelected(false); // Make sure new entries are not selected by default.
+
+             // diag.setProgress(0, count);
         diag.setVisible(true);
         keepOn = true;
          diag.addCallBack(new ImportInspectionDialog.CallBack() {
@@ -452,7 +454,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 	Matcher matcher;
 	matcher=articleTitle.matcher(sb);
 	if (matcher.find())
-	    result.append("Title: "+matcher.group(1));
+        result.append("Title: ").append(matcher.group(1));
 
 	//matcher=authorName.matcher(sb);
 	//while (matcher.find())

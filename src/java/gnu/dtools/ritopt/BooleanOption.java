@@ -145,7 +145,7 @@ public class BooleanOption extends Option {
      */
 
     public Object getObject() {
-	return new Boolean( value );
+	return Boolean.valueOf(value);
     }
 
     /**

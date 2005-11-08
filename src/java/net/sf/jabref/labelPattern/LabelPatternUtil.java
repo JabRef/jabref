@@ -578,7 +578,7 @@ public class LabelPatternUtil {
     }
     author.append((tokens[0].split(","))[0]);
     if (tokens.length >= 2)
-      author.append("."+(tokens[1].split(","))[0]);
+        author.append(".").append((tokens[1].split(","))[0]);
     if (tokens.length > 2)
       author.append(".ea");
 

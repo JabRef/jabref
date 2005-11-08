@@ -61,8 +61,9 @@ public class InspecImporter implements ImportFormat {
 	String str;
 	while ((str = in.readLine()) != null){
 	    if (str.length() < 2) continue;
-	    if (str.indexOf("Record") == 0) sb.append("__::__" + str);
-	    else sb.append("__NEWFIELD__" + str);
+	    if (str.indexOf("Record") == 0) sb.append("__::__").append(str);
+	    else
+            sb.append("__NEWFIELD__").append(str);
 	}
 	in.close();
 	String[] entries = sb.toString().split("__::__");

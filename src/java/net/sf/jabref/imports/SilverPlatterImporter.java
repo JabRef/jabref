@@ -59,8 +59,9 @@ public class SilverPlatterImporter implements ImportFormat {
 	String str;
 	StringBuffer sb = new StringBuffer();
 	while ((str = in.readLine()) != null){
-	    if (str.length() < 2) sb.append("__::__" + str);
-	    else sb.append("__NEWFIELD__" + str);
+	    if (str.length() < 2) sb.append("__::__").append(str);
+	    else
+            sb.append("__NEWFIELD__").append(str);
 	}
 	in.close();
 	String[] entries = sb.toString().split("__::__");

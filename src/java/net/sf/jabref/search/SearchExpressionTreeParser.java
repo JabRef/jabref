@@ -41,9 +41,9 @@ public SearchExpressionTreeParser() {
 }
 
 	public final boolean  tSearchExpression(AST _t) throws RecognitionException, PatternSyntaxException {
-		boolean ret = false;;
-		
-		AST tSearchExpression_AST_in = (_t == ASTNULL) ? null : (AST)_t;
+		boolean ret = false;
+
+        AST tSearchExpression_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		
 			boolean a = false, b = false;
 		
@@ -143,9 +143,9 @@ public SearchExpressionTreeParser() {
 	}
 	
 	public final boolean  tExpressionSearch(AST _t) throws RecognitionException, PatternSyntaxException {
-		 boolean ret = false; ;
-		
-		AST tExpressionSearch_AST_in = (_t == ASTNULL) ? null : (AST)_t;
+		 boolean ret = false;
+
+        AST tExpressionSearch_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		AST var_f = null;
 		AST var_v = null;
 		
@@ -215,9 +215,9 @@ public SearchExpressionTreeParser() {
 	}
 	
 	public final int  tSearchType(AST _t) throws RecognitionException {
-		 int matchType = 0; ;
-		
-		AST tSearchType_AST_in = (_t == ASTNULL) ? null : (AST)_t;
+		 int matchType = 0;
+
+        AST tSearchType_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;

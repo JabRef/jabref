@@ -38,11 +38,6 @@ import java.util.Comparator;
 public class CrossRefEntryComparator implements Comparator {
 
     private String crossRefField = "crossref";
-    private Comparator secComparator;
-
-    public CrossRefEntryComparator(Comparator comp) {
-	secComparator = comp;
-    }
 
     public int compare(Object o1, Object o2) throws ClassCastException {
 	if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
@@ -53,10 +48,10 @@ public class CrossRefEntryComparator implements Comparator {
 	Object f1 = e1.getField(crossRefField),
 	    f2 = e2.getField(crossRefField);
 
-	if ((f1 == null) && (f2 == null)) return secComparator.compare(e1, e2);
-	if ((f1 != null) && (f2 != null)) return secComparator.compare(e1, e2);
-	if ((f1 != null) && (f2 == null)) return -1;
-	return 1;
+	if ((f1 == null) && (f2 == null)) return 0; //secComparator.compare(e1, e2);
+	if ((f1 != null) && (f2 != null)) return 0; //secComparator.compare(e1, e2);
+	if (f1 != null) return -1;
+	else return 1;
     }
 
 }

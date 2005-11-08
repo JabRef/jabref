@@ -38,7 +38,7 @@ public class CiteSeerCitationHandler extends DefaultHandler {
 		if (getCitation == true) {
 			String target = new String(ch, start, length);
 			if (citationList.get(target) == null) {
-				citationList.put(target,new Boolean(true));
+				citationList.put(target, Boolean.TRUE);
 			}
 			getCitation = false;
 		}

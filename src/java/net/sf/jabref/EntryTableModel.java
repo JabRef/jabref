@@ -370,13 +370,13 @@ public class EntryTableModel
     }
 
     // Then the sort options:
-    directions.add(new Boolean(frame.prefs.getBoolean("priDescending")));
-    directions.add(new Boolean(frame.prefs.getBoolean("secDescending")));
-    directions.add(new Boolean(frame.prefs.getBoolean("terDescending")));
+    directions.add(Boolean.valueOf(frame.prefs.getBoolean("priDescending")));
+    directions.add(Boolean.valueOf(frame.prefs.getBoolean("secDescending")));
+    directions.add(Boolean.valueOf(frame.prefs.getBoolean("terDescending")));
     fields.add(frame.prefs.get("priSort"));
     fields.add(frame.prefs.get("secSort"));
     fields.add(frame.prefs.get("terSort"));
-    binary.add(new Boolean(Globals.prefs.getBoolean("priBinary"))); // TRUE if we are sorting on an icon.
+    binary.add(Boolean.valueOf(Globals.prefs.getBoolean("priBinary"))); // TRUE if we are sorting on an icon.
     binary.add(Boolean.FALSE);
     binary.add(Boolean.FALSE);
 

@@ -100,12 +100,12 @@ public class OptionEvent {
 
     public OptionEvent( Option option ) {
 	this.target = option;
-	this.value = new String( option.getStringValue() );
+	this.value = option.getStringValue();
 	String longOption = option.getLongOption();
 	char shortOption = option.getShortOption();
 						      
         if ( longOption != null ) {
-	    command = new String( longOption );
+	    command = longOption;
 	}
 	else if ( shortOption != '\0' ) {
 	    command = new Character( shortOption ).toString();

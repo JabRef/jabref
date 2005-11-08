@@ -13,7 +13,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
     private String[] _choices;
-    private Boolean[] _sel;
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
@@ -67,7 +66,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     case 0:
                       return tr.name;
                     case 1:
-                      return ((tr.length > 0) ? new Integer(tr.length).toString() : "");
+                      return ((tr.length > 0) ? Integer.toString(tr.length) : "");
                   }
                   return null; // Unreachable.
                 }
@@ -265,25 +264,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         }
     }
 
-    private String[] getChoices() {
-
-        // First we count how many checkboxes the user has selected.
-        int count = 0;
-        for (int i=0; i<_sel.length; i++)
-            if (_sel[i].booleanValue()) count++;
-
-        // Then we build the byte array.
-        String[] choices = new String[count];
-        count = 0;
-        for (int i=0; i<_sel.length; i++)
-            if (_sel[i].booleanValue()) {
-                choices[count] = GUIGlobals.ALL_FIELDS[i];
-                count++;
-            }
-        return choices;
-    }
-
-
+ 
     /**
      * Store changes to table preferences. This method is called when
      * the user clicks Ok.

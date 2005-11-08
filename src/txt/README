@@ -71,7 +71,7 @@ Building JabRef from source:
 Please see the INSTALL file for instructions for building from source.
 
 Documentation:
-JabRef comes with an online help function, accessed by presing F1 or
+JabRef comes with an online help function, accessed by pressing F1 or
 clicking on a question mark icon. The help files are probably not
 exhaustive enough to satisfy everyone yet, but they should help sort
 out the most important issues about using the program. The help files
@@ -80,7 +80,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Added new options for name formatting in main table.
+1.x:    - Added export option for OpenDocument spreadsheet.
+        - Added new options for name formatting in main table.
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
         - [UNFINISHED] Added toggling of abbreviated and full journal names, based on a built-in
           journal list, extendable by linking to an external text file.          

@@ -73,7 +73,7 @@ public class IsiImporter implements ImportFormat {
 
       // begining of a new item
       if (str.substring(0, 3).equals("PT "))
-        sb.append("::" + str);
+          sb.append("::").append(str);
       else {
         String beg = str.substring(0, 3).trim();
 

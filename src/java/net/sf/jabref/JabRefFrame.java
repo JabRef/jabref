@@ -1626,7 +1626,7 @@ class ImportCiteSeerAction
                                                 //currentBp.showEntry(toShow);
                                                 output(Globals.lang("Completed Import Fields from CiteSeer."));
                                         }
-                                };
+                                }
 
                             public void run() {
                                 currentBp = (BasePanel) tabbedPane.getSelectedComponent();
@@ -2110,7 +2110,8 @@ class FetchCiteSeerAction
       modsItem = new JMenuItem(Globals.lang("MODS")),
       rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
       endnoteItem = new JMenuItem(Globals.lang("Endnote")),
-      openofficeItem = new JMenuItem("OpenOffice Calc");
+      openofficeItem = new JMenuItem("OpenOffice Calc"),
+      odsItem = new JMenuItem("OpenDocument Spreadsheet");
 
 
 
@@ -2161,7 +2162,10 @@ class FetchCiteSeerAction
             lfFileName = "oocalc";
             extension = ".sxc";
        }
-
+       else if (source == odsItem) {
+            lfFileName = "ods";
+            extension = ".ods";
+       }
         // We need to find out:
         // 1. The layout definition string to use. Or, rather, we
         //    must provide a Reader for the layout definition.
@@ -2186,7 +2190,7 @@ class FetchCiteSeerAction
           public void run() {
             try {
               FileActions.exportDatabase
-                  (basePanel().database, dir, lfName, oFile);
+                  (basePanel().database, dir, lfName, oFile, basePanel().getEncoding());
               output(Globals.lang("Exported database to file") + " '" +
                      oFile.getPath() + "'.");
             }
@@ -2216,8 +2220,9 @@ class FetchCiteSeerAction
     endnoteItem.addActionListener(listener);
     menu.add(endnoteItem);
         openofficeItem.addActionListener(listener);
-        menu.add(openofficeItem);
-
+      odsItem.addActionListener(listener);
+      menu.add(openofficeItem);
+      menu.add(odsItem);
     menu.add(exportCSV);
 
     menu.addSeparator();
@@ -2358,7 +2363,7 @@ class SaveSessionAction
           try {
             FileActions.exportDatabase
                 (basePanel().database, directory,
-                 lfName, oFile);
+                 lfName, oFile, basePanel().getEncoding());
             output(Globals.lang("Exported database to file") + " '" +
                    oFile.getPath() + "'.");
           }

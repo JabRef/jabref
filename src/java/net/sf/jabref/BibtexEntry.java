@@ -310,7 +310,7 @@ public class BibtexEntry
         out.write("@"+_type.getName().toUpperCase()+"{");
 
         String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
-        out.write(((str == null) ? "" : str.toString())+","+Globals.NEWLINE);
+        out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
         HashMap written = new HashMap();
         written.put(GUIGlobals.KEY_FIELD, null);
         // Write required fields first.

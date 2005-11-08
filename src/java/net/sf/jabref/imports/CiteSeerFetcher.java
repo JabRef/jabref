@@ -173,8 +173,8 @@ public class CiteSeerFetcher extends SidePaneComponent {
                 
             } else if (rejectedEntries.size() > 1) {
             	int i;
-                String rowNumbers = new String("");
-                String oneRowOfNumbers = new String("");
+                String rowNumbers = "";
+                String oneRowOfNumbers = "";
                 TreeSet rowSet = new TreeSet(rejectedEntries.keySet());
                 int rowSize = rowSet.size();
                 for(i=0; (i < rowSize - 1) && (i < 100); i++) {
@@ -439,7 +439,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append(OAI_URL);
 					citeseerURLString.append(OAI_ACTION);
 					citeseerURLString.append("&" + OAI_METADATAPREFIX);
-					citeseerURLString.append("&" + "identifier=" + key);
+                    citeseerURLString.append("&" + "identifier=").append(key);
 					URL citeseerUrl = new URL( citeseerURLString.toString());
 					HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();				
 					saxParser.parse(citeseerConnection.getInputStream(), new CiteSeerUndoHandler(dummyNamedCompound, newEntry, panel, dummyBoolean));
@@ -510,7 +510,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
                       citeseerURLString.append(OAI_URL);
                       citeseerURLString.append(OAI_ACTION);
                       citeseerURLString.append("&" + OAI_METADATAPREFIX);
-                      citeseerURLString.append("&" + "identifier=" + identifier);
+                        citeseerURLString.append("&" + "identifier=").append(identifier);
                       URL citeseerUrl = new URL( citeseerURLString.toString());
                       HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();				
                       saxParser.parse(citeseerConnection.getInputStream(), new CiteSeerCitationHandler(citationHashTable));
@@ -576,7 +576,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 					citeseerURLString.append(OAI_URL);
 					citeseerURLString.append(OAI_ACTION);
 					citeseerURLString.append("&" + OAI_METADATAPREFIX);
-					citeseerURLString.append("&" + "identifier=" + identifier);
+                citeseerURLString.append("&" + "identifier=").append(identifier);
                     URL citeseerUrl = new URL( citeseerURLString.toString());
                     HttpURLConnection citeseerConnection = (HttpURLConnection)citeseerUrl.openConnection();									
 					InputStream inputStream  = citeseerConnection.getInputStream();

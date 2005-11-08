@@ -197,7 +197,7 @@ public class JabRefPreferences {
 	defaults.put(CUSTOM_TAB_NAME+"2", Globals.lang("Review"));
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
-        defaults.put("historySize", new Integer(5));
+        defaults.put("historySize", new Integer(8));
         defaults.put("fontFamily", "Times");
         defaults.put("fontStyle", new Integer(java.awt.Font.PLAIN));
         defaults.put("fontSize", new Integer(12));

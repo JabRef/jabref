@@ -32,7 +32,7 @@ import java.util.*;
 public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
-    ArrayList set;
+    final ArrayList set;
     Comparator comp;
     String[] idArray;
     BibtexEntry[] entryArray;

@@ -18,14 +18,14 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name
 	 */
 	public void testOneAuthorSimpleName() {
-		String name = new String("Lastname, Name");
+		String name = "Lastname, Name";
 		
 		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
 		
 		String result = ab.format(name);
 		
 		//Expected Results:
-		String expectedResult = new String ("Lastname, N.");
+		String expectedResult = "Lastname, N.";
 
 		//Verifies the functionality:				
 		Assert.assertEquals("Abbreviator Test", result, expectedResult);
@@ -37,14 +37,14 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name Middlename
 	 */
 	public void testOneAuthorCommonName() {
-		String name = new String("Lastname, Name Middlename");
+		String name = "Lastname, Name Middlename";
 		
 		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
 		
 		String result = ab.format(name);
 		
 		//Expected Results:
-		String expectedResult = new String ("Lastname, N.M.");
+		String expectedResult = "Lastname, N.M.";
 		
 		//Verifies the functionality:				
 		Assert.assertEquals("Abbreviator Test", result, expectedResult);
@@ -56,14 +56,14 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name Middlename
 	 */
 	public void testTwoAuthorsCommonName() {
-		String name = new String("Lastname, Name Middlename and Sobrenome, Nome Nomedomeio");
+		String name = "Lastname, Name Middlename and Sobrenome, Nome Nomedomeio";
 		
 		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
 		
 		String result = ab.format(name);
 		
 		//Expected Results:
-		String expectedResult = new String ("Lastname, N.M. and Sobrenome, N.N.");
+		String expectedResult = "Lastname, N.M. and Sobrenome, N.N.";
 		
 		//Verifies the functionality:				
 		Assert.assertEquals("Abbreviator Test", result, expectedResult);

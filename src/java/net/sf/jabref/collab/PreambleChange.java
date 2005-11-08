@@ -26,17 +26,15 @@ public class PreambleChange extends Change {
 
     StringBuffer text = new StringBuffer();
     text.append("<FONT SIZE=3>");
-    text.append("<H2>"+Globals.lang("Changed preamble")+"</H2>");
+      text.append("<H2>").append(Globals.lang("Changed preamble")).append("</H2>");
 
     if ((disk != null) && !disk.equals(""))
-      text.append("<H3>"+Globals.lang("Value set externally")+":</H3>"
-                  +"<CODE>"+disk+"</CODE>");
+        text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
     else
-      text.append("<H3>"+Globals.lang("Value cleared externally")+"</H3>");
+        text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
 
     if ((mem != null) && !mem.equals(""))
-        text.append("<H3>"+Globals.lang("Current value")+":</H3>"
-                    +"<CODE>"+mem+"</CODE>");
+        text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
 
       //tp.setContentType("text/html");
       tp.setText(text.toString());

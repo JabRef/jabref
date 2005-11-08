@@ -118,17 +118,15 @@ public class EntryChange extends Change {
 
       StringBuffer text = new StringBuffer();
       text.append("<FONT SIZE=10>");
-      text.append("<H2>"+Globals.lang("Modification of field")+" <I>"+field+"</I></H2>");
+        text.append("<H2>").append(Globals.lang("Modification of field")).append(" <I>").append(field).append("</I></H2>");
 
       if ((onDisk != null) && !onDisk.equals(""))
-        text.append("<H3>"+Globals.lang("Value set externally")+":</H3>"
-                    +" "+onDisk);
+          text.append("<H3>").append(Globals.lang("Value set externally")).append(":</H3>" + " ").append(onDisk);
       else
-        text.append("<H3>"+Globals.lang("Value cleared externally")+"</H3>");
+          text.append("<H3>").append(Globals.lang("Value cleared externally")).append("</H3>");
 
       if ((inMem != null) && !inMem.equals(""))
-        text.append("<H3>"+Globals.lang("Current value")+":</H3>"
-                    +" "+inMem);
+          text.append("<H3>").append(Globals.lang("Current value")).append(":</H3>" + " ").append(inMem);
       else {
         // No value in memory.
         /*if ((onTmp != null) && !onTmp.equals(inMem))

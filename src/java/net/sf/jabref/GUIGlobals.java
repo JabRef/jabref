@@ -547,9 +547,9 @@ public class GUIGlobals {
     FIELD_WEIGHT.put("owner", SMALL_W);
     FIELD_WEIGHT.put("timestamp", SMALL_W);
     //FIELD_WEIGHT = Collections.unmodifiableMap(FIELD_WEIGHT);
-  };
+  }
 
-  /*
+    /*
     public static int getPreferredFieldLength(String name) {
     int l = DEFAULT_FIELD_LENGTH;
     Object o = fieldLength.get(name.toLowerCase());

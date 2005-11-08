@@ -11,8 +11,9 @@ import net.sf.jabref.*;
 import java.util.*;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
-import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.BasicEventList;
 
 /**
  * @author Morten O. Alver.
@@ -21,7 +22,7 @@ import ca.odell.glazedlists.SortedList;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class OOCalcDatabase {
+public class OpenDocumentRepresentation {
     protected Collection entries;
 
         /*protected final static String TYPE_COL = "BibliographyType";
@@ -37,11 +38,11 @@ public class OOCalcDatabase {
          
         }*/
 
-    public OOCalcDatabase() {
+    public OpenDocumentRepresentation() {
         //entries = new HashSet();
     }
 
-    public OOCalcDatabase(BibtexDatabase bibtex) {
+    public OpenDocumentRepresentation(BibtexDatabase bibtex) {
         this();
         // Make a list of comparators for sorting the entries:
         List comparators = new ArrayList();
@@ -52,7 +53,6 @@ public class OOCalcDatabase {
         BasicEventList entryList = new BasicEventList();
         entryList.addAll(bibtex.getEntries());
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
-        
     }
     public Document getDOMrepresentation() {
         Document result = null;
@@ -61,21 +61,22 @@ public class OOCalcDatabase {
             result = dbuild.newDocument();
             Element collection = result.createElement("office:document-content");
             //collection.setAttribute("xmlns", "http://openoffice.org/2000/office");
-            collection.setAttribute("xmlns:office", "http://openoffice.org/2000/office");
-            collection.setAttribute("xmlns:style", "http://openoffice.org/2000/style");
-            collection.setAttribute("xmlns:text", "http://openoffice.org/2000/text");
-            collection.setAttribute("xmlns:table", "http://openoffice.org/2000/table");
-            collection.setAttribute("xmlns:office:class", "spreadsheet");
-            collection.setAttribute("xmlns:office:version", "1.0");
-            collection.setAttribute("xmlns:fo", "http://www.w3.org/1999/XSL/Format");
-            Element el = result.createElement("office:script");
+            collection.setAttribute("xmlns:office", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
+            collection.setAttribute("xmlns:style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
+            collection.setAttribute("xmlns:text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+            collection.setAttribute("xmlns:table", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
+            collection.setAttribute("xmlns:meta", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0");
+            collection.setAttribute("office:version", "1.0");
+            collection.setAttribute("xmlns:fo", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
+            collection.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+            Element el = result.createElement("office:scripts");
             collection.appendChild(el);
 
             el = result.createElement("office:automatic-styles");
             Element el2 = result.createElement("style:style");
             el2.setAttribute("style:name", "ro1");
             el2.setAttribute("style:family", "table-row");
-            Element el3 = result.createElement("style.properties");
+            Element el3 = result.createElement("style.table-row-properties");
             el3.setAttribute("style:row-height", "0.1681inch");
             el3.setAttribute("fo:break-before", "auto");
             el3.setAttribute("style:use-optimal-row-height", "true");
@@ -92,6 +93,7 @@ public class OOCalcDatabase {
             collection.appendChild(el);
 
             Element body = result.createElement("office:body"),
+                    spreadsheet = result.createElement("office:spreadsheet"),
                     table = result.createElement("table:table");
             table.setAttribute("table:name", "Bibliography");
             table.setAttribute("table.style-name", "ta1");
@@ -168,7 +170,8 @@ public class OOCalcDatabase {
                 table.appendChild(row);
             }
 
-            body.appendChild(table);
+            spreadsheet.appendChild(table);
+            body.appendChild(spreadsheet);
             collection.appendChild(body);
 
             result.appendChild(collection);

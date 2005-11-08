@@ -194,7 +194,7 @@ public class AuthorList {
         while (token_start < orig.length()) {
             Author author = getAuthor();
             if (author != null) authors.add(author);
-        };
+        }
         // clean-up
         orig = null; tokens = null;
     }
@@ -258,18 +258,18 @@ public class AuthorList {
                     tokens.add(orig.substring(token_start, token_end));
                     tokens.add(orig.substring(token_start, token_abbr));
                     tokens.add(new Character(token_term));
-                    tokens.add(new Boolean(token_case));
+                    tokens.add(Boolean.valueOf(token_case));
                     if (comma_first >= 0) break cases;
                     if (last_start >= 0) break cases;
                     if (von_start < 0) {
                         if (!token_case) {
                             von_start = tokens.size()-TOKEN_GROUP_LENGTH; break cases;
-                        };
+                        }
                     } else if (last_start < 0 && token_case) {
                         last_start = tokens.size()-TOKEN_GROUP_LENGTH; break cases;
-                    };
-            };
-        }; // end token_loop
+                    }
+    }
+        }// end token_loop
 
         // Second step: split name into parts (here: calculate indices
         // of parts in 'tokens' Vector)
@@ -291,11 +291,11 @@ public class AuthorList {
                     von_part_end = last_part_start;
                 } else {
                     von_part_end = tokens.size();
-                };
+                }
                 von_part_start = von_start;
                 first_part_end = von_part_start;
                 if (first_part_end>0) first_part_start = 0;
-            };
+            }
         } else {    // commas are present: it affects only 'first part' and 'junior part'
             first_part_end = tokens.size();
             if (comma_second<0) {    // one comma
@@ -304,7 +304,7 @@ public class AuthorList {
                 if (comma_second < first_part_end) first_part_start = comma_second;
                 jr_part_end = comma_second;
                 if (comma_first < jr_part_end) jr_part_start = comma_first;
-            };
+            }
             if (von_start!=0) {     // no 'von part'
                 last_part_end = comma_first;
                 if (last_part_end>0) last_part_start = 0;
@@ -315,10 +315,10 @@ public class AuthorList {
                     last_part_end = comma_first;
                     last_part_start = last_start;
                     von_part_end = last_part_start;
-                };
+                }
                 von_part_start = 0;
-            };
-        };
+            }
+        }
 
         // Third step: do actual splitting, construct Author object
         return new Author(
@@ -356,7 +356,7 @@ public class AuthorList {
             res.append((String) tokens.get(start+offset));
             if (dot_after) res.append('.');
             start += TOKEN_GROUP_LENGTH;
-        };
+        }
         return res.toString();
     }
 
@@ -390,10 +390,10 @@ public class AuthorList {
             char c = orig.charAt(token_start);
             if ( !(c=='~' || c=='-' || Character.isWhitespace(c)) ) break;
             token_start++;
-        };
+        }
         token_end = token_start;
         if (token_start >= orig.length()) return TOKEN_EOF;
-        if (orig.charAt(token_start)==',') { token_end++; return TOKEN_COMMA; };
+        if (orig.charAt(token_start)==',') { token_end++; return TOKEN_COMMA; }
         token_abbr = -1;
         token_term = ' ';
         token_case = true;
@@ -402,12 +402,12 @@ public class AuthorList {
         boolean first_letter_is_found = false;
         while (token_end < orig.length()) {
             char c = orig.charAt(token_end);
-            if (c=='{') { braces_level++; };
+            if (c=='{') { braces_level++; }
             if (braces_level > 0) if (c=='}') braces_level--;
             if (first_letter_is_found && token_abbr<0 && braces_level==0) token_abbr = token_end;
             if (!first_letter_is_found && current_backslash<0 && Character.isLetter(c)) {
                 token_case = Character.isUpperCase(c); first_letter_is_found = true;
-            };
+            }
             if (current_backslash>=0 && !Character.isLetter(c)) {
                 if (!first_letter_is_found) {
                     String tex_cmd_name = orig.substring(current_backslash+1, token_end);
@@ -415,14 +415,14 @@ public class AuthorList {
                         token_case = Character.isUpperCase(tex_cmd_name.charAt(0));
                         first_letter_is_found = true;
                     }
-                };
+                }
                 current_backslash = -1;
-            };
+            }
             if (c=='\\') current_backslash = token_end;
             if (braces_level==0)
                 if (c==',' || c=='~' || c=='-' || Character.isWhitespace(c)) break;
             token_end++;
-        };
+        }
         if (token_abbr<0) token_abbr = token_end;
         if (token_end<orig.length() && orig.charAt(token_end)=='-') token_term='-';
         if (orig.substring(token_start,token_end).equalsIgnoreCase("and"))
@@ -457,7 +457,7 @@ public class AuthorList {
                 res.append(getAuthor(1).getLastOnly());
             } else if (size()>2) {
                 res.append(" et al.");
-            };
+            }
         }
         return res.toString();
     }
@@ -475,20 +475,20 @@ public class AuthorList {
     public String getAuthorsLastOnly() {
         StringBuilder res = new StringBuilder();
         if (size()>0) {
-            res.append(getAuthor(0).getLast());
+            res.append(getAuthor(0).getLastOnly());
             int i = 1;
             while (i < size()-1) {
                 res.append(", ");
-                res.append(getAuthor(i).getLast());
+                res.append(getAuthor(i).getLastOnly());
                 i++;
-            };
+            }
             if (size() > 2) res.append(",");
             if (size() > 1) {
                 res.append(" and ");
-                res.append(getAuthor(i).getLast());
+                res.append(getAuthor(i).getLastOnly());
             }
-        };
-        return res.toString();
+        }
+            return res.toString();
     }
     /**
      * Returns the list of authors separated by commas with first names after last name;
@@ -515,13 +515,13 @@ public class AuthorList {
                 res.append(", ");
                 res.append(getAuthor(i).getLastFirst(abbr));
                 i++;
-            };
+            }
             if (size() > 2) res.append(",");
             if (size() > 1) {
                 res.append(" and ");
                 res.append(getAuthor(i).getLastFirst(abbr));
             }
-        };
+        }
         return res.toString();
     }
     /**
@@ -541,8 +541,8 @@ public class AuthorList {
             for (int i=1; i<size(); i++) {
                 res.append(" and ");
                 res.append(getAuthor(i).getLastFirst(false));
-            };
-        };
+            }
+        }
         return res.toString();
     }
     /**
@@ -570,13 +570,13 @@ public class AuthorList {
                 res.append(", ");
                 res.append(getAuthor(i).getFirstLast(abbr));
                 i++;
-            };
+            }
             if (size() > 2) res.append(",");
             if (size() > 1) {
                 res.append(" and ");
                 res.append(getAuthor(i).getFirstLast(abbr));
-            };
-        };
+            }
+        }
         return res.toString();
     }
     /**
@@ -596,8 +596,8 @@ public class AuthorList {
             for (int i=1; i<size(); i++) {
                 res.append(" and ");
                 res.append(getAuthor(i).getFirstLast(false));
-            };
-        };
+            }
+        }
         return res.toString();
     }
 
@@ -620,8 +620,8 @@ public class AuthorList {
             for (int i=1; i<size(); i++) {
                 res.append(" and ");
                 res.append(getAuthor(i).getNameForAlphabetization());
-            };
-        };
+            }
+        }
         return res.toString();
     }
 
@@ -741,7 +741,7 @@ public class AuthorList {
                 res = (first_abbr==null ? "" : first_abbr + " ") + res;
             } else {
                 res = (first_part==null ? "" : first_part + " ") + res;
-            };
+            }
             if (jr_part != null) res += ", " + jr_part;
             return res;
         }

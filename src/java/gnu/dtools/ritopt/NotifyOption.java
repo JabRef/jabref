@@ -151,7 +151,7 @@ public class NotifyOption extends Option implements OptionNotifier {
 
     public NotifyOption( NotifyOption op ) {
 	super( op );
-	op.value = new String( op.getValue() );
+	op.value = op.getValue();
 	listeners = new java.util.ArrayList( op.listeners );
     }
 

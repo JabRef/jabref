@@ -59,7 +59,7 @@ public class AuthorAbbreviator implements LayoutFormatter {
 
 			for(i=0; i<authors.length-1; i++)
 			{
-				sb.append(authors_abrv[i] + " and ");	
+                sb.append(authors_abrv[i]).append(" and ");
 			}
 			sb.append(authors_abrv[i]);
 
@@ -94,20 +94,20 @@ public class AuthorAbbreviator implements LayoutFormatter {
 		if (author.length > 1) {
 		    for (int i=0; i<author.length-1; i++) if (author[i].length() > 0) {
 			c = author[i].charAt(0);
-			sb.append(c + ".");
+                sb.append(c).append(".");
 		    }
 		}
-		sb.append(" "+author[author.length-1]);
+            sb.append(" ").append(author[author.length - 1]);
 	    }
 	    else {               
 		//Gets the name:
-		sb.append(author[0] + ", ");
+            sb.append(author[0]).append(", ");
 		int index = author[1].indexOf(" ");
 		if(index==-1) {
 		    //Its a simple name like van Something, Someone or  Something, Someone:
 		    c  = author[1].charAt(0);
 		    //			System.out.println("Char c: " + c + " Name: " + author[1]);
-		    sb.append(c + ".");
+            sb.append(c).append(".");
 		}
 		else {
 		    //Its a "complex" name like van Something, Someone Something
@@ -120,7 +120,7 @@ public class AuthorAbbreviator implements LayoutFormatter {
                 if (nameParts[i].length() > 0) {
 			        c = nameParts[i].charAt(0);
 			//			System.out.println("Char c: " + c + " Name: " + nameParts[i]);
-			        sb.append(c + ".");
+                    sb.append(c).append(".");
 		        }
 		}
 	    }

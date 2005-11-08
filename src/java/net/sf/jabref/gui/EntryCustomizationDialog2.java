@@ -234,10 +234,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected void typeDeletion(String name) {
         BibtexEntryType type = BibtexEntryType.getType(name);
 
-        if (!(type instanceof CustomEntryType));
-            //messageLabel.setText("'"+type.getName()+"' "+
-            //        Globals.lang("is a standard type."));
-        else {
+        if (type instanceof CustomEntryType) {
             if (BibtexEntryType.getStandardType(name) == null) {
                 int reply = JOptionPane.showConfirmDialog
                         (frame, Globals.lang("All entries of this "
@@ -255,6 +252,9 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             reqLists.remove(name);
             optLists.remove(name);
         }
+        //messageLabel.setText("'"+type.getName()+"' "+
+        //        Globals.lang("is a standard type."));
+
     }
 
 

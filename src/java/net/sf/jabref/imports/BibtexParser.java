@@ -226,7 +226,7 @@ public class BibtexParser
 			if (comment.substring(0, Math.min(comment.length(), GUIGlobals.ENTRYTYPE_FLAG.length()))
 			    .equals(GUIGlobals.ENTRYTYPE_FLAG)) {
 			    
-			    CustomEntryType typ = CustomEntryType.parseEntryType(comment.toString());
+			    CustomEntryType typ = CustomEntryType.parseEntryType(comment);
 			    entryTypes.put(typ.getName().toLowerCase(), typ);
 
 			}
@@ -481,7 +481,7 @@ public class BibtexParser
 		    throw new IOException("Error in line "+line+" or above: "+
 					  "Empty text token.\nThis could be caused "+
 					  "by a missing comma between two fields.");
-		value.append("#"+textToken+"#");
+            value.append("#").append(textToken).append("#");
 		//Util.pr(parseTextToken());
 		//throw new RuntimeException("Unknown field type");
 	    }

@@ -35,7 +35,6 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.*;
 import net.sf.jabref.collab.*;
@@ -710,7 +709,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 first = false;
                               }
                               else {
-                                toSend.append("," + citeKey);
+                                  toSend.append(",").append(citeKey);
                                 //message += ", ";
                               }
                               //message += (1 + rows[i]);
@@ -963,18 +962,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     return;
                   fileToOpen = new File(chosenFile);
 
-                  // Run the actual open in a thread to prevent the program
-                  // locking until the file is loaded.
-                  if (fileToOpen != null) {
+                    // Run the actual open in a thread to prevent the program
+                    // locking until the file is loaded.
                     (new Thread() {
-                      public void run() {
-                        openIt(md.importEntries(), md.importStrings(),
-                               md.importGroups(), md.importSelectorWords());
-                      }
+                        public void run() {
+                            openIt(md.importEntries(), md.importStrings(),
+                                    md.importGroups(), md.importSelectorWords());
+                        }
                     }).start();
                     frame.getFileHistory().newFile(fileToOpen.getPath());
-                  }
                 }
+
               }
 
               void openIt(boolean importEntries, boolean importStrings,
@@ -1883,11 +1881,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         splitPane.revalidate();
         revalidate();
         repaint();
-    }
-
-
-    public void setDivider() {
-        //contentPane.setDividerLocation(-1);
     }
 
 

@@ -60,7 +60,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 
 			for(i=0; i<authors.length-1; i++)
 			{
-				sb.append(authors_abrv[i] + " and ");	
+                sb.append(authors_abrv[i]).append(" and ");
 			}
 			sb.append(authors_abrv[i]);
 
@@ -125,7 +125,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 			//Its a simple name like van Something, Someone or  Something, Someone:
 			c  = author[1].charAt(0);
 //			System.out.println("Char c: " + c + " Name: " + author[1]);
-			sb.append(c + ".");
+            sb.append(c).append(".");
 		}
 		else {
 			//Its a "complex" name like van Something, Someone Something
@@ -137,7 +137,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 			{
 				c = nameParts[i].charAt(0);
 	//			System.out.println("Char c: " + c + " Name: " + nameParts[i]);
-				sb.append(c + ".");								
+                sb.append(c).append(".");
 			}
 		}
 		

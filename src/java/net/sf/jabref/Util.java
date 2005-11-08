@@ -997,7 +997,7 @@ public class Util {
                 new StringBuffer("This action will modify the following field(s)\n" +
                         "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i)
-            message.append(affectedFields.elementAt(i) + "\n");
+            message.append(affectedFields.elementAt(i)).append("\n");
         message.append("This could cause undesired changes to "
                 + "your entries, so it is\nrecommended that you change the grouping field "
                 + "in your group\ndefinition to \"keywords\" or a non-standard name."

@@ -445,7 +445,7 @@ public class JabRef {
                                 String fname = (lfFile.getName().split("\\."))[0];
                                 FileActions.exportDatabase(pr.getDatabase(),
                                     lfFile.getParent() + File.separator, fname,
-                                    new File(data[0]));
+                                    new File(data[0]), pr.getEncoding());
                                 System.out.println(Globals.lang("Exporting") + ": "
                                     + data[0]);
                             } catch (Exception ex) {
@@ -464,7 +464,7 @@ public class JabRef {
                         try {
                             System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                             FileActions.exportDatabase(pr.getDatabase(), data[1],
-                                new File(data[0]));
+                                new File(data[0]), pr.getEncoding());
                         } catch (NullPointerException ex2) {
                             System.err.println(Globals.lang("Unknown export format")
                                 + ": " + data[1]);
@@ -731,7 +731,7 @@ lastEdLoop:
                     String[] wrns = pr.warnings();
                     StringBuffer wrn = new StringBuffer();
                     for (int j = 0; j<wrns.length; j++)
-                        wrn.append((j + 1) + ". " + wrns[j] + "\n");
+                        wrn.append(j + 1).append(". ").append(wrns[j]).append("\n");
                     if (wrn.length() > 0)
                         wrn.deleteCharAt(wrn.length() - 1);
                     jrf.showBaseAt(i);

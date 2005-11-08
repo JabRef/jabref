@@ -327,8 +327,8 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                 : Globals.lang(
                         "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
                         field, expr));
-        sb.append(" (" + (caseSensitive ? Globals.lang("case sensitive") 
-                : Globals.lang("case insensitive")) + "). ");
+        sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
+                : Globals.lang("case insensitive")).append("). ");
         sb.append(regExp ? Globals.lang(
                 "Entries cannot be manually assigned to or removed from this group.")
                 : Globals.lang(
@@ -349,12 +349,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<b>");
 		if (Globals.prefs.getBoolean("groupShowDynamic"))
-			sb.append("<i>" + getName() + "</i>");
+            sb.append("<i>").append(getName()).append("</i>");
 		else
 			sb.append(getName());
-		sb.append("</b> - dynamic group (<b>"
-				+ m_searchField + "</b> contains <b>" 
-				+ m_searchExpression + "</b>)");		
+        sb.append("</b> - dynamic group (<b>").append(m_searchField).append("</b> contains <b>").append(m_searchExpression).append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
 			sb.append(", includes subgroups");

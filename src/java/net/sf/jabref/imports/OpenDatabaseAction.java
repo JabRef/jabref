@@ -95,7 +95,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         public void run() {
                             StringBuffer wrn = new StringBuffer();
                             for (int i = 0; i < wrns.length; i++)
-                                wrn.append((i + 1) + ". " + wrns[i] + "\n");
+                                wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
 
                             if (wrn.length() > 0)
                                 wrn.deleteCharAt(wrn.length() - 1);
@@ -135,7 +135,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     Object[] types = pr.getEntryTypes().keySet().toArray();
                     Arrays.sort(types);
                     for (int i = 0; i < types.length; i++) {
-                        sb.append(types[i].toString() + ", ");
+                        sb.append(types[i].toString()).append(", ");
                     }
                     String s = sb.toString();
                     int answer = JOptionPane.showConfirmDialog(frame,

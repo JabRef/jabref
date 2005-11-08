@@ -8,7 +8,6 @@ import java.io.File;
 
 public class FileHistory extends JMenu implements ActionListener {
 
-    int bound = 5; //or user defined
     JabRefPreferences prefs;
     LinkedList history = new LinkedList();
     JabRefFrame frame;

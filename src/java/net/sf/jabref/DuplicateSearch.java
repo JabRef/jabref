@@ -41,7 +41,7 @@ public class DuplicateSearch extends Thread {
 
   BasePanel panel;
   BibtexEntry[] bes;
-  Vector duplicates = new Vector();
+  final Vector duplicates = new Vector();
 
   public DuplicateSearch(BasePanel bp) {
     panel = bp;

@@ -153,10 +153,9 @@ public class MetaData {
             StringBuffer sb = new StringBuffer();
             Vector orderedData = (Vector) metaData.get(key);
             if (orderedData.size() > 0) {
-                sb.append("@comment{" + GUIGlobals.META_FLAG + key + ":");
+                sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
                 for (int j = 0; j < orderedData.size(); j++) {
-                    sb.append(Util.quote((String)orderedData.elementAt(j),";",'\\') 
-                            + ";");
+                    sb.append(Util.quote((String) orderedData.elementAt(j), ";", '\\')).append(";");
                 }
                 sb.append("}");
                 sb.append(Globals.NEWLINE);
@@ -170,7 +169,7 @@ public class MetaData {
         if (groupsRoot != null && groupsRoot.getChildCount() > 0) {
             StringBuffer sb = new StringBuffer();
             // write version first
-            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupsversion:");
+            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupsversion:");
             sb.append(""+VersionHandling.CURRENT_VERSION+";");
             sb.append("}");
             sb.append(Globals.NEWLINE);
@@ -179,7 +178,7 @@ public class MetaData {
             
             // now write actual groups
             sb = new StringBuffer();
-            sb.append("@comment{" + GUIGlobals.META_FLAG + "groupstree:");
+            sb.append("@comment{").append(GUIGlobals.META_FLAG).append("groupstree:");
             sb.append(Globals.NEWLINE);
             // GroupsTreeNode.toString() uses "\n" for separation
             StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(),Globals.NEWLINE);

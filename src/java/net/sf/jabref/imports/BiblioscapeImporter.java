@@ -227,7 +227,7 @@ public class BiblioscapeImporter implements ImportFormat {
           if (comments.size() > 0){ // set comment if present
             StringBuffer s = new StringBuffer();
             for (int i = 0; i < comments.size(); ++i)
-              s.append((i > 0 ? "; " : "") + comments.elementAt(i).toString());
+                s.append(i > 0 ? "; " : "").append(comments.elementAt(i).toString());
             hm.put("comment", s.toString());
           }
           BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,

@@ -465,12 +465,12 @@ inputState.guessing--;
 	
 	protected void buildTokenTypeASTClassMap() {
 		tokenTypeToASTClassMap=null;
-	};
-	
-	private static final long[] mk_tokenSet_0() {
-		long[] data = { 328768L, 0L};
-		return data;
 	}
+
+     private static final long[] mk_tokenSet_0() {
+         long[] data = { 328768L, 0L};
+         return data;
+     }
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
 		long[] data = { 357824L, 0L};

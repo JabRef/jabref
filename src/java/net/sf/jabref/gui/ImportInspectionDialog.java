@@ -63,6 +63,7 @@ public class ImportInspectionDialog extends JDialog {
     private PreviewPanel preview = new PreviewPanel(Globals.prefs.get("preview1"));
     private ListSelectionListener previewListener = null;
     private boolean generatedKeys = false; // Set to true after keys have been generated.
+    private boolean defaultSelected = true;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private Map groupAdditions = new HashMap();
     private Icon pdfIcon = new ImageIcon(GUIGlobals.pdfIcon);
@@ -74,7 +75,16 @@ public class ImportInspectionDialog extends JDialog {
         PS_COL = 3,
         URL_COL = 4,
         PAD = 5;
-    
+
+
+    /**
+     * The "defaultSelected" boolean value determines if new entries added are selected for import or not.
+     * This value is true by default.
+     * @param defaultSelected The desired value.
+     */
+    public void setDefaultSelected(boolean defaultSelected) {
+        this.defaultSelected = defaultSelected;
+    }
 
     /**
      * Creates a dialog that displays the given list of fields in the table.
@@ -208,7 +218,7 @@ public class ImportInspectionDialog extends JDialog {
                 BibtexEntry entry = (BibtexEntry) i.next();
                 this.entries.add(entry);
                 Object[] values = new Object[tableModel.getColumnCount()];
-                values[0] = Boolean.TRUE;
+                values[0] = Boolean.valueOf(defaultSelected);
                 // Add an icon for it if this entry is a duplicate of an existing entry:
                 if ((panel != null) && (Util.containsDuplicate(panel.database(), entry) != null)) {
                     JLabel lab = new JLabel(new ImageIcon(GUIGlobals.duplicateIcon));
@@ -662,7 +672,7 @@ public class ImportInspectionDialog extends JDialog {
         private Boolean enable;
 
         public SelectionButton(boolean enable) {
-            this.enable = new Boolean(enable);
+            this.enable = Boolean.valueOf(enable);
         }
 
         public void actionPerformed(ActionEvent event) {

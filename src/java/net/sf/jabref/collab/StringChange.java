@@ -26,19 +26,19 @@ public class StringChange extends Change {
     sb.append("<HTML><H2>");
     sb.append(Globals.lang("Modified string"));
     sb.append("</H2><H3>");
-    sb.append(Globals.lang("Label")+":</H3>");
+      sb.append(Globals.lang("Label")).append(":</H3>");
     sb.append(label);
     sb.append("<H3>");
-    sb.append(Globals.lang("New content")+":</H3>");
+      sb.append(Globals.lang("New content")).append(":</H3>");
     sb.append(disk);
     if (string != null) {
       sb.append("<H3>");
-      sb.append(Globals.lang("Current content") + ":</H3>");
+        sb.append(Globals.lang("Current content")).append(":</H3>");
       sb.append(string.getContent());
     } else {
       sb.append("<P><I>");
-      sb.append(Globals.lang("Cannot merge this change")+": ");
-      sb.append(Globals.lang("The string has been removed locally")+"</I>");
+        sb.append(Globals.lang("Cannot merge this change")).append(": ");
+        sb.append(Globals.lang("The string has been removed locally")).append("</I>");
     }
     sb.append("</HTML>");
     tp.setText(sb.toString());

@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
@@ -18,9 +18,15 @@ public class FieldComparator implements Comparator {
 
         private String field;
         private boolean isNameField, isTypeHeader;
+        private int multiplier;
 
     public FieldComparator(String field) {
+        this(field, false);
+    }
+
+    public FieldComparator(String field, boolean reversed) {
         this.field = field;
+        multiplier = reversed ? -1 : 1;
         isNameField = (field.equals("author") || field.equals("editor"));
         isTypeHeader = field.equals(GUIGlobals.TYPE_HEADER);
     }
@@ -48,8 +54,8 @@ public class FieldComparator implements Comparator {
         }
 
 	    if ((f1 == null) && (f2 == null)) return 0;
-	    if ((f1 != null) && (f2 == null)) return -1;
-	    if ((f1 == null) && (f2 != null)) return 1;
+	    if ((f1 != null) && (f2 == null)) return -1*multiplier;
+	    if (f1 == null) return multiplier;
 
 	    int result = 0;
 
@@ -68,7 +74,7 @@ public class FieldComparator implements Comparator {
     		
     	}
 
-        return result;
+        return result*multiplier;
     }
 
 }

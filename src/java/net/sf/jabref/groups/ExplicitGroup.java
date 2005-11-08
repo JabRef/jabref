@@ -183,8 +183,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(ID + Util.quote(m_name, SEPARATOR, QUOTE_CHAR) + SEPARATOR
-                + m_context + SEPARATOR);
+        sb.append(ID).append(Util.quote(m_name, SEPARATOR, QUOTE_CHAR)).append(SEPARATOR).append(m_context).append(SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set sortedKeys = new TreeSet();
@@ -194,8 +193,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
                 sortedKeys.add(s);
         }
         for (Iterator it = sortedKeys.iterator(); it.hasNext();) {
-            sb.append(Util.quote((String) it.next(), SEPARATOR, QUOTE_CHAR)
-                    + SEPARATOR);
+            sb.append(Util.quote((String) it.next(), SEPARATOR, QUOTE_CHAR)).append(SEPARATOR);
         }
         return sb.toString();
     }
@@ -226,7 +224,7 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
 
     public String getShortDescription() {
         StringBuffer sb = new StringBuffer();
-        sb.append("<b>" + getName() + "</b> - static group");
+        sb.append("<b>").append(getName()).append("</b> - static group");
         switch (getHierarchicalContext()) {
         case AbstractGroup.INCLUDING:
             sb.append(", includes subgroups");

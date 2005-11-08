@@ -130,7 +130,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                         panel.output(Globals.lang("Completed Import Fields from CiteSeer."));
                     } */
 
-                };
+                }
 
                 public void run() {
 

@@ -125,7 +125,7 @@ public class MODSEntry {
 		if (bibtex.getField("month") != null)
 			result += "-" + bibtex.getField("month").toString();
 		
-		return result.toString();
+		return result;
 	}
 	// must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
 	protected String getMODSgenre(BibtexEntry bibtex) {

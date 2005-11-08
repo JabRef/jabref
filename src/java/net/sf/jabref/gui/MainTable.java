@@ -3,8 +3,6 @@ package net.sf.jabref.gui;
 import net.sf.jabref.*;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableColumnModel;
@@ -12,7 +10,6 @@ import javax.swing.table.TableColumnModel;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 

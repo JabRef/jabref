@@ -65,7 +65,7 @@ public class BiomailImporter implements ImportFormat {
 
             // begining of a new item
             if (str.substring(0, 6).equals("PMID- "))
-                sb.append("::" + str);
+                sb.append("::").append(str);
             else {
                 String beg = str.substring(0, 6);
 

@@ -274,42 +274,42 @@ class KeyBindingsDialog
     public KeystrokeTable(KeystrokeTableModel model) { super(model); }
      public boolean isCellEditable(int row, int col) { return false; }
      public String getOriginalName(int row) { return ((KeystrokeTableModel)getModel()).data[row][2]; }
-   };
+   }
 
-  class KeystrokeTableModel extends AbstractTableModel {
-    String[][] data;
-    //String[] trData;
-    public KeystrokeTableModel(TreeMap sorted) {
-      data = new String[sorted.size()][3];
-      Iterator i = sorted.keySet().iterator();
-      int row = 0;
-      while (i.hasNext()) {
-        data[row++] = ((String[])sorted.get(i.next()));
+    class KeystrokeTableModel extends AbstractTableModel {
+      String[][] data;
+      //String[] trData;
+      public KeystrokeTableModel(TreeMap sorted) {
+        data = new String[sorted.size()][3];
+        Iterator i = sorted.keySet().iterator();
+        int row = 0;
+        while (i.hasNext()) {
+          data[row++] = ((String[])sorted.get(i.next()));
+        }
+        //for (int i=0; i<trData.length; i++)
+        //  trData[i] = Globals.lang(data[i][0]);
       }
-      //for (int i=0; i<trData.length; i++)
-      //  trData[i] = Globals.lang(data[i][0]);
-    }
-    public boolean isCellEditable(int row, int col) { return false; }
-    public String getColumnName(int col) {
-      return (col==0 ? Globals.lang("Action") : Globals.lang("Shortcut"));
-    }
-    public int getColumnCount() {
-      return 2;
-    }
+      public boolean isCellEditable(int row, int col) { return false; }
+      public String getColumnName(int col) {
+        return (col==0 ? Globals.lang("Action") : Globals.lang("Shortcut"));
+      }
+      public int getColumnCount() {
+        return 2;
+      }
 
-    public int getRowCount() {
-      return data.length;
+      public int getRowCount() {
+        return data.length;
+      }
+      public Object getValueAt(int rowIndex, int columnIndex) {
+        //if (columnIndex == 0)
+        return data[rowIndex][columnIndex];
+        //else
+        //return data[rowIndex][0];
+      }
+      public void setValueAt(Object o, int row, int col) {
+        data[row][col] = (String)o;
+      }
     }
-    public Object getValueAt(int rowIndex, int columnIndex) {
-      //if (columnIndex == 0)
-      return data[rowIndex][columnIndex];
-      //else
-      //return data[rowIndex][0];
-    }
-    public void setValueAt(Object o, int row, int col) {
-      data[row][col] = (String)o;
-    }
-  }
 
   // listners
   void setButtons() {

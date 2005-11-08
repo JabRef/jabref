@@ -154,7 +154,7 @@ public class PreambleEditor extends JDialog {
 		    set = true;
 	    } else {
 		if ((base.getPreamble() != null)
-		    && toSet.equals(base.getPreamble().toString()))
+		    && toSet.equals(base.getPreamble()))
 		    set = false;
 		    else
 		    set = true;

@@ -23,10 +23,10 @@ public class StringRemoveChange extends Change {
     sb.append("<HTML><H2>");
     sb.append(Globals.lang("Removed string"));
     sb.append("</H2><H3>");
-    sb.append(Globals.lang("Label")+":</H3>");
+      sb.append(Globals.lang("Label")).append(":</H3>");
     sb.append(string.getName());
     sb.append("<H3>");
-    sb.append(Globals.lang("Content")+":</H3>");
+      sb.append(Globals.lang("Content")).append(":</H3>");
     sb.append(string.getContent());
     sb.append("</HTML>");
     tp.setText(sb.toString());

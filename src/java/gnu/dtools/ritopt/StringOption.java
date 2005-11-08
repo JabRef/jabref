@@ -55,7 +55,7 @@ public class StringOption extends Option {
 
     public StringOption( StringOption op ) {
 	super( op );
-	op.value = new String( op.getValue() );
+	op.value = op.getValue();
     }
 
     /**

@@ -266,16 +266,16 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
                     : Globals.lang(
                             "This group contains entries in which any field contains the term <b>%0</b>",
                             expr));
-			sb.append(" (" + (caseSensitive ? Globals.lang("case sensitive") 
-                    : Globals.lang("case insensitive")) + "). ");
+            sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
+                    : Globals.lang("case insensitive")).append("). ");
 			sb.append(Globals.lang(
                     "Entries cannot be manually assigned to or removed from this group."));
-			sb.append("<p><br>" + Globals.lang(
+            sb.append("<p><br>").append(Globals.lang(
                     "Hint%c To search specific fields only, enter for example%c<p><tt>author%esmith and title%eelectrical</tt>"));
 			return sb.toString();
 		}
 		// describe advanced search expression
-		sb.append(Globals.lang("This group contains entries in which") + " ");
+        sb.append(Globals.lang("This group contains entries in which")).append(" ");
 		sb.append(describeNode(ast, regExp, false, false, false));
 		sb.append(". ");
 		sb.append(caseSensitive ? Globals.lang("The search is case sensitive.")
@@ -289,34 +289,26 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		switch (node.getType()) {
 		case SearchExpressionTreeParserTokenTypes.And:
 			if (not)
-				sb.append(Globals.lang("not") + " ");
+                sb.append(Globals.lang("not")).append(" ");
 			// if there was an "or" in this subtree so far, braces may be needed
 			if (or || not)
 				sb.append("(");
-			sb.append(describeNode(node.getFirstChild(), regExp,
-					false, true, false)
-					+ " "
-					+ Globals.lang("and")
-					+ " "
-					+ describeNode(node.getFirstChild()
-							.getNextSibling(), regExp, false, true, false));
+            sb.append(describeNode(node.getFirstChild(), regExp,
+                    false, true, false)).append(" ").append(Globals.lang("and")).append(" ").append(describeNode(node.getFirstChild()
+                    .getNextSibling(), regExp, false, true, false));
 			if (or || not)
 				sb.append(")");
 			return sb.toString();
 		case SearchExpressionTreeParserTokenTypes.Or:
 			if (not)
-				sb.append(Globals.lang("not") + " ");
+                sb.append(Globals.lang("not")).append(" ");
 			// if there was an "and" in this subtree so far, braces may be
 			// needed
 			if (and || not)
 				sb.append("(");
-			sb.append(describeNode(node.getFirstChild(), regExp,
-					false, false, true)
-					+ " "
-					+ Globals.lang("or")
-					+ " "
-					+ describeNode(node.getFirstChild()
-							.getNextSibling(), regExp, false, false, true));
+            sb.append(describeNode(node.getFirstChild(), regExp,
+                    false, false, true)).append(" ").append(Globals.lang("or")).append(" ").append(describeNode(node.getFirstChild()
+                    .getNextSibling(), regExp, false, false, true));
 			if (and || not)
 				sb.append(")");
 			return sb.toString();
@@ -385,12 +377,10 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<b>");
 		if (Globals.prefs.getBoolean("groupShowDynamic"))
-			sb.append("<i>" + getName() + "</i>");
+            sb.append("<i>").append(getName()).append("</i>");
 		else
 			sb.append(getName());
-		sb.append("</b> - dynamic group ("
-				+ "search expression: <b>" 
-				+ m_searchExpression + "</b>)");		
+        sb.append("</b> - dynamic group (" + "search expression: <b>").append(m_searchExpression).append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
 			sb.append(", includes subgroups");

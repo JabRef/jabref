@@ -85,6 +85,7 @@ public class ImportFormatReader {
     formats.put("jstor", new JstorImporter());
     formats.put("silverplatter", new SilverPlatterImporter());
     formats.put("biomail", new BiomailImporter());
+      formats.put("repecnep", new RepecNepImporter());
       
   }
 

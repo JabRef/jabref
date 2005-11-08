@@ -306,7 +306,7 @@ public class Utility {
      */
 
     public static String stripComments( String s, char delim, char comment ) {
-	String retval = new String( s );
+	String retval = s;
 	boolean q = false;
 	for ( int n = 0; n < s.length(); n++ ) {
 	    if ( s.charAt( n ) == delim ) {

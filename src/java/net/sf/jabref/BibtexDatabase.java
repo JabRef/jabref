@@ -496,8 +496,7 @@ public class BibtexDatabase
                                 allKeys.remove( key);
                         else
                                 allKeys.put( key, new Integer( ((Integer)tI).intValue() - 1));//decrementInteger( tI ));
-                }else // ignore, as there is no such key
-                        ;
+                }
     }
 
 

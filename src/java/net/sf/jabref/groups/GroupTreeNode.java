@@ -87,8 +87,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 		GroupTreeNode cursor;
 		while (e.hasMoreElements()) {
 			cursor = (GroupTreeNode) e.nextElement();
-			sb.append(cursor.getLevel() + " " + cursor.getGroup().toString()
-					+ "\n");
+            sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup().toString()).append("\n");
 		}
 		return sb.toString();
 	}
