@@ -10,20 +10,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
+import net.sf.jabref.AuthorList;
 
 /**
- * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm Several
- * Biblioscape field types are ignored. Others are only included in the BibTeX
- * field "comment".
+ * Imports an Ovid file.
  */
 public class OvidImporter implements ImportFormat {
 
     public static Pattern ovid_src_pat = Pattern
-    .compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
     public static Pattern ovid_src_pat_no_issue = Pattern
-    .compile("Source ([ \\w&\\-]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+    .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
+
+    public static Pattern ovid_src_pat_2 = Pattern.compile(
+            "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)");
+
+    public static Pattern incollection_pat = Pattern.compile(
+            "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.  \\(pp. ([0-9]+\\-?[0-9]+?)\\)(.*)");
+    public static Pattern book_pat = Pattern.compile(
+                "\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.(.*)");
 
     //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
     // \\w&\\-]+)");
@@ -73,13 +80,13 @@ public class OvidImporter implements ImportFormat {
             if (fieldName.indexOf("Author") == 0
                 && fieldName.indexOf("Author Keywords") == -1
                 && fieldName.indexOf("Author e-mail") == -1){
-                String author;
-                String[] names;
-                if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
-                    names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").split(";");
+
+                h.put("author", content);
+                /*if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
+                    names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
                 }else{// LN FN. [LN FN.]*
                     //author = content.replaceAll("\\.", " and").replaceAll(" and$", "");
-                    names = content.split("  ");
+                    names = content;
                 }
 
                 StringBuffer buf = new StringBuffer();
@@ -93,10 +100,12 @@ public class OvidImporter implements ImportFormat {
                     } else {
                         buf.append(names[ii]);
                     }
+
+                    buf.append()
                     if (ii < names.length-1)
                         buf.append(" and ");
                 }
-                h.put("author", buf.toString());
+                h.put("author", AuthorList.fixAuthor_lastNameFirst(names));  */
 
                 //    author = content.replaceAll("  ", " and ").replaceAll(" and $", "");
 
@@ -105,37 +114,90 @@ public class OvidImporter implements ImportFormat {
 
         }else if (fieldName.indexOf("Title") == 0) h.put("title",
                        content.replaceAll("\\[.+\\]", ""));
+        else if (fieldName.indexOf("Chapter Title") == 0) h.put("chaptertitle", content);
+
+        // The "Source" field is a complete mess - it can have several different formats,
+        // but since it can contain journal name, book title, year, month, volume etc. we
+        // must try to parse it. We use different regular expressions to check different
+        // possible formattings.
         else if (fieldName.indexOf("Source") == 0){
-            //System.out.println(fields[j]);
-            String s = content;
-            Matcher matcher = ovid_src_pat.matcher(s);
-            boolean matchfound = matcher.find();
-            if (matchfound){
+                Matcher matcher;
+            if ((matcher = ovid_src_pat.matcher(content)).find()) {
             h.put("journal", matcher.group(1));
             h.put("volume", matcher.group(2));
             h.put("issue", matcher.group(3));
             h.put("pages", matcher.group(4));
             h.put("year", matcher.group(5));
-            }else{// may be missing the issue
-            matcher = ovid_src_pat_no_issue.matcher(s);
-            matchfound = matcher.find();
-            if (matchfound){
+            } else if ((matcher = ovid_src_pat_no_issue.matcher(content)).find()) {// may be missing the issue
                 h.put("journal", matcher.group(1));
                 h.put("volume", matcher.group(2));
                 h.put("pages", matcher.group(3));
                 h.put("year", matcher.group(4));
+            } else if ((matcher = ovid_src_pat_2.matcher(content)).find()) {
+
+                h.put("journal", matcher.group(1));
+                h.put("volume", matcher.group(2));
+                h.put("issue", matcher.group(3));
+                h.put("month", matcher.group(4));
+                h.put("year", matcher.group(5));
+                h.put("pages", matcher.group(6));
+
+            } else if ((matcher = incollection_pat.matcher(content)).find()) {
+                h.put("editor", matcher.group(1).replaceAll(" \\(Ed\\)", ""));
+                h.put("year", matcher.group(2));
+                h.put("booktitle", matcher.group(3));
+                h.put("pages", matcher.group(4));
+            } else if ((matcher = book_pat.matcher(content)).find()) {
+                h.put("year", matcher.group(1));
+                //h.put("booktitle", matcher.group(3));
             }
+            // Add double hyphens to page ranges:
+            if (h.get("pages") != null) {
+                h.put("pages", ((String)h.get("pages")).replaceAll("-", "--"));
             }
 
-        }else
-            if (fieldName.equals("Abstract")) {
-                System.out.println("'"+content+"'");
+        } else if (fieldName.equals("Abstract")) {
+                //System.out.println("'"+content+"'");
                 h.put("abstract", content);
+
+        } else if (fieldName.equals("Publication Type")) {
+             if (content.indexOf("Book") >= 0)
+                h.put("entrytype", "book");
+             else if (content.indexOf("Journal") >= 0)
+                h.put("entrytype", "article");
+        }
+        }
+
+        // Now we need to check if a book entry has given editors in the author field;
+        // if so, rearrange:
+        String auth = (String)h.get("author");
+        if ((auth != null) && (auth.indexOf(" [Ed]") >= 0)) {
+            h.remove("author");
+            h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
+        }
+
+        // Rearrange names properly:
+        auth = (String)h.get("author");
+        if (auth != null)
+            h.put("author", fixNames(auth));
+        auth = (String)h.get("editor");
+        if (auth != null)
+            h.put("editor", fixNames(auth));
+
+
+
+        // Set the entrytype properly:
+        String entryType = h.containsKey("entrytype") ? (String)h.get("entrytype") : "other";
+        h.remove("entrytype");
+        if (entryType.equals("book")) {
+            if (h.containsKey("chaptertitle")) {
+                // This means we have an "incollection" entry.
+                entryType = "incollection";
+                // Move the "chaptertitle" to just "title":
+                h.put("title", h.remove("chaptertitle"));
             }
         }
-        BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
-                        .getEntryType("article")); // id assumes an existing database so
-        // don't create one here
+        BibtexEntry b = new BibtexEntry(Util.createNeutralId(), Globals.getEntryType(entryType));
         b.setField(h);
 
         bibitems.add(b);
@@ -144,6 +206,16 @@ public class OvidImporter implements ImportFormat {
 
     return bibitems;
     }
+
+    private String fixNames(String content) {
+        String names;
+        if (content.indexOf(";") > 0){ //LN FN; [LN FN;]*
+            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
+        } else
+            names = content;
+        return AuthorList.fixAuthor_lastNameFirst(names);
+    }
+
 }
 
 
