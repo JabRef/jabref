@@ -60,7 +60,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
-    public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2;
+    public final static int SHOWING_NOTHING=0, SHOWING_PREVIEW=1, SHOWING_EDITOR=2, WILL_SHOW_EDITOR=3;
     private int mode=0;
     private EntryEditor currentEditor = null;
     private PreviewPanel currentPreview = null;
@@ -165,14 +165,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       setupActions();
       setupMainPanel();
         encoding = Globals.prefs.get("defaultEncoding");
-        System.out.println("Default: "+encoding);
+        //System.out.println("Default: "+encoding);
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
                      HashMap meta, String encoding) {
 
         this.encoding = encoding;
-        System.out.println(encoding);
+       // System.out.println(encoding);
      //super(JSplitPane.HORIZONTAL_SPLIT, true);
       this.sidePaneManager = Globals.sidePaneManager;
       this.frame = frame;
@@ -1560,15 +1560,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                        +Globals.lang("entry")+".");
                 final int row = mainTable.findEntry(be);
 
-                highlightEntry(be);
+                // We are going to select the new entry. Before that, make sure that we are in
+                // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
+                // mode which makes sure the selection will trigger display of the entry editor
+                // and adjustment of the splitter.
+                if (mode != SHOWING_EDITOR)
+                    mode = WILL_SHOW_EDITOR;
+                highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
 
                 markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean("autoOpenForm")) {
-
-                   showEntry(be);
-                    runCommand("edit");
-
-                }
+                new FocusRequester(getEntryEditor(be));
             } catch (KeyCollisionException ex) {
                 Util.pr(ex.getMessage());
             }
@@ -1943,6 +1944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             splitPane.setDividerLocation(splitPane.getHeight()-GUIGlobals.PREVIEW_PANEL_HEIGHT);
         } else {
             splitPane.setDividerLocation(GUIGlobals.VERTICAL_DIVIDER_LOCATION);
+
         }
     }
 
@@ -2089,11 +2091,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         int oldSplitterLocation = -1;
         if (mode == SHOWING_EDITOR)
             oldSplitterLocation = splitPane.getDividerLocation();
+        boolean adjustSplitter = (mode == WILL_SHOW_EDITOR);
         mode = SHOWING_EDITOR;
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
         if (oldSplitterLocation > 0)
             splitPane.setDividerLocation(oldSplitterLocation);
+        if (adjustSplitter) {
+            adjustSplitter();
+            //new FocusRequester(editor);
+        }
     }
 
     /**
@@ -2120,16 +2127,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntry(final BibtexEntry be) {
-        SwingUtilities.invokeLater(new Thread() {
-             public void run() {
+        //SwingUtilities.invokeLater(new Thread() {
+        //     public void run() {
                  final int row = mainTable.findEntry(be);
                  if (row >= 0) {
                     mainTable.setRowSelectionInterval(row, row);
                     //entryTable.setActiveRow(row);
                     mainTable.ensureVisible(row);
                  }
-             }
-        });
+        //     }
+        //});
+    }
+
+    /**
+     * This method is called from an EntryEditor when it should be closed. We relay
+     * to the selection listener, which takes care of the rest.
+     * @param editor The entry editor to close.
+     */
+    public void entryEditorClosing(EntryEditor editor) {
+        selectionListener.entryEditorClosing(editor);
     }
 
     /**

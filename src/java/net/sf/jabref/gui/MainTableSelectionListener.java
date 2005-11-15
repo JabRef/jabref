@@ -76,14 +76,14 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
             final BibtexEntry toShow = (BibtexEntry) newSelected;
             final int mode = panel.getMode(); // What is the panel already showing?
-            if (mode == BasePanel.SHOWING_EDITOR) {
+            if ((mode == BasePanel.WILL_SHOW_EDITOR) || (mode == BasePanel.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
                 EntryEditor oldEditor = panel.getCurrentEditor();
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
                 // Show the new editor unless it was already visible:
+
                 if (newEditor != oldEditor) {
-                    newEditor.setSelectionListener(this);
                     panel.showEntryEditor(newEditor);
                 }
             } else {
@@ -131,7 +131,6 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         final int mode = panel.getMode();
         EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanel.SHOWING_EDITOR) {
-            editor.setSelectionListener(this);
             panel.showEntryEditor(editor);
             panel.adjustSplitter();
         }

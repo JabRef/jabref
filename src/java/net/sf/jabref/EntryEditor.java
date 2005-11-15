@@ -100,7 +100,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   TypeLabel typeLabel;
   JabRefFrame frame;
   BasePanel panel;
-  MainTableSelectionListener selectionListener;
   EntryEditor ths = this;
   HashSet contentSelectors = new HashSet();
   Logger logger = Logger.getLogger(EntryEditor.class.getName());
@@ -225,9 +224,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     return type;
   }
 
-    public void setSelectionListener(MainTableSelectionListener selectionListener) {
-        this.selectionListener = selectionListener;
-    }
 
     public BibtexEntry getEntry() {
         return entry;
@@ -857,9 +853,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     //Util.pr(e.getPropertyName());
   }
 
-  /**
-   * @param ed
-   */
+
   public void updateField(final Object source) {
     storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
   }
@@ -952,7 +946,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       if (!goOn)
         return;
 
-      selectionListener.entryEditorClosing(EntryEditor.this);
+      panel.entryEditorClosing(EntryEditor.this);
       panel.database.removeEntry(entry.getId());
       panel.markBaseChanged();
       panel.undoManager.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
@@ -970,9 +964,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if (tabbed.getSelectedComponent() == srcPanel) {
             updateField(source);
             if (lastSourceAccepted)
-            selectionListener.entryEditorClosing(EntryEditor.this);
+            panel.entryEditorClosing(EntryEditor.this);
         } else
-            selectionListener.entryEditorClosing(EntryEditor.this);
+            panel.entryEditorClosing(EntryEditor.this);
     }
   }
 

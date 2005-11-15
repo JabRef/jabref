@@ -28,9 +28,10 @@ public class OvidImporter implements ImportFormat {
             "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)");
 
     public static Pattern incollection_pat = Pattern.compile(
-            "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.  \\(pp. ([0-9]+\\-?[0-9]+?)\\)(.*)");
+            "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. "
+            +"([\\w, ]+): ([\\w, ]+)\\.");
     public static Pattern book_pat = Pattern.compile(
-                "\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.(.*)");
+                "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)\\.");
 
     //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
     // \\w&\\-]+)");
@@ -147,9 +148,14 @@ public class OvidImporter implements ImportFormat {
                 h.put("year", matcher.group(2));
                 h.put("booktitle", matcher.group(3));
                 h.put("pages", matcher.group(4));
+                h.put("address", matcher.group(5));
+                h.put("publisher", matcher.group(6));
             } else if ((matcher = book_pat.matcher(content)).find()) {
                 h.put("year", matcher.group(1));
-                //h.put("booktitle", matcher.group(3));
+                h.put("pages", matcher.group(2));
+                h.put("address", matcher.group(3));
+                h.put("publisher", matcher.group(4));
+
             }
             // Add double hyphens to page ranges:
             if (h.get("pages") != null) {
