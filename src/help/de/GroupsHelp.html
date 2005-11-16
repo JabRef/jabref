@@ -9,7 +9,8 @@ Mit Gruppen k&ouml;nnen Sie Ihre BibTeX-Datei in einer Baumstruktur anordnen, ve
 
 <ul>
 <li>W&auml;hrend eine Datei auf einer Festplatte immer in genau einem Ordner abgelegt ist, kann ein Literatureintrag in JabRef mehreren Gruppen angeh&ouml;ren.</li>
-<li>Gruppen benutzen bestimmte Kriterien, um ihren Inhalt dynamisch zu bestimmen. Neue Eintr&auml;ge, die den Kriterien einer Gruppe entsprechen, geh&ouml;ren automatisch zu dieser Gruppe. Diese Funktionalit&auml;t gibt es nicht in &uuml;blichen Dateisystemen, wohl aber in einigen E-Mail-Programmen (z.B. Thunderbird und Opera).
+<li>Gruppen benutzen bestimmte Kriterien, um ihren Inhalt dynamisch zu bestimmen. Neue Eintr&auml;ge, die den Kriterien einer Gruppe entsprechen, geh&ouml;ren automatisch zu dieser Gruppe. Diese Funktionalit&auml;t gibt es nicht in &uuml;blichen Dateisystemen, wohl aber in einigen E-Mail-Programmen (z.B. Thunderbird und Opera).</li>
+</ul>
 
 Wenn Sie eine Gruppe ausw&auml;hlen, werden die Eintr&auml;ge dieser Gruppe angezeigt. Wenn Sie mehrere Gruppen ausw&auml;hlen, werden entweder die Eintr&auml;ge angezeigt, die in einer der Gruppen sind (Vereinigung), oder solche, die in allen Gruppen vorhanden sind (Schnittmenge) -- das h&auml;ngt von Ihren Einstellungen ab. All dies wird im Folgenden detailliert erl&auml;utert.
 <p>
@@ -17,9 +18,8 @@ Gruppendefinitionen sind dateispezifisch; sie werden als <tt>@COMMENT</tt>-Block
 
 <H2>Die Gruppenansicht</H2>
 
-Die Gruppenansicht wird im linken Seitenbereich des Bildschirms angezeigt. Sie kann mit der Tastenkombination <tt>STRG-SHIFT-G</tt> oder mit dem Gruppenknopf in der Toolbar ein- und ausgeblendet werden. Die Gruppenansicht verf&uuml;gt &uuml;ber mehrere Buttons, aber die meisten Funktionen werden &uuml;ber das Kontextmen&uuml; angesteuert (also mit der rechten Maustaste). Drag & Drop wird ebenfalls unterst&uuml;tzt.
+Die Gruppenansicht wird im linken Bereich des Bildschirms angezeigt. Sie kann mit der Tastenkombination <tt>STRG-SHIFT-G</tt> oder dem Gruppen-Button in der Toolbar ein- und ausgeblendet werden. Die Gruppenansicht verf&uuml;gt &uuml;ber mehrere Schaltfl&auml;chen, aber die meisten Funktionen werden &uuml;ber das Kontextmen&uuml; angesteuert (also mit der rechten Maustaste). Drag & Drop wird ebenfalls unterst&uuml;tzt.
 <p>
-
 <table cellspacing=0 cellpadding=5 border=0 bgcolor=#c0ffc0>
 <tr><td>
 <h2>Einige kurze Beispiele</h2>
@@ -97,159 +97,41 @@ In der Gruppenansicht werden dynamische Gruppen standardm&auml;&szlig;ig <i>kurs
 <h3>Hierarchischer Kontext</h3>
 
 <em>Hinweis des &Uuml;bersetzers: weiter bin ich noch (03.11.2005) nicht gekommen.</em><br>
-By default, a group is <b>independent</b> of its position in the groups tree: When selected, only the group's contents are shown. However, especially when using dynamic groups, it is often useful to define a subgroup that <b>refines its supergroup</b>, i.e., when selected, entries contained in both groups are displayed. For example, create a supergroup containing entries with the keyword <tt>distribution</tt> and a subgroup containing entries with the keyword <tt>gauss</tt> that refines this supergroup. Selecting the subgroup now displays entries that match both conditions, i.e. are concerned with Gaussian distributions. By adding another refining subgroup for <tt>laplace</tt> to the original supergroup, the grouping can easily be extended. In the groups tree, refining groups have a special icon (this can be turned off in the preferences).
+Standardm&auml;&szlig;ig ist eine Gruppe <b>unabh&auml;ngig</b> von ihrer Position im Gruppenbaum. Ist eine Gruppe ausgew&auml;hlt, wird nur der Inhalt dieser Gruppe angezeigt. Es ist jedoch -- besonders beim Verwenden dynamischer Gruppen -- oft n&uuml;tzlich, eine Untergruppe zu erstellen, die <b>ihre Obergruppe verfeinert</b>. Wenn diese Untergruppe ausgew&auml;hlt wird, werden alle Eintr&auml;ge dieser Gruppe und ihrer Obergruppe angezeigt. Erstellen Sie z.B. eine Obergrupe, die Eintr&auml;ge mit dem Stichwort <tt>Verteilung</tt> enth&auml;lt, sowie eine verfeinernde Untergruppe mit Eintr&auml;gen, die das Stichwort <tt>Gau&szlig;</tt> enthalten. Wenn Sie nun die Untergruppe ausw&auml;hlen, werden alle Eintr&auml;ge angezeigt, die beiden Bedingungen entsprechen, also alle, die mit Gau&szlig;'scher Verteilung zu tun haben. Indem Sie nun eine weitere Untergruppe f&uuml;r <tt>Laplace</tt> anlegen, die dieselbe Obergruppe verfeinert, k&ouml;nnen Sie die Gruppierung einfach erweitern. Im Gruppenbaum haben solche Gruppen, die ihre Obergruppen verfeinern, ein spezielles Icon. (Dieses Verhalten kann in den Einstellungen abgestellt werden.)
 <p>
-The logical complement to a refining group is a group that <b>includes its subgroups</b>, i.e. when selected, not only the group's own entries, but also its subgroups' entries are shown. In the groups tree, this type of group has a special icon (this can be turned off in the preferences).
+Das logische Gegenst&uuml;ck zu einer solchen verfeinernden Untergruppe ist eine Gruppe, die <b>ihre Untergruppen ber&uuml;cksichtigt</b>. Wird sie ausgew&auml;hlt, werden nicht nur die Eintr&auml;ge dieser Gruppe, sondern auch diejenigen aller Untergruppen angezeigt. Im Gruppenbaum hat auch diese Art von Gruppen ein spezielles Icon. (Dieses Verhalten kann in den Einstellungen abgestellt werden.)
 
-<h2>Viewing a group's entries, combining multiple groups</H2>
+<h2>Eintr&auml;ge einer Gruppe anzeigen, mehrere Gruppen kombinieren</h2>
 
-Selecting a group shows the entries contained in that group by highlighting them and, depending on the settings (accessible by clicking the <b>Settings</b> button), moving them to the top of the list and/or selecting them. These options are identical to those available for the regular search.
+Wenn Sie eine Gruppe ausw&auml;hlen, werden die Eintr&auml;ge, die dieser Gruppe zugeordnet sind, hervorgehoben und -- je nach Einstellung (die mit einem Klick auf den <b>Einstellungen</b>-Button vorgenommen werden kann) -- an den Anfang der Tabelle verschoben und/oder ausgew&auml;hlt. Diese Optionen entsprechen denen f&uuml;r die normale Suche.
 <p>
-When multiple groups are selected, either the union or the intersection of their content is shown, depending on the current settings. This allows to quickly combine multiple conditions, e.g. if you have a static group <tt>Extremely Important</tt> to which you assign all extremely important entries, you can view the extremely important entries in any other group by selecting both groups (this requires to have <b>Intersection</b> selected in the settings).
+Wenn Sie meherere Gruppen ausw&auml;hlen (indem Sie die STRG-Taste gedr&uuml;ckt halten und mehrere Gruppen anklicken), wird -- je nach Einstellung -- entweder die Vereinigung oder die Schnittmenge ihrer Inhalte angezeigt. Damit k&ouml;nnen mehrere Bedingungen schnell miteinander kombiniert werden. Ein Beispiel: Wenn Sie eine statische Gruppe <tt>Sehr wichtig</tt> haben, in der alle sehr wichtigen Eintr&auml;ge sind, k&ouml;nnen Sie sich die sehr wichtigen Eintr&auml;ge jeder anderen Gruppe anzeigen lassen, indem Sie beide Gruppen ausw&auml;hlen (dazu muss <b>Schnittmenge</b> in den Einstellungen aktiviert sein).
 
-<h2>Groups and searching</h2>
+<h2>Gruppen und Suche</h2>
 
-When viewing the contents of the selected group(s), a search can be performed within these contents using the regular search facility.
+Wenn der Inhalt einer oder mehrerer Gruppen angezeigt wird, k&ouml;nnen Sie eine Suche innerhalb dieser Eintr&auml;ge durchf&uuml;hren. Benutzen Sie dazu die normalen Suchfunktionen.
 
-<h2>Highlighting overlapping groups</h2>
+<h2>Sich &uuml;berschneidende Gruppen markieren</h2>
 
-The <b>Settings</b> button offers an option to highlight overlapping groups. If this is activated, upon selection of one or more groups, all groups that contain at least one of the entries contained in the currently selected group(s) are highlighted. This quickly identifies overlap between the groups' contents. You might, for example, create a group <tt>To Read</tt> that contains all entries which you plan to read. Now, whenever you select any group, the group <tt>To Read</tt> is highlighted if the selected group contains entries that you plan to read.
+Der <b>Einstellungs</b>-Button bietet eine Option zum Markieren von sich &uuml;berschneidenden Gruppen. Wenn diese Option aktiviert ist und Sie eine (oder mehrere) Gruppe(n) ausw&auml;hlen, werden alle Gruppen markiert, die mindestens einen Eintrag enthalten, der auch der ausgew&auml;hlten Gruppe zugeordnet ist. Damit k&ouml;nnen Sie schnell &Uuml;berschneidungen zwischen den Eintr&auml;gen verschiedener Gruppen erkennen. Sie k&ouml;nnten beispielsweise eine Gruppe <tt>lesen</tt> erstellen, die alle Eintr&auml;ge enth&auml;lt, die sie lesen wollen. Sobald Sie nun eine Gruppe ausw&auml;hlen, wird die Gruppe <tt>lesen</tt> markiert, sofern die ausgew&auml;hlte Gruppe Eintr&auml;ge enth&auml;lt, die Sie noch lesen wollten.
 
-<h2>Advanced features</h2>
+<h2>Erweiterte Funktionen</h2>
 
-After mastering the grouping concepts described above, the following advanced features might come in handy.
+Wenn Sie sich mit dem oben beschriebenen Gruppenkonzept vertraut gemacht haben, k&ouml;nnten die folgenden erweiterten Funktionen n&uuml;tzlich sein.
 
-<h3>Automatically creating dynamic groups</h3>
+<h3>Dynamische Gruppen automatisch erstellen</h3>
 
-By clicking the <b>Automatically create groups for database</b> button, you can quickly create a set of groups appropriate for your database. This feature will gather all words found in a specific field of your choice, and create a group for each word. This is useful for instance if your database contains suitable keywords for all entries. By autogenerating groups based on the <tt>keywords</tt> field, you should have a basic set of groups at no cost.
+Mit einem Klick auf den Button <b>Automatisch Gruppen f&uuml;r die Datei anlegen</b> k&ouml;nnen Sie ganz schnell passende Gruppen f&uuml;r Ihre Datei erzeugen. Diese Funktion sammelt alle W&ouml;rter eines bestimmten Felds Ihrer Wahl und erstellt eine Gruppe f&uuml;r jedes Wort. Das ist zum Beispiel n&uuml;tzlich, wenn Ihre Datei geeignete Stichworte f&uuml;r alle Eintr&auml;ge enth&auml;lt. Mit dem automatischen Erstellen von Gruppen basierend auf dem Feld <tt>keywords</tt> k&ouml;nnen Sie also ohne gro&szlig;en Aufwand ein Grundger&uuml;st von Gruppen anlegen.
 <p>
-You can also specify characters to ignore, for instance commas used between keywords. These will be treated as separators between words, and not part of them. This step is important for combined keywords such as <tt>laplace distribution</tt> to be recognized as a single semantic unit. (You cannot use this option to remove complete words. Instead, delete the unwanted groups manually after they were created automatically.)
+Sie k&ouml;nnen auch Buchstaben angeben, die ignoriert werden sollen, z.B. Kommas, die zwischen einzelnen Stichworten stehen. Diese werden als Worttrenner behandelt und nicht als Teile des Wortes selbst. Dieser Schritt ist wichtig, damit kombinierte Stichworte wie etwa <tt>Gau&szlig;'sche Verteilung</tt> als semantische Einheit interpretiert werden k&ouml;nnen. (Sie k&ouml;nnen diese Option allerdings nicht verwenden, um ganze W&ouml;rter zu ignorieren. Sie m&uuml;ssen stattdessen die Gruppen, die Sie nicht wollen, nach dem automatischen Erstellen von Hand l&ouml;schen.)
 
-<h3>Refreshing the groups view</h3>
+<h3>Ansicht aktualisieren</h3>
 
-The <b>Refresh</b> button updates the entry table to reflect the current groups selection. This is usually done automatically, but in rare occasions (e.g. after a group-related undo/redo) a manual refresh is required.
+Der <b>Aktualisieren</b>-Button aktualisiert die Tabelle in Bezug auf die aktuell ausgew&auml;hlten Gruppen. Normalerweise erfolgt dies automatisch, aber in seltenen F&auml;llen (z.B. nach einem R&uuml;ckg&auml;ngig- oder Wiederholen-Vorgang, der mit Gruppen zusammenh&auml;ngt) ist ein h&auml;ndisches Aktualisieren n&ouml;tig.
 
-<h3>Mixing refining groups with including groups</h3>
+<h3>Verfeinernde Untergruppen und einbeziehende Obergruppen mischen</h3>
 
-If a refining group is a subgroup of a group that includes its subgroups -- the refining group's siblings --, these siblings are ignored when the refining group is selected.
+Wenn eine verfeinernde Gruppe die Untergruppe von einer Gruppe ist, die ihre Untergruppen ber&uuml;cksichtigt -- also sozusagen die Geschwister der verfeinernden Gruppe --, dann werden diese Geschwister ignoriert, sobald die verfeinernde Gruppe ausgew&auml;hlt wird.
 
-Selecting a group shows the entries contained in that group. Selecting multiple groups shows the entries contained in any group (union) or those contained in all groups (intersection), depending on the current settings. All this is explained in detail below.
-<p>
-Group definitions are database-specific; they are saved as a <tt>@COMMENT</tt> block in the <tt>.bib</tt>-file and are shared among all users. (Future versions of JabRef might support user-dependent groups.)
-
-<H2>Interface</H2>
-
-The groups interface is shown in the side pane on the left of the screen. It can be toggled on or off by pressing <tt>CTRL-SHIFT-G</tt> or by the groups button in the toolbar. The interface has several buttons, but most functions are accessed via a context ("right-click") menu. Drag and Drop is also supported.
-<p>
-
-<table cellspacing=0 cellpadding=5 border=0 bgcolor=#c0ffc0>
-<tr><td>
-<h2>Some quick examples</h2>
-
-You might want to...
-
-<h3>...just create a group and assign some entries to it</h3>
-
-Ensure that the groups interface is visible. Press the <b>New Group</b> button, enter a name for the group, then press OK, leaving all values at their defaults. Now select the entries to be assigned to the group and use Drag and Drop to the group, or the option <b>Add to group</b> in the context menu. Finally select the group to see its content (which should be the entries you just assigned).
-
-<h3>...use the <tt>keywords</tt> field to group the entries</h3>
-
-Ensure that the groups interface is visible. Press the <b>New Group</b> button, enter a name for the group, and select the option to dynamically group entries by searching a field for a keyword. Enter the keyword to search for, then click OK. Finally select the group to see its content (which should be all entries whose <tt>keywords</tt> field contains the keyword you specified).
-
-<h3>...use a free-form search expression to define a group</h3>
-
-Ensure that the groups interface is visible. Press the <b>New Group</b> button, enter a name for the group, and select the option to dynamically group entries by a free-form search expression. Enter <tt>author=smith</tt> as a search expression (replace <tt>smith</tt> with a name that actually occurs in your database) and click <b>OK</b>. Finally select the group to see its content (which should be all entries whose <tt>author</tt> field contains the name you specified).
-
-<h3>...combine multiple groups</h3>
-
-Create two different groups (e.g. as described above). Click the <b>Settings</b> button and make sure that <b>Union</b> is selected. Now select both groups. You should see all entries contained in any of the two groups. Click <b>Settings</b> again and select <b>Intersection</b>. Now you should see only those entries contained in both groups (which might be none at all, or exactly the same entries as before in case both groups contain the same entries).
-
-<h3>...identify overlapping groups</h3>
-
-JabRef allows you to easily identify groups that overlap with the currently selected groups (i.e. that contain at least one entry that is also contained in the currently selected groups). Click <b>Settings</b> and activate the option to highlight overlapping groups. Then select a group that overlaps with other groups. The other groups should be highlighted.
-
-</tr></td>
-</table>
-<p>
-
-<H2>Types of groups</H2>
-
-In JabRef 1.8 there are four different types of groups:
-
-<ol>
-<li> The group <b>All Entries</b>, which -- as the name suggests -- contains all entries, is always present and cannot be edited or removed.
-<li> <b>Static groups</b> behave like directories on disk and contain only those entries that you explicitly assign to them.
-<li> <b>Dynamic groups based on keyword search</b> contain entries in which a certain BibTeX field (e.g. <tt>keywords</tt>) contains a certain keyword (e.g. <tt>electrical</tt>). This method does not require manual assignment of entries, but uses information that is already present in the database. If all entries in your database have suitable keywords in their <tt>keywords</tt> field, using this type of group might be the best choice.
-<li> <b>Dynamic groups based on free-form search expressions</b> contain entries that match a specified search expression, using the same syntax as the <a href="SearchHelp.html">search panel</a> on the side pane. This <a href="SearchHelp.html#advanced">syntax</a> supports logical operators (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) and allows to specify one or more BibTeX fields to search, facilitating more flexible group definitions than a keyword search (e.g. <tt>author=smith and title=electrical</tt>).
-</ol>
-
-Every group that you create is of one of the last three types. The group editing dialog, which is invoked by double-clicking on a group, shows a short description of the selected/edited group in plain English.
-
-<H2>Groups structure, creating and removing groups</H2>
-
-Just like directories, groups are structured like a tree, with the group <b>All Entries</b> at the root. By right-clicking on a group you can add a new group to the tree, either at the same level as the selected group or as a subgroup of it. The <b>New Group</b> button lets you create a new subgroup of the group <b>All Entries</b>, regardless of the currently selected group(s). The context menu also allows to remove groups and/or subgroups, to sort subgroups alphabetically, or to move groups to a different location in the tree. The latter can also be done by Drag and Drop, with the restriction that Drag and Drop does not support changing the order of a group's subgroups.
-<p>
-Undo and redo is supported for all edits.
-
-<H3>Static groups</h3>
-
-Static groups are populated only by explicit manual assignment of entries. After creating a static group you select the entries to be assigned to it, and use either Drag and Drop or the main table's context menu to perform the assignment. To remove entries from a static group, select them and use the main table's context menu. There are no options to be configured.
-<p>
-This method of grouping requires that all entries have a unique BibTeX key. In case of missing or duplicate BibTeX keys, the assignment of the affected entries cannot be correctly restored in future sessions.
-
-<H3>Dynamic groups</h3>
-
-The content of a dynamic group is defined by a logical condition. Only entries that meet this condition are contained in the group. This method uses the information stored in the database itself, and updates dynamically whenever the database changes.
-<p>
-Two types of conditions can be used:
-<dl>
-<dt><b>Searching a field for a keyword</b></dt>
-<dd>
-This method groups entries in which a specified BibTeX field (e.g. <tt>keywords</tt>) contains a specified search term (e.g. <tt>electrical</tt>). Obviously, for this to work, the grouping field must be present in every entry, and its content must be accurate. The above example would group all entries referring to something electrical. Using the field <tt>author</tt> allows to group entries by a certain author, etc. The search can either be done as a plain-text or a regular expression search. In the former case, JabRef allows to manually assign/remove entries to/from the group by simply appending/removing the search term to/from the content of the grouping field. This makes sense only for the <tt>keywords</tt> field or for self-defined fields, but obviously not for fields like <tt>author</tt> or <tt>year</tt>.
-</dd>
-<dt><b>Using a free-form search expression</b></dt>
-<dd>
-This is similar to the above, but rather than search a single field for a single search term, the <a href="SearchHelp.html#advanced">search expression syntax</a> can be used, which supports logical operators (<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>) and allows to search multiple BibTeX fields. For example, the search expression <tt>keywords=regression and not keywords=linear</tt> groups entries concerned with non-linear regression.
-</dd>
-</dl>
-
-In the groups view, dynamic groups are shown in <i>italics</i> by default. This can be turned off in the preferences.
-
-<h3>Hierarchical context</h3>
-
-By default, a group is <b>independent</b> of its position in the groups tree: When selected, only the group's contents are shown. However, especially when using dynamic groups, it is often useful to define a subgroup that <b>refines its supergroup</b>, i.e., when selected, entries contained in both groups are displayed. For example, create a supergroup containing entries with the keyword <tt>distribution</tt> and a subgroup containing entries with the keyword <tt>gauss</tt> that refines this supergroup. Selecting the subgroup now displays entries that match both conditions, i.e. are concerned with Gaussian distributions. By adding another refining subgroup for <tt>laplace</tt> to the original supergroup, the grouping can easily be extended. In the groups tree, refining groups have a special icon (this can be turned off in the preferences).
-<p>
-The logical complement to a refining group is a group that <b>includes its subgroups</b>, i.e. when selected, not only the group's own entries, but also its subgroups' entries are shown. In the groups tree, this type of group has a special icon (this can be turned off in the preferences).
-
-<h2>Viewing a group's entries, combining multiple groups</H2>
-
-Selecting a group shows the entries contained in that group by highlighting them and, depending on the settings (accessible by clicking the <b>Settings</b> button), moving them to the top of the list and/or selecting them. These options are identical to those available for the regular search.
-<p>
-When multiple groups are selected, either the union or the intersection of their content is shown, depending on the current settings. This allows to quickly combine multiple conditions, e.g. if you have a static group <tt>Extremely Important</tt> to which you assign all extremely important entries, you can view the extremely important entries in any other group by selecting both groups (this requires to have <b>Intersection</b> selected in the settings).
-
-<h2>Groups and searching</h2>
-
-When viewing the contents of the selected group(s), a search can be performed within these contents using the regular search facility.
-
-<h2>Highlighting overlapping groups</h2>
-
-The <b>Settings</b> button offers an option to highlight overlapping groups. If this is activated, upon selection of one or more groups, all groups that contain at least one of the entries contained in the currently selected group(s) are highlighted. This quickly identifies overlap between the groups' contents. You might, for example, create a group <tt>To Read</tt> that contains all entries which you plan to read. Now, whenever you select any group, the group <tt>To Read</tt> is highlighted if the selected group contains entries that you plan to read.
-
-<h2>Advanced features</h2>
-
-After mastering the grouping concepts described above, the following advanced features might come in handy.
-
-<h3>Automatically creating dynamic groups</h3>
-
-By clicking the <b>Automatically create groups for database</b> button, you can quickly create a set of groups appropriate for your database. This feature will gather all words found in a specific field of your choice, and create a group for each word. This is useful for instance if your database contains suitable keywords for all entries. By autogenerating groups based on the <tt>keywords</tt> field, you should have a basic set of groups at no cost.
-<p>
-You can also specify characters to ignore, for instance commas used between keywords. These will be treated as separators between words, and not part of them. This step is important for combined keywords such as <tt>laplace distribution</tt> to be recognized as a single semantic unit. (You cannot use this option to remove complete words. Instead, delete the unwanted groups manually after they were created automatically.)
-
-<h3>Refreshing the groups view</h3>
-
-The <b>Refresh</b> button updates the entry table to reflect the current groups selection. This is usually done automatically, but in rare occasions (e.g. after a group-related undo/redo) a manual refresh is required.
-
-<h3>Mixing refining groups with including groups</h3>
-
-If a refining group is a subgroup of a group that includes its subgroups -- the refining group's siblings --, these siblings are ignored when the refining group is selected.
+</BODY>
 </HTML>
