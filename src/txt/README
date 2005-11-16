@@ -92,9 +92,9 @@ Change log:
         - The encoding used when opening a database is now remembered, and used when database is stored.
         - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
           when loading. Added option to put braces around capital letters of a chosen set of fields.
+        - Improved Ovid import.
         - Fixed problem with loading 16-bit encoded bib files with 8-bit encoding as default, and vice versa.
         - Fixed multiplying authors bug when author/editor field appears both in Required and Optional tabs.
-        - Fixed bug in Ovid import.
         - Fixed startup freeze when trying to load certain malformed bib files.
         - Fixed bug related to multi-line fields in RIS import.
         - Fixed bug related to looking up a fully qualified DOI

@@ -29,9 +29,9 @@ public class OvidImporter implements ImportFormat {
 
     public static Pattern incollection_pat = Pattern.compile(
             "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. "
-            +"([\\w, ]+): ([\\w, ]+)\\.");
+            +"([\\w, ]+): ([\\w, ]+)");
     public static Pattern book_pat = Pattern.compile(
-                "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)\\.");
+                "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
 
     //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
     // \\w&\\-]+)");
@@ -77,6 +77,9 @@ public class OvidImporter implements ImportFormat {
             int linebreak = fields[j].indexOf('\n');
             String fieldName = fields[j].substring(0, linebreak).trim();
             String content = fields[j].substring(linebreak).trim();
+            // Remove unnecessary dots at the end of lines:
+            if (content.endsWith("."))
+                    content = content.substring(0, content.length()-1);
             //fields[j] = fields[j].trim();
             if (fieldName.indexOf("Author") == 0
                 && fieldName.indexOf("Author Keywords") == -1
@@ -113,8 +116,13 @@ public class OvidImporter implements ImportFormat {
 
             //h.put("author", ImportFormatReader.fixAuthor_lastNameFirst(author));
 
-        }else if (fieldName.indexOf("Title") == 0) h.put("title",
-                       content.replaceAll("\\[.+\\]", ""));
+        }else if (fieldName.indexOf("Title") == 0) {
+                content = content.replaceAll("\\[.+\\]", "").trim();
+                if (content.endsWith("."))
+                    content = content.substring(0, content.length()-1);
+                h.put("title", content);
+        }
+
         else if (fieldName.indexOf("Chapter Title") == 0) h.put("chaptertitle", content);
 
         // The "Source" field is a complete mess - it can have several different formats,
