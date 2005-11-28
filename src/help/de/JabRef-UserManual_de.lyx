@@ -2,6 +2,8 @@
 \lyxformat 221
 \textclass scrartcl
 \begin_preamble
+\pdfoptionpdfminorversion 2 % PDF 1.2 for Acrobat 3 onwards
+
 %%%%% Colors %%%%%
 \usepackage{color}
 \definecolor{dkblue}{rgb}{0,0.1,0.5} % dark blue
@@ -28,6 +30,9 @@
     \color{dkblue}\textit{#1}#2}}%
   \end{center}%
 }%
+\newcommand{\ctan}[1]{% for CTAN references
+  \texttt{CTAN: \color{dkblue}#1}%
+}
 
 %%%%% author, version of file %%%%%
 \def\FileAuthor{Dominik Waßenhoven}
@@ -110,48 +115,39 @@ bookmarksopenlevel=1,%
 \tocdepth 2
 \paragraph_separation indent
 \defskip medskip
-\quotes_language german
+\quotes_language danish
 \quotes_times 2
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
 
-\layout Standard
-
-
-\begin_inset Note
-collapsed false
-
-\layout Standard
+\layout Comment
 
 To do:
-\layout Itemize
+\layout Comment
 
 unter 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Erscheinungsbild
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  noch die Punkte Tabellendarstellung, Toolbar, Panels und Schriften erstellen
  [DW]
-\layout Itemize
+\layout Comment
 
 FAQ ganz am Ende? (halte ich für nicht unbedingt nötig; eine Online-FAQ
  wäre m.E.
  besser) [DW]
-\end_inset 
-
-
 \layout Subject
 
 
 \begin_inset Graphics
-	filename /home/domnik/Bilder/jabref.png
+	filename ../../images/JabRef-splash.png
 	lyxscale 50
-	scale 50
+	scale 25
 
 \end_inset 
 
@@ -275,6 +271,37 @@ jabref{}
  kann auch von der Kommandozeile gestartet werden, um von einem Importformat
  in ein Exportformat zu konvertieren, ohne die grafische Benutzeroberfläche
  zu starten.
+\layout Quote
+\paragraph_spacing other 0.70 
+\align center 
+
+\size scriptsize 
+Copyright 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+textcopyright{}
+\end_inset 
+
+ 2005, Dominik Waßenhoven
+\newline 
+Permission is granted to copy, distribute and/or modify this document under
+ the terms of the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+href{http://www.gnu.org/copyleft/fdl.html}{GNU Free Documentation License}
+\end_inset 
+
+, Version\SpecialChar ~
+1.2 or any later version published by the Free Software Foundation;
+ with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 \layout Standard
 
 
@@ -458,20 +485,41 @@ menu{Untermenü}
  die Navigation innerhalb des Dokuments als auch für Links ins Internet.
 \layout Standard
 
-Über den Stand und die 
-\begin_inset Quotes gld
+Das 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+jabrefversion{}
+\end_inset 
+
+ Benutzerhandbuch ist frei verfügbar unter den Bedingungen der 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+href{http://www.gnu.org/copyleft/fdl.html}{GNU Free Documentation License}
+\end_inset 
+
+.
+ Über den Stand und die 
+\begin_inset Quotes ald
 \end_inset 
 
 Geschichte
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  dieses Handbuchs gibt der Abschnitt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
-Revision History
-\begin_inset Quotes grd
+Versionsgeschichte
+\begin_inset Quotes ard
 \end_inset 
 
  (S.
@@ -593,11 +641,11 @@ collapsed true
 \layout Standard
 
 Nicht durch Kommata, auch nicht durch 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 und
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 .
@@ -1684,7 +1732,7 @@ CTRL-SHIFT-TAB oder CTRL-
 
 Außerdem können Sie zum nächsten oder vorherigen Eintrag wechseln, indem
  Sie 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 STRG-SHIFT-
@@ -1692,12 +1740,12 @@ STRG-SHIFT-
 \end_inset 
 
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  bzw.
  
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 STRG-SHIFT-
@@ -1705,7 +1753,7 @@ STRG-SHIFT-
 \end_inset 
 
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  oder die Pfeil-Buttons in der linken Toolbar drücken.
@@ -1866,27 +1914,27 @@ jabref{}
 \family default 
  hin überprüft.
  Das 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 hash
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 -Symbol (im Deutschen oft 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Doppelkreuz
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  oder 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Raute
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  genannt) darf 
@@ -2305,11 +2353,11 @@ status Collapsed
 
 B.
  eine weitere Suche durchführen, ohne die bisherigen Ergebnisse zu 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 verlieren
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 .
@@ -2344,11 +2392,11 @@ slash{}
 oder logische Operatoren im Suchbegriff zu benutzen, wird eine spezielle
  Syntax zur Verfügung gestellt.
  Um beispielsweise nach Einträgen mit dem Autor 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Miller
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  zu suchen, geben Sie
@@ -2370,11 +2418,11 @@ nie
 \emph default 
  Leerzeichen in dem Feldbezeichner.
  Mehrere Feldbezeichner werden durch 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 |
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  voneinander getrennt.
@@ -2396,11 +2444,11 @@ AND NOT author = brown
 
 \SpecialChar \ldots{}
  sucht beispielsweise nach Einträgen, in denen entweder der Autor 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Miller
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  heißt oder im 
@@ -2412,19 +2460,19 @@ title
 keywords
 \emph default 
 -Feld der Begriff 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Karl der Große
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  steht; gleichzeitig werden die Einträge mit dem Autor 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Brown
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  nicht angezeigt.
@@ -2435,11 +2483,11 @@ Das
 =
 \family default 
 -Zeichen ist eigentlich eine Abkürzung für 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 enthält
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  
@@ -2456,11 +2504,11 @@ enthält
 matches
 \family default 
  (
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 übereinstimmen
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 ) eingeben.
@@ -2490,11 +2538,11 @@ entrytype = thesis
 Entrytype
 \emph default 
  dargestellt) das Wort 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 thesis
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  enthält (z.
@@ -2509,19 +2557,19 @@ status Collapsed
 
 B.
  
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 phdthesis
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  und 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 mastersthesis
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 ).
@@ -3264,11 +3312,11 @@ Statische Gruppen
 \layout Standard
 
 Statische Gruppen werden nur durch manuelles Zuweisen von Einträgen 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 gefüttert
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 .
@@ -3990,21 +4038,21 @@ Inhalt
 
 Ein Beispiel: Wenn viele Einträge aus einer Zeitschrift stammen, deren Abkürzung
  schwer zu behalten ist, wie etwa 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 J.
  Theor.
  Biol.
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  (Journal of Theroretical Biology), könnte ein String mit dem Namen 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 JTB
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  angelegt werden, um den Namen der Zeitschrift zu repräsentieren.
@@ -4438,13 +4486,13 @@ Author
 \emph default 
 .
  Geben Sie 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 \SpecialChar ~
 and\SpecialChar ~
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  in das Suchfeld ein (ohne Anführungszeichen) sowie ein RETURN-Zeichen in
@@ -4479,11 +4527,11 @@ EndNote Import from JabRef Filter
 \layout Standard
 
 Folgen Sie den Anweisungen im Abschnitt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Erweiterte Benutzung
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  (siehe unten, Seite\SpecialChar ~
@@ -5210,11 +5258,11 @@ Dieser Dialog ermöglicht das schnelle Einfügen von Einträgen aus normalem
  Wählen Sie zunächst aus, welcher Eintragstyp erstellt werden soll.
  Fügen Sie dann einfach Text aus der Zwischenablage ein (mit dem Kontextmenü
  im Textfeld mit der Wasserzeichenschrift 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Text einfügen
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  oder über den Button 
@@ -5254,7 +5302,7 @@ status Collapsed
 B.
  den Textbereich, der zum Titel des neuen Eintrags werden soll, und machen
  im rechten Teil des Dialogfensters im Bereich 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 verfügbare 
@@ -5266,7 +5314,7 @@ BibTeX
 \end_inset 
 
  Felder
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  einen Doppelklick auf 
@@ -5562,21 +5610,21 @@ jabref{}
 \end_inset 
 
  eine 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Spezialbehandlung
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 , um das Verlinken mit den entsprechenden Einträgen so einfach wie möglich
  zu gestalten.
  Um diese 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Spezialbehandlung
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  nutzen zu können, müssen Sie im Unterpunkt 
@@ -6953,11 +7001,11 @@ Zusammenfassung:abstract;annote
 \layout Standard
 
 ergibt somit einen Tab mit dem Namen 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Allgemeine Felder
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 , der die Felder 
@@ -6977,11 +7025,11 @@ doi
 pdf
 \emph default 
  enthält, sowie einen zweiten Tab namens 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Zusammenfassung
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  mit den Feldern 
@@ -7314,27 +7362,27 @@ Spezielle Feldmarken
 [veryshorttitle]
 \family default 
  Die ersten beiden Worte des Titels (title), wobei 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 the
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 , 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 a
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  und 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 an
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  ausgelassen werden.
@@ -7362,19 +7410,19 @@ Hinter einem Feldnamen (oder einem der oben aufgeführten Pseudo-Feldnamen)
 abbr]
 \family default 
  die Zeitschrift 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 Jorunal of Fish Biology
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  zu 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 JoFB
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  wandeln.
@@ -7427,28 +7475,59 @@ menu{Einstellungen}
 \end_inset 
 
 .
-\layout Subsection
+\layout Standard
 
-Erscheinungsbild
-\begin_inset Note
-collapsed false
+Beachten Sie, dass 
+\begin_inset ERT
+status Collapsed
 
 \layout Standard
 
-\SpecialChar ~
-
-\layout Subsubsection
-
-Tabellendarstellung
-\layout Subsubsection
-
-Toolbar
-\layout Subsubsection
-
-Panels
+\backslash 
+jabref{}
 \end_inset 
 
+ Umlaute und Buchstaben mit Akzenten sowie das ß beim Erstellen von BibTeX-Keys
+ verändert, um möglichen Problemen vorzubeugen.
+ Hierzu einige Beispiele:
+\layout LyX-Code
 
+Díaz Ibañez 
+\begin_inset Formula $\to$
+\end_inset 
+
+ DiazIbanez
+\layout LyX-Code
+
+Strömbäck 
+\begin_inset Formula $\to$
+\end_inset 
+
+ Stroembaeck
+\layout LyX-Code
+
+Waßenhoven 
+\begin_inset Formula $\to$
+\end_inset 
+
+ Wassenhoven
+\layout LyX-Code
+
+
+\family roman 
+usw.
+\layout Subsection
+
+Erscheinungsbild
+\layout Comment
+
+Tabellendarstellung
+\layout Comment
+
+Toolbar
+\layout Comment
+
+Panels
 \layout Standard
 
 
@@ -7487,23 +7566,13 @@ Aussehen und Inhalt der Vorschau können mit derselben Syntax verändert werden,
 \end_inset 
 
 ).
-\begin_inset Note
-collapsed false
-
-\layout Standard
-
-\SpecialChar ~
-
-\layout Subsubsection
+\layout Comment
 
 Schriften
-\layout Standard
+\layout Comment
 
 
 \begin_inset LatexCommand \label{sub:Erscheinungsbild_Schriften}
-
-\end_inset 
-
 
 \end_inset 
 
@@ -7790,11 +7859,11 @@ Das Format der Layout-Datei
 
 Layout-Dateien werden mit einem einfachen markup-Format erstellt, bei dem
  die Kommandos mit einem 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 backslash
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  (
@@ -8053,27 +8122,27 @@ AuthorLastFirst
 AuthorAndsReplacer
 \family default 
  ersetzt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 and
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  zwischen den Namen durch 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 ;
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 , zwischen den letzten beiden Autoren steht 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 &
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 .
@@ -8085,19 +8154,19 @@ and
 AuthorAndsCommaReplacer
 \family default 
  ersetzt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 and
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  zwischen den Namen durch ein Komma (,) sowie 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 &
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  zwischen den beiden letzten.
@@ -8109,7 +8178,7 @@ and
 FormatPagesForHTML
 \family default 
  ersetzt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 
@@ -8117,11 +8186,11 @@ FormatPagesForHTML
 --
 \family default 
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  durch 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 
@@ -8129,7 +8198,7 @@ FormatPagesForHTML
 -
 \family default 
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 .
@@ -8141,7 +8210,7 @@ FormatPagesForHTML
 FormatPagesForXML
 \family default 
  ersetzt 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 
@@ -8149,15 +8218,15 @@ FormatPagesForXML
 --
 \family default 
 
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  durch einen XML en-dash (
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 --
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 ).
@@ -8169,19 +8238,19 @@ FormatPagesForXML
 RemoveBrackets
 \family default 
  entfernt alle geschweiften Klammern (
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 {
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
  und 
-\begin_inset Quotes gld
+\begin_inset Quotes ald
 \end_inset 
 
 }
-\begin_inset Quotes grd
+\begin_inset Quotes ard
 \end_inset 
 
 ).
@@ -9776,6 +9845,11 @@ Anpassung der Tastenkürzel
 Danksagung
 \layout Standard
 
+Neben den Entwicklern, die die Hilfe-Seiten des Programms geschrieben haben,
+ möchte ich Thomas Fernstein für seine hilfreichen Tipps und Anregungen
+ zum Handbuch danken.
+\layout Standard
+
 Seit den Anfängen als 
 \emph on 
 BibKeeper
@@ -9930,7 +10004,7 @@ status Collapsed
 \layout Standard
 
 \backslash 
-href{http://www.opensource.org/licenses/lgpl.php}{LGPL}
+href{http://www.opensource.org/licenses/lgpl-license.php}{LGPL}
 \end_inset 
 
  (Lesser GNU Public License) vertrieben wird.
@@ -10017,26 +10091,16 @@ href{http://www.gnu.org/copyleft/gpl.html}{GNU Public License}
 \end_inset 
 
  vertrieben wird.
-\layout Standard
-
-
-\begin_inset Note
-collapsed true
-
-\layout Standard
-
-\SpecialChar ~
-
-\layout Section
+\layout Comment
 
 FAQ
-\layout Subsection
+\layout Comment
 
 Ich kann nicht programmieren, kann ich trotzdem zum Projekt beitragen?
-\layout Subsection
+\layout Comment
 
 Wie installiere ich neue Schriften?
-\layout Standard
+\layout Comment
 
 Siehe 
 \begin_inset LatexCommand \ref{sub:Erscheinungsbild_Schriften}
@@ -10044,20 +10108,17 @@ Siehe
 \end_inset 
 
 .
-\end_inset 
-
-
 \layout Standard
-\pagebreak_top 
+\pagebreak_top \start_of_appendix 
 
 \begin_inset LatexCommand \BibTeX[jurabib]{JabRef-UserManual_de}
 
 \end_inset 
 
 
-\layout Subsection*
+\layout Section*
 \pagebreak_top 
-Revision History
+Versionsgeschichte
 \layout Standard
 
 
@@ -10066,6 +10127,50 @@ Revision History
 \end_inset 
 
 
+\layout Enumerate
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+[0.2]
+\end_inset 
+
+28.
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+,
+\end_inset 
+
+11.
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+,
+\end_inset 
+
+2005
+\begin_deeper 
+\layout Standard
+
+Lizenzbedingungen für das Handbuch hinzugefügt
+\layout Standard
+
+von PDF\SpecialChar ~
+1.4 auf PDF\SpecialChar ~
+1.2 umgestellt
+\layout Standard
+
+mehrere kleinere Änderungen
+\end_deeper 
 \layout Enumerate
 
 
