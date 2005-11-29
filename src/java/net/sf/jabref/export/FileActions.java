@@ -32,6 +32,9 @@ import javax.xml.transform.stream.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -44,6 +47,8 @@ import ca.odell.glazedlists.SortedList;
 public class FileActions
 {
 
+    private static Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+
 
     private static void writePreamble(Writer fw, String preamble) throws IOException {
     if (preamble != null) {
@@ -53,25 +58,59 @@ public class FileActions
     }
     }
 
+    /**
+     * Write all strings in alphabetical order, modified to produce a safe (for BibTeX) order of the strings
+     * if they reference each other.
+     * @param fw The Writer to send the output to.
+     * @param database The database whose strings we should write.
+     * @throws IOException If anthing goes wrong in writing.
+     */
     private static void writeStrings(Writer fw, BibtexDatabase database) throws IOException {
-    TreeSet strings = new TreeSet(new BibtexStringComparator(true));
-    for (Iterator i=database.getStringKeySet().iterator(); i.hasNext();) {
-        strings.add(database.getString(i.next()));
+        List strings = new ArrayList();
+        for (Iterator i = database.getStringKeySet().iterator(); i.hasNext();) {
+            strings.add(database.getString(i.next()));
+        }
+        Collections.sort(strings, new BibtexStringComparator(false));
+        // First, make a Map of all entries:
+        HashMap remaining = new HashMap();
+        for (Iterator i=strings.iterator(); i.hasNext();) {
+            BibtexString string = (BibtexString)i.next();
+            remaining.put(string.getName(), string);
+        }
+        for (Iterator i = strings.iterator(); i.hasNext();) {
+            BibtexString bs = (BibtexString) i.next();
+            if (remaining.containsKey(bs.getName()))
+                writeString(fw, bs, remaining);
+        }
     }
 
-    for (Iterator i=strings.iterator(); i.hasNext();) {
-        BibtexString bs = (BibtexString)i.next();
+    private static void writeString(Writer fw, BibtexString bs, HashMap remaining) throws IOException {
+        // First remove this from the "remaining" list so it can't cause problem with circular refs:
+        remaining.remove(bs.getName());
+
+        // Then we go through the string looking for references to other strings. If we find references
+        // to strings that we will write, but still haven't, we write those before proceeding. This ensures
+        // that the string order will be acceptable for BibTeX.
+        String content = bs.getContent();
+        Matcher m;
+        while ((m = refPat.matcher(content)).find()) {
+            String foundLabel = m.group(1);
+            int restIndex = content.indexOf(foundLabel)+foundLabel.length();
+            content = content.substring(restIndex);
+            Object referred = remaining.get(foundLabel.substring(1, foundLabel.length()-1));
+            // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
+            if (referred != null)
+                writeString(fw, (BibtexString)referred, remaining);
+        }
 
         fw.write("@STRING{" + bs.getName() + " = ");
         if (!bs.getContent().equals(""))
-        fw.write((new LatexFieldFormatter()).format(bs.getContent(), "__dummy"));
-        else fw.write("{}");
+            fw.write((new LatexFieldFormatter()).format(bs.getContent(), Globals.BIBTEX_STRING));
+        else
+            fw.write("{}");
 
-        //Util.writeField(bs.getName(), bs.getContent(), fw) ;
-        fw.write("}"+Globals.NEWLINE +Globals.NEWLINE);
+        fw.write("}" + Globals.NEWLINE + Globals.NEWLINE);
     }
-    }
-
 
     /**
      * Writes the JabRef signature and the encoding.

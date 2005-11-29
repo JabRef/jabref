@@ -126,6 +126,9 @@ public class Globals {
   public static final String NEWLINE = System.getProperty("line.separator");
     public static final boolean UNIX_NEWLINE = NEWLINE.equals("\n"); // true if we have unix newlines.
 
+    public static final String BIBTEX_STRING = "__string";
+    // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
+
     public static void logger(String s) {
     Logger.global.info(s);
   }

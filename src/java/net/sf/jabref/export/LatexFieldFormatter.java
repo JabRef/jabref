@@ -40,13 +40,13 @@ public class LatexFieldFormatter implements FieldFormatter {
     public String format(String text, String fieldName)
 	throws IllegalArgumentException {
 
-        if (Globals.prefs.putBracesAroundCapitals(fieldName)) {
+        if (Globals.prefs.putBracesAroundCapitals(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
             text = Util.putBracesAroundCapitals(text);
         }
 
     // If the field is non-standard, we will just append braces,
 	// wrap and write.
-	if (!GUIGlobals.isStandardField(fieldName)) {
+	if (!GUIGlobals.isStandardField(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
           int brc = 0;
           boolean ok = true;
           for (int i=0; i<text.length(); i++) {

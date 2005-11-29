@@ -93,6 +93,7 @@ Change log:
         - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
           when loading. Added option to put braces around capital letters of a chosen set of fields.
         - Improved Ovid import.
+        - Fixed problem with ordering of BibTeX strings that are referred to by other strings.
         - Fixed problem with loading 16-bit encoded bib files with 8-bit encoding as default, and vice versa.
         - Fixed multiplying authors bug when author/editor field appears both in Required and Optional tabs.
         - Fixed startup freeze when trying to load certain malformed bib files.

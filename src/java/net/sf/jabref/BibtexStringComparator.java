@@ -28,60 +28,79 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class BibtexStringComparator implements Comparator {
 
     protected boolean considerRefs;
+    private static final String MARKER = "__MARKER__";
+    private static final String PADDED_MARKER = " "+MARKER+" ";
 
     /**
      * @param considerRefs Indicates whether the strings should be
-     * sorted according to internal references in addition to 
-     * alphabetical sorting. 
+     *                     sorted according to internal references in addition to
+     *                     alphabetical sorting.
      */
     public BibtexStringComparator(boolean considerRefs) {
-	this.considerRefs = considerRefs;
+        this.considerRefs = considerRefs;
     }
 
     public int compare(Object one, Object two) {
-	BibtexString s1 = (BibtexString)one;
-	BibtexString s2 = (BibtexString)two;
-	
-	int res = 0;
+        BibtexString s1 = (BibtexString) one;
+        BibtexString s2 = (BibtexString) two;
 
-	// First check their names:
-	String name1 = s1.getName().toLowerCase(),
-	    name2 = s2.getName().toLowerCase();
+        /*
+         If crossreferences are to be considered, the following block sorts by the number of string
+         references, so strings with less references precede those with more.
+        */
+        if (considerRefs) {
+            //Pattern refPat = Pattern.compile("#[A-Za-z]+#");
+            int ref1 = s1.getContent().replaceAll("#[A-Za-z]+#", PADDED_MARKER).split(MARKER).length,
+                ref2 = s2.getContent().replaceAll("#[A-Za-z]+#", PADDED_MARKER).split(MARKER).length;
 
-	res = name1.compareTo(name2);
+            if (ref1 != ref2)
+                return ref1-ref2;
+        }
 
-	if (res == 0)
-	    return res;
+        int res = 0;
 
-	// Then, if we are supposed to, see if the ordering needs
-	// to be changed because of one string referring to the other.x
-	if (considerRefs) {
+        // First check their names:
+        String name1 = s1.getName().toLowerCase(),
+                name2 = s2.getName().toLowerCase();
 
-	    // First order them:
-	    BibtexString pre, post;
-	    if (res < 0) {
-		pre = s1;
-		post = s2;
-	    } else {
-		pre = s2;
-		post = s1;
-	    }
+        res = name1.compareTo(name2);
 
-	    // Then see if "pre" refers to "post", which is the only
-	    // situation when we must change the ordering:
-	    String namePost = post.getName().toLowerCase(),
-		textPre = pre.getContent().toLowerCase();
+        if (res == 0)
+            return res;
 
-	    // If that is the case, reverse the order found:
-	    if (textPre.indexOf("#"+namePost+"#") >= 0)
-		res = -res;
-	}
+        // Then, if we are supposed to, see if the ordering needs
+        // to be changed because of one string referring to the other.x
+        if (considerRefs) {
 
-	return res;
+            // First order them:
+            BibtexString pre, post;
+            if (res < 0) {
+                pre = s1;
+                post = s2;
+            } else {
+                pre = s2;
+                post = s1;
+            }
+
+            // Then see if "pre" refers to "post", which is the only
+            // situation when we must change the ordering:
+            String namePost = post.getName().toLowerCase(),
+                    textPre = pre.getContent().toLowerCase();
+
+            // If that is the case, reverse the order found:
+            if (textPre.indexOf("#" + namePost + "#") >= 0)
+                res = -res;
+
+
+        }
+
+        return res;
     }
 
 }
