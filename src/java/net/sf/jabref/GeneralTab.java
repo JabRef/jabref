@@ -4,13 +4,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.Iterator;
-import java.io.File;
 import java.text.SimpleDateFormat;
 
 import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.builder.*;
 
 public class GeneralTab extends JPanel implements PrefsTab {
@@ -20,7 +17,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
-    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField, bracesAroundCapitalsFields;
+    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField,
+            bracesAroundCapitalsFields, nonWrappableFields;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
@@ -74,6 +72,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         // Font sizes:
         fontSize = new JTextField();
         bracesAroundCapitalsFields = new JTextField(30);
+        nonWrappableFields = new JTextField(30);
         // We need a listener on showSource to enable and disable the source panel-related choices:
         showSource.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
@@ -115,12 +114,21 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.append(autoDoubleBraces);
         builder.nextLine();
         JLabel label = new JLabel(Globals.lang("Store the following fields with braces around capital letters")+":");
-        JPanel panel = new JPanel();
-        panel.add(label);
-        panel.add(bracesAroundCapitalsFields);
+        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref",""));
+        //panel.setLayout
+        builder3.append(label);
+        builder3.append(bracesAroundCapitalsFields);
+        //
+        //builder.append(panel);
+        //builder.nextLine();
+        label = new JLabel(Globals.lang("Do not wrap the following fields when saving")+":");
+        builder3.append(label);
+        builder3.append(nonWrappableFields);
         builder.append(pan);
-        builder.append(panel);
+        builder.append(builder3.getPanel());
+        //builder.append(panel);
         builder.nextLine();
+
         //builder.appendSeparator(Globals.lang("Miscellaneous"));
         //builder.nextLine();
         builder.appendSeparator(Globals.lang("Entry editor"));
@@ -236,6 +244,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
         inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
         bracesAroundCapitalsFields.setText(_prefs.get("putBracesAroundCapitals"));
+        nonWrappableFields.setText(_prefs.get("nonWrappableFields"));
+
         String enc = _prefs.get("defaultEncoding");
         outer: for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
@@ -285,10 +295,19 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.put("timeStampFormat", timeStampFormat.getText().trim());
         _prefs.put("timeStampField", timeStampField.getText().trim());
         _prefs.put("defaultEncoding", (String) encodings.getSelectedItem());
+        boolean updateSpecialFields = false;
         if (!bracesAroundCapitalsFields.getText().trim().equals(_prefs.get("putBracesAroundCapitals"))) {
             _prefs.put("putBracesAroundCapitals", bracesAroundCapitalsFields.getText());
-            _prefs.updatePutBracesAroundCapitalsFields();
+            updateSpecialFields = true;
         }
+        if (!nonWrappableFields.getText().trim().equals(_prefs.get("nonWrappableFields"))) {
+            _prefs.put("nonWrappableFields", nonWrappableFields.getText());
+            updateSpecialFields = true;
+        }
+        // If either of the two last entries were changed, run the update for special field handling:
+        if (updateSpecialFields)
+                _prefs.updateSpecialFieldHandling();
+
         // We want to know if the following setting has been modified:
         boolean oldShowSource = _prefs.getBoolean("showSource");
         _prefs.putBoolean("showSource", showSource.isSelected());

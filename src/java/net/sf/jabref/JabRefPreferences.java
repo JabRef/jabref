@@ -32,7 +32,6 @@ import javax.swing.*;
 
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.export.CustomExportList;
 import java.awt.*;
 import java.util.prefs.*;
@@ -57,6 +56,7 @@ public class JabRefPreferences {
         keyBinds = new HashMap(),
         defKeyBinds = new HashMap();
     private HashSet putBracesAroundCapitalsFields = new HashSet(4);
+    private HashSet nonWrappableFields = new HashSet(4);
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
@@ -271,6 +271,7 @@ public class JabRefPreferences {
                      +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
         defaults.put("putBracesAroundCapitals","");
+        defaults.put("nonWrappableFields", "pdf;ps;url;doi");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
@@ -294,7 +295,7 @@ public class JabRefPreferences {
         customExports = new CustomExportList(this, new ExportComparator());
 
         //defaults.put("oooWarning", Boolean.TRUE);
-        updatePutBracesAroundCapitalsFields();
+        updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
     }
 
@@ -302,7 +303,7 @@ public class JabRefPreferences {
         return putBracesAroundCapitalsFields.contains(fieldName);
     }
 
-    public void updatePutBracesAroundCapitalsFields() {
+    public void updateSpecialFieldHandling() {
         putBracesAroundCapitalsFields.clear();
         String fieldString = get("putBracesAroundCapitals");
         if (fieldString.length() > 0) {
@@ -310,6 +311,14 @@ public class JabRefPreferences {
             for (int i=0; i<fields.length; i++)
                 putBracesAroundCapitalsFields.add(fields[i]);
         }
+        nonWrappableFields.clear();
+        fieldString = get("nonWrappableFields");
+        if (fieldString.length() > 0) {
+            String[] fields = fieldString.split(";");
+            for (int i=0; i<fields.length; i++)
+                nonWrappableFields.add(fields[i]);
+        }
+
     }
 
     public String get(String key) {
@@ -832,4 +841,14 @@ public class JabRefPreferences {
           throw new IOException(ex.getMessage());
         }
       }
+
+    /**
+     * Determines whether the given field should be written without any sort of wrapping.
+     * @param fieldName The field name.
+     * @return true if the field should not be wrapped.
+     */
+    public boolean isNonWrappableField(String fieldName) {
+
+        return nonWrappableFields.contains(fieldName);
+    }
 }

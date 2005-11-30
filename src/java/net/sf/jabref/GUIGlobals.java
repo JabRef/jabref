@@ -32,6 +32,7 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.net.URL;
 import javax.swing.*;
 
