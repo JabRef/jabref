@@ -82,8 +82,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
                 // Show the new editor unless it was already visible:
-
-                if (newEditor != oldEditor) {
+                if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
                     panel.showEntryEditor(newEditor);
                 }
             } else {

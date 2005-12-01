@@ -1564,8 +1564,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
                 // mode which makes sure the selection will trigger display of the entry editor
                 // and adjustment of the splitter.
-                if (mode != SHOWING_EDITOR)
+                if (mode != SHOWING_EDITOR) {
                     mode = WILL_SHOW_EDITOR;
+                }
                 highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
 
                 markBaseChanged(); // The database just changed.
