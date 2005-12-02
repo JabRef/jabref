@@ -752,7 +752,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     entries = new ArrayList(Arrays.asList(getSelectedEntries()));
                     //rows = entryTable.getSelectedRows() ;
-                    //numSelected = rows.length ;
+                    numSelected = entries.size();
 
                     if (entries.size() == 0) { // None selected. Inform the user to select entries first.
                         JOptionPane.showMessageDialog(frame, Globals.lang("First select the entries you want keys to be generated for."),

@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import java.util.Vector;
+import java.util.WeakHashMap;
 
 /**
  * This is an immutable class representing information of either
@@ -128,8 +129,13 @@ import java.util.Vector;
  * </ol>
  */
 public class AuthorList {
-    // This is the only meaningful field after construction of the object
+
     private Vector authors;     // of Author
+
+    // Variables for storing computed strings, so they only need be created once:
+    private String authorsNatbib=null, authorsLastOnly=null, authorsLastFirst=null, authorLastFirstAnds=null,
+        authorsFirstFirst=null, authorsFirstFirstAnds=null, authorsAlph=null;
+
 
     // The following variables are used only during parsing
 
@@ -150,7 +156,7 @@ public class AuthorList {
     private static final int OFFSET_TOKEN = 0;         // String -- token itself;
     private static final int OFFSET_TOKEN_ABBR = 1;    // String -- token abbreviation;
     private static final int OFFSET_TOKEN_TERM = 2;    // Character -- token terminator (either " " or "-")
-    private static final int OFFSET_TOKEN_CASE = 3;    // Boolean -- true=uppercase, false=lowercase
+    //private static final int OFFSET_TOKEN_CASE = 3;    // Boolean -- true=uppercase, false=lowercase
     // the following are indices in 'tokens' vector created during parsing of author name
     // and later used to properly split author name into parts
     int von_start,      // first lower-case token (-1 if all tokens upper-case)
@@ -182,6 +188,8 @@ public class AuthorList {
         tex_names.put("j","j");
     }
 
+    static WeakHashMap authorCache = new WeakHashMap();
+
     /**
      * Parses the parameter strings and stores preformatted author information.
      * @param bibtex_authors contents of either <CODE>author</CODE> or
@@ -204,33 +212,43 @@ public class AuthorList {
         return authors.getAuthorsNatbib();
     }
 
+    public static AuthorList getAuthorList(String inOrig) {
+        Object o = authorCache.get(inOrig);
+        if (o == null) {
+            AuthorList authors = new AuthorList(inOrig);
+            authorCache.put(inOrig, authors);
+            return authors;
+        } else
+            return (AuthorList)o;
+    }
+
     public static String fixAuthor_firstNameFirstCommas(final String inOrig, final boolean abbr) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
         return authors.getAuthorsFirstFirst(abbr);
     }
 
     public static String fixAuthor_firstNameFirst(final String inOrig) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
         return authors.getAuthorsFirstFirstAnds();
     }
 
     public static String fixAuthor_lastNameFirstCommas(final String inOrig, final boolean abbr) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
         return authors.getAuthorsLastFirst(abbr);
     }
 
     public static String fixAuthor_lastNameFirst(final String inOrig) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
         return authors.getAuthorsLastFirstAnds();
     }
 
     public static String fixAuthor_lastNameOnlyCommas(final String inOrig) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
         return authors.getAuthorsLastOnly();
     }
 
     public static String fixAuthorForAlphabetization(final String inOrig) {
-      AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = getAuthorList(inOrig);
       return authors.getAuthorsForAlphabetization();
 
     }
@@ -241,6 +259,7 @@ public class AuthorList {
      * @return Preformatted author name; <CODE>null</CODE> if author name is empty.
      */
     private Author getAuthor() {
+
         tokens = new Vector();      // initialization
         von_start = -1;  last_start = -1;  comma_first = -1;  comma_second = -1;
 
@@ -352,7 +371,7 @@ public class AuthorList {
         if (dot_after) res.append('.');
         start += TOKEN_GROUP_LENGTH;
         while (start < end) {
-            res.append((Character) tokens.get(start-TOKEN_GROUP_LENGTH+OFFSET_TOKEN_TERM));
+            res.append(tokens.get(start-TOKEN_GROUP_LENGTH+OFFSET_TOKEN_TERM));
             res.append((String) tokens.get(start+offset));
             if (dot_after) res.append('.');
             start += TOKEN_GROUP_LENGTH;
@@ -449,6 +468,10 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsNatbib() {
+        // Check if we've computed this before:
+        if (authorsNatbib != null)
+            return authorsNatbib;
+
         StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getLastOnly());
@@ -459,7 +482,8 @@ public class AuthorList {
                 res.append(" et al.");
             }
         }
-        return res.toString();
+        authorsNatbib = res.toString();
+        return authorsNatbib;
     }
         /**
      * Returns the list of authors separated by commas with last name only;
@@ -472,24 +496,28 @@ public class AuthorList {
      * "von Neumann, Smith and Black Brown".
      * @return formatted list of authors.
      */
-    public String getAuthorsLastOnly() {
-        StringBuilder res = new StringBuilder();
-        if (size()>0) {
-            res.append(getAuthor(0).getLastOnly());
-            int i = 1;
-            while (i < size()-1) {
-                res.append(", ");
-                res.append(getAuthor(i).getLastOnly());
-                i++;
+        public String getAuthorsLastOnly() {
+            // Check if we've computed this before:
+            if (authorsLastOnly != null)
+                return authorsLastOnly;
+            StringBuilder res = new StringBuilder();
+            if (size() > 0) {
+                res.append(getAuthor(0).getLastOnly());
+                int i = 1;
+                while (i < size() - 1) {
+                    res.append(", ");
+                    res.append(getAuthor(i).getLastOnly());
+                    i++;
+                }
+                if (size() > 2) res.append(",");
+                if (size() > 1) {
+                    res.append(" and ");
+                    res.append(getAuthor(i).getLastOnly());
+                }
             }
-            if (size() > 2) res.append(",");
-            if (size() > 1) {
-                res.append(" and ");
-                res.append(getAuthor(i).getLastOnly());
-            }
+            authorsLastOnly = res.toString();
+            return authorsLastOnly;
         }
-            return res.toString();
-    }
     /**
      * Returns the list of authors separated by commas with first names after last name;
      * first names are abbreviated or not depending on parameter.
@@ -507,6 +535,10 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsLastFirst(boolean abbr) {
+        // Check if we've computed this before:
+        if (authorsLastFirst != null)
+            return authorsLastFirst;
+
         StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getLastFirst(abbr));
@@ -522,7 +554,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getLastFirst(abbr));
             }
         }
-        return res.toString();
+        authorsLastFirst = res.toString();
+        return authorsLastFirst;
     }
     /**
      * Returns the list of authors separated by "and"s with first names after last name;
@@ -535,6 +568,10 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsLastFirstAnds() {
+        // Check if we've computed this before:
+        if (authorLastFirstAnds != null)
+            return authorLastFirstAnds;
+
         StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getLastFirst(false));
@@ -543,7 +580,9 @@ public class AuthorList {
                 res.append(getAuthor(i).getLastFirst(false));
             }
         }
-        return res.toString();
+
+        authorLastFirstAnds = res.toString();
+        return authorLastFirstAnds;
     }
     /**
      * Returns the list of authors separated by commas with first names before last name;
@@ -562,6 +601,10 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsFirstFirst(boolean abbr) {
+        // Check if we've computed this before:
+        if (authorsFirstFirst != null)
+            return authorsFirstFirst;
+
         StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getFirstLast(abbr));
@@ -577,7 +620,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getFirstLast(abbr));
             }
         }
-        return res.toString();
+        authorsFirstFirst = res.toString();
+        return authorsFirstFirst;
     }
     /**
      * Returns the list of authors separated by "and"s with first names before last name;
@@ -590,6 +634,10 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsFirstFirstAnds() {
+        // Check if we've computed this before:
+        if (authorsFirstFirstAnds != null)
+            return authorsFirstFirstAnds;
+
         StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getFirstLast(false));
@@ -598,7 +646,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getFirstLast(false));
             }
         }
-        return res.toString();
+        authorsFirstFirstAnds = res.toString();
+        return authorsFirstFirstAnds;
     }
 
     /**
@@ -614,6 +663,9 @@ public class AuthorList {
      * @return formatted list of authors
      */
     public String getAuthorsForAlphabetization() {
+         if (authorsAlph != null)
+            return authorsAlph;
+
          StringBuilder res = new StringBuilder();
         if (size()>0) {
             res.append(getAuthor(0).getNameForAlphabetization());
@@ -622,7 +674,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getNameForAlphabetization());
             }
         }
-        return res.toString();
+        authorsAlph = res.toString();
+        return authorsAlph;
     }
 
 

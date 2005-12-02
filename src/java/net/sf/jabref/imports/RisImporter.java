@@ -161,6 +161,9 @@ public class RisImporter implements ImportFormat {
                     comment = comment+"\n";
                 comment = comment+val;
             }
+            // Added ID import 2005.12.01, Morten Alver:
+            else if (lab.equals("ID"))
+                hm.put("refid", val);
         }
         }
         // fix authors

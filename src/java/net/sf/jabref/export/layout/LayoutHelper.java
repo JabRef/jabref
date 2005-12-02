@@ -237,10 +237,13 @@ public class LayoutHelper
             {
                 if ((c == '}') || (c == ']'))
                 {
-                    if (buffer != null)
-                    {
-                        if (c == ']')
+                    // changed section start - arudert
+                    // buffer may be null for parameters
+                    //if (buffer != null)
+                    //{
+                        if (c == ']' && buffer != null)
                         {
+                    // changed section end - arudert
                             option = buffer.toString();
                             buffer = null;
                             start = false;
@@ -248,15 +251,22 @@ public class LayoutHelper
 
                         //myStrings.add(buffer.toString());
                         //System.out.println("\nbracketedOption: " + buffer.toString());
-                        if (buffer != null)
+                        
+                        // changed section begin - arudert
+                        // bracketed option must be followed by an (optionally empty) parameter
+                        // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
+                        // splits the string later on ignores the empty parameter)
+                        //if (buffer != null)
+                        else if (c == '}')
                         {
-                            if (option != null)
+                           String parameter = buffer == null ? " " : buffer.toString();
+                           if (option != null)
                             {
-                                tmp = buffer.toString() + "\n" + option;
+                                tmp = parameter + "\n" + option;
                             }
                             else
                             {
-                                tmp = buffer.toString();
+                                tmp = parameter;
                             }
 
                             //System.out.println("FORMAT: '"+tmp+"'");
@@ -264,7 +274,10 @@ public class LayoutHelper
 
                             return null;
                         }
-                    }
+                        // changed section end - arudert
+                     // changed section start - arudert
+                     // }
+                     // changed section end - arudert
                 }
                 else
                 {
@@ -280,15 +293,19 @@ public class LayoutHelper
 
                 if (start)
                 {
+                  
                     if ((c == '}') || (c == ']'))
                     {
                     }
                     else
                     {
-                        if (c != '\\')
-                        {
+                        // changed section begin - arudert
+                        // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+                        //if (c != '\\')
+                        //{
                             buffer.append((char) c);
-                        }
+                        //}
+                        // changed section end - arudert
                     }
                 }
             }

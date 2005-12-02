@@ -80,8 +80,15 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - Added export option for OpenDocument spreadsheet.
+1.x:    - (Did some profiling with Netbeans... introduced caching of AuthorList objects to reduce number allocated
+          by 95% for my test case)
+        - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
+        - Added REPEC-NEP import filter.
+        - Added option for non-field parameters for export formatters. If the parameters does not start with the
+          backslash character, it will be passed unchanged to the formatter in place of any field value.
+        - Added export formatter CurrentDate, which returns the current date, and takes a format string as
+          parameter.                   
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
         - [UNFINISHED] Added toggling of abbreviated and full journal names, based on a built-in
           journal list, extendable by linking to an external text file.          

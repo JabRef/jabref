@@ -209,6 +209,57 @@ public class Layout
 
         return sb.toString();
     }
+    
+    // added section - begin (arudert)
+    // note: string resolving not implemented yet
+    /**
+     * Returns the processed text. If the database argument is
+     * null, no string references will be resolved. Otherwise all valid
+     * string references will be replaced by the strings' contents. Even
+     * recursive string references are resolved.
+     */
+    public String doLayout(BibtexDatabase database)
+    {
+        //System.out.println("LAYOUT: " + bibtex.getId());
+        StringBuffer sb = new StringBuffer(100);
+        String fieldText;
+        boolean previousSkipped = false;
+
+        for (int i = 0; i < layoutEntries.length; i++)
+        {
+            fieldText = layoutEntries[i].doLayout(database);
+
+            if (fieldText == null) 
+            {
+                fieldText = "";
+                if (previousSkipped)
+                {
+                    int eol = 0;
+
+                    while ((eol < fieldText.length()) &&
+                            ((fieldText.charAt(eol) == '\n') ||
+                            (fieldText.charAt(eol) == '\r')))
+                    {
+                        eol++;
+                    }
+
+                    if (eol < fieldText.length())
+                    {
+                        sb.append(fieldText.substring(eol));
+                    }
+                }
+            }
+            else
+            {
+                sb.append(fieldText);
+            }
+
+            previousSkipped = false;
+        }
+
+        return sb.toString();
+    }
+    // added section - end (arudert)
 }
 ///////////////////////////////////////////////////////////////////////////////
 //  END OF FILE.

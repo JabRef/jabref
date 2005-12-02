@@ -444,15 +444,28 @@ public class FileActions
         return;
     }
 
-    // Print header
-    try {
-        reader = getReader(prefix+lfName+".begin.layout");
-        while ((c = reader.read()) != -1) {
+        // Print header
+        // changed section - begin (arudert)
+        Layout beginLayout = null;
+        try {
+            reader = getReader(prefix + lfName + ".begin.layout");
+            LayoutHelper layoutHelper = new LayoutHelper(reader);
+            beginLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            reader.close();
+/*
+	    while ((c = reader.read()) != -1) {
                 ps.write((char)c);
+	    }
+	    reader.close();
+*/
+        } catch (IOException ex) {
+            //  // If an exception was cast, export filter doesn't have a begin file.
         }
-        reader.close();
-    } catch (IOException ex) {}
-    // If an exception was cast, export filter doesn't have a begin file.
+        // Write the header
+        if (beginLayout != null) {
+            ps.write(beginLayout.doLayout(database));
+        }
+        // changed section - end (arudert)
 
     // Write database entries; entries will be sorted as they
     // appear on the screen, or sorted by author, depending on
@@ -503,19 +516,33 @@ public class FileActions
             ps.write(layout.doLayout(entry, database));
           }
 
-          // Print footer
-          try {
-            reader = getReader(prefix+lfName+".end.layout");
-            while ((c = reader.read()) != -1) {
-              ps.write((char)c);
-            }
-            reader.close();
-          } catch (IOException ex) {}
-          // If an exception was cast, export filter doesn't have a end file.
+        // Print footer
 
-          ps.flush();
-          ps.close();
+        // changed section - begin (arudert)
+        Layout endLayout = null;
+        try {
+            reader = getReader(prefix + lfName + ".end.layout");
+            layoutHelper = new LayoutHelper(reader);
+            endLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            reader.close();
+            /*
+                  while ((c = reader.read()) != -1) {
+                            ps.write((char)c);
+                  }
+                  reader.close();
+            */
+        } catch (IOException ex) {
+            //  // If an exception was cast, export filter doesn't have an end file.
         }
+        // Write the header
+        if (endLayout != null) {
+            ps.write(endLayout.doLayout(database));
+        }
+        // changed section - end (arudert)
+
+        ps.flush();
+        ps.close();
+    }
 
 
     public static void exportEntries(BibtexDatabase database, BibtexEntry[] bes,

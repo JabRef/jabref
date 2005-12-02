@@ -301,7 +301,11 @@ public class LayoutEntry
                 fieldEntry = bibtex.getType().getName();
             }
             else{
-            String field = getField(bibtex, text, database);
+            // changed section begin - arudert
+            // resolve field (recognized by leading backslash) or text
+            String field = text.startsWith("\\") ? getField(bibtex, text.substring(1), database) : getText(text, database);
+            // changed section end - arudert
+            
             //String field = (String) bibtex.getField(text);
 
             if (field == null)
@@ -330,6 +334,48 @@ public class LayoutEntry
         //		}
         return "";
     }
+
+  // added section - begin (arudert)
+  /**
+   * Do layout for general formatters (no bibtex-entry fields).
+   * 
+   * @param database Bibtex Database
+   * @return 
+   */
+  public String doLayout(BibtexDatabase database)
+  {
+      if (type == LayoutHelper.IS_LAYOUT_TEXT)
+      {
+          return text;
+      }
+      else if (type == LayoutHelper.IS_SIMPLE_FIELD)
+      {
+          throw new UnsupportedOperationException("bibtext entry fields not allowed in begin or end layout");
+      }
+      else if ((type == LayoutHelper.IS_FIELD_START) ||
+                (type == LayoutHelper.IS_GROUP_START))
+      {
+        throw new UnsupportedOperationException("field and group starts not allowed in begin or end layout");
+      }
+      else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END))
+      {
+        throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
+      }
+      else if (type == LayoutHelper.IS_OPTION_FIELD)
+      {
+          String field = getText(text, database);
+          if (option != null)
+          {
+            for (int i=0; i<option.length; i++) {
+              field = option[i].format(field);
+            }
+          }
+
+          return field;
+      }
+      return "";
+  }
+  // added section - end (arudert)
 
     /**
      * @param string
@@ -376,8 +422,21 @@ public class LayoutEntry
     }
 
 
+    // changed section begin - arudert
+    /**
+     * Returns a text with references resolved according to an optionally given database. 
+     */
+    private String getText(String text, BibtexDatabase database) {
+      String res = text;
+      // changed section end - arudert
+      if ((res != null) && (database != null))
+        res = database.resolveForStrings(res);
+      return res;
+    }
+    // changed section end - arudert
+    
     private String getField(BibtexEntry bibtex, String field, BibtexDatabase database) {
-            String res = (String) bibtex.getField(field);
+      String res = (String)bibtex.getField(field);
 	    if ((res != null) && (database != null))
 		res = database.resolveForStrings(res);
 	    return res;
