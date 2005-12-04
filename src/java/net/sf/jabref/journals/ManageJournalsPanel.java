@@ -40,7 +40,8 @@ public class ManageJournalsPanel extends JPanel{
     JTable userTable; // builtInTable
     JPanel userPanel = new JPanel(),
         journalEditPanel,
-        externalFilesPanel = new JPanel();
+        externalFilesPanel = new JPanel(),
+        addExtPan = new JPanel();
     JTextField nameTf = new JTextField(),
         newNameTf = new JTextField(),
         abbrTf = new JTextField();
@@ -55,7 +56,8 @@ public class ManageJournalsPanel extends JPanel{
         cancel = new JButton(Globals.lang("Cancel")),
         help = new JButton(Globals.lang("Help")),
         browseOld = new JButton(Globals.lang("Browse")),
-        browseNew = new JButton(Globals.lang("Browse"));
+        browseNew = new JButton(Globals.lang("Browse")),
+        addExt = new JButton(new ImageIcon(GUIGlobals.addIconFile));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -67,6 +69,8 @@ public class ManageJournalsPanel extends JPanel{
         group.add(newFile);
         group.add(oldFile);
 
+        addExtPan.add(addExt);
+
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                         "40dlu, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, 200dlu");
@@ -76,11 +80,12 @@ public class ManageJournalsPanel extends JPanel{
 
         JPanel pan = new JPanel();
 
-        JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef can switch journal names between "
+        /*JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef can switch journal names between "
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
-            +"you may need to add your own definitions.")+"</HTML>");
+            +"you may need to add your own definitions.")+"</HTML>");*/
+        builder.addSeparator(Globals.lang("Personal journal list"), cc.xyw(2,1,6));
 
-        builder.add(description, cc.xyw(2,1,6));
+        //builder.add(description, cc.xyw(2,1,6));
         builder.add(newFile, cc.xy(3,2));
         builder.add(newNameTf, cc.xy(5,2));
         builder.add(browseNew, cc.xy(7,2));
@@ -183,7 +188,12 @@ public class ManageJournalsPanel extends JPanel{
 
         add.addActionListener(tableModel);
         remove.addActionListener(tableModel);
-
+        addExt.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                externals.add(new ExternalFileEntry());
+                buildExternalsPanel();
+            }
+        });
 
         dialog.pack();
 
@@ -203,33 +213,46 @@ public class ManageJournalsPanel extends JPanel{
             oldFile.setEnabled(true);
         }
         setupUserTable();
+        setupExternals();
+        buildExternalsPanel();
+
+    }
+
+    private void buildExternalsPanel() {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("fill:pref:grow",""));
+        for (Iterator i=externals.iterator(); i.hasNext();) {
+            ExternalFileEntry efe = (ExternalFileEntry)i.next();
+            builder.append(efe.getPanel());
+            builder.nextLine();
+        }
+        builder.append(Box.createVerticalGlue());
+        builder.nextLine();
+        builder.append(addExtPan);
+        externalFilesPanel.removeAll();
+        externalFilesPanel.add(builder.getPanel(), BorderLayout.CENTER);
+        externalFilesPanel.revalidate();
+        externalFilesPanel.repaint();
+
+    }
+
+    private void setupExternals() {
         String[] externalFiles = Globals.prefs.getStringArray("externalJournalLists");
         if ((externalFiles == null) || (externalFiles.length == 0)) {
-
-
+            ExternalFileEntry efe = new ExternalFileEntry();
+            externals.add(efe);
         } else {
             for (int i=0; i<externalFiles.length; i++) {
                 ExternalFileEntry efe = new ExternalFileEntry(externalFiles[i]);
                 externals.add(efe);
-                builder.append(efe.getPanel());
-                builder.nextLine();
+
             }
 
         }
-        ExternalFileEntry efe = new ExternalFileEntry();
-        externals.add(efe);
-        builder.append(efe.getPanel());
-        builder.nextLine();
-        efe = new ExternalFileEntry();
-        externals.add(efe);
-        builder.append(efe.getPanel());
-        builder.nextLine();
-        builder.append(Box.createVerticalGlue());
-        externalFilesPanel.removeAll();
-        externalFilesPanel.add(builder.getPanel(), BorderLayout.CENTER);
-        //externalFilesPanel.add(new JPanel(), BorderLayout.CENTER);
+
+        //efe = new ExternalFileEntry();
+        //externals.add(efe);
+
     }
 
     public void setupUserTable() {
@@ -500,7 +523,7 @@ public class ManageJournalsPanel extends JPanel{
         private JTextField tf;
         private JButton browse = new JButton(Globals.lang("Browse")),
             view = new JButton(Globals.lang("Preview")),
-            clear = new JButton(Globals.lang("Clear")),
+            clear = new JButton(new ImageIcon(GUIGlobals.removeIconFile)),
             download = new JButton(Globals.lang("Download"));
         public ExternalFileEntry() {
             tf = new JTextField();
@@ -517,12 +540,12 @@ public class ManageJournalsPanel extends JPanel{
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
             DefaultFormBuilder builder = new DefaultFormBuilder
-                    (new FormLayout("fill:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, fill:pref", ""));
+                    (new FormLayout("fill:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, fill:pref", ""));
             builder.append(tf);
             builder.append(browse);
             builder.append(download);
-            builder.append(clear);
             builder.append(view);
+            builder.append(clear);
 
             pan = builder.getPanel();
 
@@ -541,7 +564,8 @@ public class ManageJournalsPanel extends JPanel{
             });
             clear.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    tf.setText("");
+                    externals.remove(ExternalFileEntry.this);
+                    buildExternalsPanel();
                 }
             });
         }
