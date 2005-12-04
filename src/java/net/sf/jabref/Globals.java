@@ -911,8 +911,22 @@ public class Globals {
   }
 
     public static void initializeJournalNames() {
-        // Read built-in journal list:
-        journalAbbrev = new JournalAbbreviations("/resource/journalList.txt");
+        journalAbbrev = new JournalAbbreviations();//"/resource/journalList.txt");
+
+        // Read external lists, if any (in reverse order, so the upper lists override the lower):
+        String[] lists = prefs.getStringArray("externalJournalLists");
+        if ((lists != null) && (lists.length > 0)) {
+            for (int i=lists.length-1; i>=0; i--) {
+                try {
+                    journalAbbrev.readJournalList(new File(lists[i]));
+                } catch (FileNotFoundException e) {
+                    // The file couldn't be found... should we tell anyone?
+                    Globals.logger(e.getMessage());
+                }
+            }
+        }
+
+        // Read personal list, if set up:
         if (prefs.get("personalJournalList") != null) {
             try {
                 journalAbbrev.readJournalList(new File(prefs.get("personalJournalList")));
@@ -921,6 +935,8 @@ public class Globals {
                     "' not found.");
             }
         }
+
+
     }
 
 }

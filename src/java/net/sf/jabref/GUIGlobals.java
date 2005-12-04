@@ -294,7 +294,8 @@ public class GUIGlobals {
       shortPlainImport="ShortPlainImport.html",
       importInspectionHelp = "ImportInspectionDialog.html",
       shortIntegrityCheck="ShortIntegrityCheck.html",
-        remoteHelp = "RemoteHelp.html";
+        remoteHelp = "RemoteHelp.html",
+        journalAbbrHelp = "JournalAbbreviations.html";
 
 
 // Colors.

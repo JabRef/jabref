@@ -90,8 +90,10 @@ Change log:
         - Added export formatter CurrentDate, which returns the current date, and takes a format string as
           parameter.                   
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
-        - [UNFINISHED] Added toggling of abbreviated and full journal names, based on a built-in
-          journal list, extendable by linking to an external text file.          
+        - [UNFINISHED] Added toggling of abbreviated and full journal names. The list of journals is realized as
+           an external file, but editable from a Manage Journal Abbreviations panel. Secondary lists can also
+           be linked, but not edited. There is a download option to quickly get a list available on the internet,
+           and we will provide one or more lists for download from the SourceForge web server.
         - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
         - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.

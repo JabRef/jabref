@@ -284,6 +284,7 @@ public class JabRefPreferences {
         defaults.put("remoteServerPort", new Integer(6050));
 
         defaults.put("personalJournalList", null);
+        defaults.put("externalJournalLists", null);
 
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));

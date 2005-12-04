@@ -18,11 +18,15 @@ public class FieldContentParser {
      */
     public StringBuffer format(StringBuffer content) {
 
+        //boolean rep = false;
+
         int i=0;
 
         // Remove windows newlines and insert unix ones:
-        content = new StringBuffer(content.toString().replaceAll("\r\n","\n"));
-
+        // TODO: 2005.12.3: Added replace from \r to \n, to work around a reported problem of words stiched together.
+        // But: we need to find out why these lone \r characters appear in his file.
+        content = new StringBuffer(content.toString().replaceAll("\r\n","\n").replaceAll("\r", "\n"));
+        //if (rep) System.out.println(content.toString());
         /*while (i<content.length()) {
             if (content.charAt(i) == '\r')
                 content.deleteCharAt(i);

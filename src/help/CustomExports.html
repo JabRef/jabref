@@ -91,6 +91,10 @@ which will be copied directly to the output.
 <p>will cause the formatter <b>ToLowerCase</b> to be called first, and then <b>HTMLChars</b> will be
   called to format the result. You can list an arbitrary number of formatters in this way.
 
+<p>The argument to the formatters, withing the curly braces, does not have to be a field command. Instead,
+you can insert normal text, which will then be passed to the formatters instead of the contents of any field.
+This can be useful for some fomatters, e.g. the CurrentDate formatter (described below).
+
 <p>JabRef provides the following set of formatters, some of which depend on the others:
 <ul>
 <li><code>HTMLChars</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
@@ -98,6 +102,11 @@ which will be copied directly to the output.
 <li><code>XMLChars</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
   with their XML representations.
 <li><code>CreateDocBookAuthors</code> : formats the author field in DocBook style.
+<li><code>CurrentDate</code> : outputs the current date. With no argument, this formatter outputs the
+    current date and time in the format "yyyy.MM.dd hh:mm:ss z" (date, time and time zone). By giving a
+    different format string as argument, the date format can be customized. E.g.
+    <code>\format[CurrentDate]{yyyy.MM.dd}</code> will give the date only, e.g. 2005.11.30.
+
 <li><code>AuthorFirstFirst</code> : formats author/editor fields with the first names first.
 <li><code>AuthorFirstFirstCommas</code> : formats author/editor fields with the first names first, and deliminated by commas.
 <li><code>AuthorLastFirst</code> : formats author/editor fields with the last names first.

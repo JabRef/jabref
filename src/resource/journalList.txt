@@ -1,3 +1,8 @@
+####################################################
+##
+## Journal abbreviations list readable by JabRef.
+##
+####################################################
 Accounts of Chemical Research=Acc. Chem. Res.;ACHRE4;M
 ACS Symposium Series=ACS Symp. Ser.;ACSMC8;IRR
 Acta Biochimica Polonica=Acta Biochim. Pol.;ABPLAF;Q

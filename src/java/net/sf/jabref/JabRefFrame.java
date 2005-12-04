@@ -362,8 +362,11 @@ public class JabRefFrame
     //Globals.setLanguage("no", "");
 
     macOSXRegistration();
-    setGlassPane(new MyGlassPane());
-    setTitle(GUIGlobals.frameTitle);
+      MyGlassPane glassPane = new MyGlassPane();
+    setGlassPane(glassPane);
+    //  glassPane.setVisible(true);
+    
+      setTitle(GUIGlobals.frameTitle);
     setIconImage(new ImageIcon(GUIGlobals.jabreflogo).getImage());
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
@@ -721,6 +724,8 @@ public JabRefPreferences prefs() {
     con.insets = new Insets(0, 0, 0, 0);
     gbl.setConstraints(status, con);
     getContentPane().add(status);
+
+
 
   }
 
@@ -2549,11 +2554,29 @@ class SaveSessionAction
         }
     }
 
-  private class MyGlassPane extends JPanel {
+    /*private class ForegroundLabel extends JLabel {
+         public ForegroundLabel(String s) {
+             super(s);
+             setFont(new Font("plain", Font.BOLD, 70));
+             setHorizontalAlignment(JLabel.CENTER);
+         }
 
+        public void paint(Graphics g) {
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            super.paint(g2);    //To change body of overridden methods use File | Settings | File Templates.
+        }
+    }       */
+
+  private class MyGlassPane extends JPanel {
+    //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
     public MyGlassPane() {
       addKeyListener(new KeyAdapter() { });
       addMouseListener(new MouseAdapter() { });
+      /*  infoLabel.setForeground(new Color(255, 100, 100, 124));
+
+        setLayout(new BorderLayout());
+        add(infoLabel, BorderLayout.CENTER);*/
       super.setCursor(
         Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }

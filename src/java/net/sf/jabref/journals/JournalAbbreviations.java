@@ -43,6 +43,10 @@ public class JournalAbbreviations {
         readJournalList(resource);
     }
 
+    public JournalAbbreviations(File file) throws FileNotFoundException {
+        readJournalList(file);
+    }
+
     /**
      * Get an iterator for the known journals in alphabetical order.
      * @return Iterator for journal full names
@@ -140,6 +144,8 @@ public class JournalAbbreviations {
             String line;
             while ((line = reader.readLine()) != null) {
                 //System.out.println(line);
+                if (line.startsWith("#"))
+                    continue;
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
                     String fullName = parts[0].trim();
