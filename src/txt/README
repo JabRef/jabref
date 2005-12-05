@@ -90,6 +90,7 @@ Change log:
         - Added export formatter CurrentDate, which returns the current date, and takes a format string as
           parameter.                   
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
+        - Added new Appearance tab to preferences dialog to gather appearance related options.
         - [UNFINISHED] Added toggling of abbreviated and full journal names. The list of journals is realized as
            an external file, but editable from a Manage Journal Abbreviations panel. Secondary lists can also
            be linked, but not edited. There is a download option to quickly get a list available on the internet,
@@ -101,6 +102,8 @@ Change log:
         - The encoding used when opening a database is now remembered, and used when database is stored.
         - Added option to disable wrapping for certain fields. Wrapping of pdf, ps, doi and url is disabled by
           default.
+        - Antialiasing option now affects entry editor text fields as well as table text.
+        - Changed to monospaced font in source editor field.
         - Removed option to put double braces around BibTeX fields, but retained option to remove double braces
           when loading. Added option to put braces around capital letters of a chosen set of fields.
         - Improved Ovid import.

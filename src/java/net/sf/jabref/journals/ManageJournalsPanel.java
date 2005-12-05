@@ -68,12 +68,12 @@ public class ManageJournalsPanel extends JPanel{
         ButtonGroup group = new ButtonGroup();
         group.add(newFile);
         group.add(oldFile);
-
-        addExtPan.add(addExt);
-
+        addExtPan.setLayout(new BorderLayout());
+        addExtPan.add(addExt, BorderLayout.EAST);
+        //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "40dlu, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, 200dlu");
+                ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, 150dlu");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         CellConstraints cc = new CellConstraints();

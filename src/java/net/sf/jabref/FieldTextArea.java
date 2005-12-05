@@ -43,6 +43,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor, KeyListener
     //protected Completer completer;
     static Pattern bull = Pattern.compile("\\s*[-\\*]+.*");
     static Pattern indent = Pattern.compile("\\s+.*");
+    private boolean antialias = Globals.prefs.getBoolean("antialias");
 
     public FieldTextArea(String fieldName_, String content) {
         super(content);
@@ -54,6 +55,8 @@ public class FieldTextArea extends JTextArea implements FieldEditor, KeyListener
         sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setMinimumSize(new Dimension(200, 1));
+
+
 
         setLineWrap(true);
         setWrapStyleWord(true);
@@ -96,15 +99,11 @@ public class FieldTextArea extends JTextArea implements FieldEditor, KeyListener
 
 
 
-  public void paintComponent(Graphics g) {
+  public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-        RenderingHints rh = g2.getRenderingHints();
-        rh.put(RenderingHints.KEY_ANTIALIASING,
-               RenderingHints.VALUE_ANTIALIAS_ON);
-        rh.put(RenderingHints.KEY_RENDERING,
-               RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHints(rh);
-        super.paintComponent(g2);
+        if (antialias)
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paint(g2);
   }
 
     public String getFieldName() { return fieldName; }

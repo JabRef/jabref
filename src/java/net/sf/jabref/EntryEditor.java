@@ -417,13 +417,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   private void setupSourcePanel() {
     source =
       new JTextArea() {
-          public void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-              RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-              RenderingHints.VALUE_RENDER_QUALITY);
-            super.paintComponent(g2);
+          private boolean antialias = Globals.prefs.getBoolean("antialias");
+          public void paint(Graphics g) {
+                Graphics2D g2 = (Graphics2D)g;
+                if (antialias)
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                super.paint(g2);
           }
         };
     con = new GridBagConstraints();
@@ -442,7 +441,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     // was focused when
     // an action was called.
     source.addFocusListener(Globals.focusListener);
-
+    source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt("fontSize")));
     setupJTextComponent(source);
     updateSource();
 
@@ -855,7 +854,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 
   public void updateField(final Object source) {
-    storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
+      storeFieldAction.actionPerformed(new ActionEvent(source, 0, ""));
   }
 
   private class TypeLabel extends JPanel {
@@ -917,7 +916,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class TabListener implements ChangeListener {
     public void stateChanged(ChangeEvent e) {
-        activateVisible();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                activateVisible();
+            }
+        });
+
 
         // After the initial event train has finished, we tell the editor tab to update all
         // its fields. This makes sure they are updated even if the tab we just left contained one

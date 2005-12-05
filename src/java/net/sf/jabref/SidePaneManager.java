@@ -32,6 +32,7 @@ import net.sf.jabref.groups.*;
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.*;
 
 public class SidePaneManager implements ChangeListener {
 
@@ -45,15 +46,15 @@ public class SidePaneManager implements ChangeListener {
     private int visibleComponents = 0;
 
     public SidePaneManager(JabRefFrame frame) {
-	    this.prefs = Globals.prefs;
-	    // TODO: tab listener, update all sidepanecomponents.
-	    this.frame = frame;
+        this.prefs = Globals.prefs;
+        // TODO: tab listener, update all sidepanecomponents.
+        this.frame = frame;
         frame.tabbedPane.addChangeListener(this);
-	    sidep = new SidePane();
+        sidep = new SidePane();
     }
 
     public SidePane getPanel() {
-	return sidep;
+    return sidep;
     }
 
     public void populatePanel() {
@@ -166,13 +167,13 @@ public class SidePaneManager implements ChangeListener {
       visible.remove(comp);
       //sidep.setComponents(visible);
       updateView();
-	/*comp.componentClosing();
-	comp.setVisible(false);  // Swing method to make component invisible.
-	comp.setVisibility(false); // Our own boolean to keep track of visibility.
-	visibleComponents--;
-	if (visibleComponents == 0)
-	    panel.remove(sidep);
-      */
+    /*comp.componentClosing();
+  comp.setVisible(false);  // Swing method to make component invisible.
+  comp.setVisibility(false); // Our own boolean to keep track of visibility.
+  visibleComponents--;
+  if (visibleComponents == 0)
+      panel.remove(sidep);
+    */
     }
 
     /**
@@ -198,12 +199,12 @@ public class SidePaneManager implements ChangeListener {
       sidep.setComponents(toShow);
       boolean wasVisible = sidep.isVisible();
       if (visible.size() > 0) {
-	  sidep.setVisible(true);
+      sidep.setVisible(true);
       if (!wasVisible)
         frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
 
       } else
-	  sidep.setVisible(false);
+      sidep.setVisible(false);
 
     }
 
@@ -213,6 +214,14 @@ public class SidePaneManager implements ChangeListener {
     }
 
     public void stateChanged(ChangeEvent event) {
-        setActiveBasePanel((BasePanel)frame.tabbedPane.getSelectedComponent());
+        // Change by Morten Alver 2005.12.04:
+        // By postponing the updating of the side pane components, we get rid of the annoying
+        // latency when switching tabs:
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setActiveBasePanel((BasePanel)frame.tabbedPane.getSelectedComponent());
+            }
+        });
+
     }
 }

@@ -13,21 +13,13 @@ import net.sf.jabref.gui.ColorSetupPanel;
 class TablePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private String[] _choices;
-    private Boolean[] _sel;
-    private JCheckBox colorCodes, autoResizeMode, secDesc, terDesc,
-    antialias, pdfColumn, urlColumn, citeseerColumn;
+    private JCheckBox autoResizeMode, secDesc, terDesc,
+    pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames, lastNamesOnly;
-    private GridBagLayout gbl = new GridBagLayout();
-    private GridBagConstraints con = new GridBagConstraints();
     private JComboBox
     secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
     terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
-    private JTextField secField, terField, fontSize;
-    private JButton fontButton = new JButton(Globals.lang("Set table font"));
-    private ColorSetupPanel colorPanel = new ColorSetupPanel();
-    private boolean tableChanged = false;
-    private Font font = GUIGlobals.CURRENTFONT,	menuFont;
+    private JTextField secField, terField;
     private JabRefFrame frame;
 
 
@@ -43,10 +35,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 
 
-        colorCodes = new JCheckBox(Globals.lang
-                   ("Color codes for required and optional fields"));
-        antialias = new JCheckBox(Globals.lang
-                  ("Use antialiasing font in table"));
         autoResizeMode = new JCheckBox(Globals.lang
                        ("Fit table horizontally on screen"));
 
@@ -139,46 +127,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     builder.append(pan);
     builder.append(builder2.getPanel());
     builder.nextLine();
-    builder.appendSeparator(Globals.lang("Table appearance"));
-    builder.append(pan); builder.append(colorCodes); builder.nextLine();
+    builder.appendSeparator(Globals.lang("General"));
     builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
-    builder.append(pan); builder.append(antialias); builder.nextLine();
-    builder.append(pan); builder.append(fontButton); builder.nextLine();
-    builder.append(pan); builder.append(colorPanel);
-    //	builder.append(pan); builder.append(); builder.nextLine();
 
-    JPanel upper = new JPanel(),
-        sort = new JPanel(),
-        namesp = new JPanel(),
-            iconCol = new JPanel();
-    upper.setLayout(gbl);
-    sort.setLayout(gbl);
-        namesp.setLayout(gbl);
-        iconCol.setLayout(gbl);
-
-
-
-    fontButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            // JDialog dl = new EntryCustomizationDialog(ths);
-            Font f=new FontSelectorDialog
-                (null, GUIGlobals.CURRENTFONT).getSelectedFont();
-            if(f==null)
-                return;
-            else
-                font = f;
-        }
-        });
-    /*menuFontButton.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-             Font f=new FontSelectorDialog
-                 (null, menuFont).getSelectedFont();
-             if(f==null)
-                 return;
-             else
-                 menuFont = f;
-         }
-         });*/
 
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -186,11 +137,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     }
 
     public void setValues() {
-    menuFont = new Font
-        (_prefs.get("menuFontFamily"), _prefs.getInt("menuFontStyle"),
-         _prefs.getInt("menuFontSize"));
-    colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
-    antialias.setSelected(_prefs.getBoolean("antialias"));
     autoResizeMode.setSelected((_prefs.getInt("autoResizeMode")==JTable.AUTO_RESIZE_ALL_COLUMNS));
     pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
     urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
@@ -218,7 +164,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
-        colorPanel.setValues();
     }
 
     /**
@@ -228,14 +173,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
      */
     public void storeSettings() {
 
-    _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
     _prefs.putBoolean("namesAsIs", namesAsIs.isSelected());
     _prefs.putBoolean("namesFf", namesFf.isSelected());
     _prefs.putBoolean("namesNatbib", namesNatbib.isSelected());
     _prefs.putBoolean("namesLastOnly", lastNamesOnly.isSelected());
     _prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
 
-        _prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
         _prefs.putBoolean("urlColumn", urlColumn.isSelected());
         _prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
@@ -250,15 +193,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.put("secSort", secField.getText().toLowerCase().trim());
         _prefs.put("terSort", terField.getText().toLowerCase().trim());
     // updatefont
-    _prefs.put("fontFamily", font.getFamily());
-    _prefs.putInt("fontStyle", font.getStyle());
-    _prefs.putInt("fontSize", font.getSize());
-    //_prefs.put("menuFontFamily", menuFont.getFamily());
-    //_prefs.putInt("menuFontStyle", menuFont.getStyle());
-    //_prefs.putInt("menuFontSize", menuFont.getSize());
-
-    GUIGlobals.CURRENTFONT = font;
-        colorPanel.storeSettings();
     }
 
     public boolean readyToClose() {

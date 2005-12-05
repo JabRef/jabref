@@ -27,12 +27,8 @@ package net.sf.jabref;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.util.*;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Component;
-import java.awt.Insets;
-import java.awt.AWTKeyStroke;
-import java.awt.KeyboardFocusManager;
+import java.util.List;
+import java.awt.*;
 import java.awt.event.*;
 
 public class EntryEditorTab {
@@ -52,11 +48,12 @@ public class EntryEditorTab {
         else
             this.fields = new String[] {};
         this.parent = parent;
-	    setupPanel(addKeyField, name);
+        setupPanel(addKeyField, name);
 
         // The following line makes sure focus cycles inside tab instead of being lost
         // to other parts of the frame:
         panel.setFocusCycleRoot(true);
+
     }
 
 
@@ -73,7 +70,7 @@ public class EntryEditorTab {
 
 	    // Create the text area:
 	    FieldTextArea ta = new FieldTextArea(fields[i], null);//stringContent);
-	    JComponent ex = parent.getExtra(fields[i], ta);
+        JComponent ex = parent.getExtra(fields[i], ta);
 	    // Attach listeners and key bindings:
 	    setupJTextComponent(ta);
 	    ta.addFocusListener(new FieldListener(ta));
@@ -131,7 +128,7 @@ public class EntryEditorTab {
 	    con.anchor = GridBagConstraints.SOUTHWEST;
 	    FieldTextField tf = new FieldTextField(Globals.KEY_FIELD, (String) parent.entry.getField(Globals.KEY_FIELD), true);//(String) entry.getField(Globals.KEY_FIELD));
         editors.put("bibtexkey", tf);
-        
+
         // If the key field is the only field, we should have only one editor, and this one should be set
         // as active initially:
         if (editors.size() == 1)

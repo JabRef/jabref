@@ -17,14 +17,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, saveInStandardOrder, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
-    private JTextField defOwnerField, fontSize, timeStampFormat, timeStampField,
+    private JTextField defOwnerField, timeStampFormat, timeStampField,
             bracesAroundCapitalsFields, nonWrappableFields;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
     encodings = new JComboBox(Globals.ENCODINGS);
     private HelpAction ownerHelp, timeStampHelp;
-    private int oldMenuFontSize;
 
     public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
         _prefs = prefs;
@@ -69,8 +68,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         editSource.setMargin(marg);
         defSource.setMargin(marg);
         inspectionWarnDupli.setMargin(marg);
-        // Font sizes:
-        fontSize = new JTextField();
         bracesAroundCapitalsFields = new JTextField(30);
         nonWrappableFields = new JTextField(30);
         // We need a listener on showSource to enable and disable the source panel-related choices:
@@ -198,10 +195,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         lab = new JLabel(Globals.lang("Default encoding") + ":");
         builder2.append(lab);
         builder2.append(encodings);
-        lab = new JLabel(Globals.lang("Menu and label font size") + ":");
-        builder2.nextLine();
-        builder2.append(lab);
-        builder2.append(fontSize);
         builder.append(pan);
         builder.append(builder2.getPanel());
         builder.nextLine();
@@ -253,8 +246,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
                 break outer;
             }
         }
-        fontSize.setText("" + _prefs.getInt("menuFontSize"));
-        oldMenuFontSize = _prefs.getInt("menuFontSize");
         String oldLan = _prefs.get("language");
 
         // Language choice
@@ -329,35 +320,15 @@ public class GeneralTab extends JPanel implements PrefsTab {
                     JOptionPane.WARNING_MESSAGE);
         }
 
-        try {
-            int size = Integer.parseInt(fontSize.getText());
-            if (size != oldMenuFontSize) {
-                _prefs.putInt("menuFontSize", size);
-                JOptionPane.showMessageDialog(null, Globals.lang("You have changed the menu and label font size. "
-                        + "You must restart JabRef for this to come into effect."), Globals.lang("Changed font settings"),
-                        JOptionPane.WARNING_MESSAGE);
-            }
 
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
 
     }
 
     public boolean readyToClose() {
         try {
-            // Test if font size is a number:
-            int size = Integer.parseInt(fontSize.getText());
-
             // Test if date format is legal:
             SimpleDateFormat sdf = new SimpleDateFormat(timeStampFormat.getText());
 
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog
-                    (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
-                    Globals.lang("Menu and label font size") + "'", Globals.lang("Changed font settings"),
-                            JOptionPane.ERROR_MESSAGE);
-            return false;
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("The chosen date format for new entries is not valid"),

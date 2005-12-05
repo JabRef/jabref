@@ -79,9 +79,10 @@ public class PrefsDialog3 extends JDialog {
         // ----------------------------------------------------------------
     String
         GEN = Globals.lang("General"),
+        APP = Globals.lang("Appearance"),
         GRP = Globals.lang("Groups"), // JZTODO lyrics
         EXT = Globals.lang("External programs"),
-        APP = Globals.lang("Entry table"),
+        TAB = Globals.lang("Entry table"),
         COL = Globals.lang("Entry table columns"),
         KEY = Globals.lang("Key pattern"),
         PRE = Globals.lang("Entry preview"),
@@ -90,9 +91,10 @@ public class PrefsDialog3 extends JDialog {
 
     ArrayList al = new ArrayList();
     al.add(GEN);
+    al.add(APP);
     al.add(GRP);
     al.add(EXT);
-    al.add(APP);
+    al.add(TAB);
     al.add(COL);
     al.add(KEY);
     //al.add(JOU);
@@ -110,8 +112,9 @@ public class PrefsDialog3 extends JDialog {
 
 
         main.add(new GroupsPrefsTab(_prefs), GRP);
+        main.add(new AppearancePrefsTab(_prefs), APP);
         main.add(new ExternalTab(frame, _prefs), EXT);
-        main.add(new TablePrefsTab(_prefs, parent), APP);
+        main.add(new TablePrefsTab(_prefs, parent), TAB);
         main.add(new TableColumnsTab(_prefs, parent), COL);
         main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
         main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
