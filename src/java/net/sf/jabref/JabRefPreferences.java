@@ -217,7 +217,7 @@ public class JabRefPreferences {
         defaults.put("markedEntryBackground", "255:255:180");
         defaults.put("incompleteEntryBackground", "250:175:175");
 
-        defaults.put("antialias", Boolean.TRUE);
+        defaults.put("antialias", Boolean.FALSE);
         defaults.put("ctrlClick", Boolean.FALSE);
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
         defaults.put("pdfColumn", Boolean.TRUE);
