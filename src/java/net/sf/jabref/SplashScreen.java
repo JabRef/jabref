@@ -87,17 +87,21 @@ public class SplashScreen extends Window {
         SplashScreen w = new SplashScreen(f);
 
         // Show the window.
-        w.toFront();
         w.setVisible(true);
+        w.toFront();
 
         // Note: To make sure the user gets a chance to see the
         // splash window we wait until its paint method has been
         // called at least once by the AWT event dispatcher thread.
+
+        // sebwills adds: However, just in case the paint method never gets called
+        // (e.g. if the splashscreen is completely obscured by an 'always on top'
+        // window of some other application), we time-out after 5 seconds.
         if (! EventQueue.isDispatchThread()) {
             synchronized (w) {
-                while (! w.paintCalled) {
+                if (! w.paintCalled) {
                     try { 
-                        w.wait(); 
+                        w.wait(5000);
                     } catch (InterruptedException e) {}
                 }
             }
