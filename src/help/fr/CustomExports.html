@@ -78,24 +78,27 @@ Les mots pr&eacute;c&eacute;d&eacute;s d'un antislash, par exemple <code>\author
 <h3>Les formateurs de champs</h3>
 
 <p>
-Souvent, on a besoin de faire subir au contenu des champs un pr&eacute;-traitement avant de le copier dans le fichier de sortie. Cela est r&eacute;alis&eacute; en utilisant un <i>formateur de champ</i> - une classe java contenant une seule m&eacute;thode qui manipule le contenu du champ.
+Souvent, on a besoin de faire subir au contenu d'un champ un pr&eacute;-traitement avant de le copier dans le fichier de sortie. Cela est r&eacute;alis&eacute; en utilisant un <i>formateur de champ</i> - une classe java contenant une seule m&eacute;thode qui manipule le contenu du champ.
 </p>
 
 <p>
-Le formateur est utilis&eacute; en ins&eacute;rant la commande <code>\format</code> suivie du nom du formateur entre crochets et du nom du champ entre accolades, par exemple&nbsp;:
+Le formateur est utilis&eacute; en ins&eacute;rant la commande <code>\format</code> suivie du nom du formateur entre crochets et du nom du champ entre accolades, par exemple
 </p>
 <p>
 <code>\format[ToLowerCase]{\author}</code>
 </p>
 
 <p>
-Vous pouvez aussi indiquer plusieurs formateurs s&eacute;par&eacute;s par des virgules. Il seront alors appel&eacute;s s&eacute;quentiellement de la gauche vers la droite, par exemple&nbsp;: 
+Vous pouvez aussi indiquer plusieurs formateurs s&eacute;par&eacute;s par des virgules. Ils seront alors appel&eacute;s s&eacute;quentiellement de la gauche vers la droite, par exemple&nbsp;: 
 </p>
 <p>
 <code>\format[ToLowerCase,HTMLChars]{\author}</code>
 </p>
 <p>
 va d'abord appliqu&eacute; le formateur <b>ToLowerCase</b> puis <b>HTMLChars</b> sur le r&eacute;sultat. Vous pouvez lister un nombre arbitraire de formateurs de cette mani&egrave;re.
+</p>
+
+<p>Le param&egrave;tre des formateurs, entre les accolades, n'est pas obligatoirement une commande de champ. Vous pouvez y ins&eacute;rer du texte normal, qui sera alors pass&eacute; aux formateurs au lieu des contenues de tout champ [NdT : pas s&ucirc;r d'avoir bien compris...]. Cela peut-&ecirc;tre utile avec certains formateurs, par exemple le formateur CurrentDate (voir ci-dessous).
 </p>
 
 <p>
@@ -106,6 +109,8 @@ JabRef fournit les formateurs suivants, certains d'entre eux d&eacute;pendant d'
 <li><code>HTMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation HTML.
 <li><code>XMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation XML.
 <li><code>CreateDocBookAuthors</code>&nbsp;: formate le contenu du champ author selon le style DocBook.
+<li><code>CurrentDate</code>&nbsp;: renvoie la date actuelle. Sans argument, ce formateur renvoie la date et l'heure actuelle au format "yyyy.MM.dd hh:mm:ss z" (date, heure et fuseau horaire). En donnant une cha&icirc;ne de format diff&eacute;rent comme argument, le format de la date peut-&ecirc;tre adapt&eacute;. Par exemple, 
+<code>\format[CurrentDate]{yyyy.MM.dd}</code> renverra uniquement la date, comme par exemple 2005.11.30.
 <li><code>AuthorFirstFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier.
 <li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier et des virgules comme s&eacute;parateurs.
 <li><code>AuthorLastFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant le nom de famille en premier.
