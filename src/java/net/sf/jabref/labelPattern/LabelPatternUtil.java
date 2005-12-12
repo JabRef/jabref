@@ -145,49 +145,68 @@ public class LabelPatternUtil {
 	    StringBuffer _sbvalue = new StringBuffer();
 
 	    try {
-		/*if (val.equals("uppercase")) {
-		    forceUpper = true;
-		}
-		else if (val.equals("lowercase")) {
-		    forceLower = true;
-		    }*/
-                if (val.startsWith("auth")) {
+
+               if (val.startsWith("auth") || val.startsWith("pureauth")) {
+
+                  // For label code "auth...": if there is no author, but there are editor(s)
+                  // (e.g. for an Edited Book), use the editor(s) instead. (saw27@mrao.cam.ac.uk).
+                  // This is what most people want, but in case somebody really needs a field which
+                  // expands to nothing if there is no author (e.g. someone who uses both "auth"
+                  // and "ed" in the same label), we provide an alternative form "pureauth..." which
+                  // does not do this fallback substitution of editor.
+
+                  String authString;
+                  if(val.startsWith("pure")) {
+                    // remove the "pure" prefix so the remaining code in this section functions correctly
+                    val = val.substring(4);
+		    System.out.println("val is now "+val);
+                    authString = _entry.getField("author").toString(); // use even if empty
+		    System.out.println("Got authString " + authString);
+                  } else {
+                    if (_entry.getField("author") == null || _entry.getField("author").toString().equals("")) {
+                      System.out.println("author empty, so replacing with editor for label generation");
+                      authString = _entry.getField("editor").toString();
+                    } else {
+                      authString = _entry.getField("author").toString();
+                    }
+                  }
+
                   // Gather all author-related checks, so we don't have to check all all the time.
                   if (val.equals("auth")) {
-                    _sbvalue.append(firstAuthor(_entry.getField("author").toString()));
+                    _sbvalue.append(firstAuthor(authString));
                   }
                   else if (val.equals("authors")) {
-                    _sbvalue.append(allAuthors(_entry.getField("author").toString()));
+                    _sbvalue.append(allAuthors(authString));
                   }
                   else if (val.equals("authorIni")) {
-                    _sbvalue.append(oneAuthorPlusIni(_entry.getField("author").toString()));
+                    _sbvalue.append(oneAuthorPlusIni(authString));
                   }
                   else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-					_sbvalue.append(authIniN(_entry.getField("author").toString(),num));
+					_sbvalue.append(authIniN(authString,num));
                   }
 				  else if (val.equals("auth.auth.ea")) {
-                    _sbvalue.append(authAuthEa(_entry.getField("author").toString()));
+                    _sbvalue.append(authAuthEa(authString));
                   }
                   else if (val.equals("authshort")) {
-                    _sbvalue.append(authshort(_entry.getField("author").toString()));
+                    _sbvalue.append(authshort(authString));
                   }
                   else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    _sbvalue.append(authN_M(_entry.getField("author").toString(),
+                    _sbvalue.append(authN_M(authString,
                                             Integer.parseInt(nums[0]),
                                             Integer.parseInt(nums[1]) - 1));
                   }
                   // authN.  First N chars of the first author's last name.
                   else if (val.matches("auth\\d+")) {
                     int num = Integer.parseInt(val.substring(4));
-                    String fa = firstAuthor(_entry.getField("author").toString());
+                    String fa = firstAuthor(authString);
                     if ( num > fa.length() )
                       num = fa.length();
                     _sbvalue.append(fa.substring(0,num));
                   }
                   else if (val.matches("authors\\d+")) {
-                    _sbvalue.append(NAuthors(_entry.getField("author").toString(),Integer.parseInt(val.substring(7))));
+                    _sbvalue.append(NAuthors(authString,Integer.parseInt(val.substring(7))));
                   }
 
                   else {

@@ -78,6 +78,7 @@ public class EndnoteImporter implements ImportFormat {
         Author = "";
         Type = "";
         Editor = "";
+	boolean IsEditedBook = false;
         String[] fields = entries[i].substring(1).split("\n%");
         //String lastPrefix = "";
         for (int j = 0; j < fields.length; j++){
@@ -109,9 +110,11 @@ public class EndnoteImporter implements ImportFormat {
         else if (prefix.equals("0")){
             if (val.indexOf("Journal") == 0) Type = "article";
             else if ((val.indexOf("Book Section") == 0)) Type = "incollection";
-            else if ((val.indexOf("Book") == 0)
-                 || (val.indexOf("Edited Book") == 0)) Type = "book";
-            else if (val.indexOf("Conference") == 0) // Proceedings
+            else if ((val.indexOf("Book") == 0)) Type = "book";
+            else if (val.indexOf("Edited Book") == 0) {
+                Type = "book";
+                IsEditedBook = true;
+            }else if (val.indexOf("Conference") == 0) // Proceedings
             Type = "inproceedings";
             else if (val.indexOf("Report") == 0) // Techreport
             Type = "techreport";
@@ -157,6 +160,14 @@ public class EndnoteImporter implements ImportFormat {
         }else if (prefix.equals("F")) hm.put(Globals.KEY_FIELD, Util
                              .checkLegalKey(val));
         }
+
+        // For Edited Book, EndNote puts the editors in the author field.
+        // We want them in the editor field so that bibtex knows it's an edited book
+        if (IsEditedBook && Editor.equals("")) {
+           Editor = Author;
+           Author = "";
+        }
+
         //fixauthorscomma
         if (!Author.equals("")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(Author));
         if (!Editor.equals("")) hm.put("editor", AuthorList.fixAuthor_lastNameFirst(Editor));
