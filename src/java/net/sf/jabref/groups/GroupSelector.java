@@ -950,9 +950,10 @@ public class GroupSelector extends SidePaneComponent implements
                     "Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
         }
-        // update of selection/expansion state not required
-        // when moving amongst siblings (no path is invalidated)
-        revalidateGroups();
+        // update selection/expansion state (not really needed when
+        // moving among siblings, but I'm paranoid)
+        revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
+                groupsTree.refreshPaths(getExpandedPaths()));
         concludeMoveGroup(undo, node);
         return true;
     }
@@ -974,9 +975,10 @@ public class GroupSelector extends SidePaneComponent implements
                     "Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
         }
-        // update of selection/expansion state not required
-        // when moving amongst siblings (no path is invalidated)
-        revalidateGroups();
+        // update selection/expansion state (not really needed when
+        // moving among siblings, but I'm paranoid)
+        revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
+                groupsTree.refreshPaths(getExpandedPaths()));
         concludeMoveGroup(undo, node);
         return true;
     }
@@ -993,15 +995,14 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo = null;
-        Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveLeft() || (undo = node.moveLeft(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
-        revalidateGroups(new TreePath[]{new TreePath(node.getPath())},
-                groupsTree.refreshPaths(expandedPaths));
+        revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
+                groupsTree.refreshPaths(getExpandedPaths()));
         concludeMoveGroup(undo, node);
         return true;
     }
@@ -1018,15 +1019,14 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
         AbstractUndoableEdit undo = null;
-        Enumeration expandedPaths = getExpandedPaths();
         if (!node.canMoveRight() || (undo = node.moveRight(GroupSelector.this)) == null) {
             frame.output(Globals.lang(
                     "Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
-        revalidateGroups(new TreePath[]{new TreePath(node.getPath())},
-                groupsTree.refreshPaths(expandedPaths));
+        revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
+                groupsTree.refreshPaths(getExpandedPaths()));
         concludeMoveGroup(undo, node);
         return true;
     }
