@@ -307,24 +307,42 @@ public class GroupsTree extends JTree implements DragSourceListener,
 				.getLastPathComponent() : null;
 	}
 
-	/**
-	 * Refresh paths that may have become invalid due to node movements within
-	 * the tree. This method creates new paths to the last path components
-	 * (which must still exist) of the specified paths.
-	 * 
-	 * @param paths
-	 *            Paths that may have become invalid.
-	 * @return Refreshed paths that are all valid.
-	 */
-	public Enumeration refreshPaths(Enumeration paths) {
-		Vector freshPaths = new Vector();
-		while (paths.hasMoreElements()) {
-			freshPaths.add(new TreePath(
-					((DefaultMutableTreeNode) ((TreePath) paths.nextElement())
-							.getLastPathComponent()).getPath()));
-		}
-		return freshPaths.elements();
-	}
+    /**
+     * Refresh paths that may have become invalid due to node movements within
+     * the tree. This method creates new paths to the last path components
+     * (which must still exist) of the specified paths.
+     * 
+     * @param paths
+     *            Paths that may have become invalid.
+     * @return Refreshed paths that are all valid.
+     */
+    public Enumeration refreshPaths(Enumeration paths) {
+        Vector freshPaths = new Vector();
+        while (paths.hasMoreElements()) {
+            freshPaths.add(new TreePath(
+                    ((DefaultMutableTreeNode) ((TreePath) paths.nextElement())
+                            .getLastPathComponent()).getPath()));
+        }
+        return freshPaths.elements();
+    }
+
+    /**
+     * Refresh paths that may have become invalid due to node movements within
+     * the tree. This method creates new paths to the last path components
+     * (which must still exist) of the specified paths.
+     * 
+     * @param paths
+     *            Paths that may have become invalid.
+     * @return Refreshed paths that are all valid.
+     */
+    public TreePath[] refreshPaths(TreePath[] paths) {
+        TreePath[] freshPaths = new TreePath[paths.length];
+        for (int i = 0; i < paths.length; ++i) {
+            freshPaths[i] = new TreePath(((DefaultMutableTreeNode) paths[i]
+                            .getLastPathComponent()).getPath());
+        }
+        return freshPaths;
+    }
 
 	/** Highlights the specified cell or disables highlight if cell == null */
 	public void setHighlight1Cell(Object cell) {
