@@ -49,6 +49,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             selected = true; // show as selected
         Component c = super.getTreeCellRendererComponent(tree, value, selected,
                 expanded, leaf, row, hasFocus);
+        // this is sometimes called from deep within somewhere, with a dummy 
+        // value (probably for layout etc.), so we've got to check here!
+        if (!(value instanceof GroupTreeNode))
+            return c;
         AbstractGroup group = ((GroupTreeNode) value).getGroup();
         if (group == null || !(c instanceof JLabel))
             return c; // sanity check
