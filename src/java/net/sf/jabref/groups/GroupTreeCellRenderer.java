@@ -40,6 +40,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     protected Object highlight1Cell = null;
     protected Object[] highlight2Cells = null;
     protected Object[] highlight3Cells = null;
+    protected Object highlightBorderCell = null;
 
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
@@ -52,6 +53,10 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (group == null || !(c instanceof JLabel))
             return c; // sanity check
         JLabel label = (JLabel) c;
+        if (highlightBorderCell != null && highlightBorderCell == value)
+            label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        else
+            label.setBorder(BorderFactory.createEmptyBorder());
         boolean italics = Globals.prefs.getBoolean("groupShowDynamic")
         && group.isDynamic();
         boolean red = false;
@@ -138,5 +143,13 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
      */
     void setHighlight3Cells(Object[] cells) {
         this.highlight3Cells = cells;
+    }
+
+    /**
+     * Highlights the specified cells (by drawing a border around it), 
+     * or disables highlight if highlightBorderCell == null.
+     */
+    void setHighlightBorderCell(Object highlightBorderCell) {
+        this.highlightBorderCell = highlightBorderCell;
     }
 }
