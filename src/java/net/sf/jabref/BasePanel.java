@@ -1781,22 +1781,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         case KeyEvent.VK_UP:
                             e.consume();
                             if (node != null)
-                                frame.groupSelector.moveNodeUp(node);
+                                frame.groupSelector.moveNodeUp(node, true);
                             break;
                         case KeyEvent.VK_DOWN:
                             e.consume();
                             if (node != null)
-                                frame.groupSelector.moveNodeDown(node);
+                                frame.groupSelector.moveNodeDown(node, true);
                             break;
                         case KeyEvent.VK_LEFT:
                             e.consume();
                             if (node != null)
-                                frame.groupSelector.moveNodeLeft(node);
+                                frame.groupSelector.moveNodeLeft(node, true);
                             break;
                         case KeyEvent.VK_RIGHT:
                             e.consume();
                             if (node != null)
-                                frame.groupSelector.moveNodeRight(node);
+                                frame.groupSelector.moveNodeRight(node, true);
                             break;
                         case KeyEvent.VK_PAGE_DOWN:
                             frame.nextTab.actionPerformed(null);
