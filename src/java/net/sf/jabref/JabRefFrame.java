@@ -47,10 +47,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.SortedSet;
 import java.util.Vector;
 import java.util.List;
 import java.util.Iterator;
-import java.util.Map;
 import java.io.*;
 import java.net.URL;
 import net.sf.jabref.undo.NamedCompound;
@@ -291,6 +291,7 @@ public class JabRefFrame
 
 
       customExpAction = new CustomizeExportsAction(),
+      customImpAction = new CustomizeImportsAction(),
       exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
@@ -596,6 +597,7 @@ public JabRefPreferences prefs() {
 
       fileHistory.storeHistory();
       prefs.customExports.store();
+      prefs.customImports.store();
       BibtexEntryType.saveCustomEntryTypes(prefs);
 
       // Let the search interface store changes to prefs.
@@ -949,6 +951,14 @@ public JabRefPreferences prefs() {
     Util.pr("JabRefFrame: Must set non-empty state.");
     }*/
 
+  /**
+   * Refresh import menus.
+   */
+  public void setUpImportMenus() {
+    setUpImportMenu(importMenu, false);
+    setUpImportMenu(importNewMenu, true);
+  }
+  
   private void fillMenu() {
     //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
       mb.setBorder(null);
@@ -961,8 +971,7 @@ public JabRefPreferences prefs() {
         newSpec = subMenu("New entry..."),
         helpMenu = subMenu("Help");
 
-    setUpImportMenu(importMenu, false);
-    setUpImportMenu(importNewMenu, true);
+    setUpImportMenus();
     setUpExportMenu(exportMenu);
     setUpCustomExportMenu();
 
@@ -1080,6 +1089,7 @@ public JabRefPreferences prefs() {
     options.add(customizeAction);
     options.add(genFieldsCustomization);
     options.add(customExpAction);
+    options.add(customImpAction);
     options.add(manageJournals);
 
     /*options.add(new AbstractAction("Font") {
@@ -2057,15 +2067,34 @@ class FetchCiteSeerAction
 
   private void setUpImportMenu(JMenu importMenu, boolean intoNew_) {
       final boolean intoNew = intoNew_;
+      importMenu.removeAll();
 
       // Add a menu item for autodetecting import format:
       importMenu.add(new ImportUnknownMenuItem(ths, intoNew));
 
+      // Add custom importers
       importMenu.addSeparator();
-
+      
+      SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
+      JMenu submenu = new JMenu("Custom Importers");
+      submenu.setMnemonic(KeyEvent.VK_S);
+      if (customImporters.size() == 0) {
+        submenu.setEnabled(false);
+        submenu.setToolTipText("No custom imports registered yet.");
+      } else {
+        // Put in all formatters registered in ImportFormatReader:
+        for (Iterator i=customImporters.iterator(); i.hasNext();) {
+            ImportFormat imFo = (ImportFormat)i.next();
+            submenu.add(new ImportMenuItem(ths, imFo, intoNew));
+        }        
+      }
+      
+      importMenu.add(submenu);
+      importMenu.addSeparator();
+      
       // Put in all formatters registered in ImportFormatReader:
-      for (Iterator i=Globals.importFormatReader.getImportFormats().iterator(); i.hasNext();) {
-          ImportFormat imFo = (ImportFormat)((Map.Entry)i.next()).getValue();
+      for (Iterator i=Globals.importFormatReader.getBuiltInInputFormats().iterator(); i.hasNext();) {
+          ImportFormat imFo = (ImportFormat)i.next();
           importMenu.add(new ImportMenuItem(ths, imFo, intoNew));
       }
   }
@@ -2247,6 +2276,7 @@ class FetchCiteSeerAction
     }
 
   }
+
 
    public void removeCachedEntryEditors() {
        for (int j=0; j<tabbedPane.getTabCount(); j++) {
@@ -2493,6 +2523,17 @@ class SaveSessionAction
 
     public void actionPerformed(ActionEvent e) {
       ExportCustomizationDialog ecd = new ExportCustomizationDialog(ths);
+      ecd.setVisible(true);
+    }
+  }
+
+  class CustomizeImportsAction extends MnemonicAwareAction {
+    public CustomizeImportsAction() {
+      putValue(NAME, "Manage custom imports");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      ImportCustomizationDialog ecd = new ImportCustomizationDialog(ths);
       ecd.setVisible(true);
     }
   }

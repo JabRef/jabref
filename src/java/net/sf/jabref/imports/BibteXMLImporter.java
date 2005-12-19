@@ -1,6 +1,5 @@
 package net.sf.jabref.imports;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -9,10 +8,6 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -20,7 +15,7 @@ import net.sf.jabref.Util;
  * check here for details on the format
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
  */
-public class BibteXMLImporter implements ImportFormat {
+public class BibteXMLImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

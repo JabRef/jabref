@@ -16,7 +16,7 @@ import net.sf.jabref.AuthorList;
 /**
  * Imports an Ovid file.
  */
-public class OvidImporter implements ImportFormat {
+public class OvidImporter extends ImportFormat {
 
     public static Pattern ovid_src_pat = Pattern
     .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");

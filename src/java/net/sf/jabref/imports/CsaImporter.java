@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
  *
  * @author John Relph
  */
-public class CsaImporter implements ImportFormat {
+public class CsaImporter extends ImportFormat {
 
     // local fields
     private int line;

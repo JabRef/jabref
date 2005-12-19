@@ -33,6 +33,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,9 +69,15 @@ public class ImportFormatReader {
     private final static Map nameCacheLastFirst = new WeakHashMap();
     private final static Map nameCacheFirstFirst = new WeakHashMap();
 
-  private TreeMap formats = new TreeMap();
+  private SortedMap formats = new TreeMap();
 
   public ImportFormatReader() {
+    super();
+  }
+
+  public void resetImportFormats() {
+    formats.clear();
+    
     // Add all our importers to the TreeMap. The map is used to build the import
     // menus, and to resolve command-line import instructions.
     formats.put("csa", new CsaImporter());   
@@ -85,10 +94,21 @@ public class ImportFormatReader {
     formats.put("jstor", new JstorImporter());
     formats.put("silverplatter", new SilverPlatterImporter());
     formats.put("biomail", new BiomailImporter());
-      formats.put("repecnep", new RepecNepImporter());
-      
-  }
+    formats.put("repecnep", new RepecNepImporter());    
+    
+    for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {
+      CustomImportList.Importer importer = (CustomImportList.Importer)i.next();
 
+      try {
+        ImportFormat imFo = importer.getInstance();
+        formats.put(imFo.getFormatName(), imFo);
+      } catch(Exception e) {
+        System.err.println("Could not instantiate " + importer.getName() + " importer, will ignore it. Please check if the class is still available.");
+        e.printStackTrace();
+      }      
+    }
+  }
+  
     public static void clearNameCache() {
 	nameCacheLastFirst.clear();
 	nameCacheFirstFirst.clear();
@@ -158,6 +178,38 @@ public class ImportFormatReader {
     return database;
   }
 
+  /**
+   * All custom importers.
+   * 
+   * @return all custom importers, elements are of type {@link InputFormat}
+   */
+  public SortedSet getCustomImportFormats() {
+    SortedSet result = new TreeSet();
+    for (Iterator i = this.formats.values().iterator(); i.hasNext(); ) {
+      ImportFormat format = (ImportFormat)i.next();
+      if (format.getIsCustomImporter()) {
+        result.add(format);  
+      }
+    }
+    return result;
+  }
+  
+  /**
+   * All built-in importers.
+   * 
+   * @return all custom importers, elements are of type {@link InputFormat}
+   */
+  public SortedSet getBuiltInInputFormats() {
+    SortedSet result = new TreeSet();
+    for (Iterator i = this.formats.values().iterator(); i.hasNext(); ) {
+      ImportFormat format = (ImportFormat)i.next();
+      if (!format.getIsCustomImporter()) {
+        result.add(format);  
+      }
+    }
+    return result;    
+  }
+  
   public Set getImportFormats() {
     return formats.entrySet();
   }

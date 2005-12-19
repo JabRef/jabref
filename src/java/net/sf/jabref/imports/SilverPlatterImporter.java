@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * Imports a SilverPlatter exported file. This is a poor format to parse,
  * so it currently doesn't handle everything correctly.
  */
-public class SilverPlatterImporter implements ImportFormat {
+public class SilverPlatterImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

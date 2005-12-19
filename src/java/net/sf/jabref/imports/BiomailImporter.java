@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Importer for the ISI Web of Science format.
  */
-public class BiomailImporter implements ImportFormat {
+public class BiomailImporter extends ImportFormat {
     /**
      * Return the name of this import format.
      */

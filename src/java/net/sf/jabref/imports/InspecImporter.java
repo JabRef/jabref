@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * INSPEC format importer.
  */
-public class InspecImporter implements ImportFormat {
+public class InspecImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

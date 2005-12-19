@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * Importer for the ISI Web of Science format.
  */
-public class IsiImporter implements ImportFormat {
+public class IsiImporter extends ImportFormat {
   /**
    * Return the name of this import format.
    */

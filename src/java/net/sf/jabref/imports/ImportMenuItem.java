@@ -8,7 +8,6 @@ import java.io.File;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
-import java.util.List;
 
 public class ImportMenuItem extends JMenuItem implements ActionListener,
         ImportInspectionDialog.CallBack {
@@ -22,6 +21,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
 	this.frame = frame;
 	this.importer = importer;
 	this.openInNew = openInNew;
+  this.setToolTipText( importer.getDescription() );
 	addActionListener(this);
     }
 

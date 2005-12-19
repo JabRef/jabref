@@ -18,7 +18,7 @@ import net.sf.jabref.AuthorList;
  * check here for details on the format
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
  */
-public class EndnoteImporter implements ImportFormat {
+public class EndnoteImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

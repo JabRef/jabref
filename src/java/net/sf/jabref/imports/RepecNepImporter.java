@@ -158,7 +158,7 @@ import net.sf.jabref.Util;
  * @see http://nep.repec.org
  * @author andreas_sf at rudert-home dot de
  */
-public class RepecNepImporter implements ImportFormat {
+public class RepecNepImporter extends ImportFormat {
 
   private final static Collection recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL"});
   

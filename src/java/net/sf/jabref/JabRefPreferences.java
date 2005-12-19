@@ -33,6 +33,7 @@ import javax.swing.*;
 import net.sf.jabref.labelPattern.DefaultLabelPatterns;
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.export.CustomExportList;
+import net.sf.jabref.imports.CustomImportList;
 import java.awt.*;
 import java.util.prefs.*;
 import java.util.*;
@@ -63,6 +64,9 @@ public class JabRefPreferences {
     // Object containing custom export formats:
     public CustomExportList customExports;
 
+    /** Set with all custom {@link ImportFormat}s */
+    public CustomImportList customImports;
+    
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList = null;
 
@@ -294,6 +298,7 @@ public class JabRefPreferences {
         restoreKeyBindings();
 
         customExports = new CustomExportList(this, new ExportComparator());
+        customImports = new CustomImportList(this);
 
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();

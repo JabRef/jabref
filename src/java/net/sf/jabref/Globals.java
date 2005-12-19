@@ -27,7 +27,6 @@ package net.sf.jabref;
 
 import java.io.* ;
 import java.util.* ;
-import java.util.List;
 import java.util.logging.* ;
 import java.util.logging.Filter ;
 
@@ -368,7 +367,17 @@ public class Globals {
                                   File directory, String extension,
                                   int dialogType,
                                   boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, dialogType,
+    return getNewFile(owner, prefs, directory, extension, null, dialogType,
+                      updateWorkingDirectory, false);
+  }
+
+    
+  public static String getNewFile(JFrame owner, JabRefPreferences prefs,
+                                  File directory, String extension,
+                                  String description,
+                                  int dialogType,
+                                  boolean updateWorkingDirectory) {
+    return getNewFile(owner, prefs, directory, extension, description, dialogType,
                       updateWorkingDirectory, false);
   }
 
@@ -377,19 +386,28 @@ public class Globals {
                                   File directory, String extension, OpenFileFilter off,
                                   int dialogType,
                                   boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, off, dialogType,
+    return getNewFile(owner, prefs, directory, extension, null, off, dialogType,
                       updateWorkingDirectory, false);
   }
 
   public static String getNewDir(JFrame owner, JabRefPreferences prefs,
                                  File directory, String extension,
                                  int dialogType, boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, dialogType,
+    return getNewFile(owner, prefs, directory, extension, null, dialogType,
+                      updateWorkingDirectory, true);
+  }
+
+  public static String getNewDir(JFrame owner, JabRefPreferences prefs,
+                                 File directory, String extension,
+                                 String description,
+                                 int dialogType, boolean updateWorkingDirectory) {
+    return getNewFile(owner, prefs, directory, extension, description, dialogType,
                       updateWorkingDirectory, true);
   }
 
   private static String getNewFile(JFrame owner, JabRefPreferences prefs,
                                    File directory, String extension,
+                                   String description,
                                    int dialogType,
                                    boolean updateWorkingDirectory,
                                    boolean dirOnly) {
@@ -401,11 +419,13 @@ public class Globals {
     else if (!extension.equals(NONE))
       off = new OpenFileFilter(extension);
 
-    return getNewFile(owner, prefs, directory, extension, off, dialogType, updateWorkingDirectory, dirOnly);
+    return getNewFile(owner, prefs, directory, extension, description, off, dialogType, updateWorkingDirectory, dirOnly);
   }
 
   private static String getNewFile(JFrame owner, JabRefPreferences prefs,
-                                   File directory, String extension, OpenFileFilter off,
+                                   File directory, String extension, 
+                                   String description,
+                                   OpenFileFilter off,
                                    int dialogType,
                                    boolean updateWorkingDirectory,
                                    boolean dirOnly) {
@@ -438,8 +458,11 @@ public class Globals {
     if (dialogType == JFileChooser.OPEN_DIALOG) {
       dialogResult = fc.showOpenDialog(null);
     }
-    else {
+    else if (dialogType == JFileChooser.SAVE_DIALOG){
       dialogResult = fc.showSaveDialog(null);
+    }
+    else {
+      dialogResult = fc.showDialog(null, description);
     }
 
      // the getSelectedFile method returns a valid fileselection

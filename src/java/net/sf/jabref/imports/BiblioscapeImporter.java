@@ -1,6 +1,5 @@
 package net.sf.jabref.imports;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -19,7 +17,7 @@ import net.sf.jabref.Util;
  * Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class BiblioscapeImporter implements ImportFormat {
+public class BiblioscapeImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

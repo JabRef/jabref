@@ -1,12 +1,9 @@
 package net.sf.jabref.imports;
 
-import java.io.Reader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
@@ -20,7 +17,7 @@ import net.sf.jabref.Util;
  * Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class SixpackImporter implements ImportFormat {
+public class SixpackImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

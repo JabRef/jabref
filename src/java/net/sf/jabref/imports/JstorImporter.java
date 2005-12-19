@@ -16,7 +16,7 @@ import net.sf.jabref.AuthorList;
  * Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class JstorImporter implements ImportFormat {
+public class JstorImporter extends ImportFormat {
 
     /**
      * Return the name of this import format.

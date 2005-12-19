@@ -86,6 +86,7 @@ public class JabRef {
         ths = this;
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
+        Globals.importFormatReader.resetImportFormats();
         BibtexEntryType.loadCustomEntryTypes(prefs);
         // Read list(s) of journal names and abbreviations:
         Globals.initializeJournalNames();
