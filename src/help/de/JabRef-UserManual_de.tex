@@ -35,6 +35,10 @@
      \normalfont\ttfamily}%
     \item[]}
    {\end{list}}
+%%%%% Environment "revhist" (for revision history) %%%%%
+\newenvironment{revhist}
+    {\list{--}{\setlength\itemsep{0pt}\setlength{\parsep}{0pt}}}
+    {\endlist}
 
 %%%%% PDF 1.2 for Acrobat 3 onwards %%%%%
 \pdfoptionpdfminorversion 2
@@ -73,7 +77,7 @@
 }%
 %%% for CTAN references
 \newcommand{\ctan}[1]{%
-  \texttt{CTAN: \color{dkblue}#1}%
+  {CTAN: \color{dkblue}#1}%
 }
 
 %%%%% author, version of file %%%%%
@@ -115,6 +119,7 @@ Me-nü-be-feh-le
 %%%%% Hyperref %%%%%
 \usepackage{hyperref}
 \hypersetup{%
+breaklinks=true,%
 colorlinks=true,%
 linkcolor=dkblue,%
 urlcolor=dkblue,%
@@ -174,12 +179,9 @@ zu starten.
 \begin{quote}
 \begin{spacing}{0.7}
 \begin{center}{\scriptsize Copyright \textcopyright{} 2005, Dominik
-Waßenhoven}\\
-{\scriptsize Permission is granted to copy, distribute and/or modify
-this document under the terms of the \href{http://www.gnu.org/copyleft/fdl.html}{GNU Free Documentation License},
-Version~1.2 or any later version published by the Free Software Foundation;
-with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
-Texts.}\end{center}{\scriptsize \par}\end{spacing}
+Waßenhoven}
+\end{center}
+{\scriptsize Dieser Inhalt ist unter einem Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Germany Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken Sie einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
 
 \end{quote}
 \thispagestyle{empty}
@@ -217,8 +219,6 @@ mit dunkelblauer Schrift dargestellt. Hyperlinks sind ebenfalls dunkelblau
 und anklickbar~-- das gilt sowohl für die Navigation innerhalb des
 Dokuments als auch für Links ins Internet.
 
-Das \jabrefversion{} Benutzerhandbuch ist frei verfügbar unter den
-Bedingungen der \href{http://www.gnu.org/copyleft/fdl.html}{GNU Free Documentation License}.
 Über den Stand und die >>Geschichte<< dieses Handbuchs gibt der
 Abschnitt >>Versionsgeschichte<< (S.\,\pageref{RevisionHistory})
 Auskunft.
@@ -2359,7 +2359,7 @@ der \href{http://www.opensource.org/licenses/bsd-license.html}{BSD License}
 vertrieben wird. Kommandozeilenbefehle werden geparst mit \href{http://ritopt.sourceforge.net}{RitOpt},
 das unter den Bedingungen der GNU Public License (Version 2) verfügbar
 ist. \jabref{} verwendet für die Suche den ANTLR Parser Generator.
-ANTLR ist \emph{public domain software}~-- siehe \url{http://www.antlr.org/license.html}
+ANTLR ist \emph{public domain software}~-- siehe \href{http://www.antlr.org/license.html}{http://www.antlr.org/license.html}
 für die Lizenzbedingungen. \jabref{} benutzt außerdem die \emph{threading
 library} Spin 1.3.1, die unter den Bedingungen der \href{http://www.opensource.org/licenses/lgpl-license.php}{LGPL}
 (Lesser GNU Public License) vertrieben wird. Das hier beschriebene
@@ -2393,19 +2393,20 @@ Möglicherweise ans Ende eine FAQ anschließen
 
 \label{RevisionHistory}
 
-\begin{enumerate}
-\item [0.2]28.\,11.\,2005
+\subsection*{Version 0.2 (6.\,12.\,2005)}
+\renewcommand{\labelitemi}{}
 
+\begin{revhist}
+\item Lizenzbedingungen für das Handbuch hinzugefügt
+\item von PDF~1.4 auf PDF~1.2 umgestellt
+\item mehrere kleinere Änderungen
+\end{revhist}
 
-Lizenzbedingungen für das Handbuch hinzugefügt {[}DW{]}
-
-von PDF~1.4 auf PDF~1.2 umgestellt {[}DW{]}
-
-mehrere kleinere Änderungen {[}DW{]}
-
-\item [0.1]Erstentwurf, 16.\,11.\,2005: Dominik Waßenhoven, basierend
-auf dem englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
+\subsubsection*{Version 0.1 (16.\,11.\,2005)}
+\begin{revhist}
+\item Erstentwurf von Dominik Waßenhoven, basierend
+auf dem unveröffentlichten englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
 und den Hilfeseiten des Programms
-\end{enumerate}
+\end{revhist}
 
 \end{document}
