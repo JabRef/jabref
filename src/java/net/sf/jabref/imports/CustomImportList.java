@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005 Andreas Rudert
+ Copyright (C) 2005 Andreas Rudert, based on CustomExportList by ??
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as

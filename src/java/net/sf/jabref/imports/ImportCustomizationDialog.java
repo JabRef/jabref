@@ -1,3 +1,29 @@
+/*
+ Copyright (C) 2005 Andreas Rudert, based on ExportCustomizationDialog by ??
+
+ All programs in this directory and
+ subdirectories are published under the GNU General Public License as
+ described below.
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or (at
+ your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ USA
+
+ Further information about the GNU GPL is available at:
+ http://www.gnu.org/copyleft/gpl.ja.html
+
+ */
 package net.sf.jabref.imports;
 
 import javax.swing.JDialog;
@@ -128,6 +154,7 @@ public class ImportCustomizationDialog extends JDialog {
       public void actionPerformed(ActionEvent e) {
         int row = customImporterTable.getSelectedRow();
         if (row != -1) {
+          customImporterTable.removeRowSelectionInterval(row,row);
           prefs.customImports.remove(((ImportTableModel)customImporterTable.getModel()).getImporter(row));
           Globals.importFormatReader.resetImportFormats();
           customImporterTable.revalidate();
@@ -153,9 +180,9 @@ public class ImportCustomizationDialog extends JDialog {
     ImportTableModel tableModel = new ImportTableModel();
     customImporterTable = new JTable(tableModel);
     TableColumnModel cm = customImporterTable.getColumnModel();
-    cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
-    cm.getColumn(1).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_1_WIDTH);
-    cm.getColumn(2).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_2_WIDTH);
+    cm.getColumn(0).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH);
+    cm.getColumn(1).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH);
+    cm.getColumn(2).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH);
     JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -186,6 +213,9 @@ public class ImportCustomizationDialog extends JDialog {
     new FocusRequester(customImporterTable);
   }
 
+  /**
+   * Table model for the custom importer table.
+   */
   class ImportTableModel extends AbstractTableModel {
     public int getColumnCount() {
       return 3;

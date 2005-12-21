@@ -478,6 +478,12 @@ public class GUIGlobals {
       EXPORT_DIALOG_COL_1_WIDTH = 200,
       EXPORT_DIALOG_COL_2_WIDTH = 30;
 
+  // Column widths for import customization dialog table:
+  public static final int
+      IMPORT_DIALOG_COL_0_WIDTH = 50,
+      IMPORT_DIALOG_COL_1_WIDTH = 200,
+      IMPORT_DIALOG_COL_2_WIDTH = 100;
+
   public static final Map FIELD_WEIGHT;
   public static final Map FIELD_EXTRAS, LANGUAGES;
   public static Map fieldLength = new HashMap();

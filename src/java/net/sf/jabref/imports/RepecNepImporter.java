@@ -25,7 +25,6 @@
 
  */
 package net.sf.jabref.imports;
-
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +40,9 @@ import java.util.ArrayList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Util;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormatReader;
+
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -93,7 +95,8 @@ import net.sf.jabref.Util;
  * # working papers are recognized by a number followed by a '.' 
  * # in a non-overview section
  * WorkingPaper:
- *       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract EmptyLine AdditionalFields
+ *       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
+ *       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
  *       
  * TitleString:
  *       a String that may span several lines and should be joined
@@ -120,6 +123,7 @@ import net.sf.jabref.Util;
  *
  * AdditionalFields:
  *       AdditionalField '\n' AdditionalFields
+ *       EmptyLine AdditionalFields
  *       ''
  *       
  * AdditionalField:
@@ -127,9 +131,11 @@ import net.sf.jabref.Util;
  *       'URL:' non-empty String
  *       'Date:' DateString
  *       'JEL:' JelClassificationList
+ *       'By': Authors
  *       
  * KeywordList:
  *        Keyword ',' KeywordList
+ *        Keyword ';' KeywordList
  *        Keyword
  *        
  * Keyword:
@@ -160,9 +166,12 @@ import net.sf.jabref.Util;
  */
 public class RepecNepImporter extends ImportFormat {
 
-  private final static Collection recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL"});
+  private final static Collection recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL", "By"});
   
   private int line = 0;
+  private String lastLine = "";
+  private BufferedReader in = null;
+  private boolean inOverviewSection = false;
   
   /**
    * Return the name of this import format.
@@ -171,8 +180,22 @@ public class RepecNepImporter extends ImportFormat {
     return "REPEC New Economic Papers (NEP)";
   }
 
-  /**
-   * Check whether the source is in the correct format for this importer.
+  /*
+   *  (non-Javadoc)
+   * @see net.sf.jabref.imports.ImportFormat#getDescription()
+   */
+  public String getDescription() {
+    return 
+      "Imports a New Economics Papers-Message (see http://nep.repec.org)\n"
+    + "from the REPEC-NEP Service (see http://www.repec.org).\n"
+    + "To import papers either save a NEP message as a text file and then import or\n"
+    + "copy&paste the papers you want to import and make sure, one of the first lines\n"
+    + "contains the line \"nep.repec.org\".";
+  }
+  
+  /*
+   *  (non-Javadoc)
+   * @see net.sf.jabref.imports.ImportFormat#isRecognizedFormat(java.io.InputStream)
    */
   public boolean isRecognizedFormat(InputStream stream) throws IOException {
     // read the first couple of lines
@@ -188,23 +211,206 @@ public class RepecNepImporter extends ImportFormat {
     return startOfMessage.indexOf("NEP: New Economics Papers") >= 0 || startOfMessage.indexOf("nep.repec.org") >= 0;
   }
 
-  private boolean startsWithKeyword(String s, Collection keywords) {
-    boolean result = s.indexOf(':') > 0;
+  private boolean startsWithKeyword(Collection keywords) {
+    boolean result = this.lastLine.indexOf(':') > 0;
     if (result) {
-      String possibleKeyword = s.substring(0, s.indexOf(':'));
+      String possibleKeyword = this.lastLine.substring(0, this.lastLine.indexOf(':'));
       result = keywords.contains(possibleKeyword);
     }
     return result;
   }
   
-  private String readLine(BufferedReader in) throws IOException {
+  private void readLine() throws IOException {
     this.line++;
-    return in.readLine();
+    this.lastLine = this.in.readLine();
   }
   
   /**
-   * Parse the entries in the source, and return a List of BibtexEntry
-   * objects.
+   * Read multiple lines.
+   * 
+   * <p>Reads multiple lines until either
+   * <ul>
+   *   <li>an empty line</li>
+   *   <li>the end of file</li>
+   *   <li>the next working paper or</li>
+   *   <li>a keyword</li>
+   * </ul>
+   * is found. Whitespace at start or end of lines is trimmed except for one blank character.</p>
+   * 
+   * @return  result
+   */
+  private String readMultipleLines() throws IOException {
+    String result = this.lastLine.trim();
+    readLine();
+    while (this.lastLine != null && !this.lastLine.trim().equals("") && !startsWithKeyword(recognizedFields) && !isStartOfWorkingPaper()) {
+      result += this.lastLine.length() == 0 ? this.lastLine.trim() : " " + this.lastLine.trim();
+      readLine();
+    }
+    return result;
+  }
+
+  /**
+   * Implements grammar rule "TitleString".
+   * 
+   * @param be
+   * @throws IOException
+   */
+  private void parseTitleString(BibtexEntry be) throws IOException {
+    // skip article number
+    this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
+    be.setField("title", readMultipleLines());
+  }
+  
+  /**
+   * Implements grammer rule "Authors"
+   * 
+   * @param be
+   * @throws IOException
+   */
+  private void parseAuthors(BibtexEntry be) throws IOException {
+    // read authors and institutions
+    String authors = "";
+    String institutions = "";
+    while (this.lastLine != null && !this.lastLine.equals("") && !startsWithKeyword(recognizedFields)) {
+      
+      // read single author
+      String author = null;
+      String institution = null;
+      boolean institutionDone = false;
+      if (this.lastLine.indexOf('(') >= 0) {
+        author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
+        institutionDone = this.lastLine.indexOf(')') > 0;
+        institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && this.lastLine.indexOf(')') > this.lastLine.indexOf('(') + 1 ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+      } else {
+        author = this.lastLine.substring(0, this.lastLine.length()).trim();
+        institutionDone = true;
+      }
+      
+      readLine();
+      while (!institutionDone && this.lastLine!= null) {
+        institutionDone = this.lastLine.indexOf(')') > 0;
+        institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+        readLine();
+      }
+      
+      if (author != null) {
+        authors += !authors.equals("") ? " and " + author : "" + author;
+      }
+      if (institution != null) {
+        institutions += !institutions.equals("") ? " and " + institution : "" + institution;
+      }            
+    }
+    
+    if (!authors.equals("")) {
+      be.setField("author", authors);
+    }
+    if (!institutions.equals("")) {
+      be.setField("institution", institutions);
+    }
+  }
+  
+  /**
+   * Implements grammar rule "Abstract".
+   * 
+   * @param be
+   * @throws IOException
+   */
+  private void parseAbstract(BibtexEntry be) throws IOException {
+    String theabstract = readMultipleLines();
+    
+    if (!theabstract.equals("")) {
+      be.setField("abstract", theabstract);
+    }
+  }
+    
+  /**
+   * Implements grammar rule "AdditionalFields".
+   * 
+   * @param be
+   * @throws IOException
+   */
+  private void parseAdditionalFields(BibtexEntry be, boolean multilineUrlFieldAllowed) throws IOException {
+    
+    // one empty line is possible before fields start
+    if (this.lastLine != null && this.lastLine.trim().equals("")) {
+      readLine();  
+    }
+    
+    // read other fields
+    while (this.lastLine != null && !isStartOfWorkingPaper() && (startsWithKeyword(recognizedFields) || this.lastLine.equals(""))) {
+      
+      // if multiple lines for a field are allowed and field consists of multiple lines, join them
+      String keyword = this.lastLine.equals("") ? "" : this.lastLine.substring(0, this.lastLine.indexOf(':')).trim();
+      // skip keyword
+      this.lastLine = this.lastLine.equals("") ? "" : this.lastLine.substring(this.lastLine.indexOf(':')+1, this.lastLine.length()).trim();
+      
+      // parse keywords field
+      if (keyword.equals("Keywords")) {
+        String content = readMultipleLines();
+        String[] keywords = content.split("[,;]");
+        String keywordStr = "";
+        for (int i = 0; i < keywords.length; i++) {
+          keywordStr += " '" + keywords[i].trim() + "'";
+        }
+        be.setField("keywords", keywordStr.trim());
+        
+      // parse JEL field
+      } else if (keyword.equals("JEL")) {
+        be.setField("jel", readMultipleLines());
+        
+      // parse date field
+      } else if (keyword.startsWith("Date")) {
+        Date date = null;
+        String content = readMultipleLines();
+        String[] recognizedDateFormats = new String[] {"yyyy-MM-dd","yyyy-MM","yyyy"};
+        int i = 0;
+        for (; i < recognizedDateFormats.length && date == null; i++) {
+          try {            
+            date = new SimpleDateFormat(recognizedDateFormats[i]).parse(content);
+          } catch (ParseException e) {
+            // wrong format
+          }
+        }
+        
+        Calendar cal = new GregorianCalendar();              
+        cal.setTime(date != null ? date : new Date());
+        be.setField("year", "" + cal.get(Calendar.YEAR));
+        if (date != null && recognizedDateFormats[i-1].indexOf("MM") >= 0) {
+          be.setField("month", "" + cal.get(Calendar.MONTH));
+        }
+        
+      // parse URL field
+      } else if (keyword.startsWith("URL")) {
+        String content = null;
+        if (multilineUrlFieldAllowed) {
+          content = readMultipleLines(); 
+        } else {
+          content = this.lastLine;
+          readLine();
+        }
+        be.setField("url", content);
+        
+      // authors field
+      } else if (keyword.startsWith("By")) {
+        // parse authors      
+        parseAuthors(be); 
+      } else {
+        readLine();
+      }
+    }
+  }
+
+  /**
+   * if line starts with a string of the form 'x. ' and we are not in the overview
+   * section, we have a working paper entry we are interested in
+   */
+  private boolean isStartOfWorkingPaper() {
+    return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection;
+  }
+  
+  /*
+   *  (non-Javadoc)
+   * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
    */
   public List importEntries(InputStream stream) throws IOException {    
   	ArrayList bibitems = new ArrayList();
@@ -212,157 +418,42 @@ public class RepecNepImporter extends ImportFormat {
     this.line = 0;
     
     try {
-    	String s = "";
-    	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+    	this.in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
       
       String prevLine = "";
-      boolean inOverviewSection = false;
-      // skip header and editor information
-      s = readLine(in);
-    	while (s != null) {
+      
+      readLine(); // skip header and editor information
+    	while (this.lastLine != null) {
   
-        if (s.startsWith("-----------------------------")) {
-          inOverviewSection = prevLine.startsWith("In this issue we have");
+        if (this.lastLine.startsWith("-----------------------------")) {
+          this.inOverviewSection = prevLine.startsWith("In this issue we have");
         } 
-        
-        // if line starts with a string of the form 'x. ' and we are not in the overview
-        // section, we have a working paper entry we are interested in
-        if (s.matches("\\d+\\.\\s.*") && !inOverviewSection) {
-          paperNoStr = s.substring(0, s.indexOf('.'));
-  
+        if (isStartOfWorkingPaper()) {
           BibtexEntry be = new BibtexEntry(Util.createNeutralId());
           be.setType(BibtexEntryType.getType("techreport"));
-          
-          // read title
-          String title = s.substring(s.indexOf('.') + 1, s.length()).trim();
-          s = readLine(in).trim();
-          while (s != null && !s.equals("")) {
-            title += " " + s;
-            s = readLine(in).trim();
+          paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));  
+          parseTitleString(be);
+          if (startsWithKeyword(recognizedFields)) {
+            parseAdditionalFields(be, false);
+          } else {
+            readLine(); // skip empty line
+            parseAuthors(be);
+            readLine(); // skip empty line
           }
-          be.setField("title", title);
-          
-          // skip empty line
-          s = readLine(in);
-          
-          // read authors and institutions
-          String authors = "";
-          String institutions = "";
-          while (s != null && !s.equals("")) {
-            
-            // read single author
-            String author = null;
-            String institution = null;
-            boolean institutionDone = false;
-            if (s.indexOf('(') >= 0) {
-              author = s.substring(0, s.indexOf('(')).trim();
-              institutionDone = s.indexOf(')') > 0;
-              institution = s.substring(s.indexOf('(') + 1, institutionDone? s.indexOf(')') : s.length()).trim();
-            } else {
-              author = s.substring(0, s.length()).trim();
-              institutionDone = true;
-            }
-            s = readLine(in).trim();
-            while (!institutionDone && s!= null) {
-              institutionDone = s.indexOf(')') > 0;
-              institution = s.substring(s.indexOf('(') + 1, institutionDone ? s.indexOf(')') : s.length()).trim();
-              s = readLine(in).trim();
-            }
-            
-            if (author != null) {
-              authors += !authors.equals("") ? " and " + author : "" + author;
-            }
-            if (institution != null) {
-              institutions += !institutions.equals("") ? "and " + institution : "" + institution;
-            }            
+          if (!startsWithKeyword(recognizedFields)) {
+            parseAbstract(be);
           }
-          
-          if (!authors.equals("")) {
-            be.setField("author", authors);
-          }
-          if (!institutions.equals("")) {
-            be.setField("institution", institutions);
-          }
-  
-          // skip empty line
-          s = readLine(in);
-          
-          // read abstract
-          String theabstract = "";
-          while (s != null && !s.equals("") && !startsWithKeyword(s,recognizedFields)) {
-            theabstract += " " + s.trim();
-            s = readLine(in);
-          }
-          theabstract = theabstract.trim();
-          
-          if (!theabstract.equals("")) {
-            be.setField("abstract", theabstract);
-          }
-          
-          // read other fields
-          while (startsWithKeyword(s, recognizedFields)) {
-            
-            // if field consists of multiple lines, join them
-            String field = s;
-            s = readLine(in);
-            while (s != null && !s.equals("") && !startsWithKeyword(s,recognizedFields)) {
-              field += " " + s.trim();
-              s = readLine(in);
-            }
-            String content = field.substring(field.indexOf(':')+1, field.length()).trim();
-            
-            // now field keyword-content
-            if (field.startsWith("Keywords:")) {
-              String[] keywords = content.split(",");
-              String keywordStr = "";
-              for (int i = 0; i < keywords.length; i++) {
-                keywordStr += " '" + keywords[i].trim() + "'";
-              }
-              be.setField("keywords", keywordStr.trim());
-              
-            } else if (field.startsWith("JEL:")) {
-              be.setField("jel", content);
-              
-            } else if (field.startsWith("Date:")) {
-              Date date = null;
-              try {
-                date = new SimpleDateFormat("yyyy-MM-dd").parse(content);
-              } catch (ParseException e) {
-                // wrong format
-              }
-              
-              if (date == null) {
-                try {
-                  date = new SimpleDateFormat("yyyy-MM").parse(content);
-                } catch (ParseException e) {
-                  // wrong format
-                }                  
-              }
-              
-              Calendar cal = new GregorianCalendar();              
-              if (date != null) {
-                cal.setTime(date);
-              } else {
-                cal.setTime(new Date());
-              }
-              int year = cal.get(Calendar.YEAR);
-              int month = cal.get(Calendar.MONTH);
-              
-              be.setField("year", ""+year);
-              be.setField("month", ""+month);
-              
-            } else if (field.startsWith("URL:")) {
-              be.setField("url", content);
-            }
-          }
+          parseAdditionalFields(be, true);
           
           bibitems.add(be);
           paperNoStr = null;
+          
+        } else {        
+          prevLine = this.lastLine;
+          readLine();
         }
-        
-        prevLine = s;
-        s = readLine(in);
       }
+      
     } catch (Exception e) {
       String message = "Error in REPEC-NEP import on line " + this.line;
       if (paperNoStr != null) {
