@@ -286,6 +286,7 @@ public class GUIGlobals {
       timeStampHelp = "TimeStampHelp.html",
         pdfHelp = "ExternalFiles.html",
       exportCustomizationHelp = "CustomExports.html",
+      importCustomizationHelp = "CustomImports.html",
       medlineHelp = "MedlineHelp.html",
         citeSeerHelp = "CiteSeerHelp.html",
       generalFieldsHelp = "GeneralFields.html",

@@ -174,7 +174,7 @@ public class ImportCustomizationDialog extends JDialog {
 
     closeButton.addActionListener(closeAction);
 
-    helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.exportCustomizationHelp,
+    helpButton.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importCustomizationHelp,
                                           "Help"));
 
     ImportTableModel tableModel = new ImportTableModel();
