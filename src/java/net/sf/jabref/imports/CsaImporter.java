@@ -57,6 +57,14 @@ public class CsaImporter extends ImportFormat {
 	return "CSA";
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "csa";
+    }
+    
     // read a line
     private String readLine(BufferedReader file) throws IOException {
 	String str = file.readLine();

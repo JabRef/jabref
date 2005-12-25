@@ -25,6 +25,14 @@ public class ScifinderImporter extends ImportFormat {
     return "Scifinder";
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "scifinder";
+    }
+    
     /**
      * Check whether the source is in the correct format for this importer.
      */

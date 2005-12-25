@@ -48,6 +48,23 @@ public abstract class ImportFormat implements Comparable {
     public abstract String getFormatName();
     
     /**
+     * Short, one token ID to identify the format from the command line.
+     * 
+     * @return command line ID
+     */
+    public String getCLIId() {
+      String id = getFormatName();
+      StringBuffer result = new StringBuffer(id.length());
+      for (int i = 0; i < id.length(); i++) {
+        char c = id.charAt(i);
+        if (Character.isLetterOrDigit(c)) {
+          result.append(Character.toLowerCase(c));
+        }
+      }
+      return result.toString();
+    }
+    
+    /**
      * Description  of the ImportFormat.
      * 
      * <p>Implementors of ImportFormats should override this. Ideally, it should specify

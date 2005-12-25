@@ -25,6 +25,14 @@ public class JstorImporter extends ImportFormat {
     return "JStor (tab delimited)";
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "jstor";
+    }
+    
     /**
      * Check whether the source is in the correct format for this importer.
      */

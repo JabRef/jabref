@@ -34,7 +34,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 /**
- * Collection of user defined custom export formats. 
+ * Collection of user defined custom import formats. 
  * 
  * <p>The collection can be stored and retrieved from Preferences. It is sorted by the default
  * order of {@link ImportFormat}.</p>
@@ -42,11 +42,14 @@ import net.sf.jabref.JabRefPreferences;
 public class CustomImportList extends TreeSet {
 
   /**
-   * Structure with data for a custom importer 
+   * Object with data for a custom importer.
+   * 
+   * <p>Is also responsible for instantiating the class loader.</p>
    */
   public class Importer implements Comparable {
     
     private String name;
+    private String cliId;
     private String className;
     private String basePath;
     
@@ -57,8 +60,9 @@ public class CustomImportList extends TreeSet {
     public Importer(String[] data) {
       super();
       this.name = data[0];
-      this.className = data[1];
-      this.basePath = data[2];
+      this.cliId = data[1];
+      this.className = data[2];
+      this.basePath = data[3];
     }
     
     public String getName() {
@@ -67,6 +71,14 @@ public class CustomImportList extends TreeSet {
     
     public void setName(String name) {
       this.name = name;
+    }
+    
+    public String getClidId() {
+      return this.cliId;
+    }
+    
+    public void setCliId(String cliId) {
+      this.cliId = cliId;
     }
     
     public String getClassName() {
@@ -90,7 +102,7 @@ public class CustomImportList extends TreeSet {
     }
     
     public String[] getAsStringArray() {
-      return new String[] {name, className, basePath};
+      return new String[] {name, cliId, className, basePath};
     }
     
     public boolean equals(Object o) {
@@ -131,13 +143,33 @@ public class CustomImportList extends TreeSet {
     int i=0;
     String[] s = null;
     while ((s = prefs.getStringArray("customImportFormat"+i)) != null) {
-      super.add(new Importer(s));
+      try {
+        super.add(new Importer(s));
+      } catch (Exception e) {
+        System.err.println("Warning! Could not load " + s[0] + " from preferences. Will ignore.");
+        // Globals.prefs.remove("customImportFormat"+i);
+      }
       i++;
     }
   }
 
   public void addImporter(Importer customImporter) {
     super.add(customImporter);
+  }
+  
+  /**
+   * Adds an importer.
+   * 
+   * <p>If an old one equal to the new one was contained, the old
+   * one is replaced.</p>
+   * 
+   * @param customImporter new (version of an) importer
+   * @return  if the importer was contained
+   */
+  public boolean replaceImporter(Importer customImporter) {
+    boolean wasContained = this.remove(customImporter);
+    this.addImporter(customImporter);
+    return wasContained;
   }
 
   public void store() {

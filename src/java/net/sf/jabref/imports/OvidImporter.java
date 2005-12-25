@@ -44,6 +44,14 @@ public class OvidImporter extends ImportFormat {
     return "Ovid";
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "ovid";
+    }
+    
     /**
      * Check whether the source is in the correct format for this importer.
      */

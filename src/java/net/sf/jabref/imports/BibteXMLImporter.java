@@ -24,6 +24,15 @@ public class BibteXMLImporter extends ImportFormat {
 	return "BibTeXML";
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "bibtexml";
+    }
+    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */

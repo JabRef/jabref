@@ -56,6 +56,18 @@ public class ImportCustomizationDialog extends JDialog {
   private JTable customImporterTable;
   private JabRefPreferences prefs = Globals.prefs;
   
+  /*
+   *  (non-Javadoc)
+   * @see java.awt.Component#getSize()
+   */
+  public Dimension getSize() {
+    int width = GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH
+              + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
+              + GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH
+              + GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH;
+    return new Dimension(width, width*2);
+  }
+  
   /**
    * 
    * @param frame_
@@ -68,10 +80,10 @@ public class ImportCustomizationDialog extends JDialog {
     addFromFolderButton.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
        CustomImportList.Importer importer = prefs.customImports.new Importer();  
-       importer.setBasePath( Globals.getNewDir(frame, prefs, new File(prefs.get("workingDirectory")), null,
-           "Select Classpath of New Importer", JFileChooser.CUSTOM_DIALOG, true) );
+       importer.setBasePath( Globals.getNewDir(frame, prefs, new File(prefs.get("workingDirectory")), "",
+           "Select Classpath of New Importer", JFileChooser.CUSTOM_DIALOG, false) );
        String chosenFileStr = Globals.getNewFile(frame, prefs, importer.getBasePath(), ".class",
-           "Select new ImportFormat Subclass", JFileChooser.CUSTOM_DIALOG, true);
+           "Select new ImportFormat Subclass", JFileChooser.CUSTOM_DIALOG, false);
        if (chosenFileStr != null) {
          try {
            File chosenFile = new File(chosenFileStr);
@@ -84,12 +96,13 @@ public class ImportCustomizationDialog extends JDialog {
            className = className.substring(0, className.lastIndexOf('.'));
            importer.setClassName(className);
            importer.setName( importer.getInstance().getFormatName() );
+           importer.setCliId( importer.getInstance().getCLIId() );
          } catch (Exception exc) {           
            exc.printStackTrace();
            JOptionPane.showMessageDialog(frame, "Could not instantiate " + chosenFileStr + ":\n " + exc.getMessage());
          }
 
-         prefs.customImports.addImporter(importer);
+         prefs.customImports.replaceImporter(importer);
          Globals.importFormatReader.resetImportFormats();
          customImporterTable.revalidate();
          customImporterTable.repaint();
@@ -183,6 +196,7 @@ public class ImportCustomizationDialog extends JDialog {
     cm.getColumn(0).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH);
     cm.getColumn(1).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH);
     cm.getColumn(2).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH);
+    cm.getColumn(3).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH);
     JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -208,6 +222,7 @@ public class ImportCustomizationDialog extends JDialog {
 
     getContentPane().add(mainPanel, BorderLayout.CENTER);
     getContentPane().add(optionsPanel, BorderLayout.SOUTH);
+    this.setSize(getSize());
     pack();
     Util.placeDialog(this, frame);
     new FocusRequester(customImporterTable);
@@ -218,7 +233,7 @@ public class ImportCustomizationDialog extends JDialog {
    */
   class ImportTableModel extends AbstractTableModel {
     public int getColumnCount() {
-      return 3;
+      return 4;
     }
 
     public int getRowCount() {
@@ -230,6 +245,8 @@ public class ImportCustomizationDialog extends JDialog {
         case 0:
           return Globals.lang("Import name");
         case 1:
+          return Globals.lang("Command line id");
+        case 2:
           return Globals.lang("ImportFormat class");
         default:
           return Globals.lang("Contained in");
@@ -247,8 +264,10 @@ public class ImportCustomizationDialog extends JDialog {
       if (columnIndex == 0) {
         value = importer.getName();
       } else if (columnIndex == 1) {
-        value = importer.getClassName();
+        value = importer.getClidId();
       } else if (columnIndex == 2) {
+        value = importer.getClassName();
+      } else if (columnIndex == 3) {
         value = importer.getBasePath();
       }
       return value;

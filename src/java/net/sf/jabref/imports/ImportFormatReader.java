@@ -33,15 +33,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import java.util.regex.*;
 
@@ -62,14 +57,8 @@ public class ImportFormatReader {
     private final static Pattern bracketsPattern = Pattern.compile("\\{.*\\}"),
 	spaceMarkerPattern = Pattern.compile(SPACE_MARKER);
 
-    /* Use a WeakHashMAp for storing cached names, so the cached mapping will not prevent
-     * an obsoleted name string from being garbage collected.
-     */
-
-    private final static Map nameCacheLastFirst = new WeakHashMap();
-    private final static Map nameCacheFirstFirst = new WeakHashMap();
-
-  private SortedMap formats = new TreeMap();
+  /** all import formats, in the defalt order of import formats */
+  private SortedSet formats = new TreeSet();
 
   public ImportFormatReader() {
     super();
@@ -79,29 +68,30 @@ public class ImportFormatReader {
     formats.clear();
     
     // Add all our importers to the TreeMap. The map is used to build the import
-    // menus, and to resolve command-line import instructions.
-    formats.put("csa", new CsaImporter());   
-    formats.put("isi", new IsiImporter());
-    formats.put("refer", new EndnoteImporter());
-    formats.put("medline", new MedlineImporter());
-    formats.put("bibtexml", new BibteXMLImporter());
-    formats.put("biblioscape", new BiblioscapeImporter());
-    formats.put("sixpack", new SixpackImporter());
-    formats.put("inspec", new InspecImporter());
-    formats.put("scifinder", new ScifinderImporter());
-    formats.put("ovid", new OvidImporter());
-    formats.put("ris", new RisImporter());
-    formats.put("jstor", new JstorImporter());
-    formats.put("silverplatter", new SilverPlatterImporter());
-    formats.put("biomail", new BiomailImporter());
-    formats.put("repecnep", new RepecNepImporter());    
+    // menus, and .
+    formats.add(new CsaImporter());   
+    formats.add(new IsiImporter());
+    formats.add(new EndnoteImporter());
+    formats.add(new MedlineImporter());
+    formats.add(new BibteXMLImporter());
+    formats.add(new BiblioscapeImporter());
+    formats.add(new SixpackImporter());
+    formats.add(new InspecImporter());
+    formats.add(new ScifinderImporter());
+    formats.add(new OvidImporter());
+    formats.add(new RisImporter());
+    formats.add(new JstorImporter());
+    formats.add(new SilverPlatterImporter());
+    formats.add(new BiomailImporter());
+    formats.add(new RepecNepImporter());    
     
+    // add all custom importers
     for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {
       CustomImportList.Importer importer = (CustomImportList.Importer)i.next();
 
       try {
         ImportFormat imFo = importer.getInstance();
-        formats.put(imFo.getFormatName(), imFo);
+        formats.add(imFo);
       } catch(Exception e) {
         System.err.println("Could not instantiate " + importer.getName() + " importer, will ignore it. Please check if the class is still available.");
         e.printStackTrace();
@@ -109,20 +99,33 @@ public class ImportFormatReader {
     }
   }
   
-    public static void clearNameCache() {
-	nameCacheLastFirst.clear();
-	nameCacheFirstFirst.clear();
+  /**
+   * Format for a given CLI-ID.
+   * 
+   * <p>Will return the first format according to the default-order of
+   * format that matches the given ID.</p>
+   * 
+   * @param cliId  CLI-Id
+   * @return  Import Format or <code>null</code> if none matches
+   */
+  public ImportFormat getByCliId(String cliId) {
+    ImportFormat result = null;
+    for (Iterator i = formats.iterator(); i.hasNext() && result == null; ) {
+      ImportFormat format = (ImportFormat)i.next();
+      if (format.getCLIId().equals(cliId)) {
+        result = format;
+      }
     }
-
-
+    return result;
+  }
+  
   public List importFromStream(String format, InputStream in)
     throws IOException {
-    Object o = formats.get(format);
+    ImportFormat importer = getByCliId(format);
 
-    if (o == null)
+    if (importer == null)
       throw new IllegalArgumentException("Unknown import format: " + format);
 
-    ImportFormat importer = (ImportFormat) o;
     List res = importer.importEntries(in);
 
     // Remove all empty entries
@@ -134,14 +137,11 @@ public class ImportFormatReader {
 
   public List importFromFile(String format, String filename)
     throws IOException {
-    Object o = formats.get(format);
+    ImportFormat importer = getByCliId(format);
 
-    if (o == null)
+    if (importer == null)
       throw new IllegalArgumentException("Unknown import format: " + format);
 
-    ImportFormat importer = (ImportFormat) o;
-
-    //System.out.println(importer.getFormatName());
     return importFromFile(importer, filename);
   }
 
@@ -181,11 +181,13 @@ public class ImportFormatReader {
   /**
    * All custom importers.
    * 
+   * <p>Elements are in default order.</p>
+   * 
    * @return all custom importers, elements are of type {@link InputFormat}
    */
   public SortedSet getCustomImportFormats() {
     SortedSet result = new TreeSet();
-    for (Iterator i = this.formats.values().iterator(); i.hasNext(); ) {
+    for (Iterator i = this.formats.iterator(); i.hasNext(); ) {
       ImportFormat format = (ImportFormat)i.next();
       if (format.getIsCustomImporter()) {
         result.add(format);  
@@ -197,11 +199,13 @@ public class ImportFormatReader {
   /**
    * All built-in importers.
    * 
+   * <p>Elements are in default order.</p>
+   * 
    * @return all custom importers, elements are of type {@link InputFormat}
    */
   public SortedSet getBuiltInInputFormats() {
     SortedSet result = new TreeSet();
-    for (Iterator i = this.formats.values().iterator(); i.hasNext(); ) {
+    for (Iterator i = this.formats.iterator(); i.hasNext(); ) {
       ImportFormat format = (ImportFormat)i.next();
       if (!format.getIsCustomImporter()) {
         result.add(format);  
@@ -210,16 +214,29 @@ public class ImportFormatReader {
     return result;    
   }
   
-  public Set getImportFormats() {
-    return formats.entrySet();
+  /**
+   * All importers.
+   * 
+   * <p>Elements are in default order.</p>
+   * 
+   * @return all custom importers, elements are of type {@link InputFormat}
+   */
+  public SortedSet getImportFormats() {
+    return this.formats;
   }
 
+  /**
+   * Human readable list of all known import formats (name and CLI Id).
+   * 
+   * <p>List is in default-order.</p>
+   * 
+   * @return  human readable list of all known import formats
+   */
   public String getImportFormatList() {
     StringBuffer sb = new StringBuffer();
 
-    for (Iterator i = formats.keySet().iterator(); i.hasNext();) {
-      String format = (String) i.next();
-      ImportFormat imFo = (ImportFormat) formats.get(format);
+    for (Iterator i = this.formats.iterator(); i.hasNext();) {
+      ImportFormat imFo = (ImportFormat)i.next();
       int pad = Math.max(0, 14 - imFo.getFormatName().length());
       sb.append("  ");
       sb.append(imFo.getFormatName());
@@ -228,7 +245,7 @@ public class ImportFormatReader {
         sb.append(" ");
 
       sb.append(" : ");
-      sb.append(format);
+      sb.append(imFo.getCLIId());
       sb.append("\n");
     }
 
@@ -243,7 +260,7 @@ public class ImportFormatReader {
      * @param name
      * @return The name after expanding initials.
      */
-  public static String expandAuthorInitials(String name) {
+    public static String expandAuthorInitials(String name) {
       String[] authors = name.split(" and ");
       StringBuffer sb = new StringBuffer();
       for (int i=0; i<authors.length; i++) {
@@ -425,7 +442,7 @@ public class ImportFormatReader {
 
     // Cycle through all importers:
     for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
-      ImportFormat imFo = (ImportFormat) ((Map.Entry) i.next()).getValue();
+      ImportFormat imFo = (ImportFormat)i.next();
 
       try {
         //System.out.println("Trying format: "+imFo.getFormatName());

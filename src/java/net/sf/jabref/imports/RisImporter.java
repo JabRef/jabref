@@ -26,7 +26,14 @@ public class RisImporter extends ImportFormat {
     return "RIS";
     }
 
-
+    /*
+     *  (non-Javadoc)
+     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+     */
+    public String getCLIId() {
+      return "ris";
+    }
+    
     /**
      * Check whether the source is in the correct format for this importer.
      */

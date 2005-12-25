@@ -24,6 +24,14 @@ public class InspecImporter extends ImportFormat {
 	return "INSPEC";
     }
 
+  /*
+   *  (non-Javadoc)
+   * @see net.sf.jabref.imports.ImportFormat#getCLIId()
+   */
+  public String getCLIId() {
+    return "inspec";
+  }
+    
   /**
    * Check whether the source is in the correct format for this importer.
    */
