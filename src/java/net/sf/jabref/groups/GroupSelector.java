@@ -361,6 +361,10 @@ public class GroupSelector extends SidePaneComponent implements
         moveSubmenu.add(moveNodeDownPopupAction);
         moveSubmenu.add(moveNodeLeftPopupAction);
         moveSubmenu.add(moveNodeRightPopupAction);
+        groupsContextMenu.addSeparator();
+        groupsContextMenu.add(addToGroup);
+        groupsContextMenu.add(moveToGroup);
+        groupsContextMenu.add(removeFromGroup);
         groupsTree.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger())
@@ -416,6 +420,9 @@ public class GroupSelector extends SidePaneComponent implements
         collapseSubtreePopupAction.setEnabled(path != null);
         removeSubgroupsPopupAction.setEnabled(path != null);
         sortSubmenu.setEnabled(path != null);
+        addToGroup.setEnabled(false);
+        moveToGroup.setEnabled(false);
+        removeFromGroup.setEnabled(false);
         if (path != null) { // some path dependent enabling/disabling
             GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
             editGroupPopupAction.setNode(node);
@@ -459,6 +466,25 @@ public class GroupSelector extends SidePaneComponent implements
             moveNodeDownPopupAction.setNode(node);
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
+            // add/remove entries to/from group
+            BibtexEntry[] selection = frame.basePanel().getSelectedEntries();
+            if (selection.length > 0) {
+                if (node.getGroup().supportsAdd() && !node.getGroup().
+                        containsAll(selection)) {
+                    addToGroup.setNode(node);
+                    addToGroup.setBasePanel(panel);
+                    addToGroup.setEnabled(true);
+                    moveToGroup.setNode(node);
+                    moveToGroup.setBasePanel(panel);
+                    moveToGroup.setEnabled(true);
+                }
+                if (node.getGroup().supportsRemove() && node.getGroup().
+                        containsAny(selection)) {
+                    removeFromGroup.setNode(node);
+                    removeFromGroup.setBasePanel(panel);
+                    removeFromGroup.setEnabled(true);
+                }
+            }
         } else {
             editGroupPopupAction.setNode(null);
             addGroupPopupAction.setNode(null);
@@ -655,6 +681,9 @@ public class GroupSelector extends SidePaneComponent implements
     final NodeAction collapseSubtreePopupAction = new CollapseSubtreeAction();
     final NodeAction sortDirectSubgroupsPopupAction = new SortDirectSubgroupsAction();
     final NodeAction sortAllSubgroupsPopupAction = new SortAllSubgroupsAction();
+    final AddToGroupAction addToGroup = new AddToGroupAction(false);
+    final AddToGroupAction moveToGroup = new AddToGroupAction(true);
+    final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
     
     private class EditGroupAction extends NodeAction {
         public EditGroupAction() {

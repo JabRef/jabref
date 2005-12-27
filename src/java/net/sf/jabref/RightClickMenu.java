@@ -302,8 +302,8 @@ public class RightClickMenu extends JPopupMenu
      */
     private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection, 
     		boolean add, boolean move) {
-        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node, move)
-                : (AbstractAction) new RemoveFromGroupAction(node);
+        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node, move,
+                panel) : (AbstractAction) new RemoveFromGroupAction(node, panel);
         AbstractGroup group = node.getGroup();
         if (!move) {
 	        action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
@@ -322,109 +322,6 @@ public class RightClickMenu extends JPopupMenu
 
     public void popupMenuCanceled(PopupMenuEvent e) {
         // nothing to do
-    }
-
-    class AddToGroupAction extends AbstractAction {
-        final GroupTreeNode m_node;
-        final boolean m_move;
-        /**
-         * @param move If true, remove node from all other groups.
-         */
-        public AddToGroupAction(GroupTreeNode node, boolean move) {
-            super(node.getGroup().getName());
-            m_node = node;
-            m_move = move;
-        }
-        public void actionPerformed(ActionEvent evt) {
-        	final BibtexEntry[] entries = panel.getSelectedEntries();
-    		final Vector removeGroupsNodes = new Vector(); // used only when moving
-    		
-        	if (m_move) {
-        		// collect warnings for removal
-        		Enumeration e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
-        		GroupTreeNode node;
-        		while (e.hasMoreElements()) {
-        			node = (GroupTreeNode) e.nextElement();
-        			if (!node.getGroup().supportsRemove())
-        				continue;
-        			for (int i = 0; i < entries.length; ++i) {
-        				if (node.getGroup().contains(entries[i]))
-        					removeGroupsNodes.add(node);
-        			}
-        		}
-        		// warning for all groups from which the entries are removed, and 
-        		// for the one to which they are added! hence the magical +1
-        		AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size()+1];
-        		for (int i = 0; i < removeGroupsNodes.size(); ++i)
-        			groups[i] = ((GroupTreeNode) removeGroupsNodes.elementAt(i)).getGroup();
-        		groups[groups.length-1] = m_node.getGroup();
-	            if (!Util.warnAssignmentSideEffects(groups,
-	            		entries, panel.getDatabase(), panel.frame))
-	                return; // user aborted operation
-        	} else {
-	            // warn if assignment has undesired side effects (modifies a field != keywords)
-	            if (!Util.warnAssignmentSideEffects(new AbstractGroup[]{m_node.getGroup()},
-	            		entries, panel.getDatabase(), panel.frame))
-	                return; // user aborted operation
-        	}
-        	
-            // if an editor is showing, its fields must be updated
-            // after the assignment, and before that, the current
-            // edit has to be stored:
-            panel.storeCurrentEdit();
-            
-            NamedCompound undoAll = new NamedCompound(Globals.lang("change assignment of entries")); 
-            
-            if (m_move) {
-            	// first remove
-            	for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-            		GroupTreeNode node = (GroupTreeNode) removeGroupsNodes.elementAt(i);
-        			if (node.getGroup().containsAny(entries))
-        				undoAll.addEdit(node.removeFromGroup(entries));
-            	}
-            	// then add
-                AbstractUndoableEdit undoAdd = m_node.addToGroup(entries);
-                if (undoAdd != null)
-                	undoAll.addEdit(undoAdd);
-            } else {
-                AbstractUndoableEdit undoAdd = m_node.addToGroup(entries);
-                if (undoAdd == null)
-                    return; // no changed made
-                undoAll.addEdit(undoAdd);
-            }
-            
-            undoAll.end();
-            
-            panel.undoManager.addEdit(undoAll);
-            panel.markBaseChanged();
-            panel.updateEntryEditorIfShowing();
-            panel.getGroupSelector().valueChanged(null);
-        }
-    }
-    
-    class RemoveFromGroupAction extends AbstractAction {
-        GroupTreeNode m_node;
-        public RemoveFromGroupAction(GroupTreeNode node) {
-            super(node.getGroup().getName());
-            m_node = node;
-        }
-        public void actionPerformed(ActionEvent evt) {
-            // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[]{m_node.getGroup()},
-                    panel.getSelectedEntries(),
-                    panel.getDatabase(),
-                    panel.frame))
-                return; // user aborted operation
-            
-            AbstractUndoableEdit undo = m_node.removeFromGroup(panel.getSelectedEntries());
-            if (undo == null)
-                return; // no changed made
-            
-            panel.undoManager.addEdit(undo);
-            panel.markBaseChanged();
-            panel.updateEntryEditorIfShowing();
-            panel.getGroupSelector().valueChanged(null);
-        }
     }
 
     class ChangeTypeAction extends AbstractAction {
