@@ -200,8 +200,18 @@ public class JournalAbbreviations {
             entry.setField(fieldName, newText);
             ce.addEdit(new UndoableFieldChange(entry, fieldName, text, newText));
             return true;
-        } else
-            return false;
+        } else {
+            String unabbr = getFullName(text);
+            if (unabbr != null) {
+                String newText = getAbbreviatedName(unabbr, withDots);
+                if (newText == null)
+                    return false;
+                entry.setField(fieldName, newText);
+                ce.addEdit(new UndoableFieldChange(entry, fieldName, text, newText));
+                return true;
+            } else
+                return false;
+        }
     }
 
     /**

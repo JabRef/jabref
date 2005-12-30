@@ -1,6 +1,6 @@
 
-JabRef 1.8.1
-------------
+JabRef 2.0 beta
+---------------
 
 
 Introduction:
@@ -80,9 +80,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-1.x:    - (Did some profiling with Netbeans... introduced caching of AuthorList objects to reduce number allocated
-          by 95% for my test case)
-        - Added export option for OpenDocument spreadsheet.
+2.0b:   - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
         - Added REPEC-NEP import filter.
         - Added option for non-field parameters for export formatters. If the parameters does not start with the
@@ -91,12 +89,13 @@ Change log:
           parameter.                   
         - Added customization of table colors, accessible from Tools -> Preferences -> Entry table.
         - Added new Appearance tab to preferences dialog to gather appearance related options.
-        - [UNFINISHED] Added toggling of abbreviated and full journal names. The list of journals is realized as
+        - Added toggling of abbreviated and full journal names. The list of journals is realized as
            an external file, but editable from a Manage Journal Abbreviations panel. Secondary lists can also
            be linked, but not edited. There is a download option to quickly get a list available on the internet,
            and we will provide one or more lists for download from the SourceForge web server.
         - Added functionality for new JabRef instances to detect a running instance, and send
           command line parameters to the running instance for processing.
+        - Added handling of HTML links in preview panel.
         - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
           Gives options to save, cancel or try a different encoding.
         - The encoding used when opening a database is now remembered, and used when database is stored.

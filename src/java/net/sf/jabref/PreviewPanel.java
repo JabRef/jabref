@@ -1,6 +1,8 @@
 package net.sf.jabref;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.border.Border;
 import java.io.*;
 import java.net.URL;
@@ -73,6 +75,15 @@ public class PreviewPanel extends JEditorPane {
   private void init() {
     setEditable(false);
     setContentType(CONTENT_TYPE);
+      addHyperlinkListener(new HyperlinkListener () {
+          public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
+              try {
+                  Util.openExternalViewer(hyperlinkEvent.getURL().toString(), "url", Globals.prefs);
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+          }
+      });
     //setSize(100, 100);
   }
 

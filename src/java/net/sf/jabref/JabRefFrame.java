@@ -298,9 +298,12 @@ public class JabRefFrame
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
 
-    abbreviate = new GeneralAction("abbreviate", "Abbreviate journal names",
-                Globals.lang("Abbreviate journal names of the selected entries"),
-                Globals.prefs.getKey("Abbreviate")),
+    abbreviateMedline = new GeneralAction("abbreviateMedline", "Abbreviate journal names (MEDLINE)",
+                Globals.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
+  abbreviateIso = new GeneralAction("abbreviateIso", "Abbreviate journal names (ISO)",
+                          Globals.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"),
+                          Globals.prefs.getKey("Abbreviate")),
+
 
     unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
                     Globals.lang("Unabbreviate journal names of the selected entries"),
@@ -1078,7 +1081,8 @@ public JabRefPreferences prefs() {
       tools.addSeparator();
       tools.add(autoSetPdf);
       tools.add(autoSetPs);
-      tools.add(abbreviate);
+      tools.add(abbreviateIso);
+      tools.add(abbreviateMedline);
       tools.add(unabbreviate);
 
     mb.add(tools);
