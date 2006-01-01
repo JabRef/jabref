@@ -29,11 +29,12 @@ import java.awt.event.InputEvent;
 import javax.swing.*;
 
 import net.sf.jabref.EntryTable;
+import net.sf.jabref.gui.MainTable;
 
 public class EntryTableTransferHandler extends TransferHandler {
-    protected final EntryTable entryTable;
+    protected final MainTable entryTable;
 
-    public EntryTableTransferHandler(EntryTable entryTable) {
+    public EntryTableTransferHandler(MainTable entryTable) {
         this.entryTable = entryTable;
     }
 

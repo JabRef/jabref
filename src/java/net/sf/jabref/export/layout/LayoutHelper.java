@@ -392,7 +392,7 @@ public class LayoutHelper
         while (!_eof)
         {
             c = read();
-
+            //System.out.print((char)c);
             if (c == -1)
             {
                 _eof = true;
@@ -403,7 +403,7 @@ public class LayoutHelper
                 unread(c);
 
                 //System.out.println("\n#" + (char) c);
-                name = buffer.toString();
+                name = buffer != null ? buffer.toString() : "";
 
                 //System.out.println("NAME:" + name);
                 buffer = null;

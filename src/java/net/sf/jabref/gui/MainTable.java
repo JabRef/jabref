@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.groups.EntryTableTransferHandler;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -52,6 +53,10 @@ public class MainTable extends JTable {
         setGridColor(Globals.prefs.getColor("gridColor"));
         comparatorChooser = new TableComparatorChooser(this, list, true);
         final EventList selected = getSelected();
+
+        // enable DnD
+        setDragEnabled(true);
+        setTransferHandler(new EntryTableTransferHandler(this));
 
         setupComparatorChooser();
         setWidths();

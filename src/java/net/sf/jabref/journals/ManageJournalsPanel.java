@@ -122,7 +122,7 @@ public class ManageJournalsPanel extends JPanel{
         bb.addGridded(help);
         bb.addGlue();
 
-        dialog = new JDialog(frame, Globals.lang("Journal abbrebiations"), false);
+        dialog = new JDialog(frame, Globals.lang("Journal abbreviations"), false);
         dialog.getContentPane().add(this, BorderLayout.CENTER);
         dialog.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
