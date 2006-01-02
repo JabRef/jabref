@@ -65,7 +65,7 @@ public class ImportCustomizationDialog extends JDialog {
               + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
               + GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH
               + GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH;
-    return new Dimension(width, width*2);
+    return new Dimension(width, width/2);
   }
   
   /**
@@ -81,9 +81,9 @@ public class ImportCustomizationDialog extends JDialog {
      public void actionPerformed(ActionEvent e) {
        CustomImportList.Importer importer = prefs.customImports.new Importer();  
        importer.setBasePath( Globals.getNewDir(frame, prefs, new File(prefs.get("workingDirectory")), "",
-           "Select Classpath of New Importer", JFileChooser.CUSTOM_DIALOG, false) );
+           Globals.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false) );
        String chosenFileStr = Globals.getNewFile(frame, prefs, importer.getBasePath(), ".class",
-           "Select new ImportFormat Subclass", JFileChooser.CUSTOM_DIALOG, false);
+           Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
        if (chosenFileStr != null) {
          try {
            File chosenFile = new File(chosenFileStr);
@@ -110,7 +110,7 @@ public class ImportCustomizationDialog extends JDialog {
        }
       }
     });
-    addFromFolderButton.setToolTipText("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef.");
+    addFromFolderButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
 
     // TODO: select class from jar
     /*
@@ -158,7 +158,7 @@ public class ImportCustomizationDialog extends JDialog {
            JOptionPane.showMessageDialog(frame, "Could not instantiate " + importer.getClassName() + ": " + exc.getMessage());
          }
        } else {
-         JOptionPane.showMessageDialog(frame, "Please select an importer.");
+         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
        }
      }
     });
@@ -174,7 +174,7 @@ public class ImportCustomizationDialog extends JDialog {
           customImporterTable.repaint();
           frame.setUpImportMenus();
         }  else {
-          JOptionPane.showMessageDialog(frame, "Please select an importer.");
+          JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
         }
       }
     });
@@ -200,7 +200,7 @@ public class ImportCustomizationDialog extends JDialog {
     JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    customImporterTable.setPreferredScrollableViewportSize(new Dimension(500, 150));
+    customImporterTable.setPreferredScrollableViewportSize(getSize());
     if (customImporterTable.getRowCount() > 0) {
       customImporterTable.setRowSelectionInterval(0, 0);
     }
@@ -232,31 +232,12 @@ public class ImportCustomizationDialog extends JDialog {
    * Table model for the custom importer table.
    */
   class ImportTableModel extends AbstractTableModel {
-    public int getColumnCount() {
-      return 4;
-    }
-
-    public int getRowCount() {
-      return Globals.prefs.customImports.size();
-    }
-
-    public String getColumnName(int col) {
-      switch (col) {
-        case 0:
-          return Globals.lang("Import name");
-        case 1:
-          return Globals.lang("Command line id");
-        case 2:
-          return Globals.lang("ImportFormat class");
-        default:
-          return Globals.lang("Contained in");
-      }
-    }
-
-    public CustomImportList.Importer getImporter(int rowIndex) {
-      CustomImportList.Importer[] importers = (CustomImportList.Importer[])Globals.prefs.customImports.toArray(new CustomImportList.Importer[] {});
-      return importers[rowIndex];
-    }
+    private String[] columnNames = new String[] {
+      Globals.lang("Import name"), 
+      Globals.lang("Command line id"),
+      Globals.lang("ImportFormat class"),
+      Globals.lang("Contained in")
+    };
     
     public Object getValueAt(int rowIndex, int columnIndex) {
       Object value = null;
@@ -272,6 +253,23 @@ public class ImportCustomizationDialog extends JDialog {
       }
       return value;
     }
+    
+    public int getColumnCount() {
+      return columnNames.length;
+    }
+
+    public int getRowCount() {
+      return Globals.prefs.customImports.size();
+    }
+
+    public String getColumnName(int col) {
+      return columnNames[col];
+    }
+
+    public CustomImportList.Importer getImporter(int rowIndex) {
+      CustomImportList.Importer[] importers = (CustomImportList.Importer[])Globals.prefs.customImports.toArray(new CustomImportList.Importer[] {});
+      return importers[rowIndex];
+    }    
   }
 
 }
