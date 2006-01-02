@@ -187,7 +187,15 @@ public class RepecNepImporter extends ImportFormat {
   public String getCLIId() {
     return "repecnep";
   }
-    
+  
+  /*
+   *  (non-Javadoc)
+   * @see net.sf.jabref.imports.ImportFormat#getExtensions()
+   */  
+  public String getExtensions() {
+    return ".txt";
+  }
+  
   /*
    *  (non-Javadoc)
    * @see net.sf.jabref.imports.ImportFormat#getDescription()

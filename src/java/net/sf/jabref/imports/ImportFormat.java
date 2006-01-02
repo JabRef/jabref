@@ -48,6 +48,15 @@ public abstract class ImportFormat implements Comparable {
     public abstract String getFormatName();
     
     /**
+     * Extensions that this importer can read.
+     * 
+     * @return comma separated list of extensions or <code>null</code> for the default
+     */
+    public String getExtensions() {
+      return null;
+    }
+    
+    /**
      * Short, one token ID to identify the format from the command line.
      * 
      * @return command line ID

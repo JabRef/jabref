@@ -17,35 +17,36 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
     boolean openInNew;
 
     public ImportMenuItem(JabRefFrame frame, ImportFormat importer, boolean openInNew) {
-	super(importer.getFormatName());
-	this.frame = frame;
-	this.importer = importer;
-	this.openInNew = openInNew;
-  this.setToolTipText( importer.getDescription() );
-	addActionListener(this);
+    	super(importer.getFormatName());
+    	this.frame = frame;
+    	this.importer = importer;
+    	this.openInNew = openInNew;
+      this.setToolTipText( importer.getDescription() );
+    	addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
-	MyWorker worker = new MyWorker();
-	worker.init();
-	worker.getWorker().run();
-	worker.getCallBack().update();
+    	MyWorker worker = new MyWorker();
+    	worker.init();
+    	worker.getWorker().run();
+    	worker.getCallBack().update();
     }
 
     class MyWorker extends AbstractWorker {
-	String filename = null, formatName = null;
-	java.util.List entries = null;
-	boolean fileOk = false;
-	public void init() {
-	    filename = frame.getNewFile();
-	    if ((filename != null) && !(new File(filename)).exists()) {
-		JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+": '"+filename+"'",
+    	String filename = null, formatName = null;
+    	java.util.List entries = null;
+    	boolean fileOk = false;
+    	public void init() {
+  	    filename = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")),
+          importer.getExtensions(), JFileChooser.OPEN_DIALOG, false);
+  	    if ((filename != null) && !(new File(filename)).exists()) {
+      		JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+": '"+filename+"'",
 					      Globals.lang("Import failed"), JOptionPane.ERROR_MESSAGE);
 	    }
 	    else if (filename != null) {
-		frame.block();
-		frame.output(Globals.lang("Importing file")+": '"+filename+"'");
-		fileOk = true;
+    		frame.block();
+    		frame.output(Globals.lang("Importing file")+": '"+filename+"'");
+    		fileOk = true;
 	    }
 	    
 	}
