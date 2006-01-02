@@ -2,6 +2,8 @@ package net.sf.jabref;
 
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -134,6 +136,14 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     add(pan, BorderLayout.CENTER);
+
+        namesNatbib.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                abbrNames.setEnabled(!namesNatbib.isSelected());
+                lastNamesOnly.setEnabled(!namesNatbib.isSelected());
+                noAbbrNames.setEnabled(!namesNatbib.isSelected());
+            }
+        });
     }
 
     public void setValues() {
@@ -164,6 +174,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
+
+        abbrNames.setEnabled(!namesNatbib.isSelected());
+        lastNamesOnly.setEnabled(!namesNatbib.isSelected());
+        noAbbrNames.setEnabled(!namesNatbib.isSelected());
     }
 
     /**
