@@ -456,13 +456,13 @@ public class Globals {
     fc.setDialogType(dialogType);
     int dialogResult = JFileChooser.CANCEL_OPTION ;
     if (dialogType == JFileChooser.OPEN_DIALOG) {
-      dialogResult = fc.showOpenDialog(null);
+      dialogResult = fc.showOpenDialog(owner);
     }
     else if (dialogType == JFileChooser.SAVE_DIALOG){
-      dialogResult = fc.showSaveDialog(null);
+      dialogResult = fc.showSaveDialog(owner);
     }
     else {
-      dialogResult = fc.showDialog(null, description);
+      dialogResult = fc.showDialog(owner, description);
     }
 
      // the getSelectedFile method returns a valid fileselection
