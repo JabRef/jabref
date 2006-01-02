@@ -8,8 +8,8 @@
 <p>JabRef allows you to define and use your own importers, in very much the same way as the
 standard import filters are defined. An import filter is defined by one or more
 Java <i>classes</i>, which parse the contents of a file from an input stream
-and create BibTex-Entrues. So with some basic Java programming you can add an importer
-for your favorite source of references or register a new, impproved version of an existing
+and create BibTex-Entries. So with some basic Java programming you can add an importer
+for your favorite source of references or register a new, improved version of an existing
 importer. Also, this allows you to add compiled custom importers that you might
 have obtained e.g. from SourceForge without rebuilding JabRef (see "Sharing your work").</p>
 
@@ -32,10 +32,13 @@ of custom import filters. All custom importers will appear in the <b>File -> Imp
 Custom Importers</b> and <b>File -> Import and Append -> Custom Importers</b> submenus 
 of the JabRef window.</p>
 
-<p>Please note that if you move the class to another directory you will jave to
-remove and re-add the Importer. If you add a custom importer under a name that
-already exists, the existing importer will be replaced. It is not yet possible
-to register importers conatined in a ZIP- or JAR-file, please extract them first.</p>
+<p>Please note that if you move the class to another directory you will have to
+remove and re-add the importer. If you add a custom importer under a name that
+already exists, the existing importer will be replaced. Although in some cases
+it is possible to update an existing custom importer without restarting JabRef 
+(when the importer is not on the classpath), we recommend restarting JabRef 
+after updating an custom-importer. It is not yet possible to register importers 
+conatined in a ZIP- or JAR-file, please extract them first.</p>
 
 <H2>Creating an import filter</H2>
 
