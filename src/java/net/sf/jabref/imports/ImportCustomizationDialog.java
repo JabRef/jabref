@@ -99,7 +99,7 @@ public class ImportCustomizationDialog extends JDialog {
            importer.setCliId( importer.getInstance().getCLIId() );
          } catch (Exception exc) {           
            exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, "Could not instantiate " + chosenFileStr + ":\n " + exc.getMessage());
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", chosenFileStr + ":\n", exc.getMessage()));
          }
 
          prefs.customImports.replaceImporter(importer);
@@ -155,10 +155,10 @@ public class ImportCustomizationDialog extends JDialog {
            JOptionPane.showMessageDialog(frame, importFormat.getDescription());
          } catch (Exception exc) {           
            exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, "Could not instantiate " + importer.getClassName() + ": " + exc.getMessage());
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
          }
        } else {
-         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer."));
+         JOptionPane.showMessageDialog(frame, Globals.lang("Please select an importer"));
        }
      }
     });

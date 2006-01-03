@@ -2081,11 +2081,11 @@ class FetchCiteSeerAction
       importMenu.addSeparator();
       
       SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
-      JMenu submenu = new JMenu("Custom Importers");
+      JMenu submenu = new JMenu(Globals.lang("Custom importers"));
       submenu.setMnemonic(KeyEvent.VK_S);
       if (customImporters.size() == 0) {
         submenu.setEnabled(false);
-        submenu.setToolTipText("No custom imports registered yet.");
+        submenu.setToolTipText(Globals.lang("No custom imports registered yet."));
       } else {
         // Put in all formatters registered in ImportFormatReader:
         for (Iterator i=customImporters.iterator(); i.hasNext();) {
