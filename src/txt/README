@@ -80,7 +80,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.0b:   - Added export option for OpenDocument spreadsheet.
+2.0b:   - Added a system for registering custom import formats in the form of Java classes.
+        - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
         - Added REPEC-NEP import filter.
         - Added option for non-field parameters for export formatters. If the parameters does not start with the
@@ -99,6 +100,7 @@ Change log:
         - Added confirmation dialog when database is saved and the chosen encoding doesn't support all characters.
           Gives options to save, cancel or try a different encoding.
         - The encoding used when opening a database is now remembered, and used when database is stored.
+        - Added review field for research comments, paper reviews, etc.
         - Added option to disable wrapping for certain fields. Wrapping of pdf, ps, doi and url is disabled by
           default.
         - Antialiasing option now affects entry editor text fields as well as table text.
@@ -112,7 +114,6 @@ Change log:
         - Fixed startup freeze when trying to load certain malformed bib files.
         - Fixed bug related to multi-line fields in RIS import.
         - Fixed bug related to looking up a fully qualified DOI
-        - Added review field for research comments, paper reviews, etc.
         - Included review field to preview panel 1, which shows the abstract
         - Fixed bug where booktitle field was not displayed in preview for conference proceedings, similar to journal field
 1.8.1:  - Added automatic timestamp with configurable format for entries.

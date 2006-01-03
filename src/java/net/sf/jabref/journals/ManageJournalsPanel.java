@@ -48,7 +48,7 @@ public class ManageJournalsPanel extends JPanel{
     java.util.List externals = new ArrayList(); // To hold references to external journal lists.
     JDialog dialog;
     JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
-        oldFile = new JRadioButton("Existing file");
+        oldFile = new JRadioButton(Globals.lang("Existing file"));
 
     JButton add = new JButton(new ImageIcon(GUIGlobals.addIconFile)),
         remove = new JButton(new ImageIcon(GUIGlobals.removeIconFile)),
@@ -70,10 +70,11 @@ public class ManageJournalsPanel extends JPanel{
         group.add(oldFile);
         addExtPan.setLayout(new BorderLayout());
         addExtPan.add(addExt, BorderLayout.EAST);
+        addExtPan.setToolTipText(Globals.lang("Add"));
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, 150dlu");
+                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, fill:150dlu");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         CellConstraints cc = new CellConstraints();
@@ -135,7 +136,7 @@ public class ManageJournalsPanel extends JPanel{
         builder2.append(Globals.lang("Journal name"));
         builder2.append(nameTf);
         builder2.nextLine();
-        builder2.append(Globals.lang("Abbreviation"));
+        builder2.append(Globals.lang("ISO abbreviation"));
         builder2.append(abbrTf);
         journalEditPanel = builder2.getPanel();
 
@@ -229,6 +230,10 @@ public class ManageJournalsPanel extends JPanel{
         builder.append(Box.createVerticalGlue());
         builder.nextLine();
         builder.append(addExtPan);
+        builder.nextLine();
+        builder.append(Box.createVerticalGlue());
+        //builder.getPanel().setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.green));
+        //externalFilesPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         externalFilesPanel.removeAll();
         externalFilesPanel.add(builder.getPanel(), BorderLayout.CENTER);
         externalFilesPanel.revalidate();
@@ -568,6 +573,8 @@ public class ManageJournalsPanel extends JPanel{
                     buildExternalsPanel();
                 }
             });
+            clear.setToolTipText(Globals.lang("Remove"));
+
         }
         public JPanel getPanel() { return pan; }
         public String getValue() { return tf.getText(); }

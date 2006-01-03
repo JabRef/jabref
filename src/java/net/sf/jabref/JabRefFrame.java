@@ -299,14 +299,14 @@ public class JabRefFrame
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
 
     abbreviateMedline = new GeneralAction("abbreviateMedline", "Abbreviate journal names (MEDLINE)",
-                Globals.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
+                "Abbreviate journal names of the selected entries (MEDLINE abbreviation)"),
   abbreviateIso = new GeneralAction("abbreviateIso", "Abbreviate journal names (ISO)",
-                          Globals.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"),
+                          "Abbreviate journal names of the selected entries (ISO abbreviation)",
                           Globals.prefs.getKey("Abbreviate")),
 
 
     unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
-                    Globals.lang("Unabbreviate journal names of the selected entries"),
+                    "Unabbreviate journal names of the selected entries",
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
@@ -1359,6 +1359,9 @@ public JabRefPreferences prefs() {
     toggleHighlightAny.setEnabled(false);
     toggleHighlightAll.setEnabled(false);
         databaseProperties.setEnabled(false);
+    abbreviateIso.setEnabled(false);
+    abbreviateMedline.setEnabled(false);
+    unabbreviate.setEnabled(false);
   }
 
     /**
@@ -1420,7 +1423,10 @@ public JabRefPreferences prefs() {
     autoSetPs.setEnabled(true);
     toggleHighlightAny.setEnabled(true);
     toggleHighlightAll.setEnabled(true);
-        databaseProperties.setEnabled(true);
+    databaseProperties.setEnabled(true);
+    abbreviateIso.setEnabled(true);
+    abbreviateMedline.setEnabled(true);
+    unabbreviate.setEnabled(true);
   }
 
     /**
