@@ -60,7 +60,7 @@ class SearchManager2 extends SidePaneComponent
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
 	searchAll, caseSensitive, regExpSearch;
 
-    private JRadioButton increment, highlight, reorder;
+    private JRadioButton increment, normal;
     private JCheckBoxMenuItem select;
     private ButtonGroup types = new ButtonGroup();
     private boolean incSearch = false;
@@ -98,23 +98,18 @@ class SearchManager2 extends SidePaneComponent
 
 	
 	increment = new JRadioButton(Globals.lang("Incremental"), false);
-	highlight = new JRadioButton(Globals.lang("Highlight"), true);
-	reorder = new JRadioButton(Globals.lang("Float"), false);
+	normal = new JRadioButton(Globals.lang("Normal"), true);
 	types.add(increment);
-	types.add(highlight);
-	types.add(reorder);
-
+	types.add(normal);
 
         select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
-        highlight.setToolTipText(Globals.lang("Gray out non-matching entries"));
-        reorder.setToolTipText(Globals.lang("Move matching entries to the top"));
+        normal.setToolTipText(Globals.lang("Gray out non-matching entries"));
 
 	// Add an item listener that makes sure we only listen for key events
 	// when incremental search is turned on.
 	increment.addItemListener(this);
-	reorder.addItemListener(this);
-
+    normal.addItemListener(this);
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         searchField.addFocusListener(Globals.focusListener);
@@ -201,10 +196,8 @@ settings.add(select);
 
 	if (Globals.prefs.getBoolean("incrementS"))
 	    increment.setSelected(true);
-	else if (!Globals.prefs.getBoolean("selectS"))
-	    reorder.setSelected(true);
 
-        JPanel main = new JPanel();
+    JPanel main = new JPanel();
 	main.setLayout(gbl);
 	//SidePaneHeader header = new SidePaneHeader("Search", GUIGlobals.searchIconFile, this);
 	con.gridwidth = GridBagConstraints.REMAINDER;
@@ -225,11 +218,9 @@ settings.add(select);
         con.insets = new Insets(0, 2, 0,  0);
 	gbl.setConstraints(increment, con);
         main.add(increment);
-	gbl.setConstraints(highlight, con);
-        main.add(highlight);
-	gbl.setConstraints(reorder, con);
-        main.add(reorder);
-        con.insets = new Insets(0, 0, 0,  0);
+	gbl.setConstraints(normal, con);
+        main.add(normal);
+	con.insets = new Insets(0, 0, 0,  0);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
         gbl.setConstraints(pan, con);
@@ -283,7 +274,7 @@ settings.add(select);
 	Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
 	Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
 	Globals.prefs.putBoolean("incrementS", increment.isSelected());
-	Globals.prefs.putBoolean("selectS", highlight.isSelected());
+	Globals.prefs.putBoolean("selectS", normal.isSelected());
 	//	Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
 	Globals.prefs.putBoolean("caseSensitiveSearch",
 			 caseSensitive.isSelected());
@@ -313,9 +304,7 @@ settings.add(select);
 	    searchField.requestFocus();
 	} else {
 	    if (increment.isSelected())
-		highlight.setSelected(true);
-	    else if (highlight.isSelected())
-		reorder.setSelected(true);
+		    normal.setSelected(true);
 	    else {
 		increment.setSelected(true);
 	    }
@@ -348,7 +337,7 @@ settings.add(select);
               panel.stopShowingSearchResults();
               return;
             }
-	    // Setup search parameters common to both highlight and float.
+	    // Setup search parameters common to both normal and float.
 	    Hashtable searchOptions = new Hashtable();
 	    searchOptions.put("option",searchField.getText()) ;
 	    SearchRuleSet searchRules = new SearchRuleSet() ;
@@ -391,7 +380,7 @@ settings.add(select);
                     , select.isSelected());
 		search.start() ;
 	    }
-	    else if (highlight.isSelected()) {
+	    else if (normal.isSelected()) {
 		// Highlight search.
 		DatabaseSearch search = new DatabaseSearch
 		    (this, searchOptions,searchRules, panel,
@@ -413,13 +402,12 @@ settings.add(select);
 		searchField.addKeyListener(this);
 	    else
 		searchField.removeKeyListener(this);
-    } else if (e.getSource() == highlight) {
+    } else if (e.getSource() == normal) {
         updateSearchButtonText();
-	} else if (e.getSource() == reorder) {
-        updateSearchButtonText();
+
 	    // If this search type is disabled, remove reordering from
 	    // all databases.
-	    if (!reorder.isSelected()) {
+	    if ((panel != null) && !normal.isSelected()) {
 		panel.stopShowingSearchResults();
 	    }
 	}

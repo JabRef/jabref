@@ -167,9 +167,9 @@ public class GroupSelector extends SidePaneComponent implements
         settings.add(floatCb);
         settings.addSeparator();
         settings.add(select);
-        settings.addSeparator();
-        settings.add(grayOut);
-        settings.add(hideNonHits);
+        //settings.addSeparator();
+        //settings.add(grayOut);
+        //settings.add(hideNonHits);
         settings.addSeparator();
         settings.add(showOverlappingGroups);
 

@@ -109,6 +109,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     //builder.append(pan); builder.append(noAbbrNames); builder.nextLine();
     //builder.append(pan); builder.append(abbrNames); builder.nextLine();
     //builder.append(pan); builder.append(lastNamesOnly); builder.nextLine();
+
     builder.appendSeparator(Globals.lang("Sort options"));
     // Create a new panel with its own FormLayout for these items:
     FormLayout layout2 = new FormLayout
