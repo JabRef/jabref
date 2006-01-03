@@ -81,7 +81,9 @@ public class EntryTable extends JTable {
 
         // enable DnD
         setDragEnabled(true);
-        setTransferHandler(new EntryTableTransferHandler(this));
+        // The following line is commented because EntryTableTransferHandler's
+	// constructor now only accepts MainTable which has replaced EntryTable.
+	// setTransferHandler(new EntryTableTransferHandler(this));
 
   //renderingHints = g2.getRenderingHints();
          //renderingHints.put(RenderingHints.KEY_ANTIALIASING,
