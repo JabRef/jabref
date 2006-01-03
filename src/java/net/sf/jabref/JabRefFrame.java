@@ -1930,6 +1930,7 @@ class FetchCiteSeerAction
                 diag.entryListComplete();
                 Util.placeDialog(diag, ths);
                 diag.setVisible(true);
+		diag.toFront();
         } else {
             ths.addBibEntries(entries, filename, openInNew);
           if ((panel != null) && (entries.size() == 1)) {

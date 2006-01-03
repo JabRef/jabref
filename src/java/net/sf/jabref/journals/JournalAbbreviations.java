@@ -106,7 +106,11 @@ public class JournalAbbreviations {
      */
     public String getFullName(String journalName) {
         // Normalize name first:
-        String s = getAbbreviatedName(journalName, true).toLowerCase();
+        String s = getAbbreviatedName(journalName, true);
+	if (s != null) 
+	    s = s.toLowerCase();
+	else
+	    return null;
         Object o = abbrNameKeyed.get(s);
         if (o == null) {
             if (fullNameKeyed.containsKey(s))
@@ -115,7 +119,7 @@ public class JournalAbbreviations {
                 return null;
         }
         s = (String)o;
-        return caseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
+        return s;//caseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
     }
 
     public void readJournalList(String resourceFileName) {
