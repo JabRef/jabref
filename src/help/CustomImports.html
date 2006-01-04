@@ -26,7 +26,7 @@ their package structure. To add a new custom import filter, open the dialog box
 A file chooser will appear, allowing you to select the classpath of your importer, 
 i.e. the directory where the top folder of the package structure of your importer 
 resides. In a second file chooser you select your importer
-class file, which must be derived from <code>ImportFormat</code>. By cklicking
+class file, which must be derived from <code>ImportFormat</code>. By clicking
 <b>Select new ImportFormat Subclass</b>, your new importer will appear in the list 
 of custom import filters. All custom importers will appear in the <b>File -> Import -> 
 Custom Importers</b> and <b>File -> Import and Append -> Custom Importers</b> submenus 
@@ -38,7 +38,7 @@ already exists, the existing importer will be replaced. Although in some cases
 it is possible to update an existing custom importer without restarting JabRef 
 (when the importer is not on the classpath), we recommend restarting JabRef 
 after updating an custom-importer. It is not yet possible to register importers 
-conatined in a ZIP- or JAR-file, please extract them first.</p>
+contained in a ZIP- or JAR-file, please extract them first.</p>
 
 <H2>Creating an import filter</H2>
 
@@ -71,7 +71,7 @@ public class SimpleCsvImporter extends ImportFormat {
   }
 
   public boolean isRecognizedFormat(InputStream stream) throws IOException {
-    return true; // this is dicouraged except for demonstration purposes
+    return true; // this is discouraged except for demonstration purposes
   }
   
   public List importEntries(InputStream stream) throws IOException {    
