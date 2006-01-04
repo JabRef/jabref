@@ -15,13 +15,14 @@ import net.sf.jabref.gui.ColorSetupPanel;
 class TablePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox autoResizeMode, secDesc, terDesc,
+    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc,
     pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames, lastNamesOnly;
     private JComboBox
+    priSort = new JComboBox(GUIGlobals.ALL_FIELDS),
     secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
     terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
-    private JTextField secField, terField;
+    private JTextField priField, secField, terField;
     private JabRefFrame frame;
 
 
@@ -51,12 +52,22 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
 
+        priField = new JTextField(10);
         secField = new JTextField(10);
         terField = new JTextField(10);
 
+        priSort.insertItemAt(Globals.lang("<select>"), 0);
         secSort.insertItemAt(Globals.lang("<select>"), 0);
         terSort.insertItemAt(Globals.lang("<select>"), 0);
 
+        priSort.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (priSort.getSelectedIndex() > 0) {
+              priField.setText(GUIGlobals.ALL_FIELDS[priSort.getSelectedIndex() - 1]);
+              priSort.setSelectedIndex(0);
+            }
+          }
+        });
         secSort.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (secSort.getSelectedIndex() > 0) {
@@ -83,6 +94,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     bg2.add(lastNamesOnly);
     bg2.add(abbrNames);
     bg2.add(noAbbrNames);
+    priDesc = new JCheckBox(Globals.lang("Descending"));
     secDesc = new JCheckBox(Globals.lang("Descending"));
     terDesc = new JCheckBox(Globals.lang("Descending"));
 
@@ -110,11 +122,17 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     //builder.append(pan); builder.append(abbrNames); builder.nextLine();
     //builder.append(pan); builder.append(lastNamesOnly); builder.nextLine();
 
-    builder.appendSeparator(Globals.lang("Sort options"));
+    builder.appendSeparator(Globals.lang("Default sort criteria"));
     // Create a new panel with its own FormLayout for these items:
     FormLayout layout2 = new FormLayout
         ("left:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref", "");
     DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
+    lab = new JLabel(Globals.lang("Primary sort criterion"));
+    builder2.append(lab);
+    builder2.append(priSort);
+    builder2.append(priField);
+    builder2.append(priDesc);
+    builder2.nextLine();
     lab = new JLabel(Globals.lang("Secondary sort criterion"));
     builder2.append(lab);
     builder2.append(secSort);
@@ -153,8 +171,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
     citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
 
+    priField.setText(_prefs.get("priSort"));
     secField.setText(_prefs.get("secSort"));
     terField.setText(_prefs.get("terSort"));
+        priSort.setSelectedIndex(0);
         secSort.setSelectedIndex(0);
         terSort.setSelectedIndex(0);
 
@@ -172,7 +192,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         lastNamesOnly.setSelected(true);
     else
         noAbbrNames.setSelected(true);
-
+    priDesc.setSelected(_prefs.getBoolean("priDescending"));
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
 
@@ -201,10 +221,12 @@ class TablePrefsTab extends JPanel implements PrefsTab {
               autoResizeMode.isSelected() ?
               JTable.AUTO_RESIZE_ALL_COLUMNS :
               JTable.AUTO_RESIZE_OFF);
+    _prefs.putBoolean("priDescending", priDesc.isSelected());
     _prefs.putBoolean("secDescending", secDesc.isSelected());
     _prefs.putBoolean("terDescending", terDesc.isSelected());
     //_prefs.put("secSort", GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex()]);
     //_prefs.put("terSort", GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex()]);
+        _prefs.put("priSort", priField.getText().toLowerCase().trim());
         _prefs.put("secSort", secField.getText().toLowerCase().trim());
         _prefs.put("terSort", terField.getText().toLowerCase().trim());
     // updatefont

@@ -74,7 +74,7 @@ public class ManageJournalsPanel extends JPanel{
         //addExtPan.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu:grow, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref, 4dlu, fill:150dlu");
+                        "pref, 20dlu, 20dlu, fill:200dlu, 4dlu, pref");//150dlu");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         CellConstraints cc = new CellConstraints();
@@ -109,12 +109,12 @@ public class ManageJournalsPanel extends JPanel{
 
         builder.addSeparator(Globals.lang("External files"), cc.xyw(2,6,6));
         externalFilesPanel.setLayout(new BorderLayout());
-        builder.add(/*new JScrollPane(*/externalFilesPanel/*)*/, cc.xyw(2,8,6));
+        //builder.add(/*new JScrollPane(*/externalFilesPanel/*)*/, cc.xyw(2,8,6));
 
         setLayout(new BorderLayout());
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        add(builder.getPanel(), BorderLayout.CENTER);
-
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));//createMatteBorder(1,1,1,1,Color.green));
+        add(builder.getPanel(), BorderLayout.NORTH);
+        add(externalFilesPanel, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addGridded(ok);
@@ -122,7 +122,7 @@ public class ManageJournalsPanel extends JPanel{
         bb.addGridded((JComponent)Box.createHorizontalStrut(10));
         bb.addGridded(help);
         bb.addGlue();
-
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         dialog = new JDialog(frame, Globals.lang("Journal abbreviations"), false);
         dialog.getContentPane().add(this, BorderLayout.CENTER);
         dialog.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -196,8 +196,8 @@ public class ManageJournalsPanel extends JPanel{
             }
         });
 
-        dialog.pack();
-
+        //dialog.pack();
+        dialog.setSize(600,700);
     }
 
     public JDialog getDialog() {
@@ -232,10 +232,14 @@ public class ManageJournalsPanel extends JPanel{
         builder.append(addExtPan);
         builder.nextLine();
         builder.append(Box.createVerticalGlue());
+
         //builder.getPanel().setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.green));
         //externalFilesPanel.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
+        JScrollPane pane = new JScrollPane(builder.getPanel());
+        pane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        externalFilesPanel.setMinimumSize(new Dimension(400,400));
         externalFilesPanel.removeAll();
-        externalFilesPanel.add(builder.getPanel(), BorderLayout.CENTER);
+        externalFilesPanel.add(pane, BorderLayout.CENTER);
         externalFilesPanel.revalidate();
         externalFilesPanel.repaint();
 
