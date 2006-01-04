@@ -163,9 +163,9 @@ public class GroupSelector extends SidePaneComponent implements
         settings.addSeparator();
         settings.add(invCb);
         settings.addSeparator();
-        settings.add(highlCb);
-        settings.add(floatCb);
-        settings.addSeparator();
+        //settings.add(highlCb);
+        //settings.add(floatCb);
+        //settings.addSeparator();
         settings.add(select);
         //settings.addSeparator();
         //settings.add(grayOut);
