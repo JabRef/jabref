@@ -323,10 +323,10 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
         StringBuffer sb = new StringBuffer();
         sb.append(regExp ? Globals.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",
-                field, expr)
+                field, Util.quoteForHTML(expr))
                 : Globals.lang(
                         "This group contains entries whose <b>%0</b> field contains the keyword <b>%1</b>",
-                        field, expr));
+                        field, Util.quoteForHTML(expr)));
         sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
                 : Globals.lang("case insensitive")).append("). ");
         sb.append(regExp ? Globals.lang(
@@ -341,7 +341,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
                         + "then using the context menu. "
                         + "This process removes the term <b>%1</b> from "
                         + "each entry's <b>%0</b> field.",
-                        field, expr));
+                        field, Util.quoteForHTML(expr)));
         return sb.toString();
     }
 
@@ -349,10 +349,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<b>");
 		if (Globals.prefs.getBoolean("groupShowDynamic"))
-            sb.append("<i>").append(getName()).append("</i>");
+            sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
 		else
-			sb.append(getName());
-        sb.append("</b> - dynamic group (<b>").append(m_searchField).append("</b> contains <b>").append(m_searchExpression).append("</b>)");
+			sb.append(Util.quoteForHTML(getName()));
+        sb.append("</b> - dynamic group (<b>").append(m_searchField).
+            append("</b> contains <b>").
+            append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
 			sb.append(", includes subgroups");

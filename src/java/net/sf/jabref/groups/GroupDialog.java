@@ -485,10 +485,18 @@ class GroupDialog extends JDialog {
 	}
 
 	protected String formatRegExException(String regExp, Exception e) {
+        String[] sa = e.getMessage().split("\\n");
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < sa.length; ++i) {
+            if (i > 0)
+                sb.append("<br>");
+            sb.append(Util.quoteForHTML(sa[i]));
+        }
 		String s = Globals.lang(
-				"The regular expression <b>%0</b> is invalid%c", regExp)
+				"The regular expression <b>%0</b> is invalid%c", 
+                Util.quoteForHTML(regExp))
 				+ "<p><tt>"
-				+ e.getMessage().replaceAll("\\n", "<br>")
+				+ sb.toString()
 				+ "</tt>";
 		if (!(e instanceof PatternSyntaxException))
 			return s;

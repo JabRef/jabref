@@ -262,10 +262,10 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		if (ast == null) {
 			sb.append(regExp ? Globals.lang(
 			        "This group contains entries in which any field contains the regular expression <b>%0</b>",
-			        expr)
+                    Util.quoteForHTML(expr))
                     : Globals.lang(
                             "This group contains entries in which any field contains the term <b>%0</b>",
-                            expr));
+                            Util.quoteForHTML(expr)));
             sb.append(" (").append(caseSensitive ? Globals.lang("case sensitive")
                     : Globals.lang("case insensitive")).append("). ");
 			sb.append(Globals.lang(
@@ -325,46 +325,49 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 			final String term = node.getText();
 			final String fieldSpec = regExpFieldSpec ? Globals.lang(
 					"any field that matches the regular expression <b>%0</b>",
-					field) : Globals.lang("the field <b>%0</b>", field);
+                    Util.quoteForHTML(field)) : Globals.lang("the field <b>%0</b>", 
+                            Util.quoteForHTML(field));
 			switch (type) {
 			case SearchExpressionTreeParserTokenTypes.LITERAL_contains:
 			case SearchExpressionTreeParserTokenTypes.EQUAL:
 				if (regExp)
 					return not ? Globals.lang(
 					        "%0 doesn't contain the Regular Expression <b>%1</b>",
-					        fieldSpec, term)
+                            Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term))
 							: Globals.lang(
 							        "%0 contains the Regular Expression <b>%1</b>",
-							        fieldSpec, term);
+                                    Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term));
 				return not ? Globals.lang(
-						"%0 doesn't contain the term <b>%1</b>", fieldSpec,
-						term) : Globals.lang("%0 contains the term <b>%1</b>",
-						fieldSpec, term);
+						"%0 doesn't contain the term <b>%1</b>", Util.quoteForHTML(fieldSpec),
+                        Util.quoteForHTML(term)) : Globals.lang("%0 contains the term <b>%1</b>",
+                                Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term));
 			case SearchExpressionTreeParserTokenTypes.LITERAL_matches:
 			case SearchExpressionTreeParserTokenTypes.EEQUAL:
 				if (regExp)
 					return not ? Globals.lang(
 					        "%0 doesn't match the Regular Expression <b>%1</b>",
-					        fieldSpec, term)
+                            Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term))
 							: Globals.lang(
                                     "%0 matches the Regular Expression <b>%1</b>",
-                                    fieldSpec, term);
+                                    Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term));
 				return not ? Globals.lang(
-						"%0 doesn't match the term <b>%1</b>", fieldSpec, term)
+						"%0 doesn't match the term <b>%1</b>", 
+                        Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term))
 						: Globals.lang("%0 matches the term <b>%1</b>",
-								fieldSpec, term);
+                                Util.quoteForHTML(fieldSpec), 
+                                Util.quoteForHTML(term));
 			case SearchExpressionTreeParserTokenTypes.NEQUAL:
 				if (regExp)
 					return not ? Globals.lang(
 							"%0 contains the Regular Expression <b>%1</b>",
-							fieldSpec, term)
+                            Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term))
 							: Globals.lang(
                                     "%0 doesn't contain the Regular Expression <b>%1</b>",
-                                    fieldSpec, term);
+                                    Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term));
 				return not ? Globals.lang("%0 contains the term <b>%1</b>",
-						fieldSpec, term) : Globals.lang(
-						"%0 doesn't contain the term <b>%1</b>", fieldSpec,
-						term);
+                        Util.quoteForHTML(fieldSpec), Util.quoteForHTML(term)) : Globals.lang(
+						"%0 doesn't contain the term <b>%1</b>", Util.quoteForHTML(fieldSpec),
+                        Util.quoteForHTML(term));
 			default:
 				return "Internal error: Unknown AST node type. "
 						+ "Please report this on www.sf.net/projects/jabref";
@@ -377,10 +380,11 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<b>");
 		if (Globals.prefs.getBoolean("groupShowDynamic"))
-            sb.append("<i>").append(getName()).append("</i>");
+            sb.append("<i>").append(Util.quoteForHTML(getName())).append("</i>");
 		else
-			sb.append(getName());
-        sb.append("</b> - dynamic group (" + "search expression: <b>").append(m_searchExpression).append("</b>)");
+			sb.append(Util.quoteForHTML(getName()));
+        sb.append("</b> - dynamic group (" + "search expression: <b>").
+            append(Util.quoteForHTML(m_searchExpression)).append("</b>)");
 		switch (getHierarchicalContext()) {
 		case AbstractGroup.INCLUDING:
 			sb.append(", includes subgroups");

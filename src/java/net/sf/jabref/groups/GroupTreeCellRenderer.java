@@ -90,7 +90,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             sb.append("<u>");
         if (italics)
             sb.append("<i>");
-        sb.append(group.getName());
+        sb.append(Util.quoteForHTML(group.getName()));
         if (italics)
             sb.append("</i>");
         if (underline)

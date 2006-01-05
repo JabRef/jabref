@@ -852,7 +852,17 @@ public class Util {
 
         return back;
     }
-
+    
+    /** Quotes each and every character, e.g. '!' as &#33;. Used for
+     *  verbatim display of arbitrary strings that may contain HTML entities. */
+    public static String quoteForHTML(String s) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < s.length(); ++i) {
+            sb.append("&#"+(int)s.charAt(i)+";");
+        }
+        return sb.toString();
+    }
+    
     public static String quote(String s, String specials, char quoteChar) {
         return quote(s, specials, quoteChar, 0);
     }
