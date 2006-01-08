@@ -27,6 +27,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Collection;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -36,6 +38,8 @@ import javax.swing.event.ChangeEvent;
 
 import net.sf.jabref.search.*;
 import net.sf.jabref.search.SearchExpression;
+import ca.odell.glazedlists.matchers.Matcher;
+import ca.odell.glazedlists.EventList;
 
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
@@ -50,7 +54,7 @@ class SearchManager2 extends SidePaneComponent
     //private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
     private JLabel lab = //new JLabel(Globals.lang("Search")+":");
-	new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
+    new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings"));
     private JButton escape = new JButton(Globals.lang("Clear"));
@@ -58,121 +62,126 @@ class SearchManager2 extends SidePaneComponent
     /** This button's text will be set later. */
     private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
-	searchAll, caseSensitive, regExpSearch;
+    searchAll, caseSensitive, regExpSearch;
 
-    private JRadioButton increment, normal;
+    private JRadioButton increment, floatSearch, hideSearch;
     private JCheckBoxMenuItem select;
     private ButtonGroup types = new ButtonGroup();
-    private boolean incSearch = false;
+    private boolean incSearch = false, startedFloatSearch=false, startedFilterSearch=false;
 
     private int incSearchPos = -1; // To keep track of where we are in
-				   // an incremental search. -1 means
-				   // that the search is inactive.
+                   // an incremental search. -1 means
+                   // that the search is inactive.
 
 
     public SearchManager2(JabRefFrame frame, SidePaneManager manager) {
-	super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
+    super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
 
         this.frame = frame;
-	incSearcher = new IncrementalSearcher(Globals.prefs);
+    incSearcher = new IncrementalSearcher(Globals.prefs);
 
 
-	
-	//setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.magenta));
+
+    //setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.magenta));
 
         searchReq = new JCheckBoxMenuItem
-	    (Globals.lang("Search required fields"),
-	     Globals.prefs.getBoolean("searchReq"));
-	searchOpt = new JCheckBoxMenuItem
-	    (Globals.lang("Search optional fields"),
-	     Globals.prefs.getBoolean("searchOpt"));
-	searchGen = new JCheckBoxMenuItem
-	    (Globals.lang("Search general fields"),
-	     Globals.prefs.getBoolean("searchGen"));
+        (Globals.lang("Search required fields"),
+         Globals.prefs.getBoolean("searchReq"));
+    searchOpt = new JCheckBoxMenuItem
+        (Globals.lang("Search optional fields"),
+         Globals.prefs.getBoolean("searchOpt"));
+    searchGen = new JCheckBoxMenuItem
+        (Globals.lang("Search general fields"),
+         Globals.prefs.getBoolean("searchGen"));
         searchAll = new JCheckBoxMenuItem
-	    (Globals.lang("Search all fields"),
-	     Globals.prefs.getBoolean("searchAll"));
+        (Globals.lang("Search all fields"),
+         Globals.prefs.getBoolean("searchAll"));
         regExpSearch = new JCheckBoxMenuItem
-	    (Globals.lang("Use regular expressions"),
-	     Globals.prefs.getBoolean("regExpSearch"));
+        (Globals.lang("Use regular expressions"),
+         Globals.prefs.getBoolean("regExpSearch"));
 
-	
-	increment = new JRadioButton(Globals.lang("Incremental"), false);
-	normal = new JRadioButton(Globals.lang("Normal"), true);
-	types.add(increment);
-	types.add(normal);
+
+    increment = new JRadioButton(Globals.lang("Incremental"), false);
+    floatSearch = new JRadioButton(Globals.lang("Float"), true);
+    hideSearch = new JRadioButton(Globals.lang("Filter"), true);
+    types.add(increment);
+    types.add(floatSearch);
+        types.add(hideSearch);
 
         select = new JCheckBoxMenuItem(Globals.lang("Select matches"), false);
         increment.setToolTipText(Globals.lang("Incremental search"));
-        normal.setToolTipText(Globals.lang("Gray out non-matching entries"));
+        floatSearch.setToolTipText(Globals.lang("Gray out non-matching entries"));
+        hideSearch.setToolTipText(Globals.lang("Hide non-matching entries"));
 
-	// Add an item listener that makes sure we only listen for key events
-	// when incremental search is turned on.
-	increment.addItemListener(this);
-    normal.addItemListener(this);
+    // Add an item listener that makes sure we only listen for key events
+    // when incremental search is turned on.
+    increment.addItemListener(this);
+        floatSearch.addItemListener(this);
+        hideSearch.addItemListener(this);
+
         // Add the global focus listener, so a menu item can see if this field was focused when
         // an action was called.
         searchField.addFocusListener(Globals.focusListener);
 
 
-	if (searchAll.isSelected()) {
-	    searchReq.setEnabled(false);
-	    searchOpt.setEnabled(false);
-	    searchGen.setEnabled(false);
-	}
+    if (searchAll.isSelected()) {
+        searchReq.setEnabled(false);
+        searchOpt.setEnabled(false);
+        searchGen.setEnabled(false);
+    }
     searchAll.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent event) {
             boolean state = !searchAll.isSelected();
             searchReq.setEnabled(state);
-	        searchOpt.setEnabled(state);
-	        searchGen.setEnabled(state);            
+            searchOpt.setEnabled(state);
+            searchGen.setEnabled(state);
         }
     });
 
         caseSensitive = new JCheckBoxMenuItem(Globals.lang("Case sensitive"),
-				      Globals.prefs.getBoolean("caseSensitiveSearch"));
+                      Globals.prefs.getBoolean("caseSensitiveSearch"));
 settings.add(select);
 
     // 2005.03.29, trying to remove field category searches, to simplify
         // search usability.
     //settings.addSeparator();
-	//settings.add(searchReq);
-	//settings.add(searchOpt);
-	//settings.add(searchGen);
-	//settings.addSeparator();
-	//settings.add(searchAll);
+    //settings.add(searchReq);
+    //settings.add(searchOpt);
+    //settings.add(searchGen);
+    //settings.addSeparator();
+    //settings.add(searchAll);
     // ---------------------------------------------------------------
-	settings.addSeparator();
+    settings.addSeparator();
         settings.add(caseSensitive);
-	settings.add(regExpSearch);
-	//settings.addSeparator();
+    settings.add(regExpSearch);
+    //settings.addSeparator();
 
 
-	searchField.addActionListener(this);
+    searchField.addActionListener(this);
     searchField.addCaretListener(this);
         search.addActionListener(this);
-	searchField.addFocusListener(new FocusAdapter() {
+    searchField.addFocusListener(new FocusAdapter() {
           public void focusGained(FocusEvent e) {
             if (increment.isSelected())
               searchField.setText("");
           }
-		public void focusLost(FocusEvent e) {
-		    incSearch = false;
-		    incSearchPos = -1; // Reset incremental
-				       // search. This makes the
-				       // incremental search reset
-				       // once the user moves focus to
-				       // somewhere else.
+        public void focusLost(FocusEvent e) {
+            incSearch = false;
+            incSearchPos = -1; // Reset incremental
+                       // search. This makes the
+                       // incremental search reset
+                       // once the user moves focus to
+                       // somewhere else.
                     if (increment.isSelected()) {
                       //searchField.setText("");
                       //System.out.println("focuslistener");
                     }
-		}
-	    });
-	escape.addActionListener(this);
+        }
+        });
+    escape.addActionListener(this);
 
-	openset.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+    openset.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
                   if (settings.isVisible()) {
                     //System.out.println("oee");
                     //settings.setVisible(false);
@@ -181,8 +190,8 @@ settings.add(select);
                     JButton src = (JButton) e.getSource();
                     settings.show(src, 0, openset.getHeight());
                   }
-		}
-	    });
+        }
+        });
 
             Insets margin = new Insets(0, 2, 0, 2);
             //search.setMargin(margin);
@@ -194,18 +203,18 @@ settings.add(select);
             help.setMargin(margin);
             help.addActionListener(new HelpAction(Globals.helpDiag, GUIGlobals.searchHelp, "Help"));
 
-	if (Globals.prefs.getBoolean("incrementS"))
-	    increment.setSelected(true);
+    if (Globals.prefs.getBoolean("incrementS"))
+        increment.setSelected(true);
 
     JPanel main = new JPanel();
-	main.setLayout(gbl);
-	//SidePaneHeader header = new SidePaneHeader("Search", GUIGlobals.searchIconFile, this);
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.BOTH;
+    main.setLayout(gbl);
+    //SidePaneHeader header = new SidePaneHeader("Search", GUIGlobals.searchIconFile, this);
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
-	//con.insets = new Insets(0, 0, 2,  0);
-	//gbl.setConstraints(header, con);
-	//add(header);
+    //con.insets = new Insets(0, 0, 2,  0);
+    //gbl.setConstraints(header, con);
+    //add(header);
         //con.insets = new Insets(0, 0, 0,  0);
         gbl.setConstraints(searchField,con);
         main.add(searchField) ;
@@ -216,11 +225,13 @@ settings.add(select);
         gbl.setConstraints(escape,con);
         main.add(escape) ;
         con.insets = new Insets(0, 2, 0,  0);
-	gbl.setConstraints(increment, con);
+        gbl.setConstraints(increment, con);
         main.add(increment);
-	gbl.setConstraints(normal, con);
-        main.add(normal);
-	con.insets = new Insets(0, 0, 0,  0);
+        gbl.setConstraints(floatSearch, con);
+        main.add(floatSearch);
+        gbl.setConstraints(hideSearch, con);
+        main.add(hideSearch);
+    con.insets = new Insets(0, 0, 0,  0);
         JPanel pan = new JPanel();
         GridBagLayout gb = new GridBagLayout();
         gbl.setConstraints(pan, con);
@@ -236,22 +247,22 @@ settings.add(select);
         main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         add(main, BorderLayout.CENTER);
 
-	searchField.getInputMap().put(Globals.prefs.getKey("Repeat incremental search"),
-				      "repeat");
+    searchField.getInputMap().put(Globals.prefs.getKey("Repeat incremental search"),
+                      "repeat");
 
-	searchField.getActionMap().put("repeat", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    if (increment.isSelected())
-			repeatIncremental();
-		}
-	    });
-	searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
-	searchField.getActionMap().put("escape", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
+    searchField.getActionMap().put("repeat", new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            if (increment.isSelected())
+            repeatIncremental();
+        }
+        });
+    searchField.getInputMap().put(Globals.prefs.getKey("Clear search"), "escape");
+    searchField.getActionMap().put("escape", new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
             hideAway();
-		    //SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
-		}
-	    });
+            //SearchManager2.this.actionPerformed(new ActionEvent(escape, 0, ""));
+        }
+        });
     setSearchButtonSizes();
     updateSearchButtonText();
     }
@@ -263,30 +274,30 @@ settings.add(select);
         Dimension size1 = search.getPreferredSize();
         search.setText(Globals.lang("Search All Fields"));
         Dimension size2 = search.getPreferredSize();
-        size2.width = Math.max(size1.width,size2.width); 
+        size2.width = Math.max(size1.width,size2.width);
         search.setMinimumSize(size2);
         search.setPreferredSize(size2);
     }
 
     public void updatePrefs() {
-	Globals.prefs.putBoolean("searchReq", searchReq.isSelected());
-	Globals.prefs.putBoolean("searchOpt", searchOpt.isSelected());
-	Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
-	Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
-	Globals.prefs.putBoolean("incrementS", increment.isSelected());
-	Globals.prefs.putBoolean("selectS", normal.isSelected());
-	//	Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
-	Globals.prefs.putBoolean("caseSensitiveSearch",
-			 caseSensitive.isSelected());
-	Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
+    Globals.prefs.putBoolean("searchReq", searchReq.isSelected());
+    Globals.prefs.putBoolean("searchOpt", searchOpt.isSelected());
+    Globals.prefs.putBoolean("searchGen", searchGen.isSelected());
+    Globals.prefs.putBoolean("searchAll", searchAll.isSelected());
+    Globals.prefs.putBoolean("incrementS", increment.isSelected());
+    Globals.prefs.putBoolean("selectS", select.isSelected());
+    Globals.prefs.putBoolean("grayOutNonHits", floatSearch.isSelected());
+    Globals.prefs.putBoolean("caseSensitiveSearch",
+             caseSensitive.isSelected());
+    Globals.prefs.putBoolean("regExpSearch", regExpSearch.isSelected());
 
     }
 
     public void startIncrementalSearch() {
-	increment.setSelected(true);
-	searchField.setText("");
+    increment.setSelected(true);
+    searchField.setText("");
         //System.out.println("startIncrementalSearch");
-	searchField.requestFocus();
+    searchField.requestFocus();
     }
 
     /**
@@ -294,129 +305,167 @@ settings.add(select);
      * focused. Otherwise, cycles to the next search type.
      */
     public void startSearch() {
-	if (increment.isSelected() && incSearch) {
-	    repeatIncremental();
-	    return;
-	}
-	if (!searchField.hasFocus()) {
-	    //searchField.setText("");
+    if (increment.isSelected() && incSearch) {
+        repeatIncremental();
+        return;
+    }
+    if (!searchField.hasFocus()) {
+        //searchField.setText("");
             searchField.selectAll();
-	    searchField.requestFocus();
-	} else {
-	    if (increment.isSelected())
-		    normal.setSelected(true);
-	    else {
-		increment.setSelected(true);
-	    }
-	    increment.revalidate();
-	    increment.repaint();
+        searchField.requestFocus();
+    } else {
+        if (increment.isSelected())
+            floatSearch.setSelected(true);
+        else if (floatSearch.isSelected())
+            hideSearch.setSelected(true);
+        else {
+        increment.setSelected(true);
+        }
+        increment.revalidate();
+        increment.repaint();
 
         searchField.requestFocus();
 
-	}
+    }
     }
 
     public void actionPerformed(ActionEvent e) {
-	if (e.getSource() == escape) {
-	    incSearch = false;
-	    if (panel != null) {
-		(new Thread() {
-			public void run() {
-			    panel.stopShowingSearchResults();
-			}
-		    }).start();
+    if (e.getSource() == escape) {
+        incSearch = false;
+        if (panel != null) {
+        (new Thread() {
+            public void run() {
+                clearSearch();
+            }
+            }).start();
 
-	    }
-	}
-	else if (((e.getSource() == searchField) || (e.getSource() == search))
-		 && !increment.isSelected()
-		 && (panel != null)) {
-	    updatePrefs(); // Make sure the user's choices are recorded.
+        }
+    }
+    else if (((e.getSource() == searchField) || (e.getSource() == search))
+         && !increment.isSelected()
+         && (panel != null)) {
+        updatePrefs(); // Make sure the user's choices are recorded.
             if (searchField.getText().equals("")) {
               // An empty search field should cause the search to be cleared.
               panel.stopShowingSearchResults();
               return;
             }
-	    // Setup search parameters common to both normal and float.
-	    Hashtable searchOptions = new Hashtable();
-	    searchOptions.put("option",searchField.getText()) ;
-	    SearchRuleSet searchRules = new SearchRuleSet() ;
-	    SearchRule rule1;
-	    if (Globals.prefs.getBoolean("regExpSearch"))
-	        rule1 = new RegExpRule(
+        // Setup search parameters common to both normal and float.
+        Hashtable searchOptions = new Hashtable();
+        searchOptions.put("option",searchField.getText()) ;
+        SearchRuleSet searchRules = new SearchRuleSet() ;
+        SearchRule rule1;
+        if (Globals.prefs.getBoolean("regExpSearch"))
+            rule1 = new RegExpRule(
                     Globals.prefs.getBoolean("caseSensitiveSearch"));
-	    else
-	        rule1 = new SimpleSearchRule(
+        else
+            rule1 = new SimpleSearchRule(
                     Globals.prefs.getBoolean("caseSensitiveSearch"));
 
-		try {
-			// this searches specified fields if specified, 
+        try {
+            // this searches specified fields if specified,
             // and all fields otherwise
-			rule1 = new SearchExpression(Globals.prefs,searchOptions);
-		} catch (Exception ex) {
+            rule1 = new SearchExpression(Globals.prefs,searchOptions);
+        } catch (Exception ex) {
             // we'll do a search in all fields
-		}
-//		} catch (PatternSyntaxException ex) {
-//			System.out.println(ex);
-//			return;
-//		} catch (TokenStreamException ex) {
-//			System.out.println(ex);
-//			return;
-//		} catch (RecognitionException ex) {
-//			System.out.println(ex);
-//			return;
-//		}
+        }
 
-	    searchRules.addRule(rule1) ;
-        panel.setSearchMatcher(new SearchMatcher(searchRules, searchOptions));
-        panel.output(Globals.lang("Searched database. Number of hits")
-                    + ": " + panel.mainTable.getRowCount());
-        /*
-        if (reorder.isSelected()) {
-		// Float search.
-		DatabaseSearch search = new DatabaseSearch
-		    (this, searchOptions,searchRules, panel,
-		     Globals.SEARCH, true, true//Globals.Globals.prefs.getBoolean("grayOutNonHits")
-                    , select.isSelected());
-		search.start() ;
-	    }
-	    else if (normal.isSelected()) {
-		// Highlight search.
-		DatabaseSearch search = new DatabaseSearch
-		    (this, searchOptions,searchRules, panel,
-		     Globals.SEARCH, false, true, select.isSelected());
-		search.start() ;
-	    }
-        */
-	    // Afterwards, select all text in the search field.
-	    searchField.select(0,searchField.getText().length()) ;
-	    //new FocusRequester(frame.basePanel().entryTable);
+        searchRules.addRule(rule1) ;
+        SearchWorker worker = new SearchWorker(searchRules, searchOptions);
+        worker.getWorker().run();
+        worker.getCallBack().update();
 
-	}
+    }
     }
 
+    class SearchWorker extends AbstractWorker {
+        private SearchRuleSet rules;
+        Hashtable searchTerm;
+        int hits = 0;
+        public SearchWorker(SearchRuleSet rules, Hashtable searchTerm) {
+            this.rules = rules;
+            this.searchTerm = searchTerm;
+        }
+
+        public void run() {
+            Collection entries = panel.getDatabase().getEntries();
+            for (Iterator i=entries.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry)i.next();
+                boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                entry.setSearchHit(hit);
+                if (hit) hits++;
+            }
+        }
+
+        public void update() {
+            panel.output(Globals.lang("Searched database. Number of hits")
+                    + ": " + hits);
+
+            // Show the result in the chosen way:
+            if (hideSearch.isSelected()) {
+                // Filtering search - removes non-hits from the table:
+                if (startedFloatSearch) {
+                    panel.mainTable.stopShowingFloatSearch();
+                    startedFloatSearch = false;
+                }
+                startedFilterSearch = true;
+                panel.setSearchMatcher(SearchMatcher.INSTANCE);
+
+            } else {
+                // Float search - floats hits to the top of the table:
+                if (startedFilterSearch) {
+                    panel.stopShowingSearchResults();
+                    startedFilterSearch = false;
+                }
+                startedFloatSearch = true;
+                panel.mainTable.showFloatSearch(SearchMatcher.INSTANCE);
+
+            }
+
+            // Afterwards, select all text in the search field.
+            searchField.select(0, searchField.getText().length());
+
+        }
+    }
+
+    public void clearSearch() {
+        if (startedFloatSearch) {
+            startedFloatSearch = false;
+            panel.mainTable.stopShowingFloatSearch();
+        } else if (startedFilterSearch) {
+            startedFilterSearch = false;
+            panel.stopShowingSearchResults();
+        }
+
+
+    }
     public void itemStateChanged(ItemEvent e) {
-	if (e.getSource() == increment) {
+    if (e.getSource() == increment) {
+        System.out.println("Her");
+        if (startedFilterSearch || startedFloatSearch) {
+            clearSearch();
+            System.out.println("der");
+        }
         updateSearchButtonText();
-	    if (increment.isSelected())
-		searchField.addKeyListener(this);
-	    else
-		searchField.removeKeyListener(this);
-    } else if (e.getSource() == normal) {
+        if (increment.isSelected())
+        searchField.addKeyListener(this);
+        else
+        searchField.removeKeyListener(this);
+    } else /*if (e.getSource() == normal)*/ {
         updateSearchButtonText();
 
-	    // If this search type is disabled, remove reordering from
-	    // all databases.
-	    if ((panel != null) && !normal.isSelected()) {
-		panel.stopShowingSearchResults();
-	    }
-	}
+        // If this search type is disabled, remove reordering from
+        // all databases.
+        /*if ((panel != null) && increment.isSelected()) {
+            clearSearch();
+        } */
+    }
     }
 
     private void repeatIncremental() {
-	incSearchPos++;
-	if (panel != null)
-	    goIncremental();
+    incSearchPos++;
+    if (panel != null)
+        goIncremental();
     }
 
     /**
@@ -427,59 +476,61 @@ settings.add(select);
      * checked.
      */
     public void keyTyped(KeyEvent e) {
-	if (e.isControlDown()) {
-	    return;
-	}
-	if (panel != null)
-	    goIncremental();
+    if (e.isControlDown()) {
+        return;
+    }
+    if (panel != null)
+        goIncremental();
     }
 
     private void goIncremental() {
-	incSearch = true;
-	SwingUtilities.invokeLater(new Thread() {
-		public void run() {
-		    String text = searchField.getText();
+    incSearch = true;
+    SwingUtilities.invokeLater(new Thread() {
+        public void run() {
+            String text = searchField.getText();
 
 
-		    if (incSearchPos >= panel.getDatabase().getEntryCount()) {
-			panel.output("'"+text+"' : "+Globals.lang
+            if (incSearchPos >= panel.getDatabase().getEntryCount()) {
+            panel.output("'"+text+"' : "+Globals.lang
 
-				     ("Incremental search failed. Repeat to search from top.")+".");
-			incSearchPos = -1;
-			return;
-		    }
+                     ("Incremental search failed. Repeat to search from top.")+".");
+            incSearchPos = -1;
+            return;
+            }
 
-		    if (searchField.getText().equals("")) return;
-		    if (incSearchPos < 0)
-			incSearchPos = 0;
-		    BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
-		    while (!incSearcher.search(text, be)) {
-			    incSearchPos++;
-			    if (incSearchPos < panel.getDatabase().getEntryCount())
-			        be = panel.mainTable.getEntryAt(incSearchPos);
-			else {
-			    panel.output("'"+text+"' : "+Globals.lang
-					 ("Incremental search failed. Repeat to search from top."));
-			    incSearchPos = -1;
-			    return;
-			}
-		    }
-		    if (incSearchPos >= 0) {
+            if (searchField.getText().equals("")) return;
+            if (incSearchPos < 0)
+            incSearchPos = 0;
+            BibtexEntry be = panel.mainTable.getEntryAt(incSearchPos);
+            while (!incSearcher.search(text, be)) {
+                incSearchPos++;
+                if (incSearchPos < panel.getDatabase().getEntryCount())
+                    be = panel.mainTable.getEntryAt(incSearchPos);
+            else {
+                panel.output("'"+text+"' : "+Globals.lang
+                     ("Incremental search failed. Repeat to search from top."));
+                incSearchPos = -1;
+                return;
+            }
+            }
+            if (incSearchPos >= 0) {
 
-			panel.selectSingleEntry(incSearchPos);
-			panel.output("'"+text+"' "+Globals.lang
+            panel.selectSingleEntry(incSearchPos);
+            panel.output("'"+text+"' "+Globals.lang
 
-				     ("found")+".");
-                
-		    }
-		}
-	    });
+                     ("found")+".");
+
+            }
+        }
+        });
     }
 
     public void componentClosing() {
-	frame.searchToggle.setSelected(false);
-	if (panel != null)
-	    panel.stopShowingSearchResults();
+    frame.searchToggle.setSelected(false);
+        if (panel != null) {
+            if (startedFilterSearch || startedFloatSearch)
+                clearSearch();
+        }
     }
 
 
@@ -491,16 +542,16 @@ settings.add(select);
             updateSearchButtonText();
         }
     }
-    
-	/** Updates the text on the search button to reflect
+
+    /** Updates the text on the search button to reflect
       * the type of search that will happen on click. */
     private void updateSearchButtonText() {
-        search.setText(!increment.isSelected() 
+        search.setText(!increment.isSelected()
                 && SearchExpressionParser.checkSyntax(
                 searchField.getText(),
                 caseSensitive.isSelected(),
-                regExpSearch.isSelected()) != null 
-                ? Globals.lang("Search Specified Field(s)") 
+                regExpSearch.isSelected()) != null
+                ? Globals.lang("Search Specified Field(s)")
                 : Globals.lang("Search All Fields"));
     }
 

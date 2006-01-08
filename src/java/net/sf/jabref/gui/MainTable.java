@@ -1,6 +1,8 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.search.SearchMatcher;
+import net.sf.jabref.search.HitOrMissComparator;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
 import javax.swing.*;
@@ -10,11 +12,14 @@ import javax.swing.table.TableColumnModel;
 
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import ca.odell.glazedlists.swing.EventTableModel;
 
 import java.awt.*;
+import java.util.Comparator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,12 +30,13 @@ import java.awt.*;
  */
 public class MainTable extends JTable {
     private MainTableFormat tableFormat;
-    private SortedList list;
-    private boolean tableColorCodes;
+    private SortedList sortedForTable, sortedForSearch, sortedForGrouping;
+    private boolean tableColorCodes, showingFloatSearch=false, showingFloatGrouping=false;
     private EventSelectionModel selectionModel;
     private TableComparatorChooser comparatorChooser;
     private JScrollPane pane;
-
+    private Comparator searchComparator, groupComparator;
+    private Matcher searchMatcher, groupMatcher;
     public static final int REQUIRED = 1
     ,
     OPTIONAL = 2
@@ -41,17 +47,33 @@ public class MainTable extends JTable {
         updateRenderers();
     }
 
-    public MainTable(TableModel tableModel, MainTableFormat tableFormat, SortedList list) {
-        super(tableModel);
+    public MainTable(MainTableFormat tableFormat, EventList list) {
+        super();
         this.tableFormat = tableFormat;
-        this.list = list;
+        // This SortedList has a Comparator controlled by the TableComparatorChooser
+        // we are going to install, which responds to user sorting selctions:
+        sortedForTable = new SortedList(list, null);
+        // This SortedList applies afterwards, and can float search hits:
+        sortedForSearch = new SortedList(sortedForTable, null);
+        // This SortedList applies afterwards, and can float grouping hits:
+        sortedForGrouping = new SortedList(sortedForSearch, null);
+
+
+        searchMatcher = null;
+        groupMatcher = null;
+        searchComparator = null;//new HitOrMissComparator(searchMatcher);
+        groupComparator = null;//new HitOrMissComparator(groupMatcher);
+
+        EventTableModel tableModel = new EventTableModel(sortedForGrouping, tableFormat);
+        setModel(tableModel);
+
         tableColorCodes = Globals.prefs.getBoolean("tableColorCodesOn");
         selectionModel = new EventSelectionModel(list);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
         setGridColor(Globals.prefs.getColor("gridColor"));
-        comparatorChooser = new TableComparatorChooser(this, list, true);
+        comparatorChooser = new MyTableComparatorChooser(this, sortedForTable, true);
         final EventList selected = getSelected();
 
         // enable DnD
@@ -59,10 +81,61 @@ public class MainTable extends JTable {
         setTransferHandler(new EntryTableTransferHandler(this));
 
         setupComparatorChooser();
+        refreshSorting();
         setWidths();
 
     }
 
+    public void refreshSorting() {
+        sortedForSearch.setComparator(searchComparator);
+        sortedForGrouping.setComparator(groupComparator);
+    }
+
+    /**
+     * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
+     * @param m The Matcher that determines if an entry is a hit or not.
+     */
+    public void showFloatSearch(Matcher m) {
+        showingFloatSearch = true;
+        searchMatcher = m;
+        searchComparator = new HitOrMissComparator(m);
+        refreshSorting();
+    }
+
+    /**
+     * Removes sorting by search results, and graying out of non-hits.
+     */
+    public void stopShowingFloatSearch() {
+        showingFloatSearch = false;
+        searchMatcher = null;
+        searchComparator = null;
+        refreshSorting();
+    }
+
+    /**
+     * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
+     * @param m The Matcher that determines if an entry is a in the current group selection or not.
+     */
+    public void showFloatGrouping(Matcher m) {
+        showingFloatGrouping = true;
+        groupMatcher = m;
+        groupComparator = new HitOrMissComparator(m);
+        refreshSorting();
+    }
+
+    /**
+     * Removes sorting by group, and graying out of non-hits.
+     */
+    public void stopShowingFloatGrouping() {
+        showingFloatGrouping = false;
+        groupMatcher = null;
+        groupComparator = null;
+        refreshSorting();
+    }
+
+    public EventList getTableRows() {
+        return sortedForGrouping;
+    }
     public void addSelectionListener(ListEventListener listener) {
         getSelected().addListEventListener(listener);
     }
@@ -73,16 +146,14 @@ public class MainTable extends JTable {
 
     public TableCellRenderer getCellRenderer(int row, int column) {
 
-        int score = 0;//-3;
+        int score = -3;
         TableCellRenderer renderer = defRenderer;
 
         int status = getCellStatus(row, column);
 
-        /*if (!panel.coloringBySearchResults ||
-                nonZeroField(row, Globals.SEARCH))
+        if (!showingFloatSearch || matches(row, searchMatcher))
             score++;
-        if (!panel.coloringByGroup ||
-                nonZeroField(row, Globals.GROUPSEARCH))
+        if (!showingFloatGrouping || matches(row, groupMatcher))
             score += 2;
 
         // Now, a grayed out renderer is for entries with -1, and
@@ -92,7 +163,7 @@ public class MainTable extends JTable {
         else if (score == -1)
             renderer = grayedOutRenderer;
 
-        else*/ if (tableColorCodes) {
+        else if (tableColorCodes) {
 
         if (column == 0) {
             // Return a renderer with red background if the entry is incomplete.
@@ -148,7 +219,7 @@ public class MainTable extends JTable {
     }
 
     public BibtexEntry getEntryAt(int row) {
-        return (BibtexEntry)list.get(row);
+        return (BibtexEntry)sortedForGrouping.get(row);
     }
 
     public BibtexEntry[] getSelectedEntries() {
@@ -195,7 +266,7 @@ public class MainTable extends JTable {
 
     public int getCellStatus(int row, int col) {
         try {
-            BibtexEntry be = (BibtexEntry) list.get(row);
+            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
             String columnName = tableFormat.getColumnName(col).toLowerCase();
             if (columnName.equals(GUIGlobals.KEY_FIELD) || type.isRequired(columnName)) {
@@ -216,7 +287,7 @@ public class MainTable extends JTable {
     }
 
     public int findEntry(BibtexEntry entry) {
-        return list.indexOf(entry);
+        return sortedForGrouping.indexOf(entry);
     }
 
     public String[] getIconTypeForColumn(int column) {
@@ -224,14 +295,19 @@ public class MainTable extends JTable {
     }
 
     private boolean nonZeroField(int row, String field) {
-        BibtexEntry be = (BibtexEntry) list.get(row);
+        BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
         Object o = be.getField(field);
         return ((o == null) || !o.equals("0"));
     }
 
+    private boolean matches(int row, Matcher m) {
+        Object o = sortedForGrouping.get(row);
+        return m.matches(o);
+    }
+
     private boolean isComplete(int row) {
         try {
-            BibtexEntry be = (BibtexEntry) list.get(row);
+            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
             return be.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isComplete");
@@ -241,7 +317,7 @@ public class MainTable extends JTable {
 
     private boolean isMarked(int row) {
         try {
-            BibtexEntry be = (BibtexEntry) list.get(row);
+            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
             return Util.isMarked(be);
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isMarked");
@@ -375,4 +451,14 @@ public class MainTable extends JTable {
         }
     }
 
+    class MyTableComparatorChooser extends TableComparatorChooser {
+        public MyTableComparatorChooser(JTable table, SortedList list, boolean multiple) {
+            super(table, list, multiple);
+        }
+
+        protected void columnClicked(int i, int i1) {
+            super.columnClicked(i, i1);
+            refreshSorting();
+        }
+    }
 }

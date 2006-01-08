@@ -186,51 +186,6 @@ public class MainTableFormat implements TableFormat {
 
 
 
-
-    public static void displayTable(BasePanel panel, BibtexDatabase database, Comparator comp) {
-        GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap(), comp);
-        database.addDatabaseChangeListener(eventList);
-        final FilterList filterList = new FilterList(eventList.getTheList(), new NoSearchMatcher());
-        final SortedList sortedList = new SortedList(filterList, comp);
-        MainTableFormat tableFormat = new MainTableFormat(panel);
-        tableFormat.updateTableFormat();
-        EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
-        PreviewPanel preview = new PreviewPanel(database, Globals.prefs.get("preview1"));
-        final MainTable table = new MainTable(tableModel, tableFormat, sortedList);
-        MainTableSelectionListener selectionListener = new MainTableSelectionListener(panel, sortedList, table);
-        table.addSelectionListener(selectionListener);
-        table.addMouseListener(selectionListener);
-        JDialog dialog = new JDialog((JFrame) null, "Glazed table", false);
-        dialog.setSize(540, 380);
-        JButton test = new JButton("Test");
-        test.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Hashtable searchOptions = new Hashtable();
-                searchOptions.put("option","alfredsen") ;
-                SearchRuleSet searchRules = new SearchRuleSet() ;
-                SearchRule rule1 = new SimpleSearchRule(false);
-                searchRules.addRule(rule1);
-                filterList.setMatcher(new SearchMatcher(searchRules, searchOptions));
-
-                /*java.util.List selected = table.getSelected();
-                for (Iterator i=selected.iterator(); i.hasNext();) {
-                    System.out.println(i.next());
-                }*/
-
-            }
-        });
-
-        JScrollPane sp = new JScrollPane(table);
-        sp.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
-        dialog.getContentPane().add(sp);
-        dialog.getContentPane().add(preview, BorderLayout.SOUTH);
-
-
-        dialog.setVisible(true);
-
-
-    }
-
     static class NoSearchMatcher implements Matcher {
         public boolean matches(Object object) {
             return true;

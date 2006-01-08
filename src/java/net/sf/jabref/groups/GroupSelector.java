@@ -29,6 +29,7 @@ package net.sf.jabref.groups;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -167,9 +168,9 @@ public class GroupSelector extends SidePaneComponent implements
         //settings.add(floatCb);
         //settings.addSeparator();
         settings.add(select);
-        //settings.addSeparator();
-        //settings.add(grayOut);
-        //settings.add(hideNonHits);
+        settings.addSeparator();
+        settings.add(grayOut);
+        settings.add(hideNonHits);
         settings.addSeparator();
         settings.add(showOverlappingGroups);
 
@@ -527,24 +528,66 @@ public class GroupSelector extends SidePaneComponent implements
 		}
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
-        panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
+        GroupingWorker worker = new GroupingWorker(searchRules, searchOptions);
+        worker.getWorker().run();
+        worker.getCallBack().update();
+        /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
         DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
                 panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
                         .getBoolean("grayOutNonHits"),
                 //true,
                 select.isSelected());
-        search.start();
-        if (showOverlappingGroups.isSelected()) {
-	        try {
-				search.join();
-				showOverlappingGroups(search);
-			} catch (InterruptedException e1) {
-				// this should never happen
-			}
-        }
-        frame.output(Globals.lang("Updated group selection") + ".");
+        search.start();*/
+
+
     }
-    
+
+    class GroupingWorker extends AbstractWorker {
+        private SearchRuleSet rules;
+        private Hashtable searchTerm;
+        private ArrayList matches = new ArrayList();
+        private boolean showOverlappingGroupsP;
+        int hits = 0;
+
+        public GroupingWorker(SearchRuleSet rules, Hashtable searchTerm) {
+            this.rules = rules;
+            this.searchTerm = searchTerm;
+            showOverlappingGroupsP = showOverlappingGroups.isSelected();
+        }
+
+        public void run() {
+            Collection entries = panel.getDatabase().getEntries();
+            for (Iterator i = entries.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry) i.next();
+                boolean hit = rules.applyRule(searchTerm, entry) > 0;
+                entry.setGroupHit(hit);
+                if (hit) {
+                    hits++;
+                    if (showOverlappingGroupsP)
+                        matches.add(entry);
+                }
+            }
+        }
+
+        public void update() {
+            // Show the result in the chosen way:
+            if (hideNonHits.isSelected()) {
+                panel.mainTable.stopShowingFloatGrouping(); // Turn off shading, if active.
+                panel.setGroupMatcher(GroupMatcher.INSTANCE); // Turn on filtering.
+
+            }
+            else if (grayOut.isSelected()) {
+                panel.stopShowingGroup(); // Turn off filtering, if active.
+                panel.mainTable.showFloatGrouping(GroupMatcher.INSTANCE); // Turn on shading.
+            }
+
+            if (showOverlappingGroupsP) {
+				showOverlappingGroups(matches);
+        }
+            frame.output(Globals.lang("Updated group selection") + ".");
+        }
+    }
+
     /** 
      * Revalidate the groups tree (e.g. after the data stored in the model has
      * been changed) and set the specified selection and expansion state. */
@@ -1196,7 +1239,7 @@ public class GroupSelector extends SidePaneComponent implements
     
     /** Show groups that, if selected, would show at least one
      * of the entries found in the specified search. */
-    protected void showOverlappingGroups(DatabaseSearch search) {
+    protected void showOverlappingGroups(List matches) { //DatabaseSearch search) {
       GroupTreeNode node;
       SearchRule rule;
       BibtexEntry entry;
@@ -1205,7 +1248,7 @@ public class GroupSelector extends SidePaneComponent implements
       for (Enumeration e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
           node = (GroupTreeNode) e.nextElement();
           rule = node.getSearchRule(); 
-          for (Iterator it = search.matches(); it.hasNext(); ) {
+          for (Iterator it = matches.iterator(); it.hasNext(); ) {
               entry = (BibtexEntry) it.next();
               if (rule.applyRule(dummyMap, entry) == 0)
             	  continue;

@@ -1,7 +1,5 @@
 package net.sf.jabref.search;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.SearchRuleSet;
 import net.sf.jabref.BibtexEntry;
 
 import java.util.Hashtable;
@@ -9,21 +7,15 @@ import java.util.Hashtable;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
- * Matcher for filtering the table according to a SearchRuleSet and a search term. 
+ * Matcher for filtering or sorting the table according to whether entries
+ * are tagged as search matches.
  */
 public class SearchMatcher implements Matcher {
 
-    private String field = Globals.SEARCH;
-        private SearchRuleSet ruleSet;
-        private Hashtable searchOptions;
+        public static SearchMatcher INSTANCE = new SearchMatcher();
 
-        public SearchMatcher(SearchRuleSet ruleSet, Hashtable searchOptions) {
-            this.ruleSet = ruleSet;
-            this.searchOptions = searchOptions;
-        }
         public boolean matches(Object object) {
             BibtexEntry entry = (BibtexEntry)object;
-            int result = ruleSet.applyRule(searchOptions, entry);
-            return result > 0;
+            return entry.isSearchHit();
         }
 }

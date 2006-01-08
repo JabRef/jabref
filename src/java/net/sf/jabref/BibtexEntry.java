@@ -47,6 +47,9 @@ public class BibtexEntry
     private Map _fields = new HashMap();
     VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
+    // Search and grouping status is stored in boolean fields for quick reference:
+    private boolean searchHit, groupHit;
+
     public BibtexEntry(String id)
     {
         this(id, BibtexEntryType.OTHER);
@@ -373,7 +376,23 @@ public class BibtexEntry
     public String toString() {
 	return getType().getName()+":"+getField(Globals.KEY_FIELD);
     }
-    
+
+    public boolean isSearchHit() {
+        return searchHit;
+    }
+
+    public void setSearchHit(boolean searchHit) {
+        this.searchHit = searchHit;
+    }
+
+    public boolean isGroupHit() {
+        return groupHit;
+    }
+
+    public void setGroupHit(boolean groupHit) {
+        this.groupHit = groupHit;
+    }
+
     /**
      * @param maxCharacters The maximum number of characters (additional
      * characters are replaced with "..."). Set to 0 to disable truncation.

@@ -54,6 +54,7 @@ import net.sf.jabref.search.SearchMatcher;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.swing.EventTableModel;
@@ -1708,21 +1709,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void createMainTable() {
-        Comparator comp = new FieldComparator("author");
+        //Comparator comp = new FieldComparator("author");
 
-        GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap(), comp);
+        GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap(), null);
         // Must initialize sort columns somehow:
 
         database.addDatabaseChangeListener(eventList);
         groupFilterList = new FilterList(eventList.getTheList(), NoSearchMatcher.INSTANCE);
         searchFilterList = new FilterList(groupFilterList, NoSearchMatcher.INSTANCE);
-        final SortedList sortedList = new SortedList(searchFilterList, comp);
+        //final SortedList sortedList = new SortedList(searchFilterList, null);
         MainTableFormat tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
-        EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
-        //PreviewPanel preview = new PreviewPanel(database, Globals.prefs.get("preview1"));
-        mainTable = new MainTable(tableModel, tableFormat, sortedList);
-        selectionListener = new MainTableSelectionListener(this, sortedList, mainTable);
+        //EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
+        mainTable = new MainTable(/*tableModel, */tableFormat, searchFilterList);
+        selectionListener = new MainTableSelectionListener(this, mainTable);
         mainTable.updateFont();
         mainTable.addSelectionListener(selectionListener);
         mainTable.addMouseListener(selectionListener);
@@ -2322,7 +2322,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         searchFilterList.setMatcher(matcher);
     }
 
-    public void setGroupMatcher(SearchMatcher matcher) {
+    public void setGroupMatcher(Matcher matcher) {
         groupFilterList.setMatcher(matcher);
     }
 

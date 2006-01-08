@@ -1590,6 +1590,7 @@ public JabRefPreferences prefs() {
           if (tabbedPane.getTabCount() == 1) { setOnlyOne() ; }
         }
         output(Globals.lang("Closed database") + ".");
+          System.gc(); // Test
       }
     }
   }

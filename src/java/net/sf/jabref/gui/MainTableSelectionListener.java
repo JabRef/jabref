@@ -28,10 +28,10 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
 
-    public MainTableSelectionListener(BasePanel panel, EventList tableRows, MainTable table) {
+    public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
         this.panel = panel;
-        this.tableRows = tableRows;
+        this.tableRows = table.getTableRows();
         instantiatePreviews();
         this.preview = previewPanel[activePreview];
     }
