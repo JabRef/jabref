@@ -158,11 +158,19 @@ public class MainTable extends JTable {
 
         // Now, a grayed out renderer is for entries with -1, and
         // a very grayed out one for entries with -2
-        if (score < -1)
-            renderer = veryGrayedOutRenderer;
-        else if (score == -1)
-            renderer = grayedOutRenderer;
-
+        if (score < -1) {
+            if (column == 0) {
+                veryGrayedOutNumberRenderer.setNumber(row);
+                renderer = veryGrayedOutNumberRenderer;
+            } else renderer = veryGrayedOutRenderer;
+        }
+        else if (score == -1) {
+            if (column == 0) {
+                grayedOutNumberRenderer.setNumber(row);
+                renderer = grayedOutNumberRenderer;
+            } else renderer = grayedOutRenderer;
+        }
+        
         else if (tableColorCodes) {
 
         if (column == 0) {
@@ -393,16 +401,17 @@ public class MainTable extends JTable {
     ,
     optRenderer
     ,
-    grayedOutRenderer
-    ,
+    grayedOutRenderer,
     veryGrayedOutRenderer
     ,
     markedRenderer;
 
     private static IncompleteRenderer incRenderer;
-    private static CompleteRenderer compRenderer
-    ,
-    markedNumberRenderer;
+    private static CompleteRenderer
+            compRenderer,
+            grayedOutNumberRenderer,
+            veryGrayedOutNumberRenderer,
+            markedNumberRenderer;
 
     public static void updateRenderers() {
 
@@ -414,8 +423,10 @@ public class MainTable extends JTable {
         incRenderer = new IncompleteRenderer(antialiasing);
         compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"), antialiasing);
         markedNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("markedEntryBackground"), antialiasing);
+        grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"), antialiasing);
+        veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"), antialiasing);
         grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
-                Globals.prefs.getColor("grayedOutText"), antialiasing);
+            Globals.prefs.getColor("grayedOutText"), antialiasing);
         veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
                 Globals.prefs.getColor("veryGrayedOutText"), antialiasing);
         markedRenderer = new GeneralRenderer(Globals.prefs.getColor("markedEntryBackground"),

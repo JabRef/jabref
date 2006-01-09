@@ -514,6 +514,7 @@ public class GroupSelector extends SidePaneComponent implements
                 || (selection.length == 1 && ((GroupTreeNode) selection[0]
                         .getLastPathComponent()).getGroup() instanceof AllEntriesGroup)) {
             panel.stopShowingGroup();
+            panel.mainTable.stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected())
                 groupsTree.setHighlight2Cells(null);
             frame.output(Globals.lang("Displaying no groups") + ".");
@@ -652,8 +653,10 @@ public class GroupSelector extends SidePaneComponent implements
     }
 
     public void componentClosing() {
-        if (panel != null) // panel may be null if no file is open any more
+        if (panel != null) {// panel may be null if no file is open any more
             panel.stopShowingGroup();
+            panel.mainTable.stopShowingFloatGrouping();
+        }
         frame.groupToggle.setSelected(false);
     }
 

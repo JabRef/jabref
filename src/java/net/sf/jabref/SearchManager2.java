@@ -441,10 +441,8 @@ settings.add(select);
     }
     public void itemStateChanged(ItemEvent e) {
     if (e.getSource() == increment) {
-        System.out.println("Her");
         if (startedFilterSearch || startedFloatSearch) {
             clearSearch();
-            System.out.println("der");
         }
         updateSearchButtonText();
         if (increment.isSelected())
