@@ -68,7 +68,7 @@ public class MainTable extends JTable {
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean("tableColorCodesOn");
-        selectionModel = new EventSelectionModel(list);
+        selectionModel = new EventSelectionModel(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
