@@ -33,6 +33,8 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.zip.ZipFile;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
@@ -44,8 +46,7 @@ public class ImportCustomizationDialog extends JDialog {
 
   private final JabRefFrame frame;
   private JButton addFromFolderButton = new JButton(Globals.lang("Add from folder"));
-  // TODO: allow importers to be added from Jar-Files
-  // private JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
+  private JButton addFromJarButton = new JButton(Globals.lang("Add from jar"));
   private JButton showDescButton = new JButton(Globals.lang("Show description"));
   private JButton removeButton = new JButton(Globals.lang("Remove"));
   private JButton closeButton = new JButton(Globals.lang("Close"));
@@ -55,6 +56,7 @@ public class ImportCustomizationDialog extends JDialog {
   private JPanel mainPanel = new JPanel();
   private JTable customImporterTable;
   private JabRefPreferences prefs = Globals.prefs;
+  private ImportCustomizationDialog importCustomizationDialog;
   
   /*
    *  (non-Javadoc)
@@ -69,12 +71,42 @@ public class ImportCustomizationDialog extends JDialog {
   }
   
   /**
+   * Converts a path relative to a base-path into a class name.
+   * 
+   * @param basePath  base path
+   * @param path  path that includes base-path as a prefix
+   * @return  class name
+   */
+  private String pathToClass(File basePath, File path) {
+    String className = null;
+    // remove leading basepath from path
+    while (!path.equals(basePath)) {
+      className = path.getName() + (className != null ? "." + className : "");
+      path = path.getParentFile();
+    }
+    className = className.substring(0, className.lastIndexOf('.'));
+    return className;    
+  }
+  
+  /**
+   * Adds an importer to the model that underlies the custom importers.
+   * 
+   * @param importer  importer
+   */
+  void addOrReplaceImporter(CustomImportList.Importer importer) {
+    prefs.customImports.replaceImporter(importer);
+    Globals.importFormatReader.resetImportFormats();
+    ((ImportTableModel)customImporterTable.getModel()).fireTableDataChanged();
+  }
+  
+  /**
    * 
    * @param frame_
    * @throws HeadlessException
    */
   public ImportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
     super(frame_, Globals.lang("Manage custom imports"), false);
+    this.importCustomizationDialog = this;
     frame = frame_;
     
     addFromFolderButton.addActionListener(new ActionListener() {
@@ -86,15 +118,7 @@ public class ImportCustomizationDialog extends JDialog {
            Globals.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
        if (chosenFileStr != null) {
          try {
-           File chosenFile = new File(chosenFileStr);
-           String className = null;
-           while (!chosenFile.equals(importer.getBasePath())) {
-             className = chosenFile.getName() + (className != null ? "." + className : "");
-             chosenFile = chosenFile.getParentFile();
-           }
-           // TODO: there should be a less system dependent way of removing the extension
-           className = className.substring(0, className.lastIndexOf('.'));
-           importer.setClassName(className);
+           importer.setClassName( pathToClass(importer.getBasePath(), new File(chosenFileStr)) );
            importer.setName( importer.getInstance().getFormatName() );
            importer.setCliId( importer.getInstance().getCLIId() );
          } catch (Exception exc) {           
@@ -102,8 +126,7 @@ public class ImportCustomizationDialog extends JDialog {
            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", chosenFileStr + ":\n", exc.getMessage()));
          }
 
-         prefs.customImports.replaceImporter(importer);
-         Globals.importFormatReader.resetImportFormats();
+         addOrReplaceImporter(importer);
          customImporterTable.revalidate();
          customImporterTable.repaint();
          frame.setUpImportMenus();
@@ -112,38 +135,31 @@ public class ImportCustomizationDialog extends JDialog {
     });
     addFromFolderButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a class path. \nThe path need not be on the classpath of JabRef."));
 
-    // TODO: select class from jar
-    /*
     addFromJarButton.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
-       String basePath = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".jar",
-            JFileChooser.OPEN_DIALOG, true);
-       String chosenFile = Globals.getNewFile(frame, prefs, new File(basePath), ".class",
-                                              JFileChooser.OPEN_DIALOG, true);
-
-       if (chosenFile != null) {
-         URL[] urls = new URL[1];
+       String basePath = Globals.getNewFile(frame, prefs, new File(prefs.get("workingDirectory")), ".zip,.jar",
+           Globals.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+       ZipFile zipFile = null;
+       if (basePath != null) {
          try {
-           urls[0] = new URL("file:/" + new File(basePath).getAbsolutePath());
-           URLClassLoader cl = new URLClassLoader(urls);
-           // TODO: allow classes in packages 
-           String className = chosenFile.substring(basePath.length()+1, chosenFile.lastIndexOf('.')).replace('\\','.');
-           Class importFormatClass = Class.forName(className, true, cl);
-           ImportFormat importFormat = (ImportFormat)importFormatClass.newInstance();
-           System.out.println(importFormat.getFormatName());
-         } catch (Exception exc) {
+           zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
+         } catch (IOException exc) {
            exc.printStackTrace();
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0 %1", basePath + ":\n", exc.getMessage()));
+           return;         
          }
-
-         String[] newFormat = new String[] {ecd.name(), ecd.layoutFile(), ecd.extension() };
-         Globals.importFormatReader.resetImportFormats();
-         customImporterTable.revalidate();
-         customImporterTable.repaint();
-         frame.setUpImportMenus();
        }
+         
+       if (zipFile != null) {
+         ZipFileChooser zipFileChooser = new ZipFileChooser(importCustomizationDialog, zipFile);
+         zipFileChooser.setVisible(true);
+       }
+       customImporterTable.revalidate();
+       customImporterTable.repaint(10);
+       frame.setUpImportMenus();
       }
-    );
-    */
+    });
+    addFromJarButton.setToolTipText(Globals.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.\nThe Zip-archive need not be on the classpath of JabRef."));
     
     showDescButton.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
@@ -213,7 +229,7 @@ public class ImportCustomizationDialog extends JDialog {
     mainPanel.setLayout(new BorderLayout());
     mainPanel.add(sp, BorderLayout.CENTER);
     optionsPanel.add(addFromFolderButton);
-    // optionsPanel.add(addFromJarButton);
+    optionsPanel.add(addFromJarButton);
     optionsPanel.add(showDescButton);
     optionsPanel.add(removeButton);
     optionsPanel.add(closeButton);
