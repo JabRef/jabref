@@ -5,49 +5,49 @@
 
 <H1>Externe Importfilter</H1>
 
-<p>JabRef bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
+<p>JabRef bietet Ihnen die M&ouml;glichkeit, ganz &auml;hnlich den Standard-Importern, eigene Importer 
 zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java
 <i>Klassen</i>, die Dateinhalte aus einem sogenannten <i>Input stream</i> lesen
-und daraus BibTex-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
-von SourceForge erhalten haben (siehe "Ihre Arbeit anderen zur Verfügung stellen"). Sie können auch
-mit Grundkenntnissen der Java-Programmierung eigene Importer für für Sie wichtige Referenzquellen 
+und daraus BibTex-Eintr&auml;ge erzeugen. Sie k&ouml;nnen vorkompilierte Importer einbinden, die Sie vielleicht 
+von SourceForge erhalten haben (siehe "Ihre Arbeit anderen zur Verf&uuml;gung stellen"). Sie k&ouml;nnen auch
+mit Grundkenntnissen der Java-Programmierung eigene Importer f&uuml;r f&uuml;r Sie wichtige Referenzquellen 
 erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne JabRef neu zu
 kompilieren.</p> 
 
-<p>Externe Importfilter haben Vorrang vor Standard-Importern. So können Sie mit Ihren Importern
-die existierenden in der automatischen Formaterkennung und an der Kommandozeile in JabRef überschreiben.
+<p>Externe Importfilter haben Vorrang vor Standard-Importern. So k&ouml;nnen Sie mit Ihren Importern
+die existierenden in der automatischen Formaterkennung und an der Kommandozeile in JabRef &uuml;berschreiben.
 Externe Importfilter selbst sind dann nach Namen sortiert.</p>
 
-<H2>Einen externen Importfilter hinzufügen</H2>
+<H2>Einen externen Importfilter hinzuf&uuml;gen</H2>
 
 <p>Stellen Sie sicher, dass Sie den Importer in kompilierter Form haben (eine oder mehrere
 <code>.class</code> Dateien) und dass die Klassendateien
 in einer Verzeichnisstruktur entsprechend ihrer Package-Struktur liegen. 
-Um einen neuen externen Importfilter hinzuzufügen, öffnen Sie den Dialog 
+Um einen neuen externen Importfilter hinzuzuf&uuml;gen, &ouml;ffnen Sie den Dialog 
 <b>Optionen -> Verwalte externe Importfilter</b>, und klicken Sie auf
-c. Ein Dateiauswahl-Fenster erscheint, 
-mit dem Sie den Klassenpfad des Importers wählen, dass heißt den obersten Ordner,
+<b>Aus Klassenpfad hinzuf&uuml;gen</b>. Ein Dateiauswahl-Fenster erscheint, 
+mit dem Sie den Klassenpfad des Importers w&auml;hlen, dass hei&szlig;t den obersten Ordner,
 in dem die Package-Struktur Ihres Importers beginnt. In einem zweiten Dateiauswahl-Fenster
-wählen Sie die <i>.class</i>-Datei Ihres Importers, die von <code>ImportFormat</code> abgeleitet
-ist. Wenn Sie <b>Klasse auswählen</b> klicken, erscheint Ihr neuer Importer
+w&auml;hlen Sie die <i>.class</i>-Datei Ihres Importers, die von <code>ImportFormat</code> abgeleitet
+ist. Wenn Sie <b>Klasse ausw&auml;hlen</b> klicken, erscheint Ihr neuer Importer
 in der Liste der externen Importfilter. Alle externen Importfilter erscheinen in den
-JabRef-Submenüs <b>Datei -> Importieren -> Externe Importfilter</b> und 
-<b>Datei -> Importieren und Anhängen -> Externe Importfilter</b>.</p>
+JabRef-Submen&uuml;s <b>Datei -> Importieren -> Externe Importfilter</b> und 
+<b>Datei -> Importieren und Anh&auml;ngen -> Externe Importfilter</b>.</p>
 
 <p>Bitte beachten Sie: wenn Sie die Klassen in ein anderes Verzeichnis verschieben,
-müssen Sie den Importer entfernen und neu hinzufügen. Wenn Sie einen Importfilter
+m&uuml;ssen Sie den Importer entfernen und neu hinzuf&uuml;gen. Wenn Sie einen Importfilter
 mit einem bereits vorhandenen Namen registrieren, ersetzt JabRef den vorhandenen
-externen Importfilter. Auch wenn es in manchen Fällen möglich ist, einen schon registrierten
-Importer zu aktualisieren ohne JabRef neu zu starten (nämlich dann,
-wenn der Importer nicht im Klassenpfad von JabRef ist), empfehlen wir, grundsätzlich
-JabRef neu zu starten, wenn Sie ein Update eines externen Importers durchgeführt haben.
-Sie können auch Importer aus ZIP- oder JAR-Archiven registrieren, wählen Sie einfach
-<b>Aus Archiv-Datei hinzufügen</b>, dann das ZIP- oder JAR-Archiv und dann den Eintrag
+externen Importfilter. Auch wenn es in manchen F&auml;llen m&ouml;glich ist, einen schon registrierten
+Importer zu aktualisieren ohne JabRef neu zu starten (n&auml;mlich dann,
+wenn der Importer nicht im Klassenpfad von JabRef ist), empfehlen wir, grunds&auml;tzlich
+JabRef neu zu starten, wenn Sie ein Update eines externen Importers durchgef&uuml;hrt haben.
+Sie k&ouml;nnen auch Importer aus ZIP- oder JAR-Archiven registrieren, w&auml;hlen Sie einfach
+<b>Aus Archiv-Datei hinzuf&uuml;gen</b>, dann das ZIP- oder JAR-Archiv und dann den Eintrag
 (Klassendatei), der den neuen Importer darstellt.</p>
 
 <H2>Einen Importfilter entwickeln</H2>
 
-Bitte schauen Sie auf unseren Download-Seiten nach Beispielen und nützliche Dateien zur 
+Bitte schauen Sie auf unseren Download-Seiten nach Beispielen und n&uuml;tzliche Dateien zur 
 Entwicklung Ihres Importfilters.
 
 <H3>Ein einfaches Beispiel</H3>
@@ -96,7 +96,7 @@ public class SimpleCsvImporter extends ImportFormat {
         line = in.readLine();
       }     
     }
-  	return bibitems;	  	
+    return bibitems;	  	
   }
 }
 </pre></p>
@@ -111,21 +111,21 @@ javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
 </pre>
 Nun sollte dort auch eine Datei <code>/mypath/SimpleCsvImporter.class</code> liegen.</p>
 
-<p>Öffnen Sie in JabRef <b>Optionen -> Verwaltung externer Importfilter</b> und klicken Sie
-auf <b>Aus Klassenpfad hinzufügen</b>. Navigieren Sie nach <code>/meinpfad</code> und 
-klicken Sie <b>Klassenpfad auswählen</b>. Wählen Sie dann <code>SimpleCsvImporter.class</code>
-und klicken Sie <b>Klasse auswählen</b>. Ihr Importfilter sollte nun in der Liste der
+<p>&Ouml;ffnen Sie in JabRef <b>Optionen -> Verwaltung externer Importfilter</b> und klicken Sie
+auf <b>Aus Klassenpfad hinzuf&uuml;gen</b>. Navigieren Sie nach <code>/meinpfad</code> und 
+klicken Sie <b>Klassenpfad ausw&auml;hlen</b>. W&auml;hlen Sie dann <code>SimpleCsvImporter.class</code>
+und klicken Sie <b>Klasse ausw&auml;hlen</b>. Ihr Importfilter sollte nun in der Liste der
 externen Importfilter unter dem Namen "Simple CSV Importer" erscheinen, und,
-sobald Sie <b>Schließen</b> gewählt haben, auch in den Untermenüs <b>Datei -> Importieren -> 
-Externe Importfilter</b> und <b>Datei -> Importieren und Anhängen -> Externe Importfilter</b> 
+sobald Sie <b>Schlie&szlig;en</b> gew&auml;hlt haben, auch in den Untermen&uuml;s <b>Datei -> Importieren -> 
+Externe Importfilter</b> und <b>Datei -> Importieren und Anh&auml;ngen -> Externe Importfilter</b> 
 des JabRef-Hauptfensters.</p>
 
-<H2>Ihre Arbeit anderen zur Verfügung stellen</H2>
+<H2>Ihre Arbeit anderen zur Verf&uuml;gung stellen</H2>
 
 Mit externen Importfiltern ist es recht einfach, Importfilter zwischen Nutzern auszutauschen und
-gemeinsam zu nutzen. Wenn Sie einen Importer für ein  Format schreiben, das JabRef noch nicht unterstützt, 
+gemeinsam zu nutzen. Wenn Sie einen Importer f&uuml;r ein  Format schreiben, das JabRef noch nicht unterst&uuml;tzt, 
 oder einen Importer verbessern, bitten wir Sie, Ihre Ergebnisse auf unserer SourceForge.net 
-Seite zu veröffentlichen. Wir bieten gerne eine Sammlung eingereichter Importfilter an oder 
-fügen sie unserer Auswahl an Standard-Importfiltern hinzu.
+Seite zu ver&ouml;ffentlichen. Wir bieten gerne eine Sammlung eingereichter Importfilter an oder 
+f&uuml;gen sie unserer Auswahl an Standard-Importfiltern hinzu.
 
 </HTML>
