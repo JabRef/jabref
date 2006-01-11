@@ -170,6 +170,7 @@ public class RepecNepImporter extends ImportFormat {
   
   private int line = 0;
   private String lastLine = "";
+  private String preLine = "";
   private BufferedReader in = null;
   private boolean inOverviewSection = false;
   
@@ -238,6 +239,7 @@ public class RepecNepImporter extends ImportFormat {
   
   private void readLine() throws IOException {
     this.line++;
+    this.preLine = this.lastLine;
     this.lastLine = this.in.readLine();
   }
   
@@ -421,7 +423,7 @@ public class RepecNepImporter extends ImportFormat {
    * section, we have a working paper entry we are interested in
    */
   private boolean isStartOfWorkingPaper() {
-    return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection;
+    return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().equals("");
   }
   
   /*
@@ -436,13 +438,11 @@ public class RepecNepImporter extends ImportFormat {
     try {
     	this.in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
       
-      String prevLine = "";
-      
       readLine(); // skip header and editor information
     	while (this.lastLine != null) {
   
         if (this.lastLine.startsWith("-----------------------------")) {
-          this.inOverviewSection = prevLine.startsWith("In this issue we have");
+          this.inOverviewSection = this.preLine.startsWith("In this issue we have");
         } 
         if (isStartOfWorkingPaper()) {
           BibtexEntry be = new BibtexEntry(Util.createNeutralId());
@@ -465,7 +465,7 @@ public class RepecNepImporter extends ImportFormat {
           paperNoStr = null;
           
         } else {        
-          prevLine = this.lastLine;
+          this.preLine = this.lastLine;
           readLine();
         }
       }
