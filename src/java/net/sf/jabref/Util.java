@@ -524,7 +524,7 @@ public class Util {
      * @throws IOException
      */
     public static void openFileOnWindows(String link, boolean localFile) throws IOException {
-        if (localFile) {
+        /*if (localFile) {
             String[] spl = link.split("\\\\");
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < spl.length; i++) {
@@ -534,8 +534,8 @@ public class Util {
                 sb.append(spl[i]);
             }
             link = sb.toString();
-        }
-
+	    }*/
+	link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
         String cmd = "cmd.exe /c start " + link;
         Process child = Runtime.getRuntime().exec(cmd);
     }
