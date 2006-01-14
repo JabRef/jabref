@@ -740,7 +740,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   }
             });
 
-        actions.put("test", new PushToEmacs(BasePanel.this));
+        actions.put("pushToEmacs", new PushToEmacs(BasePanel.this));
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {

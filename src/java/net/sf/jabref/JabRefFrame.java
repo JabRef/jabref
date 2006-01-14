@@ -310,7 +310,9 @@ public class JabRefFrame
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
-    test = new GeneralAction("test", "Test");
+    pushToEmacs = new GeneralAction("pushToEmacs", "Insert selected citations into Emacs",
+            "Push selection to Emacs", Globals.prefs.getKey("Push to Emacs"));
+    //test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
@@ -1014,7 +1016,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    edit.add(test);
+    //edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -1065,6 +1067,7 @@ public JabRefPreferences prefs() {
     tools.addSeparator();
     tools.add(manageSelectors);
     tools.add(makeKeyAction);
+    tools.add(pushToEmacs);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
     tools.add(fetchMedline);

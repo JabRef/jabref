@@ -340,6 +340,14 @@ public class LabelPatternUtil {
     // Remove all illegal characters from the key.
     _label = Util.checkLegalKey(_sb.toString());
 
+    // Patch by Toralf Senger:
+    // Remove Regular Expressions while generating Keys
+    String regex = Globals.prefs.get("KeyPatternRegex");
+    if ((regex != null) && (regex.trim().length() > 0)) {
+        String replacement = Globals.prefs.get("KeyPatternReplacement");
+        _label = _label.replaceAll(regex, replacement);
+    }
+
     if (forceUpper) {
       _label = _label.toUpperCase();
     }

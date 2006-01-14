@@ -634,6 +634,7 @@ public class JabRefPreferences {
     private void defineDefaultKeyBindings() {
       defKeyBinds.put("Push to LyX","ctrl L");
       defKeyBinds.put("Push to WinEdt","ctrl shift W");
+      defKeyBinds.put("Push to Emacs","ctrl shift E");
         defKeyBinds.put("Quit JabRef", "ctrl Q");
         defKeyBinds.put("Open database", "ctrl O");
         defKeyBinds.put("Save database", "ctrl S");

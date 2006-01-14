@@ -80,6 +80,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+?       - Changed field order in OpenDocument export to comply with bibliography requirement.
+        - Added support for inserting citations into Emacs using gnuserv/gnuclient.
 2.0b:   - Added a system for registering custom import formats in the form of Java classes.
         - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
