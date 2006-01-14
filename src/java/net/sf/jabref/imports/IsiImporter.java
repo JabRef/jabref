@@ -171,6 +171,14 @@ public class IsiImporter extends ImportFormat {
           hm.put("year", value);
         else if (beg.equals("VL"))
           hm.put("volume", value);
+        else if (beg.equals("PD")) {
+            String[] parts = value.split(" ");
+            for (int ii=0; ii<parts.length; ii++) {
+                if (Globals.MONTH_STRINGS.containsKey(parts[ii].toLowerCase())) {
+                    hm.put("month", "#"+parts[ii].toLowerCase()+"#");
+                }
+            }
+        }
         else if (beg.equals("DT")) {
           Type = value;
 	  if (Type.equals("Review")) {

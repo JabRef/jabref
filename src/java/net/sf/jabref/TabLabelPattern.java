@@ -49,8 +49,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
     private JTextField defaultPat = new JTextField();
 
-    private JTextField basenamePatternRegex = new JTextField(20);
-    private JTextField basenamePatternReplacement = new JTextField(20);
+    //private JTextField basenamePatternRegex = new JTextField(20);
+    //private JTextField basenamePatternReplacement = new JTextField(20);
+    private JTextField KeyPatternRegex = new JTextField(20);
+    private JTextField KeyPatternReplacement = new JTextField(20);
 
 	private JButton btnDefaultAll, btnDefault;
 
@@ -82,8 +84,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
          Globals.prefs.putBoolean("warnBeforeOverwritingKey", warnBeforeOverwriting.isSelected());
          Globals.prefs.putBoolean("avoidOverwritingKey", dontOverwrite.isSelected());
 
-         Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
-         Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
+         //Globals.prefs.put("basenamePatternRegex", basenamePatternRegex.getText());
+         //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
+         Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
+         Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
 
          LabelPatternUtil.updateDefaultPattern();
 
@@ -261,7 +265,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
         // Build a panel for checkbox settings:
         FormLayout layout = new FormLayout
-	        ("1dlu, 8dlu, left:pref", "");//, 8dlu, 20dlu, 8dlu, fill:pref", "");
+	        ("1dlu, 8dlu, left:pref, 8dlu, left:pref", "");//, 8dlu, 20dlu, 8dlu, fill:pref", "");
         pan = new JPanel();
 	    DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Globals.lang("Key generator settings"));
@@ -270,10 +274,19 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         builder.append(pan);
         builder.append(warnBeforeOverwriting);
         builder.nextLine();
-        //builder.nextColumn();
         builder.append(pan);
         builder.append(dontOverwrite);
+
         builder.nextLine();
+        builder.append(pan);
+        builder.append(Globals.lang("Replace (regular expression)"));
+        builder.append(Globals.lang("by"));
+
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(KeyPatternRegex);
+        builder.append(KeyPatternReplacement);
+
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         con.gridx = 1;
 	    con.gridy = 3;
@@ -387,8 +400,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     	    setValue(tf, name);
     	}
 
+        KeyPatternRegex.setText(Globals.prefs.get("KeyPatternRegex"));
+        KeyPatternReplacement.setText(Globals.prefs.get("KeyPatternReplacement"));
 
-	    basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
-	    basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
+	    //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
+	    //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
     }
 }

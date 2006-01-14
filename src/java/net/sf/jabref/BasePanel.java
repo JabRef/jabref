@@ -41,6 +41,7 @@ import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.PushToLyx;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
+import net.sf.jabref.external.PushToEmacs;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -53,11 +54,9 @@ import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.swing.EventTableModel;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -741,6 +740,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   }
             });
 
+        actions.put("test", new PushToEmacs(BasePanel.this));
+
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
         //int[] rows;
@@ -1379,18 +1380,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           });
 
-              actions.put("test", new AbstractWorker() {
-                  String message = "";
-                  public void init() {
-                    
-                  }
-                  public void run() {
 
-                }
-                  public void update() {
-                    output(message);
-                  }
-          });
 
         actions.put("abbreviateIso", new AbbreviateAction(this, true));
         actions.put("abbreviateMedline", new AbbreviateAction(this, false));
@@ -2515,11 +2505,43 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     updatedExternally = b;
   }
 
-  public BibtexEntry[] getSelectedEntries() {
-    return mainTable.getSelectedEntries();
-  }
+    /**
+     * Get an array containing the currently selected entries.
+     *
+     * @return An array containing the selected entries.
+     */
+    public BibtexEntry[] getSelectedEntries() {
+        return mainTable.getSelectedEntries();
+    }
 
-  public GroupSelector getGroupSelector() {
-      return frame.groupSelector;
-  }
+    /**
+     * Get a String containing a comma-separated list of the bibtex keys
+     * of the selected entries.
+     *
+     * @return A comma-separated list of the keys of the selected entries.
+     */
+    public String getKeysForSelection() {
+        List entries = mainTable.getSelected();
+        StringBuffer result = new StringBuffer();
+        String citeKey = "";//, message = "";
+        boolean first = true;
+        for (Iterator i = entries.iterator(); i.hasNext();) {
+            BibtexEntry bes = (BibtexEntry) i.next();
+            citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
+            // if the key is empty we give a warning and ignore this entry
+            if (citeKey == null || citeKey.equals(""))
+                continue;
+            if (first) {
+                result.append(citeKey);
+                first = false;
+            } else {
+                result.append(",").append(citeKey);
+            }
+        }
+        return result.toString();
+    }
+
+    public GroupSelector getGroupSelector() {
+        return frame.groupSelector;
+    }
 }

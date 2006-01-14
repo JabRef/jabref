@@ -227,6 +227,15 @@ public class Util {
         // letter or letter combination that bibtex can accept.
         String newKeyS = replaceSpecialCharacters(newKey.toString());
 
+        // Patch by Toralf Senger:
+        // Remove Regular Expressions while generating Keys
+        String regex = Globals.prefs.get("KeyPatternRegex");
+        if ((regex != null) && (regex.trim().length() > 0)) {
+            String replacement = Globals.prefs.get("KeyPatternReplacement");
+            newKeyS = newKeyS.replaceAll(regex, replacement);
+        }
+
+
         return newKeyS;
     }
 

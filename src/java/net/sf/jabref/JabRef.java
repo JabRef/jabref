@@ -101,10 +101,12 @@ public class JabRef {
 
         // Unless we are alone, try to contact already running JabRef:
 	    if (remoteListener == null) {
-		if (RemoteListener.sendToActiveJabRefInstance(args))
-            // We have successfully sent our command line options through the socket to
-            // another JabRef instance. So we assume it's all taken care of, and quit.
-            System.exit(0);
+		    if (RemoteListener.sendToActiveJabRefInstance(args)) {
+                // We have successfully sent our command line options through the socket to
+                // another JabRef instance. So we assume it's all taken care of, and quit.
+                System.out.println(Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                System.exit(0);
+            }
         }
 	}
 

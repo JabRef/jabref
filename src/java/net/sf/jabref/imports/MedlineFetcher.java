@@ -183,7 +183,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 //==================================================
 //
 //==================================================
-  public ArrayList fetchMedline(String id)
+  public static ArrayList fetchMedline(String id)
   {
     ArrayList bibItems=null;
     try {
