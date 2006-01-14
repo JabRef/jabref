@@ -115,7 +115,9 @@ Change log:
         - Fixed bug related to multi-line fields in RIS import.
         - Fixed bug related to looking up a fully qualified DOI
         - Included review field to preview panel 1, which shows the abstract
-        - Fixed bug where booktitle field was not displayed in preview for conference proceedings, similar to journal field
+        - Fixed bug where booktitle field was not displayed in preview
+          for conference proceedings, similar to journal field
+        - By default preserve capitalization on the following fields: title;journal;booktitle;review;abstract
 1.8.1:  - Added automatic timestamp with configurable format for entries.
         - Added new key generator modifier ":abbr" to abbreviate field contents.
         - Added Help button in Preferences -> Entry preview

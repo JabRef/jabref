@@ -274,7 +274,7 @@ public class JabRefPreferences {
                      +"\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                      +"</dd>__NEWLINE__<p></p></font>");
         defaults.put("autoDoubleBraces", Boolean.FALSE);
-        defaults.put("putBracesAroundCapitals","");
+        defaults.put("putBracesAroundCapitals","title;journal;booktitle;review;abstract");
         defaults.put("nonWrappableFields", "pdf;ps;url;doi");
         defaults.put("useImportInspectionDialog", Boolean.TRUE);
         defaults.put("useImportInspectionDialogForSingle", Boolean.FALSE);
