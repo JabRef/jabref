@@ -9,7 +9,7 @@
 In the 'Key pattern' tab in Preferences, one can set the fields used in auto
 generation of BibTex labels. The pattern can be set for each of the standard entry
 types.
-<P>
+<H2>Key patterns</H2>
 The pattern can contain any text you wish, in addition to field
 markers that indicate that a specific field of the entry should be
 inserted at that position of the key. A field marker generally
@@ -83,6 +83,15 @@ until a unique key is found. Thus, the labels might look like:
 <blockquote> <code>Yared1998</code><BR> <code>Yared1998a</code><BR>
 <code>Yared1998b</code> </blockquote>
 
+<h2>Regular expression replace</h2>
+
+    After the key pattern has been applied to produce a key, you can choose to have the
+    key generator search for occurences of a specific regular expression, and replace
+    it with a string. The regular expression and replacement string are entered in the
+    text fields below the list of key patterns.
+
+    If the replacement string is empty, matches of the regular expression will simply
+    be removed from the generated key.
 
 </font>
 </BODY>

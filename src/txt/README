@@ -82,6 +82,7 @@ appear in your chosen languages.
 Change log:
 ?       - Changed field order in OpenDocument export to comply with bibliography requirement.
         - Added support for inserting citations into Emacs using gnuserv/gnuclient.
+        - Added option to set a regular expression replace operation on generated bibtex keys.
 2.0b:   - Added a system for registering custom import formats in the form of Java classes.
         - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
