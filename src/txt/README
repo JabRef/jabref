@@ -1,6 +1,6 @@
 
-JabRef 2.0 beta
----------------
+JabRef 2.0 beta 2
+-----------------
 
 
 Introduction:
@@ -80,9 +80,11 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-?       - Changed field order in OpenDocument export to comply with bibliography requirement.
+2.0b2   - Changed field order in OpenDocument export to comply with bibliography requirement.
         - Added support for inserting citations into Emacs using gnuserv/gnuclient.
         - Added option to set a regular expression replace operation on generated bibtex keys.
+        - Added support for custom importers inside a jar file.
+        - Fixed bug in opening URLs containing '&' on Windows.
 2.0b:   - Added a system for registering custom import formats in the form of Java classes.
         - Added export option for OpenDocument spreadsheet.
         - Added new options for name formatting in main table.
