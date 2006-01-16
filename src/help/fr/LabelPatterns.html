@@ -10,6 +10,7 @@
 Dans le menu 'Param&eacute;trage des clefs' de la fen&ecirc;tre Pr&eacute;f&eacute;rences, on peut indiquer les champs &agrave; utiliser pour la g&eacute;n&eacute;ration automatique des clefs BibTeX. La d&eacute;finition peut &ecirc;tre faite pour chacune des entr&eacute;es standards.
 </p>
 
+<H2>Les d&eacute;finitions de clefs</H2>
 <p>
 La d&eacute;finition peut contenir n'importe quel texte au choix ainsi que des marqueurs de champs qui indiquent les champs particuliers de l'entr&eacute;e utilis&eacute;s et leur position dans la clef. Un marqueur de champ est constitu&eacute; g&eacute;n&eacute;ralement du nom du champ entre crochets, par ex. <b>[volume]</b>. Si le champ n'est pas d&eacute;fini dans l'entr&eacute;e lorsque la clef est g&eacute;n&eacute;r&eacute;e, aucun texte n'est ins&eacute;r&eacute; dans la clef.
 </p>
@@ -33,8 +34,8 @@ Les marqueurs de champs sp&eacute;ciaux&nbsp;:
 <li><b>[<code>auth.auth.ea</code>]</b>&nbsp;: Le nom des deux premiers auteurs suivi de ".ea" lorsqu'ils sont plus de deux.<BR>
 <li><b>[<code>authshort</code>]</b>&nbsp;: Le nom s'il n'y a qu'un seul auteur. Jusqu'&agrave; trois auteurs, le premier caract&egrave;re du nom de chacun d'eux. Au del&agrave; de trois auteurs, le caract&egrave;re plus (+) est ajout&eacute;.<BR>
 </ul>
-<b>Note&nbsp;:</b> S'il n'y a pas d'auteur (dans le cas d'un livre édité), alors tous les marqueurs <b><code>[auth...]</code></b> ci-dessus utiliseront l'éditeur(s) (s'il y en a) comme alternative. Ainsi l'éditeur(s) d'un livre sans auteur sera traité comme l'auteur(s) pour la génération des clefs.
-Si vous ne désirez pas ce comportement, c'est à dire si vous voulez un marqueur qui soit vide s'il n'y a pas d'auteur, utilisez le code <b><code>pureauth</code></b> au lieu du code <b><code>auth</code></b> dans les marqueurs ci-dessus. Par exemple, <b><code>[pureauth]</code></b> ou <b><code>[pureauthors3]</code></b>.
+<b>Note&nbsp;:</b> S'il n'y a pas d'auteur (dans le cas d'un livre &eacute;dit&eacute;), alors tous les marqueurs <b><code>[auth...]</code></b> ci-dessus utiliseront l'&eacute;diteur(s) (s'il y en a) comme alternative. Ainsi l'&eacute;diteur(s) d'un livre sans auteur sera trait&eacute; comme l'auteur(s) pour la g&eacute;n&eacute;ration des clefs.
+Si vous ne d&eacute;sirez pas ce comportement, c'est &agrave; dire si vous voulez un marqueur qui soit vide s'il n'y a pas d'auteur, utilisez le code <b><code>pureauth</code></b> au lieu du code <b><code>auth</code></b> dans les marqueurs ci-dessus. Par exemple, <b><code>[pureauth]</code></b> ou <b><code>[pureauthors3]</code></b>.
 <ul>
 <li><b>[<code>edtr</code>]</b>&nbsp;: Le nom du premier &eacute;diteur<BR>
 <li><b>[<code>edtrIniN</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom de chaque &eacute;diteur<BR>
@@ -75,6 +76,17 @@ La clef utilis&eacute;e par d&eacute;faut est [auth][year]; elle produit des cle
 <code>Yared1998a</code><BR>
 <code>Yared1998b</code> 
 </blockquote>
+
+<h2>Remplacement d'expressions r&eacute;guli&egrave;res</h2>
+
+<P>
+Apr&egrave;s que la d&eacute;finition de clef ait &eacute;t&eacute; appliqu&eacute;e pour produire une clef, vous pouvez demander au g&eacute;n&eacute;rateur de clef de rechercher les occurrences d'une expression r&eacute;guli&egrave;re donn&eacute;e et de la remplacer avec une cha&icirc;ne. L'expression r&eacute;guli&egrave;re et la cha&icirc;ne de remplacement sont entr&eacute;es dans les champs textes situ&eacute;s sous la liste des d&eacute;finition de clefs.
+</P>
+
+<P>
+Si la cha&icirc;ne de remplacement est vide, les correspondances de l'expression r&eacute;guli&egrave;re seront simplement supprim&eacute;es de la clef g&eacute;n&eacute;r&eacute;e.
+</P>
+
 
 </body>
 </html>
