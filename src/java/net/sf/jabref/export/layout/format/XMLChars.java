@@ -39,7 +39,7 @@ public class XMLChars implements LayoutFormatter
     //~ Methods ////////////////////////////////////////////////////////////////
     //Pattern pattern = Pattern.compile(".*\\{..[a-zA-Z].\\}.*");
     Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
-
+  
     public String format(String fieldText)
     {
  
@@ -59,11 +59,52 @@ public class XMLChars implements LayoutFormatter
     }
 
     private String firstFormat(String s) {
-	return s.replaceAll("&|\\\\&","&#x0026;").replaceAll("--", "&#x2013;");
+	return s.replaceAll("&|\\\\&","&#x0026;").replaceAll("--", "&#x2013;").replaceAll("–", "-");
     }
 
     private String restFormat(String s) {
-	return s.replaceAll("\\}","").replaceAll("\\{","").replaceAll("<", "&#x3c;");
+		String fieldText=s.replaceAll("\\}","").replaceAll("\\{","");
+		
+		// now some copy-paste problems most often occuring in abstracts when copied from PDF
+		// AND: this is accepted in the abstract of bibtex files, so are forced to catch those cases
+		int code;
+		char character;
+		StringBuffer buffer=new StringBuffer(fieldText.length()<<1);
+    for ( int i = 0; i < fieldText.length(); i++)
+    {
+    	character = fieldText.charAt(i);
+      code = ((int) character)&255;
+      //System.out.println(""+character+" "+code);
+      if((code<40 && code!=32)||code>125){
+      	buffer.append("&#" + code+";");
+      }
+      else 
+      {
+      	// TODO: highly inefficient, create look-up array with all 255 codes only once and use code as key!!!
+      	int[] forceReplace=new int[]{44,45,63,64,94,95,96,124};
+      	boolean alphabet=true;
+      	for(int ii=0;ii<forceReplace.length;ii++){
+      		if(code==forceReplace[ii]){
+      			buffer.append("&#" + code+";");
+      			alphabet=false;
+      			break;
+      		}
+      	}
+    		// force roundtripping
+      	if(alphabet)buffer.append((char)code);
+      }
+    }
+    fieldText=buffer.toString();
+
+		// use common abbreviations for <, > instead of code
+		for (Iterator i=Globals.ASCII2XML_CHARS.keySet().iterator(); i.hasNext();) {
+	    String ss = (String)i.next();         
+            String repl = (String)Globals.ASCII2XML_CHARS.get(ss);
+            if (repl != null)
+                fieldText = fieldText.replaceAll(ss, repl);
+	  }
+		
+		return fieldText;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

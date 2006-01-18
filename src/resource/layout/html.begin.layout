@@ -1,3 +1,5 @@
+<!-- jabref.sf.net generated HTML layout  -->
+<!-- 2006-01-17 wegner added PMID linkout -->
 <html>
 <header>
 	<title>JabRef Output</title>
@@ -36,7 +38,7 @@ body {
     padding-bottom:1em;
 }
 
-.bibtex_url, .bibtex_pdf, .bibtex_doi, .bibtex_citeseer {
+.bibtex_url, .bibtex_pmid, .bibtex_doi, .bibtex_citeseer {
     display:inline;
 	font-size:small;
 	float:right;
@@ -44,7 +46,7 @@ body {
 	padding-right:1em;
 }
 
-.bibtex_url a, .bibtex_pdf a, .bibtex_doi a, .bibtex_citeseer a , .bibtex_url a:visited, .bibtex_pdf a:visited, .bibtex_doi a:visited, .bibtex_citeseer a:visited {
+.bibtex_url a, .bibtex_pdf a, .bibtex_pmid a,.bibtex_pmid a:visited, .bibtex_doi a, .bibtex_pdf a:visited, .bibtex_citeseer a , .bibtex_url a:visited, .bibtex_doi a:visited, .bibtex_citeseer a:visited {
 	text-decoration:none;
 	font-weight:bold;
 	color:darkblue;

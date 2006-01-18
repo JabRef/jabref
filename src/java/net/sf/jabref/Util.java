@@ -569,8 +569,13 @@ public class Util {
      */
     public static File expandFilename(String name, String dir) {
         //System.out.println("expandFilename: name="+name+"\t dir="+dir);
-
-        File file = new File(name);
+				File file = null; 
+				if(name==null && name.length()==0)
+				{
+					file = new File(name);
+				}
+        
+        if(file!=null){
         if (!file.exists() && (dir != null)) {
             if (dir.endsWith(System.getProperty("file.separator"))) name = dir
                     + name;
@@ -586,8 +591,9 @@ public class Util {
             else name = name.replaceAll("\\\\", "/");
             //System.out.println("expandFilename: "+name);
             file = new File(name);
-            return (file.exists() ? file : null);
-        } else return file;
+            if (!file.exists()) file = null;
+        }} 
+        return file;
     }
 
     private static String findInDir(String key, String dir, OpenFileFilter off) {

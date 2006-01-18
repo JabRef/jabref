@@ -11,6 +11,12 @@
 		</div>
 		\end{doi}
 
+		\begin{pmid}
+		<div class="bibtex_pmid">
+			<a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&query_hl=1&itool=pubmed_docsum&list_uids=\pmid">pmid</a>
+		</div>
+		\end{pmid}
+
 		\begin{citeseerurl}
 		<div class="bibtex_citeseer">
 			<a href="http://citeseer.ist.psu.edu/\citeseerurl">cs</a>

@@ -526,6 +526,7 @@ public class Globals {
   public static HashMap HTML_CHARS = new HashMap(),
           HTMLCHARS = new HashMap(),
       XML_CHARS = new HashMap(),
+      ASCII2XML_CHARS = new HashMap(),
       UNICODE_CHARS = new HashMap(),
       RTFCHARS = new HashMap();
   static {
@@ -624,6 +625,8 @@ public class Globals {
     HTMLCHARS.put("'U", "&Uacute;");
     HTMLCHARS.put("'a", "&aacute;");
     HTMLCHARS.put("'A", "&Aacute;");
+    HTMLCHARS.put("^a", "&ocirc;");
+    HTMLCHARS.put("^A", "&Ocirc;");
     HTMLCHARS.put("^o", "&ocirc;");
     HTMLCHARS.put("^O", "&Ocirc;");
     HTMLCHARS.put("^u", "&ucirc;");
@@ -766,6 +769,8 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\'a\\}", "&#x00E1;");
     XML_CHARS.put("\\{\\\\\\'A\\}", "&#x00C1;");
 
+    XML_CHARS.put("\\{\\\\\\^a\\}", "&#x00F4;");
+    XML_CHARS.put("\\{\\\\\\^A\\}", "&#x00D4;");
     XML_CHARS.put("\\{\\\\\\^o\\}", "&#x00F4;");
     XML_CHARS.put("\\{\\\\\\^O\\}", "&#x00D4;");
     XML_CHARS.put("\\{\\\\\\^u\\}", "&#x00F9;");
@@ -780,7 +785,12 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\~N\\}", "&#x00D1;");
     XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
     XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
-
+    
+    ASCII2XML_CHARS.put("<", "&lt;");
+    ASCII2XML_CHARS.put("\"", "&quot;");
+    ASCII2XML_CHARS.put(">", "&gt;");
+    
+    
     UNICODE_CHARS.put("\u00C0", "A");
     UNICODE_CHARS.put("\u00C1", "A");
     UNICODE_CHARS.put("\u00C2", "A");
