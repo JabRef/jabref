@@ -571,6 +571,8 @@ public class Util {
         //System.out.println("expandFilename: name="+name+"\t dir="+dir);
 				File file = null; 
 				if(name==null && name.length()==0)
+					return null;
+				else
 				{
 					file = new File(name);
 				}
