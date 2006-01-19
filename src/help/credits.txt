@@ -19,6 +19,7 @@ Kolja Brix
 Frédéric Darboux
 Fabrice Dessaint
 Nathan Dunn
+Brian Van Essen
 Alexis Gallagher
 Sascha Hunold
 Bernd Kalbfuss
