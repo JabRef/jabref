@@ -124,6 +124,9 @@ public class ImportCustomizationDialog extends JDialog {
          } catch (Exception exc) {           
            exc.printStackTrace();
            JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", chosenFileStr + ":\n", exc.getMessage()));
+         } catch (NoClassDefFoundError exc) {
+           exc.printStackTrace();
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1. Have you chosen the correct package path?", chosenFileStr + ":\n", exc.getMessage()));           
          }
 
          addOrReplaceImporter(importer);
@@ -145,8 +148,13 @@ public class ImportCustomizationDialog extends JDialog {
            zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ);
          } catch (IOException exc) {
            exc.printStackTrace();
-           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0 %1", basePath + ":\n", exc.getMessage()));
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not open %0 %1", basePath + ":\n", exc.getMessage()) 
+                                              + "\n" + Globals.lang("Have you chosen the correct package path?"));
            return;         
+         } catch (NoClassDefFoundError exc) {
+           exc.printStackTrace();
+           JOptionPane.showMessageDialog(frame, Globals.lang("Could not instantiate %0 %1", basePath + ":\n", exc.getMessage())
+                                              + "\n" + Globals.lang("Have you chosen the correct package path?"));           
          }
        }
          
