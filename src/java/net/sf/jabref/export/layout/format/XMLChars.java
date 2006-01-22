@@ -59,7 +59,7 @@ public class XMLChars implements LayoutFormatter
     }
 
     private String firstFormat(String s) {
-	return s.replaceAll("&|\\\\&","&#x0026;").replaceAll("--", "&#x2013;").replaceAll("–", "-");
+	return s.replaceAll("&|\\\\&","&#x0026;").replaceAll("--", "&#x2013;");
     }
 
     private String restFormat(String s) {
@@ -73,7 +73,7 @@ public class XMLChars implements LayoutFormatter
     for ( int i = 0; i < fieldText.length(); i++)
     {
     	character = fieldText.charAt(i);
-      code = ((int) character)&255;
+      code = ((int) character);
       //System.out.println(""+character+" "+code);
       if((code<40 && code!=32)||code>125){
       	buffer.append("&#" + code+";");
