@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.lang.StringIndexOutOfBoundsException;
 
 import javax.swing.*;
 
@@ -570,7 +571,7 @@ public class Util {
     public static File expandFilename(String name, String dir) {
         //System.out.println("expandFilename: name="+name+"\t dir="+dir);
 				File file = null; 
-				if(name==null && name.length()==0)
+				if(name==null || name.length()==0)
 					return null;
 				else
 				{
@@ -589,7 +590,16 @@ public class Util {
             file = new File(name);
             if (file.exists()) return file;
             // Ok, try to fix / and \ problems:
-            if (Globals.ON_WIN) name = name.replaceAll("/", "\\");
+            if (Globals.ON_WIN){
+            	// workaround for catching Java bug in regexp replacer
+            	// and, why, why, why ... I don't get it - wegner 2006/01/22
+            	try{
+            	 name = name.replaceAll("/", "\\");
+            	}
+            	catch(java.lang.StringIndexOutOfBoundsException exc){
+            		System.err.println("An internal Java error was caused by the entry "+"\""+name+"\"");
+            	}
+            }
             else name = name.replaceAll("\\\\", "/");
             //System.out.println("expandFilename: "+name);
             file = new File(name);
