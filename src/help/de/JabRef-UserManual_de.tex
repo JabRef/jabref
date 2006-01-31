@@ -1,8 +1,15 @@
+%%%%% To do: %%%%%
+% unter >>Erscheinungsbild<< noch die Punkte Tabellendarstellung,
+% Toolbar, Panels und Schriften erstellen (DW)
+%
+% FAQ ganz am Ende? (halte ich für nicht unbedingt nötig; eine Online-FAQ
+% wäre m.E. besser) (DW)
+
 \documentclass[10pt,normalheadings]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
-\setcounter{secnumdepth}{4}
-\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{4}
 
 %%%%% Page Dimensions %%%%%
 \usepackage{geometry}
@@ -61,7 +68,7 @@
   }%
 }
 %%% version number
-\newcommand{\versionnr}{2.0 beta} %
+\newcommand{\versionnr}{2.0} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref{}~\versionnr}
 %%% for Menu references
@@ -100,7 +107,15 @@
 
 %%%%% Other stuff %%%%%
 \deffootnote{1.5em}{1em}{\makebox[1.5em][l]{\thefootnotemark}}
-\usepackage{microtype} % micro typography
+%\usepackage{microtype} % micro typography
+
+%%%%% Mini TOCs %%%%%
+\usepackage[ngerman]{minitoc}
+\mtcsetrules{secttoc}{off}
+%\mtcsetdepth{secttoc}{3}
+\mtcsetfont{secttoc}{subsection}{}
+%\mtcsettitle{secttoc}{In diesem Abschnitt}
+%\mtcsettitlefont{secttoc}{\itshape}
 
 %%%%% Language %%%%%
 \usepackage[ngerman]{babel}
@@ -114,7 +129,7 @@ Me-nü-be-feh-le
 %%%%% Bibliography %%%%%
 \usepackage{jurabib}
 \jurabibsetup{annote=true}
-\renewcommand{\bib@heading}{\section*{Kommentiertes Literaturverzeichnis}}
+\renewcommand{\bib@heading}{\addsec{Kommentiertes Literaturverzeichnis}}
 
 %%%%% Hyperref %%%%%
 \usepackage{hyperref}
@@ -135,15 +150,6 @@ bookmarksopenlevel=1,%
 
 \makeatother
 \begin{document}
-\begin{comment}
-To do:
-
-unter >>Erscheinungsbild<< noch die Punkte Tabellendarstellung,
-Toolbar, Panels und Schriften erstellen (DW)
-
-FAQ ganz am Ende? (halte ich für nicht unbedingt nötig; eine Online-FAQ
-wäre m.E. besser) (DW)
-\end{comment}
 
 \subject{\includegraphics[%
   scale=0.25]{../../images/JabRef-splash.png}}
@@ -178,7 +184,7 @@ zu starten.
 \end{abstract}
 \begin{quote}
 \begin{spacing}{0.7}
-\begin{center}{\scriptsize Copyright \textcopyright{} 2005, Dominik
+\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2006, Dominik
 Waßenhoven}
 \end{center}
 {\scriptsize Dieser Inhalt ist unter einem Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Germany Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken Sie einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
@@ -187,13 +193,14 @@ Waßenhoven}
 \thispagestyle{empty}
 
 \newpage
-\tableofcontents{}
+\dosecttoc[e]
+\faketableofcontents{}
 
 \newpage
 
 
 \section{Einleitung}
-
+\secttoc
 
 \subsection{Über dieses Handbuch}
 
@@ -232,7 +239,7 @@ wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden,
 dass Bib\TeX{} Ihre Datei richtig verarbeiten kann.}
 
 
-\subsubsection*{Bib\TeX{} Felder}
+\subsubsection{Bib\TeX{} Felder}
 
 Es gibt viele unterschiedliche Felder in Bib\TeX{} und einige zusätzliche
 Felder, die Sie in \jabref{} einsetzen können. Grundsätzlich können
@@ -274,8 +281,9 @@ die Groß"~\slash{}Kleinschreibung).
 Für weitere Erläuterungen zu Bib\TeX{} wird verwiesen auf \cite{Markey2005,btxdoc,btxhak,Raichle2002}.
 
 
+\clearpage 
 \section{Installation}
-
+\secttoc
 
 \subsection{System-Voraussetzungen}
 
@@ -292,7 +300,7 @@ Development Kit}.
 \subsection{Windows}
 
 
-\subsubsection*{Installer (msi)}
+\subsubsection{Installer (msi)}
 
 \jabref{} gibt es im Windows Installer-Format (\texttt{.msi}). Ein
 Doppelklick auf die MSI-Datei installiert \jabref{} und fügt dem
@@ -306,7 +314,7 @@ ein Tool zum Kompilieren von MSI-Dateien aus einer XML-Spezifikation
 }
 
 
-\subsubsection*{Batch-Datei (jar)}
+\subsubsection{Batch-Datei (jar)}
 
 Wenn Sie die ausführbare jar-Datei (\texttt{.jar}) heruntergeladen
 haben, probieren Sie zunächst, ob ein Doppelklick darauf das Programm
@@ -358,9 +366,12 @@ unter \url{http://jabref.sourceforge.net} und in der Datei INSTALL
 (zum Kompilieren aus den \emph{sourcen}).
 
 
+\clearpage 
 \section{Funktionen}
+\secttoc
+\bigskip
 
-\label{JabRefHelp}\jabref{} ist ein Programm zur Verwaltung von
+\noindent \label{JabRefHelp}\jabref{} ist ein Programm zur Verwaltung von
 Bib\TeX{}-Dateien. Es benutzt kein eigenes Dateiformat, d.\,h. dass
 Sie Ihre Dateien direkt im Bib\TeX{}-Format (Dateiendung \texttt{.bib})
 laden und speichern. Sie können aber auch bibliographische Datenbanken
@@ -374,7 +385,6 @@ automatisch generieren. \jabref{} ist sehr nützlich, wenn Sie Bib\TeX{}
 oder CiteMaker benutzen, kann aber auch für diejenigen sinnvoll sein,
 die andere Bibliographie-Systeme benutzen oder schlicht und einfach
 ihre Literaturquellen organisieren wollen.
-
 
 \subsection{Das Hauptfenster}
 
@@ -431,7 +441,7 @@ für diesen Eintragstyp nicht benutzt wird. Das Feld kann selbstverständlich
 in \jabref{} bearbeitet werden.
 \end{itemize}
 
-\subsubsection*{Einen neuen Eintrag hinzufügen}
+\subsubsection{Einen neuen Eintrag hinzufügen}
 
 Es gibt verschiedene Möglichkeiten, einen neuen Eintrag hinzuzufügen.
 Im Menü \menu{BibTeX} führt ein Klick auf \menu{Neuer Eintrag} zu
@@ -448,7 +458,7 @@ einzuprägen, die Sie am häufigsten benutzen, z.\,B. STRG-SHIFT-A
 für einen Zeitschriftenaufsatz \emph{(article)}.}
 
 
-\subsubsection*{Einen Eintrag bearbeiten}
+\subsubsection{Einen Eintrag bearbeiten}
 
 Um den Eintrags-Editor (siehe \ref{EntryEditorHelp}) zur Bearbeitung
 eines existierenden Eintrags zu öffnen, klicken Sie einfach doppelt
@@ -459,7 +469,7 @@ nicht ausgewählt ist (im Dialog \menu{Optionen} \msep{} \menu{Einstellungen}
 zugehörigen Zeile den Eintrags-Editor.
 
 
-\subsubsection*{Einen Bib\TeX{}-String in einem Feld verwenden}
+\subsubsection{Einen Bib\TeX{}-String in einem Feld verwenden}
 
 In \jabref{} schreiben Sie den Inhalt aller Felder so, wie Sie es
 in einem Texteditor machen würden, mit einer Ausnahme: um einen String
@@ -499,7 +509,7 @@ Schlagen Sie unter Abschnitt~\ref{CustomEntriesHelp} nach, wenn
 Sie mehr Informationen darüber erhalten möchten.
 
 
-\subsubsection*{Die Panels des Eintrags-Editors}
+\subsubsection{Die Panels des Eintrags-Editors}
 
 Der Eintrags-Editor besteht in der Standardeinstellung aus fünf Panels:
 \emph{Benötigte Felder}, \emph{Optionale Felder}, \emph{General},
@@ -541,7 +551,7 @@ erscheinen diese im Quelltext-Panel.}
 Drag \& Drop. Sie können z.\,B. ein URL aus Ihrem Browser dort einfügen.}
 
 
-\subsubsection*{Überprüfung der Feldkonsistenz}
+\subsubsection{Überprüfung der Feldkonsistenz}
 
 Wenn der Inhalt eines Feldes geändert wird, überprüft \jabref{},
 ob der neue Inhalt akzeptiert werden kann. Bei Feldern, die von Bib\TeX{}
@@ -615,7 +625,7 @@ Es gibt drei verschiedene Suchmethoden in \jabref{}: die direkte
 Suche, die Markier-Suche und die Sortier-Suche.
 
 
-\subsubsection*{Direkte Suche}
+\subsubsection{Direkte Suche}
 
 Bei der direkten Suche sucht \jabref{} unmittelbar, wenn Sie einen
 Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg.
@@ -627,7 +637,7 @@ Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, drücken
 Sie ESC oder klicken Sie auf \menu{Zurücksetzen}.
 
 
-\subsubsection*{Markier-Suche}
+\subsubsection{Markier-Suche}
 
 Wenn Sie die Suchmethode \emph{Markieren} wählen, sucht das Programm
 in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie
@@ -637,7 +647,7 @@ Nicht-Treffer werden grau hinterlegt. Haben Sie zusätzlich die Option
 des Suchdialogs), dann werden die Treffer ausgewählt.
 
 
-\subsubsection*{Sortier-Suche}
+\subsubsection{Sortier-Suche}
 
 Die Suche mit der Methode \emph{Oben einsortieren} ist ähnlich wie
 die Suche mit Markierung, nur dass die Treffer automatisch an den
@@ -652,7 +662,7 @@ Markieren von Einträgen) und können z.\,B. eine weitere Suche durchführen,
 ohne die bisherigen Ergebnisse zu >>verlieren<<.}
 
 
-\subsubsection*{Feldbezeichner und logische Operatoren}
+\subsubsection{Feldbezeichner und logische Operatoren}
 
 \label{SearchHelp_advanced}Um nur einige bestimmte Felder zu durchsuchen
 und\slash{}oder logische Operatoren im Suchbegriff zu benutzen, wird
@@ -704,7 +714,7 @@ die Suche nach Bib\TeX{}-Keys, z.\,B.:
 bibtexkey~=~miller2005
 \end{lyxcode}
 
-\subsubsection*{Suchoptionen}
+\subsubsection{Suchoptionen}
 
 Der \menu{Einstellungen}-Button im Suchdialog öffnet ein Menü, in
 dem man mehrere Optionen (de)aktivieren kann: das Beachten von Groß-
@@ -741,7 +751,7 @@ benutzt. (Künftige Versionen von \jabref{} werden möglicherweise
 benutzerabhängige Gruppen unterstützen.)
 
 
-\subsubsection*{Die Gruppenansicht}
+\subsubsection{Die Gruppenansicht}
 
 Die Gruppenansicht wird im linken Bereich des Bildschirms angezeigt.
 Sie kann mit der Tastenkombination STRG-SHIFT-G oder dem Gruppen-Button
@@ -751,7 +761,7 @@ das Kontextmenü angesteuert (also mit der rechten Maustaste). Drag\,\&\,Drop
 wird ebenfalls unterstützt.
 
 
-\subsection*{Einige kurze Beispiele}
+\subsection{Einige kurze Beispiele}
 
 Sie möchten vielleicht~\ldots{}
 
@@ -822,7 +832,7 @@ anderen Gruppen sollten nun markiert sein.
 
 \end{itemize}
 
-\subsubsection*{Arten von Gruppen}
+\subsubsection{Arten von Gruppen}
 
 In \jabref{}~1.8 gibt es vier verschiedene Arten von Gruppen:
 
@@ -854,7 +864,7 @@ auf eine Gruppe aufgerufen wird, zeigt eine kurze Beschreibung der
 ausgewählten Gruppe.
 
 
-\subsubsection*{Gruppenstrukturen, Erstellen und Löschen von Gruppen}
+\subsubsection{Gruppenstrukturen, Erstellen und Löschen von Gruppen}
 
 Die Gruppen sind~-- vergleichbar mit Datei-Ordnern~-- in einer Baumansicht
 strukturiert, in der die Gruppe \emph{Alle Einträge} das Stammelement
@@ -873,7 +883,7 @@ Die Funktionen \menu{Rückgängig} und \menu{Wiederholen} werden für
 alle Bearbeitungsschritte unterstützt.
 
 
-\paragraph*{Statische Gruppen}
+\paragraph{Statische Gruppen}
 
 Statische Gruppen werden nur durch manuelles Zuweisen von Einträgen
 >>gefüttert<<. Nachdem Sie eine statische Gruppe erstellt haben,
@@ -889,7 +899,7 @@ Bib\TeX{}-Keys kann das Zuweisen der betreffenden Einträge in künftigen
 Sitzungen nicht korrekt wiederhergestellt werden.
 
 
-\paragraph*{Dynamische Gruppen}
+\paragraph{Dynamische Gruppen}
 
 Der Inhalt einer dynamischen Gruppe wird von einer logischen Bedingung
 bestimmt. Nur Einträge, die dieser Bedingung entsprechen, gehören
@@ -932,7 +942,7 @@ dargestellt. Dies kann unter \menu{Optionen} \msep{} \menu{Einstellungen}
 \msep{} \menu{Gruppen} abgestellt werden.
 
 
-\paragraph*{Hierarchischer Kontext}
+\paragraph{Hierarchischer Kontext}
 
 Standardmäßig ist eine Gruppe \emph{unabhängig} von ihrer Position
 im Gruppenbaum. Ist eine Gruppe ausgewählt, wird nur der Inhalt dieser
@@ -962,7 +972,7 @@ hat auch diese Art von Gruppen ein spezielles Icon. (Dieses Verhalten
 kann in den Einstellungen abgestellt werden.)
 
 
-\subsubsection*{Einträge einer Gruppe anzeigen, mehrere Gruppen kombinieren}
+\subsubsection{Einträge einer Gruppe anzeigen, mehrere Gruppen kombinieren}
 
 Wenn Sie eine Gruppe auswählen, werden die Einträge, die dieser Gruppe
 zugeordnet sind, hervorgehoben und~-- je nach Einstellung (die mit
@@ -981,14 +991,14 @@ Sie beide Gruppen auswählen (dazu muss \menu{Schnittmenge} in den
 Einstellungen aktiviert sein).
 
 
-\subsubsection*{Gruppen und Suche}
+\subsubsection{Gruppen und Suche}
 
 Wenn der Inhalt einer oder mehrerer Gruppen angezeigt wird, können
 Sie eine Suche innerhalb dieser Einträge durchführen. Benutzen Sie
 dazu die normalen Suchfunktionen (siehe Abschnitt~\ref{SearchHelp}).
 
 
-\subsubsection*{Sich überschneidende Gruppen markieren}
+\subsubsection{Sich überschneidende Gruppen markieren}
 
 Der \menu{Einstellungen}-Button bietet eine Option zum Markieren
 von sich überschneidenden Gruppen. Wenn diese Option aktiviert ist
@@ -1002,13 +1012,13 @@ wird die Gruppe \emph{lesen} markiert, sofern die ausgewählte Gruppe
 Einträge enthält, die Sie noch lesen wollten.
 
 
-\subsubsection*{Erweiterte Funktionen}
+\subsubsection{Erweiterte Funktionen}
 
 Wenn Sie sich mit dem oben beschriebenen Gruppenkonzept vertraut gemacht
 haben, könnten die folgenden erweiterten Funktionen nützlich sein.
 
 
-\paragraph*{Dynamische Gruppen automatisch erstellen}
+\paragraph{Dynamische Gruppen automatisch erstellen}
 
 Mit einem Klick auf den Button \menu{Automatisch Gruppen für die Datei anlegen}
 können Sie ganz schnell passende Gruppen für Ihre Datei erzeugen.
@@ -1028,7 +1038,7 @@ ignorieren. Sie müssen stattdessen die Gruppen, die Sie nicht wollen,
 nach dem automatischen Erstellen von Hand löschen.)
 
 
-\paragraph*{Ansicht aktualisieren}
+\paragraph{Ansicht aktualisieren}
 
 Der \menu{Aktualisieren}-Button in der Gruppenansicht aktualisiert
 die Tabelle in Bezug auf die aktuell ausgewählten Gruppen. Normalerweise
@@ -1037,11 +1047,12 @@ Rückgängig- oder Wiederholen-Vorgang, der mit Gruppen zusammenhängt)
 ist ein händisches Aktualisieren nötig.
 
 
-\paragraph*{Verfeinernde Untergruppen und einbeziehende Obergruppen mischen\protect%
-\footnote{In \jabref{}~1.8.1 sind die entsprechenden Optionen noch nicht ins
-Deutsche übersetzt. Gemeint sind hier \emph{refining (sub-)groups}
-und \emph{including (super-)groups}.%
-}}
+\paragraph{Verfeinernde Untergruppen und einbeziehende Obergruppen mischen%\protect%
+%\footnote{In \jabref{}~1.8.1 sind die entsprechenden Optionen noch nicht ins
+%Deutsche übersetzt. Gemeint sind hier \emph{refining (sub-)groups}
+%und \emph{including (super-)groups}.%
+%}
+}
 
 Wenn eine verfeinernde Gruppe die Untergruppe von einer Gruppe ist,
 die ihre Untergruppen berücksichtigt~-- also sozusagen die Geschwister
@@ -1139,7 +1150,7 @@ Um ein neues Wort hinzuzufügen, schreiben Sie es einfach in das Auswahlfeld
 \subsection{Import und Export}
 
 
-\subsubsection*{Import-Kontrollfenster}
+\subsubsection{Import-Kontrollfenster}
 
 \label{ImportInspectionDialog}Beim Importieren neuer Einträge aus
 einem unterstützten Format oder beim Herunterladen von Einträgen aus
@@ -1155,7 +1166,7 @@ ist es oftmals leichter, diese Arbeiten durchzuführen, bevor die neuen
 Einträge zwischen die bereits bestehenden sortiert wurden.
 
 
-\subsubsection*{\jabref{} $\to$~EndNote}
+\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}
 
 \begin{quote}
 \label{EndnoteFilters}\emph{\jabref{} kann Dateien so exportieren,
@@ -1239,7 +1250,7 @@ mit Klammern enthalten, als Eintrag mit mehreren Autoren gewertet
 und demzufolge unpassend formatiert.
 
 
-\subsubsection*{Erweiterte Benutzung: EndNote Extras}
+\subsubsection{Erweiterte Benutzung: EndNote Extras}
 
 \label{EndNote_erweitert}Einige Felder, die von Bib\TeX{} genutzt
 werden, gehören nicht zu EndNotes vorgegebenen Referenztypen. Während
@@ -1258,7 +1269,7 @@ und entpacken die Zip-Datei, die dabei erstellt wird. Dann folgen
 Sie den Angaben in der Datei \texttt{readme.txt}.
 
 
-\subsubsection*{EndNote $\to$~\jabref{}}
+\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}
 
 EndNote hat einen Export-Stil Bib\TeX{}, der allerdings nicht alle
 Eintragstypen und Felder von Bib\TeX{} und auch nicht die zusätzlich
@@ -1269,21 +1280,45 @@ extrahieren Sie die EndNote Extras (\menu{Datei} \msep{} \menu{Exportieren}
 die dabei erstellt wird und folgen den Anweisungenx in der Datei \texttt{readme.txt}.
 
 
-\subsubsection*{\jabref{} $\to$~ OpenOffice.org}
+\subsubsection[JabRef-Bibliographien in OpenOffice.org benutzen]{\jabref{}-Bibliographien in OpenOffice.org benutzen}
 
-\begin{quote}
-\label{OpenOfficeHelp}\menu{Datei} \msep{} \menu{Exportieren}
-\msep{} \menu{OpenOffice Calc}
-\end{quote}
-\jabref{} kann Ihre Datei in das OpenOffice.org-Tabellenkalkulationsformat
-exportieren. Die exportierte Tabelle besteht aus einem Arbeitsblatt,
-das die Einträge in Reihen und die unterschiedlichen Felder in Spalten
-enthält. Die Tabelle ist kompatibel zu den Literaturverzeichnis-Funktionen
-von OpenOffice.org; Sie können die exportierte Tabelle unter \menu{Datenquellen}
-als Literaturdatenbank angeben.
+\jabref{} kann Ihre Datei sowohl in das OpenOffice.org 1.1 \texttt{.sxc}"=Tabellenkalkulationsformat als auch in das OpenDocument \texttt{.ods}"=Tabellenkalkulationsformat, das von OpenOffice.org 2.0 benutzt wird, exportieren.
 
+In beiden Fällen besteht die exportierte Tabelle aus einem Arbeitsblatt, das die Einträge in Reihen
+und die unterschiedlichen Felder in Spalten enthält. Die Reihenfolge und Benennung der Spalten ist kompatibel
+zu den Literaturverzeichnis-Funktionen von OpenOffice.org (OOo 1.1: \texttt{.sxc}, OOo 2.0: \texttt{.ods}).
 
-\subsubsection*{Klartext-Import}
+\paragraph{Die exportierte Datei als Bibliographiedatenbank in OpenOffice 2.0 (oder neuer) benutzen}
+Gehen Sie folgendermaßen vor, um eine Tabelle, die von \jabref{} exportiert wurde, als Bibliographiedatenbank in OpenOffice.org zu benutzen:
+
+\begin{itemize}
+\item Exportieren Sie Ihre Datenbank in das \texttt{.ods} -Format.
+\item Starten Sie OpenOffice.org.
+\item Wählen Sie \menu{Extras} \msep{} \menu{Optionen} \msep{} \menu{OpenOffice.org Base} \msep{} \menu{Datenbanken}.
+\item Bearbeiten Sie die \emph{Bibliography}-Datenbank und ändern ihren Namen z.\,B. in \emph{Bibliographie-alt}.
+\item Schließen Sie das Fenster \menu{Optionen} und gehen Sie zu \menu{Datei} \msep{} \menu{Neu} \msep{} \menu{Datenbank}.
+\item Dann wählen Sie \menu{Verbindung zu einer bestehenden Datenbank herstellen}, nehmen \menu{Tabellendokument} als
+    Datenbanktyp und wählen die \texttt{.ods}-Datei, die Sie exportiert haben.
+\item Klicken Sie auf \menu{Fertig stellen} und wählen den Namen \emph{Bibliography} im Speicherdialog.
+\end{itemize}
+Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}. Ihre Datenbank sollte nun angezeigt werden.
+
+\paragraph{Eine exportierte Datei als Datenbank in OpenOffice 1.1.x benutzen}
+
+\begin{itemize}
+\item Exportieren Sie Ihre Datei in das \texttt{.sxc}-Format.
+\item Starten Sie OpenOffice.org.
+\item Wählen Sie \menu{Extras} \msep{} \menu{Datenquellen}.
+\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen z.B. in \emph{Bibliographie-alt}. 
+\item Drücken Sie \menu{Anwenden}.
+\item Klicken Sie \menu{Neue Datenquelle}. Ein neuer Eintrag erscheint. Ändern Sie den Namen zu \emph{Bibliography}.
+\item Andern Sie den \menu{Dateityp} zu \menu{Tabelle}. Klicken Sie den \menu{\ldots}-Button in der Zeile \menu{Datenquellen URL}. Wählen Sie die \texttt{.sxc}-Datei, die Sie exportiert haben.
+\item Klicken Sie auf \menu{OK}, um das Fenster \menu{Datenquellen} zu schließen.
+\end{itemize}
+Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}.
+Ihre Datenbank sollte nun angezeigt werden.
+
+\subsubsection{Klartext-Import}
 
 \begin{quote}
 \emph{Sie können aus einfachen Text-Dateien oder der Zwischenablage
@@ -1331,7 +1366,7 @@ befinden, verlinken. Ebenso ist es möglich, Dateien im Internet über
 ein URL oder DOI zu verlinken.
 
 
-\subsubsection*{Externe Betrachter einrichten}
+\subsubsection{Externe Betrachter einrichten}
 
 \jabref{} benötigt Informationen darüber, welche Programme es für
 PDF- und PS-Dateien und Internetseiten benutzen soll. In der Standardeinstellung
@@ -1345,7 +1380,7 @@ Sie den Unterpunkt \menu{Externe Programme} im Dialog \menu{Optionen}}
 \msep{} \emph{\menu{Einstellungen}.}
 \end{quote}
 
-\subsubsection*{Externe Dateien oder Links öffnen}
+\subsubsection{Externe Dateien oder Links öffnen}
 
 Es gibt verschiedene Möglichkeiten, wie man externe Dateien oder Internetseiten
 aus \jabref{} öffnen kann. Im Eintrags-Editor können Sie einfach
@@ -1366,7 +1401,7 @@ PDF, wenn beide vorhanden sind), die dritte Spalte zeigt Icons für
 URL oder DOI (nur URL, wenn beide vorhanden sind).
 
 
-\subsubsection*{Der Standard-Ordner für PDF-Dateien}
+\subsubsection{Der Standard-Ordner für PDF-Dateien}
 
 PDF-Dateien erhalten von \jabref{} eine >>Spezialbehandlung<<,
 um das Verlinken mit den entsprechenden Einträgen so einfach wie möglich
@@ -1396,7 +1431,7 @@ nicht angezeigt wird, solange das PDF-Feld leer bleibt.
 \subsection[JabRef und Online-Datenbanken]{\jabref{} und Online-Datenbanken}
 
 
-\subsubsection*{CiteSeer}
+\subsubsection{CiteSeer}
 
 \label{CiteSeerHelp}\jabref{} kann Informationen über eine bestimmte
 Literaturangabe aus der CiteSeer-Datenbank herunterladen. Um diesen
@@ -1435,7 +1470,7 @@ ich deshalb dankbar.%
 }
 
 
-\subsubsection*{Medline}
+\subsubsection{Medline}
 
 \begin{quote}
 \label{MedlineHelp}\jabref{} kann Literaturangaben von der Medline-Datenbank
@@ -1462,7 +1497,7 @@ Die abgerufenen Einträge werden Ihrer zu diesem Zeitpunkt aktivierten
 Datei zugeordnet.
 
 
-\subsubsection*{Benutzung eines Proxy-Servers}
+\subsubsection{Benutzung eines Proxy-Servers}
 
 Wenn Sie einen HTTP-Proxy-Server benutzen müssen, übergeben Sie den
 Servernamen und die Portnummer an Java. Diese Umgebungseinstellungen
@@ -1482,7 +1517,7 @@ ein Netzwerk~-- bearbeitet wird. Das sind vor allem die Felder \emph{owner}
 und \emph{timestamp}.
 
 
-\subsubsection*{Zeitstempel \emph{(timestamp)}}
+\subsubsection{Zeitstempel \emph{(timestamp)}}
 
 \begin{quote}
 \label{TimeStampHelp}\emph{Die Benutzung des Zeitstempels kann unter
@@ -1515,7 +1550,7 @@ werden. Hier einige Beispiele:
 \texttt{yyyy.MM.dd~HH:mm} $\to$ 2005.09.14 17:45
 \end{quote}
 
-\subsubsection*{Besitzer \emph{(owner)}}
+\subsubsection{Besitzer \emph{(owner)}}
 
 \label{OwnerHelp}\jabref{} kann allen neuen Einträgen, die zu einer
 Datei hinzugefügt oder in sie importiert werden, Ihren Benutzernamen
@@ -1554,7 +1589,7 @@ dass der Dateiname als Argument der Option \texttt{-n} interpretiert
 wird.
 
 
-\subsubsection*{Kommandozeilen-Optionen}
+\subsubsection{Kommandozeilen-Optionen}
 
 Im folgenden werden die wichtigsten Optionen und Befehle für die Kommandozeile
 vorgestellt.
@@ -1659,8 +1694,9 @@ ist, auch nicht in die neue Datei geschrieben werden kann.
 
 \end{itemize}
 
+\clearpage 
 \section{Anpassung}
-
+\secttoc
 
 \subsection{Eintragstypen}
 
@@ -1681,7 +1717,7 @@ Wenn Sie \menu{Abbrechen} anklicken oder einfach den Dialog schließen,
 gehen die bislang nicht übernommenen Änderungen verloren.
 
 
-\subsubsection*{Der Dialog \menu{Eintragstypen anpassen}}
+\subsubsection{Der Dialog \menu{Eintragstypen anpassen}}
 
 Der Dialog \menu{Eintragstypen anpassen} ist in drei Hauptbereiche
 unterteilt. Im linken Bereich können Sie den Eintragstyp auswählen,
@@ -1691,7 +1727,7 @@ Eintragstyps vorgenommen und im rechten Bereich diejenigen der optionalen
 Felder.
 
 
-\subsubsection*{Eintragstypen hinzufügen und löschen}
+\subsubsection{Eintragstypen hinzufügen und löschen}
 
 Die derzeit verfügbaren Eintragstypen werden im linken Bereich des
 Dialogfensters aufgelistet. Wenn Sie einen Eintragstyp auswählen,
@@ -1713,7 +1749,7 @@ ihn aus und drücken auf \menu{Standard}. Dieser Vorgang ist nur für
 Standard-Typen verfügbar, die bearbeitet wurden.
 
 
-\subsubsection*{Eintragstypen bearbeiten}
+\subsubsection{Eintragstypen bearbeiten}
 
 Wenn ein Eintragstyp ausgewählt ist, werden die derzeitigen benötigten
 und optionalen Felder im mittleren und rechten Bereich des Dialogfensters
@@ -1800,7 +1836,7 @@ Teil aus einem Feld extrahieren. Sie werden unten aufgelistet. Natürlich
 können Sie auch neue spezielle Feldmarken vorschlagen.
 
 
-\subsubsection*{Spezielle Feldmarken}
+\subsubsection{Spezielle Feldmarken}
 
 \begin{labeling}{veryveryveryshorttitle}
 \item [\texttt{{[}auth{]}}]Der Nachname des ersten Autors.
@@ -1821,6 +1857,11 @@ und \texttt{.ea}, falls es mehr als zwei Autoren sind.
 Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein
 Autor vorhanden ist. Ein Plus (+) wird angehängt, falls es mehr als
 drei Autoren gibt.
+\end{labeling}
+
+\tip[Anmerkung:]{Falls es keinen Autor gibt (z.\,B. bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth...{]}}-Feldmarken den oder die Herausgeber, die im editor-Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label-Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author-Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B.: \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
+
+\begin{labeling}{veryveryveryshorttitle}
 \item [\texttt{{[}edtr{]}}]Der Nachname des ersten Herausgebers.
 \item [\texttt{{[}editors{]}}]Die Nachnamen aller Herausgeber.
 \item [\texttt{{[}edtrIniN{]}}]Der Anfang des Nachnamens von jedem Herausgeber,
@@ -1882,6 +1923,10 @@ Waßenhoven~$\to$~Wassenhoven
 \textrm{usw.}
 \end{lyxcode}
 
+\subsubsection{Ersetzen eines Regulären Ausdrucks}
+
+Nachdem das Key-Muster angewendet wurde, um einen Bib\TeX{}-Key zu erstellen, können Sie den Key-Generator nach einem bestimmten Regulären Ausdruck suchen und ihn durch eine Zeichenfolge ersetzen lassen. Der Reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key-Muster eingegeben. Falls das Feld zur Ersetzung des Regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden Regulären Ausdrücke einfach gelöscht.
+
 \subsection{Erscheinungsbild}
 
 \begin{comment}
@@ -1921,7 +1966,7 @@ Dateien festlegen. Ihre Layout-Datei müssen Sie in einem separaten
 Texteditor erstellen.
 
 
-\subsubsection*{Hinzufügen eines Exportfilters}
+\subsubsection{Hinzufügen eines Exportfilters}
 
 Die einzige Voraussetzung für einen Exportfilter ist, daß eine Datei
 mit der Endung \texttt{.layout} vorhanden ist. Um einen neuen, eigenen
@@ -1935,7 +1980,7 @@ den Exportfilter benutzen, wird diese Endung im Datei-Dialog automatisch
 vorgeschlagen.
 
 
-\subsubsection*{Das Erstellen des Exportfilters}
+\subsubsection{Das Erstellen des Exportfilters}
 
 Um einen Eindruck zu bekommen, wie Exportfilter auszusehen haben,
 suchen Sie am besten auf unserer Homepage nach dem Paket, das die
@@ -1991,7 +2036,7 @@ Typs genutzt werden. Achten Sie darauf, dass die Standard-Layout-Datei
 so allgemein gehalten wird, dass sie die meisten Eintragstypen abdeckt.
 
 
-\paragraph*{Das Format der Layout-Datei}
+\paragraph{Das Format der Layout-Datei}
 
 Layout-Dateien werden mit einem einfachen markup-Format erstellt,
 bei dem die Kommandos mit einem >>backslash<< (\texttt{\textbackslash{}})
@@ -1999,7 +2044,7 @@ eingeleitet werden. Alle Textbestandteile, die nicht als Kommando
 identifiziert werden, gelangen direkt in die Ausgabedatei.
 
 
-\paragraph*{Feldkommandos}
+\paragraph{Feldkommandos}
 
 Ein beliebiges Wort, vor dem ein backslash steht, z.\,B. \texttt{\textbackslash{}author},
 \texttt{\textbackslash{}editor,} \texttt{\textbackslash{}title} oder
@@ -2007,7 +2052,7 @@ Ein beliebiges Wort, vor dem ein backslash steht, z.\,B. \texttt{\textbackslash{
 Feld ausgewertet, das dann direkt in die Ausgabe kopiert wird.
 
 
-\paragraph*{Feldformatierer}
+\paragraph{Feldformatierer}
 
 Oft muss der Feldinhalt vor der Ausgabe verarbeitet werden. Dies wird
 mit Hilfe eines \emph{Feldformatierers} gemacht~-- einer java class,
@@ -2076,7 +2121,7 @@ muss der Formatierer in ihrem classpath sein, wenn Sie \jabref{}
 starten.
 
 
-\paragraph*{Bedingte Ausgabe}
+\paragraph{Bedingte Ausgabe}
 
 Manche statische Ausgabe macht nur Sinn, wenn ein bestimmtes Feld
 nicht leer ist. Wenn wir z.\,B. hinter den Namen der Editoren den
@@ -2109,7 +2154,7 @@ leer ist.
 die mit einer Vielzahl von Eintragstypen umgehen können.}
 
 
-\paragraph*{Gruppierte Ausgabe}
+\paragraph{Gruppierte Ausgabe}
 
 Wenn Sie Ihre Einträge auf der Basis eines bestimmten Feldes gruppieren
 wollen, benutzen Sie die Kommandos für die gruppierte Ausgabe. Die
@@ -2131,7 +2176,7 @@ New~Category:~\textbackslash{}format{[}HTMLChars{]}\{\textbackslash{}keywords\}
 \textbackslash{}endgroup\{keywords\}
 \end{lyxcode}
 
-\subsubsection*{Teilen Sie Ihre Arbeit mit anderen}
+\subsubsection{Teilen Sie Ihre Arbeit mit anderen}
 
 Mit externen Layout-Dateien ist es einfach, Ihre eigenen Export-Formate
 mit anderen Anwendern gemeinsam zu benutzen. Falls Sie einen Exportfilter
@@ -2144,9 +2189,12 @@ zu können oder die Standard-Export-Filter und Standard-Formatierer
 zu erweitern.
 
 
+\clearpage 
 \section{Externe Importfilter}
+\secttoc
+\bigskip
 
-\jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
+\noindent \jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
 zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java
 \emph{Klassen}, die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
 und daraus Bib\TeX{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
@@ -2156,7 +2204,7 @@ mit Grundkenntnissen der Java-Programmierung eigene Importer für für Sie wichtig
 erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref{} neu zu
 kompilieren.
 
-\paragraph*{Vorrangsregeln}
+\paragraph{Vorrangsregeln}
 
 Externe Importfilter haben Vorrang vor Standard-Importern. So können Sie mit Ihren Importern
 die existierenden in der automatischen Formaterkennung und an der Kommandozeile in \jabref{} überschreiben.
@@ -2205,7 +2253,7 @@ Angenommen, wir wollen Dateien der folgenden Form importieren:
 2004;ROBERT HUNT AND JAMES BESSEN;The Software Patent Experiment
 \end{lyxcode}
 
-\paragraph*{SimpleCsvImporter Erstellen}
+\paragraph{SimpleCsvImporter Erstellen}
 
 Erzeugen Sie in einem Text-Editor eine von \texttt{ImportFormat} abgeleitete Klasse,
 die die Methoden \texttt{getFormatName()}, 
@@ -2285,7 +2333,7 @@ public class SimpleCsvImporter extends ImportFormat {
 }
 \end{lyxcode}
 
-\paragraph*{SimpleCsvImporter übersetzen}
+\paragraph{SimpleCsvImporter übersetzen}
 
 Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, Sie haben
 sie unter \texttt{/meinpfad/SimpleCsvImporter.java} gespeichert. Nehmen wir weiter an,
@@ -2297,7 +2345,7 @@ javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
 \end{lyxcode}
 Nun sollte dort auch eine Datei \texttt{/mypath/SimpleCsvImporter.class} liegen.
 
-\paragraph*{SimpleCsvImporter registrieren}
+\paragraph{SimpleCsvImporter registrieren}
 
 Öffnen Sie in \jabref{} \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
 auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und 
@@ -2317,6 +2365,7 @@ Seite zu veröffentlichen. Wir bieten gerne eine Sammlung eingereichter Importfil
 fügen sie unserer Auswahl an Standard-Importfiltern hinzu.
 
 
+\clearpage 
 \section{Tastenkürzel}
 
 Die Menüs können alle über Tastenkürzel angesteuert werden, die meisten
@@ -2468,9 +2517,12 @@ F1\tabularnewline
 \end{longtable}
 
 
+\clearpage 
 \section{Entwicklung}
+\secttoc
+\bigskip
 
-\jabref{} ist ein \emph{Open Source} Projekt, das heißt, dass jede(r)
+\noindent \jabref{} ist ein \emph{Open Source} Projekt, das heißt, dass jede(r)
 dazu beitragen kann, das Programm zu verbessern und weiterzuentwickeln.
 Wenn Sie Anregungen, Wünsche oder Fragen haben, ist die erste Anlaufstelle
 die \href{http://sourceforge.net/projects/jabref/}{Projektseite bei \emph{Sourceforge}}.
@@ -2524,18 +2576,18 @@ geht an Samin Muhammad Ridwanul Karim und Stefan Robert.
 \jabref{} ist frei verfügbar unter den Bedingungen der \href{http://www.gnu.org/copyleft/gpl.html}{GNU Public License}.
 
 
-\subsubsection*{Benutzte Fremdsoftware}
+\subsubsection{Benutzte Fremdsoftware}
 
 \jabref{} benutzt JGoodies Looks 1.2.2 und JGoodiesForms 1.0.4, das
 von \href{http://www.jgoodies.com}{JGoodies} unter den Bedingungen
 der \href{http://www.opensource.org/licenses/bsd-license.html}{BSD License}
-vertrieben wird. Kommandozeilenbefehle werden geparst mit \href{http://ritopt.sourceforge.net}{RitOpt},
+vertrieben wird. Außerdem werden zwei zustätzliche Klassen (SimpleInternalFrame and UIFSplitPane) von Karsten Lentzsch benutzt. Kommandozeilenbefehle werden geparst mit \href{http://ritopt.sourceforge.net}{RitOpt},
 das unter den Bedingungen der GNU Public License (Version 2) verfügbar
 ist. \jabref{} verwendet für die Suche den ANTLR Parser Generator.
 ANTLR ist \emph{public domain software}~-- siehe \href{http://www.antlr.org/license.html}{http://www.antlr.org/license.html}
-für die Lizenzbedingungen. \jabref{} benutzt außerdem die \emph{threading
-library} Spin 1.3.1, die unter den Bedingungen der \href{http://www.opensource.org/licenses/lgpl-license.php}{LGPL}
-(Lesser GNU Public License) vertrieben wird. Das hier beschriebene
+für die Lizenzbedingungen. Für die Darstellung und Filterung der Tabelle benutzt \jabref{} die \href{http://publicobject.com/glazedlists}{Glazed Lists library}, die unter den Bedingungen der \href{http://www.opensource.org/licenses/lgpl-license.php}{LGPL}
+(Lesser GNU Public License) vertrieben wird. \jabref{} benutzt darüber hinaus die \emph{threading
+library} Spin 1.3.1, die unter den Bedingungen der \href{http://www.opensource.org/licenses/lgpl-license.php}{LGPL} vertrieben wird. Das hier beschriebene
 Produkt beinhaltet Software, die von der \href{http://www.apache.org}{Apache Software Foundation}
 entwickelt wurde. Die Bibliotheken \emph{Commons Logging} und \emph{Commons
 HTTP Client} werden von \href{http://jakarta.apache.org}{The Jakarta Project}
@@ -2562,16 +2614,19 @@ Möglicherweise ans Ende eine FAQ anschließen
 
 
 \newpage
-\section*{Versionsgeschichte}
+\addsec{Versionsgeschichte}
 
 \label{RevisionHistory}
 
-\subsection*{Version 0.3 (zu \jabref{} 2.0, Stand: 13.\,1.\,2006)}
+\subsection*{30.\,1.\,2006}
 \begin{revhist}
+\item Abschnitt >>\jabref{}-Bibliographien in OpenOffice.org benutzen<< aktualisiert
+\item Abschnitt zur Erzeugung der Bib\TeX{}-Keys aktualisiert
 \item Neues Kapitel (>>Externe Importfilter<<), geschrieben von Andreas Rudert
+\item Einige kleinere Änderungen
 \end{revhist}
 
-\subsection*{Version 0.2 (6.\,12.\,2005)}
+\subsection*{6.\,12.\,2005}
 %\renewcommand{\labelitemi}{}
 
 \begin{revhist}
@@ -2580,7 +2635,7 @@ Möglicherweise ans Ende eine FAQ anschließen
 \item mehrere kleinere Änderungen
 \end{revhist}
 
-\subsubsection*{Version 0.1 (16.\,11.\,2005)}
+\subsection*{16.\,11.\,2005}
 \begin{revhist}
 \item Erstentwurf von Dominik Waßenhoven, basierend
 auf dem unveröffentlichten englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
