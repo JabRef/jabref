@@ -126,7 +126,7 @@ public class EntryEditorTab {
 	    con.weightx = 0;
 	    con.fill = GridBagConstraints.HORIZONTAL;
 	    con.anchor = GridBagConstraints.SOUTHWEST;
-	    FieldTextField tf = new FieldTextField(Globals.KEY_FIELD, (String) parent.entry.getField(Globals.KEY_FIELD), true);//(String) entry.getField(Globals.KEY_FIELD));
+	    FieldTextField tf = new FieldTextField(Globals.KEY_FIELD, (String) parent.getEntry().getField(Globals.KEY_FIELD), true);
         editors.put("bibtexkey", tf);
 
         // If the key field is the only field, we should have only one editor, and this one should be set
@@ -171,7 +171,7 @@ public class EntryEditorTab {
 
     public void updateAll() {
         // Test: make sure all fields are correct:
-        setEntry(parent.entry);
+        setEntry(parent.getEntry());
         /*for (int i=0; i<fields.length; i++) {
             FieldEditor fe = (FieldEditor)editors.get(fields[i]);
             fe.setText(e);

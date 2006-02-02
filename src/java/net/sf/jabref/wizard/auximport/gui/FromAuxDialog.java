@@ -316,7 +316,7 @@ public class FromAuxDialog
     public void actionPerformed( ActionEvent e )
     {
       String chosen = null ;
-      chosen = Globals.getNewFile( _frame, null, new File( comp.getText() ),
+      chosen = Globals.getNewFile( _frame, Globals.prefs, new File( comp.getText() ),
                                    ".aux",
                                    JFileChooser.OPEN_DIALOG, false ) ;
       if ( chosen != null )

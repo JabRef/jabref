@@ -12,6 +12,7 @@ import javax.swing.table.TableColumnModel;
 
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.EventSelectionModel;
@@ -19,6 +20,8 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.EventTableModel;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.util.Comparator;
 
 /**
@@ -73,7 +76,9 @@ public class MainTable extends JTable {
         pane = new JScrollPane(this);
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
         setGridColor(Globals.prefs.getColor("gridColor"));
-        comparatorChooser = new MyTableComparatorChooser(this, sortedForTable, true);
+        comparatorChooser = new MyTableComparatorChooser(this, sortedForTable,
+                TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+
         final EventList selected = getSelected();
 
         // enable DnD
@@ -87,8 +92,12 @@ public class MainTable extends JTable {
     }
 
     public void refreshSorting() {
+        sortedForSearch.getReadWriteLock().writeLock().lock();
         sortedForSearch.setComparator(searchComparator);
+        sortedForSearch.getReadWriteLock().writeLock().unlock();
+        sortedForGrouping.getReadWriteLock().writeLock().lock();
         sortedForGrouping.setComparator(groupComparator);
+        sortedForGrouping.getReadWriteLock().writeLock().unlock();
     }
 
     /**
@@ -171,9 +180,7 @@ public class MainTable extends JTable {
             } else renderer = grayedOutRenderer;
         }
         
-        else if (tableColorCodes) {
-
-        if (column == 0) {
+        else if (column == 0) {
             // Return a renderer with red background if the entry is incomplete.
             if (!isComplete(row)) {
                 incRenderer.setNumber(row);
@@ -186,13 +193,15 @@ public class MainTable extends JTable {
                 } else
                     renderer = compRenderer;
             }
-        } else if (status == EntryTableModel.REQUIRED)
-            renderer = reqRenderer;
-        else if (status == EntryTableModel.OPTIONAL)
-            renderer = optRenderer;
-        else if (status == EntryTableModel.BOOLEAN)
-            renderer = getDefaultRenderer(Boolean.class);
-    }
+        }
+        else if (tableColorCodes) {
+            if (status == EntryTableModel.REQUIRED)
+                renderer = reqRenderer;
+            else if (status == EntryTableModel.OPTIONAL)
+                renderer = optRenderer;
+            else if (status == EntryTableModel.BOOLEAN)
+                renderer = getDefaultRenderer(Boolean.class);
+        }
 
         // For MARKED feature:
         if ((column != 0) && isMarked(row)) {
@@ -263,12 +272,14 @@ public class MainTable extends JTable {
         boolean[] sortDirections = new boolean[] {Globals.prefs.getBoolean("priDescending"),
             Globals.prefs.getBoolean("secDescending"), Globals.prefs.getBoolean("terDescending")}; // descending
 
+        sortedForTable.getReadWriteLock().writeLock().lock();
         for (int i=0; i<sortFields.length; i++) {
             int index = tableFormat.getColumnIndex(sortFields[i]);
             if (index >= 0) {
                 comparatorChooser.appendComparator(index, 0, sortDirections[i]);
             }
         }
+        sortedForTable.getReadWriteLock().writeLock().unlock();
 
     }
 
@@ -295,6 +306,7 @@ public class MainTable extends JTable {
     }
 
     public int findEntry(BibtexEntry entry) {
+        //System.out.println(sortedForGrouping.indexOf(entry));
         return sortedForGrouping.indexOf(entry);
     }
 
@@ -463,13 +475,23 @@ public class MainTable extends JTable {
     }
 
     class MyTableComparatorChooser extends TableComparatorChooser {
-        public MyTableComparatorChooser(JTable table, SortedList list, boolean multiple) {
-            super(table, list, multiple);
+        public MyTableComparatorChooser(JTable table, SortedList list,
+                                        Object sortingStrategy) {
+            super(table, list, sortingStrategy);
+            // We need to reset the stack of sorted list each time sorting order
+            // changes, or the sorting breaks down:
+            addSortActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    //System.out.println("...");
+                    refreshSorting();
+                }
+            });
         }
-
+/*
         protected void columnClicked(int i, int i1) {
+
             super.columnClicked(i, i1);
             refreshSorting();
-        }
+        }*/
     }
 }

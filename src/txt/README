@@ -1,6 +1,6 @@
 
-JabRef 2.0 beta 2
------------------
+JabRef 2.0.1
+------------
 
 
 Introduction:
@@ -80,7 +80,21 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.0b2   - Changed field order in OpenDocument export to comply with bibliography requirement.
+2.0.1:	- Fixed bug that made a hidden entry editor under some circumstances store a
+	  field value to the wrong entry.
+	- Fixed synchronization bug that made the opening of a new database sometimes fail.
+	- Fixed bug in setting external journal lists when no personal list is set.
+2.0:    - Changed sorting selection interface for main table for more intuitive
+          operation.
+        - Made import operation update "working directory".
+        - Removed hard-coded author/editor name rearrangement in OpenOffice and
+          OpenDocument exports.
+        - Fixed hangup when parsing RIS files from Nature.
+        - Fixed NullPointerException when generating database from AUX file on Mac OS X.
+        - Fixed bug in routine for adding braces around capital letters.
+        - Fixed bug in switching preview layouts.
+        - Fixed bug in link handling in entry preview.
+2.0b2:  - Changed field order in OpenDocument export to comply with bibliography requirement.
         - Added support for inserting citations into Emacs using gnuserv/gnuclient.
         - Added option to set a regular expression replace operation on generated bibtex keys.
         - Added support for custom importers inside a jar file.

@@ -47,6 +47,7 @@ import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.gui.MainTableSelectionListener;
 
+import java.text.*;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
   /*
@@ -57,7 +58,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
 
   // A reference to the entry this object works on.
-  public BibtexEntry entry;
+  private BibtexEntry entry;
   BibtexEntryType type;
   CloseAction closeAction;
 
@@ -193,22 +194,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
         tabs.add(newTab);
     }
-    /*
-     if ((entry.getGeneralFields() != null) && (entry.getGeneralFields().length >= 1)) {
-	    
-         genPan = new EntryEditorTab(java.util.Arrays.asList(entry.getGeneralFields()), this, false);
-	    
-         tabbed.addTab(Globals.lang("General fields"),
-               new ImageIcon(GUIGlobals.showGenIconFile), genPan.getPane(),
-               Globals.lang("Show general fields"));
-         tabs.add(genPan);
-     }
-	
-     String[] absFields = new String[] {"abstract", "annote"};
-     absPan = new EntryEditorTab(java.util.Arrays.asList(absFields), this, false);
-     tabbed.addTab("Abstract", new ImageIcon(GUIGlobals.showAbsIconFile),
-               absPan.getPane(), Globals.lang("Show abstract"));
-               tabs.add(absPan);*/
+
     srcPanel.setName(Globals.lang("BibTeX source"));
     if (Globals.prefs.getBoolean("showSource")) {
         tabbed.addTab(Globals.lang("BibTeX source"),
@@ -329,7 +315,21 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     //if (o == null)
     //  return null;
     String s = (String) o;
-
+    //addedByMoritz
+      if (fieldName.equals(Globals.prefs.get("timeStampField"))){
+    //if (fieldName.equals("dateadded")){
+        ((JTextArea) ed).addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount()==2){
+                    String date = Util.easyDateFormat();
+                    ed.setText(date);
+                    //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    //ed.setText(df.format(new Date()));
+                }
+            }
+        });
+    }
+    //END_OF addedByMoritz
     if ((s != null) && s.equals("external")) {
 
       // Add external viewer listener for "pdf" and "url" fields.
@@ -575,33 +575,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   }
 
   /**
-   * Switches the entry for this editor to the one with the given id. If the
-   * target entry is of the same type as the current, field values are simply
-   * updated. Otherwise, a new editor created to replace this one.
-   *
-   * @param id
-   *          a <code>String</code> value
-   */
-  private void switchTo(String id) {
-    // Make sure the current edit is stored.
-
-    Object activeTab = tabs.get(tabbed.getSelectedIndex());
-    if (activeTab instanceof EntryEditorTab) {
-        updateField(((EntryEditorTab)activeTab).getActive());
+    * Makes sure the current edit is stored.
+    */
+    public void storeCurrentEdit() {
+        Component comp = Globals.focusListener.getFocused();
+        if ((comp instanceof FieldEditor) && this.isAncestorOf(comp)) {
+            storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
+        }
     }
 
-    BibtexEntry be = panel.database.getEntryById(id);
-
-    // If the entry we are switching to is of the same type as
-    // this one, we can make the switch more elegant by keeping this
-    // same dialog, and updating it.
-    if (entry.getType() == be.getType())
-      switchTo(be);
-    else {
-      panel.showEntry(be);
-      panel.moveFocusToEntryEditor();
-    }
-  }
 
   /**
    * Returns the index of the active (visible) panel.
@@ -645,13 +627,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * @param be
    *          a <code>BibtexEntry</code> value
    */
-  public void switchTo(BibtexEntry be) {
-    entry = be;
-    updateAllFields();
-    validateAllFields();
-    updateSource();
-    panel.showing = be;
-}
+  public synchronized void switchTo(BibtexEntry be) {
+      if (entry == be)
+        return;
+
+        //Util.pr("EntryEditor.switchTo(BibtexEntry): "+entry.getCiteKey());
+        //Util.pr("::EntryEditor.switchTo(BibtexEntry): "+this.type.getName());
+      storeCurrentEdit();
+         entry = be;
+        updateAllFields();
+        validateAllFields();
+        updateSource();
+        panel.showing = be;
+
+    }
 
   /**
    * Returns false if the contents of the source panel has not been validated,
@@ -670,7 +659,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    * sourceIndex) return storeSource(); else return true; }
    */
   public boolean storeSource(boolean showError) {
-    //Util.pr("StoreSource");
     // Store edited bibtex code.
     BibtexParser bp = new BibtexParser(new java.io.StringReader(source.getText()));
 
@@ -801,16 +789,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   }
 
-
-    /**
-     * Makes sure the current edit is stored.
-     */
-    public void storeCurrentEdit() {
-        Component comp = Globals.focusListener.getFocused();
-        if (comp instanceof FieldEditor) {
-            storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
-        }
-    }
 
   /**
    * Sets all the text areas according to the shown entry.
@@ -999,11 +977,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        //Util.pr("EntryEditor.StoreFieldAction: "+entry.getCiteKey());
+        //Util.pr("..EntryEditor.StoreFieldAction: "+this.toString());
+
       if (e.getSource() instanceof FieldTextArea) {
         String toSet = null;
         FieldEditor fe = (FieldEditor) e.getSource();
         boolean set;
-
+          //Util.pr("....EntryEditor.StoreFieldAction: "+fe.getFieldName());
+        //Util.pr("...."+fe.getText()+"....");
         // Trim the whitespace off this value
         fe.setText(fe.getText().trim());
 
@@ -1131,7 +1113,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if (accepted) {
         }
       }
-
     }
   }
 
@@ -1212,7 +1193,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
       scrollTo(newRow);
       panel.mainTable.setRowSelectionInterval(newRow, newRow);
-      
+
     }
   }
 
@@ -1239,7 +1220,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
 
         //entry = frame.labelMaker.applyRule(entry, panel.database) ;
-        entry = LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
+        LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
 
         // Store undo information:
         panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
@@ -1348,7 +1329,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   /**
    * Scans all groups.
    * @return true if the specified entry is contained in any ExplicitGroup,
-   * false otherwise. 
+   * false otherwise.
    */
   private boolean containedInExplicitGroup(BibtexEntry entry) {
       AbstractGroup[] matchingGroups = panel.getGroupSelector().getGroupTreeRoot().

@@ -47,7 +47,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
     		frame.block();
     		frame.output(Globals.lang("Importing file")+": '"+filename+"'");
     		fileOk = true;
-	    }
+            Globals.prefs.put("workingDirectory", filename);
+        }
 	    
 	}
 	public void run() {

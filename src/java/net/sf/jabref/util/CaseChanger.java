@@ -37,7 +37,8 @@ public class CaseChanger{
     /** First letter of each word uppercase */
     public final static int UPPER_EACH_FIRST=3;
     private final static Matcher UF_MATCHER =
-            Pattern.compile("(?i)\\b\\w").matcher("");
+            //Pattern.compile("(?i)\\b\\w").matcher("");
+        Pattern.compile("\\b\\w").matcher("");
 
     /* you can add more modes here */
     private final static int numModes=4;

@@ -279,8 +279,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
         builder.nextLine();
         builder.append(pan);
-        builder.append(Globals.lang("Replace (regular expression)"));
-        builder.append(Globals.lang("by"));
+        builder.append(Globals.lang("Replace (regular expression)")+":");
+        builder.append(Globals.lang("by")+":");
 
         builder.nextLine();
         builder.append(pan);

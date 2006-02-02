@@ -38,7 +38,7 @@ public class RemoveFromGroupAction extends AbstractAction {
         m_panel = panel;
     }
     public RemoveFromGroupAction() {
-        super("Remove entry selection from this group"); // JZTODO lyrics
+        super(Globals.lang("Remove entry selection from this group")); // JZTODO lyrics
     }
     public void setNode(GroupTreeNode node) {
         m_node = node;

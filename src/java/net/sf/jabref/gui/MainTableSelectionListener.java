@@ -88,7 +88,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {
-                    updatePreview(toShow);
+                    updatePreview(toShow, false);
                 }
 
             }
@@ -96,7 +96,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
 
     }
 
-    private void updatePreview(final BibtexEntry toShow) {
+    private void updatePreview(final BibtexEntry toShow, final boolean changedPreview) {
         if (workingOnPreview)
             return;
         final int mode = panel.getMode();
@@ -104,7 +104,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         final Runnable update = new Runnable() {
             public void run() {
                 // If nothing was already shown, set the preview and move the separator:
-                if (mode == BasePanel.SHOWING_NOTHING) {
+                if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
                     panel.showPreview(preview);
                     panel.adjustSplitter();
                 }
@@ -246,8 +246,8 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         if (!previewActive) {
             panel.hideBottomComponent();
         } else {
-            if (tableRows.size() == 1) {
-                updatePreview((BibtexEntry) tableRows.get(0));
+            if (table.getSelected().size() > 0 ) {
+                updatePreview((BibtexEntry) table.getSelected().get(0), false);
             }
         }
     }
@@ -257,10 +257,11 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             activePreview++;
         else
             activePreview = 0;
-
         if (previewActive) {
-            if (tableRows.size() == 1) {
-                updatePreview((BibtexEntry) tableRows.get(0));
+            this.preview = previewPanel[activePreview];
+
+            if (table.getSelected().size() > 0) {
+                updatePreview((BibtexEntry) table.getSelected().get(0), true);
             }
         }
     }

@@ -199,8 +199,8 @@ public class Globals {
     }
     catch (MissingResourceException ex) {
       translation = key;
-      logger("Warning: could not get translation for \""
-                         + key + "\"");
+      //logger("Warning: could not get translation for \""
+      //                   + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
       translation = translation.replaceAll("_", " ");
@@ -267,8 +267,8 @@ public class Globals {
     catch (MissingResourceException ex) {
       translation = key;
 
-//      System.err.println("Warning: could not get menu item translation for \""
-//                         + key + "\"");
+      //System.err.println("Warning: could not get menu item translation for \""
+      //                   + key + "\"");
 
     }
     if ((translation != null) && (translation.length() != 0)) {
@@ -431,7 +431,7 @@ public class Globals {
                                    boolean dirOnly) {
 
     if (ON_MAC) {
-      return getNewFileForMac(owner, prefs, directory, extension, dialogType,
+      return getNewFileForMac(owner, directory, extension, dialogType,
                               updateWorkingDirectory, dirOnly, off);
     }
 
@@ -444,7 +444,7 @@ public class Globals {
         // bug in JGoodies Windows PLAF. This clause can be removed if the
         // bug is fixed, but for now we just resort to the native file
         // dialog, using the same method as is always used on Mac:
-        return getNewFileForMac(owner, prefs, directory, extension, dialogType,
+        return getNewFileForMac(owner, directory, extension, dialogType,
                                 updateWorkingDirectory, dirOnly, off);
     }
 
@@ -491,7 +491,7 @@ public class Globals {
     return selectedFile.getAbsolutePath();
   }
 
-  private static String getNewFileForMac(JFrame owner, JabRefPreferences prefs,
+  private static String getNewFileForMac(JFrame owner,
                                          File directory, String extensions,
                                          int dialogType,
                                          boolean updateWorkingDirectory,
@@ -513,7 +513,7 @@ public class Globals {
     fc.show();
 
     if (fc.getFile() != null) {
-      prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
+      Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());
       return fc.getDirectory() + fc.getFile();
     }
     else {

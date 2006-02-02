@@ -74,7 +74,7 @@ public class GroupSelector extends SidePaneComponent implements
             false), select = new JCheckBoxMenuItem(Globals
             .lang("Select matches"), false);
     JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
-    		"Highlight overlapping groups"); // JZTODO lyrics
+    		Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
     ButtonGroup nonHits = new ButtonGroup();

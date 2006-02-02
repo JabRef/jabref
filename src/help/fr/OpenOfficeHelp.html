@@ -3,12 +3,43 @@
 <BODY text="#275856">
 <basefont size="4" color="#2F4958" face="arial">
 
-<H1>Exporter vers OpenOffice.org</H1>
 
-JabRef peut exporter votre base de donn&eacute;es dans le format classeur d'OpenOffice.org.
-Le classeur export&eacute; contiendra une feuille de calcul listant les entr&eacute;es selon les lignes
-et les diff&eacute;rents champs selon les colonnes. Le classeur est compatible avec les fonctions
-bibliographiques d'OpenOffice.org, ce qui signifie que vous pouvez param&eacute;trer le classeur
-export&eacute; comme votre base de donn&eacute;es bibliographique en utilisant <b>Outils -> Sources de donn&eacute;es...</b>
+<H1>Utiliser les bibliographies JabRef dans OpenOffice.org</H1>
+
+JabRef peut exporter votre base de donn&eacute;es dans le format de tableur OpenOffice.org 1.1 <b>.sxc</b> ainsi que dans le format OpenDocument <b>.ods</b> utilis&eacute; par OpenOffice.org 2.0.
+<p>
+Dans les deux cas, la table export&eacute;e contiendra une feuille de calcul, listant les entr&eacute;es selon les lignes et les diff&eacute;rents champs en colonnes. L'ordre et les noms des colonnes sont configur&eacute;s pour &ecirc;tre compatible avec les fonctions bibliographiques d'OpenOffice.org (OOo 1.1 dans le cas d'une exportation au format <b>.sxc</b>, et OOo 2.0 pour une exportation au format <b>.ods</b>).
+
+<h2>Utiliser le fichier export&eacute; comme une base de donn&eacute;es dans OpenOffice 2.0 et sup&eacute;rieur</h2>
+
+Suivez les &eacute;tapes suivantes pour configurer une feuille de calcul export&eacute;e par JabRef comme une base de donn&eacute;es bibliographique dans OpenOffice.org&nbsp;:
+<ul>
+    <li>Exporter votre base en utilisant le format <b>.ods</b></li>
+    <li>D&eacute;marrer OpenOffice.org Writer</li>
+    <li>Choisir <b>Outils -> Options -> OpenOffice.org Base -> Base de donn&eacute;es</b></li>
+    <li>Éditer la base de donn&eacute;es <i>Bibliography</i>, et lui donner un autre nom, tel que
+          <i>Bibliography-old</i></li>
+    <li>Fermer la fen&ecirc;tre <b>Options</b> et choisir <b>Fichier -> Nouveau -> Base de donn&eacute;es</b></li>
+    <li>Choisir <b>Se connecter &agrave; une base de donn&eacute;es existante</b>, s&eacute;lectionner <b>Classeur</b> comme type de base de donn&eacute;es, cliquer sur <b>Suivant</b> et choisir le fichier <b>.ods</b> que vous avez export&eacute;.</li>
+    <li>Cliquer sur <b>Terminer</b>, puis choisir le nom <i>Bibliographie</i> quand demand&eacute;.</li>
+</ul>                                       
+Apr&egrave;s avoir effectu&eacute; ces &eacute;tapes, choisir <b>Outils -> Base de donn&eacute;es bibliographique</b>. Votre base de donn&eacute;es devrait maintenant s'afficher.
+<p>
+
+<h2>Utiliser le fichier export&eacute; comme une base de donn&eacute;es bibliographique dans OpenOffice 1.1.x</h2>
+
+ <ul>
+    <li>Exporter votre base de donn&eacute;es vers le format <b>.sxc</b></li>
+    <li>D&eacute;marrer OpenOffice.org Texte</li>
+    <li>Choisir <b>Outils -> Sources de donn&eacute;es...</b></li>
+    <li>S&eacute;lectionner la base de donn&eacute;es <i>Bibliography</i> et lui donner un autre nom, tel que 
+     <i>Bibliography-old</i>. Cliquer sur <b>Appliquer</b>.</li>
+    <li>Cliquer sur <b>Nouvelle source de donn&eacute;es</b>. Une nouvelle entr&eacute;e appara&icirc;t. La renommer 
+        <i>Bibliography</i>.</li>
+     <li>Changer le <b>type de BD</b> en <b>Classeur</b>. Cliquer le bouton <b>...</b> 
+     au bout de la ligne <b>URL de la source de donn&eacute;es</b>. Choisir le fichier <b>.sxc</b> que vous avez export&eacute;.</li>
+     <li>Cliquer sur <b>OK</b> pour fermer la fen&ecirc;tre <b>Gestion des sources de donn&eacute;es</b>.</li>
+</ul>
+Apr&egrave;s avoir effectu&eacute; ces &eacute;tapes, choisir <b>Outils -> Base de donn&eacute;es bibliographique</b>. Votre base de donn&eacute;es devrait maintenant s'afficher.
 
 </HTML>

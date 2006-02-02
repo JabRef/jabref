@@ -14,10 +14,10 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
     JabRefFrame _frame;
-    private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
-    JTextField pdfDir, psDir, pdf, ps, html, lyx, winEdt;
+    //private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
+    JTextField pdfDir, psDir, pdf, ps, html, lyx, winEdt, citeCommand;
 
-    private HelpAction ownerHelp, pdfHelp;
+    //private HelpAction ownerHelp, pdfHelp;
 
 
     public ExternalTab(JabRefFrame frame, JabRefPreferences prefs) {
@@ -25,8 +25,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _frame = frame;
         setLayout(new BorderLayout());
 
-        pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
-                "Help", GUIGlobals.helpSmallIconFile);
+        //pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
+        //        "Help", GUIGlobals.helpSmallIconFile);
 
         psDir = new JTextField(30);
         pdfDir = new JTextField(30);
@@ -35,7 +35,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         html = new JTextField(30);
         lyx = new JTextField(30);
         winEdt = new JTextField(30);
-
+        citeCommand = new JTextField(30);
         BrowseAction browse;
 
         FormLayout layout = new FormLayout
@@ -107,7 +107,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
         browse = new BrowseAction(winEdt, false);
         builder.append(new JButton(browse));
         builder.nextLine();
-
+        builder.append(pan);
+        builder.append(Globals.lang("Cite command (for Emacs/WinEdt)")+":");
+        builder.append(citeCommand);
         //builder.appendSeparator();
 
         pan = builder.getPanel();
@@ -161,6 +163,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
         lyx.setText(_prefs.get("lyxpipe"));
         winEdt.setText(_prefs.get("winEdtPath"));
+        citeCommand.setText(_prefs.get("citeCommand"));
     }
 
     public void storeSettings() {
@@ -173,6 +176,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         _prefs.put("htmlviewer", html.getText());
         _prefs.put("lyxpipe", lyx.getText());
         _prefs.put("winEdtPath", winEdt.getText());
+        _prefs.put("citeCommand", citeCommand.getText());
     }
 
     public boolean readyToClose() {

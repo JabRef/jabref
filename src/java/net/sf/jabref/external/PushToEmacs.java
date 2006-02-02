@@ -31,7 +31,8 @@ public class PushToEmacs extends BaseAction {
 
         if (numSelected > 0) {
             String keys = panel.getKeysForSelection();
-            StringBuffer command = new StringBuffer("(insert\"\\\\cite{");
+            StringBuffer command = new StringBuffer("(insert\"\\\\")
+                    .append(Globals.prefs.get("citeCommand")).append("{");
             if (keys.length() == 0)
                 panel.output(Globals.lang("Please define BibTeX key first"));
             else {
@@ -65,7 +66,7 @@ public class PushToEmacs extends BaseAction {
                                         Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
                             }
                             else {
-                                Globals.lang("Pushed citations to Emacs");
+                                panel.output(Globals.lang("Pushed citations to Emacs"));
                             }
                         }
                     };

@@ -695,7 +695,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           String winEdt = Globals.prefs.get("winEdtPath");
                           //winEdt = "osascript";
                           try {
-                            StringBuffer toSend = new StringBuffer("\"[InsText('\\cite{");
+                            StringBuffer toSend = new StringBuffer("\"[InsText('\\")
+                              .append(Globals.prefs.get("citeCommand")).append("{");
                             String citeKey = "";//, message = "";
                             boolean first = true;
                             for (Iterator i=entries.iterator(); i.hasNext();) {
@@ -719,6 +720,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               output(Globals.lang("Please define BibTeX key first"));
                             else {
                               toSend.append("}');]\"");
+                              //System.out.println(toSend.toString());
                               Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
                               Globals.lang("Pushed citations to WinEdt");
                                 /*output(
@@ -1257,7 +1259,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       public void action() {
                           boolean enabled = !Globals.prefs.getBoolean("previewEnabled");
                           Globals.prefs.putBoolean("previewEnabled", enabled);
-                          selectionListener.setPreviewActive(enabled);
+                          frame.setPreviewActive(enabled);
                           frame.previewToggle.setSelected(enabled);
                       }
                   });
@@ -1537,7 +1539,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         if (type != null) { // Only if the dialog was not cancelled.
             String id = Util.createNeutralId();
-            BibtexEntry be = new BibtexEntry(id, type);
+            final BibtexEntry be = new BibtexEntry(id, type);
             try {
                 database.insertEntry(be);
 
@@ -1559,8 +1561,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (mode != SHOWING_EDITOR) {
                     mode = WILL_SHOW_EDITOR;
                 }
-                highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
 
+                highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
+                
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));
             } catch (KeyCollisionException ex) {
@@ -2052,9 +2055,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public EntryEditor getEntryEditor(BibtexEntry entry) {
         EntryEditor form;
         if (entryEditors.containsKey(entry.getType().getName())) {
+            EntryEditor visibleNow = currentEditor;
             // We already have an editor for this entry type.
             form = (EntryEditor)entryEditors.get
                 ((entry.getType().getName()));
+
             form.switchTo(entry);
             //if (visName != null)
             //    form.setVisiblePanel(visName);
@@ -2131,6 +2136,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //});
     }
 
+
     /**
      * This method is called from an EntryEditor when it should be closed. We relay
      * to the selection listener, which takes care of the rest.
@@ -2181,10 +2187,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void updateEntryEditorIfShowing() {
         if (mode == SHOWING_EDITOR) {
-            if (currentEditor.getType() != currentEditor.entry.getType()) {
+            if (currentEditor.getType() != currentEditor.getEntry().getType()) {
                 // The entry has changed type, so we must get a new editor.
                 showing = null;
-                EntryEditor newEditor = getEntryEditor(currentEditor.entry);
+                EntryEditor newEditor = getEntryEditor(currentEditor.getEntry());
                 showEntryEditor(newEditor);
             } else {
                 currentEditor.updateAllFields();
@@ -2402,6 +2408,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return (answer == JOptionPane.YES_OPTION);
         } else return true;
 
+    }
+
+    /**
+     * Activates or deactivates the entry preview, depending on the argument.
+     * When deactivating, makes sure that any visible preview is hidden.
+     * @param enabled
+     */
+    public void setPreviewActive(boolean enabled) {
+        selectionListener.setPreviewActive(enabled);
     }
 
 

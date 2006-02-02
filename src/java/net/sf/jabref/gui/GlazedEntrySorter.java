@@ -1,9 +1,9 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.DatabaseChangeListener;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.DatabaseChangeEvent;
+import net.sf.jabref.*;
 import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEventAssembler;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -46,7 +46,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 
     //TreeSet list;
-    BasicEventList list;
+    EventList list;
 
     Comparator comp;
     String[] idArray;
@@ -58,8 +58,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
     public GlazedEntrySorter(Map entries, Comparator comp) {
         //list = new TreeSet(comp);
         list = new BasicEventList();
-
+        //list2 = new SortedList(list, new FieldComparator(Globals.KEY_FIELD));
         this.comp = comp;
+        list.getReadWriteLock().writeLock().lock();
         Set keySet = entries.keySet();
         if (keySet != null) {
             Iterator i = keySet.iterator();
@@ -67,9 +68,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
                 list.add(entries.get(i.next()));
             }
         }
+        list.getReadWriteLock().writeLock().unlock();
     }
 
-    public BasicEventList getTheList() {
+    public EventList getTheList() {
         return list;
     }
 

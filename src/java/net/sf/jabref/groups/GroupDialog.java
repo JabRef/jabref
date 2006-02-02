@@ -202,7 +202,7 @@ class GroupDialog extends JDialog {
 		builderAll.append(m_searchRadioButton, 5);
 		builderAll.nextLine();
 		builderAll.nextLine();
-		builderAll.appendSeparator("Hierarchical Context"); // JZTODO lyrics
+		builderAll.appendSeparator(Globals.lang("Hierarchical context")); // JZTODO lyrics
 		builderAll.nextLine();
 		builderAll.nextLine();
 		builderAll.append(m_independentButton, 5);

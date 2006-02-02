@@ -284,8 +284,8 @@ public class LabelPatternUtil {
                   _sbvalue.append(_entry.getField(val).toString());
 		}
 	    }
-	    catch (Exception ex) {
-		Globals.logger("Key generator warning: field '" + val + "' empty.");
+	    catch (NullPointerException ex) {
+		    //Globals.logger("Key generator warning: field '" + val + "' empty.");
 	    }
 	    // apply modifier if present
         if (parts.length > 1) for (int j=1; j<parts.length; j++) {

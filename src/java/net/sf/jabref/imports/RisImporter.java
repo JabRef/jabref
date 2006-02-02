@@ -82,7 +82,8 @@ public class RisImporter extends ImportFormat {
                 boolean done = false;
                 while (!done && (j < fields.length-1)) {
                     if ((fields[j+1].length() >= 6) && !fields[j+1].substring(2, 6).equals("  - ")) {
-                        if (!Character.isWhitespace(current.charAt(current.length()-1))
+                        if ((current.length() > 0)
+                                && !Character.isWhitespace(current.charAt(current.length()-1))
                                 && !Character.isWhitespace(fields[j+1].charAt(0)))
                             current.append(' ');
                         current.append(fields[j+1]);

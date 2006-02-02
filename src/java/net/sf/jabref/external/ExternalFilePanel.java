@@ -90,7 +90,7 @@ public class ExternalFilePanel extends JPanel {
 
     protected Object getKey() {
         return (entry != null ? entry.getField(Globals.KEY_FIELD) :
-            entryEditor.entry.getField(Globals.KEY_FIELD));
+            entryEditor.getEntry().getField(Globals.KEY_FIELD));
     }
 
     protected void output(String s) {

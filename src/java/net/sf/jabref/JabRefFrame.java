@@ -84,15 +84,17 @@ public class JabRefFrame
 
     JTabbedPane tabbedPane = new JTabbedPane();
   final Insets marg = new Insets(1,0,2,0);
-  class ToolBar extends JToolBar {
-    void addAction(Action a) {
-      JButton b = new JButton(a);
-      b.setText(null);
-      if (!Globals.ON_MAC)
-          b.setMargin(marg);
-      add(b);
+
+
+    class ToolBar extends JToolBar {
+      void addAction(Action a) {
+        JButton b = new JButton(a);
+        b.setText(null);
+        if (!Globals.ON_MAC)
+            b.setMargin(marg);
+        add(b);
+      }
     }
-  }
   ToolBar tlb = new ToolBar();
 
   JMenuBar mb = new JMenuBar();/* {
@@ -266,8 +268,8 @@ public class JabRefFrame
                                         GUIGlobals.genKeyIconFile,
                                         prefs.getKey("Autogenerate BibTeX keys")),
       lyxPushAction = new GeneralAction("pushToLyX",
-                                        "Insert selected citations into LyX",
-                                        "push selection to lyx",
+                                        "Insert selected citations into LyX/Kile",
+                                        "Push selection to LyX/Kile",
                                         GUIGlobals.lyxIconFile,
                                         prefs.getKey("Push to LyX")),
       winEdtPushAction = new GeneralAction("pushToWinEdt",
@@ -310,8 +312,9 @@ public class JabRefFrame
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
-    pushToEmacs = new GeneralAction("pushToEmacs", "Insert selected citations into Emacs",
-            "Push selection to Emacs", Globals.prefs.getKey("Push to Emacs"));
+    emacsPushAction = new GeneralAction("pushToEmacs", "Insert selected citations into Emacs",
+            "Push selection to Emacs", GUIGlobals.emacsIcon,
+            Globals.prefs.getKey("Push to Emacs"));
     //test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -1067,7 +1070,7 @@ public JabRefPreferences prefs() {
     tools.addSeparator();
     tools.add(manageSelectors);
     tools.add(makeKeyAction);
-    tools.add(pushToEmacs);
+    tools.add(emacsPushAction);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
     tools.add(fetchMedline);
@@ -1211,6 +1214,7 @@ public JabRefPreferences prefs() {
     tlb.add(highlightAll);
 
     tlb.addSeparator();
+    tlb.addAction(emacsPushAction);
     tlb.addAction(lyxPushAction);
     tlb.addAction(winEdtPushAction);
     tlb.addAction(openFile);
@@ -1332,6 +1336,7 @@ public JabRefPreferences prefs() {
     toggleGroups.setEnabled(false);
     toggleSearch.setEnabled(false);
     makeKeyAction.setEnabled(false);
+    emacsPushAction.setEnabled(false);
     lyxPushAction.setEnabled(false);
     winEdtPushAction.setEnabled(false);
     normalSearch.setEnabled(false);
@@ -1397,6 +1402,7 @@ public JabRefPreferences prefs() {
     toggleGroups.setEnabled(true);
     toggleSearch.setEnabled(true);
     makeKeyAction.setEnabled(true);
+    emacsPushAction.setEnabled(true);
     lyxPushAction.setEnabled(true);
     winEdtPushAction.setEnabled(true);
     normalSearch.setEnabled(true);
@@ -1926,7 +1932,7 @@ class FetchCiteSeerAction
    * @param openInNew Should the entries be imported into a new database?
    * @param callBack The callback for the ImportInspectionDialog to use.
    */
-  public void addImportedEntries(final BasePanel panel, List entries, String filename, boolean openInNew,
+  public void addImportedEntries(final BasePanel panel, final List entries, String filename, boolean openInNew,
                                   ImportInspectionDialog.CallBack callBack) {
       // Use the import inspection dialog if it is enabled in preferences, and (there are more than
       // one entry or the inspection dialog is also enabled for single entries):
@@ -1944,7 +1950,12 @@ class FetchCiteSeerAction
         } else {
             ths.addBibEntries(entries, filename, openInNew);
           if ((panel != null) && (entries.size() == 1)) {
-              panel.highlightEntry((BibtexEntry)entries.get(0));
+              SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                      panel.highlightEntry((BibtexEntry)entries.get(0));
+                  }
+              });
+
 
           }
        }
@@ -2291,6 +2302,16 @@ class FetchCiteSeerAction
     }
 
   }
+
+    /**
+     * Set the preview active state for all BasePanel instances.
+     * @param enabled
+     */
+    public void setPreviewActive(boolean enabled) {
+        for (int i=0; i<tabbedPane.getTabCount(); i++) {
+            baseAt(i).setPreviewActive(enabled);
+        }
+    }
 
 
    public void removeCachedEntryEditors() {

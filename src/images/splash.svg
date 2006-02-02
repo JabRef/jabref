@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:export-ydpi="90.000000"
+   inkscape:export-xdpi="90.000000"
+   inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash6.png"
+   sodipodi:docname="splash.svg"
+   sodipodi:docbase="/home/alver/jabref_beta/jabref/src/images"
+   inkscape:version="0.42+0.43pre1"
+   sodipodi:version="0.32"
+   id="svg2138"
+   height="1052.3622047"
+   width="744.09448819">
+  <defs
+     id="defs2140">
+    <pattern
+       patternTransform="translate(316.0000,1046.362)"
+       id="pattern9054"
+       xlink:href="#pattern9048"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient5361"
+       inkscape:collect="always">
+      <stop
+         id="stop5363"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop5365"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <marker
+       style="overflow:visible;"
+       id="Arrow2Send"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="Arrow2Send">
+      <path
+         transform="scale(0.3) rotate(180) translate(-5,0)"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+         id="path3046"
+         sodipodi:nodetypes="cccc" />
+    </marker>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="300.91277"
+       x2="491.20592"
+       y1="300.91277"
+       x1="445.01770"
+       id="linearGradient5367"
+       xlink:href="#linearGradient5361"
+       inkscape:collect="always" />
+    <pattern
+       id="pattern9048"
+       patternTransform="translate(231.0000,284.3622)"
+       height="428.00000"
+       width="572.00000"
+       patternUnits="userSpaceOnUse">
+      <image
+         transform="translate(-231.0000,-284.3622)"
+         style="opacity:1.0000000;stroke:#000000;stroke-width:5.0000000;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-opacity:1.0000000"
+         inkscape:export-ydpi="90.000000"
+         inkscape:export-xdpi="90.000000"
+         inkscape:export-filename="/home/alver/Desktop/bilder/jabref/splash4.png"
+         y="284.36218"
+         x="231.00000"
+         xlink:href="behandlet.png"
+         sodipodi:absref="/home/alver/Desktop/bilder/jabref/behandlet.png"
+         width="572.00000"
+         height="428.00000"
+         id="image9050" />
+    </pattern>
+  </defs>
+  <sodipodi:namedview
+     inkscape:window-y="80"
+     inkscape:window-x="8"
+     inkscape:window-height="856"
+     inkscape:window-width="750"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="px"
+     inkscape:cy="698.1925"
+     inkscape:cx="364.52617"
+     inkscape:zoom="1"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata2143">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <rect
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       y="170.36218"
+       x="77.500000"
+       height="432.00000"
+       width="576.00000"
+       id="rect6833"
+       style="opacity:1.0000000;fill:#6b6b75;fill-opacity:1.0000000;stroke:none;stroke-width:5.0000000;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000" />
+    <image
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       y="172.36218"
+       x="79.000000"
+       id="image1390"
+       height="428.00000"
+       width="572.00000"
+       sodipodi:absref="/home/alver/oldhome/bilder/bilder/jabref/behandlet.png"
+       xlink:href="/home/alver/oldhome/bilder/bilder/jabref/behandlet.png" />
+    <flowRoot
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       style="opacity:1.0000000;fill:#635578;fill-opacity:1.0000000;stroke:#b5b5c7;stroke-width:0.48137558;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000"
+       transform="matrix(1.875133,0.000000,0.000000,2.542210,-129.6969,-372.8897)"
+       id="flowRoot2189"
+       xml:space="preserve">
+      <flowRegion
+   id="flowRegion2191">
+        <rect
+   style="fill:#635578;fill-opacity:1.0000000;stroke:#b5b5c7;stroke-opacity:1.0000000;stroke-width:0.48137557;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-linejoin:bevel"
+   y="199.10532"
+   x="128.49385"
+   height="127.49445"
+   width="283.51782"
+   id="rect2193" />
+      </flowRegion>
+      <flowPara
+   style="font-size:90.000000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125.00000%;writing-mode:lr-tb;text-anchor:start;fill:#635578;fill-opacity:1.0000000;stroke:#b5b5c7;stroke-width:0.48137558;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000;font-family:AR PL KaitiM GB"
+   id="flowPara2201">JabRef</flowPara>
+    </flowRoot>    <flowRoot
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       style="font-size:34.96500015px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:104.16220427%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#5cc757;stroke-width:0.64448702;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:0.64448701 0.64448701 ;stroke-dashoffset:0.45114091;stroke-opacity:1;font-family:FreeSans"
+       transform="matrix(2.869197,-1.415830e-2,2.234317e-2,3.356271,-832.1435,-652.0185)"
+       id="flowRoot2203"
+       xml:space="preserve">
+      <flowRegion
+   style="stroke:url(#linearGradient5367);stroke-width:0.64448702;stroke-miterlimit:4;stroke-dasharray:0.64448701 0.64448701 ;stroke-dashoffset:0.45114091"
+   id="flowRegion2205">
+        <rect
+   style="font-size:34.96500015px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:104.16220427%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#322b5b;stroke-width:0.64448702;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:0.64448701 0.64448701 ;stroke-dashoffset:0.45114091;stroke-opacity:1;font-family:FreeSans"
+   y="286.45224"
+   x="443.95346"
+   height="119.83134"
+   width="173.972"
+   id="rect2207" />
+      </flowRegion>
+      <flowPara
+   style="font-size:34.96500015px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:104.16220427%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#322b5b;stroke-width:0.64448702;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:0.64448701 0.64448701 ;stroke-dashoffset:0.45114091;stroke-opacity:1;font-family:FreeSans"
+   id="flowPara2211">2.0</flowPara>
+    </flowRoot>    <flowRoot
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       transform="matrix(0.972246,0.000000,0.000000,1.325301,6.054966,-126.1181)"
+       style="font-size:11.9999996;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#797580;fill-opacity:1.0000000;font-family:Bitstream Vera Sans;text-anchor:middle;writing-mode:lr;text-align:center;line-height:100%"
+       id="flowRoot3076"
+       xml:space="preserve"><flowRegion
+         id="flowRegion3078">
+        <rect
+   style="fill:#797580;fill-opacity:1.0000000;font-family:Bitstream Vera Sans;font-weight:bold;font-style:oblique;font-stretch:normal;font-variant:normal;font-size:11.9999996;text-anchor:middle;text-align:center;writing-mode:lr;line-height:100%"
+   y="514.56494"
+   x="115.50008"
+   height="78.684433"
+   width="506.03476"
+   id="rect3080" />
+      </flowRegion><flowPara
+         id="flowPara1339">This program is distributed under the terms of the General Public License.</flowPara><flowPara
+         id="flowPara1341">Copyright (2003-2006) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       transform="scale(0.853277,1.171952)"
+       sodipodi:linespacing="100%"
+       id="text1393"
+       y="315.20035"
+       x="163.38908"
+       style="font-size:183.29680;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#413b62;fill-opacity:1.0000000;stroke:none;stroke-width:1.0000000px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1.0000000;font-family:Nimbus Roman No9 L;text-anchor:start;writing-mode:lr-tb"
+       xml:space="preserve"><tspan
+         y="315.20035"
+         x="163.38908"
+         id="tspan1395"
+         sodipodi:role="line">JabRef</tspan></text>
+    <text
+       inkscape:export-ydpi="75.000000"
+       inkscape:export-xdpi="75.000000"
+       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       transform="scale(0.853347,1.171856)"
+       sodipodi:linespacing="100%"
+       id="text2179"
+       y="397.84811"
+       x="149.99753"
+       style="font-size:45.702374;font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#805b41;fill-opacity:1.0000000;stroke:none;stroke-width:1.0000000px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1.0000000;font-family:Times New Roman;text-anchor:start;writing-mode:lr-tb"
+       xml:space="preserve"><tspan
+         y="397.84811"
+         x="149.99753"
+         id="tspan2181"
+         sodipodi:role="line">reference manager</tspan></text>
+  </g>
+</svg>

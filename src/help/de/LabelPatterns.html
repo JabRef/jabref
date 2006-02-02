@@ -10,6 +10,7 @@ Im Tab "Key-Muster" im Dialog "Einstellungen" kann man  die Felder bestimmen, di
 zur automatischen Generierung der BibTeX-Labels (bibtexkey) herangezogen werden.
 Das Muster kann f&uuml;r jeden der vorgegebenen Eintragstypen bestimmt werden.
 <P>
+<h2>Key-Muster</h2>
 Das Muster kann beliebigen Text enthalten, unabh&auml;ngig von und zus&auml;tzlich zu
 den Feldmarken, die angeben, dass ein bestimmtes Feld des Eintrags an dieser Stelle des
 Keys eingef&uuml;gt werden soll. Eine Feldmarke besteht gew&ouml;hnlich aus dem
@@ -34,7 +35,9 @@ Spezielle Feldmarken:
 <li><b>[<code>authN_M</code>]</b>: Die ersten N Buchstaben des Nachnamens des M. Autors.<BR>
 <li><b>[<code>auth.auth.ea</code>]</b>: Die Nachnamen der beiden ersten Autoren und ".ea", falls
 	es mehr als zwei Autoren sind.<BR>
-<li><b>[<code>authshort</code>]</b>: Der Nachname bei einem Autor; der erste Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein Autor vorhanden ist. Ein Plus (+) wird angeh&auml;ngt, falls es mehr als drei Autoren gibt.<BR>
+<li><b>[<code>authshort</code>]</b>: Der Nachname bei einem Autor; der erste Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein Autor vorhanden ist. Ein Plus (+) wird angeh&auml;ngt, falls es mehr als drei Autoren gibt.<BR></ul>
+<b>Anmerkung:</b>Falls es keinen Autor gibt (z.B. bei einem Buch mit Herausgeber), benutzen die genannten [auth...]-Feldmarken den oder die Herausgeber, die im editor-Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor f&uuml;r die Label-Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht w&uuml;nschen und die Feldmarke stattdessen bei einem leeren author-Feld zu nichts expandieren soll, m&uuml;ssen Sie <b>pureauth</b> statt <b>auth</b> verwenden, z.B.: <b>[pureauth]</b> oder <b>[pureauthors3]</b>.
+<ul>
 <li><b>[<code>edtr</code>]</b>: Der Nachname des ersten Editors.<BR>
 <li><b>[<code>editors</code>]</b>: Die Nachnamen aller Editoren.<BR>
 <li><b>[<code>edtrIniN</code>]</b>: Der Anfang des Nachnamens von jedem Editor,
@@ -75,6 +78,11 @@ wie folgt aussehen:
 <blockquote> <code>Yared1998</code><BR> <code>Yared1998a</code><BR>
 <code>Yared1998b</code> </blockquote>
 
+<h2>Ersetzen eines Regul&auml;ren Ausdrucks</h2>
+
+Nachdem das Key-Muster angewendet wurde, um einen BibTeX-Key zu erstellen, k&ouml;nnen Sie den Key-Generator nach einem bestimmten Regul&auml;ren Ausdruck suchen und ihn durch eine Zeichenfolge ersetzen lassen. Der Regul&auml;re Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key-Muster eingegeben.
+
+Falls das Feld zur Ersetzung des Regul&auml;ren Ausdrucks leer ist, werden die mit der Suche &uuml;bereinstimmenden Regul&auml;ren Ausdr&uuml;cke einfach gel&ouml;scht.
 
 </font>
 </BODY>

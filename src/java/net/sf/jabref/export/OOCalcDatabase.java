@@ -93,12 +93,12 @@ public class OOCalcDatabase {
 
             Element body = result.createElement("office:body"),
                     table = result.createElement("table:table");
-            table.setAttribute("table:name", "Bibliography");
+            table.setAttribute("table:name", "biblio");
             table.setAttribute("table.style-name", "ta1");
 
             Element row = result.createElement("table:table-row");
             row.setAttribute("table.style-name", "ro1");
-            addTableCell(result, row, "BibliographyType");
+            addTableCell(result, row, "Type");
             addTableCell(result, row, "ISBN");
             addTableCell(result, row, "Identifier");
             addTableCell(result, row, "Author");
@@ -121,7 +121,7 @@ public class OOCalcDatabase {
             addTableCell(result, row, "ReportType");
             addTableCell(result, row, "Howpublished");
             addTableCell(result, row, "Institution");
-            addTableCell(result, row, "Organizations");
+            addTableCell(result, row, "Organization");
             addTableCell(result, row, "School");
             addTableCell(result, row, "Annote");
             addTableCell(result, row, "Custom1");
@@ -137,7 +137,7 @@ public class OOCalcDatabase {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "isbn"));
                 addTableCell(result, row, getField(e, Globals.KEY_FIELD));
-                addTableCell(result, row, new AuthorLastFirst().format(getField(e, "author")));
+                addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
                 addTableCell(result, row, getField(e, "journal"));
                 addTableCell(result, row, getField(e, "volume"));
@@ -152,7 +152,7 @@ public class OOCalcDatabase {
                 addTableCell(result, row, getField(e, "chapter"));
                 addTableCell(result, row, getField(e, "edition"));
                 addTableCell(result, row, getField(e, "series"));
-                addTableCell(result, row, new AuthorLastFirst().format(getField(e, "editor")));
+                addTableCell(result, row, getField(e, "editor"));//new AuthorLastFirst().format(getField(e, "editor")));
                 addTableCell(result, row, getField(e, "publisher"));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, "howpublished"));

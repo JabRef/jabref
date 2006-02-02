@@ -27,8 +27,9 @@ import java.net.URL;
  */
 public class JournalAbbreviations {
 
-    static String TOOLTIPTEXT = "<HTML>"+Globals.lang("Switches between full and abbreviated journal name")
-            +"<BR>"+Globals.lang("if the journal name is known. Go to (...............)")+"</HTML>";
+    static String TOOLTIPTEXT = "<HTML>"+Globals.lang("Switches between full and abbreviated journal name "
+        +"if the journal name is known.")
+        +"<BR>"+Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>")+".</HTML>";
     TreeMap fullNameKeyed = new TreeMap();
     HashMap abbrNameKeyed = new HashMap();
     HashMap abbrNoDotsToAbbr = new HashMap();
@@ -36,7 +37,7 @@ public class JournalAbbreviations {
     CaseChanger caseChanger = new CaseChanger();
 
     public JournalAbbreviations() {
-
+        
     }
 
     public JournalAbbreviations(String resource) {
@@ -279,7 +280,7 @@ public class JournalAbbreviations {
                     if (s != null) {
                         editor.setText(s);
                         entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                        undoManager.addEdit(new UndoableFieldChange(entryEditor.entry, editor.getFieldName(),
+                        undoManager.addEdit(new UndoableFieldChange(entryEditor.getEntry(), editor.getFieldName(),
                                 text, s));
                     }
                 }

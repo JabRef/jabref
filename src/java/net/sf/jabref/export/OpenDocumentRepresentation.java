@@ -140,11 +140,11 @@ public class OpenDocumentRepresentation {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "annote"));
-                addTableCell(result, row, new AuthorLastFirst().format(getField(e, "author")));
+                addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
                 addTableCell(result, row, getField(e, "booktitle"));
                 addTableCell(result, row, getField(e, "chapter"));
                 addTableCell(result, row, getField(e, "edition"));
-                addTableCell(result, row, new AuthorLastFirst().format(getField(e, "editor")));
+                addTableCell(result, row, getField(e, "editor"));//new AuthorLastFirst().format(getField(e, "editor")));
                 addTableCell(result, row, getField(e, "howpublished"));
                 addTableCell(result, row, getField(e, "institution"));
                 addTableCell(result, row, getField(e, "journal"));

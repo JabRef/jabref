@@ -198,10 +198,10 @@ public class FieldTextMenu implements MouseListener
       catch (Exception ex) {}
     }
   }
-// ---------------------------------------------------------------------------
-  /*class ReplaceAction extends BasicAction{
+
+  class ReplaceAction extends BasicAction{
     public ReplaceAction(){
-        super("Replace , by \u201e and\u201c");
+        super("Replace comma by and where appropriate");
     }
     public void actionPerformed(ActionEvent evt){
         if (myFieldName.getText().equals("")){
@@ -209,8 +209,60 @@ public class FieldTextMenu implements MouseListener
         }
         //myFieldName.selectAll();
         String input = myFieldName.getText();
-        myFieldName.setText(input.replaceAll(","," and"));
+        //myFieldName.setText(input.replaceAll(","," and"));
+        myFieldName.setText(generalFixAuthor(input));
     }
-  }  */
- //------------------------------------------------------------------------------
+  }
+
+ public static String generalFixAuthor(String in){
+        String author;
+        String[] authors = in.split("( |,)and ",-1);
+        for (int i = 0; i < authors.length; i++){
+            authors[i].trim();
+        }
+        /* determine whether the last author name includes a comma
+         * 0 is intentional (consider -1 as alternative) */
+        author = authors[authors.length-1];
+        boolean lnfn = (author.indexOf(",") > 0);
+        StringBuffer sb = new StringBuffer();
+        /*not tested!*/
+        if(lnfn){
+            String[] parts;
+            for (int i = 0; i < authors.length; i++){
+                parts = authors[i].split(",",-1);
+                if(parts.length == 2){
+                    parts[0] = parts[0].trim().replaceAll(" ","~");
+                    parts[1] = parts[1].trim().replaceAll(" ","~");
+                    sb.append(parts[1]+" "+ parts[0]);
+                } else {
+                    sb.append(authors[i]);
+                }
+                if(i < authors.length -1){
+                    sb.append(" and ");
+                }
+            }
+        } else {
+            for (int i = 0; i < authors.length; i++){
+                String[] iAuthors = authors[i].split(",");
+                String[] ijparts;
+                for (int j=0; j<iAuthors.length; j++){
+                    iAuthors[j] = iAuthors[j].trim();
+                    ijparts = iAuthors[j].split(" ",-1);
+                    for (int k=0; k<ijparts.length; k++){
+                        sb.append(ijparts[k]);
+                        if(k < ijparts.length-2){
+                            sb.append('~');
+                        } else if (k == ijparts.length-2){
+                            sb.append(' ');
+                        }
+                    }
+                    if (j < iAuthors.length -1 || i < authors.length -1){
+                        sb.append(" and ");
+                    }
+                } /* end of j-loop (authors split by ,) */
+            } /* end of i-loop (authors split by and)*/
+        }
+        return sb.toString();
+    }
+
 }

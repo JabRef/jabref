@@ -160,7 +160,7 @@ public class UrlDragDrop implements DropTargetListener {
                 try{
                     //auto file name:
                     File file = new File(new File(Globals.prefs
-                            .get("pdfDirectory")), editor.entry
+                            .get("pdfDirectory")), editor.getEntry()
                             .getField(Globals.KEY_FIELD)
                             + ".pdf");
                     URLDownload udl = new URLDownload((Component) editor, url,

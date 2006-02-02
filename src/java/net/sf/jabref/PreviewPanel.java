@@ -77,10 +77,13 @@ public class PreviewPanel extends JEditorPane {
     setContentType(CONTENT_TYPE);
       addHyperlinkListener(new HyperlinkListener () {
           public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-              try {
-                  Util.openExternalViewer(hyperlinkEvent.getURL().toString(), "url", Globals.prefs);
-              } catch (IOException e) {
-                  e.printStackTrace();
+              if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    String address = hyperlinkEvent.getURL().toString(); 
+                      Util.openExternalViewer(address, "url", Globals.prefs);
+                  } catch (IOException e) {
+                      e.printStackTrace();
+                  }
               }
           }
       });

@@ -86,12 +86,14 @@ public class JabRef {
         ths = this;
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
+        Globals.setLanguage(prefs.get("language"), "");
+                
         Globals.importFormatReader.resetImportFormats();
         BibtexEntryType.loadCustomEntryTypes(prefs);
         // Read list(s) of journal names and abbreviations:
-        Globals.initializeJournalNames();
         //Globals.turnOnFileLogging();
-        Globals.setLanguage(prefs.get("language"), "");
+
+        Globals.initializeJournalNames();
 
         if (Globals.prefs.getBoolean("useRemoteServer")) {
             remoteListener = RemoteListener.openRemoteListener(this);
@@ -562,7 +564,6 @@ public class JabRef {
     }
 
     public void openWindow(Vector loaded) {
-
         if (!graphicFailure && !disableGui.isInvoked()) {
             // Call the method performCompatibilityUpdate(), which does any
             // necessary changes for users with a preference set from an older
@@ -603,7 +604,7 @@ public class JabRef {
                 // com.jgoodies.plaf.plastic.Plastic3DLookAndFeel();
                 Object objLnf = null;
 
-                //Util.pr(": LnF: "+lookAndFeel);
+
                 try {
                     //lnf2 =
                     // Class.forName("com.jgoodies.plaf.plastic.Plastic3DLookAndFeel").newInstance();

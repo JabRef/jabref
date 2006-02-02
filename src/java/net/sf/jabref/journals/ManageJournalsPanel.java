@@ -305,43 +305,45 @@ public class ManageJournalsPanel extends JPanel{
     }
 
     public void storeSettings() {
-        File f;
+        File f = null;
         if (newFile.isSelected()) {
             if (newNameTf.getText().length() > 0) {
                 f = new File(newNameTf.getText());
-            } else {
-                return; // Nothing to do.
-            }
+            }// else {
+            //    return; // Nothing to do.
+            //}
         } else
             f = new File(personalFile.getText());
 
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(f, false);
-            for (Iterator i=tableModel.getJournals().iterator(); i.hasNext();) {
-                JournalEntry entry = (JournalEntry)i.next();
-                fw.write(entry.name);
-                fw.write(" = ");
-                fw.write(entry.abbreviation);
-                fw.write(Globals.NEWLINE);
+        if (f != null) {
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter(f, false);
+                for (Iterator i=tableModel.getJournals().iterator(); i.hasNext();) {
+                    JournalEntry entry = (JournalEntry)i.next();
+                    fw.write(entry.name);
+                    fw.write(" = ");
+                    fw.write(entry.abbreviation);
+                    fw.write(Globals.NEWLINE);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            } finally {
+                if (fw != null)
+                    try {
+                        fw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        } finally {
-            if (fw != null)
-                try {
-                    fw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            String filename = f.getPath();
+            if (filename.equals(""))
+                filename = null;
+            Globals.prefs.put("personalJournalList", filename);
         }
-
-        String filename = f.getPath();
-        if (filename.equals(""))
-            filename = null;
-        Globals.prefs.put("personalJournalList", filename);
 
         // Store the list of external files set up:
         ArrayList extFiles = new ArrayList();
