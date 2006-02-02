@@ -761,35 +761,62 @@ public class Util {
      */
 
     /**
-     * Sets empty or non-existing owner fields of bibtex entries inside an array
+     * Sets empty or non-existing owner fields of bibtex entries inside a List
      * to a specified default value. Timestamp field is also set. Preferences are
      * checked to see if these options are enabled.
      *
      * @param bibs List of bibtex entries
      */
     public static void setAutomaticFields(List bibs) {
-
         String defaultOwner = Globals.prefs.get("defaultOwner");
         String timestamp = easyDateFormat();
+        boolean setOwner = Globals.prefs.getBoolean("useOwner"),
+                setTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
+        String timeStampField = Globals.prefs.get("timeStampField");
         // Iterate through all entries
         for (int i = 0; i < bibs.size(); i++) {
             // Get current entry
             BibtexEntry curEntry = (BibtexEntry) bibs.get(i);
+            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp,
+                    timeStampField, timestamp);
 
-            // Set owner field if this option is enabled:
-            if (Globals.prefs.getBoolean("useOwner")) {
-                // No or empty owner field?
-                if (curEntry.getField(Globals.OWNER) == null
-                        || ((String) curEntry.getField(Globals.OWNER)).length() == 0) {
-                    // Set owner field to default value
-                    curEntry.setField(Globals.OWNER, defaultOwner);
-                }
-            }
-
-            if (Globals.prefs.getBoolean("useTimeStamp"))
-                curEntry.setField(Globals.prefs.get("timeStampField"), timestamp);
         }
 
+    }
+
+    /**
+     * Sets empty or non-existing owner fields of a bibtex entry
+     * to a specified default value. Timestamp field is also set. Preferences are
+     * checked to see if these options are enabled.
+     *
+     * @param entry The entry to set fields for.
+     */
+    public static void setAutomaticFields(BibtexEntry entry) {
+        String defaultOwner = Globals.prefs.get("defaultOwner");
+        String timestamp = easyDateFormat();
+        boolean setOwner = Globals.prefs.getBoolean("useOwner"),
+                setTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
+        String timeStampField = Globals.prefs.get("timeStampField");
+        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp,
+                    timeStampField, timestamp);
+    }
+
+    private static void setAutomaticFields(BibtexEntry entry, boolean setOwner,
+                                           String owner, boolean setTimeStamp,
+                                           String timeStampField, String timeStamp) {
+
+        // Set owner field if this option is enabled:
+        if (setOwner) {
+            // No or empty owner field?
+            //if (entry.getField(Globals.OWNER) == null
+            //        || ((String) entry.getField(Globals.OWNER)).length() == 0) {
+                // Set owner field to default value
+                entry.setField(Globals.OWNER, owner);
+            //}
+        }
+
+        if (setTimeStamp)
+            entry.setField(timeStampField, timeStamp);
     }
 
     /**

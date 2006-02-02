@@ -354,7 +354,8 @@ public class JabRefFrame
       new NewEntryAction("techreport"),
       new NewEntryAction("unpublished",
                          prefs.getKey("New unpublished")),
-      new NewEntryAction("misc")
+      new NewEntryAction("misc"),
+      new NewEntryAction("other")
   };
 
   public JabRefFrame() {

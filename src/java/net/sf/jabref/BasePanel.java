@@ -600,11 +600,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
                         // or were parsed from a string
                         if ((bes != null) && (bes.length > 0)) {
+
                           NamedCompound ce = new NamedCompound
                               (Globals.lang(bes.length > 1 ? "paste entries" : "paste entry"));
                           for (int i=0; i<bes.length; i++) {
                             try {
                               BibtexEntry be = (BibtexEntry)(bes[i].clone());
+                                Util.setAutomaticFields(be);
+
                               // We have to clone the
                               // entries, since the pasted
                               // entries must exist

@@ -80,10 +80,12 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+?       - Changed Paste fuction so timestamp and owner fields are updated.
+        - Added "Other" item to the "New entry ..." menu.
 2.0.1:	- Fixed bug that made a hidden entry editor under some circumstances store a
-	  field value to the wrong entry.
-	- Fixed synchronization bug that made the opening of a new database sometimes fail.
-	- Fixed bug in setting external journal lists when no personal list is set.
+	      field value to the wrong entry.
+	    - Fixed synchronization bug that made the opening of a new database sometimes fail.
+	    - Fixed bug in setting external journal lists when no personal list is set.
 2.0:    - Changed sorting selection interface for main table for more intuitive
           operation.
         - Made import operation update "working directory".
