@@ -588,12 +588,23 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output(Globals.lang("Updated group selection") + ".");
         }
     }
+    /** 
+     * Revalidate the groups tree (e.g. after the data stored in the model has
+     * been changed) and set the specified selection and expansion state. 
+     * @param node If this is non-null, the view is scrolled to make it visible.
+     */
+    public void revalidateGroups(TreePath[] selectionPaths, 
+            Enumeration expandedNodes) {
+    	revalidateGroups(selectionPaths, expandedNodes, null);
+    }
 
     /** 
      * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and set the specified selection and expansion state. */
+     * been changed) and set the specified selection and expansion state. 
+     * @param node If this is non-null, the view is scrolled to make it visible.
+     */
     public void revalidateGroups(TreePath[] selectionPaths, 
-            Enumeration expandedNodes) {
+            Enumeration expandedNodes, GroupTreeNode node) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -605,13 +616,25 @@ public class GroupSelector extends SidePaneComponent implements
                 groupsTree.expandPath((TreePath)expandedNodes.nextElement());
         }
         groupsTree.revalidate();
+        if (node != null) {
+        	groupsTree.scrollPathToVisible(new TreePath(node.getPath()));
+        }
     }
     
     /** 
      * Revalidate the groups tree (e.g. after the data stored in the model has
      * been changed) and maintain the current selection and expansion state. */
     public void revalidateGroups() {
-        revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths());
+        revalidateGroups(null);
+    }
+    
+    /** 
+     * Revalidate the groups tree (e.g. after the data stored in the model has
+     * been changed) and maintain the current selection and expansion state. 
+     * @param node If this is non-null, the view is scrolled to make it visible.
+     */
+    public void revalidateGroups(GroupTreeNode node) {
+        revalidateGroups(groupsTree.getSelectionPaths(),getExpandedPaths(),node);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -747,7 +770,7 @@ public class GroupSelector extends SidePaneComponent implements
                 UndoableModifyGroup undo = new UndoableModifyGroup(
                         GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
-                revalidateGroups();
+                revalidateGroups(node);
                 // Store undo information.
                 if (undoAddPreviousEntries == null) {
                     panel.undoManager.addEdit(undo);
