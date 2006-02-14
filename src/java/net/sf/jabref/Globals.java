@@ -26,6 +26,7 @@
 package net.sf.jabref;
 
 import java.io.* ;
+import java.nio.charset.Charset;
 import java.util.* ;
 import java.util.logging.* ;
 import java.util.logging.Filter ;
@@ -83,12 +84,7 @@ public class Globals {
       FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
   public static float duplicateThreshold = 0.75f;
   private static Handler consoleHandler = new java.util.logging.ConsoleHandler();
-  public static String[] ENCODINGS = new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
-      "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
-      "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
-      "Big5", "Big5_HKSCS", "GBK",
-      "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
-      "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
+  public static String[] ENCODINGS = (String[])Charset.availableCharsets().keySet().toArray(new String[]{}); 
 
   // String array that maps from month number to month string label:
   public static String[] MONTHS = new String[] {"jan", "feb", "mar", "apr", "may", "jun",
