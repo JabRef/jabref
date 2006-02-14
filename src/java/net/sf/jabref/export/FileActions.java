@@ -142,7 +142,12 @@ public class FileActions
         SaveSession session;
         try {
             session = new SaveSession(file, encoding, backup);
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            // we must catch all exceptions to be able notify users that
+            // saving failed, no matter what the reason was
+            // (and they won't just quit JabRef thinking
+            // everyting worked and loosing data)
+            e.printStackTrace();
             throw new SaveException(e.getMessage());
         }
 
