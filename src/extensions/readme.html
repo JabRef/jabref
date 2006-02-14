@@ -1,0 +1,52 @@
+<html>
+<head>
+  <title>JabRef-Extensions for JabRef @version@ help</title>
+</head>
+
+<body>
+  <h1>Extending JabRef's export and import capabilities</h1>
+  
+  <h2>Custom exports</h2>
+  
+  <p>JabRef's export and import capabilities can be extended quite
+  easily. Please unzip the JabRef-extensions file, preferably to the
+  same folder where you installed JabRef (where the <code>jabref.jar</code> file can be found).
+  </p>
+  
+  <p>To create your own export format, you can define <i>custom layouts</i>,
+  simple templates where at certain places the contents of a JabRef database are written
+  into. For an example see the files in the <a href="layout">layout directory</a>.
+  For more details about creating your own export format, please read 
+  <a href="API/CustomExports.html"><code>API/CustomExports.html</code></a>.</p>
+  
+  <p>The extensions contain also a few simple examples on how to create new <i>field formatters</i> -
+  small commands that determine how database entries are written to your
+  custom layout, please check <a href="net/sf/jabref/export/layout/format"><code>net/sf/export/layout/format</code></a>.  
+  </p>
+  
+  <h2>Custom imports</h2>
+  
+  <p>You can also quite easily  create an importer that allows you
+  to read references from sources important to you. This requires only
+  modest programming skills. Please check the 
+  <a href="SimpleCsvImporter.java">example</a>, compile it
+  using the <code>compileAll.bat</code> script, register it
+  as a custom importer with your JabRef-installation and
+  import the <a href="SimpleCsvImporter.csv">SimpleCsvImporter.csv</a>
+  file to see how it is done. More details can be found
+  in <a href="API/CustomImports.html"><code>API/CustomImports.html</code></a>.</p>
+  
+  <p>All importers that are part of the standard JabRef-distribution are also
+  included in this extensions-package under <a href="net/sf/jabref/imports"><code>net/sf/jabref/imports</code></a>. 
+  In addition to serving as further examples, you can also fix them and register them as custom importers
+  if you encounter any problems.
+  </p>
+  
+  <h2>API documentation</h2>
+  
+  <p>The API-documentation for extensions that require some programming
+  is available under <a href="API/index.html"><code>API/index.html</code></a>.
+  </p>
+  
+</body>
+</html>

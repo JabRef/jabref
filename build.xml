@@ -63,6 +63,9 @@
         <property name="build.resource" value="${build.dir}/resource" />
         <property name="build.help" value="${build.dir}/help" />
         <property name="build.javadocs" value="${build.dir}/docs/API" />
+        <property name="build.extensions" value="${build.dir}/extensions" />
+        <property name="build.extension-javadocs" value="${build.extensions}/API" />
+        <property name="build.extension-layout" value="${build.extensions}/layout" />
         <property name="build.openoffice.meta" value="${build.resource}/openoffice"/>
 
         <!-- Set the properties for source directories -->
@@ -77,6 +80,8 @@
         <property name="images.dir" value="${src.dir}/images" />
         <property name="fonts.dir" value="${src.dir}/images/font" />
         <property name="help.dir" value="${src.dir}/help" />
+        <property name="extensions.dir" value="${src.dir}/extensions" />
+        <property name="layout.dir" value="${src.dir}/resource/layout" />
 
 
         <!-- Set the properties for library directories -->
@@ -327,6 +332,70 @@ version=${jabref.version}</echo>
                 </javadoc>
         </target>
 
+        <!-- Creates javadocs for the extensions -->
+        <target name="extension-javadocs" depends="build" description="Generates the javadocs for the extensions archive">
+                <mkdir dir="${build.extension-javadocs}" />
+                <copy todir="${build.extension-javadocs}">
+                    <fileset dir="${help.dir}" defaultexcludes="yes">
+                        <include name="CustomExports.html" />
+                        <include name="CustomImports.html" />
+                    </fileset>
+                </copy>
+                
+                <javadoc sourcepath="${java.dir}" 
+                         destdir="${build.extension-javadocs}" 
+                         author="true" 
+                         version="true" 
+                         windowtitle="JabRef-Extensions API" 
+                         link="http://java.sun.com/j2se/1.4.1/docs/api/"
+                         Overview="${extensions.dir}/API/overview.html"
+                         access="protected"
+                >
+                        <!-- 
+                          create javadoc only selectively for classes that 
+                          users extending JabRef are likely to use
+                        -->
+                        <fileset dir="${java.dir}" defaultexcludes="yes">
+                            <include name="net/sf/jabref/imports/ImportFormat.java" />
+                            <include name="net/sf/jabref/imports/ImportFormatReader.java" />
+                            <include name="net/sf/jabref/BibtexEntry.java" />
+                            <include name="net/sf/jabref/BibtexEntryType.java" />
+                            <include name="net/sf/jabref/AuthorList.java" />
+                            <include name="net/sf/jabref/AuthorList.java" />                        
+                            <include name="net/sf/jabref/export/layout/LayoutFormatter.java" />
+                        </fileset>
+
+                        <classpath refid="classpath" />
+                </javadoc>
+        </target>
+        
+        <!-- Creates javadocs for the extensions -->
+        <target name="extensions" depends="extension-javadocs" description="Generates the extensions archive">
+            <!-- copy examples -->
+            <copy todir="${build.extensions}">
+			   <fileset dir="${java.dir}">
+			      <include name="net/sf/jabref/export/layout/format/CurrentDate.java"/>
+			      <include name="net/sf/jabref/export/layout/format/ToLowerCase.java"/>
+			      <include name="net/sf/jabref/export/layout/format/HTMLChars.java"/>
+			      <include name="net/sf/jabref/imports/*Importer.java"/>
+			    </fileset>
+            </copy>
+            <mkdir dir="${build.extension-layout}" />
+            <copy todir="${build.extension-layout}">
+			   <fileset dir="${layout.dir}" />
+            </copy>
+            <copy todir="${build.extensions}">
+			   <fileset dir="${extensions.dir}" />
+			   <filterset>
+			      <filter token="version" value="${jabref.version}"/>
+			   </filterset>
+            </copy>
+            <!-- create extensions-zip file -->
+		    <zip destfile="${build.dir}/jabref-extensions.zip">
+		        <zipfileset dir="${build.extensions}" prefix="jabref-extensions"/>
+		    </zip>        
+		</target>
+        
         <target name="clean" description="Clean project">
                 <delete dir="${build.dir}" />
         </target>
