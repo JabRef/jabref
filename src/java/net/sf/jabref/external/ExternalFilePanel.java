@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,16 +29,20 @@ public class ExternalFilePanel extends JPanel {
     private JabRefFrame frame;
     private OpenFileFilter off;
     private BibtexEntry entry = null;
+    private MetaData metaData;
 
-    public ExternalFilePanel(final String fieldName, final BibtexEntry entry, final OpenFileFilter off) {
-        this(null, null, fieldName, off, null);
+    public ExternalFilePanel(final String fieldName, final MetaData metaData,
+                             final BibtexEntry entry, final OpenFileFilter off) {
+        this(null, metaData, null, fieldName, off, null);
         this.entry = entry;
     }
 
-    public ExternalFilePanel(final JabRefFrame frame, final EntryEditor entryEditor,
+    public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,
+                             final EntryEditor entryEditor,
                              final String fieldName, final OpenFileFilter off, final FieldEditor editor) {
 
         this.frame = frame;
+        this.metaData = metaData;
         this.off = off;
         this.entryEditor = entryEditor;
 
@@ -99,7 +104,8 @@ public class ExternalFilePanel extends JPanel {
     }
 
     public void browseFile(final String fieldName, final FieldEditor editor) {
-        String directory = Globals.prefs.get(fieldName+"Directory");
+
+        String directory = metaData.getFileDirectory(fieldName);
         if ((directory != null) && directory.equals(""))
             directory = null;
 
@@ -166,8 +172,8 @@ public class ExternalFilePanel extends JPanel {
                         url = new URL(res);
 
                         String suffix = off.getSuffix(res);
-			            if (suffix == null)
-			            suffix = "."+fieldName.toLowerCase();
+                        if (suffix == null)
+                        suffix = "."+fieldName.toLowerCase();
 
                         String plannedName = null;
                         if (getKey() != null)
@@ -181,7 +187,11 @@ public class ExternalFilePanel extends JPanel {
                             if (!off.accept(plannedName))
                                 plannedName += suffix;
                         }
-                        File file = new File(new File(Globals.prefs.get(fieldName+"Directory")), plannedName);
+
+                        // Find the default directory for this field type:
+                        String directory = metaData.getFileDirectory(fieldName);
+                        System.out.println(directory);
+                        File file = new File(new File(directory), plannedName);
 
                         URLDownload udl = new URLDownload(parent, url, file);
                         output(Globals.lang("Downloading..."));
@@ -196,8 +206,7 @@ public class ExternalFilePanel extends JPanel {
 
                         output(Globals.lang("Download completed"));
                         String filename = file.getPath();
-                        //System.out.println(filename);
-                        String directory = Globals.prefs.get(fieldName+"Directory");
+
                         if (filename.startsWith(directory)) {
                             // Construct path relative to pdf base dir
                             String relPath = filename.substring(directory.length(), filename.length());
@@ -252,7 +261,11 @@ public class ExternalFilePanel extends JPanel {
         Thread t = (new Thread() {
             public void run() {
                 Object o = getKey();
-                String found = Util.findPdf((String) o, fieldName, Globals.prefs.get(fieldName+"Directory"), off);
+
+                // Find the default directory for this field type:
+                String dir = metaData.getFileDirectory(fieldName);
+
+                String found = Util.findPdf((String) o, fieldName, dir, off);
                 if (found != null) {
                     editor.setText(found);
                     if (entryEditor != null)

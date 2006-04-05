@@ -119,7 +119,28 @@ public class MetaData {
     public void putData(String key, Vector orderedData) {
         metaData.put(key, orderedData);
     }
-    
+
+    /**
+     * Look up the directory set up for the given field type for this database.
+     * If no directory is set up, return that defined in global preferences.
+     * @param fieldName The field type
+     * @return The default directory for this field type.
+     */
+    public String getFileDirectory(String fieldName) {
+        // There can be up to two directory definitions for these files - the database's
+        // metadata can specify a directory, or the preferences can specify one. The
+        // metadata directory takes precedence if defined.
+        String key = fieldName + "Directory";
+        String dir;
+        Vector vec = getData(key);
+        if ((vec != null) && (vec.size() > 0))
+            dir = (String)vec.get(0);
+        else
+            dir = Globals.prefs.get(key);
+
+        return dir;
+    }
+
     private void putGroups(Vector orderedData, BibtexDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db, 
@@ -129,7 +150,7 @@ public class MetaData {
             System.err.println(e);
         }
     }
-    
+
     public GroupTreeNode getGroups() {
         return groupsRoot;
     }

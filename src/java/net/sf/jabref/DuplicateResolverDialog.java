@@ -68,8 +68,8 @@ public class DuplicateResolverDialog extends JDialog {
       }
 
     String layout = Globals.prefs.get("preview0");
-    p1 = new PreviewPanel(one, layout);
-    p2 = new PreviewPanel(two, layout);
+    p1 = new PreviewPanel(one, new MetaData(), layout);
+    p2 = new PreviewPanel(two, new MetaData(), layout);
     ta1 = new JTextArea();
     ta2 = new JTextArea();
     ta1.setEditable(false);

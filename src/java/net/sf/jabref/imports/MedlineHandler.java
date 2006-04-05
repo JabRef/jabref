@@ -1,6 +1,4 @@
 package net.sf.jabref.imports;
-import java.util.regex.*;
-import javax.xml.parsers.*;
 import java.util.ArrayList;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -45,11 +43,11 @@ public class MedlineHandler extends DefaultHandler
 		inIssue = false,			inPubDate = false,
 		inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
 		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false;
-    String title="", journal="", keyword="",author="",
+    String title="", journal="", keywords ="",author="",
 		lastName="",year="",forename="", abstractText="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
-		pubmedid="", descriptorName="",doi="",pii="";
+		pubmedid="",doi="",pii="";
     ArrayList authors=new ArrayList();
     int rowNum=0;
     public ArrayList getItems(){ return bibitems;}
@@ -80,7 +78,14 @@ public class MedlineHandler extends DefaultHandler
 		}
                 else if(localName.equals("Author")){inAuthor=true;author="";}
                 else if(localName.equals("CollectiveName")){inForename=true;forename="";} // Morten A. 20040513.
-		else if(localName.equals("PMID")){inPubMedID=true;pubmedid="";}
+		else if(localName.equals("PMID")){
+            // Set PMID only once, because there can be <CommentIn> tags later on that
+            // contain IDs of different articles.
+            if (pubmedid.length() == 0) {
+                inPubMedID=true;
+                pubmedid="";
+            }
+        }
 		else if(localName.equals("LastName")){inLastName=true; lastName="";}
 		else if(localName.equals("ForeName") || localName.equals("FirstName")) {
 			inForename=true; forename="";
@@ -140,16 +145,13 @@ public class MedlineHandler extends DefaultHandler
 					//year = m.group();
 				}
 			}
-			//################################## 09/23/03  put {} around capitals
-
-			title=Util.putBracesAroundCapitals(title);
-			//##############################
+			
 			// Sort keywords and remove duplicates. Add pubmedid as keyword (user request)
-            StringBuffer sb = new StringBuffer(Util.sortWordsAndRemoveDuplicates(descriptorName));
+            StringBuffer sb = new StringBuffer(Util.sortWordsAndRemoveDuplicates(keywords));
             if (sb.length()>0)
                 sb.append(", ");
             sb.append(pubmedid);
-            keyword = sb.toString();
+            keywords = sb.toString();
             
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
 										  Globals.getEntryType("article")); // id assumes an existing database so don't create one here
@@ -164,7 +166,7 @@ public class MedlineHandler extends DefaultHandler
 			if (!page.equals("")) b.setField("pages",fixPageRange(page));
 			if (!volume.equals("")) b.setField("volume",volume);
 			if (!abstractText.equals("")) b.setField("abstract",abstractText.replaceAll("%","\\\\%"));
-			if (!keyword.equals("")) b.setField("keywords",keyword);
+			if (!keywords.equals("")) b.setField("keywords",keywords);
 			if (!month.equals("")) b.setField("month",month);
 			//if (!url.equals("")) b.setField("url",url);
 			if (!number.equals("")) b.setField("number",number);
@@ -176,12 +178,12 @@ public class MedlineHandler extends DefaultHandler
 			if(!pii.equals(""))
 			    b.setField("pii",pii);
 
-                        // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
-                        // Older references do not have doi entries, but every
-                        // medline entry has a unique pubmed ID (aka primary ID).
-                        // Add a bibtex field for the pubmed ID for future use.
-                        if (!pubmedid.equals(""))
-                            b.setField("pmid",pubmedid);
+            // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
+            // Older references do not have doi entries, but every
+            // medline entry has a unique pubmed ID (aka primary ID).
+            // Add a bibtex field for the pubmed ID for future use.
+            if (!pubmedid.equals(""))
+                b.setField("pmid",pubmedid);
                         
 			bibitems.add( b  );
 
@@ -189,7 +191,7 @@ public class MedlineHandler extends DefaultHandler
 			author = "";
 			title="";
 			journal="";
-			keyword="";
+			keywords ="";
 			doi=""; pii="";
 			year="";
 			forename="";
@@ -259,7 +261,7 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineID){medlineID += new String(data,start,length);}
 		else if(inURL){url += new String(data,start,length);}
 		else if(inPubMedID){pubmedid = new String(data,start,length);}
-		else if(inDescriptorName) descriptorName += new String(data,start,length) + ", ";
+		else if(inDescriptorName) keywords += new String(data,start,length) + ", ";
 		else if(inForename){
 			forename += new String(data,start,length);
 			//System.out.println("IN FORENAME: " + forename);

@@ -1,15 +1,11 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.KeyCollisionException;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.*;
+
 import javax.swing.JScrollPane;
 
 public class EntryAddChange extends Change {
@@ -23,7 +19,7 @@ public class EntryAddChange extends Change {
     super("Added entry");
     this.diskEntry = diskEntry;
 
-    pp = new PreviewPanel(diskEntry, Globals.prefs.get("preview0"));
+    pp = new PreviewPanel(diskEntry, new MetaData(), Globals.prefs.get("preview0"));
     sp = new JScrollPane(pp);
   }
 

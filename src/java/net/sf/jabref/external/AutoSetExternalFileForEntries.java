@@ -10,6 +10,7 @@ import java.io.File;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Vector;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -78,9 +79,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
 
-        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, null, off);
+        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, off);
         FieldTextField editor = new FieldTextField(fieldName, "", false);
-        String dir = Globals.prefs.get(fieldName+"Directory");
+
+        // Find the default directory for this field type:
+        String dir = panel.metaData().getFileDirectory(fieldName);
+
         // First we try to autoset fields
         if (autoSet) {
             for (int i=0; i<sel.length; i++) {
@@ -130,7 +134,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                         switch (answer) {
                             case 1:
                                 // Assign new file.
-                                AttachFileDialog afd = new AttachFileDialog(panel.frame(), sel[i], fieldName);
+                                AttachFileDialog afd = new AttachFileDialog(panel.frame(),
+                                        panel.metaData(), sel[i], fieldName);
                                 Util.placeDialog(afd, panel.frame());
                                 afd.setVisible(true);
                                 if (!afd.cancelled()) {

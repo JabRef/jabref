@@ -1,13 +1,9 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
-import net.sf.jabref.KeyCollisionException;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import net.sf.jabref.PreviewPanel;
+import net.sf.jabref.*;
+
 import javax.swing.JScrollPane;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -35,7 +31,7 @@ public class EntryDeleteChange extends Change {
     //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
     //        +" Modifications agree: "+modificationsAgree);
 
-    pp = new PreviewPanel(memEntry, Globals.prefs.get("preview0"));
+    pp = new PreviewPanel(memEntry, new MetaData(), Globals.prefs.get("preview0"));
     sp = new JScrollPane(pp);
   }
 

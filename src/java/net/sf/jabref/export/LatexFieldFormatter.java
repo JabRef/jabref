@@ -145,14 +145,59 @@ public class LatexFieldFormatter implements FieldFormatter {
      sb.append(text.substring(start_pos, end_pos));
      sb.append("}");*/
     sb.append(Globals.getOpeningBrace());
-    boolean escape = false;
+    boolean escape = false, inCommandName = false, inCommand = false,
+        inCommandOption = false;
+    StringBuffer commandName = new StringBuffer();
     char c;
     for (int i=start_pos; i<end_pos; i++) {
         c = text.charAt(i);
-        if ((c == '&') && !escape)
-        sb.append("\\&");
+
+        // Track whether we are in a LaTeX command of some sort.
+        if (Character.isLetter(c) && (escape || inCommandName)) {
+            inCommandName = true;
+            if (!inCommandOption)
+                commandName.append((char)c);
+        }
+        else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
+            //System.out.println("whitespace here");
+        }
+        else if (inCommandName) {
+            // This means the command name is ended.
+            // Perhaps the beginning of an argument:
+            if (c == '[') {
+                inCommandOption = true;
+            }
+            // Or the end of an argument:
+            else if (inCommandOption && (c == ']'))
+                inCommandOption = false;
+            // Or the beginning of the command body:
+            else if (!inCommandOption && (c == '{')) {
+                //System.out.println("Read command: '"+commandName.toString()+"'");
+                inCommandName = false;
+                inCommand = true;
+            }
+            // Or simply the end of this command altogether:
+            else {
+                //System.out.println("I think I read command: '"+commandName.toString()+"'");
+
+                commandName.delete(0, commandName.length());
+                inCommandName = false;
+            }
+        }
+        // If we are in a command body, see if it has ended:
+        if (inCommand && (c == '}')) {
+            //System.out.println("Done with command: '"+commandName.toString()+"'");
+            commandName.delete(0, commandName.length());
+            inCommand = false;
+        }
+
+        // We add a backslash before any ampersand characters, with one exception: if
+        // we are inside an \\url{...} command, we should write it as it is. Maybe.
+        if ((c == '&') && !escape && !(inCommand && commandName.toString().equals("url"))) {
+            sb.append("\\&");
+        }
         else
-        sb.append(c);
+            sb.append(c);
         escape = (c == '\\');
     }
     sb.append(Globals.getClosingBrace());

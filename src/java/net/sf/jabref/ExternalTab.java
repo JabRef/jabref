@@ -2,12 +2,8 @@ package net.sf.jabref;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.Iterator;
-import java.io.File;
 
 import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.builder.*;
 
 public class ExternalTab extends JPanel implements PrefsTab {
@@ -50,7 +46,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         JLabel lab = new JLabel(Globals.lang("Main PDF directory") + ":");
         builder.append(lab);
         builder.append(pdfDir);
-        browse = new BrowseAction(pdfDir, true);
+        browse = new BrowseAction(_frame, pdfDir, true);
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.appendSeparator(Globals.lang("PS links"));
@@ -59,7 +55,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         lab = new JLabel(Globals.lang("Main PS directory") + ":");
         builder.append(lab);
         builder.append(psDir);
-        browse = new BrowseAction(psDir, true);
+        browse = new BrowseAction(_frame, psDir, true);
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.appendSeparator(Globals.lang("External programs"));
@@ -70,7 +66,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(lab);
         builder.append(pdf);
-        browse = new BrowseAction(pdf, false);
+        browse = new BrowseAction(_frame, pdf, false);
         if (Globals.ON_WIN)
             browse.setEnabled(false);
         builder.append(new JButton(browse));
@@ -79,7 +75,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(lab);
         builder.append(ps);
-        browse = new BrowseAction(ps, false);
+        browse = new BrowseAction(_frame, ps, false);
         if (Globals.ON_WIN)
             browse.setEnabled(false);
         builder.append(new JButton(browse));
@@ -88,7 +84,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(lab);
         builder.append(html);
-        browse = new BrowseAction(html, false);
+        browse = new BrowseAction(_frame, html, false);
         if (Globals.ON_WIN)
             browse.setEnabled(false);
         builder.append(new JButton(browse));
@@ -97,14 +93,14 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(pan);
         builder.append(lab);
         builder.append(lyx);
-        browse = new BrowseAction(lyx, false);
+        browse = new BrowseAction(_frame, lyx, false);
         builder.append(new JButton(browse));
         builder.nextLine();
         lab = new JLabel(Globals.lang("Path to WinEdt.exe") + ":");
         builder.append(pan);
         builder.append(lab);
         builder.append(winEdt);
-        browse = new BrowseAction(winEdt, false);
+        browse = new BrowseAction(_frame, winEdt, false);
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.append(pan);
@@ -115,34 +111,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
-    }
-
-    /**
-     * Action used to produce a "Browse" button for one of the text fields.
-     */
-    class BrowseAction extends AbstractAction {
-        JTextField comp;
-        boolean dir;
-
-        public BrowseAction(JTextField tc, boolean dir) {
-            super(Globals.lang("Browse"));
-            this.dir = dir;
-            comp = tc;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            String chosen = null;
-            if (dir)
-                chosen = Globals.getNewDir(_frame, _prefs, new File(comp.getText()), Globals.NONE,
-                        JFileChooser.OPEN_DIALOG, false);
-            else
-                chosen = Globals.getNewFile(_frame, _prefs, new File(comp.getText()), Globals.NONE,
-                        JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
-            }
-        }
     }
 
     public void setValues() {

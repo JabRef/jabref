@@ -36,20 +36,26 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+
 import java.lang.StringIndexOutOfBoundsException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+
 
 import javax.swing.*;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-
-import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.external.ExternalFileType;
 
 /**
  * Describe class <code>Util</code> here.
@@ -72,6 +78,15 @@ public class Util {
     EMPTY_IN_ONE = 2
     ,
     EMPTY_IN_TWO = 3;
+
+
+    final static NumberFormat idFormat;
+
+    static {
+        idFormat = NumberFormat.getInstance();
+        idFormat.setMinimumIntegerDigits(8);
+        idFormat.setGroupingUsed(false);
+    }
 
     public static void bool(boolean b) {
         if (b) System.out.println("true");
@@ -104,8 +119,10 @@ public class Util {
 
     private static int idCounter = 0;
 
+
     public synchronized static String createNeutralId() {
-        return String.valueOf(idCounter++);
+        return idFormat.format(idCounter++);
+        //return String.valueOf(idCounter++);
     }
 
     /**
@@ -381,12 +398,15 @@ public class Util {
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(String link, String fieldName,
-                                          JabRefPreferences prefs) throws IOException {
+    public static void openExternalViewer(MetaData metaData, String link, String fieldName
+    ) throws IOException {
 
         if (fieldName.equals("ps") || fieldName.equals("pdf")) {
-            //System.out.println(expandFilename(link, prefs.get(fieldName+"Directory")));
-            File file = expandFilename(link, prefs.get(fieldName + "Directory"));
+
+            // Find the default directory for this field type:
+            String dir = metaData.getFileDirectory(fieldName);
+
+            File file = expandFilename(link, dir);
 
             // Check that the file exists:
             if ((file == null) || !file.exists()) {
@@ -427,57 +447,59 @@ public class Util {
                 if (link.startsWith("\\url{") && link.endsWith("}")) link = link
                         .substring(5, link.length() - 1);
 
-                //System.err.println("Starting HTML browser: "
-                //                   + prefs.get("htmlviewer") + " " + link);
+                link = sanitizeUrl(link);
+
                 if (Globals.ON_MAC) {
                     String[] cmd = {"/usr/bin/open", "-a",
-                            prefs.get("htmlviewer"), link};
+                            Globals.prefs.get("htmlviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
                 } else if (Globals.ON_WIN) {
                     openFileOnWindows(link, false);
-                    /*cmdArray[0] = prefs.get("htmlviewer");
+                    /*cmdArray[0] = Globals.prefs.get("htmlviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(
                     cmdArray[0] + " " + cmdArray[1]);
                     */
                 } else {
-                    cmdArray[0] = prefs.get("htmlviewer");
+                    cmdArray[0] = Globals.prefs.get("htmlviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray);
                 }
 
             } catch (IOException e) {
                 System.err.println("An error occured on the command: "
-                        + prefs.get("htmlviewer") + " " + link);
+                        + Globals.prefs.get("htmlviewer") + " " + link);
+            } catch (URISyntaxException e2) {
+                e2.printStackTrace();
             }
         } else if (fieldName.equals("ps")) {
             try {
                 if (Globals.ON_MAC) {
                     String[] cmd = {"/usr/bin/open", "-a",
-                            prefs.get("psviewer"), link};
+                            Globals.prefs.get("psviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
                 } else if (Globals.ON_WIN) {
                     openFileOnWindows(link, true);
                     /*
-                    cmdArray[0] = prefs.get("psviewer");
+                    cmdArray[0] = Globals.prefs.get("psviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(
                             cmdArray[0] + " " + cmdArray[1]);
                     */
                 } else {
-                    cmdArray[0] = prefs.get("psviewer");
+                    cmdArray[0] = Globals.prefs.get("psviewer");
                     cmdArray[1] = link;
                     Process child = Runtime.getRuntime().exec(cmdArray);
                 }
             } catch (IOException e) {
                 System.err.println("An error occured on the command: "
-                        + prefs.get("psviewer") + " " + link);
+                        + Globals.prefs.get("psviewer") + " " + link);
             }
         } else if (fieldName.equals("pdf")) {
             try {
                 if (Globals.ON_MAC) {
                     String[] cmd = {"/usr/bin/open", "-a",
-                            prefs.get("pdfviewer"), link};
+                            Globals.prefs.get("pdfviewer"), link};
                     Process child = Runtime.getRuntime().exec(cmd);
                 } else if (Globals.ON_WIN) {
                     openFileOnWindows(link, true);
@@ -499,7 +521,7 @@ public class Util {
                     Process child = Runtime.getRuntime().exec(cmd);
                     */
                 } else {
-                    cmdArray[0] = prefs.get("pdfviewer");
+                    cmdArray[0] = Globals.prefs.get("pdfviewer");
                     cmdArray[1] = link;
                     //Process child = Runtime.getRuntime().exec(cmdArray[0]+"
                     // "+cmdArray[1]);
@@ -508,7 +530,7 @@ public class Util {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("An error occured on the command: "
-                        + prefs.get("pdfviewer") + " #" + link);
+                        + Globals.prefs.get("pdfviewer") + " #" + link);
                 System.err.println(e.getMessage());
             }
         } else {
@@ -517,6 +539,7 @@ public class Util {
             //ignore
         }
     }
+
 
     /**
      * Opens a file on a Windows system, using its default viewer.
@@ -536,9 +559,120 @@ public class Util {
             }
             link = sb.toString();
 	    }*/
-	link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
+    link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
         String cmd = "cmd.exe /c start " + link;
         Process child = Runtime.getRuntime().exec(cmd);
+    }
+
+    /**
+     * Open an external file, attempting to use the correct viewer for it.
+     * @param metaData The MetaData for the database this file belongs to.
+     * @param link The file name.
+     */
+    public static void openExternalFileAnyFormat(MetaData metaData, String link)
+        throws IOException {
+
+        // For other platforms we'll try to find the file type:
+        File file = new File(link);
+
+        // We try to check the extension for the file:
+        String name = file.getName();
+        int pos = name.indexOf('.');
+        String extension = ((pos >= 0) && (pos < name.length()-1)) ?
+                name.substring(pos+1).trim().toLowerCase() : null;
+
+        /*if ((extension == null) || (extension.length() == 0)) {
+            // No extension. What to do?
+            throw new IOException(Globals.lang("No file extension. Could not find viewer for file."));
+        } */
+
+        // Now we know the extension, check if it is one we know about:
+        ExternalFileType fileType = Globals.prefs.getExternalFileType(extension);
+
+        
+        // Find the default directory for this field type, if any:
+        String dir = metaData.getFileDirectory(extension);
+        if (dir != null) {
+            File tmp = expandFilename(link, dir);
+            if (tmp != null)
+                file = tmp;
+        }
+
+        // Check if we have arrived at an existing file:
+        if (file.exists() && (fileType != null)) {
+            // Open the file:
+            try {
+                if (Globals.ON_MAC) {
+                    String[] cmd = {"/usr/bin/open", "-a",
+                            fileType.getOpenWith(), file.getPath()};
+                    Runtime.getRuntime().exec(cmd);
+                } else if (Globals.ON_WIN) {
+                    openFileOnWindows(file.getPath(), true);
+                } else {
+                    String[] cmdArray = new String[] {
+                            fileType.getOpenWith(),
+                            file.getPath()
+                    };
+                    Runtime.getRuntime().exec(cmdArray);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("An error occured on the command: "
+                        + fileType.getOpenWith() + " #" + link);
+                System.err.println(e.getMessage());
+            }
+
+        }
+        else {
+            // No file matched the name, or we didn't know the file type.
+            // Perhaps it is an URL thing.
+
+            // First check if it is enclosed in \\url{}. If so, remove
+            // the wrapper.
+            if (link.startsWith("\\url{") && link.endsWith("}")) link = link
+                    .substring(5, link.length() - 1);
+
+            if (link.startsWith("doi:"))
+                link = Globals.DOI_LOOKUP_PREFIX+link;
+
+            try {
+                link = sanitizeUrl(link);
+            } catch (URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+
+            if (Globals.ON_MAC) {
+                String[] cmd = {"/usr/bin/open", "-a",
+                        Globals.prefs.get("htmlviewer"), link};
+                Runtime.getRuntime().exec(cmd);
+            } else if (Globals.ON_WIN) {
+                openFileOnWindows(link, false);
+            } else {
+                String[] cmdArray = new String[] {
+                    Globals.prefs.get("htmlviewer"),
+                    link
+                };
+                Runtime.getRuntime().exec(cmdArray);
+            }
+
+        }
+    }
+
+    /**
+     * Make sure an URL is "portable", in that it doesn't contain bad characters
+     * that break the open command in some OSes.
+     * @param link The URL to sanitize.
+     * @return Sanitized URL
+     */
+    private static String sanitizeUrl(String link) throws URISyntaxException {
+        String scheme = "http";
+        String ssp;
+        if (link.indexOf("//") > 0)
+            ssp = "//" + link.substring(2+link.indexOf("//"));
+        else
+            ssp = "//" + link;
+        URI uri = new URI(scheme, ssp, null);
+        return uri.toASCIIString();
     }
 
     /**
@@ -897,7 +1031,7 @@ public class Util {
 
         return back;
     }
-    
+
     /** Quotes each and every character, e.g. '!' as &#33;. Used for
      *  verbatim display of arbitrary strings that may contain HTML entities. */
     public static String quoteForHTML(String s) {
@@ -907,7 +1041,7 @@ public class Util {
         }
         return sb.toString();
     }
-    
+
     public static String quote(String s, String specials, char quoteChar) {
         return quote(s, specials, quoteChar, 0);
     }

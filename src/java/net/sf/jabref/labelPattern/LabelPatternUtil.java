@@ -164,7 +164,6 @@ public class LabelPatternUtil {
 		    System.out.println("Got authString " + authString);
                   } else {
                     if (_entry.getField("author") == null || _entry.getField("author").toString().equals("")) {
-                      System.out.println("author empty, so replacing with editor for label generation");
                       authString = _entry.getField("editor").toString();
                     } else {
                       authString = _entry.getField("author").toString();

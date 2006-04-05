@@ -85,6 +85,7 @@ public class Layout
                 }
                 else
                 {
+                    System.out.println(blockStart+"\n"+si.s);
                     System.out.println(
                         "Nested field entries are not implemented !!!");
                     //System.out.println("..."+blockStart+"..."+si.s+"...");

@@ -15,8 +15,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JCheckBox autoOpenForm, backup, openLast, showSource,
     defSource, editSource, defSort, ctrlClick, disableOnMultiple,
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
-    confirmDelete, saveInStandardOrder, allowEditing, /*preserveFormatting, */useImportInspector,
+    confirmDelete, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
+    private JRadioButton
+        saveOriginalOrder, saveAuthorOrder, saveTableOrder;
     private JTextField defOwnerField, timeStampFormat, timeStampField,
             bracesAroundCapitalsFields, nonWrappableFields;
     JabRefPreferences _prefs;
@@ -46,7 +48,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
         keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
         keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
-        saveInStandardOrder = new JCheckBox(Globals.lang("Always save database ordered by author name"));
+        saveAuthorOrder = new JRadioButton(Globals.lang("Save ordered by author/editor/year"));
+        saveOriginalOrder = new JRadioButton(Globals.lang("Save entries in their original order"));
+        saveTableOrder = new JRadioButton(Globals.lang("Save in default table sort order"));
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(saveAuthorOrder);
+        bg.add(saveOriginalOrder);
+        bg.add(saveTableOrder);
         autoDoubleBraces = new JCheckBox(
                 //+ Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
                 //+ "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
@@ -68,8 +76,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         editSource.setMargin(marg);
         defSource.setMargin(marg);
         inspectionWarnDupli.setMargin(marg);
-        bracesAroundCapitalsFields = new JTextField(30);
-        nonWrappableFields = new JTextField(30);
+        bracesAroundCapitalsFields = new JTextField(25);
+        nonWrappableFields = new JTextField(25);
         // We need a listener on showSource to enable and disable the source panel-related choices:
         showSource.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
@@ -89,84 +97,43 @@ public class GeneralTab extends JPanel implements PrefsTab {
         );
 
         FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
-                        "");
+                ("8dlu, left:pref, 8dlu, fill:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
+                        "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
+                        +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
+                        +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
+                                    +"pref, 6dlu, pref, 6dlu, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JPanel pan = new JPanel();
-        builder.appendSeparator(Globals.lang("File"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(openLast);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(backup);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(saveInStandardOrder);
-        builder.nextLine();
-        builder.append(pan);
-        //builder.append(preserveFormatting);
-        //builder.nextLine();
-        //builder.append(pan);
-        builder.append(autoDoubleBraces);
-        builder.nextLine();
+        CellConstraints cc = new CellConstraints();
+        builder.addSeparator(Globals.lang("File"), cc.xyw(1,1, 5));
+        builder.add(openLast, cc.xy(2,3));
+        builder.add(backup, cc.xy(2,5));
+        builder.add(autoDoubleBraces, cc.xy(2, 7));
+        builder.add(saveAuthorOrder, cc.xy(4, 3));
+        builder.add(saveTableOrder, cc.xy(4, 5));
+        builder.add(saveOriginalOrder, cc.xy(4, 7));
         JLabel label = new JLabel(Globals.lang("Store the following fields with braces around capital letters")+":");
-        DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref",""));
-        //panel.setLayout
+        DefaultFormBuilder builder3 = new DefaultFormBuilder
+                (new FormLayout("left:pref, 4dlu, fill:pref",""));
         builder3.append(label);
         builder3.append(bracesAroundCapitalsFields);
-        //
-        //builder.append(panel);
-        //builder.nextLine();
         label = new JLabel(Globals.lang("Do not wrap the following fields when saving")+":");
         builder3.append(label);
         builder3.append(nonWrappableFields);
-        builder.append(pan);
-        builder.append(builder3.getPanel());
-        //builder.append(panel);
-        builder.nextLine();
+        builder.add(builder3.getPanel(), cc.xyw(2, 9, 3));
 
-        //builder.appendSeparator(Globals.lang("Miscellaneous"));
-        //builder.nextLine();
-        builder.appendSeparator(Globals.lang("Entry editor"));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(autoOpenForm);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(disableOnMultiple);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(showSource);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(defSource);
-        builder.nextLine();
-        builder.appendSeparator(Globals.lang("Miscellaneous"));
-        builder.append(pan);
-        builder.append(useImportInspector);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(useImportInspector);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(useImportInspectorForSingle);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(inspectionWarnDupli);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(ctrlClick);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(confirmDelete);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(keyDuplicateWarningDialog);
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(keyEmptyWarningDialog);
-        builder.nextLine();
+        builder.addSeparator(Globals.lang("Entry editor"), cc.xyw(1, 11, 5));
+        builder.add(autoOpenForm, cc.xy(2, 13));
+        builder.add(disableOnMultiple, cc.xy(2, 15));
+        builder.add(showSource, cc.xy(2, 17));
+        builder.add(defSource, cc.xy(2, 19));
+        builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 21, 5));
+        builder.add(useImportInspector, cc.xy(2, 23));
+        builder.add(useImportInspectorForSingle, cc.xy(4, 23));
+        builder.add(inspectionWarnDupli, cc.xy(4, 25));
+        builder.add(ctrlClick, cc.xy(2, 27));
+        builder.add(confirmDelete, cc.xy(2, 29));
+        builder.add(keyDuplicateWarningDialog, cc.xy(2, 31));
+        builder.add(keyEmptyWarningDialog, cc.xy(2, 33));
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
                 ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
@@ -195,12 +162,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
         lab = new JLabel(Globals.lang("Default encoding") + ":");
         builder2.append(lab);
         builder2.append(encodings);
-        builder.append(pan);
-        builder.append(builder2.getPanel());
-        builder.nextLine();
-        //builder.appendSeparator();
 
-        pan = builder.getPanel();
+        builder.add(builder2.getPanel(), cc.xyw(2, 35, 3));
+
+
+        JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
 
@@ -222,7 +188,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
         confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
-        saveInStandardOrder.setSelected(_prefs.getBoolean("saveInStandardOrder"));
+        if (_prefs.getBoolean("saveInStandardOrder"))
+            saveAuthorOrder.setSelected(true);
+        else if (_prefs.getBoolean("saveInOriginalOrder"))
+            saveOriginalOrder.setSelected(true);
+        else
+            saveTableOrder.setSelected(true);
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
         defOwnerField.setText(_prefs.get("defaultOwner"));
@@ -271,7 +242,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
-        _prefs.putBoolean("saveInStandardOrder", saveInStandardOrder.isSelected());
+        _prefs.putBoolean("saveInStandardOrder", saveAuthorOrder.isSelected());
+        _prefs.putBoolean("saveInOriginalOrder", saveOriginalOrder.isSelected());
         _prefs.putBoolean("allowTableEditing", allowEditing.isSelected());
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
         //_prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());

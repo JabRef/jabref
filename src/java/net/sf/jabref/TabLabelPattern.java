@@ -24,12 +24,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 
 /**
- * This is the panel for the key pattern definition tab in 'Preferences'. So far
- * it is only possible to edit default entry types.
- * 
- * Labels and buttons does not yet draw from a resource file.
- *   
- * @author Ulrik Stervbo (ulriks AT ruc.dk)
+ * The Preferences panel for key generation.
  */
 public class TabLabelPattern extends JPanel implements PrefsTab{
 	
@@ -42,10 +37,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	private LabelPattern _keypatterns = null;
 	
     private JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys")),
-        warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys"));
+        warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys")),
+        generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
 
-    
-	private JLabel lblEntryType, lblKeyPattern;
+
+    private JLabel lblEntryType, lblKeyPattern;
 
     private JTextField defaultPat = new JTextField();
 
@@ -88,7 +84,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
          //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
          Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
          Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
-
+         Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
          LabelPatternUtil.updateDefaultPattern();
 
 
@@ -273,10 +269,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         builder.nextLine();
         builder.append(pan);
         builder.append(warnBeforeOverwriting);
+        builder.append(dontOverwrite);
         builder.nextLine();
         builder.append(pan);
-        builder.append(dontOverwrite);
-
+        builder.append(generateOnSave);        
         builder.nextLine();
         builder.append(pan);
         builder.append(Globals.lang("Replace (regular expression)")+":");
@@ -391,6 +387,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         _keypatterns = _prefs.getKeyPattern();
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
         dontOverwrite.setSelected(Globals.prefs.getBoolean("avoidOverwritingKey"));
+        generateOnSave.setSelected(Globals.prefs.getBoolean("generateKeysBeforeSaving"));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());

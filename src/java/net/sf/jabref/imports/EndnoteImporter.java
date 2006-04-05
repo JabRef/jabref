@@ -113,8 +113,7 @@ public class EndnoteImporter extends ImportFormat {
         }else if (prefix.equals("E")){
             if (Editor.equals("")) Editor = val;
             else Editor += " and " + val;
-        }else if (prefix.equals("T")) hm.put("title", Util
-                             .putBracesAroundCapitals(val));
+        }else if (prefix.equals("T")) hm.put("title", val);
         else if (prefix.equals("0")){
             if (val.indexOf("Journal") == 0) Type = "article";
             else if ((val.indexOf("Book Section") == 0)) Type = "incollection";

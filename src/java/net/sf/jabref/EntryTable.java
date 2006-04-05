@@ -39,8 +39,6 @@ import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.*;
 
-import net.sf.jabref.groups.EntryTableTransferHandler;
-
 public class EntryTable extends JTable {
 
     final int PREFERRED_WIDTH = 400, PREFERRED_HEIGHT = 30;
@@ -67,9 +65,9 @@ public class EntryTable extends JTable {
 
     private ListSelectionListener previewListener = null;
     private int activeRow = -1;
-    
+
     ListSelectionListener groupsHighlightListener;
-    
+
     public EntryTable(EntryTableModel tm_, BasePanel panel_, JabRefPreferences prefs_) {
         super(tm_);
         this.tableModel = tm_;
@@ -82,8 +80,8 @@ public class EntryTable extends JTable {
         // enable DnD
         setDragEnabled(true);
         // The following line is commented because EntryTableTransferHandler's
-	// constructor now only accepts MainTable which has replaced EntryTable.
-	// setTransferHandler(new EntryTableTransferHandler(this));
+    // constructor now only accepts MainTable which has replaced EntryTable.
+    // setTransferHandler(new EntryTableTransferHandler(this));
 
   //renderingHints = g2.getRenderingHints();
          //renderingHints.put(RenderingHints.KEY_ANTIALIASING,
@@ -157,7 +155,7 @@ public class EntryTable extends JTable {
               else prefs.putBoolean("priDescending",
                                     !prefs.getBoolean("priDescending"));
               tableModel.remap();
-              
+
             }
           }
         });
@@ -194,7 +192,7 @@ public class EntryTable extends JTable {
             }
         };
         getSelectionModel().addListSelectionListener(groupsHighlightListener);
-        
+
         // (to update entry editor or preview)
         setWidths();
         sp.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
@@ -226,12 +224,11 @@ public class EntryTable extends JTable {
     /**
      * Updates our Set containing the last row selection. Ckecks which rows were ADDED
      * to the selection, to see what new entry should be previewed.
-     * Returns the number of the row that should be considered active, or -1 if none.
      *
      * This method may have some potential for optimization.
      *
      * @param rows
-     * @return
+     * @return The number of the row that should be considered active, or -1 if none. 
      */
     private int resolveNewSelection(int[] rows) {
         HashSet newSel = new HashSet();
@@ -546,7 +543,7 @@ public class EntryTable extends JTable {
               }
 
               try {
-                Util.openExternalViewer( (String) link, fieldName, prefs);
+                Util.openExternalViewer(panel.metaData, (String) link, fieldName);
               }
               catch (IOException ex) {
                 panel.output(Globals.lang("Error")+": "+ex.getMessage());

@@ -60,11 +60,11 @@ public class GUIGlobals {
       TYPE_HEADER = "entrytype",
       NUMBER_COL = "#",
       encPrefix = "Encoding: ", // Part of the signature in written bib files.
-      linuxDefaultLookAndFeel = "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel",
+      linuxDefaultLookAndFeel = "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
       //"com.shfarr.ui.plaf.fh.FhLookAndFeel",
 //"net.sourceforge.mlf.metouia.MetouiaLookAndFeel",
 //"org.compiere.plaf.CompiereLookAndFeel",
-      windowsDefaultLookAndFeel = "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel";
+      windowsDefaultLookAndFeel = "com.jgoodies.looks.windows.WindowsLookAndFeel";
 
   public static Font CURRENTFONT,
       typeNameFont,
@@ -118,7 +118,7 @@ public class GUIGlobals {
     public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
     public static Color activeEditor = new Color(230, 230, 255);
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
-        {"author", "title", "year"};
+        {"author", "title", "year", Globals.KEY_FIELD};
 
     public static JLabel getTableIcon(String fieldType) {
         Object o = tableIcons.get(fieldType);
@@ -436,7 +436,8 @@ public class GUIGlobals {
     LANGUAGES.put("English", "en");
     LANGUAGES.put("Deutsch", "de");
     LANGUAGES.put("Fran\u00E7ais", "fr");
-    LANGUAGES.put("Norsk", "no");
+      LANGUAGES.put("Italiano", "it");
+      LANGUAGES.put("Norsk", "no");
 
     FIELD_EXTRAS = new HashMap();
     // fieldExtras contains mappings to tell the EntryEditor to add a specific

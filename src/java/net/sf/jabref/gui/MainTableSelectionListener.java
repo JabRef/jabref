@@ -4,6 +4,7 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.EventList;
 import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileMenuItem;
 
 import javax.swing.*;
 import java.awt.event.MouseListener;
@@ -38,8 +39,8 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
 
     private void instantiatePreviews() {
         previewPanel = new PreviewPanel[]
-                {new PreviewPanel(panel.database(), Globals.prefs.get("preview0")),
-                        new PreviewPanel(panel.database(), Globals.prefs.get("preview1"))};
+                {new PreviewPanel(panel.database(), panel.metaData(), Globals.prefs.get("preview0")),
+                        new PreviewPanel(panel.database(), panel.metaData(), Globals.prefs.get("preview1"))};
         BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
         previewPanel[0].setEntry(testEntry);
         previewPanel[1].setEntry(testEntry);
@@ -142,23 +143,13 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                 row = table.rowAtPoint(e.getPoint());
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger()) {
-            processPopupTrigger(e, row, col);
+            processPopupTrigger(e, row);
             return;
         }
     }
 
-    protected void processPopupTrigger(MouseEvent e, int row, int col) {
-        int selRow = table.getSelectedRow();
-        if (selRow == -1 ||// (getSelectedRowCount() == 0))
-                !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
-            table.setRowSelectionInterval(row, row);
-            //panel.updateViewToSelected();
-        }
-        RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.metaData());
-        rightClickMenu.show(table, e.getX(), e.getY());
-    }
+     public void mousePressed(MouseEvent e) {
 
-    public void mousePressed(MouseEvent e) {
 
         // First find the column on which the user has clicked.
         final int col = table.columnAtPoint(e.getPoint()),
@@ -171,14 +162,20 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             editSignalled(toShow);
         }
 
+        // Check if the user has clicked on an icon cell to open url or pdf.
+        final String[] iconType = table.getIconTypeForColumn(col);
+
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger()) {
-            processPopupTrigger(e, row, col);
+            if (iconType == null)
+                processPopupTrigger(e, row);
+            else
+                showIconRightClickMenu(e, row, iconType);
+
             return;
         }
 
-        // Check if the user has clicked on an icon cell to open url or pdf.
-        final String[] iconType = table.getIconTypeForColumn(col);
+
         if (iconType != null) {
 
             Object value = table.getValueAt(row, col);
@@ -207,7 +204,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                     }
 
                     try {
-                        Util.openExternalViewer((String) link, fieldName, Globals.prefs);
+                        Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                     }
                     catch (IOException ex) {
                         panel.output(Globals.lang("Error") + ": " + ex.getMessage());
@@ -216,6 +213,53 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
 
             }).start();
         }
+    }
+
+    /**
+     * Process general right-click events on the table. Show the table context menu at
+     * the position where the user right-clicked.
+     * @param e The mouse event defining the popup trigger.
+     * @param row The row where the event occured.
+     */
+    protected void processPopupTrigger(MouseEvent e, int row) {
+         int selRow = table.getSelectedRow();
+         if (selRow == -1 ||// (getSelectedRowCount() == 0))
+                 !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
+             table.setRowSelectionInterval(row, row);
+             //panel.updateViewToSelected();
+         }
+         RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.metaData());
+         rightClickMenu.show(table, e.getX(), e.getY());
+     }
+
+    /**
+     * Process popup trigger events occuring on an icon cell in the table. Show
+     * a menu where the user can choose which external resource to open for the
+     * entry. If no relevant external resources exist, let the normal popup trigger
+     * handler do its thing instead.
+     * @param e The mouse event defining this popup trigger.
+     * @param row The row where the event occured.
+     * @param iconType A string array containing the resource fields associated with
+     *  this table cell.
+     */
+    private void showIconRightClickMenu(MouseEvent e, int row, String[] iconType) {
+        BibtexEntry entry = (BibtexEntry) tableRows.get(row);
+        JPopupMenu menu = new JPopupMenu();
+        int count = 0;
+        for (int i=0; i<iconType.length; i++) {
+            Object o = entry.getField(iconType[i]);
+            if (o != null) {
+                menu.add(new ExternalFileMenuItem((String)o, (String)o,
+                        GUIGlobals.getTableIcon(iconType[i]).getIcon(),
+                        panel.metaData()));
+                count++;
+            }
+        }
+        if (count == 0) {
+            processPopupTrigger(e, row);
+            return;
+        }
+        menu.show(table, e.getX(), e.getY());
     }
 
     public void entryEditorClosing(EntryEditor editor) {

@@ -31,10 +31,12 @@ public class AttachFileDialog extends JDialog {
         ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel"));
     BibtexEntry entry;
+    MetaData metaData;
     private boolean cancelled = true; // Default to true, so a pure close operation implies Cancel.
 
-    public AttachFileDialog(Frame parent, BibtexEntry entry, String fieldName) {
+    public AttachFileDialog(Frame parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);
+        this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
         this.editor = new FieldTextField(fieldName, (String)entry.getField(fieldName), false);
@@ -42,8 +44,9 @@ public class AttachFileDialog extends JDialog {
         initGui();
     }
 
-    public AttachFileDialog(Dialog parent, BibtexEntry entry, String fieldName) {
+    public AttachFileDialog(Dialog parent, MetaData metaData, BibtexEntry entry, String fieldName) {
         super(parent, true);
+        this.metaData = metaData;
         this.entry = entry;
         this.fieldName = fieldName;
         this.editor = new FieldTextField(fieldName, (String)entry.getField(fieldName), false);
@@ -61,7 +64,7 @@ public class AttachFileDialog extends JDialog {
 
     private void initGui() {
 
-        final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, entry,
+        final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
                       Util.getFileFilterForField(fieldName));
 
         browse.addActionListener(new ActionListener () {

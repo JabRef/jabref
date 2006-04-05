@@ -39,6 +39,7 @@ import java.util.prefs.*;
 import java.util.*;
 import java.awt.event.*;
 import net.sf.jabref.export.ExportComparator;
+import net.sf.jabref.external.ExternalFileType;
 
 public class JabRefPreferences {
 
@@ -46,8 +47,8 @@ public class JabRefPreferences {
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
         CUSTOM_TYPE_OPT = "customTypeOpt_",
-	CUSTOM_TAB_NAME = "customTabName_",
-	CUSTOM_TAB_FIELDS = "customTabFields_";
+    CUSTOM_TAB_NAME = "customTabName_",
+    CUSTOM_TAB_FIELDS = "customTabFields_";
 
     public String WRAPPED_USERNAME;
 
@@ -66,17 +67,20 @@ public class JabRefPreferences {
 
     /** Set with all custom {@link ImportFormat}s */
     public CustomImportList customImports;
-    
+
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList = null;
+
+    // Map containing all registered external file types:
+    private Map externalFileTypes = new HashMap();
 
     // The only instance of this class:
     private static JabRefPreferences INSTANCE = null;
 
     public static JabRefPreferences getInstance() {
-	if (INSTANCE == null)
-	    INSTANCE = new JabRefPreferences();
-	return INSTANCE;
+    if (INSTANCE == null)
+        INSTANCE = new JabRefPreferences();
+    return INSTANCE;
     }
 
     // The constructor is made private to enforce this as a singleton class:
@@ -116,10 +120,10 @@ public class JabRefPreferences {
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
         defaults.put("namesFf", Boolean.FALSE);
-	    defaults.put("namesLf", Boolean.FALSE);
+        defaults.put("namesLf", Boolean.FALSE);
         defaults.put("namesNatbib", Boolean.TRUE);
         defaults.put("abbrAuthorNames", Boolean.TRUE);
-	    defaults.put("namesLastOnly", Boolean.TRUE);
+        defaults.put("namesLastOnly", Boolean.TRUE);
         defaults.put("language", "en");
         defaults.put("showShort", Boolean.TRUE);
         defaults.put("priSort", "author");
@@ -139,7 +143,7 @@ public class JabRefPreferences {
         defaults.put("entryTypeFormWidth", new Integer(1));
         defaults.put("backup", Boolean.TRUE);
         defaults.put("openLastEdited", Boolean.TRUE);
-        defaults.put("lastEdited", (String)null);
+        defaults.put("lastEdited", null);
         defaults.put("stringsPosX", new Integer(0));
         defaults.put("stringsPosY", new Integer(0));
         defaults.put("stringsSizeX", new Integer(600));
@@ -155,6 +159,7 @@ public class JabRefPreferences {
         defaults.put("searchAll", Boolean.FALSE);
         defaults.put("incrementS", Boolean.FALSE);
         defaults.put("saveInStandardOrder", Boolean.TRUE);
+        defaults.put("saveInOriginalOrder", Boolean.FALSE);
         defaults.put("selectS", Boolean.FALSE);
         defaults.put("regExpSearch", Boolean.TRUE);
         defaults.put("searchPanePosX", new Integer(0));
@@ -180,25 +185,26 @@ public class JabRefPreferences {
 
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
+        defaults.put("latexEditorPath", "C:\\TEMP\\Led.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
-	// The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
+    // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
                      "pdf;comment;owner");
 
-	// Entry editor tab 0:
-	defaults.put(CUSTOM_TAB_NAME+"0", Globals.lang("General"));
+    // Entry editor tab 0:
+    defaults.put(CUSTOM_TAB_NAME+"0", Globals.lang("General"));
         defaults.put(CUSTOM_TAB_FIELDS+"0", "crossref;keywords;doi;url;citeseerurl;"+
                      "pdf;comment;owner;timestamp");
 
-	// Entry editor tab 1:
+    // Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS+"1", "abstract");
-	defaults.put(CUSTOM_TAB_NAME+"1", Globals.lang("Abstract"));
+    defaults.put(CUSTOM_TAB_NAME+"1", Globals.lang("Abstract"));
 
   // Entry editor tab 2: Review Field - used for research comments, etc.
         defaults.put(CUSTOM_TAB_FIELDS+"2", "review");
-	defaults.put(CUSTOM_TAB_NAME+"2", Globals.lang("Review"));
+    defaults.put(CUSTOM_TAB_NAME+"2", Globals.lang("Review"));
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(8));
@@ -283,6 +289,7 @@ public class JabRefPreferences {
         defaults.put("useTimeStamp", Boolean.TRUE);
         defaults.put("timeStampFormat", "yyyy.MM.dd");
         defaults.put("timeStampField", "timestamp");
+        defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
         defaults.put("remoteServerPort", new Integer(6050));
@@ -304,6 +311,13 @@ public class JabRefPreferences {
         //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
+
+        // TODO: remove temporary registering of external file types?
+        externalFileTypes.put("pdf", new ExternalFileType("PDF", "pdf", "acroread", null));
+        externalFileTypes.put("ps", new ExternalFileType("PostScript", "ps", "gs", null));
+        externalFileTypes.put("doc", new ExternalFileType("Word file", "doc", "oowriter", null));
+        externalFileTypes.put("odt", new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
+
     }
 
     public boolean putBracesAroundCapitals(String fieldName) {
@@ -326,6 +340,15 @@ public class JabRefPreferences {
                 nonWrappableFields.add(fields[i]);
         }
 
+    }
+
+    /**
+     * Check whether a key is set (differently from null).
+     * @param key The key to check.
+     * @return true if the key is set, false otherwise.
+     */
+    public boolean hasKey(String key) {
+        return prefs.get(key, null) != null;
     }
 
     public String get(String key) {
@@ -532,11 +555,11 @@ public class JabRefPreferences {
     }
 
     public void flush() {
-	try {
-	    prefs.flush();
-	} catch (BackingStoreException ex) {
-	    ex.printStackTrace();
-	}
+    try {
+        prefs.flush();
+    } catch (BackingStoreException ex) {
+        ex.printStackTrace();
+    }
     }
 
     /**
@@ -565,7 +588,7 @@ public class JabRefPreferences {
 
 
         public LabelPattern getKeyPattern(){
-            
+
             keyPattern = new LabelPattern(KEY_PATTERN);
             Preferences pre = Preferences.userNodeForPackage
                 (net.sf.jabref.labelPattern.LabelPattern.class);
@@ -782,13 +805,23 @@ public class JabRefPreferences {
     }
 
     /**
+     * Look up the external file type registered for this extension, if any.
+     * @param extension The file extension.
+     * @return The ExternalFileType registered, or null if none.
+     */
+    public ExternalFileType getExternalFileType(String extension) {
+        return (ExternalFileType)externalFileTypes.get(extension);
+    }
+
+
+    /**
      * Removes all information about custom entry types with tags of
      * @param number or higher.
      */
     public void purgeCustomEntryTypes(int number) {
-	purgeSeries(CUSTOM_TYPE_NAME, number);
-	purgeSeries(CUSTOM_TYPE_REQ, number);
-	purgeSeries(CUSTOM_TYPE_OPT, number);
+    purgeSeries(CUSTOM_TYPE_NAME, number);
+    purgeSeries(CUSTOM_TYPE_REQ, number);
+    purgeSeries(CUSTOM_TYPE_OPT, number);
 
         /*while (get(CUSTOM_TYPE_NAME+number) != null) {
             remove(CUSTOM_TYPE_NAME+number);
@@ -811,13 +844,13 @@ public class JabRefPreferences {
     }
 
     public EntryEditorTabList getEntryEditorTabList() {
-	if (tabList == null)
-	    updateEntryEditorTabList();
-	return tabList;
+    if (tabList == null)
+        updateEntryEditorTabList();
+    return tabList;
     }
 
     public void updateEntryEditorTabList() {
-	tabList = new EntryEditorTabList();
+    tabList = new EntryEditorTabList();
     }
 
     /**

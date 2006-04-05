@@ -28,10 +28,12 @@ package net.sf.jabref;
 import java.io.* ;
 import java.nio.charset.Charset;
 import java.util.* ;
+import java.util.List;
 import java.util.logging.* ;
 import java.util.logging.Filter ;
 
 import java.awt.* ;
+import java.nio.charset.Charset;
 import javax.swing.* ;
 
 import net.sf.jabref.collab.* ;
@@ -57,7 +59,7 @@ public class Globals {
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();
     public static ImportFormatReader importFormatReader = new ImportFormatReader();
 
-
+  public static ErrorConsole errorConsole;
 
    public static String VERSION,
                        BUILD,
@@ -69,6 +71,9 @@ public class Globals {
     VERSION = bi.getBUILD_VERSION() ;
     BUILD = bi.getBUILD_NUMBER() ;
     BUILD_DATE = bi.getBUILD_DATE() ;
+
+      // TODO: Error console initialization here. When should it be used?
+      errorConsole = ErrorConsole.getInstance();
   }
 
 
@@ -84,7 +89,14 @@ public class Globals {
       FORMATTER_PACKAGE = "net.sf.jabref.export.layout.format.";
   public static float duplicateThreshold = 0.75f;
   private static Handler consoleHandler = new java.util.logging.ConsoleHandler();
-  public static String[] ENCODINGS = (String[])Charset.availableCharsets().keySet().toArray(new String[]{}); 
+  public static String[] ENCODINGS,
+      ALL_ENCODINGS = //(String[]) Charset.availableCharsets().keySet().toArray(new String[]{});
+          new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
+              "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
+              "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
+              "Big5", "Big5_HKSCS", "GBK",
+              "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
+              "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
 
   // String array that maps from month number to month string label:
   public static String[] MONTHS = new String[] {"jan", "feb", "mar", "apr", "may", "jun",
@@ -105,6 +117,16 @@ public class Globals {
       MONTH_STRINGS.put("oct", "October");
       MONTH_STRINGS.put("nov", "November");
       MONTH_STRINGS.put("dec", "December");
+
+      // Build list of encodings, by filtering out all that are not supported
+      // on this system:
+      List encodings = new ArrayList();
+      for (int i=0; i<ALL_ENCODINGS.length; i++) {
+          if (Charset.isSupported(ALL_ENCODINGS[i]))
+            encodings.add(ALL_ENCODINGS[i]);
+      }
+      ENCODINGS = (String[])encodings.toArray(new String[0]);
+
   }
 
 
@@ -524,7 +546,8 @@ public class Globals {
       XML_CHARS = new HashMap(),
       ASCII2XML_CHARS = new HashMap(),
       UNICODE_CHARS = new HashMap(),
-      RTFCHARS = new HashMap();
+      RTFCHARS = new HashMap(),
+        URL_CHARS = new HashMap();
   static {
       
       //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", true));
@@ -544,52 +567,18 @@ public class Globals {
     } catch (Throwable t) {
 
     }
-    /*
-    HTML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&auml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&Auml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&euml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{E\\}\\}", "&Euml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{i\\}\\}", "&iuml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{I\\}\\}", "&Iuml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{o\\}\\}", "&ouml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{O\\}\\}", "&Ouml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{u\\}\\}", "&uuml;");
-    HTML_CHARS.put("\\{\\\\\\\"\\{U\\}\\}", "&Uuml;");
 
-    HTML_CHARS.put("\\{\\\\\\`\\{e\\}\\}", "&egrave;");
-    HTML_CHARS.put("\\{\\\\\\`\\{E\\}\\}", "&Egrave;");
-    HTML_CHARS.put("\\{\\\\\\`\\{i\\}\\}", "&igrave;");
-    HTML_CHARS.put("\\{\\\\\\`\\{I\\}\\}", "&Igrave;");
-    HTML_CHARS.put("\\{\\\\\\`\\{o\\}\\}", "&ograve;");
-    HTML_CHARS.put("\\{\\\\\\`\\{O\\}\\}", "&Ograve;");
-    HTML_CHARS.put("\\{\\\\\\`\\{u\\}\\}", "&ugrave;");
-    HTML_CHARS.put("\\{\\\\\\`\\{U\\}\\}", "&Ugrave;");
+      // Special characters in URLs need to be replaced to ensure that the URL
+      // opens properly on all platforms:
+      URL_CHARS.put("<", "%3c");
+      URL_CHARS.put(">", "%3e");
+      URL_CHARS.put("(", "%28");
+      URL_CHARS.put(")", "%29");
+      URL_CHARS.put(" ", "%20");
+      URL_CHARS.put("&", "%26");
+      URL_CHARS.put("$", "%24");
 
-    HTML_CHARS.put("\\{\\\\\\'\\{e\\}\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{E\\}\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{i\\}\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{I\\}\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{o\\}\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{O\\}\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{u\\}\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{U\\}\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{a\\}\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\'\\{A\\}\\}", "&Aacute;");
-    HTML_CHARS.put("\\{\\\\\\^\\{o\\}\\}", "&ocirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{O\\}\\}", "&Ocirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{u\\}\\}", "&ucirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{U\\}\\}", "&Ucirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{e\\}\\}", "&ecirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{E\\}\\}", "&Ecirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{i\\}\\}", "&icirc;");
-    HTML_CHARS.put("\\{\\\\\\^\\{I\\}\\}", "&Icirc;");
-    HTML_CHARS.put("\\{\\\\\\~\\{o\\}\\}", "&otilde;");
-    HTML_CHARS.put("\\{\\\\\\~\\{O\\}\\}", "&Otilde;");
-    HTML_CHARS.put("\\{\\\\\\~\\{n\\}\\}", "&ntilde;");
-    HTML_CHARS.put("\\{\\\\\\~\\{N\\}\\}", "&Ntilde;");
-    HTML_CHARS.put("\\{\\\\\\~\\{a\\}\\}", "&atilde;");
-    HTML_CHARS.put("\\{\\\\\\~\\{A\\}\\}", "&Atilde;");
-    */
+
 
     HTMLCHARS.put("\"a", "&auml;");
     HTMLCHARS.put("\"A", "&Auml;");
@@ -639,55 +628,6 @@ public class Globals {
     HTMLCHARS.put("~A", "&Atilde;");
     HTMLCHARS.put("cc", "&ccedil;");
     HTMLCHARS.put("cC", "&Ccedil;");
-    /*
-    HTML_CHARS.put("\\{\\\\\\\"a\\}", "&auml;");
-    HTML_CHARS.put("\\{\\\\\\\"A\\}", "&Auml;");
-    HTML_CHARS.put("\\{\\\\\\\"e\\}", "&euml;");
-    HTML_CHARS.put("\\{\\\\\\\"E\\}", "&Euml;");
-    HTML_CHARS.put("\\{\\\\\\\"i\\}", "&iuml;");
-    HTML_CHARS.put("\\{\\\\\\\"I\\}", "&Iuml;");
-    HTML_CHARS.put("\\{\\\\\\\"o\\}", "&ouml;");
-    HTML_CHARS.put("\\{\\\\\\\"O\\}", "&Ouml;");
-    HTML_CHARS.put("\\{\\\\\\\"u\\}", "&uuml;");
-    HTML_CHARS.put("\\{\\\\\\\"U\\}", "&Uuml;");
-
-    HTML_CHARS.put("\\{\\\\\\`e\\}", "&egrave;");
-    HTML_CHARS.put("\\{\\\\\\`E\\}", "&Egrave;");
-    HTML_CHARS.put("\\{\\\\\\`i\\}", "&igrave;");
-    HTML_CHARS.put("\\{\\\\\\`I\\}", "&Igrave;");
-    HTML_CHARS.put("\\{\\\\\\`o\\}", "&ograve;");
-    HTML_CHARS.put("\\{\\\\\\`O\\}", "&Ograve;");
-    HTML_CHARS.put("\\{\\\\\\`u\\}", "&ugrave;");
-    HTML_CHARS.put("\\{\\\\\\`U\\}", "&Ugrave;");
-    HTML_CHARS.put("\\{\\\\\\'A\\}", "&eacute;");
-    HTML_CHARS.put("\\{\\\\\\'E\\}", "&Eacute;");
-    HTML_CHARS.put("\\{\\\\\\'i\\}", "&iacute;");
-    HTML_CHARS.put("\\{\\\\\\'I\\}", "&Iacute;");
-    HTML_CHARS.put("\\{\\\\\\'o\\}", "&oacute;");
-    HTML_CHARS.put("\\{\\\\\\'O\\}", "&Oacute;");
-    HTML_CHARS.put("\\{\\\\\\'u\\}", "&uacute;");
-    HTML_CHARS.put("\\{\\\\\\'U\\}", "&Uacute;");
-    HTML_CHARS.put("\\{\\\\\\'a\\}", "&aacute;");
-    HTML_CHARS.put("\\{\\\\\\'A\\}", "&Aacute;");
-
-    HTML_CHARS.put("\\{\\\\\\^o\\}", "&ocirc;");
-    HTML_CHARS.put("\\{\\\\\\^O\\}", "&Ocirc;");
-    HTML_CHARS.put("\\{\\\\\\^u\\}", "&ucirc;");
-    HTML_CHARS.put("\\{\\\\\\^U\\}", "&Ucirc;");
-    HTML_CHARS.put("\\{\\\\\\^e\\}", "&ecirc;");
-    HTML_CHARS.put("\\{\\\\\\^E\\}", "&Ecirc;");
-    HTML_CHARS.put("\\{\\\\\\^i\\}", "&icirc;");
-    HTML_CHARS.put("\\{\\\\\\^I\\}", "&Icirc;");
-    HTML_CHARS.put("\\{\\\\\\~o\\}", "&otilde;");
-    HTML_CHARS.put("\\{\\\\\\~O\\}", "&Otilde;");
-    HTML_CHARS.put("\\{\\\\\\~n\\}", "&ntilde;");
-    HTML_CHARS.put("\\{\\\\\\~N\\}", "&Ntilde;");
-    HTML_CHARS.put("\\{\\\\\\~a\\}", "&atilde;");
-    HTML_CHARS.put("\\{\\\\\\~A\\}", "&Atilde;");
-
-    HTML_CHARS.put("\\{\\\\c c\\}", "&ccedil;");
-    HTML_CHARS.put("\\{\\\\c C\\}", "&Ccedil;");
-    */
 
     XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
     XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");

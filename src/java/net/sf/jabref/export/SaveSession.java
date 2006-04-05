@@ -7,6 +7,7 @@ import net.sf.jabref.GUIGlobals;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
+import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * Class used to handle safe storage to disk. Usage: create a SaveSession giving the file to save to, the
@@ -28,7 +29,8 @@ public class SaveSession {
     boolean backup;
     VerifyingWriter writer;
 
-    public SaveSession(File file, String encoding, boolean backup) throws IOException {
+    public SaveSession(File file, String encoding, boolean backup) throws IOException,
+        UnsupportedCharsetException {
         this.file = file;
         tmp = File.createTempFile(TEMP_PREFIX, TEMP_SUFFIX);
         this.backup = backup;

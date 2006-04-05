@@ -1,5 +1,5 @@
 
-JabRef 2.0.1
+JabRef 2.x
 ------------
 
 
@@ -80,8 +80,27 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-?       - Changed Paste fuction so timestamp and owner fields are updated.
+2.x     - Changed Paste fuction so timestamp and owner fields are updated.
         - Added "Other" item to the "New entry ..." menu.
+        - TODO: font size stuff after upgrading JGoodies Looks.
+        - TODO: HTML handling for IEEEXplore.
+        - Added IEEEXplore search and download feature.
+        - Added option to store entries in their original order. Unsorted table view now
+          shows entries in their original order.
+        - Added option to autogenerate keys for entries with missing keys before each save.
+        - Improved handling of external URLs to prevent problems with special characters.
+        - Medline and Endnote imports no longer automatically add curly braces around capital
+          letters in title.
+        - Float search now scrolls table to the top.
+        - Fixed problem with unsupported character encodings being selectable and causing
+          unreported save errors.
+        - Fixed bug that blocked last line in table columns setup from being removed.
+        - Fixed missing export formats from command line.
+        - Fixed bug that made Review tab impossible to remove from entry editor.
+        - Fixed bug in Medline XML import that assigned wrong PMID for some entries.
+        - Fixed bug in custom export that collapsed sequences of two or more backslashes
+          into a single backslash in output.
+        - Fixed bug (misspelled formatter name) in Harvard RTF export.
 2.0.1:	- Fixed bug that made a hidden entry editor under some circumstances store a
 	      field value to the wrong entry.
 	    - Fixed synchronization bug that made the opening of a new database sometimes fail.

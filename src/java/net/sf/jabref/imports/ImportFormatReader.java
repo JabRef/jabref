@@ -145,18 +145,31 @@ public class ImportFormatReader {
     return importFromFile(importer, filename);
   }
 
-  public List importFromFile(ImportFormat importer, String filename)
-    throws IOException {
-    File file = new File(filename);
-    InputStream stream = new FileInputStream(file);
+    public List importFromFile(ImportFormat importer, String filename) throws IOException {
+        List result = null;
+        InputStream stream = null;
 
-    if (!importer.isRecognizedFormat(stream))
-      throw new IOException(Globals.lang("Wrong file format"));
+        try {
+            File file = new File(filename);
+            stream = new FileInputStream(file);
 
-    stream = new FileInputStream(file);
+            if (!importer.isRecognizedFormat(stream))
+                throw new IOException(Globals.lang("Wrong file format"));
 
-    return importer.importEntries(stream);
-  }
+            stream = new FileInputStream(file);
+
+            result = importer.importEntries(stream);
+        } finally {
+            try {
+                if (stream != null)
+                    stream.close();
+            } catch (IOException ex) {
+                throw ex;
+            }
+        }
+
+        return result;
+    }
 
   public static BibtexDatabase createDatabase(List bibentries) {
     purgeEmptyEntries(bibentries);

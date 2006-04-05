@@ -30,12 +30,13 @@
 
 package com.jgoodies.uif_lite.panel;
 
+import com.jgoodies.looks.LookUtils;
+
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 
-import com.jgoodies.plaf.LookUtils;
 
 /** 
  * A <code>JPanel</code> subclass that has a drop shadow border and 

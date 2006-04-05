@@ -3,9 +3,7 @@ package net.sf.jabref;
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.border.Border;
 import java.io.*;
-import java.net.URL;
 import java.util.HashMap;
 import net.sf.jabref.export.layout.*;
 import java.awt.Dimension;
@@ -18,6 +16,7 @@ public class PreviewPanel extends JEditorPane {
   public String CONTENT_TYPE = "text/html";
       //LAYOUT_FILE = "simplehtml";
   BibtexEntry entry;
+  MetaData metaData;
   BibtexDatabase database = null;
     // If a database is set, the preview will attempt to resolve strings in the previewed
     // entry using that database.
@@ -29,17 +28,17 @@ public class PreviewPanel extends JEditorPane {
   String layoutFile;
   JScrollPane sp;
 
-    public PreviewPanel(BibtexDatabase db, String layoutFile) {
-        this(layoutFile);
+    public PreviewPanel(BibtexDatabase db, MetaData metaData, String layoutFile) {
+        this(layoutFile, metaData);
         this.database = db;
     }
 
-    public PreviewPanel(BibtexDatabase db, BibtexEntry be, String layoutFile) {
-        this(be, layoutFile);
+    public PreviewPanel(BibtexDatabase db, MetaData metaData, BibtexEntry be, String layoutFile) {
+        this(be, metaData, layoutFile);
         this.database = db;
     }
 
-  public PreviewPanel(BibtexEntry be, String layoutFile) {
+  public PreviewPanel(BibtexEntry be, MetaData metaData, String layoutFile) {
     entry = be;
     sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -58,11 +57,12 @@ public class PreviewPanel extends JEditorPane {
 
   }
 
-  public PreviewPanel(String layoutFile) {
+  public PreviewPanel(String layoutFile, MetaData metaData) {
     sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                          JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     this.layoutFile = layoutFile;
     sp.setBorder(null);
+    this.metaData = metaData;
 
     init();
     //setText("<HTML></HTML>");
@@ -80,7 +80,7 @@ public class PreviewPanel extends JEditorPane {
               if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
                     String address = hyperlinkEvent.getURL().toString(); 
-                      Util.openExternalViewer(address, "url", Globals.prefs);
+                      Util.openExternalViewer(metaData, address, "url");
                   } catch (IOException e) {
                       e.printStackTrace();
                   }

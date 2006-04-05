@@ -94,7 +94,8 @@ public class FieldContentSelector extends JComponent implements ActionListener {
 
     private void doInit() {
         setLayout(gbl);
-        list.setEditable(true);
+        //list.setEditable(true);
+        
         list.setMaximumRowCount(35);
 
         /*

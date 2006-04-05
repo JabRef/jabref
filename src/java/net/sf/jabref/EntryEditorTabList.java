@@ -18,10 +18,10 @@ public final class EntryEditorTabList {
 	list = new ArrayList();
 	names = new ArrayList();
 	int i=0;
-	String name=null;
-	String[] fields=null;
-	while ((name=Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i)) != null) {
-
+	String name;
+	String[] fields;
+	while (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME+i)) {
+        name=Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i);
 	    fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+i).split(";");
 	    List entry = Arrays.asList(fields);
 	    names.add(name);

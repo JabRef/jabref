@@ -42,6 +42,7 @@ import java.io.*;
 
 public class BibtexEntry
 {
+    public final static String ID_FIELD = "id";
     private String _id;
     private BibtexEntryType _type;
     private Map _fields = new HashMap();
@@ -169,7 +170,7 @@ public class BibtexEntry
 
         try
         {
-            firePropertyChangedEvent("id", _id, id);
+            firePropertyChangedEvent(ID_FIELD, _id, id);
         }
         catch (PropertyVetoException pv)
         {
@@ -208,7 +209,7 @@ public class BibtexEntry
 
     public void setField(String name, Object value) {
 
-        if ("id".equals(name)) {
+        if (ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
                                                "' is reserved");
         }
@@ -251,7 +252,7 @@ public class BibtexEntry
      */
     public void clearField(String name) {
 
-      if ("id".equals(name)) {
+      if (ID_FIELD.equals(name)) {
            throw new IllegalArgumentException("The field name '" + name +
                                               "' is reserved");
        }
@@ -316,17 +317,19 @@ public class BibtexEntry
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
         HashMap written = new HashMap();
         written.put(GUIGlobals.KEY_FIELD, null);
+        boolean hasWritten = false;
         // Write required fields first.
         String[] s = getRequiredFields();
         if (s != null) for (int i=0; i<s.length; i++) {
-            writeField(s[i], out, ff);
+            hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten);
             written.put(s[i], null);
         }
         // Then optional fields.
         s = getOptionalFields();
         if (s != null) for (int i=0; i<s.length; i++) {
             if (!written.containsKey(s[i])) { // If field appears both in req. and opt. don't repeat.
-                writeField(s[i], out, ff);
+                //writeField(s[i], out, ff);
+                hasWritten = hasWritten | writeField(s[i], out, ff, hasWritten);
                 written.put(s[i], null);
             }
         }
@@ -340,16 +343,30 @@ public class BibtexEntry
                	remainingFields.add(key);
         }
         for (Iterator i = remainingFields.iterator(); i.hasNext(); )
-            writeField((String)i.next(),out,ff);
+            hasWritten = hasWritten | writeField((String)i.next(), out, ff, hasWritten);
+            //writeField((String)i.next(),out,ff);
 
         // Finally, end the entry.
-        out.write("}"+Globals.NEWLINE);
+        out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
     }
 
-    private void writeField(String name, Writer out,
-                            FieldFormatter ff) throws IOException {
+    /**
+     * Write a single field, if it has any content.
+     * @param name The field name
+     * @param out The Writer to send it to
+     * @param ff A formatter to filter field contents before writing
+     * @param isFirst Indicates whether this is the first field written for
+     *    this entry - if not, start by writing a comma and newline
+     * @return true if this field was written, false if it was skipped because
+     *    it was not set
+     * @throws IOException In case of an IO error
+     */
+    private boolean writeField(String name, Writer out,
+                            FieldFormatter ff, boolean isFirst) throws IOException {
         Object o = getField(name);
         if (o != null) {
+            if (isFirst)
+                out.write(","+Globals.NEWLINE);
             out.write("  "+name+" = ");
 
             try {
@@ -358,9 +375,11 @@ public class BibtexEntry
                 throw new IOException
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
             }
+            return true;
             //Util.writeField(name, o, out);
-            out.write(","+Globals.NEWLINE);
-        }
+            //out.write(","+Globals.NEWLINE);
+        } else
+            return false;
     }
 
     /**

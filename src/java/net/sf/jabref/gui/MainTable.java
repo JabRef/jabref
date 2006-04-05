@@ -109,6 +109,7 @@ public class MainTable extends JTable {
         searchMatcher = m;
         searchComparator = new HitOrMissComparator(m);
         refreshSorting();
+        scrollTo(0);
     }
 
     /**

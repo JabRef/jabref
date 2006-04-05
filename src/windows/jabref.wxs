@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2003/01/wi">
-    <Product Name="JabRef 1.8.1" Id="118b0801-c924-4071-a0ab-6ec9844cc55a"
-            Version="1.8.1" Manufacturer="http://jabref.sf.net/"
+    <Product Name="JabRef 2.0.1" Id="118b0801-c924-4071-a0ab-6ec9844cc55a"
+            Version="2.0.1" Manufacturer="http://jabref.sf.net/"
             Language="1033">
         <Package Id="????????-????-????-????-????????????"
                 Comments="This MSI file installs JabRef."
@@ -10,7 +10,7 @@
         <Media Id="1" EmbedCab="yes" Cabinet="JabRef.cab"/>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
-                <Directory Id="JabRefDir" Name="JabRef" LongName="JabRef 1.8.1">
+                <Directory Id="JabRefDir" Name="JabRef" LongName="JabRef 2.0.1">
                         <Component Id="Libraries"
                                 Guid="6922b877-d0ea-4c52-a2b4-1e1339c398f5">
                             <File Id="jabrefjar" Name="JabRef.jar" LongName="jabref.jar" DiskId="1" src="jabref.jar" />
@@ -21,7 +21,7 @@
                                     src="jabref.exe">
                                 <Shortcut Id="shortcut"
                                         Directory="ProgramMenuFolder" Name="JabRef"
-                                        LongName="JabRef 1.8.1"
+                                        LongName="JabRef 2.0.1"
                                         Show="normal"
                                         WorkingDirectory="TARGETDIR"/>
                             </File>
@@ -34,5 +34,6 @@
             <ComponentRef Id="Libraries"/>
             <ComponentRef Id="Executables"/>
         </Feature>
+    <UIRef Id="WixUI" />
     </Product>
 </Wix>

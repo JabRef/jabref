@@ -71,7 +71,6 @@ public class FieldComparator implements Comparator {
     		String ours = ((String) f1).toLowerCase(),
     	    	theirs = ((String) f2).toLowerCase();
     		result = ours.compareTo(theirs);
-    		
     	}
 
         return result*multiplier;

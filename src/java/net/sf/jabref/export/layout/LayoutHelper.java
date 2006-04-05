@@ -326,6 +326,7 @@ public class LayoutHelper
         StringBuffer buffer = null;
         int previous = -1;
         boolean justParsedTag = false;
+        boolean escaped = false;
 
         while (!_eof)
         {
@@ -342,7 +343,8 @@ public class LayoutHelper
                 return null;
             }
 
-            if ((c == '\\') && (peek() != '\\') && (justParsedTag || (previous != '\\')))
+            if ((c == '\\') && (peek() != '\\') && !escaped)
+            //&& (justParsedTag || (previous != '\\')))
             {
                 if (buffer != null)
                 {
@@ -357,7 +359,7 @@ public class LayoutHelper
                 // To make sure the next character, if it is a backslash, doesn't get ignored,
                 // since "previous" now holds a backslash:
                 justParsedTag = true;
-
+                escaped = false;
             }
             else
             {
@@ -368,10 +370,12 @@ public class LayoutHelper
                     buffer = new StringBuffer(100);
                 }
 
-                if (!((c == '\\') && (previous == '\\')))
+                if ((c != '\\') || escaped)//(previous == '\\')))
                 {
                     buffer.append((char) c);
                 }
+
+                escaped = (c == '\\') && !escaped;
             }
 
             previous = c;

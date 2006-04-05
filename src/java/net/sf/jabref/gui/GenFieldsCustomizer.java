@@ -102,14 +102,14 @@ public class GenFieldsCustomizer extends JDialog {
 
   void ok_actionPerformed(ActionEvent e) {
       String[] lines = fieldsArea.getText().split("\n");
-      int i=0;
-      for (; i<lines.length; i++) {
-	  String[] parts = lines[i].split(":");
+      int i = 0;
+      for (; i < lines.length; i++) {
+          String[] parts = lines[i].split(":");
           if (parts.length != 2) {
               // Report error and exit.
               String field = Globals.lang("field");
-              JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form")+" '"+
-                      Globals.lang("Tabname")+":"+field+"1;"+field+"2;...;"+field+"N'",
+              JOptionPane.showMessageDialog(this, Globals.lang("Each line must be on the following form") + " '" +
+                      Globals.lang("Tabname") + ":" + field + "1;" + field + "2;...;" + field + "N'",
                       Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
               return;
           }
@@ -117,14 +117,15 @@ public class GenFieldsCustomizer extends JDialog {
           if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
               // Report error and exit.
               JOptionPane.showMessageDialog(this, Globals.lang("Field names are not allowed to contain white space or the following "
-                      +"characters")+": # { } ~ , ^ &",
+                      + "characters") + ": # { } ~ , ^ &",
                       Globals.lang("Error"), JOptionPane.ERROR_MESSAGE);
-              
+
               return;
           }
-          
-	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME+i), parts[0]);
-	  Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS+i), parts[1].toLowerCase());
+
+          System.out.println(Globals.prefs.CUSTOM_TAB_NAME + i);
+          Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME + i), parts[0]);
+          Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
       }
       Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_NAME, i);
       Globals.prefs.purgeSeries(Globals.prefs.CUSTOM_TAB_FIELDS, i);
@@ -149,13 +150,15 @@ public class GenFieldsCustomizer extends JDialog {
 	StringBuffer sb = new StringBuffer();
 	String name = null, fields = null;
 	int i=0;
-	while ((name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i)) != null) {
+	while (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME+i)) {
+        name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i);
 	    sb.append(name);
 	    fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+i);
 	    sb.append(":");
 	    sb.append(fields);
 	    sb.append("\n");
-	    i++;
+        System.out.println(Globals.prefs.CUSTOM_TAB_NAME+i);
+        i++;
 	}
 	fieldsArea.setText(sb.toString());
     }

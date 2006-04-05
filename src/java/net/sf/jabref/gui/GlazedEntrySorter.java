@@ -68,7 +68,13 @@ http://www.gnu.org/copyleft/gpl.ja.html
                 list.add(entries.get(i.next()));
             }
         }
+
+        // Sort the list so it is ordered according to creation (or read) order
+        // when the table is unsorted.
+        Collections.sort(list, new IdComparator());
+        
         list.getReadWriteLock().writeLock().unlock();
+
     }
 
     public EventList getTheList() {

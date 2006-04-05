@@ -1,94 +1,107 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.*;
+
+import javax.swing.*;
 import java.io.*;
 import java.awt.event.*;
 
-public class PushToLyx extends BaseAction {
+public class PushToLyx implements PushToApplication {
 
-    private BasePanel panel;
+    private boolean couldNotFindPipe=false;
+    private boolean couldNotWrite=false;
+    private String message = "";
 
-    public PushToLyx(BasePanel panel) {
-	this.panel = panel;
-    }
+    public void pushEntries(final BibtexEntry[] entries, final String keyString) {
 
-    public void action() {
-	final BibtexEntry[] entries = panel.getSelectedEntries();
-	if (entries == null)
-	    return;
-	final int numSelected = entries.length;
-	// Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to LyX");
-	// check if lyxpipe is defined
-	final File lyxpipe = new File( Globals.prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-	if( !lyxpipe.exists() || !lyxpipe.canWrite()){
-	    panel.output(Globals.lang("Error")+": "+Globals.lang("verify that LyX is running and that the lyxpipe is valid")
-		   +". [" + Globals.prefs.get("lyxpipe") +"]");
-	    return;
-	}
-	//Util.pr("tre");
-	if( numSelected > 0){
-	    Thread pushThread = new Thread()
-		{
-		    public void run()
-		    {
-			try {
-                            FileWriter fw = new FileWriter(lyxpipe);
-                            BufferedWriter lyx_out = new BufferedWriter(fw);
-                            String citeStr = "", citeKey = "", message = "";
-                            for (int i = 0; i < numSelected; i++)
-				{
-				    BibtexEntry bes = entries[i];//database.getEntryById(tableModel.getNameFromNumber(rows[
-				    //													      i]));
-				    citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
-				    // if the key is empty we give a warning and ignore this entry
-				    if (citeKey == null || citeKey.equals(""))
-					continue;
-				    if (citeStr.equals(""))
-					citeStr = citeKey;
-				    else
-					citeStr += "," + citeKey;
-				    if (i > 0)
-					message += ", ";
-				    //message += (1 + rows[i]);
-				}
-                            if (citeStr.equals(""))
-				panel.output(Globals.lang("Please define BibTeX key first"));
-                            else
-				{
-				    citeStr = "LYXCMD:sampleclient:citation-insert:" + citeStr;
-				    lyx_out.write(citeStr + "\n");
-				    panel.output(Globals.lang("Pushed the citations for the following rows to")+" Lyx: " +
-					   message);
-				}
-                            lyx_out.close();
-			    
-			}
-			catch (IOException excep) {
-                            panel.output(Globals.lang("Error")+": "+Globals.lang("unable to write to")+" " + Globals.prefs.get("lyxpipe") +
-                                   ".in");
-			}
-			// catch (InterruptedException e2) {}
-		    }
-		};
-	    pushThread.start();
-	    Timeout t = new Timeout(2000, pushThread, Globals.lang("Error")+": "+
-				    Globals.lang("unable to access LyX-pipe"));
-	    t.start();
-	}
-    }
+        couldNotFindPipe = false;
+        couldNotWrite = false;
 
-  class Timeout extends javax.swing.Timer
-  {
-    public Timeout(int timeout, final Thread toStop, final String message) {
-      super(timeout, new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          toStop.stop();         // !!! <- deprecated
-          // toStop.interrupt(); // better ?, interrupts wait and IO
-          //stop();
-          //output(message);
+
+        final File lyxpipe = new File( Globals.prefs.get("lyxpipe") +".in"); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+        if( !lyxpipe.exists() || !lyxpipe.canWrite()){
+            couldNotFindPipe = true;
+            return;
         }
-      });
+
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    FileWriter fw = new FileWriter(lyxpipe);
+                    BufferedWriter lyx_out = new BufferedWriter(fw);
+                    String citeStr = "";
+
+                    citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
+                    lyx_out.write(citeStr + "\n");
+
+                    lyx_out.close();
+
+                } catch (IOException excep) {
+                    couldNotWrite = true;
+                    return;
+                }
+            }
+        });
+
+
+	    t.start();
+	    /*new Timeout(2000, t, Globals.lang("Error")+": "+
+            Globals.lang("unable to access LyX-pipe"));*/
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-  }
+
+    public String getName() {
+        return Globals.lang("Insert selected citations into LyX/Kile");
+    }
+
+    public String getTooltip() {
+        return Globals.lang("Push selection to LyX/Kile");
+    }
+
+    public Icon getIcon() {
+        return new ImageIcon(GUIGlobals.lyxIconFile);
+    }
+
+    public String getKeyStrokeName() {
+        return "Push to LyX";
+    }
+
+
+    public void operationCompleted(BasePanel panel) {
+        if (couldNotFindPipe) {
+            panel.output(Globals.lang("Error") + ": " + Globals.lang("verify that LyX is running and that the lyxpipe is valid")
+                    + ". [" + Globals.prefs.get("lyxpipe") + "]");
+        } else if (couldNotWrite) {
+            panel.output(Globals.lang("Error") + ": " + Globals.lang("unable to write to") + " " + Globals.prefs.get("lyxpipe") +
+                    ".in");
+        } else {
+
+            panel.output(Globals.lang("Pushed the citations for the following rows to") + " Lyx: " +
+                    message);
+        }
+
+    }
+
+    public boolean requiresBibtexKeys() {
+        return true;
+    }
+
+    /*class Timeout extends javax.swing.Timer
+    {
+      public Timeout(int timeout, final Thread toStop, final String message) {
+        super(timeout, new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            toStop.stop();         // !!! <- deprecated
+            // toStop.interrupt(); // better ?, interrupts wait and IO
+            //stop();
+            //output(message);
+          }
+        });
+      }
+    } */
 
 }

@@ -45,9 +45,6 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.gui.MainTableSelectionListener;
-
-import java.text.*;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
   /*
@@ -396,7 +393,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         else
             off = new OpenFileFilter(new String[] { ext });
 
-        ExternalFilePanel pan = new ExternalFilePanel(frame, this, fieldName, off, ed);
+        ExternalFilePanel pan = new ExternalFilePanel(frame, panel.metaData(), this, fieldName, off, ed);
         return pan;
     }
     /*else if ((s != null) && s.equals("browsePs")) {
@@ -1303,7 +1300,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
         // getSelectedText()
         try {
-          Util.openExternalViewer(link, tf.getFieldName(), prefs);
+          Util.openExternalViewer(panel.metaData(), link, tf.getFieldName());
         } catch (IOException ex) {
           System.err.println("Error opening file.");
         }

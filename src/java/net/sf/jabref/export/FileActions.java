@@ -29,11 +29,13 @@ package net.sf.jabref.export;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
+import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.nio.charset.UnsupportedCharsetException;
 
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
@@ -181,6 +183,7 @@ public class FileActions
         // entry, as well. Our criterion is that all non-standard
         // types (*not* customized standard types) must be written.
         BibtexEntryType tp = be.getType();
+       
         if (BibtexEntryType.getStandardType(tp.getName()) == null) {
             types.put(tp.getName(), tp);
         }
@@ -410,6 +413,7 @@ public class FileActions
         }
 
         SaveSession ss = new SaveSession(outFile, encoding, false);
+
         VerifyingWriter ps = ss.getWriter();
         //ps = new OutputStreamWriter(new FileOutputStream(outFile), encoding);
         exportDatabase(database, null, prefix, lfName, ps);
@@ -562,6 +566,38 @@ public class FileActions
 
     }
 
+    public static void performExport(final BibtexDatabase database,
+                                        final String exportName, final String fileName,
+                                        final String encoding) throws Exception {
+
+        String lfFileName = exportName, directory = null;
+        if (exportName.equals("harvard")) {
+            directory = "harvard";
+        } else if (exportName.equals("endnote")) {
+            lfFileName = "EndNote";
+            directory = "endnote";
+        }
+
+        // We need to find out:
+        // 1. The layout definition string to use. Or, rather, we
+        //    must provide a Reader for the layout definition.
+        // 2. The preferred extension for the layout format.
+        // 3. The name of the file to use.
+        File outFile = new File(fileName);
+        final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
+                Globals.LAYOUT_PREFIX + directory + "/");
+
+        final String lfName = lfFileName;
+        final File oFile = outFile;
+
+        //System.out.println(oFile.getPath()+"\t "+dir+"\t "+lfName+"\t "+encoding);
+
+        FileActions.exportDatabase
+                (database, dir, lfName, oFile, encoding);
+
+    }
+
+
     public static void exportToCSV(BibtexDatabase database,
                                    File outFile, JabRefPreferences prefs)
         throws Exception {
@@ -639,7 +675,7 @@ public class FileActions
     private static Reader getReader(String name) throws IOException {
       Reader reader = null;
       // Try loading as a resource first. This works for files inside the jar:
-      URL reso = JabRefFrame.class.getResource(name);
+      URL reso = Globals.class.getResource(name);
 
       // If that didn't work, try loading as a normal file URL:
       if (reso != null) {
@@ -667,37 +703,53 @@ public class FileActions
     * global preference of saving in standard order.
     */
     protected static List getSortedEntries(BibtexDatabase database, Set keySet, boolean isSaveOperation) {
-        String pri, sec, ter;
-        boolean priD, secD, terD, priBinary = false;
-        if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
-            // The setting is to save according to the current table order.
-            priBinary = Globals.prefs.getBoolean("priBinary");
-            pri = Globals.prefs.get("priSort");
-            sec = Globals.prefs.get("secSort");
-            // sorted as they appear on the screen.
-            ter = Globals.prefs.get("terSort");
-            priD = Globals.prefs.getBoolean("priDescending");
-            secD = Globals.prefs.getBoolean("secDescending");
-            terD = Globals.prefs.getBoolean("terDescending");
-        } else {
-            // The setting is to save in standard order: author, editor, year
-            pri = "author";
-            sec = "editor";
-            ter = "year";
-            priD = false;
-            secD = false;
-            terD = true;
-        }
+        FieldComparatorStack comparatorStack = null;
 
-        List comparators = new ArrayList();
-        comparators.add(new CrossRefEntryComparator());
-        comparators.add(new FieldComparator(pri, priD));
-        comparators.add(new FieldComparator(sec, secD));
-        comparators.add(new FieldComparator(ter, terD));
-        comparators.add(new FieldComparator(Globals.KEY_FIELD));
+        if (Globals.prefs.getBoolean("saveInOriginalOrder")) {
+            // Sort entries based on their creation order, utilizing the fact
+            // that IDs used for entries are increasing, sortable numbers.
+            List comparators = new ArrayList();
+            comparators.add(new CrossRefEntryComparator());
+            comparators.add(new IdComparator());
+            comparatorStack = new FieldComparatorStack(comparators);
+
+        } else {
+            String pri, sec, ter;
+            boolean priD, secD, terD, priBinary = false;
+
+
+            if (!isSaveOperation || !Globals.prefs.getBoolean("saveInStandardOrder")) {
+                // The setting is to save according to the current table order.
+                priBinary = Globals.prefs.getBoolean("priBinary");
+                pri = Globals.prefs.get("priSort");
+                sec = Globals.prefs.get("secSort");
+                // sorted as they appear on the screen.
+                ter = Globals.prefs.get("terSort");
+                priD = Globals.prefs.getBoolean("priDescending");
+                secD = Globals.prefs.getBoolean("secDescending");
+                terD = Globals.prefs.getBoolean("terDescending");
+            } else {
+                // The setting is to save in standard order: author, editor, year
+                pri = "author";
+                sec = "editor";
+                ter = "year";
+                priD = false;
+                secD = false;
+                terD = true;
+            }
+
+            List comparators = new ArrayList();
+            comparators.add(new CrossRefEntryComparator());
+            comparators.add(new FieldComparator(pri, priD));
+            comparators.add(new FieldComparator(sec, secD));
+            comparators.add(new FieldComparator(ter, terD));
+            comparators.add(new FieldComparator(Globals.KEY_FIELD));
+
+            comparatorStack = new FieldComparatorStack(comparators);
+        }
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList entryList = new BasicEventList();
-        SortedList sorter = new SortedList(entryList, new FieldComparatorStack(comparators));
+        SortedList sorter = new SortedList(entryList, comparatorStack);
 
         if (keySet == null)
             keySet = database.getKeySet();

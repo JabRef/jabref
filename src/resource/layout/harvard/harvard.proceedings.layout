@@ -1,5 +1,5 @@
 \begin{author}
-\format[RTFChars,uthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
+\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}
 \end{author}
 \begin{editor}
 \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}, ed.

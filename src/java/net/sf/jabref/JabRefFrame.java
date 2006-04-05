@@ -45,12 +45,8 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.SortedSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.List;
-import java.util.Iterator;
 import java.io.*;
 import java.net.URL;
 import net.sf.jabref.undo.NamedCompound;
@@ -62,9 +58,11 @@ import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.journals.ManageJournalsAction;
+import net.sf.jabref.external.*;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
-import com.jgoodies.plaf.HeaderStyle;
-import com.jgoodies.plaf.Options;
+import com.jgoodies.looks.Options;
+import com.jgoodies.looks.HeaderStyle;
+
 
 /**
  * The main window of the application.
@@ -172,6 +170,7 @@ public class JabRefFrame
                                          GUIGlobals.saveAsIconFile),
       nextTab = new ChangeTabAction(true),
       prevTab = new ChangeTabAction(false),
+      sortTabs = new SortTabsAction(this),
       undo = new GeneralAction("undo", "Undo", "Undo",
                                GUIGlobals.undoIconFile,
                                prefs.getKey("Undo")),
@@ -267,16 +266,11 @@ public class JabRefFrame
                                         "Autogenerate BibTeX keys",
                                         GUIGlobals.genKeyIconFile,
                                         prefs.getKey("Autogenerate BibTeX keys")),
-      lyxPushAction = new GeneralAction("pushToLyX",
-                                        "Insert selected citations into LyX/Kile",
-                                        "Push selection to LyX/Kile",
-                                        GUIGlobals.lyxIconFile,
-                                        prefs.getKey("Push to LyX")),
-      winEdtPushAction = new GeneralAction("pushToWinEdt",
-                                        "Insert selected citations into WinEdt",
-                                        "Push selection to WinEdt",
-                                        GUIGlobals.winEdtIcon,
-                                        prefs.getKey("Push to WinEdt")),
+
+      lyxPushAction = new PushToApplicationAction(ths, new PushToLyx()),
+
+      winEdtPushAction = new PushToApplicationAction(ths, new PushToWinEdt()),
+      latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
       openFile = new GeneralAction("openFile", "Open PDF or PS",
                                    "Open PDF or PS",
                                    GUIGlobals.pdfIcon,
@@ -312,10 +306,10 @@ public class JabRefFrame
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
-    emacsPushAction = new GeneralAction("pushToEmacs", "Insert selected citations into Emacs",
-            "Push selection to Emacs", GUIGlobals.emacsIcon,
-            Globals.prefs.getKey("Push to Emacs"));
-    //test = new GeneralAction("test", "Test");
+    emacsPushAction = new PushToApplicationAction(ths, new PushToEmacs()),
+
+      errorConsole = Globals.errorConsole.getAction(this),
+    test = new GeneralAction("test", "Test");
 
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
@@ -325,6 +319,7 @@ public class JabRefFrame
     MedlineFetcher medlineFetcher;
     CiteSeerFetcher citeSeerFetcher;
     CiteSeerFetcherPanel citeSeerFetcherPanel;
+    IEEEXploreFetcher ieeexplorerFetcher;
     SearchManager2 searchManager;
     public GroupSelector groupSelector;
 
@@ -375,7 +370,7 @@ public class JabRefFrame
       MyGlassPane glassPane = new MyGlassPane();
     setGlassPane(glassPane);
     //  glassPane.setVisible(true);
-    
+
       setTitle(GUIGlobals.frameTitle);
     setIconImage(new ImageIcon(GUIGlobals.jabreflogo).getImage());
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -395,6 +390,7 @@ public class JabRefFrame
     medlineFetcher = new MedlineFetcher(sidePaneManager);
     citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
     citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager, (CiteSeerFetcher)citeSeerFetcher);
+    ieeexplorerFetcher = new IEEEXploreFetcher();
     searchManager = new SearchManager2(this, sidePaneManager);
       // Groups
       /*if (metaData.getGroups() != null) {
@@ -967,7 +963,7 @@ public JabRefPreferences prefs() {
     setUpImportMenu(importMenu, false);
     setUpImportMenu(importNewMenu, true);
   }
-  
+
   private void fillMenu() {
     //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
       mb.setBorder(null);
@@ -976,6 +972,7 @@ public JabRefPreferences prefs() {
         bibtex = subMenu("BibTeX"),
         view = subMenu("View"),
         tools = subMenu("Tools"),
+        web = subMenu("Web search"),
         options = subMenu("Options"),
         newSpec = subMenu("New entry..."),
         helpMenu = subMenu("Help");
@@ -1020,7 +1017,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    //edit.add(test);
+    edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -1042,6 +1039,7 @@ public JabRefPreferences prefs() {
     mb.add(edit);
     view.add(nextTab);
     view.add(prevTab);
+      view.add(sortTabs);
     view.addSeparator();
     view.add(toggleGroups);
     view.add(togglePreview);
@@ -1074,9 +1072,7 @@ public JabRefPreferences prefs() {
     tools.add(emacsPushAction);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
-    tools.add(fetchMedline);
-    tools.add(citeSeerPanelAction);
-    tools.add(fetchCiteSeer);
+    tools.add(latexEditorPushAction);
     //tools.add(fetchAuthorMedline);
     tools.addSeparator();
     tools.add(openFile);
@@ -1093,6 +1089,14 @@ public JabRefPreferences prefs() {
       tools.add(unabbreviate);
 
     mb.add(tools);
+
+    web.add(fetchMedline);
+    web.add(citeSeerPanelAction);
+    web.add(fetchCiteSeer);
+    GeneralFetcher ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
+    web.add(ieex.getAction());
+
+      mb.add(web);
 
     options.add(showPrefs);
     AbstractAction customizeAction = new CustomizeEntryTypeAction();
@@ -1134,6 +1138,8 @@ public JabRefPreferences prefs() {
 //old about    helpMenu.add(about);
     helpMenu.add(about);
     mb.add(helpMenu);
+      helpMenu.addSeparator();
+      helpMenu.add(errorConsole);
   }
 
     private JMenu subMenu(String name) {
@@ -1250,7 +1256,7 @@ public JabRefPreferences prefs() {
                           RenderingHints.VALUE_ANTIALIAS_ON);
       g2.drawString(label, getWidth() - width - 7, getHeight() - 10);
 
-     
+
     }
   }
 
@@ -1308,136 +1314,137 @@ public JabRefPreferences prefs() {
     /**
      * Disable actions that demand an open database.
      */
-  private void setEmptyState() {
-    manageSelectors.setEnabled(false);
-    mergeDatabaseAction.setEnabled(false);
-    newSubDatabaseAction.setEnabled(false);
-    close.setEnabled(false);
-    save.setEnabled(false);
-    saveAs.setEnabled(false);
-    saveSelectedAs.setEnabled(false);
-    nextTab.setEnabled(false);
-    prevTab.setEnabled(false);
-    undo.setEnabled(false);
-    redo.setEnabled(false);
-    cut.setEnabled(false);
-    delete.setEnabled(false);
-    copy.setEnabled(false);
-    paste.setEnabled(false);
-    mark.setEnabled(false);
-    unmark.setEnabled(false);
-    unmarkAll.setEnabled(false);
-    editEntry.setEnabled(false);
-    importCiteSeer.setEnabled(false);
-    selectAll.setEnabled(false);
-    copyKey.setEnabled(false);
-    copyCiteKey.setEnabled(false);
-    editPreamble.setEnabled(false);
-    editStrings.setEnabled(false);
-    toggleGroups.setEnabled(false);
-    toggleSearch.setEnabled(false);
-    makeKeyAction.setEnabled(false);
-    emacsPushAction.setEnabled(false);
-    lyxPushAction.setEnabled(false);
-    winEdtPushAction.setEnabled(false);
-    normalSearch.setEnabled(false);
-    incrementalSearch.setEnabled(false);
-    replaceAll.setEnabled(false);
-    importMenu.setEnabled(false);
-    exportMenu.setEnabled(false);
-    fetchMedline.setEnabled(false);
-    fetchCiteSeer.setEnabled(false);
-    openFile.setEnabled(false);
-    openUrl.setEnabled(false);
-    togglePreview.setEnabled(false);
-    dupliCheck.setEnabled(false);
-    strictDupliCheck.setEnabled(false);
-    highlightAll.setEnabled(false);
-    highlightAny.setEnabled(false);
-    citeSeerPanelAction.setEnabled(false);
-    for (int i = 0; i < newSpecificEntryAction.length; i++) {
-      newSpecificEntryAction[i].setEnabled(false);
-    }
-    newEntryAction.setEnabled(false);
-    plainTextImport.setEnabled(false);
-    closeDatabaseAction.setEnabled(false);
-    switchPreview.setEnabled(false);
-    integrityCheckAction.setEnabled(false);
-    autoSetPdf.setEnabled(false);
-    autoSetPs.setEnabled(false);
-    toggleHighlightAny.setEnabled(false);
-    toggleHighlightAll.setEnabled(false);
+    private void setEmptyState() {
+        manageSelectors.setEnabled(false);
+        mergeDatabaseAction.setEnabled(false);
+        newSubDatabaseAction.setEnabled(false);
+        close.setEnabled(false);
+        save.setEnabled(false);
+        saveAs.setEnabled(false);
+        saveSelectedAs.setEnabled(false);
+        nextTab.setEnabled(false);
+        prevTab.setEnabled(false);
+        sortTabs.setEnabled(false);
+        undo.setEnabled(false);
+        redo.setEnabled(false);
+        cut.setEnabled(false);
+        delete.setEnabled(false);
+        copy.setEnabled(false);
+        paste.setEnabled(false);
+        mark.setEnabled(false);
+        unmark.setEnabled(false);
+        unmarkAll.setEnabled(false);
+        editEntry.setEnabled(false);
+        importCiteSeer.setEnabled(false);
+        selectAll.setEnabled(false);
+        copyKey.setEnabled(false);
+        copyCiteKey.setEnabled(false);
+        editPreamble.setEnabled(false);
+        editStrings.setEnabled(false);
+        toggleGroups.setEnabled(false);
+        toggleSearch.setEnabled(false);
+        makeKeyAction.setEnabled(false);
+        emacsPushAction.setEnabled(false);
+        lyxPushAction.setEnabled(false);
+        winEdtPushAction.setEnabled(false);
+        normalSearch.setEnabled(false);
+        incrementalSearch.setEnabled(false);
+        replaceAll.setEnabled(false);
+        importMenu.setEnabled(false);
+        exportMenu.setEnabled(false);
+        fetchMedline.setEnabled(false);
+        fetchCiteSeer.setEnabled(false);
+        openFile.setEnabled(false);
+        openUrl.setEnabled(false);
+        togglePreview.setEnabled(false);
+        dupliCheck.setEnabled(false);
+        strictDupliCheck.setEnabled(false);
+        highlightAll.setEnabled(false);
+        highlightAny.setEnabled(false);
+        citeSeerPanelAction.setEnabled(false);
+        for (int i = 0; i < newSpecificEntryAction.length; i++) {
+            newSpecificEntryAction[i].setEnabled(false);
+        }
+        newEntryAction.setEnabled(false);
+        plainTextImport.setEnabled(false);
+        closeDatabaseAction.setEnabled(false);
+        switchPreview.setEnabled(false);
+        integrityCheckAction.setEnabled(false);
+        autoSetPdf.setEnabled(false);
+        autoSetPs.setEnabled(false);
+        toggleHighlightAny.setEnabled(false);
+        toggleHighlightAll.setEnabled(false);
         databaseProperties.setEnabled(false);
-    abbreviateIso.setEnabled(false);
-    abbreviateMedline.setEnabled(false);
-    unabbreviate.setEnabled(false);
-  }
+        abbreviateIso.setEnabled(false);
+        abbreviateMedline.setEnabled(false);
+        unabbreviate.setEnabled(false);
+    }
 
     /**
      * Enable actions that demand an open database.
      */
-  private void setNonEmptyState() {
-    manageSelectors.setEnabled(true);
-    mergeDatabaseAction.setEnabled(true);
-    newSubDatabaseAction.setEnabled(true);
-    close.setEnabled(true);
-    save.setEnabled(true);
-    saveAs.setEnabled(true);
-    saveSelectedAs.setEnabled(true);
-    undo.setEnabled(true);
-    redo.setEnabled(true);
-    cut.setEnabled(true);
-    delete.setEnabled(true);
-    copy.setEnabled(true);
-    paste.setEnabled(true);
-    mark.setEnabled(true);
-    unmark.setEnabled(true);
-    unmarkAll.setEnabled(true);
-    editEntry.setEnabled(true);
-    importCiteSeer.setEnabled(true);
-    selectAll.setEnabled(true);
-    copyKey.setEnabled(true);
-    copyCiteKey.setEnabled(true);
-    editPreamble.setEnabled(true);
-    editStrings.setEnabled(true);
-    toggleGroups.setEnabled(true);
-    toggleSearch.setEnabled(true);
-    makeKeyAction.setEnabled(true);
-    emacsPushAction.setEnabled(true);
-    lyxPushAction.setEnabled(true);
-    winEdtPushAction.setEnabled(true);
-    normalSearch.setEnabled(true);
-    incrementalSearch.setEnabled(true);
-    replaceAll.setEnabled(true);
-    importMenu.setEnabled(true);
-    exportMenu.setEnabled(true);
-    fetchMedline.setEnabled(true);
-    fetchCiteSeer.setEnabled(true);
-    openFile.setEnabled(true);
-    openUrl.setEnabled(true);
-    togglePreview.setEnabled(true);
-    dupliCheck.setEnabled(true);
-    strictDupliCheck.setEnabled(true);
-    highlightAll.setEnabled(true);
-    highlightAny.setEnabled(true);
-    citeSeerPanelAction.setEnabled(true);
-    for (int i = 0; i < newSpecificEntryAction.length; i++) {
-      newSpecificEntryAction[i].setEnabled(true);
+    private void setNonEmptyState() {
+        manageSelectors.setEnabled(true);
+        mergeDatabaseAction.setEnabled(true);
+        newSubDatabaseAction.setEnabled(true);
+        close.setEnabled(true);
+        save.setEnabled(true);
+        saveAs.setEnabled(true);
+        saveSelectedAs.setEnabled(true);
+        undo.setEnabled(true);
+        redo.setEnabled(true);
+        cut.setEnabled(true);
+        delete.setEnabled(true);
+        copy.setEnabled(true);
+        paste.setEnabled(true);
+        mark.setEnabled(true);
+        unmark.setEnabled(true);
+        unmarkAll.setEnabled(true);
+        editEntry.setEnabled(true);
+        importCiteSeer.setEnabled(true);
+        selectAll.setEnabled(true);
+        copyKey.setEnabled(true);
+        copyCiteKey.setEnabled(true);
+        editPreamble.setEnabled(true);
+        editStrings.setEnabled(true);
+        toggleGroups.setEnabled(true);
+        toggleSearch.setEnabled(true);
+        makeKeyAction.setEnabled(true);
+        emacsPushAction.setEnabled(true);
+        lyxPushAction.setEnabled(true);
+        winEdtPushAction.setEnabled(true);
+        normalSearch.setEnabled(true);
+        incrementalSearch.setEnabled(true);
+        replaceAll.setEnabled(true);
+        importMenu.setEnabled(true);
+        exportMenu.setEnabled(true);
+        fetchMedline.setEnabled(true);
+        fetchCiteSeer.setEnabled(true);
+        openFile.setEnabled(true);
+        openUrl.setEnabled(true);
+        togglePreview.setEnabled(true);
+        dupliCheck.setEnabled(true);
+        strictDupliCheck.setEnabled(true);
+        highlightAll.setEnabled(true);
+        highlightAny.setEnabled(true);
+        citeSeerPanelAction.setEnabled(true);
+        for (int i = 0; i < newSpecificEntryAction.length; i++) {
+            newSpecificEntryAction[i].setEnabled(true);
+        }
+        newEntryAction.setEnabled(true);
+        plainTextImport.setEnabled(true);
+        closeDatabaseAction.setEnabled(true);
+        switchPreview.setEnabled(true);
+        integrityCheckAction.setEnabled(true);
+        autoSetPdf.setEnabled(true);
+        autoSetPs.setEnabled(true);
+        toggleHighlightAny.setEnabled(true);
+        toggleHighlightAll.setEnabled(true);
+        databaseProperties.setEnabled(true);
+        abbreviateIso.setEnabled(true);
+        abbreviateMedline.setEnabled(true);
+        unabbreviate.setEnabled(true);
     }
-    newEntryAction.setEnabled(true);
-    plainTextImport.setEnabled(true);
-    closeDatabaseAction.setEnabled(true);
-    switchPreview.setEnabled(true);
-    integrityCheckAction.setEnabled(true);
-    autoSetPdf.setEnabled(true);
-    autoSetPs.setEnabled(true);
-    toggleHighlightAny.setEnabled(true);
-    toggleHighlightAll.setEnabled(true);
-    databaseProperties.setEnabled(true);
-    abbreviateIso.setEnabled(true);
-    abbreviateMedline.setEnabled(true);
-    unabbreviate.setEnabled(true);
-  }
 
     /**
      * Disable actions that need more than one database open.
@@ -1445,6 +1452,7 @@ public JabRefPreferences prefs() {
     private void setOnlyOne() {
         nextTab.setEnabled(false);
         prevTab.setEnabled(false);
+        sortTabs.setEnabled(false);
     }
 
     /**
@@ -1453,6 +1461,7 @@ public JabRefPreferences prefs() {
     private void setMultiple() {
         nextTab.setEnabled(true);
         prevTab.setEnabled(true);
+        sortTabs.setEnabled(true);
     }
 
   /**
@@ -1934,20 +1943,20 @@ class FetchCiteSeerAction
    * @param callBack The callback for the ImportInspectionDialog to use.
    */
   public void addImportedEntries(final BasePanel panel, final List entries, String filename, boolean openInNew,
-                                  ImportInspectionDialog.CallBack callBack) {
+                                 ImportInspectionDialog.CallBack callBack) {
       // Use the import inspection dialog if it is enabled in preferences, and (there are more than
       // one entry or the inspection dialog is also enabled for single entries):
       if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
               (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
-                String[] fields = new String[] {"author", "title", "year" };
-                ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel, fields,
+                ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel,
+                        GUIGlobals.DEFAULT_INSPECTION_FIELDS,
                         Globals.lang("Import"), openInNew);
                 diag.addEntries(entries);
                 diag.addCallBack(callBack);
                 diag.entryListComplete();
                 Util.placeDialog(diag, ths);
                 diag.setVisible(true);
-		diag.toFront();
+        diag.toFront();
         } else {
             ths.addBibEntries(entries, filename, openInNew);
           if ((panel != null) && (entries.size() == 1)) {
@@ -1971,7 +1980,7 @@ class FetchCiteSeerAction
      * one.
      */
   public int addBibEntries(java.util.List bibentries, String filename,
-                             boolean intoNew) {
+                           boolean intoNew) {
           if (bibentries == null || bibentries.size() == 0) {
 
       // No entries found. We need a message for this.
@@ -2039,7 +2048,7 @@ class FetchCiteSeerAction
         // Check for duplicates among the current entries:
         if (checkForDuplicates) {
             loop: for (Iterator i2=database.getKeySet().iterator();
-                 i2.hasNext();) {
+                       i2.hasNext();) {
                 BibtexEntry existingEntry = database.getEntryById((String)i2.next());
                 if (Util.isDuplicate(entry, existingEntry,
                                      Globals.duplicateThreshold)) {
@@ -2101,7 +2110,7 @@ class FetchCiteSeerAction
 
       // Add custom importers
       importMenu.addSeparator();
-      
+
       SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
       JMenu submenu = new JMenu(Globals.lang("Custom importers"));
       submenu.setMnemonic(KeyEvent.VK_S);
@@ -2113,12 +2122,12 @@ class FetchCiteSeerAction
         for (Iterator i=customImporters.iterator(); i.hasNext();) {
             ImportFormat imFo = (ImportFormat)i.next();
             submenu.add(new ImportMenuItem(ths, imFo, intoNew));
-        }        
+        }
       }
-      
+
       importMenu.add(submenu);
       importMenu.addSeparator();
-      
+
       // Put in all formatters registered in ImportFormatReader:
       for (Iterator i=Globals.importFormatReader.getBuiltInInputFormats().iterator(); i.hasNext();) {
           ImportFormat imFo = (ImportFormat)i.next();
@@ -2178,116 +2187,91 @@ class FetchCiteSeerAction
 
 
   private void setUpExportMenu(JMenu menu) {
-    ActionListener listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        JMenuItem source = (JMenuItem) e.getSource();
-        String lfFileName = null, extension = null, directory = null;
-        if (source == htmlItem) {
-          lfFileName = "html";
-          extension = ".html";
-        }
-        if (source == simpleHtmlItem) {
-          lfFileName = "simplehtml";
-          extension = ".html";
-        }
-        //else if (source == plainTextItem)
-        //lfFileName = "text";
-        else if (source == docbookItem) {
-          lfFileName = "docbook";
-          extension = ".xml";
-        }
-        else if (source == bibtexmlItem) {
-          lfFileName = "bibtexml";
-          extension = ".xml";
-        }
-        else if (source == modsItem) {
-          lfFileName = "mods";
-          extension = ".xml";
-        }
-        else if (source == rtfItem) {
-          lfFileName = "harvard";
-          directory = "harvard";
-          extension = ".rtf";
-        }
-       else if (source == endnoteItem) {
-          lfFileName = "EndNote";
-          directory = "endnote";
-          extension = ".txt";
-        }
-        /*    else if (source == openofficeItem) {
-                  lfFileName = "openoffice-csv";
-                  directory = "openoffice";
-                  extension = ".csv";
-                }*/
-       else if (source == openofficeItem) {
-            lfFileName = "oocalc";
-            extension = ".sxc";
-       }
-       else if (source == odsItem) {
-            lfFileName = "ods";
-            extension = ".ods";
-       }
-        // We need to find out:
-        // 1. The layout definition string to use. Or, rather, we
-        //    must provide a Reader for the layout definition.
-        // 2. The preferred extension for the layout format.
-        // 3. The name of the file to use.
-        File outFile;
-        String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
-                                               extension, JFileChooser.SAVE_DIALOG, false);
-        final String dir = (directory == null ? Globals.LAYOUT_PREFIX :
-                         Globals.LAYOUT_PREFIX+directory+"/");
+      ActionListener listener = new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+              JMenuItem source = (JMenuItem) e.getSource();
+              String lfFileName = null, extension = null;
+              if (source == htmlItem) {
+                  lfFileName = "html";
+                  extension = ".html";
+              }
+              else if (source == simpleHtmlItem) {
+                  lfFileName = "simplehtml";
+                  extension = ".html";
+              } else if (source == docbookItem) {
+                  lfFileName = "docbook";
+                  extension = ".xml";
+              } else if (source == bibtexmlItem) {
+                  lfFileName = "bibtexml";
+                  extension = ".xml";
+              } else if (source == modsItem) {
+                  lfFileName = "mods";
+                  extension = ".xml";
+              } else if (source == rtfItem) {
+                  lfFileName = "harvard";
+                  extension = ".rtf";
+              } else if (source == endnoteItem) {
+                  lfFileName = "endnote";
+                  extension = ".txt";
+              } else if (source == openofficeItem) {
+                  lfFileName = "oocalc";
+                  extension = ".sxc";
+              } else if (source == odsItem) {
+                  lfFileName = "ods";
+                  extension = ".ods";
+              }
+              // We need to find out:
+              // 1. The layout definition string to use. Or, rather, we
+              //    must provide a Reader for the layout definition.
+              // 2. The preferred extension for the layout format.
+              // 3. The name of the file to use.
+              final String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
+                      extension, JFileChooser.SAVE_DIALOG, false);
+              final String exportName = lfFileName;
+              if (chosenFile == null)
+                  return;
 
-         if (chosenFile != null)
-           outFile = new File(chosenFile);
+              (new Thread() {
+                  public void run() {
+                      try {
+                          FileActions.performExport(basePanel().database(), exportName,
+                                  chosenFile, basePanel().getEncoding());
+                          output(Globals.lang("Exported database to file") + " '" +
+                                  chosenFile + "'.");
+                      }
+                      catch (Exception ex) {
+                          ex.printStackTrace();
+                      }
+                  }
+              }).start();
 
-         else {
-           return;
-         }
-
-        final String lfName = lfFileName;
-        final File oFile = outFile;
-        (new Thread() {
-          public void run() {
-            try {
-              FileActions.exportDatabase
-                  (basePanel().database, dir, lfName, oFile, basePanel().getEncoding());
-              output(Globals.lang("Exported database to file") + " '" +
-                     oFile.getPath() + "'.");
-            }
-            catch (Exception ex) {
-              ex.printStackTrace();
-            }
           }
-        }).start();
+      };
 
-      }
-    };
-
-    htmlItem.addActionListener(listener);
-    menu.add(htmlItem);
-    simpleHtmlItem.addActionListener(listener);
-    menu.add(simpleHtmlItem);
-    //plainTextItem.addActionListener(listener);
-    //menu.add(plainTextItem);
-    bibtexmlItem.addActionListener(listener);
-    menu.add(bibtexmlItem);
-    docbookItem.addActionListener(listener);
-    menu.add(docbookItem);
-    modsItem.addActionListener(listener);
-    menu.add(modsItem);
-    rtfItem.addActionListener(listener);
-    menu.add(rtfItem);
-    endnoteItem.addActionListener(listener);
-    menu.add(endnoteItem);
-        openofficeItem.addActionListener(listener);
+      htmlItem.addActionListener(listener);
+      menu.add(htmlItem);
+      simpleHtmlItem.addActionListener(listener);
+      menu.add(simpleHtmlItem);
+      //plainTextItem.addActionListener(listener);
+      //menu.add(plainTextItem);
+      bibtexmlItem.addActionListener(listener);
+      menu.add(bibtexmlItem);
+      docbookItem.addActionListener(listener);
+      menu.add(docbookItem);
+      modsItem.addActionListener(listener);
+      menu.add(modsItem);
+      rtfItem.addActionListener(listener);
+      menu.add(rtfItem);
+      endnoteItem.addActionListener(listener);
+      menu.add(endnoteItem);
+      openofficeItem.addActionListener(listener);
       odsItem.addActionListener(listener);
       menu.add(openofficeItem);
       menu.add(odsItem);
-    menu.add(exportCSV);
+      menu.add(exportCSV);
 
-    menu.addSeparator();
-    menu.add(expandEndnoteZip);
+      menu.addSeparator();
+      menu.add(expandEndnoteZip);
 
   }
 
@@ -2317,11 +2301,10 @@ class FetchCiteSeerAction
 
    public void removeCachedEntryEditors() {
        for (int j=0; j<tabbedPane.getTabCount(); j++) {
-	        BasePanel bp = (BasePanel)tabbedPane.getComponentAt(j);
-	        bp.entryEditors.clear();
+            BasePanel bp = (BasePanel)tabbedPane.getComponentAt(j);
+            bp.entryEditors.clear();
        }
    }
-
 
     /**
      * This method shows a wait cursor and blocks all input to the JFrame's contents.

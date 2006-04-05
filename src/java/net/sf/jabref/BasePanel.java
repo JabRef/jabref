@@ -34,14 +34,13 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.nio.charset.UnsupportedCharsetException;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.*;
 import net.sf.jabref.collab.*;
 import net.sf.jabref.export.*;
-import net.sf.jabref.external.PushToLyx;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.external.PushToEmacs;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.imports.*;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -53,6 +52,8 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -258,6 +259,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 */
             });
 
+
+        actions.put("test", new BaseAction () {
+                public void action() throws Throwable {
+
+
+
+
+                }
+            });
+
+
         // The action for saving a database.
         actions.put("save", new AbstractWorker() {
             private boolean success = false;
@@ -316,6 +328,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             public void run() {
                 try {
+                    // If the option is set, autogenerate keys for all entries that are
+                    // lacking keys, before saving:
+                    if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
+                        BibtexEntry bes;
+                        NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
+                        boolean any = false;
+                        for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
+                            bes = database.getEntryById((String)i.next());
+                            String oldKey = bes.getCiteKey();
+                            if ((oldKey == null) || (oldKey.equals(""))) {
+                                LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                                ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
+                                    (String)bes.getField(GUIGlobals.KEY_FIELD)));
+                                any = true;
+                            }
+                        }
+                        // Store undo information, if any:
+                        if (any) {
+                            ce.end();
+                            undoManager.addEdit(ce);
+                        }
+                    }
+                    // Done with autosetting keys. Now save the database:
+
                     success = saveDatabase(file, false, encoding);
 
                     //Util.pr("Testing resolve string... BasePanel line 237");
@@ -683,69 +719,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-    // The action for pushing citations to an open Lyx/Kile instance:
-        actions.put("pushToLyX", new PushToLyx(BasePanel.this));
-
-            actions.put("pushToWinEdt",new BaseAction(){
-              public void action(){
-                    final List entries = mainTable.getSelected();
-                    final int numSelected = entries.size();
-                    // Globals.logger("Pushing " +numSelected+(numSelected>1? " entries" : "entry") + " to WinEdt");
-
-                    if( numSelected > 0){
-                      Thread pushThread = new Thread() {
-                        public void run() {
-                          String winEdt = Globals.prefs.get("winEdtPath");
-                          //winEdt = "osascript";
-                          try {
-                            StringBuffer toSend = new StringBuffer("\"[InsText('\\")
-                              .append(Globals.prefs.get("citeCommand")).append("{");
-                            String citeKey = "";//, message = "";
-                            boolean first = true;
-                            for (Iterator i=entries.iterator(); i.hasNext();) {
-                                BibtexEntry bes = (BibtexEntry)i.next();
-                              citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
-                              // if the key is empty we give a warning and ignore this entry
-                              if (citeKey == null || citeKey.equals(""))
-                                continue;
-                              if (first) {
-                                toSend.append(citeKey);
-                                first = false;
-                              }
-                              else {
-                                  toSend.append(",").append(citeKey);
-                                //message += ", ";
-                              }
-                              //message += (1 + rows[i]);
-
-                            }
-                            if (first)
-                              output(Globals.lang("Please define BibTeX key first"));
-                            else {
-                              toSend.append("}');]\"");
-                              //System.out.println(toSend.toString());
-                              Runtime.getRuntime().exec(winEdt + " " + toSend.toString());
-                              Globals.lang("Pushed citations to WinEdt");
-                                /*output(
-                                  Globals.lang("Pushed the citations for the following rows to")+"WinEdt: " +
-                                  message);*/
-                            }
-                          }
-
-                          catch (IOException excep) {
-                            output(Globals.lang("Error")+": "+Globals.lang("Could not call executable")+" '"
-                                   +winEdt+"'.");
-                            excep.printStackTrace();
-                          }
-                        }
-                      };
-
-                      pushThread.start();
-                    }
-                  }
-            });
-
-        actions.put("pushToEmacs", new PushToEmacs(BasePanel.this));
 
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
@@ -1046,7 +1019,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                    if (filepath != null) {
                      //output(Globals.lang("Calling external viewer..."));
                      try {
-                       Util.openExternalViewer(filepath, field, Globals.prefs);
+                       Util.openExternalViewer(metaData(), filepath, field);
                        output(Globals.lang("External viewer called") + ".");
                      }
                      catch (IOException ex) {
@@ -1079,7 +1052,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                               if (link != null) {
                                 //output(Globals.lang("Calling external viewer..."));
                                 try {
-                                  Util.openExternalViewer(link.toString(), field, Globals.prefs);
+                                  Util.openExternalViewer(metaData(), link.toString(), field);
                                   output(Globals.lang("External viewer called")+".");
                                 } catch (IOException ex) {
                                     output(Globals.lang("Error") + ": " + ex.getMessage());
@@ -1456,6 +1429,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 session = FileActions.savePartOfDatabase(database, metaData, file,
                                                Globals.prefs, mainTable.getSelectedEntries(), encoding);
 
+        } catch (UnsupportedCharsetException ex2) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file. "
+                +"Character encoding '%0' is not supported.", encoding),
+                    Globals.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+            throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
                 // Error occured during processing of
@@ -1481,16 +1459,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         boolean commit = true;
         if (!session.getWriter().couldEncodeAll()) {
-              String warning = Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
-                      session.getEncoding())+session.getWriter().getProblemCharacters()
-                      +"\nDo you want to continue?";
-            //int answer = JOptionPane.showConfirmDialog(frame, warning, Globals.lang("Save database"),
-            //        JOptionPane.YES_NO_OPTION);
-            String message = Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
-                      session.getEncoding())+session.getWriter().getProblemCharacters()
-                      +"\nWhat do you want to do?";
+            DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref", ""));
+            JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
+            ta.setEditable(false);
+            builder.append(Globals.lang("The chosen encoding '%0' could not encode the following characters: ",
+                      session.getEncoding()));
+            builder.append(ta);
+            builder.append(Globals.lang("What do you want to do?"));
             String tryDiff = Globals.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, message, Globals.lang("Save database"),
+            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Globals.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[] {Globals.lang("Save"), tryDiff, Globals.lang("Cancel")}, tryDiff);
 
