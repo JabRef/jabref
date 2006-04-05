@@ -179,6 +179,7 @@ settings.add(select);
         }
         });
     escape.addActionListener(this);
+    escape.setEnabled(false); // enabled after searching
 
     openset.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -333,12 +334,13 @@ settings.add(select);
     if (e.getSource() == escape) {
         incSearch = false;
         if (panel != null) {
-        (new Thread() {
-            public void run() {
-                clearSearch();
-            }
-            }).start();
-
+            Thread t = new Thread() {
+                public void run() {
+                    clearSearch();
+                }
+            };
+            // do this after the button action is over
+            SwingUtilities.invokeLater(t);
         }
     }
     else if (((e.getSource() == searchField) || (e.getSource() == search))
@@ -374,7 +376,7 @@ settings.add(select);
         SearchWorker worker = new SearchWorker(searchRules, searchOptions);
         worker.getWorker().run();
         worker.getCallBack().update();
-
+        escape.setEnabled(true);
     }
     }
 
@@ -436,8 +438,8 @@ settings.add(select);
             startedFilterSearch = false;
             panel.stopShowingSearchResults();
         }
-
-
+        // disable "Cancel" button to signal this to the user
+        escape.setEnabled(false);
     }
     public void itemStateChanged(ItemEvent e) {
     if (e.getSource() == increment) {
@@ -483,6 +485,7 @@ settings.add(select);
 
     private void goIncremental() {
     incSearch = true;
+    escape.setEnabled(true);
     SwingUtilities.invokeLater(new Thread() {
         public void run() {
             String text = searchField.getText();
