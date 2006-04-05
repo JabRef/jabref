@@ -1226,10 +1226,10 @@ public class GroupSelector extends SidePaneComponent implements
     
     /**
      * Highlight all groups that contain any/all of the specified entries.
-     * If entries is null, highlight is cleared. 
+     * If entries is null or has zero length, highlight is cleared. 
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
-        if (entries == null) { // nothing selected
+        if (entries == null || entries.length == 0) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
             return;
