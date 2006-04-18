@@ -200,11 +200,11 @@ public class GUIGlobals {
           integrityFail = GUIGlobals.class.getResource(pre + "messageFail.png"),
           duplicateIcon = GUIGlobals.class.getResource(pre + "duplicate.png"),
           emacsIcon = GUIGlobals.class.getResource(pre + "emacs.png");
-  
+
   public static ImageIcon
-  	groupRefiningIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupRefining.png")),
-  	groupIncludingIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupIncluding.png")),
-  	groupRegularIcon = null;
+          groupRefiningIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupRefining.png")),
+          groupIncludingIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupIncluding.png")),
+          groupRegularIcon = null;
 
     /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
     static {
@@ -235,6 +235,7 @@ public class GUIGlobals {
       shortPlainImport="ShortPlainImport.html",
       importInspectionHelp = "ImportInspectionDialog.html",
       shortIntegrityCheck="ShortIntegrityCheck.html",
+      shortAuxImport="ShortAuxImport.html",
         remoteHelp = "RemoteHelp.html",
         journalAbbrHelp = "JournalAbbreviations.html";
 

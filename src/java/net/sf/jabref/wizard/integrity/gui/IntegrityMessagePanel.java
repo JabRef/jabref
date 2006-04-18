@@ -35,16 +35,15 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity.gui ;
 
-import javax.swing.* ;
-import javax.swing.undo.UndoManager;
-import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.wizard.text.gui.HintListModel ;
-import java.awt.Dimension ;
-import net.sf.jabref.* ;
 import java.awt.* ;
-import net.sf.jabref.wizard.integrity.*;
-import javax.swing.event.*;
-import java.awt.event.*;
+import java.awt.event.* ;
+import javax.swing.* ;
+import javax.swing.event.* ;
+
+import net.sf.jabref.* ;
+import net.sf.jabref.undo.* ;
+import net.sf.jabref.wizard.integrity.* ;
+import net.sf.jabref.wizard.text.gui.* ;
 
 public class IntegrityMessagePanel
     extends JPanel
@@ -80,7 +79,7 @@ public class IntegrityMessagePanel
 
   // Fix Panel ---------------------------------------------------------
     JPanel fixPanel = new JPanel() ;
-    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
+//    BoxLayout box = new BoxLayout(fixPanel, BoxLayout.LINE_AXIS) ;
 
     JLabel label1 = new JLabel(Globals.lang("Field_content")) ;
 
@@ -135,7 +134,11 @@ public class IntegrityMessagePanel
 
         if (entry != null)
         {
-            str = (String) entry.getField(msg.getFieldName()) ;
+          str = (String) entry.getField(msg.getFieldName()) ;
+          basePanel.highlightEntry(entry);
+  // make the "invalid" field visible  ....
+  //          EntryEditor editor = basePanel.getCurrentEditor() ;
+  //          editor.
         }
       }
       content.setText(str);
@@ -177,7 +180,7 @@ public class IntegrityMessagePanel
         {
 //          System.out.println("update") ;
             Object oldContent = entry.getField(msg.getFieldName());
-            UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent, 
+            UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent,
                         content.getText());
             entry.setField(msg.getFieldName(), content.getText());
             basePanel.undoManager.addEdit(edit);
@@ -191,7 +194,6 @@ public class IntegrityMessagePanel
       applyButton.setEnabled(false);
     }
   }
-
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   class IntegrityListRenderer extends DefaultListCellRenderer

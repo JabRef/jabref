@@ -60,7 +60,7 @@ public class IntegrityWizard
 
   public IntegrityWizard( JabRefFrame frame, BasePanel basePanel)
   {
-    super( frame, "dialog", true ) ;
+    super( frame, "dialog", false ) ;  // no modal
 
     _frame = frame ;
     this.basePanel = basePanel;

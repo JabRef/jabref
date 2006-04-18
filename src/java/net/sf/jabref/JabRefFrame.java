@@ -330,6 +330,9 @@ public class JabRefFrame
       customExportMenu = subMenu("Custom export"),
       newDatabaseMenu = subMenu("New database" );
 
+  // Other submenus
+  JMenu checkAndFix = subMenu("Find And Fix") ;
+
 
   // The action for adding a new entry of unspecified type.
   NewEntryAction newEntryAction = new NewEntryAction(prefs.getKey("New entry"));
@@ -1061,14 +1064,20 @@ public JabRefPreferences prefs() {
     bibtex.add(editPreamble);
     bibtex.add(editStrings);
     mb.add(bibtex);
+
     tools.add(normalSearch);
     tools.add(incrementalSearch);
     tools.add(replaceAll);
-    tools.add(dupliCheck);
-    tools.add(strictDupliCheck);
+
+    // [kiar] I think we should group these festures
+    tools.add(checkAndFix) ;
+     checkAndFix.add( dupliCheck);
+     checkAndFix.add( strictDupliCheck);
+     checkAndFix.add( makeKeyAction);
+     checkAndFix.add( integrityCheckAction) ;
+
     tools.addSeparator();
     tools.add(manageSelectors);
-    tools.add(makeKeyAction);
     tools.add(emacsPushAction);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
@@ -1079,7 +1088,6 @@ public JabRefPreferences prefs() {
     tools.add(openUrl);
     tools.addSeparator();
     tools.add(newSubDatabaseAction);
-    tools.add(integrityCheckAction) ;
 
       tools.addSeparator();
       tools.add(autoSetPdf);
@@ -1828,7 +1836,7 @@ class FetchCiteSeerAction
     {
       public IntegrityCheckAction()
       {
-        super(Globals.menuTitle("Integrity check"), //Globals.lang( "" ),
+        super(Globals.menuTitle("Integrity check"),
                new ImageIcon( GUIGlobals.integrityCheck ) ) ;
                //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
@@ -1843,7 +1851,6 @@ class FetchCiteSeerAction
          BibtexDatabase refBase = bp.getDatabase() ;
          if (refBase != null)
          {
-
              IntegrityWizard wizard = new IntegrityWizard(ths, basePanel()) ;
              Util.placeDialog(wizard, ths);
              wizard.setVisible(true) ;
