@@ -19,9 +19,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames, lastNamesOnly;
     private JComboBox
-    priSort = new JComboBox(GUIGlobals.ALL_FIELDS),
-    secSort = new JComboBox(GUIGlobals.ALL_FIELDS),
-    terSort = new JComboBox(GUIGlobals.ALL_FIELDS);
+    priSort = new JComboBox(BibtexFields.getAllFieldNames()),
+    secSort = new JComboBox(BibtexFields.getAllFieldNames()),
+    terSort = new JComboBox(BibtexFields.getAllFieldNames());
     private JTextField priField, secField, terField;
     private JabRefFrame frame;
 
@@ -63,7 +63,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         priSort.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (priSort.getSelectedIndex() > 0) {
-              priField.setText(GUIGlobals.ALL_FIELDS[priSort.getSelectedIndex() - 1]);
+              priField.setText(BibtexFields.getFieldName( priSort.getSelectedIndex() - 1));
               priSort.setSelectedIndex(0);
             }
           }
@@ -71,7 +71,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (secSort.getSelectedIndex() > 0) {
-              secField.setText(GUIGlobals.ALL_FIELDS[secSort.getSelectedIndex() - 1]);
+              secField.setText(BibtexFields.getFieldName( secSort.getSelectedIndex() - 1));
               secSort.setSelectedIndex(0);
             }
           }
@@ -79,7 +79,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         terSort.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             if (terSort.getSelectedIndex() > 0) {
-              terField.setText(GUIGlobals.ALL_FIELDS[terSort.getSelectedIndex() - 1]);
+              terField.setText(BibtexFields.getFieldName( terSort.getSelectedIndex() - 1));
               terSort.setSelectedIndex(0);
             }
           }
@@ -238,75 +238,75 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 }
 
-	/*
-	Boolean[] sel = new Boolean[GUIGlobals.ALL_FIELDS.length];
-	boolean found;
-	_choices = GUIGlobals.ALL_FIELDS;
-	_sel = sel;
-	String[] columns = prefs.getStringArray("columnNames");
-	for (int i=0; i<_choices.length; i++) {
-	    found = false;
-	    for (int j=0; j<columns.length; j++)
-		if (columns[j].equals(_choices[i]))
-		    found = true;
-	    if (found)
-		sel[i] = new Boolean(true);
-	    else
-		sel[i] = new Boolean(false);
-	}
+        /*
+        Boolean[] sel = new Boolean[GUIGlobals.ALL_FIELDS.length];
+        boolean found;
+        _choices = GUIGlobals.ALL_FIELDS;
+        _sel = sel;
+        String[] columns = prefs.getStringArray("columnNames");
+        for (int i=0; i<_choices.length; i++) {
+            found = false;
+            for (int j=0; j<columns.length; j++)
+                if (columns[j].equals(_choices[i]))
+                    found = true;
+            if (found)
+                sel[i] = new Boolean(true);
+            else
+                sel[i] = new Boolean(false);
+        }
 
-	TableModel tm = new AbstractTableModel() {
-		public int getRowCount() { return (_choices.length-1)/2; }
-		public int getColumnCount() { return 4; }
-		public Object getValueAt(int row, int column) {
-		    switch (column) {
-		    case 0:
-			return _choices[row];
-		    case 1:
-			return _sel[row];
-		    case 2:
-			return _choices[getRowCount()+row];
-		    case 3:
-			return _sel[getRowCount()+row];
-		    }
-		    return null; // Unreachable.
-		}
-		public Class getColumnClass(int column) {
-		    if ((column == 0) || (column == 2)) return String.class;
-		    else return Boolean.class;
-		}
-		public boolean isCellEditable(int row, int col) {
-		    if ((col == 1) || (col == 3)) return true;
-		    else return false;
-		}
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		    if (columnIndex == 1)
-			_sel[rowIndex] = (Boolean)aValue;
-		    if (columnIndex == 3)
-			_sel[getRowCount()+rowIndex] = (Boolean)aValue;
-		}
+        TableModel tm = new AbstractTableModel() {
+                public int getRowCount() { return (_choices.length-1)/2; }
+                public int getColumnCount() { return 4; }
+                public Object getValueAt(int row, int column) {
+                    switch (column) {
+                    case 0:
+                        return _choices[row];
+                    case 1:
+                        return _sel[row];
+                    case 2:
+                        return _choices[getRowCount()+row];
+                    case 3:
+                        return _sel[getRowCount()+row];
+                    }
+                    return null; // Unreachable.
+                }
+                public Class getColumnClass(int column) {
+                    if ((column == 0) || (column == 2)) return String.class;
+                    else return Boolean.class;
+                }
+                public boolean isCellEditable(int row, int col) {
+                    if ((col == 1) || (col == 3)) return true;
+                    else return false;
+                }
+                public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                    if (columnIndex == 1)
+                        _sel[rowIndex] = (Boolean)aValue;
+                    if (columnIndex == 3)
+                        _sel[getRowCount()+rowIndex] = (Boolean)aValue;
+                }
 
-	    };
+            };
 
-	JTable table = new JTable(tm);
-	table.setRowSelectionAllowed(false);
-	table.setColumnSelectionAllowed(false);
-	//table.getInputMap().put(GUIGlobals.exitDialog, "close");
-	//table.getActionMap().put("close", new CancelAction());
-	JPanel
-	    tablePanel = new JPanel(),
-	    innerTablePanel = new JPanel();
+        JTable table = new JTable(tm);
+        table.setRowSelectionAllowed(false);
+        table.setColumnSelectionAllowed(false);
+        //table.getInputMap().put(GUIGlobals.exitDialog, "close");
+        //table.getActionMap().put("close", new CancelAction());
+        JPanel
+            tablePanel = new JPanel(),
+            innerTablePanel = new JPanel();
 
-	table.setShowVerticalLines(false);
-	innerTablePanel.setBorder(BorderFactory.createEtchedBorder());
-	//innerTablePanel.setBorder(BorderFactory.createLoweredBevelBorder());
-	innerTablePanel.add(table);
-	tablePanel.add(innerTablePanel);
+        table.setShowVerticalLines(false);
+        innerTablePanel.setBorder(BorderFactory.createEtchedBorder());
+        //innerTablePanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        innerTablePanel.add(table);
+        tablePanel.add(innerTablePanel);
 
 
-	TableColumnModel cm = table.getColumnModel();
-	cm.getColumn(0).setPreferredWidth(90);
-	cm.getColumn(1).setPreferredWidth(25);
-	cm.getColumn(2).setPreferredWidth(90);
-	cm.getColumn(3).setPreferredWidth(25);
-	*/
+        TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(90);
+        cm.getColumn(1).setPreferredWidth(25);
+        cm.getColumn(2).setPreferredWidth(90);
+        cm.getColumn(3).setPreferredWidth(25);
+        */

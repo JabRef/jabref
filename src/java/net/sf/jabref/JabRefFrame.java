@@ -1956,7 +1956,7 @@ class FetchCiteSeerAction
       if (Globals.prefs.getBoolean("useImportInspectionDialog") &&
               (Globals.prefs.getBoolean("useImportInspectionDialogForSingle") || (entries.size() > 1))) {
                 ImportInspectionDialog diag = new ImportInspectionDialog(ths, panel,
-                        GUIGlobals.DEFAULT_INSPECTION_FIELDS,
+                        BibtexFields.DEFAULT_INSPECTION_FIELDS,
                         Globals.lang("Import"), openInNew);
                 diag.addEntries(entries);
                 diag.addCallBack(callBack);

@@ -228,7 +228,7 @@ public class EntryTable extends JTable {
      * This method may have some potential for optimization.
      *
      * @param rows
-     * @return The number of the row that should be considered active, or -1 if none. 
+     * @return The number of the row that should be considered active, or -1 if none.
      */
     private int resolveNewSelection(int[] rows) {
         HashSet newSel = new HashSet();
@@ -572,10 +572,10 @@ public class EntryTable extends JTable {
 
 
         if (!panel.coloringBySearchResults ||
-            tableModel.nonZeroField(row, Globals.SEARCH))
+            tableModel.nonZeroField(row, BibtexFields.SEARCH))
             score++;
         if (!panel.coloringByGroup ||
-            tableModel.nonZeroField(row, Globals.GROUPSEARCH))
+            tableModel.nonZeroField(row, BibtexFields.GROUPSEARCH))
             score+=2;
 
         // Now, a grayed out renderer is for entries with -1, and

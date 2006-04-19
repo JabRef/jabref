@@ -17,68 +17,68 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     JTextArea layout1 = new JTextArea("", 1, 1),
     layout2 = new JTextArea("", 1, 1);
     JButton def1 = new JButton(Globals.lang("Default")),
-	    def2 = new JButton(Globals.lang("Default")),
+            def2 = new JButton(Globals.lang("Default")),
         test1 = new JButton(Globals.lang("Test")),
         test2 = new JButton(Globals.lang("Test")),
         help = new JButton(Globals.lang("Help"));
     JPanel p1 = new JPanel(),
-	p2 = new JPanel();
+        p2 = new JPanel();
     JScrollPane sp1 = new JScrollPane(layout1),
-	sp2 = new JScrollPane(layout2);
+        sp2 = new JScrollPane(layout2);
     private static BibtexEntry entry;
 
     public PreviewPrefsTab(JabRefPreferences prefs, HelpDialog diag) {
-	_prefs = prefs;
- 	p1.setLayout(gbl);
- 	p2.setLayout(gbl);
+        _prefs = prefs;
+         p1.setLayout(gbl);
+         p2.setLayout(gbl);
     help.addActionListener(helpAction);
     /*p1.setBorder(BorderFactory.createTitledBorder
               (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 1"));
      p2.setBorder(BorderFactory.createTitledBorder
               (BorderFactory.createEtchedBorder(),Globals.lang("Preview")+" 2")); */
-	setLayout(gbl);//new GridLayout(2,1));
-	JLabel lab;
-	lab = new JLabel(Globals.lang("Preview")+" 1");
-	con.anchor = GridBagConstraints.WEST;
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.BOTH;
-	con.weightx = 1;
-	con.weighty = 0;
-	con.insets = new Insets(2,2,2,2);
-	gbl.setConstraints(lab, con);
-	//p1.add(lab);
-	con.weighty = 1;
-	gbl.setConstraints(sp1, con);
-	p1.add(sp1);
-	con.weighty = 0;
+        setLayout(gbl);//new GridLayout(2,1));
+        JLabel lab;
+        lab = new JLabel(Globals.lang("Preview")+" 1");
+        con.anchor = GridBagConstraints.WEST;
+        con.gridwidth = GridBagConstraints.REMAINDER;
+        con.fill = GridBagConstraints.BOTH;
+        con.weightx = 1;
+        con.weighty = 0;
+        con.insets = new Insets(2,2,2,2);
+        gbl.setConstraints(lab, con);
+        //p1.add(lab);
+        con.weighty = 1;
+        gbl.setConstraints(sp1, con);
+        p1.add(sp1);
+        con.weighty = 0;
     con.gridwidth = 1;
     con.weightx = 0;
-	con.fill = GridBagConstraints.NONE;
+        con.fill = GridBagConstraints.NONE;
     con.anchor = GridBagConstraints.WEST;
     gbl.setConstraints(test1, con);
-	p1.add(test1);
+        p1.add(test1);
     gbl.setConstraints(def1, con);
-	p1.add(def1);
+        p1.add(def1);
     con.gridwidth = GridBagConstraints.REMAINDER;
     JPanel pan = new JPanel();
     con.weightx = 1;
     gbl.setConstraints(pan, con);
     p1.add(pan);
     lab = new JLabel(Globals.lang("Preview")+" 2");
-	gbl.setConstraints(lab, con);
-	//p2.add(lab);
-	con.weighty = 1;
-	con.fill = GridBagConstraints.BOTH;
-	gbl.setConstraints(sp2, con);
-	p2.add(sp2);
-	con.weighty = 0;
+        gbl.setConstraints(lab, con);
+        //p2.add(lab);
+        con.weighty = 1;
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(sp2, con);
+        p2.add(sp2);
+        con.weighty = 0;
     con.weightx = 0;
-	con.fill = GridBagConstraints.NONE;
+        con.fill = GridBagConstraints.NONE;
     con.gridwidth = 1;
     gbl.setConstraints(test2, con);
-	p2.add(test2);
-	gbl.setConstraints(def2, con);
-	p2.add(def2);
+        p2.add(test2);
+        gbl.setConstraints(def2, con);
+        p2.add(def2);
     con.gridwidth = 1;
     pan = new JPanel();
     con.weightx = 1;
@@ -111,48 +111,48 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     gbl.setConstraints(p2, con);
     add(p2);
 
-	def1.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
-		    _prefs.remove("preview0");
-		    layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
-		    _prefs.put("preview0", tmp);
-		}
-	    });
-	def2.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
-		    _prefs.remove("preview1");
-		    layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
-		    _prefs.put("preview1", tmp);
-		}
-	    });
+        def1.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
+                    _prefs.remove("preview0");
+                    layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
+                    _prefs.put("preview0", tmp);
+                }
+            });
+        def2.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
+                    _prefs.remove("preview1");
+                    layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
+                    _prefs.put("preview1", tmp);
+                }
+            });
 
 
     test1.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) {
             getTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, new MetaData(), layout1.getText());
             testPanel.setPreferredSize(new Dimension(800, 350));
             JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
-		}
-	    });
+                }
+            });
 
     test2.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) {
             getTestEntry();
             PreviewPanel testPanel = new PreviewPanel(entry, new MetaData(), layout2.getText());
             testPanel.setPreferredSize(new Dimension(800, 350));
             JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Globals.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
-		}
-	    });
+                }
+            });
     }
-   
+
     public static BibtexEntry getTestEntry() {
         if (entry != null)
             return entry;
         entry = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
-        entry.setField(Globals.KEY_FIELD, "conceicao1997");
+        entry.setField(BibtexFields.KEY_FIELD, "conceicao1997");
         entry.setField("author", "L. E. C. Conceic{\\~a}o and T. van der Meeren and J. A. J. Verreth and M. S. Evjen and D. F. Houlihan and H. J. Fyhn");
         entry.setField("title", "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
         entry.setField("year", "1997");
@@ -188,17 +188,17 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     }
 
     public void setValues() {
-	layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
-	layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
+        layout1.setText(_prefs.get("preview0").replaceAll("__NEWLINE__", "\n"));
+        layout2.setText(_prefs.get("preview1").replaceAll("__NEWLINE__", "\n"));
     }
 
     public void storeSettings() {
-	_prefs.put("preview0", layout1.getText().replaceAll("\n", "__NEWLINE__"));
-	_prefs.put("preview1", layout2.getText().replaceAll("\n", "__NEWLINE__"));
+        _prefs.put("preview0", layout1.getText().replaceAll("\n", "__NEWLINE__"));
+        _prefs.put("preview1", layout2.getText().replaceAll("\n", "__NEWLINE__"));
     }
 
     public boolean readyToClose() {
-	return true;
+        return true;
     }
 
 }

@@ -105,17 +105,22 @@ public class EntryTableModel
     else if (getIconTypeForColumn(col) != null) {
       return "";
     }
-    else if(GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]) != null) {
-        return((String) GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]));
+    else // try to find an alternative fieldname (for display)
+    {
+       String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
+       if ( disName != null)
+       {
+         return disName ;
+       }
     }
     return Util.nCase(columns[col - padleft]);
   }
 
-    public void showAllEntries() {
+  public void showAllEntries() {
     visibleRows = sorter.getEntryCount();
     }
 
-    public void setRowCount(int rows) {
+  public void setRowCount(int rows) {
     visibleRows = rows;
     }
 
@@ -164,10 +169,10 @@ public class EntryTableModel
         o = "" + (row + 1);
     }
 /*      if (!isComplete(row)) {
-      	//JLabel incomplete = new JLabel("" + (row + 1),GUIGlobals.incompleteLabel.getIcon(), JLabel.RIGHT);
+              //JLabel incomplete = new JLabel("" + (row + 1),GUIGlobals.incompleteLabel.getIcon(), JLabel.RIGHT);
         //JLabel incomplete = new JLabel("" + (row + 1));
         //incomplete.setToolTipText(Globals.lang("This entry is incomplete"));
-        //return incomplete;        
+        //return incomplete;
       } else
 */
 
@@ -231,8 +236,8 @@ public class EntryTableModel
             o = processed;
         } else
             o = processed;
-        
-            
+
+
     }*/
     return o;
   }
@@ -261,7 +266,7 @@ public class EntryTableModel
 
     BibtexEntryType type = (db.getEntryById(getIdForRow(row)))
         .getType();
-    if (columns[col - padleft].equals(GUIGlobals.KEY_FIELD)
+    if (columns[col - padleft].equals(BibtexFields.KEY_FIELD)
         || type.isRequired(columns[col - padleft])) {
       return REQUIRED;
     }
@@ -347,19 +352,19 @@ public class EntryTableModel
     // For testing MARKED feature. With this IF clause, the marked entries will only float to the top when
     // no sorting/grouping reordering is active.
     if  (!panel.sortingBySearchResults && !panel.sortingByCiteSeerResults && !panel.sortingByGroup) {
-        fields.add(Globals.MARKED);
+        fields.add(BibtexFields.MARKED);
         directions.add(Boolean.TRUE);
         binary.add(Boolean.FALSE);
     }
     if (panel.sortingByGroup) {
       // Group search has the highest priority if active.
-      fields.add(Globals.GROUPSEARCH);
+      fields.add(BibtexFields.GROUPSEARCH);
       directions.add(Boolean.TRUE);
         binary.add(Boolean.FALSE);
     }
     if (panel.sortingBySearchResults) {
       // Normal search has priority over regular sorting.
-      fields.add(Globals.SEARCH);
+      fields.add(BibtexFields.SEARCH);
       directions.add(Boolean.TRUE);
         binary.add(Boolean.FALSE);
     }
@@ -395,7 +400,7 @@ public class EntryTableModel
           // Loop down towards the highest ranking criterion, wrapping new sorters around the
           // ones we have:
           String field = (String)fields.get(piv);
-          if (field.equals(Globals.MARKED)) {
+          if (field.equals(BibtexFields.MARKED)) {
                 comp = new MarkedComparator(comp);
           }
           else

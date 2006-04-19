@@ -306,12 +306,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   public JComponent getExtra(String string, FieldEditor editor) {
     final FieldEditor ed = editor;
-    Object o = GUIGlobals.FIELD_EXTRAS.get(string);
+
+    // fieldName and parameter string identically ????
     final String fieldName = editor.getFieldName();
 
-    //if (o == null)
-    //  return null;
-    String s = (String) o;
+    String s = BibtexFields.getFieldExtras( string ) ;
+
     //addedByMoritz
       if (fieldName.equals(Globals.prefs.get("timeStampField"))){
     //if (fieldName.equals("dateadded")){
@@ -687,7 +687,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       Object[] fields = entry.getAllFields();
 
       for (int i = 0; i < fields.length; i++) {
-        if (GUIGlobals.isDisplayableField(fields[i].toString())) {
+        if (BibtexFields.isDisplayableField(fields[i].toString())) {
           if (nu.getField(fields[i].toString()) == null) {
             compound.addEdit(new UndoableFieldChange(entry, fields[i].toString(),
                 entry.getField(fields[i].toString()), (Object) null));
@@ -1214,20 +1214,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
       try {
         // this updates the table automatically, on close, but not
         // within the tab
-        Object oldValue = entry.getField(GUIGlobals.KEY_FIELD);
+        Object oldValue = entry.getField(BibtexFields.KEY_FIELD);
 
         //entry = frame.labelMaker.applyRule(entry, panel.database) ;
         LabelPatternUtil.makeLabel(prefs.getKeyPattern(), panel.database, entry);
 
         // Store undo information:
         panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-            (String) oldValue, (String) entry.getField(GUIGlobals.KEY_FIELD)));
+            (String) oldValue, (String) entry.getField(BibtexFields.KEY_FIELD)));
 
         // here we update the field
-        String bibtexKeyData = (String) entry.getField(Globals.KEY_FIELD);
+        String bibtexKeyData = (String) entry.getField(BibtexFields.KEY_FIELD);
 
         // set the field named for "bibtexkey"
-        setField(Globals.KEY_FIELD, bibtexKeyData);
+        setField(BibtexFields.KEY_FIELD, bibtexKeyData);
         updateSource();
         panel.markBaseChanged();
       } catch (Throwable t) {

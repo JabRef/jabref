@@ -558,7 +558,7 @@ public class Util {
                 sb.append(spl[i]);
             }
             link = sb.toString();
-	    }*/
+            }*/
     link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
         String cmd = "cmd.exe /c start " + link;
         Process child = Runtime.getRuntime().exec(cmd);
@@ -589,7 +589,7 @@ public class Util {
         // Now we know the extension, check if it is one we know about:
         ExternalFileType fileType = Globals.prefs.getExternalFileType(extension);
 
-        
+
         // Find the default directory for this field type, if any:
         String dir = metaData.getFileDirectory(extension);
         if (dir != null) {
@@ -704,14 +704,14 @@ public class Util {
      */
     public static File expandFilename(String name, String dir) {
         //System.out.println("expandFilename: name="+name+"\t dir="+dir);
-				File file = null; 
-				if(name==null || name.length()==0)
-					return null;
-				else
-				{
-					file = new File(name);
-				}
-        
+                                File file = null;
+                                if(name==null || name.length()==0)
+                                        return null;
+                                else
+                                {
+                                        file = new File(name);
+                                }
+
         if(file!=null){
         if (!file.exists() && (dir != null)) {
             if (dir.endsWith(System.getProperty("file.separator"))) name = dir
@@ -725,20 +725,20 @@ public class Util {
             if (file.exists()) return file;
             // Ok, try to fix / and \ problems:
             if (Globals.ON_WIN){
-            	// workaround for catching Java bug in regexp replacer
-            	// and, why, why, why ... I don't get it - wegner 2006/01/22
-            	try{
-            	 name = name.replaceAll("/", "\\");
-            	}
-            	catch(java.lang.StringIndexOutOfBoundsException exc){
-            		System.err.println("An internal Java error was caused by the entry "+"\""+name+"\"");
-            	}
+                    // workaround for catching Java bug in regexp replacer
+                    // and, why, why, why ... I don't get it - wegner 2006/01/22
+                    try{
+                     name = name.replaceAll("/", "\\");
+                    }
+                    catch(java.lang.StringIndexOutOfBoundsException exc){
+                            System.err.println("An internal Java error was caused by the entry "+"\""+name+"\"");
+                    }
             }
             else name = name.replaceAll("\\\\", "/");
             //System.out.println("expandFilename: "+name);
             file = new File(name);
             if (!file.exists()) file = null;
-        }} 
+        }}
         return file;
     }
 
@@ -888,7 +888,7 @@ public class Util {
     /*
      * public static void updateCompletersForEntry(Hashtable autoCompleters,
      * BibtexEntry be) {
-     * 
+     *
      * for (Iterator j=autoCompleters.keySet().iterator(); j.hasNext();) {
      * String field = (String)j.next(); Completer comp =
      * (Completer)autoCompleters.get(field); comp.addAll(be.getField(field)); } }
@@ -945,7 +945,7 @@ public class Util {
             //if (entry.getField(Globals.OWNER) == null
             //        || ((String) entry.getField(Globals.OWNER)).length() == 0) {
                 // Set owner field to default value
-                entry.setField(Globals.OWNER, owner);
+                entry.setField(BibtexFields.OWNER, owner);
             //}
         }
 
@@ -1170,8 +1170,10 @@ public class Util {
                 String field = kg.getSearchField().toLowerCase();
                 if (field.equals("keywords"))
                     continue; // this is not undesired
-                for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
-                    if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
+                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i)
+                {
+                    if (field.equals( BibtexFields.getFieldName(i)))
+                    {
                         affectedFields.add(field);
                         break;
                     }
@@ -1199,7 +1201,7 @@ public class Util {
 //        if (groups instanceof KeywordGroup) {
 //            KeywordGroup kg = (KeywordGroup) groups;
 //            String field = kg.getSearchField().toLowerCase();
-//            if (field.equals("keywords")) 
+//            if (field.equals("keywords"))
 //                return true; // this is not undesired
 //            for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {
 //                if (field.equals(GUIGlobals.ALL_FIELDS[i])) {
@@ -1335,7 +1337,7 @@ public class Util {
      * @return The file filter.
      */
     public static OpenFileFilter getFileFilterForField(String fieldName) {
-        String s = (String) GUIGlobals.FIELD_EXTRAS.get(fieldName);
+        String s = BibtexFields.getFieldExtras( fieldName ) ;
         final String ext = "." + fieldName.toLowerCase();
         final OpenFileFilter off;
         if (s.equals("browseDocZip"))
@@ -1441,7 +1443,7 @@ public class Util {
 
 
     public static void markEntry(BibtexEntry be, NamedCompound ce) {
-        Object o = be.getField(Globals.MARKED);
+        Object o = be.getField(BibtexFields.MARKED);
         if ((o != null) && (o.toString().indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0))
             return;
         String newValue;
@@ -1453,13 +1455,13 @@ public class Util {
             sb.append(Globals.prefs.WRAPPED_USERNAME);
             newValue = sb.toString();
         }
-        ce.addEdit(new UndoableFieldChange(be, Globals.MARKED,
-                                          be.getField(Globals.MARKED), newValue));
-        be.setField(Globals.MARKED, newValue);
+        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED,
+                                          be.getField(BibtexFields.MARKED), newValue));
+        be.setField(BibtexFields.MARKED, newValue);
     }
 
     public static void unmarkEntry(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
-        Object o = be.getField(Globals.MARKED);
+        Object o = be.getField(BibtexFields.MARKED);
         if (o != null) {
             String s = o.toString();
             if (s.equals("0")) {
@@ -1478,9 +1480,9 @@ public class Util {
                 sb.append(s.substring(piv));
             }
             String newVal = sb.length()>0 ? sb.toString() : null;
-            ce.addEdit(new UndoableFieldChange(be, Globals.MARKED,
-                be.getField(Globals.MARKED), newVal));
-            be.setField(Globals.MARKED, newVal);
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED,
+                be.getField(BibtexFields.MARKED), newVal));
+            be.setField(BibtexFields.MARKED, newVal);
         }
     }
 
@@ -1498,7 +1500,7 @@ public class Util {
         TreeSet owners = new TreeSet();
         for (Iterator i=database.getEntries().iterator(); i.hasNext();) {
             BibtexEntry entry = (BibtexEntry)i.next();
-            Object o = entry.getField(Globals.OWNER);
+            Object o = entry.getField(BibtexFields.OWNER);
             if (o != null)
                 owners.add(o);
             //System.out.println("Owner: "+entry.getField(Globals.OWNER));
@@ -1513,13 +1515,13 @@ public class Util {
         String newVal = sb.toString();
         if (newVal.length() == 0)
             newVal = null;
-        ce.addEdit(new UndoableFieldChange(be, Globals.MARKED, be.getField(Globals.MARKED), newVal));
-        be.setField(Globals.MARKED, newVal);
+        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newVal));
+        be.setField(BibtexFields.MARKED, newVal);
 
     }
 
     public static boolean isMarked(BibtexEntry be) {
-        Object fieldVal = be.getField(Globals.MARKED);
+        Object fieldVal = be.getField(BibtexFields.MARKED);
         if (fieldVal == null)
             return false;
         String s = (String)fieldVal;

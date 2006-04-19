@@ -196,15 +196,15 @@ public class BibtexEntry
     }
 
     public String getCiteKey() {
-        return (_fields.containsKey(Globals.KEY_FIELD) ?
-                (String)_fields.get(Globals.KEY_FIELD) : null);
+        return (_fields.containsKey(BibtexFields.KEY_FIELD) ?
+                (String)_fields.get(BibtexFields.KEY_FIELD) : null);
     }
 
     /**
      * Sets the given field to the given value.
      */
     public void setField(HashMap fields){
-        _fields.putAll(fields); 
+        _fields.putAll(fields);
     }
 
     public void setField(String name, Object value) {
@@ -218,30 +218,30 @@ public class BibtexEntry
         //Object normalValue = FieldTypes.normalize(name, value);
 
 
-	Object oldValue = _fields.get(name);
+        Object oldValue = _fields.get(name);
 
         try {
-	        /* The first event is no longer needed, so the following comment doesn't apply
-	           as of 2005.08.11.
+                /* The first event is no longer needed, so the following comment doesn't apply
+                   as of 2005.08.11.
 
             // First throw an empty event that just signals that this entry
-	        // is about to change. This is needed, so the EntrySorter can
-	        // remove the entry from its TreeSet. After a sort-sensitive
-	        // field changes, the entry will not be found by the TreeMap,
-	        // so without this event it would be impossible to reinsert this
-	        // entry to keep everything sorted properly.
+                // is about to change. This is needed, so the EntrySorter can
+                // remove the entry from its TreeSet. After a sort-sensitive
+                // field changes, the entry will not be found by the TreeMap,
+                // so without this event it would be impossible to reinsert this
+                // entry to keep everything sorted properly.
             firePropertyChangedEvent(null, null, null);
             */
 
             // We set the field before throwing the changeEvent, to enable
-    	    // the change listener to access the new value if the change
-    	    // sets off a change in database sorting etc.
-    	    _fields.put(name, value);
+                // the change listener to access the new value if the change
+                // sets off a change in database sorting etc.
+                _fields.put(name, value);
             firePropertyChangedEvent(name, oldValue, value);
         } catch (PropertyVetoException pve) {
-    	    // Since we have already made the change, we must undo it since
-	        // the change was rejected:
-    	    _fields.put(name, oldValue);
+                // Since we have already made the change, we must undo it since
+                // the change was rejected:
+                _fields.put(name, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
 
@@ -313,10 +313,10 @@ public class BibtexEntry
         // Write header with type and bibtex-key.
         out.write("@"+_type.getName().toUpperCase()+"{");
 
-        String str = Util.shaveString((String)getField(GUIGlobals.KEY_FIELD));
+        String str = Util.shaveString((String)getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
         HashMap written = new HashMap();
-        written.put(GUIGlobals.KEY_FIELD, null);
+        written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
         String[] s = getRequiredFields();
@@ -337,10 +337,10 @@ public class BibtexEntry
         TreeSet remainingFields = new TreeSet();
         for (Iterator i = _fields.keySet().iterator(); i.hasNext(); ) {
             String key = (String)i.next();
-            boolean writeIt = (write ? GUIGlobals.isWriteableField(key) :
-                               GUIGlobals.isDisplayableField(key));
+            boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
+                               BibtexFields.isDisplayableField(key));
             if (!written.containsKey(key) && writeIt)
-               	remainingFields.add(key);
+                       remainingFields.add(key);
         }
         for (Iterator i = remainingFields.iterator(); i.hasNext(); )
             hasWritten = hasWritten | writeField((String)i.next(), out, ff, hasWritten);
@@ -391,9 +391,9 @@ public class BibtexEntry
         return clone;
     }
 
-   
+
     public String toString() {
-	return getType().getName()+":"+getField(Globals.KEY_FIELD);
+        return getType().getName()+":"+getField(BibtexFields.KEY_FIELD);
     }
 
     public boolean isSearchHit() {

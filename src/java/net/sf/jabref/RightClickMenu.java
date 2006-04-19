@@ -50,7 +50,7 @@ public class RightClickMenu extends JPopupMenu
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
         metaData = metaData_;
-        
+
         // Are multiple entries selected?
         boolean multiple = (panel.mainTable.getSelectedRowCount() > 1);
 
@@ -105,7 +105,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
             addSeparator();
-         
+
         if (multiple) {
           add(new AbstractAction(Globals.lang("Mark entries"), new ImageIcon(GUIGlobals.markIcon)) {
             public void actionPerformed(ActionEvent e) {
@@ -123,7 +123,7 @@ public class RightClickMenu extends JPopupMenu
           });
           addSeparator();
         } else if (be != null) {
-          if (be.getField(Globals.MARKED) == null)
+          if (be.getField(BibtexFields.MARKED) == null)
             add(new AbstractAction(Globals.lang("Mark entry"), new ImageIcon(GUIGlobals.markIcon)) {
                public void actionPerformed(ActionEvent e) {
                  try {
@@ -215,14 +215,14 @@ public class RightClickMenu extends JPopupMenu
         groupRemoveMenu.setEnabled(false);
         return;
       }
-      
+
       groupAddMenu.setEnabled(true);
       groupMoveMenu.setEnabled(true);
       groupRemoveMenu.setEnabled(true);
       groupAddMenu.removeAll();
       groupMoveMenu.removeAll();
       groupRemoveMenu.removeAll();
-      
+
       if (bes == null)
         return;
       add(groupAddMenu);
@@ -236,23 +236,23 @@ public class RightClickMenu extends JPopupMenu
       insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
       insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);
     }
-    
+
     /**
      * @param move For add: if true, remove from previous groups
      */
-    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection, 
-    		boolean add, boolean move) {
+    public void insertNodes(JMenu menu, GroupTreeNode node, BibtexEntry[] selection,
+                    boolean add, boolean move) {
         final AbstractAction action = getAction(node,selection,add,move);
-        
+
         if (node.getChildCount() == 0) {
             JMenuItem menuItem = new JMenuItem(action);
             setGroupFontAndIcon(menuItem, node.getGroup());
-            menu.add(menuItem);            
+            menu.add(menuItem);
             if (action.isEnabled())
-            	menu.setEnabled(true);
+                    menu.setEnabled(true);
             return;
         }
-        
+
         JMenu submenu = null;
         if (node.getGroup() instanceof AllEntriesGroup) {
             for (int i = 0; i < node.getChildCount(); ++i) {
@@ -261,9 +261,9 @@ public class RightClickMenu extends JPopupMenu
         } else {
             submenu = new JMenu("["+node.getGroup().getName()+"]");
             setGroupFontAndIcon(submenu, node.getGroup());
-            // setEnabled(true) is done above/below if at least one menu 
+            // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled
-            submenu.setEnabled(action.isEnabled()); 
+            submenu.setEnabled(action.isEnabled());
             JMenuItem menuItem = new JMenuItem(action);
             setGroupFontAndIcon(menuItem, node.getGroup());
             submenu.add(menuItem);
@@ -275,41 +275,41 @@ public class RightClickMenu extends JPopupMenu
                 menu.setEnabled(true);
         }
     }
-    
+
     /** Sets the font and icon to be used, depending on the group */
     private void setGroupFontAndIcon(JMenuItem menuItem, AbstractGroup group) {
         if (Globals.prefs.getBoolean("groupShowDynamic")) {
-        	menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ? 
-        			Font.ITALIC : Font.PLAIN));
+                menuItem.setFont(menuItem.getFont().deriveFont(group.isDynamic() ?
+                                Font.ITALIC : Font.PLAIN));
         }
-    	if (Globals.prefs.getBoolean("groupShowIcons")) {
-    		switch (group.getHierarchicalContext()) {
-    		case AbstractGroup.INCLUDING:
-    			menuItem.setIcon(GUIGlobals.groupIncludingIcon);
-    			break;
-    		case AbstractGroup.REFINING:
-    			menuItem.setIcon(GUIGlobals.groupRefiningIcon);
-    			break;
-    		default:
-    			menuItem.setIcon(GUIGlobals.groupRegularIcon);
-				break;
-    		}
-    	}
+            if (Globals.prefs.getBoolean("groupShowIcons")) {
+                    switch (group.getHierarchicalContext()) {
+                    case AbstractGroup.INCLUDING:
+                            menuItem.setIcon(GUIGlobals.groupIncludingIcon);
+                            break;
+                    case AbstractGroup.REFINING:
+                            menuItem.setIcon(GUIGlobals.groupRefiningIcon);
+                            break;
+                    default:
+                            menuItem.setIcon(GUIGlobals.groupRegularIcon);
+                                break;
+                    }
+            }
     }
-    
+
     /**
      * @param move For add: if true, remove from all previous groups
      */
-    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection, 
-    		boolean add, boolean move) {
+    private AbstractAction getAction(GroupTreeNode node, BibtexEntry[] selection,
+                    boolean add, boolean move) {
         AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node, move,
                 panel) : (AbstractAction) new RemoveFromGroupAction(node, panel);
         AbstractGroup group = node.getGroup();
         if (!move) {
-	        action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
-	                : group.supportsRemove() && group.containsAny(selection));
+                action.setEnabled(add ? group.supportsAdd() && !group.containsAll(selection)
+                        : group.supportsRemove() && group.containsAny(selection));
         } else {
-        	action.setEnabled(group.supportsAdd());
+                action.setEnabled(group.supportsAdd());
         }
         return action;
     }

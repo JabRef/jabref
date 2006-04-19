@@ -68,8 +68,8 @@ public class BibtexDatabase
             public void vetoableChange(PropertyChangeEvent pce)
                 throws PropertyVetoException
             {
-		if (pce.getPropertyName() == null)
-		    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
+                if (pce.getPropertyName() == null)
+                    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGING_ENTRY, (BibtexEntry)pce.getSource()));
                 else if ("id".equals(pce.getPropertyName()))
                 {
                     // locate the entry under its old key
@@ -98,10 +98,10 @@ public class BibtexDatabase
                     _entries.put((String) pce.getNewValue(),
                         (BibtexEntry) pce.getSource());
                 } else {
-		    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGED_ENTRY, (BibtexEntry)pce.getSource()));
-		    //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
-		    //    +"\n"+pce.getNewValue());
-		}
+                    fireDatabaseChanged (new DatabaseChangeEvent(ths, DatabaseChangeEvent.CHANGED_ENTRY, (BibtexEntry)pce.getSource()));
+                    //Util.pr(pce.getSource().toString()+"\n"+pce.getPropertyName()
+                    //    +"\n"+pce.getNewValue());
+                }
             }
         };
 
@@ -127,8 +127,8 @@ public class BibtexDatabase
      * sorted by the given Comparator.
      */
     public synchronized EntrySorter getSorter(java.util.Comparator comp) {
-	EntrySorter sorter = new EntrySorter(_entries, comp);
-	addDatabaseChangeListener(sorter);
+        EntrySorter sorter = new EntrySorter(_entries, comp);
+        addDatabaseChangeListener(sorter);
         return sorter;
     }
 
@@ -145,9 +145,9 @@ public class BibtexDatabase
     {
         return (BibtexEntry) _entries.get(id);
     }
-    
+
     public synchronized Collection getEntries() {
-    	return _entries.values();
+            return _entries.values();
     }
 
     /**
@@ -185,7 +185,7 @@ public class BibtexDatabase
       }
       return back ;
     }
-    
+
     public synchronized BibtexEntry[] getEntriesByKey(String key) {
         Vector entries = new Vector();
         BibtexEntry entry;
@@ -196,7 +196,7 @@ public class BibtexDatabase
         }
         BibtexEntry[] entryArray = new BibtexEntry[entries.size()];
         return (BibtexEntry[]) entries.toArray(entryArray);
-    }    
+    }
 
     /**
      * Inserts the entry, given that its ID is not already in use.
@@ -226,7 +226,7 @@ public class BibtexDatabase
         */
         _entries.put(id, entry);
 
-	fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ADDED_ENTRY, entry));
+        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ADDED_ENTRY, entry));
 
         return checkForDuplicateKeyAndAdd(null, entry.getCiteKey(), false);
     }
@@ -244,7 +244,7 @@ public class BibtexDatabase
             oldValue.removePropertyChangeListener(listener);
         }
 
-	fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.REMOVED_ENTRY, oldValue));
+        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.REMOVED_ENTRY, oldValue));
 
         return oldValue;
     }
@@ -254,9 +254,9 @@ public class BibtexDatabase
         BibtexEntry entry = getEntryById(id);
         String oldKey = entry.getCiteKey();
         if (key != null)
-          entry.setField(Globals.KEY_FIELD, key);
+          entry.setField(BibtexFields.KEY_FIELD, key);
         else
-          entry.clearField(Globals.KEY_FIELD);
+          entry.clearField(BibtexFields.KEY_FIELD);
         return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey(), false);
     }
 
@@ -286,10 +286,10 @@ public class BibtexDatabase
             if (((BibtexString)_strings.get(i.next())).getName().equals(string.getName()))
                 throw new KeyCollisionException("A string with this label already exists,");
         }
-	
-	if (_strings.containsKey(string.getId()))
-	    throw new KeyCollisionException("Duplicate BibtexString id.");
-	
+
+        if (_strings.containsKey(string.getId()))
+            throw new KeyCollisionException("Duplicate BibtexString id.");
+
         _strings.put(string.getId(), string);
     }
 
@@ -305,7 +305,7 @@ public class BibtexDatabase
      * These are in no sorted order.
      */
     public Set getStringKeySet() {
-	return _strings.keySet();
+        return _strings.keySet();
     }
 
     /**
@@ -340,15 +340,15 @@ public class BibtexDatabase
     * If the string is undefined, returns the label itself.
     */
     public String resolveString(String label) {
-	return resolveString(label, new HashSet());
+        return resolveString(label, new HashSet());
     }
-   
+
     /**
      * Resolves any references to strings contained in this database,
      * if possible.
      */
     public String resolveForStrings(String content) {
-	return resolveContent(content, new HashSet());
+        return resolveContent(content, new HashSet());
     }
 
     private String resolveString(String label, HashSet usedIds) {
@@ -356,67 +356,67 @@ public class BibtexDatabase
         for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
             BibtexString string = (BibtexString)_strings.get(i.next());
 
-	        //Util.pr(label+" : "+string.getName());
+                //Util.pr(label+" : "+string.getName());
             if (string.getName().toLowerCase().equals(label.toLowerCase())) {
 
-		// First check if this string label has been resolved
-		// earlier in this recursion. If so, we have a
-		// circular reference, and have to stop to avoid
-		// infinite recursion.
-		if (usedIds.contains(string.getId())) {
-		    Util.pr("Stopped due to circular reference in strings: "+label);
-		    return label;
-		}
-		// If not, log this string's ID now.
-		usedIds.add(string.getId());
+                // First check if this string label has been resolved
+                // earlier in this recursion. If so, we have a
+                // circular reference, and have to stop to avoid
+                // infinite recursion.
+                if (usedIds.contains(string.getId())) {
+                    Util.pr("Stopped due to circular reference in strings: "+label);
+                    return label;
+                }
+                // If not, log this string's ID now.
+                usedIds.add(string.getId());
 
-		// Ok, we found the string. Now we must make sure we
-		// resolve any references to other strings in this one.
-		String res = string.getContent();
-		res = resolveContent(res, usedIds);
+                // Ok, we found the string. Now we must make sure we
+                // resolve any references to other strings in this one.
+                String res = string.getContent();
+                res = resolveContent(res, usedIds);
 
-		// Finished with recursing this branch, so we remove our
-		// ID again:
-		usedIds.remove(string.getId());
+                // Finished with recursing this branch, so we remove our
+                // ID again:
+                usedIds.remove(string.getId());
 
-		return res;
-	    }
+                return res;
+            }
         }
-        
+
         // If we get to this point, the string has obviously not been defined locally.
         // Check if one of the standard BibTeX month strings has been used:
         Object o;
         if ((o = Globals.MONTH_STRINGS.get(label.toLowerCase())) != null) {
             return (String)o;
         }
-        
+
         return label;
     }
 
     private String resolveContent(String res, HashSet usedIds) {
-	//if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
+        //if (res.matches(".*#[-\\^\\:\\w]+#.*")) {
     if (res.matches(".*#[^#]+#.*")) {
-	    StringBuffer newRes = new StringBuffer();
-	    int piv = 0, next = 0;
-	    while ((next=res.indexOf("#", piv)) >= 0) {
-		// We found the next string ref. Append the text
-		// up to it.
-		if (next > 0)
-		    newRes.append(res.substring(piv, next));
-		int stringEnd = res.indexOf("#", next+1);
-		if (stringEnd >= 0) {
-		    // We found the boundaries of the string ref,
-		    // now resolve that one.
-		    String refLabel = res.substring(next+1, stringEnd);
-		    newRes.append(resolveString(refLabel, usedIds));
-		}
-		piv = stringEnd+1;
-	    }
-	    if (piv < res.length()-1)
-		newRes.append(res.substring(piv));
-	    res = newRes.toString();
-	}
-	return res;
+            StringBuffer newRes = new StringBuffer();
+            int piv = 0, next = 0;
+            while ((next=res.indexOf("#", piv)) >= 0) {
+                // We found the next string ref. Append the text
+                // up to it.
+                if (next > 0)
+                    newRes.append(res.substring(piv, next));
+                int stringEnd = res.indexOf("#", next+1);
+                if (stringEnd >= 0) {
+                    // We found the boundaries of the string ref,
+                    // now resolve that one.
+                    String refLabel = res.substring(next+1, stringEnd);
+                    newRes.append(resolveString(refLabel, usedIds));
+                }
+                piv = stringEnd+1;
+            }
+            if (piv < res.length()-1)
+                newRes.append(res.substring(piv));
+            res = newRes.toString();
+        }
+        return res;
     }
 
     //##########################################
@@ -466,9 +466,9 @@ public class BibtexDatabase
             return 0;
         else
             return ((Integer)o).intValue();
-            
+
     }
-    
+
     //========================================================
     // keep track of all the keys to warn if there are duplicates
     //========================================================
@@ -500,19 +500,19 @@ public class BibtexDatabase
     }
 
 
-    
+
     public void fireDatabaseChanged(DatabaseChangeEvent e) {
-	for (Iterator i=changeListeners.iterator(); i.hasNext();) {
-	    ((DatabaseChangeListener)i.next()).databaseChanged(e);
-	}
+        for (Iterator i=changeListeners.iterator(); i.hasNext();) {
+            ((DatabaseChangeListener)i.next()).databaseChanged(e);
+        }
     }
 
     public void addDatabaseChangeListener(DatabaseChangeListener l) {
-	changeListeners.add(l);
+        changeListeners.add(l);
     }
 
     public void removeDatabaseChangeListener(DatabaseChangeListener l) {
-	changeListeners.remove(l);
+        changeListeners.remove(l);
     }
 
     /*

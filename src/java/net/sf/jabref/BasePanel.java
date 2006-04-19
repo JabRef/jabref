@@ -23,7 +23,7 @@ USA
 Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
- 
+
 */
 
 package net.sf.jabref;
@@ -340,7 +340,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             if ((oldKey == null) || (oldKey.equals(""))) {
                                 LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
                                 ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
-                                    (String)bes.getField(GUIGlobals.KEY_FIELD)));
+                                    (String)bes.getField(BibtexFields.KEY_FIELD)));
                                 any = true;
                             }
                         }
@@ -756,7 +756,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // them from consideration, or warn about overwriting keys.
                     loop: for (Iterator i=entries.iterator(); i.hasNext();) {
                         bes = (BibtexEntry)i.next();
-                        if (bes.getField(GUIGlobals.KEY_FIELD) != null) {
+                        if (bes.getField(BibtexFields.KEY_FIELD) != null) {
                             if (Globals.prefs.getBoolean("avoidOverwritingKey"))
                                 // Rmove the entry, because its key is already set:
                                 i.remove();
@@ -786,7 +786,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if (!Globals.prefs.getBoolean("avoidOverwritingKey")) for (Iterator i=entries.iterator(); i.hasNext();) {
                         bes = (BibtexEntry)i.next();
                         // Store the old value:
-                        oldvals.put(bes, bes.getField(GUIGlobals.KEY_FIELD));
+                        oldvals.put(bes, bes.getField(BibtexFields.KEY_FIELD));
                         database.setCiteKeyForEntry(bes.getId(), null);
                     }
 
@@ -796,7 +796,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldvals.get(bes),
-                                    (String)bes.getField(GUIGlobals.KEY_FIELD)));
+                                    (String)bes.getField(BibtexFields.KEY_FIELD)));
                     }
                     ce.end();
                     undoManager.addEdit(ce);
@@ -857,8 +857,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Vector keys = new Vector();
                         // Collect all non-null keys.
                         for (int i=0; i<bes.length; i++)
-                            if (bes[i].getField(Globals.KEY_FIELD) != null)
-                                keys.add(bes[i].getField(Globals.KEY_FIELD));
+                            if (bes[i].getField(BibtexFields.KEY_FIELD) != null)
+                                keys.add(bes[i].getField(BibtexFields.KEY_FIELD));
                         if (keys.size() == 0) {
                             output("None of the selected entries have BibTeX keys.");
                             return;
@@ -895,8 +895,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Vector keys = new Vector();
                         // Collect all non-null keys.
                         for (int i=0; i<bes.length; i++)
-                            if (bes[i].getField(Globals.KEY_FIELD) != null)
-                                keys.add(bes[i].getField(Globals.KEY_FIELD));
+                            if (bes[i].getField(BibtexFields.KEY_FIELD) != null)
+                                keys.add(bes[i].getField(BibtexFields.KEY_FIELD));
                         if (keys.size() == 0) {
                             output("None of the selected entries have BibTeX keys.");
                             return;
@@ -996,7 +996,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                      // see if we can fall back to a filename based on the bibtex key
                      String basefile;
-                     Object key = bes[0].getField(Globals.KEY_FIELD);
+                     Object key = bes[0].getField(BibtexFields.KEY_FIELD);
                      if (key != null) {
                        basefile = key.toString();
                         final String[] types = new String[] {"pdf", "ps"};
@@ -1149,7 +1149,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           // Create an UndoableInsertEntry object.
                           undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
 
-                          TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this, 
+                          TextInputDialog tidialog = new TextInputDialog(frame, BasePanel.this,
                                                                          "import", true,
                                                                          bibEntry) ;
                           Util.placeDialog(tidialog, BasePanel.this);
@@ -1543,7 +1543,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
 
                 highlightEntry(be);  // Selects the entry. The selection listener will open the editor.
-                
+
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));
             } catch (KeyCollisionException ex) {
@@ -1662,7 +1662,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
           database.insertEntry(bibEntry) ;
           if (Globals.prefs.getBoolean("useOwner"))
             // Set owner field to default value
-            bibEntry.setField(Globals.OWNER, Globals.prefs.get("defaultOwner") );
+            bibEntry.setField(BibtexFields.OWNER, Globals.prefs.get("defaultOwner") );
             // Create an UndoableInsertEntry object.
             undoManager.addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
             output(Globals.lang("Added new")+" '"
@@ -2522,7 +2522,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         boolean first = true;
         for (Iterator i = entries.iterator(); i.hasNext();) {
             BibtexEntry bes = (BibtexEntry) i.next();
-            citeKey = (String) bes.getField(GUIGlobals.KEY_FIELD);
+            citeKey = (String) bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
             if (citeKey == null || citeKey.equals(""))
                 continue;

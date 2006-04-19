@@ -70,7 +70,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragEnter(java.awt.dnd.DropTargetDragEvent)
      */
     public void dragEnter(DropTargetDragEvent dtde) {
@@ -78,7 +78,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
      */
     public void dragOver(DropTargetDragEvent dtde) {
@@ -86,7 +86,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dropActionChanged(java.awt.dnd.DropTargetDragEvent)
      */
     public void dropActionChanged(DropTargetDragEvent dtde) {
@@ -94,7 +94,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
      */
     public void dragExit(DropTargetEvent dte) {
@@ -123,7 +123,7 @@ public class UrlDragDrop implements DropTargetListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
      */
     public void drop(DropTargetDropEvent dtde) {
@@ -161,7 +161,7 @@ public class UrlDragDrop implements DropTargetListener {
                     //auto file name:
                     File file = new File(new File(Globals.prefs
                             .get("pdfDirectory")), editor.getEntry()
-                            .getField(Globals.KEY_FIELD)
+                            .getField(BibtexFields.KEY_FIELD)
                             + ".pdf");
                     URLDownload udl = new URLDownload((Component) editor, url,
                             file);

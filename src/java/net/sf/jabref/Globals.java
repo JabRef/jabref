@@ -182,19 +182,6 @@ public class Globals {
     });
   }
 
-  /**
-   * String constants.
-   */
-  public static final String
-      KEY_FIELD = "bibtexkey",
-      SEARCH = "__search",
-      GROUPSEARCH = "__groupsearch",
-      MARKED = "__markedentry",
-      OWNER = "owner",
-        // Using this when I have no database open when I read
-      // non bibtex file formats (used byte ImportFormatReader.java
-      DEFAULT_BIBTEXENTRY_ID = "__ID";
-
   public static void setLanguage(String language, String country) {
     locale = new Locale(language, country);
     messages = ResourceBundle.getBundle(resourcePrefix, locale);
@@ -205,7 +192,7 @@ public class Globals {
   }
 
 
-    public static JournalAbbreviations journalAbbrev;
+  public static JournalAbbreviations journalAbbrev;
 
 
   public static String lang(String key, String[] params) {
@@ -389,7 +376,7 @@ public class Globals {
                       updateWorkingDirectory, false);
   }
 
-    
+
   public static String getNewFile(JFrame owner, JabRefPreferences prefs,
                                   File directory, String extension,
                                   String description,
@@ -399,7 +386,7 @@ public class Globals {
                       updateWorkingDirectory, false);
   }
 
-    
+
   public static String getNewFile(JFrame owner, JabRefPreferences prefs,
                                   File directory, String extension, OpenFileFilter off,
                                   int dialogType,
@@ -441,7 +428,7 @@ public class Globals {
   }
 
   private static String getNewFile(JFrame owner, JabRefPreferences prefs,
-                                   File directory, String extension, 
+                                   File directory, String extension,
                                    String description,
                                    OpenFileFilter off,
                                    int dialogType,
@@ -549,7 +536,7 @@ public class Globals {
       RTFCHARS = new HashMap(),
         URL_CHARS = new HashMap();
   static {
-      
+
       //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", true));
       //System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish Biology", false));
       //System.out.println(journalAbbrev.getFullName("Aquaculture Eng."));
@@ -721,12 +708,12 @@ public class Globals {
     XML_CHARS.put("\\{\\\\\\~N\\}", "&#x00D1;");
     XML_CHARS.put("\\{\\\\\\~a\\}", "&#x00E3;");
     XML_CHARS.put("\\{\\\\\\~A\\}", "&#x00C3;");
-    
+
     ASCII2XML_CHARS.put("<", "&lt;");
     ASCII2XML_CHARS.put("\"", "&quot;");
     ASCII2XML_CHARS.put(">", "&gt;");
-    
-    
+
+
     UNICODE_CHARS.put("\u00C0", "A");
     UNICODE_CHARS.put("\u00C1", "A");
     UNICODE_CHARS.put("\u00C2", "A");

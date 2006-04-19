@@ -32,7 +32,7 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
+//import java.util.List;
 import java.net.URL;
 import javax.swing.*;
 
@@ -117,8 +117,6 @@ public class GUIGlobals {
     // further below.
     public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
     public static Color activeEditor = new Color(230, 230, 255);
-    public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
-        {"author", "title", "year", Globals.KEY_FIELD};
 
     public static JLabel getTableIcon(String fieldType) {
         Object o = tableIcons.get(fieldType);
@@ -263,147 +261,22 @@ public class GUIGlobals {
   public static String META_FLAG = "jabref-meta: ";
   public static String META_FLAG_OLD = "bibkeeper-meta: ";
   public static String ENTRYTYPE_FLAG = "jabref-entrytype: ";
-  public static String KEY_FIELD = "bibtexkey";
-  public static String[] ALL_FIELDS = new String[] {
-      "author",
-      "editor",
-      "title",
-      "year",
-      "pages",
-      "publisher",
-      "journal",
-      "volume",
-      "month",
-      "note",
-      "edition",
-      "number",
-      "chapter",
-      "series",
-      "type",
-      "address",
-      "location",
-      "annote",
-      "booktitle",
-      "crossref",
-      "howpublished",
-      "institution",
-      "key",
-      "organization",
-      "school",
-      "abstract",
-      "url",
-          "citeseerurl",
-      "pdf",
-      "comment",
-      "bibtexkey",
-      "keywords",
-      "doi",
-      "eid",
-      "search",
-          "citeseercitationcount"
-  };
 
-  public static final Map FIELD_DISPLAYS;
-  static {
-      Arrays.sort(ALL_FIELDS);
-          FIELD_DISPLAYS = new HashMap();
-          FIELD_DISPLAYS.put("citeseercitationcount","Popularity");
-  }
-
-
-// These are the fields that BibTex might want to treat, so these
-// must conform to BibTex rules.
-  public static String[] BIBTEX_STANDARD_FIELDS = new String[] {
-      "author",
-      "editor",
-      "title",
-      "year",
-      "pages",
-      "month",
-      "note",
-      "publisher",
-      "journal",
-      "volume",
-      "edition",
-      "number",
-      "chapter",
-      "series",
-      "type",
-      "address",
-      //? "annote",
-      "booktitle",
-      "crossref",
-      "howpublished",
-      "institution",
-      "key",
-      "organization",
-      "school",
-      "bibtexkey",
-      "doi",
-      "eid",
-      "date"
-  };
-
-  // These fields will not be saved to the .bib file.
-  public static String[] NON_WRITABLE_FIELDS = new String[] {
-      Globals.SEARCH,
-      Globals.GROUPSEARCH
-  };
-
-  // These fields will not be shown inside the source editor panel.
-  public static String[] NON_DISPLAYABLE_FIELDS = new String[] {
-      Globals.MARKED,
-      Globals.SEARCH,
-      Globals.GROUPSEARCH
-  };
-
-     public static boolean isWriteableField(String field) {
-       for (int i = 0; i < NON_WRITABLE_FIELDS.length; i++) {
-         if (NON_WRITABLE_FIELDS[i].equals(field)) {
-           return false;
-         }
-       }
-       return true;
-     }
-
-     public static boolean isDisplayableField(String field) {
-       for (int i = 0; i < NON_DISPLAYABLE_FIELDS.length; i++) {
-         if (NON_DISPLAYABLE_FIELDS[i].equals(field)) {
-           return false;
-         }
-       }
-       return true;
-     }
-
-  /**
-   * Returns true if the given field is a standard Bibtex field.
-   *
-   * @param field a <code>String</code> value
-   * @return a <code>boolean</code> value
-   */
-  public static boolean isStandardField(String field) {
-    for (int i = 0; i < BIBTEX_STANDARD_FIELDS.length; i++) {
-      if (BIBTEX_STANDARD_FIELDS[i].equals(field)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static double DEFAULT_FIELD_WEIGHT = 1,
+  // some fieldname constants
+  public static final double
+        DEFAULT_FIELD_WEIGHT = 1,
         MAX_FIELD_WEIGHT = 2;
 
-  public static Double
-      SMALL_W = new Double(0.30),
-      MEDIUM_W = new Double(0.5),
-      LARGE_W = new Double(1.5);
+  public static final double
+      SMALL_W = 0.30,
+      MEDIUM_W = 0.5,
+      LARGE_W = 1.5 ;
+
   public static final double PE_HEIGHT = 2;
 
 // Size constants for EntryTypeForm; small, medium and large.
-  public static int[] FORM_WIDTH = new int[] {
-      500, 650, 820};
-  public static int[] FORM_HEIGHT = new int[] {
-      90, 110, 130};
+  public static int[] FORM_WIDTH = new int[] { 500, 650, 820};
+  public static int[] FORM_HEIGHT = new int[] { 90, 110, 130};
 
 // Constants controlling formatted bibtex output.
   public static final int
@@ -427,11 +300,9 @@ public class GUIGlobals {
       IMPORT_DIALOG_COL_2_WIDTH = 200,
       IMPORT_DIALOG_COL_3_WIDTH = 200;
 
-  public static final Map FIELD_WEIGHT;
-  public static final Map FIELD_EXTRAS, LANGUAGES;
-  public static Map fieldLength = new HashMap();
-  static {
+  public static final Map LANGUAGES;
 
+  static {
     LANGUAGES = new HashMap();
     // LANGUAGES contains mappings for supported languages.
     LANGUAGES.put("English", "en");
@@ -440,87 +311,6 @@ public class GUIGlobals {
       LANGUAGES.put("Italiano", "it");
       LANGUAGES.put("Norsk", "no");
 
-    FIELD_EXTRAS = new HashMap();
-    // fieldExtras contains mappings to tell the EntryEditor to add a specific
-    // function to this field, for instance a "browse" button for the "pdf" field.
-    FIELD_EXTRAS.put("pdf", "browseDoc");
-    FIELD_EXTRAS.put("ps", "browseDocZip");
-    FIELD_EXTRAS.put("url", "external");
-    FIELD_EXTRAS.put("citeseerurl", "external");
-    FIELD_EXTRAS.put("doi", "external");
-    FIELD_EXTRAS.put("journal", "journalNames");
-    //FIELD_EXTRAS.put("keywords", "selector");
-
-
-    fieldLength.put("author", new Integer(280));
-    fieldLength.put("editor", new Integer(280));
-    fieldLength.put("title", new Integer(400));
-    fieldLength.put("abstract", new Integer(400));
-    fieldLength.put("booktitle", new Integer(175));
-    fieldLength.put("year", new Integer(60));
-    fieldLength.put("volume", new Integer(60));
-    fieldLength.put("number", new Integer(60));
-    fieldLength.put("entrytype", new Integer(75));
-    fieldLength.put("search", new Integer(75));
-    fieldLength.put("citeseercitationcount", new Integer(75));
-    fieldLength.put(NUMBER_COL, new Integer(32));
-
-    FIELD_WEIGHT = new HashMap();
-    FIELD_WEIGHT.put("author", MEDIUM_W);
-    FIELD_WEIGHT.put("year", SMALL_W);
-    FIELD_WEIGHT.put("pages", SMALL_W);
-    FIELD_WEIGHT.put("month", SMALL_W);
-    FIELD_WEIGHT.put("url", SMALL_W);
-    FIELD_WEIGHT.put("citeseerurl", SMALL_W);
-    FIELD_WEIGHT.put("crossref", SMALL_W);
-    FIELD_WEIGHT.put("note", MEDIUM_W);
-    FIELD_WEIGHT.put("publisher", MEDIUM_W);
-    FIELD_WEIGHT.put("journal", SMALL_W);
-    FIELD_WEIGHT.put("volume", SMALL_W);
-    FIELD_WEIGHT.put("edition", SMALL_W);
-    FIELD_WEIGHT.put("keywords", SMALL_W);
-    FIELD_WEIGHT.put("doi", SMALL_W);
-    FIELD_WEIGHT.put("eid", SMALL_W);
-    FIELD_WEIGHT.put("pdf", SMALL_W);
-    FIELD_WEIGHT.put("number", SMALL_W);
-    FIELD_WEIGHT.put("chapter", SMALL_W);
-    FIELD_WEIGHT.put("editor", MEDIUM_W);
-    FIELD_WEIGHT.put("series", SMALL_W);
-    FIELD_WEIGHT.put("type", SMALL_W);
-    FIELD_WEIGHT.put("address", SMALL_W);
-    FIELD_WEIGHT.put("howpublished", MEDIUM_W);
-    FIELD_WEIGHT.put("institution", MEDIUM_W);
-    FIELD_WEIGHT.put("organization", MEDIUM_W);
-    FIELD_WEIGHT.put("school", MEDIUM_W);
-    FIELD_WEIGHT.put("comment", MEDIUM_W);
-    FIELD_WEIGHT.put("abstract", LARGE_W);
-    FIELD_WEIGHT.put("annote", LARGE_W);
-    FIELD_WEIGHT.put("citeseercitationcount", SMALL_W);
-    FIELD_WEIGHT.put("owner", SMALL_W);
-    FIELD_WEIGHT.put("timestamp", SMALL_W);
-    //FIELD_WEIGHT = Collections.unmodifiableMap(FIELD_WEIGHT);
-  }
-
-    /*
-    public static int getPreferredFieldLength(String name) {
-    int l = DEFAULT_FIELD_LENGTH;
-    Object o = fieldLength.get(name.toLowerCase());
-    if (o != null)
-    l = ((Integer)o).intValue();
-    return l;
-    }*/
-
-  public static double getFieldWeight(String name) {
-    double l = DEFAULT_FIELD_WEIGHT;
-    Object o = FIELD_WEIGHT.get(name.toLowerCase());
-    if (o != null) {
-      l = ( (Double) o).doubleValue();
-    }
-    return l;
-  }
-
-  public static void setFieldWeight(String fieldName, double weight) {
-      FIELD_WEIGHT.put(fieldName, new Double(weight));
   }
 
   /** returns the path to language independent help files */
