@@ -28,61 +28,62 @@ package net.sf.jabref.label;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
-import java.util.StringTokenizer ; 
+import java.util.StringTokenizer ;
+import net.sf.jabref.BibtexFields;
 
 public class BookLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)
     public String applyRule(BibtexEntry oldEntry){
-        String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
-        String newLabel = "" ; 
+        String oldLabel = (String) (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
+        String newLabel = "" ;
 
 
-        StringTokenizer authorTokens = null ; 
+        StringTokenizer authorTokens = null ;
         // use the author token
-        try{ 
+        try{
             if((String) oldEntry.getField("author")!= null){
-                authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ; 
+                authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ;
             }else
             if((String) oldEntry.getField("editor")!= null){
-                authorTokens= new StringTokenizer((String) oldEntry.getField("editor"),",") ; 
+                authorTokens= new StringTokenizer((String) oldEntry.getField("editor"),",") ;
             }
-            newLabel += authorTokens.nextToken().toLowerCase() ; 
+            newLabel += authorTokens.nextToken().toLowerCase() ;
         }catch(Throwable t){
-			System.out.println("error getting author/editor: "+t) ; 
+                        System.out.println("error getting author/editor: "+t) ;
         }
 
         // use the year token
         try{
             if( oldEntry.getField("year")!= null){
-                newLabel += String.valueOf( oldEntry.getField("year")) ;  
+                newLabel += String.valueOf( oldEntry.getField("year")) ;
             }
         }catch(Throwable t){
-			System.out.println("error getting author: "+t) ; 
+                        System.out.println("error getting author: "+t) ;
         }
 
         newLabel += "book" ;
-        
-	//	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-	return newLabel; 
+
+        //	oldEntry.setField(Globals.KEY_FIELD,newLabel) ;
+        return newLabel;
     }
 
 
 //    public static void main(String args[]){
-//        
-//        System.out.println(args[0]) ; 
-//        BibtexEntry entry = new BibtexEntry("1",BibtexEntryType.ARTICLE) ; 
-//        entry.setField("journal",args[0]) ; 
-//        entry.setField("author","jones, b") ; 
-//        entry.setField("year","1984") ; 
-//        BookLabelRule rule = new BookLabelRule() ; 
-//        entry = rule.applyRule(entry) ; 
-////        System.out.println(entry.getField("journal") ); 
-//        System.out.println(entry.getField(BibtexBaseFrame.KEY_PROPERTY) ); 
+//
+//        System.out.println(args[0]) ;
+//        BibtexEntry entry = new BibtexEntry("1",BibtexEntryType.ARTICLE) ;
+//        entry.setField("journal",args[0]) ;
+//        entry.setField("author","jones, b") ;
+//        entry.setField("year","1984") ;
+//        BookLabelRule rule = new BookLabelRule() ;
+//        entry = rule.applyRule(entry) ;
+////        System.out.println(entry.getField("journal") );
+//        System.out.println(entry.getField(BibtexBaseFrame.KEY_PROPERTY) );
 //
 //    }
-    
+
 }
 
 

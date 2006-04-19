@@ -9,6 +9,7 @@ import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexFields;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -32,7 +33,7 @@ public class ScifinderImporter extends ImportFormat {
     public String getCLIId() {
       return "scifinder";
     }
-    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
@@ -87,7 +88,7 @@ public class ScifinderImporter extends ImportFormat {
             }
         }
 
-        BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
+        BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here
         b.setField(hm);

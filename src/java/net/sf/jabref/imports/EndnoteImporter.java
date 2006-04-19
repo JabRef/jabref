@@ -11,6 +11,7 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
 import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexFields;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -34,7 +35,7 @@ public class EndnoteImporter extends ImportFormat {
     public String getCLIId() {
       return "refer";
     }
-    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
@@ -86,7 +87,7 @@ public class EndnoteImporter extends ImportFormat {
         Author = "";
         Type = "";
         Editor = "";
-	boolean IsEditedBook = false;
+        boolean IsEditedBook = false;
         String[] fields = entries[i].substring(1).split("\n%");
         //String lastPrefix = "";
         for (int j = 0; j < fields.length; j++){
@@ -164,7 +165,7 @@ public class EndnoteImporter extends ImportFormat {
             //Util.pr(val);
             if (val.indexOf("Ph.D.") == 0) Type = "phdthesis";
             if (val.indexOf("Masters") == 0) Type = "mastersthesis";
-        }else if (prefix.equals("F")) hm.put(Globals.KEY_FIELD, Util
+        }else if (prefix.equals("F")) hm.put(BibtexFields.KEY_FIELD, Util
                              .checkLegalKey(val));
         }
 
@@ -178,7 +179,7 @@ public class EndnoteImporter extends ImportFormat {
         //fixauthorscomma
         if (!Author.equals("")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(Author));
         if (!Editor.equals("")) hm.put("editor", AuthorList.fixAuthor_lastNameFirst(Editor));
-        BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals
+        BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here
         b.setField(hm);

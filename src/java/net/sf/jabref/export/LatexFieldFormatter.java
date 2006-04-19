@@ -27,11 +27,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.export;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
-import java.util.Vector;
-import net.sf.jabref.Util;
-import net.sf.jabref.JabRefPreferences;
+import java.util.* ;
+
+import net.sf.jabref.* ;
 
 public class LatexFieldFormatter implements FieldFormatter {
 
@@ -48,7 +46,7 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     // If the field is non-standard, we will just append braces,
     // wrap and write.
-    if (!GUIGlobals.isStandardField(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
+    if (!BibtexFields.isStandardField(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
           int brc = 0;
           boolean ok = true;
           for (int i=0; i<text.length(); i++) {

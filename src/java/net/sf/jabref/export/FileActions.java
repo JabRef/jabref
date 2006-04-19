@@ -183,7 +183,7 @@ public class FileActions
         // entry, as well. Our criterion is that all non-standard
         // types (*not* customized standard types) must be written.
         BibtexEntryType tp = be.getType();
-       
+
         if (BibtexEntryType.getStandardType(tp.getName()) == null) {
             types.put(tp.getName(), tp);
         }
@@ -191,12 +191,12 @@ public class FileActions
                 // Check if the entry should be written.
                 boolean write = true;
 
-                if (checkSearch && !nonZeroField(be, Globals.SEARCH))
+                if (checkSearch && !nonZeroField(be, BibtexFields.SEARCH))
                 {
                     write = false;
                 }
 
-                if (checkGroup && !nonZeroField(be, Globals.GROUPSEARCH))
+                if (checkGroup && !nonZeroField(be, BibtexFields.GROUPSEARCH))
                 {
                     write = false;
                 }
@@ -317,7 +317,7 @@ public class FileActions
         comparators.add(new FieldComparator(pri, priD));
         comparators.add(new FieldComparator(sec, secD));
         comparators.add(new FieldComparator(ter, terD));
-        comparators.add(new FieldComparator(Globals.KEY_FIELD));
+        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList entryList = new BasicEventList();
         SortedList sorter = new SortedList(entryList, new FieldComparatorStack(comparators));
@@ -462,10 +462,10 @@ public class FileActions
             beginLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
             reader.close();
 /*
-	    while ((c = reader.read()) != -1) {
+            while ((c = reader.read()) != -1) {
                 ps.write((char)c);
-	    }
-	    reader.close();
+            }
+            reader.close();
 */
         } catch (IOException ex) {
             //  // If an exception was cast, export filter doesn't have a begin file.
@@ -611,8 +611,8 @@ public class FileActions
     String SEPARATOR = "\t";
     List sorted = getSortedEntries(database, null, true);
     Set fields = new TreeSet();
-    for (int i=0; i<GUIGlobals.ALL_FIELDS.length; i++)
-        fields.add(GUIGlobals.ALL_FIELDS[i]);
+    for (int i=0, len=BibtexFields.numberOfPublicFields(); i<len; i++)
+        fields.add(BibtexFields.getFieldName(i));
 
     //	try {
     Object[] o = fields.toArray();
@@ -743,7 +743,7 @@ public class FileActions
             comparators.add(new FieldComparator(pri, priD));
             comparators.add(new FieldComparator(sec, secD));
             comparators.add(new FieldComparator(ter, terD));
-            comparators.add(new FieldComparator(Globals.KEY_FIELD));
+            comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
 
             comparatorStack = new FieldComparatorStack(comparators);
         }

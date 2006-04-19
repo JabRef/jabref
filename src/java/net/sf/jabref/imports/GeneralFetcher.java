@@ -91,7 +91,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (tf.getText().trim().length() == 0)
             return;
         ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.basePanel(),
-                GUIGlobals.DEFAULT_INSPECTION_FIELDS, fetcher.getTitle(), false);
+                BibtexFields.DEFAULT_INSPECTION_FIELDS, fetcher.getTitle(), false);
         dialog.addCallBack(fetcher);
         Util.placeDialog(dialog, frame);
         fetcher.processQuery(tf.getText().trim(), dialog, frame);

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import net.sf.jabref.BibtexFields;
 
 
 /**
@@ -29,32 +30,32 @@ public class CsaImporter extends ImportFormat {
 
     // pre-compiled patterns
     private final static Pattern FIELD_PATTERN =
-	Pattern.compile("^([A-Z][A-Z]): ([A-Z].*)$");
+        Pattern.compile("^([A-Z][A-Z]): ([A-Z].*)$");
     private final static Pattern VOLNOPP_PATTERN =
-	Pattern.compile("[;,\\.]\\s+(\\d+[A-Za-z]?)\\((\\d+(?:-\\d+)?)\\)(?:,\\s+|:)(\\d+-\\d+)");
+        Pattern.compile("[;,\\.]\\s+(\\d+[A-Za-z]?)\\((\\d+(?:-\\d+)?)\\)(?:,\\s+|:)(\\d+-\\d+)");
     private final static Pattern PAGES_PATTERN =
-	Pattern.compile("[;,\\.]\\s+(?:(\\[?[vn]\\.?p\\.?\\]?)|(?:pp?\\.?\\s+)(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)|(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)(?:\\s+pp?))");
+        Pattern.compile("[;,\\.]\\s+(?:(\\[?[vn]\\.?p\\.?\\]?)|(?:pp?\\.?\\s+)(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)|(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)(?:\\s+pp?))");
     private final static Pattern VOLUME_PATTERN =
-	Pattern.compile("[;,\\.]?\\s+[vV][oO][lL]\\.?\\s+(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)");
+        Pattern.compile("[;,\\.]?\\s+[vV][oO][lL]\\.?\\s+(\\d+[A-Z]?(?:-\\d+[A-Z]?)?)");
     private final static Pattern NUMBER_PATTERN =
-	Pattern.compile("[;,\\.]\\s+(?:No|no|Part|part|NUMB)\\.?\\s+([A-Z]?\\d+(?:[/-]\\d+)?)");
+        Pattern.compile("[;,\\.]\\s+(?:No|no|Part|part|NUMB)\\.?\\s+([A-Z]?\\d+(?:[/-]\\d+)?)");
     private final static Pattern DATE_PATTERN =
-	Pattern.compile("[;,\\.]\\s+(?:(\\d+)\\s)?(?:([A-Z][a-z][a-z])[\\.,]*\\s)?\\(?(\\d\\d\\d\\d)\\)?(?:\\s([A-Z][a-z][a-z]))?(?:\\s+(\\d+))?");
+        Pattern.compile("[;,\\.]\\s+(?:(\\d+)\\s)?(?:([A-Z][a-z][a-z])[\\.,]*\\s)?\\(?(\\d\\d\\d\\d)\\)?(?:\\s([A-Z][a-z][a-z]))?(?:\\s+(\\d+))?");
     private final static Pattern LT_PATTERN =
-	Pattern.compile("\\[Lt\\]");
+        Pattern.compile("\\[Lt\\]");
 
     // other constants
     private static final String MONS =
-	"jan feb mar apr may jun jul aug sep oct nov dec";
+        "jan feb mar apr may jun jul aug sep oct nov dec";
     private static final String[] MONTHS =
-	{ "January", "February", "March", "April", "May", "June",
-	  "July", "August", "September", "October", "November", "December" };
+        { "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December" };
 
     /**
      * Return the name of this import format.
      */
     public String getFormatName() {
-	return "CSA";
+        return "CSA";
     }
 
     /*
@@ -64,130 +65,130 @@ public class CsaImporter extends ImportFormat {
     public String getCLIId() {
       return "csa";
     }
-    
+
     // read a line
     private String readLine(BufferedReader file) throws IOException {
-	String str = file.readLine();
-	if (str != null)
-	    line++;
-	return str;
+        String str = file.readLine();
+        if (str != null)
+            line++;
+        return str;
     }
 
     // append to the "note" field
     private void addNote(HashMap hm, String note) {
-	
-	StringBuffer notebuf = new StringBuffer();
-	if (hm.get("note") != null) {
-	    notebuf.append((String)hm.get("note"));
-	    notebuf.append("\n");
-	}
-	notebuf.append(note);
-	hm.put("note", notebuf.toString());
+
+        StringBuffer notebuf = new StringBuffer();
+        if (hm.get("note") != null) {
+            notebuf.append((String)hm.get("note"));
+            notebuf.append("\n");
+        }
+        notebuf.append(note);
+        hm.put("note", notebuf.toString());
     }
 
     // parse the date from the Source field
     private String parseDate(HashMap hm, String fstr) {
 
-	// find LAST matching date in string
-	int match = -1;
-	Matcher pm = DATE_PATTERN.matcher(fstr);
-	while (pm.find()) {
-	    match = pm.start();
+        // find LAST matching date in string
+        int match = -1;
+        Matcher pm = DATE_PATTERN.matcher(fstr);
+        while (pm.find()) {
+            match = pm.start();
 //	    System.out.println("MATCH: " + match + ": " + pm.group(0));
-	}
+        }
 
-	if (match == -1) {
+        if (match == -1) {
 //	    System.out.println("NO MATCH: \"" + fstr + "\"");
-	    return fstr;
-	}
-	
-	if (!pm.find(match)) {
+            return fstr;
+        }
+
+        if (!pm.find(match)) {
 //	    System.out.println("MATCH FAILED: \"" + fstr + "\"");
-	    return fstr;
-	}
-	
-	StringBuffer date = new StringBuffer();
+            return fstr;
+        }
 
-	String day = pm.group(1);
-	if (day == null)
-	    day = pm.group(5);
-	else if (pm.group(5) != null)
-	    return fstr;	// possible day found in two places
+        StringBuffer date = new StringBuffer();
 
-	if (day != null && !day.equals("0")) {
-	    date.append(day);
-	    date.append(" ");
-	} else
-	    day = null;
+        String day = pm.group(1);
+        if (day == null)
+            day = pm.group(5);
+        else if (pm.group(5) != null)
+            return fstr;	// possible day found in two places
 
-	String mon = pm.group(2);
-	if (mon == null)
-	    mon = pm.group(4);
-	else if (pm.group(4) != null)
-	    return fstr;	// possible month found in two places
+        if (day != null && !day.equals("0")) {
+            date.append(day);
+            date.append(" ");
+        } else
+            day = null;
 
-	int idx = -1;
-	if (mon != null) {
-	    String lmon = mon.toLowerCase();
-	    idx = MONS.indexOf(lmon);
-	    if (idx == -1)  // not legal month, error
-		return fstr;
-	    date.append(mon);
-	    date.append(" ");
-	    idx = idx / 4;
-	    hm.put("month", MONTHS[idx]);
+        String mon = pm.group(2);
+        if (mon == null)
+            mon = pm.group(4);
+        else if (pm.group(4) != null)
+            return fstr;	// possible month found in two places
 
-	} else if (day != null) // day found but not month, error
-	    return fstr;
+        int idx = -1;
+        if (mon != null) {
+            String lmon = mon.toLowerCase();
+            idx = MONS.indexOf(lmon);
+            if (idx == -1)  // not legal month, error
+                return fstr;
+            date.append(mon);
+            date.append(" ");
+            idx = idx / 4;
+            hm.put("month", MONTHS[idx]);
 
-	String year = pm.group(3);
-	date.append(year);
+        } else if (day != null) // day found but not month, error
+            return fstr;
 
-	StringBuffer note = new StringBuffer();
-	if (day != null && !day.equals("0")) {
-	    note.append("Source Date: ");
-	    note.append(date);
-	    note.append(".");
-	    addNote(hm, note.toString());
-	}
+        String year = pm.group(3);
+        date.append(year);
 
-	// check if journal year matches PY field
-	if (hm.get("year") != null) {
-	    String oyear = (String)hm.get("year");
-	    if (!year.equals(oyear)) {
-		note.setLength(0);
-		note.append("Source Year: ");
-		note.append(year);
-		note.append(".");
-		addNote(hm, note.toString());
+        StringBuffer note = new StringBuffer();
+        if (day != null && !day.equals("0")) {
+            note.append("Source Date: ");
+            note.append(date);
+            note.append(".");
+            addNote(hm, note.toString());
+        }
+
+        // check if journal year matches PY field
+        if (hm.get("year") != null) {
+            String oyear = (String)hm.get("year");
+            if (!year.equals(oyear)) {
+                note.setLength(0);
+                note.append("Source Year: ");
+                note.append(year);
+                note.append(".");
+                addNote(hm, note.toString());
 //		System.out.println(year + " != " + oyear);
-	    }
-	} else
-	    hm.put("year", year);
-	    
-	int len = fstr.length();
-	StringBuffer newf = new StringBuffer();
-	if (pm.start() > 0)
-	    newf.append(fstr.substring(0, pm.start()));
-	if (pm.end() < len)
-	    newf.append(fstr.substring(pm.end(), len));
-	return newf.toString();
+            }
+        } else
+            hm.put("year", year);
+
+        int len = fstr.length();
+        StringBuffer newf = new StringBuffer();
+        if (pm.start() > 0)
+            newf.append(fstr.substring(0, pm.start()));
+        if (pm.end() < len)
+            newf.append(fstr.substring(pm.end(), len));
+        return newf.toString();
     }
 
     /**
      * Check whether the source is in the correct format for this importer.
      */
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
-	// CSA records start with "DN: Database Name"
-	BufferedReader in =
-	    new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-	String str;
-	while ((str = in.readLine()) != null) {
-	    if (str.equals("DN: Database Name"))
-		return true;
-	}
+        // CSA records start with "DN: Database Name"
+        BufferedReader in =
+            new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String str;
+        while ((str = in.readLine()) != null) {
+            if (str.equals("DN: Database Name"))
+                return true;
+        }
 
-	return false;
+        return false;
     }
 
     /**
@@ -195,256 +196,256 @@ public class CsaImporter extends ImportFormat {
      * objects.
      */
     public List importEntries(InputStream stream) throws IOException {
-	ArrayList bibitems = new ArrayList();
-	StringBuffer sb = new StringBuffer();
-	HashMap hm = new HashMap();
+        ArrayList bibitems = new ArrayList();
+        StringBuffer sb = new StringBuffer();
+        HashMap hm = new HashMap();
 
-	BufferedReader in =
-	    new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        BufferedReader in =
+            new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-	String Type = null;
-	String str;
-	boolean first = true;
-	int rline = 1;
-	line = 1;
-	str = readLine(in);
-	while (true) {
-	    if (str == null || str.length() == 0) {	// end of record
-		if (!hm.isEmpty()) { // have a record
-		    if (Type == null) {
-			addNote(hm, "Publication Type: [NOT SPECIFIED]");
-			addNote(hm, "[PERHAPS NOT FULL FORMAT]");
-			Type = "article";
-		    }
+        String Type = null;
+        String str;
+        boolean first = true;
+        int rline = 1;
+        line = 1;
+        str = readLine(in);
+        while (true) {
+            if (str == null || str.length() == 0) {	// end of record
+                if (!hm.isEmpty()) { // have a record
+                    if (Type == null) {
+                        addNote(hm, "Publication Type: [NOT SPECIFIED]");
+                        addNote(hm, "[PERHAPS NOT FULL FORMAT]");
+                        Type = "article";
+                    }
 
-		    // post-process Journal article
-		    if (Type.equals("article") &&
-			hm.get("booktitle") != null) {
-			String booktitle = (String)hm.get("booktitle");
-			hm.remove("booktitle");
-			hm.put("journal", booktitle);
-		    }
+                    // post-process Journal article
+                    if (Type.equals("article") &&
+                        hm.get("booktitle") != null) {
+                        String booktitle = (String)hm.get("booktitle");
+                        hm.remove("booktitle");
+                        hm.put("journal", booktitle);
+                    }
 
-		    BibtexEntry b =
-			new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
-					Globals.getEntryType(Type));
+                    BibtexEntry b =
+                        new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
+                                        Globals.getEntryType(Type));
 
-		    // create one here
-		    b.setField(hm);
+                    // create one here
+                    b.setField(hm);
 
-		    bibitems.add(b);
-		}
-		hm.clear();	// ready for next record
-		first = true;
-		if (str == null)
-		    break;	// end of file
-		str = readLine(in);
-		rline = line;
-		continue;
-	    }
+                    bibitems.add(b);
+                }
+                hm.clear();	// ready for next record
+                first = true;
+                if (str == null)
+                    break;	// end of file
+                str = readLine(in);
+                rline = line;
+                continue;
+            }
 
-	    int fline = line;	// save this before reading field contents
-	    Matcher fm = FIELD_PATTERN.matcher(str);
-	    if (fm.find()) {
+            int fline = line;	// save this before reading field contents
+            Matcher fm = FIELD_PATTERN.matcher(str);
+            if (fm.find()) {
 
-		// save the field name (long and short)
-		String fabbr = fm.group(1);
-		String fname = fm.group(2);
+                // save the field name (long and short)
+                String fabbr = fm.group(1);
+                String fname = fm.group(2);
 
-		// read the contents of the field
-		sb.setLength(0); // clear the buffer
-		while ((str = readLine(in)) != null) {
-		    if (! str.startsWith("    ")) // field contents?
-			break;	// nope
-		    if (sb.length() > 0) {
-			sb.append(" ");
-		    }
-		    sb.append(str.substring(4)); // skip spaces
-		}
-		String fstr = sb.toString();
-		if (fstr == null || fstr.length() == 0) {
-		    int line1 = line - 1;
-		    throw new IOException("illegal empty field at line " +
-					  line1);
-		}
-		// replace [Lt] with <
-		fm = LT_PATTERN.matcher(fstr);
-		if (fm.find())
-		    fstr = fm.replaceAll("<");
+                // read the contents of the field
+                sb.setLength(0); // clear the buffer
+                while ((str = readLine(in)) != null) {
+                    if (! str.startsWith("    ")) // field contents?
+                        break;	// nope
+                    if (sb.length() > 0) {
+                        sb.append(" ");
+                    }
+                    sb.append(str.substring(4)); // skip spaces
+                }
+                String fstr = sb.toString();
+                if (fstr == null || fstr.length() == 0) {
+                    int line1 = line - 1;
+                    throw new IOException("illegal empty field at line " +
+                                          line1);
+                }
+                // replace [Lt] with <
+                fm = LT_PATTERN.matcher(fstr);
+                if (fm.find())
+                    fstr = fm.replaceAll("<");
 
-		// check for start of new record
-		if (fabbr.equals("DN") &&
-		    fname.equalsIgnoreCase("Database Name")) {
-		    if (first == false) {
-			throw new IOException("format error at line " + fline +
-					      ": DN out of order");
-		    }
-		    first = false;
-		    rline = fline; // save start of record
-		} else if (first == true) {
-		    throw new IOException("format error at line " + fline +
-					      ": missing DN");
-		}
+                // check for start of new record
+                if (fabbr.equals("DN") &&
+                    fname.equalsIgnoreCase("Database Name")) {
+                    if (first == false) {
+                        throw new IOException("format error at line " + fline +
+                                              ": DN out of order");
+                    }
+                    first = false;
+                    rline = fline; // save start of record
+                } else if (first == true) {
+                    throw new IOException("format error at line " + fline +
+                                              ": missing DN");
+                }
 
-		if (fabbr.equals("PT")) {
-		    Type = null;
-		    String flow = fstr.toLowerCase();
-		    String[] types = flow.split("; ");
-		    if (types[0].equals("article") ||
-			types[0].equals("journal article")) {
-			Type = "article";
-		    } else if (types[0].equals("dissertation")) {
-			Type = "phdthesis";
-		    } else {
-			for (int ii = 0; ii < types.length; ++ii) {
-			    if (types[ii].equals("conference")) {
-				Type = "inproceedings";
-				break;
-			    } else if (types[ii].equals("book monograph") &&
-				       Type == null) {
-				Type = "book";
-			    } else if (types[ii].equals("report") &&
-				       Type == null) {
-				Type = "techreport";
-			    }
-			}
-			if (Type == null) {
-			    Type = "misc";
-			}
-		    }
-		}
+                if (fabbr.equals("PT")) {
+                    Type = null;
+                    String flow = fstr.toLowerCase();
+                    String[] types = flow.split("; ");
+                    if (types[0].equals("article") ||
+                        types[0].equals("journal article")) {
+                        Type = "article";
+                    } else if (types[0].equals("dissertation")) {
+                        Type = "phdthesis";
+                    } else {
+                        for (int ii = 0; ii < types.length; ++ii) {
+                            if (types[ii].equals("conference")) {
+                                Type = "inproceedings";
+                                break;
+                            } else if (types[ii].equals("book monograph") &&
+                                       Type == null) {
+                                Type = "book";
+                            } else if (types[ii].equals("report") &&
+                                       Type == null) {
+                                Type = "techreport";
+                            }
+                        }
+                        if (Type == null) {
+                            Type = "misc";
+                        }
+                    }
+                }
 
-		String ftype = null;
-		if (fabbr.equals("AB"))
-		    ftype = "abstract";
-		else if (fabbr.equals("AF"))
-		    ftype = "affiliation";
-		else if (fabbr.equals("AU"))
-		    ftype = "author";
-		else if (fabbr.equals("CA"))
-		    ftype = "organization";
-		else if (fabbr.equals("DE"))
-		    ftype = "keywords";
-		else if (fabbr.equals("DO"))
-		    ftype = "doi";
-		else if (fabbr.equals("ED"))
-		    ftype = "editor";
-		else if (fabbr.equals("IB"))
-		    ftype = "ISBN";
-		else if (fabbr.equals("IS"))
-		    ftype = "ISSN";
-		else if (fabbr.equals("JN"))
-		    ftype = "journal";
-		else if (fabbr.equals("LA"))
-		    ftype = "language";
-		else if (fabbr.equals("PB"))
-		    ftype = "publisher";
-		else if (fabbr.equals("PY")) {
-		    ftype = "year";
-		    if (hm.get("year") != null) {
-			String oyear = (String)hm.get("year");
-			if (!fstr.equals(oyear)) {
-			    StringBuffer note = new StringBuffer();
-			    note.append("Source Year: ");
-			    note.append(oyear);
-			    note.append(".");
-			    addNote(hm, note.toString());
+                String ftype = null;
+                if (fabbr.equals("AB"))
+                    ftype = "abstract";
+                else if (fabbr.equals("AF"))
+                    ftype = "affiliation";
+                else if (fabbr.equals("AU"))
+                    ftype = "author";
+                else if (fabbr.equals("CA"))
+                    ftype = "organization";
+                else if (fabbr.equals("DE"))
+                    ftype = "keywords";
+                else if (fabbr.equals("DO"))
+                    ftype = "doi";
+                else if (fabbr.equals("ED"))
+                    ftype = "editor";
+                else if (fabbr.equals("IB"))
+                    ftype = "ISBN";
+                else if (fabbr.equals("IS"))
+                    ftype = "ISSN";
+                else if (fabbr.equals("JN"))
+                    ftype = "journal";
+                else if (fabbr.equals("LA"))
+                    ftype = "language";
+                else if (fabbr.equals("PB"))
+                    ftype = "publisher";
+                else if (fabbr.equals("PY")) {
+                    ftype = "year";
+                    if (hm.get("year") != null) {
+                        String oyear = (String)hm.get("year");
+                        if (!fstr.equals(oyear)) {
+                            StringBuffer note = new StringBuffer();
+                            note.append("Source Year: ");
+                            note.append(oyear);
+                            note.append(".");
+                            addNote(hm, note.toString());
 //			    System.out.println(fstr + " != " + oyear);
-			}
-		    } 
-		} else if (fabbr.equals("RL")) {
-		    ftype = "url";
-		    String[] lines = fstr.split(" ");
-		    StringBuffer urls = new StringBuffer();
-		    for (int ii = 0; ii < lines.length; ++ii) {
-			if (lines[ii].startsWith("[URL:"))
-			    urls.append(lines[ii].substring(5));
-			else if (lines[ii].endsWith("]")) {
-			    int len = lines[ii].length();
-			    urls.append(lines[ii].substring(0, len - 1));
-			    if (ii < lines.length - 1)
-				urls.append("\n");
-			} else
-			    urls.append(lines[ii]);
-		    }
-		    fstr = urls.toString();
-		} else if (fabbr.equals("SO")) {
-		    ftype = "booktitle";
+                        }
+                    }
+                } else if (fabbr.equals("RL")) {
+                    ftype = "url";
+                    String[] lines = fstr.split(" ");
+                    StringBuffer urls = new StringBuffer();
+                    for (int ii = 0; ii < lines.length; ++ii) {
+                        if (lines[ii].startsWith("[URL:"))
+                            urls.append(lines[ii].substring(5));
+                        else if (lines[ii].endsWith("]")) {
+                            int len = lines[ii].length();
+                            urls.append(lines[ii].substring(0, len - 1));
+                            if (ii < lines.length - 1)
+                                urls.append("\n");
+                        } else
+                            urls.append(lines[ii]);
+                    }
+                    fstr = urls.toString();
+                } else if (fabbr.equals("SO")) {
+                    ftype = "booktitle";
 
-		    // see if we can extract journal information
+                    // see if we can extract journal information
 
-		    // compact vol(no):page-page:
-		    Matcher pm = VOLNOPP_PATTERN.matcher(fstr);
-		    if (pm.find()) {
-			hm.put("volume", pm.group(1));
-			hm.put("number", pm.group(2));
-			hm.put("pages", pm.group(3));
-			fstr = pm.replaceFirst("");
-		    }
+                    // compact vol(no):page-page:
+                    Matcher pm = VOLNOPP_PATTERN.matcher(fstr);
+                    if (pm.find()) {
+                        hm.put("volume", pm.group(1));
+                        hm.put("number", pm.group(2));
+                        hm.put("pages", pm.group(3));
+                        fstr = pm.replaceFirst("");
+                    }
 
-		    // pages
-		    pm = PAGES_PATTERN.matcher(fstr);
-		    StringBuffer pages = new StringBuffer();
-		    while (pm.find()) {
-			if (pages.length() > 0)
-			    pages.append(",");
-			String pp = pm.group(1);
-			if (pp == null)
-			    pp = pm.group(2);
-			if (pp == null)
-			    pp = pm.group(3);
-			pages.append(pp);
-			fstr = pm.replaceFirst("");
-			pm = PAGES_PATTERN.matcher(fstr);
-		    }
-		    if (pages.length() > 0)
-			hm.put("pages", pages.toString());
+                    // pages
+                    pm = PAGES_PATTERN.matcher(fstr);
+                    StringBuffer pages = new StringBuffer();
+                    while (pm.find()) {
+                        if (pages.length() > 0)
+                            pages.append(",");
+                        String pp = pm.group(1);
+                        if (pp == null)
+                            pp = pm.group(2);
+                        if (pp == null)
+                            pp = pm.group(3);
+                        pages.append(pp);
+                        fstr = pm.replaceFirst("");
+                        pm = PAGES_PATTERN.matcher(fstr);
+                    }
+                    if (pages.length() > 0)
+                        hm.put("pages", pages.toString());
 
-		    // volume:
-		    pm = VOLUME_PATTERN.matcher(fstr);
-		    if (pm.find()) {
-			hm.put("volume", pm.group(1));
-			fstr = pm.replaceFirst("");
-		    }
+                    // volume:
+                    pm = VOLUME_PATTERN.matcher(fstr);
+                    if (pm.find()) {
+                        hm.put("volume", pm.group(1));
+                        fstr = pm.replaceFirst("");
+                    }
 
-		    // number:
-		    pm = NUMBER_PATTERN.matcher(fstr);
-		    if (pm.find()) {
-			hm.put("number", pm.group(1));
-			fstr = pm.replaceFirst("");
-		    }
+                    // number:
+                    pm = NUMBER_PATTERN.matcher(fstr);
+                    if (pm.find()) {
+                        hm.put("number", pm.group(1));
+                        fstr = pm.replaceFirst("");
+                    }
 
-		    // journal date:
-		    fstr = parseDate(hm, fstr);
+                    // journal date:
+                    fstr = parseDate(hm, fstr);
 
-		    // strip trailing whitespace
-		    Pattern pp = Pattern.compile(",?\\s*$");
-		    pm = pp.matcher(fstr);
-		    if (pm.find())
-			fstr = pm.replaceFirst("");
+                    // strip trailing whitespace
+                    Pattern pp = Pattern.compile(",?\\s*$");
+                    pm = pp.matcher(fstr);
+                    if (pm.find())
+                        fstr = pm.replaceFirst("");
 
-		    if (fstr.equals(""))
-			continue;
+                    if (fstr.equals(""))
+                        continue;
 //		    System.out.println("SOURCE: \"" + fstr + "\"");
-		} else if (fabbr.equals("TI"))
-		    ftype = "title";
-		else if (fabbr.equals("RE"))
-		    continue;	// throw away References
+                } else if (fabbr.equals("TI"))
+                    ftype = "title";
+                else if (fabbr.equals("RE"))
+                    continue;	// throw away References
 
-		if (ftype != null) {
-		    hm.put(ftype, fstr);
-		} else {
-		    StringBuffer val = new StringBuffer();
-		    val.append(fname);
-		    val.append(": ");
-		    val.append(fstr);
-		    val.append(".");
-		    addNote(hm, val.toString());
-		}
-	    } else
-		str = readLine(in);
-	}
+                if (ftype != null) {
+                    hm.put(ftype, fstr);
+                } else {
+                    StringBuffer val = new StringBuffer();
+                    val.append(fname);
+                    val.append(": ");
+                    val.append(fstr);
+                    val.append(".");
+                    addNote(hm, val.toString());
+                }
+            } else
+                str = readLine(in);
+        }
 
-	return bibitems;
+        return bibitems;
     }
 }

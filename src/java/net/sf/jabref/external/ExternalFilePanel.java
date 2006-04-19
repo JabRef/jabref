@@ -94,8 +94,8 @@ public class ExternalFilePanel extends JPanel {
     }
 
     protected Object getKey() {
-        return (entry != null ? entry.getField(Globals.KEY_FIELD) :
-            entryEditor.getEntry().getField(Globals.KEY_FIELD));
+        return (entry != null ? entry.getField(BibtexFields.KEY_FIELD) :
+            entryEditor.getEntry().getField(BibtexFields.KEY_FIELD));
     }
 
     protected void output(String s) {

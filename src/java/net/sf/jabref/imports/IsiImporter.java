@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+import net.sf.jabref.BibtexFields;
 
 
 /**
@@ -32,7 +33,7 @@ public class IsiImporter extends ImportFormat {
   public String getCLIId() {
     return "isi";
   }
-    
+
   /**
    * Check whether the source is in the correct format for this importer.
    */
@@ -119,7 +120,7 @@ public class IsiImporter extends ImportFormat {
         if (fields[j].length() <= 2)
           continue;
 
-        // this is Java 1.5.0 code: 
+        // this is Java 1.5.0 code:
         // fields[j] = fields[j].replace(" - ", "");
         // TODO: switch to 1.5.0 some day; until then, use 1.4.2 code:
         fields[j] = fields[j].replaceAll(" - ", "");
@@ -137,7 +138,7 @@ public class IsiImporter extends ImportFormat {
         } else if (beg.equals("JO"))
           hm.put("booktitle", value);
         else if (beg.equals("AU")) {
-	    String author = isiAuthorConvert(
+            String author = isiAuthorConvert(
             AuthorList.fixAuthor_lastNameFirst(value.replaceAll("EOLEOL", " and ")));
 
           // if there is already someone there then append with "and"
@@ -181,10 +182,10 @@ public class IsiImporter extends ImportFormat {
         }
         else if (beg.equals("DT")) {
           Type = value;
-	  if (Type.equals("Review")) {
-	      Type = "article";
-	      // set "Review" in Note/Comment?
-	  }
+          if (Type.equals("Review")) {
+              Type = "article";
+              // set "Review" in Note/Comment?
+          }
           else if (!Type.equals("Article") && !PT.equals("Journal"))
             Type = "misc";
           else
@@ -198,7 +199,7 @@ public class IsiImporter extends ImportFormat {
         hm.put("pages", pages);
 
       BibtexEntry b =
-        new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals.getEntryType(Type)); // id assumes an existing database so don't
+        new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals.getEntryType(Type)); // id assumes an existing database so don't
 
       // create one here
       b.setField(hm);
@@ -210,26 +211,26 @@ public class IsiImporter extends ImportFormat {
   }
 
     private String isiAuthorConvert(String authors) {
-	String[] author = authors.split(" and ");
-	StringBuffer sb = new StringBuffer();
-	for (int i=0; i<author.length; i++) {
-	    int pos = author[i].indexOf(", ");
-	    if (pos > 0) {
-		sb.append(author[i].substring(0, pos));
-		sb.append(", ");
+        String[] author = authors.split(" and ");
+        StringBuffer sb = new StringBuffer();
+        for (int i=0; i<author.length; i++) {
+            int pos = author[i].indexOf(", ");
+            if (pos > 0) {
+                sb.append(author[i].substring(0, pos));
+                sb.append(", ");
 
-		for (int j=pos+2; j<author[i].length(); j++) {
-		    sb.append(author[i].charAt(j));
-		    sb.append(".");
-		    if (j<author[i].length()-1)
-			sb.append(" ");
-		}
-	    } else
-		sb.append(author[i]);
-	    if (i<author.length-1)
-		sb.append(" and ");
-	}
-	return sb.toString();
+                for (int j=pos+2; j<author[i].length(); j++) {
+                    sb.append(author[i].charAt(j));
+                    sb.append(".");
+                    if (j<author[i].length()-1)
+                        sb.append(" ");
+                }
+            } else
+                sb.append(author[i]);
+            if (i<author.length-1)
+                sb.append(" and ");
+        }
+        return sb.toString();
     }
 
 }

@@ -180,7 +180,7 @@ public class MainTable extends JTable {
                 renderer = grayedOutNumberRenderer;
             } else renderer = grayedOutRenderer;
         }
-        
+
         else if (column == 0) {
             // Return a renderer with red background if the entry is incomplete.
             if (!isComplete(row)) {
@@ -289,7 +289,7 @@ public class MainTable extends JTable {
             BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
             String columnName = tableFormat.getColumnName(col).toLowerCase();
-            if (columnName.equals(GUIGlobals.KEY_FIELD) || type.isRequired(columnName)) {
+            if (columnName.equals(BibtexFields.KEY_FIELD) || type.isRequired(columnName)) {
                 return REQUIRED;
             }
             if (type.isOptional(columnName)) {

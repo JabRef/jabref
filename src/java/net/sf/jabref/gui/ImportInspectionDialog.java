@@ -513,7 +513,7 @@ public class ImportInspectionDialog extends JDialog {
                     // If this entry should be added to any groups, do it now:
                     Set groups = (Set) groupAdditions.get(entry);
                     if (!groupingCanceled && (groups != null)) {
-                        if (entry.getField(Globals.KEY_FIELD) == null) {
+                        if (entry.getField(BibtexFields.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the group.
                             // The best course of ation is probably to ask the user if a key should be generated
                             // immediately.
@@ -527,7 +527,7 @@ public class ImportInspectionDialog extends JDialog {
                         }
 
                         // If the key was list, or has been list now, go ahead:
-                        if (entry.getField(Globals.KEY_FIELD) != null) {
+                        if (entry.getField(BibtexFields.KEY_FIELD) != null) {
                             for (Iterator i2 = groups.iterator(); i2.hasNext();) {
                                 GroupTreeNode node = (GroupTreeNode) i2.next();
                                 if (node.getGroup().supportsAdd()) {
@@ -594,9 +594,7 @@ public class ImportInspectionDialog extends JDialog {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            Object o = GUIGlobals.fieldLength.get(fields[i]);
-            int width = o == null ? GUIGlobals.DEFAULT_FIELD_LENGTH :
-                    ((Integer) o).intValue();
+            int width = BibtexFields.getFieldLength( fields[i]) ;
             glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
         }
     }

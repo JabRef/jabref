@@ -27,72 +27,72 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.label;
 
 import net.sf.jabref.*;
-import java.util.StringTokenizer ; 
+import java.util.StringTokenizer ;
 
 public class InproceedingsLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)/(first unique booktitle word)
     public String applyRule(BibtexEntry oldEntry){
-        String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ; 
-        String newLabel = "" ; 
+        String oldLabel = (String) (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
+        String newLabel = "" ;
 
 
-        StringTokenizer authorTokens = null ; 
+        StringTokenizer authorTokens = null ;
         // use the author token
-        try{ 
-            authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ; 
-            newLabel += authorTokens.nextToken().toLowerCase().replaceAll(" ","").replaceAll("\\.","")   ; 
+        try{
+            authorTokens= new StringTokenizer((String) oldEntry.getField("author"),",") ;
+            newLabel += authorTokens.nextToken().toLowerCase().replaceAll(" ","").replaceAll("\\.","")   ;
         }catch(Throwable t){
-			System.out.println("error getting author: "+t) ; 
+                        System.out.println("error getting author: "+t) ;
         }
 
         // use the year token
         try{
             if( oldEntry.getField("year")!= null){
-                newLabel += String.valueOf( oldEntry.getField("year")) ;  
+                newLabel += String.valueOf( oldEntry.getField("year")) ;
             }
         }catch(Throwable t){
-			System.out.println("error getting year: "+t) ; 
+                        System.out.println("error getting year: "+t) ;
         }
 
         // use the booktitle name
         // return the first token 4 wrds or longer, that's not a keyword
         try{
-           
+
           if(oldEntry.getField("booktitle") != null) {
-            authorTokens = new StringTokenizer( ((String) oldEntry.getField("booktitle")).replaceAll(","," ").replaceAll("/"," ")) ; 
-            String tempString = authorTokens.nextToken() ; 
-            tempString = tempString.replaceAll(",","") ; 
-            boolean done = false ; 
+            authorTokens = new StringTokenizer( ((String) oldEntry.getField("booktitle")).replaceAll(","," ").replaceAll("/"," ")) ;
+            String tempString = authorTokens.nextToken() ;
+            tempString = tempString.replaceAll(",","") ;
+            boolean done = false ;
             while(tempString!=null && !done ){
-                tempString = tempString.replaceAll(",","").trim() ; 
+                tempString = tempString.replaceAll(",","").trim() ;
                 if(tempString.trim().length() > 3 && !KeyWord.isKeyWord(tempString))  {
-                    done = true ; 
+                    done = true ;
                 }
                 else{
 
                     if(authorTokens.hasMoreTokens()){
-                        tempString = authorTokens.nextToken() ; 
+                        tempString = authorTokens.nextToken() ;
                     }else{
-                        done = true ; 
+                        done = true ;
                     }
                 }
             }
 
             if(tempString!=null && (tempString.indexOf("null")<0) ){
-                newLabel += String.valueOf( tempString.toLowerCase()) ;  
+                newLabel += String.valueOf( tempString.toLowerCase()) ;
             }
           }
         }
         catch(Throwable t){  System.err.println(t) ; }
 
-	//	oldEntry.setField(Globals.KEY_FIELD,newLabel) ; 
-	return newLabel; 
+        //	oldEntry.setField(Globals.KEY_FIELD,newLabel) ;
+        return newLabel;
     }
 
 
-    
+
 }
 
 

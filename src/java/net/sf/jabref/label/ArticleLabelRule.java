@@ -33,7 +33,7 @@ public class ArticleLabelRule extends DefaultLabelRule {
     // this is the rule used handle articles
     // we try (first author last name)/(year)/(first unique journal word)
     public String applyRule(BibtexEntry oldEntry){
-        String oldLabel = (String) (oldEntry.getField(Globals.KEY_FIELD)) ;
+        String oldLabel = (String) (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
         String newLabel = "" ;
 
         String author="";

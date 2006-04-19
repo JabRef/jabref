@@ -107,7 +107,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                     public void cancelled() {
                         panel.output(Globals.lang("%0 import cancelled.", "CiteSeer"));
                     }
-                    
+
                     public void stopFetching() {
                     }
 
@@ -138,7 +138,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                     ImportInspectionDialog diag = null;
                     if (Globals.prefs.getBoolean("useImportInspectionDialog")) {
                         diag = new ImportInspectionDialog(panel.frame(), panel,
-                            GUIGlobals.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch CiteSeer"), false);
+                            BibtexFields.DEFAULT_INSPECTION_FIELDS, Globals.lang("Fetch CiteSeer"), false);
                         diag.addCallBack(new Update());
                         Util.placeDialog(diag, panel.frame());
                         diag.setVisible(true);

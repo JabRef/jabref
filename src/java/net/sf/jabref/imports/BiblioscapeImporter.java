@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.BibtexFields;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -23,7 +24,7 @@ public class BiblioscapeImporter extends ImportFormat {
      * Return the name of this import format.
      */
     public String getFormatName() {
-	return "Biblioscape";
+        return "Biblioscape";
     }
 
     /*
@@ -33,12 +34,12 @@ public class BiblioscapeImporter extends ImportFormat {
     public String getCLIId() {
       return "biblioscape";
     }
-    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
     public boolean isRecognizedFormat(InputStream in) throws IOException {
-	return true;
+        return true;
     }
 
     /**
@@ -47,14 +48,14 @@ public class BiblioscapeImporter extends ImportFormat {
      */
     public List importEntries(InputStream stream) throws IOException {
 
-	ArrayList bibItems = new ArrayList();
-	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-	String line;
-	HashMap hm = new HashMap();
-	HashMap lines = new HashMap();
-	StringBuffer previousLine = null;
-	while ((line = in.readLine()) != null){
-	    if (line.length() == 0) continue; // ignore empty lines, e.g. at file
+        ArrayList bibItems = new ArrayList();
+        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        String line;
+        HashMap hm = new HashMap();
+        HashMap lines = new HashMap();
+        StringBuffer previousLine = null;
+        while ((line = in.readLine()) != null){
+            if (line.length() == 0) continue; // ignore empty lines, e.g. at file
                                           // end
         // entry delimiter -> item complete
         if (line.equals("------")){
@@ -236,7 +237,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 s.append(i > 0 ? "; " : "").append(comments.elementAt(i).toString());
             hm.put("comment", s.toString());
           }
-          BibtexEntry b = new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID,
+          BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID,
               Globals.getEntryType(bibtexType));
           b.setField(hm);
           bibItems.add(b);
@@ -259,8 +260,8 @@ public class BiblioscapeImporter extends ImportFormat {
         return null;
         previousLine.append(line.trim());
       }
-	
-	return bibItems;
+
+        return bibItems;
     }
-    
+
 }

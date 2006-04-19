@@ -26,16 +26,16 @@ public class OpenDocumentRepresentation {
     protected Collection entries;
 
         /*protected final static String TYPE_COL = "BibliographyType";
-         
+
         protected final static Map columns = new LinkedHashMap();
         static {
-         
+
             columns.put(TYPE_COL, "dummy");
             columns.put("ISBN", "isbn");
             coulmns.put("Identifier", "\bibtexkey");
             coulmns.put("", "");
             coulmns.put("", "");
-         
+
         }*/
 
     public OpenDocumentRepresentation() {
@@ -48,7 +48,7 @@ public class OpenDocumentRepresentation {
         List comparators = new ArrayList();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
-        comparators.add(new FieldComparator(Globals.KEY_FIELD));
+        comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList entryList = new BasicEventList();
         entryList.addAll(bibtex.getEntries());
@@ -136,7 +136,7 @@ public class OpenDocumentRepresentation {
             for(Iterator iter = entries.iterator(); iter.hasNext(); ) {
                 BibtexEntry e = (BibtexEntry)iter.next();
                 row = result.createElement("table:table-row");
-                addTableCell(result, row, getField(e, Globals.KEY_FIELD));
+                addTableCell(result, row, getField(e, BibtexFields.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "annote"));

@@ -75,7 +75,7 @@ public class BibTeXMLHandler extends DefaultHandler {
                 }
             }
             b = new BibtexEntry(Util.createNeutralId());
-	    b.setField(Globals.KEY_FIELD, articleID);
+            b.setField(BibtexFields.KEY_FIELD, articleID);
         } else if (
             name.equals("bibtex:article") ||
             name.equals("bibtex:inbook") ||

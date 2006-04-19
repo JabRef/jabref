@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+import net.sf.jabref.BibtexFields;
 
 
 /**
@@ -31,7 +32,7 @@ public class BiomailImporter extends ImportFormat {
     public String getCLIId() {
       return "biomail";
     }
-    
+
     /**
      * Check whether the source is in the correct format for this importer.
      */
@@ -172,7 +173,7 @@ public class BiomailImporter extends ImportFormat {
                 hm.put("author", shortauthor);
 
             BibtexEntry b =
-                    new BibtexEntry(Globals.DEFAULT_BIBTEXENTRY_ID, Globals.getEntryType(Type)); // id assumes an existing database so don't
+                    new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals.getEntryType(Type)); // id assumes an existing database so don't
 
             // create one here
             b.setField(hm);

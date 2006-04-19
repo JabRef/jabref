@@ -54,8 +54,14 @@ public class MainTableFormat implements TableFormat {
             return GUIGlobals.NUMBER_COL;
         } else if (getIconTypeForColumn(col) != null) {
             return "";
-        } else if (GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]) != null) {
-            return ((String) GUIGlobals.FIELD_DISPLAYS.get(columns[col - padleft]));
+        }
+        else // try to find an alternative fieldname (for display)
+        {
+          String disName = BibtexFields.getFieldDisplayName(columns[col - padleft]) ;
+          if ( disName != null)
+          {
+            return disName ;
+          }
         }
         return Util.nCase(columns[col - padleft]);
     }
@@ -76,7 +82,7 @@ public class MainTableFormat implements TableFormat {
     /**
      * Finds the column index for the given column name.
      * @param colName The column name
-     * @return The column index if any, or -1 if no column has that name. 
+     * @return The column index if any, or -1 if no column has that name.
      */
     public int getColumnIndex(String colName) {
         for (int i=0; i<columns.length; i++) {
@@ -193,7 +199,7 @@ public class MainTableFormat implements TableFormat {
     }
 
     static class SearchMatcher implements Matcher {
-        private String field = Globals.SEARCH;
+        private String field = BibtexFields.SEARCH;
         private SearchRuleSet ruleSet;
         private Hashtable searchOptions;
 
