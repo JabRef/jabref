@@ -24,38 +24,37 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
+// created by : Morten O. Alver 2003
+//
+// function : utility functions
+//
+// todo     :
+//
+// modified :  - r.nagel 20.04.2006
+//               make the DateFormatter abstract and splitt the easyDate methode
+//               (now we cannot change the dateformat dynamicly, sorry)
+
 
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.text.SimpleDateFormat;
-import java.text.NumberFormat;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+import java.io.* ;
+import java.net.* ;
+import java.nio.charset.* ;
+import java.text.* ;
+import java.util.* ;
+import java.util.List ;
+import java.util.regex.* ;
 
-import java.lang.StringIndexOutOfBoundsException;
+import java.awt.* ;
+import java.awt.event.* ;
+import javax.swing.* ;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.MalformedURLException;
-
-
-import javax.swing.*;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.external.ExternalFileType;
+import com.jgoodies.forms.builder.* ;
+import com.jgoodies.forms.layout.* ;
+import net.sf.jabref.external.* ;
+import net.sf.jabref.groups.* ;
+import net.sf.jabref.imports.* ;
+import net.sf.jabref.undo.* ;
 
 /**
  * Describe class <code>Util</code> here.
@@ -63,21 +62,22 @@ import net.sf.jabref.external.ExternalFileType;
  * @author <a href="mailto:"> </a>
  * @version 1.0
  */
-public class Util {
+public class Util
+{
+  // A static Object for date formatting. Please do not create the object here,
+  // because there are some references from the Globals class.....
+  private static SimpleDateFormat dateFormatter = null ;
 
     // Colors are defined here.
     public static Color fieldsCol = new Color(180, 180, 200);
 
     // Integer values for indicating result of duplicate check (for entries):
-    final static int TYPE_MISMATCH = -1
-    ,
-    NOT_EQUAL = 0
-    ,
-    EQUAL = 1
-    ,
-    EMPTY_IN_ONE = 2
-    ,
-    EMPTY_IN_TWO = 3;
+    final static int
+        TYPE_MISMATCH = -1,
+        NOT_EQUAL     =  0,
+        EQUAL         =  1,
+        EMPTY_IN_ONE  =  2,
+        EMPTY_IN_TWO  =  3;
 
 
     final static NumberFormat idFormat;
@@ -1434,12 +1434,29 @@ public class Util {
      *
      * @return The date string.
      */
-    public static String easyDateFormat() {
-        String format = Globals.prefs.get("timeStampFormat");
-        Date today = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat(format);
-        return formatter.format(today);
+    public static String easyDateFormat()
+    {
+//        Date today = new Date();
+        return easyDateFormat( new Date() ) ;
     }
+
+    /**
+     * Creates a readable Date string from the parameter date.
+     * The format is set in preferences under the key "timeStampFormat".
+     *
+     * @return The formatted date string.
+     */
+    public static String easyDateFormat(Date date)
+    {
+        // first use, create an instance
+        if (dateFormatter == null)
+        {
+          String format = Globals.prefs.get( "timeStampFormat" ) ;
+          dateFormatter = new SimpleDateFormat( format ) ;
+        }
+        return dateFormatter.format(date);
+    }
+
 
 
     public static void markEntry(BibtexEntry be, NamedCompound ce) {

@@ -82,7 +82,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
 
     public String getTitle() {
-        return Globals.lang("Search IEEEXplore");
+        return Globals.menuTitle("Search IEEEXplore");
     }
 
 

@@ -20,7 +20,7 @@ public class PushToEmacs implements PushToApplication {
     private boolean couldNotConnect=false, couldNotRunClient=false;
 
     public String getName() {
-        return Globals.lang("Insert selected citations into Emacs");
+        return Globals.menuTitle("Insert selected citations into Emacs") ;
     }
 
     public String getTooltip() {

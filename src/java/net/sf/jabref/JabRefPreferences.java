@@ -288,7 +288,8 @@ public class JabRefPreferences {
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
         defaults.put("useTimeStamp", Boolean.TRUE);
         defaults.put("timeStampFormat", "yyyy.MM.dd");
-        defaults.put("timeStampField", "timestamp");
+//        defaults.put("timeStampField", "timestamp");
+        defaults.put("timeStampField", BibtexFields.TIMESTAMP);
         defaults.put("generateKeysBeforeSaving", Boolean.FALSE);
 
         defaults.put("useRemoteServer", Boolean.FALSE);
@@ -828,7 +829,7 @@ public class JabRefPreferences {
             remove(CUSTOM_TYPE_REQ+number);
             remove(CUSTOM_TYPE_OPT+number);
             number++;
-	    }*/
+            }*/
     }
 
     /**

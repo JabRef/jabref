@@ -178,7 +178,8 @@
                                 <pathelement location="${library.directory}/looks-2.0.1.jar" />
                                 <pathelement location="${library.directory}/forms-1.0.4.jar" />
                                 <pathelement location="${library.directory}/spin-1.4.jar" />
-                            <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+                                <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+                                <pathelement location="${library.directory}/microba.jar" />
                         </classpath>
                 </javac>
         </target>
@@ -240,8 +241,8 @@
                                 <include name="README" />
                         </fileset>
                         <manifest>
-                            <attribute name="Main-Class" value="net.sf.jabref.JabRef" />
-
+                            <attribute name="Main-Class" value="net.sf.jabref.JabRef" /> 
+<!--                            <attribute name="Main-Class" value="net.sf.jabref.gui.FieldWeightDialog" /> -->
                         </manifest>
                 </jar>
 
@@ -413,7 +414,7 @@ version=${jabref.version}</echo>
                 <unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/spin-1.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/glazedlists-1.5.0_java14.jar" dest="${build.tmp}" />
-
+                <unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
             <delete dir="${build.tmp}/META-INF"/>
         </target>
 

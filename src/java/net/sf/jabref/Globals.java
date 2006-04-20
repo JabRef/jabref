@@ -54,6 +54,7 @@ public class Globals {
                         menuResourcePrefix = "resource/Menu",
                         integrityResourcePrefix = "resource/IntegrityMessage";
   private static final String buildInfos = "/resource/build.properties" ;
+  public static final String additionalFields = "/resource/fields/fields.xml" ;  // some extra field definitions
   private static String logfile = "jabref.log";
   public static ResourceBundle messages, menuTitles, intMessages ;
   public static FileUpdateMonitor fileUpdateMonitor = new FileUpdateMonitor();

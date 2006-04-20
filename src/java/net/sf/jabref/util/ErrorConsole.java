@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
  * error messages and stack traces to the user. Such an error console can be
  * useful in getting complete bug reports, especially from Windows users,
  * without asking users to run JabRef in a command window to catch the error info.
- * 
+ *
  * User: alver
  * Date: Mar 1, 2006
  * Time: 11:13:03 PM
@@ -58,7 +58,7 @@ public class ErrorConsole {
     class ErrorConsoleAction extends AbstractAction {
         JFrame frame;
         public ErrorConsoleAction(JFrame frame) {
-            super(Globals.lang("Show error console"));
+            super(Globals.menuTitle("Show error console"));
             putValue(SHORT_DESCRIPTION, Globals.lang("Display all error messages"));
             this.frame = frame;
         }

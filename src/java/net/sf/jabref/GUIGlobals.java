@@ -35,6 +35,8 @@ import java.util.*;
 //import java.util.List;
 import java.net.URL;
 import javax.swing.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 public class GUIGlobals {
 

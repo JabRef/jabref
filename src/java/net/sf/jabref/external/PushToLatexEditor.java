@@ -19,7 +19,7 @@ public class PushToLatexEditor implements PushToApplication {
     private boolean couldNotCall=false;
 
     public String getName() {
-        return Globals.lang("Insert selected citations into LatexEditor");
+        return Globals.menuTitle("Insert selected citations into LatexEditor");
     }
 
     public String getTooltip() {

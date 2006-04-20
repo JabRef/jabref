@@ -45,6 +45,9 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
+import com.michaelbaranov.microba.calendar.*;
+import com.michaelbaranov.microba.common.*;
+import net.sf.jabref.gui.date.*;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
   /*
@@ -295,10 +298,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 
   /**
-   * getExtra checks the field name against GUIGlobals.FIELD_EXTRAS. If the name
-   * has an entry, the proper component to be shown is created and returned.
-   * Otherwise, null is returned. In addition, e.g. listeners can be added to
-   * the field editor, even if no component is returned.
+   * getExtra checks the field name against BibtexFields.getFieldExtras(name).
+   * If the name has an entry, the proper component to be shown is created and
+   * returned. Otherwise, null is returned. In addition, e.g. listeners can be
+   * added to the field editor, even if no component is returned.
    *
    * @param string
    *          Field name
@@ -312,21 +315,29 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     String s = BibtexFields.getFieldExtras( string ) ;
 
-    //addedByMoritz
-      if (fieldName.equals(Globals.prefs.get("timeStampField"))){
-    //if (fieldName.equals("dateadded")){
+   // timestamp or a other field with datepicker command
+   if ( (fieldName.equals( Globals.prefs.get("timeStampField"))) ||
+           ((s != null) && s.equals("datepicker"))  )
+   {
+         // double click AND datefield => insert the current date (today)
         ((JTextArea) ed).addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                if(e.getClickCount()==2){
+                if(e.getClickCount()==2)  // double click
+                {
                     String date = Util.easyDateFormat();
                     ed.setText(date);
-                    //DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    //ed.setText(df.format(new Date()));
                 }
             }
         });
+
+        // insert a datepicker, if the extras field contains this command
+        if ((s != null) && s.equals("datepicker"))
+        {
+          DatePickerButton datePicker = new DatePickerButton( ed ) ;
+          return datePicker.getDatePicker() ;
+        }
     }
-    //END_OF addedByMoritz
+
     if ((s != null) && s.equals("external")) {
 
       // Add external viewer listener for "pdf" and "url" fields.
@@ -351,7 +362,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         return controls;
     }
     else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
-          + editor.getFieldName()) != null) {
+          + editor.getFieldName()) != null)
+    {
       FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
               panel.metaData, storeFieldAction, false);
       contentSelectors.add(ws);

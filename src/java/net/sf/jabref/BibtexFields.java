@@ -37,12 +37,16 @@
 // todo     : - handling of identically fields with different names
 //              e.g. LCCN = lib-congress
 //            - export/import of some definition from/to a xml file
+//            - group id for each fields, e.g. standard, jurabib, bio....
 //
 // modified :
 
 package net.sf.jabref ;
 
 import java.util.* ;
+import net.sf.jabref.util.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class BibtexFields
 {
@@ -54,7 +58,7 @@ public class BibtexFields
       GROUPSEARCH = "__groupsearch",
       MARKED = "__markedentry",
       OWNER = "owner",
-      TIMESTAMP = "timestamp",
+      TIMESTAMP = "timestamp", // it's also definied at the JabRefPreferences class
       ENTRYTYPE = "entrytype",
 
       // Using this when I have no database open or when I read
@@ -195,6 +199,8 @@ public class BibtexFields
     dummy.setDisplayable(false);
     add(dummy) ;
 
+     // read external field definitions
+    readXML( Globals.additionalFields ) ;
 
     // collect all public fields for the PUBLIC_FIELDS array
     Vector pFields = new Vector( fieldSet.size()) ;
@@ -210,6 +216,7 @@ public class BibtexFields
     }
 
     PUBLIC_FIELDS = pFields.toArray() ;
+    // sort the entries
     java.util.Arrays.sort( PUBLIC_FIELDS );
   }
 
@@ -220,6 +227,34 @@ public class BibtexFields
     // field == null check
     String key = field.name ;
     fieldSet.put( key, field ) ;
+  }
+
+  /** read a xml definiton file and put only NEW fields into the field list */
+  private void readXML( String resName )
+  {
+    TXMLReader reader = new TXMLReader(resName) ;
+    if (reader.isReady() )
+    {
+      // get a list of all fields
+      NodeList fieldNodes = reader.getNodes("field") ;
+
+      int tagsCount = fieldNodes.getLength() ;
+      for (int t = 0 ; t < tagsCount ; t++)
+      {
+        Element entry = (Element) fieldNodes.item(t) ;
+        String fName = reader.readStringAttribute(entry, "name", null) ;
+        if (fName != null)  // something found ?
+        {
+          fName = fName.toLowerCase() ;
+          BibtexSingleField dummy = (BibtexSingleField) fieldSet.get( fName ) ;
+          if (dummy == null)  // unknown field
+          {
+            dummy = new BibtexSingleField(reader, entry) ;
+            fieldSet.put(fName, dummy) ;
+          }
+        }
+      }
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -420,6 +455,53 @@ public class BibtexFields
       setFlag( pStandard, STANDARD) ;
       weight = pWeight ;
       length = pLength ;
+    }
+
+    /** the constructor reads all neccessary data from the xml file */
+    public BibtexSingleField( TXMLReader reader, Element node)
+    {
+      // default is: not standard, public, displayable and writable
+      flag = DISPLAYABLE | WRITEABLE ;
+
+      name = reader.readStringAttribute(node, "name", "field") ;
+      name = name.toLowerCase() ;
+
+      // read the weight
+      String wStr = reader.readStringAttribute(node, "weight", null) ;
+      if (wStr != null)
+      {
+        int hCode = wStr.toLowerCase().hashCode() ;
+        if (hCode == "small".hashCode())
+        {
+          weight = GUIGlobals.SMALL_W ;
+        }
+        else if (hCode == "medium".hashCode())
+        {
+          weight = GUIGlobals.MEDIUM_W ;
+        }
+        else if (hCode == "large".hashCode())
+        {
+          weight = GUIGlobals.LARGE_W ;
+        }
+        else // try to convert to a double value
+        {
+          try
+          {
+            weight = Double.parseDouble(wStr) ;
+            if ((weight < 0.0) || (weight > GUIGlobals.MAX_FIELD_WEIGHT))
+            {
+              weight = GUIGlobals.DEFAULT_FIELD_WEIGHT ;
+            }
+          }
+          catch (Exception e)
+          {
+            weight = GUIGlobals.DEFAULT_FIELD_WEIGHT ;
+          }
+        }
+      }
+      length = reader.readIntegerAttribute( node, "length", GUIGlobals.DEFAULT_FIELD_LENGTH ) ;
+
+      extras = reader.readStringAttribute(node, "extras", null) ;
     }
 
     // -----------------------------------------------------------------------
