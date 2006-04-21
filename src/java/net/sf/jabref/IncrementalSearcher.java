@@ -16,33 +16,14 @@ public class IncrementalSearcher {
     }
 
     public boolean search(String pattern, BibtexEntry bibtexEntry) {
-	hitInField = null;
-	//if (!prefs.getBoolean("caseSensitiveSearch"))
-	//    flags = Pattern.CASE_INSENSITIVE;
-	//Pattern pattern = Pattern.compile(searchString, flags);
+	    hitInField = null;
+	    //if (!prefs.getBoolean("caseSensitiveSearch"))
+	    //    flags = Pattern.CASE_INSENSITIVE;
+	    //Pattern pattern = Pattern.compile(searchString, flags);
 	
-	if (prefs.getBoolean("searchAll")) {
 	    Object[] fields = bibtexEntry.getAllFields();
 	    return searchFields(fields, bibtexEntry, pattern);
-	} else {
-	    if (prefs.getBoolean("searchReq")) {
-		String[] requiredField = bibtexEntry.getRequiredFields() ;
-		if (searchFields(requiredField, bibtexEntry, pattern))
-		    return true;
-	    }
-	    if (prefs.getBoolean("searchOpt")) {
-		String[] optionalField = bibtexEntry.getOptionalFields() ;
-		if (searchFields(optionalField, bibtexEntry, pattern))
-		    return true;
-	    }
-	    if (prefs.getBoolean("searchGen")) {
-		String[] generalField = bibtexEntry.getGeneralFields() ;
-		if (searchFields(generalField, bibtexEntry, pattern))
-		    return true;
-	    }
-	}
 
-        return false;
     }
 
 	protected boolean searchFields(Object[] fields, BibtexEntry bibtexEntry, 

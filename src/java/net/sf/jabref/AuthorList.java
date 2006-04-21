@@ -439,7 +439,9 @@ public class AuthorList {
             }
             if (c=='\\') current_backslash = token_end;
             if (braces_level==0)
-                if (c==',' || c=='~' || c=='-' || Character.isWhitespace(c)) break;
+                if (c==',' || c=='~' || /*c=='-' ||*/ Character.isWhitespace(c)) break;
+            // Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to prevent
+            // problems with names like Bailey-Jones getting broken up and sorted wrong.
             token_end++;
         }
         if (token_abbr<0) token_abbr = token_end;
