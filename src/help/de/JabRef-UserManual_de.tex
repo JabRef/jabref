@@ -1,5 +1,3 @@
-% OpenOffice-Export aktualisieren (an aktuelle HTML-Doku anpassen)
-%
 % unter >>Erscheinungsbild<< noch die Punkte Tabellendarstellung,
 % Toolbar, Panels und Schriften erstellen (DW)
 %
@@ -282,7 +280,7 @@ die Groß"~\slash{}Kleinschreibung).
 Für weitere Erläuterungen zu Bib\TeX{} wird verwiesen auf \cite{Markey2005,btxdoc,btxhak,Raichle2002}.
 
 
-\clearpage 
+\clearpage
 \section{Installation}
 \secttoc
 
@@ -367,7 +365,7 @@ unter \url{http://jabref.sourceforge.net} und in der Datei INSTALL
 (zum Kompilieren aus den \emph{sourcen}).
 
 
-\clearpage 
+\clearpage
 \section{Funktionen}
 \secttoc
 \bigskip
@@ -1310,10 +1308,10 @@ Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}. Ihre Da
 \item Exportieren Sie Ihre Datei in das \texttt{.sxc}-Format.
 \item Starten Sie OpenOffice.org.
 \item Wählen Sie \menu{Extras} \msep{} \menu{Datenquellen}.
-\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen z.B. in \emph{Bibliographie-alt}. 
+\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen z.B. in \emph{Bibliographie-alt}.
 \item Drücken Sie \menu{Anwenden}.
 \item Klicken Sie \menu{Neue Datenquelle}. Ein neuer Eintrag erscheint. Ändern Sie den Namen zu \emph{Bibliography}.
-\item Andern Sie den \menu{Dateityp} zu \menu{Tabelle}. Klicken Sie den \menu{\ldots}-Button in der Zeile \menu{Datenquellen URL}. Wählen Sie die \texttt{.sxc}-Datei, die Sie exportiert haben.
+\item Ändern Sie den \menu{Dateityp} zu \menu{Tabelle}. Klicken Sie den \menu{\ldots}-Button in der Zeile \menu{Datenquellen URL}. Wählen Sie die \texttt{.sxc}-Datei, die Sie exportiert haben.
 \item Klicken Sie auf \menu{OK}, um das Fenster \menu{Datenquellen} zu schließen.
 \end{itemize}
 Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}.
@@ -1695,7 +1693,7 @@ ist, auch nicht in die neue Datei geschrieben werden kann.
 
 \end{itemize}
 
-\clearpage 
+\clearpage
 \section{Anpassung}
 \secttoc
 
@@ -2190,18 +2188,18 @@ zu können oder die Standard-Export-Filter und Standard-Formatierer
 zu erweitern.
 
 
-\clearpage 
+\clearpage
 \section{Externe Importfilter}
 \secttoc
 \bigskip
 
-\noindent \jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
+\noindent \jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer
 zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java
 \emph{Klassen}, die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
-und daraus Bib\TeX{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
-von SourceForge erhalten haben (siehe Abschnitt >>Ihre Arbeit anderen zur Verfügung stellen<<, 
+und daraus Bib\TeX{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht
+von SourceForge erhalten haben (siehe Abschnitt >>Ihre Arbeit anderen zur Verfügung stellen<<,
 S.\,\pageref{subsec:Ihre-Arbeit}). Sie können auch
-mit Grundkenntnissen der Java-Programmierung eigene Importer für für Sie wichtige Referenzquellen 
+mit Grundkenntnissen der Java-Programmierung eigene Importer für für Sie wichtige Referenzquellen
 erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref{} neu zu
 kompilieren.
 
@@ -2215,16 +2213,16 @@ Externe Importfilter selbst sind dann nach Namen sortiert.
 
 Stellen Sie sicher, dass Sie den Importer in kompilierter Form haben (eine oder mehrere
 \texttt{.class} Dateien) und dass die Klassendateien
-in einer Verzeichnisstruktur entsprechend ihrer Package-Struktur liegen. 
-Um einen neuen externen Importfilter hinzuzufügen, öffnen Sie den Dialog 
+in einer Verzeichnisstruktur entsprechend ihrer Package-Struktur liegen.
+Um einen neuen externen Importfilter hinzuzufügen, öffnen Sie den Dialog
 \menu{Optionen} \msep{} \menu{Verwalte externe Importfilter}, und klicken Sie auf
-\menu{Aus Klassenpfad hinzufügen}. Ein Dateiauswahl-Fenster erscheint, 
+\menu{Aus Klassenpfad hinzufügen}. Ein Dateiauswahl-Fenster erscheint,
 mit dem Sie den Klassenpfad des Importers wählen, dass heißt den obersten Ordner,
 in dem die Package-Struktur Ihres Importers beginnt. In einem zweiten Dateiauswahl-Fenster
 wählen Sie die \emph{.class}-Datei Ihres Importers, die von \texttt{\textbackslash{}ImportFormat} abgeleitet
 ist. Wenn Sie \menu{Klasse auswählen} klicken, erscheint Ihr neuer Importer
 in der Liste der externen Importfilter. Alle externen Importfilter erscheinen in den
-\jabref{}-Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} \menu{Externe Importfilter} und 
+\jabref{}-Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} \menu{Externe Importfilter} und
 \menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter}.
 
 \tip[Bitte beachten Sie: ]{Wenn Sie die Klassen in ein anderes Verzeichnis verschieben,
@@ -2240,7 +2238,7 @@ Sie können auch Importer aus ZIP- oder JAR-Archiven registrieren, wählen Sie ein
 
 \subsection{Einen Importfilter entwickeln}
 
-Bitte schauen Sie auf unseren Download-Seiten nach Beispielen und nützlichen Dateien zur 
+Bitte schauen Sie auf unseren Download-Seiten nach Beispielen und nützlichen Dateien zur
 Entwicklung Ihres Importfilters.
 
 \subsubsection{Ein einfaches Beispiel}
@@ -2257,7 +2255,7 @@ Angenommen, wir wollen Dateien der folgenden Form importieren:
 \paragraph{SimpleCsvImporter Erstellen}
 
 Erzeugen Sie in einem Text-Editor eine von \texttt{ImportFormat} abgeleitete Klasse,
-die die Methoden \texttt{getFormatName()}, 
+die die Methoden \texttt{getFormatName()},
 \texttt{isRecognizedFormat()}
 und \texttt{importEntries()} implementiert. Hier ein Beispiel:
 \begin{lyxcode}
@@ -2290,15 +2288,15 @@ public class SimpleCsvImporter extends ImportFormat {
     return true; // this is discouraged except for demonstration purposes
 
   }
-  
+
 ~
 
-  public List importEntries(InputStream stream) throws IOException {    
+  public List importEntries(InputStream stream) throws IOException {
 
   	ArrayList bibitems = new ArrayList();
 
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-      
+
 ~
 
     String line = in.readLine();
@@ -2323,11 +2321,11 @@ public class SimpleCsvImporter extends ImportFormat {
 
         line = in.readLine();
 
-      }     
+      }
 
     }
 
-  	return bibitems;	  	
+  	return bibitems;
 
   }
 
@@ -2339,8 +2337,8 @@ public class SimpleCsvImporter extends ImportFormat {
 Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, Sie haben
 sie unter \texttt{/meinpfad/SimpleCsvImporter.java} gespeichert. Nehmen wir weiter an,
 die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
-\texttt{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad. 
-Kompilieren Sie die Klasse mit JSDK 1.4 zum Beispiel mit folgendem Kommandozeilen"=Aufruf: 
+\texttt{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad.
+Kompilieren Sie die Klasse mit JSDK 1.4 zum Beispiel mit folgendem Kommandozeilen"=Aufruf:
 \begin{lyxcode}
 javac -classpath JabRef-2.0.jar SimpleCsvImporter.java
 \end{lyxcode}
@@ -2349,24 +2347,24 @@ Nun sollte dort auch eine Datei \texttt{/mypath/SimpleCsvImporter.class} liegen.
 \paragraph{SimpleCsvImporter registrieren}
 
 Öffnen Sie in \jabref{} \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
-auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und 
+auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und
 klicken Sie \menu{Klassenpfad auswählen}. Wählen Sie dann die Datei \texttt{SimpleCsvImporter.class}
 und klicken Sie \menu{Klasse auswählen}. Ihr Importfilter sollte nun in der Liste der
 externen Importfilter unter dem Namen >>Simple CSV Importer<< erscheinen und,
-sobald Sie \menu{Schließen} gewählt haben, auch in den Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} 
-\menu{Externe Importfilter} und \menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter} 
+sobald Sie \menu{Schließen} gewählt haben, auch in den Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{}
+\menu{Externe Importfilter} und \menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter}
 des \jabref{}-Hauptfensters auftauchen.
 
 \subsection{Ihre Arbeit anderen zur Verfügung stellen}
 \label{subsec:Ihre-Arbeit}
 Mit externen Importfiltern ist es recht einfach, Importfilter zwischen Nutzern auszutauschen und
-gemeinsam zu nutzen. Wenn Sie einen Importer für ein  Format schreiben, das \jabref{} noch nicht unterstützt, 
-oder einen Importer verbessern, bitten wir Sie, Ihre Ergebnisse auf unserer SourceForge.net 
-Seite zu veröffentlichen. Wir bieten gerne eine Sammlung eingereichter Importfilter an oder 
+gemeinsam zu nutzen. Wenn Sie einen Importer für ein  Format schreiben, das \jabref{} noch nicht unterstützt,
+oder einen Importer verbessern, bitten wir Sie, Ihre Ergebnisse auf unserer SourceForge.net
+Seite zu veröffentlichen. Wir bieten gerne eine Sammlung eingereichter Importfilter an oder
 fügen sie unserer Auswahl an Standard-Importfiltern hinzu.
 
 
-\clearpage 
+\clearpage
 \section{Tastenkürzel}
 
 Die Menüs können alle über Tastenkürzel angesteuert werden, die meisten
@@ -2518,7 +2516,7 @@ F1\tabularnewline
 \end{longtable}
 
 
-\clearpage 
+\clearpage
 \section{Entwicklung}
 \secttoc
 \bigskip
@@ -2619,7 +2617,11 @@ Möglicherweise ans Ende eine FAQ anschließen
 
 \label{RevisionHistory}
 
-\subsection*{Version 0.3 (zu \jabref{} 2.0, Stand: 16.\,1.\,2006)}
+\subsection*{(in Arbeit))}
+\begin{revhist}
+\end{revhist}
+
+\subsection*{30.\,1.\,2006)}
 \begin{revhist}
 \item Abschnitt >>\jabref{}-Bibliographien in OpenOffice.org benutzen<< aktualisiert
 \item Abschnitt zur Erzeugung der Bib\TeX{}-Keys aktualisiert
