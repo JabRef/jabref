@@ -5,6 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.event.*;
+import java.util.Iterator;
 
 /**
  * <p>Title: </p>
@@ -34,18 +35,18 @@ public class GenFieldsCustomizer extends JDialog {
   JButton revert = new JButton();
   //EntryCustomizationDialog diag;
   HelpAction help;
-  
+
   public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
     super(frame, Globals.lang("Set general fields"), false);
     parent = frame;
     //this.diag = diag;
     help = new HelpAction(parent.helpDiag, GUIGlobals.generalFieldsHelp,
-	      "Help", GUIGlobals.helpSmallIconFile);
+          "Help", GUIGlobals.helpSmallIconFile);
     helpBut = new JButton(Globals.lang("Help"));
     helpBut.addActionListener(help);
     try {
       jbInit();
-      setSize(new Dimension(400, 200));
+      setSize(new Dimension(650, 300));
     }
     catch(Exception ex) {
       ex.printStackTrace();
@@ -147,37 +148,41 @@ public class GenFieldsCustomizer extends JDialog {
   }
 
     void setFieldsText() {
-	StringBuffer sb = new StringBuffer();
-	String name = null, fields = null;
-	int i=0;
-	while (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME+i)) {
-        name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME+i);
-	    sb.append(name);
-	    fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+i);
-	    sb.append(":");
-	    sb.append(fields);
-	    sb.append("\n");
-        System.out.println(Globals.prefs.CUSTOM_TAB_NAME+i);
-        i++;
-	}
-	fieldsArea.setText(sb.toString());
+        StringBuffer sb = new StringBuffer();
+        String name = null, fields = null;
+        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+        for (int i=0; i<tabList.getTabCount(); i++) {
+            sb.append(tabList.getTabName(i));
+            sb.append(":");
+            for (Iterator j=tabList.getTabFields(i).iterator(); j.hasNext();) {
+                String field = (String)j.next();
+                sb.append(field);
+                if (j.hasNext())
+                    sb.append(";");
+            }
+            sb.append("\n");
+        }
+
+        fieldsArea.setText(sb.toString());
     }
 
-  void revert_actionPerformed(ActionEvent e) {
-      StringBuffer sb = new StringBuffer();
-      String name = null, fields = null;
-      int i=0;
-      while ((name = (String)Globals.prefs.defaults.get(Globals.prefs.CUSTOM_TAB_NAME+i)) != null) {
-	  sb.append(name);
-	  fields = (String)Globals.prefs.defaults.get(Globals.prefs.CUSTOM_TAB_FIELDS+i);
-	  sb.append(":");
-	  sb.append(fields);
-	  sb.append("\n");
-	  i++;
-      }
-      fieldsArea.setText(sb.toString());
-      //    fieldsArea.setText((String)parent.prefs.defaults.get("generalFields"));
-  }
+    void revert_actionPerformed(ActionEvent e) {
+        StringBuffer sb = new StringBuffer();
+        String name = null, fields = null;
+        int i = 0;
+        while ((name = (String) Globals.prefs.defaults.get
+                (Globals.prefs.CUSTOM_TAB_NAME + "_def" + i)) != null) {
+            sb.append(name);
+            fields = (String) Globals.prefs.defaults.get
+                    (Globals.prefs.CUSTOM_TAB_FIELDS + "_def" + i);
+            sb.append(":");
+            sb.append(fields);
+            sb.append("\n");
+            i++;
+        }
+        fieldsArea.setText(sb.toString());
+
+    }
 }
 
 class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListener {

@@ -194,17 +194,17 @@ public class JabRefPreferences {
                      "pdf;comment;owner");
 
     // Entry editor tab 0:
-    defaults.put(CUSTOM_TAB_NAME+"0", Globals.lang("General"));
-        defaults.put(CUSTOM_TAB_FIELDS+"0", "crossref;keywords;doi;url;citeseerurl;"+
+    defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
+        defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;doi;url;citeseerurl;"+
                      "pdf;comment;owner;timestamp");
 
     // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS+"1", "abstract");
-    defaults.put(CUSTOM_TAB_NAME+"1", Globals.lang("Abstract"));
+        defaults.put(CUSTOM_TAB_FIELDS+"_def1", "abstract");
+    defaults.put(CUSTOM_TAB_NAME+"_def1", Globals.lang("Abstract"));
 
   // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS+"2", "review");
-    defaults.put(CUSTOM_TAB_NAME+"2", Globals.lang("Review"));
+        defaults.put(CUSTOM_TAB_FIELDS+"_def2", "review");
+    defaults.put(CUSTOM_TAB_NAME+"_def2", Globals.lang("Review"));
 
         //defaults.put("recentFiles", "/home/alver/Documents/bibk_dok/hovedbase.bib");
         defaults.put("historySize", new Integer(8));
