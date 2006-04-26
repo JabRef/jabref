@@ -190,7 +190,7 @@ public class JabRefPreferences {
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
     // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put("generalFields", "crossref;keywords;doi;url;citeseerurl;"+
+        defaults.put("generalFields", "crossref;keywords;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");
 
     // Entry editor tab 0:

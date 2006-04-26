@@ -34,7 +34,8 @@
 //
 // todo     :
 //
-// modified :
+// modified :  r.nagel 25.04.2006
+//             check NullPointer at the actionPerformed methode
 
 package net.sf.jabref.gui.date ;
 
@@ -43,6 +44,7 @@ import javax.swing.* ;
 
 import com.michaelbaranov.microba.calendar.* ;
 import net.sf.jabref.* ;
+import java.util.*;
 
 public class DatePickerButton implements ActionListener
 {
@@ -59,7 +61,11 @@ public class DatePickerButton implements ActionListener
 
   public void actionPerformed( ActionEvent e )
   {
-    editor.setText( Util.easyDateFormat( datePicker.getDate()) );
+    Date date = datePicker.getDate() ;
+    if (date != null)
+    {
+      editor.setText( Util.easyDateFormat( date ) ) ;
+    }
   }
 
   public JComponent getDatePicker()

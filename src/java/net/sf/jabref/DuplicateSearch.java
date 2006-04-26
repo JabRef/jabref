@@ -102,8 +102,8 @@ public void run() {
       {
 
         drd = new DuplicateResolverDialog( panel.frame, be[0], be[1],
-					   DuplicateResolverDialog.DUPLICATE_SEARCH) ;
-        drd.show() ;
+                                           DuplicateResolverDialog.DUPLICATE_SEARCH) ;
+        drd.setVisible(true); // drd.show(); -> deprecated since 1.5
 
         duplicateCounter++ ;
         int answer = drd.getSelected() ;

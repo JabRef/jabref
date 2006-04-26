@@ -22,31 +22,31 @@ import java.awt.*;
 public class DuplicateResolverDialog extends JDialog {
 
     public static final int
-	NOT_CHOSEN = -1,
-	KEEP_BOTH = 0,
-	KEEP_UPPER = 1,
-	KEEP_LOWER = 2,
-	BREAK      = 5,  // close
-	DUPLICATE_SEARCH = 1,
-	IMPORT_CHECK = 2,
+        NOT_CHOSEN = -1,
+        KEEP_BOTH = 0,
+        KEEP_UPPER = 1,
+        KEEP_LOWER = 2,
+        BREAK      = 5,  // close
+        DUPLICATE_SEARCH = 1,
+        IMPORT_CHECK = 2,
     INSPECTION = 3;
 
     final Dimension DIM = new Dimension(650, 600);
-    
+
     PreviewPanel p1, p2;
     JTextArea ta1, ta2;
     JTabbedPane tabbed = new JTabbedPane();
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JButton first, second, both,
-	cancel = new JButton(Globals.lang("Cancel"));
+        cancel = new JButton(Globals.lang("Cancel"));
     JPanel options = new JPanel(),
-	main = new JPanel(),
-	source = new JPanel();
+        main = new JPanel(),
+        source = new JPanel();
     int status = NOT_CHOSEN;
     boolean block = true;
     TitleLabel lab;
-    
+
   public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two, int type) {
     super(frame, Globals.lang("Possible duplicate entries"), true);
 
@@ -63,8 +63,8 @@ public class DuplicateResolverDialog extends JDialog {
               break;
           default:
               first = new JButton(Globals.lang("Import and remove old entry"));
-	          second = new JButton(Globals.lang("Do not import entry"));
-	          both = new JButton(Globals.lang("Import and keep old entry"));
+                  second = new JButton(Globals.lang("Do not import entry"));
+                  both = new JButton(Globals.lang("Import and keep old entry"));
       }
 
     String layout = Globals.prefs.get("preview0");
@@ -74,10 +74,10 @@ public class DuplicateResolverDialog extends JDialog {
     ta2 = new JTextArea();
     ta1.setEditable(false);
     ta2.setEditable(false);
-    
-    //ta1.setPreferredSize(dim); 
+
+    //ta1.setPreferredSize(dim);
     //ta2.setPreferredSize(dim);
-    
+
     setSourceView(one, two);
 
     //getContentPane().setLayout();
@@ -89,7 +89,7 @@ public class DuplicateResolverDialog extends JDialog {
     con.weightx = 1;
     con.weighty = 0;
     lab = new TitleLabel(Globals.lang((type==DUPLICATE_SEARCH)?"":
-				  "Entry in current database"));
+                                  "Entry in current database"));
     gbl.setConstraints(lab, con);
     main.add(lab);
     con.weighty = 1;
@@ -100,7 +100,7 @@ public class DuplicateResolverDialog extends JDialog {
     con.weighty = 0;
     con.insets = new Insets(10,10,0,10);
     lab = new TitleLabel(Globals.lang((type==DUPLICATE_SEARCH)?"":
-				  "Entry in import"));
+                                  "Entry in import"));
     gbl.setConstraints(lab, con);
     main.add(lab);
     con.weighty = 1;
@@ -159,16 +159,16 @@ public class DuplicateResolverDialog extends JDialog {
     getContentPane().add(tabbed, BorderLayout.CENTER);
     getContentPane().add(options, BorderLayout.SOUTH);
     pack();
-    
-    
+
+
     if (getHeight() > DIM.height) {
         setSize(new Dimension(getWidth(), DIM.height));
     }
     if (getWidth() > DIM.width) {
         setSize(new Dimension(DIM.width, getHeight()));
     }
-    
-    
+
+
     both.requestFocus();
     Util.placeDialog(this, frame);
   }
@@ -208,8 +208,8 @@ public boolean isBlocking() {
 
   public static int resolveDuplicate(JabRefFrame frame, BibtexEntry one, BibtexEntry two) {
     DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two,
-							      DUPLICATE_SEARCH);
-    drd.show();
+                                                              DUPLICATE_SEARCH);
+    drd.setVisible(true); // drd.show(); -> deprecated since 1.5
     return drd.getSelected();
   }
 

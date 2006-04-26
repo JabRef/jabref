@@ -74,7 +74,7 @@ public class GroupSelector extends SidePaneComponent implements
             false), select = new JCheckBoxMenuItem(Globals
             .lang("Select matches"), false);
     JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
-    		Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
+                    Globals.lang("Highlight overlapping groups")); // JZTODO lyrics
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
     ButtonGroup nonHits = new ButtonGroup();
@@ -86,7 +86,7 @@ public class GroupSelector extends SidePaneComponent implements
     /**
      * The first element for each group defines which field to use for the
      * quicksearch. The next two define the name and regexp for the group.
-     * 
+     *
      * @param groupData
      *            The group meta data in raw format.
      */
@@ -120,8 +120,8 @@ public class GroupSelector extends SidePaneComponent implements
         });
         showOverlappingGroups.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean("groupShowOverlapping", 
-                		showOverlappingGroups.isSelected());
+                Globals.prefs.putBoolean("groupShowOverlapping",
+                                showOverlappingGroups.isSelected());
                 if (!showOverlappingGroups.isSelected())
                     groupsTree.setHighlight2Cells(null);
             }
@@ -137,7 +137,7 @@ public class GroupSelector extends SidePaneComponent implements
                 Globals.prefs.putBoolean("grayOutNonHits", grayOut.isSelected());
             }
         });
-        
+
         if (Globals.prefs.getBoolean("groupFloatSelections")) {
 
             floatCb.setSelected(true);
@@ -153,7 +153,7 @@ public class GroupSelector extends SidePaneComponent implements
             orCb.setSelected(true);
             andCb.setSelected(false);
         }
-        
+
         invCb.setSelected(Globals.prefs.getBoolean("groupInvertSelections"));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean("groupShowOverlapping"));
         select.setSelected(Globals.prefs.getBoolean("groupSelectMatches"));
@@ -258,7 +258,7 @@ public class GroupSelector extends SidePaneComponent implements
         invCb.setToolTipText(Globals
                 .lang("Show entries *not* in group selection"));
         showOverlappingGroups.setToolTipText( // JZTODO lyrics
-        		"Highlight groups that contain entries contained in any currently selected group");
+                        "Highlight groups that contain entries contained in any currently selected group");
         floatCb.setToolTipText(Globals
                 .lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Globals
@@ -329,19 +329,19 @@ public class GroupSelector extends SidePaneComponent implements
         main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
         add(main, BorderLayout.CENTER);
         definePopup();
-        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, 
+        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
-        moveNodeDownAction.putValue(Action.ACCELERATOR_KEY, 
+        moveNodeDownAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK));
-        moveNodeLeftAction.putValue(Action.ACCELERATOR_KEY, 
+        moveNodeLeftAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
-        moveNodeRightAction.putValue(Action.ACCELERATOR_KEY, 
+        moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
     }
 
     private void definePopup() {
         // These key bindings are just to have the shortcuts displayed
-        // in the popup menu. The actual keystroke processing is in 
+        // in the popup menu. The actual keystroke processing is in
         // BasePanel (entryTable.addKeyListener(...)).
         groupsContextMenu.add(editGroupPopupAction);
         groupsContextMenu.add(addGroupPopupAction);
@@ -404,7 +404,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
             public void popupMenuCanceled(PopupMenuEvent e) {
                 groupsTree.setHighlightBorderCell(null);
-            }            
+            }
         });
     }
 
@@ -449,10 +449,10 @@ public class GroupSelector extends SidePaneComponent implements
                 removeGroupAndSubgroupsPopupAction.setEnabled(true);
                 removeGroupKeepSubgroupsPopupAction.setEnabled(true);
             }
-			expandSubtreePopupAction.setEnabled(groupsTree.isCollapsed(path) ||
-					groupsTree.hasCollapsedDescendant(path));
-			collapseSubtreePopupAction.setEnabled(groupsTree.isExpanded(path) ||
-					groupsTree.hasExpandedDescendant(path));
+                        expandSubtreePopupAction.setEnabled(groupsTree.isCollapsed(path) ||
+                                        groupsTree.hasCollapsedDescendant(path));
+                        collapseSubtreePopupAction.setEnabled(groupsTree.isExpanded(path) ||
+                                        groupsTree.hasExpandedDescendant(path));
             sortSubmenu.setEnabled(!node.isLeaf());
             removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
             moveNodeUpPopupAction.setEnabled(node.canMoveUp());
@@ -460,7 +460,7 @@ public class GroupSelector extends SidePaneComponent implements
             moveNodeLeftPopupAction.setEnabled(node.canMoveLeft());
             moveNodeRightPopupAction.setEnabled(node.canMoveRight());
             moveSubmenu.setEnabled(moveNodeUpPopupAction.isEnabled()
-                    || moveNodeDownPopupAction.isEnabled() 
+                    || moveNodeDownPopupAction.isEnabled()
                     || moveNodeLeftPopupAction.isEnabled()
                     || moveNodeRightPopupAction.isEnabled());
             moveNodeUpPopupAction.setNode(node);
@@ -524,9 +524,9 @@ public class GroupSelector extends SidePaneComponent implements
                 .isSelected(), invCb.isSelected());
 
         for (int i = 0; i < selection.length; ++i) {
-			searchRules.addRule(((GroupTreeNode) selection[i]
-					.getLastPathComponent()).getSearchRule());
-		}
+                        searchRules.addRule(((GroupTreeNode) selection[i]
+                                        .getLastPathComponent()).getSearchRule());
+                }
         Hashtable searchOptions = new Hashtable();
         searchOptions.put("option", "dummy");
         GroupingWorker worker = new GroupingWorker(searchRules, searchOptions);
@@ -583,27 +583,27 @@ public class GroupSelector extends SidePaneComponent implements
             }
 
             if (showOverlappingGroupsP) {
-				showOverlappingGroups(matches);
+                                showOverlappingGroups(matches);
         }
             frame.output(Globals.lang("Updated group selection") + ".");
         }
     }
-    /** 
+    /**
      * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and set the specified selection and expansion state. 
+     * been changed) and set the specified selection and expansion state.
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
-    public void revalidateGroups(TreePath[] selectionPaths, 
+    public void revalidateGroups(TreePath[] selectionPaths,
             Enumeration expandedNodes) {
-    	revalidateGroups(selectionPaths, expandedNodes, null);
+            revalidateGroups(selectionPaths, expandedNodes, null);
     }
 
-    /** 
+    /**
      * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and set the specified selection and expansion state. 
+     * been changed) and set the specified selection and expansion state.
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
-    public void revalidateGroups(TreePath[] selectionPaths, 
+    public void revalidateGroups(TreePath[] selectionPaths,
             Enumeration expandedNodes, GroupTreeNode node) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
@@ -617,20 +617,20 @@ public class GroupSelector extends SidePaneComponent implements
         }
         groupsTree.revalidate();
         if (node != null) {
-        	groupsTree.scrollPathToVisible(new TreePath(node.getPath()));
+                groupsTree.scrollPathToVisible(new TreePath(node.getPath()));
         }
     }
-    
-    /** 
+
+    /**
      * Revalidate the groups tree (e.g. after the data stored in the model has
      * been changed) and maintain the current selection and expansion state. */
     public void revalidateGroups() {
         revalidateGroups(null);
     }
-    
-    /** 
+
+    /**
      * Revalidate the groups tree (e.g. after the data stored in the model has
-     * been changed) and maintain the current selection and expansion state. 
+     * been changed) and maintain the current selection and expansion state.
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
     public void revalidateGroups(GroupTreeNode node) {
@@ -642,7 +642,7 @@ public class GroupSelector extends SidePaneComponent implements
             valueChanged(null);
         } else if (e.getSource() == newButton) {
             GroupDialog gd = new GroupDialog(frame, panel, null);
-            gd.show();
+            gd.setVisible(true); // gd.show(); -> deprecated since 1.5
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
                 GroupTreeNode newNode = new GroupTreeNode(newGroup);
@@ -660,7 +660,7 @@ public class GroupSelector extends SidePaneComponent implements
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel,
                     GroupSelector.this, groupsRoot, Globals.prefs
                             .get("groupsDefaultField"), " .,", ",");
-            gd.show();
+            gd.setVisible(true); // gd.show(); -> deprecated since 1.5
             // gd does the operation itself
         } else if (e.getSource() instanceof JCheckBox) {
             valueChanged(null);
@@ -687,7 +687,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
         this.groupsRoot = groupsRoot;
         if (Globals.prefs.getBoolean("groupExpandTree"))
-        	groupsTree.expandSubtree(groupsRoot);
+                groupsTree.expandSubtree(groupsRoot);
     }
 
     /**
@@ -705,7 +705,7 @@ public class GroupSelector extends SidePaneComponent implements
                 groupsRoot, newGroups, UndoableAddOrRemoveGroup.ADD_NODE);
         ce.addEdit(undo);
     }
-    
+
     private abstract class NodeAction extends AbstractAction {
         protected GroupTreeNode m_node = null;
         public NodeAction(String s) {
@@ -730,7 +730,7 @@ public class GroupSelector extends SidePaneComponent implements
             return null;
         }
     }
-    
+
     final AbstractAction editGroupAction = new EditGroupAction();
     final NodeAction editGroupPopupAction = new EditGroupAction();
     final NodeAction addGroupPopupAction = new AddGroupAction();
@@ -753,7 +753,7 @@ public class GroupSelector extends SidePaneComponent implements
     final AddToGroupAction addToGroup = new AddToGroupAction(false);
     final AddToGroupAction moveToGroup = new AddToGroupAction(true);
     final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
-    
+
     private class EditGroupAction extends NodeAction {
         public EditGroupAction() {
             super(Globals.lang("Edit group"));
@@ -766,7 +766,7 @@ public class GroupSelector extends SidePaneComponent implements
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
                 AbstractUndoableEdit undoAddPreviousEntries
-                    = gd.getUndoForAddPreviousEntries(); 
+                    = gd.getUndoForAddPreviousEntries();
                 UndoableModifyGroup undo = new UndoableModifyGroup(
                         GroupSelector.this, groupsRoot, node, newGroup);
                 node.setGroup(newGroup);
@@ -787,7 +787,7 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     }
-    
+
     private class AddGroupAction extends NodeAction {
         public AddGroupAction() {
             super(Globals.lang("Add Group"));
@@ -818,7 +818,7 @@ public class GroupSelector extends SidePaneComponent implements
                     newGroup.getName()));
         }
     }
-    
+
     private class AddSubgroupAction extends NodeAction {
         public AddSubgroupAction() {
             super(Globals.lang("Add Subgroup"));
@@ -853,7 +853,7 @@ public class GroupSelector extends SidePaneComponent implements
             final GroupTreeNode node = getNodeToUse();
             final AbstractGroup group = node.getGroup();
             int conf = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("Remove group \"%0\" and its subgroups?",group.getName()), 
+                    .lang("Remove group \"%0\" and its subgroups?",group.getName()),
                     Globals.lang("Remove group and subgroups"),
                     JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
@@ -879,7 +879,7 @@ public class GroupSelector extends SidePaneComponent implements
             final GroupTreeNode node = getNodeToUse();
             final AbstractGroup group = node.getGroup();
             int conf = JOptionPane.showConfirmDialog(frame, Globals
-                    .lang("Remove all subgroups of \"%0\"?",group.getName()), 
+                    .lang("Remove all subgroups of \"%0\"?",group.getName()),
                     Globals.lang("Remove all subgroups"),
                     JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
@@ -926,11 +926,11 @@ public class GroupSelector extends SidePaneComponent implements
             }
         }
     };
-    
+
     public TreePath getSelectionPath() {
         return groupsTree.getSelectionPath();
     }
-    
+
     private class SortDirectSubgroupsAction extends NodeAction {
         public SortDirectSubgroupsAction() {
             super(Globals.lang("Immediate subgroups"));
@@ -945,7 +945,7 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output(Globals.lang("Sorted immediate subgroups."));
         }
     }
-    
+
     private class SortAllSubgroupsAction extends NodeAction {
         public SortAllSubgroupsAction() {
             super(Globals.lang("All subgroups (recursively)"));
@@ -960,13 +960,13 @@ public class GroupSelector extends SidePaneComponent implements
             frame.output(Globals.lang("Sorted all subgroups recursively."));
         }
     };
-    
+
     public final AbstractAction clearHighlightAction = new AbstractAction(Globals.lang("Clear highlight")) {
         public void actionPerformed(ActionEvent ae) {
             groupsTree.setHighlight3Cells(null);
         }
     };
-    
+
     private class ExpandSubtreeAction extends NodeAction {
         public ExpandSubtreeAction() {
             super(Globals.lang("Expand subtree"));
@@ -978,7 +978,7 @@ public class GroupSelector extends SidePaneComponent implements
             revalidateGroups();
         }
     }
-    
+
     private class CollapseSubtreeAction extends NodeAction {
         public CollapseSubtreeAction() {
             super(Globals.lang("Collapse subtree"));
@@ -990,7 +990,7 @@ public class GroupSelector extends SidePaneComponent implements
             revalidateGroups();
         }
     }
-    
+
     private class MoveNodeUpAction extends NodeAction {
         public MoveNodeUpAction() {
             super(Globals.lang("Up"));
@@ -1000,7 +1000,7 @@ public class GroupSelector extends SidePaneComponent implements
             moveNodeUp(node, false);
         }
     }
-    
+
     private class MoveNodeDownAction extends NodeAction {
         public MoveNodeDownAction() {
             super(Globals.lang("Down"));
@@ -1010,7 +1010,7 @@ public class GroupSelector extends SidePaneComponent implements
             moveNodeDown(node, false);
         }
     }
-    
+
     private class MoveNodeLeftAction extends NodeAction {
         public MoveNodeLeftAction() {
             super(Globals.lang("Left"));
@@ -1020,7 +1020,7 @@ public class GroupSelector extends SidePaneComponent implements
             moveNodeLeft(node, false);
         }
     }
-    
+
     private class MoveNodeRightAction extends NodeAction {
         public MoveNodeRightAction() {
             super(Globals.lang("Right"));
@@ -1055,7 +1055,7 @@ public class GroupSelector extends SidePaneComponent implements
         concludeMoveGroup(undo, node);
         return true;
     }
-    
+
     /**
      * @param node The node to move
      * @return true if move was successful, false if not.
@@ -1080,7 +1080,7 @@ public class GroupSelector extends SidePaneComponent implements
         concludeMoveGroup(undo, node);
         return true;
     }
-    
+
     /**
      * @param node The node to move
      * @return true if move was successful, false if not.
@@ -1104,7 +1104,7 @@ public class GroupSelector extends SidePaneComponent implements
         concludeMoveGroup(undo, node);
         return true;
     }
-    
+
     /**
      * @param node The node to move
      * @return true if move was successful, false if not.
@@ -1128,20 +1128,20 @@ public class GroupSelector extends SidePaneComponent implements
         concludeMoveGroup(undo, node);
         return true;
     }
-    
+
     /**
      * Concludes the moving of a group tree node by storing the specified
      * undo information, marking the change, and setting the status line.
-     * @param undo Undo information for the move operation. 
+     * @param undo Undo information for the move operation.
      * @param node The node that has been moved.
      */
     public void concludeMoveGroup(AbstractUndoableEdit undo, GroupTreeNode node) {
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
-        frame.output(Globals.lang("Moved group \"%0\".", 
+        frame.output(Globals.lang("Moved group \"%0\".",
                 node.getGroup().getName()));
     }
-    
+
     public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
         if (undo == null) {
             frame.output(Globals.lang("The group \"%0\" already contains the selection.",
@@ -1150,22 +1150,22 @@ public class GroupSelector extends SidePaneComponent implements
         }
         panel.undoManager.addEdit(undo);
         panel.markBaseChanged();
-        panel.updateEntryEditorIfShowing(); 
+        panel.updateEntryEditorIfShowing();
         final String groupName = node.getGroup().getName();
         if (assignedEntries == 1)
             frame.output(Globals.lang("Assigned 1 entry to group \"%0\".", groupName));
         else
-            frame.output(Globals.lang("Assigned %0 entries to group \"%1\".", 
+            frame.output(Globals.lang("Assigned %0 entries to group \"%1\".",
                     String.valueOf(assignedEntries), groupName));
     }
-    
+
     JMenu moveSubmenu = new JMenu(Globals.lang("Move"));
     JMenu sortSubmenu = new JMenu(Globals.lang("Sort alphabetically")); // JZTODO lyrics
 
     public GroupTreeNode getGroupTreeRoot() {
         return groupsRoot;
     }
-    
+
     public Enumeration getExpandedPaths() {
         return groupsTree.getExpandedDescendants(
                 new TreePath(groupsRoot.getPath()));
@@ -1186,18 +1186,18 @@ public class GroupSelector extends SidePaneComponent implements
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
         }
-        
+
         // auto show/hide groups interface
         if (Globals.prefs.getBoolean("groupAutoShow") &&
-        		!groupsRoot.isLeaf()) { // groups were defined
+                        !groupsRoot.isLeaf()) { // groups were defined
             frame.sidePaneManager.ensureVisible("groups");
             frame.groupToggle.setSelected(true);
         } else if (Globals.prefs.getBoolean("groupAutoHide") &&
-        		groupsRoot.isLeaf()) { // groups were not defined
+                        groupsRoot.isLeaf()) { // groups were not defined
             frame.sidePaneManager.ensureNotVisible("groups");
             frame.groupToggle.setSelected(false);
         }
-        
+
         validateTree();
     }
 
@@ -1223,10 +1223,10 @@ public class GroupSelector extends SidePaneComponent implements
     public void reportError(String errorMessage, Exception exception) {
         reportError(errorMessage);
     }
-    
+
     /**
      * Highlight all groups that contain any/all of the specified entries.
-     * If entries is null or has zero length, highlight is cleared. 
+     * If entries is null or has zero length, highlight is cleared.
      */
     public void showMatchingGroups(BibtexEntry[] entries, boolean requireAll) {
         if (entries == null || entries.length == 0) { // nothing selected
@@ -1248,7 +1248,7 @@ public class GroupSelector extends SidePaneComponent implements
                 } else {
                     if (group.contains(entries[i]))
                         vec.add(node);
-                } 
+                }
             }
             if (requireAll && i >= entries.length) // did not break from loop
                 vec.add(node);
@@ -1262,7 +1262,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         groupsTree.revalidate();
     }
-    
+
     /** Show groups that, if selected, would show at least one
      * of the entries found in the specified search. */
     protected void showOverlappingGroups(List matches) { //DatabaseSearch search) {
@@ -1273,11 +1273,11 @@ public class GroupSelector extends SidePaneComponent implements
       Map dummyMap = new HashMap(); // just because I don't want to use null...
       for (Enumeration e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
           node = (GroupTreeNode) e.nextElement();
-          rule = node.getSearchRule(); 
+          rule = node.getSearchRule();
           for (Iterator it = matches.iterator(); it.hasNext(); ) {
               entry = (BibtexEntry) it.next();
               if (rule.applyRule(dummyMap, entry) == 0)
-            	  continue;
+                      continue;
               vec.add(node);
               break;
           }

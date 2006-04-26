@@ -26,9 +26,9 @@ public class ChangeScanner extends Thread {
      */
     //ArrayList changes = new ArrayList();
     DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Globals.lang("External changes"));
-    
+
     //  NamedCompound edit = new NamedCompound("Merged external changes")
-    
+
     public ChangeScanner(JabRefFrame frame, BasePanel bp) { //, BibtexDatabase inMem, MetaData mdInMem) {
         panel = bp;
         this.frame = frame;
@@ -47,7 +47,7 @@ public class ChangeScanner extends Thread {
     public void run() {
         try {
             //long startTime = System.currentTimeMillis();
-            
+
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile,
@@ -55,14 +55,14 @@ public class ChangeScanner extends Thread {
             BibtexDatabase inTemp = pr.getDatabase();
             MetaData mdInTemp = new MetaData(pr.getMetaData(),inTemp);
             //Util.pr(tempFile.getPath()+": "+inMem.getEntryCount());
-            
+
             // Parse the modified file.
             pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
             BibtexDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = new MetaData(pr.getMetaData(),onDisk);
-            
+
             //Util.pr(f.getPath()+": "+onDisk.getEntryCount());
-            
+
             // Sort both databases according to a common sort key.
             EntryComparator comp = new EntryComparator(false, true, sortBy[2]);
             comp = new EntryComparator(false, true, sortBy[1], comp);
@@ -76,7 +76,7 @@ public class ChangeScanner extends Thread {
             comp = new EntryComparator(false, true, sortBy[1], comp);
             comp = new EntryComparator(false, true, sortBy[0], comp);
             EntrySorter sInMem = inMem.getSorter(comp);
-            
+
             // Start looking at changes.
             scanPreamble(inMem, inTemp, onDisk);
             scanStrings(inMem, inTemp, onDisk);
@@ -99,7 +99,7 @@ public class ChangeScanner extends Thread {
                 public void run() {
                     ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, changes);
                     Util.placeDialog(dial, frame);
-                    dial.show();
+                    dial.setVisible(true); // dial.show(); -> deprecated since 1.5
                 }
             });
 
@@ -115,12 +115,12 @@ public class ChangeScanner extends Thread {
         // successive order from the beginning. Entries "further down" in the "disk" base
         // can also be matched.
         int piv1 = 0, piv2 = 0;
-        
+
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
         HashSet used = new HashSet(disk.getEntryCount());
         HashSet notMatched = new HashSet(tmp.getEntryCount());
-        
+
         // Loop through the entries of the "mem" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
@@ -139,7 +139,7 @@ public class ChangeScanner extends Thread {
                 piv2++;
                 continue mainLoop;
             }
-            
+
             // No? Then check if another entry matches exactly.
             if (piv2 < disk.getEntryCount()-1) {
                 for (int i = piv2+1; i < disk.getEntryCount(); i++) {
@@ -154,24 +154,24 @@ public class ChangeScanner extends Thread {
                     }
                 }
             }
-            
+
             // No? Add this entry to the list of nonmatched entries.
             notMatched.add(new Integer(piv1));
         }
-        
-        
+
+
         // Now we've found all exact matches, look through the remaining entries, looking
         // for close matches.
         if (notMatched.size() > 0) {
             //Util.pr("Could not find exact match for "+notMatched.size()+" entries.");
-            
+
             fuzzyLoop: for (Iterator it=notMatched.iterator(); it.hasNext();) {
 
                 Integer integ = (Integer)it.next();
                 piv1 = integ.intValue();
-                
+
                 //Util.printEntry(mem.getEntryAt(piv1));
-                
+
                 // These two variables will keep track of which entry most closely matches the
                 // one we're looking at, in case none matches completely.
                 int bestMatchI = -1;
@@ -203,14 +203,14 @@ public class ChangeScanner extends Thread {
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
                     disk.getEntryAt(bestMatchI));
                     changes.add(ec);
-                    
+
                     // Create an undo edit to represent this change:
                     //NamedCompound ce = new NamedCompound("Modified entry");
                     //ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(bestMatchI), panel));
                     //ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
                     //ce.end();
                     //changes.add(ce);
-                    
+
                     //System.out.println("Possible match for entry:");
                     //Util.printEntry(mem.getEntryAt(piv1));
                     //System.out.println("----------------------------------------------");
@@ -305,13 +305,13 @@ public class ChangeScanner extends Thread {
         HashSet used = new HashSet();
         HashSet usedInMem = new HashSet();
         HashSet notMatched = new HashSet(onTmp.getStringCount());
-        
+
         // First try to match by string names.
         //int piv2 = -1;
         mainLoop: for (Iterator i=onTmp.getStringKeySet().iterator(); i.hasNext();) {
             Object tmpId = i.next();
             BibtexString tmp = onTmp.getString(tmpId);
-            
+
             //      for (int j=piv2+1; j<nDisk; j++)
             for (Iterator j=onDisk.getStringKeySet().iterator(); j.hasNext();) {
                 Object diskId = j.next();
@@ -340,13 +340,13 @@ public class ChangeScanner extends Thread {
             // If we get here, there was no match for this string.
             notMatched.add(tmp.getId());
         }
-        
+
         // See if we can detect a name change for those entries that we couldn't match.
         if (notMatched.size() > 0) {
             for (Iterator i = notMatched.iterator(); i.hasNext(); ) {
                 Object nmId = i.next();
                 BibtexString tmp = onTmp.getString(nmId);
-                
+
                 // If we get to this point, we found no string with matching name. See if we
                 // can find one with matching content.
                 String tmpContent = tmp.getContent();
@@ -360,7 +360,7 @@ public class ChangeScanner extends Thread {
                         if (disk.getContent().equals(tmp.getContent())) {
                             // We have found a string with the same content. It cannot have the same
                             // name, or we would have found it above.
-                            
+
                             // Try to find the matching one in memory:
                             BibtexString bsMem = null;
                             findInMem: for (Iterator k=inMem.getStringKeySet().iterator(); k.hasNext();) {
@@ -400,7 +400,7 @@ public class ChangeScanner extends Thread {
         }
 
         //System.out.println(used.size());
-        
+
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.
         for (Iterator i=onDisk.getStringKeySet().iterator(); i.hasNext();) {
@@ -448,13 +448,13 @@ public class ChangeScanner extends Thread {
             return;
         changes.add(new GroupChange(groupsDisk));
         return;
-        
-//        
+
+//
 //        if (((vOnTmp == null) || (vOnTmp.size()==0)) && ((vOnDisk == null) || (vOnDisk.size()==0))) {
 //            // No groups defined in either the tmp or disk version.
 //            return;
 //        }
-//        
+//
 //        // To avoid checking for null all the time, make empty vectors to replace null refs. We clone
 //        // non-null vectors so we can remove the elements as we finish with them.
 //        if (vOnDisk == null)
@@ -469,7 +469,7 @@ public class ChangeScanner extends Thread {
 //            vInMem = new Vector(0);
 //        else
 //            vInMem = (Vector)vInMem.clone();
-//        
+//
 //        // If the tmp version has groups, iterate through these and compare with disk version:
 //        while (vOnTmp.size() >= 1) {
 //            AbstractGroup group = (AbstractGroup)vOnTmp.firstElement();
@@ -480,17 +480,17 @@ public class ChangeScanner extends Thread {
 //                changes.add(new GroupAddOrRemove(group, false));
 //            } else {
 //                AbstractGroup diskGroup = (AbstractGroup)vOnDisk.elementAt(pos);
-//                
+//
 //                if (!diskGroup.equals(group)) {
 //                    // Group has changed.
 //                    changes.add(new GroupChange(inMem, group, diskGroup));
 //                }
-//                
+//
 //                // Remove this group, since it's been accounted for.
 //                vOnDisk.remove(pos);
 //            }
 //        }
-//        
+//
 //        // If there are entries left in the disk version, these must have been added.
 //        while (vOnDisk.size() >= 1) {
 //            AbstractGroup group = (AbstractGroup)vOnDisk.firstElement();

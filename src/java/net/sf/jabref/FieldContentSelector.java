@@ -51,7 +51,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
     GridBagConstraints con = new GridBagConstraints();
     protected final MetaData m_metaData;
     protected final JabRefFrame m_frame;
-    protected final Window m_owner; 
+    protected final Window m_owner;
     protected final BasePanel m_panel;
     protected final AbstractAction m_action;
     protected final boolean m_horizontalLayout;
@@ -95,7 +95,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
     private void doInit() {
         setLayout(gbl);
         //list.setEditable(true);
-        
+
         list.setMaximumRowCount(35);
 
         /*
@@ -115,7 +115,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         list.addActionListener(this);
 
         add(list);
-        
+
         if (m_horizontalLayout)
             add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2,this)));
 
@@ -126,7 +126,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         manage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // m_owner is either a Frame or a Dialog
-                ContentSelectorDialog2 csd = m_owner instanceof Frame ? 
+                ContentSelectorDialog2 csd = m_owner instanceof Frame ?
                         new ContentSelectorDialog2(
                         (Frame) m_owner, m_frame, m_panel, true, m_metaData,
                         m_editor.getFieldName())
@@ -134,7 +134,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
                                 m_panel, true, m_metaData, m_editor
                                         .getFieldName());
                 Util.placeDialog(csd, m_frame);
-                csd.show();
+                csd.setVisible(true); // csd.show(); -> deprecated since 1.5
                 updateList();
             }
         });
@@ -197,7 +197,7 @@ public class FieldContentSelector extends JComponent implements ActionListener {
     /**
      * Adds a word to the selector (to the JList and to the MetaData), unless it
      * is already there
-     * 
+     *
      * @param newWord
      *            String Word to add
      */

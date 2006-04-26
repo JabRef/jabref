@@ -416,6 +416,8 @@ version=${jabref.version}</echo>
                 <unjar src="${library.directory}/glazedlists-1.5.0_java14.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
             <delete dir="${build.tmp}/META-INF"/>
+	    <!-- rename the microba license file -->
+	    <move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt"/>
         </target>
 
 

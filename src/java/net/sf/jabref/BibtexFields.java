@@ -36,10 +36,12 @@
 //
 // todo     : - handling of identically fields with different names
 //              e.g. LCCN = lib-congress
-//            - export/import of some definition from/to a xml file
 //            - group id for each fields, e.g. standard, jurabib, bio....
+//            - add a additional properties functionality into the
+//              BibtexSingleField class
 //
-// modified :
+// modified : r.nagel 25.04.2006
+//            export/import of some definition from/to a xml file
 
 package net.sf.jabref ;
 
@@ -390,9 +392,9 @@ public class BibtexFields
   private class BibtexSingleField
   {
     private static final int
-        STANDARD       = 0x01,  // is it a standard bibtex-field
-        PRIVATE        = 0x02,  // internal use
-        DISPLAYABLE    = 0x04,  // These fields will not be shown inside the source editor panel
+        STANDARD       = 0x01,  // it is a standard bibtex-field
+        PRIVATE        = 0x02,  // internal use, e.g. owner, timestamp
+        DISPLAYABLE    = 0x04,  // These fields cannot be shown inside the source editor panel
         WRITEABLE      = 0x08 ; // These fields will not be saved to the .bib file.
 
     // the fieldname

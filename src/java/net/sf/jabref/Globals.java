@@ -516,7 +516,7 @@ public class Globals {
       fc.setMode(FileDialog.SAVE);
     }
 
-    fc.show();
+    fc.setVisible(true); // fc.show(); -> deprecated since 1.5
 
     if (fc.getFile() != null) {
       Globals.prefs.put("workingDirectory", fc.getDirectory() + fc.getFile());

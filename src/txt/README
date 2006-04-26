@@ -80,7 +80,7 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.x     - Changed Paste fuction so timestamp and owner fields are updated.
+2.x     - Changed Paste function so timestamp and owner fields are updated.
         - Added "Other" item to the "New entry ..." menu.
         - TODO: font size stuff after upgrading JGoodies Looks.
         - TODO: HTML handling for IEEEXplore.

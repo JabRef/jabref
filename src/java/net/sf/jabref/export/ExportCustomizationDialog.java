@@ -39,7 +39,7 @@ public class ExportCustomizationDialog extends JDialog {
     addExport.addActionListener(new ActionListener() {
      public void actionPerformed(ActionEvent e) {
        CustomExportDialog ecd = new CustomExportDialog(frame);
-       ecd.show();
+       ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
        if (ecd.okPressed()) {
          String[] newFormat = new String[] {ecd.name(), ecd.layoutFile(), ecd.extension() };
          Globals.prefs.customExports.addFormat(newFormat);
@@ -56,7 +56,7 @@ public class ExportCustomizationDialog extends JDialog {
         if (row == -1) return;
        String[] old = Globals.prefs.customExports.getElementAt(row);
        CustomExportDialog ecd = new CustomExportDialog(frame, old[0], old[1], old[2]);
-       ecd.show();
+       ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
        if (ecd.okPressed()) {
          old[0] = ecd.name();
          old[1] = ecd.layoutFile();
