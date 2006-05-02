@@ -43,7 +43,6 @@ public class MetaData {
      * it has been passed.
      */
     public MetaData(HashMap inData, BibtexDatabase db) {
-        this();
         boolean groupsTreePresent = false;
         Vector flatGroupsData = null;
         Vector treeGroupsData = null;
@@ -92,6 +91,13 @@ public class MetaData {
      * The MetaData object can be constructed with no data in it.
      */
     public MetaData() {
+
+    }
+
+    /**
+     * Add default metadata for new database:
+     */
+    public void initializeNewDatabase() {
         metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector());
         metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector());
         metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector());
@@ -173,7 +179,7 @@ public class MetaData {
             String key = (String) i.next();
             StringBuffer sb = new StringBuffer();
             Vector orderedData = (Vector) metaData.get(key);
-            if (orderedData.size() > 0) {
+            if (orderedData.size() >= 0) {
                 sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
                 for (int j = 0; j < orderedData.size(); j++) {
                     sb.append(Util.quote((String) orderedData.elementAt(j), ";", '\\')).append(";");

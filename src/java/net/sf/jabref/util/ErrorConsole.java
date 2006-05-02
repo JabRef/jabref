@@ -22,7 +22,8 @@ import java.awt.event.ActionEvent;
  */
 public class ErrorConsole {
 
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    ByteArrayOutputStream errByteStream = new ByteArrayOutputStream();
+    ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
     private static ErrorConsole instance = null;
 
 
@@ -34,25 +35,43 @@ public class ErrorConsole {
     }
 
     private ErrorConsole() {
-        PrintStream myErr = new PrintStream(byteStream);
-        PrintStream tee = new TeeStream(System.out, myErr);
+        PrintStream myErr = new PrintStream(errByteStream);
+        PrintStream tee = new TeeStream(System.err, myErr);
         System.setErr(tee);
+        myErr = new PrintStream(outByteStream);
+        tee = new TeeStream(System.out, myErr);
+        System.setOut(tee);
     }
 
     public String getErrorMessages() {
-        return byteStream.toString();
+        return errByteStream.toString();
+    }
+
+    public String getOutput() {
+        return outByteStream.toString();
     }
 
     public void displayErrorConsole(JFrame parent) {
-        JTextArea ta = new JTextArea(getErrorMessages());
+        JTabbedPane tabbed = new JTabbedPane();
+        JTextArea ta = new JTextArea(getOutput());
+        ta.setEditable(false);
+        JScrollPane sp = new JScrollPane(ta);
+        tabbed.addTab(Globals.lang("Output"), sp);
+
+        ta = new JTextArea(getErrorMessages());
         ta.setEditable(false);
         if (ta.getText().length() == 0) {
             ta.setText(Globals.lang("No exceptions have ocurred."));
         }
-        JScrollPane sp = new JScrollPane(ta);
-        sp.setPreferredSize(new Dimension(500,500));
-        JOptionPane.showMessageDialog(parent,  sp,
-                Globals.lang("Error messages"), JOptionPane.ERROR_MESSAGE);
+        sp = new JScrollPane(ta);
+
+        tabbed.addTab(Globals.lang("Exceptions"), sp);
+
+
+        tabbed.setPreferredSize(new Dimension(500,500));
+
+        JOptionPane.showMessageDialog(parent,  tabbed,
+                Globals.lang("Program output"), JOptionPane.ERROR_MESSAGE);
     }
 
     class ErrorConsoleAction extends AbstractAction {

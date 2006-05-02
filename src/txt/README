@@ -92,6 +92,7 @@ Change log:
         - Medline and Endnote imports no longer automatically add curly braces around capital
           letters in title.
         - Float search now scrolls table to the top.
+        - Fixed problem with default content selector fields reappearing after removal.
         - Fixed problem with unsupported character encodings being selectable and causing
           unreported save errors.
         - Fixed bug that blocked last line in table columns setup from being removed.

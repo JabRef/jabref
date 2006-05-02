@@ -88,46 +88,47 @@ public class LatexFieldFormatter implements FieldFormatter {
     // jan # { - } # feb
     checkBraces(text);
 
-    while (pivot < text.length()) {
-        int goFrom = pivot;
-        pos1 = pivot;
-        while (goFrom == pos1) {
-        pos1 = text.indexOf('#',goFrom);
-        if ((pos1 > 0) && (text.charAt(pos1-1) == '\\')) {
-            goFrom = pos1+1;
-            pos1++;
-        } else
-            goFrom = pos1-1; // Ends the loop.
-        }
 
-        if (pos1 == -1) {
-        pos1 = text.length(); // No more occurences found.
-        pos2 = -1;
-        } else {
-        pos2 = text.indexOf('#',pos1+1);
-        //System.out.println("pos2:"+pos2);
-        if (pos2 == -1) {
-            throw new IllegalArgumentException
-            (Globals.lang("The # character is not allowed in BibTeX fields")+".\n"+
-             Globals.lang("In JabRef, use pairs of # characters to indicate "
-                      +"a string.")+"\n"+
-             Globals.lang("Note that the entry causing the problem has been selected."));
-        }
-        }
+        while (pivot < text.length()) {
+            int goFrom = pivot;
+            pos1 = pivot;
+            while (goFrom == pos1) {
+                pos1 = text.indexOf('#', goFrom);
+                if ((pos1 > 0) && (text.charAt(pos1 - 1) == '\\')) {
+                    goFrom = pos1 + 1;
+                    pos1++;
+                } else
+                    goFrom = pos1 - 1; // Ends the loop.
+            }
 
-        if (pos1 > pivot)
-        writeText(text, pivot, pos1);
-        if ((pos1 < text.length()) && (pos2-1 > pos1))
-        // We check that the string label is not empty. That means
-        // an occurence of ## will simply be ignored. Should it instead
-        // cause an error message?
-        writeStringLabel(text, pos1+1, pos2, (pos1 == pivot),
-                 (pos2+1 == text.length()));
+            if (pos1 == -1) {
+                pos1 = text.length(); // No more occurences found.
+                pos2 = -1;
+            } else {
+                pos2 = text.indexOf('#', pos1 + 1);
+                //System.out.println("pos2:"+pos2);
+                if (pos2 == -1) {
+                    throw new IllegalArgumentException
+                            (Globals.lang("The # character is not allowed in BibTeX fields") + ".\n" +
+                                    Globals.lang("In JabRef, use pairs of # characters to indicate "
+                                            + "a string.") + "\n" +
+                                    Globals.lang("Note that the entry causing the problem has been selected."));
+                }
+            }
 
-        if (pos2 > -1) pivot = pos2+1;
-        else pivot = pos1+1;
-        //if (tell++ > 10) System.exit(0);
-    }
+            if (pos1 > pivot)
+                writeText(text, pivot, pos1);
+            if ((pos1 < text.length()) && (pos2 - 1 > pos1))
+                // We check that the string label is not empty. That means
+                // an occurence of ## will simply be ignored. Should it instead
+                // cause an error message?
+                writeStringLabel(text, pos1 + 1, pos2, (pos1 == pivot),
+                        (pos2 + 1 == text.length()));
+
+            if (pos2 > -1) pivot = pos2 + 1;
+            else pivot = pos1 + 1;
+            //if (tell++ > 10) System.exit(0);
+        }
 
         if (!Globals.prefs.isNonWrappableField(fieldName))
             return Util.wrap2(sb.toString(), GUIGlobals.LINE_LENGTH);

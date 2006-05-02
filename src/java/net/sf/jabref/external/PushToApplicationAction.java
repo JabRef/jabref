@@ -25,7 +25,8 @@ public class PushToApplicationAction extends AbstractAction implements Runnable 
         putValue(SMALL_ICON, operation.getIcon());
         putValue(NAME, operation.getName());
         putValue(SHORT_DESCRIPTION, operation.getTooltip());
-        putValue(ACCELERATOR_KEY, Globals.prefs.getKey(operation.getKeyStrokeName()));
+        if (operation.getKeyStrokeName() != null)
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey(operation.getKeyStrokeName()));
         this.operation = operation;
     }
 

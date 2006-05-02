@@ -1636,7 +1636,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
         BibtexDatabase database = new BibtexDatabase();
-        addTab(database, null, new HashMap(), Globals.prefs.get("defaultEncoding"), true);
+        addTab(database, null, null, Globals.prefs.get("defaultEncoding"), true);
         output(Globals.lang("New database created."));
     }
   }

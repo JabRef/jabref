@@ -33,12 +33,13 @@ import java.util.Comparator;
  */
 public class MainTable extends JTable {
     private MainTableFormat tableFormat;
-    private SortedList sortedForTable, sortedForSearch, sortedForGrouping;
+    private SortedList sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
     private boolean tableColorCodes, showingFloatSearch=false, showingFloatGrouping=false;
     private EventSelectionModel selectionModel;
     private TableComparatorChooser comparatorChooser;
     private JScrollPane pane;
-    private Comparator searchComparator, groupComparator;
+    private Comparator searchComparator, groupComparator,
+            markingComparator = new IsMarkedComparator();
     private Matcher searchMatcher, groupMatcher;
     public static final int REQUIRED = 1
     ,
@@ -56,8 +57,10 @@ public class MainTable extends JTable {
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selctions:
         sortedForTable = new SortedList(list, null);
+        // This SortedList applies afterwards, and floats marked entries:
+        sortedForMarking = new SortedList(sortedForTable, null);
         // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList(sortedForTable, null);
+        sortedForSearch = new SortedList(sortedForMarking, null);
         // This SortedList applies afterwards, and can float grouping hits:
         sortedForGrouping = new SortedList(sortedForSearch, null);
 
@@ -92,6 +95,9 @@ public class MainTable extends JTable {
     }
 
     public void refreshSorting() {
+        sortedForMarking.getReadWriteLock().writeLock().lock();
+        sortedForMarking.setComparator(markingComparator);
+        sortedForMarking.getReadWriteLock().writeLock().unlock();
         sortedForSearch.getReadWriteLock().writeLock().lock();
         sortedForSearch.setComparator(searchComparator);
         sortedForSearch.getReadWriteLock().writeLock().unlock();

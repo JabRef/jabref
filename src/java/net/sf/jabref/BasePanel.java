@@ -162,6 +162,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       this.sidePaneManager = Globals.sidePaneManager;
       database = new BibtexDatabase();
       metaData = new MetaData();
+        metaData.initializeNewDatabase();
       this.frame = frame;
       setupActions();
       setupMainPanel();
@@ -180,8 +181,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       database = db;
       if (meta != null)
         parseMetaData(meta);
-      else
+      else {
         metaData = new MetaData();
+        metaData.initializeNewDatabase();   
+      }
       setupActions();
       setupMainPanel();
       /*if (Globals.prefs.getBoolean("autoComplete")) {

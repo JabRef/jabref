@@ -176,6 +176,7 @@ public class BibtexFields
     add(dummy) ;
 
     dummy = new BibtexSingleField( TIMESTAMP, false, GUIGlobals.SMALL_W ) ;
+    dummy.setExtras("datepicker");
     dummy.setPrivate();
     add(dummy) ;
 
