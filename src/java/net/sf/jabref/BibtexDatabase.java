@@ -333,16 +333,6 @@ public class BibtexDatabase
         return false;
     }
 
-   /**
-    * If the label represents a string contained in this database, returns
-    * that string's content. Resolves references to other strings, taking
-    * care not to follow a circular reference pattern.
-    * If the string is undefined, returns the label itself.
-    */
-    public String resolveString(String label) {
-        return resolveString(label, new HashSet());
-    }
-
     /**
      * Resolves any references to strings contained in this database,
      * if possible.
@@ -351,8 +341,13 @@ public class BibtexDatabase
         return resolveContent(content, new HashSet());
     }
 
+    /**
+    * If the label represents a string contained in this database, returns
+    * that string's content. Resolves references to other strings, taking
+    * care not to follow a circular reference pattern.
+    * If the string is undefined, returns the label itself.
+    */
     private String resolveString(String label, HashSet usedIds) {
-
         for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
             BibtexString string = (BibtexString)_strings.get(i.next());
 
@@ -399,6 +394,7 @@ public class BibtexDatabase
             StringBuffer newRes = new StringBuffer();
             int piv = 0, next = 0;
             while ((next=res.indexOf("#", piv)) >= 0) {
+
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0)
@@ -408,9 +404,27 @@ public class BibtexDatabase
                     // We found the boundaries of the string ref,
                     // now resolve that one.
                     String refLabel = res.substring(next+1, stringEnd);
-                    newRes.append(resolveString(refLabel, usedIds));
+                    String resolved = resolveString(refLabel, usedIds);
+                    if (refLabel.equals(resolved)) {
+                        // We got just the label in return, so this may not have
+                        // been intended as a string label, or it may be a label for
+                        // an undefined string. Therefore we prefer to display the #
+                        // characters rather than removing them:
+                        newRes.append(res.substring(next, stringEnd+1));
+                    } else
+                        // The string was resolved, so we display its meaning only,
+                        // stripping the # characters signifying the string label:
+                        newRes.append(resolved);
+                    piv = stringEnd+1;
+                } else {
+                    // We didn't find the boundaries of the string ref. This
+                    // makes it impossible to interpret it as a string label.
+                    // So we should just append the rest of the text and finish.
+                    newRes.append(res.substring(next));
+                    piv = res.length();
+                    break;
                 }
-                piv = stringEnd+1;
+
             }
             if (piv < res.length()-1)
                 newRes.append(res.substring(piv));

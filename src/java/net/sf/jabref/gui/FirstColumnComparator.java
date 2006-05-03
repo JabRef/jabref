@@ -21,11 +21,11 @@ public class FirstColumnComparator implements Comparator {
 
         int score1=0, score2=0;
 
-        if (Util.isMarked(e1))
-            score1 -= 2;
+        //if (Util.isMarked(e1))
+        //    score1 -= 2;
 
-        if (Util.isMarked(e2))
-            score2 -= 2;
+        //if (Util.isMarked(e2))
+        //    score2 -= 2;
 
         if (e1.hasAllRequiredFields())
             score1++;

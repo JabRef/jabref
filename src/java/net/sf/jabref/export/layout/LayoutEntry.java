@@ -436,10 +436,13 @@ public class LayoutEntry
     // changed section end - arudert
     
     private String getField(BibtexEntry bibtex, String field, BibtexDatabase database) {
+
       String res = (String)bibtex.getField(field);
-	    if ((res != null) && (database != null))
-		res = database.resolveForStrings(res);
-	    return res;
+        
+        if ((res != null) && (database != null))
+        res = database.resolveForStrings(res);
+
+        return res;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
