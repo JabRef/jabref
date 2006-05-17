@@ -20,7 +20,7 @@ public class SplashScreen extends Window {
     
     public SplashScreen(Frame owner) {
         super(owner);
-        URL imageURL = SplashScreen.class.getResource("/images/jabref-2.0-splash.png");
+        URL imageURL = SplashScreen.class.getResource("/images/splash-2.1beta.png");
         splashImage = Toolkit.getDefaultToolkit().createImage(imageURL);
 
         // Load the image

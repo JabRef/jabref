@@ -46,6 +46,9 @@ public class RightClickMenu extends JPopupMenu
         groupRemoveMenu = new JMenu(Globals.lang("Remove from group")),
         groupMoveMenu = new JMenu("Assign exclusively to group"), // JZTODO lyrics
         typeMenu = new JMenu(Globals.lang("Change entry type"));
+    JCheckBoxMenuItem
+        floatMarked = new JCheckBoxMenuItem(Globals.lang("Float marked entries"),
+            Globals.prefs.getBoolean("floatMarkedEntries"));
 
     public RightClickMenu(BasePanel panel_, MetaData metaData_) {
         panel = panel_;
@@ -187,6 +190,13 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
+
+        floatMarked.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Globals.prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
+                panel.mainTable.refreshSorting(); // Bad remote access
+            }
+        });
     }
 
     /**
@@ -235,6 +245,10 @@ public class RightClickMenu extends JPopupMenu
       insertNodes(groupAddMenu,metaData.getGroups(),bes,true,false);
       insertNodes(groupMoveMenu,metaData.getGroups(),bes,true,true);
       insertNodes(groupRemoveMenu,metaData.getGroups(),bes,false,false);
+
+        addSeparator();
+        floatMarked.setSelected(Globals.prefs.getBoolean("floatMarkedEntries"));
+        add(floatMarked);
     }
 
     /**

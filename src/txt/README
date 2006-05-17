@@ -1,6 +1,6 @@
 
-JabRef 2.x
-------------
+JabRef 2.1 beta
+---------------
 
 
 Introduction:
@@ -80,10 +80,14 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.x     - Changed Paste function so timestamp and owner fields are updated.
+2.1??   - Added option to toggle floating of marked entries to the top of the table.
+2.1b    - Known issue: font sizes cannot be changed, but should follow OS settings on
+          Windows and Mac.
+        - Known issue: some HTML may be handled inappropriately when downloading from
+          IEEEXplore.
+        - Changed Paste function so timestamp and owner fields are updated.
         - Added "Other" item to the "New entry ..." menu.
-        - TODO: font size stuff after upgrading JGoodies Looks.
-        - TODO: HTML handling for IEEEXplore.
+        - Changed sorting order so marked entries are displayed at the top of the table.
         - Added IEEEXplore search and download feature.
         - Added option to store entries in their original order. Unsorted table view now
           shows entries in their original order.
@@ -92,6 +96,7 @@ Change log:
         - Medline and Endnote imports no longer automatically add curly braces around capital
           letters in title.
         - Float search now scrolls table to the top.
+        - Fixed lockup problem in preview with uneven number of # characters in fields.
         - Fixed problem with default content selector fields reappearing after removal.
         - Fixed problem with unsupported character encodings being selectable and causing
           unreported save errors.

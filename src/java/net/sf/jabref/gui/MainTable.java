@@ -96,7 +96,10 @@ public class MainTable extends JTable {
 
     public void refreshSorting() {
         sortedForMarking.getReadWriteLock().writeLock().lock();
-        sortedForMarking.setComparator(markingComparator);
+        if (Globals.prefs.getBoolean("floatMarkedEntries"))
+            sortedForMarking.setComparator(markingComparator);
+        else
+            sortedForMarking.setComparator(null);
         sortedForMarking.getReadWriteLock().writeLock().unlock();
         sortedForSearch.getReadWriteLock().writeLock().lock();
         sortedForSearch.setComparator(searchComparator);

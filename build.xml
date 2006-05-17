@@ -115,6 +115,7 @@
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin-1.4.jar" />
             <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+            <pathelement location="${library.directory}/microba.jar" />
         </classpath>
          </java>
     </target>

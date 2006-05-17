@@ -15,7 +15,7 @@ import net.sf.jabref.gui.ColorSetupPanel;
 class TablePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc,
+    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked,
     pdfColumn, urlColumn, citeseerColumn;
     private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames, lastNamesOnly;
     private JComboBox
@@ -51,6 +51,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
+
+        floatMarked = new JCheckBox(Globals.lang("Float marked entries"));
 
         priField = new JTextField(10);
         secField = new JTextField(10);
@@ -148,6 +150,9 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     builder.append(pan);
     builder.append(builder2.getPanel());
     builder.nextLine();
+    builder.append(pan);
+    builder.append(floatMarked);
+    builder.nextLine();
     builder.appendSeparator(Globals.lang("General"));
     builder.append(pan); builder.append(autoResizeMode); builder.nextLine();
 
@@ -196,6 +201,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
     secDesc.setSelected(_prefs.getBoolean("secDescending"));
     terDesc.setSelected(_prefs.getBoolean("terDescending"));
 
+        floatMarked.setSelected(_prefs.getBoolean("floatMarkedEntries"));
+
         abbrNames.setEnabled(!namesNatbib.isSelected());
         lastNamesOnly.setEnabled(!namesNatbib.isSelected());
         noAbbrNames.setEnabled(!namesNatbib.isSelected());
@@ -229,6 +236,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         _prefs.put("priSort", priField.getText().toLowerCase().trim());
         _prefs.put("secSort", secField.getText().toLowerCase().trim());
         _prefs.put("terSort", terField.getText().toLowerCase().trim());
+
+        _prefs.putBoolean("floatMarkedEntries", floatMarked.isSelected());
     // updatefont
     }
 

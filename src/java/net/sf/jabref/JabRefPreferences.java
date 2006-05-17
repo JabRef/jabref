@@ -297,8 +297,9 @@ public class JabRefPreferences {
 
         defaults.put("personalJournalList", null);
         defaults.put("externalJournalLists", null);
-
         defaults.put("citeCommand", "cite");
+        defaults.put("floatMarkedEntries", Boolean.TRUE);
+        
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 
@@ -728,7 +729,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Synchronize PS", "ctrl F4");
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
-
+        defKeyBinds.put("Search IEEXplore", "F8");
+        
         //defKeyBinds.put("Select value", "ctrl B");
     }
 

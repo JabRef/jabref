@@ -88,9 +88,10 @@ public class EndnoteImporter extends ImportFormat {
         Type = "";
         Editor = "";
         boolean IsEditedBook = false;
-        String[] fields = entries[i].substring(1).split("\n%");
+        String[] fields = entries[i].trim().substring(1).split("\n%");
         //String lastPrefix = "";
         for (int j = 0; j < fields.length; j++){
+
         if (fields[j].length() < 3) continue;
 
         /*
@@ -107,7 +108,9 @@ public class EndnoteImporter extends ImportFormat {
            */
 
         String prefix = fields[j].substring(0, 1);
+
         String val = fields[j].substring(2);
+
         if (prefix.equals("A")){
             if (Author.equals("")) Author = val;
             else Author += " and " + val;
