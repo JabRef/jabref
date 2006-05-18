@@ -24,32 +24,42 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        File fileToOpen = null;
+        List filesToOpen = new ArrayList();
+        //File fileToOpen = null;
 
         if (showDialog) {
 
-            String chosenFile = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")), ".bib",
+            String[] chosen = Globals.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+                    true);
+            if (chosen != null) for (int i=0; i<chosen.length; i++)
+                filesToOpen.add(new File(chosen[i]));
+
+            /*
+            String chosenFile = Globals.getNewFile(frame,
+                    new File(Globals.prefs.get("workingDirectory")), ".bib",
                     JFileChooser.OPEN_DIALOG, true);
 
             if (chosenFile != null) {
                 fileToOpen = new File(chosenFile);
-            }
+            }*/
         } else {
             Util.pr(NAME);
             Util.pr(e.getActionCommand());
-            fileToOpen = new File(Util.checkName(e.getActionCommand()));
+            filesToOpen.add(new File(Util.checkName(e.getActionCommand())));
         }
 
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
-        if (fileToOpen != null) {
-            final File theFile = fileToOpen;
+        if (filesToOpen.size() > 0) {
+            final List theFiles = Collections.unmodifiableList(filesToOpen);
             (new Thread() {
                 public void run() {
-                    openIt(theFile, true);
+                    for (Iterator i=theFiles.iterator(); i.hasNext();)
+                        openIt((File)i.next(), true);
                 }
             }).start();
-            frame.getFileHistory().newFile(fileToOpen.getPath());
+            for (Iterator i=theFiles.iterator(); i.hasNext();)
+                frame.getFileHistory().newFile(((File)i.next()).getPath());
         }
     }
 

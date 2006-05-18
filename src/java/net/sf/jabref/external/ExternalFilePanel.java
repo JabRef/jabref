@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -119,7 +118,7 @@ public class ExternalFilePanel extends JPanel {
         }
 
         String chosenFile =
-                Globals.getNewFile(frame, Globals.prefs, new File(dir), "."+fieldName,
+                Globals.getNewFile(frame, new File(dir), "."+fieldName,
                         JFileChooser.OPEN_DIALOG, false);
 
         if (chosenFile != null) {

@@ -324,8 +324,8 @@ public class JabRefFrame
     public GroupSelector groupSelector;
 
   // The menus for importing/appending other formats
-  JMenu importMenu = subMenu("Import and append"),
-      importNewMenu = subMenu("Import"),
+  JMenu importMenu = subMenu("Import into current database"),
+      importNewMenu = subMenu("Import into new database"),
       exportMenu = subMenu("Export"),
       customExportMenu = subMenu("Custom export"),
       newDatabaseMenu = subMenu("New database" );
@@ -2152,7 +2152,7 @@ class FetchCiteSeerAction
 
   public String getNewFile() {
 
-    return Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
+    return Globals.getNewFile(ths, new File(prefs.get("workingDirectory")),
                               null, JFileChooser.OPEN_DIALOG, false);
 
     /*JFileChooser fc;
@@ -2232,7 +2232,7 @@ class FetchCiteSeerAction
               //    must provide a Reader for the layout definition.
               // 2. The preferred extension for the layout format.
               // 3. The name of the file to use.
-              final String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")),
+              final String chosenFile = Globals.getNewFile(ths, new File(prefs.get("workingDirectory")),
                       extension, JFileChooser.SAVE_DIALOG, false);
               final String exportName = lfFileName;
               if (chosenFile == null)
@@ -2405,8 +2405,8 @@ class SaveSessionAction
       // 2. The preferred extension for the layout format.
       // 3. The name of the file to use.
       File outFile;
-      String chosenFile = Globals.getNewFile(ths, prefs,
-                                             new File(prefs.get("workingDirectory")),
+      String chosenFile = Globals.getNewFile(ths,
+              new File(prefs.get("workingDirectory")),
                                              extension,
                                              JFileChooser.SAVE_DIALOG, false);
 
@@ -2570,7 +2570,7 @@ class SaveSessionAction
             putValue(NAME, "Tab-separated file");
         }
         public void actionPerformed(ActionEvent e) {
-            String chosenFile = Globals.getNewFile(ths, prefs, new File(prefs.get("workingDirectory")), ".csv",
+            String chosenFile = Globals.getNewFile(ths, new File(prefs.get("workingDirectory")), ".csv",
                                                    JFileChooser.SAVE_DIALOG, true);
             if (chosenFile == null)
                 return;

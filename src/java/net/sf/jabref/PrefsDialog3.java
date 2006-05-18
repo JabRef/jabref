@@ -180,7 +180,7 @@ public class PrefsDialog3 extends JDialog {
     exportPrefs.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             String filename = Globals.getNewFile
-            (frame, _prefs, new File(System.getProperty("user.home")),
+            (frame, new File(System.getProperty("user.home")),
              ".xml", JFileChooser.SAVE_DIALOG, false);
             if (filename == null)
             return;
@@ -206,7 +206,7 @@ public class PrefsDialog3 extends JDialog {
     importPrefs.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             String filename = Globals.getNewFile
-            (frame, _prefs, new File(System.getProperty("user.home")),
+            (frame, new File(System.getProperty("user.home")),
              ".xml", JFileChooser.OPEN_DIALOG, false);
             if (filename == null)
             return;

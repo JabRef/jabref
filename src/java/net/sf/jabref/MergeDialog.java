@@ -28,7 +28,11 @@ public class MergeDialog extends JDialog {
 
   boolean okPressed = false;
 
-  public MergeDialog(JabRefFrame frame, String title, boolean modal) {
+    public boolean isOkPressed() {
+        return okPressed;
+    }
+
+    public MergeDialog(JabRefFrame frame, String title, boolean modal) {
     super(frame, title, modal);
     try {
       jbInit(frame);

@@ -25,10 +25,10 @@ public class BrowseAction extends AbstractAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String chosen = null;
         if (dir)
-            chosen = Globals.getNewDir(frame, Globals.prefs, new File(comp.getText()), Globals.NONE,
+            chosen = Globals.getNewDir(frame, new File(comp.getText()), Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);
         else
-            chosen = Globals.getNewFile(frame, Globals.prefs, new File(comp.getText()), Globals.NONE,
+            chosen = Globals.getNewFile(frame, new File(comp.getText()), Globals.NONE,
                     JFileChooser.OPEN_DIALOG, false);
         if (chosen != null) {
             File newFile = new File(chosen);

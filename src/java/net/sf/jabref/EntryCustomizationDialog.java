@@ -295,7 +295,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	exportTypes.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    String filename = Globals.getNewFile
-			(parent, Globals.prefs, new File(System.getProperty("user.home")), 
+			(parent, new File(System.getProperty("user.home")),
 			 ".txt", JFileChooser.SAVE_DIALOG, false);
 		    if (filename == null) 
 			return;
@@ -330,7 +330,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	importTypes.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    String filename = Globals.getNewFile
-			(parent, Globals.prefs, new File(System.getProperty("user.home")), 
+			(parent, new File(System.getProperty("user.home")),
 			 ".txt", JFileChooser.OPEN_DIALOG, false);
 		    if (filename == null) 
 			return;

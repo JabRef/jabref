@@ -37,7 +37,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener,
     	java.util.List entries = null;
     	boolean fileOk = false;
     	public void init() {
-  	    filename = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")),
+  	    filename = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
           importer.getExtensions(), JFileChooser.OPEN_DIALOG, false);
   	    if ((filename != null) && !(new File(filename)).exists()) {
       		JOptionPane.showMessageDialog(frame, Globals.lang("File not found")+": '"+filename+"'",

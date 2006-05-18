@@ -45,8 +45,6 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
-import com.michaelbaranov.microba.calendar.*;
-import com.michaelbaranov.microba.common.*;
 import net.sf.jabref.gui.date.*;
 
 public class EntryEditor extends JPanel implements VetoableChangeListener {
@@ -382,7 +380,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
               dir = prefs.get(fieldName + Globals.FILETYPE_PREFS_EXT, "");
 
             String chosenFile =
-              Globals.getNewFile(frame, prefs, new File(dir), "." + fieldName,
+              Globals.getNewFile(frame, new File(dir), "." + fieldName,
                 JFileChooser.OPEN_DIALOG, false);
 
             if (chosenFile != null) {

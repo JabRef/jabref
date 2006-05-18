@@ -33,7 +33,6 @@ import java.util.logging.* ;
 import java.util.logging.Filter ;
 
 import java.awt.* ;
-import java.nio.charset.Charset;
 import javax.swing.* ;
 
 import net.sf.jabref.collab.* ;
@@ -369,49 +368,55 @@ public class Globals {
     /*    public static void setupKeyBindings(JabRefPreferences prefs) {
     }*/
 
-  public static String getNewFile(JFrame owner, JabRefPreferences prefs,
+
+    public static String[] getMultipleFiles(JFrame owner,
+                                          File directory, String extension,
+                                          boolean updateWorkingdirectory) {
+
+        OpenFileFilter off = null;
+        if (extension == null)
+          off = new OpenFileFilter();
+        else if (!extension.equals(NONE))
+          off = new OpenFileFilter(extension);
+        return (String[])getNewFileImpl(owner, directory, extension, null, off,
+                JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true);
+    }
+
+  public static String getNewFile(JFrame owner,
                                   File directory, String extension,
                                   int dialogType,
                                   boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, null, dialogType,
+    return getNewFile(owner, directory, extension, null, dialogType,
                       updateWorkingDirectory, false);
   }
 
 
-  public static String getNewFile(JFrame owner, JabRefPreferences prefs,
+  public static String getNewFile(JFrame owner,
                                   File directory, String extension,
                                   String description,
                                   int dialogType,
                                   boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, description, dialogType,
+    return getNewFile(owner, directory, extension, description, dialogType,
                       updateWorkingDirectory, false);
   }
 
 
-  public static String getNewFile(JFrame owner, JabRefPreferences prefs,
-                                  File directory, String extension, OpenFileFilter off,
-                                  int dialogType,
-                                  boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, null, off, dialogType,
-                      updateWorkingDirectory, false);
-  }
-
-  public static String getNewDir(JFrame owner, JabRefPreferences prefs,
+  public static String getNewDir(JFrame owner,
                                  File directory, String extension,
                                  int dialogType, boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, null, dialogType,
+    return getNewFile(owner, directory, extension, null, dialogType,
                       updateWorkingDirectory, true);
   }
 
-  public static String getNewDir(JFrame owner, JabRefPreferences prefs,
+  public static String getNewDir(JFrame owner,
                                  File directory, String extension,
                                  String description,
                                  int dialogType, boolean updateWorkingDirectory) {
-    return getNewFile(owner, prefs, directory, extension, description, dialogType,
+    return getNewFile(owner, directory, extension, description, dialogType,
                       updateWorkingDirectory, true);
   }
 
-  private static String getNewFile(JFrame owner, JabRefPreferences prefs,
+  private static String getNewFile(JFrame owner,
                                    File directory, String extension,
                                    String description,
                                    int dialogType,
@@ -425,76 +430,88 @@ public class Globals {
     else if (!extension.equals(NONE))
       off = new OpenFileFilter(extension);
 
-    return getNewFile(owner, prefs, directory, extension, description, off, dialogType, updateWorkingDirectory, dirOnly);
+    return (String)getNewFileImpl(owner, directory, extension, description, off,
+            dialogType, updateWorkingDirectory, dirOnly, false);
   }
 
-  private static String getNewFile(JFrame owner, JabRefPreferences prefs,
-                                   File directory, String extension,
-                                   String description,
-                                   OpenFileFilter off,
-                                   int dialogType,
-                                   boolean updateWorkingDirectory,
-                                   boolean dirOnly) {
+  private static Object getNewFileImpl(JFrame owner,
+                                       File directory, String extension,
+                                       String description,
+                                       OpenFileFilter off,
+                                       int dialogType,
+                                       boolean updateWorkingDirectory,
+                                       boolean dirOnly,
+                                       boolean multipleSelection) {
 
-    if (ON_MAC) {
-      return getNewFileForMac(owner, directory, extension, dialogType,
-                              updateWorkingDirectory, dirOnly, off);
-    }
+      if (ON_MAC) {
+          return getNewFileForMac(owner, directory, extension, dialogType,
+                  updateWorkingDirectory, dirOnly, off);
+      }
 
-    JFileChooser fc = null;
-    try {
-        fc = new JabRefFileChooser(directory);
-    } catch (InternalError errl) {
-        // This try/catch clause was added because a user reported an
-        // InternalError getting thrown on WinNT, presumably because of a
-        // bug in JGoodies Windows PLAF. This clause can be removed if the
-        // bug is fixed, but for now we just resort to the native file
-        // dialog, using the same method as is always used on Mac:
-        return getNewFileForMac(owner, directory, extension, dialogType,
-                                updateWorkingDirectory, dirOnly, off);
-    }
+      JFileChooser fc = null;
+      try {
+          fc = new JabRefFileChooser(directory);
+      } catch (InternalError errl) {
+          // This try/catch clause was added because a user reported an
+          // InternalError getting thrown on WinNT, presumably because of a
+          // bug in JGoodies Windows PLAF. This clause can be removed if the
+          // bug is fixed, but for now we just resort to the native file
+          // dialog, using the same method as is always used on Mac:
+          return getNewFileForMac(owner, directory, extension, dialogType,
+                  updateWorkingDirectory, dirOnly, off);
+      }
 
-    if (dirOnly) {
-      fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      if (dirOnly) {
+          fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-    }
-    fc.addChoosableFileFilter(off);
-    fc.setDialogType(dialogType);
-    int dialogResult = JFileChooser.CANCEL_OPTION ;
-    if (dialogType == JFileChooser.OPEN_DIALOG) {
-      dialogResult = fc.showOpenDialog(owner);
-    }
-    else if (dialogType == JFileChooser.SAVE_DIALOG){
-      dialogResult = fc.showSaveDialog(owner);
-    }
-    else {
-      dialogResult = fc.showDialog(owner, description);
-    }
+      }
 
-     // the getSelectedFile method returns a valid fileselection
-     // (if something is selected) indepentently from dialog return status
-    if (dialogResult != JFileChooser.APPROVE_OPTION)
-      return null ;
+      fc.setMultiSelectionEnabled(multipleSelection);
 
-    // okay button
-    File selectedFile = fc.getSelectedFile();
-    if (selectedFile == null) { // cancel
-      return null;
-    }
+      fc.addChoosableFileFilter(off);
+      fc.setDialogType(dialogType);
+      int dialogResult = JFileChooser.CANCEL_OPTION;
+      if (dialogType == JFileChooser.OPEN_DIALOG) {
+          dialogResult = fc.showOpenDialog(owner);
+      } else if (dialogType == JFileChooser.SAVE_DIALOG) {
+          dialogResult = fc.showSaveDialog(owner);
+      } else {
+          dialogResult = fc.showDialog(owner, description);
+      }
 
-    // If this is a save dialog, and the user has not chosen "All files" as filter
-    // we enforce the given extension. But only if extension is not null.
-    if ((extension != null) && (dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
-        !off.accept(selectedFile)) {
+      // the getSelectedFile method returns a valid fileselection
+      // (if something is selected) indepentently from dialog return status
+      if (dialogResult != JFileChooser.APPROVE_OPTION)
+          return null;
 
-      // add the first extension if there are multiple extensions
-      selectedFile = new File(selectedFile.getPath() + extension.split("[, ]+",0)[0]);
-    }
+      // okay button
+      File selectedFile = fc.getSelectedFile();
+      if (selectedFile == null) { // cancel
+          return null;
+      }
 
-    if (updateWorkingDirectory) {
-      prefs.put("workingDirectory", selectedFile.getPath());
-    }
-    return selectedFile.getAbsolutePath();
+      // If this is a save dialog, and the user has not chosen "All files" as filter
+      // we enforce the given extension. But only if extension is not null.
+      if ((extension != null) && (dialogType == JFileChooser.SAVE_DIALOG) && (fc.getFileFilter() == off) &&
+              !off.accept(selectedFile)) {
+
+          // add the first extension if there are multiple extensions
+          selectedFile = new File(selectedFile.getPath() + extension.split("[, ]+", 0)[0]);
+      }
+
+      if (updateWorkingDirectory) {
+          prefs.put("workingDirectory", selectedFile.getPath());
+      }
+
+      if (!multipleSelection)
+        return selectedFile.getAbsolutePath();
+      else {
+          File[] files = fc.getSelectedFiles();
+          String[] filenames = new String[files.length];
+          for (int i=0; i<files.length; i++)
+            filenames[i] = files[i].getAbsolutePath();
+          return filenames;
+      }
   }
 
   private static String getNewFileForMac(JFrame owner,

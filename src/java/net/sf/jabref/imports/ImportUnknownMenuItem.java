@@ -81,7 +81,8 @@ public class ImportUnknownMenuItem extends JMenuItem implements ActionListener,
             if (!openInNew) {
                 BasePanel panel = (BasePanel)frame.getTabbedPane().getSelectedComponent();
                 try {
-                    panel.mergeFromBibtex(bibtexResult, true, true, false, false);
+                    AppendDatabaseAction.mergeFromBibtex(frame, panel,
+                            bibtexResult, true, true, false, false);
                     frame.output(Globals.lang("Imported from database")+" '"+filename+"'");
                 } catch (KeyCollisionException e) {
                     e.printStackTrace();

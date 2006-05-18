@@ -34,7 +34,6 @@ import java.io.File;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
 
 /**
  * Dialog for creating or modifying custom exports.
@@ -42,20 +41,20 @@ import net.sf.jabref.GUIGlobals;
 class CustomExportDialog extends JDialog {
 
     JTextField
-	name = new JTextField(60),
-	layoutFile = new JTextField(60),
-	extension = new JTextField(60);
+    name = new JTextField(60),
+    layoutFile = new JTextField(60),
+    extension = new JTextField(60);
     JLabel
-	nl = new JLabel(Globals.lang("Export name")+":"),
-	nr = new JLabel(Globals.lang("Main layout file")+":"),
-	nf = new JLabel(Globals.lang("File extension")+":");
+    nl = new JLabel(Globals.lang("Export name")+":"),
+    nr = new JLabel(Globals.lang("Main layout file")+":"),
+    nf = new JLabel(Globals.lang("File extension")+":");
     JButton
         ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel")),
         browse = new JButton(Globals.lang("Browse"));
     JPanel
-	main = new JPanel(),
-	opt = new JPanel();
+    main = new JPanel(),
+    opt = new JPanel();
     private boolean ok_pressed = false;
     private Vector groups;
     private int index;
@@ -76,69 +75,69 @@ class CustomExportDialog extends JDialog {
 
 
     public CustomExportDialog(JabRefFrame parent_) {
-	super(parent_, Globals.lang("Edit custom export"), true);
-	parent = parent_;
-	//groups = groups_;
-	//index = index_;
-	/*if (index >= 0) {
-	    // Group entry already exists.
-	    try {
-		oldField = (String)groups.elementAt(index);
-		field.setText(oldField);
-		oldName = (String)groups.elementAt(index+1);
-		name.setText(oldName);
-		oldRegexp = (String)groups.elementAt(index+2);
-		regexp.setText(oldRegexp);
+    super(parent_, Globals.lang("Edit custom export"), true);
+    parent = parent_;
+    //groups = groups_;
+    //index = index_;
+    /*if (index >= 0) {
+            // Group entry already exists.
+            try {
+            oldField = (String)groups.elementAt(index);
+            field.setText(oldField);
+            oldName = (String)groups.elementAt(index+1);
+            name.setText(oldName);
+            oldRegexp = (String)groups.elementAt(index+2);
+            regexp.setText(oldRegexp);
 
-		// We disable these text fields, since changing field
-		// or regexp would leave the entries added to the
-		// group hanging.
-		field.setEnabled(false);
-		regexp.setEnabled(false);
-	    } catch (ArrayIndexOutOfBoundsException ex) {
-	    }
-	} else
-	    field.setText(defaultField);
-*/
-	ActionListener okListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+            // We disable these text fields, since changing field
+            // or regexp would leave the entries added to the
+            // group hanging.
+            field.setEnabled(false);
+            regexp.setEnabled(false);
+            } catch (ArrayIndexOutOfBoundsException ex) {
+            }
+        } else
+            field.setText(defaultField);
+    */
+    ActionListener okListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
 
-		    // Check that there are no empty strings.
-		    if ((layoutFile.getText().equals("")) ||
-			(name.getText().equals("")) ||
-			(extension.getText().equals("")) ||
+            // Check that there are no empty strings.
+            if ((layoutFile.getText().equals("")) ||
+            (name.getText().equals("")) ||
+            (extension.getText().equals("")) ||
                         (!layoutFile.getText().endsWith(".layout"))) {
-			//JOptionPane.showMessageDialog
-			//    (parent, Globals.lang("You must provide a name, a search "
-			//			  +"string and a field name for this group."),
-			//			  Globals.lang("Create group"),
-			//     JOptionPane.ERROR_MESSAGE);
-			return;
-		    }
+            //JOptionPane.showMessageDialog
+            //    (parent, Globals.lang("You must provide a name, a search "
+            //			  +"string and a field name for this group."),
+            //			  Globals.lang("Create group"),
+            //     JOptionPane.ERROR_MESSAGE);
+            return;
+            }
 
-		    // Handling of : and ; must also be done.
+            // Handling of : and ; must also be done.
 
-		    ok_pressed = true;
-		    dispose();
-		}
-	    };
-	ok.addActionListener(okListener);
-	name.addActionListener(okListener);
-	layoutFile.addActionListener(okListener);
-	extension.addActionListener(okListener);
+            ok_pressed = true;
+            dispose();
+        }
+        };
+    ok.addActionListener(okListener);
+    name.addActionListener(okListener);
+    layoutFile.addActionListener(okListener);
+    extension.addActionListener(okListener);
 
-	AbstractAction cancelAction = new AbstractAction() {
+    AbstractAction cancelAction = new AbstractAction() {
           public void actionPerformed(ActionEvent e) {
               dispose();
-		}
-	    };
+        }
+        };
 
-	cancel.addActionListener(cancelAction);
+    cancel.addActionListener(cancelAction);
 
         browse.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             File directory = new File(Globals.prefs.get("exportWorkingDirectory"));
-            String chosenStr = Globals.getNewFile(parent, Globals.prefs, directory, ".layout",
+            String chosenStr = Globals.getNewFile(parent, directory, ".layout",
                                              JFileChooser.OPEN_DIALOG, false);
             if (chosenStr == null) return;
             File chosen = new File(chosenStr);
@@ -154,45 +153,45 @@ class CustomExportDialog extends JDialog {
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(parent.prefs().getKey("Close dialog"), "close");
-	am.put("close", cancelAction);
+    am.put("close", cancelAction);
 
 
-	// Layout starts here.
-	main.setLayout(gbl);
-	//opt.setLayout(gbl);
-	main.setBorder(BorderFactory.createTitledBorder
-		       (BorderFactory.createEtchedBorder(),
-			Globals.lang("Export properties")));
+    // Layout starts here.
+    main.setLayout(gbl);
+    //opt.setLayout(gbl);
+    main.setBorder(BorderFactory.createTitledBorder
+               (BorderFactory.createEtchedBorder(),
+            Globals.lang("Export properties")));
 
-	// Main panel:
-	con.weightx = 0;
-	con.gridwidth = 1;
-	con.insets = new Insets(3, 5, 3, 5);
-	con.anchor = GridBagConstraints.EAST;
-	con.fill = GridBagConstraints.NONE;
-	con.gridx = 0;
-	con.gridy = 0;
-	gbl.setConstraints(nl, con);
-	main.add(nl);
-	con.gridy = 1;
-	gbl.setConstraints(nr, con);
-	main.add(nr);
-	con.gridy = 2;
-	gbl.setConstraints(nf, con);
-	main.add(nf);
+    // Main panel:
+    con.weightx = 0;
+    con.gridwidth = 1;
+    con.insets = new Insets(3, 5, 3, 5);
+    con.anchor = GridBagConstraints.EAST;
+    con.fill = GridBagConstraints.NONE;
+    con.gridx = 0;
+    con.gridy = 0;
+    gbl.setConstraints(nl, con);
+    main.add(nl);
+    con.gridy = 1;
+    gbl.setConstraints(nr, con);
+    main.add(nr);
+    con.gridy = 2;
+    gbl.setConstraints(nf, con);
+    main.add(nf);
 
         con.gridwidth = 2;
         con.weightx = 1;
-	con.anchor = GridBagConstraints.WEST;
-	con.fill = GridBagConstraints.HORIZONTAL;
-	con.gridy = 0;
-	con.gridx = 1;
-	gbl.setConstraints(name, con);
-	main.add(name);
-	con.gridy = 1;
+    con.anchor = GridBagConstraints.WEST;
+    con.fill = GridBagConstraints.HORIZONTAL;
+    con.gridy = 0;
+    con.gridx = 1;
+    gbl.setConstraints(name, con);
+    main.add(name);
+    con.gridy = 1;
         con.gridwidth = 1;
         gbl.setConstraints(layoutFile, con);
-	main.add(layoutFile);
+    main.add(layoutFile);
         con.gridx = 2;
         con.weightx = 0;
         gbl.setConstraints(browse, con);
@@ -200,35 +199,35 @@ class CustomExportDialog extends JDialog {
         con.weightx = 1;
         con.gridwidth = 2;
         con.gridx = 1;
-	con.gridy = 2;
-	gbl.setConstraints(extension, con);
-	main.add(extension);
+    con.gridy = 2;
+    gbl.setConstraints(extension, con);
+    main.add(extension);
 
-       	// Option buttons:
-	con.gridx = GridBagConstraints.RELATIVE;
-	con.gridy = GridBagConstraints.RELATIVE;
-	con.weightx = 1;
-	con.gridwidth = 1;
-	con.anchor = GridBagConstraints.EAST;
-	con.fill = GridBagConstraints.NONE;
-	//gbl.setConstraints(ok, con);
-	opt.add(ok);
-	con.anchor = GridBagConstraints.WEST;
-	con.gridwidth = GridBagConstraints.REMAINDER;
-	//gbl.setConstraints(cancel, con);
-	opt.add(cancel);
+           // Option buttons:
+    con.gridx = GridBagConstraints.RELATIVE;
+    con.gridy = GridBagConstraints.RELATIVE;
+    con.weightx = 1;
+    con.gridwidth = 1;
+    con.anchor = GridBagConstraints.EAST;
+    con.fill = GridBagConstraints.NONE;
+    //gbl.setConstraints(ok, con);
+    opt.add(ok);
+    con.anchor = GridBagConstraints.WEST;
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    //gbl.setConstraints(cancel, con);
+    opt.add(cancel);
 
-	getContentPane().add(main, BorderLayout.CENTER);
-	getContentPane().add(opt, BorderLayout.SOUTH);
+    getContentPane().add(main, BorderLayout.CENTER);
+    getContentPane().add(opt, BorderLayout.SOUTH);
 
-	//pack();
-	setSize(600, 170);
+    //pack();
+    setSize(600, 170);
 
         Util.placeDialog(this, parent);
     }
 
     public boolean okPressed() {
-	return ok_pressed;
+    return ok_pressed;
     }
 
     public int index() { return index; }

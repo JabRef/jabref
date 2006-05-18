@@ -387,7 +387,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("saveAs", new BaseAction () {
                 public void action() throws Throwable {
 
-                  String chosenFile = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")), ".bib",
+                  String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                                                          JFileChooser.SAVE_DIALOG, false);
 
                   if (chosenFile != null) {
@@ -419,7 +419,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("saveSelectedAs", new BaseAction () {
                 public void action() throws Throwable {
 
-                  String chosenFile = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")), ".bib",
+                  String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                                                          JFileChooser.SAVE_DIALOG, false);
                   if (chosenFile != null) {
                     File expFile = new File(chosenFile);
@@ -927,57 +927,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
             });
 
-          actions.put("mergeDatabase", new BaseAction() {
-            public void action() {
-
-                final MergeDialog md = new MergeDialog(frame, Globals.lang("Append database"), true);
-                Util.placeDialog(md, BasePanel.this);
-                md.setVisible(true);
-                if (md.okPressed) {
-                  String chosenFile = Globals.getNewFile(frame, Globals.prefs, new File(Globals.prefs.get("workingDirectory")),
-                                                         null, JFileChooser.OPEN_DIALOG, false);
-                  /*JFileChooser chooser = (Globals.prefs.get("workingDirectory") == null) ?
-                      new JabRefFileChooser((File)null) :
-                      new JabRefFileChooser(new File(Globals.prefs.get("workingDirectory")));
-                  chooser.addChoosableFileFilter( new OpenFileFilter() );//nb nov2
-                  int returnVal = chooser.showOpenDialog(BasePanel.this);*/
-                  if(chosenFile == null)
-                    return;
-                  fileToOpen = new File(chosenFile);
-
-                    // Run the actual open in a thread to prevent the program
-                    // locking until the file is loaded.
-                    (new Thread() {
-                        public void run() {
-                            openIt(md.importEntries(), md.importStrings(),
-                                    md.importGroups(), md.importSelectorWords());
-                        }
-                    }).start();
-                    frame.getFileHistory().newFile(fileToOpen.getPath());
-                }
-
-              }
-
-              void openIt(boolean importEntries, boolean importStrings,
-                          boolean importGroups, boolean importSelectorWords) {
-                if ((fileToOpen != null) && (fileToOpen.exists())) {
-                  try {
-                    Globals.prefs.put("workingDirectory", fileToOpen.getPath());
-                    // Should this be done _after_ we know it was successfully opened?
-                    String encoding = Globals.prefs.get("defaultEncoding");
-                    ParserResult pr = OpenDatabaseAction.loadDatabase(fileToOpen, encoding);
-                    mergeFromBibtex(pr, importEntries, importStrings, importGroups, importSelectorWords);
-                    output(Globals.lang("Imported from database")+" '"+fileToOpen.getPath()+"'");
-                    fileToOpen = null;
-                  } catch (Throwable ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog
-                        (BasePanel.this, ex.getMessage(),
-                         "Open database", JOptionPane.ERROR_MESSAGE);
-                  }
-                }
-              }
-            });
+          actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 
          actions.put("openFile", new BaseAction() {
            public void action() {
@@ -1555,100 +1505,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-        public void mergeFromBibtex(ParserResult pr,
-                                    boolean importEntries, boolean importStrings,
-                                    boolean importGroups, boolean importSelectorWords)
-                throws KeyCollisionException {
-
-            BibtexDatabase fromDatabase = pr.getDatabase();
-            ArrayList appendedEntries = new ArrayList();
-            ArrayList originalEntries = new ArrayList();
-            BibtexEntry originalEntry;
-            NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
-            MetaData meta = new MetaData(pr.getMetaData(), pr.getDatabase());
-
-            if (importEntries) { // Add entries
-                Iterator i = fromDatabase.getKeySet().iterator();
-                while (i.hasNext()) {
-                    originalEntry = fromDatabase.getEntryById((String) i.next());
-                    BibtexEntry be = (BibtexEntry) (originalEntry.clone());
-                    be.setId(Util.createNeutralId());
-                    database.insertEntry(be);
-                    appendedEntries.add(be);
-                    originalEntries.add(originalEntry);
-                    ce.addEdit(new UndoableInsertEntry(database, be, this));
-                }
-            }
-
-            if (importStrings) {
-                BibtexString bs;
-                int pos = 0;
-                Iterator i = fromDatabase.getStringKeySet().iterator();
-                for (; i.hasNext();) {
-                    bs = (BibtexString) (fromDatabase.getString(i.next()).clone());
-                    if (!database.hasStringLabel(bs.getName())) {
-                        //pos = toDatabase.getStringCount();
-                        database.addString(bs);
-                        ce.addEdit(new UndoableInsertString(this, database, bs));
-                    }
-                }
-            }
-
-            if (importGroups) {
-                GroupTreeNode newGroups = meta.getGroups();
-                if (newGroups != null) {
-
-                    // ensure that there is always only one AllEntriesGroup
-                    if (newGroups.getGroup() instanceof AllEntriesGroup) {
-                        // create a dummy group
-                        ExplicitGroup group = new ExplicitGroup("Imported",
-                                AbstractGroup.INDEPENDENT); // JZTODO lyrics
-                        newGroups.setGroup(group);
-                        for (int i = 0; i < appendedEntries.size(); ++i)
-                            group.addEntry((BibtexEntry) appendedEntries.get(i));
-                    }
-
-                    // groupsSelector is always created, even when no groups
-                    // have been defined. therefore, no check for null is
-                    // required here
-                    frame.groupSelector.addGroups(newGroups, ce);
-                    // for explicit groups, the entries copied to the mother fromDatabase have to
-                    // be "reassigned", i.e. the old reference is removed and the reference
-                    // to the new fromDatabase is added.
-                    GroupTreeNode node;
-                    ExplicitGroup group;
-                    BibtexEntry entry;
-                    for (Enumeration e = newGroups.preorderEnumeration(); e.hasMoreElements();) {
-                        node = (GroupTreeNode) e.nextElement();
-                        if (!(node.getGroup() instanceof ExplicitGroup))
-                            continue;
-                        group = (ExplicitGroup) node.getGroup();
-                        for (int i = 0; i < originalEntries.size(); ++i) {
-                            entry = (BibtexEntry) originalEntries.get(i);
-                            if (group.contains(entry)) {
-                                group.removeEntry(entry);
-                                group.addEntry((BibtexEntry) appendedEntries.get(i));
-                            }
-                        }
-                    }
-                    frame.groupSelector.revalidateGroups();
-                }
-            }
-
-            if (importSelectorWords) {
-                Iterator i = meta.iterator();
-                while (i.hasNext()) {
-                    String s = (String) i.next();
-                    if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-                        metaData().putData(s, meta.getData(s));
-                    }
-                }
-            }
-
-            ce.end();
-            undoManager.addEdit(ce);
-            markBaseChanged();
-        }
 
 
     /**
@@ -2542,4 +2398,5 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public GroupSelector getGroupSelector() {
         return frame.groupSelector;
     }
+
 }
