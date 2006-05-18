@@ -180,8 +180,8 @@ public class EndnoteImporter extends ImportFormat {
         }
 
         //fixauthorscomma
-        if (!Author.equals("")) hm.put("author", AuthorList.fixAuthor_lastNameFirst(Author));
-        if (!Editor.equals("")) hm.put("editor", AuthorList.fixAuthor_lastNameFirst(Editor));
+        if (!Author.equals("")) hm.put("author", fixAuthor(Author));
+        if (!Editor.equals("")) hm.put("editor", fixAuthor(Editor));
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here
@@ -192,6 +192,28 @@ public class EndnoteImporter extends ImportFormat {
     }
     return bibitems;
 
+    }
+
+    /**
+     * We must be careful about the author names, since they can be presented differently
+     * by different sources. Normally each %A tag brings one name, and we get the authors
+     * separated by " and ". This is the correct behaviour.
+     * One source lists the names separated by comma, with a comma at the end. We can detect
+     * this format and fix it.
+     * @param s The author string
+     * @return The fixed author string
+     */
+    private String fixAuthor(String s) {
+        int index = s.indexOf(" and ");
+        if (index >= 0)
+            return AuthorList.fixAuthor_lastNameFirst(s);
+        // Look for the comma at the end:
+        index = s.lastIndexOf(",");
+        if (index == s.length()-1) {
+            String mod = s.substring(0, s.length()-1).replaceAll(", ", " and ");
+            return AuthorList.fixAuthor_lastNameFirst(mod);
+        } else
+            return AuthorList.fixAuthor_lastNameFirst(s);
     }
 
 }
