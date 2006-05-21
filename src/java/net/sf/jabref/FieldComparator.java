@@ -46,7 +46,8 @@ public class FieldComparator implements Comparator {
 		        f1 = AuthorList.fixAuthorForAlphabetization((String)f1);
 	        if (f2 != null)
 		        f2 = AuthorList.fixAuthorForAlphabetization((String)f2);
-	    }
+            //System.out.println(".. "+f1);
+        }
         else if (isTypeHeader) {
           // Sort by type.
           f1 = e1.getType().getName();
@@ -58,7 +59,7 @@ public class FieldComparator implements Comparator {
 	    if (f1 == null) return multiplier;
 
 	    int result = 0;
-
+        //System.out.println(f1);
 	    if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
 		    result = -(((Integer) f1).compareTo((Integer) f2));
 	    } else if (f2 instanceof Integer) {
@@ -70,7 +71,8 @@ public class FieldComparator implements Comparator {
     	} else {
     		String ours = ((String) f1).toLowerCase(),
     	    	theirs = ((String) f2).toLowerCase();
-    		result = ours.compareTo(theirs);
+            //System.out.println(ours);
+            result = ours.compareTo(theirs);
     	}
 
         return result*multiplier;

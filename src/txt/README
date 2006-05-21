@@ -81,7 +81,7 @@ appear in your chosen languages.
 
 Change log:
 2.1??   - Added option to toggle floating of marked entries to the top of the table.
-        - Added option to open/append multiple BibTeX files.
+        - Added option to open, append and import multiple BibTeX files.
 2.1b    - Known issue: font sizes cannot be changed, but should follow OS settings on
           Windows and Mac.
         - Known issue: some HTML may be handled inappropriately when downloading from

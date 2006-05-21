@@ -41,11 +41,15 @@ public class MainTable extends JTable {
     private Comparator searchComparator, groupComparator,
             markingComparator = new IsMarkedComparator();
     private Matcher searchMatcher, groupMatcher;
-    public static final int REQUIRED = 1
-    ,
-    OPTIONAL = 2
-    ,
-    OTHER = 3;
+
+    // Constants used to define how a cell should be rendered.
+    public static final int REQUIRED = 1, OPTIONAL = 2,
+      REQ_STRING = 1,
+      REQ_NUMBER = 2,
+      OPT_STRING = 3,
+      OTHER = 3,
+      BOOLEAN = 4,
+      ICON_COL = 8; // Constant to indicate that an icon cell renderer should be used.
 
     static {
         updateRenderers();
@@ -205,11 +209,11 @@ public class MainTable extends JTable {
             }
         }
         else if (tableColorCodes) {
-            if (status == EntryTableModel.REQUIRED)
+            if (status == REQUIRED)
                 renderer = reqRenderer;
-            else if (status == EntryTableModel.OPTIONAL)
+            else if (status == OPTIONAL)
                 renderer = optRenderer;
-            else if (status == EntryTableModel.BOOLEAN)
+            else if (status == BOOLEAN)
                 renderer = getDefaultRenderer(Boolean.class);
         }
 

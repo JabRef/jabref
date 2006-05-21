@@ -28,7 +28,6 @@ import java.awt.event.InputEvent;
 
 import javax.swing.*;
 
-import net.sf.jabref.EntryTable;
 import net.sf.jabref.gui.MainTable;
 
 public class EntryTableTransferHandler extends TransferHandler {

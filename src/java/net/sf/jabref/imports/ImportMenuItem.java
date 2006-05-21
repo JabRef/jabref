@@ -22,6 +22,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     MyWorker worker = null;
     ImportFormat importer;
 
+    public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
+        this(frame, openInNew, null);
+    }
+
     public ImportMenuItem(JabRefFrame frame, boolean openInNew, ImportFormat importer) {
         super(importer != null ? importer.getFormatName()
                 : Globals.lang("Autodetect format"));

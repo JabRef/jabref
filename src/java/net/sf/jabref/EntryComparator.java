@@ -94,18 +94,20 @@ public class EntryComparator implements Comparator {
     // sorted according to last name.
     if (sortField.equals("author") || sortField.equals("editor")) {
         if (f1 != null)
-        f1 = AuthorList.fixAuthorForAlphabetization((String)f1);
+        f1 = AuthorList.fixAuthorForAlphabetization((String)f1).toLowerCase();
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
         if (f2 != null)
-        f2 = AuthorList.fixAuthorForAlphabetization((String)f2);
+        f2 = AuthorList.fixAuthorForAlphabetization((String)f2).toLowerCase();
                 //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
+
     } else if (sortField.equals(GUIGlobals.TYPE_HEADER)) {
           // Sort by type.
           f1 = e1.getType().getName();
           f2 = e2.getType().getName();
         }
 
-	if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+
+    if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
 	if ((f1 != null) && (f2 == null)) return -1;
 	if ((f1 == null) && (f2 != null)) return 1;
 
@@ -122,9 +124,10 @@ public class EntryComparator implements Comparator {
 		Integer f2AsInteger = new Integer(f2.toString());
 		result = -(((Integer) f1).compareTo(f2AsInteger));
 	} else {
-		String ours = ((String) f1).toLowerCase(),
+        String ours = ((String) f1).toLowerCase(),
 	    	theirs = ((String) f2).toLowerCase();
-		int comp = ours.compareTo(theirs);
+        System.out.println(ours);
+        int comp = ours.compareTo(theirs);
 		result = -comp;
 	}
 	if (result != 0)

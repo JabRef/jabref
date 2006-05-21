@@ -984,26 +984,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        //Util.pr("EntryEditor.StoreFieldAction: "+entry.getCiteKey());
-        //Util.pr("..EntryEditor.StoreFieldAction: "+this.toString());
 
       if (e.getSource() instanceof FieldTextArea) {
         String toSet = null;
         FieldEditor fe = (FieldEditor) e.getSource();
         boolean set;
-          //Util.pr("....EntryEditor.StoreFieldAction: "+fe.getFieldName());
-        //Util.pr("...."+fe.getText()+"....");
         // Trim the whitespace off this value
         fe.setText(fe.getText().trim());
 
         if (fe.getText().length() > 0) {
           toSet = fe.getText();
-
-          // We check if the field has changed, since we don't want to
-          // mark the
-          // base as changed unless we have a real change.
         }
 
+
+        // We check if the field has changed, since we don't want to
+        // mark the
+        // base as changed unless we have a real change.
         if (toSet == null) {
           if (entry.getField(fe.getFieldName()) == null)
             set = false;
@@ -1047,6 +1043,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 oldValue, toSet));
             updateSource();
             panel.markBaseChanged();
+
+              // TODO: is this a safe solution to keep selection on entry?
+              SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                      panel.highlightEntry(entry);
+                  }
+              });
+
+
           } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage(),
               Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);

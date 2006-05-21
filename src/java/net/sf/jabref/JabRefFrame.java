@@ -2113,7 +2113,7 @@ class FetchCiteSeerAction
       importMenu.removeAll();
 
       // Add a menu item for autodetecting import format:
-      importMenu.add(new ImportMenuItem(ths, intoNew, null));
+      importMenu.add(new ImportMenuItem(ths, intoNew));
 
       // Add custom importers
       importMenu.addSeparator();
