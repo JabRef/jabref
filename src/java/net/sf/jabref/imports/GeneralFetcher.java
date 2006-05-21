@@ -101,6 +101,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     class FetcherAction extends AbstractAction {
         public FetcherAction() {
             super(fetcher.getTitle(), new ImageIcon(fetcher.getIcon()));
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey(fetcher.getKeyName()));
         }
         public void actionPerformed(ActionEvent e) {
             sidePaneManager.add(fetcher.getTitle(), GeneralFetcher.this);

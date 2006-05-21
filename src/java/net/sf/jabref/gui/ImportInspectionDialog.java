@@ -229,7 +229,7 @@ public class ImportInspectionDialog extends JDialog {
      *
      * @param entries
      */
-    public void addEntries(List entries) {
+    public void addEntries(Collection entries) {
 
         for (Iterator i = entries.iterator(); i.hasNext();) {
             BibtexEntry entry = (BibtexEntry) i.next();

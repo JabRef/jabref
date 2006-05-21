@@ -2113,7 +2113,7 @@ class FetchCiteSeerAction
       importMenu.removeAll();
 
       // Add a menu item for autodetecting import format:
-      importMenu.add(new ImportUnknownMenuItem(ths, intoNew));
+      importMenu.add(new ImportMenuItem(ths, intoNew, null));
 
       // Add custom importers
       importMenu.addSeparator();
@@ -2128,7 +2128,7 @@ class FetchCiteSeerAction
         // Put in all formatters registered in ImportFormatReader:
         for (Iterator i=customImporters.iterator(); i.hasNext();) {
             ImportFormat imFo = (ImportFormat)i.next();
-            submenu.add(new ImportMenuItem(ths, imFo, intoNew));
+            submenu.add(new ImportMenuItem(ths, intoNew, imFo));
         }
       }
 
@@ -2138,41 +2138,10 @@ class FetchCiteSeerAction
       // Put in all formatters registered in ImportFormatReader:
       for (Iterator i=Globals.importFormatReader.getBuiltInInputFormats().iterator(); i.hasNext();) {
           ImportFormat imFo = (ImportFormat)i.next();
-          importMenu.add(new ImportMenuItem(ths, imFo, intoNew));
+          importMenu.add(new ImportMenuItem(ths, intoNew, imFo));
       }
   }
 
-
-  //
-  // simply opens up a jfilechooser dialog and gets a filename
-  // returns null if user selects cancel
-  // it should also do a check perhaps to see if
-  // file exists and is readable?
-  //
-
-  public String getNewFile() {
-
-    return Globals.getNewFile(ths, new File(prefs.get("workingDirectory")),
-                              null, JFileChooser.OPEN_DIALOG, false);
-
-    /*JFileChooser fc;
-    if (prefs.get("workingDirectory") == null) {
-      fc = new JabRefFileChooser(new File(System.getProperty("user.home"))); //cwd));
-    }
-    else {
-      fc = new JabRefFileChooser(new File(prefs.get("workingDirectory"))); //cwd));
-    }
-
-    fc.addChoosableFileFilter(new OpenFileFilter());
-    fc.setDialogType(JFileChooser.OPEN_DIALOG);
-    fc.showOpenDialog(null);
-    File selectedFile = fc.getSelectedFile();
-    if (selectedFile == null) { // cancel
-      return null;
-    }
-    prefs.put("workingDirectory", selectedFile.getPath());
-    return selectedFile.getAbsolutePath();*/
-  }
 
     public FileHistory getFileHistory() {
         return fileHistory;

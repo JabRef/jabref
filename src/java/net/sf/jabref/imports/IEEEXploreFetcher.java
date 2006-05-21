@@ -91,9 +91,12 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     }
 
     public String getHelpPage() {
-        return null;
+        return "IEEEXplorerHelp.html";
     }
 
+    public String getKeyName() {
+        return "Search IEEXplore";
+    }
 
     // This method is called by the dialog when the user has cancelled the import.
     public void cancelled() {
@@ -104,8 +107,8 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 // wanted entries, and clicked Ok. The callback object can update status
 // line etc.
     public void done(int entriesImported) {
-        System.out.println("Number of entries parsed: "+parsed);
-        System.out.println("Parsing failed for "+unparseable+" entries");
+        //System.out.println("Number of entries parsed: "+parsed);
+        //System.out.println("Parsing failed for "+unparseable+" entries");
     }
 
     // This method is called by the dialog when the user has cancelled or
@@ -159,8 +162,8 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             //String page = getResultsFromFile(new File("/home/alver/div/temp50.txt"));
 
             //List entries = new ArrayList();
-            System.out.println("Number of hits: "+hits);
-            System.out.println("Maximum returned: "+maxHits);
+            //System.out.println("Number of hits: "+hits);
+            //System.out.println("Maximum returned: "+maxHits);
             if (hits > maxHits)
                 hits = maxHits;
             //parse(dialog, page, 0, 51);
@@ -168,7 +171,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             parse(dialog, page, 0, 1);
             int firstEntry = perPage;
             while (shouldContinue && (firstEntry < hits)) {
-                System.out.println("Fetching from: "+firstEntry);
+                //System.out.println("Fetching from: "+firstEntry);
                 address = makeUrl(firstEntry);
                 //System.out.println(address);
                 page = getResults(new URL(address));
@@ -334,8 +337,8 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 entry.setField("year", m.group(6));
 
             } else {
-                System.out.println("---no structure match---");
-                System.out.println(text);
+                System.err.println("---no structure match---");
+                System.err.println(text);
                 unparseable++;
             }
             int pgInd = text.indexOf("Page(s):");
@@ -402,7 +405,8 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             throw new IOException(Globals.lang("Could not parse number of hits"));
         String substring = page.substring(ind, Math.min(ind+42, page.length()));
         Matcher m = pattern.matcher(substring);
-        m.find();
+        if (!m.find())
+            return 0;
         if (m.groupCount() >= 1) {
             try {
                 return Integer.parseInt(m.group(1));
@@ -461,9 +465,9 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     public String fetchAbstract(String link) throws IOException {
         URL url = new URL(link);
         String page = getResults(url);
-        System.out.println(link);
+        //System.out.println(link);
 
-        System.out.println("Fetched abstract page.");
+        //System.out.println("Fetched abstract page.");
 
         String marker = "Abstract</span><br>";
         int index = page.indexOf(marker);
