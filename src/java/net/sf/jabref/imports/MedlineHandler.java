@@ -1,5 +1,8 @@
 package net.sf.jabref.imports;
 import java.util.ArrayList;
+import java.util.TreeSet;
+import java.util.Iterator;
+
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import net.sf.jabref.*;
@@ -49,7 +52,11 @@ public class MedlineHandler extends DefaultHandler
     String series="",editor="",booktitle="",type="article",key="",address="",
 		pubmedid="",doi="",pii="";
     ArrayList authors=new ArrayList();
+    TreeSet descriptors = new TreeSet(); // To gather keywords
     int rowNum=0;
+
+    private static final String KEYWORD_SEPARATOR = "; ";
+
     public ArrayList getItems(){ return bibitems;}
 
     public MedlineHandler(){
@@ -146,11 +153,14 @@ public class MedlineHandler extends DefaultHandler
 				}
 			}
 			
-			// Sort keywords and remove duplicates. Add pubmedid as keyword (user request)
-            StringBuffer sb = new StringBuffer(Util.sortWordsAndRemoveDuplicates(keywords));
-            if (sb.length()>0)
-                sb.append(", ");
-            sb.append(pubmedid);
+			// Build a string from the collected keywords:
+            StringBuffer sb = new StringBuffer();
+            for (Iterator iterator = descriptors.iterator(); iterator.hasNext();) {
+                String s = (String) iterator.next();
+                sb.append(s);
+                if (iterator.hasNext())
+                    sb.append(KEYWORD_SEPARATOR);
+            }
             keywords = sb.toString();
             
 			BibtexEntry b=new BibtexEntry(Util.createNeutralId(),//Globals.DEFAULT_BIBTEXENTRY_ID,
@@ -192,7 +202,7 @@ public class MedlineHandler extends DefaultHandler
 			title="";
 			journal="";
 			keywords ="";
-			doi=""; pii="";
+            doi=""; pii="";
 			year="";
 			forename="";
 			lastName="";
@@ -200,7 +210,8 @@ public class MedlineHandler extends DefaultHandler
 			pubmedid="";
 			month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
 			MedlineDate="";
-		}
+            descriptors.clear();
+        }
 
 		else if(localName.equals("ArticleTitle")){inTitle=false;}
 		else if(localName.equals("PubDate")){inPubDate=false;}
@@ -261,7 +272,9 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineID){medlineID += new String(data,start,length);}
 		else if(inURL){url += new String(data,start,length);}
 		else if(inPubMedID){pubmedid = new String(data,start,length);}
-		else if(inDescriptorName) keywords += new String(data,start,length) + ", ";
+		else if(inDescriptorName)
+            descriptors.add(new String(data,start,length));
+            //keywords += new String(data,start,length) + ", ";
 		else if(inForename){
 			forename += new String(data,start,length);
 			//System.out.println("IN FORENAME: " + forename);
