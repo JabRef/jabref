@@ -37,8 +37,7 @@ public class ToLowerCase implements LayoutFormatter
 
     public String format(String fieldText)
     {
-        String fieldEntry = fieldText.toLowerCase();
-       return fieldEntry;
+        return fieldText.toLowerCase();
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

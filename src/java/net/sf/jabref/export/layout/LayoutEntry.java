@@ -192,6 +192,7 @@ public class LayoutEntry
 
     public String doLayout(BibtexEntry bibtex, BibtexDatabase database)
     {
+
         if (type == LayoutHelper.IS_LAYOUT_TEXT)
         {
             return text;
@@ -207,6 +208,7 @@ public class LayoutEntry
 
             if (field == null)
             {
+
                 return null;
             }
             else
@@ -219,6 +221,8 @@ public class LayoutEntry
         else if ((type == LayoutHelper.IS_FIELD_START) ||
                 	(type == LayoutHelper.IS_GROUP_START))
         {
+
+
             String field = getField(bibtex, text, database);
             //String field = (String) bibtex.getField(text);
 
@@ -332,6 +336,7 @@ public class LayoutEntry
         //		else if (type == LayoutHelper.IS_OPTION_FIELD_PARAM)
         //		{
         //		}
+
         return "";
     }
 
@@ -437,8 +442,17 @@ public class LayoutEntry
     
     private String getField(BibtexEntry bibtex, String field, BibtexDatabase database) {
 
-      String res = (String)bibtex.getField(field);
-        
+        // Change: Morten Alver, May 23, 2006. Formatter argument uses this method to
+        // resolve field values. We need this part to resolve \bibtextype correctly in
+        // constructs like \format[ToLowerCase]{\bibtextype}:
+        if (field.equals("bibtextype"))
+        {
+            return bibtex.getType().getName();
+        }
+        // end change Morten Alver
+
+        String res = (String)bibtex.getField(field);
+
         if ((res != null) && (database != null))
         res = database.resolveForStrings(res);
 
