@@ -1,50 +1,349 @@
-<HTML>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//FR">
+<html><head></head>
 
-<BODY text="#275856">
+<body style="color: rgb(39, 88, 86);">
 <basefont size="4" color="#2F4958" face="arial">
 
-<H1>A propos de <em>BibTeX</em></H1>
+<h1>A propos de <em>BibTeX</em></h1>
+
 
 JabRef vous aide &agrave; travailler avec vos bases de donn&eacute;es <em>BibTeX</em>,
 mais certaines r&egrave;gles doivent &ecirc;tre gard&eacute;es &agrave; l'esprit lorsque vous
 &eacute;ditez vos entr&eacute;es afin le traitement correct de vos bases de donn&eacute;es par le programme <em>BibTeX</em>.
 
-<H2>Les champs <em>BibTeX</em></H2>
+
+<h2>Les champs <em>BibTeX</em></h2>
 
 Il y a un grand nombre de champs possibles dans <em>BibTeX</em>, et
 quelques champs en plus que vous pouvez param&eacute;trer dans JabRef.
-
-<P>
+<p>
 G&eacute;n&eacute;ralement, vous pouvez utiliser des commandes LaTeX &agrave; l'int&eacute;rieur
 de champs contenant du texte. <em>BibTeX</em> formatera automatiquement
 vos listes de r&eacute;f&eacute;rences et les champs qui sont inclus dans ces
 listes seront mis en majuscules/minuscules selon votre style bibliographique. Pour &ecirc;tre certain que certains caract&egrave;res restent en majuscules, encadrez-les
 par des accolades, comme dans le mot {B}elgique.
 
-<P>
+</p>
+
+
+
+<p>
 Notes &agrave; propos de certains types de champs&nbsp;:
+</p>
+
+
+
 <ul>
-<li><em>Author</em>&nbsp;: Ce champ doit contenir la liste compl&egrave;te
-des auteurs de votre entr&eacute;e. Les noms sont s&eacute;par&eacute;s par le mot
-<em>and</em> m&ecirc;me s'il y a plus de deux auteurs. Chaque nom peut
-&ecirc;tre &eacute;crit indiff&eacute;remment selon une des deux formes suivantes&nbsp;:<br>
- Donald E. Knuth <em>ou</em> Knuth, Donald E.<br>
- Eddie van Halen <em>ou</em> van Halen, Eddie<br>
 
-La seconde forme doit &ecirc;tre utilis&eacute;e pour les auteurs qui ont des noms
-compos&eacute;s (afin de diff&eacute;rencier entre pr&eacute;noms et noms).
- 
-<li><em>Editor</em>&nbsp;: Ce champ est analogue au champ <em>author</em>.
 
-<li><em>Year</em>&nbsp;: Ann&eacute;e de la publication. Ce champ est requis pour
-la plupart des types d'entr&eacute;es. 
 
-<li><em>Bibtexkey</em>&nbsp;: C'est une cha&icirc;ne unique utilis&eacute;e pour r&eacute;f&eacute;rencer
+<li><strong style="font-style: italic;">Bibtexkey</strong>
+C'est une cha&icirc;ne unique utilis&eacute;e pour r&eacute;f&eacute;rencer
 l'entr&eacute;e dans les documents LaTeX. Notez que lorsque vous r&eacute;f&eacute;rencez une entr&eacute;e
 dans LaTeX, la clef doit respecter la casse (majuscules/minuscules) de la cha&icirc;ne
 de r&eacute;f&eacute;rence.
+    <br>
+</li>
+
+  <li><strong>address<br>
+    </strong>Habituellement l'adresse de l'<tt>éditeur commercial</tt> ("publisher" en anglais) ou d'un autre type d'institution.
+Pour les principales maisons d'édition,
+van&nbsp;Leunen recommande d'omettre complètement cette information.
+Pour les petites maisons d'édition, d'un autre coté, vous pouvez aider le lecteur en donnant l'adresse complète.
+    <p>
+    </p>
+  </li>
+  <li><strong>annote<br>
+    </strong>Une annotation.
+Ce champ n'est pas utilisé par les styles bibliographiques standards, mais peut être utilisé par d'autres styles qui produisent une bibliographie annotée.
+    <p>
+    </p>
+  </li>
+  <li><strong>author<br>
+    </strong>Ce champ doit contenir la liste complète des auteurs de votre entrée. Les noms sont séparés par le mot <em>and</em>, même si il y a plus de deux auteurs. Chaque nom peut être écrit dans deux formes équivalentes&nbsp;:<br>
+
+ Donald E. Knuth <em>ou</em> Knuth, Donald E.<br>
+
+ Eddie van Halen <em>ou</em> van Halen, Eddie<br>
+
+La seconde forme devrait être utilisée pour les auteurs ayants plus de deux noms afin de différencier les seconds prénoms et les noms de famille [NDT: pas sur de la traduction...].
+<br>
+    <br>
+    <span style="font-weight: bold;"></span></li>
+  <li><span style="font-weight: bold;"></span><strong>booktitle<br>
+    </strong>Titre d'un libre, dont une partie est citée.
+Voir le "LaTeX book" pour la façon d'entrer les titres.
+Pour les entrées du type "book", utiliser le champ <tt>title</tt>.
+    <p>
+    </p>
+  </li>
+  <li><strong>chapter<br>
+    </strong>Un numéro de chapitre (ou de partie, ou d'autre chose).
+    <p>
+    </p>
+  </li>
+  <li><strong>crossref<br>
+    </strong>La clef de l'entrée vers laquelle on effectue le renvoi.
+    <p>
+    </p>
+  </li>
+  <li><strong>edition<br>
+    </strong>Le numéro d'édition d'un livre -- par exemple "Troisième".
+Cela doit être un nombre, et la première lettre doit être capitalisée, comme montré ici&nbsp;;
+Les styles standard la convertisse en minuscule si nécessaire.
+    <p>
+    </p>
+  </li>
+  <li><strong>editor<br>
+    </strong>Ce champ est analogue au champ <em>author</em>.
+S'il y a aussi un champ <tt>author</tt>, alors
+le champ <tt>editor</tt> fournit l'éditeur du livre ou de la collection
+dans lequel la référence apparaît.
+    <p>
+    </p>
+  </li>
+  <li><strong>howpublished<br>
+    </strong>Comment quelque chose de non-standard a été publiée.
+Le premier mot prend une majuscule.
+    <p>
+    </p>
+  </li>
+  <li><strong>institution<br>
+    </strong>L'institution ayant promue un rapport technique.
+    <p>
+    </p>
+  </li>
+  <li><strong>journal<br>
+    </strong>Un nom de journal.
+Les abréviations sont fournies pour beaucoup de journaux&nbsp;;
+voir le <i>Guide Local</i> [NdT: c'est quoi ce guide local ?].
+    <p>
+    </p>
+  </li>
+  <li><strong>key<br>
+    </strong>utilisé pour alphabétiser, renvoyer et créer une étiquette quand l'information sur "author" est manquante.
+Ce champ ne doit pas être confondu avec la clef qui fournit dans la commande
+    <code>\cite</code> et au début de l'entrée.
+    <p>
+    </p>
+  </li>
+  <li><strong>month<br>
+    </strong>Le mois au cours duquel le travail a été
+publié ou, pour un travail non publié, au cours duquel il a été écrit.
+Vous devriez utiliser l'abréviation standard à trois lettres, comme décrit dans l'annexe
+B.1.3 du LaTeX book.
+    <p>
+    </p>
+  </li>
+  <li><strong>note<br>
+    </strong>Toute information additionnelle qui peut aider le lecteur.
+Le premier mot doit prendre une majuscule.
+    <p>
+    </p>
+  </li>
+  <li><strong>number</strong><br>
+Le numéro d'un journal, d'un magazine, d'un rapport technique
+ou d'un travail dans une série.
+Les journaux et les magazines sont habituellement
+identifiés par leur volume et leur numéro&nbsp;;
+l'organisation qui publie un
+rapport technique lui donne en général un numéro&nbsp;;
+et parfois les livres portent des numéros
+lorsqu'ils appartiennent à une série nommée.
+    <p>
+    </p>
+  </li>
+  <li><strong>organization<br>
+    </strong>L'organisation ayant promue une conférence ou qui publie un manuel.
+    <p>
+    </p>
+  </li>
+  <li><strong>pages<br>
+    </strong>Un ou plusieurs numéros de page, ou une gamme de numéros,
+tel que <tt>42-111</tt> ou <tt>7,41,73-97</tt> ou <tt>43+</tt>
+(le `<tt>+</tt>' dans le dernier exemple indique des pages suivantes
+qui ne sont pas dans un ordre simple).
+Pour garder facilement la compatibilité avec les bases de données compatibles
+<em>Scribe</em>, les styles standards convertissent le tiret simple
+(comme dans <tt>7-33</tt>)
+en un tiret double utilisé par TeX pour définir une gamme de nombres
+(comme dans <tt>7-33</tt>).
+    <p>
+    </p>
+  </li>
+  <li><strong>publisher<br>
+    </strong>Le nom de l'éditeur commercial.
+    <p>
+    </p>
+  </li>
+  <li><strong>school<br>
+    </strong>Le nom de l'école où a été écrite une thèse.
+    <p>
+    </p>
+  </li>
+  <li><strong>series<br>
+    </strong>Le nom d'une série ou d'un ensemble de livres.
+Quand on cite un livre entier, le champ <tt>title</tt>
+donne son titre et le champ optionnel <tt>series</tt> donne le
+nom de la série ou de l'ensemble de volumes
+dans lequel le livre est publié.
+    <p>
+    </p>
+  </li>
+  <li><strong>title<br>
+    </strong>Le titre du travail, entré comme expliqué dans le LaTeX book.
+    <p>
+    </p>
+  </li>
+  <li><strong>type<br>
+    </strong>Le type de rapport technique -- par exemple,
+"Note de recherche".
+    <p>
+    </p>
+  </li>
+  <li><strong>volume<br>
+    </strong>Le volume d'un journal ou d'un livre en plusieurs tomes.
+    <p>
+    </p>
+  </li>
+  <li><strong>year<br>
+    </strong>L'année de publication ou, pour
+un travail non publié, l'année où il a été écrit.
+Généralement, elle doit prendre quatre chiffres, tel que <tt>1984</tt>,
+cependant les styles standards peuvent gérer toute valeur de <tt>year</tt>
+dont les quatre derniers caractères sont des chiffres (hors caractères de ponctuation),
+tel que `(autour de 1984)'. Ce champ est requis par la plupart des types d'entrées.
+</li>
+</ul>
+
+
+<br>
+
+
+<h2>Autres champs</h2>
+
+BibTeX est très populaire, et beaucoup de gens l'ont utilisé pour stocker
+des informations. Voici une liste de quelque uns des champs les plus communs&nbsp;:
+
+<dl>
+
+
+</dl>
+
+<ul>
+
+  <li><strong><span style="font-weight: normal; font-style: italic;">affiliation*</span><br>
+    </strong>L'affiliation des auteurs.<br>
+    <br>
+
+  </li>
+  <li><strong>abstract<br>
+    </strong>Le résumé d'un travail.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">contents*</span><br>
+    </strong>La table des matières<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">copyright*</span><br>
+    </strong>Informations sur les droits d'auteur (copyright).<br>
+    <br>
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">ISBN*</span><br>
+    </strong>L'"International Standard Book Number".<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">ISSN*</span><br>
+    </strong>L'"International Standard Serial Number".  Utilisé pour identifier un journal.<br>
+    <br>
+
+  </li>
+  <li><strong>keywords<br>
+    </strong>Mots-clefs utilisés pour la recherche, ou pour annotation.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">language*</span><br>
+    </strong>La langue du document.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">location*</span><br>
+    </strong>Une localisation associée avec l'entrée, telle que la ville où la conférence a eu lieu.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">LCCN*</span><br>
+    </strong>Le "Library of Congress Call Number".  Champ parfois nommé <tt>lib-congress</tt>.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">mrnumber*</span><br>
+    </strong>Le numéro de <i>Mathematical Reviews</i>.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">price*</span><br>
+    </strong>Le prix du document.<br>
+    <br>
+
+  </li>
+  <li><strong><span style="font-weight: normal; font-style: italic;">size*</span><br>
+    </strong>La taille physique d'un travail.<br>
+    <br>
+
+  </li>
+  <li><strong>URL<br>
+    </strong>Le "WWW Universal Resource Locator" (adresse URL)
+    qui pointe vers l'élément référencé.
+    C'est souvent utilisé pour les rapports techniques afin d'indiquer
+    le site ftp où la source postscript du rapport est localisée.
+  </li>
+</ul>
+
+<dl>
+
+
+</dl>
+
+
+
+
+
+
+<h3><br>
+</h3>
+
+
+
+<h3>JuraBib</h3>
+
+
+
+
+<ul>
+
+  <li><strong>urldate<br>
+    </strong>La date de la dernière visite de la page.</li>
 
 </ul>
 
 
-</HTML>
+<br>
+
+*) non supporté directement par JabRef<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+</body></html> 
