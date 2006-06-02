@@ -739,7 +739,8 @@ public class FileActions
             }
 
             List comparators = new ArrayList();
-            comparators.add(new CrossRefEntryComparator());
+            if (isSaveOperation)
+                comparators.add(new CrossRefEntryComparator());
             comparators.add(new FieldComparator(pri, priD));
             comparators.add(new FieldComparator(sec, secD));
             comparators.add(new FieldComparator(ter, terD));
