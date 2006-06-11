@@ -25,17 +25,29 @@ or the right-click menu to open the file or web page. Finally, you can click on 
  are present), and the third column shows icons for URL or DOI (only URL if both are present). You open the file or web
  page by clicking on an icon.
 
-<H2>The main PDF directory</H2>
+<P><b>Note:</b> If the PS field does not appear in the entry editor (in the 'General' panel),
+you may have to <a href="GeneralFields.html">customize the entry types of the general fields</a>.
+</P>
 
-PDF files get a special treatment to make it as easy as possible to link them to your entries. To take advantage of this
-you have to indicate a directory in <b>Options -> Preferences -> External programs</b> as your main PDF directory. All PDF files that are stored in
-or below this directory will be referred to with a relative path by JabRef, making it easy for you if you need to move the
-PDF directory or if several users use the same database from different network places.
-<P>Additionally, if you give your PDF files names that correspond to the relevant entry's bibtex key (plus '.pdf'),
-  JabRef will be able to search your main directory and its subfolders for the correct PDF. Once the correctly-named
-  PDF is in place you access this function by clicking the 'Auto' button next to the PDF field in the entry editor. If
-  the PDF is found, the field will immediately be set.
-<P>If you name a PDF file as mentioned, you can also open the PDF without setting the PDF field of the entry at all.
-  The downside is that the PDF icon will not appear in the table unless you do (manually or with the 'Auto' button).
+<H2>The main PDF and PS directories</H2>
+
+JabRef makes it easy to link PDF and PS files to your entries. To take advantage of this,
+you have to indicate in <b>Options -> Preferences -> External programs</b> your main PDF and PS directories. All PDF and PS files that are stored in
+or below each of these directories will be referred to with a relative path by JabRef, making it easy for you if you need to move the
+PDF and PS directories, or if several users use the same database from different network places.
+
+<P>Additionally, if you give your PDF and PS files names that correspond to the relevant entry's bibtex key (plus '.pdf' or '.ps'),
+  JabRef will be able to search your main directories and its subfolders for the correct PDF and PS. Once the correctly-named
+  PDF or PS is in place you access this function by clicking the 'Auto' button next to the PDF and PS fields in the entry editor. If
+  the PDF or PS is found, the field will immediately be set.
+<P>If you name a PDF or PS file as mentioned, you can also open the file without setting the PDF or PS field of the entry at all.
+  The downside is that the PDF or PS icon will not appear in the table unless you do (manually or with the 'Auto' button).
+
+<H2>The database-specific PDF and PS directories</H2>
+<P>
+You can set PDF and PS directories specific to a database (<b>File -> Database properties</b>).
+These directories will supersede the main directories.
+</P>
+
 
 </HTML>
