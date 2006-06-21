@@ -429,6 +429,11 @@ public class BibtexParser
             }
             if (c == '"')
             {
+                StringBuffer text = parseQuotedFieldExactly();
+                value.append(fieldContentParser.format(text));
+                /*
+
+                The following code doesn't handle {"} correctly:
                 // value is a string
                 consume('"');
 
@@ -445,7 +450,7 @@ public class BibtexParser
                 }
 
                 consume('"');
-
+                */
             }
             else if (c == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
@@ -710,6 +715,38 @@ public class BibtexParser
         }
 
         consume('}');
+
+        return value;
+    }
+
+    private StringBuffer parseQuotedFieldExactly() throws IOException
+    {
+
+        StringBuffer value = new StringBuffer();
+
+        consume('"');
+
+        int brackets = 0;
+
+        while (!((peek() == '"') && (brackets == 0)))
+        {
+
+            int j = read();
+            if ((j == -1) || (j == 65535))
+            {
+                throw new RuntimeException("Error in line "+line
+                                           +": EOF in mid-string");
+            }
+            else if (j == '{')
+                brackets++;
+            else if (j == '}')
+                brackets--;
+
+            value.append((char) j);
+
+        }
+
+        consume('"');
 
         return value;
     }
