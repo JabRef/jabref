@@ -249,10 +249,10 @@ public class BibtexParser
                     boolean duplicateKey = _db.insertEntry(be);
                     if (duplicateKey) // JZTODO lyrics
                       _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
-                              + " (" + "Grouping may not work for this entry." + ")");
+                              + " (" + Globals.lang("grouping may not work for this entry") + ")");
                     else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
                         _pr.addWarning(Globals.lang("empty BibTeX key")+": "+be.getAuthorTitleYear(40)
-                                + " (" + "Grouping may not work for this entry." + ")");
+                                + " (" + Globals.lang("grouping may not work for this entry") + ")");
                     }
                 }
 

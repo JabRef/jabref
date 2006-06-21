@@ -23,10 +23,10 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	public String format(String fieldText) 
 	{
 
-		String[] authors = fieldText.split(" and ");
+        String[] authors = fieldText.split(" and ");
 
 		String abbrev = getAbbreviations(authors);
-		return (abbrev==null ? "" : abbrev);
+        return (abbrev==null ? "" : abbrev);
 
 	}
 				

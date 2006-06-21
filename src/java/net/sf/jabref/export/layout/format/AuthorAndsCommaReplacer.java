@@ -38,7 +38,7 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
 			break;
 		}
 
-		return s;
+        return s;
 
 	}
 }

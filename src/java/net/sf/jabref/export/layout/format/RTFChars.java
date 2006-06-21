@@ -7,9 +7,9 @@ public class RTFChars implements LayoutFormatter {
 
 
   public String format(String field) {
+    
     int i;
     field = firstFormat(field);
-
     StringBuffer sb = new StringBuffer("");
     StringBuffer currentCommand = null;
     char c;
@@ -20,6 +20,7 @@ public class RTFChars implements LayoutFormatter {
         sb.append('\\');
         escaped = false;
       }
+
       else if (c == '\\') {
         escaped = true;
         incommand = true;
@@ -108,7 +109,7 @@ public class RTFChars implements LayoutFormatter {
   }
 
   private String firstFormat(String s) {
-    return s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
+    return s;//s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--", "&mdash;");
   }
 
   private IntAndString getPart(String text, int i) {

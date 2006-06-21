@@ -239,14 +239,17 @@ elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
 		changeFiles = 0
 		
 	handleFileSet("resource/JabRef_en.properties", ("resource/JabRef_de.properties", "resource/JabRef_fr.properties",\
+	"resource/JabRef_it.properties",\
 		"resource/JabRef_no.properties"), changeFiles)
-	handleFileSet("resource/Menu_en.properties", ("resource/Menu_de.properties", "resource/Menu_fr.properties",\
+	handleFileSet("resource/Menu_en.properties", ("resource/Menu_de.properties", "resource/Menu_fr.properties", "resource/Menu_it.properties",\
 		"resource/Menu_no.properties"), changeFiles)
 		
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-d"):
 	files = ("resource/JabRef_en.properties", "resource/JabRef_de.properties",\
-		"resource/JabRef_fr.properties", "resource/JabRef_no.properties",
+		"resource/JabRef_fr.properties", "resource/JabRef_it.properties",\
+		"resource/JabRef_no.properties",
 		"resource/Menu_en.properties", "resource/Menu_de.properties",\
-		"resource/Menu_fr.properties", "resource/Menu_no.properties")
+		"resource/Menu_fr.properties", "resource/Menu_it.properties",\
+		"resource/Menu_no.properties")
 	for file in files:
 		lookForDuplicates(file)

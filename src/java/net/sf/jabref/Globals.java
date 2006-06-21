@@ -204,8 +204,8 @@ public class Globals {
     }
     catch (MissingResourceException ex) {
       translation = key;
-      //logger("Warning: could not get translation for \""
-      //                   + key + "\"");
+      logger("Warning: could not get translation for \""
+                         + key + "\"");
     }
     if ((translation != null) && (translation.length() != 0)) {
       translation = translation.replaceAll("_", " ");

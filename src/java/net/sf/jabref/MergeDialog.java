@@ -19,7 +19,7 @@ public class MergeDialog extends JDialog {
   JPanel jPanel2 = new JPanel();
   JButton ok = new JButton();
   JButton Cancel = new JButton();
-  TitledBorder titledBorder1;
+  //TitledBorder titledBorder1;
   JCheckBox entries = new JCheckBox();
   JCheckBox strings = new JCheckBox();
   GridBagLayout gridBagLayout1 = new GridBagLayout();
@@ -48,13 +48,13 @@ public class MergeDialog extends JDialog {
   }
 
   private void jbInit(JabRefFrame parent) {
-      titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
+    //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
     panel1.setLayout(borderLayout1);
     ok.setText(Globals.lang("Ok"));
     ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
     Cancel.setText(Globals.lang("Cancel"));
     Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
-    jPanel1.setBorder(titledBorder1);
+    jPanel1.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     jPanel1.setLayout(gridBagLayout1);
     entries.setToolTipText("");
     entries.setSelected(true);
@@ -65,7 +65,6 @@ public class MergeDialog extends JDialog {
     selector.setText(Globals.lang("Import word selector definitions"));
     this.setModal(true);
     this.setResizable(false);
-    this.setTitle("Import database");
     getContentPane().add(panel1);
     panel1.add(jPanel2, BorderLayout.SOUTH);
     jPanel2.add(ok, null);

@@ -87,8 +87,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         //right.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Globals.lang("Fields")));
         right.setBorder(BorderFactory.createEtchedBorder());
         ok = new JButton("OK");
-        cancel = new JButton("Cancel");
-        apply = new JButton("Apply");
+        cancel = new JButton(Globals.lang("Cancel"));
+        apply = new JButton(Globals.lang("Apply"));
         ok.addActionListener(this);
         apply.addActionListener(this);
         cancel.addActionListener(this);

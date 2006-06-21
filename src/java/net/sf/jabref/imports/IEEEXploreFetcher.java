@@ -91,7 +91,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     }
 
     public String getHelpPage() {
-        return "IEEEXplorerHelp.html";
+        return "IEEEXploreHelp.html";
     }
 
     public String getKeyName() {
