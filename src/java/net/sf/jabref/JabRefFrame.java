@@ -331,7 +331,7 @@ public class JabRefFrame
       newDatabaseMenu = subMenu("New database" );
 
   // Other submenus
-  JMenu checkAndFix = subMenu("Find And Fix") ;
+  JMenu checkAndFix = subMenu("Scan database...");
 
 
   // The action for adding a new entry of unspecified type.
@@ -1069,19 +1069,24 @@ public JabRefPreferences prefs() {
     tools.add(incrementalSearch);
     tools.add(replaceAll);
 
-    // [kiar] I think we should group these festures
-    tools.add(checkAndFix) ;
-     checkAndFix.add( dupliCheck);
-     checkAndFix.add( strictDupliCheck);
-     checkAndFix.add( makeKeyAction);
-     checkAndFix.add( integrityCheckAction) ;
+    tools.add( makeKeyAction);
+
+     // [kiar] I think we should group these festures
+     tools.add(checkAndFix) ;
+     checkAndFix.add(dupliCheck);
+     checkAndFix.add(strictDupliCheck);
+     checkAndFix.add(autoSetPdf);
+     checkAndFix.add(autoSetPs);
+     checkAndFix.add(integrityCheckAction) ;
+
+
 
     tools.addSeparator();
     tools.add(manageSelectors);
     tools.add(emacsPushAction);
     tools.add(lyxPushAction);
     tools.add(winEdtPushAction);
-    tools.add(latexEditorPushAction);
+    //tools.add(latexEditorPushAction);
     //tools.add(fetchAuthorMedline);
     tools.addSeparator();
     tools.add(openFile);
@@ -1090,8 +1095,6 @@ public JabRefPreferences prefs() {
     tools.add(newSubDatabaseAction);
 
       tools.addSeparator();
-      tools.add(autoSetPdf);
-      tools.add(autoSetPs);
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
       tools.add(unabbreviate);
