@@ -270,8 +270,8 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
                                             Integer.toString(result.count));
 
             // for strCount ...
-            if(strCount.equals(""))
-                    return;
+            if((strCount == null) || strCount.equals(""))
+                return;
             int count;
         try {
             count = Integer.parseInt(strCount);

@@ -585,54 +585,255 @@ public class Globals {
 
 
 
-    HTMLCHARS.put("\"a", "&auml;");
-    HTMLCHARS.put("\"A", "&Auml;");
-    HTMLCHARS.put("\"e", "&euml;");
-    HTMLCHARS.put("\"E", "&Euml;");
-    HTMLCHARS.put("\"i", "&iuml;");
-    HTMLCHARS.put("\"I", "&Iuml;");
-    HTMLCHARS.put("\"o", "&ouml;");
-    HTMLCHARS.put("\"O", "&Ouml;");
-    HTMLCHARS.put("\"u", "&uuml;");
-    HTMLCHARS.put("\"U", "&Uuml;");
-    HTMLCHARS.put("`a", "&agrave;");
-    HTMLCHARS.put("`A", "&Agrave;");
-    HTMLCHARS.put("`e", "&egrave;");
-    HTMLCHARS.put("`E", "&Egrave;");
-    HTMLCHARS.put("`i", "&igrave;");
-    HTMLCHARS.put("`I", "&Igrave;");
-    HTMLCHARS.put("`o", "&ograve;");
-    HTMLCHARS.put("`O", "&Ograve;");
-    HTMLCHARS.put("`u", "&ugrave;");
-    HTMLCHARS.put("`U", "&Ugrave;");
-    HTMLCHARS.put("'e", "&eacute;");
-    HTMLCHARS.put("'E", "&Eacute;");
-    HTMLCHARS.put("'i", "&iacute;");
-    HTMLCHARS.put("'I", "&Iacute;");
-    HTMLCHARS.put("'o", "&oacute;");
-    HTMLCHARS.put("'O", "&Oacute;");
-    HTMLCHARS.put("'u", "&uacute;");
-    HTMLCHARS.put("'U", "&Uacute;");
-    HTMLCHARS.put("'a", "&aacute;");
-    HTMLCHARS.put("'A", "&Aacute;");
-    HTMLCHARS.put("^a", "&ocirc;");
-    HTMLCHARS.put("^A", "&Ocirc;");
-    HTMLCHARS.put("^o", "&ocirc;");
-    HTMLCHARS.put("^O", "&Ocirc;");
-    HTMLCHARS.put("^u", "&ucirc;");
-    HTMLCHARS.put("^U", "&Ucirc;");
-    HTMLCHARS.put("^e", "&ecirc;");
-    HTMLCHARS.put("^E", "&Ecirc;");
-    HTMLCHARS.put("^i", "&icirc;");
-    HTMLCHARS.put("^I", "&Icirc;");
-    HTMLCHARS.put("~o", "&otilde;");
-    HTMLCHARS.put("~O", "&Otilde;");
-    HTMLCHARS.put("~n", "&ntilde;");
-    HTMLCHARS.put("~N", "&Ntilde;");
-    HTMLCHARS.put("~a", "&atilde;");
-    HTMLCHARS.put("~A", "&Atilde;");
-    HTMLCHARS.put("cc", "&ccedil;");
-    HTMLCHARS.put("cC", "&Ccedil;");
+//    HTMLCHARS.put("\"a", "&auml;");
+//    HTMLCHARS.put("\"A", "&Auml;");
+//    HTMLCHARS.put("\"e", "&euml;");
+//    HTMLCHARS.put("\"E", "&Euml;");
+//    HTMLCHARS.put("\"i", "&iuml;");
+//    HTMLCHARS.put("\"I", "&Iuml;");
+//    HTMLCHARS.put("\"o", "&ouml;");
+//    HTMLCHARS.put("\"O", "&Ouml;");
+//    HTMLCHARS.put("\"u", "&uuml;");
+//    HTMLCHARS.put("\"U", "&Uuml;");
+//    HTMLCHARS.put("`a", "&agrave;");
+//    HTMLCHARS.put("`A", "&Agrave;");
+//    HTMLCHARS.put("`e", "&egrave;");
+//    HTMLCHARS.put("`E", "&Egrave;");
+//    HTMLCHARS.put("`i", "&igrave;");
+//    HTMLCHARS.put("`I", "&Igrave;");
+//    HTMLCHARS.put("`o", "&ograve;");
+//    HTMLCHARS.put("`O", "&Ograve;");
+//    HTMLCHARS.put("`u", "&ugrave;");
+//    HTMLCHARS.put("`U", "&Ugrave;");
+//    HTMLCHARS.put("'e", "&eacute;");
+//    HTMLCHARS.put("'E", "&Eacute;");
+//    HTMLCHARS.put("'i", "&iacute;");
+//    HTMLCHARS.put("'I", "&Iacute;");
+//    HTMLCHARS.put("'o", "&oacute;");
+//    HTMLCHARS.put("'O", "&Oacute;");
+//    HTMLCHARS.put("'u", "&uacute;");
+//    HTMLCHARS.put("'U", "&Uacute;");
+//    HTMLCHARS.put("'a", "&aacute;");
+//    HTMLCHARS.put("'A", "&Aacute;");
+//    HTMLCHARS.put("^a", "&ocirc;");
+//    HTMLCHARS.put("^A", "&Ocirc;");
+//    HTMLCHARS.put("^o", "&ocirc;");
+//    HTMLCHARS.put("^O", "&Ocirc;");
+//    HTMLCHARS.put("^u", "&ucirc;");
+//    HTMLCHARS.put("^U", "&Ucirc;");
+//    HTMLCHARS.put("^e", "&ecirc;");
+//    HTMLCHARS.put("^E", "&Ecirc;");
+//    HTMLCHARS.put("^i", "&icirc;");
+//    HTMLCHARS.put("^I", "&Icirc;");
+//    HTMLCHARS.put("~o", "&otilde;");
+//    HTMLCHARS.put("~O", "&Otilde;");
+//    HTMLCHARS.put("~n", "&ntilde;");
+//    HTMLCHARS.put("~N", "&Ntilde;");
+//    HTMLCHARS.put("~a", "&atilde;");
+//    HTMLCHARS.put("~A", "&Atilde;");
+//    HTMLCHARS.put("cc", "&ccedil;");
+//    HTMLCHARS.put("cC", "&Ccedil;");
+
+
+      // Following character definitions contributed by Ervin Kolenovic:
+      // HTML named entities from #192 - #255 (UNICODE Latin-1)
+       HTMLCHARS.put("`A", "&Agrave;");    // #192
+       HTMLCHARS.put("'A", "&Aacute;");    // #193
+       HTMLCHARS.put("^A", "&Acirc;");     // #194
+       HTMLCHARS.put("~A", "&Atilde;");    // #195
+       HTMLCHARS.put("\"A", "&Auml;");     // #196
+       HTMLCHARS.put("AA", "&Aring;");     // #197
+       HTMLCHARS.put("AE", "&AElig;");     // #198
+       HTMLCHARS.put("cC", "&Ccedil;");    // #199
+       HTMLCHARS.put("`E", "&Egrave;");    // #200
+       HTMLCHARS.put("'E", "&Eacute;");    // #201
+       HTMLCHARS.put("^E", "&Ecirc;");     // #202
+       HTMLCHARS.put("\"E", "&Euml;");     // #203
+       HTMLCHARS.put("`I", "&Igrave;");    // #204
+       HTMLCHARS.put("'I", "&Iacute;");    // #205
+       HTMLCHARS.put("^I", "&Icirc;");     // #206
+       HTMLCHARS.put("\"I", "&Iuml;");     // #207
+       HTMLCHARS.put("DH", "&ETH;");       // #208
+       HTMLCHARS.put("~N", "&Ntilde;");    // #209
+       HTMLCHARS.put("`O", "&Ograve;");    // #210
+       HTMLCHARS.put("'O", "&Oacute;");    // #211
+       HTMLCHARS.put("^O", "&Ocirc;");     // #212
+       HTMLCHARS.put("~O", "&Otilde;");    // #213
+       HTMLCHARS.put("\"O", "&Ouml;");     // #214
+       // According to ISO 8859-1 the "\times" symbol should be placed here (#215).
+       // Omitting this, because it is a mathematical symbol.
+       HTMLCHARS.put("O", "&OSlash;");     // #216
+       HTMLCHARS.put("`U", "&Ugrave;");    // #217
+       HTMLCHARS.put("'U", "&Uacute;");    // #218
+       HTMLCHARS.put("^U", "&Ucirc;");     // #219
+       HTMLCHARS.put("\"U", "&Uuml;");     // #220
+       HTMLCHARS.put("'Y", "&Yacute;");    // #221
+       HTMLCHARS.put("TH", "&THORN;");     // #222
+       HTMLCHARS.put("ss", "&szlig;");     // #223
+       HTMLCHARS.put("`a", "&agrave;");    // #224
+       HTMLCHARS.put("'a", "&aacute;");    // #225
+       HTMLCHARS.put("^a", "&acirc;");     // #226
+       HTMLCHARS.put("~a", "&atilde;");    // #227
+       HTMLCHARS.put("\"a", "&auml;");     // #228
+       HTMLCHARS.put("aa", "&aring;");     // #229
+       HTMLCHARS.put("ae", "&aelig;");     // #230
+       HTMLCHARS.put("cc", "&ccedil;");    // #231
+       HTMLCHARS.put("`e", "&egrave;");    // #232
+       HTMLCHARS.put("'e", "&eacute;");    // #233
+       HTMLCHARS.put("^e", "&ecirc;");     // #234
+       HTMLCHARS.put("\"e", "&euml;");     // #235
+       HTMLCHARS.put("`i", "&igrave;");    // #236
+       HTMLCHARS.put("'i", "&iacute;");    // #237
+       HTMLCHARS.put("^i", "&icirc;");     // #238
+       HTMLCHARS.put("\"i", "&iuml;");     // #239
+       HTMLCHARS.put("dh", "&eth;");       // #240
+       HTMLCHARS.put("~n", "&ntilde;");    // #241
+       HTMLCHARS.put("`o", "&ograve;");    // #242
+       HTMLCHARS.put("'o", "&oacute;");    // #243
+       HTMLCHARS.put("^o", "&ocirc;");     // #244
+       HTMLCHARS.put("~o", "&otilde;");    // #245
+       HTMLCHARS.put("\"o", "&ouml;");     // #246
+       // According to ISO 8859-1 the "\div" symbol should be placed here (#247).
+       // Omitting this, because it is a mathematical symbol.
+       HTMLCHARS.put("o", "&oslash;");     // #248
+       HTMLCHARS.put("`u", "&ugrave;");    // #249
+       HTMLCHARS.put("'u", "&uacute;");    // #250
+       HTMLCHARS.put("^u", "&ucirc;");     // #251
+       HTMLCHARS.put("\"u", "&uuml;");     // #252
+       HTMLCHARS.put("'y", "&yacute;");    // #253
+       HTMLCHARS.put("th", "&thorn;");     // #254
+       HTMLCHARS.put("\"y", "&yuml;");     // #255
+
+       // HTML special characters without names (UNICODE Latin Extended-A), indicated by UNICODE number
+       HTMLCHARS.put("=A", "&#256;");      // "Amacr"
+       HTMLCHARS.put("=a", "&#257;");      // "amacr"
+       HTMLCHARS.put("uA", "&#258;");      // "Abreve"
+       HTMLCHARS.put("ua", "&#259;");      // "abreve"
+       HTMLCHARS.put("kA", "&#260;");      // "Aogon"
+       HTMLCHARS.put("ka", "&#261;");      // "aogon"
+       HTMLCHARS.put("'C", "&#262;");      // "Cacute"
+       HTMLCHARS.put("'c", "&#263;");      // "cacute"
+       HTMLCHARS.put("^C", "&#264;");      // "Ccirc"
+       HTMLCHARS.put("^c", "&#265;");      // "ccirc"
+       HTMLCHARS.put(".C", "&#266;");      // "Cdot"
+       HTMLCHARS.put(".c", "&#267;");      // "cdot"
+       HTMLCHARS.put("vC", "&#268;");      // "Ccaron"
+       HTMLCHARS.put("vc", "&#269;");      // "ccaron"
+       HTMLCHARS.put("vD", "&#270;");      // "Dcaron"
+       // Symbol #271 (d´) has no special Latex command
+       HTMLCHARS.put("DJ", "&#272;");      // "Dstrok"
+       HTMLCHARS.put("dj", "&#273;");      // "dstrok"
+       HTMLCHARS.put("=E", "&#274;");      // "Emacr"
+       HTMLCHARS.put("=e", "&#275;");      // "emacr"
+       HTMLCHARS.put("uE", "&#276;");      // "Ebreve"
+       HTMLCHARS.put("ue", "&#277;");      // "ebreve"
+       HTMLCHARS.put(".E", "&#278;");      // "Edot"
+       HTMLCHARS.put(".e", "&#279;");      // "edot"
+       HTMLCHARS.put("kE", "&#280;");      // "Eogon"
+       HTMLCHARS.put("ke", "&#281;");      // "eogon"
+       HTMLCHARS.put("vE", "&#282;");      // "Ecaron"
+       HTMLCHARS.put("ve", "&#283;");      // "ecaron"
+       HTMLCHARS.put("^G", "&#284;");      // "Gcirc"
+       HTMLCHARS.put("^g", "&#285;");      // "gcirc"
+       HTMLCHARS.put("uG", "&#286;");      // "Gbreve"
+       HTMLCHARS.put("ug", "&#287;");      // "gbreve"
+       HTMLCHARS.put(".G", "&#288;");      // "Gdot"
+       HTMLCHARS.put(".g", "&#289;");      // "gdot"
+       HTMLCHARS.put("cG", "&#290;");      // "Gcedil"
+       HTMLCHARS.put("'g", "&#291;");      // "gacute"
+       HTMLCHARS.put("^H", "&#292;");      // "Hcirc"
+       HTMLCHARS.put("^h", "&#293;");      // "hcirc"
+       HTMLCHARS.put("Hstrok", "&#294;");  // "Hstrok"
+       HTMLCHARS.put("hstrok", "&#295;");  // "hstrok"
+       HTMLCHARS.put("~I", "&#296;");      // "Itilde"
+       HTMLCHARS.put("~i", "&#297;");      // "itilde"
+       HTMLCHARS.put("=I", "&#298;");      // "Imacr"
+       HTMLCHARS.put("=i", "&#299;");      // "imacr"
+       HTMLCHARS.put("uI", "&#300;");      // "Ibreve"
+       HTMLCHARS.put("ui", "&#301;");      // "ibreve"
+       HTMLCHARS.put("kI", "&#302;");      // "Iogon"
+       HTMLCHARS.put("ki", "&#303;");      // "iogon"
+       HTMLCHARS.put(".I", "&#304;");      // "Idot"
+       HTMLCHARS.put("i", "&#305;");       // "inodot"
+       // Symbol #306 (IJ) has no special Latex command
+       // Symbol #307 (ij) has no special Latex command
+       HTMLCHARS.put("^J", "&#308;");      // "Jcirc"
+       HTMLCHARS.put("^j", "&#309;");      // "jcirc"
+       HTMLCHARS.put("cK", "&#310;");      // "Kcedil"
+       HTMLCHARS.put("ck", "&#311;");      // "kcedil"
+       // Symbol #312 (k) has no special Latex command
+       HTMLCHARS.put("'L", "&#313;");      // "Lacute"
+       HTMLCHARS.put("'l", "&#314;");      // "lacute"
+       HTMLCHARS.put("cL", "&#315;");      // "Lcedil"
+       HTMLCHARS.put("cl", "&#316;");      // "lcedil"
+       // Symbol #317 (L´) has no special Latex command
+       // Symbol #318 (l´) has no special Latex command
+       HTMLCHARS.put("Lmidot", "&#319;");      // "Lmidot"
+       HTMLCHARS.put("lmidot", "&#320;");      // "lmidot"
+       HTMLCHARS.put("L", "&#321;");      // "Lstrok"
+       HTMLCHARS.put("l", "&#322;");      // "lstrok"
+       HTMLCHARS.put("'N", "&#323;");      // "Nacute"
+       HTMLCHARS.put("'n", "&#324;");      // "nacute"
+       HTMLCHARS.put("cN", "&#325;");      // "Ncedil"
+       HTMLCHARS.put("cn", "&#326;");      // "ncedil"
+       HTMLCHARS.put("vN", "&#327;");      // "Ncaron"
+       HTMLCHARS.put("vn", "&#328;");      // "ncaron"
+       // Symbol #329 (´n) has no special Latex command
+       HTMLCHARS.put("NG", "&#330;");      // "ENG"
+       HTMLCHARS.put("ng", "&#331;");      // "eng"
+       HTMLCHARS.put("=O", "&#332;");      // "Omacr"
+       HTMLCHARS.put("=o", "&#333;");      // "omacr"
+       HTMLCHARS.put("uO", "&#334;");      // "Obreve"
+       HTMLCHARS.put("uo", "&#335;");      // "obreve"
+       HTMLCHARS.put("HO", "&#336;");      // "Odblac"
+       HTMLCHARS.put("Ho", "&#337;");      // "odblac"
+       HTMLCHARS.put("OE", "&#338;");      // "OElig"
+       HTMLCHARS.put("oe", "&#339;");      // "oelig"
+       HTMLCHARS.put("'R", "&#340;");      // "Racute"
+       HTMLCHARS.put("'r", "&#341;");      // "racute"
+       HTMLCHARS.put("cR", "&#342;");      // "Rcedil"
+       HTMLCHARS.put("cr", "&#343;");      // "rcedil"
+       HTMLCHARS.put("vR", "&#344;");      // "Rcaron"
+       HTMLCHARS.put("vr", "&#345;");      // "rcaron"
+       HTMLCHARS.put("'S", "&#346;");      // "Sacute"
+       HTMLCHARS.put("'s", "&#347;");      // "sacute"
+       HTMLCHARS.put("^S", "&#348;");      // "Scirc"
+       HTMLCHARS.put("^s", "&#349;");      // "scirc"
+       HTMLCHARS.put("cS", "&#350;");      // "Scedil"
+       HTMLCHARS.put("cs", "&#351;");      // "scedil"
+       HTMLCHARS.put("vS", "&#352;");      // "Scaron"
+       HTMLCHARS.put("vs", "&#353;");      // "scaron"
+       HTMLCHARS.put("cT", "&#354;");      // "Tcedil"
+       HTMLCHARS.put("ct", "&#355;");      // "tcedil"
+       HTMLCHARS.put("vT", "&#356;");      // "Tcaron"
+       // Symbol #357 (t´) has no special Latex command
+       HTMLCHARS.put("Tstrok", "&#358;");  // "Tstrok"
+       HTMLCHARS.put("tstrok", "&#359;");  // "tstrok"
+       HTMLCHARS.put("~U", "&#360;");      // "Utilde"
+       HTMLCHARS.put("~u", "&#361;");      // "utilde"
+       HTMLCHARS.put("=U", "&#362;");      // "Umacr"
+       HTMLCHARS.put("=u", "&#363;");      // "umacr"
+       HTMLCHARS.put("uU", "&#364;");      // "Ubreve"
+       HTMLCHARS.put("uu", "&#365;");      // "ubreve"
+       HTMLCHARS.put("rU", "&#366;");      // "Uring"
+       HTMLCHARS.put("ru", "&#367;");      // "uring"
+       HTMLCHARS.put("HU", "&#368;");      // "Odblac"
+       HTMLCHARS.put("Hu", "&#369;");      // "odblac"
+       HTMLCHARS.put("kU", "&#370;");      // "Uogon"
+       HTMLCHARS.put("ku", "&#371;");      // "uogon"
+       HTMLCHARS.put("^W", "&#372;");      // "Wcirc"
+       HTMLCHARS.put("^w", "&#373;");      // "wcirc"
+       HTMLCHARS.put("^Y", "&#374;");      // "Ycirc"
+       HTMLCHARS.put("^y", "&#375;");      // "ycirc"
+       HTMLCHARS.put("\"Y", "&#376;");     // "Yuml"
+       HTMLCHARS.put("'Z", "&#377;");      // "Zacute"
+       HTMLCHARS.put("'z", "&#378;");      // "zacute"
+       HTMLCHARS.put(".Z", "&#379;");      // "Zdot"
+       HTMLCHARS.put(".z", "&#380;");      // "zdot"
+       HTMLCHARS.put("vZ", "&#381;");      // "Zcaron"
+       HTMLCHARS.put("vz", "&#382;");      // "zcaron"
+       // Symbol #383 (f) has no special Latex command
+
 
     XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
     XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
@@ -858,7 +1059,7 @@ public class Globals {
     RTFCHARS.put("\"e", "\\'eb");
     RTFCHARS.put("\"i", "\\'ef");
     RTFCHARS.put("\"o", "\\'f6");
-    RTFCHARS.put("\"u", "\\'fc");
+    RTFCHARS.put("\"u", "\\uc0\\u252");
     RTFCHARS.put("~n", "\\'f1");
     RTFCHARS.put("`A", "\\'c0");
     RTFCHARS.put("`E", "\\'c8");
@@ -880,6 +1081,203 @@ public class Globals {
     RTFCHARS.put("\"I", "\\'cf");
     RTFCHARS.put("\"O", "\\'d6");
     RTFCHARS.put("\"U", "\\'dc");
+    // Use UNICODE characters for RTF-Chars which can not be found in the standard codepage
+
+    //  RTFCHARS.put("`A", "\\uc0\\u192");     // "Agrave" exists in standard codepage  
+      RTFCHARS.put("'A", "\\uc0\\u193");     // "Aacute"
+//  RTFCHARS.put("^A", "\\uc0\\u194");     // "Acirc"  exists in standard codepage
+      RTFCHARS.put("~A", "\\uc0\\u195");     // "Atilde"
+//  RTFCHARS.put("\"A", "\\uc0\\u196");    // "Auml"   exists in standard codepage
+      RTFCHARS.put("AA", "\\uc0\\u197");     // "Aring"
+      RTFCHARS.put("AE", "\\uc0\\u198");     // "AElig"
+      RTFCHARS.put("cC", "\\uc0\\u199");     // "Ccedil"
+//  RTFCHARS.put("`E", "\\uc0\\u200");     // "Egrave" exists in standard codepage
+      RTFCHARS.put("'E", "\\uc0\\u201");     // "Eacute"
+//  RTFCHARS.put("^E", "\\uc0\\u202");     // "Ecirc"  exists in standard codepage
+//  RTFCHARS.put("\"E", "\\uc0\\u203");    // "Euml"   exists in standard codepage
+//  RTFCHARS.put("`I", "\\uc0\\u204");     // "Igrave" exists in standard codepage
+      RTFCHARS.put("'I", "\\uc0\\u205");     // "Iacute"
+//  RTFCHARS.put("^I", "\\uc0\\u206");     // "Icirc"  exists in standard codepage
+//  RTFCHARS.put("\"I", "\\uc0\\u207");    // "Iuml"   exists in standard codepage
+      RTFCHARS.put("DH", "\\uc0\\u208");     // "ETH"
+      RTFCHARS.put("~N", "\\uc0\\u209");     // "Ntilde"
+//  RTFCHARS.put("`O", "\\uc0\\u210");     // "Ograve" exists in standard codepage
+      RTFCHARS.put("'O", "\\uc0\\u211");     // "Oacute"
+//  RTFCHARS.put("^O", "\\uc0\\u212");     // "Ocirc"  exists in standard codepage
+      RTFCHARS.put("~O", "\\uc0\\u213");     // "Otilde"
+//  RTFCHARS.put("\"O", "\\uc0\\u214");    // "Ouml"   exists in standard codepage
+      // According to ISO 8859-1 the "\times" symbol should be placed here (#215).
+      // Omitting this, because it is a mathematical symbol.
+      RTFCHARS.put("O", "\\uc0\\u216");      // "OSlash"
+//  RTFCHARS.put("`U", "\\uc0\\u217");     // "Ugrave"  exists in standard codepage
+      RTFCHARS.put("'U", "\\uc0\\u218");     // "Uacute"
+//  RTFCHARS.put("^U", "\\uc0\\u219");     // "Ucirc"   exists in standard codepage
+//  RTFCHARS.put("\"U", "\\uc0\\u220");    // "Uuml"    exists in standard codepage
+      RTFCHARS.put("'Y", "\\uc0\\u221");     // "Yacute"
+      RTFCHARS.put("TH", "\\uc0\\u222");     // "THORN"
+      RTFCHARS.put("ss", "\\uc0\\u223");     // "szlig"
+//  RTFCHARS.put("`a", "\\uc0\\u224");     // "agrave"  exists in standard codepage
+      RTFCHARS.put("'a", "\\uc0\\u225");     // "aacute"
+//  RTFCHARS.put("^a", "\\uc0\\u226");     // "acirc"   exists in standard codepage
+      RTFCHARS.put("~a", "\\uc0\\u227");     // "atilde"
+//  RTFCHARS.put("\"a", "\\uc0\\u228");    // "auml"    exists in standard codepage
+      RTFCHARS.put("aa", "\\uc0\\u229");     // "aring"
+      RTFCHARS.put("ae", "\\uc0\\u230");     // "aelig"
+      RTFCHARS.put("cc", "\\uc0\\u231");     // "ccedil"
+//  RTFCHARS.put("`e", "\\uc0\\u232");     // "egrave"  exists in standard codepage
+      RTFCHARS.put("'e", "\\uc0\\u233");     // "eacute"
+//  RTFCHARS.put("^e", "\\uc0\\u234");     // "ecirc"   exists in standard codepage
+//  RTFCHARS.put("\"e", "\\uc0\\u235");    // "euml"    exists in standard codepage
+//  RTFCHARS.put("`i", "\\uc0\\u236");     // "igrave"  exists in standard codepage
+      RTFCHARS.put("'i", "\\uc0\\u237");     // "iacute"
+//  RTFCHARS.put("^i", "\\uc0\\u238");     // "icirc"   exists in standard codepage
+//  RTFCHARS.put("\"i", "\\uc0\\u239");    // "iuml"    exists in standard codepage
+      RTFCHARS.put("dh", "\\uc0\\u240");     // "eth"
+//  RTFCHARS.put("~n", "\\uc0\\u241");     // "ntilde"  exists in standard codepage
+//  RTFCHARS.put("`o", "\\uc0\\u242");     // "ograve"  exists in standard codepage
+      RTFCHARS.put("'o", "\\uc0\\u243");     // "oacute"
+//  RTFCHARS.put("^o", "\\uc0\\u244");     // "ocirc"   exists in standard codepage
+      RTFCHARS.put("~o", "\\uc0\\u245");     // "otilde"
+//  RTFCHARS.put("\"o", "\\uc0\\u246");    // "ouml"    exists in standard codepage
+      // According to ISO 8859-1 the "\div" symbol should be placed here (#247).
+      // Omitting this, because it is a mathematical symbol.
+      RTFCHARS.put("o", "\\uc0\\u248");       // "oslash"
+//  RTFCHARS.put("`u", "\\uc0\\u249");      // "ugrave"  exists in standard codepage
+      RTFCHARS.put("'u", "\\uc0\\u250");      // "uacute"
+//  RTFCHARS.put("^u", "\\uc0\\u251");      // "ucirc"   exists in standard codepage
+//  RTFCHARS.put("\"u", "\\uc0\\u252");     // "uuml"    exists in standard codepage
+      RTFCHARS.put("'y", "\\uc0\\u253");      // "yacute"
+      RTFCHARS.put("th", "\\uc0\\u254");      // "thorn"
+      RTFCHARS.put("\"y", "\\uc0\\u255");     // "yuml"
+
+      RTFCHARS.put("=A", "\\uc0\\u256");      // "Amacr"
+      RTFCHARS.put("=a", "\\uc0\\u257");      // "amacr"
+      RTFCHARS.put("uA", "\\uc0\\u258");      // "Abreve"
+      RTFCHARS.put("ua", "\\uc0\\u259");      // "abreve"
+      RTFCHARS.put("kA", "\\uc0\\u260");      // "Aogon"
+      RTFCHARS.put("ka", "\\uc0\\u261");      // "aogon"
+      RTFCHARS.put("'C", "\\uc0\\u262");      // "Cacute"
+      RTFCHARS.put("'c", "\\uc0\\u263");      // "cacute"
+      RTFCHARS.put("^C", "\\uc0\\u264");      // "Ccirc"
+      RTFCHARS.put("^c", "\\uc0\\u265");      // "ccirc"
+      RTFCHARS.put(".C", "\\uc0\\u266");      // "Cdot"
+      RTFCHARS.put(".c", "\\uc0\\u267");      // "cdot"
+      RTFCHARS.put("vC", "\\uc0\\u268");      // "Ccaron"
+      RTFCHARS.put("vc", "\\uc0\\u269");      // "ccaron"
+      RTFCHARS.put("vD", "\\uc0\\u270");      // "Dcaron"
+      // Symbol #271 (d´) has no special Latex command
+      RTFCHARS.put("DJ", "\\uc0\\u272");      // "Dstrok"
+      RTFCHARS.put("dj", "\\uc0\\u273");      // "dstrok"
+      RTFCHARS.put("=E", "\\uc0\\u274");      // "Emacr"
+      RTFCHARS.put("=e", "\\uc0\\u275");      // "emacr"
+      RTFCHARS.put("uE", "\\uc0\\u276");      // "Ebreve"
+      RTFCHARS.put("ue", "\\uc0\\u277");      // "ebreve"
+      RTFCHARS.put(".E", "\\uc0\\u278");      // "Edot"
+      RTFCHARS.put(".e", "\\uc0\\u279");      // "edot"
+      RTFCHARS.put("kE", "\\uc0\\u280");      // "Eogon"
+      RTFCHARS.put("ke", "\\uc0\\u281");      // "eogon"
+      RTFCHARS.put("vE", "\\uc0\\u282");      // "Ecaron"
+      RTFCHARS.put("ve", "\\uc0\\u283");      // "ecaron"
+      RTFCHARS.put("^G", "\\uc0\\u284");      // "Gcirc"
+      RTFCHARS.put("^g", "\\uc0\\u285");      // "gcirc"
+      RTFCHARS.put("uG", "\\uc0\\u286");      // "Gbreve"
+      RTFCHARS.put("ug", "\\uc0\\u287");      // "gbreve"
+      RTFCHARS.put(".G", "\\uc0\\u288");      // "Gdot"
+      RTFCHARS.put(".g", "\\uc0\\u289");      // "gdot"
+      RTFCHARS.put("cG", "\\uc0\\u290");      // "Gcedil"
+      RTFCHARS.put("'g", "\\uc0\\u291");      // "gacute"
+      RTFCHARS.put("^H", "\\uc0\\u292");      // "Hcirc"
+      RTFCHARS.put("^h", "\\uc0\\u293");      // "hcirc"
+      RTFCHARS.put("Hstrok", "\\uc0\\u294");  // "Hstrok"
+      RTFCHARS.put("hstrok", "\\uc0\\u295");  // "hstrok"
+      RTFCHARS.put("~I", "\\uc0\\u296");      // "Itilde"
+      RTFCHARS.put("~i", "\\uc0\\u297");      // "itilde"
+      RTFCHARS.put("=I", "\\uc0\\u298");      // "Imacr"
+      RTFCHARS.put("=i", "\\uc0\\u299");      // "imacr"
+      RTFCHARS.put("uI", "\\uc0\\u300");      // "Ibreve"
+      RTFCHARS.put("ui", "\\uc0\\u301");      // "ibreve"
+      RTFCHARS.put("kI", "\\uc0\\u302");      // "Iogon"
+      RTFCHARS.put("ki", "\\uc0\\u303");      // "iogon"
+      RTFCHARS.put(".I", "\\uc0\\u304");      // "Idot"
+      RTFCHARS.put("i", "\\uc0\\u305");       // "inodot"
+      // Symbol #306 (IJ) has no special Latex command
+      // Symbol #307 (ij) has no special Latex command
+      RTFCHARS.put("^J", "\\uc0\\u308");      // "Jcirc"
+      RTFCHARS.put("^j", "\\uc0\\u309");      // "jcirc"
+      RTFCHARS.put("cK", "\\uc0\\u310");      // "Kcedil"
+      RTFCHARS.put("ck", "\\uc0\\u311");      // "kcedil"
+      // Symbol #312 (k) has no special Latex command
+      RTFCHARS.put("'L", "\\uc0\\u313");      // "Lacute"
+      RTFCHARS.put("'l", "\\uc0\\u314");      // "lacute"
+      RTFCHARS.put("cL", "\\uc0\\u315");      // "Lcedil"
+      RTFCHARS.put("cl", "\\uc0\\u316");      // "lcedil"
+      // Symbol #317 (L´) has no special Latex command
+      // Symbol #318 (l´) has no special Latex command
+      RTFCHARS.put("Lmidot", "\\uc0\\u319");  // "Lmidot"
+      RTFCHARS.put("lmidot", "\\uc0\\u320");  // "lmidot"
+      RTFCHARS.put("L", "\\uc0\\u321");      // "Lstrok"
+      RTFCHARS.put("l", "\\uc0\\u322");      // "lstrok"
+      RTFCHARS.put("'N", "\\uc0\\u323");      // "Nacute"
+      RTFCHARS.put("'n", "\\uc0\\u324");      // "nacute"
+      RTFCHARS.put("cN", "\\uc0\\u325");      // "Ncedil"
+      RTFCHARS.put("cn", "\\uc0\\u326");      // "ncedil"
+      RTFCHARS.put("vN", "\\uc0\\u327");      // "Ncaron"
+      RTFCHARS.put("vn", "\\uc0\\u328");      // "ncaron"
+      // Symbol #329 (´n) has no special Latex command
+      RTFCHARS.put("NG", "\\uc0\\u330");      // "ENG"
+      RTFCHARS.put("ng", "\\uc0\\u331");      // "eng"
+      RTFCHARS.put("=O", "\\uc0\\u332");      // "Omacr"
+      RTFCHARS.put("=o", "\\uc0\\u333");      // "omacr"
+      RTFCHARS.put("uO", "\\uc0\\u334");      // "Obreve"
+      RTFCHARS.put("uo", "\\uc0\\u335");      // "obreve"
+      RTFCHARS.put("HO", "\\uc0\\u336");      // "Odblac"
+      RTFCHARS.put("Ho", "\\uc0\\u337");      // "odblac"
+      RTFCHARS.put("OE", "\\uc0\\u338");      // "OElig"
+      RTFCHARS.put("oe", "\\uc0\\u339");      // "oelig"
+      RTFCHARS.put("'R", "\\uc0\\u340");      // "Racute"
+      RTFCHARS.put("'r", "\\uc0\\u341");      // "racute"
+      RTFCHARS.put("cR", "\\uc0\\u342");      // "Rcedil"
+      RTFCHARS.put("cr", "\\uc0\\u343");      // "rcedil"
+      RTFCHARS.put("vR", "\\uc0\\u344");      // "Rcaron"
+      RTFCHARS.put("vr", "\\uc0\\u345");      // "rcaron"
+      RTFCHARS.put("'S", "\\uc0\\u346");      // "Sacute"
+      RTFCHARS.put("'s", "\\uc0\\u347");      // "sacute"
+      RTFCHARS.put("^S", "\\uc0\\u348");      // "Scirc"
+      RTFCHARS.put("^s", "\\uc0\\u349");      // "scirc"
+      RTFCHARS.put("cS", "\\uc0\\u350");      // "Scedil"
+      RTFCHARS.put("cs", "\\uc0\\u351");      // "scedil"
+      RTFCHARS.put("vS", "\\uc0\\u352");      // "Scaron"
+      RTFCHARS.put("vs", "\\uc0\\u353");      // "scaron"
+      RTFCHARS.put("cT", "\\uc0\\u354");      // "Tcedil"
+      RTFCHARS.put("ct", "\\uc0\\u355");      // "tcedil"
+      RTFCHARS.put("vT", "\\uc0\\u356");      // "Tcaron"
+      // Symbol #357 (t´) has no special Latex command
+      RTFCHARS.put("Tstrok", "\\uc0\\u358");  // "Tstrok"
+      RTFCHARS.put("tstrok", "\\uc0\\u359");  // "tstrok"
+      RTFCHARS.put("~U", "\\uc0\\u360");      // "Utilde"
+      RTFCHARS.put("~u", "\\uc0\\u361");      // "utilde"
+      RTFCHARS.put("=U", "\\uc0\\u362");      // "Umacr"
+      RTFCHARS.put("=u", "\\uc0\\u363");      // "umacr"
+      RTFCHARS.put("uU", "\\uc0\\u364");      // "Ubreve"
+      RTFCHARS.put("uu", "\\uc0\\u365");      // "ubreve"
+      RTFCHARS.put("rU", "\\uc0\\u366");      // "Uring"
+      RTFCHARS.put("ru", "\\uc0\\u367");      // "uring"
+      RTFCHARS.put("HU", "\\uc0\\u368");      // "Odblac"
+      RTFCHARS.put("Hu", "\\uc0\\u369");      // "odblac"
+      RTFCHARS.put("kU", "\\uc0\\u370");      // "Uogon"
+      RTFCHARS.put("ku", "\\uc0\\u371");      // "uogon"
+      RTFCHARS.put("^W", "\\uc0\\u372");      // "Wcirc"
+      RTFCHARS.put("^w", "\\uc0\\u373");      // "wcirc"
+      RTFCHARS.put("^Y", "\\uc0\\u374");      // "Ycirc"
+      RTFCHARS.put("^y", "\\uc0\\u375");      // "ycirc"
+      RTFCHARS.put("\"Y", "\\uc0\\u376");     // "Yuml"
+      RTFCHARS.put("'Z", "\\uc0\\u377");      // "Zacute"
+      RTFCHARS.put("'z", "\\uc0\\u378");      // "zacute"
+      RTFCHARS.put(".Z", "\\uc0\\u379");      // "Zdot"
+      RTFCHARS.put(".z", "\\uc0\\u380");      // "zdot"
+      RTFCHARS.put("vZ", "\\uc0\\u381");      // "Zcaron"
+      RTFCHARS.put("vz", "\\uc0\\u382");      // "zcaron"
+      // Symbol #383 (f) has no special Latex command
 
     //XML_CHARS.put("\\u00E1", "&#x00E1;");
   }

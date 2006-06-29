@@ -80,8 +80,17 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.1??   - Added option to toggle floating of marked entries to the top of the table.
+2.1b2   - Added option to toggle floating of marked entries to the top of the table.
         - Added option to open, append and import multiple BibTeX files.
+        - Improved support for LaTeX special characters in HTML and RTF representations.
+        - Fixed bug that made entry selection get lost when an edit modifies the entry's
+          position in the main table.
+        - Fixed bug in BibTeXML export (entry type name missing in tag).
+        - Fixed name handling in (non-compliant) Endnote files giving all author names
+          on the same line.
+        - Fixed problem with keyword handling in Medline import.
+        - Fixed (harmless) NullPointerException when medline fetch is cancelled.
+        - Fixed bug in parser that made {"} illegal in fields quoted with ".
 2.1b    - Known issue: font sizes cannot be changed, but should follow OS settings on
           Windows and Mac.
         - Known issue: some HTML may be handled inappropriately when downloading from

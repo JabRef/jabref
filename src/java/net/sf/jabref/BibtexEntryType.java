@@ -155,7 +155,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "volume", "number", "series", "type", "address", "edition",
+                    "volume", "number", "pages", "series", "type", "address", "edition",
 		    "month", "note"
                 };
             }
@@ -200,7 +200,7 @@ public abstract class BibtexEntryType implements Comparable
             {
                 return new String[]
                 {
-                    "volume", "number", "series", "address", "edition", "month",
+                    "volume", "number", "pages", "series", "address", "edition", "month",
                     "note"
                 };
             }
