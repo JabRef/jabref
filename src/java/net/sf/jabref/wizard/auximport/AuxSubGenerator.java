@@ -69,7 +69,7 @@ public class AuxSubGenerator
   private BibtexDatabase auxDB ; // contains only the bibtex keys who found in aux file
 
   private int nestedAuxCounter ;  // counts the nested aux files
-
+  private int crossreferencedEntriesCount = 0; // counts entries pulled in due to crossref
 
   public AuxSubGenerator(BibtexDatabase refDBase)
   {
@@ -283,31 +283,56 @@ public class AuxSubGenerator
         notFoundList.add(str) ;
       } else
       {
-        try
-        {
-          auxDB.insertEntry( entry ) ;
-        }
-        catch (Exception e) {}
+          insertEntry(auxDB, entry);
+          // Check if the entry we just found references another entry which
+          // we don't already have in our list of entries to include. If so,
+          // pull in that entry as well:
+          String crossref = (String)entry.getField("crossref");
+          if ((crossref != null) && (!mySet.contains(crossref))) {
+              BibtexEntry refEntry = db.getEntryByKey(crossref);
+              if (entry == null) {
+                  notFoundList.add(crossref);
+              } else {
+                  insertEntry(auxDB, refEntry);
+                  crossreferencedEntriesCount++;
+              }
+          }
+
       }
     }
   }
 
-  /**
-   * generate
-   * Shortcut methode for easy generation.
-   *
-   * @param auxFileName String
-   * @param bibDB BibtexDatabase - reference database
-   * @return Vector - contains all not resolved bibtex entries
-   */
-  public final Vector generate(String auxFileName, BibtexDatabase bibDB)
-  {
-    setReferenceDatabase(bibDB);
-    parseAuxFile(auxFileName) ;
-    resolveTags();
+    /**
+     * Insert a clone of the given entry. The clone is given a new unique ID.
+     * @param auxDB The database to insert into.
+     * @param entry The entry to insert a copy of.
+     */
+    private void insertEntry(BibtexDatabase auxDB, BibtexEntry entry) {
+        try {
+            BibtexEntry clonedEntry = (BibtexEntry)entry.clone();
+            clonedEntry.setId(Util.createNeutralId());
+            auxDB.insertEntry(clonedEntry);
+        } catch (KeyCollisionException e) {
+            e.printStackTrace();
+        }
+    }
 
-    return notFoundList ;
-  }
+    /**
+     * generate
+     * Shortcut methode for easy generation.
+     *
+     * @param auxFileName String
+     * @param bibDB BibtexDatabase - reference database
+     * @return Vector - contains all not resolved bibtex entries
+     */
+    public final Vector generate(String auxFileName, BibtexDatabase bibDB)
+    {
+      setReferenceDatabase(bibDB);
+      parseAuxFile(auxFileName) ;
+      resolveTags();
+
+      return notFoundList ;
+    }
 
   public BibtexDatabase getGeneratedDatabase()
   {
@@ -324,7 +349,7 @@ public class AuxSubGenerator
 
   public final int getResolvedKeysCount()
   {
-    return auxDB.getEntryCount() ;
+    return auxDB.getEntryCount() - crossreferencedEntriesCount;
   }
 
   public final int getNotResolvedKeysCount()
@@ -332,11 +357,22 @@ public class AuxSubGenerator
     return notFoundList.size() ;
   }
 
+    /**
+     * Query the number of extra entries pulled in due to crossrefs from other
+     * entries.
+     * @return The number of additional entries pulled in due to crossref
+     */
+    public final int getCrossreferencedEntriesCount()
+    {
+        return crossreferencedEntriesCount;
+    }
+
   /** reset all used datastructures */
   public final void clear()
   {
     mySet.clear() ;
     notFoundList.clear();
+    crossreferencedEntriesCount = 0;
     // db = null ;  ???
   }
 

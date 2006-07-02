@@ -378,8 +378,14 @@ public class Globals {
           off = new OpenFileFilter();
         else if (!extension.equals(NONE))
           off = new OpenFileFilter(extension);
-        return (String[])getNewFileImpl(owner, directory, extension, null, off,
+        Object o = getNewFileImpl(owner, directory, extension, null, off,
                 JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true);
+        String[] toReturn;
+        if (o instanceof String[])
+            toReturn = (String[])o;
+        else toReturn = new String[] {(String)o};
+
+        return toReturn;
     }
 
   public static String getNewFile(JFrame owner,
@@ -470,7 +476,7 @@ public class Globals {
 
       fc.addChoosableFileFilter(off);
       fc.setDialogType(dialogType);
-      int dialogResult = JFileChooser.CANCEL_OPTION;
+      int dialogResult;
       if (dialogType == JFileChooser.OPEN_DIALOG) {
           dialogResult = fc.showOpenDialog(owner);
       } else if (dialogType == JFileChooser.SAVE_DIALOG) {

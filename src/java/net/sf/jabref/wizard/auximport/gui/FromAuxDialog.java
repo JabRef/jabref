@@ -334,6 +334,9 @@ public class FromAuxDialog
                             auxParser.getResolvedKeysCount() ) ;
         statusInfos.append( "\n" + Globals.lang( "not found" ) + " " +
                             auxParser.getNotResolvedKeysCount() ) ;
+        statusInfos.append( "\n" + Globals.lang( "crossreferenced entries included" ) + " " +
+                            auxParser.getCrossreferencedEntriesCount() ) ;
+
 
         int nested = auxParser.getNestedAuxCounter() ;
         if ( nested > 0 )

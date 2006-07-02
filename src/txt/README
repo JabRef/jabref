@@ -83,6 +83,8 @@ Change log:
 2.1b2   - Added option to toggle floating of marked entries to the top of the table.
         - Added option to open, append and import multiple BibTeX files.
         - Improved support for LaTeX special characters in HTML and RTF representations.
+        - Improved generation of subdatabase from AUX file. Crossreferenced entries are
+          now included automatically.          
         - Fixed bug that made entry selection get lost when an edit modifies the entry's
           position in the main table.
         - Fixed bug in BibTeXML export (entry type name missing in tag).
