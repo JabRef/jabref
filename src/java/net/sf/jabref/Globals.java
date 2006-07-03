@@ -450,8 +450,9 @@ public class Globals {
                                        boolean multipleSelection) {
 
       if (ON_MAC) {
+
           return getNewFileForMac(owner, directory, extension, dialogType,
-                  updateWorkingDirectory, dirOnly, off);
+                updateWorkingDirectory, dirOnly, off);
       }
 
       JFileChooser fc = null;
