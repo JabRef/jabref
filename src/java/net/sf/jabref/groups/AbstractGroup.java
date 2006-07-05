@@ -194,7 +194,7 @@ public abstract class AbstractGroup {
 	}
 	
 	/** Returns a lengthy textual description of this instance (for 
-     * the groups editor). */
+     * the groups editor). The text is formatted in HTML. */
 	public abstract String getDescription();
 
 	/**
