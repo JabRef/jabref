@@ -5,6 +5,8 @@
 package net.sf.jabref.net;
 
 import java.awt.Component;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,8 +33,8 @@ public class URLDownload {
     }
     
     public void download() throws IOException {
-        InputStream input = source.openStream();
-        FileOutputStream output =  new FileOutputStream(dest);
+        InputStream input = new BufferedInputStream(source.openStream());
+        OutputStream output =  new BufferedOutputStream(new FileOutputStream(dest));
      
         try
           {
@@ -57,19 +59,14 @@ public class URLDownload {
 
     public void copy(InputStream in, OutputStream out) throws IOException
       {
-        ProgressMonitorInputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
-        byte[] buffer = new byte[256];
-        synchronized(in)
-          {
-            synchronized(out)
-              {
-                while(true)
-                  {
-                    int bytesRead = _in.read(buffer);
-                    if(bytesRead == -1) break;
-                    out.write(buffer, 0, bytesRead);
-                  }
-              }
-          }
-      }    
+        InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
+        byte[] buffer = new byte[512];
+        int reps=0;
+        while(true)
+        {
+            int bytesRead = _in.read(buffer);
+            if(bytesRead == -1) break;
+            out.write(buffer, 0, bytesRead);
+        }        
+      }   
 }

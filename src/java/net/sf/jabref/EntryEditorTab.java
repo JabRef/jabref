@@ -197,12 +197,13 @@ public class EntryEditorTab {
     }
 
     public void validateAllFields() {
-        for (Iterator i=editors.keySet().iterator(); i.hasNext();) {
-            String field = (String)i.next();
-            FieldEditor ed = (FieldEditor)editors.get(field);
-        if (((Component)ed).hasFocus())
-            ed.setBackground(GUIGlobals.activeEditor);
-        else
+        for (Iterator i = editors.keySet().iterator(); i.hasNext();) {
+            String field = (String) i.next();
+            FieldEditor ed = (FieldEditor) editors.get(field);
+            ed.setEnabled(true);
+            if (((Component) ed).hasFocus())
+                ed.setBackground(GUIGlobals.activeEditor);
+            else
                 ed.setBackground(GUIGlobals.validFieldBackground);
         }
     }

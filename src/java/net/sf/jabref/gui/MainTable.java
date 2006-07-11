@@ -55,7 +55,7 @@ public class MainTable extends JTable {
         updateRenderers();
     }
 
-    public MainTable(MainTableFormat tableFormat, EventList list) {
+    public MainTable(MainTableFormat tableFormat, EventList list, JabRefFrame frame) {
         super();
         this.tableFormat = tableFormat;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
@@ -90,9 +90,10 @@ public class MainTable extends JTable {
 
         // enable DnD
         setDragEnabled(true);
-        setTransferHandler(new EntryTableTransferHandler(this));
+        TransferHandler xfer = new EntryTableTransferHandler(this, frame);
+        setTransferHandler(xfer);
+        pane.setTransferHandler(xfer);
 
-        setupComparatorChooser();
         refreshSorting();
         setWidths();
 

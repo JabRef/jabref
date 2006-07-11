@@ -47,9 +47,19 @@ public class DuplicateResolverDialog extends JDialog {
     boolean block = true;
     TitleLabel lab;
 
-  public DuplicateResolverDialog(JabRefFrame frame, BibtexEntry one, BibtexEntry two, int type) {
-    super(frame, Globals.lang("Possible duplicate entries"), true);
+  public DuplicateResolverDialog(JFrame frame, BibtexEntry one, BibtexEntry two, int type) {
+      super(frame, Globals.lang("Possible duplicate entries"), true);
+      init(one, two, type);
+      Util.placeDialog(this, frame);
+  }
 
+    public DuplicateResolverDialog(JDialog frame, BibtexEntry one, BibtexEntry two, int type) {
+        super(frame, Globals.lang("Possible duplicate entries"), true);
+        init(one, two, type);
+        Util.placeDialog(this, frame);
+    }
+
+    private void init(BibtexEntry one, BibtexEntry two, int type) {
       switch (type) {
           case DUPLICATE_SEARCH:
               first = new JButton(Globals.lang("Keep upper"));
@@ -170,7 +180,7 @@ public class DuplicateResolverDialog extends JDialog {
 
 
     both.requestFocus();
-    Util.placeDialog(this, frame);
+
   }
 
   private void setSourceView(BibtexEntry one, BibtexEntry two) {

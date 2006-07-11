@@ -149,23 +149,30 @@ public class ExternalFilePanel extends JPanel {
     }
 
 
-    public void downLoadFile(final String fieldName, final FieldEditor editor, final Component parent) {
-        String res =
-                JOptionPane.showInputDialog(parent,
+    public void downLoadFile(final String fieldName,
+                             final FieldEditor editor, final Component parent) {
+
+        String res = JOptionPane.showInputDialog(parent,
                         Globals.lang("Enter URL to download"));
 
         if (res != null) {
             class Downloader extends Thread {
                 String res;
+                BibtexEntry targetEntry = null;
 
                 public Downloader(String res) {
                     this.res = res;
+                    // If this panel belongs in an entry editor, note which entry is
+                    // currently shown:
+                    if (entryEditor != null)
+                        targetEntry = entryEditor.getEntry();
                 }
 
                 public void run() {
                     URL url;
                     String textToSet = editor.getText();
                     editor.setEnabled(false);
+                    boolean updateEditor = true;
                     try {
                         editor.setText(Globals.lang("Downloading..."));
                         url = new URL(res);
@@ -203,6 +210,10 @@ public class ExternalFilePanel extends JPanel {
                             Globals.logger("Error while downloading " + url.toString());
                         }
 
+                        // Check if we should update the editor text field, or update the
+                        // target entry directly:
+                        updateEditor = (entryEditor == null) ||
+                                (entryEditor.getEntry() == targetEntry);
                         output(Globals.lang("Download completed"));
                         String filename = file.getPath();
 
@@ -217,19 +228,28 @@ public class ExternalFilePanel extends JPanel {
                             filename = relPath;
                         }
                         textToSet = filename;
-                       //editor.setText(filename);
-                        SwingUtilities.invokeLater(new Thread() {
-                            public void run() {
-                                if (entryEditor != null)
-                                    entryEditor.updateField(editor);
-                            }
-                        });
+                        if (updateEditor)
+                            SwingUtilities.invokeLater(new Thread() {
+                                public void run() {
+                                    if (entryEditor != null)
+                                        entryEditor.updateField(editor);
+                                }
+                            });
+                        else {
+                            // Editor has probably changed to show a different entry. So
+                            // we must update the target entry directly and not set the
+                            // text of the editor.
+                            targetEntry.setField(fieldName, textToSet);
+                        }
                     } catch (MalformedURLException e1) {
                         JOptionPane.showMessageDialog(parent, "Invalid URL: "+e1.getMessage(),
                                 "Download file", JOptionPane.ERROR_MESSAGE);
                     } finally {
-                        editor.setText(textToSet);
-                        editor.setEnabled(true);
+                        if (updateEditor) {
+                            System.out.println("Juuu");
+                            editor.setText(textToSet);
+                            editor.setEnabled(true);
+                        }
                     }
                 }
             }

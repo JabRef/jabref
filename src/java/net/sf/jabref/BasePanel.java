@@ -1553,7 +1553,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         MainTableFormat tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         //EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
-        mainTable = new MainTable(/*tableModel, */tableFormat, searchFilterList);
+        mainTable = new MainTable(/*tableModel, */tableFormat, searchFilterList, frame);
+        
         selectionListener = new MainTableSelectionListener(this, mainTable);
         mainTable.updateFont();
         mainTable.addSelectionListener(selectionListener);

@@ -9,6 +9,7 @@ import junit.framework.TestCase;
  * formater AuthorLastFirstAbbreviator.
  * 
  * @author Carlos Silla
+ * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class AuthorLastFirstAbbreviatorTester extends TestCase {
 
@@ -75,13 +76,25 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * 
 	 * Ex: Lastname, Name Middlename
 	 */
-	//TODO: Verify how to tell this test that it should pass if fail.
-/*	public void testTwoAuthorsBadFormating() {
-		String name = new String("Lastname, Name Middlename and Nome Nomedomeio Sobrenome");
+	public void testTwoAuthorsBadFormating() {
+		// String name = new String("Lastname, Name Middlename and Nome Nomedomeio Sobrenome");
 		
-		AuthorLastFirstAbbreviator ab = new AuthorLastFirstAbbreviator();
-		
-		String result = ab.format(name);		
-	}*/
+		fail();
+		// @TODO: How should a Formatter fail? 
+		// assertEquals("Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator", abbreviate(name));
+	}
+	
+	/**
+	 * Testcase for 
+	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
+	 */
+	public void testJrAuthor(){
+		String name = "Other, Jr., Anthony N.";
+		assertEquals("Other, A.N.", abbreviate(name));
+	}
+
+	protected String abbreviate(String name) {
+		return (new AuthorLastFirstAbbreviator()).format(name);
+	}
 	
 }

@@ -636,18 +636,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
    */
   public synchronized void switchTo(BibtexEntry be) {
       if (entry == be)
-        return;
+          return;
 
-        //Util.pr("EntryEditor.switchTo(BibtexEntry): "+entry.getCiteKey());
-        //Util.pr("::EntryEditor.switchTo(BibtexEntry): "+this.type.getName());
+      //Util.pr("EntryEditor.switchTo(BibtexEntry): "+entry.getCiteKey());
+      //Util.pr("::EntryEditor.switchTo(BibtexEntry): "+this.type.getName());
       storeCurrentEdit();
-         entry = be;
-        updateAllFields();
-        validateAllFields();
-        updateSource();
-        panel.showing = be;
 
-    }
+      // Remove this instance as property listener for the entry:
+      entry.removePropertyChangeListener(this);
+      // Register as property listener for the new entry:
+      be.addPropertyChangeListener(this);
+      
+      entry = be;
+
+      updateAllFields();
+      validateAllFields();
+      updateSource();
+      panel.showing = be;
+
+  }
 
   /**
    * Returns false if the contents of the source panel has not been validated,

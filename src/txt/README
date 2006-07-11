@@ -80,11 +80,15 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+2.1?    - Fixed erroneous updates in entry editor if user switches to a different entry
+          while downloading PDF/PS file.
+        - Fixed bug (only in 2.1b2) in calling file open/save dialog on Mac OS X.
+        - Fixed bug that made duplicate resolver dialog pop under import inspection dialog.
 2.1b2   - Added option to toggle floating of marked entries to the top of the table.
         - Added option to open, append and import multiple BibTeX files.
         - Improved support for LaTeX special characters in HTML and RTF representations.
         - Improved generation of subdatabase from AUX file. Crossreferenced entries are
-          now included automatically.          
+          now included automatically.
         - Fixed bug that made entry selection get lost when an edit modifies the entry's
           position in the main table.
         - Fixed bug in BibTeXML export (entry type name missing in tag).

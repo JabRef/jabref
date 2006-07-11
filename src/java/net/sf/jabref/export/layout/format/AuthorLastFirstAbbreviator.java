@@ -1,150 +1,123 @@
-/*
- * Created on 12/10/2004
- */
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
- * 
- * Uses as input the fields (author or editor) in the LastFirst format. 
+ * Uses as input the fields (author or editor) in the LastFirst format.
  * 
  * This formater enables to abbreviate the authors name in the following way:
  * 
- * Ex: Someone, Van Something will be abbreviated as Someone, V. S.
+ * Ex: Someone, Van Something will be abbreviated as Someone, V.S.
  * 
  * @author Carlos Silla
+ * @author Christopher Oezbek <oezi@oezi.de>
+ * 
+ * @version 1.0 Created on 12/10/2004
+ * @version 1.1 Fixed bug
+ *          http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
  */
 public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 
-	/* (non-Javadoc)
+	/**
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
-	public String format(String fieldText) 
-	{
-
-        String[] authors = fieldText.split(" and ");
-
-		String abbrev = getAbbreviations(authors);
-        return (abbrev==null ? "" : abbrev);
-
+	public String format(String fieldText) {
+		try {
+		  return getAbbreviations(fieldText.split(" and "));
+		} catch(Exception e){
+            return fieldText;
+            //return "Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator";
+		}
 	}
-				
+
 	/**
-	 * Abbreviates the names in the Last First format.
+	 * Abbreviates the names in the Last, First or Last, Jr, First format.
 	 * 
-	 * @param authors List of authors or editors.
-	 * @return the names abbreviated.
-	 * @throws RequiredOrderException
-	 * 
+	 * @param authors
+	 *            List of authors.
+	 * @return The abbreviated names.
 	 */
-	private String getAbbreviations(String[] authors)
-	{
-		String s = null;
-		
-		try
-		{
-			verifyProperFormat(authors);
-		
-			String[] authors_abrv = new String[authors.length];
+	private String getAbbreviations(String[] authors) {
+		if (authors.length == 0)
+			return "";
 
-			int i = 0;
-
-			for(i=0; i<authors.length; i++)
-			{
-				authors_abrv[i] = getAbbreviation(authors[i]);
-			}
-
-			//Faz o merge em um "unico string" usando " and " 
-			StringBuffer sb = new StringBuffer();
-
-			for(i=0; i<authors.length-1; i++)
-			{
-                sb.append(authors_abrv[i]).append(" and ");
-			}
-			sb.append(authors_abrv[i]);
-
-			 s = new String(sb);		
+		if (!isProperFormat(authors)) {
+			return "Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator";
 		}
-		catch(Exception e)
-		{
-                    e.printStackTrace();
-                    //	System.out.println(e);
-			//System.exit(-1);
+
+		for (int i = 0; i < authors.length; i++) {
+			authors[i] = getAbbreviation(authors[i]);
 		}
-		
-		return s;
+
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < authors.length - 1; i++) {
+			sb.append(authors[i]).append(" and ");
+		}
+		sb.append(authors[authors.length - 1]);
+
+		return sb.toString();
 	}
 
 	/**
-	 * Method that verifies if the author names are in the Last First format.
+	 * Method that verifies if the author names are in the Last, First or Last,
+	 * Jr, First format.
 	 * 
-	 * @param authors List of author or editor names.
-	 * @throws Exception
+	 * If the name contains a space, but does not have the comma it is not in
+	 * the appropriate format.
+	 * 
+	 * @param authors
+	 *            List of authors to verify
 	 */
-	private void verifyProperFormat(String[] authors) throws Exception 
-	{
-		int i = 0;
-		
-		for(i=0; i<authors.length; i++)
-		{
-			//If the name contains a space, but does not have the comma it is not in the 
-                        // appropriate format.
-			if((authors[i].indexOf(' ') >= 0) && (authors[i].lastIndexOf(',')==-1))
-			{
-                System.out.println(": '"+authors[i]+"'");
-                            Exception e = new Exception("Error: names must be rearranged in Last, First format before formatted with AuthorLastFirstAbbreviator");
-                            e.printStackTrace();
-                            throw e;
+	private boolean isProperFormat(String[] authors) {
+		for (int i = 0; i < authors.length; i++) {
+			if ((authors[i].indexOf(' ') >= 0)
+					&& (authors[i].indexOf(',') == -1)) {
+				return false;
 			}
+
 		}
+		return true;
 	}
 
 	/**
+	 * Abbreviates all first names of the author.
 	 * 
-	 * Abbreviates all but the last name of the author.
-	 * 
-	 * @param string
+	 * @param author
 	 * @return
 	 */
-	private String getAbbreviation(String string) {
-		String[] author = string.split(", ");
-                
-                // If there is no comma in the name, we return it as it is:
-		if (author.length < 2)
-                    return string;
-                
-		char c;
-		String s;
-		//Gets the name:
-		StringBuffer sb = new StringBuffer(author[0] + ", ");
-		
-		int index = author[1].indexOf(" ");
-		
-		if(index==-1) {
-			//Its a simple name like van Something, Someone or  Something, Someone:
-			c  = author[1].charAt(0);
-//			System.out.println("Char c: " + c + " Name: " + author[1]);
-            sb.append(c).append(".");
+	private String getAbbreviation(String author) {
+
+		String[] parts = author.split(",");
+
+		String last, first;
+
+		switch (parts.length) {
+		case 1:
+			// If there is no comma in the name, we return it as it is
+			return author;
+		case 2:
+			last = parts[0].trim();
+			first = parts[1].trim();
+			break;
+		case 3:
+			last = parts[0].trim();
+			// jr = author[1];
+			first = parts[2].trim();
+			break;
+		default:
+			throw new IllegalArgumentException("Authorname contained 3 or more commas");
 		}
-		else {
-			//Its a "complex" name like van Something, Someone Something
-			String[] nameParts = author[1].split(" ");
-			
-			int i = 0;
-			
-			for(i=0;i<nameParts.length;i++)
-			{
-				c = nameParts[i].charAt(0);
-	//			System.out.println("Char c: " + c + " Name: " + nameParts[i]);
-                sb.append(c).append(".");
-			}
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(last);
+		sb.append(", ");
+
+		String[] firstNames = first.split(" ");
+		for (int i = 0; i < firstNames.length; i++) {
+			sb.append(firstNames[i].charAt(0));
+			sb.append('.');
 		}
-		
-		//Replaces each "part of the name" for the corresponding Letter Dot Space format:
-		s = new String(sb);
-		
-		//System.out.println("The Abbreviated name is: " + s);
-		return s;
-	}	
+		return sb.toString();
+	}
 }

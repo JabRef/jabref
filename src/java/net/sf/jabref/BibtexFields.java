@@ -198,7 +198,7 @@ public class BibtexFields
 
     dummy =  new BibtexSingleField( MARKED, false) ;
     dummy.setPrivate();
-    dummy.setWriteable(false);
+    dummy.setWriteable(true); // This field must be written to file!
     dummy.setDisplayable(false);
     add(dummy) ;
 

@@ -190,4 +190,9 @@ public class FieldTextArea extends JTextArea implements FieldEditor, KeyListener
 
     public void keyTyped(KeyEvent event) {
     }
+
+/*    public void setText(String t) {
+        super.setText(t);    //To change body of overridden methods use File | Settings | File Templates.
+        Thread.dumpStack();
+    }*/
 }

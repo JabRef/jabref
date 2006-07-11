@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
 
+// TODO: could separate the "menu item" functionality from the importing functionality
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     JabRefFrame frame;
@@ -41,6 +42,21 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         worker.getWorker().run();
         worker.getCallBack().update();
     }
+    
+    /**
+     * Automatically imports the files given as arguments
+     * @param filenames List of files to import
+     */
+    public void automatedImport(String filenames[]) {
+        // replace the work of the init step:
+        MyWorker worker = new MyWorker();
+        worker.fileOk = true;
+        worker.filenames = filenames;
+        
+        worker.getWorker().run();
+        worker.getCallBack().update();
+    }
+    
 
     class MyWorker extends AbstractWorker implements ImportInspectionDialog.CallBack {
         String[] filenames = null, formatName = null;
@@ -61,10 +77,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 frame.output(Globals.lang("Starting import"));
                 //frame.output(Globals.lang("Importing file") + ": '" + filename + "'");
                 fileOk = true;
-
+                
                 Globals.prefs.put("workingDirectory", filenames[0]);
             }
-
         }
 
         public void run() {
@@ -86,13 +101,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 else
                     // Unknown format:
                     imports.add(Globals.importFormatReader.importUnknownFormat(filename));
-
             }
 
             // Ok, done. Then try to gather in all we have found. Since we might have found
             // one or more bibtex results, it's best to gather them in a BibtexDatabase.
             bibtexResult = mergeImportResults(imports);
-
         }
 
         public void update() {
@@ -184,7 +197,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
             }
             */
-            if (worker.bibtexResult != null) {
+            if ((worker != null) && (worker.bibtexResult != null)) {
                 frame.output(Globals.lang("Imported entries") + ": " + entriesImported);
                 //        + "  " + Globals.lang("Format used") + ": " + worker.formatName);
             }

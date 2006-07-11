@@ -733,7 +733,8 @@ public class ImportInspectionDialog extends JDialog {
                 BibtexEntry first = (BibtexEntry)sortedList.get(row);
                 BibtexEntry other = Util.containsDuplicate(panel.database(), first);
                 if (other != null) { // This should be true since the icon is displayed...
-                    DuplicateResolverDialog diag = new DuplicateResolverDialog(frame, other, first, DuplicateResolverDialog.INSPECTION);
+                    DuplicateResolverDialog diag = new DuplicateResolverDialog
+                            (ImportInspectionDialog.this, other, first, DuplicateResolverDialog.INSPECTION);
                     Util.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();

@@ -95,7 +95,7 @@ public class AppendDatabaseAction extends BaseAction {
           BibtexDatabase fromDatabase = pr.getDatabase();
           ArrayList appendedEntries = new ArrayList();
           ArrayList originalEntries = new ArrayList();
-        BibtexDatabase database = panel.database();
+          BibtexDatabase database = panel.database();
           BibtexEntry originalEntry;
           NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
           MetaData meta = new MetaData(pr.getMetaData(), pr.getDatabase());

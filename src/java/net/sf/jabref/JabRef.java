@@ -494,6 +494,37 @@ public class JabRef {
         return loaded;
     }
 
+    ParserResult importFiletypeUnknown(String fname) {
+        Object[] o =
+                Globals.importFormatReader.importUnknownFormat(fname
+                        .replaceAll("~", System.getProperty("user.home")));
+        String formatName = (String) o[0];
+
+        if (formatName == null) {
+            System.err.println(Globals.lang("Error opening file") + " '" + fname + "'");
+        } else if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
+            ParserResult pr = (ParserResult) o[1];
+            return pr;
+        } else {
+            List entries = (java.util.List) o[1];
+            if (entries != null)
+                System.out.println(Globals.lang("Format used") + ": "
+                        + formatName);
+            else
+                System.out.println(Globals.lang(
+                        "Could not find a suitable import format."));
+
+            if (entries != null) {
+                BibtexDatabase base = ImportFormatReader.createDatabase(entries);
+                ParserResult pr = new ParserResult(base, null, new HashMap());
+                return pr;
+            }
+        }
+        
+        // not reached
+        return null;
+    }
+
     public void openWindow(Vector loaded) {
         if (!graphicFailure && !disableGui.isInvoked()) {
             // Call the method performCompatibilityUpdate(), which does any
