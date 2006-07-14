@@ -41,9 +41,9 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		if (authors.length == 0)
 			return "";
 
-		if (!isProperFormat(authors)) {
+		/*if (!isProperFormat(authors)) {
 			return "Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator";
-		}
+		}*/
 
 		for (int i = 0; i < authors.length; i++) {
 			authors[i] = getAbbreviation(authors[i]);
@@ -70,7 +70,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	 *            List of authors to verify
 	 */
 	private boolean isProperFormat(String[] authors) {
-		for (int i = 0; i < authors.length; i++) {
+        for (int i = 0; i < authors.length; i++) {
 			if ((authors[i].indexOf(' ') >= 0)
 					&& (authors[i].indexOf(',') == -1)) {
 				return false;

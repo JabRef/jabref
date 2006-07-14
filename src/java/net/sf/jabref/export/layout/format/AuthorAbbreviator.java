@@ -23,11 +23,16 @@ public class AuthorAbbreviator implements LayoutFormatter {
 	public String format(String fieldText) 
 	{
 
-		String[] authors = fieldText.split(" and ");
+        // It seems to me that this formatter and AuthorLastFirstAbbreviator
+        // are duplicates. Since the latter was patched to improve handling of
+        // some names, we refer the operation there:
+        return (new AuthorLastFirstAbbreviator()).format(fieldText);
+
+        /*String[] authors = fieldText.split(" and ");
 
 		String abbrev = getAbbreviations(authors);
 		return abbrev;
-
+        */
 	}
 				
 	/**
@@ -35,8 +40,7 @@ public class AuthorAbbreviator implements LayoutFormatter {
 	 * 
 	 * @param authors List of authors or editors.
 	 * @return the names abbreviated.
-	 * @throws RequiredOrderException
-	 * 
+	 *
 	 */
 	private String getAbbreviations(String[] authors)
 	{

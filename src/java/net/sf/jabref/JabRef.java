@@ -57,7 +57,7 @@ public class JabRef {
     boolean graphicFailure = false;
 
     StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase;
-    BooleanOption helpO, disableGui, blank, loadSess;
+    BooleanOption helpO, disableGui, blank, loadSess, showVersion;
     /*
     * class StringArrayOption extends ArrayOption { public public void
     * modify(String value) { } public void modify(String[] value) { } public
@@ -135,6 +135,7 @@ public class JabRef {
         disableGui = new BooleanOption();
         blank = new BooleanOption();
         loadSess = new BooleanOption();
+        showVersion = new BooleanOption();
         exportPrefs = new StringOption("jabref_prefs.xml");
         importPrefs = new StringOption("jabref_prefs.xml");
         auxImExport = new StringOption("");
@@ -144,6 +145,8 @@ public class JabRef {
         options.setVersion(GUIGlobals.version);
 
         importFile.setDescription("imopoepuoeu"); //Globals.lang);
+        options.register("version", 'v',
+                Globals.lang("Display version"), showVersion);
         options.register("nogui", 'n',
             Globals.lang("No GUI. Only process command line options."), disableGui);
         options.register("import", 'i',
@@ -174,7 +177,14 @@ public class JabRef {
         setupOptions();
         String[] leftOver = options.process(args);
 
+
+
         //Util.pr(": Options processed");
+
+        if (initialStartup && showVersion.isInvoked()) {
+            options.displayVersion();
+            disableGui.setInvoked(true);
+        }
 
         if (initialStartup && helpO.isInvoked()) {
             System.out.println("jabref [options] [bibtex-file]\n");
