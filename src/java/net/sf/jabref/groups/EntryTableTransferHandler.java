@@ -34,12 +34,9 @@ import java.util.Iterator;
 import javax.swing.*;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
-import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
@@ -78,7 +75,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         if (dropStr.startsWith("file:")) {
             // This appears to be a dragged file link and not a reference
             // format. Check if we can map this to a set of files:
-            if (handleFileLinkSet(dropStr))
+            if (handleDraggedFilenames(dropStr))
                 return true;
             // If not, handle it in the normal way...
         } else if (dropStr.startsWith("http:")) {
@@ -100,7 +97,11 @@ public class EntryTableTransferHandler extends TransferHandler {
         return true;
     }
 
-    private boolean handleFileLinkSet(String s) {
+    /**
+     * Handle a String describing a set of files or URLs dragged into JabRef.
+     * @param s String describing a set of files or URLs dragged into JabRef
+     */
+    private boolean handleDraggedFilenames(String s) {
         // Split into lines:
         String[] lines = s.replaceAll("\r", "").split("\n");
         List files = new ArrayList();
@@ -118,7 +119,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 files.add(f);
             }
         }
-        return handleFileList(files);
+        return handleDraggedFiles(files);
 
     }
 
@@ -126,7 +127,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      * Handle a List containing File objects for a set of files to import.
      * @param files A List containing File instances pointing to files.
      */
-    private boolean handleFileList(List files) {
+    private boolean handleDraggedFiles(List files) {
         final String[] fileNames = new String[files.size()];
         int i=0;
         for (Iterator iterator = files.iterator(); iterator.hasNext();) {
@@ -210,7 +211,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 //JOptionPane.showMessageDialog(null, "Received javaFileListFlavor");
                 // This flavor is used for dragged file links in Windows:
                 List l = (List)t.getTransferData(DataFlavor.javaFileListFlavor);
-                return handleFileList(l);
+                return handleDraggedFiles(l);
             }
             if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
