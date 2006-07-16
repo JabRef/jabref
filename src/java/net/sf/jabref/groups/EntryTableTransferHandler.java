@@ -36,8 +36,12 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
+import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
 
 public class EntryTableTransferHandler extends TransferHandler {
@@ -110,7 +114,6 @@ public class EntryTableTransferHandler extends TransferHandler {
             if (line.startsWith("//"))
                 line = line.substring(2);
             File f = new File(line);
-            System.out.println(f.getPath());
             if (f.exists()) {
                 files.add(f);
             }
@@ -124,16 +127,62 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @param files A List containing File instances pointing to files.
      */
     private boolean handleFileList(List files) {
-        String[] fileNames = new String[files.size()];
+        final String[] fileNames = new String[files.size()];
         int i=0;
         for (Iterator iterator = files.iterator(); iterator.hasNext();) {
             File file = (File) iterator.next();
             fileNames[i] = file.getAbsolutePath();
             i++;
         }
-        ImportMenuItem importer = new ImportMenuItem(frame, false);
-        importer.automatedImport(fileNames);
+        // Try to load bib files normally, and import the rest into the current database.
+        // This process must be spun off into a background thread:
+        new Thread(new Runnable() {
+            public void run() {
+                loadOrImportFiles(fileNames);
+            }
+        }).start();
+
         return true;
+    }
+
+    /**
+     * Take a set of filenames. Those with names indicating bib files are opened as such
+     * if possible. All other files we will attempt to import into the current database.
+     * @param fileNames The names of the files to open.
+     */
+    private void loadOrImportFiles(String[] fileNames) {
+
+        OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
+        ArrayList notBibFiles = new ArrayList();
+        String encoding = Globals.prefs.get("defaultEncoding");
+        for (int i = 0; i < fileNames.length; i++) {
+            if (fileNames[i].endsWith(".bib")) {
+                File f = new File(fileNames[i]);
+                try {
+                    ParserResult pr = OpenDatabaseAction.loadDatabase
+                            (f, encoding);
+                    if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                        notBibFiles.add(fileNames[i]);
+                    } else {
+                        openAction.addNewDatabase(pr, f, false);
+                    }
+                } catch (IOException e) {
+                    notBibFiles.add(fileNames[i]);
+                    // No error message, since we want to try importing the file?
+                    //
+                    //Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
+                }
+            }
+            else notBibFiles.add(fileNames[i]);
+        }
+
+        if (notBibFiles.size() > 0) {
+            String[] toImport = new String[notBibFiles.size()];
+            notBibFiles.toArray(toImport);
+
+            ImportMenuItem importer = new ImportMenuItem(frame, false);
+            importer.automatedImport(toImport);
+        }
     }
 
     protected boolean handleDropTransfer(URL dropLink) throws IOException {

@@ -76,6 +76,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         public void run() {
             frame.addTab(bp, file, raisePanel);
+
         }
     }
 
@@ -88,87 +89,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
                 ParserResult pr = loadDatabase(file, encoding);
-		if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
-		    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file"+" '"+fileName+"'"),
-						  Globals.lang("Error"),
-						  JOptionPane.ERROR_MESSAGE);
+                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
+                    JOptionPane.showMessageDialog(null, Globals.lang("Error opening file" + " '" + fileName + "'"),
+                            Globals.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
 
-		    return;
-		}
-		 
-                BibtexDatabase db = pr.getDatabase();
-                HashMap meta = pr.getMetaData();
-
-                if (pr.hasWarnings()) {
-                    final String[] wrns = pr.warnings();
-                    (new Thread() {
-                        public void run() {
-                            StringBuffer wrn = new StringBuffer();
-                            for (int i = 0; i < wrns.length; i++)
-                                wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
-
-                            if (wrn.length() > 0)
-                                wrn.deleteCharAt(wrn.length() - 1);
-                            // Note to self or to someone else: The following line causes an
-                            // ArrayIndexOutOfBoundsException in situations with a large number of
-                            // warnings; approx. 5000 for the database I opened when I observed the problem
-                            // (duplicate key warnings). I don't think this is a big problem for normal situations,
-                            // and it may possibly be a bug in the Swing code.
-                            JOptionPane.showMessageDialog(frame, wrn.toString(),
-                                    Globals.lang("Warnings"),
-                                    JOptionPane.WARNING_MESSAGE);
-                        }
-                    }).start();
+                    return;
                 }
 
-                BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
-
-                /*
-                 if (Globals.prefs.getBoolean("autoComplete")) {
-                 db.setCompleters(autoCompleters);
-                 }
-                */
-
-                // file is set to null inside the EventDispatcherThread
-                SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
-
-                // See if any custom entry types were imported, but disregard those we already know:
-                for (Iterator i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
-                    String typeName = ((String) i.next()).toLowerCase();
-                    if (BibtexEntryType.ALL_TYPES.get(typeName) != null)
-                        i.remove();
-                }
-                if (pr.getEntryTypes().size() > 0) {
-
-
-                    StringBuffer sb = new StringBuffer(Globals.lang("Custom entry types found in file") + ": ");
-                    Object[] types = pr.getEntryTypes().keySet().toArray();
-                    Arrays.sort(types);
-                    for (int i = 0; i < types.length; i++) {
-                        sb.append(types[i].toString()).append(", ");
-                    }
-                    String s = sb.toString();
-                    int answer = JOptionPane.showConfirmDialog(frame,
-                            s.substring(0, s.length() - 2) + ".\n"
-                            + Globals.lang("Remember these entry types?"),
-                            Globals.lang("Custom entry types"),
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE);
-                    if (answer == JOptionPane.YES_OPTION) {
-                        // Import
-                        HashMap et = pr.getEntryTypes();
-                        for (Iterator i = et.keySet().iterator(); i.hasNext();) {
-                            BibtexEntryType typ = (BibtexEntryType) et.get(i.next());
-                            //System.out.println(":"+typ.getName()+"\n"+typ.toString());
-                            BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
-                        }
-
-                    }
-                }
-
-                frame.output(Globals.lang("Opened database") + " '" + fileName +
-                        "' " + Globals.lang("with") + " " +
-                        db.getEntryCount() + " " + Globals.lang("entries") + ".");
+                addNewDatabase(pr, file, raisePanel);
 
             } catch (Exception ex) {
                 //ex.printStackTrace();
@@ -180,6 +109,84 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                 */
             }
         }
+    }
+
+    public void addNewDatabase(ParserResult pr, File file,
+                               boolean raisePanel) {
+
+        String fileName = file.getPath();
+        BibtexDatabase db = pr.getDatabase();
+        HashMap meta = pr.getMetaData();
+
+        if (pr.hasWarnings()) {
+            final String[] wrns = pr.warnings();
+            (new Thread() {
+                public void run() {
+                    StringBuffer wrn = new StringBuffer();
+                    for (int i = 0; i < wrns.length; i++)
+                        wrn.append(i + 1).append(". ").append(wrns[i]).append("\n");
+
+                    if (wrn.length() > 0)
+                        wrn.deleteCharAt(wrn.length() - 1);
+                    // Note to self or to someone else: The following line causes an
+                    // ArrayIndexOutOfBoundsException in situations with a large number of
+                    // warnings; approx. 5000 for the database I opened when I observed the problem
+                    // (duplicate key warnings). I don't think this is a big problem for normal situations,
+                    // and it may possibly be a bug in the Swing code.
+                    JOptionPane.showMessageDialog(frame, wrn.toString(),
+                            Globals.lang("Warnings"),
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            }).start();
+        }
+        BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
+        /*
+         if (Globals.prefs.getBoolean("autoComplete")) {
+         db.setCompleters(autoCompleters);
+         }
+        */
+
+        // file is set to null inside the EventDispatcherThread
+        SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
+
+        // See if any custom entry types were imported, but disregard those we already know:
+        for (Iterator i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
+            String typeName = ((String) i.next()).toLowerCase();
+            if (BibtexEntryType.ALL_TYPES.get(typeName) != null)
+                i.remove();
+        }
+        if (pr.getEntryTypes().size() > 0) {
+
+
+            StringBuffer sb = new StringBuffer(Globals.lang("Custom entry types found in file") + ": ");
+            Object[] types = pr.getEntryTypes().keySet().toArray();
+            Arrays.sort(types);
+            for (int i = 0; i < types.length; i++) {
+                sb.append(types[i].toString()).append(", ");
+            }
+            String s = sb.toString();
+            int answer = JOptionPane.showConfirmDialog(frame,
+                    s.substring(0, s.length() - 2) + ".\n"
+                            + Globals.lang("Remember these entry types?"),
+                    Globals.lang("Custom entry types"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (answer == JOptionPane.YES_OPTION) {
+                // Import
+                HashMap et = pr.getEntryTypes();
+                for (Iterator i = et.keySet().iterator(); i.hasNext();) {
+                    BibtexEntryType typ = (BibtexEntryType) et.get(i.next());
+                    //System.out.println(":"+typ.getName()+"\n"+typ.toString());
+                    BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
+                }
+
+            }
+        }
+
+        frame.output(Globals.lang("Opened database") + " '" + fileName +
+                "' " + Globals.lang("with") + " " +
+                db.getEntryCount() + " " + Globals.lang("entries") + ".");
+
     }
 
     public static ParserResult loadDatabase(File fileToOpen, String encoding)

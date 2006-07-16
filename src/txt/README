@@ -80,7 +80,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.1?    - Fixed erroneous updates in entry editor if user switches to a different entry
+2.1?    - The -v command line option now makes the application only print version number
+          and quit immediately.
+        - Fixed erroneous updates in entry editor if user switches to a different entry
           while downloading PDF/PS file.
         - Fixed bug (only in 2.1b2) in calling file open/save dialog on Mac OS X.
         - Fixed bug that made duplicate resolver dialog pop under import inspection dialog.
