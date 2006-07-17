@@ -472,6 +472,7 @@ public class ImportFormatReader {
           bestResult = entryCount;
           usedFormat = imFo.getFormatName();
           entryList = entries;
+            //System.out.println("Looks good: "+imFo.getFormatName());
         }
       } catch (IOException ex) {
 	  //ex.printStackTrace();

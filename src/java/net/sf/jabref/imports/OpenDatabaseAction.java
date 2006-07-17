@@ -31,8 +31,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             String[] chosen = Globals.getMultipleFiles(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
                     true);
-            if (chosen != null) for (int i=0; i<chosen.length; i++)
-                filesToOpen.add(new File(chosen[i]));
+            if (chosen != null) for (int i=0; i<chosen.length; i++) {
+                if (chosen[i] != null)
+                    filesToOpen.add(new File(chosen[i]));
+            }
 
             /*
             String chosenFile = Globals.getNewFile(frame,

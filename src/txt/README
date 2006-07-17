@@ -82,6 +82,12 @@ appear in your chosen languages.
 Change log:
 2.1?    - The -v command line option now makes the application only print version number
           and quit immediately.
+        - Duplicates within a set of imported entries are now found and shown in the
+          import inspection window.
+        - Fixed missing duplicate warning when importing without import inspection window.
+        - Fixed error in ISI import which allowed empty fields to be set, causing errors
+          when saving and reloading entries.
+        - Fixed missing time and owner stamps when importing entries (only in 2.1b/2.1b2).
         - Fixed erroneous updates in entry editor if user switches to a different entry
           while downloading PDF/PS file.
         - Fixed bug (only in 2.1b2) in calling file open/save dialog on Mac OS X.

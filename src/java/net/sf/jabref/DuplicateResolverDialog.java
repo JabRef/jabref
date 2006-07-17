@@ -27,6 +27,9 @@ public class DuplicateResolverDialog extends JDialog {
         KEEP_UPPER = 1,
         KEEP_LOWER = 2,
         BREAK      = 5,  // close
+        IMPORT_AND_DELETE_OLD = 1,
+        IMPORT_AND_KEEP_OLD = 0,
+        DO_NOT_IMPORT = 2,
         DUPLICATE_SEARCH = 1,
         IMPORT_CHECK = 2,
     INSPECTION = 3;
@@ -98,8 +101,8 @@ public class DuplicateResolverDialog extends JDialog {
     con.gridwidth = GridBagConstraints.REMAINDER;
     con.weightx = 1;
     con.weighty = 0;
-    lab = new TitleLabel(Globals.lang((type==DUPLICATE_SEARCH)?"":
-                                  "Entry in current database"));
+    lab = new TitleLabel((type==DUPLICATE_SEARCH) ? "" :
+                                  Globals.lang("Entry in current database"));
     gbl.setConstraints(lab, con);
     main.add(lab);
     con.weighty = 1;
@@ -109,8 +112,8 @@ public class DuplicateResolverDialog extends JDialog {
     main.add(sp);
     con.weighty = 0;
     con.insets = new Insets(10,10,0,10);
-    lab = new TitleLabel(Globals.lang((type==DUPLICATE_SEARCH)?"":
-                                  "Entry in import"));
+    lab = new TitleLabel((type==DUPLICATE_SEARCH) ? "" :
+                                  Globals.lang("Entry in import"));
     gbl.setConstraints(lab, con);
     main.add(lab);
     con.weighty = 1;
@@ -216,9 +219,24 @@ public boolean isBlocking() {
     return status;
   }
 
-  public static int resolveDuplicate(JabRefFrame frame, BibtexEntry one, BibtexEntry two) {
+  public static int resolveDuplicate(JFrame frame, BibtexEntry one, BibtexEntry two) {
     DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two,
                                                               DUPLICATE_SEARCH);
+    drd.setVisible(true); // drd.show(); -> deprecated since 1.5
+    return drd.getSelected();
+  }
+
+  public static int resolveDuplicate(JDialog frame, BibtexEntry one, BibtexEntry two) {
+    DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, one, two,
+                                                              DUPLICATE_SEARCH);
+    drd.setVisible(true); // drd.show(); -> deprecated since 1.5
+    return drd.getSelected();
+  }
+
+  public static int resolveDuplicateInImport(JabRefFrame frame, BibtexEntry existing,
+                                           BibtexEntry imported) {
+    DuplicateResolverDialog drd = new DuplicateResolverDialog(frame, existing, imported,
+                                                              IMPORT_CHECK);
     drd.setVisible(true); // drd.show(); -> deprecated since 1.5
     return drd.getSelected();
   }

@@ -204,6 +204,8 @@ public class Globals {
     }
     catch (MissingResourceException ex) {
       translation = key;
+      
+      //Thread.dumpStack();  // For debugging
       logger("Warning: could not get translation for \""
                          + key + "\"");
     }

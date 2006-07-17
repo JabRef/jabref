@@ -3,6 +3,7 @@ package net.sf.jabref.imports;
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 import javax.swing.*;
@@ -139,8 +140,26 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                              i.hasNext();) {
                             BibtexEntry entry = (BibtexEntry) i.next();
                             try {
-                                toAddTo.insertEntry(entry);
-                                ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
+                                // Check if the entry is a duplicate of an existing one:
+                                boolean keepEntry = true;
+                                BibtexEntry duplicate = Util.containsDuplicate(toAddTo, entry);
+                                if (duplicate != null) {
+                                    int answer = DuplicateResolverDialog.resolveDuplicateInImport
+                                            (frame, duplicate, entry);
+                                    // The upper entry is the
+                                    if (answer == DuplicateResolverDialog.DO_NOT_IMPORT)
+                                        keepEntry = false;
+                                    if (answer == DuplicateResolverDialog.IMPORT_AND_DELETE_OLD) {
+                                        // Remove the old one and import the new one.
+                                        toAddTo.removeEntry(duplicate.getId());
+                                        ce.addEdit(new UndoableRemoveEntry(toAddTo, duplicate, panel));
+                                    }
+                                }
+                                // Add the entry, if we are supposed to:
+                                if (keepEntry) {
+                                    toAddTo.insertEntry(entry);
+                                    ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
+                                }
                             } catch (KeyCollisionException e) {
                                 e.printStackTrace();
                             }
@@ -228,6 +247,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             if (o[1] instanceof List) {
                 List entries = (List) o[1];
                 anythingUseful = anythingUseful | (entries.size() > 0);
+                Util.setAutomaticFields(entries); // set timestamp and owner
                 for (Iterator j = entries.iterator(); j.hasNext();) {
                     BibtexEntry entry = (BibtexEntry) j.next();
                     try {

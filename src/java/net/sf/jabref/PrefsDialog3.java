@@ -37,6 +37,7 @@ import javax.swing.event.*;
 
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined
@@ -153,20 +154,20 @@ public class PrefsDialog3 extends JDialog {
     upper.add(two, BorderLayout.WEST);
     upper.add(main, BorderLayout.CENTER);
 
-    // Add all panels to main panel:
-    //for (Iterator i=panels.entrySet().iterator(); i.hasNext();) {
-
-
-    //}
-
+    
         JButton
             ok = new JButton(Globals.lang("Ok")),
             cancel = new JButton(Globals.lang("Cancel"));
         ok.addActionListener(new OkAction());
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);
-        lower.add(ok);
-        lower.add(cancel);
+        ButtonBarBuilder bb = new ButtonBarBuilder(lower);
+        bb.addGlue();
+        bb.addGridded(ok);
+        bb.addGridded(cancel);
+        bb.addGlue();
+        //lower.add(ok);
+        //lower.add(cancel);
 
         // Key bindings:
         ActionMap am = chooser.getActionMap();

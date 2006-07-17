@@ -235,14 +235,35 @@ public class ImportInspectionDialog extends JDialog {
             BibtexEntry entry = (BibtexEntry) i.next();
             // We exploit the entry's search status for indicating "Keep" status:
             entry.setSearchHit(defaultSelected);
-            // We exploit the entry's group status for indicating duplicate status:
-            if ((panel != null) && (Util.containsDuplicate(panel.database(), entry) != null)) {
+            // We exploit the entry's group status for indicating duplicate status.
+            // Checking duplicates means both checking against the background database (if
+            // applicable) and against entries already in the table.
+            if (((panel != null) && (Util.containsDuplicate(panel.database(), entry) != null))
+                || (internalDuplicate(this.entries, entry) != null)) {
                 entry.setGroupHit(true);
             }
             this.entries.getReadWriteLock().writeLock().lock();
             this.entries.add(entry);
             this.entries.getReadWriteLock().writeLock().unlock();
         }
+    }
+
+    /**
+     * Checks if there are duplicates to the given entry in the Collection. Does not
+     * report the entry as duplicate of itself if it is in the Collection.
+     * @param entries A Collection of BibtexEntry instances.
+     * @param entry The entry to search for duplicates of.
+     * @return A possible duplicate, if any, or null if none were found.
+     */
+    protected BibtexEntry internalDuplicate(Collection entries, BibtexEntry entry) {
+        for (Iterator iterator = entries.iterator(); iterator.hasNext();) {
+            BibtexEntry othEntry = (BibtexEntry) iterator.next();
+            if (othEntry == entry)
+                continue; // Don't compare the entry to itself
+            if (Util.isDuplicate(entry, othEntry, Globals.duplicateThreshold))
+                return othEntry;
+        }
+        return null;
     }
 
     /**
@@ -732,7 +753,9 @@ public class ImportInspectionDialog extends JDialog {
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibtexEntry first = (BibtexEntry)sortedList.get(row);
                 BibtexEntry other = Util.containsDuplicate(panel.database(), first);
-                if (other != null) { // This should be true since the icon is displayed...
+                if (other != null) {
+                    // This will be true if the duplicate is in the existing
+                    // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog
                             (ImportInspectionDialog.this, other, first, DuplicateResolverDialog.INSPECTION);
                     Util.placeDialog(diag, ImportInspectionDialog.this);
@@ -758,6 +781,20 @@ public class ImportInspectionDialog extends JDialog {
                         entries.getReadWriteLock().writeLock().lock();
                         first.setGroupHit(false);
                         entries.getReadWriteLock().writeLock().unlock();
+                    }
+                }
+                // Check if the duplicate is of another entry in the import:
+                other = internalDuplicate(entries, first);
+                if (other != null) {
+                    int answer = DuplicateResolverDialog.resolveDuplicate
+                            (ImportInspectionDialog.this, first, other);
+                    if (answer == DuplicateResolverDialog.KEEP_UPPER) {
+                        entries.remove(other);
+                        first.setGroupHit(false);
+                    } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                        entries.remove(first);
+                    } else if (answer == DuplicateResolverDialog.KEEP_BOTH) {
+                        first.setGroupHit(false);
                     }
                 }
             }

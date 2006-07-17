@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 import net.sf.jabref.BibtexFields;
 
@@ -201,8 +202,19 @@ public class IsiImporter extends ImportFormat {
       BibtexEntry b =
         new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals.getEntryType(Type)); // id assumes an existing database so don't
 
-      // create one here
-      b.setField(hm);
+      // Remove empty fields:
+        ArrayList toRemove = new ArrayList();
+        for (Iterator it = hm.keySet().iterator(); it.hasNext();) {
+            Object key = it.next();
+            String content = (String)hm.get(key);
+            if ((content == null) || (content.trim().length() == 0))
+                toRemove.add(key);
+        }
+        for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
+            hm.remove(iterator.next());
+
+        }
+        b.setField(hm);
 
       bibitems.add(b);
     }
