@@ -191,7 +191,8 @@ public class EntryTableTransferHandler extends TransferHandler {
             String[] toImport = new String[notBibFiles.size()];
             notBibFiles.toArray(toImport);
 
-            ImportMenuItem importer = new ImportMenuItem(frame, false);
+            // Import into new if entryTable==null, otherwise into current database:
+            ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
             importer.automatedImport(toImport);
         }
     }
@@ -205,7 +206,6 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         new URLDownload(entryTable, dropLink, tmpfile).download();
 
-        
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
         importer.automatedImport(new String[] { tmpfile.getAbsolutePath() } );
