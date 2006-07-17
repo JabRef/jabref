@@ -57,6 +57,7 @@ import java.lang.reflect.*;
 import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
 import net.sf.jabref.groups.GroupSelector;
+import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.external.*;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
@@ -736,6 +737,9 @@ public JabRefPreferences prefs() {
     getContentPane().add(status);
 
 
+      // Drag and drop for tabbedPane:
+      TransferHandler xfer = new EntryTableTransferHandler(null, this);
+      tabbedPane.setTransferHandler(xfer);
 
   }
 

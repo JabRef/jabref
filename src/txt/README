@@ -80,7 +80,9 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.1?    - The -v command line option now makes the application only print version number
+2.1?    - Added capability to drag files and WWW links into JabRef. BibTeX files will be
+          opened normally, other files imported, and WWW links downloaded and imported.
+        - The -v command line option now makes the application only print version number
           and quit immediately.
         - Duplicates within a set of imported entries are now found and shown in the
           import inspection window.

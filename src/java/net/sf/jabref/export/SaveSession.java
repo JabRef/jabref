@@ -47,6 +47,8 @@ public class SaveSession {
     }
 
     public void commit() throws SaveException {
+        if (file == null)
+            return;
         if (file.exists() && backup) {
             String name = file.getName();
             String path = file.getParent();

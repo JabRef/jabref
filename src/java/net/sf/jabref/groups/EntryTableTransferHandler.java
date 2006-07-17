@@ -47,7 +47,14 @@ public class EntryTableTransferHandler extends TransferHandler {
     protected DataFlavor urlFlavor;
     protected DataFlavor stringFlavor;
     protected static boolean DROP_ALLOWED = true;
-    
+
+    /**
+     * Construct the transfer handler.
+     * @param entryTable The table this transfer handler should operate on. This argument is
+     * allowed to equal @null, in which case the transfer handler can assume that it
+     * works for a JabRef instance with no databases open, attached to the empty tabbed pane.
+     * @param frame The JabRefFrame instance.
+     */
     public EntryTableTransferHandler(MainTable entryTable, JabRefFrame frame) {
         this.entryTable = entryTable;
         this.frame = frame;
@@ -65,6 +72,8 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
     public Transferable createTransferable(JComponent c) {
+        // This method is called when dragging stuff *from* the table, so we can assume
+        // it will never be called if entryTable==null:
         return new TransferableEntrySelection(entryTable.getSelectedEntries());
     }
 
@@ -81,15 +90,16 @@ public class EntryTableTransferHandler extends TransferHandler {
         } else if (dropStr.startsWith("http:")) {
             // This is the way URL links are received on OS X and KDE (Gnome?):
             URL url = new URL(dropStr);
-            JOptionPane.showMessageDialog(null, "Making URL: "+url.toString());
+            //JOptionPane.showMessageDialog(null, "Making URL: "+url.toString());
             return handleDropTransfer(url);
         }
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
+        tmpfile.deleteOnExit();
         FileWriter fw = new FileWriter(tmpfile);
         fw.write(dropStr);
         fw.close();
         
-        System.out.println("importing from " + tmpfile.getAbsolutePath());
+        //System.out.println("importing from " + tmpfile.getAbsolutePath());
         
         ImportMenuItem importer = new ImportMenuItem(frame, false);
         importer.automatedImport(new String[] { tmpfile.getAbsolutePath() } );
@@ -188,12 +198,16 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     protected boolean handleDropTransfer(URL dropLink) throws IOException {
         File tmpfile = java.io.File.createTempFile("jabrefimport", "");
+        tmpfile.deleteOnExit();
+
         //System.out.println("Import url: " + dropLink.toString());
         //System.out.println("Temp file: "+tmpfile.getAbsolutePath());
+
         new URLDownload(entryTable, dropLink, tmpfile).download();
 
-        // JabRef.importFiletypeUnknown(tmpfile.getAbsolutePath());
-        ImportMenuItem importer = new ImportMenuItem(frame, false);
+        
+        // Import into new if entryTable==null, otherwise into current database:
+        ImportMenuItem importer = new ImportMenuItem(frame, (entryTable == null));
         importer.automatedImport(new String[] { tmpfile.getAbsolutePath() } );
 
         return true;

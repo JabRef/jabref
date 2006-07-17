@@ -275,9 +275,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // The action for saving a database.
         actions.put("save", new AbstractWorker() {
-            private boolean success = false;
+            private boolean success = false, cancelled = false;
             public void init() throws Throwable {
                 success = false;
+                cancelled = false;
                 if (file == null)
                     runCommand("saveAs");
                 else {
@@ -324,12 +325,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     frame.setTabTitle(BasePanel.this, file.getName());
                     frame.output(Globals.lang("Saved database")+" '"
                              +file.getPath()+"'.");
-                } else {
+                } else if (!cancelled) {
                     frame.output(Globals.lang("Save failed"));
                 }
             }
 
             public void run() {
+                if (file == null) {
+                    cancelled = true;
+                    return;
+                }
+
                 try {
                     // If the option is set, autogenerate keys for all entries that are
                     // lacking keys, before saving:
