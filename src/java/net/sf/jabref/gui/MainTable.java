@@ -94,6 +94,7 @@ public class MainTable extends JTable {
         setTransferHandler(xfer);
         pane.setTransferHandler(xfer);
 
+        setupComparatorChooser();
         refreshSorting();
         setWidths();
 
@@ -259,6 +260,12 @@ public class MainTable extends JTable {
         return (BibtexEntry[]) getSelected().toArray(BE_ARRAY);
     }
 
+    /**
+     * This method sets up what Comparators are used for the various table columns.
+     * The ComparatorChooser enables and disables such Comparators as the user clicks
+     * columns, but this is where the Comparators are defined. Also, the ComparatorChooser
+     * is initialized with the sort order defined in Preferences.
+     */
     private void setupComparatorChooser() {
         // First column:
         java.util.List comparators = comparatorChooser.getComparatorsForColumn(0);
