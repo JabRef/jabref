@@ -46,6 +46,8 @@ import net.sf.jabref.wizard.auximport.* ;
 import java.net.URL ;
 import java.io.IOException ;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 public class FromAuxDialog
     extends JDialog
 {
@@ -107,11 +109,13 @@ public class FromAuxDialog
     initStatusPanel() ;
 
     // insert the buttons
-    JPanel buttonPanel = new JPanel() ;
-    buttonPanel.add( generateButton, null ) ;
-    buttonPanel.add( okButton, null ) ;
-    buttonPanel.add( cancelButton, null ) ;
-
+      ButtonBarBuilder bb = new ButtonBarBuilder();
+    JPanel buttonPanel = bb.getPanel();
+    bb.addGlue();
+    bb.addGridded( generateButton ) ;
+    bb.addGridded( okButton ); ;
+    bb.addGridded( cancelButton ); ;
+    bb.addGlue();
     this.setModal( true ) ;
     this.setResizable( false ) ;
     this.setTitle( Globals.lang( "AUX file import" ) ) ;
