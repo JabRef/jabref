@@ -103,7 +103,13 @@ public class HTMLChars implements LayoutFormatter {
           argument = "";
         }
         else {
-          System.err.println("Unreachable code??");
+            /* TODO: this point is reached, apparently, if a command is terminated in a
+             * strange way, such as with "$\omega$". Also, the command "\&" causes us
+             * to get here. The former issue is maybe a little difficult to address, since
+             * it involves the LaTeX math mode. We don't have a complete LaTeX parser, so
+             * maybe it's better to ignore these commands?
+            */
+          //System.err.println("Unreachable code?? '"+field+"'");
         }
         if (argument != null) {
           // handle common case of general latex command
