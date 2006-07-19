@@ -71,31 +71,55 @@ public class HTMLChars implements LayoutFormatter {
 
       }
       else {
-        //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-        testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{')))
+        String argument = null;
+
+        if (!incommand) {
           sb.append((char)c);
-        else {
+        }
+        else if (Character.isWhitespace(c) || c == '{') {
           // First test if we are already at the end of the string.
-          if (i >= field.length()-1)
-            break testContent;
+          //if (i >= field.length()-1)
+          //  break testContent;
 
-          if (c == '{') {
-
-            String command = currentCommand.toString();
-            // Then test if we are dealing with a italics or bold command. If so, handle.
-            if (command.equals("emph") || command.equals("textit")) {
-              IntAndString part = getPart(field, i);
-              i += part.i;
-                sb.append("<em>").append(part.s).append("</em>");
-            }
-            else if (command.equals("textbf")) {
-              IntAndString part = getPart(field, i);
-              i += part.i;
-                sb.append("<b>").append(part.s).append("</b>");
-            }
-          } else
-            sb.append((char)c);
-
+          String command = currentCommand.toString();
+          // Then test if we are dealing with a italics or bold command.
+          // If so, handle.
+          if (command.equals("emph") || command.equals("textit")) {
+            IntAndString part = getPart(field, i);
+            i += part.i;
+              sb.append("<em>").append(part.s).append("</em>");
+          }
+          else if (command.equals("textbf")) {
+            IntAndString part = getPart(field, i);
+            i += part.i;
+              sb.append("<b>").append(part.s).append("</b>");
+          }
+          else {
+            IntAndString part = getPart(field, i);
+            i += part.i; argument = part.s;
+          }
+        }
+        else if (c == '}') {
+          argument = "";
+        }
+        else {
+          System.err.println("Unreachable code??");
+        }
+        if (argument != null) {
+          // handle common case of general latex command
+          String command  = currentCommand.toString();
+          Object result = Globals.HTMLCHARS.get(command+argument);
+          //System.out.print("command: "+command+", arg: "+argument);
+          //System.out.print(", result: ");
+          // If found, then use translated version. If not, then keep the
+          // text of the parameter intact.
+          if (result != null) {
+            //System.out.println((String)result);
+            sb.append((String)result);
+          } else {
+            //System.out.println(argument);
+            sb.append(argument);
+          }
         }
         incommand = false;
         escaped = false;
@@ -114,14 +138,23 @@ public class HTMLChars implements LayoutFormatter {
     char c;
     int count = 0;//, i=index;
     StringBuffer part = new StringBuffer();
-    while ((count >= 0) && (i < text.length())) {
-      i++;
+    // advance to first char and skip wihitespace
+    i++;
+    for ( ; i < text.length() ; ++i) {
+      if (!Character.isWhitespace(text.charAt(i)))
+        break;
+    }
+    // then grab whathever is the first token (counting braces)
+    for ( ; i < text.length() ; ++i) {
       c = text.charAt(i);
-      if (c == '}')
-        count--;
+      if (count == 0 && Character.isWhitespace(c)) {
+        i--; // end argument and leave whitespace for further processing
+        break;
+      }
+      if (c == '}' && --count <= 0)
+        break;
       else if (c == '{')
         count++;
-
       part.append((char)c);
     }
     //System.out.println("part: "+part.toString()+"\nformatted: "+format(part.toString()));
