@@ -54,11 +54,11 @@ class SearchManager2 extends SidePaneComponent
     //private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
     private JLabel lab = //new JLabel(Globals.lang("Search")+":");
-    new JLabel(new ImageIcon(GUIGlobals.searchIconFile));
+    new JLabel(GUIGlobals.getImage("search"));
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings"));
     private JButton escape = new JButton(Globals.lang("Clear"));
-    private JButton help = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    private JButton help = new JButton(GUIGlobals.getImage("help"));
     /** This button's text will be set later. */
     private JButton search = new JButton();
     private JCheckBoxMenuItem searchReq, searchOpt, searchGen,
@@ -75,7 +75,7 @@ class SearchManager2 extends SidePaneComponent
 
 
     public SearchManager2(JabRefFrame frame, SidePaneManager manager) {
-    super(manager, GUIGlobals.searchIconFile, Globals.lang("Search"));
+    super(manager, GUIGlobals.getIconUrl("search"), Globals.lang("Search"));
 
         this.frame = frame;
     incSearcher = new IncrementalSearcher(Globals.prefs);
@@ -198,7 +198,7 @@ settings.add(select);
             //search.setMargin(margin);
             escape.setMargin(margin);
             openset.setMargin(margin);
-            Dimension butDim = new Dimension(20, 20);
+            Dimension butDim = new Dimension(29, 29);
             help.setPreferredSize(butDim);
             help.setMinimumSize(butDim);
             help.setMargin(margin);

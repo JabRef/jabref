@@ -68,7 +68,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	super(parent,Globals.lang("Customize entry types"), false);
 	this.parent = parent;
 	help = new HelpAction(parent.helpDiag, GUIGlobals.customEntriesHelp,
-			      "Help", GUIGlobals.helpSmallIconFile);
+			      "Help", GUIGlobals.getIconUrl("helpSmall"));
 	setTypeSelection();
 	//setSize(440,400);
 	initialize();

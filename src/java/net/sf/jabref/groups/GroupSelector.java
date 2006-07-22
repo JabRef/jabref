@@ -42,12 +42,12 @@ import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements
         TreeSelectionListener, ActionListener, ErrorMessageDisplay {
-    JButton newButton = new JButton(new ImageIcon(GUIGlobals.newSmallIconFile)),
+    JButton newButton = new JButton(GUIGlobals.getImage("new")),
             helpButton = new JButton(
-                    new ImageIcon(GUIGlobals.helpSmallIconFile)),
+                    GUIGlobals.getImage("help")),
             refresh = new JButton(
-                    new ImageIcon(GUIGlobals.refreshSmallIconFile)),
-            autoGroup = new JButton(new ImageIcon(GUIGlobals.autoGroupIcon)),
+                    GUIGlobals.getImage("refresh")),
+            autoGroup = new JButton(GUIGlobals.getImage("autoGroup")),
             openset = new JButton(Globals.lang("Settings"));
     Color bgColor = Color.white;
     GroupsTree groupsTree;
@@ -78,8 +78,8 @@ public class GroupSelector extends SidePaneComponent implements
     ButtonGroup bgr = new ButtonGroup();
     ButtonGroup visMode = new ButtonGroup();
     ButtonGroup nonHits = new ButtonGroup();
-    JButton expand = new JButton(new ImageIcon(GUIGlobals.downIconFile)),
-            reduce = new JButton(new ImageIcon(GUIGlobals.upIconFile));
+    JButton expand = new JButton(GUIGlobals.getImage("down")),
+            reduce = new JButton(GUIGlobals.getImage("up"));
     SidePaneManager manager;
 
 
@@ -87,11 +87,10 @@ public class GroupSelector extends SidePaneComponent implements
      * The first element for each group defines which field to use for the
      * quicksearch. The next two define the name and regexp for the group.
      *
-     * @param groupData
-     *            The group meta data in raw format.
+     *
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
-        super(manager, GUIGlobals.groupsIconFile, Globals.lang("Groups"));
+        super(manager, GUIGlobals.getIconUrl("toggleGroups"), Globals.lang("Groups"));
         this.groupsRoot = new GroupTreeNode(new AllEntriesGroup());
 
         this.manager = manager;
@@ -212,8 +211,10 @@ public class GroupSelector extends SidePaneComponent implements
                 Globals.prefs.putInt("groupsVisibleRows", i);
             }
         });
-        Dimension butDim = new Dimension(20, 20);
-        Dimension butDim2 = new Dimension(40, 20);
+        Dimension butDim = new Dimension(29, 29);
+        //Dimension butDimSmall = new Dimension(20, 20);
+
+        Dimension butDim2 = new Dimension(40, 22);
         newButton.setPreferredSize(butDim);
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);

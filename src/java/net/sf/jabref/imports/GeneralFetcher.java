@@ -28,7 +28,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JButton go = new JButton(Globals.lang("Fetch")),
-    helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    helpBut = new JButton(GUIGlobals.getImage("helpSmall"));
     HelpAction help;
     EntryFetcher fetcher;
     SidePaneManager sidePaneManager;

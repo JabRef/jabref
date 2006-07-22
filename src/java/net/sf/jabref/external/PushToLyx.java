@@ -63,7 +63,7 @@ public class PushToLyx implements PushToApplication {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(GUIGlobals.lyxIconFile);
+        return GUIGlobals.getImage("lyx");
     }
 
     public String getKeyStrokeName() {

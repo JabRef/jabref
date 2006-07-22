@@ -171,7 +171,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         fieldList = java.util.Arrays.asList(fields);
     reqPan = new EntryEditorTab(fieldList, this, true, Globals.lang("Required fields"));
     tabbed.addTab(Globals.lang("Required fields"),
-          new ImageIcon(GUIGlobals.showReqIconFile), reqPan.getPane(),
+          GUIGlobals.getImage("required"), reqPan.getPane(),
           Globals.lang("Show required fields"));
     tabs.add(reqPan);
     //}
@@ -180,7 +180,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()),
                 this, false, Globals.lang("Optional fields"));
         tabbed.addTab(Globals.lang("Optional fields"),
-              new ImageIcon(GUIGlobals.showOptIconFile), optPan.getPane(),
+              GUIGlobals.getImage("optional"), optPan.getPane(),
               Globals.lang("Show optional fields"));
         tabs.add(optPan);
     }
@@ -189,14 +189,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     for (int i=0; i<tabList.getTabCount(); i++) {
         EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i),
                 this, false, tabList.getTabName(i));
-        tabbed.addTab(tabList.getTabName(i), new ImageIcon(GUIGlobals.showGenIconFile), newTab.getPane());
+        tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
         tabs.add(newTab);
     }
 
     srcPanel.setName(Globals.lang("BibTeX source"));
     if (Globals.prefs.getBoolean("showSource")) {
         tabbed.addTab(Globals.lang("BibTeX source"),
-              new ImageIcon(GUIGlobals.sourceIconFile), srcPanel,
+              GUIGlobals.getImage("source"), srcPanel,
               Globals.lang("Show/edit BibTeX source"));
         tabs.add(srcPanel);
     }
@@ -932,7 +932,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     class DeleteAction extends AbstractAction {
     public DeleteAction() {
-      super(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile));
+      super(Globals.lang("Delete"), GUIGlobals.getImage("remove"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Delete entry"));
     }
 
@@ -953,7 +953,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class CloseAction extends AbstractAction {
     public CloseAction() {
-      super(Globals.lang("Close window"), new ImageIcon(GUIGlobals.closeIconFile));
+      super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Close window"));
     }
 
@@ -969,7 +969,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class CopyKeyAction extends AbstractAction {
     public CopyKeyAction() {
-      super("Copy BibTeX key to clipboard", new ImageIcon(GUIGlobals.copyKeyIconFile));
+      super("Copy BibTeX key to clipboard");
       putValue(SHORT_DESCRIPTION, "Copy BibTeX key to clipboard (Ctrl-K)");
 
       //putValue(MNEMONIC_KEY, GUIGlobals.copyKeyCode);
@@ -1165,7 +1165,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class NextEntryAction extends AbstractAction {
     public NextEntryAction() {
-      super(Globals.lang("Next entry"), new ImageIcon(GUIGlobals.downIconFile));
+      super(Globals.lang("Next entry"), GUIGlobals.getImage("down"));
 
       putValue(SHORT_DESCRIPTION, Globals.lang("Next entry"));
     }
@@ -1191,7 +1191,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class PrevEntryAction extends AbstractAction {
     public PrevEntryAction() {
-      super(Globals.lang("Previous entry"), new ImageIcon(GUIGlobals.upIconFile));
+      super(Globals.lang("Previous entry"), GUIGlobals.getImage("up"));
 
       putValue(SHORT_DESCRIPTION, Globals.lang("Previous entry"));
     }
@@ -1221,7 +1221,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     BibtexEntry selectedEntry;
 
     public GenerateKeyAction(JabRefFrame parentFrame) {
-      super(Globals.lang("Generate BibTeX key"), new ImageIcon(GUIGlobals.genKeyIconFile));
+      super(Globals.lang("Generate BibTeX key"), GUIGlobals.getImage("makeKey"));
       parent = parentFrame;
 
       //            selectedEntry = newEntry ;
@@ -1260,7 +1260,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class UndoAction extends AbstractAction {
     public UndoAction() {
-      super("Undo", new ImageIcon(GUIGlobals.undoIconFile));
+      super("Undo", GUIGlobals.getImage("undo"));
       putValue(SHORT_DESCRIPTION, "Undo");
     }
 
@@ -1274,7 +1274,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
   class RedoAction extends AbstractAction {
     public RedoAction() {
-      super("Undo", new ImageIcon(GUIGlobals.redoIconFile));
+      super("Undo", GUIGlobals.getImage("redo"));
       putValue(SHORT_DESCRIPTION, "Redo");
     }
 

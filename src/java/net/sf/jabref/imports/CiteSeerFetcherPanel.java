@@ -39,12 +39,12 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     AuthorDialog authorDialog;
     JFrame jFrame; // invisible dialog holder
     JButton go = new JButton(Globals.lang("Fetch")),
-    helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+    helpBut = new JButton(GUIGlobals.getImage("helpSmall"));
     HelpAction help;
     CiteSeerFetcherPanel ths = this;
 
     public CiteSeerFetcherPanel(SidePaneManager p0, final CiteSeerFetcher fetcher) {
-        super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("Fetch CiteSeer"));
+        super(p0, GUIGlobals.getIconUrl("citeseer"), Globals.lang("Fetch CiteSeer"));
 
         help = new HelpAction(Globals.helpDiag, GUIGlobals.citeSeerHelp, "Help");
 

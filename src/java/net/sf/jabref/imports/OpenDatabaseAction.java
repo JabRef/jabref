@@ -15,7 +15,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private JabRefFrame frame;
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
-        super(new ImageIcon(GUIGlobals.openIconFile));
+        super(GUIGlobals.getImage("open"));
         this.frame = frame;
         this.showDialog = showDialog;
         putValue(NAME, "Open database");

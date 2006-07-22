@@ -601,7 +601,7 @@ public class TextInputDialog
   {
     public PasteAction()
     {
-      super( "Paste", "Paste from clipboard", GUIGlobals.pasteIconFile ) ;
+      super( "Paste", "Paste from clipboard", GUIGlobals.getIconUrl("paste")) ;
     }
 
     public void actionPerformed( ActionEvent e )
@@ -632,7 +632,7 @@ public class TextInputDialog
   {
     public LoadAction()
     {
-      super( "Open", "Open_file", GUIGlobals.openIconFile ) ;
+      super( "Open", "Open_file", GUIGlobals.getIconUrl("open")) ;
     }
 
     public void actionPerformed( ActionEvent e )
@@ -666,7 +666,7 @@ public class TextInputDialog
   {
     public ClearAction()
     {
-      super( "Clear", "Clear_inputarea", GUIGlobals.clearInputArea ) ;
+      super( "Clear", "Clear_inputarea", GUIGlobals.getIconUrl("new")) ;
     }
 
     public void actionPerformed( ActionEvent e )
@@ -734,8 +734,8 @@ public class TextInputDialog
   {
     private Font baseFont ;
     private Font usedFont ;
-    private ImageIcon okIcon = new ImageIcon( GUIGlobals.completeTagIcon ) ;
-    private ImageIcon needIcon = new ImageIcon( GUIGlobals.wrongTagIcon ) ;
+    private ImageIcon okIcon = GUIGlobals.getImage("complete");
+    private ImageIcon needIcon = GUIGlobals.getImage("wrong");
 
     public SimpleCellRenderer( Font normFont )
     {

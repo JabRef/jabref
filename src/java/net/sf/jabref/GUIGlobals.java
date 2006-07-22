@@ -34,6 +34,7 @@ import java.awt.*;
 import java.util.*;
 //import java.util.List;
 import java.net.URL;
+import java.net.MalformedURLException;
 import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -117,8 +118,10 @@ public class GUIGlobals {
 
     static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
     // further below.
-    public static JLabel incompleteLabel; // JLabel with icon signaling an incomplete entry.
     public static Color activeEditor = new Color(230, 230, 255);
+
+    static ResourceBundle iconBundle;
+    static HashMap iconMap;
 
     public static JLabel getTableIcon(String fieldType) {
         Object o = tableIcons.get(fieldType);
@@ -128,88 +131,6 @@ public class GUIGlobals {
         } else return (JLabel)o;
     }
 
-
-  public static URL
-
-          openIconFile = GUIGlobals.class.getResource(pre + "fldr_obj.gif"),
-          editIconFile = GUIGlobals.class.getResource(pre + "edittsk_tsk.gif"),
-          saveIconFile = GUIGlobals.class.getResource(pre + "save_edit.gif"),
-          saveAsIconFile = GUIGlobals.class.getResource(pre + "saveas_edit.gif"),
-          prefsIconFile = GUIGlobals.class.getResource(pre + "configure2.png"),
-          newIconFile = GUIGlobals.class.getResource(pre + "new_page.gif"),
-          undoIconFile = GUIGlobals.class.getResource(pre + "undo_edit.gif"),
-          redoIconFile = GUIGlobals.class.getResource(pre + "redo_edit.gif"),
-          preambleIconFile = GUIGlobals.class.getResource(pre + "preamble.png"),
-          addIconFile = GUIGlobals.class.getResource(pre + "plus.gif"),
-          delRowIconFile = GUIGlobals.class.getResource(pre + "minus.gif"),
-          showReqIconFile = GUIGlobals.class.getResource(pre + "reqIcon.png"),
-          showOptIconFile = GUIGlobals.class.getResource(pre + "optIcon.png"),
-          showGenIconFile = GUIGlobals.class.getResource(pre + "absIcon.png"),
-          showAbsIconFile = GUIGlobals.class.getResource(pre + "genIcon.png"),
-          sourceIconFile = GUIGlobals.class.getResource(pre + "viewsource.gif"),
-          copyIconFile = GUIGlobals.class.getResource(pre + "copy_edit.gif"),
-          cutIconFile = GUIGlobals.class.getResource(pre + "cut_edit.gif"),
-          copyKeyIconFile = GUIGlobals.class.getResource(pre + "copy_edit.gif"),
-          genKeyIconFile = GUIGlobals.class.getResource(pre + "wizard.png"),
-          lyxIconFile = GUIGlobals.class.getResource(pre + "lyx2.png"),
-          backIconFile = GUIGlobals.class.getResource(pre + "backward_nav.gif"),
-          forwardIconFile = GUIGlobals.class.getResource(pre + "forward_nav.gif"),
-          contentsIconFile = GUIGlobals.class.getResource(pre + "toc_closed.gif"),
-          removeIconFile = GUIGlobals.class.getResource(pre + "delete_edit.gif"),
-          upIconFile = GUIGlobals.class.getResource(pre + "prev_nav.gif"),
-          downIconFile = GUIGlobals.class.getResource(pre + "next_nav.gif"),
-          stringsIconFile = GUIGlobals.class.getResource(pre + "strings.png"),
-          groupsIconFile = GUIGlobals.class.getResource(pre + "queue.png"),
-          groupsHighlightMatchingAnyFile = GUIGlobals.class.getResource(pre + "groupsHighlightAny.png"),
-          groupsHighlightMatchingAllFile = GUIGlobals.class.getResource(pre + "groupsHighlightAll.png"),
-          closeIconFile = GUIGlobals.class.getResource(pre + "fileclose.png"),
-          close2IconFile = GUIGlobals.class.getResource(pre + "fileclose2.png"),
-          refreshSmallIconFile = GUIGlobals.class.getResource(pre + "refresh_nav.gif"),
-          helpSmallIconFile = GUIGlobals.class.getResource(pre + "view.gif"),
-          helpIconFile = GUIGlobals.class.getResource(pre + "view.gif"),
-          aboutIcon = GUIGlobals.class.getResource(pre + "view.gif"),
-          helpContentsIconFile = GUIGlobals.class.getResource(pre + "contents2.png"),
-          newSmallIconFile = GUIGlobals.class.getResource(pre + "new_page.gif"),
-          pasteIconFile = GUIGlobals.class.getResource(pre + "paste_edit.gif"),
-          editEntryIconFile = GUIGlobals.class.getResource(pre + "DocumentDraw.gif"),
-          searchIconFile = GUIGlobals.class.getResource(pre + "search.gif"),
-          previewIconFile = GUIGlobals.class.getResource(pre + "preview.png"),
-          autoGroupIcon = GUIGlobals.class.getResource(pre + "addtsk_tsk.gif"),
-          wwwIcon = GUIGlobals.class.getResource(pre + "www.png"),
-          wwwCiteSeerIcon = GUIGlobals.class.getResource(pre + "wwwciteseer.png"),
-          fetchMedlineIcon = GUIGlobals.class.getResource(pre + "goto.png"),
-          fetchHourglassIcon = GUIGlobals.class.getResource(pre + "Hourglass.png"),
-          pdfIcon = GUIGlobals.class.getResource(pre + "pdf.png"),
-          pdfSmallIcon = GUIGlobals.class.getResource(pre + "pdf_small.gif"),
-          sheetIcon = GUIGlobals.class.getResource(pre + "defaults_ps.gif"),
-          doiIcon = GUIGlobals.class.getResource(pre + "doi.png"),
-          doiSmallIcon = GUIGlobals.class.getResource(pre + "doismall.png"),
-          psIcon = GUIGlobals.class.getResource(pre + "postscript.png"),
-          incompleteIcon = GUIGlobals.class.getResource(pre + "exclamation.gif"),
-          winEdtIcon = GUIGlobals.class.getResource(pre + "winedt.png"),
-          jabreflogo = GUIGlobals.class.getResource(pre + "JabRef-icon.png"),
-          completeTagIcon = GUIGlobals.class.getResource(pre + "completeItem.png"),
-          wrongTagIcon = GUIGlobals.class.getResource(pre + "wrongItem.png"),
-          clearInputArea = GUIGlobals.class.getResource(pre + "new_page.gif"),
-          markIcon = GUIGlobals.class.getResource(pre + "mark.png"),
-          unmarkIcon = GUIGlobals.class.getResource(pre + "unmark.png"),
-          newBibFile = GUIGlobals.class.getResource(pre + "newBibFile.png"),
-          integrityCheck = GUIGlobals.class.getResource(pre + "integrity.png"),
-          integrityInfo = GUIGlobals.class.getResource(pre + "messageInfo.png"),
-          integrityWarn = GUIGlobals.class.getResource(pre + "messageWarn.png"),
-          integrityFail = GUIGlobals.class.getResource(pre + "messageFail.png"),
-          duplicateIcon = GUIGlobals.class.getResource(pre + "duplicate.png"),
-          emacsIcon = GUIGlobals.class.getResource(pre + "emacs.png");
-
-  public static ImageIcon
-          groupRefiningIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupRefining.png")),
-          groupIncludingIcon = new ImageIcon(GUIGlobals.class.getResource(pre +"groupIncluding.png")),
-          groupRegularIcon = null;
-
-    /*public static incompleteEntryIcon = new ImageIcon(incompleteIcon);
-    static {
-      incompleteEntryIcon.setTool
-    }*/
 
 // Help files (in HTML format):
   public static String
@@ -313,7 +234,40 @@ public class GUIGlobals {
       LANGUAGES.put("Italiano", "it");
       LANGUAGES.put("Norsk", "no");
 
+
+      // Read the image resource bundle, and put all the information into a more
+      // practical HashMap. We may drop the resourcebundle altogether, eventually.
+      iconBundle = ResourceBundle.getBundle("resource/Icons", new Locale("en"));
+      iconMap = new HashMap();
+      Enumeration keys = iconBundle.getKeys();
+      for (; keys.hasMoreElements();) {
+          String key = (String)keys.nextElement();
+          iconMap.put(key, iconBundle.getString(key));
+      }
   }
+
+    /**
+     * Looks up the URL for the image representing the given function, in the resource
+     * file listing images.
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The URL to the actual image to use.
+     */
+    public static URL getIconUrl(String name) {
+        if (iconMap.containsKey(name))
+            return GUIGlobals.class.getResource((String)iconMap.get(name));
+        else return null;
+    }
+
+    /**
+     * Constructs an ImageIcon for the given function, using the image specified in
+     * the resource files resource/Icons_en.properties.
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The ImageIcon for the function.
+     */
+    public static ImageIcon getImage(String name) {
+        URL u = getIconUrl(name);
+        return u != null ? new ImageIcon(getIconUrl(name)) : null;
+    }
 
   /** returns the path to language independent help files */
   public static String getLocaleHelpPath()
@@ -334,22 +288,20 @@ public class GUIGlobals {
   public static void init() {
     typeNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 24);
     fieldNameFont = new Font("arial", Font.ITALIC+Font.BOLD, 14);
-    incompleteLabel = new JLabel(new ImageIcon(GUIGlobals.incompleteIcon));
-    incompleteLabel.setToolTipText(Globals.lang("Entry is incomplete"));
     JLabel lab;
-    lab = new JLabel(new ImageIcon(pdfIcon));
+    lab = new JLabel(getImage("pdfSmall"));
     lab.setToolTipText(Globals.lang("Open")+" PDF");
     tableIcons.put("pdf", lab);
-    lab = new JLabel(new ImageIcon(wwwIcon));
+    lab = new JLabel(getImage("wwwSmall"));
     lab.setToolTipText(Globals.lang("Open")+" URL");
     tableIcons.put("url", lab);
-    lab = new JLabel(new ImageIcon(wwwCiteSeerIcon));
+    lab = new JLabel(getImage("citeseer"));
     lab.setToolTipText(Globals.lang("Open")+" CiteSeer URL");
     tableIcons.put("citeseerurl", lab);
-    lab = new JLabel(new ImageIcon(doiSmallIcon));
+    lab = new JLabel(getImage("doiSmall"));
     lab.setToolTipText(Globals.lang("Open")+" DOI "+Globals.lang("web link"));
     tableIcons.put("doi", lab);
-    lab = new JLabel(new ImageIcon(psIcon));
+    lab = new JLabel(getImage("psSmall"));
     lab.setToolTipText(Globals.lang("Open")+" PS");
     tableIcons.put("ps", lab);
 

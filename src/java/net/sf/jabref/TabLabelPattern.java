@@ -238,7 +238,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    con.weighty = 0;
 	    con.anchor = GridBagConstraints.SOUTHEAST;
 	    con.insets = new Insets( 0,5,0,5 );
-	    JButton hlb = new JButton(new ImageIcon(GUIGlobals.helpSmallIconFile));
+	    JButton hlb = new JButton(GUIGlobals.getImage("helpSmall"));
 	    hlb.setToolTipText(Globals.lang("Help on key patterns"));
 	    gbl.setConstraints( hlb, con );
 	    add(hlb);

@@ -35,7 +35,7 @@ import java.net.URL;
 
 public class SidePaneComponent extends SimpleInternalFrame {
 
-    protected JButton close = new JButton(new ImageIcon(GUIGlobals.closeIconFile));
+    protected JButton close = new JButton(GUIGlobals.getImage("close"));
     protected boolean visible = false;
     protected SidePaneManager manager;
     protected BasePanel panel = null;

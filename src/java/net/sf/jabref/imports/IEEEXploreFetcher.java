@@ -87,7 +87,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
 
     public URL getIcon() {
-        return GUIGlobals.wwwIcon;
+        return GUIGlobals.getIconUrl("www");
     }
 
     public String getHelpPage() {

@@ -333,7 +333,7 @@ public class StringDialog extends JDialog {
 	StringDialog parent;
 	public NewStringAction(StringDialog parent) {
 	    super("New string",
-		  new ImageIcon(GUIGlobals.addIconFile));
+		  GUIGlobals.getImage("add"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("New string"));
 	    this.parent = parent;
 	}
@@ -395,7 +395,7 @@ public class StringDialog extends JDialog {
 	StringDialog parent;
 	public StoreContentAction(StringDialog parent) {
 	    super("Store string",
-		  new ImageIcon(GUIGlobals.addIconFile));
+		  GUIGlobals.getImage("add"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Store string"));
 	    this.parent = parent;
 	}
@@ -408,7 +408,7 @@ public class StringDialog extends JDialog {
 	StringDialog parent;
 	public RemoveStringAction(StringDialog parent) {
 	    super("Remove selected strings",
-		  new ImageIcon(GUIGlobals.removeIconFile));
+		  GUIGlobals.getImage("remove"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Remove selected strings"));
 	    this.parent = parent;
 	}
@@ -523,7 +523,7 @@ public class StringDialog extends JDialog {
     UndoAction undoAction = new UndoAction();
     class UndoAction extends AbstractAction {
 	public UndoAction() {
-	    super("Undo", new ImageIcon(GUIGlobals.undoIconFile));
+	    super("Undo", GUIGlobals.getImage("undo"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Undo"));
 	}
 	public void actionPerformed(ActionEvent e) {
@@ -536,7 +536,7 @@ public class StringDialog extends JDialog {
     RedoAction redoAction = new RedoAction();
     class RedoAction extends AbstractAction {
 	public RedoAction() {
-	    super("Undo", new ImageIcon(GUIGlobals.redoIconFile));
+	    super("Undo", GUIGlobals.getImage("redo"));
 	    putValue(SHORT_DESCRIPTION, Globals.lang("Redo"));
 	}
 	public void actionPerformed(ActionEvent e) {

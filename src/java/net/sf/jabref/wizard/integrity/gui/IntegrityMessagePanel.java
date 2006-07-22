@@ -198,10 +198,10 @@ public class IntegrityMessagePanel
   // ---------------------------------------------------------------------------
   class IntegrityListRenderer extends DefaultListCellRenderer
   {
-    final ImageIcon warnIcon = new ImageIcon( GUIGlobals.integrityWarn ) ;
-    final ImageIcon infoIcon = new ImageIcon( GUIGlobals.integrityInfo ) ;
-    final ImageIcon failIcon = new ImageIcon( GUIGlobals.integrityFail ) ;
-    final ImageIcon fixedIcon = new ImageIcon( GUIGlobals.completeTagIcon) ;
+    final ImageIcon warnIcon = GUIGlobals.getImage("integrityWarn");
+    final ImageIcon infoIcon = GUIGlobals.getImage("integrityInfo");
+    final ImageIcon failIcon = GUIGlobals.getImage("integrityFail");
+    final ImageIcon fixedIcon = GUIGlobals.getImage("complete");
 
     public Component getListCellRendererComponent(
         JList list,

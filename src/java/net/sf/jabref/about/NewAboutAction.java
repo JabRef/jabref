@@ -54,7 +54,7 @@ public class NewAboutAction
   public NewAboutAction()
   {
     // This action leads to a dialog asking for entry type.
-    super( new ImageIcon( GUIGlobals.helpIconFile ) ) ;
+    super(GUIGlobals.getImage("about")) ;
     putValue( NAME, "About JabRef" ) ;
 //    putValue( ACCELERATOR_KEY, key ) ;
     putValue( SHORT_DESCRIPTION, Globals.lang( "About JabRef" ) ) ;

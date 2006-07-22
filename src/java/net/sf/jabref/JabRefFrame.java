@@ -148,55 +148,49 @@ public class JabRefFrame
                             prefs.getKey("Help")),
       contents = new HelpAction("Help contents", helpDiag,
                                 GUIGlobals.helpContents, "Help contents",
-                                GUIGlobals.helpContentsIconFile),
+                                GUIGlobals.getIconUrl("helpContents")),
 /* old about*/
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
-                             GUIGlobals.aboutIcon),
+                             GUIGlobals.getIconUrl("about")),
 /**/
   //    about2 = new NewAboutAction(),
       editEntry = new GeneralAction("edit", "Edit entry",
-                               "Edit entry", GUIGlobals.editIconFile,
+                               "Edit entry",
                                prefs.getKey("Edit entry")),
       save = new GeneralAction("save", "Save database",
-                               "Save database", GUIGlobals.saveIconFile,
+                               "Save database",
                                prefs.getKey("Save database")),
       saveAs = new GeneralAction("saveAs", "Save database as ...",
                                  "Save database as ...",
-                                 GUIGlobals.saveAsIconFile,
                                  prefs.getKey("Save database as ...")),
       saveSelectedAs = new GeneralAction("saveSelectedAs",
                                          "Save selected as ...",
                                          "Save selected as ...",
-                                         GUIGlobals.saveAsIconFile),
+                                         GUIGlobals.getIconUrl("saveAs")),
       nextTab = new ChangeTabAction(true),
       prevTab = new ChangeTabAction(false),
       sortTabs = new SortTabsAction(this),
       undo = new GeneralAction("undo", "Undo", "Undo",
-                               GUIGlobals.undoIconFile,
                                prefs.getKey("Undo")),
       redo = new GeneralAction("redo", "Redo", "Redo",
-                               GUIGlobals.redoIconFile,
                                prefs.getKey("Redo")),
       /*cut = new GeneralAction("cut", "Cut", "Cut",
          GUIGlobals.cutIconFile,
          prefs.getKey("Cut")),*/
       delete = new GeneralAction("delete", "Delete", "Delete",
-                                 GUIGlobals.removeIconFile,
                                  prefs.getKey("Delete")),
       /*copy = new GeneralAction("copy", "Copy", "Copy",
                                GUIGlobals.copyIconFile,
                                prefs.getKey("Copy")),*/
-      copy = new EditAction("copy", GUIGlobals.copyIconFile),
-      paste = new EditAction("paste", GUIGlobals.pasteIconFile),
-      cut = new EditAction("cut", GUIGlobals.cutIconFile),
+      copy = new EditAction("copy", GUIGlobals.getIconUrl("copy")),
+      paste = new EditAction("paste", GUIGlobals.getIconUrl("paste")),
+      cut = new EditAction("cut", GUIGlobals.getIconUrl("cut")),
       mark = new GeneralAction("markEntries", "Mark entries",
                                "Mark entries",
-                               GUIGlobals.markIcon,
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
                                   "Unmark entries",
-                                  GUIGlobals.unmarkIcon,
                                   prefs.getKey("Unmark entries")),
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
@@ -204,14 +198,11 @@ public class JabRefFrame
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
                                             "Start incremental search",
-                                            GUIGlobals.searchIconFile,
                                             prefs.getKey("Incremental search")),
       normalSearch = new GeneralAction("search", "Search", "Search",
-                                       GUIGlobals.searchIconFile,
                                        prefs.getKey("Search")),
-      toggleSearch = new GeneralAction("toggleSearch", "Search", "Toggle search panel",
-                                       GUIGlobals.searchIconFile),
-    //                                       prefs.getKey("Search")),
+      toggleSearch = new GeneralAction("toggleSearch", "Search", "Toggle search panel"),
+
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
       fetchMedline = new FetchMedlineAction(),
@@ -225,7 +216,7 @@ public class JabRefFrame
       mergeDatabaseAction = new GeneralAction("mergeDatabase",
                                               "Append database",
                                               "Append contents from a BibTeX database into the currently viewed database",
-                                              GUIGlobals.openIconFile),
+                                              GUIGlobals.getIconUrl("open")),
       //prefs.getKey("Open")),
       /*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
         GUIGlobals.removeIconFile),*/
@@ -236,36 +227,31 @@ public class JabRefFrame
 
       editPreamble = new GeneralAction("editPreamble", "Edit preamble",
                                        "Edit preamble",
-                                       GUIGlobals.preambleIconFile,
                                        prefs.getKey("Edit preamble")),
       editStrings = new GeneralAction("editStrings", "Edit strings",
                                       "Edit strings",
-                                      GUIGlobals.stringsIconFile,
                                       prefs.getKey("Edit strings")),
       toggleGroups = new GeneralAction("toggleGroups",
                                        "Toggle groups interface",
                                        "Toggle groups interface",
-                                       GUIGlobals.groupsIconFile,
                                        prefs.getKey("Toggle groups interface")),
       togglePreview = new GeneralAction("togglePreview",
                                         "Toggle entry preview",
                                         "Toggle entry preview",
-                                        GUIGlobals.previewIconFile,
                                         prefs.getKey("Toggle entry preview")),
       toggleHighlightAny = new GeneralAction("toggleHighlightGroupsMatchingAny",
                                         "Highlight groups matching any selected entry",
                                         "Highlight groups matching any selected entry",
-                                        GUIGlobals.groupsHighlightMatchingAnyFile),
+                                        GUIGlobals.getIconUrl("groupsHighlightAny")),
       toggleHighlightAll = new GeneralAction("toggleHighlightGroupsMatchingAll",
                                         "Highlight groups matching all selected entries",
                                         "Highlight groups matching all selected entries",
-                                        GUIGlobals.groupsHighlightMatchingAllFile),
+                                        GUIGlobals.getIconUrl("groupsHighlightAll")),
       switchPreview = new GeneralAction("switchPreview",
                                         "Switch preview layout",
                                         prefs.getKey("Switch preview layout")),
        makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
                                         "Autogenerate BibTeX keys",
-                                        GUIGlobals.genKeyIconFile,
                                         prefs.getKey("Autogenerate BibTeX keys")),
 
       lyxPushAction = new PushToApplicationAction(ths, new PushToLyx()),
@@ -274,11 +260,9 @@ public class JabRefFrame
       latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
       openFile = new GeneralAction("openFile", "Open PDF or PS",
                                    "Open PDF or PS",
-                                   GUIGlobals.pdfIcon,
                                    prefs.getKey("Open PDF or PS")),
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
                                   "Open URL or DOI",
-                                  GUIGlobals.wwwIcon,
                                   prefs.getKey("Open URL or DOI")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
       strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
@@ -376,7 +360,7 @@ public class JabRefFrame
     //  glassPane.setVisible(true);
 
       setTitle(GUIGlobals.frameTitle);
-    setIconImage(new ImageIcon(GUIGlobals.jabreflogo).getImage());
+    setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
@@ -820,37 +804,55 @@ public JabRefPreferences prefs() {
     }
 
     public GeneralAction(String command, String text,
-                         String description, URL icon,
+                         String description, String imageName,
                          KeyStroke key) {
-      super(new ImageIcon(icon));
+      super(GUIGlobals.getImage(imageName));
       this.command = command;
       putValue(NAME, text);
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
     }
 
-    public GeneralAction(String command, String text) {
-      putValue(NAME, text);
-      this.command = command;
-    }
+      public GeneralAction(String command, String text) {
+          putValue(NAME, text);
+          this.command = command;
+      }
 
-    public GeneralAction(String command, String text, KeyStroke key) {
-      this.command = command;
-      putValue(NAME, text);
-      putValue(ACCELERATOR_KEY, key);
-    }
+      public GeneralAction(String command, String text, KeyStroke key) {
+          this.command = command;
+          putValue(NAME, text);
+          putValue(ACCELERATOR_KEY, key);
+      }
 
-    public GeneralAction(String command, String text, String description) {
+      public GeneralAction(String command, String text, String description) {
+          this.command = command;
+          ImageIcon icon = GUIGlobals.getImage(command);
+          if (icon != null)
+              putValue(SMALL_ICON, icon);
+          putValue(NAME, text);
+          putValue(SHORT_DESCRIPTION, Globals.lang(description));
+      }
+
+      public GeneralAction(String command, String text, String description, KeyStroke key) {
+          this.command = command;
+          ImageIcon icon = GUIGlobals.getImage(command);
+          if (icon != null)
+              putValue(SMALL_ICON, icon);
+          putValue(NAME, text);
+          putValue(SHORT_DESCRIPTION, Globals.lang(description));
+          putValue(ACCELERATOR_KEY, key);
+      }
+
+  /*    public GeneralAction(String command, String text, String description,
+                           URL imageUrl, KeyStroke key) {
       this.command = command;
-      putValue(NAME, text);
-      putValue(SHORT_DESCRIPTION, Globals.lang(description));
-    }
-    public GeneralAction(String command, String text, String description, KeyStroke key) {
-      this.command = command;
+        ImageIcon icon = GUIGlobals.getImage(command);
+        if (icon != null)
+            putValue(SMALL_ICON, icon);
       putValue(NAME, text);
       putValue(SHORT_DESCRIPTION, Globals.lang(description));
         putValue(ACCELERATOR_KEY, key);
-    }
+    }*/
 
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
@@ -903,7 +905,7 @@ public JabRefPreferences prefs() {
 
     public NewEntryAction(KeyStroke key) {
       // This action leads to a dialog asking for entry type.
-      super(new ImageIcon(GUIGlobals.addIconFile));
+      super(GUIGlobals.getImage("add"));
       putValue(NAME, "New entry");
       putValue(ACCELERATOR_KEY, key);
       putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX entry"));
@@ -1573,7 +1575,7 @@ public JabRefPreferences prefs() {
   class CloseDatabaseAction
       extends MnemonicAwareAction {
     public CloseDatabaseAction() {
-        super(new ImageIcon(GUIGlobals.closeIconFile));
+        super(GUIGlobals.getImage("close"));
         putValue(NAME, "Close database");
         putValue(SHORT_DESCRIPTION,
                  Globals.lang("Close the current database"));
@@ -1634,7 +1636,7 @@ public JabRefPreferences prefs() {
   class NewDatabaseAction
       extends MnemonicAwareAction {
     public NewDatabaseAction() {
-        super(new ImageIcon(GUIGlobals.newIconFile));
+        super(GUIGlobals.getImage("new"));
         putValue(NAME, "New database");
         putValue(SHORT_DESCRIPTION, Globals.lang("New BibTeX database"));
         //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
@@ -1652,7 +1654,7 @@ class ImportCiteSeerAction
         extends MnemonicAwareAction {
 
     public ImportCiteSeerAction() {
-        super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
+        super(GUIGlobals.getImage("citeseer"));
         putValue(NAME, "Import Fields from CiteSeer");
         putValue(SHORT_DESCRIPTION, Globals.lang("Import Fields from CiteSeer Database"));
         putValue(ACCELERATOR_KEY, prefs.getKey("Import Fields from CiteSeer")); // Key defined in MenuTitles!
@@ -1731,7 +1733,7 @@ class FetchCiteSeerAction
         extends MnemonicAwareAction {
 
                 public FetchCiteSeerAction() {
-                    super(new ImageIcon(GUIGlobals.wwwCiteSeerIcon));
+                    super(GUIGlobals.getImage("citeseer"));
                     putValue(NAME, "Fetch citations from CiteSeer");
 
                     putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Articles Citing your Database"));
@@ -1805,7 +1807,7 @@ class FetchCiteSeerAction
     {
       public NewSubDatabaseAction()
       {
-        super(new ImageIcon( GUIGlobals.newBibFile));
+        super(GUIGlobals.getImage("new"));
         putValue(NAME, "New subdatabase based on AUX file" );
         putValue( SHORT_DESCRIPTION, Globals.lang( "New BibTeX subdatabase" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
@@ -1844,7 +1846,7 @@ class FetchCiteSeerAction
       public IntegrityCheckAction()
       {
         super(Globals.menuTitle("Integrity check"),
-               new ImageIcon( GUIGlobals.integrityCheck ) ) ;
+               GUIGlobals.getImage("integrityCheck")) ;
                //putValue( SHORT_DESCRIPTION, "integrity" ) ;  //Globals.lang( "integrity" ) ) ;
             //putValue(MNEMONIC_KEY, GUIGlobals.newKeyCode);
       }
@@ -1870,7 +1872,7 @@ class FetchCiteSeerAction
   class FetchMedlineAction
       extends MnemonicAwareAction {
     public FetchMedlineAction() {
-      super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      super(GUIGlobals.getImage("medline"));
       putValue(NAME, "Fetch Medline");
       putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
@@ -1892,7 +1894,7 @@ class FetchCiteSeerAction
   class CiteSeerPanelAction
       extends MnemonicAwareAction {
     public CiteSeerPanelAction() {
-      super(new ImageIcon(GUIGlobals.fetchMedlineIcon));
+      super(GUIGlobals.getImage("medline"));
       putValue(NAME, "Fetch CiteSeer");
       //System.out.println(Globals.menuTitle("Fetch CiteSeer"));
       putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
@@ -1909,34 +1911,13 @@ class FetchCiteSeerAction
 
   }
 
-    /*class FetchAuthorMedlineAction
-      extends AbstractAction {
-    public FetchAuthorMedlineAction() {
-      super(Globals.lang("Fetch Medline by author"),
-            new ImageIcon(GUIGlobals.fetchMedlineIcon));
-      putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by author"));
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      if (tabbedPane.getTabCount() > 0) {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-          ( (BasePanel) tabbedPane.getComponentAt(i)).sidePaneManager.
-              ensureVisible("fetchAuthorMedline");
-          new FocusRequester(basePanel().medlineFetcher);
-        }
-      }
-    }
-
-    }*/
-
   // The action for opening the preferences dialog.
-
   AbstractAction showPrefs = new ShowPrefsAction();
 
   class ShowPrefsAction
       extends MnemonicAwareAction {
     public ShowPrefsAction() {
-      super(new ImageIcon(GUIGlobals.prefsIconFile));
+      super(GUIGlobals.getImage("preferences"));
       putValue(NAME, "Preferences");
       putValue(SHORT_DESCRIPTION, Globals.lang("Preferences"));
     }
@@ -2310,7 +2291,7 @@ class FetchCiteSeerAction
 class SaveSessionAction
       extends MnemonicAwareAction {
     public SaveSessionAction() {
-      super(new ImageIcon(GUIGlobals.saveIconFile));
+      super(GUIGlobals.getImage("save"));
       putValue(NAME, "Save session");
       putValue(ACCELERATOR_KEY, prefs.getKey("Save session"));
     }
@@ -2419,7 +2400,7 @@ class SaveSessionAction
       extends MnemonicAwareAction {
       boolean running = false;
     public LoadSessionAction() {
-      super(new ImageIcon(GUIGlobals.openIconFile));
+      super(GUIGlobals.getImage("loadSession"));
       putValue(NAME, "Load session");
       putValue(ACCELERATOR_KEY, prefs.getKey("Load session"));
     }

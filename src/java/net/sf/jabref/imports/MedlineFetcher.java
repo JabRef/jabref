@@ -70,11 +70,11 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
     AuthorDialog authorDialog;
     JFrame jFrame; // invisible dialog holder
     JButton go = new JButton(Globals.lang("Fetch")),
-        helpBut = new JButton(new ImageIcon(GUIGlobals.helpIconFile));
+        helpBut = new JButton(GUIGlobals.getImage("helpSmall"));
     HelpAction help;
 
     public MedlineFetcher(SidePaneManager p0) {
-        super(p0, GUIGlobals.fetchMedlineIcon, Globals.lang("Fetch Medline"));
+        super(p0, GUIGlobals.getIconUrl("medline"), Globals.lang("Fetch Medline"));
 
         help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
         helpBut.addActionListener(help);

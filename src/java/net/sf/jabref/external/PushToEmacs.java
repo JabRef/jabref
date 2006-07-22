@@ -28,7 +28,7 @@ public class PushToEmacs implements PushToApplication {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(GUIGlobals.emacsIcon);
+        return GUIGlobals.getImage("emacs");
     }
 
     public String getKeyStrokeName() {

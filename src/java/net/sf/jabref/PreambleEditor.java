@@ -180,7 +180,7 @@ public class PreambleEditor extends JDialog {
     UndoAction undoAction = new UndoAction();
     class UndoAction extends AbstractAction {
 	public UndoAction() {
-	    super("Undo", new ImageIcon(GUIGlobals.undoIconFile));
+	    super("Undo", GUIGlobals.getImage("undo"));
 	    putValue(SHORT_DESCRIPTION, "Undo");
 	}
 	public void actionPerformed(ActionEvent e) {
@@ -193,7 +193,7 @@ public class PreambleEditor extends JDialog {
     RedoAction redoAction = new RedoAction();
     class RedoAction extends AbstractAction {
 	public RedoAction() {
-	    super("Undo", new ImageIcon(GUIGlobals.redoIconFile));
+	    super("Undo", GUIGlobals.getImage("redo"));
 	    putValue(SHORT_DESCRIPTION, "Redo");
 	}
 	public void actionPerformed(ActionEvent e) {

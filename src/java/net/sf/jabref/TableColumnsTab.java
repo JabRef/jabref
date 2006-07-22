@@ -176,7 +176,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     class DeleteRowAction extends AbstractAction {
         public DeleteRowAction() {
-          super("Delete row", new ImageIcon(GUIGlobals.delRowIconFile));
+          super("Delete row", GUIGlobals.getImage("remove"));
           putValue(SHORT_DESCRIPTION, Globals.lang("Delete rows"));
         }
         public void actionPerformed(ActionEvent e) {
@@ -200,7 +200,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     class AddRowAction extends AbstractAction {
         public AddRowAction() {
-          super("Add row", new ImageIcon(GUIGlobals.addIconFile));
+          super("Add row", GUIGlobals.getImage("add"));
           putValue(SHORT_DESCRIPTION, Globals.lang("Insert rows"));
         }
         public void actionPerformed(ActionEvent e) {
@@ -227,7 +227,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     class UpdateWidthsAction extends AbstractAction {
         public UpdateWidthsAction() {
           //super(Globals.lang("Update to current column widths"));
-          super(Globals.lang("Update to current column widths"), new ImageIcon(GUIGlobals.sheetIcon));
+          super(Globals.lang("Update to current column widths"));
           //putValue(SHORT_DESCRIPTION, Globals.lang("Update to current column widths"));
         }
         public void actionPerformed(ActionEvent e) {

@@ -34,7 +34,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
 
 
     remoteHelp = new HelpAction(diag, GUIGlobals.remoteHelp, "Help",
-                GUIGlobals.helpSmallIconFile);
+                GUIGlobals.getIconUrl("helpSmall"));
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
     useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
     remoteServerPort = new JTextField();

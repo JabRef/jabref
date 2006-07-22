@@ -66,7 +66,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 
 	public CiteSeerFetcher(SidePaneManager p0)  {
-		super(p0, GUIGlobals.wwwCiteSeerIcon, Globals.lang("CiteSeer Transfer"));
+		super(p0, GUIGlobals.getIconUrl("citeseer"), Globals.lang("CiteSeer Transfer"));
 
 		sidePaneManager = p0;
 		progressBar = new JProgressBar();

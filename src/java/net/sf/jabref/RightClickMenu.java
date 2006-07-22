@@ -64,21 +64,21 @@ public class RightClickMenu extends JPopupMenu
 
         addPopupMenuListener(this);
 
-        add(new AbstractAction(Globals.lang("Copy"), new ImageIcon(GUIGlobals.copyIconFile)) {
+        add(new AbstractAction(Globals.lang("Copy"), GUIGlobals.getImage("copy")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copy");
                     } catch (Throwable ex) {}
                 }
             });
-        add(new AbstractAction(Globals.lang("Paste"), new ImageIcon(GUIGlobals.pasteIconFile)) {
+        add(new AbstractAction(Globals.lang("Paste"), GUIGlobals.getImage("paste")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("paste");
                     } catch (Throwable ex) {}
                 }
             });
-        add(new AbstractAction(Globals.lang("Cut"), new ImageIcon(GUIGlobals.cutIconFile)) {
+        add(new AbstractAction(Globals.lang("Cut"), GUIGlobals.getImage("cut")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("cut");
@@ -86,7 +86,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-        add(new AbstractAction(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile)) {
+        add(new AbstractAction(Globals.lang("Delete"), GUIGlobals.getImage("delete")) {
                 public void actionPerformed(ActionEvent e) {
                     /*SwingUtilities.invokeLater(new Runnable () {
                         public void run() {*/
@@ -110,14 +110,14 @@ public class RightClickMenu extends JPopupMenu
             addSeparator();
 
         if (multiple) {
-          add(new AbstractAction(Globals.lang("Mark entries"), new ImageIcon(GUIGlobals.markIcon)) {
+          add(new AbstractAction(Globals.lang("Mark entries"), GUIGlobals.getImage("markEntries")) {
             public void actionPerformed(ActionEvent e) {
               try {
                 panel.runCommand("markEntries");
               } catch (Throwable ex) {}
             }
           });
-          add(new AbstractAction(Globals.lang("Unmark entries"), new ImageIcon(GUIGlobals.unmarkIcon)) {
+          add(new AbstractAction(Globals.lang("Unmark entries"), GUIGlobals.getImage("unmarkEntries")) {
             public void actionPerformed(ActionEvent e) {
               try {
                 panel.runCommand("unmarkEntries");
@@ -127,7 +127,7 @@ public class RightClickMenu extends JPopupMenu
           addSeparator();
         } else if (be != null) {
           if (be.getField(BibtexFields.MARKED) == null)
-            add(new AbstractAction(Globals.lang("Mark entry"), new ImageIcon(GUIGlobals.markIcon)) {
+            add(new AbstractAction(Globals.lang("Mark entry"), GUIGlobals.getImage("markEntries")) {
                public void actionPerformed(ActionEvent e) {
                  try {
                    panel.runCommand("markEntries");
@@ -135,7 +135,7 @@ public class RightClickMenu extends JPopupMenu
                }
              });
            else
-             add(new AbstractAction(Globals.lang("Unmark entry"), new ImageIcon(GUIGlobals.unmarkIcon)) {
+             add(new AbstractAction(Globals.lang("Unmark entry"), GUIGlobals.getImage("unmarkEntries")) {
                public void actionPerformed(ActionEvent e) {
                  try {
                    panel.runCommand("unmarkEntries");
@@ -145,7 +145,7 @@ public class RightClickMenu extends JPopupMenu
            addSeparator();
         }
 
-        add(new AbstractAction(Globals.lang("Open PDF or PS"), new ImageIcon(GUIGlobals.pdfIcon)) {
+        add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("pdf")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("openFile");
@@ -153,7 +153,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-            add(new AbstractAction(Globals.lang("Open URL or DOI"), new ImageIcon(GUIGlobals.wwwIcon)) {
+            add(new AbstractAction(Globals.lang("Open URL or DOI"), GUIGlobals.getImage("www")) {
               public void actionPerformed(ActionEvent e) {
                 try {
                   panel.runCommand("openUrl");
@@ -161,7 +161,7 @@ public class RightClickMenu extends JPopupMenu
               }
             });
 
-        add(new AbstractAction(Globals.lang("Copy BibTeX key"), new ImageIcon(GUIGlobals.copyKeyIconFile)) {
+        add(new AbstractAction(Globals.lang("Copy BibTeX key")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copyKey");
@@ -169,7 +169,7 @@ public class RightClickMenu extends JPopupMenu
                 }
             });
 
-        add(new AbstractAction(Globals.lang("Copy")+" \\cite{"+Globals.lang("BibTeX key")+"}", new ImageIcon(GUIGlobals.copyKeyIconFile)) {
+        add(new AbstractAction(Globals.lang("Copy")+" \\cite{"+Globals.lang("BibTeX key")+"}") {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("copyCiteKey");
@@ -299,13 +299,13 @@ public class RightClickMenu extends JPopupMenu
             if (Globals.prefs.getBoolean("groupShowIcons")) {
                     switch (group.getHierarchicalContext()) {
                     case AbstractGroup.INCLUDING:
-                            menuItem.setIcon(GUIGlobals.groupIncludingIcon);
+                            menuItem.setIcon(GUIGlobals.getImage("groupIncluding"));
                             break;
                     case AbstractGroup.REFINING:
-                            menuItem.setIcon(GUIGlobals.groupRefiningIcon);
+                            menuItem.setIcon(GUIGlobals.getImage("groupRefining"));
                             break;
                     default:
-                            menuItem.setIcon(GUIGlobals.groupRegularIcon);
+                            menuItem.setIcon(GUIGlobals.getImage("groupRegular"));
                                 break;
                     }
             }

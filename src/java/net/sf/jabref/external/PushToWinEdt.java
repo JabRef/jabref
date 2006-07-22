@@ -30,7 +30,7 @@ public class PushToWinEdt implements PushToApplication {
     }
 
     public Icon getIcon() {
-        return new ImageIcon(GUIGlobals.winEdtIcon);
+        return GUIGlobals.getImage("winedt");
     }
 
     public String getKeyStrokeName() {

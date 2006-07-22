@@ -75,10 +75,10 @@ public class ImportInspectionDialog extends JDialog {
     private Map groupAdditions = new HashMap();
     private JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs.getBoolean("generateKeysAfterInspection"));
     private JLabel
-        duplLabel = new JLabel(new ImageIcon(GUIGlobals.duplicateIcon)),
-        pdfLabel = new JLabel(new ImageIcon(GUIGlobals.pdfIcon)),
-        psLabel = new JLabel(new ImageIcon(GUIGlobals.psIcon)),
-        urlLabel = new JLabel(new ImageIcon(GUIGlobals.wwwIcon));
+        duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
+        pdfLabel = new JLabel(GUIGlobals.getImage("pdfSmall")),
+        psLabel = new JLabel(GUIGlobals.getImage("psSmall")),
+        urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
     private final int
         DUPL_COL = 1,
@@ -649,7 +649,7 @@ public class ImportInspectionDialog extends JDialog {
 
     class DeleteListener extends AbstractAction implements ActionListener {
         public DeleteListener() {
-            super(Globals.lang("Delete"), new ImageIcon(GUIGlobals.removeIconFile));
+            super(Globals.lang("Delete"), GUIGlobals.getImage("delete"));
         }
 
         public void actionPerformed(ActionEvent event) {

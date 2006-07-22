@@ -50,14 +50,14 @@ public class ManageJournalsPanel extends JPanel{
     JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
         oldFile = new JRadioButton(Globals.lang("Existing file"));
 
-    JButton add = new JButton(new ImageIcon(GUIGlobals.addIconFile)),
-        remove = new JButton(new ImageIcon(GUIGlobals.removeIconFile)),
+    JButton add = new JButton(GUIGlobals.getImage("add")),
+        remove = new JButton(GUIGlobals.getImage("remove")),
         ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel")),
         help = new JButton(Globals.lang("Help")),
         browseOld = new JButton(Globals.lang("Browse")),
         browseNew = new JButton(Globals.lang("Browse")),
-        addExt = new JButton(new ImageIcon(GUIGlobals.addIconFile));
+        addExt = new JButton(GUIGlobals.getImage("add"));
 
 
     public ManageJournalsPanel(final JabRefFrame frame) {
@@ -534,7 +534,7 @@ public class ManageJournalsPanel extends JPanel{
         private JTextField tf;
         private JButton browse = new JButton(Globals.lang("Browse")),
             view = new JButton(Globals.lang("Preview")),
-            clear = new JButton(new ImageIcon(GUIGlobals.removeIconFile)),
+            clear = new JButton(GUIGlobals.getImage("delete")),
             download = new JButton(Globals.lang("Download"));
         public ExternalFileEntry() {
             tf = new JTextField();

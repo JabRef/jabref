@@ -42,6 +42,12 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     protected Object[] highlight3Cells = null;
     protected Object highlightBorderCell = null;
 
+    public static ImageIcon
+      groupRefiningIcon = GUIGlobals.getImage("groupRefining"),
+      groupIncludingIcon = GUIGlobals.getImage("groupIncluding"),
+      groupRegularIcon = null;
+
+
     public Component getTreeCellRendererComponent(JTree tree, Object value,
             boolean selected, boolean expanded, boolean leaf, int row,
             boolean hasFocus) {
@@ -105,16 +111,16 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (Globals.prefs.getBoolean("groupShowIcons")) {
             switch (group.getHierarchicalContext()) {
             case AbstractGroup.REFINING:
-                if (label.getIcon() != GUIGlobals.groupRefiningIcon)
-                    label.setIcon(GUIGlobals.groupRefiningIcon);
+                if (label.getIcon() != groupRefiningIcon)
+                    label.setIcon(groupRefiningIcon);
                 break;
             case AbstractGroup.INCLUDING:
-                if (label.getIcon() != GUIGlobals.groupIncludingIcon)
-                    label.setIcon(GUIGlobals.groupIncludingIcon);
+                if (label.getIcon() != groupIncludingIcon)
+                    label.setIcon(groupIncludingIcon);
                 break;
             default:
-                if (label.getIcon() != GUIGlobals.groupRegularIcon)
-                    label.setIcon(GUIGlobals.groupRegularIcon);
+                if (label.getIcon() != groupRegularIcon)
+                    label.setIcon(groupRegularIcon);
                 break;
             }
         } else {

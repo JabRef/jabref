@@ -34,7 +34,7 @@ import java.net.URL;
 
 public class SidePaneHeader extends JPanel implements ActionListener {
 
-  private JButton close = new JButton(new ImageIcon(GUIGlobals.close2IconFile));
+  private JButton close = new JButton(GUIGlobals.getImage("close2"));
     private JLabel nameLabel, imageIcon;
     private SidePaneComponent parent;
     private GridBagLayout gbl = new GridBagLayout();
