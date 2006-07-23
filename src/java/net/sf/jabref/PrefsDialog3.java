@@ -161,6 +161,7 @@ public class PrefsDialog3 extends JDialog {
         ok.addActionListener(new OkAction());
         CancelAction cancelAction = new CancelAction();
         cancel.addActionListener(cancelAction);
+        lower.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         ButtonBarBuilder bb = new ButtonBarBuilder(lower);
         bb.addGlue();
         bb.addGridded(ok);

@@ -109,8 +109,10 @@ public class FromAuxDialog
     initStatusPanel() ;
 
     // insert the buttons
-      ButtonBarBuilder bb = new ButtonBarBuilder();
+    ButtonBarBuilder bb = new ButtonBarBuilder();
     JPanel buttonPanel = bb.getPanel();
+    buttonPanel.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+
     bb.addGlue();
     bb.addGridded( generateButton ) ;
     bb.addGridded( okButton ); ;

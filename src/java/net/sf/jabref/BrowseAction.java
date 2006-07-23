@@ -10,7 +10,8 @@ import java.io.File;
  */
 public class BrowseAction extends AbstractAction implements ActionListener {
 
-    JFrame frame;
+    JFrame frame=null;
+    //JDialog dialog=null;
     JTextField comp;
     boolean dir;
 
@@ -21,6 +22,14 @@ public class BrowseAction extends AbstractAction implements ActionListener {
         comp = tc;
 
     }
+
+    /*public BrowseAction(JDialog dialog, JTextField tc, boolean dir) {
+        super(Globals.lang("Browse"));
+        this.dialog = dialog;
+        this.dir = dir;
+        comp = tc;
+
+    } */
 
     public void actionPerformed(ActionEvent e) {
         String chosen = null;

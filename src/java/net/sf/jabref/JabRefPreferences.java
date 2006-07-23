@@ -193,6 +193,9 @@ public class JabRefPreferences {
         defaults.put("generalFields", "crossref;keywords;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");
 
+        defaults.put("useCustomIconTheme", Boolean.TRUE);
+        defaults.put("customIconThemeFile", null);
+
     // Entry editor tab 0:
     defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
         defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;doi;url;citeseerurl;"+

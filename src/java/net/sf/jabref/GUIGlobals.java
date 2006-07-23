@@ -36,8 +36,9 @@ import java.util.*;
 import java.net.URL;
 import java.net.MalformedURLException;
 import javax.swing.*;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
 
 public class GUIGlobals {
 
@@ -120,7 +121,6 @@ public class GUIGlobals {
     // further below.
     public static Color activeEditor = new Color(230, 230, 255);
 
-    static ResourceBundle iconBundle;
     static HashMap iconMap;
 
     public static JLabel getTableIcon(String fieldType) {
@@ -234,16 +234,44 @@ public class GUIGlobals {
       LANGUAGES.put("Italiano", "it");
       LANGUAGES.put("Norsk", "no");
 
+  }
 
-      // Read the image resource bundle, and put all the information into a more
-      // practical HashMap. We may drop the resourcebundle altogether, eventually.
-      iconBundle = ResourceBundle.getBundle("resource/Icons", new Locale("en"));
-      iconMap = new HashMap();
-      Enumeration keys = iconBundle.getKeys();
-      for (; keys.hasMoreElements();) {
-          String key = (String)keys.nextElement();
-          iconMap.put(key, iconBundle.getString(key));
+    /**
+     * Read either the default icon theme, or a custom one. If loading of the custom theme
+     * fails, try to fall back on the default theme.
+     */
+    public static void setUpIconTheme() {
+      URL defaultResource = GUIGlobals.class.getResource("/resource/Icons.properties");
+      URL resource = defaultResource;
+      String defaultPrefix = "/images/", prefix = defaultPrefix;
+      if (Globals.prefs.getBoolean("useCustomIconTheme")) {
+          String filename = Globals.prefs.get("customIconThemeFile");
+          if (filename != null)
+              try {
+                  File file = new File(filename);
+                  String parent = file.getParentFile().getAbsolutePath();
+                  prefix = "file://"+parent+System.getProperty("file.separator");
+                  resource = new URL("file://"+file.getAbsolutePath());
+              } catch (MalformedURLException e) {
+                  e.printStackTrace();
+              }
       }
+      try {
+          iconMap = readIconThemeFile(resource, prefix);
+      } catch (IOException e) {
+          System.err.println(Globals.lang("Unable to read icon theme file")+" '"+
+            resource.toString()+"'");
+          // If we were trying to load a custom theme, try the default one as a fallback:
+          if (resource != defaultResource)
+              try {
+                  iconMap = readIconThemeFile(defaultResource, defaultPrefix);
+              } catch (IOException e2) {
+                  System.err.println(Globals.lang("Unable to read default icon theme."));
+              }
+
+      }
+
+
   }
 
     /**
@@ -253,8 +281,20 @@ public class GUIGlobals {
      * @return The URL to the actual image to use.
      */
     public static URL getIconUrl(String name) {
-        if (iconMap.containsKey(name))
-            return GUIGlobals.class.getResource((String)iconMap.get(name));
+        if (iconMap.containsKey(name)) {
+            String path = (String)iconMap.get(name);
+            URL url = GUIGlobals.class.getResource(path);
+            if (url == null)
+                // This may be a resource outside of the jar file, so we try a general URL:
+                try {
+                    url = new URL(path);
+                } catch (MalformedURLException e) {
+                    url = null;
+                }
+            if (url == null)
+                System.err.println(Globals.lang("Could not find image file")+" '"+path+"'");
+            return url;
+        }
         else return null;
     }
 
@@ -267,6 +307,48 @@ public class GUIGlobals {
     public static ImageIcon getImage(String name) {
         URL u = getIconUrl(name);
         return u != null ? new ImageIcon(getIconUrl(name)) : null;
+    }
+
+    /**
+     * Read a typical java property file into a HashMap. Currently doesn't support escaping
+     * of the '=' character - it simply looks for the first '=' to determine where the key ends.
+     * Both the key and the value is trimmed for whitespace at the ends.
+     * @param file The URL to read information from.
+     * @param prefix A String to prefix to all values read. Can represent e.g. the directory
+     * where icon files are to be found.
+     * @return A HashMap containing all key-value pairs found.
+     * @throws IOException
+     */
+    private static HashMap readIconThemeFile(URL file, String prefix) throws IOException {
+        HashMap map = new HashMap();
+        InputStream in = null;
+        try {
+            in = file.openStream();
+            StringBuffer buffer = new StringBuffer();
+            int c;
+            while ((c = in.read()) != -1)
+                buffer.append((char)c);
+            String[] lines = buffer.toString().split("\n");
+            String directory = null;
+            for (int i=0; i<lines.length; i++) {
+                String line = lines[i].trim();
+                int index = line.indexOf("=");
+                if (index >= 0) {
+                    String key = line.substring(0, index).trim();
+                    String value = prefix+line.substring(index+1).trim();
+                    map.put(key, value);
+                }
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            try {
+                if (in != null) in.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return map;
     }
 
   /** returns the path to language independent help files */

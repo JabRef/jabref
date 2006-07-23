@@ -542,6 +542,9 @@ public class JabRef {
             // Jabref version.
             Util.performCompatibilityUpdate();
 
+            // Set up custom or default icon theme:
+            GUIGlobals.setUpIconTheme();
+
            // This property is set to make the Mac OSX Java VM move the menu bar to
             // the top
             // of the screen, where Mac users expect it to be.

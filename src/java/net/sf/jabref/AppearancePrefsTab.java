@@ -13,13 +13,13 @@ import net.sf.jabref.gui.ColorSetupPanel;
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox colorCodes, antialias;
+    private JCheckBox colorCodes, antialias;//, useCustomIconTheme;
     private GridBagLayout gbl = new GridBagLayout();
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private ColorSetupPanel colorPanel = new ColorSetupPanel();
     private Font font = GUIGlobals.CURRENTFONT;
     private int oldMenuFontSize;
-    private JTextField fontSize;
+    private JTextField fontSize;//, customIconThemeFile;
 
     /**
      * Customization of appearance parameters.
@@ -38,7 +38,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                    ("Color codes for required and optional fields"));
         antialias = new JCheckBox(Globals.lang
                   ("Use antialiasing font"));
-
+        //useCustomIconTheme = new JCheckBox(Globals.lang("Use custom icon theme"));
+        //customIconThemeFile = new JTextField();
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
                         "");
@@ -60,8 +61,19 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.append(fontButton);
         builder.nextLine();
         builder.append(colorPanel);
-
-
+        /*builder.appendSeparator(Globals.lang("Custom icon theme"));
+        builder.append(useCustomIconTheme);
+        builder.nextLine();
+        JPanel p2 = new JPanel();
+        lab = new JLabel(Globals.lang("Custom icon theme file")+":");
+        p2.add(lab);
+        p2.add(customIconThemeFile);
+        BrowseAction browse = new BrowseAction(null, customIconThemeFile, false);
+        JButton browseBut = new JButton(Globals.lang("Browse"));
+        browseBut.addActionListener(browse);
+        p2.add(browseBut);
+        builder.append(p2);
+          */
 
     JPanel upper = new JPanel(),
         sort = new JPanel(),
@@ -106,7 +118,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         antialias.setSelected(_prefs.getBoolean("antialias"));
         fontSize.setText("" + _prefs.getInt("menuFontSize"));
         oldMenuFontSize = _prefs.getInt("menuFontSize");
-
+        //useCustomIconTheme.setSelected(_prefs.getBoolean("useCustomIconTheme"));
+        //customIconThemeFile.setText(_prefs.get("customIconThemeFile"));
         colorPanel.setValues();
     }
 
