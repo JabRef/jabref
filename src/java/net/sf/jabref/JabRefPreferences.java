@@ -194,7 +194,7 @@ public class JabRefPreferences {
                      "pdf;comment;owner");
 
         defaults.put("useCustomIconTheme", Boolean.TRUE);
-        defaults.put("customIconThemeFile", null);
+        defaults.put("customIconThemeFile", "/home/alver/div/smalltheme/Icons.properties");
 
     // Entry editor tab 0:
     defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));

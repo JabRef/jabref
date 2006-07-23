@@ -211,10 +211,11 @@ public class GroupSelector extends SidePaneComponent implements
                 Globals.prefs.putInt("groupsVisibleRows", i);
             }
         });
-        Dimension butDim = new Dimension(29, 29);
+
+        int butSize = newButton.getIcon().getIconHeight() + 5;
+        Dimension butDim = new Dimension(butSize, butSize);
         //Dimension butDimSmall = new Dimension(20, 20);
 
-        Dimension butDim2 = new Dimension(40, 22);
         newButton.setPreferredSize(butDim);
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
@@ -223,8 +224,8 @@ public class GroupSelector extends SidePaneComponent implements
         helpButton.setMinimumSize(butDim);
         autoGroup.setPreferredSize(butDim);
         autoGroup.setMinimumSize(butDim);
-        openset.setPreferredSize(butDim2);
-        openset.setMinimumSize(butDim2);
+        openset.setPreferredSize(butDim);
+        openset.setMinimumSize(butDim);
         expand.setPreferredSize(butDim);
         expand.setMinimumSize(butDim);
         reduce.setPreferredSize(butDim);
