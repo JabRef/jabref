@@ -96,19 +96,8 @@ public class JabRefFrame
     }
   ToolBar tlb = new ToolBar();
 
-  JMenuBar mb = new JMenuBar();/* {
-    public void paintComponent(Graphics g) {
-      Graphics2D g2 = (Graphics2D)g;
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                          RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                          RenderingHints.VALUE_RENDER_QUALITY);
-      super.paintComponent(g2);
-
-    }
-
-  };*/
-  GridBagLayout gbl = new GridBagLayout();
+  JMenuBar mb = new JMenuBar();
+   GridBagLayout gbl = new GridBagLayout();
   GridBagConstraints con = new GridBagConstraints();
 
   JLabel statusLine = new JLabel("", SwingConstants.LEFT),
@@ -649,6 +638,7 @@ public JabRefPreferences prefs() {
   }
 
   private void setupLayout() {
+    tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
     fillMenu();
     createToolBar();
     getContentPane().setLayout(gbl);
@@ -660,7 +650,7 @@ public JabRefPreferences prefs() {
     con.weightx = 1;
     con.weighty = 0;
     con.gridwidth = GridBagConstraints.REMAINDER;
-    mb.setMinimumSize(mb.getPreferredSize());
+
     //gbl.setConstraints(mb, con);
     //getContentPane().add(mb);
     setJMenuBar(mb);

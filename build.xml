@@ -111,7 +111,7 @@
             <!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
             <pathelement location="${library.directory}/commons-logging.jar" />-->
             <pathelement location="${library.directory}/antlr.jar" />
-            <pathelement location="${library.directory}/looks-2.0.1.jar" />
+            <pathelement location="${library.directory}/looks-2.0.4.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin-1.4.jar" />
             <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
@@ -126,7 +126,7 @@
         <classpath>
             <pathelement location="${build.lib}/jabref.jar"/>
             <pathelement location="${library.directory}/antlr.jar" />
-            <pathelement location="${library.directory}/looks-2.0.1.jar" />
+            <pathelement location="${library.directory}/looks-2.0.4.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin.jar" />
             <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
@@ -140,7 +140,7 @@
           <classpath>
             <pathelement location="${build.lib}/jabref.jar"/>
             <pathelement location="${library.directory}/antlr.jar" />
-            <pathelement location="${library.directory}/looks-2.0.1.jar" />
+            <pathelement location="${library.directory}/looks-2.0.4.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin-1.4.jar" />
             <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
@@ -156,7 +156,7 @@
           <classpath>
             <pathelement location="${build.lib}/jabref.jar"/>
             <pathelement location="${library.directory}/antlr.jar" />
-            <pathelement location="${library.directory}/looks-2.0.1.jar" />
+            <pathelement location="${library.directory}/looks-2.0.4.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin-1.4.jar" />
             <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
@@ -176,7 +176,7 @@
                                 <!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
                                 <pathelement location="${library.directory}/commons-logging.jar" />-->
                                 <pathelement location="${library.directory}/antlr.jar" />
-                                <pathelement location="${library.directory}/looks-2.0.1.jar" />
+                                <pathelement location="${library.directory}/looks-2.0.4.jar" />
                                 <pathelement location="${library.directory}/forms-1.0.4.jar" />
                                 <pathelement location="${library.directory}/spin-1.4.jar" />
                                 <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
@@ -195,7 +195,7 @@
                                 <!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
                                 <pathelement location="${library.directory}/commons-logging.jar" />-->
                                 <pathelement location="${library.directory}/antlr.jar" />
-                                <pathelement location="${library.directory}/looks-2.0.1.jar" />
+                                <pathelement location="${library.directory}/looks-2.0.4.jar" />
                                 <pathelement location="${library.directory}/spin-1.4.jar" />
                         </classpath>
                 </javac>
@@ -411,7 +411,7 @@ version=${jabref.version}</echo>
                 <unjar src="${library.directory}/commons-logging.jar" dest="${build.tmp}" />-->
                 <unjar src="${library.directory}/antlr.jar" dest="${build.tmp}" />
                 <!--                <unjar src="${library.directory}/plastic-1.2.1.jar" dest="${build.classes}" />-->
-                <unjar src="${library.directory}/looks-2.0.1.jar" dest="${build.tmp}" />
+                <unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/spin-1.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/glazedlists-1.5.0_java14.jar" dest="${build.tmp}" />
@@ -546,8 +546,8 @@ Number (CCN)           maintenance
                                 <!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
                                 <pathelement location="${library.directory}/commons-logging.jar" />-->
                                 <pathelement location="${library.directory}/antlr.jar" />
-                                <pathelement location="${library.directory}/looks-2.0.1.jar" />
-                                <pathelement location="${library.directory}/looks-2.0.1.jar" />
+                                <pathelement location="${library.directory}/looks-2.0.4.jar" />
+                                <pathelement location="${library.directory}/looks-2.0.4.jar" />
                                 <pathelement location="${library.directory}/spin-1.4.jar" />
                         </classpath>
 

@@ -39,10 +39,15 @@ import java.io.File;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
-
+import com.jgoodies.looks.FontSet;
+import com.jgoodies.looks.FontSets;
+import com.jgoodies.looks.FontPolicy;
+import com.jgoodies.looks.FontPolicies;
 
 //import javax.swing.UIManager;
 //import javax.swing.UIDefaults;
@@ -556,7 +561,7 @@ public class JabRef {
             // If we are not on Mac, deal with font sizes and LookAndFeels:
             if (!Globals.ON_MAC) {
                 int fontSizes = Globals.prefs.getInt("menuFontSize");
-
+                boolean overrideDefaultFonts = Globals.prefs.getBoolean("overrideDefaultFonts");
                 String defaultLookAndFeel;
 
                 if (Globals.ON_WIN)
@@ -593,20 +598,39 @@ public class JabRef {
                     lnf = (LookAndFeel) objLnf;
 
                 // Set font sizes if we are using a JGoodies look and feel.
-                /*if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
-                    //MetalLookAndFeel.setCurrentTheme(new
-                    // com.jgoodies.plaf.plastic.theme.SkyBluer());
-                    Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel) lnf;
-                    //Plastic3DLookAndFeel.setFontPolicy();
-                    //Plastic3DLookAndFeel.setFontPolicy(FontPolicy.);
-                    //plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes,
-                    //        fontSizes, fontSizes));
-                } else if ((lnf != null) && (lnf instanceof WindowsLookAndFeel)) {
-                    //System.out.println("ttt");
-                    //ExtWindowsLookAndFeel plLnf = (ExtWindowsLookAndFeel) lnf;
-                    //plLnf.setFontSizeHints(new FontSizeHints(fontSizes, fontSizes,
-                    //        fontSizes, fontSizes));
-                } */
+                if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
+
+                    //UIManager.put("jgoodies.popupDropShadowEnabled", Boolean.TRUE);
+
+                    MetalLookAndFeel.setCurrentTheme(new
+                     com.jgoodies.looks.plastic.theme.SkyBluer());
+
+                    if (overrideDefaultFonts) {
+                        FontSet fontSet = FontSets.createDefaultFontSet(
+                            new Font("Tahoma", Font.PLAIN, fontSizes),    // control font
+                            new Font("Tahoma", Font.PLAIN, fontSizes),    // menu font
+                            new Font("Tahoma", Font.BOLD, fontSizes)     // title font
+                            );
+                        FontPolicy fixedPolicy = FontPolicies.createFixedPolicy(fontSet);
+                        Plastic3DLookAndFeel.setFontPolicy(fixedPolicy);
+                    }
+
+                    //Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel) lnf;
+                }
+                else if ((lnf != null) && (lnf instanceof WindowsLookAndFeel)) {
+
+                    if (overrideDefaultFonts) {
+                        FontSet fontSet = FontSets.createDefaultFontSet(
+                            new Font("Tahoma", Font.PLAIN, fontSizes),    // control font
+                            new Font("Tahoma", Font.PLAIN, fontSizes),    // menu font
+                            new Font("Tahoma", Font.BOLD, fontSizes)     // title font
+                            );
+                        FontPolicy fixedPolicy = FontPolicies.createFixedPolicy(fontSet);
+                        WindowsLookAndFeel.setFontPolicy(fixedPolicy);
+                    }
+                    
+                    //WindowsLookAndFeel plLnf = (WindowsLookAndFeel) lnf;
+                }
 
                 if (lnf != null) {
                     try {

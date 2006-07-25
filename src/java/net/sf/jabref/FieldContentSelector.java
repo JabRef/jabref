@@ -33,6 +33,7 @@ import java.util.Vector;
 import javax.swing.*;
 
 import com.jgoodies.forms.layout.Sizes;
+import com.jgoodies.looks.Options;
 
 public class FieldContentSelector extends JComponent implements ActionListener {
 
@@ -62,8 +63,8 @@ public class FieldContentSelector extends JComponent implements ActionListener {
      *            insertion.
      */
     public FieldContentSelector(JabRefFrame frame, BasePanel panel,
-            Dialog owner, FieldEditor editor, MetaData data,
-            AbstractAction action, boolean horizontalLayout) {
+                                Dialog owner, FieldEditor editor, MetaData data,
+                                AbstractAction action, boolean horizontalLayout) {
         m_editor = editor;
         m_metaData = data;
         m_action = action;
@@ -80,8 +81,8 @@ public class FieldContentSelector extends JComponent implements ActionListener {
      *            insertion.
      */
     public FieldContentSelector(JabRefFrame frame, BasePanel panel,
-            Frame owner, FieldEditor editor, MetaData data,
-            AbstractAction action, boolean horizontalLayout) {
+                                Frame owner, FieldEditor editor, MetaData data,
+                                AbstractAction action, boolean horizontalLayout) {
         m_editor = editor;
         m_metaData = data;
         m_action = action;
@@ -97,7 +98,10 @@ public class FieldContentSelector extends JComponent implements ActionListener {
         //list.setEditable(true);
 
         list.setMaximumRowCount(35);
-
+        // Set the width of the popup independent of the size of th box itself:
+        list.putClientProperty(
+            Options.COMBO_POPUP_PROTOTYPE_DISPLAY_VALUE_KEY,
+            "The longest text in the combo popup menu. And even longer.");
         /*
          * list.getInputMap().put(Globals.prefs.getKey("Select value"),
          * "enter"); list.getActionMap().put("enter", new EnterAction());

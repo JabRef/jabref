@@ -932,7 +932,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     class DeleteAction extends AbstractAction {
     public DeleteAction() {
-      super(Globals.lang("Delete"), GUIGlobals.getImage("remove"));
+      super(Globals.lang("Delete"), GUIGlobals.getImage("delete"));
       putValue(SHORT_DESCRIPTION, Globals.lang("Delete entry"));
     }
 

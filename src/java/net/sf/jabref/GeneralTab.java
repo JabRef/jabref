@@ -101,7 +101,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
                         "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
                         +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
                         +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
-                                    +"pref, 6dlu, pref, 6dlu, pref");
+                                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Globals.lang("File"), cc.xyw(1,1, 5));
@@ -128,12 +128,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.add(defSource, cc.xy(2, 19));
         builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 21, 5));
         builder.add(useImportInspector, cc.xy(2, 23));
-        builder.add(useImportInspectorForSingle, cc.xy(4, 23));
-        builder.add(inspectionWarnDupli, cc.xy(4, 25));
-        builder.add(ctrlClick, cc.xy(2, 27));
-        builder.add(confirmDelete, cc.xy(2, 29));
-        builder.add(keyDuplicateWarningDialog, cc.xy(2, 31));
-        builder.add(keyEmptyWarningDialog, cc.xy(2, 33));
+        builder.add(useImportInspectorForSingle, cc.xy(2, 25));
+        builder.add(inspectionWarnDupli, cc.xy(2, 27));
+        builder.add(ctrlClick, cc.xy(2, 29));
+        builder.add(confirmDelete, cc.xy(2, 31));
+        builder.add(keyDuplicateWarningDialog, cc.xy(2, 33));
+        builder.add(keyEmptyWarningDialog, cc.xy(2, 35));
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
                 ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
@@ -163,7 +163,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.append(lab);
         builder2.append(encodings);
 
-        builder.add(builder2.getPanel(), cc.xyw(2, 35, 3));
+        builder.add(builder2.getPanel(), cc.xyw(2, 37, 3));
 
 
         JPanel pan = builder.getPanel();
