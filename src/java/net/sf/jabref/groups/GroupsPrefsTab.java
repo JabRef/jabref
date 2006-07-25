@@ -45,7 +45,7 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 			}
 		});
 		
-		FormLayout layout = new FormLayout("9dlu, 500px",
+		FormLayout layout = new FormLayout("9dlu, pref", //500px",
 				"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, " +
 				"p, 3dlu, p");
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);

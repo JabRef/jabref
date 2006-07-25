@@ -601,7 +601,6 @@ public class JabRef {
                 if ((lnf != null) && (lnf instanceof Plastic3DLookAndFeel)) {
 
                     //UIManager.put("jgoodies.popupDropShadowEnabled", Boolean.TRUE);
-
                     MetalLookAndFeel.setCurrentTheme(new
                      com.jgoodies.looks.plastic.theme.SkyBluer());
 
