@@ -52,7 +52,7 @@ public class BibtexParser
         }
 
         _in = new PushbackReader(in);
-
+        
     }
 
     /**

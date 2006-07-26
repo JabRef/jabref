@@ -193,7 +193,7 @@ public class JabRefPreferences {
         defaults.put("generalFields", "crossref;keywords;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");
 
-        defaults.put("useCustomIconTheme", Boolean.TRUE);
+        defaults.put("useCustomIconTheme", Boolean.FALSE);
         defaults.put("customIconThemeFile", "/home/alver/div/smalltheme/Icons.properties");
 
     // Entry editor tab 0:
