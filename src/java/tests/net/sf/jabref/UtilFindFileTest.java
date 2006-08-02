@@ -144,7 +144,7 @@ public class UtilFindFileTest extends TestCase {
 	 * Will check if two paths are the same.
 	 */
 	public static void assertEqualPaths(String path1, String path2) {
-		System.out.println(path1);
+		// System.out.println(path1);
 		if ((path1 == null || path2 == null) && path1 != path2)
 			fail("Path1 was: " + path1 + " but Path2 was: " + path2);
 

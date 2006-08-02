@@ -13,6 +13,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(AuthorListTest.class);
 		suite.addTestSuite(UtilTest.class);
+		suite.addTestSuite(UtilFindFileTest.class);
 		suite.addTestSuite(AuthorAndsReplacerTest.class);
 		suite.addTestSuite(AuthorLastFirstAbbreviatorTester.class);
 		suite.addTestSuite(BibtexParserTest.class);

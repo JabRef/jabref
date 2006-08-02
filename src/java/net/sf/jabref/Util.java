@@ -713,8 +713,8 @@ public class Util
         if (!directory.endsWith(System.getProperty("file.separator"))) 
         	directory += System.getProperty("file.separator");
     	
-        System.out.println("Trying to find: " + directory);
-        System.out.println(".*[bibtexkey].*\\." + extension);
+        // System.out.println("Trying to find: " + directory);
+        // System.out.println(".*[bibtexkey].*\\." + extension);
     	String result = findFile(entry, null, directory + "**" + System.getProperty("file.separator"), ".*[bibtexkey].*\\." + extension);
     	
     	// Return a relative path
@@ -847,7 +847,7 @@ public class Util
 	    	  	
 	    	for (int i = 0; i < dirs.length; i++){
 	    		
-	    		System.out.println(currentDirectory);
+	    		// System.out.println(currentDirectory);
 	    		
 	    		String dirToProcess = dirs[i];
 	    			    		
