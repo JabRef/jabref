@@ -94,6 +94,9 @@ Change log:
           while downloading PDF/PS file.
         - Fixed bug (only in 2.1b2) in calling file open/save dialog on Mac OS X.
         - Fixed bug that made duplicate resolver dialog pop under import inspection dialog.
+        - Fixed bug in windows-installer which prevented running JabRef from the 
+          command-line with arguments.
+        - Added windows-installer-option to associate JabRef with .bib files.
 2.1b2   - Added option to toggle floating of marked entries to the top of the table.
         - Added option to open, append and import multiple BibTeX files.
         - Improved support for LaTeX special characters in HTML and RTF representations.
