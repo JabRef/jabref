@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 David Weitzman, Nizar N. Batada, Morten O. Alver
+Copyright (C) 2003-06 David Weitzman, Nizar N. Batada, Morten O. Alver
 
 All programs in this directory and
 subdirectories are published under the GNU General Public License as
@@ -35,6 +35,27 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.*;
 
+
+/**
+ * Class for importing BibTeX-files.
+ * 
+ * Use:
+ * 
+ *   BibtexParser parser = new BibtexParser(reader); 
+ *   
+ *   ParserResult result = parser.parse();
+ * 
+ * or
+ * 
+ *   ParserResult result = BibtexParser.parse(reader);
+ * 
+ * Can be used stand-alone.
+ * 
+ * @author David Weitzman
+ * @author Nizar N. Batada
+ * @author Morten O. Alver
+ * @author Christopher Oezbek <oezi@oezi.de>
+ */
 public class BibtexParser
 {
     private PushbackReader _in;
@@ -43,19 +64,32 @@ public class BibtexParser
     private boolean _eof = false;
     private int line = 1;
     private FieldContentParser fieldContentParser = new FieldContentParser();
-
-    public BibtexParser(Reader in)
-    {
-        if (in == null)
-        {
+    private ParserResult _pr;
+    
+    public BibtexParser(Reader in){
+    	
+        if (in == null){
             throw new NullPointerException();
         }
-
+        if (Globals.prefs == null){
+        	Globals.prefs = JabRefPreferences.getInstance();
+        }
         _in = new PushbackReader(in);
-        
     }
 
     /**
+	 * Shortcut usage to create a Parser and read the input.
+	 * 
+	 * @param in -
+	 *            Reader to read from
+	 * @throws IOException
+	 */
+	public static ParserResult parse(Reader in) throws IOException {
+		BibtexParser parser = new BibtexParser(in);
+		return parser.parse();
+	}
+    
+   /**
    * Check whether the source is in the correct format for this importer.
    */
   public static boolean isRecognizedFormat(Reader inOrig)
@@ -141,13 +175,26 @@ public class BibtexParser
         return sb.toString();
     }
 
-
+	/**
+	 * Will parse the BibTex-Data found when reading from reader.
+	 * 
+	 * The reader will be consumed. 
+	 * 
+	 * Multiple calls to parse() return the same results
+	 * 
+	 * @return ParserResult
+	 * @throws IOException
+	 */
     public ParserResult parse() throws IOException {
 
+    	// If we already parsed this, just return it.
+    	if (_pr != null)
+			return _pr;
+		
         _db = new BibtexDatabase(); // Bibtex related contents.
         _meta = new HashMap();      // Metadata in comments for Bibkeeper.
         entryTypes = new HashMap(); // To store custem entry types parsed.
-        ParserResult _pr = new ParserResult(_db, _meta, entryTypes);
+        _pr = new ParserResult(_db, _meta, entryTypes);
         skipWhitespace();
 
         try
