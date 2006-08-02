@@ -77,11 +77,10 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 * Ex: Lastname, Name Middlename
 	 */
 	public void testTwoAuthorsBadFormating() {
-		// String name = new String("Lastname, Name Middlename and Nome Nomedomeio Sobrenome");
+		String name = new String("Lastname, Name Middlename and Nome Nomedomeio Sobrenome");
 		
-		fail();
-		// @TODO: How should a Formatter fail? 
-		// assertEquals("Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator", abbreviate(name));
+		// Formatters should not fail but return the given string (if they can).
+		assertEquals(name, abbreviate(name));
 	}
 	
 	/**

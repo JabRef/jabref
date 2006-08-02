@@ -26,7 +26,6 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		  return getAbbreviations(fieldText.split(" and "));
 		} catch(Exception e){
             return fieldText;
-            //return "Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator";
 		}
 	}
 
@@ -41,9 +40,9 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		if (authors.length == 0)
 			return "";
 
-		/*if (!isProperFormat(authors)) {
-			return "Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator";
-		}*/
+		if (!isProperFormat(authors)) {
+			throw new IllegalArgumentException("Author names must be formatted \"Last, First\" or \"Last, Jr., First\" before formatting with AuthorLastFirstAbbreviator");
+		}
 
 		for (int i = 0; i < authors.length; i++) {
 			authors[i] = getAbbreviation(authors[i]);
