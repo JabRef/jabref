@@ -88,7 +88,7 @@ public class LayoutEntry
 
                 //try
                 //{
-                    option = getOptionalLayout((String) v.get(1));
+                    option = getOptionalLayout((String) v.get(1), classPrefix);
                 //}
                 // catch (Exception e)
                 //{
@@ -386,7 +386,7 @@ public class LayoutEntry
      * @param string
      * @return
      */
-    private LayoutFormatter[] getOptionalLayout(String formatterName)
+    public static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix)
         throws Exception
     {
       String[] formatters = formatterName.split(",");

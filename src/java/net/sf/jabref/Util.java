@@ -51,6 +51,9 @@ import javax.swing.* ;
 
 import com.jgoodies.forms.builder.* ;
 import com.jgoodies.forms.layout.* ;
+
+import net.sf.jabref.export.layout.LayoutEntry;
+import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.external.* ;
 import net.sf.jabref.groups.* ;
 import net.sf.jabref.imports.* ;
@@ -697,6 +700,314 @@ public class Util
         else return null;
     }
 
+    /**
+     * New version of findPdf that uses findFiles.
+     */
+    public static String findPdf(BibtexEntry entry, String extension, String directory){
+    	
+    	try {
+			directory = new File(directory).getCanonicalPath();
+		} catch (IOException e) {
+			return null;
+		}
+        if (!directory.endsWith(System.getProperty("file.separator"))) 
+        	directory += System.getProperty("file.separator");
+    	
+        System.out.println("Trying to find: " + directory);
+        System.out.println(".*[bibtexkey].*\\." + extension);
+    	String result = findFile(entry, null, directory + "**" + System.getProperty("file.separator"), ".*[bibtexkey].*\\." + extension);
+    	
+    	// Return a relative path
+    	if (result != null) 
+    		result = result.substring(directory.length());
+    	return result;
+    }
+    
+    /**
+     * Searches the given directory and file name pattern for a file for the bibtexentry.
+     * 
+     * Used to fix:
+     *   
+     *   http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
+     *   
+     * Requirements:
+     * 
+     *   - Be able to find the associated PDF in a set of given directories.  
+     * 
+     *   - Be able to return a relative path or absolute path. -> This is not implemented 
+     *   
+     *   - Be fast.
+     *   
+     *   - Allow for flexible naming schemes in the PDFs.
+     *   
+     * Syntax scheme:
+     * 
+     *   *     Any subDir
+     *   **    Any subDir (recursiv)
+     *   [key] Key from bibtex file and database
+     *   .*    Anything else is taken to be a Regular expression.
+     *   
+     * @param entry non-null
+     * @param database non-null
+     * @param directory non-null
+     * @param file non-null
+     * 
+     * @return Will return the first file found to match the given criteria or null if none was found.
+     */
+    public static String findFile(
+    		BibtexEntry entry, 
+    		BibtexDatabase database, 
+    		String directory, 
+    		String file){
+    	
+    	return findFile(new File("."), entry, database, directory, file);
+    }
+    
+    /**
+     * Removes optional square brackets from the string s
+     * @param s
+     * @return
+     */
+    public static String stripBrackets(String s){
+    	int beginIndex = (s.startsWith("[") ? 1 : 0);
+    	int endIndex = (s.endsWith("]") ? s.length() - 1 : s.length());
+    	return s.substring(beginIndex, endIndex);
+    }
+    
+    /**
+     * Accepts a string like [author:toLowerCase,toUpperCase], whereas the first string signifies 
+     * the bibtex-field to get while the others are the names of layouters that will be applied.
+     * 
+     * @param fieldAndFormat
+     * @param entry
+     * @param database
+     * @return
+     */
+    public static String getFieldAndFormat(String fieldAndFormat, BibtexEntry entry, BibtexDatabase database){
+    	
+    	fieldAndFormat = stripBrackets(fieldAndFormat);
+    	
+    	String[] fieldAndFormatStrings = fieldAndFormat.split(":");
+    	
+    	if (fieldAndFormatStrings.length == 0)
+    		return null;
+    	
+    	String fieldValue = getField(fieldAndFormatStrings[0].trim(), entry, database);
+    	
+    	if (fieldValue == null)
+    		return null;
+    	
+    	if (fieldAndFormatStrings.length == 1)
+    		return fieldValue;
+    	
+    	try {
+    		LayoutFormatter[] formatters = LayoutEntry.getOptionalLayout(fieldAndFormatStrings[1], "");
+    		for (int i = 0; i < formatters.length; i++){
+        		fieldValue = formatters[i].format(fieldValue); 
+        	}
+    	} catch (Exception e){
+    		throw new RuntimeException(e);
+    	}
+    	
+    	return fieldValue;
+    }
+    
+    public static String getField(String field, BibtexEntry bibtex, BibtexDatabase database) {
+
+        if (field.equals("bibtextype"))
+            return bibtex.getType().getName();
+        
+        String res = (String)bibtex.getField(field);
+
+        if ((res != null) && (database != null))
+        	res = database.resolveForStrings(res);
+
+        return res;
+    }
+ 
+    /**
+     * Internal Version of findFile, which also accepts a current directory to base the search on.
+     * 
+     * @param currentDirectory
+     * @param entry
+     * @param database
+     * @param directory
+     * @param file
+     * @return
+     */
+    protected static String findFile(File currentDirectory,
+    		BibtexEntry entry,
+    		BibtexDatabase database, 
+    		String directory, 
+    		String file){ 
+
+    	if (directory.length() > 0){
+	    	
+    		String[] dirs = directory.split("(\\\\|/)");
+	    	  	
+	    	for (int i = 0; i < dirs.length; i++){
+	    		
+	    		System.out.println(currentDirectory);
+	    		
+	    		String dirToProcess = dirs[i];
+	    			    		
+	    		dirToProcess = expandBrackets(dirToProcess, entry, database);
+	    			
+	    		if (dirToProcess.equals("")){ // Linux Root Path
+	    			currentDirectory = new File("/");
+	    			continue;
+	    		}
+	    		if (dirToProcess.matches("^.:$")){ // Windows Drive Letter
+	    			currentDirectory = new File(dirToProcess + "/");
+	    			continue;
+	    		}
+	    		if (dirToProcess.equals(".")){ // Stay in current directory
+	    			continue;
+	    		}
+	    		if (dirToProcess.equals("..")){
+	    			currentDirectory = new File(currentDirectory.getParent());
+	    			continue;
+	    		}
+	    		if (dirToProcess.equals("*")) { // Do for all direct subdirs
+	    			
+	    			File[] subDirs = currentDirectory.listFiles();
+					if (subDirs == null)
+						return null; // No permission?
+					
+					String restOfDirString = join(dirs, "/", i + 1, dirs.length);
+			
+					for (int sub = 0; sub < subDirs.length; sub++) {
+						if (subDirs[sub].isDirectory()){
+							String result = findFile(subDirs[sub], entry, database,
+									restOfDirString, file);
+							if (result != null)
+								return result;
+						}
+					}
+					return null;
+				}
+	    		// Do for all direct and indirect subdirs
+	    		if (dirToProcess.equals("**")) {
+					List toDo = new LinkedList();
+					toDo.add(currentDirectory);
+	
+					String restOfDirString = join(dirs, "/", i + 1, dirs.length);
+					
+					// Before checking the subdirs, we first check the current dir
+					String result = findFile(currentDirectory, entry, database,
+						restOfDirString, file);
+					if (result != null)
+						return result;
+		
+					while (!toDo.isEmpty()) {
+	
+						// Get all subdirs of each of the elements found in toDo
+						File[] subDirs = ((File) toDo.remove(0)).listFiles();
+						if (subDirs == null) // No permission?
+							continue;
+	
+						toDo.addAll(Arrays.asList(subDirs));
+	
+						for (int sub = 0; sub < subDirs.length; sub++) {
+							result = findFile(subDirs[sub], entry, database,
+									restOfDirString, file);
+							if (result != null)
+								return result;
+						}
+					}
+					// We already did the currentDirectory
+					return null;
+				}
+	    		
+	    		final Pattern toMatch = Pattern.compile(dirToProcess);
+	    		
+	    		File[] matches = currentDirectory.listFiles(new FilenameFilter(){
+					public boolean accept(File arg0, String arg1) {
+						return toMatch.matcher(arg1).matches();
+					}
+	    		});
+	    		if (matches == null || matches.length == 0)
+	    			return null;
+	    		
+	    		currentDirectory = matches[0];
+	    		   		
+				if (!currentDirectory.exists())
+					return null;
+	    		
+	    	} // End process directory information
+    	}
+    	// Last step check if the given file can be found in this directory
+    	String filenameToLookFor = expandBrackets(file, entry, database);
+    	
+    	final Pattern toMatch = Pattern.compile("^" + filenameToLookFor + "$");
+		
+		File[] matches = currentDirectory.listFiles(new FilenameFilter(){
+			public boolean accept(File arg0, String arg1) {
+				return toMatch.matcher(arg1).matches();
+			}
+		});
+		if (matches == null || matches.length == 0)
+			return null;
+		
+		try {
+			return matches[0].getCanonicalPath();
+		} catch (IOException e) {
+			return null;
+		}
+    }
+    
+    static Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
+    
+    /**
+     * Takes a string that contains bracketed expression and expands each of these using
+     * getFieldAndFormat.
+     * 
+     * Unknown Bracket expressions are silently dropped.
+     * 
+     * @param bracketString
+     * @param entry
+     * @param database
+     * @return
+     */
+    public static String expandBrackets(String bracketString, BibtexEntry entry, BibtexDatabase database) {
+    	Matcher m = squareBracketsPattern.matcher(bracketString);
+    	StringBuffer s = new StringBuffer();
+    	while (m.find()) {
+    		String replacement = getFieldAndFormat(m.group(), entry, database);
+    		if (replacement == null)
+    			replacement = "";
+        	m.appendReplacement(s, replacement);
+        }
+        m.appendTail(s);
+        
+        return s.toString();
+    }
+    
+	/**
+     * Concatenate all strings in the array from index 'from' to 'to' 
+     * (excluding to) with the given separator.
+     * 
+     * Example:
+     * 
+     *   String[] s = "ab/cd/ed".split("/");
+     *   join(s, "\\", 0, s.length) -> "ab\\cd\\ed"
+     * 
+     * @param strings
+     * @param separator
+     * @param from
+     * @param to Excluding strings[to]
+     * @return
+     */
+    public static String join(String[] strings, String separator, int from, int to) {
+    	if (strings.length == 0 || from >= to)
+    		return "";
+    	
+    	StringBuffer sb = new StringBuffer();
+    	for (int i = from; i < to - 1; i++){
+    		sb.append(strings[i]).append(separator);
+    	}
+    	return sb.append(strings[to - 1]).toString();
+	}
 
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
