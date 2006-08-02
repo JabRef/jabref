@@ -74,7 +74,7 @@
         <property name="txt.dir" value="src/txt" />
         <property name="java.dir" value="${src.dir}/java" />
         <property name="osx.dir" value="${src.dir}/osx" />
-        <property name="win.dir" value="${src.dir}/windows" />
+        <property name="win.installer.dir" value="${src.dir}/windows/nsis" />
         <property name="resource.dir" value="${src.dir}/resource" />
         <property name="bin.dir" value="${src.dir}/scripts" />
         <property name="images.dir" value="${src.dir}/images" />
@@ -83,10 +83,23 @@
         <property name="extensions.dir" value="${src.dir}/extensions" />
         <property name="layout.dir" value="${src.dir}/resource/layout" />
 
-
         <!-- Set the properties for library directories -->
         <property name="library.directory" value="lib" />
 
+        <!-- Load user dependent properties --> 
+        <property file="build.properties"/>
+          <!-- 
+           * For instance define the NSIS-compiler:
+           *   nsis.executable="d:\prog\dev\NSIS\makensis.exe" 
+           *-->
+
+		<!-- win.installer can only be build under Windows -->
+		<condition property="is.windows">
+			<and>
+				<os family="windows" />
+				<isset property="nsis.executable" />
+			</and>
+		</condition>
 
     <taskdef name="jarbundler"
                   classpath="${library.directory}/jarbundler-1.4.jar"
@@ -293,15 +306,6 @@
                    <include name="meta.xml"/>
                 </replace>
 
-<!-- WHY ???
-                <mkdir dir="${build.win}" />
-                <copy file="${build.lib}/${jabref.bin}.jar" todir="${build.win}" />
-                <copy todir="${build.win}">
-                        <fileset dir="${win.dir}">
-                                <include name="*" />
-                        </fileset>
-                </copy>
--->
         </target>
 
 <!-- generate and save some build infos !!! necessary for dynamic build infos !!! -->
@@ -400,7 +404,7 @@ version=${jabref.version}</echo>
 		    </zip>        
 		</target>
         
-        <target name="clean" description="Clean project">
+        <target name="clean" depends="-win.installer.clean" description="Clean project">
                 <delete dir="${build.dir}" />
         </target>
 
@@ -410,7 +414,7 @@ version=${jabref.version}</echo>
                 <!--<unjar src="${library.directory}/commons-httpclient-2.0.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/commons-logging.jar" dest="${build.tmp}" />-->
                 <unjar src="${library.directory}/antlr.jar" dest="${build.tmp}" />
-                <!--                <unjar src="${library.directory}/plastic-1.2.1.jar" dest="${build.classes}" />-->
+                <!-- <unjar src="${library.directory}/plastic-1.2.1.jar" dest="${build.classes}" /> -->
                 <unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
                 <unjar src="${library.directory}/spin-1.4.jar" dest="${build.tmp}" />
@@ -433,11 +437,49 @@ version=${jabref.version}</echo>
                   stubfile="${library.directory}/JavaApplicationStub" />
 
         </target>
+	
+	
+	<!-- Build Windows Installer -->
+	
+	<!-- Don't forget to set nsis.executable property -->
+	
+	<target name="-win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
+		<delete dir="${win.installer.dir}/dist" />
+		<delete file="${win.installer.dir}/JabRefSetup.exe" />
+	</target>
 
+	<target name="-win.installer.prepare" depends="jars" if="is.windows" 
+     description="Copy files in place to be used by the installer">
+		<!-- Gather everything that will go into the installer in dist -->
+		<mkdir dir="${win.installer.dir}/dist" />
+    	<copy file="${build.lib}/${jabref.bin}.jar" 
+    		todir="${win.installer.dir}/dist" />
+		<copy todir="${win.installer.dir}/dist">
+            <fileset dir="${txt.dir}">
+                    <include name="gpl.txt" />
+                    <include name="lesser.txt" />
+                    <include name="README" />
+            </fileset>
+		</copy>
+	</target>
+	
+	<target name="-win.installer.exewrapper" depends="-win.installer.prepare" if="is.windows"
+		description="Create Exe-Wrapper">
+		<exec dir="." executable="${nsis.executable}" failonerror="true">
+			<arg line="'/DJARFILE=${jabref.bin}.jar' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+		</exec>
+	</target>
+	
+	<target name="win.installer.build" depends="-win.installer.exewrapper" if="is.windows"
+		description="Create Windows-Installer.">
+		<exec dir="." executable="${nsis.executable}" failonerror="true">
+			<arg line="${win.installer.dir}/setup.nsi" />
+		</exec>
+	</target>
 
-        <!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         What's about the software design ?!;-)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
         <target name="pmd" description="SOFTWAREDESIGN: Project Mess Detector !;-)">
                 <echo>Checking Project Mess Detection (PMD) rulesets.</echo>
