@@ -115,13 +115,13 @@ public class Util
 
     public static String checkName(String s) {
         // Append '.bib' to the string unless it ends with that.
-        String extension = s.substring(s.length() - 4);
-        if (!extension.equalsIgnoreCase(".bib")) return s + ".bib";
-        else return s;
+        if (s.length() < 4 || !s.substring(s.length() - 4).equalsIgnoreCase(".bib")){ 
+        	return s + ".bib";
+        }
+        return s;
     }
 
     private static int idCounter = 0;
-
 
     public synchronized static String createNeutralId() {
         return idFormat.format(idCounter++);
@@ -150,7 +150,7 @@ public class Util
      * references are enclosed in a pair of '#' characters.
      */
     public static String parseField(String content) {
-        if (content.length() == 0) return "";
+        if (content.length() == 0) return content;
         String toSet = "";
         boolean string;
         // Keeps track of whether the next item is
@@ -232,6 +232,10 @@ public class Util
     /**
      * This method returns a String similar to the one passed in, except that it is
      * molded into a form that is acceptable for bibtex.
+     *
+     * Watch-out that the returned string might be of length 0 afterwards.
+     * 
+     * @param key mayBeNull
      */
     public static String checkLegalKey(String key) {
         if (key == null) return null;

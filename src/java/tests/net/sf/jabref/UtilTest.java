@@ -1,8 +1,12 @@
 package tests.net.sf.jabref;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.awt.Container;
+import java.awt.Dialog;
 import java.io.StringReader;
+import java.util.HashSet;
+
+import javax.swing.JDialog;
+import javax.swing.JWindow;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexDatabase;
@@ -13,36 +17,65 @@ import net.sf.jabref.imports.ParserResult;
 
 public class UtilTest extends TestCase {
 
-	public void testBool() {
-		// cannot be tested
-	}
-
-	public void testPr() {
-		// cannot be tested
-	}
-
-	public void testPr_() {
-		// cannot be tested		
-	}
-
 	public void testNCase() {
-		fail("Not yet implemented");
+		assertEquals("", Util.nCase(""));
+		assertEquals("Hello world", Util.nCase("Hello World"));
+		assertEquals("A", Util.nCase("a"));
+		assertEquals("Aa", Util.nCase("AA"));
 	}
 
 	public void testCheckName() {
-		fail("Not yet implemented");
+		assertEquals("aa.bib", Util.checkName("aa"));
+		assertEquals(".bib", Util.checkName(""));
+		assertEquals("a.bib", Util.checkName("a.bib"));
+		assertEquals("a.bib", Util.checkName("a"));
+		assertEquals("a.bb.bib", Util.checkName("a.bb"));
 	}
 
 	public void testCreateNeutralId() {
-		fail("Not yet implemented");
+		
+		HashSet set = new HashSet();
+		for (int i = 0; i < 10000; i++){
+			String string = Util.createNeutralId();
+			assertFalse(set.contains(string));
+			set.add(string);
+		}
+		
 	}
 
 	public void testPlaceDialog() {
-		fail("Not yet implemented");
+		Dialog d = new JDialog();
+		d.setSize(50, 50);
+		Container c = new JWindow();
+		c.setBounds(100, 200, 100, 50);
+		
+		Util.placeDialog(d, c);
+		assertEquals(125, d.getX());
+		assertEquals(200, d.getY());
+		
+		// Test upper left corner
+		c.setBounds(0,0,100,100);
+		d.setSize(200, 200);
+		
+		Util.placeDialog(d, c);
+		assertEquals(0, d.getX());
+		assertEquals(0, d.getY());
 	}
 
 	public void testParseField() {
-		fail("Not yet implemented");
+	
+		assertEquals("", Util.parseField(""));
+		
+		// Three basic types (references, { } and " ")
+		assertEquals("#hallo#", Util.parseField("hallo"));
+		assertEquals("hallo", Util.parseField("{hallo}"));
+		assertEquals("bye", Util.parseField("\"bye\""));
+		
+		// Concatenation
+		// TODO: Well the function is wrong :-) another bug.
+		assertEquals("longlonglonglong", Util.parseField("\"long\" # \"long\" # \"long\" # \"long\""));
+		
+		assertEquals("hallo#bye#", Util.parseField("{hallo} # bye"));
 	}
 
 	public void testShaveString() {
@@ -58,59 +91,17 @@ public class UtilTest extends TestCase {
 	}
 
 	public void testCheckLegalKey() {
-		fail("Not yet implemented");
+
+		assertEquals("AAAA", Util.checkLegalKey("AA AA"));
+		assertEquals("SPECIALCHARS", Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^"));
+		assertEquals("AeaeaAAA", Util.checkLegalKey("ÄäáÀÁÂ"));
+		assertEquals("", Util.checkLegalKey("\n\t\r"));
 	}
 
 	public void testReplaceSpecialCharacters() {
-		fail("Not yet implemented");
-	}
-
-	public void test_wrap2() {
-		fail("Not yet implemented");
-	}
-
-	public void testWrap2() {
-		fail("Not yet implemented");
-	}
-
-	public void test__wrap2() {
-		fail("Not yet implemented");
-	}
-
-	public void testFindDeliminatedWordsInField() {
-		fail("Not yet implemented");
-	}
-
-	public void testFindAllWordsInField() {
-		fail("Not yet implemented");
-	}
-
-	public void testStringArrayToDelimited() {
-		fail("Not yet implemented");
-	}
-
-	public void testDelimToStringArray() {
-		fail("Not yet implemented");
-	}
-
-	public void testOpenExternalViewer() {
-		fail("Not yet implemented");
-	}
-
-	public void testOpenFileOnWindows() {
-		fail("Not yet implemented");
-	}
-
-	public void testOpenExternalFileAnyFormat() {
-		fail("Not yet implemented");
-	}
-
-	public void testFindPdf() {
-		fail("Not yet implemented");
-	}
-
-	public void testFindFile() {
-		// -> Tested in UtilFindFileTest
+		// Shouldn't German Ä be resolved to Ae
+		assertEquals("AeaeaAAA", Util.replaceSpecialCharacters("ÄäáÀÁÂ"));
+		assertEquals("Hallo Arger", Util.replaceSpecialCharacters("Hallo Arger"));
 	}
 
 	public void testJoin() {
@@ -206,120 +197,5 @@ public class UtilTest extends TestCase {
 
 		assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.", 
 				Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
-
-		
 	}
-	
-	public void testExpandFilename() {
-		fail("Not yet implemented");
-	}
-
-	public void testIsDuplicate() {
-		fail("Not yet implemented");
-	}
-
-	public void testContainsDuplicate() {
-		fail("Not yet implemented");
-	}
-
-	public void testCompareEntriesStrictly() {
-		fail("Not yet implemented");
-	}
-
-	public void testSetAutomaticFieldsList() {
-		fail("Not yet implemented");
-	}
-
-	public void testSetAutomaticFieldsBibtexEntry() {
-		fail("Not yet implemented");
-	}
-
-	public void testCopyFile() {
-		fail("Not yet implemented");
-	}
-
-	public void testPerformCompatibilityUpdate() {
-		fail("Not yet implemented");
-	}
-
-	public void testGetCorrectFileName() {
-		fail("Not yet implemented");
-	}
-
-	public void testQuoteForHTML() {
-		fail("Not yet implemented");
-	}
-
-	public void testQuoteStringStringChar() {
-		fail("Not yet implemented");
-	}
-
-	public void testQuoteStringStringCharInt() {
-		fail("Not yet implemented");
-	}
-
-	public void testUnquote() {
-		fail("Not yet implemented");
-	}
-
-	public void testQuoteMeta() {
-		fail("Not yet implemented");
-	}
-
-	public void testSortWordsAndRemoveDuplicates() {
-		fail("Not yet implemented");
-	}
-
-	public void testWarnAssignmentSideEffects() {
-		fail("Not yet implemented");
-	}
-
-	public void testPutBracesAroundCapitals() {
-		fail("Not yet implemented");
-	}
-
-	public void testRemoveBracesAroundCapitals() {
-		fail("Not yet implemented");
-	}
-
-	public void testRemoveSingleBracesAroundCapitals() {
-		fail("Not yet implemented");
-	}
-
-	public void testGetFileFilterForField() {
-		fail("Not yet implemented");
-	}
-
-	public void testShowQuickErrorDialog() {
-		fail("Not yet implemented");
-	}
-
-	public void testWrapHTML() {
-		fail("Not yet implemented");
-	}
-
-	public void testEasyDateFormat() {
-		fail("Not yet implemented");
-	}
-
-	public void testEasyDateFormatDate() {
-		fail("Not yet implemented");
-	}
-
-	public void testMarkEntry() {
-		fail("Not yet implemented");
-	}
-
-	public void testUnmarkEntry() {
-		fail("Not yet implemented");
-	}
-
-	public void testIsMarked() {
-		fail("Not yet implemented");
-	}
-
-	public void testFindEncodingsForString() {
-		fail("Not yet implemented");
-	}
-
 }
