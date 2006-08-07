@@ -1,18 +1,35 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-import net.sf.jabref.net.URLDownload;
-
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.*;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DnDConstants;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldEditor;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.OpenFileFilter;
+import net.sf.jabref.UrlDragDrop;
+import net.sf.jabref.Util;
+import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.util.XMPUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -92,9 +109,12 @@ public class ExternalFilePanel extends JPanel {
         this.entry = entry;
     }
 
+    public BibtexEntry getEntry(){
+        return (entry != null ? entry : entryEditor.getEntry());
+    }
+    
     protected Object getKey() {
-        return (entry != null ? entry.getField(BibtexFields.KEY_FIELD) :
-            entryEditor.getEntry().getField(BibtexFields.KEY_FIELD));
+    	return getEntry().getField(BibtexFields.KEY_FIELD);
     }
 
     protected void output(String s) {
@@ -102,6 +122,35 @@ public class ExternalFilePanel extends JPanel {
             frame.output(s);
     }
 
+    public void pushXMP(String fieldName, FieldEditor editor) {
+		
+        // Find the default directory for this field type, if any:
+        String dir = metaData.getFileDirectory(fieldName);
+        File file = null;
+        if (dir != null) {
+            File tmp = Util.expandFilename(editor.getText(), dir);
+            if (tmp != null)
+                file = tmp;
+        }
+        
+        if (file == null){
+        	file = new File(editor.getText());
+        }
+        
+        if (file == null){
+        	output(Globals.lang("No file associated"));
+        }
+        
+        try {
+			XMPUtil.writeXMP(file, getEntry());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
+    
+    
     public void browseFile(final String fieldName, final FieldEditor editor) {
 
         String directory = metaData.getFileDirectory(fieldName);
@@ -285,6 +334,10 @@ public class ExternalFilePanel extends JPanel {
                 String dir = metaData.getFileDirectory(fieldName);
 
                 String found = Util.findPdf((String) o, fieldName, dir, off);
+
+                // To activate findFile:
+                // String found = Util.findFile(getEntry(), null, dir, ".*[bibtexkey].*");
+                
                 if (found != null) {
                     editor.setText(found);
                     if (entryEditor != null)
