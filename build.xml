@@ -45,8 +45,8 @@
      ========================================================================================== -->
 
         <!-- some version information -->
-        <property name="jabref.bin" value="jabref" />
-        <property name="jabref.version" value="2.1 beta 2" />
+        <property name="jabref.bin" value="JabRef-2.1" />
+        <property name="jabref.version" value="2.1" />
         <property name="jabref.placeholder.version" value="@version@" /> <!-- used by replace task -->
 
 
@@ -452,8 +452,8 @@ version=${jabref.version}</echo>
      description="Copy files in place to be used by the installer">
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
-    	<copy file="${build.lib}/${jabref.bin}.jar" 
-    		todir="${win.installer.dir}/dist" />
+<!--    	<copy file="${build.lib}/${jabref.bin}.jar" 
+    		todir="${win.installer.dir}/dist" /> -->
 		<copy todir="${win.installer.dir}/dist">
             <fileset dir="${txt.dir}">
                     <include name="gpl.txt" />
@@ -466,14 +466,14 @@ version=${jabref.version}</echo>
 	<target name="-win.installer.exewrapper" depends="-win.installer.prepare" if="is.windows"
 		description="Create Exe-Wrapper">
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="'/DJARFILE=${jabref.bin}.jar' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+			<arg line="'/DJARFILE=${jabref.bin}.jar' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
 		</exec>
 	</target>
 	
 	<target name="win.installer.build" depends="-win.installer.exewrapper" if="is.windows"
 		description="Create Windows-Installer.">
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="${win.installer.dir}/setup.nsi" />
+			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
 	</target>
 
