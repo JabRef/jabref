@@ -29,7 +29,6 @@ import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.UrlDragDrop;
 import net.sf.jabref.Util;
 import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.util.XMPUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -122,32 +121,32 @@ public class ExternalFilePanel extends JPanel {
             frame.output(s);
     }
 
-    public void pushXMP(String fieldName, FieldEditor editor) {
-		
-        // Find the default directory for this field type, if any:
-        String dir = metaData.getFileDirectory(fieldName);
-        File file = null;
-        if (dir != null) {
-            File tmp = Util.expandFilename(editor.getText(), dir);
-            if (tmp != null)
-                file = tmp;
-        }
-        
-        if (file == null){
-        	file = new File(editor.getText());
-        }
-        
-        if (file == null){
-        	output(Globals.lang("No file associated"));
-        }
-        
-        try {
-			XMPUtil.writeXMP(file, getEntry());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+//    public void pushXMP(String fieldName, FieldEditor editor) {
+//		
+//        // Find the default directory for this field type, if any:
+//        String dir = metaData.getFileDirectory(fieldName);
+//        File file = null;
+//        if (dir != null) {
+//            File tmp = Util.expandFilename(editor.getText(), dir);
+//            if (tmp != null)
+//                file = tmp;
+//        }
+//        
+//        if (file == null){
+//        	file = new File(editor.getText());
+//        }
+//        
+//        if (file == null){
+//        	output(Globals.lang("No file associated"));
+//        }
+//        
+//        try {
+//		//	XMPUtil.writeXMP(file, getEntry());
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    }
 
     
     
