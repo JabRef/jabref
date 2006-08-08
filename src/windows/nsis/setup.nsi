@@ -4,7 +4,9 @@
 Name "JabRef"
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 2.1.0
+!ifndef VERSION
+	!define VERSION "2.1"
+!endif
 !define COMPANY "JabRef Team"
 !define URL http://jabref.sourceforge.net/
 
