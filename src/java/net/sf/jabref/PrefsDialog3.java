@@ -100,15 +100,13 @@ public class PrefsDialog3 extends JDialog {
     al.add(KEY);
     //al.add(JOU);
     al.add(PRE);
-
+    al.add(ADV);
     main.setLayout(cardLayout);
 
         main.add(new GeneralTab(frame, _prefs), GEN);
-    if (!Globals.ON_MAC) {
-        al.add(ADV);
-        main.add(new AdvancedTab(_prefs, parent.helpDiag), ADV);
-    }
 
+        main.add(new AdvancedTab(_prefs, parent.helpDiag), ADV);
+    
 
 
 

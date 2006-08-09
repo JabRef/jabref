@@ -49,7 +49,7 @@ public class HTMLChars implements LayoutFormatter {
             //System.out.println("next: "+(char)c);
             String combody;
             if (c == '{') {
-              IntAndString part = getPart(field, i);
+              IntAndString part = getPart(field, i, false);
               i += part.i;
               combody = part.s;
             }
@@ -85,17 +85,18 @@ public class HTMLChars implements LayoutFormatter {
           // Then test if we are dealing with a italics or bold command.
           // If so, handle.
           if (command.equals("emph") || command.equals("textit")) {
-            IntAndString part = getPart(field, i);
+            IntAndString part = getPart(field, i, true);
+              
             i += part.i;
               sb.append("<em>").append(part.s).append("</em>");
           }
           else if (command.equals("textbf")) {
-            IntAndString part = getPart(field, i);
+            IntAndString part = getPart(field, i, true);
             i += part.i;
               sb.append("<b>").append(part.s).append("</b>");
           }
           else {
-            IntAndString part = getPart(field, i);
+            IntAndString part = getPart(field, i, true);
             i += part.i; argument = part.s;
           }
         }
@@ -140,7 +141,7 @@ public class HTMLChars implements LayoutFormatter {
     return s.replaceAll("&|\\\\&","&amp;").replaceAll("[\\n]{1,}","<p>");//.replaceAll("--", "&mdash;");
   }
 
-  private IntAndString getPart(String text, int i) {
+  private IntAndString getPart(String text, int i, boolean terminateOnEndBraceOnly) {
     char c;
     int count = 0;//, i=index;
     StringBuffer part = new StringBuffer();
@@ -153,11 +154,11 @@ public class HTMLChars implements LayoutFormatter {
     // then grab whathever is the first token (counting braces)
     for ( ; i < text.length() ; ++i) {
       c = text.charAt(i);
-      if (count == 0 && Character.isWhitespace(c)) {
+      if (!terminateOnEndBraceOnly && count == 0 && Character.isWhitespace(c)) {
         i--; // end argument and leave whitespace for further processing
         break;
       }
-      if (c == '}' && --count <= 0)
+      if (c == '}' && --count < 0)
         break;
       else if (c == '{')
         count++;

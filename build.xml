@@ -108,8 +108,6 @@
 	<!-- Build classpath -->
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
-		<!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                <pathelement location="${library.directory}/commons-logging.jar" />-->
 		<fileset dir="${library.directory}">
 			<include name="*.jar" />
 		</fileset>
@@ -120,8 +118,6 @@
 		<java classname="net.sf.jabref.JabRef" fork="true">
 			<classpath>
 				<pathelement location="${build.lib}/jabref.jar" />
-				<!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-            <pathelement location="${library.directory}/commons-logging.jar" />-->
 				<pathelement location="${library.directory}/antlr.jar" />
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
@@ -185,8 +181,6 @@
 			<exclude name="tests/**" />
 			<classpath>
 				<pathelement path="${build.classes}" />
-				<!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                                <pathelement location="${library.directory}/commons-logging.jar" />-->
 				<pathelement location="${library.directory}/antlr.jar" />
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
@@ -204,8 +198,6 @@
 		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
 			<classpath>
 				<pathelement path="${build.classes}" />
-				<!--<pathelement location="${library.directory}/commons-httpclient-2.0.jar" />
-                                <pathelement location="${library.directory}/commons-logging.jar" />-->
 				<pathelement location="${library.directory}/antlr.jar" />
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
@@ -274,7 +266,7 @@
 		<mkdir dir="${build.images}" />
 		<copy todir="${build.images}">
 			<fileset dir="${images.dir}">
-				<include name="*" />
+				<include name="**" />
 			</fileset>
 		</copy>
 

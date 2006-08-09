@@ -241,9 +241,11 @@ public class GUIGlobals {
      * fails, try to fall back on the default theme.
      */
     public static void setUpIconTheme() {
-      URL defaultResource = GUIGlobals.class.getResource("/resource/Icons.properties");
-      URL resource = defaultResource;
-      String defaultPrefix = "/images/", prefix = defaultPrefix;
+        String defaultPrefix = "/images/crystal_16/", prefix = defaultPrefix;
+
+        URL defaultResource = GUIGlobals.class.getResource(prefix+"Icons.properties");
+        URL resource = defaultResource;
+
       if (Globals.prefs.getBoolean("useCustomIconTheme")) {
           String filename = Globals.prefs.get("customIconThemeFile");
           if (filename != null)

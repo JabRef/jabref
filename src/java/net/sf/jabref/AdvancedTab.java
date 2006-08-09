@@ -19,7 +19,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     JPanel pan = new JPanel(),
         lnf = new JPanel();
     JLabel lab;
-    JCheckBox useDefault, useRemoteServer;
+    JCheckBox useDefault, useRemoteServer, useNativeFileDialogOnMac;
     JTextField className, remoteServerPort;
     JButton def1 = new JButton(Globals.lang("Default")),
         def2 = new JButton(Globals.lang("Default"));
@@ -37,6 +37,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
                 GUIGlobals.getIconUrl("helpSmall"));
     useDefault = new JCheckBox(Globals.lang("Use other look and feel"));
     useRemoteServer = new JCheckBox(Globals.lang("Listen for remote operation on port")+":");
+    useNativeFileDialogOnMac = new JCheckBox(Globals.lang("Use native file dialog"));
     remoteServerPort = new JTextField();
     className = new JTextField(50);
     final JTextField clName = className;
@@ -51,32 +52,35 @@ public class AdvancedTab extends JPanel implements PrefsTab {
          "");
     DefaultFormBuilder builder = new DefaultFormBuilder(layout);
     JPanel pan = new JPanel();
-    builder.appendSeparator(Globals.lang("Look and feel"));
-    JLabel lab = new JLabel(Globals.lang("Default look and feel")+": "
-             +(Globals.ON_WIN ? GUIGlobals.windowsDefaultLookAndFeel :
-               GUIGlobals.linuxDefaultLookAndFeel));
-    builder.nextLine();
-    builder.append(pan);
-    builder.append(lab);
-    builder.nextLine();
-    builder.append(pan);
-    builder.append(useDefault);
-    builder.nextLine();
-    builder.append(pan);
-    JPanel pan2 = new JPanel();
-    lab = new JLabel(Globals.lang("Class name")+":");
-    pan2.add(lab);
-    pan2.add(className);
-    builder.append(pan2);
-    builder.nextLine();
-    builder.append(pan);
-    lab = new JLabel(Globals.lang("Note that you must specify the fully qualified class name for the look and feel,"));
-    builder.append(lab);
-    builder.nextLine();
-    builder.append(pan);
-    lab = new JLabel(Globals.lang("and the class must be available in your classpath next time you start JabRef."));
-    builder.append(lab);
-    builder.nextLine();
+
+    if (!Globals.ON_MAC) {
+        builder.appendSeparator(Globals.lang("Look and feel"));
+        JLabel lab = new JLabel(Globals.lang("Default look and feel")+": "
+                 +(Globals.ON_WIN ? GUIGlobals.windowsDefaultLookAndFeel :
+                   GUIGlobals.linuxDefaultLookAndFeel));
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(useDefault);
+        builder.nextLine();
+        builder.append(pan);
+        JPanel pan2 = new JPanel();
+        lab = new JLabel(Globals.lang("Class name")+":");
+        pan2.add(lab);
+        pan2.add(className);
+        builder.append(pan2);
+        builder.nextLine();
+        builder.append(pan);
+        lab = new JLabel(Globals.lang("Note that you must specify the fully qualified class name for the look and feel,"));
+        builder.append(lab);
+        builder.nextLine();
+        builder.append(pan);
+        lab = new JLabel(Globals.lang("and the class must be available in your classpath next time you start JabRef."));
+        builder.append(lab);
+        builder.nextLine();
+    }
     builder.appendSeparator(Globals.lang("Remote operation"));
     builder.nextLine();
     builder.append(new JPanel());
@@ -85,6 +89,14 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     p.add(remoteServerPort);
     p.add(remoteHelp.getIconButton());
     builder.append(p);
+
+    if (Globals.ON_MAC) {
+        builder.nextLine();
+        builder.appendSeparator(Globals.lang("Mac file dialog"));
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(useNativeFileDialogOnMac);
+    }
 
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -102,11 +114,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     useRemoteServer.setSelected(_prefs.getBoolean("useRemoteServer"));
     oldPort = _prefs.getInt("remoteServerPort");
     remoteServerPort.setText(String.valueOf(oldPort));
+        useNativeFileDialogOnMac.setSelected(Globals.prefs.getBoolean("useNativeFileDialogOnMac"));
     }
 
     public void storeSettings() {
         _prefs.putBoolean("useDefaultLookAndFeel", !useDefault.isSelected());
         _prefs.put("lookAndFeel", className.getText());
+        _prefs.putBoolean("useNativeFileDialogOnMac", useNativeFileDialogOnMac.isSelected());
         try {
             int port = Integer.parseInt(remoteServerPort.getText());
             if (port != oldPort) {

@@ -451,7 +451,7 @@ public class Globals {
                                        boolean dirOnly,
                                        boolean multipleSelection) {
 
-      if (ON_MAC) {
+      if (ON_MAC && prefs.getBoolean("useNativeFileDialogOnMac")) {
 
           return getNewFileForMac(owner, directory, extension, dialogType,
                 updateWorkingDirectory, dirOnly, off);
@@ -531,6 +531,7 @@ public class Globals {
                                          FilenameFilter filter) {
 
     FileDialog fc = new FileDialog(owner);
+    
     //fc.setFilenameFilter(filter);
     if (directory != null) {
       fc.setDirectory(directory.getParent());

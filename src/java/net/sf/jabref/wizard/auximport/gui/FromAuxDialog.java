@@ -52,7 +52,7 @@ public class FromAuxDialog
     extends JDialog
 {
   private JPanel statusPanel = new JPanel() ;
-  private JPanel optionsPanel = new JPanel() ;
+  private JPanel buttons = new JPanel() ;
   private JButton okButton = new JButton() ;
   private JButton cancelButton = new JButton() ;
   private JButton generateButton = new JButton() ;
@@ -131,7 +131,7 @@ public class FromAuxDialog
       panel1.add( buttonPanel, BorderLayout.SOUTH ) ;
 
       JPanel centerPane = new JPanel( new BorderLayout() ) ;
-      centerPane.add( optionsPanel, BorderLayout.NORTH ) ;
+      centerPane.add( buttons, BorderLayout.NORTH ) ;
       centerPane.add( statusPanel, BorderLayout.CENTER ) ;
 
 
@@ -139,7 +139,7 @@ public class FromAuxDialog
     }
     else  // generate a view without the "short info" area
     {
-      panel1.add( optionsPanel, BorderLayout.NORTH ) ;
+      panel1.add( buttons, BorderLayout.NORTH ) ;
       panel1.add( buttonPanel, BorderLayout.SOUTH ) ;
       panel1.add( statusPanel, BorderLayout.CENTER ) ;
     }
@@ -176,17 +176,17 @@ public class FromAuxDialog
     TitledBorder border = new TitledBorder( BorderFactory.createLineBorder(
         new Color( 153, 153, 153 ), 2 ),
                                             Globals.lang( "Options" ) ) ;
-    optionsPanel.setBorder( border ) ;
-    optionsPanel.setLayout( gbl ) ;
+    buttons.setBorder( border ) ;
+    buttons.setLayout( gbl ) ;
 
     // Database
     JLabel lab1 = new JLabel( Globals.lang( "Reference database" ) + ":" ) ;
     lab1.setHorizontalAlignment( SwingConstants.LEFT ) ;
     gbl.setConstraints( lab1, con ) ;
-    optionsPanel.add( lab1 ) ;
+    buttons.add( lab1 ) ;
     con.gridwidth = GridBagConstraints.REMAINDER ;
     gbl.setConstraints( dbChooser, con ) ;
-    optionsPanel.add( dbChooser ) ;
+    buttons.add( dbChooser ) ;
 
     // AUX
     con.gridwidth = 1 ;
@@ -196,11 +196,11 @@ public class FromAuxDialog
     lab1 = new JLabel( Globals.lang( "LaTeX AUX file" ) + ":" ) ;
     lab1.setHorizontalAlignment( SwingConstants.LEFT ) ;
     gbl.setConstraints( lab1, con ) ;
-    optionsPanel.add( lab1 ) ;
+    buttons.add( lab1 ) ;
     con.weightx = 1 ;
     auxFileField = new JTextField( "", 25 ) ;
     gbl.setConstraints( auxFileField, con ) ;
-    optionsPanel.add( auxFileField ) ;
+    buttons.add( auxFileField ) ;
     con.weightx = 0 ;
     con.insets = new Insets( 5, 10, 15, 2 ) ;
     browseAuxFileButton = new JButton( Globals.lang( "Browse" ) ) ;
@@ -208,7 +208,7 @@ public class FromAuxDialog
         auxFileField,
         parent ) ) ;
     gbl.setConstraints( browseAuxFileButton, con ) ;
-    optionsPanel.add( browseAuxFileButton ) ;
+    buttons.add( browseAuxFileButton ) ;
 
   }
 

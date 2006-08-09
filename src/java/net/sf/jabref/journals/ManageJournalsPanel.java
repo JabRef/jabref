@@ -79,8 +79,6 @@ public class ManageJournalsPanel extends JPanel{
 
         CellConstraints cc = new CellConstraints();
 
-        JPanel pan = new JPanel();
-
         /*JLabel description = new JLabel("<HTML>"+Globals.lang("JabRef can switch journal names between "
             +"abbreviated and full form. Since it knows only a limited number of journal names, "
             +"you may need to add your own definitions.")+"</HTML>");*/
@@ -119,7 +117,7 @@ public class ManageJournalsPanel extends JPanel{
         bb.addGlue();
         bb.addGridded(ok);
         bb.addGridded(cancel);
-        bb.addGridded((JComponent)Box.createHorizontalStrut(10));
+        bb.addUnrelatedGap();
         bb.addGridded(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -197,7 +195,8 @@ public class ManageJournalsPanel extends JPanel{
         });
 
         //dialog.pack();
-        dialog.setSize(600,700);
+        int xSize = getPreferredSize().width;
+        dialog.setSize(xSize+10,700);
     }
 
     public JDialog getDialog() {
@@ -238,6 +237,7 @@ public class ManageJournalsPanel extends JPanel{
         JScrollPane pane = new JScrollPane(builder.getPanel());
         pane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         externalFilesPanel.setMinimumSize(new Dimension(400,400));
+        externalFilesPanel.setPreferredSize(new Dimension(400,400));
         externalFilesPanel.removeAll();
         externalFilesPanel.add(pane, BorderLayout.CENTER);
         externalFilesPanel.revalidate();

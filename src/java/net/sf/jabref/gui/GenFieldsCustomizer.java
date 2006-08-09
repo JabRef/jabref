@@ -7,6 +7,9 @@ import javax.swing.border.*;
 import java.awt.event.*;
 import java.util.Iterator;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.Sizes;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -17,7 +20,7 @@ import java.util.Iterator;
  */
 
 public class GenFieldsCustomizer extends JDialog {
-  JPanel jPanel2 = new JPanel();
+  JPanel buttons = new JPanel();
   JButton ok = new JButton();
   JButton cancel = new JButton();
   JButton helpBut = new JButton();
@@ -58,7 +61,7 @@ public class GenFieldsCustomizer extends JDialog {
     ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
     cancel.setText(Globals.lang("Cancel"));
     cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
-    //jPanel2.setBackground(GUIGlobals.lightGray);
+    //buttons.setBackground(GUIGlobals.lightGray);
     jLabel1.setText(Globals.lang("Delimit fields with semicolon, ex.")+": url;pdf;note");
     jPanel3.setLayout(gridBagLayout2);
     jPanel4.setBorder(BorderFactory.createEtchedBorder());
@@ -71,12 +74,17 @@ public class GenFieldsCustomizer extends JDialog {
     //jPanel3.setBackground(GUIGlobals.lightGray);
     revert.setText(Globals.lang("Default"));
     revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
-    this.getContentPane().add(jPanel2, BorderLayout.SOUTH);
-    jPanel2.add(ok, null);
-    jPanel2.add(revert, null);
-    jPanel2.add(cancel, null);
-    jPanel2.add(Box.createHorizontalStrut(10));
-    jPanel2.add(helpBut, null);
+    this.getContentPane().add(buttons, BorderLayout.SOUTH);
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+    bb.addGlue();
+    bb.addGridded(ok);
+    bb.addGridded(revert);
+    bb.addGridded(cancel);
+    bb.addStrut(Sizes.DLUX5);
+    bb.addGridded(helpBut);
+    bb.addGlue();
+    
     this.getContentPane().add(jPanel3, BorderLayout.CENTER);
     jPanel3.add(jLabel1,    new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
@@ -89,8 +97,8 @@ public class GenFieldsCustomizer extends JDialog {
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 
   // Key bindings:
-  ActionMap am = jPanel2.getActionMap();
-  InputMap im = jPanel2.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+  ActionMap am = buttons.getActionMap();
+  InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
   im.put(Globals.prefs.getKey("Close dialog"), "close");
   am.put("close", new AbstractAction() {
     public void actionPerformed(ActionEvent e) {

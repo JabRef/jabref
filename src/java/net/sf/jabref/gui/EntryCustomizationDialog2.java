@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.swing.event.ListDataListener;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 /**
  * NOTAT:
  *    * S?rg for at ting oppdateres riktig ved tillegg av ny type. (velge, unng? at det blir feil innhold i listene).
@@ -92,10 +94,14 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         ok.addActionListener(this);
         apply.addActionListener(this);
         cancel.addActionListener(this);
-        buttons.add(ok);
-        buttons.add(apply);
-        buttons.add(cancel);
-
+        ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+        buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        bb.addGlue();
+        bb.addGridded(ok);
+        bb.addGridded(apply);
+        bb.addGridded(cancel);
+        bb.addGlue();
+                
 
         //con.fill = GridBagConstraints.BOTH;
         //con.weightx = 0.3;

@@ -34,6 +34,8 @@ import java.io.File;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.Globals;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.Sizes;
 
 /**
  * Dialog for creating or modifying custom exports.
@@ -54,7 +56,7 @@ class CustomExportDialog extends JDialog {
         browse = new JButton(Globals.lang("Browse"));
     JPanel
     main = new JPanel(),
-    opt = new JPanel();
+    buttons = new JPanel();
     private boolean ok_pressed = false;
     private Vector groups;
     private int index;
@@ -158,7 +160,6 @@ class CustomExportDialog extends JDialog {
 
     // Layout starts here.
     main.setLayout(gbl);
-    //opt.setLayout(gbl);
     main.setBorder(BorderFactory.createTitledBorder
                (BorderFactory.createEtchedBorder(),
             Globals.lang("Export properties")));
@@ -203,22 +204,15 @@ class CustomExportDialog extends JDialog {
     gbl.setConstraints(extension, con);
     main.add(extension);
 
-           // Option buttons:
-    con.gridx = GridBagConstraints.RELATIVE;
-    con.gridy = GridBagConstraints.RELATIVE;
-    con.weightx = 1;
-    con.gridwidth = 1;
-    con.anchor = GridBagConstraints.EAST;
-    con.fill = GridBagConstraints.NONE;
-    //gbl.setConstraints(ok, con);
-    opt.add(ok);
-    con.anchor = GridBagConstraints.WEST;
-    con.gridwidth = GridBagConstraints.REMAINDER;
-    //gbl.setConstraints(cancel, con);
-    opt.add(cancel);
-
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+    bb.addGlue();
+    bb.addGridded(ok);
+    bb.addGridded(cancel);
+    bb.addGlue();
+    
     getContentPane().add(main, BorderLayout.CENTER);
-    getContentPane().add(opt, BorderLayout.SOUTH);
+    getContentPane().add(buttons, BorderLayout.SOUTH);
 
     //pack();
     setSize(600, 170);

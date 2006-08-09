@@ -7,14 +7,14 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:export-ydpi="90.000000"
    inkscape:export-xdpi="90.000000"
    inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
    sodipodi:docname="splash-2.1.svg"
-   sodipodi:docbase="/home/alver/jabref/src/images"
-   inkscape:version="0.42+0.43pre1"
+   sodipodi:docbase="/home/alver/jabref_newcvs/jabref/src/images"
+   inkscape:version="0.44"
    sodipodi:version="0.32"
    id="svg2138"
    height="1052.3622047"
@@ -86,7 +86,7 @@
      inkscape:window-y="53"
      inkscape:window-x="15"
      inkscape:window-height="856"
-     inkscape:window-width="750"
+     inkscape:window-width="853"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
      inkscape:cy="698.1925"
@@ -116,7 +116,7 @@
     <rect
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        y="170.36218"
        x="77.500000"
        height="432.00000"
@@ -128,16 +128,16 @@
        height="428"
        width="572"
        sodipodi:absref="/home/alver/jabref/src/images/splashBackground.png"
-       xlink:href="splashBackground.png"
+       xlink:href="/home/alver/jabref/src/images/splashBackground.png"
        x="79"
        y="172.36218"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        inkscape:export-xdpi="75"
        inkscape:export-ydpi="75" />
     <flowRoot
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref_beta/jabref/jabref-2.0-splash.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        style="opacity:1.0000000;fill:#635578;fill-opacity:1.0000000;stroke:#b5b5c7;stroke-width:0.48137558;stroke-linejoin:bevel;stroke-miterlimit:4.0000000;stroke-dasharray:none;stroke-dashoffset:0.0000000;stroke-opacity:1.0000000"
        transform="matrix(1.875133,0.000000,0.000000,2.542210,-129.6969,-372.8897)"
        id="flowRoot2189"
@@ -180,7 +180,7 @@
     </flowRoot>    <flowRoot
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        transform="matrix(0.972246,0.000000,0.000000,1.325301,6.054966,-126.1181)"
        style="font-size:11.9999996;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#797580;fill-opacity:1.0000000;font-family:Bitstream Vera Sans;text-anchor:middle;writing-mode:lr;text-align:center;line-height:100%"
        id="flowRoot3076"
@@ -198,7 +198,7 @@
          id="flowPara1341">Copyright (2003-2006) Morten O. Alver, Nizar Batada and all contributors.</flowPara></flowRoot>    <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        transform="scale(0.853277,1.171952)"
        sodipodi:linespacing="100%"
        id="text1393"
@@ -213,7 +213,7 @@
     <text
        inkscape:export-ydpi="75.000000"
        inkscape:export-xdpi="75.000000"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
+       inkscape:export-filename="/home/alver/jabref-2.1rc/src/images/splash-2.1.png"
        transform="scale(0.853347,1.171856)"
        sodipodi:linespacing="100%"
        id="text2179"
@@ -225,20 +225,5 @@
          x="149.99753"
          id="tspan2181"
          sodipodi:role="line">reference manager</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:68.76833344px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:0.66853937;fill:#cf5953;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Nimbus Sans L"
-       x="288.67255"
-       y="712.21191"
-       id="text1343"
-       sodipodi:linespacing="125%"
-       transform="matrix(0.950669,-0.326025,0.330198,0.938651,0.000000,0.000000)"
-       inkscape:export-filename="/home/alver/jabref-2.1b/src/images/splash-2.1beta.png"
-       inkscape:export-xdpi="75"
-       inkscape:export-ydpi="75"><tspan
-         sodipodi:role="line"
-         id="tspan1345"
-         x="288.67255"
-         y="712.21191">beta</tspan></text>
   </g>
 </svg>

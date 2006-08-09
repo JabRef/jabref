@@ -39,7 +39,7 @@ public class LabelPatternUtil {
    * where the fields are the (required) fields of a BibTex entry. The string is split
    * into firlds and spacers by recognizing the [ and ].
    *
-   * @param keyPattern a <code>String</code>
+   * @param labelPattern a <code>String</code>
    * @return an <code>ArrayList</code> The first item of the list
    * is a string representation of the key pattern (the parameter),
    * the second item is the spacer character (a <code>String</code>).
@@ -298,7 +298,8 @@ public class LabelPatternUtil {
                 // Abbreviate - that is,
                 //System.out.println(_sbvalue.toString());
                 StringBuffer abbr = new StringBuffer();
-                String[] words = _sbvalue.toString().split("\\b");
+                String[] words = _sbvalue.toString().replaceAll("[\\{\\}]","")
+                        .split("[ \r\n]");//split("\\b");
                 for (int word=0; word<words.length; word++)
                     if (words[word].length() > 0)
                         abbr.append(words[word].charAt(0));
@@ -537,7 +538,7 @@ public class LabelPatternUtil {
   /**
    * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
    * @param authorField a <code>String</code>
-   * @param int n the number of desired authors
+   * @param n the number of desired authors
    * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
    */
   private static String NAuthors(String authorField, int n) {

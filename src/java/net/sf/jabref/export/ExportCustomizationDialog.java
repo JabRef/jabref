@@ -9,6 +9,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.Sizes;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -27,7 +30,7 @@ public class ExportCustomizationDialog extends JDialog {
       close = new JButton(Globals.lang("Close")),
       help = new JButton(Globals.lang("Help"));
 
-  JPanel options = new JPanel(),
+  JPanel buttons = new JPanel(),
       main = new JPanel();
   JTable table;
 
@@ -115,15 +118,19 @@ public class ExportCustomizationDialog extends JDialog {
     //am.put("close", closeAction);
     main.setLayout(new BorderLayout());
     main.add(sp, BorderLayout.CENTER);
-    options.add(addExport);
-    options.add(modify);
-    options.add(remove);
-    options.add(close);
-    options.add(Box.createHorizontalStrut(5));
-    options.add(help);
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+    bb.addGlue();
+    bb.addGridded(addExport);
+    bb.addGridded(modify);
+    bb.addGridded(remove);
+    bb.addGridded(close);
+    bb.addUnrelatedGap();
+    bb.addGridded(help);
+    bb.addGlue();
 
     getContentPane().add(main, BorderLayout.CENTER);
-    getContentPane().add(options, BorderLayout.SOUTH);
+    getContentPane().add(buttons, BorderLayout.SOUTH);
     pack();
     Util.placeDialog(this, frame);
     new FocusRequester(table);

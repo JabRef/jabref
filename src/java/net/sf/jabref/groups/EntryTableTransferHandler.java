@@ -167,7 +167,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         ArrayList notBibFiles = new ArrayList();
         String encoding = Globals.prefs.get("defaultEncoding");
         for (int i = 0; i < fileNames.length; i++) {
-            if (fileNames[i].endsWith(".bib")) {
+            if (fileNames[i].toLowerCase().endsWith(".bib")) {
                 File f = new File(fileNames[i]);
                 try {
                     ParserResult pr = OpenDatabaseAction.loadDatabase
@@ -183,6 +183,11 @@ public class EntryTableTransferHandler extends TransferHandler {
                     //
                     //Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
                 }
+            }
+            else if (fileNames[i].toLowerCase().endsWith(".pdf") ||
+                    fileNames[i].toLowerCase().endsWith(".ps")) {
+                // Handle PDF by linking to it from the entry where it was dropped?
+                // Not implemented. We should not try to import the PDF file.
             }
             else notBibFiles.add(fileNames[i]);
         }

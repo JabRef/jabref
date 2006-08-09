@@ -27,6 +27,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -71,22 +73,25 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	getContentPane().setLayout(new BorderLayout());
 	JPanel pan = new JPanel();
 	getContentPane().add(pan, BorderLayout.CENTER);
-	JPanel lower = new JPanel();
+	JPanel buttons = new JPanel();
 	JButton // ok = new JButton("Ok"),
 	    cancel = new JButton(Globals.lang("Cancel"));
 	//ok.addActionListener(this);
 	cancel.addActionListener(this);
 
-        //pan.setBackground(GUIGlobals.lightGray);
-        //lower.setBackground(GUIGlobals.lightGray);
-	// Make ESC close dialog, equivalent to clicking Cancel.
+    // Make ESC close dialog, equivalent to clicking Cancel.
 	cancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 	    .put(baseFrame_.prefs.getKey("Close dialog"), "close");
 	cancel.getActionMap().put("close", cancelAction);
 
-	//lower.add(ok);
-	lower.add(cancel);
-	getContentPane().add(lower, BorderLayout.SOUTH);
+	//buttons.add(ok);
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    //buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+    bb.addGlue();
+    bb.addGridded(cancel);
+    bb.addGlue();
+
+    getContentPane().add(buttons, BorderLayout.SOUTH);
 	GridBagLayout gbl = new GridBagLayout();
 	pan.setLayout(gbl);
 	GridBagConstraints con = new GridBagConstraints();
@@ -116,7 +121,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 		      (BorderFactory.createEtchedBorder(),
 		       Globals.lang("Entry types")));
 	//pan.setBackground(Color.white);
-	//lower.setBackground(Color.white);
+	//buttons.setBackground(Color.white);
 	pack();
 	setResizable(false);
     }

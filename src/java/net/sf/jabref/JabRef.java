@@ -30,13 +30,13 @@ import net.sf.jabref.wizard.auximport.*;
 import net.sf.jabref.remote.RemoteListener;
 
 import gnu.dtools.ritopt.*;
-import java.awt.Font;
-import java.awt.Frame;
+import java.awt.*;
 
 import java.io.*;
 import java.io.File;
 
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -604,6 +604,14 @@ public class JabRef {
                     MetalLookAndFeel.setCurrentTheme(new
                      com.jgoodies.looks.plastic.theme.SkyBluer());
 
+                    // Set a "model" icon size, so menu items are evenly spaced even though
+                    // only some items have icons. We load an arbitrary icon and look at
+                    // its size to determine what size to use:
+                    int defaultIconSize = GUIGlobals.getImage("open").getIconWidth();
+                    com.jgoodies.looks.Options.setDefaultIconSize
+                            (new Dimension(defaultIconSize, defaultIconSize));
+
+
                     if (overrideDefaultFonts) {
                         FontSet fontSet = FontSets.createDefaultFontSet(
                             new Font("Tahoma", Font.PLAIN, fontSizes),    // control font
@@ -617,6 +625,13 @@ public class JabRef {
                     //Plastic3DLookAndFeel plLnf = (Plastic3DLookAndFeel) lnf;
                 }
                 else if ((lnf != null) && (lnf instanceof WindowsLookAndFeel)) {
+
+                    // Set a "model" icon size, so menu items are evenly spaced even though
+                    // only some items have icons. We load an arbitrary icon and look at
+                    // its size to determine what size to use:
+                    int defaultIconSize = GUIGlobals.getImage("open").getIconWidth();
+                    com.jgoodies.looks.Options.setDefaultIconSize
+                        (new Dimension(defaultIconSize, defaultIconSize));
 
                     if (overrideDefaultFonts) {
                         FontSet fontSet = FontSets.createDefaultFontSet(

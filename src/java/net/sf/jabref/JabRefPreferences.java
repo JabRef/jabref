@@ -194,7 +194,7 @@ public class JabRefPreferences {
                      "pdf;comment;owner");
 
         defaults.put("useCustomIconTheme", Boolean.FALSE);
-        defaults.put("customIconThemeFile", "/home/alver/div/smalltheme/Icons.properties");
+        defaults.put("customIconThemeFile", "/home/alver/div/crystaltheme_16/Icons.properties");
 
     // Entry editor tab 0:
     defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
@@ -303,6 +303,8 @@ public class JabRefPreferences {
         defaults.put("externalJournalLists", null);
         defaults.put("citeCommand", "cite");
         defaults.put("floatMarkedEntries", Boolean.TRUE);
+
+        defaults.put("useNativeFileDialogOnMac", Boolean.TRUE);
         
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));

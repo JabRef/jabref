@@ -63,6 +63,7 @@ import javax.swing.text.* ;
 import net.sf.jabref.* ;
 import net.sf.jabref.wizard.integrity.gui.* ;
 import net.sf.jabref.wizard.text.* ;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class TextInputDialog
     extends JDialog implements ActionListener
@@ -71,7 +72,7 @@ public class TextInputDialog
   private JButton cancelButton = new JButton() ;
   private JButton insertButton = new JButton() ;
   private JPanel panel1 = new JPanel() ;
-  private JPanel buttonPanel = new JPanel() ;
+  private JPanel buttons = new JPanel() ;
   private JPanel rawPanel = new JPanel() ;
   private JPanel sourcePanel = new JPanel() ;
   private IntegrityMessagePanel warnPanel;
@@ -87,7 +88,7 @@ public class TextInputDialog
   private JTextPane textPane ;
   private JTextArea preview ;
 
-  private boolean inputChanged ; // input changed, fired by insert button
+  private boolean inputChanged ; // input changed, fired by insert buttons
 
   private TagToMarkedTextStore marked ;
 
@@ -173,12 +174,12 @@ public class TextInputDialog
     con.fill = GridBagConstraints.BOTH;
     //gbl.setConstraints( tabbed, con ) ;
     panel1.add( tabbed, BorderLayout.CENTER ) ;
-    //gbl.setConstraints( buttonPanel, con ) ;
-    panel1.add( buttonPanel, BorderLayout.SOUTH ) ;
+    //gbl.setConstraints( buttons, con ) ;
+    panel1.add( buttons, BorderLayout.SOUTH ) ;
 
     // Key bindings:
-    ActionMap am = buttonPanel.getActionMap() ;
-    InputMap im = buttonPanel.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ) ;
+    ActionMap am = buttons.getActionMap() ;
+    InputMap im = buttons.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW ) ;
     im.put( parent.prefs().getKey( "Close dialog" ), "close" ) ;
     am.put( "close", new AbstractAction()
     {
@@ -277,7 +278,7 @@ public class TextInputDialog
     //fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
     //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
-    // insert button
+    // insert buttons
     insertButton.setText( Globals.lang( "Insert" ) ) ;
     insertButton.addActionListener( this ) ;
 
@@ -378,29 +379,19 @@ public class TextInputDialog
 
   private void initButtonPanel()
   {
-    // Panel Layout
-    GridBagLayout gbl = new GridBagLayout() ;
-    GridBagConstraints con = new GridBagConstraints() ;
-    con.weightx = 0 ;
-    con.insets = new Insets( 5, 10, 0, 10 ) ;
-    con.fill = GridBagConstraints.HORIZONTAL ;
 
-//    buttonPanel.setLayout(gbl) ;
-
-    // Buttons
     okButton.setText( Globals.lang( "Accept" ) ) ;
-//    okButton.setEnabled(false);
     okButton.addActionListener( this ) ;
     cancelButton.setText( Globals.lang( "Cancel" ) ) ;
     cancelButton.addActionListener( this ) ;
 
-    // insert Buttons
-    con.gridwidth = GridBagConstraints.REMAINDER ;
-    gbl.setConstraints( okButton, con ) ;
-    buttonPanel.add( okButton ) ;
+    ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
+    buttons.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+    bb.addGlue();
+    bb.addGridded(okButton);
+    bb.addGridded(cancelButton);
+    bb.addGlue();
 
-    gbl.setConstraints( cancelButton, con ) ;
-    buttonPanel.add( cancelButton ) ;
   }
 
 // ---------------------------------------------------------------------------
@@ -520,7 +511,7 @@ public class TextInputDialog
 // ---------------------------------------------------------------------------
 
 //  ActionListener
-//  handling of button-click actions
+//  handling of buttons-click actions
   public void actionPerformed( ActionEvent e )
   {
     Object source = e.getSource() ;

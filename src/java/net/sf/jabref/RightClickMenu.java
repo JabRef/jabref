@@ -145,7 +145,7 @@ public class RightClickMenu extends JPopupMenu
            addSeparator();
         }
 
-        add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("pdf")) {
+        add(new AbstractAction(Globals.lang("Open PDF or PS"), GUIGlobals.getImage("openFile")) {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         panel.runCommand("openFile");

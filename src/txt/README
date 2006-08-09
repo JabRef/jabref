@@ -1,6 +1,6 @@
 
-JabRef 2.1 beta
----------------
+JabRef 2.1
+----------
 
 
 Introduction:
@@ -80,12 +80,14 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.1?    - Added capability to drag files and WWW links into JabRef. BibTeX files will be
+2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number
           and quit immediately.
         - Duplicates within a set of imported entries are now found and shown in the
           import inspection window.
+        - Mac users can now choose between native and Swing file chooser under
+          Preferences -> Advanced.
         - Fixed missing duplicate warning when importing without import inspection window.
         - Fixed error in ISI import which allowed empty fields to be set, causing errors
           when saving and reloading entries.
