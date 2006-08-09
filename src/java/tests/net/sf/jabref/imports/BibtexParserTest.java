@@ -9,7 +9,6 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.util.XMPUtil;
 
 /**
  * Test the BibtexParser
