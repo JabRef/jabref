@@ -1,5 +1,5 @@
 
-JabRef 2.1
+JabRef 2.?
 ----------
 
 
@@ -80,6 +80,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
+2.?     - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
+        - Removed unnecessary output text when scanning for external file changes.
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

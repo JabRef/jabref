@@ -47,7 +47,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         namesNatbib = new JRadioButton(Globals.lang("Natbib style"));
         noAbbrNames = new JRadioButton(Globals.lang("Do not abbreviate names"));
         abbrNames = new JRadioButton(Globals.lang("Abbreviate names"));
-        lastNamesOnly = new JRadioButton("Show last names only");
+        lastNamesOnly = new JRadioButton(Globals.lang("Show last names only"));
         pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
         urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
         citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));

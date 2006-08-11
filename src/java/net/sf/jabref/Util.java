@@ -1282,24 +1282,34 @@ public class Util
     public static boolean copyFile(File source, File dest,
                                    boolean deleteIfExists) throws IOException {
 
-        // Check if the file already exists.
-        if (dest.exists()) {
-            if (!deleteIfExists) return false;
-            //else dest.delete();
-        }
+        BufferedInputStream in = null;
+        BufferedOutputStream out = null;
+        try {
+            // Check if the file already exists.
+            if (dest.exists()) {
+                if (!deleteIfExists) return false;
+                //else dest.delete();
+            }
 
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(
-                source));
-        BufferedOutputStream out = new BufferedOutputStream(
-                new FileOutputStream(dest));
-        int el;
-        //int tell = 0;
-        while ((el = in.read()) >= 0) {
-            out.write(el);
+            in = new BufferedInputStream(new FileInputStream(
+                    source));
+            out = new BufferedOutputStream(
+                    new FileOutputStream(dest));
+            int el;
+            //int tell = 0;
+            while ((el = in.read()) >= 0) {
+                out.write(el);
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+            if (in != null)
+                in.close();
         }
-        out.flush(); // Will this make a difference? 2005.09.30
-        in.close();
-        out.close();
         return true;
     }
 

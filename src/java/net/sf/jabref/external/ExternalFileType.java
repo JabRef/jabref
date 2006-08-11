@@ -34,6 +34,15 @@ public class ExternalFileType {
         return extension;
     }
 
+    /**
+     * Get the bibtex field name used to link to this file type.
+     * Currently we assume that field name equals filename extension.
+     * @return The field name.
+     */
+    public String getFieldName() {
+        return extension;
+    }
+
     public String getOpenWith() {
         return openWith;
     }

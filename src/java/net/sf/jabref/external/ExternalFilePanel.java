@@ -203,7 +203,7 @@ public class ExternalFilePanel extends JPanel {
         String res = JOptionPane.showInputDialog(parent,
                         Globals.lang("Enter URL to download"));
 
-        if (res != null) {
+        if ((res != null) && (res.trim().length() > 0)) {
             class Downloader extends Thread {
                 String res;
                 BibtexEntry targetEntry = null;
@@ -290,11 +290,10 @@ public class ExternalFilePanel extends JPanel {
                             targetEntry.setField(fieldName, textToSet);
                         }
                     } catch (MalformedURLException e1) {
-                        JOptionPane.showMessageDialog(parent, "Invalid URL: "+e1.getMessage(),
-                                "Download file", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"),
+                                Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                     } finally {
                         if (updateEditor) {
-                            System.out.println("Juuu");
                             editor.setText(textToSet);
                             editor.setEnabled(true);
                         }

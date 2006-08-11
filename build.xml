@@ -240,13 +240,11 @@
 			<fileset dir="${txt.dir}">
 				<include name="gpl.txt" />
 				<include name="lesser.txt" />
-				<include name="apache-license.txt" />
 				<include name="jgoodies.txt" />
 				<include name="README" />
 			</fileset>
 			<manifest>
 				<attribute name="Main-Class" value="net.sf.jabref.JabRef" />
-				<!--                            <attribute name="Main-Class" value="net.sf.jabref.gui.FieldWeightDialog" /> -->
 			</manifest>
 		</jar>
 
@@ -558,7 +556,7 @@ Number (CCN)           maintenance
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
-			</classpath>
+            </classpath>
 		</junit>
 	</target>
 

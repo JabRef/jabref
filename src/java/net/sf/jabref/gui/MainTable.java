@@ -6,6 +6,7 @@ import net.sf.jabref.search.HitOrMissComparator;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
 import javax.swing.*;
+import javax.swing.plaf.TableUI;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableColumnModel;
@@ -55,7 +56,9 @@ public class MainTable extends JTable {
         updateRenderers();
     }
 
-    public MainTable(MainTableFormat tableFormat, EventList list, JabRefFrame frame) {
+
+    public MainTable(MainTableFormat tableFormat, EventList list, JabRefFrame frame,
+                     BasePanel panel) {
         super();
         this.tableFormat = tableFormat;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
@@ -90,7 +93,7 @@ public class MainTable extends JTable {
 
         // enable DnD
         setDragEnabled(true);
-        TransferHandler xfer = new EntryTableTransferHandler(this, frame);
+        TransferHandler xfer = new EntryTableTransferHandler(this, frame, panel);
         setTransferHandler(xfer);
         pane.setTransferHandler(xfer);
 
@@ -515,5 +518,18 @@ public class MainTable extends JTable {
             super.columnClicked(i, i1);
             refreshSorting();
         }*/
+    }
+
+    /**
+     * Morten Alver: This override is a workaround NullPointerException when
+     * dragging stuff into the table. I found this in a forum, but have no idea
+     * why it works.
+     * @param newUI
+     */
+    public void setUI(TableUI newUI) {
+        super.setUI(newUI);
+        TransferHandler handler = getTransferHandler();
+        setTransferHandler(null);
+        setTransferHandler(handler);
     }
 }

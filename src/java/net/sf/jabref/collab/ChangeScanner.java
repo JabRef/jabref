@@ -54,14 +54,10 @@ public class ChangeScanner extends Thread {
             Globals.prefs.get("defaultEncoding"));
             BibtexDatabase inTemp = pr.getDatabase();
             MetaData mdInTemp = new MetaData(pr.getMetaData(),inTemp);
-            //Util.pr(tempFile.getPath()+": "+inMem.getEntryCount());
-
             // Parse the modified file.
             pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.get("defaultEncoding"));
             BibtexDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = new MetaData(pr.getMetaData(),onDisk);
-
-            //Util.pr(f.getPath()+": "+onDisk.getEntryCount());
 
             // Sort both databases according to a common sort key.
             EntryComparator comp = new EntryComparator(false, true, sortBy[2]);
@@ -78,12 +74,16 @@ public class ChangeScanner extends Thread {
             EntrySorter sInMem = inMem.getSorter(comp);
 
             // Start looking at changes.
+
             scanPreamble(inMem, inTemp, onDisk);
             scanStrings(inMem, inTemp, onDisk);
+
+
             scanEntries(sInMem, sInTemp, sOnDisk);
+            
             scanGroups(mdInMem, mdInTemp, mdOnDisk);
 
-            //System.out.println("Time used: "+(System.currentTimeMillis()-startTime));
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -125,7 +125,6 @@ public class ChangeScanner extends Thread {
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
         mainLoop: for (piv1=0; piv1<tmp.getEntryCount(); piv1++) {
-            //System.out.println(">>> "+piv1+"\t"+tmp.getEntryCount());
 
             // First check if the similarly placed entry in the other base matches exactly.
             double comp = -1;
@@ -163,14 +162,12 @@ public class ChangeScanner extends Thread {
         // Now we've found all exact matches, look through the remaining entries, looking
         // for close matches.
         if (notMatched.size() > 0) {
-            //Util.pr("Could not find exact match for "+notMatched.size()+" entries.");
 
             fuzzyLoop: for (Iterator it=notMatched.iterator(); it.hasNext();) {
 
                 Integer integ = (Integer)it.next();
                 piv1 = integ.intValue();
 
-                //Util.printEntry(mem.getEntryAt(piv1));
 
                 // These two variables will keep track of which entry most closely matches the
                 // one we're looking at, in case none matches completely.
@@ -180,9 +177,7 @@ public class ChangeScanner extends Thread {
 
                 if (piv2 < disk.getEntryCount()-1) {
                     for (int i = piv2; i < disk.getEntryCount(); i++) {
-                        //Util.pr("This one? "+i);
                         if (!used.contains(""+i)) {
-                            //Util.pr("Fuzzy matching for entry: "+piv1+" - "+i);
                             comp = Util.compareEntriesStrictly(tmp.getEntryAt(piv1),
                             disk.getEntryAt(i));
                         }
@@ -212,9 +207,8 @@ public class ChangeScanner extends Thread {
                     //changes.add(ce);
 
                     //System.out.println("Possible match for entry:");
-                    //Util.printEntry(mem.getEntryAt(piv1));
                     //System.out.println("----------------------------------------------");
-                    //Util.printEntry(disk.getEntryAt(bestMatchI));
+
                 }
                 else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
@@ -356,7 +350,7 @@ public class ChangeScanner extends Thread {
                     //for (int j = piv2 + 1; j < nDisk; j++)
                     if (!used.contains(diskId)) {
                         BibtexString disk = onDisk.getString(diskId);
-                        //System.out.println("Cand: "+disk.getName());
+
                         if (disk.getContent().equals(tmp.getContent())) {
                             // We have found a string with the same content. It cannot have the same
                             // name, or we would have found it above.
@@ -380,7 +374,7 @@ public class ChangeScanner extends Thread {
                             tmp.getContent()));
                             i.remove();
                             used.add(diskId);
-                            //System.out.println(onDisk.getString(diskId).getName());
+
                         }
                     }
                 }
@@ -399,7 +393,6 @@ public class ChangeScanner extends Thread {
             }
         }
 
-        //System.out.println(used.size());
 
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.

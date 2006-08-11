@@ -712,7 +712,7 @@ public JabRefPreferences prefs() {
 
 
       // Drag and drop for tabbedPane:
-      TransferHandler xfer = new EntryTableTransferHandler(null, this);
+      TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
       tabbedPane.setTransferHandler(xfer);
       tlb.setTransferHandler(xfer);
       mb.setTransferHandler(xfer);

@@ -126,7 +126,6 @@ public class EntryComparator implements Comparator {
 	} else {
         String ours = ((String) f1).toLowerCase(),
 	    	theirs = ((String) f2).toLowerCase();
-        System.out.println(ours);
         int comp = ours.compareTo(theirs);
 		result = -comp;
 	}
