@@ -133,9 +133,12 @@ public class AuthorList {
     private Vector authors;     // of Author
 
     // Variables for storing computed strings, so they only need be created once:
-    private String authorsNatbib=null, authorsLastOnly=null, authorsLastFirst=null, authorLastFirstAnds=null,
-        authorsFirstFirst=null, authorsFirstFirstAnds=null, authorsAlph=null;
+    private String authorsNatbib=null, authorsLastOnly=null, authorLastFirstAnds=null,
+        authorsFirstFirstAnds=null, authorsAlph=null;
 
+    private String[] authorsFirstFirst = new String[2];
+    private String[] authorsLastFirst = new String[2]; 
+    
 
     // The following variables are used only during parsing
 
@@ -195,7 +198,7 @@ public class AuthorList {
      * @param bibtex_authors contents of either <CODE>author</CODE> or
      * <CODE>editor</CODE> bibtex field.
      */
-    public AuthorList (String bibtex_authors) {
+    protected AuthorList (String bibtex_authors) {
         authors = new Vector(5);        // 5 seems to be reasonable initial size
         orig = bibtex_authors;              // initialization
         token_start = 0; token_end = 0;     // of parser
@@ -208,7 +211,7 @@ public class AuthorList {
     }
 
        public static String fixAuthor_Natbib(final String inOrig) {
-        AuthorList authors = new AuthorList(inOrig);
+        AuthorList authors = AuthorList.getAuthorList(inOrig);
         return authors.getAuthorsNatbib();
     }
 
@@ -461,6 +464,7 @@ public class AuthorList {
      * @return the <CODE>Author</CODE> object.
      */
     public Author getAuthor(int i) { return (Author) authors.get(i); }
+    
     /**
      * Returns the list of authors in "natbib" format.
      * <p>
@@ -537,9 +541,11 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsLastFirst(boolean abbr) {
-        // Check if we've computed this before:
-        if (authorsLastFirst != null)
-            return authorsLastFirst;
+        int abbrInt = (abbr ? 0 : 1);
+    	
+    	// Check if we've computed this before:
+        if (authorsLastFirst[abbrInt] != null)
+            return authorsLastFirst[abbrInt];
 
         StringBuffer res = new StringBuffer();
         if (size()>0) {
@@ -556,8 +562,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getLastFirst(abbr));
             }
         }
-        authorsLastFirst = res.toString();
-        return authorsLastFirst;
+        authorsLastFirst[abbrInt] = res.toString();
+        return authorsLastFirst[abbrInt];
     }
     /**
      * Returns the list of authors separated by "and"s with first names after last name;
@@ -603,15 +609,17 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAuthorsFirstFirst(boolean abbr) {
+    	int abbrInt = (abbr ? 0 : 1);
+    	
         // Check if we've computed this before:
-        if (authorsFirstFirst != null)
-            return authorsFirstFirst;
+        if (authorsFirstFirst[abbrInt] != null)
+            return authorsFirstFirst[abbrInt];
 
         StringBuffer res = new StringBuffer();
         if (size()>0) {
             res.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
-            while (i < size()-1) {
+            while (i < size() - 1) {
                 res.append(", ");
                 res.append(getAuthor(i).getFirstLast(abbr));
                 i++;
@@ -622,8 +630,8 @@ public class AuthorList {
                 res.append(getAuthor(i).getFirstLast(abbr));
             }
         }
-        authorsFirstFirst = res.toString();
-        return authorsFirstFirst;
+        authorsFirstFirst[abbrInt] = res.toString();
+        return authorsFirstFirst[abbrInt];
     }
     /**
      * Returns the list of authors separated by "and"s with first names before last name;
@@ -691,7 +699,7 @@ public class AuthorList {
      *  <code>getFirstLast</code>, and <code>getLastFirst</code> are used;
      *  all other methods are provided for completeness.
      */
-    private static class Author {
+    public static class Author {
         private final String first_part;
         private final String first_abbr;
         private final String von_part;
@@ -727,32 +735,32 @@ public class AuthorList {
             jr_part = jr;
         }
         /**
-         * Retunrns the first name of the author stored in this object.
+         * Returns the first name of the author stored in this object ("First").
          * @return first name of the author (may consist of several tokens)
          */
         public String getFirst() { return first_part; }
         /**
-         * Retunrns the abbreviated first name of the author stored in this object.
+         * Returns the abbreviated first name of the author stored in this object ("F.").
          * @return abbreviated first name of the author (may consist of several tokens)
          */
         public String getFirstAbbr() { return first_abbr; }
         /**
-         * Retunrns the von part of the author's name stored in this object.
+         * Returns the von part of the author's name stored in this object ("von").
          * @return von part of the author's name (may consist of several tokens)
          */
         public String getVon() { return von_part; }
         /**
-         * Retunrns the last name of the author stored in this object.
+         * Returns the last name of the author stored in this object ("Last").
          * @return last name of the author (may consist of several tokens)
          */
         public String getLast() { return last_part; }
         /**
-         * Retunrns the junior part of the author's name stored in this object.
-         * @return junior part of the author's name (may consist of several tokens)
+         * Returns the junior part of the author's name stored in this object ("Jr").
+         * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
          */
         public String getJr() { return jr_part; }
         /**
-         * Returns von part followed by last name.
+         * Returns von-part followed by last name ("von Last").
          * If both fields were specified as <CODE>null</CODE>,
          * the empty string <CODE>""</CODE> is returned.
          * @return 'von Last'
@@ -801,6 +809,10 @@ public class AuthorList {
             return res;
         }
 
+        /**
+         * Returns the name as "Last, Jr, F." omitting the von-part and removing starting braces.
+         * @return "Last, Jr, F." as described above or "" if all these parts are empty.
+         */
         public String getNameForAlphabetization() {
             StringBuffer res = new StringBuffer();
             if (last_part != null)
@@ -816,7 +828,6 @@ public class AuthorList {
             while ((res.length() > 0) && (res.charAt(0) == '{'))
                 res.deleteCharAt(0);
             return res.toString();
-
         }
     }//end Author
 }//end AuthorList

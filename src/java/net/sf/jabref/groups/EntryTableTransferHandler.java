@@ -22,27 +22,40 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.InputEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.TransferHandler;
 
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.util.XMPUtil;
 
 public class EntryTableTransferHandler extends TransferHandler {
     protected final MainTable entryTable;
@@ -181,7 +194,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             ExternalFileType fileType = null;
             int index = fileNames[i].lastIndexOf('.');
             if ((index >= 0) && (index < fileNames[i].length())) {
-                extension = fileNames[i].substring(index+1);
+                extension = fileNames[i].substring(index+1).toLowerCase();
                 //System.out.println(extension);
                 fileType = Globals.prefs.getExternalFileType(extension);
             }
@@ -201,19 +214,66 @@ public class EntryTableTransferHandler extends TransferHandler {
                     //
                     //Util.showQuickErrorDialog(frame, Globals.lang("Open database"), e);
                 }
+                continue;
             }
-            else if (fileType != null) {
+            
+            if (extension.equals("pdf")) {
+
+				Collection c;
+				try {
+					c = XMPUtil.readXMP(fileNames[i]);
+				} catch (IOException e1) {
+					c = null;
+					frame.output(Globals.lang("No XMP metadata found in " + fileNames[i]));
+				}
+
+				if (c != null && c.size() > 0) {
+					Iterator it = c.iterator();
+
+					BasePanel panel = frame.basePanel();
+					
+					if (panel == null){
+//						// Create a new, empty, database.
+				        BibtexDatabase database = new BibtexDatabase();
+				        frame.addTab(database, null, null, Globals.prefs.get("defaultEncoding"), true);
+				        frame.output(Globals.lang("New database created."));
+				        panel = frame.basePanel();
+					}
+
+					BibtexDatabase database = frame.basePanel().database();
+
+					NamedCompound ce = new NamedCompound(Globals.lang("Drog PDF"));
+
+					while (it.hasNext()) {
+						BibtexEntry e = (BibtexEntry) it.next();
+
+						try {
+							e.setId(Util.createNeutralId());
+							database.insertEntry(e);
+							ce.addEdit(new UndoableInsertEntry(database, e, panel));
+						} catch (Exception e2) {
+							// Should not happen?
+						}
+					}
+
+					ce.end();
+					panel.undoManager.addEdit(ce);
+					panel.markBaseChanged();
+					continue;
+				}
+			}
+            if (fileType != null) {
 
                 // This is a linkable file. If the user dropped it on an entry,
                 // we should offer options for autolinking to this files:
                 if (dropRow >= 0) {
                     boolean local = true; // TODO: need to signal if this is a local or autodownloaded file
-                    DroppedFileHandler dfh = new DroppedFileHandler(frame, panel); // TODO: make this an instance variable?
-                    dfh.handleDroppedfile(fileNames[i], fileType, local, entryTable, dropRow);
+               //     DroppedFileHandler dfh = new DroppedFileHandler(frame, panel); // TODO: make this an instance variable?
+               //     dfh.handleDroppedfile(fileNames[i], fileType, local, entryTable, dropRow);
                 }
-                
+                continue;
             }
-            else notBibFiles.add(fileNames[i]);
+            notBibFiles.add(fileNames[i]);
         }
 
         if (notBibFiles.size() > 0) {

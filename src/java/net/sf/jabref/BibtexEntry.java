@@ -207,7 +207,7 @@ public class BibtexEntry
      * be used for entries that are being displayed in the GUI. Furthermore, it
      * does not check values for content, so e.g. empty strings will be set as such.
      */
-    public void setField(HashMap fields){
+    public void setField(Map fields){
         _fields.putAll(fields);
     }
 
@@ -435,4 +435,5 @@ public class BibtexEntry
             return text;
         return text.substring(0, maxCharacters + 1) + "...";
     }
+    
 }

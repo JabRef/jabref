@@ -7,6 +7,7 @@ import java.util.Collection;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
@@ -131,8 +132,14 @@ public class BibtexParserTest extends TestCase {
 
 		BibtexEntry e2 = (BibtexEntry) c.iterator().next();
 
-		// What needs to be done to create two identical bibtex entries?
-		assertEquals(e, e2);
+		assertNotSame(e.getId(), e2.getId());
+		
+		Object[] o = e.getAllFields();
+		for (int i = 0; i < o.length; i++){
+			if (!e.getField(o[i].toString()).equals(e2.getField(o[i].toString()))){
+				fail("e and e2 differ in field " + o[i].toString());
+			}
+		}
 	}
 
 	public void testNewlineHandling() throws IOException {

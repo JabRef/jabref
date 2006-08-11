@@ -18,7 +18,6 @@ import java.awt.event.ActionEvent;
  * User: alver
  * Date: Mar 1, 2006
  * Time: 11:13:03 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ErrorConsole {
 

@@ -27,13 +27,30 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.imports;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.UnknownEntryType;
+import net.sf.jabref.Util;
 
 
 /**
@@ -88,7 +105,7 @@ public class BibtexParser
 		BibtexParser parser = new BibtexParser(in);
 		return parser.parse();
 	}
-    
+	
    /**
    * Check whether the source is in the correct format for this importer.
    */
@@ -711,17 +728,24 @@ public class BibtexParser
             if (peek() == '\n')
                 value.append('\n');
         }
-            else*/ if (Character.isWhitespace((char)j)) {
-            String whs = skipAndRecordWhitespace(j);
-            //System.out.println(":"+whs+":");
-                    if (!whs.equals("") && !whs.equals("\n\t")) { // && !whs.equals("\n"))
-                whs = whs.replaceAll("\t", ""); // Remove tabulators.
-                //while (whs.endsWith("\t"))
-                //    whs = whs.substring(0, whs.length()-1);
-                value.append(whs);
-            }
-            else
-                value.append(' ');
+            else*/ 
+            if (Character.isWhitespace((char)j)) {
+            	String whs = skipAndRecordWhitespace(j);
+
+            	//System.out.println(":"+whs+":");
+                
+            	if (!whs.equals("") && !whs.equals("\n\t")) { // && !whs.equals("\n"))
+                	
+                	whs = whs.replaceAll("\t", ""); // Remove tabulators.
+	            
+                	//while (whs.endsWith("\t"))
+	                //    whs = whs.substring(0, whs.length()-1);
+	                
+                	value.append(whs);
+	            
+            	} else {
+	                value.append(' ');
+	            }
 
 
             } else

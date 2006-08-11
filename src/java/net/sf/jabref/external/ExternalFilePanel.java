@@ -17,6 +17,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
@@ -29,6 +30,7 @@ import net.sf.jabref.OpenFileFilter;
 import net.sf.jabref.UrlDragDrop;
 import net.sf.jabref.Util;
 import net.sf.jabref.net.URLDownload;
+import net.sf.jabref.util.XMPUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +41,7 @@ import net.sf.jabref.net.URLDownload;
  */
 public class ExternalFilePanel extends JPanel {
 
-    private JButton browseBut, download, auto;
+    private JButton browseBut, download, auto, xmp;
     private EntryEditor entryEditor;
     private JabRefFrame frame;
     private OpenFileFilter off;
@@ -61,11 +63,13 @@ public class ExternalFilePanel extends JPanel {
         this.off = off;
         this.entryEditor = entryEditor;
 
-        setLayout(new GridLayout(2, 1));
+        setLayout(new GridLayout(2, 2));
 
         browseBut = new JButton(Globals.lang("Browse"));
         download = new JButton(Globals.lang("Download"));
         auto = new JButton(Globals.lang("Auto"));
+        xmp = new JButton(Globals.lang("Write XMP"));
+        xmp.setToolTipText(Globals.lang("Write BibtexEntry as XMP-metadata to PDF."));
         //((JComponent) editor).addMouseListener(new EntryEditor.ExternalViewerListener());
 
         browseBut.addActionListener(new ActionListener() {
@@ -86,13 +90,16 @@ public class ExternalFilePanel extends JPanel {
                 autoSetFile(fieldName, editor);
             }
         });
-
-        JPanel pan = new JPanel();
-        pan.setLayout(new GridLayout(1,2));
+		xmp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pushXMP(fieldName, editor);
+			}
+		});
+        
         add(browseBut);
-        pan.add(auto);
-        pan.add(download);
-        add(pan);
+        add(download);
+        add(auto);
+        add(xmp);
 
         // Add drag and drop support to the field
         if (editor != null)
@@ -121,34 +128,40 @@ public class ExternalFilePanel extends JPanel {
             frame.output(s);
     }
 
-//    public void pushXMP(String fieldName, FieldEditor editor) {
-//		
-//        // Find the default directory for this field type, if any:
-//        String dir = metaData.getFileDirectory(fieldName);
-//        File file = null;
-//        if (dir != null) {
-//            File tmp = Util.expandFilename(editor.getText(), dir);
-//            if (tmp != null)
-//                file = tmp;
-//        }
-//        
-//        if (file == null){
-//        	file = new File(editor.getText());
-//        }
-//        
-//        if (file == null){
-//        	output(Globals.lang("No file associated"));
-//        }
-//        
-//        try {
-//		//	XMPUtil.writeXMP(file, getEntry());
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//    }
+	public void pushXMP(String fieldName, FieldEditor editor) {
 
-    
+		// Find the default directory for this field type, if any:
+		String dir = metaData.getFileDirectory(fieldName);
+		File file = null;
+		if (dir != null) {
+			File tmp = Util.expandFilename(editor.getText(), dir);
+			if (tmp != null)
+				file = tmp;
+		}
+
+		if (file == null) {
+			file = new File(editor.getText());
+		}
+
+		if (file == null) {
+			output(Globals.lang("No file associated"));
+		}
+
+		try {
+			XMPUtil.writeXMP(file, getEntry());
+			output(Globals.lang("Wrote BibtexEntry as XMP to " + file.getName()));
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(editor.getParent(), Globals
+				.lang("Error writing XMP to file: " + e.getLocalizedMessage()), Globals
+				.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+			Globals.logger("Error while writing XMP " + file.getAbsolutePath());
+		} catch (TransformerException e) {
+			JOptionPane.showMessageDialog(editor.getParent(), Globals
+				.lang("Error converting Bibtex to XMP: " + e.getLocalizedMessage()), Globals
+				.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+			Globals.logger("Error while converting BibtexEntry to XMP " + file.getAbsolutePath());
+		}
+	}
     
     public void browseFile(final String fieldName, final FieldEditor editor) {
 

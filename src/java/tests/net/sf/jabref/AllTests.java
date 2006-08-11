@@ -6,6 +6,7 @@ import tests.net.sf.jabref.export.layout.format.AuthorAndsReplacerTest;
 import tests.net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviatorTester;
 import tests.net.sf.jabref.imports.BibtexParserTest;
 import tests.net.sf.jabref.util.CaseChangerTest;
+import tests.net.sf.jabref.util.XMPUtilTest;
 
 public class AllTests {
 
@@ -19,6 +20,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorLastFirstAbbreviatorTester.class);
 		suite.addTestSuite(BibtexParserTest.class);
 		suite.addTestSuite(CaseChangerTest.class);
+		suite.addTestSuite(XMPUtilTest.class);
 		//$JUnit-END$
 		return suite;
 	}
