@@ -308,16 +308,21 @@ public class BibtexParser
 
                 if (isEntry) // True if not comment, preamble or string.
                 {
-                    BibtexEntry be = parseEntry(tp);
+                    //try
+                    //{
+                        BibtexEntry be = parseEntry(tp);
 
-                    boolean duplicateKey = _db.insertEntry(be);
-                    if (duplicateKey) // JZTODO lyrics
-                      _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
-                              + " (" + Globals.lang("grouping may not work for this entry") + ")");
-                    else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
-                        _pr.addWarning(Globals.lang("empty BibTeX key")+": "+be.getAuthorTitleYear(40)
-                                + " (" + Globals.lang("grouping may not work for this entry") + ")");
-                    }
+                        boolean duplicateKey = _db.insertEntry(be);
+                        if (duplicateKey) // JZTODO lyrics
+                          _pr.addWarning(Globals.lang("duplicate BibTeX key")+": "+be.getCiteKey()
+                                  + " (" + Globals.lang("grouping may not work for this entry") + ")");
+                        else if (be.getCiteKey() == null || be.getCiteKey().equals("")) {
+                            _pr.addWarning(Globals.lang("empty BibTeX key")+": "+be.getAuthorTitleYear(40)
+                                    + " (" + Globals.lang("grouping may not work for this entry") + ")");
+                        }
+                    //} catch (IOException ex) {
+                    //    ex.printStackTrace();
+                    //}
                 }
 
                 skipWhitespace();
