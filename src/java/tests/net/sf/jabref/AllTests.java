@@ -16,8 +16,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorListTest.class);
 		suite.addTestSuite(UtilTest.class);
 		suite.addTestSuite(UtilFindFileTest.class);
-		suite.addTestSuite(AuthorAndsReplacerTest.class);
-		suite.addTestSuite(AuthorLastFirstAbbreviatorTester.class);
+		suite.addTestSuite(tests.net.sf.jabref.export.layout.format.AllTests.class);
 		suite.addTestSuite(BibtexParserTest.class);
 		suite.addTestSuite(CaseChangerTest.class);
 		suite.addTestSuite(XMPUtilTest.class);

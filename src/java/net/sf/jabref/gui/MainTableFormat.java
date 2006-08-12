@@ -122,9 +122,9 @@ public class MainTableFormat implements TableFormat {
                     }
                     if (namesAsIs) return o;
                     if (namesNatbib) o = AuthorList.fixAuthor_Natbib((String) o);
-                    else if (namesLastOnly) o = AuthorList.fixAuthor_lastNameOnlyCommas((String) o);
-                    else if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names);
-                    else if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names);
+                    else if (namesLastOnly) o = AuthorList.fixAuthor_lastNameOnlyCommas((String) o, false);
+                    else if (namesFf) o = AuthorList.fixAuthor_firstNameFirstCommas((String) o, abbr_names, false);
+                    else if (namesLf) o = AuthorList.fixAuthor_lastNameFirstCommas((String) o, abbr_names, false);
 
                     return o;
                 }

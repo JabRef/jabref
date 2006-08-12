@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2006 Jabref-Team
+ * Copyright (C) 2003 Jabref-Team
  * 
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
@@ -22,28 +22,29 @@
  * http://www.gnu.org/copyleft/gpl.ja.html
  *
  */
+
 package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.AuthorList;
 
 /**
- * Duplicate of AuthorLastFirstAbbreviator.
+ * <ul>
+ * <li>Names are given as first name, von and last name.</li>
+ * <li>First names will be abbreviated.</li>
+ * <li>Individual authors separated by comma.</li>
+ * <li>The and of a list of three or more authors is preceeded by a comma
+ * (Oxford comma)</li>
+ * </ul>
  * 
- * @see AuthorLastFirstAbbreviator
+ * @author mkovtun
+ * @author Christopher Oezbek <oezi@oezi.de>
  * 
- * @author Carlos Silla
  */
-public class AuthorAbbreviator implements LayoutFormatter {
+public class AuthorFirstAbbrLastOxfordCommas implements LayoutFormatter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-	 */
 	public String format(String fieldText) {
-		// It seems to me that this formatter and AuthorLastFirstAbbreviator
-		// are duplicates. Since the latter was patched to improve handling of
-		// some names, we refer the operation there:
-		return (new AuthorLastFirstAbbreviator()).format(fieldText);
+		return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, true, true);
 	}
+
 }

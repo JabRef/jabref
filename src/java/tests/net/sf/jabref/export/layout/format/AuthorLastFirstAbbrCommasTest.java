@@ -22,23 +22,43 @@
  * http://www.gnu.org/copyleft/gpl.ja.html
  *
  */
-package net.sf.jabref.export.layout.format;
+package tests.net.sf.jabref.export.layout.format;
 
+import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.AuthorList;
+import net.sf.jabref.export.layout.format.AuthorLastFirstAbbrCommas;
 
 /**
- * <ul>
- * <li>Names are given as first name, von and last name.</li>
- * <li>First names will be abbreviated.</li>
- * <li>Individual authors separated by comma.</li>
- * <li>There is no command in front the and of a list of three or more authors.</li>
- * </ul>
  * 
- * @author Christopher Oezbek <oezi@oezi.de>
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ *
  */
-public class AuthorFirstAbbrLastCommas implements LayoutFormatter {
-	public String format(String fieldText) {
-		return AuthorList.fixAuthor_firstNameFirstCommas(fieldText, true, false);
+public class AuthorLastFirstAbbrCommasTest extends TestCase {
+
+	/**
+	 * Test method for {@link net.sf.jabref.export.layout.format.AuthorLastFirstAbbrCommas#format(java.lang.String)}.
+	 */
+	public void testFormat() {
+			LayoutFormatter a = new AuthorLastFirstAbbrCommas();
+
+			// Empty case
+			assertEquals("", a.format(""));
+
+			// Single Names
+			assertEquals("Someone, V. S.", a.format("Van Something Someone"));
+
+			// Two names
+			assertEquals("von Neumann, J. and Black Brown, P.", a
+				.format("John von Neumann and Black Brown, Peter"));
+
+			// Three names
+			assertEquals("von Neumann, J., Smith, J. and Black Brown, P.", a
+				.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+
+			assertEquals("von Neumann, J., Smith, J. and Black Brown, P.", a
+				.format("John von Neumann and John Smith and Black Brown, Peter"));
+		
 	}
+
 }

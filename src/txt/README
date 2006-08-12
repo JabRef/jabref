@@ -82,6 +82,11 @@ appear in your chosen languages.
 Change log:
 2.?     - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.
+        - Added first version of support for XMP-metadata in PDFs.
+        - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
+        - Added LayoutFormatters that print the Oxford comma.
+        - Added missing space between abbreviated author first names:
+          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

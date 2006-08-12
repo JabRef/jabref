@@ -1,8 +1,9 @@
 package tests.net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviator;
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviator;
 
 /**
  * Test case  that verifies the functionalities of the
@@ -45,7 +46,7 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 		String result = ab.format(name);
 		
 		//Expected Results:
-		String expectedResult = "Lastname, N.M.";
+		String expectedResult = "Lastname, N. M.";
 		
 		//Verifies the functionality:				
 		Assert.assertEquals("Abbreviator Test", result, expectedResult);
@@ -64,7 +65,7 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 		String result = ab.format(name);
 		
 		//Expected Results:
-		String expectedResult = "Lastname, N.M. and Sobrenome, N.N.";
+		String expectedResult = "Lastname, N. M. and Sobrenome, N. N.";
 		
 		//Verifies the functionality:				
 		Assert.assertEquals("Abbreviator Test", result, expectedResult);
@@ -89,9 +90,21 @@ public class AuthorLastFirstAbbreviatorTester extends TestCase {
 	 */
 	public void testJrAuthor(){
 		String name = "Other, Jr., Anthony N.";
-		assertEquals("Other, A.N.", abbreviate(name));
+		assertEquals("Other, A. N.", abbreviate(name));
 	}
 
+	public void testFormat() {
+
+		LayoutFormatter a = new AuthorLastFirstAbbreviator();
+		
+		assertEquals("", a.format(""));
+		assertEquals("Someone, V. S.", a.format("Someone, Van Something"));
+		assertEquals("Smith, J.", a.format("Smith, John"));
+		assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.",
+				a.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+		
+	}
+	
 	protected String abbreviate(String name) {
 		return (new AuthorLastFirstAbbreviator()).format(name);
 	}

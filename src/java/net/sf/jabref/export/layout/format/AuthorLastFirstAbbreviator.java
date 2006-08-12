@@ -1,5 +1,6 @@
 package net.sf.jabref.export.layout.format;
 
+import net.sf.jabref.AuthorList;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
@@ -22,6 +23,9 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
 	 */
 	public String format(String fieldText) {
+		
+		// return AuthorList.fixAuthor_lastNameFirst(fieldText, true);
+		
 		try {
 		  return getAbbreviations(fieldText.split(" and "));
 		} catch(Exception e){
@@ -101,7 +105,7 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 			break;
 		case 3:
 			last = parts[0].trim();
-			// jr = author[1];
+			// jr = parts[1];
 			first = parts[2].trim();
 			break;
 		default:
@@ -116,6 +120,8 @@ public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 		for (int i = 0; i < firstNames.length; i++) {
 			sb.append(firstNames[i].charAt(0));
 			sb.append('.');
+			if (i < firstNames.length - 1)
+				sb.append(' ');
 		}
 		return sb.toString();
 	}

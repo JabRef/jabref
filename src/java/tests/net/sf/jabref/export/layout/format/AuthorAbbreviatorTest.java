@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2006 Jabref-Team
+ * Copyright (C) 2006 Jabref-Team
  * 
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
@@ -22,28 +22,34 @@
  * http://www.gnu.org/copyleft/gpl.ja.html
  *
  */
-package net.sf.jabref.export.layout.format;
+package tests.net.sf.jabref.export.layout.format;
 
+import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.AuthorAbbreviator;
+import net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviator;
 
 /**
- * Duplicate of AuthorLastFirstAbbreviator.
  * 
- * @see AuthorLastFirstAbbreviator
+ * Is the save as the AuthorLastFirstAbbreviator.
  * 
- * @author Carlos Silla
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ * 
  */
-public class AuthorAbbreviator implements LayoutFormatter {
+public class AuthorAbbreviatorTest extends TestCase {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-	 */
-	public String format(String fieldText) {
-		// It seems to me that this formatter and AuthorLastFirstAbbreviator
-		// are duplicates. Since the latter was patched to improve handling of
-		// some names, we refer the operation there:
-		return (new AuthorLastFirstAbbreviator()).format(fieldText);
+	public void testFormat() {
+
+		LayoutFormatter a = new AuthorLastFirstAbbreviator();
+		LayoutFormatter b = new AuthorAbbreviator();
+
+		assertEquals(b.format(""), a.format(""));
+		assertEquals(b.format("Someone, Van Something"), a.format("Someone, Van Something"));
+		assertEquals(b.format("Smith, John"), a.format("Smith, John"));
+		assertEquals(b.format("von Neumann, John and Smith, John and Black Brown, Peter"), a
+			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
+
 	}
+
 }

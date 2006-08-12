@@ -3,7 +3,7 @@ package net.sf.jabref.export.layout.format;
 import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
- * Replaces and's for & (in case of two authors) and ; (in case
+ * Replaces and's for & (in case of two authors) and , (in case
  * of more than two authors).
  *
  * @author Carlos Silla

@@ -21,14 +21,8 @@ import net.sf.jabref.AuthorList;
 
 public class AuthorLastFirst implements LayoutFormatter
 {
-    //~ Methods ////////////////////////////////////////////////////////////////
     public String format(String fieldText)
     {
-    //ConvertSpecialCharactersForHTML conv = new ConvertSpecialCharactersForHTML();
-    //return conv.format(ImportFormatReader.fixAuthor_lastNameFirst(fieldText));
         return AuthorList.fixAuthor_lastNameFirst(fieldText);
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

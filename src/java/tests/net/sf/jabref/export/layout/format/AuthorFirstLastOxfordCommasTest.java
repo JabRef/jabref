@@ -26,39 +26,39 @@ package tests.net.sf.jabref.export.layout.format;
 
 import junit.framework.TestCase;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorAndsReplacer;
+import net.sf.jabref.export.layout.format.AuthorFirstLastOxfordCommas;
 
 /**
  * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- * 
+ *
  */
-public class AuthorAndsReplacerTest extends TestCase {
+public class AuthorFirstLastOxfordCommasTest extends TestCase {
 
 	/**
-	 * Test method for
-	 * {@link net.sf.jabref.export.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
+	 * Test method for {@link net.sf.jabref.export.layout.format.AuthorFirstLastOxfordCommas#format(java.lang.String)}.
 	 */
 	public void testFormat() {
-		LayoutFormatter a = new AuthorAndsReplacer();
+		LayoutFormatter a = new AuthorFirstLastOxfordCommas();
 
 		// Empty case
 		assertEquals("", a.format(""));
 
-		// Single Names don't change
-		assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
+		// Single Names
+		assertEquals("Van Something Someone", a.format("Someone, Van Something"));
 
-		// Two names just an &
-		assertEquals("John Smith & Black Brown, Peter", a
-			.format("John Smith and Black Brown, Peter"));
+		// Two names
+		assertEquals("John von Neumann and Peter Black Brown", a
+			.format("John von Neumann and Peter Black Brown"));
 
-		// Three names put a comma:
-		assertEquals("von Neumann, John; Smith, John & Black Brown, Peter", a
+		// Three names
+		assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
 			.format("von Neumann, John and Smith, John and Black Brown, Peter"));
 
-		assertEquals("John von Neumann; John Smith & Peter Black Brown", a
-			.format("John von Neumann and John Smith and Peter Black Brown"));
+		assertEquals("John von Neumann, John Smith, and Peter Black Brown", a
+			.format("John von Neumann and John Smith and Black Brown, Peter"));
 	}
+
 
 }
