@@ -83,7 +83,8 @@ public class ImportFormatReader {
     formats.add(new JstorImporter());
     formats.add(new SilverPlatterImporter());
     formats.add(new BiomailImporter());
-    formats.add(new RepecNepImporter());    
+    formats.add(new RepecNepImporter());  
+    formats.add(new PdfXmpImporter());
     
     // add all custom importers
     for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {
