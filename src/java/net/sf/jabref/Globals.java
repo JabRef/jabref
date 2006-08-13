@@ -367,28 +367,40 @@ public class Globals {
 
     }
 
-    /*    public static void setupKeyBindings(JabRefPreferences prefs) {
-    }*/
+    /**
+	 * Will return the names of multiple files selected in the given directory
+	 * and the given extensions.
+	 * 
+	 * Will return an empty String array if no entry is found.
+	 * 
+	 * @param owner
+	 * @param directory
+	 * @param extension
+	 * @param updateWorkingdirectory
+	 * @return
+	 */
+	public static String[] getMultipleFiles(JFrame owner, File directory, String extension,
+		boolean updateWorkingdirectory) {
 
+		OpenFileFilter off = null;
+		if (extension == null)
+			off = new OpenFileFilter();
+		else if (!extension.equals(NONE))
+			off = new OpenFileFilter(extension);
 
-    public static String[] getMultipleFiles(JFrame owner,
-                                          File directory, String extension,
-                                          boolean updateWorkingdirectory) {
+		Object files = getNewFileImpl(owner, directory, extension, null, off,
+			JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true);
 
-        OpenFileFilter off = null;
-        if (extension == null)
-          off = new OpenFileFilter();
-        else if (!extension.equals(NONE))
-          off = new OpenFileFilter(extension);
-        Object o = getNewFileImpl(owner, directory, extension, null, off,
-                JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true);
-        String[] toReturn;
-        if (o instanceof String[])
-            toReturn = (String[])o;
-        else toReturn = new String[] {(String)o};
-
-        return toReturn;
-    }
+		if (files instanceof String[]) {
+			return (String[]) files;
+		}
+		// Fix for:
+		// http://sourceforge.net/tracker/index.php?func=detail&aid=1538769&group_id=92314&atid=600306
+		if (files != null) {
+			return new String[] { (String) files };
+		}
+		return new String[0];
+	}
 
   public static String getNewFile(JFrame owner,
                                   File directory, String extension,
