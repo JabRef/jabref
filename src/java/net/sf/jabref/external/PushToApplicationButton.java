@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup
@@ -30,6 +31,7 @@ public class PushToApplicationButton implements ActionListener {
     private JPopupMenu popup = null;
     private HashMap actions = new HashMap();
     private final Dimension buttonDim = new Dimension(23, 23);
+    private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
 
     public PushToApplicationButton(JabRefFrame frame, List pushActions) {
         this.frame = frame;
@@ -41,7 +43,7 @@ public class PushToApplicationButton implements ActionListener {
         comp = new JPanel();
         comp.setLayout(new BorderLayout());
 
-        menuButton = new JButton(GUIGlobals.getImage("smallArrowDown"));
+        menuButton = new JButton(new ImageIcon(ARROW_ICON));
         menuButton.setMargin(new Insets(0,0,0,0));
         menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
                 menuButton.getIcon().getIconHeight()));
