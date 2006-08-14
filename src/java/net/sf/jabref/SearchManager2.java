@@ -358,13 +358,20 @@ settings.add(select);
         searchOptions.put("option",searchField.getText()) ;
         SearchRuleSet searchRules = new SearchRuleSet() ;
         SearchRule rule1;
+
+        rule1 = new BasicSearch(Globals.prefs.getBoolean("caseSensitiveSearch"),
+                Globals.prefs.getBoolean("regExpSearch"));
+
+        /*
         if (Globals.prefs.getBoolean("regExpSearch"))
             rule1 = new RegExpRule(
                     Globals.prefs.getBoolean("caseSensitiveSearch"));
-        else
+        else {
             rule1 = new SimpleSearchRule(
                     Globals.prefs.getBoolean("caseSensitiveSearch"));
 
+        }
+        */
         try {
             // this searches specified fields if specified,
             // and all fields otherwise

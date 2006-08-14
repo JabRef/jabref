@@ -4,22 +4,19 @@ import net.sf.jabref.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.*;
 import java.util.List;
 import java.util.Iterator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Apr 4, 2006
- * Time: 7:31:00 PM
- * To change this template use File | Settings | File Templates.
+ * An Action class representing the process of invoking a PushToApplication operation.
  */
 public class PushToApplicationAction extends AbstractAction implements Runnable {
     private PushToApplication operation;
     private JabRefFrame frame;
     private BasePanel panel;
     private BibtexEntry[] entries;
-
+    
     public PushToApplicationAction(JabRefFrame frame, PushToApplication operation) {
         this.frame = frame;
         putValue(SMALL_ICON, operation.getIcon());

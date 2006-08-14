@@ -1,0 +1,151 @@
+package net.sf.jabref.external;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.FocusRequester;
+
+import javax.swing.*;
+import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+/**
+ * Customized UI component for pushing to external applications. Has a selection popup
+ * menu to change the selected external application.
+ * This class implements the ActionListener interface. When actionPerformed() is
+ * invoked, the currently selected PushToApplication is activated. The actionPerformed()
+ * method can be called with a null argument.
+ */
+public class PushToApplicationButton implements ActionListener {
+
+    private JabRefFrame frame;
+    private List pushActions;
+    private JPanel comp;
+    private JButton pushButton, menuButton;
+    private int selected = 0;
+    private JPopupMenu popup = null;
+    private HashMap actions = new HashMap();
+    private final Dimension buttonDim = new Dimension(23, 23);
+
+    public PushToApplicationButton(JabRefFrame frame, List pushActions) {
+        this.frame = frame;
+        this.pushActions = pushActions;
+        init();
+    }
+
+    private void init() {
+        comp = new JPanel();
+        comp.setLayout(new BorderLayout());
+
+        menuButton = new JButton(GUIGlobals.getImage("smallArrowDown"));
+        menuButton.setMargin(new Insets(0,0,0,0));
+        menuButton.setPreferredSize(new Dimension(menuButton.getIcon().getIconWidth(),
+                menuButton.getIcon().getIconHeight()));
+        menuButton.addActionListener(new MenuButtonActionListener());
+        menuButton.setToolTipText(Globals.lang("Select external application"));
+        pushButton = new JButton();
+        if (Globals.prefs.hasKey("pushToApplication")) {
+            String appSelected = Globals.prefs.get("pushToApplication");
+            for (int i=0; i<pushActions.size(); i++) {
+                PushToApplication toApp = (PushToApplication)pushActions.get(i);
+                if (toApp.getName().equals(appSelected)) {
+                    selected = i;
+                    break;
+                }
+            }
+        }
+
+        setSelected(selected);
+        pushButton.addActionListener(this);
+
+        comp.add(pushButton, BorderLayout.CENTER);
+        comp.add(menuButton, BorderLayout.EAST);
+        //comp.setBorder(BorderFactory.createLineBorder(Color.gray));
+        comp.setMaximumSize(comp.getPreferredSize());
+
+
+    }
+
+    /**
+     * Create a selection menu for the available "Push" options.
+     */
+    private void buildPopupMenu() {
+        popup = new JPopupMenu();
+        int j=0;
+        for (Iterator i = pushActions.iterator(); i.hasNext();) {
+            PushToApplication application = (PushToApplication) i.next();
+            JMenuItem item = new JMenuItem(application.getName(),
+                    application.getIcon());
+            item.addActionListener(new PopupItemActionListener(j));
+            popup.add(item);
+            j++;
+        }
+    }
+
+    /**
+     * Update the PushButton to default to the given application.
+     * @param i The List index of the application to default to.
+     */
+    private void setSelected(int i) {
+        this.selected = i;
+        PushToApplication toApp = (PushToApplication)pushActions.get(i);
+        pushButton.setIcon(toApp.getIcon());
+        pushButton.setToolTipText(toApp.getTooltip());
+        pushButton.setPreferredSize(buttonDim);
+        Globals.prefs.put("pushToApplication", toApp.getName());
+    }
+
+    /**
+     * Get the toolbar component for the push button.
+     * @return The component.
+     */
+    public Component getComponent() {
+        return comp;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        PushToApplication toApp = (PushToApplication)pushActions.get(selected);
+
+        // Lazy initialization of the push action:
+        PushToApplicationAction action = (PushToApplicationAction)actions.get(toApp);
+        if (action == null) {
+            action = new PushToApplicationAction(frame, toApp);
+            actions.put(toApp, action);
+        }
+        action.actionPerformed(new ActionEvent(toApp, 0, "push"));
+    }
+
+    class PopupItemActionListener implements ActionListener {
+        private int index;
+        public PopupItemActionListener(int index) {
+            this.index = index;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            // Change the selection:
+            setSelected(index);
+            // Invoke the selected operation (is that expected behaviour?):
+            PushToApplicationButton.this.actionPerformed(null);
+            // It makes sense to transfer focus to the push button after the
+            // menu closes:
+            pushButton.requestFocus();
+        }
+    }
+
+
+    class MenuButtonActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            // Lazy initialization of the popup menu:
+            if (popup == null)
+                buildPopupMenu();
+            popup.show(comp, 0, menuButton.getHeight());
+        }
+    }
+
+
+}

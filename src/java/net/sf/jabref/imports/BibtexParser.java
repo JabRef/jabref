@@ -308,8 +308,17 @@ public class BibtexParser
 
                 if (isEntry) // True if not comment, preamble or string.
                 {
-                    //try
-                    //{
+                    /** Morten Alver 13 Aug 2006:
+                     * Trying to make the parser more robust. If an exception is thrown when parsing
+                     * an entry, drop the entry and try to resume parsing. Add a warning for the
+                     * user.
+                     *
+                     * An alternative solution is to try rescuing the entry for which parsing failed,
+                     * by returning the entry with the exception and adding it before parsing is
+                     * continued.
+                     */
+                    try
+                    {
                         BibtexEntry be = parseEntry(tp);
 
                         boolean duplicateKey = _db.insertEntry(be);
@@ -320,9 +329,13 @@ public class BibtexParser
                             _pr.addWarning(Globals.lang("empty BibTeX key")+": "+be.getAuthorTitleYear(40)
                                     + " (" + Globals.lang("grouping may not work for this entry") + ")");
                         }
-                    //} catch (IOException ex) {
-                    //    ex.printStackTrace();
-                    //}
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        _pr.addWarning(Globals.lang("Error occured when parsing entry")+
+                                ": '"+ex.getMessage()+"'. "
+                                +Globals.lang("Skipped entry.")); 
+
+                    }
                 }
 
                 skipWhitespace();

@@ -48,6 +48,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.MainTable;
 import net.sf.jabref.imports.ImportMenuItem;
 import net.sf.jabref.imports.OpenDatabaseAction;
@@ -268,8 +269,8 @@ public class EntryTableTransferHandler extends TransferHandler {
                 // we should offer options for autolinking to this files:
                 if (dropRow >= 0) {
                     boolean local = true; // TODO: need to signal if this is a local or autodownloaded file
-               //     DroppedFileHandler dfh = new DroppedFileHandler(frame, panel); // TODO: make this an instance variable?
-               //     dfh.handleDroppedfile(fileNames[i], fileType, local, entryTable, dropRow);
+                    DroppedFileHandler dfh = new DroppedFileHandler(frame, panel); // TODO: make this an instance variable?
+                    dfh.handleDroppedfile(fileNames[i], fileType, local, entryTable, dropRow);
                 }
                 continue;
             }

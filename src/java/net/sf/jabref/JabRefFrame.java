@@ -1230,11 +1230,22 @@ public JabRefPreferences prefs() {
     tlb.add(highlightAll);
 
     tlb.addSeparator();
-    tlb.addAction(emacsPushAction);
-    tlb.addAction(lyxPushAction);
-    tlb.addAction(winEdtPushAction);
+
+      // Removing the separate push-to buttons, replacing them by the
+      // multipurpose button:
+      //tlb.addAction(emacsPushAction);
+      //tlb.addAction(lyxPushAction);
+      //tlb.addAction(winEdtPushAction);
+      List pushs = new ArrayList();
+      pushs.add(new PushToLyx());
+      pushs.add(new PushToEmacs());
+      pushs.add(new PushToWinEdt());
+      pushs.add(new PushToLatexEditor());
+      tlb.add(new PushToApplicationButton(this, pushs).getComponent());
+
     tlb.addAction(openFile);
     tlb.addAction(openUrl);
+
 
     //tlb.addSeparator();
     //tlb.addAction(showPrefs);

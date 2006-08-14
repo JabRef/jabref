@@ -15,12 +15,13 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Util;
 
-import org.jempbox.xmp.XMPMetadata;
-import org.jempbox.xmp.XMPSchema;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.jempbox.xmp.XMPSchema;
+import org.jempbox.xmp.XMPMetadata;
 
 public class XMPSchemaBibtex extends XMPSchema {
 
