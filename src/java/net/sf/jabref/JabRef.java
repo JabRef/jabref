@@ -76,8 +76,7 @@ public class JabRef {
 
     public JabRef(String[] args) {
 
-
-        ths = this;
+    	ths = this;
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
         Globals.setLanguage(prefs.get("language"), "");
@@ -199,8 +198,6 @@ public class JabRef {
             System.out.println(Globals.lang("Available import formats") + ":\n"
                 + importFormats);
 
-            // + ": biblioscape, bibtexml, endnote, inspec,\n\tisi, medline, ovid,
-            // ris, scifinder, sixpack, jstor, silverplatter.");
             // To specify export formats, we need to take the custom export formats
             // into account.
             // So we iterate through the custom formats and add them.

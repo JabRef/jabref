@@ -1466,8 +1466,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * prompted for an entry type.
      *
      * @param type The type of the entry to create.
+     * @return The newly created BibtexEntry or null the operation was canceled by the user.
      */
-    public void newEntry(BibtexEntryType type) {
+    public BibtexEntry newEntry(BibtexEntryType type) {
         if (type == null) {
             // Find out what type is wanted.
             EntryTypeDialog etd = new EntryTypeDialog(frame);
@@ -1505,10 +1506,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));
+                return be;
             } catch (KeyCollisionException ex) {
                 Util.pr(ex.getMessage());
             }
         }
+        return null;
     }
 
 

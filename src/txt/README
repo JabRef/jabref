@@ -84,6 +84,7 @@ Change log:
         - Removed unnecessary output text when scanning for external file changes.
         - Added first version of support for XMP-metadata in PDFs.
           - "Import into..." 
+          - Integrate with copy/move/link.
         - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
         - Added LayoutFormatters that print the Oxford comma.
         - Added missing space between abbreviated author first names:
