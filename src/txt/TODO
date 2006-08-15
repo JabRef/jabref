@@ -1,0 +1,11 @@
+
+Chris:
+------
+  * Write XMP documentation html
+  * Add extra-button to push XMP to all pdfs.
+  * Think about synchronizing XMP.
+  * Document data schema used (BibteXmp)
+  * Add build.xml target to export standalone XMPUtil for the CLI.
+  * FindFiles.
+  
+  
