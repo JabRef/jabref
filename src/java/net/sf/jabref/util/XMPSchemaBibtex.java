@@ -15,7 +15,6 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Util;
 
-import org.jdom.Attribute;
 import org.jempbox.xmp.XMPMetadata;
 import org.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;
