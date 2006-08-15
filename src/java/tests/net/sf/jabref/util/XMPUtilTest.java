@@ -718,17 +718,17 @@ public class XMPUtilTest extends TestCase {
 		String xmp = XMPUtil.toXMP(c);
 
 		/* Test minimal syntaxical completeness */
-		assertTrue(xmp.contains("xpacket"));
-		assertTrue(xmp.contains("adobe:ns:meta"));
-		assertTrue(xmp.contains("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>")
-			|| xmp.contains("bibtex:bibtexkey="));
-		assertTrue(xmp.contains("<rdf:li>Norton Bar</rdf:li>"));
-		assertTrue(xmp.contains("id='W5M0MpCehiHzreSzNTczkc9d'?>")
-			|| xmp.contains("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"));
-		assertTrue(xmp.contains("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
-			|| xmp.contains("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
-		assertTrue(xmp.contains("<rdf:Description"));
-		assertTrue(xmp.contains("<?xpacket end='w'?>") || xmp.contains("<?xpacket end=\"w\"?>"));
+		assertTrue(0 < xmp.indexOf("xpacket"));
+		assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
+		assertTrue(0 < xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>")
+			|| 0 < xmp.indexOf("bibtex:bibtexkey="));
+		assertTrue(0 < xmp.indexOf("<rdf:li>Norton Bar</rdf:li>"));
+		assertTrue(0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>")
+			|| 0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"));
+		assertTrue(0 < xmp.indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
+			|| 0 < xmp.indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
+		assertTrue(0 < xmp.indexOf("<rdf:Description"));
+		assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>") || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
 		/* Test contents of string */
 		writeManually(pdfFile, xmp);
@@ -944,17 +944,17 @@ public class XMPUtilTest extends TestCase {
 			String xmp = s.toString();
 
 			/* Test minimal syntaxical completeness */
-			assertTrue(xmp.contains("xpacket"));
-			assertTrue(xmp.contains("adobe:ns:meta"));
-			assertTrue(xmp.contains("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>")
-				|| xmp.contains("bibtex:bibtexkey="));
-			assertTrue(xmp.contains("<rdf:li>K. Crowston</rdf:li>"));
-			assertTrue(xmp.contains("id='W5M0MpCehiHzreSzNTczkc9d'?>")
-				|| xmp.contains("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"));
-			assertTrue(xmp.contains("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
-				|| xmp.contains("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
-			assertTrue(xmp.contains("<rdf:Description"));
-			assertTrue(xmp.contains("<?xpacket end='w'?>") || xmp.contains("<?xpacket end=\"w\"?>"));
+			assertTrue(0 < xmp.indexOf("xpacket"));
+			assertTrue(0 < xmp.indexOf("adobe:ns:meta"));
+			assertTrue(0 < xmp.indexOf("<bibtex:bibtexkey>canh05</bibtex:bibtexkey>")
+				|| 0 < xmp.indexOf("bibtex:bibtexkey="));
+			assertTrue(0 < xmp.indexOf("<rdf:li>K. Crowston</rdf:li>"));
+			assertTrue(0 < xmp.indexOf("id='W5M0MpCehiHzreSzNTczkc9d'?>")
+				|| 0 < xmp.indexOf("id=\"W5M0MpCehiHzreSzNTczkc9d\"?>"));
+			assertTrue(0 < xmp.indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
+				|| 0 < xmp.indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
+			assertTrue(0 < xmp.indexOf("<rdf:Description"));
+			assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>") || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
 			/* Test contents of string */
 			writeManually(pdfFile, xmp);

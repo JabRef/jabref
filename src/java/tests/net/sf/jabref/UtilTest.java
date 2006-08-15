@@ -72,7 +72,6 @@ public class UtilTest extends TestCase {
 		assertEquals("bye", Util.parseField("\"bye\""));
 		
 		// Concatenation
-		// TODO: Well the function is wrong :-) another bug.
 		assertEquals("longlonglonglong", Util.parseField("\"long\" # \"long\" # \"long\" # \"long\""));
 		
 		assertEquals("hallo#bye#", Util.parseField("{hallo} # bye"));

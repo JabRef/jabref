@@ -15,13 +15,13 @@ import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Util;
 
-
+import org.jdom.Attribute;
+import org.jempbox.xmp.XMPMetadata;
+import org.jempbox.xmp.XMPSchema;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.jempbox.xmp.XMPSchema;
-import org.jempbox.xmp.XMPMetadata;
 
 public class XMPSchemaBibtex extends XMPSchema {
 
@@ -82,43 +82,43 @@ public class XMPSchemaBibtex extends XMPSchema {
 	public void setTextProperty(String field, String value) {
 		super.setTextProperty(makeProperty(field), value);
 	}
-	
-	public List getBagList(String bagName){
+
+	public List getBagList(String bagName) {
 		return super.getBagList(makeProperty(bagName));
 	}
-	
-	public void removeBagValue(String bagName, String value){
+
+	public void removeBagValue(String bagName, String value) {
 		super.removeBagValue(makeProperty(bagName), value);
 	}
-	
-	public void addBagValue(String bagName, String value){
+
+	public void addBagValue(String bagName, String value) {
 		super.addBagValue(makeProperty(bagName), value);
 	}
-	 
-	public List getSequenceList(String seqName){
+
+	public List getSequenceList(String seqName) {
 		return super.getSequenceList(makeProperty(seqName));
 	}
-	
-	public void removeSequenceValue(String seqName, String value){
+
+	public void removeSequenceValue(String seqName, String value) {
 		super.removeSequenceValue(makeProperty(seqName), value);
 	}
-	
-	public void addSequenceValue(String seqName, String value){
+
+	public void addSequenceValue(String seqName, String value) {
 		super.addSequenceValue(makeProperty(seqName), value);
 	}
-	
-	public List getSequenceDateList(String seqName) throws IOException{
+
+	public List getSequenceDateList(String seqName) throws IOException {
 		return super.getSequenceDateList(makeProperty(seqName));
 	}
-	
-	public void removeSequenceDateValue(String seqName, Calendar date){
+
+	public void removeSequenceDateValue(String seqName, Calendar date) {
 		super.removeSequenceDateValue(makeProperty(seqName), date);
 	}
-	
-	public void addSequenceDateValue(String field, Calendar date){
+
+	public void addSequenceDateValue(String field, Calendar date) {
 		super.addSequenceDateValue(makeProperty(field), date);
 	}
-	
+
 	/**
 	 * Returns a map of all properties and their values. LIs in seqs are
 	 * concatenated using " and ".
@@ -163,45 +163,48 @@ public class XMPSchemaBibtex extends XMPSchema {
 						} else {
 							seq.append(" and ");
 						}
-						seq.append(li.getTextContent());
+						seq.append(getTextContent(li));
 					}
 					if (seq != null) {
 						result.put(split[1], seq.toString());
 					}
 				} else {
-					result.put(split[1], node.getTextContent());
+					result.put(split[1], getTextContent(node));
 				}
 			}
 		}
-		
+
 		// Then check Attributes
 		NamedNodeMap attrs = getElement().getAttributes();
 		int m = attrs.getLength();
-		for (int j = 0; j < m; j++){
+		for (int j = 0; j < m; j++) {
 			Node attr = attrs.item(j);
 
 			String nodeName = attr.getNodeName();
 			String[] split = nodeName.split(":");
 			if (split.length == 2 && split[0].equals("bibtex")) {
-				result.put(split[1], attr.getTextContent());
+				result.put(split[1], attr.getNodeValue());
 			}
 		}
-		
+
 		/*
-		 *  Collapse Whitespace
-		 *  
-		 *  Quoting from http://www.gerg.ca/software/btOOL/doc/bt_postprocess.html:
-		 *  <cite>
-		 *  "The exact rules for collapsing whitespace are simple: non-space whitespace characters (tabs and newlines mainly) are converted to space, any strings of more than one space within are collapsed to a single space, and any leading or trailing spaces are deleted."
-		 *  </cite>
+		 * Collapse Whitespace
+		 * 
+		 * Quoting from
+		 * http://www.gerg.ca/software/btOOL/doc/bt_postprocess.html: <cite>
+		 * "The exact rules for collapsing whitespace are simple: non-space
+		 * whitespace characters (tabs and newlines mainly) are converted to
+		 * space, any strings of more than one space within are collapsed to a
+		 * single space, and any leading or trailing spaces are deleted."
+		 * </cite>
 		 */
 		Set entries = result.entrySet();
 		Iterator it = entries.iterator();
-		while (it.hasNext()){
-			Map.Entry entry = (Map.Entry)it.next();
-			entry.setValue( ((String)entry.getValue()).replaceAll("\\s+", " ").trim());
+		while (it.hasNext()) {
+			Map.Entry entry = (Map.Entry) it.next();
+			entry.setValue(((String) entry.getValue()).replaceAll("\\s+", " ").trim());
 		}
-		
+
 		return result;
 	}
 
@@ -211,11 +214,10 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 		for (int i = 0; i < fields.length; i++) {
 			if (fields[i].equals("author") || fields[i].equals("editor")) {
-				setPersonList(fields[i].toString(), entry.getField(fields[i].toString())
-					.toString());
+				setPersonList(fields[i].toString(), entry.getField(fields[i].toString()).toString());
 			} else {
-				setTextProperty(fields[i].toString(), entry.getField(
-					fields[i].toString()).toString());
+				setTextProperty(fields[i].toString(), entry.getField(fields[i].toString())
+					.toString());
 			}
 		}
 		setTextProperty("entrytype", entry.getType().getName());
@@ -236,6 +238,28 @@ public class XMPSchemaBibtex extends XMPSchema {
 		Map text = getAllProperties();
 		e.setField(text);
 		return e;
-		
+
 	}
+
+	/**
+	 * Taken from DOM2Utils.java:
+	 * 
+	 * JBoss, the OpenSource EJB server
+	 * 
+	 * Distributable under LGPL license. See terms of license at gnu.org.
+	 */
+	public static String getTextContent(Node node) {
+		boolean hasTextContent = false;
+		StringBuffer buffer = new StringBuffer();
+		NodeList nlist = node.getChildNodes();
+		for (int i = 0; i < nlist.getLength(); i++) {
+			Node child = nlist.item(i);
+			if (child.getNodeType() == Node.TEXT_NODE) {
+				buffer.append(child.getNodeValue());
+				hasTextContent = true;
+			}
+		}
+		return (hasTextContent ? buffer.toString() : "");
+	}
+
 }
