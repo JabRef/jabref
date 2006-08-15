@@ -13,3 +13,5 @@ build.number
 classes
 jabref.jpx
 jabref.oif
+build.properties
+.settings
