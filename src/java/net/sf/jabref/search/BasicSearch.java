@@ -7,6 +7,7 @@ import net.sf.jabref.export.layout.format.RemoveBrackets;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,12 @@ public class BasicSearch implements SearchRule {
             System.out.print("'"+s+"' ");
         }
         System.out.println();
+    }
+
+    public int applyRule(String query, BibtexEntry bibtexEntry) {
+        HashMap map = new HashMap();
+        map.put("1", query);
+        return applyRule(map, bibtexEntry);
     }
 
     public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {

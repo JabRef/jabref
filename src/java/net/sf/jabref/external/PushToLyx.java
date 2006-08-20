@@ -58,6 +58,10 @@ public class PushToLyx implements PushToApplication {
         return Globals.lang("Insert selected citations into LyX/Kile");
     }
 
+    public String getApplicationName() {
+        return "LyX/Kile";
+    }
+
     public String getTooltip() {
         return Globals.lang("Push selection to LyX/Kile");
     }

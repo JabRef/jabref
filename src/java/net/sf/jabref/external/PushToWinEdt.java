@@ -25,6 +25,10 @@ public class PushToWinEdt implements PushToApplication {
         return Globals.lang("Insert selected citations into WinEdt");
     }
 
+    public String getApplicationName() {
+        return "WinEdt";
+    }
+
     public String getTooltip() {
         return Globals.lang("Push selection to WinEdt");
     }

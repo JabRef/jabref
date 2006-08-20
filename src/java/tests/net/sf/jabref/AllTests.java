@@ -7,6 +7,7 @@ import tests.net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviatorTester
 import tests.net.sf.jabref.imports.BibtexParserTest;
 import tests.net.sf.jabref.util.CaseChangerTest;
 import tests.net.sf.jabref.util.XMPUtilTest;
+import tests.net.sf.jabref.search.BasicSearchTest;
 
 public class AllTests {
 
@@ -20,7 +21,8 @@ public class AllTests {
 		suite.addTestSuite(BibtexParserTest.class);
 		suite.addTestSuite(CaseChangerTest.class);
 		suite.addTestSuite(XMPUtilTest.class);
-		//$JUnit-END$
+        suite.addTestSuite(BasicSearchTest.class);
+        //$JUnit-END$
 		return suite;
 	}
 

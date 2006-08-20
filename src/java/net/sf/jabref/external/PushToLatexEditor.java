@@ -22,6 +22,10 @@ public class PushToLatexEditor implements PushToApplication {
         return Globals.menuTitle("Insert selected citations into LatexEditor");
     }
 
+    public String getApplicationName() {
+        return "LatexEditor";
+    }
+
     public String getTooltip() {
         return Globals.lang("Push to LatexEditor");
     }

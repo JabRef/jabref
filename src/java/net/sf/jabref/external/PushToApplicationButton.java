@@ -1,14 +1,12 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.FocusRequester;
+import net.sf.jabref.*;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -23,6 +21,8 @@ import java.net.URL;
  */
 public class PushToApplicationButton implements ActionListener {
 
+    public static List applications;
+
     private JabRefFrame frame;
     private List pushActions;
     private JPanel comp;
@@ -32,6 +32,20 @@ public class PushToApplicationButton implements ActionListener {
     private HashMap actions = new HashMap();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
+    private MenuAction mAction = new MenuAction();
+
+    /**
+     * Set up the current available choices:
+     */
+    static {
+      applications = new ArrayList();
+      applications.add(new PushToLyx());
+      applications.add(new PushToEmacs());
+      applications.add(new PushToWinEdt());
+      applications.add(new PushToLatexEditor());
+
+    }
+
 
     public PushToApplicationButton(JabRefFrame frame, List pushActions) {
         this.frame = frame;
@@ -80,7 +94,7 @@ public class PushToApplicationButton implements ActionListener {
         int j=0;
         for (Iterator i = pushActions.iterator(); i.hasNext();) {
             PushToApplication application = (PushToApplication) i.next();
-            JMenuItem item = new JMenuItem(application.getName(),
+            JMenuItem item = new JMenuItem(application.getApplicationName(),
                     application.getIcon());
             item.addActionListener(new PopupItemActionListener(j));
             popup.add(item);
@@ -99,6 +113,7 @@ public class PushToApplicationButton implements ActionListener {
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
         Globals.prefs.put("pushToApplication", toApp.getName());
+        mAction.setTitle(toApp.getApplicationName());
     }
 
     /**
@@ -107,6 +122,10 @@ public class PushToApplicationButton implements ActionListener {
      */
     public Component getComponent() {
         return comp;
+    }
+
+    public Action getMenuAction() {
+        return mAction;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -149,5 +168,20 @@ public class PushToApplicationButton implements ActionListener {
         }
     }
 
+    class MenuAction extends MnemonicAwareAction {
+
+        public MenuAction() {
+            putValue(ACCELERATOR_KEY, Globals.prefs.getKey("Push to application"));
+        }
+
+        public void setTitle(String appName) {
+            putValue(NAME, Globals.lang("Push entries to external application (%0)",
+                    appName));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            PushToApplicationButton.this.actionPerformed(null);
+        }
+    }
 
 }

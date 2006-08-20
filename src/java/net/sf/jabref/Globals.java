@@ -959,7 +959,7 @@ public class Globals {
     UNICODE_CHARS.put("\u00C1", "A");
     UNICODE_CHARS.put("\u00C2", "A");
     UNICODE_CHARS.put("\u00C3", "A");
-    UNICODE_CHARS.put("\u00C4", "A");
+    UNICODE_CHARS.put("\u00C4", "Ae");
     UNICODE_CHARS.put("\u00C5", "Aa");
     UNICODE_CHARS.put("\u00C6", "Ae");
     UNICODE_CHARS.put("\u00C7", "C");

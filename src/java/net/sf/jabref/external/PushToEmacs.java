@@ -23,6 +23,10 @@ public class PushToEmacs implements PushToApplication {
         return Globals.menuTitle("Insert selected citations into Emacs") ;
     }
 
+    public String getApplicationName() {
+        return "Emacs";
+    }
+
     public String getTooltip() {
         return Globals.lang("Push selection to Emacs");
     }

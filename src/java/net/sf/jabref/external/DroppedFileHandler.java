@@ -145,14 +145,14 @@ public class DroppedFileHandler {
 			return false;
 		}
 
-		List l;
+		List l = null;
 		try {
 			l = XMPUtil.readXMP(fileName);
 		} catch (Exception e) {
 			return false;
 		}
 
-		if (l.size() == 0) {
+		if ((l == null) || (l.size() == 0)) {
 			return false;
 		}
 

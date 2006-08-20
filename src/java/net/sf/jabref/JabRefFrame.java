@@ -285,6 +285,7 @@ public class JabRefFrame
       errorConsole = Globals.errorConsole.getAction(this),
     test = new GeneralAction("test", "Test");
 
+    PushToApplicationButton pushExternalButton;
   /*setupSelector = new GeneralAction("setupSelector", "", "",
           GUIGlobals.pasteIconFile,
           prefs.getKey(")),*/
@@ -399,10 +400,12 @@ public class JabRefFrame
 
 
     setupLayout();
-    setSize(new Dimension(prefs.getInt("sizeX"),
-                          prefs.getInt("sizeY")));
-    setLocation(new Point(prefs.getInt("posX"),
-                          prefs.getInt("posY")));
+      if (Globals.prefs.getBoolean("rememberWindowLocation")) {
+        setSize(new Dimension(prefs.getInt("sizeX"),
+                              prefs.getInt("sizeY")));
+        setLocation(new Point(prefs.getInt("posX"),
+                              prefs.getInt("posY")));
+      }
     tabbedPane.setBorder(null);
     tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
@@ -639,6 +642,9 @@ public JabRefPreferences prefs() {
 
   private void setupLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
+
+      pushExternalButton = new PushToApplicationButton(this,
+              PushToApplicationButton.applications);
     fillMenu();
     createToolBar();
     getContentPane().setLayout(gbl);
@@ -1081,9 +1087,11 @@ public JabRefPreferences prefs() {
 
     tools.addSeparator();
     tools.add(manageSelectors);
-    tools.add(emacsPushAction);
-    tools.add(lyxPushAction);
-    tools.add(winEdtPushAction);
+
+    tools.add(pushExternalButton.getMenuAction());
+    //tools.add(emacsPushAction);
+    //tools.add(lyxPushAction);
+    //tools.add(winEdtPushAction);
     //tools.add(latexEditorPushAction);
     //tools.add(fetchAuthorMedline);
     tools.addSeparator();
@@ -1236,12 +1244,7 @@ public JabRefPreferences prefs() {
       //tlb.addAction(emacsPushAction);
       //tlb.addAction(lyxPushAction);
       //tlb.addAction(winEdtPushAction);
-      List pushs = new ArrayList();
-      pushs.add(new PushToLyx());
-      pushs.add(new PushToEmacs());
-      pushs.add(new PushToWinEdt());
-      pushs.add(new PushToLatexEditor());
-      tlb.add(new PushToApplicationButton(this, pushs).getComponent());
+      tlb.add(pushExternalButton.getComponent());
 
     tlb.addAction(openFile);
     tlb.addAction(openUrl);

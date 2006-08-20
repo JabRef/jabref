@@ -116,6 +116,7 @@ public class JabRefPreferences {
         defaults.put("posY", new Integer(0));
         defaults.put("sizeX", new Integer(840));
         defaults.put("sizeY", new Integer(680));
+        defaults.put("rememberWindowLocation", Boolean.TRUE);
         defaults.put("autoResizeMode", new Integer(JTable.AUTO_RESIZE_OFF));
         defaults.put("tableColorCodesOn", Boolean.TRUE);
         defaults.put("namesAsIs", Boolean.FALSE);
@@ -664,6 +665,7 @@ public class JabRefPreferences {
     }
 
     private void defineDefaultKeyBindings() {
+        defKeyBinds.put("Push to application","ctrl L");
       defKeyBinds.put("Push to LyX","ctrl L");
       defKeyBinds.put("Push to WinEdt","ctrl shift W");
       defKeyBinds.put("Push to Emacs","ctrl shift E");

@@ -13,6 +13,8 @@ public interface PushToApplication {
 
     public String getName();
 
+    public String getApplicationName();
+
     public String getTooltip();
 
     public Icon getIcon();
@@ -37,6 +39,7 @@ public interface PushToApplication {
      * @return true if BibTeX keys are required for this operation.
      */
     public boolean requiresBibtexKeys();
+
 
 
 }
