@@ -9,11 +9,7 @@ import net.sf.jabref.search.BasicSearch;
 import java.util.ArrayList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Aug 20, 2006
- * Time: 6:44:56 PM
- * To change this template use File | Settings | File Templates.
+ * Test case for BasicSearch.
  */
 public class BasicSearchTest extends TestCase {
 
@@ -39,11 +35,11 @@ public class BasicSearchTest extends TestCase {
         assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
         assertEquals(0, bsCaseInsensitiveRegexp.applyRule(query, be));
 
-        query = "\"Marine [A-Za-z]* larviculture\"";
+        query = "\"marine [A-Za-z]* larviculture\"";
 
         assertEquals(0, bsCaseSensitive.applyRule(query, be));
         assertEquals(0, bsCaseInsensitive.applyRule(query, be));
-        assertEquals(1, bsCaseSensitiveRegexp.applyRule(query, be));
+        assertEquals(0, bsCaseSensitiveRegexp.applyRule(query, be));
         assertEquals(1, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         

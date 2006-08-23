@@ -322,7 +322,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             public void update() {
                 if (success) {
-                    frame.setTabTitle(BasePanel.this, file.getName());
+                    frame.setTabTitle(BasePanel.this, file.getName(), file.getAbsolutePath());
                     frame.output(Globals.lang("Saved database")+" '"
                              +file.getPath()+"'.");
                 } else if (!cancelled) {
@@ -1568,6 +1568,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.updateFont();
         mainTable.addSelectionListener(selectionListener);
         mainTable.addMouseListener(selectionListener);
+        mainTable.addKeyListener(selectionListener);
 
         // Add the listener that will take care of highlighting groups as the selection changes:
         groupsHighlightListener = new ListEventListener() {
@@ -2089,7 +2090,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // database has changed.
         String oldTitle = frame.getTabTitle(this);
         if (!oldTitle.endsWith("*"))
-            frame.setTabTitle(this, oldTitle+"*");
+            frame.setTabTitle(this, oldTitle+"*", frame.getTabTooltip(this));
 
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
@@ -2111,9 +2112,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (file != null)
-                frame.setTabTitle(BasePanel.this, file.getName());
+                frame.setTabTitle(BasePanel.this, file.getName(), file.getAbsolutePath());
             else
-                frame.setTabTitle(BasePanel.this, Globals.lang("untitled"));
+                frame.setTabTitle(BasePanel.this, Globals.lang("untitled"), null);
         }
     }
 

@@ -88,7 +88,7 @@ public class MainTable extends JTable {
         setGridColor(Globals.prefs.getColor("gridColor"));
         comparatorChooser = new MyTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
-
+        
         final EventList selected = getSelected();
 
         // enable DnD
@@ -531,5 +531,14 @@ public class MainTable extends JTable {
         TransferHandler handler = getTransferHandler();
         setTransferHandler(null);
         setTransferHandler(handler);
+
+    }
+
+    public int getSortingColumn() {
+        java.util.List l = comparatorChooser.getSortingColumns();
+        if (l.size() == 0)
+            return -1;
+        else
+            return ((Integer)l.get(0)).intValue();
     }
 }

@@ -246,6 +246,9 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * 
 	 * @param s
 	 *            String describing a set of files or URLs dragged into JabRef
+     * @param dropRow The row in the table where the files were dragged.
+     * @return success status for the operation
+     *
 	 */
 	private boolean handleDraggedFilenames(String s, final int dropRow) {
 		// Split into lines:
@@ -275,7 +278,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * 
 	 * @param files
 	 *            A List containing File instances pointing to files.
-	 * @param dropRow
+	 * @param dropRow @param dropRow The row in the table where the files were dragged.
+     * @return success status for the operation
 	 */
 	private boolean handleDraggedFiles(List files, final int dropRow) {
 		final String[] fileNames = new String[files.size()];
@@ -304,7 +308,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * 
 	 * @param fileNames
 	 *            The names of the files to open.
-	 * @param dropRow
+	 * @param dropRow success status for the operation
 	 */
 	private void loadOrImportFiles(String[] fileNames, int dropRow) {
 
@@ -329,7 +333,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 						notBibFiles.add(fileNames[i]);
 					} else {
 						openAction.addNewDatabase(pr, f, true);
-					}
+                        frame.getFileHistory().newFile(fileNames[i]);
+                    }
 				} catch (IOException e) {
 					notBibFiles.add(fileNames[i]);
 					// No error message, since we want to try importing the

@@ -9,6 +9,8 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import javax.swing.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
@@ -18,7 +20,8 @@ import java.io.IOException;
  * Time: 3:02:52 AM
  * To change this template use File | Settings | File Templates.
  */
-public class MainTableSelectionListener implements ListEventListener, MouseListener {
+public class MainTableSelectionListener implements ListEventListener, MouseListener,
+        KeyListener {
 
     PreviewPanel[] previewPanel = null;
     int activePreview = 1;
@@ -28,6 +31,8 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     EventList tableRows;
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
+
+    //private int lastCharPressed = -1;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
@@ -309,4 +314,44 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             }
         }
     }
+
+    /**
+     * Register key event on the main table. If the key is a letter or a digit,
+     * we should select the first entry in the table which starts with the given
+     * letter in the column by which the table is sorted. 
+     * @param e The KeyEvent
+     */
+    public void keyTyped(KeyEvent e) {
+        //System.out.println(e.getKeyChar()+" "+table.getSortingColumn());
+        if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())) {
+            int sortingColumn = table.getSortingColumn();
+            int c = e.getKeyChar();
+
+            if (sortingColumn == -1)
+                return; // No sorting? TODO: look up by author, etc.?
+            // TODO: the following lookup should be done by a faster algorithm,
+            // such as binary search. But the table may not be sorted properly,
+            // due to marked entries, search etc., which rules out the binary search.
+            for (int i=0; i<table.getRowCount(); i++) {
+                Object o = table.getValueAt(i, sortingColumn);
+                if (o == null)
+                    continue;
+                String s = o.toString().toLowerCase();
+                if ((s.length() >= 1) && (s.charAt(0) == c)) {
+                    table.setRowSelectionInterval(i, i);
+                    table.ensureVisible(i);
+                    return;
+                }
+            }
+
+            
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+    }
+
+    public void keyPressed(KeyEvent e) {
+    }
+
 }

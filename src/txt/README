@@ -85,12 +85,18 @@ Change log:
         - Added first version of support for XMP-metadata in PDFs.
           - "Import into..." 
           - Integrate with copy/move/link.
+        - Added tooltips to database tabs showing the file's full path.
         - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
         - Added LayoutFormatters that print the Oxford comma.
         - Added missing space between abbreviated author first names:
-          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
-        - Fixed bug in import dialog.
         - Added LayoutFormatter for HTML paragraphs.
+        - Improved simple search. Words are now treated as separate search terms,
+          and phrases can be indicated with "double quotes".
+          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
+        - When a letter key is pressed in the table, the first entry starting with the
+          same letter (in the current sort column) is selected.
+        - Bib files dragged into JabRef now appear in the Recent files menu.
+        - Fixed bug in import dialog.
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

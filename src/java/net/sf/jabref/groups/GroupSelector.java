@@ -1173,6 +1173,7 @@ public class GroupSelector extends SidePaneComponent implements
                 new TreePath(groupsRoot.getPath()));
     }
 
+
     /** panel may be null to indicate that no file is currently open. */
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
@@ -1201,6 +1202,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
 
         validateTree();
+
     }
 
 

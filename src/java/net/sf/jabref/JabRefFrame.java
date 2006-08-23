@@ -425,13 +425,14 @@ public class JabRefFrame
           highlightAny.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
           highlightAll.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
           Globals.focusListener.setFocused(bp.mainTable);
+          
           new FocusRequester(bp.mainTable);
         }
       }
     });
   }
 
-// -------------------- !!!! NECESSARY ???? OBSOLETE ??? ----------------------
+
   AboutAction aboutAction = new AboutAction();
   class AboutAction
       extends AbstractAction {
@@ -445,7 +446,7 @@ public class JabRefFrame
     }
   }
 
-  // -------------------- !!!! NECESSARY ???? OBSOLETE ??? ----------------------
+
   // General info dialog.  The OSXAdapter calls this method when "About OSXAdapter"
   // is selected from the application menu.
   public void about() {
@@ -786,8 +787,14 @@ public JabRefPreferences prefs() {
     return tabbedPane.getTitleAt(getTabIndex(comp));
   }
 
-  public void setTabTitle(JComponent comp, String s) {
-    tabbedPane.setTitleAt(getTabIndex(comp), s);
+    public String getTabTooltip(JComponent comp) {
+        return tabbedPane.getToolTipTextAt(getTabIndex(comp));
+    }
+
+  public void setTabTitle(JComponent comp, String title, String toolTip) {
+      int index = getTabIndex(comp);
+      tabbedPane.setTitleAt(index, title);
+      tabbedPane.setToolTipTextAt(index, toolTip);
   }
 
   class GeneralAction
@@ -1520,6 +1527,8 @@ public JabRefPreferences prefs() {
     public void addTab(BasePanel bp, File file, boolean raisePanel) {
         tabbedPane.add((file != null ? file.getName(): Globals.lang(GUIGlobals.untitledTitle)),
                        bp);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1,
+                file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
@@ -2022,7 +2031,7 @@ class FetchCiteSeerAction
             }
        */
       addedEntries = database.getEntryCount();
-      tabbedPane.add(Globals.lang("untitled"), bp);
+      tabbedPane.add(GUIGlobals.untitledTitle, bp);
       bp.markBaseChanged();
       tabbedPane.setSelectedComponent(bp);
       if (tabbedPane.getTabCount() == 1) {
