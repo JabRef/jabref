@@ -534,11 +534,37 @@ public class MainTable extends JTable {
 
     }
 
-    public int getSortingColumn() {
+    /**
+     * Get the first comparator set up for the given column.
+     * @param index The column number.
+     * @return The Comparator, or null if none is set.
+     */
+    public Comparator getComparatorForColumn(int index) {
+        java.util.List l = comparatorChooser.getComparatorsForColumn(index);
+        return l.size() == 0 ? null : (Comparator)l.get(0);
+    }
+
+    /**
+     * Find out which column is set as sort column.
+     * @param number The position in the sort hierarchy (primary, secondary, etc.)
+     * @return The sort column number.
+     */
+    public int getSortingColumn(int number) {
         java.util.List l = comparatorChooser.getSortingColumns();
-        if (l.size() == 0)
+        if (l.size() <= number)
             return -1;
         else
-            return ((Integer)l.get(0)).intValue();
+            return ((Integer)l.get(number)).intValue();
+    }
+
+    /**
+     * Returns the List of entries sorted by a user-selected term. This is the
+     * sorting before marking, search etc. applies.
+     *
+     * Note: The returned List must not be modified from the outside
+     * @return The sorted list of entries.
+     */
+    public SortedList getSortedForTable() {
+        return sortedForTable;
     }
 }

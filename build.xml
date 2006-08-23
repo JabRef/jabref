@@ -122,7 +122,7 @@
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
 				<pathelement location="${library.directory}/microba.jar" />
 			</classpath>
 		</java>
@@ -137,7 +137,7 @@
             <pathelement location="${library.directory}/looks-2.0.4.jar" />
             <pathelement location="${library.directory}/forms-1.0.4.jar" />
             <pathelement location="${library.directory}/spin.jar" />
-            <pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+            <pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
         </classpath>
          </nbprofile>
     </target>-->
@@ -151,7 +151,7 @@
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
 			</classpath>
 		</nbprofiledirect>
 
@@ -166,7 +166,7 @@
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
                 <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
                 <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
             </classpath>
@@ -186,7 +186,7 @@
 				<pathelement location="${library.directory}/looks-2.0.4.jar" />
 				<pathelement location="${library.directory}/forms-1.0.4.jar" />
 				<pathelement location="${library.directory}/spin-1.4.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.5.0_java14.jar" />
+				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
 				<pathelement location="${library.directory}/microba.jar" />
                 <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
                 <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
@@ -397,7 +397,7 @@ version=${jabref.version}</echo>
 		<unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/spin-1.4.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/glazedlists-1.5.0_java14.jar" dest="${build.tmp}" />
+		<unjar src="${library.directory}/glazedlists-1.7.0_java14.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
         <unjar src="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" dest="${build.tmp}" />
         <unjar src="${library.directory}/JempBox-0.1.0-dev.jar" dest="${build.tmp}" />

@@ -78,4 +78,11 @@ public class FieldComparator implements Comparator {
         return result*multiplier;
     }
 
+    /**
+     * Returns the field this Comparator compares by.
+     * @return The field name.
+     */
+    public String getFieldName() {
+        return field;
+    }
 }

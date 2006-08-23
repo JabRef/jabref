@@ -3,6 +3,7 @@ package net.sf.jabref.gui;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 
@@ -12,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -316,17 +319,47 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     }
 
     /**
-     * Register key event on the main table. If the key is a letter or a digit,
+     * We should implement a faster method than the one below, but this one doesn't
+     * work currently.
+     * @param e The KeyEvent
+     */
+    public void keyTyped_(KeyEvent e) {
+        //System.out.println(e.getKeyChar()+" "+table.getSortingColumn());
+        if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())) {
+            int sortingColumn = table.getSortingColumn(0);
+            if (sortingColumn < 0)
+                return;
+            Comparator comp = table.getComparatorForColumn(sortingColumn);
+            int piv = 1;
+            while (((sortingColumn = table.getSortingColumn(piv)) >= 0)
+                && ((comp = table.getComparatorForColumn(sortingColumn)) != null)
+                && !(comp instanceof FieldComparator)) {
+                piv++;
+            }
+            if ((comp == null) || !(comp instanceof FieldComparator))
+                return;
+
+            // Ok, after all of this we should have either found a field name to go by
+            String field = ((FieldComparator)comp).getFieldName();
+            System.out.println(String.valueOf(e.getKeyChar())+" "+field);
+            SortedList list = table.getSortedForTable();
+            BibtexEntry testEntry = new BibtexEntry("0");
+            testEntry.setField(field, String.valueOf(e.getKeyChar()));
+            int i = list.sortIndex(testEntry);
+            System.out.println(i);
+        }
+    }
+
+    /**
+     * Receive key event on the main table. If the key is a letter or a digit,
      * we should select the first entry in the table which starts with the given
-     * letter in the column by which the table is sorted. 
+     * letter in the column by which the table is sorted.
      * @param e The KeyEvent
      */
     public void keyTyped(KeyEvent e) {
-        //System.out.println(e.getKeyChar()+" "+table.getSortingColumn());
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())) {
-            int sortingColumn = table.getSortingColumn();
             int c = e.getKeyChar();
-
+            int sortingColumn = table.getSortingColumn(0);
             if (sortingColumn == -1)
                 return; // No sorting? TODO: look up by author, etc.?
             // TODO: the following lookup should be done by a faster algorithm,
