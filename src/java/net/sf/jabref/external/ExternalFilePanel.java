@@ -235,7 +235,9 @@ public class ExternalFilePanel extends JPanel {
                     editor.setEnabled(false);
                     boolean updateEditor = true;
                     try {
+                        String originalText = editor.getText();
                         editor.setText(Globals.lang("Downloading..."));
+                        output(Globals.lang("Downloading..."));
                         url = new URL(res);
 
                         String suffix = off.getSuffix(res);
@@ -261,14 +263,16 @@ public class ExternalFilePanel extends JPanel {
                         File file = new File(new File(directory), plannedName);
 
                         URLDownload udl = new URLDownload(parent, url, file);
-                        output(Globals.lang("Downloading..."));
 
+                        boolean success;
                         try {
                             udl.download();
+                            success = true;
                         } catch (IOException e2) {
                             JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL: "+e2.getMessage()),
                                     Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
                             Globals.logger("Error while downloading " + url.toString());
+                            success = false;
                         }
 
                         // Check if we should update the editor text field, or update the
@@ -288,7 +292,7 @@ public class ExternalFilePanel extends JPanel {
                             }
                             filename = relPath;
                         }
-                        textToSet = filename;
+                        textToSet = success ? filename : originalText;
                         if (updateEditor)
                             SwingUtilities.invokeLater(new Thread() {
                                 public void run() {
@@ -300,7 +304,8 @@ public class ExternalFilePanel extends JPanel {
                             // Editor has probably changed to show a different entry. So
                             // we must update the target entry directly and not set the
                             // text of the editor.
-                            targetEntry.setField(fieldName, textToSet);
+                            if (success)
+                                targetEntry.setField(fieldName, textToSet);
                         }
                     } catch (MalformedURLException e1) {
                         JOptionPane.showMessageDialog(parent, Globals.lang("Invalid URL"),

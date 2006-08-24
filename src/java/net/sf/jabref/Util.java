@@ -683,14 +683,25 @@ public class Util {
 	 *            The URL to sanitize.
 	 * @return Sanitized URL
 	 */
-	private static String sanitizeUrl(String link) throws URISyntaxException {
+	public static String sanitizeUrl(String link) throws URISyntaxException {
 		String scheme = "http";
 		String ssp;
 		if (link.indexOf("//") > 0)
 			ssp = "//" + link.substring(2 + link.indexOf("//"));
 		else
 			ssp = "//" + link;
-		URI uri = new URI(scheme, ssp, null);
+
+        // The following is an ugly hack to fix the problem where a %20 in the
+        // original string (correct encoding of a space) gets returned as %2520
+        // because the URI constructor doesn't recognize that the % is the start of
+        // a sequence. The problem is that other such sequences will meet the same fate.
+        // If we need to take care of all these up front, we might as well not use URI
+        // at all.
+        // Another option is to do two times, hiding the %xx sequences in one of them,
+        // and see if one of the URLs looks good...
+        ssp = ssp.replaceAll("%20", " ");
+
+        URI uri = new URI(scheme, ssp, null);
 		return uri.toASCIIString();
 	}
 

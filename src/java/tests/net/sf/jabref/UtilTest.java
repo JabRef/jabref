@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.Dialog;
 import java.io.StringReader;
 import java.util.HashSet;
+import java.net.URISyntaxException;
 
 import javax.swing.JDialog;
 import javax.swing.JWindow;
@@ -197,4 +198,22 @@ public class UtilTest extends TestCase {
 		assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.", 
 				Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
 	}
+
+    public void testSanitizeUrl() {
+        try {
+
+            assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
+            assertEquals("http://www.vg.no/fil%20e.html",
+                    Util.sanitizeUrl("http://www.vg.no/fil e.html"));
+            assertEquals("http://www.vg.no/fil%20e.html",
+                    Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
+            assertEquals("http://www.vg.no/fil%20e.html",
+                    Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 }
