@@ -138,12 +138,9 @@ public class JabRefFrame
       contents = new HelpAction("Help contents", helpDiag,
                                 GUIGlobals.helpContents, "Help contents",
                                 GUIGlobals.getIconUrl("helpContents")),
-/* old about*/
       about = new HelpAction("About JabRef", helpDiag,
                              GUIGlobals.aboutPage, "About JabRef",
                              GUIGlobals.getIconUrl("about")),
-/**/
-  //    about2 = new NewAboutAction(),
       editEntry = new GeneralAction("edit", "Edit entry",
                                "Edit entry",
                                prefs.getKey("Edit entry")),
@@ -247,6 +244,9 @@ public class JabRefFrame
 
       winEdtPushAction = new PushToApplicationAction(ths, new PushToWinEdt()),
       latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
+      
+      writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs", "Will write XMP-metadata to the PDFs linked from selected entries.", prefs.getKey("writeXMP")),
+      
       openFile = new GeneralAction("openFile", "Open PDF or PS",
                                    "Open PDF or PS",
                                    prefs.getKey("Open PDF or PS")),
@@ -862,7 +862,7 @@ public JabRefPreferences prefs() {
     public void actionPerformed(ActionEvent e) {
       if (tabbedPane.getTabCount() > 0) {
         try {
-          ( (BasePanel) (tabbedPane.getSelectedComponent()))
+          ( (BasePanel) (tabbedPane.getSelectedComponent ()))
               .runCommand(command);
         }
         catch (Throwable ex) {
@@ -1096,6 +1096,8 @@ public JabRefPreferences prefs() {
     tools.add(manageSelectors);
 
     tools.add(pushExternalButton.getMenuAction());
+    tools.add(writeXmpAction);
+    
     //tools.add(emacsPushAction);
     //tools.add(lyxPushAction);
     //tools.add(winEdtPushAction);

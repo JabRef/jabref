@@ -28,36 +28,84 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import java.util.List;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.UnsupportedCharsetException;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
-import javax.swing.undo.*;
-import net.sf.jabref.collab.*;
-import net.sf.jabref.export.*;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+
+import net.sf.jabref.collab.ChangeScanner;
+import net.sf.jabref.collab.FileUpdateListener;
+import net.sf.jabref.collab.FileUpdatePanel;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.RtfSelection;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.*;
-import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.groups.GroupSelector;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.gui.GlazedEntrySorter;
+import net.sf.jabref.gui.MainTable;
+import net.sf.jabref.gui.MainTableFormat;
+import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.imports.AppendDatabaseAction;
+import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
+import net.sf.jabref.undo.CountingUndoManager;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableChangeType;
+import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.undo.UndoableKeyChange;
+import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.Matcher;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.matchers.Matcher;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.event.ListEvent;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -935,6 +983,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 
+          
+        
+          
+          
          actions.put("openFile", new BaseAction() {
            public void action() {
              (new Thread() {
@@ -1317,8 +1369,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           });
 
-
-
+        actions.put("writeXMP", new WriteXMPAction(this));
+        
         actions.put("abbreviateIso", new AbbreviateAction(this, true));
         actions.put("abbreviateMedline", new AbbreviateAction(this, false));
         actions.put("unabbreviate", new UnabbreviateAction(this));

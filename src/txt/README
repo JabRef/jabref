@@ -85,6 +85,7 @@ Change log:
         - Added first version of support for XMP-metadata in PDFs.
           - "Import into..." 
           - Integrate with copy/move/link.
+          - Added option to write all/selected PDFs in database
         - Added tooltips to database tabs showing the file's full path.
         - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
         - Added LayoutFormatters that print the Oxford comma.
