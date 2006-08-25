@@ -357,7 +357,9 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
      * @param e The KeyEvent
      */
     public void keyTyped(KeyEvent e) {
-        if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())) {
+        if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
+	    //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
+	    && (e.getModifiers() == 0)) {
             int c = e.getKeyChar();
             int sortingColumn = table.getSortingColumn(0);
             if (sortingColumn == -1)
