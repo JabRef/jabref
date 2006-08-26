@@ -103,21 +103,17 @@ public class PrefsDialog3 extends JDialog {
     al.add(ADV);
     main.setLayout(cardLayout);
 
-        main.add(new GeneralTab(frame, _prefs), GEN);
+    main.add(new GeneralTab(frame, _prefs), GEN);
+    main.add(new AdvancedTab(_prefs, parent.helpDiag), ADV);
+    main.add(new GroupsPrefsTab(_prefs), GRP);
+    main.add(new AppearancePrefsTab(_prefs), APP);
+    main.add(new ExternalTab(frame, _prefs, parent.helpDiag), EXT);
+    main.add(new TablePrefsTab(_prefs, parent), TAB);
+    main.add(new TableColumnsTab(_prefs, parent), COL);
+    main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
+    main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
 
-        main.add(new AdvancedTab(_prefs, parent.helpDiag), ADV);
-    
-
-
-
-        main.add(new GroupsPrefsTab(_prefs), GRP);
-        main.add(new AppearancePrefsTab(_prefs), APP);
-        main.add(new ExternalTab(frame, _prefs), EXT);
-        main.add(new TablePrefsTab(_prefs, parent), TAB);
-        main.add(new TableColumnsTab(_prefs, parent), COL);
-        main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
-        main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
-        //main.add(new ManageJournalsPanel(frame), JOU);
+    //main.add(new ManageJournalsPanel(frame), JOU);
 
     upper.setBorder(BorderFactory.createEtchedBorder());
 

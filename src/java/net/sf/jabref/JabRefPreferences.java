@@ -327,8 +327,16 @@ public class JabRefPreferences {
         externalFileTypes.put("doc", new ExternalFileType("Word file", "doc", "oowriter", null));
         externalFileTypes.put("odt", new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
 
+        String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
+        defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
     }
-
+    
+    public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
+    public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
+    public static final String USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
+    
     public boolean putBracesAroundCapitals(String fieldName) {
         return putBracesAroundCapitalsFields.contains(fieldName);
     }

@@ -18,43 +18,173 @@ import net.sf.jabref.imports.ParserResult;
  */
 public class UtilFindFileTest extends TestCase {
 
+	String findFile(String dir, String file) {
+		return Util.findFile(entry, database, dir, file, true);
+	}
+
+	/**
+	 * Test that more than one slash is taken to mean that a relative path is to
+	 * be returned.
+	 * 
+	 * @throws IOException
+	 */
+	public void testFindFileRelative() throws IOException {
+
+		// Most basic case
+		assertEqualPaths("HipKro03.pdf", findFile(root.getAbsolutePath() + "/test/",
+			"[bibtexkey].pdf"));
+
+		// Including directory
+		assertEqualPaths("test/HipKro03.pdf", findFile(root.getAbsolutePath(),
+			"test/[bibtexkey].pdf"));
+
+		// No relative paths
+		assertEqualPaths(new File(root, "/test/HipKro03.pdf").getCanonicalPath(), findFile(null,
+			root.getAbsolutePath() + "/test/" + "[bibtexkey].pdf"));
+
+		// No relative paths
+		assertEqualPaths(new File(root, "/test/HipKro03.pdf").getCanonicalPath(), Util.findFile(
+			entry, database, root.getAbsolutePath() + "/test/" + "[bibtexkey].pdf"));
+
+	}
+	
+	
+	
+
+	public void testFindPdf() throws IOException {
+
+		{
+			String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath());
+			assertEqualPaths("HipKro03 - Hello.pdf", pdf);
+
+			File fullPath = Util.expandFilename(pdf, root.getAbsolutePath());
+			assertTrue(fullPath.exists());
+		}
+		{
+			String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
+
+			assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+
+			File fullPath = Util.expandFilename(pdf, root.getAbsolutePath() + "/pdfs/");
+			assertTrue(fullPath.exists());
+		}
+	}
+
+	public void testFindPdfInMultiple() throws IOException {
+
+		{
+			String[] dirsToSearch = new String[] { root.getAbsolutePath(),
+				root.getAbsolutePath() + "/pdfs/" };
+			String pdf = Util.findPdf(entry, "pdf", dirsToSearch);
+			assertEqualPaths("HipKro03 - Hello.pdf", pdf);
+
+			File fullPath = Util.expandFilename(pdf, dirsToSearch);
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
+				.getAbsolutePath());
+
+			String tmp = dirsToSearch[1];
+			dirsToSearch[1] = dirsToSearch[0];
+			dirsToSearch[0] = tmp;
+
+			fullPath = Util.expandFilename(pdf, dirsToSearch);
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
+				.getAbsolutePath());
+
+			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[0] });
+			assertEquals(null, fullPath);
+
+			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[1] });
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf", fullPath
+				.getAbsolutePath());
+		}
+
+		{
+			String[] dirsToSearch = new String[] { root.getAbsolutePath() + "/pdfs/",
+				root.getAbsolutePath() };
+			String pdf = Util.findPdf(entry, "pdf", dirsToSearch);
+			assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+
+			File fullPath = Util.expandFilename(pdf, dirsToSearch);
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+				.getAbsolutePath());
+
+			String tmp = dirsToSearch[1];
+			dirsToSearch[1] = dirsToSearch[0];
+			dirsToSearch[0] = tmp;
+
+			fullPath = Util.expandFilename(pdf, dirsToSearch);
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+				.getAbsolutePath());
+
+			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[0] });
+			assertEquals(null, fullPath);
+
+			fullPath = Util.expandFilename(pdf, new String[] { dirsToSearch[1] });
+			assertTrue(fullPath.exists());
+			assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf", fullPath
+				.getAbsolutePath());
+		}
+
+	}
+
 	public void testFindFile() throws IOException {
 
-		assertEqualPaths(
-			new File(root, "/test/HipKro03.pdf").getCanonicalPath(), 
-			Util.findFile(entry, database, root.getAbsolutePath() + "/test/", "[bibtexkey].pdf"));
+		// Simple case
+		assertEqualPaths("HipKro03.pdf", Util.findFile(entry, database, root.getAbsolutePath()
+			+ "/test/", "[bibtexkey].pdf", true));
+
+		// Not found
+		assertEqualPaths(null, Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+			"Not there [bibtexkey].pdf", true));
+
+		// Test current dir
+		assertEqualPaths(new File(new File("."), "build.xml").getCanonicalPath(), Util.findFile(
+			entry, database, "./build.xml"));
+		assertEqualPaths("build.xml", Util.findFile(entry, database, ".", "build.xml", true));
 
 		// Test keys in path and regular expression in file
-		assertEqualPaths(
-			new File(new File("."), "build.xml").getCanonicalPath(),
-			Util.findFile(entry, database, "", "build.xml"));
-
-		// Test keys in path and regular expression in file
-		assertEqualPaths(
-			new File(root, "/2003/Paper by HipKro03.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath() + "/[year]/", ".*[bibtexkey].pdf"));
+		assertEqualPaths(new File(root, "/2003/Paper by HipKro03.pdf").getCanonicalPath(), Util
+			.findFile(entry, database, root.getAbsolutePath() + "/[year]/.*[bibtexkey].pdf"));
 
 		// Test . and ..
-		assertEqualPaths(
-			new File(root, "/Organization Science/HipKro03 - Hello.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath()
-				+ "/[year]/../2003/.././././[journal]\\", ".*[bibtexkey].*.pdf"));
+		assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
+			.getCanonicalPath(), Util.findFile(entry, database, root.getAbsolutePath()
+			+ "/[year]/../2003/.././././[journal]\\" + ".*[bibtexkey].*.pdf"));
+
+		// Test Escape
+		assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
+			.getCanonicalPath(), Util.findFile(entry, database, root.getAbsolutePath() + "/*/"
+			+ "[bibtexkey] - Hello\\\\.pdf"));
+
+		assertEqualPaths("TE.ST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+			"TE\\\\.ST", true));
+		assertEqualPaths(".TEST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+			"\\\\.TEST", true));
+		assertEqualPaths("TEST[", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+			"TEST\\\\[", true));
 
 		// Test *
-		assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath() + "/*/", "[bibtexkey].+\\.pdf"));
+		assertEqualPaths(new File(root, "/Organization Science/HipKro03 - Hello.pdf")
+			.getCanonicalPath(), Util.findFile(entry, database, root.getAbsolutePath() + "/*/"
+			+ "[bibtexkey].+?.pdf"));
 
 		// Test **
-		assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath() + "/**", "[bibtexkey]-sub.pdf"));
-		
+		assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), Util
+			.findFile(entry, database, root.getAbsolutePath() + "/**/" + "[bibtexkey]-sub.pdf"));
+
 		// Test ** - Find in level itself too
-		assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath() + "/pdfs/sub/**", "[bibtexkey]-sub.pdf"));
+		assertEqualPaths(new File(root, "/pdfs/sub/HipKro03-sub.pdf").getCanonicalPath(), Util
+			.findFile(entry, database, root.getAbsolutePath() + "/pdfs/sub/**/"
+				+ "[bibtexkey]-sub.pdf"));
 
 		// Test ** - Find lowest level first (Rest is Depth first)
-		assertEqualPaths(new File(root, "/HipKro03 - Hello.pdf").getCanonicalPath(),
-			Util.findFile(entry, database, root.getAbsolutePath() + "/**", "[bibtexkey].*Hello.pdf"));
+		assertEqualPaths(new File(root, "/HipKro03 - Hello.pdf").getCanonicalPath(), Util.findFile(
+			entry, database, root.getAbsolutePath() + "/**/" + "[bibtexkey].*Hello.pdf"));
 	}
 
 	BibtexDatabase database;
@@ -74,9 +204,9 @@ public class UtilFindFileTest extends TestCase {
 				+ "  volume = {14},\n"
 				+ "  pages = {209--223},\n"
 				+ "  number = {2},\n"
-				+ "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
-				+ "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" 
-				+ "}");
+				+ "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
+				+ "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
+				+ "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}");
 
 		BibtexParser parser = new BibtexParser(reader);
 		ParserResult result = null;
@@ -97,13 +227,13 @@ public class UtilFindFileTest extends TestCase {
 
 			File subDir1 = new File(root, "Organization Science");
 			subDir1.mkdir();
-			
+
 			File pdf1 = new File(subDir1, "HipKro03 - Hello.pdf");
 			pdf1.createNewFile();
 
 			File pdf1a = new File(root, "HipKro03 - Hello.pdf");
 			pdf1a.createNewFile();
-			
+
 			File subDir2 = new File(root, "pdfs");
 			subDir2.mkdir();
 
@@ -128,6 +258,15 @@ public class UtilFindFileTest extends TestCase {
 			File pdf4 = new File(dirTest, "HipKro03.pdf");
 			pdf4.createNewFile();
 
+			File pdf5 = new File(dirTest, ".TEST");
+			pdf5.createNewFile();
+
+			File pdf6 = new File(dirTest, "TEST[");
+			pdf6.createNewFile();
+
+			File pdf7 = new File(dirTest, "TE.ST");
+			pdf7.createNewFile();
+
 			File foo = new File(dirTest, "foo.dat");
 			foo.createNewFile();
 
@@ -139,18 +278,22 @@ public class UtilFindFileTest extends TestCase {
 	public void tearDown() {
 		deleteRecursive(root);
 	}
-	
+
 	/**
 	 * Will check if two paths are the same.
 	 */
 	public static void assertEqualPaths(String path1, String path2) {
 		// System.out.println(path1);
+
+		if (path1 == path2)
+			return;
+
 		if ((path1 == null || path2 == null) && path1 != path2)
-			fail("Path1 was: " + path1 + " but Path2 was: " + path2);
+			fail("Expected: " + path1 + " but was: " + path2);
 
 		assertEquals(path1.replaceAll("\\\\", "/"), path2.replaceAll("\\\\", "/"));
 	}
-	
+
 	/**
 	 * Creates a temp directory in the System temp directory.
 	 * 

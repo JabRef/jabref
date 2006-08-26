@@ -121,7 +121,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 // Check if a link is set:
                 if ((old != null) && !((String)old).equals("")) {
                     // Get an absolute path representation:
-                    File file = Util.expandFilename((String)old, dir);
+                    File file = Util.expandFilename((String)old, new String[]{dir, "."});;
 
                     if ((file == null) || !file.exists()) {
 

@@ -1,154 +1,205 @@
 package net.sf.jabref;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.builder.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 
-    JabRefPreferences _prefs;
-    JabRefFrame _frame;
-    //private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
-    JTextField pdfDir, psDir, pdf, ps, html, lyx, winEdt, citeCommand;
+	JabRefPreferences _prefs;
 
-    //private HelpAction ownerHelp, pdfHelp;
+	JabRefFrame _frame;
 
+	// private JComboBox language = new
+	// JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
+	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, citeCommand;
 
-    public ExternalTab(JabRefFrame frame, JabRefPreferences prefs) {
-        _prefs = prefs;
-        _frame = frame;
-        setLayout(new BorderLayout());
+	ItemListener regExpListener;
 
-        //pdfHelp = new HelpAction(frame.helpDiag, GUIGlobals.pdfHelp,
-        //        "Help", GUIGlobals.helpSmallIconFile);
+	JCheckBox useRegExpComboBox;
 
-        psDir = new JTextField(30);
-        pdfDir = new JTextField(30);
-        pdf = new JTextField(30);
-        ps = new JTextField(30);
-        html = new JTextField(30);
-        lyx = new JTextField(30);
-        winEdt = new JTextField(30);
-        citeCommand = new JTextField(30);
-        BrowseAction browse;
+	public ExternalTab(JabRefFrame frame, JabRefPreferences prefs, HelpDialog helpDialog) {
+		_prefs = prefs;
+		_frame = frame;
+		setLayout(new BorderLayout());
 
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:200dlu, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
-                        "");
+		psDir = new JTextField(30);
+		pdfDir = new JTextField(30);
+		pdf = new JTextField(30);
+		ps = new JTextField(30);
+		html = new JTextField(30);
+		lyx = new JTextField(30);
+		winEdt = new JTextField(30);
+		citeCommand = new JTextField(30);
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+		regExpTextField = new JTextField(30);
 
-        builder.appendSeparator(Globals.lang("PDF links"));
-        JPanel pan = new JPanel();
-        builder.append(pan);
-        JLabel lab = new JLabel(Globals.lang("Main PDF directory") + ":");
-        builder.append(lab);
-        builder.append(pdfDir);
-        browse = new BrowseAction(_frame, pdfDir, true);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        builder.appendSeparator(Globals.lang("PS links"));
-        pan = new JPanel();
-        builder.append(pan);
-        lab = new JLabel(Globals.lang("Main PS directory") + ":");
-        builder.append(lab);
-        builder.append(psDir);
-        browse = new BrowseAction(_frame, psDir, true);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        builder.appendSeparator(Globals.lang("External programs"));
+		useRegExpComboBox = new JCheckBox(Globals.lang("Use Regular Expression Search"));
+		regExpListener = new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				regExpTextField.setEditable(useRegExpComboBox.isSelected());
+				if (useRegExpComboBox.isSelected()) {
+					regExpTextField.setText(Globals.prefs
+						.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
+				} else {
+					Globals.prefs.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY,
+						regExpTextField.getText());
+					regExpTextField.setText(Globals.prefs
+						.get(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY));
+				}
+			}
+		};
+		useRegExpComboBox.addItemListener(regExpListener);
 
+		BrowseAction browse;
 
-        builder.nextLine();
-        lab = new JLabel(Globals.lang("Path to PDF viewer") + ":");
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(pdf);
-        browse = new BrowseAction(_frame, pdf, false);
-        if (Globals.ON_WIN)
-            browse.setEnabled(false);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        lab = new JLabel(Globals.lang("Path to PS viewer") + ":");
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(ps);
-        browse = new BrowseAction(_frame, ps, false);
-        if (Globals.ON_WIN)
-            browse.setEnabled(false);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        lab = new JLabel(Globals.lang("Path to HTML viewer") + ":");
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(html);
-        browse = new BrowseAction(_frame, html, false);
-        if (Globals.ON_WIN)
-            browse.setEnabled(false);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        lab = new JLabel(Globals.lang("Path to LyX pipe") + ":");
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(lyx);
-        browse = new BrowseAction(_frame, lyx, false);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        lab = new JLabel(Globals.lang("Path to WinEdt.exe") + ":");
-        builder.append(pan);
-        builder.append(lab);
-        builder.append(winEdt);
-        browse = new BrowseAction(_frame, winEdt, false);
-        builder.append(new JButton(browse));
-        builder.nextLine();
-        builder.append(pan);
-        builder.append(Globals.lang("Cite command (for Emacs/WinEdt)")+":");
-        builder.append(citeCommand);
-        //builder.appendSeparator();
+		FormLayout layout = new FormLayout(
+			"1dlu, 8dlu, left:pref, 4dlu, fill:200dlu, 4dlu, fill:pref",// 4dlu,
+																		// left:pref,
+																		// 4dlu",
+			"");
 
-        pan = builder.getPanel();
-        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        add(pan, BorderLayout.CENTER);
-    }
+		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-    public void setValues() {
-        pdfDir.setText(_prefs.get("pdfDirectory"));
-        psDir.setText(_prefs.get("psDirectory"));
-        if (!Globals.ON_WIN) {
-            pdf.setText(_prefs.get("pdfviewer"));
-            ps.setText(_prefs.get("psviewer"));
-            html.setText(_prefs.get("htmlviewer"));
-        } else {
-            pdf.setText(Globals.lang("Uses default application"));
-            ps.setText(Globals.lang("Uses default application"));
-            html.setText(Globals.lang("Uses default application"));
-            pdf.setEnabled(false);
-            ps.setEnabled(false);
-            html.setEnabled(false);
-        }
+		builder.appendSeparator(Globals.lang("PDF and PS links"));
+		JPanel pan = new JPanel();
+		builder.append(pan);
+		JLabel lab = new JLabel(Globals.lang("Main PDF directory") + ":");
+		builder.append(lab);
+		builder.append(pdfDir);
+		browse = new BrowseAction(_frame, pdfDir, true);
+		builder.append(new JButton(browse));
+		builder.nextLine();
 
-        lyx.setText(_prefs.get("lyxpipe"));
-        winEdt.setText(_prefs.get("winEdtPath"));
-        citeCommand.setText(_prefs.get("citeCommand"));
-    }
+		pan = new JPanel();
+		builder.append(pan);
+		lab = new JLabel(Globals.lang("Main PS directory") + ":");
+		builder.append(lab);
+		builder.append(psDir);
+		browse = new BrowseAction(_frame, psDir, true);
+		builder.append(new JButton(browse));
+		builder.nextLine();
 
-    public void storeSettings() {
+		builder.append(new JPanel());
+		builder.append(useRegExpComboBox);
+		builder.append(regExpTextField);
+		Action helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
+			"Help on Regular Expression Search", GUIGlobals.getIconUrl("helpSmall"));
+		JButton helpButton = new JButton(helpAction);
+		helpButton.setText(null);
+		builder.append(helpButton);
+		builder.nextLine();
 
-        // We should maybe do some checking on the validity of the contents?
-        _prefs.put("pdfDirectory", pdfDir.getText());
-        _prefs.put("psDirectory", psDir.getText());
-        _prefs.put("pdfviewer", pdf.getText());
-        _prefs.put("psviewer", ps.getText());
-        _prefs.put("htmlviewer", html.getText());
-        _prefs.put("lyxpipe", lyx.getText());
-        _prefs.put("winEdtPath", winEdt.getText());
-        _prefs.put("citeCommand", citeCommand.getText());
-    }
+		builder.appendSeparator(Globals.lang("External programs"));
 
-    public boolean readyToClose() {
-        return true;
-    }
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Path to PDF viewer") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(pdf);
+		browse = new BrowseAction(_frame, pdf, false);
+		if (Globals.ON_WIN)
+			browse.setEnabled(false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Path to PS viewer") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(ps);
+		browse = new BrowseAction(_frame, ps, false);
+		if (Globals.ON_WIN)
+			browse.setEnabled(false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Path to HTML viewer") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(html);
+		browse = new BrowseAction(_frame, html, false);
+		if (Globals.ON_WIN)
+			browse.setEnabled(false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Path to LyX pipe") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(lyx);
+		browse = new BrowseAction(_frame, lyx, false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Path to WinEdt.exe") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(winEdt);
+		browse = new BrowseAction(_frame, winEdt, false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		builder.append(pan);
+		builder.append(Globals.lang("Cite command (for Emacs/WinEdt)") + ":");
+		builder.append(citeCommand);
+		// builder.appendSeparator();
+
+		pan = builder.getPanel();
+		pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		add(pan, BorderLayout.CENTER);
+	}
+
+	public void setValues() {
+		pdfDir.setText(_prefs.get("pdfDirectory"));
+		psDir.setText(_prefs.get("psDirectory"));
+		if (!Globals.ON_WIN) {
+			pdf.setText(_prefs.get("pdfviewer"));
+			ps.setText(_prefs.get("psviewer"));
+			html.setText(_prefs.get("htmlviewer"));
+		} else {
+			pdf.setText(Globals.lang("Uses default application"));
+			ps.setText(Globals.lang("Uses default application"));
+			html.setText(Globals.lang("Uses default application"));
+			pdf.setEnabled(false);
+			ps.setEnabled(false);
+			html.setEnabled(false);
+		}
+
+		lyx.setText(_prefs.get("lyxpipe"));
+		winEdt.setText(_prefs.get("winEdtPath"));
+		citeCommand.setText(_prefs.get("citeCommand"));
+
+		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
+		useRegExpComboBox.setSelected(_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY));
+		regExpListener.itemStateChanged(null);
+	}
+
+	public void storeSettings() {
+
+		_prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, useRegExpComboBox.isSelected());
+		if (useRegExpComboBox.isSelected()) {
+			_prefs.put(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY, regExpTextField.getText());
+		}
+
+		// We should maybe do some checking on the validity of the contents?
+		_prefs.put("pdfDirectory", pdfDir.getText());
+		_prefs.put("psDirectory", psDir.getText());
+		_prefs.put("pdfviewer", pdf.getText());
+		_prefs.put("psviewer", ps.getText());
+		_prefs.put("htmlviewer", html.getText());
+		_prefs.put("lyxpipe", lyx.getText());
+		_prefs.put("winEdtPath", winEdt.getText());
+		_prefs.put("citeCommand", citeCommand.getText());
+	}
+
+	public boolean readyToClose() {
+		return true;
+	}
 
 }

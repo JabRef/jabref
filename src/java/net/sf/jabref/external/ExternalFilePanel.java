@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -134,7 +135,7 @@ public class ExternalFilePanel extends JPanel {
 		String dir = metaData.getFileDirectory(fieldName);
 		File file = null;
 		if (dir != null) {
-			File tmp = Util.expandFilename(editor.getText(), dir);
+			File tmp = Util.expandFilename(editor.getText(), new String[]{dir,"."});
 			if (tmp != null)
 				file = tmp;
 		}
@@ -345,11 +346,25 @@ public class ExternalFilePanel extends JPanel {
         Thread t = (new Thread() {
             public void run() {
                 Object o = getKey();
-
-                // Find the default directory for this field type:
-                String dir = metaData.getFileDirectory(fieldName);
-
-                String found = Util.findPdf((String) o, fieldName, dir, off);
+                
+                /* Find the following directories to look in for:
+                 * 
+                 * default directory for this field type.
+                 * 
+                 * directory of bibtex-file. // NOT POSSIBLE at the moment.
+                 * 
+                 * JabRef-directory.
+                 */
+                LinkedList list = new LinkedList();
+                list.add(metaData.getFileDirectory(fieldName));
+                
+              /*  File fileOfDb = frame.basePanel().file();
+                if (fileOfDb != null){
+                	list.add(fileOfDb.getParentFile().getPath());
+                }*/
+                list.add(".");
+                
+                String found = Util.findPdf(getEntry(), fieldName, (String[]) list.toArray(new String[list.size()]));//, off);
 
                 // To activate findFile:
                 // String found = Util.findFile(getEntry(), null, dir, ".*[bibtexkey].*");

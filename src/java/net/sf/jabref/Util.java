@@ -36,27 +36,65 @@
 
 package net.sf.jabref;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
-import java.text.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.*;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-import com.jgoodies.forms.builder.*;
-import com.jgoodies.forms.layout.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.external.*;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.undo.*;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.KeywordGroup;
+import net.sf.jabref.imports.CiteSeerFetcher;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Describe class <code>Util</code> here.
@@ -433,8 +471,8 @@ public class Util {
 
 			// Find the default directory for this field type:
 			String dir = metaData.getFileDirectory(fieldName);
-
-			File file = expandFilename(link, dir);
+			
+			File file = expandFilename(link, new String[]{dir, "."});
 
 			// Check that the file exists:
 			if ((file == null) || !file.exists()) {
@@ -619,7 +657,7 @@ public class Util {
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
 		if (dir != null) {
-			File tmp = expandFilename(link, dir);
+			File tmp = expandFilename(link, new String[]{dir, "."});
 			if (tmp != null)
 				file = tmp;
 		}
@@ -732,28 +770,37 @@ public class Util {
 
 	/**
 	 * New version of findPdf that uses findFiles.
+	 * 
+	 * The search pattern will be read from the preferences.
+	 * 
+	 * The [extension]-tags in this pattern will be replace by the given extension parameter.
+	 * 
 	 */
 	public static String findPdf(BibtexEntry entry, String extension, String directory) {
-
-		try {
-			directory = new File(directory).getCanonicalPath();
-		} catch (IOException e) {
-			return null;
-		}
-		if (!directory.endsWith(System.getProperty("file.separator")))
-			directory += System.getProperty("file.separator");
-
-		// System.out.println("Trying to find: " + directory);
-		// System.out.println(".*[bibtexkey].*\\." + extension);
-		String result = findFile(entry, null, directory + "**"
-			+ System.getProperty("file.separator"), ".*[bibtexkey].*\\." + extension);
-
-		// Return a relative path
-		if (result != null)
-			result = result.substring(directory.length());
-		return result;
+		return findPdf(entry, extension, new String[]{directory});
 	}
 
+	/**
+	 * Convenience method for findPDF. Can search multiple PDF directories.
+	 */
+	public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
+
+		String regularExpression;
+		if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)){
+			regularExpression = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
+		} else {
+			regularExpression = Globals.prefs.get(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY);
+		}
+		regularExpression = regularExpression.replaceAll("\\[extension\\]", extension);
+		
+		for (int i = 0; i < directories.length; i++) {
+			System.out.println(directories[i]);
+		}
+		
+		return findFile(entry, null, directories, regularExpression, true);
+	}
+	
+	
 	/**
 	 * Searches the given directory and file name pattern for a file for the
 	 * bibtexentry.
@@ -763,32 +810,53 @@ public class Util {
 	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
 	 * 
 	 * Requirements:
+	 * 
 	 *  - Be able to find the associated PDF in a set of given directories.
-	 *  - Be able to return a relative path or absolute path. -> This is not
-	 * implemented
+	 *  
+	 *  - Be able to return a relative path or absolute path. 
+	 *
 	 *  - Be fast.
+	 *  
 	 *  - Allow for flexible naming schemes in the PDFs.
 	 * 
-	 * Syntax scheme:
-	 *  * Any subDir ** Any subDir (recursiv) [key] Key from bibtex file and
-	 * database .* Anything else is taken to be a Regular expression.
+	 * Syntax scheme for file:
+	 * <ul>
+	 *   <li>* Any subDir</li>
+	 *   <li>** Any subDir (recursiv)</li>
+	 *   <li>[key] Key from bibtex file and database</li> 
+	 *   <li>.* Anything else is taken to be a Regular expression.</li>
+	 * </ul>
 	 * 
 	 * @param entry
 	 *            non-null
 	 * @param database
 	 *            non-null
 	 * @param directory
-	 *            non-null
+	 * 				A set of root directories to start the search from.
+	 * 				Paths are returned relative to these directories if
+	 * 				relative is set to true. These directories will not 
+	 * 				be expanded or anything. Use the file attribute for 
+	 * 				this.
 	 * @param file
 	 *            non-null
+	 *            
+	 * @param relative
+	 *            whether to return relative file paths or absolute ones
 	 * 
 	 * @return Will return the first file found to match the given criteria or
 	 *         null if none was found.
 	 */
-	public static String findFile(BibtexEntry entry, BibtexDatabase database, String directory,
-		String file) {
+	public static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
+		String file, boolean relative) {
 
-		return findFile(new File("."), entry, database, directory, file);
+		for (int i = 0; i < directory.length; i++){
+		
+			String result = findFile(entry, database, directory[i], file, relative);
+			if (result != null){
+				return result;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -858,58 +926,102 @@ public class Util {
 	}
 
 	/**
+	 * Convenience function for absolute search.
+     *
+     * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
+	 */
+	public static String findFile(BibtexEntry entry, BibtexDatabase database, String file){
+		return findFile(entry, database, (String)null, file, false);
+	}	
+	
+	/**
 	 * Internal Version of findFile, which also accepts a current directory to
 	 * base the search on.
 	 * 
-	 * @param currentDirectory
-	 * @param entry
-	 * @param database
-	 * @param directory
-	 * @param file
-	 * @return
 	 */
-	protected static String findFile(File currentDirectory, BibtexEntry entry,
-		BibtexDatabase database, String directory, String file) {
+	public static String findFile(BibtexEntry entry,
+		BibtexDatabase database, String directory, String file, boolean relative) {
 
-		if (directory.length() > 0) {
+		File root;
+		if (directory == null){
+			root = new File(".");
+		} else {
+			root = new File(directory);
+		}
+		if (!root.exists())
+			return null;
+	
+		String found = findFile(entry, database, root, file);
+		
+		if (directory == null || !relative){
+			return found;
+		}
+		
+		if (found != null){
+			try {
+				return found.substring(root.getCanonicalPath().length() + 1);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * The actual work-horse. Will find absolute filepaths starting from the given directory using the given regular expression string for search.
+	 */
+	protected static String findFile(BibtexEntry entry,
+		BibtexDatabase database, File directory, String file) {
 
-			String[] dirs = directory.split("(\\\\|/)");
+		if (file.startsWith("/")){
+			directory = new File(".");
+			file = file.substring(1);
+		}
+		
+		// Escape handling...
+		Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
+		StringBuffer s = new StringBuffer();
+		while (m.find()) {
+			m.appendReplacement(s, m.group(1) + "/" + m.group(2));
+		}
+		m.appendTail(s);
+		file = s.toString();
+		String[] fileParts = file.split("/");
+		
+		if (fileParts.length == 0)
+			return null;
+		
+		if (fileParts.length > 1){
 
-			for (int i = 0; i < dirs.length; i++) {
+			for (int i = 0; i < fileParts.length - 1; i++) {
 
-				// System.out.println(currentDirectory);
-
-				String dirToProcess = dirs[i];
-
+				String dirToProcess = fileParts[i];	
+				
 				dirToProcess = expandBrackets(dirToProcess, entry, database);
 
-				if (dirToProcess.equals("")) { // Linux Root Path
-					currentDirectory = new File("/");
-					continue;
-				}
 				if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-					currentDirectory = new File(dirToProcess + "/");
+					directory = new File(dirToProcess + "/");
 					continue;
 				}
 				if (dirToProcess.equals(".")) { // Stay in current directory
 					continue;
 				}
 				if (dirToProcess.equals("..")) {
-					currentDirectory = new File(currentDirectory.getParent());
+					directory = new File(directory.getParent());
 					continue;
 				}
 				if (dirToProcess.equals("*")) { // Do for all direct subdirs
 
-					File[] subDirs = currentDirectory.listFiles();
+					File[] subDirs = directory.listFiles();
 					if (subDirs == null)
 						return null; // No permission?
 
-					String restOfDirString = join(dirs, "/", i + 1, dirs.length);
+					String restOfFileString = join(fileParts, "/", i + 1, fileParts.length);
 
 					for (int sub = 0; sub < subDirs.length; sub++) {
 						if (subDirs[sub].isDirectory()) {
-							String result = findFile(subDirs[sub], entry, database,
-								restOfDirString, file);
+							String result = findFile(entry, database,
+								subDirs[sub], restOfFileString);
 							if (result != null)
 								return result;
 						}
@@ -919,14 +1031,13 @@ public class Util {
 				// Do for all direct and indirect subdirs
 				if (dirToProcess.equals("**")) {
 					List toDo = new LinkedList();
-					toDo.add(currentDirectory);
+					toDo.add(directory);
 
-					String restOfDirString = join(dirs, "/", i + 1, dirs.length);
+					String restOfFileString = join(fileParts, "/", i + 1, fileParts.length);
 
 					// Before checking the subdirs, we first check the current
 					// dir
-					String result = findFile(currentDirectory, entry, database, restOfDirString,
-						file);
+					String result = findFile(entry, database, directory, restOfFileString);
 					if (result != null)
 						return result;
 
@@ -940,7 +1051,9 @@ public class Util {
 						toDo.addAll(Arrays.asList(subDirs));
 
 						for (int sub = 0; sub < subDirs.length; sub++) {
-							result = findFile(subDirs[sub], entry, database, restOfDirString, file);
+							if (!subDirs[sub].isDirectory())
+								continue;
+							result = findFile(entry, database, subDirs[sub], restOfFileString);
 							if (result != null)
 								return result;
 						}
@@ -949,9 +1062,9 @@ public class Util {
 					return null;
 				}
 
-				final Pattern toMatch = Pattern.compile(dirToProcess);
+				final Pattern toMatch = Pattern.compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
 
-				File[] matches = currentDirectory.listFiles(new FilenameFilter() {
+				File[] matches = directory.listFiles(new FilenameFilter() {
 					public boolean accept(File arg0, String arg1) {
 						return toMatch.matcher(arg1).matches();
 					}
@@ -959,19 +1072,19 @@ public class Util {
 				if (matches == null || matches.length == 0)
 					return null;
 
-				currentDirectory = matches[0];
+				directory = matches[0];
 
-				if (!currentDirectory.exists())
+				if (!directory.exists())
 					return null;
 
 			} // End process directory information
 		}
 		// Last step check if the given file can be found in this directory
-		String filenameToLookFor = expandBrackets(file, entry, database);
+		String filenameToLookFor = expandBrackets(fileParts[fileParts.length - 1], entry, database);
 
-		final Pattern toMatch = Pattern.compile("^" + filenameToLookFor + "$");
+		final Pattern toMatch = Pattern.compile("^" + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$");
 
-		File[] matches = currentDirectory.listFiles(new FilenameFilter() {
+		File[] matches = directory.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
 				return toMatch.matcher(arg1).matches();
 			}
@@ -1044,6 +1157,24 @@ public class Util {
 	/**
 	 * Converts a relative filename to an absolute one, if necessary. Returns
 	 * null if the file does not exist.
+	 * 
+	 * Will look in each of the given dirs starting from the beginning and returning the first found file to match if any.
+	 */
+	public static File expandFilename(String name, String[] dir) {
+		
+		for (int i = 0; i < dir.length; i++) {
+			File result = expandFilename(name, dir[i]);
+			if (result != null){
+				return result;
+			}
+		}
+	
+		return null;
+	}
+	
+	/**
+	 * Converts a relative filename to an absolute one, if necessary. Returns
+	 * null if the file does not exist.
 	 */
 	public static File expandFilename(String name, String dir) {
 		// System.out.println("expandFilename: name="+name+"\t dir="+dir);
@@ -1072,7 +1203,7 @@ public class Util {
 					// workaround for catching Java bug in regexp replacer
 					// and, why, why, why ... I don't get it - wegner 2006/01/22
 					try {
-						name = name.replaceAll("/", "\\");
+						name = name.replaceAll("/", "\\\\");
 					} catch (java.lang.StringIndexOutOfBoundsException exc) {
 						System.err.println("An internal Java error was caused by the entry " + "\""
 							+ name + "\"");

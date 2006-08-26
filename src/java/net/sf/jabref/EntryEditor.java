@@ -47,14 +47,14 @@ import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.gui.date.*;
 
+/**
+ * GUI component that allows editing of the fields of a BibtexEntry.
+ * EntryTypeForm also registers itself as a VetoableChangeListener, receiving
+ * events whenever a field of the entry changes, enabling the text fields to
+ * update themselves if the change is made from somewhere else.
+ */
 public class EntryEditor extends JPanel implements VetoableChangeListener {
-  /*
-   * GUI component that allows editing of the fields of a BibtexEntry.
-   * EntryTypeForm also registers itself as a VetoableChangeListener, receiving
-   * events whenever a field of the entry changes, enabling the text fields to
-   * update themselves if the change is made from somewhere else.
-   */
-
+  
   // A reference to the entry this object works on.
   private BibtexEntry entry;
   BibtexEntryType type;

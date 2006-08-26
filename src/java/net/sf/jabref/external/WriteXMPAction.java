@@ -110,7 +110,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 			String dir = panel.metaData().getFileDirectory("pdf");
 
-			File file = Util.expandFilename(pdf, dir);
+			File file = Util.expandFilename(pdf, new String[]{dir,"."});
 
 			optDiag.progressArea.append(entry.getCiteKey() + "\n");
 
