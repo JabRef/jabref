@@ -7,6 +7,8 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
@@ -195,6 +197,9 @@ public class UtilFindFileTest extends TestCase {
 
 	public void setUp() {
 
+		Globals.prefs = JabRefPreferences.getInstance();
+		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
+		
 		StringReader reader = new StringReader(
 			"@ARTICLE{HipKro03,\n"
 				+ "  author = {Eric von Hippel and Georg von Krogh},\n"

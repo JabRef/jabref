@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+import net.sf.jabref.util.CaseChanger;
 
 /**
  * Importer for the ISI Web of Science format.
@@ -24,9 +25,18 @@ import net.sf.jabref.Util;
  * <li>http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
  * 
+ * Todo:
+ * <ul>
+ * <li>Check compatibility with other ISI2Bib tools like:
+ * http://www-lab.imr.tohoku.ac.jp/~t-nissie/computer/software/isi/ or
+ * http://www.tug.org/tex-archive/biblio/bibtex/utils/isi2bibtex/isi2bibtex or
+ * http://web.mit.edu/emilio/www/utils.html</li>
+ * <li>Deal with capitalization correctly</li>
+ * </ul>
+ * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- *
+ * 
  */
 public class IsiImporter extends ImportFormat {
 	/**
@@ -69,6 +79,54 @@ public class IsiImporter extends ImportFormat {
 		}
 
 		return false;
+	}
+
+	static Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
+
+	static public void processSubSup(HashMap map) {
+
+		String[] subsup = { "title", "abstract", "review", "notes" };
+
+		for (int i = 0; i < subsup.length; i++) {
+			if (map.containsKey(subsup[i])) {
+
+				Matcher m = subsupPattern.matcher((String) map.get(subsup[i]));
+				StringBuffer sb = new StringBuffer();
+
+				while (m.find()) {
+
+					String group2 = m.group(2);
+					if (group2.length() > 1) {
+						group2 = "{" + group2 + "}";
+					}
+					if (m.group(1).equals("sub")) {
+						m.appendReplacement(sb, "\\$_" + group2 + "\\$");
+					} else {
+						m.appendReplacement(sb, "\\$^" + group2 + "\\$");
+					}
+				}
+				m.appendTail(sb);
+				map.put(subsup[i], sb.toString());
+			}
+		}
+	}
+
+	static public void processCapitalization(HashMap map) {
+
+		String[] subsup = { "title", "journal", "publisher" };
+
+		for (int i = 0; i < subsup.length; i++) {
+
+			if (map.containsKey(subsup[i])) {
+
+				String s = (String) map.get(subsup[i]);
+
+				if (s.toUpperCase().equals(s)) {
+					s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
+					map.put(subsup[i], s);
+				}
+			}
+		}
 	}
 
 	/**
@@ -124,7 +182,7 @@ public class IsiImporter extends ImportFormat {
 			String pages = "";
 			hm.clear();
 
-			for (int j = 0; j < fields.length; j++) {
+			nextField: for (int j = 0; j < fields.length; j++) {
 				// empty field don't do anything
 				if (fields[j].length() <= 2)
 					continue;
@@ -146,9 +204,8 @@ public class IsiImporter extends ImportFormat {
 				} else if (beg.equals("JO"))
 					hm.put("booktitle", value);
 				else if (beg.equals("AU")) {
-					String author = isiAuthorsConvert(value
-						.replaceAll("EOLEOL", " and ")); 
-					
+					String author = isiAuthorsConvert(value.replaceAll("EOLEOL", " and "));
+
 					// if there is already someone there then append with "and"
 					if (hm.get("author") != null)
 						author = (String) hm.get("author") + " and " + author;
@@ -180,25 +237,52 @@ public class IsiImporter extends ImportFormat {
 					hm.put("year", value);
 				else if (beg.equals("VL"))
 					hm.put("volume", value);
+				else if (beg.equals("PU"))
+					hm.put("publisher", value);
 				else if (beg.equals("PD")) {
+
 					String[] parts = value.split(" ");
 					for (int ii = 0; ii < parts.length; ii++) {
 						if (Globals.MONTH_STRINGS.containsKey(parts[ii].toLowerCase())) {
 							hm.put("month", "#" + parts[ii].toLowerCase() + "#");
+							continue nextField;
 						}
 					}
+
+					// Try two digit month
+					for (int ii = 0; ii < parts.length; ii++) {
+						int number;
+						try {
+							number = Integer.parseInt(parts[ii]);
+							if (number >= 1 && number <= 12) {
+								hm.put("month", "#" + Globals.MONTHS[number - 1] + "#");
+								continue nextField;
+							}
+						} catch (NumberFormatException e) {
+
+						}
+					}
+
 				} else if (beg.equals("DT")) {
 					Type = value;
 					if (Type.equals("Review")) {
+						Type = "article"; // set "Review" in Note/Comment?
+					} else if (Type.startsWith("Article") || Type.startsWith("Journal")
+						|| PT.equals("article")) {
 						Type = "article";
-						// set "Review" in Note/Comment?
-					} else if (!Type.equals("Article") && !PT.equals("Journal"))
+						continue;
+					} else {
 						Type = "misc";
-					else
-						Type = "article";
-				} // ignore
-				else if (beg.equals("CR"))
+					}
+				} else if (beg.equals("CR")) {
 					hm.put("CitedReferences", value.replaceAll("EOLEOL", " ; ").trim());
+				} else {
+					// Preserve all other entries except
+					if (beg.equals("ER") || beg.equals("EF") || beg.equals("VR")
+						|| beg.equals("FN"))
+						continue nextField;
+					hm.put(beg, value);
+				}
 			}
 
 			if (!"".equals(pages))
@@ -209,8 +293,8 @@ public class IsiImporter extends ImportFormat {
 				continue;
 
 			BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
-				.getEntryType(Type)); // id assumes an existing database
-			// so don't
+				.getEntryType(Type));
+			// id assumes an existing database so don't
 
 			// Remove empty fields:
 			ArrayList toRemove = new ArrayList();
@@ -224,6 +308,11 @@ public class IsiImporter extends ImportFormat {
 				hm.remove(iterator.next());
 
 			}
+
+			// Polish entries
+			processSubSup(hm);
+			processCapitalization(hm);
+
 			b.setField(hm);
 
 			bibitems.add(b);
@@ -249,7 +338,7 @@ public class IsiImporter extends ImportFormat {
 		String first = s[1].trim();
 
 		first = first.replaceAll("\\.|\\s", "");
-		
+
 		StringBuffer sb = new StringBuffer();
 		sb.append(last).append(", ");
 
@@ -263,14 +352,14 @@ public class IsiImporter extends ImportFormat {
 	}
 
 	public static String[] isiAuthorsConvert(String[] authors) {
-		
+
 		String[] result = new String[authors.length];
-		for (int i = 0; i < result.length; i++){
+		for (int i = 0; i < result.length; i++) {
 			result[i] = isiAuthorConvert(authors[i]);
 		}
 		return result;
 	}
-	
+
 	public static String isiAuthorsConvert(String authors) {
 		String[] s = isiAuthorsConvert(authors.split(" and "));
 		return Util.join(s, " and ", 0, s.length);
