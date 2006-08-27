@@ -16,8 +16,10 @@ public class AllTests {
 		suite.addTestSuite(AuthorFirstFirstTest.class);
 		suite.addTestSuite(AuthorFirstLastOxfordCommasTest.class);
 		suite.addTestSuite(AuthorAbbreviatorTest.class);
+		suite.addTestSuite(ResolvePDFTest.class);
 		suite.addTestSuite(AuthorAndsReplacerTest.class);
 		suite.addTestSuite(AuthorLastFirstAbbrCommasTest.class);
+		suite.addTestSuite(HTMLParagraphsTest.class);
 		suite.addTestSuite(AuthorLastFirstOxfordCommasTest.class);
 		suite.addTestSuite(AuthorFirstAbbrLastCommasTest.class);
 		suite.addTestSuite(AuthorLastFirstCommasTest.class);
