@@ -96,6 +96,7 @@ public class IsiImporter extends ImportFormat {
 				while (m.find()) {
 
 					String group2 = m.group(2);
+					group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping insanity! :-)
 					if (group2.length() > 1) {
 						group2 = "{" + group2 + "}";
 					}

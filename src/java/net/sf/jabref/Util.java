@@ -793,10 +793,6 @@ public class Util {
 		}
 		regularExpression = regularExpression.replaceAll("\\[extension\\]", extension);
 		
-		for (int i = 0; i < directories.length; i++) {
-			System.out.println(directories[i]);
-		}
-		
 		return findFile(entry, null, directories, regularExpression, true);
 	}
 	

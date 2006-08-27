@@ -100,42 +100,55 @@ public class FileBasedTestCase extends TestCase {
 		file.delete();
 	}
 
-	BibtexDatabase database;
+	static BibtexDatabase database;
 
-	BibtexEntry entry;
+	static BibtexEntry entry;
 
 	File root;
+
+	private String oldPdfDirectory;
+
+	private boolean oldUseRegExp;
+
+	public static BibtexEntry getBibtexEntry() {
+
+		if (database == null) {
+
+			StringReader reader = new StringReader(
+				"@ARTICLE{HipKro03,\n"
+					+ "  author = {Eric von Hippel and Georg von Krogh},\n"
+					+ "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
+					+ "  journal = {Organization Science},\n"
+					+ "  year = {2003},\n"
+					+ "  volume = {14},\n"
+					+ "  pages = {209--223},\n"
+					+ "  number = {2},\n"
+					+ "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
+					+ "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
+					+ "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}");
+
+			BibtexParser parser = new BibtexParser(reader);
+			ParserResult result = null;
+			try {
+				result = parser.parse();
+			} catch (Exception e) {
+				fail();
+			}
+			database = result.getDatabase();
+			entry = database.getEntriesByKey("HipKro03")[0];
+		}
+		return entry;
+	}
 
 	public void setUp() throws Exception {
 
 		Globals.prefs = JabRefPreferences.getInstance();
+
+		oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
+
 		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
-		
-		
-		
-		StringReader reader = new StringReader(
-			"@ARTICLE{HipKro03,\n"
-				+ "  author = {Eric von Hippel and Georg von Krogh},\n"
-				+ "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},\n"
-				+ "  journal = {Organization Science},\n"
-				+ "  year = {2003},\n"
-				+ "  volume = {14},\n"
-				+ "  pages = {209--223},\n"
-				+ "  number = {2},\n"
-				+ "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},\n"
-				+ "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
-				+ "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}\n" + "}");
 
-		BibtexParser parser = new BibtexParser(reader);
-		ParserResult result = null;
-		try {
-			result = parser.parse();
-		} catch (Exception e) {
-			fail();
-		}
-		database = result.getDatabase();
-		entry = database.getEntriesByKey("HipKro03")[0];
-
+		getBibtexEntry();
 		assertNotNull(database);
 		assertNotNull(entry);
 
@@ -143,8 +156,10 @@ public class FileBasedTestCase extends TestCase {
 		try {
 			root = createTempDir("UtilFindFileTest");
 
+			oldPdfDirectory = Globals.prefs.get("pdfDirectory");
+
 			Globals.prefs.put("pdfDirectory", root.getPath());
-			
+
 			File subDir1 = new File(root, "Organization Science");
 			subDir1.mkdir();
 
@@ -197,6 +212,10 @@ public class FileBasedTestCase extends TestCase {
 
 	public void tearDown() {
 		deleteRecursive(root);
+		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
+		Globals.prefs.put("pdfDirectory", oldPdfDirectory);
+		// TODO: This is not a great way to do this, sure ;-)
 	}
+	
 	
 }

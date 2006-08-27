@@ -47,11 +47,10 @@ public class JabRefPreferences {
         CUSTOM_TYPE_NAME = "customTypeName_",
         CUSTOM_TYPE_REQ = "customTypeReq_",
         CUSTOM_TYPE_OPT = "customTypeOpt_",
-    CUSTOM_TAB_NAME = "customTabName_",
-    CUSTOM_TAB_FIELDS = "customTabFields_";
+        CUSTOM_TAB_NAME = "customTabName_",
+        CUSTOM_TAB_FIELDS = "customTabFields_";
 
     public String WRAPPED_USERNAME;
-
 
     Preferences prefs;
     public HashMap defaults = new HashMap(),
@@ -75,41 +74,35 @@ public class JabRefPreferences {
     private Map externalFileTypes = new HashMap();
 
     // The only instance of this class:
-    private static JabRefPreferences INSTANCE = null;
+    private static JabRefPreferences singleton = null;
 
     public static JabRefPreferences getInstance() {
-    if (INSTANCE == null)
-        INSTANCE = new JabRefPreferences();
-    return INSTANCE;
-    }
+		if (singleton == null)
+			singleton = new JabRefPreferences();
+		return singleton;
+	}
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
 
         prefs = Preferences.userNodeForPackage(JabRef.class);
         //Util.pr(prefs.toString());
-
+        
         if (Globals.osName.equals(Globals.MAC)) {
-            defaults.put("pdfviewer","/Applications/Preview.app");
-            defaults.put("psviewer","/Applications/Preview.app");
-            defaults.put("htmlviewer","/Applications/Safari.app");
-        }
-        else if (Globals.osName.toLowerCase().startsWith("windows")) {
-          defaults.put("pdfviewer","cmd.exe /c start /b");
-          defaults.put("psviewer","cmd.exe /c start /b");
-          defaults.put("htmlviewer","cmd.exe /c start /b");
-          defaults.put("lookAndFeel", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
-
-
-        }
-
-        else {
-            defaults.put("pdfviewer","acroread");
-            defaults.put("psviewer","gv");
-            defaults.put("htmlviewer","mozilla");
-            defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
-
-        }
+			defaults.put("pdfviewer", "/Applications/Preview.app");
+			defaults.put("psviewer", "/Applications/Preview.app");
+			defaults.put("htmlviewer", "/Applications/Safari.app");
+		} else if (Globals.osName.toLowerCase().startsWith("windows")) {
+			defaults.put("pdfviewer", "cmd.exe /c start /b");
+			defaults.put("psviewer", "cmd.exe /c start /b");
+			defaults.put("htmlviewer", "cmd.exe /c start /b");
+			defaults.put("lookAndFeel", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
+		} else {
+			defaults.put("pdfviewer", "acroread");
+			defaults.put("psviewer", "gv");
+			defaults.put("htmlviewer", "mozilla");
+			defaults.put("lookAndFeel", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
         defaults.put("posX", new Integer(0));
@@ -183,7 +176,6 @@ public class JabRefPreferences {
         defaults.put("highlightGroupsMatchingAny", Boolean.FALSE);
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
-
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
         defaults.put("latexEditorPath", "C:\\TEMP\\Led.exe");
@@ -908,7 +900,6 @@ public class JabRefPreferences {
      * @return true if the field should not be wrapped.
      */
     public boolean isNonWrappableField(String fieldName) {
-
         return nonWrappableFields.contains(fieldName);
     }
 }

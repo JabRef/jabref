@@ -80,12 +80,9 @@ public class IsiImporterTest extends TestCase {
 		IsiImporter.processSubSup(hm);
 		assertEquals("$^{31}$", hm.get("review"));
 
-		
-		
-		hm.put("title", "/sub $1/");
+		hm.put("title", "/sub $Hello/");
 		IsiImporter.processSubSup(hm);
-		fail(); // What should happen?
-			
+		assertEquals("$_{\\$Hello}$", hm.get("title"));
 	}
 	
 	public void testImportEntries() throws IOException {

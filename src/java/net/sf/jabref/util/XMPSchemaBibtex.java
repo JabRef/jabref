@@ -31,6 +31,11 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 	public static final String KEY = "bibtex";
 
+	/**
+	 * Create a new empty XMPSchemaBibtex as a child in the given XMPMetadata.
+	 * 
+	 * @param parent
+	 */
 	public XMPSchemaBibtex(XMPMetadata parent) {
 		super(parent, KEY, NAMESPACE);
 	}
@@ -201,10 +206,20 @@ public class XMPSchemaBibtex extends XMPSchema {
 		Iterator it = entries.iterator();
 		while (it.hasNext()) {
 			Map.Entry entry = (Map.Entry) it.next();
+			String key = (String)entry.getKey();
+			if (preserveWhiteSpace.containsKey(key))
+				continue;
 			entry.setValue(((String) entry.getValue()).replaceAll("\\s+", " ").trim());
 		}
 
 		return result;
+	}
+	
+	public static HashMap preserveWhiteSpace = new HashMap();
+	static {
+		preserveWhiteSpace.put("abstract", null);
+		preserveWhiteSpace.put("note", null);
+		preserveWhiteSpace.put("review", null);
 	}
 
 	public void setBibtexEntry(BibtexEntry entry) {
@@ -235,6 +250,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 		// Get Text Properties
 		Map text = getAllProperties();
+		text.remove("entrytype");
 		e.setField(text);
 		return e;
 

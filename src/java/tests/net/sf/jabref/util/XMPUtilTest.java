@@ -422,7 +422,7 @@ public class XMPUtilTest extends TestCase {
 	}
 
 	/**
-	 * Are newlines in the XML parsed correctly?
+	 * Are newlines in the XML processed correctly?
 	 * 
 	 * @throws Exception
 	 */
@@ -430,7 +430,8 @@ public class XMPUtilTest extends TestCase {
 
 		{
 			String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
-				+ "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n";
+				+ "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n" +
+						"<bibtex:abstract>\n\nAbstract preserve\n\t Whitespace\n\n</bibtex:abstract>";
 
 			writeManually(pdfFile, bibtexXPacket(bibtexDescription(bibtex)));
 
@@ -441,6 +442,7 @@ public class XMPUtilTest extends TestCase {
 			assertNotNull(e);
 			assertEquals("Hallo World this is not an exercise .", e.getField("title"));
 			assertEquals("Hallo World this is not an exercise .", e.getField("tabs"));
+			assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e.getField("abstract"));
 		}
 	}
 
