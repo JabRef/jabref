@@ -111,7 +111,7 @@ public class PrefsDialog3 extends JDialog {
     main.add(new TablePrefsTab(_prefs, parent), TAB);
     main.add(new TableColumnsTab(_prefs, parent), COL);
     main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
-    main.add(new PreviewPrefsTab(_prefs, parent.helpDiag), PRE);
+    main.add(new PreviewPrefsTab(_prefs), PRE);
 
     //main.add(new ManageJournalsPanel(frame), JOU);
 

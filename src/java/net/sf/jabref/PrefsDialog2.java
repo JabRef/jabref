@@ -77,7 +77,7 @@ public class PrefsDialog2 extends JDialog {
         tabbed.addTab(Globals.lang("Appearance"), new TablePrefsTab(_prefs, parent));
         //tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
         tabbed.addTab(Globals.lang("Key pattern"), new TabLabelPattern(_prefs, parent.helpDiag));
-        tabbed.addTab(Globals.lang("Entry preview"), new PreviewPrefsTab(_prefs, parent.helpDiag));
+        tabbed.addTab(Globals.lang("Entry preview"), new PreviewPrefsTab(_prefs));
 	
 	if (!Globals.ON_MAC)
 	    tabbed.addTab(Globals.lang("Advanced"), new AdvancedTab(_prefs, parent.helpDiag));

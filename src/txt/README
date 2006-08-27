@@ -103,6 +103,7 @@ Change log:
         - Search operation also now search relative to the JabRef directory.
         - [ 1542552 ] Fixed wrong author import from Inspec ISI file.
         - General improvements in Inspec ISI handling.
+        - [ 1503956 ] Fixed Help text instead of Help icon.
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

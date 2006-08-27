@@ -94,11 +94,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.append(new JPanel());
 		builder.append(useRegExpComboBox);
 		builder.append(regExpTextField);
-		Action helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
-			"Help on Regular Expression Search", GUIGlobals.getIconUrl("helpSmall"));
-		JButton helpButton = new JButton(helpAction);
-		helpButton.setText(null);
-		builder.append(helpButton);
+		HelpAction helpAction = new HelpAction(helpDialog, GUIGlobals.regularExpressionSearchHelp,
+			Globals.lang("Help on Regular Expression Search"), GUIGlobals.getIconUrl("helpSmall"));
+		builder.append(helpAction.getIconButton());
 		builder.nextLine();
 
 		builder.appendSeparator(Globals.lang("External programs"));

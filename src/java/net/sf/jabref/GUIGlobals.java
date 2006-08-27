@@ -152,8 +152,8 @@ public class GUIGlobals {
 	shortAuxImport="ShortAuxImport.html",
 	remoteHelp = "RemoteHelp.html",
 	journalAbbrHelp = "JournalAbbreviations.html",
-	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch";
-
+	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
+	previewHelp = "PreviewHelp.html";
 
 //	Colors.
 	public static Color
