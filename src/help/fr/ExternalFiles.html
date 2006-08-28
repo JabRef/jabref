@@ -75,5 +75,46 @@ Vous pouvez d&eacute;finir des r&eacute;pertoires PDF et PS sp&eacute;cifiques &
 Ces r&eacute;pertoires remplacent alors les r&eacute;pertoires principaux.
 </P>
 
+<a name="RegularExpressionSearch">
+<H2>Utiliser la recherche d'expressions r&eacute;guli&egrave;res pour les liaisons automatiques</H2>
+</a>
+<p>
+Dans les sections pr&eacute;c&eacute;dentes, la fonction de liaison automatique de JabRef &eacute;tait d&eacute;crite&nbsp;: si vous
+choisissiez des noms de fichiers qui correspondaient &agrave; la clef BibTex suivi de l'extension,
+JabRef &eacute;tait capable de trouver les fichiers automatiquement.
 
-</HTML>
+</p><p>
+A partir de JabRef 2.2, il est possible d'avoir une plus grande flexibilit&eacute; dans la forme du nom gr&acirc;ce &agrave; l'utilisation
+d'une expression r&eacute;guli&egrave;re pour la recherche. Dans la plupart des cas, adapter l'expression r&eacute;guli&egrave;re donn&eacute;e par d&eacute;faut devrait suffire.
+
+</p><p>
+Si vous ouvrez les pr&eacute;f&eacute;rences pour les programmes externes (Options -> Pr&eacute;f&eacute;rences -> Programmes externes),
+vous  y trouverez une option nomm&eacute;e "Rechercher l'expression r&eacute;guli&egrave;re".
+Cocher cette option vous permettra d'entrer votre propre expression r&eacute;guli&egrave;re pour la recherche dans les
+r&eacute;pertoires PDF.
+
+</p><p>
+Voici la syntaxe &agrave; utiliser&nbsp;:
+</p>
+<ul>
+  <li><code>*</code> - Rechercher dans tous les sous-r&eacute;pertoires directs en excluant le r&eacute;pertoire courant
+  et tout autre sous-r&eacute;pertoire.</li>
+  <li><code>**</code> - Rechercher r&eacute;cursivement dans tous les sous-r&eacute;pertoires ET dans le r&eacute;pertoire courant.</li>
+  <li><code>.</code> et <code>..</code> - Le r&eacute;pertoire courant et le r&eacute;pertoire parent.</li>
+  <li><code>[title]</code> - Toutes les expressions entre crochets sont remplac&eacute;es par le champ correspondant dans l'entr&eacute;e courante.</li>
+  <li><code>[extension]</code> - Remplacement par l'extension de fichier du champ que vous utilisez.</li>
+  <li>Tout autre texte est interpr&eacute;t&eacute; comme une expression r&eacute;guli&egrave;re. Mais attention&nbsp;: vous devez remplacer
+  chaque caract&egrave;re anti-slash (\) par deux anti-slashs (\\) afin d'&eacute;viter la confusion avec un s&eacute;parateur de r&eacute;pertoire .</li>
+</ul>
+<p>
+Par d&eacute;faut, l'expression r&eacute;guli&egrave;re de recherche est <code>**/.*[bibtexkey].*\\.[extension]</code>. Comme vous pouvez le voir cela effectuera
+la recherche dans tous les sous-r&eacute;pertoires du r&eacute;pertoire d&eacute;fini pour l'extension (par exemple dans le r&eacute;pertoire PDF) de tout nom de fichier qui poss&egrave;de la bonne extension et
+qui contient quelque part la clef BibTeX.
+
+
+
+
+
+</p>
+</body>
+</html>
