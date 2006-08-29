@@ -127,7 +127,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     JabRefFrame frame;
     BibtexDatabase database;
     // The database shown in this panel.
-    File file = null,
+    private File //file = null,  // Moving file to MetaData (Morten, 2006.08.29)
         fileToOpen = null; // The filename of the database.
     String fileMonitorHandle = null;
     boolean saving = false, updatedExternally = false;
@@ -239,7 +239,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             db.setCompleters(autoCompleters);
             }*/
 
-      this.file = file;
+      metaData.setFile(file);
 
       // Register so we get notifications about outside changes to the file.
       if (file != null)
@@ -256,7 +256,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public BibtexDatabase database() { return database; }
     public MetaData metaData() { return metaData; }
-    public File file() { return file; }
     public JabRefFrame frame() { return frame; }
     public JabRefPreferences prefs() { return Globals.prefs; }
 
@@ -327,7 +326,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void init() throws Throwable {
                 success = false;
                 cancelled = false;
-                if (file == null)
+                if (getFile() == null)
                     runCommand("saveAs");
                 else {
 
@@ -347,7 +346,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         else if (answer == JOptionPane.YES_OPTION) {
                             ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this); //, panel.database(), panel.metaData());
                             //try {
-                            scanner.changeScan(file());
+                            scanner.changeScan(getFile());
                             setUpdatedExternally(false);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
@@ -370,16 +369,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             public void update() {
                 if (success) {
-                    frame.setTabTitle(BasePanel.this, file.getName(), file.getAbsolutePath());
+                    frame.setTabTitle(BasePanel.this, getFile().getName(),
+                            getFile().getAbsolutePath());
                     frame.output(Globals.lang("Saved database")+" '"
-                             +file.getPath()+"'.");
+                             +getFile().getPath()+"'.");
                 } else if (!cancelled) {
                     frame.output(Globals.lang("Save failed"));
                 }
             }
 
             public void run() {
-                if (file == null) {
+                if (getFile() == null) {
                     cancelled = true;
                     return;
                 }
@@ -409,7 +409,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                     // Done with autosetting keys. Now save the database:
 
-                    success = saveDatabase(file, false, encoding);
+                    success = saveDatabase(getFile(), false, encoding);
 
                     //Util.pr("Testing resolve string... BasePanel line 237");
                     //Util.pr("Resolve aq: "+database.resolveString("aq"));
@@ -445,10 +445,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                                          JFileChooser.SAVE_DIALOG, false);
 
                   if (chosenFile != null) {
-                    file = new File(chosenFile);
-                    if (!file.exists() ||
+                    metaData.setFile(new File(chosenFile));
+                    if (!metaData.getFile().exists() ||
                         (JOptionPane.showConfirmDialog
-                         (frame, "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                         (frame, "'"+metaData.getFile().getName()+"' "+Globals.lang("exists. Overwrite file?"),
                           Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                          == JOptionPane.OK_OPTION)) {
 
@@ -456,17 +456,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                       // Register so we get notifications about outside changes to the file.
                       try {
-                        fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(BasePanel.this,file);
+                        fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(BasePanel.this,getFile());
                       } catch (IOException ex) {
                         ex.printStackTrace();
                       }
 
-                      Globals.prefs.put("workingDirectory", file.getParent());
-                      frame.getFileHistory().newFile(file.getPath());
+                      Globals.prefs.put("workingDirectory", metaData.getFile().getParent());
+                      frame.getFileHistory().newFile(metaData.getFile().getPath());
                     }
-                    else
-                      file = null;
+                    else {
+                      metaData.setFile(null);
                     }
+                   }
                 }
             });
 
@@ -2163,8 +2164,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (file != null)
-                frame.setTabTitle(BasePanel.this, file.getName(), file.getAbsolutePath());
+            if (getFile() != null)
+                frame.setTabTitle(BasePanel.this, getFile().getName(),
+                        getFile().getAbsolutePath());
             else
                 frame.setTabTitle(BasePanel.this, Globals.lang("untitled"), null);
         }
@@ -2385,7 +2387,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void run() {
             // Test: running scan automatically in background
             ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this);
-            scanner.changeScan(BasePanel.this.file());
+            scanner.changeScan(BasePanel.this.getFile());
             try {
                 scanner.join();
             } catch (InterruptedException e) {
@@ -2393,7 +2395,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             if (scanner.changesFound()) {
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this, sidePaneManager, file, scanner);
+                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this,
+                        sidePaneManager, getFile(), scanner);
           sidePaneManager.add("fileUpdate", pan);
                 setUpdatedExternally(false);
                 //scanner.displayResult();
@@ -2409,7 +2412,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
       public void fileRemoved() {
-        Util.pr("File '"+file.getPath()+"' has been deleted.");
+        Util.pr("File '"+getFile().getPath()+"' has been deleted.");
       }
 
 
@@ -2431,6 +2434,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return mainTable.getSelectedEntries();
     }
 
+    /**
+     * Get the file where this database was last saved to or loaded from, if any.
+     *
+     * @return The relevant File, or null if none is defined.
+     */
+    public File getFile() {
+        return metaData.getFile();
+    }
+    
     /**
      * Get a String containing a comma-separated list of the bibtex keys
      * of the selected entries.

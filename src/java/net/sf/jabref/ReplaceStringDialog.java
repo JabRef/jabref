@@ -103,12 +103,14 @@ class ReplaceStringDialog extends JDialog {
         settings.setLayout(gbl);
         opt.setLayout(gbl);
         main.setLayout(gbl);
+
         settings.setBorder(BorderFactory.createTitledBorder
                        (BorderFactory.createEtchedBorder(),
                         Globals.lang("Replace string")));
         main.setBorder(BorderFactory.createTitledBorder
                        (BorderFactory.createEtchedBorder(),
                         Globals.lang("Strings")));
+          
 
         // Settings panel:
         /*
@@ -120,11 +122,12 @@ class ReplaceStringDialog extends JDialog {
         con.gridy = 2;
         gbl.setConstraints(nf, con);
         settings.add(nf);*/
-
+        //con.weightx = 1;
+        con.fill = GridBagConstraints.HORIZONTAL;
+        //JSeparator sep = new JSeparator()
         con.gridwidth = 2;
         con.weightx = 0;
         con.anchor = GridBagConstraints.WEST;
-        con.fill = GridBagConstraints.HORIZONTAL;
         con.gridy = 0;
         con.gridx = 0;
         con.insets = new Insets(3, 5, 3, 5);

@@ -60,6 +60,7 @@ import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.external.*;
+import net.sf.jabref.util.MassSetFieldAction;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
 import com.jgoodies.looks.Options;
 import com.jgoodies.looks.HeaderStyle;
@@ -549,8 +550,8 @@ public JabRefPreferences prefs() {
             }
           }
         }
-        if (baseAt(i).file != null) {
-          filenames.add(baseAt(i).file.getPath());
+        if (baseAt(i).getFile() != null) {
+          filenames.add(baseAt(i).getFile().getPath());
         }
       }
     }
@@ -1079,7 +1080,7 @@ public JabRefPreferences prefs() {
     tools.add(normalSearch);
     tools.add(incrementalSearch);
     tools.add(replaceAll);
-
+    tools.add(new MassSetFieldAction(this));
     tools.add( makeKeyAction);
 
      // [kiar] I think we should group these festures
@@ -2336,8 +2337,8 @@ class SaveSessionAction
               catch (Throwable ex) {}
             }
           }
-          if (baseAt(i).file != null) {
-            filenames.add(baseAt(i).file.getPath());
+          if (baseAt(i).getFile() != null) {
+            filenames.add(baseAt(i).getFile().getPath());
           }
         }
       }
@@ -2436,8 +2437,8 @@ class SaveSessionAction
           HashSet currentFiles = new HashSet();
           if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (baseAt(i).file != null)
-                    currentFiles.add(baseAt(i).file.getPath());
+                if (baseAt(i).getFile() != null)
+                    currentFiles.add(baseAt(i).getFile().getPath());
             }
           }
           int i0 = tabbedPane.getTabCount();

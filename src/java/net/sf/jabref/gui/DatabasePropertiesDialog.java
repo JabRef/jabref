@@ -32,6 +32,7 @@ public class DatabasePropertiesDialog extends JDialog {
     JComboBox encoding;
     JButton ok, cancel;
     JTextField pdfDir = new JTextField(40), psDir = new JTextField(40);
+    String oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), false);
@@ -119,10 +120,16 @@ public class DatabasePropertiesDialog extends JDialog {
             if (psD.size() >= 1)
                 psDir.setText(((String)psD.get(0)).trim());
         }
+
+        // Store original values to see if they get changed:
+        oldPdfVal = pdfDir.getText();
+        oldPsVal = psDir.getText();
     }
 
     public void storeSettings() {
-        panel.setEncoding((String)encoding.getSelectedItem());
+        String oldEncoding = panel.getEncoding();
+        String newEncoding = (String)encoding.getSelectedItem();
+        panel.setEncoding(newEncoding);
 
         Vector dir = new Vector(1);
         String text = pdfDir.getText().trim();
@@ -141,5 +148,14 @@ public class DatabasePropertiesDialog extends JDialog {
         }
         else
             metaData.remove("psDirectory");
+
+        // See if any of the values have been modified:
+        boolean changed = !newEncoding.equals(oldEncoding)
+            || !oldPdfVal.equals(pdfDir.getText())
+            || !oldPsVal.equals(psDir.getText());
+        // ... if so, mark base changed. Prevent the Undo button from removing
+        // change marking:
+        if (changed)
+            panel.markNonUndoableBaseChanged();
     }
 }

@@ -87,10 +87,15 @@ Change log:
           - Integrate with copy/move/link.
           - Added option to write all/selected PDFs in database
         - Added tooltips to database tabs showing the file's full path.
+        - Added function for setting or clearing a specific field in selected or
+          all entries.
+        - Setting a relative PDF/PS path in Database Properties now makes JabRef
+          look for the directory relative to the bib file's location.
         - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
         - Added LayoutFormatters that print the Oxford comma.
         - Added missing space between abbreviated author first names:
         - Added LayoutFormatter for HTML paragraphs.
+        - Changing Database Properties now causes the database to be marked as changed.
         - Improved simple search. Words are now treated as separate search terms,
           and phrases can be indicated with "double quotes".
           William Andrew Paul => W. A. Paul (used to be W.A. Paul)

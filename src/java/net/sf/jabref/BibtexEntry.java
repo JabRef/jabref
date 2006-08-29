@@ -211,6 +211,12 @@ public class BibtexEntry
         _fields.putAll(fields);
     }
 
+    /**
+     * Set a field, and notify listeners about the change.
+     *
+     * @param name The field to set.
+     * @param value The value to set.
+     */
     public void setField(String name, Object value) {
 
         if (ID_FIELD.equals(name)) {
@@ -225,34 +231,25 @@ public class BibtexEntry
         Object oldValue = _fields.get(name);
 
         try {
-                /* The first event is no longer needed, so the following comment doesn't apply
-                   as of 2005.08.11.
-
-            // First throw an empty event that just signals that this entry
-                // is about to change. This is needed, so the EntrySorter can
-                // remove the entry from its TreeSet. After a sort-sensitive
-                // field changes, the entry will not be found by the TreeMap,
-                // so without this event it would be impossible to reinsert this
-                // entry to keep everything sorted properly.
-            firePropertyChangedEvent(null, null, null);
-            */
-
             // We set the field before throwing the changeEvent, to enable
-                // the change listener to access the new value if the change
-                // sets off a change in database sorting etc.
-                _fields.put(name, value);
+            // the change listener to access the new value if the change
+            // sets off a change in database sorting etc.
+            _fields.put(name, value);
             firePropertyChangedEvent(name, oldValue, value);
         } catch (PropertyVetoException pve) {
-                // Since we have already made the change, we must undo it since
-                // the change was rejected:
-                _fields.put(name, oldValue);
+            // Since we have already made the change, we must undo it since
+            // the change was rejected:
+            _fields.put(name, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
 
     }
 
     /**
-     * Removes the mapping for the field name.
+     * Remove the mapping for the field name, and notify listeners about
+     * the change.
+     *
+     * @param name The field to clear.
      */
     public void clearField(String name) {
 
@@ -263,7 +260,7 @@ public class BibtexEntry
        Object oldValue = _fields.get(name);
        _fields.remove(name);
        try {
-           firePropertyChangedEvent(name, oldValue, "");
+           firePropertyChangedEvent(name, oldValue, null);
        } catch (PropertyVetoException pve) {
            throw new IllegalArgumentException("Change rejected: " + pve);
        }

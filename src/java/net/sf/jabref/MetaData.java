@@ -35,7 +35,8 @@ public class MetaData {
     private HashMap metaData = new HashMap();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
-
+    private File file = null; // The File where this base gets saved.
+    
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
      * the data is written correctly to string, the user of a meta data Vector
@@ -139,11 +140,25 @@ public class MetaData {
         String key = fieldName + "Directory";
         String dir;
         Vector vec = getData(key);
-        if ((vec != null) && (vec.size() > 0))
+        if ((vec != null) && (vec.size() > 0)) {
             dir = (String)vec.get(0);
+            // If this directory is relative, we try to interpret it as relative to
+            // the file path of this bib file:
+            if (!(new File(dir)).isAbsolute() && (file != null)) {
+                String relDir = new StringBuffer(file.getParent()).
+                        append(System.getProperty("file.separator")).
+                        append(dir).toString();
+                // If this directory actually exists, it is very likely that the
+                // user wants us to use it:
+                if ((new File(relDir)).exists())
+                    dir = relDir;
+            }
+        }
         else
             dir = Globals.prefs.get(key);
 
+
+        System.out.println("MetaData: dir: '"+dir+"' relative: "+(new File(dir)).isAbsolute());
         return dir;
     }
 
@@ -251,5 +266,13 @@ public class MetaData {
         if (res.length() > 0)
             return res.toString();
         return null;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 }

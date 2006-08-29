@@ -68,6 +68,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.undo.UndoableEdit;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -2057,7 +2058,42 @@ public class Util {
 		return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
 	}
 
-	/**
+    /**
+     * Set a given field to a given value for all entries in a Collection.
+     * This method DOES NOT update any UndoManager, but returns a relevant
+     * CompoundEdit that should be registered by the caller.
+     *
+     * @param entries The entries to set the field for.
+     * @param field The name of the field to set.
+     * @param text The value to set. This value can be null, indicating that the
+     *      field should be cleared.
+     * @param overwriteValues Indicate whether the value should be set even if
+     *      an entry already has the field set.
+     * @return A CompoundEdit for the entire operation.
+     */
+    public static UndoableEdit massSetField(Collection entries,
+                                            String field, String text,
+                                            boolean overwriteValues) {
+        System.out.println(":"+text+":");
+        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        for (Iterator i = entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry) i.next();
+            Object oldVal = entry.getField(field);
+            // If we are not allowed to overwrite values, check if there is a nonempty
+            // value already for this entry:
+            if (!overwriteValues && (oldVal != null) && (((String)oldVal).length() > 0))
+                continue;
+            if (text != null)
+                entry.setField(field, text);
+            else
+                entry.clearField(field);
+            ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
+        }
+        ce.end();
+        return ce;
+    }
+
+    /**
 	 * Make a list of supported character encodings that can encode all
 	 * characters in the given String.
 	 * 
