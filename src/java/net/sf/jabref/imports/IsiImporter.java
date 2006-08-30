@@ -17,7 +17,7 @@ import net.sf.jabref.Util;
 import net.sf.jabref.util.CaseChanger;
 
 /**
- * Importer for the ISI Web of Science format.
+ * Importer for the ISI Web of Science, INSPEC and Medline format.
  * 
  * Documentation about ISI WOS format:
  * 
@@ -55,26 +55,27 @@ public class IsiImporter extends ImportFormat {
 		return "isi";
 	}
 
+	static final Pattern isiPattern = Pattern.compile("^FN ISI Export Format|^VR 1.|^PY \\d{4}|");
+
 	/**
 	 * Check whether the source is in the correct format for this importer.
 	 */
 	public boolean isRecognizedFormat(InputStream stream) throws IOException {
-		// Our strategy is to look for the "PY <year>" line.
-		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-		Pattern pat1 = Pattern.compile("PY \\d{4}");
 
-		// was PY \\\\d{4}? before
+		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+
 		String str;
 
 		while ((str = in.readLine()) != null) {
 
-			// The following line gives false positives for RIS files, so it
-			// should
-			// not be uncommented. The hypen is a characteristic of the RIS
-			// format.
-			// str = str.replace(" - ", "");
-
-			if (pat1.matcher(str).find())
+			/**
+			 * The following line gives false positives for RIS files, so it
+			 * should not be uncommented. The hypen is a characteristic of the
+			 * RIS format.
+			 * 
+			 * str = str.replace(" - ", "")
+			 */
+			if (isiPattern.matcher(str).find())
 				return true;
 		}
 
@@ -96,7 +97,9 @@ public class IsiImporter extends ImportFormat {
 				while (m.find()) {
 
 					String group2 = m.group(2);
-					group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping insanity! :-)
+					group2 = group2.replaceAll("\\$", "\\\\\\\\\\\\\\$"); // Escaping
+					// insanity!
+					// :-)
 					if (group2.length() > 1) {
 						group2 = "{" + group2 + "}";
 					}
@@ -230,6 +233,8 @@ public class IsiImporter extends ImportFormat {
 						value = value.substring(0, detpos);
 
 					pages = pages + "--" + value;
+				} else if (beg.equals("PS")) {
+					pages = parsePages(value);
 				} else if (beg.equals("AR"))
 					pages = value;
 				else if (beg.equals("IS"))
@@ -242,26 +247,10 @@ public class IsiImporter extends ImportFormat {
 					hm.put("publisher", value);
 				else if (beg.equals("PD")) {
 
-					String[] parts = value.split(" ");
-					for (int ii = 0; ii < parts.length; ii++) {
-						if (Globals.MONTH_STRINGS.containsKey(parts[ii].toLowerCase())) {
-							hm.put("month", "#" + parts[ii].toLowerCase() + "#");
-							continue nextField;
-						}
-					}
-
-					// Try two digit month
-					for (int ii = 0; ii < parts.length; ii++) {
-						int number;
-						try {
-							number = Integer.parseInt(parts[ii]);
-							if (number >= 1 && number <= 12) {
-								hm.put("month", "#" + Globals.MONTHS[number - 1] + "#");
-								continue nextField;
-							}
-						} catch (NumberFormatException e) {
-
-						}
+					String month = parseMonth(value);
+					if (month != null) {
+						hm.put("month", month);
+						continue nextField;
 					}
 
 				} else if (beg.equals("DT")) {
@@ -322,6 +311,35 @@ public class IsiImporter extends ImportFormat {
 		return bibitems;
 	}
 
+	public static String parsePages(String value) {
+		int lastDash = value.lastIndexOf("-");
+		return value.substring(0, lastDash) + "--" + value.substring(lastDash + 1);
+	}
+
+	public static String parseMonth(String value) {
+
+		String[] parts = value.split("\\s|\\-");
+		for (int ii = 0; ii < parts.length; ii++) {
+			if (Globals.MONTH_STRINGS.containsKey(parts[ii].toLowerCase())) {
+				return "#" + parts[ii].toLowerCase() + "#";
+			}
+		}
+
+		// Try two digit month
+		for (int ii = 0; ii < parts.length; ii++) {
+			int number;
+			try {
+				number = Integer.parseInt(parts[ii]);
+				if (number >= 1 && number <= 12) {
+					return "#" + Globals.MONTHS[number - 1] + "#";
+				}
+			} catch (NumberFormatException e) {
+
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Will expand ISI first names.
 	 * 
@@ -335,21 +353,37 @@ public class IsiImporter extends ImportFormat {
 		if (s.length != 2)
 			return author;
 
-		String last = s[0].trim();
-		String first = s[1].trim();
-
-		first = first.replaceAll("\\.|\\s", "");
-
 		StringBuffer sb = new StringBuffer();
+
+		String last = s[0].trim();
 		sb.append(last).append(", ");
 
-		for (int i = 0; i < first.length(); i++) {
-			sb.append(first.charAt(i)).append(".");
+		String first = s[1].trim();
 
-			if (i < first.length() - 1)
+		String[] firstParts = first.split("\\s+");
+
+		for (int i = 0; i < firstParts.length; i++) {
+
+			first = firstParts[i];
+
+			// Do we have only uppercase chars?
+			if (first.toUpperCase().equals(first)) {
+				first = first.replaceAll("\\.", "");
+				for (int j = 0; j < first.length(); j++) {
+					sb.append(first.charAt(j)).append(".");
+
+					if (j < first.length() - 1)
+						sb.append(" ");
+				}
+			} else {
+				sb.append(first);
+			}
+			if (i < firstParts.length - 1) {
 				sb.append(" ");
+			}
 		}
 		return sb.toString();
+
 	}
 
 	public static String[] isiAuthorsConvert(String[] authors) {
@@ -362,7 +396,7 @@ public class IsiImporter extends ImportFormat {
 	}
 
 	public static String isiAuthorsConvert(String authors) {
-		String[] s = isiAuthorsConvert(authors.split(" and "));
+		String[] s = isiAuthorsConvert(authors.split(" and |;"));
 		return Util.join(s, " and ", 0, s.length);
 	}
 
