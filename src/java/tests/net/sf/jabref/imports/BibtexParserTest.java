@@ -157,7 +157,7 @@ public class BibtexParserTest extends TestCase {
 		assertEquals("canh05", e.getCiteKey());
 		assertEquals(BibtexEntryType.ARTICLE, e.getType());
 
-		assertEquals("Hallo World this is not an exercise .", e.getField("title"));
-		assertEquals("Hallo World this is not an exercise .", e.getField("tabs"));
+		assertEquals("Hallo World this is not an exercise .", (String)e.getField("title"));
+		assertEquals("Hallo World this is not an exercise .", (String)e.getField("tabs"));
 	}
 }
