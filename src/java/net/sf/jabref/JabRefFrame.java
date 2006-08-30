@@ -296,6 +296,7 @@ public class JabRefFrame
     CiteSeerFetcher citeSeerFetcher;
     CiteSeerFetcherPanel citeSeerFetcherPanel;
     IEEEXploreFetcher ieeexplorerFetcher;
+    GeneralFetcher ieex;
     SearchManager2 searchManager;
     public GroupSelector groupSelector;
 
@@ -334,70 +335,69 @@ public class JabRefFrame
 
   public JabRefFrame() {
     init();
-    setEmptyState();
+    updateEnabledState();
   }
 
   private void init() {
-    /*try {
-        //UIManager.setLookAndFeel("com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
-        UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
-        } catch (Exception e) { e.printStackTrace();}*/
 
-    //Globals.setLanguage("no", "");
+		macOSXRegistration();
+		MyGlassPane glassPane = new MyGlassPane();
+		setGlassPane(glassPane);
+		// glassPane.setVisible(true);
 
-    macOSXRegistration();
-      MyGlassPane glassPane = new MyGlassPane();
-    setGlassPane(glassPane);
-    //  glassPane.setVisible(true);
+		setTitle(GUIGlobals.frameTitle);
+		setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				(new CloseAction()).actionPerformed(null);
+			}
+		});
 
-      setTitle(GUIGlobals.frameTitle);
-    setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
-    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-    addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent e) {
-        (new CloseAction()).actionPerformed(null);
-      }
-    });
+		initLabelMaker();
 
-    initLabelMaker();
+		initSidePane();
+		
+		initLayout();
+		
+		initActions();
+		
+		if (Globals.prefs.getBoolean("rememberWindowLocation")) {
+			setSize(new Dimension(prefs.getInt("sizeX"), prefs.getInt("sizeY")));
+			setLocation(new Point(prefs.getInt("posX"), prefs.getInt("posY")));
+		}
+		tabbedPane.setBorder(null);
+		tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
-    initSidePane();
+		/*
+		 * The following state listener makes sure focus is registered with the
+		 * correct database when the user switches tabs. Without this,
+		 * cut/paste/copy operations would some times occur in the wrong tab.
+		 */
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				markActiveBasePanel();
 
-    setupLayout();
-      if (Globals.prefs.getBoolean("rememberWindowLocation")) {
-        setSize(new Dimension(prefs.getInt("sizeX"),
-                              prefs.getInt("sizeY")));
-        setLocation(new Point(prefs.getInt("posX"),
-                              prefs.getInt("posY")));
-      }
-    tabbedPane.setBorder(null);
-    tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
+				BasePanel bp = basePanel();
+				if (bp != null) {
+					groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+					searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
+					previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
+					highlightAny
+						.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
+					highlightAll
+						.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
+					Globals.focusListener.setFocused(bp.mainTable);
 
-    // The following state listener makes sure focus is registered with the correct database
-    // when the user switches tabs. Without this, cut/paste/copy operations would some times
-    // occur in the wrong tab.
-    tabbedPane.addChangeListener(new ChangeListener() {
-      public void stateChanged(ChangeEvent e)
-      {
-        markActiveBasePanel() ;
-
-        BasePanel bp = basePanel();
-        if (bp != null) {
-          groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-          searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
-          previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
-          highlightAny.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
-          highlightAll.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
-          Globals.focusListener.setFocused(bp.mainTable);
-          
-          new FocusRequester(bp.mainTable);
-        }
-      }
-    });
-  }
+					new FocusRequester(bp.mainTable);
+				}
+			}
+		});
+	}
 
 
-  private void initSidePane() {
+
+	private void initSidePane() {
 		sidePaneManager = new SidePaneManager(this);
 
 		Globals.sidePaneManager = this.sidePaneManager;
@@ -410,7 +410,7 @@ public class JabRefFrame
 			(CiteSeerFetcher) citeSeerFetcher);
 		groupSelector = new GroupSelector(this, sidePaneManager);
 		searchManager = new SearchManager2(this, sidePaneManager);
-		
+
 		sidePaneManager.register("fetchMedline", medlineFetcher);
 		sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
 		sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
@@ -631,7 +631,7 @@ public JabRefPreferences prefs() {
     }
   }
 
-  private void setupLayout() {
+  private void initLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
 
       pushExternalButton = new PushToApplicationButton(this,
@@ -1011,7 +1011,7 @@ public JabRefPreferences prefs() {
     file.add(close);
     //==============================
     // NB: I added this because my frame borders are so tiny that I cannot click
-    // on the "x" close button. Anyways, I think it is good to have and "exit" button
+    // on the "x" close button. Anyways, I think it is good to have an "exit" button
     // I was too lazy to make a new ExitAction
     //JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
     //exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
@@ -1109,7 +1109,7 @@ public JabRefPreferences prefs() {
     web.add(fetchMedline);
     web.add(citeSeerPanelAction);
     web.add(fetchCiteSeer);
-    GeneralFetcher ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
+    ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
     web.add(ieex.getAction());
 
       mb.add(web);
@@ -1333,157 +1333,64 @@ public JabRefPreferences prefs() {
     }
   }
 
-    /**
-     * Disable actions that demand an open database.
-     */
-    private void setEmptyState() {
-        manageSelectors.setEnabled(false);
-        mergeDatabaseAction.setEnabled(false);
-        newSubDatabaseAction.setEnabled(false);
-        close.setEnabled(false);
-        save.setEnabled(false);
-        saveAs.setEnabled(false);
-        saveSelectedAs.setEnabled(false);
-        nextTab.setEnabled(false);
-        prevTab.setEnabled(false);
-        sortTabs.setEnabled(false);
-        undo.setEnabled(false);
-        redo.setEnabled(false);
-        cut.setEnabled(false);
-        delete.setEnabled(false);
-        copy.setEnabled(false);
-        paste.setEnabled(false);
-        mark.setEnabled(false);
-        unmark.setEnabled(false);
-        unmarkAll.setEnabled(false);
-        editEntry.setEnabled(false);
-        importCiteSeer.setEnabled(false);
-        selectAll.setEnabled(false);
-        copyKey.setEnabled(false);
-        copyCiteKey.setEnabled(false);
-        editPreamble.setEnabled(false);
-        editStrings.setEnabled(false);
-        toggleGroups.setEnabled(false);
-        toggleSearch.setEnabled(false);
-        makeKeyAction.setEnabled(false);
-        emacsPushAction.setEnabled(false);
-        lyxPushAction.setEnabled(false);
-        winEdtPushAction.setEnabled(false);
-        normalSearch.setEnabled(false);
-        incrementalSearch.setEnabled(false);
-        replaceAll.setEnabled(false);
-        importMenu.setEnabled(false);
-        exportMenu.setEnabled(false);
-        fetchMedline.setEnabled(false);
-        fetchCiteSeer.setEnabled(false);
-        openFile.setEnabled(false);
-        openUrl.setEnabled(false);
-        togglePreview.setEnabled(false);
-        dupliCheck.setEnabled(false);
-        strictDupliCheck.setEnabled(false);
-        highlightAll.setEnabled(false);
-        highlightAny.setEnabled(false);
-        citeSeerPanelAction.setEnabled(false);
-        for (int i = 0; i < newSpecificEntryAction.length; i++) {
-            newSpecificEntryAction[i].setEnabled(false);
-        }
-        newEntryAction.setEnabled(false);
-        plainTextImport.setEnabled(false);
-        closeDatabaseAction.setEnabled(false);
-        switchPreview.setEnabled(false);
-        integrityCheckAction.setEnabled(false);
-        autoSetPdf.setEnabled(false);
-        autoSetPs.setEnabled(false);
-        toggleHighlightAny.setEnabled(false);
-        toggleHighlightAll.setEnabled(false);
-        databaseProperties.setEnabled(false);
-        abbreviateIso.setEnabled(false);
-        abbreviateMedline.setEnabled(false);
-        unabbreviate.setEnabled(false);
-    }
+  protected List openDatabaseOnlyActions = new LinkedList();
+  protected List severalDatabasesOnlyActions = new LinkedList();
+  
+	protected void initActions() {
+		openDatabaseOnlyActions = new LinkedList();
+		openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
+			mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
+			redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
+			selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
+			makeKeyAction, emacsPushAction, lyxPushAction, winEdtPushAction, normalSearch,
+			incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
+			openFile, openUrl, togglePreview, dupliCheck, strictDupliCheck, highlightAll,
+			highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
+			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
+			abbreviateMedline, unabbreviate, ieex.getAction() }));
 
-    /**
-     * Enable actions that demand an open database.
-     */
-    private void setNonEmptyState() {
-        manageSelectors.setEnabled(true);
-        mergeDatabaseAction.setEnabled(true);
-        newSubDatabaseAction.setEnabled(true);
-        close.setEnabled(true);
-        save.setEnabled(true);
-        saveAs.setEnabled(true);
-        saveSelectedAs.setEnabled(true);
-        undo.setEnabled(true);
-        redo.setEnabled(true);
-        cut.setEnabled(true);
-        delete.setEnabled(true);
-        copy.setEnabled(true);
-        paste.setEnabled(true);
-        mark.setEnabled(true);
-        unmark.setEnabled(true);
-        unmarkAll.setEnabled(true);
-        editEntry.setEnabled(true);
-        importCiteSeer.setEnabled(true);
-        selectAll.setEnabled(true);
-        copyKey.setEnabled(true);
-        copyCiteKey.setEnabled(true);
-        editPreamble.setEnabled(true);
-        editStrings.setEnabled(true);
-        toggleGroups.setEnabled(true);
-        toggleSearch.setEnabled(true);
-        makeKeyAction.setEnabled(true);
-        emacsPushAction.setEnabled(true);
-        lyxPushAction.setEnabled(true);
-        winEdtPushAction.setEnabled(true);
-        normalSearch.setEnabled(true);
-        incrementalSearch.setEnabled(true);
-        replaceAll.setEnabled(true);
-        importMenu.setEnabled(true);
-        exportMenu.setEnabled(true);
-        fetchMedline.setEnabled(true);
-        fetchCiteSeer.setEnabled(true);
-        openFile.setEnabled(true);
-        openUrl.setEnabled(true);
-        togglePreview.setEnabled(true);
-        dupliCheck.setEnabled(true);
-        strictDupliCheck.setEnabled(true);
-        highlightAll.setEnabled(true);
-        highlightAny.setEnabled(true);
-        citeSeerPanelAction.setEnabled(true);
-        for (int i = 0; i < newSpecificEntryAction.length; i++) {
-            newSpecificEntryAction[i].setEnabled(true);
-        }
-        newEntryAction.setEnabled(true);
-        plainTextImport.setEnabled(true);
-        closeDatabaseAction.setEnabled(true);
-        switchPreview.setEnabled(true);
-        integrityCheckAction.setEnabled(true);
-        autoSetPdf.setEnabled(true);
-        autoSetPs.setEnabled(true);
-        toggleHighlightAny.setEnabled(true);
-        toggleHighlightAll.setEnabled(true);
-        databaseProperties.setEnabled(true);
-        abbreviateIso.setEnabled(true);
-        abbreviateMedline.setEnabled(true);
-        unabbreviate.setEnabled(true);
-    }
+		openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-    /**
-     * Disable actions that need more than one database open.
-     */
-    private void setOnlyOne() {
-        nextTab.setEnabled(false);
-        prevTab.setEnabled(false);
-        sortTabs.setEnabled(false);
-    }
+		severalDatabasesOnlyActions = new LinkedList();
+		severalDatabasesOnlyActions.addAll(Arrays
+			.asList(new Object[] { nextTab, prevTab, sortTabs }));
 
-    /**
-     * Disable actions that need more than one database open.
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent event) {
+				updateEnabledState();
+			}
+		});
+		
+		
+
+	}
+
+	public static void setEnabled(List l, boolean enabled) {
+		Iterator i = l.iterator();
+		while (i.hasNext()) {
+			Object o = i.next();
+			if (o instanceof Action)
+				((Action)o).setEnabled(enabled);
+			if (o instanceof Component)
+				((Component)o).setEnabled(enabled);
+		}
+	}
+
+	protected int previousTabCount = -1;
+	
+	/**
+     * Enable or Disable all actions based on the number of open tabs.
+     * 
+     * The action that are affected are set in initActions.
      */
-    private void setMultiple() {
-        nextTab.setEnabled(true);
-        prevTab.setEnabled(true);
-        sortTabs.setEnabled(true);
+    protected void updateEnabledState() {
+		int tabCount = tabbedPane.getTabCount();
+		if (tabCount != previousTabCount){
+			previousTabCount = tabCount;
+			setEnabled(openDatabaseOnlyActions, tabCount > 0);
+			setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+		}
     }
 
   /**
@@ -1523,11 +1430,6 @@ public JabRefPreferences prefs() {
                 file != null ? file.getAbsolutePath() : null);
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
-        }
-        if (tabbedPane.getTabCount() == 1) {
-            setNonEmptyState();
-        } else if (tabbedPane.getTabCount() == 2) {
-            setMultiple();
         }
     }
 
@@ -1578,67 +1480,56 @@ public JabRefPreferences prefs() {
   }
 
   // The action for closing the current database and leaving the window open.
-  CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
-  class CloseDatabaseAction
-      extends MnemonicAwareAction {
-    public CloseDatabaseAction() {
-        super(GUIGlobals.getImage("close"));
-        putValue(NAME, "Close database");
-        putValue(SHORT_DESCRIPTION,
-                 Globals.lang("Close the current database"));
-        putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
-    }
+	CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
 
-    public void actionPerformed(ActionEvent e) {
-      // Ask here if the user really wants to close, if the base
-      // has not been saved since last save.
-      boolean close = true;
-      if (basePanel() == null) { // when it is initially empty
-        return; //nbatada nov 7
-      }
+	class CloseDatabaseAction extends MnemonicAwareAction {
+		public CloseDatabaseAction() {
+			super(GUIGlobals.getImage("close"));
+			putValue(NAME, "Close database");
+			putValue(SHORT_DESCRIPTION, Globals.lang("Close the current database"));
+			putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
+		}
 
-      if (basePanel().baseChanged) {
-        int answer = JOptionPane.showConfirmDialog
-            (ths, Globals.lang("Database has changed. Do you want to save " +
-                               "before closing?"),
-             Globals.lang("Save before closing"),
-             JOptionPane.YES_NO_CANCEL_OPTION);
-        if ( (answer == JOptionPane.CANCEL_OPTION) ||
-            (answer == JOptionPane.CLOSED_OPTION)) {
-          close = false; // The user has cancelled.
-        }
-        if (answer == JOptionPane.YES_OPTION) {
-          // The user wants to save.
-          try {
-            basePanel().runCommand("save");
-          }
-          catch (Throwable ex) {
-            // Something prevented the file
-            // from being saved. Break!!!
-            close = false;
-          }
+		public void actionPerformed(ActionEvent e) {
+			// Ask here if the user really wants to close, if the base
+			// has not been saved since last save.
+			boolean close = true;
+			if (basePanel() == null) { // when it is initially empty
+				return; // nbatada nov 7
+			}
 
-        }
-      }
+			if (basePanel().baseChanged) {
+				int answer = JOptionPane.showConfirmDialog(ths, Globals
+					.lang("Database has changed. Do you want to save " + "before closing?"),
+					Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+				if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
+					close = false; // The user has cancelled.
+				}
+				if (answer == JOptionPane.YES_OPTION) {
+					// The user wants to save.
+					try {
+						basePanel().runCommand("save");
+					} catch (Throwable ex) {
+						// Something prevented the file
+						// from being saved. Break!!!
+						close = false;
+					}
 
-      		if (close) {
+				}
+			}
+
+			if (close) {
 				basePanel().cleanUp();
 				tabbedPane.remove(basePanel());
-				if (tabbedPane.getTabCount() == 0) {
-					setEmptyState();
-				} else {
-					// This should be triggered from the tabbedPane
-					// sidePaneManager.stateChanged(new ChangeEvent(tabbedPane));
+				if (tabbedPane.getTabCount() > 0) {
 					markActiveBasePanel();
-					if (tabbedPane.getTabCount() == 1) {
-						setOnlyOne();
-					}
 				}
+				updateEnabledState(); // Man, this is what I call a bug that this is not called.
 				output(Globals.lang("Closed database") + ".");
 				System.gc(); // Test
 			}
 		}
-  }
+	}
 
 
   // The action concerned with opening a new database.
@@ -1839,10 +1730,6 @@ class FetchCiteSeerAction
                                         null, Globals.prefs.get("defaultEncoding"));                     // meta data
           tabbedPane.add( Globals.lang( GUIGlobals.untitledTitle ), bp ) ;
           tabbedPane.setSelectedComponent( bp ) ;
-          if ( tabbedPane.getTabCount() == 1 )
-          {
-            setNonEmptyState() ;
-          }
           output( Globals.lang( "New database created." ) ) ;
         }
       }
@@ -2022,9 +1909,6 @@ class FetchCiteSeerAction
       tabbedPane.add(GUIGlobals.untitledTitle, bp);
       bp.markBaseChanged();
       tabbedPane.setSelectedComponent(bp);
-      if (tabbedPane.getTabCount() == 1) {
-        setNonEmptyState();
-      }
       if (filename != null)
           output(Globals.lang("Imported database") + " '" + filename + "' " +
                  Globals.lang("with") + " " +

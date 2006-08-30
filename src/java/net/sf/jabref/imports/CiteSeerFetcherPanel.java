@@ -1,21 +1,32 @@
 package net.sf.jabref.imports;
 
-import java.net.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.util.*;
-//import java.util.regex.Pattern;
-//import java.util.regex.Matcher;
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertEntry;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Hashtable;
 
-import java.io.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.HelpAction;
+import net.sf.jabref.SidePaneComponent;
+import net.sf.jabref.SidePaneManager;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.undo.NamedCompound;
 
 /**
  * <p>Title: </p>

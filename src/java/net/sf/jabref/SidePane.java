@@ -77,7 +77,8 @@ public class SidePane extends JPanel {
 		 */
 		JScrollPane sp = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
+		sp.setBorder(null);
+		
 		// To remove the scroll panel just change sp to mainPanel and comment
 		// the JScrollPane declaration
 		super.add(sp);
