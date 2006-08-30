@@ -4,6 +4,5 @@ Chris:
   * Think about synchronizing XMP.
   * Document data schema used (BibteXmp)
   * Add build.xml target to export standalone XMPUtil for the CLI.
-  * FindFiles.
   * Plugin-Architecture for LayoutFormatters.
   

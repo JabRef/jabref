@@ -362,7 +362,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	    progressBar.setString("");
 	    progressBar2.setVisible(false);
 	    citeSeerProgress.setText("");
-	    sidePaneManager.ensureVisible("CiteSeerProgress");
+	    sidePaneManager.show("CiteSeerProgress");
 	}
 	public void endImportCiteSeerProgress() {
 	    progressBar.setIndeterminate(false);

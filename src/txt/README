@@ -110,6 +110,7 @@ Change log:
         - General improvements in Inspec ISI handling.
         - [ 1503956 ] Fixed Help text instead of Help icon.
         - Improved PDF link resolver to produce proper URIs.
+        - [ 1534537 ] resize groups interface
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

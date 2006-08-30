@@ -350,7 +350,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             setUpdatedExternally(false);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
-                                    sidePaneManager.hideAway("fileUpdate");
+                                    sidePaneManager.hide("fileUpdate");
                                 }
                             });
 
@@ -772,8 +772,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for toggling the groups interface
         actions.put("toggleGroups", new BaseAction() {
             public void action() {
-              sidePaneManager.togglePanel("groups");
-              frame.groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
+              sidePaneManager.toggle("groups");
+              frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             }
         });
 
@@ -878,7 +878,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("search", new BaseAction() {
                 public void action() {
                     //sidePaneManager.togglePanel("search");
-                    sidePaneManager.ensureVisible("search");
+                    sidePaneManager.show("search");
                     //boolean on = sidePaneManager.isPanelVisible("search");
                     frame.searchToggle.setSelected(true);
                     if (true)
@@ -889,8 +889,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("toggleSearch", new BaseAction() {
                 public void action() {
                     //sidePaneManager.togglePanel("search");
-                    sidePaneManager.togglePanel("search");
-                    boolean on = sidePaneManager.isPanelVisible("search");
+                    sidePaneManager.toggle("search");
+                    boolean on = sidePaneManager.isComponentVisible("search");
                     frame.searchToggle.setSelected(on);
                     if (on)
                       frame.searchManager.startSearch();
@@ -899,7 +899,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("incSearch", new BaseAction() {
                 public void action() {
-                    sidePaneManager.ensureVisible("search");
+                    sidePaneManager.show("search");
                     frame.searchToggle.setSelected(true);
                     frame.searchManager.startIncrementalSearch();
                 }
@@ -2397,7 +2397,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (scanner.changesFound()) {
                 FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this,
                         sidePaneManager, getFile(), scanner);
-          sidePaneManager.add("fileUpdate", pan);
+          sidePaneManager.register("fileUpdate", pan);
+          sidePaneManager.show("fileUpdate");
                 setUpdatedExternally(false);
                 //scanner.displayResult();
             } else {

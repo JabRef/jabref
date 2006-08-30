@@ -95,7 +95,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         dialog.addCallBack(fetcher);
         Util.placeDialog(dialog, frame);
         fetcher.processQuery(tf.getText().trim(), dialog, frame);
-
     }
 
     class FetcherAction extends AbstractAction {
@@ -104,8 +103,18 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             putValue(ACCELERATOR_KEY, Globals.prefs.getKey(fetcher.getKeyName()));
         }
         public void actionPerformed(ActionEvent e) {
-            sidePaneManager.add(fetcher.getTitle(), GeneralFetcher.this);
+        	String fetcherTitle = fetcher.getTitle();
+        	
+        	if (!sidePaneManager.hasComponent(fetcherTitle)){
+        		sidePaneManager.register(fetcherTitle, GeneralFetcher.this);
+        	}
+        	
+        	if (frame.getTabbedPane().getTabCount() > 0) {
+				sidePaneManager.toggle(fetcherTitle);
+				if (sidePaneManager.isComponentVisible(fetcherTitle)) {
+					new FocusRequester(getTextField());
+				}
+			}        	
         }
     }
-
 }

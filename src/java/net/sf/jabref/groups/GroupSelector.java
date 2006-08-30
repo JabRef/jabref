@@ -195,6 +195,9 @@ public class GroupSelector extends SidePaneComponent implements
                 GroupSelector.this.revalidate();
                 GroupSelector.this.repaint();
                 Globals.prefs.putInt("groupsVisibleRows", i);
+                System.out.println(GroupSelector.this.getHeight());
+                System.out.println(GroupSelector.this.getPreferredSize().getHeight());
+                
             }
         });
         reduce.addActionListener(new ActionListener() {
@@ -1178,7 +1181,7 @@ public class GroupSelector extends SidePaneComponent implements
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            frame.sidePaneManager.ensureNotVisible("groups");
+            frame.sidePaneManager.hide("groups");
             return;
         }
         MetaData metaData = panel.metaData();
@@ -1193,11 +1196,11 @@ public class GroupSelector extends SidePaneComponent implements
         // auto show/hide groups interface
         if (Globals.prefs.getBoolean("groupAutoShow") &&
                         !groupsRoot.isLeaf()) { // groups were defined
-            frame.sidePaneManager.ensureVisible("groups");
+            frame.sidePaneManager.show("groups");
             frame.groupToggle.setSelected(true);
         } else if (Globals.prefs.getBoolean("groupAutoHide") &&
                         groupsRoot.isLeaf()) { // groups were not defined
-            frame.sidePaneManager.ensureNotVisible("groups");
+            frame.sidePaneManager.hide("groups");
             frame.groupToggle.setSelected(false);
         }
 

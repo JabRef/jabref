@@ -361,44 +361,7 @@ public class JabRefFrame
 
     initLabelMaker();
 
-    sidePaneManager = new SidePaneManager(this);
-
-    Globals.sidePaneManager = this.sidePaneManager;
-    Globals.helpDiag = this.helpDiag;
-
-    medlineFetcher = new MedlineFetcher(sidePaneManager);
-    citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
-    citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager, (CiteSeerFetcher)citeSeerFetcher);
-    ieeexplorerFetcher = new IEEEXploreFetcher();
-    searchManager = new SearchManager2(this, sidePaneManager);
-      // Groups
-      /*if (metaData.getGroups() != null) {
-          panel.groupSelector = new GroupSelector(frame, panel, metaData
-                  .getGroups(), this, prefs);
-          register("groups", panel.groupSelector);
-          if (prefs.getBoolean("groupSelectorVisible"))
-              ensureVisible("groups");
-      } else*/
-      {
-
-          groupSelector = new GroupSelector(this, sidePaneManager);
-          sidePaneManager.register("groups", groupSelector);
-      }
-
-
-    sidePaneManager.register("fetchMedline", medlineFetcher);
-    //medlineAuthorFetcher = new MedlineAuthorFetcher(this, sidePaneManager);
-    //sidePaneManager.register("fetchAuthorMedline", medlineAuthorFetcher);
-
-    sidePaneManager.register("search", searchManager);
-      // Show the search panel if it was visible at last shutdown:
-    if (Globals.prefs.getBoolean("searchPanelVisible"))
-        sidePaneManager.ensureVisible("search");
-    sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
-    sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
-    sidePaneManager.populatePanel();
-
-
+    initSidePane();
 
     setupLayout();
       if (Globals.prefs.getBoolean("rememberWindowLocation")) {
@@ -420,8 +383,8 @@ public class JabRefFrame
 
         BasePanel bp = basePanel();
         if (bp != null) {
-          groupToggle.setSelected(sidePaneManager.isPanelVisible("groups"));
-          searchToggle.setSelected(sidePaneManager.isPanelVisible("search"));
+          groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+          searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
           previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
           highlightAny.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
           highlightAll.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
@@ -434,7 +397,33 @@ public class JabRefFrame
   }
 
 
-  AboutAction aboutAction = new AboutAction();
+  private void initSidePane() {
+		sidePaneManager = new SidePaneManager(this);
+
+		Globals.sidePaneManager = this.sidePaneManager;
+		Globals.helpDiag = this.helpDiag;
+
+		ieeexplorerFetcher = new IEEEXploreFetcher();
+		medlineFetcher = new MedlineFetcher(sidePaneManager);
+		citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
+		citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
+			(CiteSeerFetcher) citeSeerFetcher);
+		groupSelector = new GroupSelector(this, sidePaneManager);
+		searchManager = new SearchManager2(this, sidePaneManager);
+		
+		sidePaneManager.register("fetchMedline", medlineFetcher);
+		sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
+		sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
+		sidePaneManager.register("groups", groupSelector);
+		sidePaneManager.register("search", searchManager);
+
+		// Show the search panel if it was visible at last shutdown:
+		if (Globals.prefs.getBoolean("searchPanelVisible"))
+			sidePaneManager.show("search");
+	}
+
+
+AboutAction aboutAction = new AboutAction();
   class AboutAction
       extends AbstractAction {
     public AboutAction() {
@@ -562,7 +551,7 @@ public JabRefPreferences prefs() {
       prefs.putInt("posY", ths.getLocation().y);
       prefs.putInt("sizeX", ths.getSize().width);
       prefs.putInt("sizeY", ths.getSize().height);
-      prefs.putBoolean("searchPanelVisible", sidePaneManager.isPanelVisible("search"));
+      prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
 
       if (prefs.getBoolean("openLastEdited")) {
         // Here we store the names of allcurrent filea. If
@@ -1632,21 +1621,23 @@ public JabRefPreferences prefs() {
         }
       }
 
-      if (close) {
-        basePanel().cleanUp();
-        tabbedPane.remove(basePanel());
-        if (tabbedPane.getTabCount() == 0) {
-          setEmptyState();
-        } else
-        {
-            sidePaneManager.stateChanged(new ChangeEvent(tabbedPane));
-          markActiveBasePanel() ;
-          if (tabbedPane.getTabCount() == 1) { setOnlyOne() ; }
-        }
-        output(Globals.lang("Closed database") + ".");
-          System.gc(); // Test
-      }
-    }
+      		if (close) {
+				basePanel().cleanUp();
+				tabbedPane.remove(basePanel());
+				if (tabbedPane.getTabCount() == 0) {
+					setEmptyState();
+				} else {
+					// This should be triggered from the tabbedPane
+					// sidePaneManager.stateChanged(new ChangeEvent(tabbedPane));
+					markActiveBasePanel();
+					if (tabbedPane.getTabCount() == 1) {
+						setOnlyOne();
+					}
+				}
+				output(Globals.lang("Closed database") + ".");
+				System.gc(); // Test
+			}
+		}
   }
 
 
@@ -1761,7 +1752,7 @@ class FetchCiteSeerAction
                 public void actionPerformed(ActionEvent e) {
 
                         if(citeSeerFetcher.activateCitationFetcher()) {
-                                sidePaneManager.ensureVisible("CiteSeerProgress");
+                                sidePaneManager.show("CiteSeerProgress");
                                 (new Thread() {
                                         BasePanel newBp;
                                         BasePanel targetBp;
@@ -1887,47 +1878,41 @@ class FetchCiteSeerAction
       }
     }
 
-  class FetchMedlineAction
-      extends MnemonicAwareAction {
-    public FetchMedlineAction() {
-      super(GUIGlobals.getImage("medline"));
-      putValue(NAME, "Fetch Medline");
-      putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
-      putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
-    }
+  class FetchMedlineAction extends MnemonicAwareAction {
+		public FetchMedlineAction() {
+			super(GUIGlobals.getImage("medline"));
+			putValue(NAME, "Fetch Medline");
+			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
+		}
 
-    public void actionPerformed(ActionEvent e) {
-      if (tabbedPane.getTabCount() > 0) {
-        //for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-        //  ( (BasePanel) tabbedPane.getComponentAt(i)).sidePaneManager.
-        sidePaneManager.togglePanel("fetchMedline");// ensureVisible("fetchMedline");
-        if (sidePaneManager.isPanelVisible("fetchMedline"))
-          new FocusRequester(medlineFetcher.getTextField());
-        //}
-      }
-    }
+		public void actionPerformed(ActionEvent e) {
+			if (tabbedPane.getTabCount() > 0) {
+				sidePaneManager.toggle("fetchMedline");
+				if (sidePaneManager.isComponentVisible("fetchMedline")) {
+					new FocusRequester(medlineFetcher.getTextField());
+				}
+			}
+		}
+	}
 
-  }
+  class CiteSeerPanelAction extends MnemonicAwareAction {
+		public CiteSeerPanelAction() {
+			super(GUIGlobals.getImage("medline"));
+			putValue(NAME, "Fetch CiteSeer");
+			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
+			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch CiteSeer by ID"));
+		}
 
-  class CiteSeerPanelAction
-      extends MnemonicAwareAction {
-    public CiteSeerPanelAction() {
-      super(GUIGlobals.getImage("medline"));
-      putValue(NAME, "Fetch CiteSeer");
-      //System.out.println(Globals.menuTitle("Fetch CiteSeer"));
-      putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      if (tabbedPane.getTabCount() > 0) {
-          sidePaneManager.togglePanel("CiteSeerPanel");// ensureVisible("fetchMedline");
-          if (sidePaneManager.isPanelVisible("CiteSeerPanel"))
-          new FocusRequester(citeSeerFetcherPanel.getTextField());
-        //}
-      }
-    }
-
-  }
+		public void actionPerformed(ActionEvent e) {
+			if (tabbedPane.getTabCount() > 0) {
+				sidePaneManager.toggle("CiteSeerPanel");
+				if (sidePaneManager.isComponentVisible("CiteSeerPanel")) {
+					new FocusRequester(citeSeerFetcherPanel.getTextField());
+				}
+			}
+		}
+	}
 
   // The action for opening the preferences dialog.
   AbstractAction showPrefs = new ShowPrefsAction();
