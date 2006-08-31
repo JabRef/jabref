@@ -103,15 +103,16 @@ Change log:
           same letter (in the current sort column) is selected.
         - Bib files dragged into JabRef now appear in the Recent files menu.
         - Fixed bug in import dialog.
-        - [ 1542552 ] Fixed wrong author import from ISI file.
+        - [ 1542552 ] Fixed: Wrong author import from ISI file.
         - Better support for ISI files in general (should basically be better than INSPEC)
         - Added regular expression search for auto-linking. Search is now more flexible by default.
         - Search operation also now search relative to the JabRef directory.
         - General improvements in Inspec ISI handling.
-        - [ 1503956 ] Fixed Help text instead of Help icon.
+        - [ 1503956 ] Fixed: Help text instead of Help icon.
         - Improved PDF link resolver to produce proper URIs.
-        - [ 1534537 ] resize groups interface
-        - [ 1465610 ] (Double-)Names containing hyphen (-) not handled correctly
+        - [ 1534537 ] Fixed: resize groups interface
+        - [ 1465610 ] Fixed: (Double-)Names containing hyphen (-) not handled correctly
+		- [ 1436014 ] Fixed: No comma added to separate keywords
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

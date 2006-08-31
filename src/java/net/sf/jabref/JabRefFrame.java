@@ -72,12 +72,14 @@ import com.jgoodies.looks.HeaderStyle;
 public class JabRefFrame
     extends JFrame {
 
-  JabRefFrame ths = this;
+   // CO: Code Smells...
+	JabRefFrame ths = this;
     UIFSplitPane contentPane = new UIFSplitPane();
 
-  JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
+    JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
     PrefsDialog3 prefsDialog = null;
-  private int lastTabbedPanelSelectionIndex = -1 ;
+    
+    private int lastTabbedPanelSelectionIndex = -1 ;
 
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;

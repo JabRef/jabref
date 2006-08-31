@@ -49,7 +49,7 @@ import net.sf.jabref.gui.date.*;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry.
- * EntryTypeForm also registers itself as a VetoableChangeListener, receiving
+ * EntryEditor also registers itself as a VetoableChangeListener, receiving
  * events whenever a field of the entry changes, enabling the text fields to
  * update themselves if the change is made from somewhere else.
  */
@@ -58,31 +58,32 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   // A reference to the entry this object works on.
   private BibtexEntry entry;
   BibtexEntryType type;
-  CloseAction closeAction;
 
   // The action concerned with closing the window.
-  DeleteAction deleteAction = new DeleteAction();
+  CloseAction closeAction;
 
   // The action that deletes the current entry, and closes the editor.
+  DeleteAction deleteAction = new DeleteAction();
+
+  // The action concerned with copying the BibTeX key to the clipboard.
   CopyKeyAction copyKeyAction;
 
   // The action concerned with copying the BibTeX key to the clipboard.
   AbstractAction nextEntryAction = new NextEntryAction();
 
-  // The action concerned with copying the BibTeX key to the clipboard.
+  // Actions for switching to next/previous entry.
   AbstractAction prevEntryAction = new PrevEntryAction();
 
-  // Actions for switching to next/previous entry.
+  // The action concerned with storing a field value.
   public StoreFieldAction storeFieldAction;
 
-  // The action concerned with storing a field value.
+  // The actions concerned with switching the panels.
   SwitchLeftAction switchLeftAction = new SwitchLeftAction();
   SwitchRightAction switchRightAction = new SwitchRightAction();
 
-  // The actions concerned with switching the panels.
+  // The action which generates a bibtexkey for this entry.
   GenerateKeyAction generateKeyAction;
 
-  // The action which generates a bibtexkey for this entry.
   SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
   JPanel mainPanel = new JPanel();
   JPanel srcPanel = new JPanel();
@@ -351,7 +352,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX
           + editor.getFieldName()) != null) {
             FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
-              panel.metaData, storeFieldAction, false);
+              panel.metaData, storeFieldAction, false, ", ");
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
         }
@@ -363,7 +364,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
           + editor.getFieldName()) != null)
     {
       FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
-              panel.metaData, storeFieldAction, false);
+              panel.metaData, storeFieldAction, false, (editor.getFieldName().equals("author") ? " and " : ", "));
       contentSelectors.add(ws);
 
       return ws;
@@ -832,7 +833,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
   public void updateAllContentSelectors() {
     if (contentSelectors.size() > 0) {
       for (Iterator i = contentSelectors.iterator(); i.hasNext();)
-        ((FieldContentSelector) i.next()).updateList();
+        ((FieldContentSelector) i.next()).rebuildComboBox();
     }
   }
 

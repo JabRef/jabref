@@ -26,220 +26,229 @@
  */
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;
 
-public class FieldContentSelector extends JComponent implements ActionListener {
+/**
+ * A combo-box and a manage button that will add selected strings to an
+ * associated entry editor.
+ * 
+ * Used to manage keywords and authors for instance.
+ * 
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ * 
+ */
+public class FieldContentSelector extends JComponent {
 
-    protected final String DELIMITER = " ", DELIMITER_2 = "";
-    protected final FieldEditor m_editor;
-    JComboBox list = new JComboBox() {
-        public Dimension getPreferredSize() {
-            Dimension parents = super.getPreferredSize();
-            if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)
-                parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
-            return parents;
-        }
-    };
-    JButton manage;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
-    protected final MetaData m_metaData;
-    protected final JabRefFrame m_frame;
-    protected final Window m_owner;
-    protected final BasePanel m_panel;
-    protected final AbstractAction m_action;
-    protected final boolean m_horizontalLayout;
+	JComboBox comboBox;
 
-    /**
-     * @param action
-     *            The action that will be performed to conclude content
-     *            insertion.
-     */
-    public FieldContentSelector(JabRefFrame frame, BasePanel panel,
-                                Dialog owner, FieldEditor editor, MetaData data,
-                                AbstractAction action, boolean horizontalLayout) {
-        m_editor = editor;
-        m_metaData = data;
-        m_action = action;
-        m_frame = frame;
-        m_panel = panel;
-        m_owner = owner;
-        m_horizontalLayout = horizontalLayout;
-        doInit();
-    }
+	FieldEditor editor;
 
-    /**
-     * @param action
-     *            The action that will be performed to conclude content
-     *            insertion.
-     */
-    public FieldContentSelector(JabRefFrame frame, BasePanel panel,
-                                Frame owner, FieldEditor editor, MetaData data,
-                                AbstractAction action, boolean horizontalLayout) {
-        m_editor = editor;
-        m_metaData = data;
-        m_action = action;
-        m_frame = frame;
-        m_panel = panel;
-        m_owner = owner;
-        m_horizontalLayout = horizontalLayout;
-        doInit();
-    }
+	MetaData metaData;
 
-    private void doInit() {
-        setLayout(gbl);
-        //list.setEditable(true);
+	JabRefFrame frame;
 
-        list.setMaximumRowCount(35);
-        // Set the width of the popup independent of the size of th box itself:
-        list.putClientProperty(
-            Options.COMBO_POPUP_PROTOTYPE_DISPLAY_VALUE_KEY,
-            "The longest text in the combo popup menu. And even longer.");
-        /*
-         * list.getInputMap().put(Globals.prefs.getKey("Select value"),
-         * "enter"); list.getActionMap().put("enter", new EnterAction());
-         * System.out.println(Globals.prefs.getKey("Select value"));
-         */
-        updateList();
-        // else
-        // list = new JComboBox(items.toArray());
-        con.gridwidth = m_horizontalLayout ? 3 : GridBagConstraints.REMAINDER;
-        con.fill = GridBagConstraints.HORIZONTAL;
-        con.weightx = 1;
-        // list.setPreferredSize(new Dimension(140,
-        // list.getPreferredSize().height));
-        gbl.setConstraints(list, con);
-        list.addActionListener(this);
+	Window owner;
 
-        add(list);
+	BasePanel panel;
 
-        if (m_horizontalLayout)
-            add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2,this)));
+	String delimiter;
 
-        manage = new JButton(Globals.lang("Manage"));
-        gbl.setConstraints(manage, con);
-        add(manage);
+	/**
+	 * 
+	 * Create a new FieldContentSelector.
+	 * 
+	 * @param frame
+	 *            The one JabRef-Frame.
+	 * @param panel
+	 *            The basepanel the entry-editor is on.
+	 * @param owner
+	 *            The window/frame/dialog which should be the owner of the
+	 *            content selector dialog.
+	 * @param editor
+	 *            The entry editor which will be appended by the text selected
+	 *            by the user from the combobox.
+	 * @param metaData
+	 *            The metadata that contains the list of items to display in the
+	 *            combobox under the key Globals.SELECTOR_META_PREFIX +
+	 *            editor.getFieldName().
+	 * @param action
+	 *            The action that will be performed to after an item from the
+	 *            combobox has been appended to the text in the entryeditor.
+	 * @param horizontalLayout
+	 *            Whether to put a 2 pixel horizontal strut between combobox and
+	 *            button.
+	 */
+	public FieldContentSelector(JabRefFrame jabRefFrame, final BasePanel panel,
+		Window ownerFrameOrDialog, final FieldEditor editor, final MetaData metaData,
+		final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
-        manage.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // m_owner is either a Frame or a Dialog
-                ContentSelectorDialog2 csd = m_owner instanceof Frame ?
-                        new ContentSelectorDialog2(
-                        (Frame) m_owner, m_frame, m_panel, true, m_metaData,
-                        m_editor.getFieldName())
-                        : new ContentSelectorDialog2((Dialog) m_owner, m_frame,
-                                m_panel, true, m_metaData, m_editor
-                                        .getFieldName());
-                Util.placeDialog(csd, m_frame);
-                csd.setVisible(true); // csd.show(); -> deprecated since 1.5
-                updateList();
-            }
-        });
-    }
+		this.frame = jabRefFrame;
+		this.editor = editor;
+		this.metaData = metaData;
+		this.panel = panel;
+		this.owner = ownerFrameOrDialog;
+		this.delimiter = delimiter;
 
-    public void updateList() {
-        list.removeAllItems();
-        list.addItem(""); // (Globals.lang(""));
-        Vector items = m_metaData.getData(Globals.SELECTOR_META_PREFIX
-                + m_editor.getFieldName());
-        if ((items != null) && (items.size() > 0)) {
-            for (int i = 0; i < items.size(); i++)
-                list.addItem(items.elementAt(i));
-        }
-    }
+		comboBox = new JComboBox() {
+			public Dimension getPreferredSize() {
+				Dimension parents = super.getPreferredSize();
+				if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH)
+					parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+				return parents;
+			}
+		};
 
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("comboBoxChanged")
-                && (e.getModifiers() == 0))
-            // These conditions signify arrow key navigation in the dropdown
-            // list, so we should
-            // not react to it. I'm not sure if this is well defined enough to
-            // be guaranteed to work
-            // everywhere.
-            return;
+		GridBagLayout gbl = new GridBagLayout();
+		GridBagConstraints con = new GridBagConstraints();
 
-        if (list.getSelectedIndex() == 0)
-            return; // The first element is only for show.
+		setLayout(gbl);
 
-        String chosen = (String) list.getSelectedItem();
-        // System.out.println(list.getSelectedIndex()+"\t"+chosen);
-        if (chosen == null)
-            return;
-        if (list.getSelectedIndex() == -1) { // User edited in a new word.
-            // Add this.
-            addWord(chosen);
-            /*
-             * Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+
-             * editor.getFieldName()); boolean exists = false; int pos = -1; for
-             * (int i=0; i<items.size(); i++) { String s =
-             * (String)items.elementAt(i); if (s.equals(chosen)) { exists =
-             * true; break; } if
-             * (s.toLowerCase().compareTo(chosen.toLowerCase()) < 0) pos = i+1; }
-             * if (!exists) { items.add(Math.max(0, pos), chosen);
-             * parent.panel.markNonUndoableBaseChanged(); updateList(); }
-             */
-        }
-        if (!m_editor.getText().equals(""))
-            m_editor.append(DELIMITER);
-        m_editor.append(chosen + DELIMITER_2);
-        list.setSelectedIndex(0);
-        if (m_action != null)
-            m_action.actionPerformed(new ActionEvent(m_editor, 0, ""));
+		// comboBox.setEditable(true);
 
-        // Transfer focus to the editor.
-        m_editor.requestFocus();
-        // new FocusRequester(editor.getTextComponent());
-    }
+		comboBox.setMaximumRowCount(35);
 
-    /**
-     * Adds a word to the selector (to the JList and to the MetaData), unless it
-     * is already there
-     *
-     * @param newWord
-     *            String Word to add
-     */
-    public void addWord(String newWord) {
+		// Set the width of the popup independent of the size of th box itself:
+		comboBox.putClientProperty(Options.COMBO_POPUP_PROTOTYPE_DISPLAY_VALUE_KEY,
+			"The longest text in the combo popup menu. And even longer.");
 
-        Vector items = m_metaData.getData(Globals.SELECTOR_META_PREFIX
-                + m_editor.getFieldName());
-        boolean exists = false;
-        int pos = -1;
-        for (int i = 0; i < items.size(); i++) {
-            String s = (String) items.elementAt(i);
-            if (s.equals(newWord)) {
-                exists = true;
-                break;
-            }
-            if (s.toLowerCase().compareTo(newWord.toLowerCase()) < 0)
-                pos = i + 1;
-        }
-        if (!exists) {
-            items.add(Math.max(0, pos), newWord);
-            m_panel.markNonUndoableBaseChanged();
-            m_panel.updateAllContentSelectors();
-            // updateList();
-        }
+		rebuildComboBox();
 
-    }
+		con.gridwidth = horizontalLayout ? 3 : GridBagConstraints.REMAINDER;
+		con.fill = GridBagConstraints.HORIZONTAL;
+		con.weightx = 1;
+		gbl.setConstraints(comboBox, con);
 
-    /*
-     * class EnterAction extends AbstractAction { public void
-     * actionPerformed(ActionEvent e) { System.out.println("enter");
-     * ths.actionPerformed(e); } }
-     */
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				/*
+				 * These conditions signify arrow key navigation in the dropdown
+				 * list, so we should not react to it. I'm not sure if this is
+				 * well defined enough to be guaranteed to work everywhere.
+				 */
+				if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0))
+					return;
 
-    /*
-     * public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-     * System.out.println("visible"); } public void
-     * popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-     * System.out.println("invisible"); } public void
-     * popupMenuCanceled(PopupMenuEvent e) { System.out.println("canceled"); }
-     */
+				// The first element is only for show.
+				// CO: Why?
+				if (comboBox.getSelectedIndex() == 0)
+					return;
+
+				String chosen = (String) comboBox.getSelectedItem();
+				if (chosen == null || chosen.equals(""))
+					return;
+
+				// The following is not possible at the moment since the
+				// combobox cannot be edited!
+
+				// User edited in a new word. Add it.
+				// if (comboBox.getSelectedIndex() == -1)
+				// addWord(chosen);
+
+				// TODO: could improve checking as not do add the same item twice
+				if (!editor.getText().equals(""))
+					editor.append(FieldContentSelector.this.delimiter);
+
+				editor.append(chosen);
+
+				comboBox.setSelectedIndex(0);
+
+				// Fire event that we changed the editor
+				if (action != null)
+					action.actionPerformed(new ActionEvent(editor, 0, ""));
+
+				// Transfer focus to the editor.
+				editor.requestFocus();
+			}
+		});
+
+		add(comboBox);
+
+		if (horizontalLayout)
+			add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2, this)));
+
+		JButton manage = new JButton(Globals.lang("Manage"));
+		gbl.setConstraints(manage, con);
+		add(manage);
+
+		manage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// I don't get the difference here:
+				ContentSelectorDialog2 csd = owner instanceof Frame ? new ContentSelectorDialog2(
+					(Frame) owner, frame, panel, true, metaData, editor.getFieldName())
+					: new ContentSelectorDialog2((Dialog) owner, frame, panel, true, metaData,
+						editor.getFieldName());
+				Util.placeDialog(csd, frame);
+
+				// Calling setVisible(true) will open the modal dialog and block
+				// for the dialog to close.
+				csd.setVisible(true);
+
+				// So we need to rebuild the ComboBox afterwards
+				rebuildComboBox();
+			}
+		});
+	}
+
+	void rebuildComboBox() {
+		comboBox.removeAllItems();
+
+		// TODO: CO - What for?
+		comboBox.addItem("");
+		Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
+		if (items != null) {
+			Iterator i = items.iterator();
+			while (i.hasNext())
+				comboBox.addItem(i.next());
+		}
+	}
+
+	// Not used since the comboBox is not editable
+
+	//	/**
+	//	 * Adds a word to the selector (to the JList and to the MetaData), unless it
+	//	 * is already there
+	//	 * 
+	//	 * @param newWord
+	//	 *            String Word to add
+	//	 */
+	//	public void addWord(String newWord) {
+	//
+	//		Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
+	//		boolean exists = false;
+	//		int pos = -1;
+	//		for (int i = 0; i < items.size(); i++) {
+	//			String s = (String) items.elementAt(i);
+	//			if (s.equals(newWord)) {
+	//				exists = true;
+	//				break;
+	//			}
+	//			if (s.toLowerCase().compareTo(newWord.toLowerCase()) < 0)
+	//				pos = i + 1;
+	//		}
+	//		if (!exists) {
+	//			items.add(Math.max(0, pos), newWord);
+	//			// TODO CO: Why is this non-undoable?
+	//			panel.markNonUndoableBaseChanged();
+	//			panel.updateAllContentSelectors();
+	//		}
+	//	}
 }
