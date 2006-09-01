@@ -113,6 +113,8 @@ Change log:
         - [ 1534537 ] Fixed: resize groups interface
         - [ 1465610 ] Fixed: (Double-)Names containing hyphen (-) not handled correctly
 		- [ 1436014 ] Fixed: No comma added to separate keywords
+		- [ 1548875 ] Fixed: download pdf produces unsupported filename
+		- [ 1545601 ] Fixed: downloading pdf corrupts pdf field text
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number
