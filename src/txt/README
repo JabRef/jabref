@@ -94,11 +94,11 @@ Change log:
         - Removed Oxford comma from AuthorList...Comma-LayoutFormatters.
         - Added LayoutFormatters that print the Oxford comma.
         - Added missing space between abbreviated author first names:
+          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
         - Added LayoutFormatter for HTML paragraphs.
         - Changing Database Properties now causes the database to be marked as changed.
         - Improved simple search. Words are now treated as separate search terms,
           and phrases can be indicated with "double quotes".
-          William Andrew Paul => W. A. Paul (used to be W.A. Paul)
         - When a letter key is pressed in the table, the first entry starting with the
           same letter (in the current sort column) is selected.
         - Bib files dragged into JabRef now appear in the Recent files menu.
