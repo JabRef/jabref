@@ -85,8 +85,8 @@ public class JabRefFrame
     public SidePaneManager sidePaneManager;
 
     JTabbedPane tabbedPane = new JTabbedPane();
-  final Insets marg = new Insets(1,0,2,0);
-
+    
+    final Insets marg = new Insets(1,0,2,0);
 
     class ToolBar extends JToolBar {
       void addAction(Action a) {
@@ -97,30 +97,33 @@ public class JabRefFrame
         add(b);
       }
     }
-  ToolBar tlb = new ToolBar();
+    ToolBar tlb = new ToolBar();
 
-  JMenuBar mb = new JMenuBar();
-   GridBagLayout gbl = new GridBagLayout();
-  GridBagConstraints con = new GridBagConstraints();
+    JMenuBar mb = new JMenuBar();
 
-  JLabel statusLine = new JLabel("", SwingConstants.LEFT),
-      statusLabel = new JLabel(Globals.lang("Status") + ":",
-                               SwingConstants.LEFT);
-  //SearchManager searchManager  = new SearchManager(ths, prefs);
+	GridBagLayout gbl = new GridBagLayout();
 
-  private FileHistory fileHistory = new FileHistory(prefs, this);
+	GridBagConstraints con = new GridBagConstraints();
 
-  LabelMaker labelMaker;
+	JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
+		.lang("Status")
+		+ ":", SwingConstants.LEFT);
 
-  // The help window.
-  public HelpDialog helpDiag = new HelpDialog(this);
+	// SearchManager searchManager = new SearchManager(ths, prefs);
 
-  // Here we instantiate menu/toolbar actions. Actions regarding
-  // the currently open database are defined as a GeneralAction
-  // with a unique command string. This causes the appropriate
-  // BasePanel's runCommand() method to be called with that command.
-  // Note: GeneralAction's constructor automatically gets translations
-  // for the name and message strings.
+	private FileHistory fileHistory = new FileHistory(prefs, this);
+
+	LabelMaker labelMaker;
+
+	// The help window.
+	public HelpDialog helpDiag = new HelpDialog(this);
+
+	// Here we instantiate menu/toolbar actions. Actions regarding
+	// the currently open database are defined as a GeneralAction
+	// with a unique command string. This causes the appropriate
+	// BasePanel's runCommand() method to be called with that command.
+	// Note: GeneralAction's constructor automatically gets translations
+	// for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
   public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,

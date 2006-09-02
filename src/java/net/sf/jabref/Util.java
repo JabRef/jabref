@@ -62,13 +62,14 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.swing.undo.UndoableEdit;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -84,6 +85,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -2110,5 +2112,108 @@ public class Util {
 				encodings.add(Globals.ENCODINGS[i]);
 		}
 		return encodings;
+	}
+	
+
+	/**
+	 * Will convert a two digit year using the following scheme (describe at
+	 * http://www.filemaker.com/help/02-Adding%20and%20view18.html):
+	 * 
+	 * If a two digit year is encountered they are matched against the last 69
+	 * years and future 30 years.
+	 * 
+	 * For instance if it is the year 1992 then entering 23 is taken to be 1923
+	 * but if you enter 23 in 1993 then it will evaluate to 2023.
+	 * 
+	 * @param year
+	 *            The year to convert to 4 digits.
+	 * @return
+	 */
+	public static String toFourDigitYear(String year) {
+		if (thisYear == 0){
+			thisYear = Calendar.getInstance().get(Calendar.YEAR);
+		}
+		return toFourDigitYear(year, thisYear);
+	}
+	
+	public static int thisYear;
+	
+	/**
+	 * Will convert a two digit year using the following scheme (describe at
+	 * http://www.filemaker.com/help/02-Adding%20and%20view18.html):
+	 * 
+	 * If a two digit year is encountered they are matched against the last 69
+	 * years and future 30 years.
+	 * 
+	 * For instance if it is the year 1992 then entering 23 is taken to be 1923
+	 * but if you enter 23 in 1993 then it will evaluate to 2023.
+	 * 
+	 * @param year
+	 *            The year to convert to 4 digits.
+	 * @return
+	 */
+	public static String toFourDigitYear(String year, int thisYear) {
+		if (year.length() != 2)
+			return year;
+		try {
+			int thisYearTwoDigits = thisYear % 100;
+			int thisCentury = thisYear - thisYearTwoDigits;
+
+			int yearNumber = Integer.parseInt(year);
+
+			if (yearNumber == thisYearTwoDigits) {
+				return String.valueOf(thisYear);
+			} 
+			// 20 , 90
+			// 99 > 30
+			if ((yearNumber + 100 - thisYearTwoDigits) % 100 > 30) {
+				if (yearNumber < thisYearTwoDigits) {
+					return String.valueOf(thisCentury + yearNumber);
+				} else {
+					return String.valueOf(thisCentury - 100 + yearNumber);
+				}
+			} else {
+				if (yearNumber < thisYearTwoDigits) {
+					return String.valueOf(thisCentury + 100 + yearNumber);
+				} else {
+					return String.valueOf(thisCentury + yearNumber);
+				}
+			}
+		} catch (NumberFormatException e) {
+			return year;
+		}
+	}
+	
+	/**
+	 * Will return an integer indicating the month of the entry from 0 to 11.
+	 * 
+	 * -1 signals a unknown month string.
+	 * 
+	 * This method accepts three types of months given:
+	 * 
+	 * - Single and Double Digit months from 1 to 12 (01 to 12)
+	 * 
+	 * - 3 Digit BibTex strings (jan
+	 * 
+	 * - Full English Month identifiers.
+	 * 
+	 * @param month
+	 * @return
+	 */
+	public static int getMonthNumber(String month){
+		
+		month = month.toLowerCase();
+		
+		for (int i = 0; i < Globals.MONTHS.length; i++){
+			if (month.startsWith(Globals.MONTHS[i])){
+				return i;
+			}
+		}
+		
+		try {
+			return Integer.parseInt(month) - 1;
+		} catch (NumberFormatException e){
+		}
+		return -1;
 	}
 }

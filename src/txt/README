@@ -115,6 +115,8 @@ Change log:
 		- [ 1436014 ] Fixed: No comma added to separate keywords
 		- [ 1548875 ] Fixed: download pdf produces unsupported filename
 		- [ 1545601 ] Fixed: downloading pdf corrupts pdf field text
+        - [ 1285977 ] Fixed: Impossible to properly sort a numeric field
+	    - [ 1535044 ] Fixed: Month sorting
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

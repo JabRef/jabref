@@ -3,8 +3,11 @@ package tests.net.sf.jabref;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.io.StringReader;
-import java.util.HashSet;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.HashSet;
 
 import javax.swing.JDialog;
 import javax.swing.JWindow;
@@ -215,5 +218,89 @@ public class UtilTest extends TestCase {
 
     }
 
+    public void test2to4DigitsYear(){
+    	assertEquals("1990", Util.toFourDigitYear("1990"));
+    	assertEquals("190", Util.toFourDigitYear("190"));
+    	assertEquals("1990", Util.toFourDigitYear("90", 1990));
+    	assertEquals("1990", Util.toFourDigitYear("90", 1991));
+    	assertEquals("2020", Util.toFourDigitYear("20", 1990));
+    	assertEquals("1921", Util.toFourDigitYear("21", 1990));
+    	assertEquals("1922", Util.toFourDigitYear("22", 1990));
+    	assertEquals("2022", Util.toFourDigitYear("22", 1992));
+    	assertEquals("1999", Util.toFourDigitYear("99", 2001));
+    	assertEquals("1931", Util.toFourDigitYear("1931", 2001));
+    	assertEquals("2031", Util.toFourDigitYear("31", 2001));
+    	assertEquals("1932", Util.toFourDigitYear("32", 2001));
+    	assertEquals("1944", Util.toFourDigitYear("44", 2001));
+    	assertEquals("2011", Util.toFourDigitYear("11", 2001));
+    	
+    	int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+    	int d2 = thisYear % 100;
 
+    	NumberFormat f = new DecimalFormat("00");
+    	
+    	for (int i = 0; i <= 30; i++){
+    		assertTrue("" + i, thisYear <= Integer.parseInt(Util.toFourDigitYear(f.format((d2 + i) % 100))));
+    	}
+    	for (int i = 0; i < 70; i++){
+    		assertTrue("" + i, thisYear >= Integer.parseInt(Util.toFourDigitYear(f.format((d2 - i + 100) % 100))));
+    	}
+    }
+    
+    public void testToMonthNumber(){
+
+    	assertEquals(0, Util.getMonthNumber("jan"));
+    	assertEquals(1, Util.getMonthNumber("feb"));
+    	assertEquals(2, Util.getMonthNumber("mar"));
+    	assertEquals(3, Util.getMonthNumber("apr"));
+    	assertEquals(4, Util.getMonthNumber("may"));
+    	assertEquals(5, Util.getMonthNumber("jun"));
+    	assertEquals(6, Util.getMonthNumber("jul"));
+    	assertEquals(7, Util.getMonthNumber("aug"));
+    	assertEquals(8, Util.getMonthNumber("sep"));
+    	assertEquals(9, Util.getMonthNumber("oct"));
+    	assertEquals(10,Util.getMonthNumber("nov"));
+    	assertEquals(11,Util.getMonthNumber("dec"));
+    	
+    	assertEquals(0, Util.getMonthNumber("January"));
+    	assertEquals(1, Util.getMonthNumber("February"));
+    	assertEquals(2, Util.getMonthNumber("March"));
+    	assertEquals(3, Util.getMonthNumber("April"));
+    	assertEquals(4, Util.getMonthNumber("May"));
+    	assertEquals(5, Util.getMonthNumber("June"));
+    	assertEquals(6, Util.getMonthNumber("July"));
+    	assertEquals(7, Util.getMonthNumber("August"));
+    	assertEquals(8, Util.getMonthNumber("September"));
+    	assertEquals(9, Util.getMonthNumber("October"));
+    	assertEquals(10,Util.getMonthNumber("November"));
+    	assertEquals(11,Util.getMonthNumber("Decembre"));
+
+    	assertEquals(0, Util.getMonthNumber("01"));
+    	assertEquals(1, Util.getMonthNumber("02"));
+    	assertEquals(2, Util.getMonthNumber("03"));
+    	assertEquals(3, Util.getMonthNumber("04"));
+    	assertEquals(4, Util.getMonthNumber("05"));
+    	assertEquals(5, Util.getMonthNumber("06"));
+    	assertEquals(6, Util.getMonthNumber("07"));
+    	assertEquals(7, Util.getMonthNumber("08"));
+    	assertEquals(8, Util.getMonthNumber("09"));
+    	assertEquals(9, Util.getMonthNumber("10"));
+    	
+    	assertEquals(0, Util.getMonthNumber("1"));
+    	assertEquals(1, Util.getMonthNumber("2"));
+    	assertEquals(2, Util.getMonthNumber("3"));
+    	assertEquals(3, Util.getMonthNumber("4"));
+    	assertEquals(4, Util.getMonthNumber("5"));
+    	assertEquals(5, Util.getMonthNumber("6"));
+    	assertEquals(6, Util.getMonthNumber("7"));
+    	assertEquals(7, Util.getMonthNumber("8"));
+    	assertEquals(8, Util.getMonthNumber("9"));
+    	    	
+    	assertEquals(10,Util.getMonthNumber("11"));
+    	assertEquals(11,Util.getMonthNumber("12"));
+
+    	assertEquals(-1,Util.getMonthNumber(";lkjasdf"));
+    	assertEquals(-1,Util.getMonthNumber("3.2"));
+    	assertEquals(-1,Util.getMonthNumber(""));
+    }
 }

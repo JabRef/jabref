@@ -26,13 +26,15 @@ import java.awt.event.ActionEvent;
 import java.util.Comparator;
 
 /**
- * Created by IntelliJ IDEA.
+ * The central table which displays the bibtex entries.
+ * 
  * User: alver
  * Date: Oct 12, 2005
  * Time: 10:29:39 PM
- * To change this template use File | Settings | File Templates.
+ * 
  */
 public class MainTable extends JTable {
+	
     private MainTableFormat tableFormat;
     private SortedList sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
     private boolean tableColorCodes, showingFloatSearch=false, showingFloatGrouping=false;
