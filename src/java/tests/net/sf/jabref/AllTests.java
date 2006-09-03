@@ -2,12 +2,6 @@ package tests.net.sf.jabref;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import tests.net.sf.jabref.export.layout.format.AuthorAndsReplacerTest;
-import tests.net.sf.jabref.export.layout.format.AuthorLastFirstAbbreviatorTester;
-import tests.net.sf.jabref.imports.BibtexParserTest;
-import tests.net.sf.jabref.util.CaseChangerTest;
-import tests.net.sf.jabref.util.XMPUtilTest;
-import tests.net.sf.jabref.search.BasicSearchTest;
 
 public class AllTests {
 
@@ -23,7 +17,8 @@ public class AllTests {
 		suite.addTest(tests.net.sf.jabref.imports.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.search.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.util.AllTests.suite());
-
+		suite.addTest(tests.net.sf.jabref.export.layout.AllTests.suite());
+		
 		return suite;
 	}
 

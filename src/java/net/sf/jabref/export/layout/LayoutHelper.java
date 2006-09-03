@@ -72,7 +72,6 @@ public class LayoutHelper
 
     public LayoutHelper(Reader in)
     {
-
         if (in == null)
         {
             throw new NullPointerException();

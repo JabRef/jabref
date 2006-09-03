@@ -114,7 +114,7 @@ public class ImportInspectionDialog extends JDialog {
         this.fields = fields;
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(Globals.prefs.get("preview1"), metaData);
+        preview = new PreviewPanel(metaData, Globals.prefs.get("preview1"));
 
         duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
 

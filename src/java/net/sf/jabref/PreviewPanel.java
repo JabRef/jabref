@@ -1,226 +1,161 @@
 package net.sf.jabref;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.event.HyperlinkEvent;
-import java.io.*;
-import java.util.HashMap;
-import net.sf.jabref.export.layout.*;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.RenderingHints;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.RenderingHints.Key;
+import java.io.IOException;
+import java.io.StringReader;
 
+import javax.swing.JEditorPane;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import net.sf.jabref.export.layout.Layout;
+import net.sf.jabref.export.layout.LayoutHelper;
+
+/**
+ * Displays an BibtexEntry using the given layout format.
+ * 
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ *
+ */
 public class PreviewPanel extends JEditorPane {
 
-  public String CONTENT_TYPE = "text/html";
-      //LAYOUT_FILE = "simplehtml";
-  BibtexEntry entry;
-  MetaData metaData;
-  BibtexDatabase database = null;
-    // If a database is set, the preview will attempt to resolve strings in the previewed
-    // entry using that database.
+	public String CONTENT_TYPE = "text/html";
 
-  Layout layout;
-  String prefix = "", postfix = "";
-  Dimension DIM = new Dimension(650, 110);
-  HashMap layouts = new HashMap();
-  String layoutFile;
-  JScrollPane sp;
+	BibtexEntry entry;
 
-    public PreviewPanel(BibtexDatabase db, MetaData metaData, String layoutFile) {
-        this(layoutFile, metaData);
-        this.database = db;
-    }
+	MetaData metaData;
 
-    public PreviewPanel(BibtexDatabase db, MetaData metaData, BibtexEntry be, String layoutFile) {
-        this(be, metaData, layoutFile);
-        this.database = db;
-    }
+	/**
+	 * If a database is set, the preview will attempt to resolve strings in the
+	 * previewed entry using that database.
+	 */
+	BibtexDatabase database;
 
-  public PreviewPanel(BibtexEntry be, MetaData metaData, String layoutFile) {
-    entry = be;
-    sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    sp.setBorder(null);
-    //Util.pr(layoutFile);
-    init();
-    this.layoutFile = layoutFile;
+	Layout layout;
 
-    try {
-      readLayout();
-    }
-    catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    update();
+	String layoutFile;
 
-  }
+	JScrollPane sp;
 
-  public PreviewPanel(String layoutFile, MetaData metaData) {
-    sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    this.layoutFile = layoutFile;
-    sp.setBorder(null);
-    this.metaData = metaData;
+	public PreviewPanel(BibtexDatabase db, MetaData metaData, String layoutFile) {
+		this(metaData, layoutFile);
+		this.database = db;
+	}
 
-    init();
-    //setText("<HTML></HTML>");
-  }
+	public PreviewPanel(BibtexDatabase database, MetaData metaData, BibtexEntry entry, String layoutFile) {
+		this(metaData, layoutFile);
+		this.database = database;
+		this.entry = entry;
 
-   public void setDatabase(BibtexDatabase db) {
-       database = db;
-   }
+		try {
+			readLayout();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		update();
+	}
 
-  private void init() {
-    setEditable(false);
-    setContentType(CONTENT_TYPE);
-      addHyperlinkListener(new HyperlinkListener () {
-          public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-              if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                try {
-                    String address = hyperlinkEvent.getURL().toString(); 
-                      Util.openExternalViewer(metaData, address, "url");
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
-              }
-          }
-      });
-    //setSize(100, 100);
-  }
+	public PreviewPanel(BibtexEntry entry, MetaData metaData, String layoutFile) {
+		this(null, metaData, entry, layoutFile);
+	}
 
-  public JScrollPane getPane() {
-    return sp;
-  }
+	/**
+	 * Emtpy Preview Panel constructor
+	 * 
+	 * @param metaData
+	 * @param layoutFile
+	 */
+	public PreviewPanel(MetaData metaData, String layoutFile) {
+		this.metaData = metaData;
+		this.layoutFile = layoutFile;
+		
+		sp = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		sp.setBorder(null);
 
-  public void readLayout(String layoutFormat) throws Exception {
-    layoutFile = layoutFormat;
-    readLayout();
-  }
+		setEditable(false);
+		setContentType(CONTENT_TYPE);
+		addHyperlinkListener(new HyperlinkListener() {
+			public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
+				if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+					try {
+						String address = hyperlinkEvent.getURL().toString();
+						Util.openExternalViewer(PreviewPanel.this.metaData, address, "url");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+	}
 
-  public void readLayout() throws Exception {
-    LayoutHelper layoutHelper = null;
-    StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-    layoutHelper = new LayoutHelper(sr);
-    layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+	public void setDatabase(BibtexDatabase db) {
+		database = db;
+	}
 
-      /*String entryType = entry.getType().getName().toLowerCase();
-      if (layouts.get(entryType) != null) {
-	  layout = (Layout)layouts.get(entryType);
-	  return;
-      }*/
+	public JScrollPane getPane() {
+		return sp;
+	}
 
+	public void readLayout(String layoutFormat) throws Exception {
+		layoutFile = layoutFormat;
+		readLayout();
+	}
 
-      //URL reso = JabRefFrame.class.getResource
-      //  (Globals.LAYOUT_PREFIX+layoutFile+"."+entryType+".layout");
+	public void readLayout() throws Exception {
+		StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+		layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
+	}
 
-      //Util.pr(Globals.LAYOUT_PREFIX+LAYOUT_FILE+"."+entryType+".layout");
+	public void setEntry(BibtexEntry newEntry) {
+		entry = newEntry;
+		try {
+			readLayout();
+			update();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
+	public void update() {
 
+		StringBuffer sb = new StringBuffer();
+		sb.append(layout.doLayout(entry, database));
+		setText(sb.toString());
+		invalidate();
+		revalidate();
 
-      /*try {
-        if (reso == null)
-          reso = JabRefFrame.class.getResource(Globals.LAYOUT_PREFIX+layoutFile+".layout");
-        layoutHelper = new LayoutHelper(new InputStreamReader(reso.openStream()));
-      }
-      catch (IOException ex) {
-      }*/
+		// Scroll to top:
+		final JScrollBar bar = sp.getVerticalScrollBar();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				bar.setValue(0);
+			}
+		});
+	}
 
+	public boolean hasEntry() {
+		return (entry != null);
+	}
 
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
 
-      //layouts.put(entryType, layout);
-
-    /*reso = JabRefFrame.class.getResource
-        (Globals.LAYOUT_PREFIX+layoutFile+".begin.layout");
-    StringWriter stw = new StringWriter();
-    InputStreamReader reader;
-    int c;
-    if (reso != null) {
-      reader = new InputStreamReader(reso.openStream());
-      while ((c = reader.read()) != -1) {
-        stw.write((char)c);
-      }
-      reader.close();
-    }
-    prefix = stw.toString();
-
-    reso = JabRefFrame.class.getResource
-        (Globals.LAYOUT_PREFIX+layoutFile+".end.layout");
-    stw = new StringWriter();
-    if (reso != null) {
-      reader = new InputStreamReader(reso.openStream());
-      while ((c = reader.read()) != -1) {
-        stw.write((char)c);
-      }
-      reader.close();
-    }
-    postfix = stw.toString();
-*/
-  }
-
-  public void setEntry(BibtexEntry newEntry) {
-    //Util.pr("en");
-    entry = newEntry;
-    try {
-      readLayout();
-      update();
-    }
-    catch (Exception ex) {
-        ex.printStackTrace();
-    }
-    
-  }
-
-  public void update() {
-
-    //StringBuffer sb = new StringBuffer(prefix);
-    StringBuffer sb = new StringBuffer();
-    sb.append(layout.doLayout(entry, database));
-    //sb.append(postfix);
-    setText(sb.toString());
-    invalidate();
-    revalidate();
-    // Scroll to top:
-    final JScrollBar bar = sp.getVerticalScrollBar();
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        bar.setValue(0);
-      }
-    });
-
-
-    //Util.pr(sb.toString());
-    //revalidate();
-
-    //Util.pr(""+getPreferredSize()+"\t"+getMinimumSize());
-
-
-  }
-
-  public boolean hasEntry() {
-    return (entry != null);
-  }
-
-  public Dimension getPreferredScrollableViewportSize() {
-    return getPreferredSize();
-  }
-
-/*  public Dimension getPreferredSize() {
-    Util.pr(""+super.getPreferredSize());
-    return super.getPreferredSize();
-  }*/
-  /*public Dimension getMinimumSize() { return DIM; }*/
-
-  public void paintComponent(Graphics g) {
-    Graphics2D g2 = (Graphics2D)g;
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                        RenderingHints.VALUE_RENDER_QUALITY);
-    super.paintComponent(g2);
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_OFF);
-  }
-
+	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		Object hint = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		super.paintComponent(g2);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
+	}
 }
