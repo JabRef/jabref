@@ -15,7 +15,9 @@ public class AllTests {
 		suite.addTestSuite(AuthorAndsCommaReplacerTest.class);
 		suite.addTestSuite(AuthorFirstFirstTest.class);
 		suite.addTestSuite(AuthorFirstLastOxfordCommasTest.class);
+		suite.addTestSuite(AuthorOrgSciTest.class);
 		suite.addTestSuite(AuthorAbbreviatorTest.class);
+		suite.addTestSuite(CompositeFormatTest.class);
 		suite.addTestSuite(ResolvePDFTest.class);
 		suite.addTestSuite(AuthorAndsReplacerTest.class);
 		suite.addTestSuite(AuthorLastFirstAbbrCommasTest.class);
@@ -24,6 +26,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorFirstAbbrLastCommasTest.class);
 		suite.addTestSuite(AuthorLastFirstCommasTest.class);
 		suite.addTestSuite(AuthorLastFirstAbbrOxfordCommasTest.class);
+		suite.addTestSuite(NoSpaceBetweenAbbreviationsTest.class);
 		//$JUnit-END$
 		return suite;
 	}

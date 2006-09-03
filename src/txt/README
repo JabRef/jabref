@@ -108,6 +108,10 @@ Change log:
         - Added regular expression search for auto-linking. Search is now more flexible by default.
         - Search operation also now search relative to the JabRef directory.
         - General improvements in Inspec ISI handling.
+        - New LayoutFormatter: AuthorOrgSci - first author is in "last, first" 
+          all others in "first last". First names are abbreviated.
+        - New LayoutFormatter: NoSpaceBetweenAbbreviations - spaces between multiple 
+          abbreviated first names are removed.
         - [ 1503956 ] Fixed: Help text instead of Help icon.
         - Improved PDF link resolver to produce proper URIs.
         - [ 1534537 ] Fixed: resize groups interface

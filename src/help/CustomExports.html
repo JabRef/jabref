@@ -115,12 +115,15 @@ This can be useful for some fomatters, e.g. the CurrentDate formatter (described
 to have been run earlier.
 <li><code>AuthorAndsReplacer</code> : replaces "and" between names with ";", and "&" between the last two. 
 <li><code>AuthorAndsCommaReplacer</code> : replaces "and" between names with ",", and "&" between the last two.
+<li><code>AuthorOrgSci</code> : first author is in "last, first" all others in "first last". First names are abbreviated.
+<li><code>NoSpaceBetweenAbbreviations</code> : spaces between multiple abbreviated first names are removed.
 <li><code>FormatPagesForHTML</code> : replaces "--" with "-".
   <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
 <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".
 <li><code>RemoveLatexCommands</code> : removes LaTeX commands like <code>\em</code>, <code>\textbf</code>, etc. If
   used together with <code>HTMLChars</code> or <code>XMLChars</code>, this formatter should be called last.
 <li><code>ToLowerCase</code> : turns all characters into lower case.
+
 </ul>
 
 <p>If none of the available formatters can do what you want to achieve, you can add your own by implementing
