@@ -1,0 +1,60 @@
+TY  - JOUR
+
+JO  - Geoscience and Remote Sensing Letters, IEEE
+
+TI  - Improving Urban Road Extraction in High-Resolution
+Images Exploiting Directional Filtering, Perceptual
+Grouping, and Simple Topological Concepts
+
+IS  - 3
+
+SN  - 1545-598X  
+
+SP  -  387
+
+EP  -  391
+
+AU  - Gamba, P.
+
+AU  - Dell'Acqua, F.
+
+AU  - Lisini, G.
+
+PY  - 2006
+
+KW  - Perceptual grouping
+
+KW  - street extraction
+
+KW  - urban remote sensing
+
+KW  - Perceptual grouping
+
+KW  - street extraction
+
+KW  - urban remote sensing
+
+VL  - 4
+
+JA  - Geoscience and Remote Sensing Letters, IEEE
+
+AB  -  In this letter, the problem of detecting urban road
+networks from high-resolution optical/synthetic aperture
+radar (SAR) images is addressed. To this end, this letter
+exploits a priori knowledge about road direction
+distribution in urban areas. In particular, this letter
+presents an adaptive filtering procedure able to capture the
+predominant directions of these roads and enhance the
+extraction results. After road element extraction, to both
+discard redundant segments and avoid gaps, a special
+perceptual grouping algorithm is devised, exploiting
+colinearity as well as proximity concepts. Finally, the road
+network topology is considered, checking for road
+intersections and regularizing the overall patterns using
+these focal points. The proposed procedure was tested on a
+pair of very high resolution images, one from an optical
+sensor and one from a SAR sensor. The experiments show an
+increase in both the completeness and the quality indexes
+for the extracted road network.
+
+ER  - 

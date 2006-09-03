@@ -270,6 +270,57 @@ public class IsiImporterTest extends TestCase {
 		assertEquals(false, importer.getIsCustomImporter());
 	}
 
+	public void testImportIEEEExport() throws IOException {
+		IsiImporter importer = new IsiImporter();
+
+		List entries = importer.importEntries(IsiImporterTest.class
+			.getResourceAsStream("IEEEImport1.txt"));
+
+		assertEquals(1, entries.size());
+		BibtexEntry a = (BibtexEntry) entries.get(0);
+		
+		assertEquals(a.getType().getName(), BibtexEntryType.ARTICLE, a.getType());
+		assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
+		assertEquals(
+			"Improving Urban Road Extraction in High-Resolution " +
+			"Images Exploiting Directional Filtering, Perceptual " +
+			"Grouping, and Simple Topological Concepts",
+			a.getField("title"));
+
+		assertEquals("4", a.getField("volume"));
+		assertEquals("3", a.getField("number"));
+		
+		assertEquals("1545-598X", a.getField("SN"));  
+
+		assertEquals("387--391", a.getField("pages"));
+
+		assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", (String) a.getField("author"));
+
+		assertEquals("2006", a.getField("year"));
+
+		assertEquals("Perceptual grouping, street extraction, urban remote sensing", (String)a.getField("keywords"));
+
+		assertEquals("In this letter, the problem of detecting urban road " +
+				"networks from high-resolution optical/synthetic aperture " +
+				"radar (SAR) images is addressed. To this end, this letter " +
+				"exploits a priori knowledge about road direction " +
+				"distribution in urban areas. In particular, this letter " +
+				"presents an adaptive filtering procedure able to capture the " +
+				"predominant directions of these roads and enhance the " +
+				"extraction results. After road element extraction, to both " +
+				"discard redundant segments and avoid gaps, a special " +
+				"perceptual grouping algorithm is devised, exploiting " +
+				"colinearity as well as proximity concepts. Finally, the road " +
+				"network topology is considered, checking for road " +
+				"intersections and regularizing the overall patterns using " +
+				"these focal points. The proposed procedure was tested on a " +
+				"pair of very high resolution images, one from an optical " +
+				"sensor and one from a SAR sensor. The experiments show an " +
+				"increase in both the completeness and the quality indexes " +
+				"for the extracted road network.", (String)a.getField("abstract"));
+		
+	}
+	
 	public void testImportEntriesMedline() throws IOException {
 		IsiImporter importer = new IsiImporter();
 

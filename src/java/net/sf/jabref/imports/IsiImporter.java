@@ -138,6 +138,10 @@ public class IsiImporter extends ImportFormat {
 	 * objects.
 	 */
 	public List importEntries(InputStream stream) throws IOException {
+		if (stream == null) {
+			throw new IOException("No stream given.");
+		}
+
 		ArrayList bibitems = new ArrayList();
 		StringBuffer sb = new StringBuffer();
 
@@ -191,19 +195,24 @@ public class IsiImporter extends ImportFormat {
 				if (fields[j].length() <= 2)
 					continue;
 
-				// this is Java 1.5.0 code:
-				// fields[j] = fields[j].replace(" - ", "");
-				// TODO: switch to 1.5.0 some day; until then, use 1.4.2 code:
-				fields[j] = fields[j].replaceAll(" - ", "");
-
 				String beg = fields[j].substring(0, 2);
-				String value = fields[j].substring(2).trim();
+				String value = fields[j].substring(3);
+				if (value.startsWith(" - ")) {
+					value = value.substring(3);
+				}
+				value = value.trim();
 
 				if (beg.equals("PT")) {
-					PT = value.replaceAll("Journal", "article").replaceAll("J", "article");
+					if (value.startsWith("J")) {
+						PT = "article";
+					} else {
+						PT = value;
+					}
 					Type = "article"; // make all of them PT?
 				} else if (beg.equals("TY")) {
-					if ("CONF".equals(value))
+					if ("JOUR".equals(value))
+						Type = "article";
+					else if ("CONF".equals(value))
 						Type = "inproceedings";
 				} else if (beg.equals("JO"))
 					hm.put("booktitle", value);
@@ -217,11 +226,20 @@ public class IsiImporter extends ImportFormat {
 					hm.put("author", author);
 				} else if (beg.equals("TI"))
 					hm.put("title", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("SO"))
+				else if (beg.equals("SO") || beg.equals("JA"))
 					hm.put("journal", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("ID"))
-					hm.put("keywords", value.replaceAll("EOLEOL", " "));
-				else if (beg.equals("AB"))
+				else if (beg.equals("ID") || beg.equals("KW")) {
+				
+					value = value.replaceAll("EOLEOL", " ");
+					String existingKeywords = (String) hm.get("keywords");
+					if (existingKeywords != null && existingKeywords.indexOf(value) == -1) {
+						existingKeywords += ", " + value;
+					} else {
+						existingKeywords = value;
+					}
+					hm.put("keywords", existingKeywords);
+
+				} else if (beg.equals("AB"))
 					hm.put("abstract", value.replaceAll("EOLEOL", " "));
 				else if (beg.equals("BP") || beg.equals("BR") || beg.equals("SP"))
 					pages = value;
@@ -229,7 +247,7 @@ public class IsiImporter extends ImportFormat {
 					int detpos = value.indexOf(' ');
 
 					// tweak for IEEE Explore
-					if (detpos != -1)
+					if (detpos != -1 && value.substring(0, detpos).trim().length() > 0)
 						value = value.substring(0, detpos);
 
 					pages = pages + "--" + value;

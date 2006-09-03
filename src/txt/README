@@ -104,7 +104,7 @@ Change log:
         - Bib files dragged into JabRef now appear in the Recent files menu.
         - Fixed bug in import dialog.
         - [ 1542552 ] Fixed: Wrong author import from ISI file.
-        - Better support for ISI files in general (should basically be better than INSPEC)
+        - Better support for ISI files in general (should basically be better than INSPEC) including IEEE parsing.
         - Added regular expression search for auto-linking. Search is now more flexible by default.
         - Search operation also now search relative to the JabRef directory.
         - General improvements in Inspec ISI handling.
