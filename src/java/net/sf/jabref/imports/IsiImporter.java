@@ -55,7 +55,9 @@ public class IsiImporter extends ImportFormat {
 		return "isi";
 	}
 
-	static final Pattern isiPattern = Pattern.compile("^FN ISI Export Format|^VR 1.|^PY \\d{4}|");
+    // 2006.09.05: Modified pattern to avoid false positives for other files due to an
+    // extra | at the end:
+    static final Pattern isiPattern = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 	/**
 	 * Check whether the source is in the correct format for this importer.
@@ -66,7 +68,7 @@ public class IsiImporter extends ImportFormat {
 
 		String str;
 
-		while ((str = in.readLine()) != null) {
+        while ((str = in.readLine()) != null) {
 
 			/**
 			 * The following line gives false positives for RIS files, so it
