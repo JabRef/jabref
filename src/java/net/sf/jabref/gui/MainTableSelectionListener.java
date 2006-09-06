@@ -8,10 +8,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileMenuItem;
 
 import javax.swing.*;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +21,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class MainTableSelectionListener implements ListEventListener, MouseListener,
-        KeyListener {
+        KeyListener, FocusListener {
 
     PreviewPanel[] previewPanel = null;
     int activePreview = 1;
@@ -34,6 +31,12 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     EventList tableRows;
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
+
+    // Register the last character pressed to quick jump in the table. Together
+    // with storing the last row number jumped to, this is used to let multiple
+    // key strokes cycle between all entries starting with the same letter:
+    private int lastPressed = '\n';
+    private int lastQuickJumpRow = -1;
 
     //private int lastCharPressed = -1;
 
@@ -367,18 +370,35 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             // TODO: the following lookup should be done by a faster algorithm,
             // such as binary search. But the table may not be sorted properly,
             // due to marked entries, search etc., which rules out the binary search.
-            for (int i=0; i<table.getRowCount(); i++) {
-                Object o = table.getValueAt(i, sortingColumn);
-                if (o == null)
-                    continue;
-                String s = o.toString().toLowerCase();
-                if ((s.length() >= 1) && (s.charAt(0) == c)) {
-                    table.setRowSelectionInterval(i, i);
-                    table.ensureVisible(i);
-                    return;
-                }
+            int startRow = 0;
+            if ((c == lastPressed) && (lastQuickJumpRow >= 0)) {
+                if (lastQuickJumpRow < table.getRowCount()-1)
+                    startRow = lastQuickJumpRow+1;
             }
 
+            lastPressed = c;
+            boolean done = false;
+            while (!done) {
+                for (int i=startRow; i<table.getRowCount(); i++) {
+                    Object o = table.getValueAt(i, sortingColumn);
+                    if (o == null)
+                        continue;
+                    String s = o.toString().toLowerCase();
+                    if ((s.length() >= 1) && (s.charAt(0) == c)) {
+                        table.setRowSelectionInterval(i, i);
+                        table.ensureVisible(i);
+                        lastQuickJumpRow = i;
+                        return;
+                    }
+                }
+                // Finished, no result. If we didn't start at the beginning of
+                // the table, try that. Otherwise, exit the while loop.
+                if (startRow > 0)
+                    startRow = 0;
+                else
+                    done = true;
+
+            }
             
         }
     }
@@ -389,4 +409,11 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     public void keyPressed(KeyEvent e) {
     }
 
+    public void focusGained(FocusEvent e) {
+
+    }
+
+    public void focusLost(FocusEvent e) {
+        lastPressed = -1; // Reset quick jump when focus is lost.
+    }
 }

@@ -37,6 +37,8 @@ import java.io.File;
 
 import java.util.*;
 import java.util.List;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -735,6 +737,9 @@ lastEdLoop:
             //Util.pr(": Showing frame");
             jrf.setVisible(true);
 
+            // TEST TEST TEST TEST TEST TEST
+            startOOPlugin(jrf);
+
             for (int i = 0; i < loaded.size(); i++) {
                 ParserResult pr = (ParserResult) loaded.elementAt(i);
                 if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
@@ -759,6 +764,33 @@ lastEdLoop:
             }
         } else
             System.exit(0);
+    }
+
+    /**
+     * Morten Alver (sept. 06): I'm adding this to run the functionality for
+     * OpenOffice integration. I'm not sure yet how to handle deployment issues,
+     * because the OO stuff requires several OO jars on the classpath, which we
+     * shouldn't distribute because OO installations already have them.
+     *
+     * To avoid introducing dependencies on these jars for the time being,
+     * I'm keeping OO "plugin" files separate, only invoking them through reflection.
+     *
+     * @param jrf The JabRefFrame.
+     */
+    private void startOOPlugin(JabRefFrame jrf) {
+
+        try {
+            Class c = Class.forName("net.sf.jabref.oo.OOTestPanel");
+            Method m = c.getDeclaredMethod("open",
+                    new Class[] {JabRefFrame.class});
+            Object i = c.newInstance();
+            Object r = m.invoke(i, new Object[] {jrf});
+        } catch (Exception e) {
+            // Do nothing.
+            //System.out.println("OO plugin not found.");
+            //e.printStackTrace();
+        }
+
     }
 
     public static ParserResult openBibFile(String name) {

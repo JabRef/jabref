@@ -1622,7 +1622,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.addSelectionListener(selectionListener);
         mainTable.addMouseListener(selectionListener);
         mainTable.addKeyListener(selectionListener);
-
+        mainTable.addFocusListener(selectionListener);
+        
         // Add the listener that will take care of highlighting groups as the selection changes:
         groupsHighlightListener = new ListEventListener() {
             public void listChanged(ListEvent listEvent) {
