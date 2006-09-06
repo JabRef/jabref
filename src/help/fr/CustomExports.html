@@ -36,7 +36,7 @@ Il faut noter que ces fichiers doivent &ecirc;tre dans le m&ecirc;me r&eacute;pe
 </p>
 
 <p>
-Dans notre exemple de fichier d'exportation, cela pourrait ressembler &agrave; 
+Dans notre exemple de fichier d'exportation, cela pourrait ressembler &agrave;
 </p>
 
 <p>
@@ -89,7 +89,7 @@ Le formateur est utilis&eacute; en ins&eacute;rant la commande <code>\format</co
 </p>
 
 <p>
-Vous pouvez aussi indiquer plusieurs formateurs s&eacute;par&eacute;s par des virgules. Ils seront alors appel&eacute;s s&eacute;quentiellement de la gauche vers la droite, par exemple&nbsp;: 
+Vous pouvez aussi indiquer plusieurs formateurs s&eacute;par&eacute;s par des virgules. Ils seront alors appel&eacute;s s&eacute;quentiellement de la gauche vers la droite, par exemple&nbsp;:
 </p>
 <p>
 <code>\format[ToLowerCase,HTMLChars]{\author}</code>
@@ -109,14 +109,15 @@ JabRef fournit les formateurs suivants, certains d'entre eux d&eacute;pendant d'
 <li><code>HTMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation HTML.
 <li><code>XMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation XML.
 <li><code>CreateDocBookAuthors</code>&nbsp;: formate le contenu du champ author selon le style DocBook.
-<li><code>CurrentDate</code>&nbsp;: renvoie la date actuelle. Sans argument, ce formateur renvoie la date et l'heure actuelle au format "yyyy.MM.dd hh:mm:ss z" (date, heure et fuseau horaire). En donnant une cha&icirc;ne de format diff&eacute;rent comme argument, le format de la date peut-&ecirc;tre adapt&eacute;. Par exemple, 
+<li><code>CurrentDate</code>&nbsp;: renvoie la date actuelle. Sans argument, ce formateur renvoie la date et l'heure actuelle au format "yyyy.MM.dd hh:mm:ss z" (date, heure et fuseau horaire). En donnant une cha&icirc;ne de format diff&eacute;rent comme argument, le format de la date peut-&ecirc;tre adapt&eacute;. Par exemple,
 <code>\format[CurrentDate]{yyyy.MM.dd}</code> renverra uniquement la date, comme par exemple 2005.11.30.
 <li><code>AuthorFirstFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier.
 <li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier et des virgules comme s&eacute;parateurs.
 <li><code>AuthorLastFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant le nom de famille en premier.
 <li><code>AuthorLastFirstAbbreviator</code>&nbsp;: r&eacute;duit les pr&eacute;noms de tous les auteurs &agrave; leurs initiales. Ce formateur n&eacute;cessite d'avoir pr&eacute;alablement utilis&eacute; AuthorLastFirst.
-<li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and" par ";" entre les premiers noms et par "&" entre les deux derniers. 
-<li><code>AuthorAndsCommaReplacer</code> : remplace "and" entre les noms par une virgule (",") et "&" entre les deux derniers.
+<li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and" par ";" entre les premiers noms et par "&" entre les deux derniers.
+<li><code>AuthorAndsCommaReplacer</code>&nbsp;: remplace "and" entre les noms par une virgule (",") et "&" entre les deux derniers.
+<li><code>AuthorOrgSci</code>&nbsp;: premier auteur selon "nom, prénom" et tous les autres selon "prénom nom". Les prénoms sont abrégés.
 <li><code>FormatPagesForHTML</code>&nbsp;: remplace "--" par "-".
   <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par un tiret XML.
 <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les accolades "{" ou "}".
@@ -164,7 +165,7 @@ Par exemple, on suppose que l'on d&eacute;sire faire des groupes &agrave; partir
 </p>
 <p>
 <code>\begingroup{keywords}New Category: \format[HTMLChars]{\keywords}
-<br>	\endgroup{keywords}</code>
+<br>    \endgroup{keywords}</code>
 </p>
 
 <h2>Partage de votre travail </h2>
