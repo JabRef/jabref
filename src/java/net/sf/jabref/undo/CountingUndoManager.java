@@ -73,10 +73,10 @@ public class CountingUndoManager extends UndoManager {
     }
 
     public synchronized void markUnchanged() {
-	unchangedPoint = current;
+    	unchangedPoint = current;
     }
 
     public boolean hasChanged() {
-	return !(current == unchangedPoint);
+    	return !(current == unchangedPoint);
     }
 }

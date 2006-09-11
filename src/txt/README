@@ -122,6 +122,7 @@ Change log:
         - [ 1285977 ] Fixed: Impossible to properly sort a numeric field
 	    - [ 1535044 ] Fixed: Month sorting
         - [ 1540646 ] Fixed: Default sort order: bibtexkey
+        - [ 1553552 ] Fixed: Not properly detecting changes to flag as changed
 2.1     - Added capability to drag files and WWW links into JabRef. BibTeX files will be
           opened normally, other files imported, and WWW links downloaded and imported.
         - The -v command line option now makes the application only print version number

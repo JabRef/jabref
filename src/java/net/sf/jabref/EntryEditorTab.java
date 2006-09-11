@@ -24,272 +24,378 @@
  */
 package net.sf.jabref;
 
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import java.util.*;
+import java.awt.AWTKeyStroke;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.awt.*;
-import java.awt.event.*;
 
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+
+/**
+ * A single tab displayed in the EntryEditor holding several FieldEditors.
+ * 
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ * 
+ */
 public class EntryEditorTab {
 
-    private JPanel panel = new JPanel();
-    private String[] fields;
-    private final static Object[] ARRAY = new String[0];
-    private EntryEditor parent;
-    private HashMap editors = new HashMap();
-    private FieldEditor activeField = null;
-    private JScrollPane sp = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    //    private BibtexEntry entry;
+	private JPanel panel = new JPanel();
 
-    public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField, String name) {
-        if (fields != null)
-                this.fields = (String[])fields.toArray(ARRAY);
-        else
-            this.fields = new String[] {};
-        this.parent = parent;
-        setupPanel(addKeyField, name);
+	private String[] fields;
 
-        // The following line makes sure focus cycles inside tab instead of being lost
-        // to other parts of the frame:
-        panel.setFocusCycleRoot(true);
+	private EntryEditor parent;
 
-    }
+	private HashMap editors = new HashMap();
 
+	private FieldEditor activeField = null;
 
-    private final void setupPanel(boolean addKeyField, String title) {
-        GridBagLayout gbl = new GridBagLayout();
-        GridBagConstraints con = new GridBagConstraints();
-        panel.setLayout(gbl);
-        double totalWeight = 0;
+	public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField, String name) {
+		if (fields != null)
+			this.fields = (String[]) fields.toArray(new String[0]);
+		else
+			this.fields = new String[] {};
 
-        //panel.setOpaque(true);
-        //panel.setBackground(java.awt.Color.white);
+		this.parent = parent;
 
-        for (int i=0; i<fields.length; i++) {
+		setupPanel(addKeyField, name);
 
-            // Create the text area:
-            FieldTextArea ta = new FieldTextArea(fields[i], null);//stringContent);
-        JComponent ex = parent.getExtra(fields[i], ta);
-            // Attach listeners and key bindings:
-            setupJTextComponent(ta);
-            ta.addFocusListener(new FieldListener(ta));
+		/*
+		 * The following line makes sure focus cycles inside tab instead of
+		 * being lost to other parts of the frame:
+		 */
+		panel.setFocusCycleRoot(true);
+	}
 
-            // Store the editor for later reference:
-            editors.put(fields[i], ta);
-            if (i == 0)
-                activeField = ta;
+	void setupPanel(boolean addKeyField, String title) {
+		GridBagLayout gbl = new GridBagLayout();
+		GridBagConstraints con = new GridBagConstraints();
+		panel.setLayout(gbl);
+		double totalWeight = 0;
 
-            // The label for this field:
-            con.insets = new Insets(5, 5, 0, 0);
-            con.anchor = GridBagConstraints.WEST;
-            con.fill = GridBagConstraints.BOTH;
-            con.gridwidth = 1;
-            con.weightx = 0;
-            con.weighty = 0;
-            con.anchor = GridBagConstraints.NORTH;
-            con.fill = GridBagConstraints.BOTH;
-            gbl.setConstraints(ta.getLabel(), con);
-            panel.add(ta.getLabel());
+		for (int i = 0; i < fields.length; i++) {
+			// Create the text area:
+			final FieldTextArea ta = new FieldTextArea(fields[i], null);
+			JComponent ex = parent.getExtra(fields[i], ta);
+			setupJTextComponent(ta);
 
-            // The field itself:
-            con.fill = GridBagConstraints.BOTH;
-            con.weightx = 1;
-            con.weighty = BibtexFields.getFieldWeight(fields[i]);
-            totalWeight += con.weighty;
-            // The gridwidth depends on whether we will add an extra component to the right:
-            if (ex != null)
-                con.gridwidth = 1;
-            else
-                con.gridwidth = GridBagConstraints.REMAINDER;
-            gbl.setConstraints(ta.getPane(), con);
-            panel.add(ta.getPane());
+			// Store the editor for later reference:
+			editors.put(fields[i], ta);
+			if (i == 0)
+				activeField = ta;
 
-            // Possibly an extra component:
-            if (ex != null) {
-                con.gridwidth = GridBagConstraints.REMAINDER;
-                con.anchor = GridBagConstraints.NORTH;
-                con.fill = GridBagConstraints.HORIZONTAL;
-                con.weightx = 0;
-                gbl.setConstraints(ex, con);
-                panel.add(ex);
-            }
-        panel.setName(title);
-        }
+			// The label for this field:
+			con.insets = new Insets(5, 5, 0, 0);
+			con.anchor = GridBagConstraints.WEST;
+			con.fill = GridBagConstraints.BOTH;
+			con.gridwidth = 1;
+			con.weightx = 0;
+			con.weighty = 0;
+			con.anchor = GridBagConstraints.NORTH;
+			con.fill = GridBagConstraints.BOTH;
+			gbl.setConstraints(ta.getLabel(), con);
+			panel.add(ta.getLabel());
 
-        // Add the edit field for Bibtex-key.
-        if (addKeyField) {
-            con.insets.top += 25;
-            con.insets.bottom = 10;
-            con.gridwidth = 1;
-            con.weighty = 0;
-            con.weightx = 0;
-            con.fill = GridBagConstraints.HORIZONTAL;
-            con.anchor = GridBagConstraints.SOUTHWEST;
-            FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD,
-                  (String) parent.getEntry().getField(BibtexFields.KEY_FIELD), true);
-        editors.put("bibtexkey", tf);
+			// The field itself:
+			con.fill = GridBagConstraints.BOTH;
+			con.weightx = 1;
+			con.weighty = BibtexFields.getFieldWeight(fields[i]);
+			totalWeight += con.weighty;
+			// The gridwidth depends on whether we will add an extra component
+			// to the right:
+			if (ex != null)
+				con.gridwidth = 1;
+			else
+				con.gridwidth = GridBagConstraints.REMAINDER;
+			gbl.setConstraints(ta.getPane(), con);
+			panel.add(ta.getPane());
 
-        // If the key field is the only field, we should have only one editor, and this one should be set
-        // as active initially:
-        if (editors.size() == 1)
-            activeField = tf;
+			// Possibly an extra component:
+			if (ex != null) {
+				con.gridwidth = GridBagConstraints.REMAINDER;
+				con.anchor = GridBagConstraints.NORTH;
+				con.fill = GridBagConstraints.HORIZONTAL;
+				con.weightx = 0;
+				gbl.setConstraints(ex, con);
+				panel.add(ex);
+			}
+			panel.setName(title);
+		}
 
-            gbl.setConstraints(tf.getLabel(), con);
-            panel.add(tf.getLabel());
-            con.gridwidth = GridBagConstraints.REMAINDER;
-            con.weightx = 1;
-            setupJTextComponent(tf);
-            tf.addFocusListener(new FieldListener(tf));
-            gbl.setConstraints(tf, con);
-            panel.add(tf);
-        }
+		// Add the edit field for Bibtex-key.
+		if (addKeyField) {
+			con.insets.top += 25;
+			con.insets.bottom = 10;
+			con.gridwidth = 1;
+			con.weighty = 0;
+			con.weightx = 0;
+			con.fill = GridBagConstraints.HORIZONTAL;
+			con.anchor = GridBagConstraints.SOUTHWEST;
 
+			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, (String) parent
+				.getEntry().getField(BibtexFields.KEY_FIELD), true);
+			setupJTextComponent(tf);
 
-    }
+			editors.put("bibtexkey", tf);
+			/*
+			 * If the key field is the only field, we should have only one
+			 * editor, and this one should be set as active initially:
+			 */
+			if (editors.size() == 1)
+				activeField = tf;
 
+			gbl.setConstraints(tf.getLabel(), con);
+			panel.add(tf.getLabel());
+			con.gridwidth = GridBagConstraints.REMAINDER;
+			con.weightx = 1;
 
-    public void setActive(FieldEditor c) {
-        activeField = c;
-        //System.out.println(c.toString());
-    }
+			gbl.setConstraints(tf, con);
+			panel.add(tf);
+		}
+	}
 
-    public FieldEditor getActive() {
-        return activeField;
-    }
+	BibtexEntry entry;
 
-    public List getFields() {
-        return java.util.Arrays.asList(fields);
-    }
+	public BibtexEntry getEntry() {
+		return entry;
+	}
 
-    public void activate() {
-        if (activeField != null)
-            activeField.requestFocus();
+	boolean isFieldModified(FieldEditor f) {
+		String text = f.getText().trim();
 
+		if (text.length() == 0) {
+			return getEntry().getField(f.getFieldName()) != null;
+		} else {
+			Object entryValue = getEntry().getField(f.getFieldName());
+			return entryValue == null || !entryValue.toString().equals(text);
+		}
+	}
 
-        //System.out.println("Activate, hurra");
-    }
+	public void markIfModified(FieldEditor f) {
+		// Only mark as changed if not already is and the field was indeed
+		// modified
+		if (!updating && !parent.panel.isBaseChanged() && isFieldModified(f)) {
+			markBaseChanged();
+		}
+	}
 
-    public void updateAll() {
-        // Test: make sure all fields are correct:
-        setEntry(parent.getEntry());
-        /*for (int i=0; i<fields.length; i++) {
-            FieldEditor fe = (FieldEditor)editors.get(fields[i]);
-            fe.setText(e);
-        }  */
-    }
+	void markBaseChanged() {
+		parent.panel.markBaseChanged();
+	}
 
-    public void setEntry(BibtexEntry entry) {
-        for (Iterator i=editors.keySet().iterator(); i.hasNext();) {
-            String field = (String)i.next();
-            FieldEditor ed = (FieldEditor)editors.get(field);
-            Object content = entry.getField(ed.getFieldName());
-            ed.setText((content == null) ? "" : content.toString());
-        }
-    }
+	/**
+	 * Only sets the activeField variable but does not focus it.
+	 * 
+	 * Call activate afterwards.
+	 * 
+	 * @param c
+	 */
+	public void setActive(FieldEditor c) {
+		activeField = c;
+	}
 
-    public boolean updateField(String field, String content) {
-        if (!editors.containsKey(field))
-            return false;
-        FieldEditor ed = (FieldEditor)editors.get(field);
-        ed.setText(content);
-        return true;
-    }
+	public FieldEditor getActive() {
+		return activeField;
+	}
 
-    public void validateAllFields() {
-        for (Iterator i = editors.keySet().iterator(); i.hasNext();) {
-            String field = (String) i.next();
-            FieldEditor ed = (FieldEditor) editors.get(field);
-            ed.setEnabled(true);
-            if (((Component) ed).hasFocus())
-                ed.setBackground(GUIGlobals.activeEditor);
-            else
-                ed.setBackground(GUIGlobals.validFieldBackground);
-        }
-    }
+	public List getFields() {
+		return java.util.Arrays.asList(fields);
+	}
 
-    public void setEnabled(boolean enabled) {
-        for (Iterator i=editors.keySet().iterator(); i.hasNext();) {
-            String field = (String)i.next();
-            FieldEditor ed = (FieldEditor)editors.get(field);
-            ed.setEnabled(enabled);
-        }
-    }
+	public void activate() {
+		if (activeField != null){
+			activeField.requestFocus();
+		}
+	}
 
-    public Component getPane() {
+	/**
+	 * Reset all fields from the data in the BibtexEntry.
+	 * 
+	 */
+	public void updateAll() {
+		setEntry(getEntry());
+	}
 
-        return panel;
-    }
+	protected boolean updating = false;
 
-    public void setupJTextComponent(JTextComponent ta) {
-        // Activate autocompletion if it should be used for this field.
+	public void setEntry(BibtexEntry entry) {
+		try {
+			updating = true;
+			Iterator i = editors.values().iterator();
+			while (i.hasNext()) {
+				FieldEditor editor = (FieldEditor) i.next();
+				Object content = entry.getField(editor.getFieldName());
+				editor.setText((content == null) ? "" : content.toString());
+			}
+			this.entry = entry;
+		} finally {
+			updating = false;
+		}
+	}
 
-        // Set up key bindings and focus listener for the FieldEditor.
-        InputMap im = ta.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap am = ta.getActionMap();
+	public boolean updateField(String field, String content) {
+		if (!editors.containsKey(field))
+			return false;
+		FieldEditor ed = (FieldEditor) editors.get(field);
+		ed.setText(content);
+		return true;
+	}
 
-        im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
-        am.put("prev", parent.prevEntryAction);
-        im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
-        am.put("next", parent.nextEntryAction);
+	public void validateAllFields() {
+		for (Iterator i = editors.keySet().iterator(); i.hasNext();) {
+			String field = (String) i.next();
+			FieldEditor ed = (FieldEditor) editors.get(field);
+			ed.setEnabled(true);
+			if (((Component) ed).hasFocus())
+				ed.setBackground(GUIGlobals.activeEditor);
+			else
+				ed.setBackground(GUIGlobals.validFieldBackground);
+		}
+	}
 
-        im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
-        am.put("store", parent.storeFieldAction);
-        im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
-        im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
-        am.put("left", parent.switchLeftAction);
-        im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
-        im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
-        am.put("right", parent.switchRightAction);
-        im.put(Globals.prefs.getKey("Help"), "help");
-        am.put("help", parent.helpAction);
-        im.put(Globals.prefs.getKey("Save database"), "save");
-        am.put("save", parent.saveDatabaseAction);
-        im.put(Globals.prefs.getKey("Next tab"), "nexttab");
-    am.put("nexttab", parent.frame.nextTab);
-    im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
-    am.put("prevtab", parent.frame.prevTab);
+	public void setEnabled(boolean enabled) {
+		Iterator i = editors.values().iterator();
+		while (i.hasNext()) {
+			FieldEditor editor = (FieldEditor) i.next();
+			editor.setEnabled(enabled);
+		}
+	}
 
+	public Component getPane() {
+		return panel;
+	}
 
-        try {
-            HashSet keys =
-                new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-            keys.clear();
-            keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
-            ta.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-            keys =
-                new HashSet(ta.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-            keys.clear();
-            keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
-            ta.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-        } catch (Throwable t) {
-            System.err.println(t);
-        }
+	/**
+	 * Set up key bindings and focus listener for the FieldEditor.
+	 * 
+	 * @param component
+	 */
+	public void setupJTextComponent(final JTextComponent component) {
 
-    }
+		component.addFocusListener(fieldListener);
 
+		InputMap im = component.getInputMap(JComponent.WHEN_FOCUSED);
+		ActionMap am = component.getActionMap();
 
-    /*
-     * Focus listener that fires the storeFieldAction when a FieldTextArea loses
-     * focus.
-     */
-    class FieldListener extends FocusAdapter {
+		im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+		am.put("prev", parent.prevEntryAction);
+		im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+		am.put("next", parent.nextEntryAction);
 
-        FieldEditor fe;
+		im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+		am.put("store", parent.storeFieldAction);
+		im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
+		im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+		am.put("left", parent.switchLeftAction);
+		im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
+		im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+		am.put("right", parent.switchRightAction);
+		im.put(Globals.prefs.getKey("Help"), "help");
+		am.put("help", parent.helpAction);
+		im.put(Globals.prefs.getKey("Save database"), "save");
+		am.put("save", parent.saveDatabaseAction);
+		im.put(Globals.prefs.getKey("Next tab"), "nexttab");
+		am.put("nexttab", parent.frame.nextTab);
+		im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+		am.put("prevtab", parent.frame.prevTab);
 
-        public FieldListener(FieldEditor fe) {
-            this.fe = fe;
-        }
+		try {
+			HashSet keys = new HashSet(component
+				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+			keys.clear();
+			keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
+			component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
+			keys = new HashSet(component
+				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+			keys.clear();
+			keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
+			component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
+		} catch (Throwable t) {
+			System.err.println(t);
+		}
+	}
 
-        public void focusGained(FocusEvent e) {
-            setActive(fe);
-        }
+	/*
+	 * Focus listener that fires the storeFieldAction when a FieldTextArea loses
+	 * focus.
+	 * 
+	 * TODO: It would be nice to test this thoroughly.
+	 */
+	FocusListener fieldListener = new FocusListener() {
+	
+		JTextComponent c;
 
-        public void focusLost(FocusEvent e) {
-              if (!e.isTemporary())
-                parent.updateField(fe);
-        }
-    }
+		DocumentListener d;
 
+		public void focusGained(FocusEvent e) {
+
+			synchronized (this){
+				if (c != null) {
+					c.getDocument().removeDocumentListener(d);
+					c = null;
+					d = null;
+				}
+
+				if (e.getSource() instanceof JTextComponent) {
+
+					c = (JTextComponent) e.getSource();
+					/**
+					 * [ 1553552 ] Not properly detecting changes to flag as
+					 * changed
+					 */
+					d = new DocumentListener() {
+
+						void fire(DocumentEvent e) {
+							if (c.isFocusOwner()) {
+								markIfModified((FieldEditor) c);
+							}
+						}
+
+						public void changedUpdate(DocumentEvent e) {
+							fire(e);
+						}
+
+						public void insertUpdate(DocumentEvent e) {
+							fire(e);
+						}
+
+						public void removeUpdate(DocumentEvent e) {
+							fire(e);
+						}
+					};
+					c.getDocument().addDocumentListener(d);
+				}
+			}
+
+			setActive((FieldEditor) e.getSource());
+
+		}
+
+		public void focusLost(FocusEvent e) {
+			synchronized (this) {
+				if (c != null) {
+					c.getDocument().removeDocumentListener(d);
+					c = null;
+					d = null;
+				}
+			}
+			if (!e.isTemporary())
+				parent.updateField((FieldEditor) e.getSource());
+		}
+	};
 }
-

@@ -114,7 +114,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private EntryEditor currentEditor = null;
     private PreviewPanel currentPreview = null;
 
-  boolean tmp = true;
+    boolean tmp = true;
 
     private MainTableSelectionListener selectionListener = null;
     private ListEventListener groupsHighlightListener;
@@ -127,8 +127,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     JabRefFrame frame;
     BibtexDatabase database;
     // The database shown in this panel.
-    private File //file = null,  // Moving file to MetaData (Morten, 2006.08.29)
-        fileToOpen = null; // The filename of the database.
+    
+    //  	Moving file to MetaData (Morten, 2006.08.29)
+    // private File fileToOpen = null; 
+    
     String fileMonitorHandle = null;
     boolean saving = false, updatedExternally = false;
     private String encoding;
@@ -250,19 +252,37 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    public boolean isBaseChanged(){
+    	return baseChanged;
+    }
+    
     public int getMode() {
         return mode;
     }
 
-    public BibtexDatabase database() { return database; }
-    public MetaData metaData() { return metaData; }
-    public JabRefFrame frame() { return frame; }
-    public JabRefPreferences prefs() { return Globals.prefs; }
+    public BibtexDatabase database() {
+		return database;
+	}
 
-    public String getEncoding() { return encoding; }
-    public void setEncoding(String encoding) {
-    this.encoding = encoding;
-    }
+	public MetaData metaData() {
+		return metaData;
+	}
+
+	public JabRefFrame frame() {
+		return frame;
+	}
+
+	public JabRefPreferences prefs() {
+		return Globals.prefs;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
 
     public void output(String s) {
     //Util.pr("\""+s+"\""+(SwingUtilities.isEventDispatchThread()));
@@ -369,6 +389,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             public void update() {
                 if (success) {
+                	// Reset title of tab
                     frame.setTabTitle(BasePanel.this, getFile().getName(),
                             getFile().getAbsolutePath());
                     frame.output(Globals.lang("Saved database")+" '"
