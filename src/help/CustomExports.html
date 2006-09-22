@@ -102,7 +102,10 @@ This can be useful for some fomatters, e.g. the CurrentDate formatter (described
 <li><code>HTMLParagraphs</code> : interprets two consecutive newlines (e.g. \n   \n) as the beginning of a new paragraph and creates paragraph-html-tags accordingly.
 <li><code>XMLChars</code> : replaces TeX-specific special characters (e.g. {\^a} or {\"{o}})
   with their XML representations.
+
 <li><code>CreateDocBookAuthors</code> : formats the author field in DocBook style.
+<li><code>CreateDocBookEditors</code> : to be documented.
+
 <li><code>CurrentDate</code> : outputs the current date. With no argument, this formatter outputs the
     current date and time in the format "yyyy.MM.dd hh:mm:ss z" (date, time and time zone). By giving a
     different format string as argument, the date format can be customized. E.g.
@@ -110,19 +113,38 @@ This can be useful for some fomatters, e.g. the CurrentDate formatter (described
 
 <li><code>AuthorFirstFirst</code> : formats author/editor fields with the first names first.
 <li><code>AuthorFirstFirstCommas</code> : formats author/editor fields with the first names first, and deliminated by commas.
+<li><code>AuthorFirstAbbrLastCommas</code> : to be documented.
+<li><code>AuthorFirstAbbrLastOxfordCommas</code> : to be documented.
+<li><code>AuthorFirstLastOxfordCommas </code> : to be documented.
+
 <li><code>AuthorLastFirst</code> : formats author/editor fields with the last names first.
 <li><code>AuthorLastFirstAbbreviator</code> : abbreviates first and middle names of all authors. This formatter requires AuthorLastFirst
 to have been run earlier.
-<li><code>AuthorAndsReplacer</code> : replaces "and" between names with ";", and "&" between the last two. 
+<li><code>AuthorLastFirstCommas</code> : to be documented.
+<li><code>AuthorLastFirstOxfordCommas</code> : to be documented.
+<li><code>AuthorLastFirstAbbrCommas</code> : to be documented.
+<li><code>AuthorLastFirstAbbrOxfordCommas</code> : to be documented.
+
+<li><code>AuthorAndsReplacer</code> : replaces "and" between names with ";", and "&" between the last two.
 <li><code>AuthorAndsCommaReplacer</code> : replaces "and" between names with ",", and "&" between the last two.
 <li><code>AuthorOrgSci</code> : first author is in "last, first" all others in "first last". First names are abbreviated.
+<li><code>AuthorAbbreviator : to be documented.
+
 <li><code>NoSpaceBetweenAbbreviations</code> : spaces between multiple abbreviated first names are removed.
 <li><code>FormatPagesForHTML</code> : replaces "--" with "-".
   <li><code>FormatPagesForXML</code> : replaces "--" with an XML en-dash.
+
 <li><code>RemoveBrackets</code> : removes all curly brackets "{" or "}".
+<li><code>RemoveBracketsAddComma</code> : to be documented.
+<li><code>RemoveWhitespace</code> : to be documented.
 <li><code>RemoveLatexCommands</code> : removes LaTeX commands like <code>\em</code>, <code>\textbf</code>, etc. If
   used together with <code>HTMLChars</code> or <code>XMLChars</code>, this formatter should be called last.
 <li><code>ToLowerCase</code> : turns all characters into lower case.
+
+<li><code>CompositeFormat</code> : to be documented.
+<li><code>GetOpenOfficeType</code> : to be documented.
+<li><code>RTFChars</code> : to be documented.
+<li><code>ResolvePDF</code> : to be documented.
 
 </ul>
 
@@ -163,7 +185,7 @@ field referred in the curly braces has changed value.
 your entries based on keyword.  Now use the following commands to group by keyword:
 
 <p><code>\begingroup{keywords}New Category: \format[HTMLChars]{\keywords}
-<br>	\endgroup{keywords}</code>
+<br>    \endgroup{keywords}</code>
 
 <H2>Sharing your work</H2>
 
