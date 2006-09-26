@@ -93,7 +93,7 @@ public class Globals {
       ALL_ENCODINGS = //(String[]) Charset.availableCharsets().keySet().toArray(new String[]{});
           new String[] {"ISO8859_1", "UTF8", "UTF-16", "ASCII",
               "Cp1250", "Cp1251", "Cp1252", "Cp1253", "Cp1254", "Cp1257",
-              "JIS", "SJIS", "EUC-JP",      // Added Japanese encodings.
+              "JIS", "SJIS", "EUC_JP",      // Added Japanese encodings.
               "Big5", "Big5_HKSCS", "GBK",
               "ISO8859_2", "ISO8859_3", "ISO8859_4", "ISO8859_5", "ISO8859_6",
               "ISO8859_7", "ISO8859_8", "ISO8859_9", "ISO8859_13", "ISO8859_15"};
@@ -122,12 +122,14 @@ public class Globals {
       // on this system:
       List encodings = new ArrayList();
       for (int i=0; i<ALL_ENCODINGS.length; i++) {
-          if (Charset.isSupported(ALL_ENCODINGS[i]))
-            encodings.add(ALL_ENCODINGS[i]);
+          if (Charset.isSupported(ALL_ENCODINGS[i])) {
+              encodings.add(ALL_ENCODINGS[i]);
+          }
       }
       ENCODINGS = (String[])encodings.toArray(new String[0]);
 
   }
+
 
 
   public static GlobalFocusListener focusListener = new GlobalFocusListener();

@@ -190,6 +190,7 @@
 				<pathelement location="${library.directory}/microba.jar" />
                 <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
                 <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
+
             </classpath>
 		</javac>
 	</target>

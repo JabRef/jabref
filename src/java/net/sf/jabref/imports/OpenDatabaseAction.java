@@ -218,13 +218,16 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             //System.out.println("Result of UTF-16 test: "+suppliedEncoding);
         }
 
+        //System.out.println(suppliedEncoding != null ? "Encoding: '"+suppliedEncoding+"'" : "no supplied encoding");
+
         if ((suppliedEncoding != null)) {
            try {
-               reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding);
+               reader = ImportFormatReader.getReader(fileToOpen, suppliedEncoding.trim());
                encoding = suppliedEncoding; // Just so we put the right info into the ParserResult.
-           } catch (IOException ex) {
-                reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
-            }
+           } catch (Exception ex) {
+               ex.printStackTrace();
+               reader = ImportFormatReader.getReader(fileToOpen, encoding); // The supplied encoding didn't work out, so we use the default.
+           }
         } else {
             // We couldn't find a header with info about encoding. Use default:
             reader = ImportFormatReader.getReader(fileToOpen, encoding);

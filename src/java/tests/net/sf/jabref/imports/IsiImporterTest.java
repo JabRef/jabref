@@ -3,6 +3,7 @@ package tests.net.sf.jabref.imports;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
@@ -33,7 +34,8 @@ public class IsiImporterTest extends TestCase {
 	}
 
 	public void testIsRecognizedFormat() throws IOException {
-		IsiImporter importer = new IsiImporter();
+
+        IsiImporter importer = new IsiImporter();
 		assertTrue(importer.isRecognizedFormat(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTest1.isi")));
 

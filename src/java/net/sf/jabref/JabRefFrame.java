@@ -511,6 +511,7 @@ public JabRefPreferences prefs() {
   // General info dialog.  The OSXAdapter calls this method when "Quit OSXAdapter"
   // is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock.
   public void quit() {
+      System.exit(0);        // TODO: ta bort
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
     boolean close = true;
@@ -590,6 +591,8 @@ public JabRefPreferences prefs() {
       System.exit(0); // End program.
     }
   }
+
+    
 
   private void macOSXRegistration() {
     if (Globals.osName.equals(Globals.MAC)) {

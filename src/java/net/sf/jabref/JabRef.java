@@ -31,6 +31,7 @@ import net.sf.jabref.remote.RemoteListener;
 
 import gnu.dtools.ritopt.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 import java.io.*;
 import java.io.File;
@@ -641,17 +642,25 @@ public class JabRef {
                         FontPolicy fixedPolicy = FontPolicies.createFixedPolicy(fontSet);
                         WindowsLookAndFeel.setFontPolicy(fixedPolicy);
                     }
-                    
+
                     //WindowsLookAndFeel plLnf = (WindowsLookAndFeel) lnf;
                 }
 
                 if (lnf != null) {
                     try {
+
                         UIManager.setLookAndFeel(lnf);
-                        
+
                         if (!Globals.ON_WIN) {
                             UIManager.put("SimpleInternalFrame.activeTitleBackground", GUIGlobals.gradientBlue);
-                            //UIManager.put("TabbedPane.selected", Color.red);
+                        }
+
+                        if (!Globals.ON_WIN && !Globals.ON_MAC) {
+                            // For Linux, add Enter as button click key:
+                            UIDefaults def = UIManager.getDefaults();
+                            InputMap im = (InputMap)def.get("Button.focusInputMap");
+                            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "pressed");
+                            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), "released");
                         }
                     } catch (Throwable ex) {
                         ex.printStackTrace();
@@ -779,6 +788,7 @@ lastEdLoop:
      */
     private void startOOPlugin(JabRefFrame jrf) {
 
+
         try {
             Class c = Class.forName("net.sf.jabref.oo.OOTestPanel");
             Method m = c.getDeclaredMethod("open",
@@ -790,7 +800,7 @@ lastEdLoop:
             //System.out.println("OO plugin not found.");
             //e.printStackTrace();
         }
-
+        
     }
 
     public static ParserResult openBibFile(String name) {
