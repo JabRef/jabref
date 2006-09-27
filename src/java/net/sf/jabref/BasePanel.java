@@ -1452,7 +1452,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, String encoding) throws SaveException {
-        System.out.println("Saving with encoding: "+encoding);
         SaveSession session;
         frame.block();
         try {
