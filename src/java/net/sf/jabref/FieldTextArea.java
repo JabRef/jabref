@@ -86,7 +86,7 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	}
 
 	public Dimension getPreferredScrollableViewportSize() {
-		return PREFERRED_SIZE;
+		return getPreferredSize();
 	}
 
 	public void paint(Graphics g) {

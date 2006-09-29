@@ -24,12 +24,10 @@
  */
 package net.sf.jabref;
 
-import java.awt.AWTKeyStroke;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -73,7 +71,7 @@ public class EntryEditorTab {
 
 		this.parent = parent;
 
-		setupPanel(addKeyField, name);
+		newSetupPanel(addKeyField, name);
 
 		/*
 		 * The following line makes sure focus cycles inside tab instead of
@@ -82,7 +80,70 @@ public class EntryEditorTab {
 		panel.setFocusCycleRoot(true);
 	}
 
-	void setupPanel(boolean addKeyField, String title) {
+
+    void newSetupPanel(boolean addKeyField, String title) {
+        panel.setName(title);
+        //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
+        String colSpec = "fill:pref, 2dlu, fill:pref:grow, 2dlu, fill:pref, 2dlu";
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < fields.length; i++) {
+            sb.append("fill:pref:grow, ");
+        }
+        if (addKeyField)
+            sb.append("4dlu, pref");
+        else
+            sb.delete(sb.length()-2, sb.length());
+        String rowSpec = sb.toString();
+
+        DefaultFormBuilder builder = new DefaultFormBuilder
+                (panel, new FormLayout(colSpec, rowSpec));
+
+        for (int i = 0; i < fields.length; i++) {
+            // Create the text area:
+            final FieldTextArea ta = new FieldTextArea(fields[i], null);
+            JComponent ex = parent.getExtra(fields[i], ta);
+            setupJTextComponent(ta);
+
+            // Store the editor for later reference:
+            editors.put(fields[i], ta);
+            if (i == 0)
+                activeField = ta;
+            //System.out.println(fields[i]+": "+BibtexFields.getFieldWeight(fields[i]));
+            ta.getPane().setPreferredSize(new Dimension(100,
+                    (int)(50.0*BibtexFields.getFieldWeight(fields[i]))));
+            builder.append(ta.getLabel());
+            if (ex == null)
+                builder.append(ta.getPane(), 3);
+            else {
+                builder.append(ta.getPane());
+                JPanel pan = new JPanel();
+                pan.setLayout(new BorderLayout());
+                pan.add(ex, BorderLayout.NORTH);
+                builder.append(pan);
+            }
+            builder.nextLine();
+        }
+
+        // Add the edit field for Bibtex-key.
+		if (addKeyField) {
+			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, (String) parent
+				.getEntry().getField(BibtexFields.KEY_FIELD), true);
+			setupJTextComponent(tf);
+
+			editors.put("bibtexkey", tf);
+			/*
+			 * If the key field is the only field, we should have only one
+			 * editor, and this one should be set as active initially:
+			 */
+			if (editors.size() == 1)
+				activeField = tf;
+            builder.nextLine();
+			builder.append(tf.getLabel());
+			builder.append(tf, 3);
+		}
+    }
+
+    void setupPanel(boolean addKeyField, String title) {
 		GridBagLayout gbl = new GridBagLayout();
 		GridBagConstraints con = new GridBagConstraints();
 		panel.setLayout(gbl);
