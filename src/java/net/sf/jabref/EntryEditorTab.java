@@ -84,13 +84,13 @@ public class EntryEditorTab {
     void newSetupPanel(boolean addKeyField, String title) {
         panel.setName(title);
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
-        String colSpec = "fill:pref, 2dlu, fill:pref:grow, 2dlu, fill:pref, 2dlu";
+        String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < fields.length; i++) {
             sb.append("fill:pref:grow, ");
         }
         if (addKeyField)
-            sb.append("4dlu, pref");
+            sb.append("4dlu, fill:pref");
         else
             sb.delete(sb.length()-2, sb.length());
         String rowSpec = sb.toString();

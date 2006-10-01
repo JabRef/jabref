@@ -46,6 +46,8 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.gui.date.*;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry. EntryEditor
@@ -103,10 +105,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 	JToolBar tlb;
 
 	JTabbedPane tabbed = new JTabbedPane(); // JTabbedPane.RIGHT);
-
-	GridBagLayout gbl = new GridBagLayout();
-
-	GridBagConstraints con;
 
 	JLabel lab;
 
@@ -447,15 +445,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 				super.paint(g2);
 			}
 		};
-		con = new GridBagConstraints();
-		con.insets = new Insets(10, 10, 10, 10);
-		con.fill = GridBagConstraints.BOTH;
-		con.gridwidth = GridBagConstraints.REMAINDER;
-		con.gridheight = GridBagConstraints.REMAINDER;
-		con.weightx = 1;
-		con.weighty = 1;
-		srcPanel.setLayout(gbl);
-		source.setEditable(true); // prefs.getBoolean("enableSourceEditing"));
+
+        DefaultFormBuilder builder = new DefaultFormBuilder
+                (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));
+        source.setEditable(true); // prefs.getBoolean("enableSourceEditing"));
 		source.setLineWrap(true);
 		source.setTabSize(GUIGlobals.INDENT);
 		source.addFocusListener(new FieldEditorFocusListener());
@@ -469,9 +462,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 		JScrollPane sp = new JScrollPane(source, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		gbl.setConstraints(sp, con);
-		srcPanel.add(sp);
-	}
+		builder.append(sp);
+
+    }
 
 	public void updateSource() {
 		if (updateSource) {

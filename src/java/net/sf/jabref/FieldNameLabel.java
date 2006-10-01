@@ -2,18 +2,18 @@ package net.sf.jabref;
 
 import javax.swing.JLabel;
 import javax.swing.Icon;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Graphics;
+import java.awt.*;
 import javax.swing.BorderFactory;
 
 public class FieldNameLabel extends JLabel {
 
   public FieldNameLabel(String name) {
-    super(name, JLabel.CENTER);
+    super(name, JLabel.LEFT);
+      setVerticalAlignment(NORTH);
     //setFont(GUIGlobals.fieldNameFont);
     setForeground(GUIGlobals.validFieldColor);
-    setBorder(BorderFactory.createEtchedBorder());
+      setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
+    //setBorder(BorderFactory.createEtchedBorder());
   }
 
   public void paintComponent(Graphics g) {
