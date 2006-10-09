@@ -158,7 +158,7 @@ public class MetaData {
             dir = Globals.prefs.get(key);
 
 
-        System.out.println("MetaData: dir: '"+dir+"' relative: "+(new File(dir)).isAbsolute());
+        //System.out.println("MetaData: dir: '"+dir+"' relative: "+(new File(dir)).isAbsolute());
         return dir;
     }
 

@@ -222,7 +222,6 @@ public class LayoutEntry
                 	(type == LayoutHelper.IS_GROUP_START))
         {
 
-            System.out.println("FIELD_START: "+text);
             String field = getField(bibtex, text, database);
             //String field = (String) bibtex.getField(text);
 
