@@ -152,10 +152,20 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         String toSet = text.getText();
         if (toSet.length() == 0)
             toSet = null;
-        UndoableEdit ce = Util.massSetField(entryList, field.getText().trim(),
-                set.isSelected() ? toSet : null,
-                overwrite.isSelected());
+        String[] fields = getFieldNames(field.getText().trim().toLowerCase());
+        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+        for (int i = 0; i < fields.length; i++) {
+            ce.addEdit(Util.massSetField(entryList, fields[i],
+                            set.isSelected() ? toSet : null,
+                            overwrite.isSelected()));
+
+        }
+        ce.end();
         bp.undoManager.addEdit(ce);
         bp.markBaseChanged();
+    }
+
+    private String[] getFieldNames(String s) {
+        return s.split("[^a-z]");
     }
 }

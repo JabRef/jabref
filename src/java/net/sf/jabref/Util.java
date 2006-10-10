@@ -2076,7 +2076,7 @@ public class Util {
     public static UndoableEdit massSetField(Collection entries,
                                             String field, String text,
                                             boolean overwriteValues) {
-        System.out.println(":"+text+":");
+        
         NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
         for (Iterator i = entries.iterator(); i.hasNext();) {
             BibtexEntry entry = (BibtexEntry) i.next();

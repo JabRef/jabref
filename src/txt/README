@@ -1,6 +1,6 @@
 
-JabRef 2.?
-----------
+JabRef 2.2 beta
+---------------
 
 
 Introduction:
@@ -80,14 +80,15 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.?     - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
+2.2b    - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.
+        - Changed layout of entry editor to solve problem with collapsing text fields.
         - Added first version of support for XMP-metadata in PDFs.
           - "Import into..." 
           - Integrate with copy/move/link.
           - Added option to write all/selected PDFs in database
         - Added tooltips to database tabs showing the file's full path.
-        - Added function for setting or clearing a specific field in selected or
+        - Added function for setting or clearing specific fields in selected or
           all entries.
         - Setting a relative PDF/PS path in Database Properties now makes JabRef
           look for the directory relative to the bib file's location.

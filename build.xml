@@ -46,7 +46,7 @@
 
 	<!-- some version information -->
 	<property name="jabref.bin" value="JabRef-2.1" />
-	<property name="jabref.version" value="2.1" />
+	<property name="jabref.version" value="2.2b" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
