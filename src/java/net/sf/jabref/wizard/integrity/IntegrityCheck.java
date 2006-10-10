@@ -241,8 +241,17 @@ public class IntegrityCheck
     }
     if (upLowCounter > 0)
     {
+
+        /*
+        Morten Alver (2006.10.10):
+
+        Disabling this warning because we have a feature for automatically adding
+        braces when saving, which makes this warning misleading. It could be modified
+        to suggest to use this feature if not enabled, and not give a warning if the
+        feature is enabled.
+
         messages.add( new IntegrityMessage( IntegrityMessage.UPPER_AND_LOWER_HINT,
-                                        entry, fieldName, null))  ;
+                                        entry, fieldName, null))  ;*/
 
     }
   }
