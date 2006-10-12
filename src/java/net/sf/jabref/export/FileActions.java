@@ -576,7 +576,10 @@ public class FileActions
         } else if (exportName.equals("endnote")) {
             lfFileName = "EndNote";
             directory = "endnote";
+        } else if (exportName.equals("tablerefsabsbib")) {
+            directory = "tablerefsabsbib";
         }
+
 
         // We need to find out:
         // 1. The layout definition string to use. Or, rather, we

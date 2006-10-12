@@ -2036,6 +2036,7 @@ class FetchCiteSeerAction
       docbookItem = new JMenuItem(Globals.lang("Docbook")),
       bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
       modsItem = new JMenuItem(Globals.lang("MODS")),
+      tablerefsabsbibItem = new JMenuItem(Globals.lang("HTML table")),
       rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
       endnoteItem = new JMenuItem(Globals.lang("Endnote")),
       openofficeItem = new JMenuItem("OpenOffice Calc"),
@@ -2077,8 +2078,10 @@ class FetchCiteSeerAction
               } else if (source == odsItem) {
                   lfFileName = "ods";
                   extension = ".ods";
-              }
-              // We need to find out:
+              } else if (source == tablerefsabsbibItem) {
+                  lfFileName = "tablerefsabsbib";
+                  extension = ".html";
+              }// We need to find out:
               // 1. The layout definition string to use. Or, rather, we
               //    must provide a Reader for the layout definition.
               // 2. The preferred extension for the layout format.
@@ -2106,6 +2109,8 @@ class FetchCiteSeerAction
           }
       };
 
+      tablerefsabsbibItem.addActionListener(listener);
+      menu.add(tablerefsabsbibItem);
       htmlItem.addActionListener(listener);
       menu.add(htmlItem);
       simpleHtmlItem.addActionListener(listener);

@@ -40,38 +40,38 @@
 package net.sf.jabref.gui.date ;
 
 import java.awt.event.* ;
+import java.awt.*;
 import javax.swing.* ;
 
 import com.michaelbaranov.microba.calendar.* ;
 import net.sf.jabref.* ;
+
 import java.util.*;
 
-public class DatePickerButton implements ActionListener
-{
-  private DatePicker datePicker = new DatePicker() ;
-  private FieldEditor editor ;
+public class DatePickerButton implements ActionListener {
+    private DatePicker datePicker = new DatePicker();
+    private JPanel panel = new JPanel();
+    private FieldEditor editor;
 
-  public DatePickerButton(FieldEditor pEditor)
-  {
-    datePicker.showButtonOnly( true ) ;
-    datePicker.addActionListener( this ) ;
-
-    editor = pEditor ;
-  }
-
-  public void actionPerformed( ActionEvent e )
-  {
-    Date date = datePicker.getDate() ;
-    if (date != null)
-    {
-      editor.setText( Util.easyDateFormat( date ) ) ;
-        // Set focus to editor component after changing its text:
-        new FocusRequester(editor.getTextComponent());
+    public DatePickerButton(FieldEditor pEditor) {
+        datePicker.showButtonOnly(true);
+        datePicker.addActionListener(this);
+        panel.setLayout(new BorderLayout());
+        panel.add(datePicker, BorderLayout.WEST);
+        editor = pEditor;
     }
-  }
 
-  public JComponent getDatePicker()
-  {
-    return datePicker ;
-  }
+    public void actionPerformed(ActionEvent e) {
+        Date date = datePicker.getDate();
+        if (date != null) {
+            editor.setText(Util.easyDateFormat(date));
+            // Set focus to editor component after changing its text:
+            new FocusRequester(editor.getTextComponent());
+        }
+    }
+
+    public JComponent getDatePicker() {
+        //return datePicker;
+        return panel;
+    }
 }

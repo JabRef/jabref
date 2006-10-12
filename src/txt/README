@@ -80,7 +80,8 @@ If you choose languages other than English, some or all help pages may
 appear in your chosen languages.
 
 Change log:
-2.2b    - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
+2.2b    - Added Mark Schenk's advanced HTML export filter.
+        - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.
         - Changed layout of entry editor to solve problem with collapsing text fields.
         - Added first version of support for XMP-metadata in PDFs.
