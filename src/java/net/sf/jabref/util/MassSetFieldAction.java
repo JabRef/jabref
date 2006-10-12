@@ -38,12 +38,12 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JCheckBox overwrite;
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(NAME, "Set field ");
+        putValue(NAME, "Set/clear fields");
         this.frame = frame;
     }
 
     private void createDialog() {
-        diag = new JDialog(frame, Globals.lang("Set field"), true);
+        diag = new JDialog(frame, Globals.lang("Set/clear fields"), true);
 
         field = new JTextField();
         text = new JTextField();
@@ -52,8 +52,8 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         all = new JRadioButton(Globals.lang("All entries"));
         selected = new JRadioButton(Globals.lang("Selected entries"));
-        clear = new JRadioButton(Globals.lang("Clear field"));
-        set = new JRadioButton(Globals.lang("Set field"));
+        clear = new JRadioButton(Globals.lang("Clear fields"));
+        set = new JRadioButton(Globals.lang("Set fields"));
         set.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 // Entering a text is only relevant if we are setting, not clearing:
@@ -63,7 +63,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             }
         });
 
-        overwrite = new JCheckBox("Overwrite existing field values", true);
+        overwrite = new JCheckBox(Globals.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(all);
         bg.add(selected);

@@ -251,7 +251,7 @@ public class JabRefFrame
       winEdtPushAction = new PushToApplicationAction(ths, new PushToWinEdt()),
       latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
       
-      writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs", "Will write XMP-metadata to the PDFs linked from selected entries.", prefs.getKey("writeXMP")),
+      writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs", "Will write XMP-metadata to the PDFs linked from selected entries.", prefs.getKey("Write XMP")),
       
       openFile = new GeneralAction("openFile", "Open PDF or PS",
                                    "Open PDF or PS",
