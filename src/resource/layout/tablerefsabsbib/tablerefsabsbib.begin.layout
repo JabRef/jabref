@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<title>JabRef References output</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<script type="text/javascript">
+<!--
+// QuickSearch script for tables
+//
+// Copyright (c) 2006, Mark Schenk
+//
+// Permission to use, copy, modify, and distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+
+// Some features:
+// + combination of CSS/JavaScript degrades nicely
+// + easy to set number of columns to search
+// + allows RegExp searches
+//   e.g. to search for entries between 1980 and 1989, type:  198[0-9]
+//   e.g. for any entry ending with 'symmetry', type:  symmetry$
+//   e.g. for all reftypes that are books: ^book$, or ^article$
+// + easy toggling of Abstract/Review/BibTeX
+
+if (window.opera) { 
+	document.addEventListener("load",initSearch,false) } 
+else if (window.addEventListener) {
+	window.addEventListener("load",initSearch,false) }
+else if (window.attachEvent) {
+	window.attachEvent("onload", initSearch); }
+
+function initSearch() {
+	// basic object detection
+	if(!document.getElementById || !document.getElementsByTagName) { return; }
+
+	// check if QuickSearch table AND search area is present 
+	if (!document.getElementById('qstable')||!document.getElementById('qs')) { return; }
+
+	// give id of the table that has QuickSearch
+	// is global variable on purpose
+	searchTable = document.getElementById('qstable');
+	
+	setStatistics(-1)
+
+	document.getElementById('qs').style.display = 'block';
+	document.getElementById('qsfield').onkeyup = testEvent;
+}
+
+function quickSearch(tInput){
+	searchText = new RegExp(tInput.value,"i");
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+	var inRows = new Array();
+
+	for (var i=0, k=0; i<allRows.length;i++) {
+		if (allRows[i].className.indexOf('entry') != -1) {
+	       	inRows[k++] = allRows[i];
+		} else if (allRows[i].className.indexOf('noshow') == -1) {
+		allRows[i].className = allRows[i].className + ' noshow';
+		}
+	}
+
+	// find/set number of searchable columns
+	// by default script searches all columns
+	var cols = searchTable.getElementsByTagName('thead')[0].getElementsByTagName('th').length;
+	// to set a fixed number of columns, uncomment next line
+	// var cols = 4  // search the left 'cols' columns
+
+	// count number of hits
+	var hits = 0;
+
+	// start looping through all rows
+	for (var i = 0; cRow = inRows[i]; i++){
+	
+	inCells = cRow.getElementsByTagName('td');
+	var gevonden = false; 
+  
+	for (var j=0; j<cols; j++) { // only first 'cols' columns
+		cCell = inCells[j];
+		var t = cCell.innerText?cCell.innerText:getTextContent(cCell);
+		if ((tInput.value.length == 0) || (t.search(searchText) != -1)){ gevonden=true; } 
+	}
+
+	gevonden == true?cRow.className = 'entry show':cRow.className = 'entry noshow';
+	gevonden == true?hits++:hits=hits;
+	}
+
+	// update statistics
+	setStatistics(hits)
+}
+
+function toggleInfo(articleid,info) {
+
+	var entry = document.getElementById(articleid);
+	var abs = document.getElementById('abs_'+articleid);
+	var rev = document.getElementById('rev_'+articleid);
+	var bib = document.getElementById('bib_'+articleid);
+	
+	if (abs && info == 'abstract') {
+		if(abs.className.indexOf('abstract') != -1) {
+		abs.className.indexOf('noshow') == -1?abs.className = 'abstract noshow':abs.className = 'abstract';
+		}
+	} else if (rev && info == 'review') {
+		if(rev.className.indexOf('review') != -1) {
+		rev.className.indexOf('noshow') == -1?rev.className = 'review noshow':rev.className = 'review';
+		}
+	} else if (bib && info == 'bibtex') {
+		if(bib.className.indexOf('bibtex') != -1) {
+		bib.className.indexOf('noshow') == -1?bib.className = 'bibtex noshow':bib.className = 'bibtex';
+		}		
+	} else { 
+		return;
+	}
+
+	// check if one or the other is available
+	var revshow = false;
+	var absshow = false;
+	var bibshow = false;
+	(abs && abs.className.indexOf('noshow') == -1)? absshow = true: absshow = false;
+	(rev && rev.className.indexOf('noshow') == -1)? revshow = true: revshow = false;	
+	(bib && bib.className == 'bibtex')? bibshow = true: bibshow = false;
+	
+	// highlight original entry
+	if(entry) {
+		if (revshow || absshow || bibshow) {
+		entry.className = 'entry highlight show';
+		} else {
+		entry.className = 'entry show';
+		}		
+	}
+	
+	// When there's a combination of abstract/review/bibtex showing, need to add class for correct styling
+	if(absshow) {
+		(revshow||bibshow)?abs.className = 'abstract nextshow':abs.className = 'abstract';
+	} 
+	if (revshow) {
+		bibshow?rev.className = 'review nextshow': rev.className = 'review';
+	}
+	
+}
+
+function setStatistics (hits) {
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+	var entries = 0
+	for (var i=0; i<allRows.length;i++) {
+		if (allRows[i].className.indexOf('entry') != -1) {
+	       	entries++;
+		}
+	}
+	
+	if(hits < 0) { hits=entries; }
+
+	var stats = document.getElementById('stat');
+	if(stats) { stats.firstChild.data = hits + '/' + entries}
+}
+
+function getTextContent(node) {
+	// Function written by Arve Bersvendsen
+	// http://www.virtuelvis.com
+	
+	if (node.nodeType == 3) {
+	return node.nodeValue;
+	} // text node
+	if (node.nodeType == 1) { // element node
+	var text = [];
+	for (var chld = node.firstChild;chld;chld=chld.nextSibling) {
+		text.push(getTextContent(chld));
+	}
+	return text.join("");
+	} return ""; // some other node, won't contain text nodes.
+}
+
+function testEvent(e){
+	if (!e) var e = window.event;
+	quickSearch(this);
+}
+
+function clearQS() {
+	qsfield = document.getElementById('qsfield'); 
+	qsfield.value = '';
+	quickSearch(qsfield);
+}
+
+function redoQS(){
+	qsfield = document.getElementById('qsfield'); 
+	quickSearch(qsfield);
+}
+-->
+</script>
+<style type="text/css">
+body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; }
+
+#qs { width: auto; border-style: solid; border-color: gray; border-width: 1px 1px 0px 1px; padding: 0.5em 0.5em; display:none;  }
+#qs form { padding: 0px; margin: 0px; }
+#qs form p { padding: 0px; margin: 0px; }
+
+table { border: 1px gray solid; width: 100%; empty-cells: show; }
+th, td { border: 1px gray solid; padding: 0.5em; vertical-align: top;  }
+td { text-align: left; vertical-align: top; }
+th { background-color: #EFEFEF; }
+
+td a, td a:hover { color: navy; font-weight: bold; }
+
+tr.noshow { display: none;}
+
+tr.highlight td { background-color: #F1F1F1; border-top: 2px black solid; font-weight: bold; }
+tr.abstract td, tr.review td, tr.bibtex td { background-color: #F1F1F1; border-bottom: 2px black solid; }
+tr.nextshow td { border-bottom: 1px gray solid; }
+
+tr.bibtex pre { width: 100%; overflow: auto;}
+
+p.infolinks { margin: 0.5em 0em 0em 0em; padding: 0px; }
+</style>
+</head>
+<body>
+
+<div id="qs"><form action=""><p>QuickSearch: <input type="text" name="qsfield" id="qsfield" autocomplete="off" title="Allows plain text as wel as RegExp searches" /><input type="button" onclick="clearQS()" value="clear" />&nbsp; Number of matching entries: <span id="stat">0</span>.</p></form></div>
+<table id="qstable" border="1">
+<thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
+<tbody>
