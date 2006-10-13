@@ -80,7 +80,7 @@ public class PushToApplicationButton implements ActionListener {
 
         comp.add(pushButton, BorderLayout.CENTER);
         comp.add(menuButton, BorderLayout.EAST);
-        //comp.setBorder(BorderFactory.createLineBorder(Color.gray));
+        comp.setBorder(BorderFactory.createLineBorder(Color.gray));
         comp.setMaximumSize(comp.getPreferredSize());
 
 

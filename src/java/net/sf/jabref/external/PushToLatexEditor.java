@@ -3,6 +3,7 @@ package net.sf.jabref.external;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.GUIGlobals;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class PushToLatexEditor implements PushToApplication {
     }
 
     public Icon getIcon() {
-        return null;
+        return GUIGlobals.getImage("edit");
     }
 
     public String getKeyStrokeName() {
