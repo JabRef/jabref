@@ -576,6 +576,8 @@ public class FileActions
         } else if (exportName.equals("endnote")) {
             lfFileName = "EndNote";
             directory = "endnote";
+        } else if (exportName.equals("tablerefs")) {
+            directory = "tablerefs";
         } else if (exportName.equals("tablerefsabsbib")) {
             directory = "tablerefsabsbib";
         }

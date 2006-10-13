@@ -2003,16 +2003,19 @@ class FetchCiteSeerAction
       SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
       JMenu submenu = new JMenu(Globals.lang("Custom importers"));
       submenu.setMnemonic(KeyEvent.VK_S);
-      if (customImporters.size() == 0) {
+      /*if (customImporters.size() == 0) {
         submenu.setEnabled(false);
         submenu.setToolTipText(Globals.lang("No custom imports registered yet."));
-      } else {
+      } else {*/
         // Put in all formatters registered in ImportFormatReader:
         for (Iterator i=customImporters.iterator(); i.hasNext();) {
             ImportFormat imFo = (ImportFormat)i.next();
             submenu.add(new ImportMenuItem(ths, intoNew, imFo));
         }
-      }
+      //}
+      if (customImporters.size() > 0)
+          submenu.addSeparator();
+      submenu.add(customImpAction);
 
       importMenu.add(submenu);
       importMenu.addSeparator();
@@ -2036,7 +2039,8 @@ class FetchCiteSeerAction
       docbookItem = new JMenuItem(Globals.lang("Docbook")),
       bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
       modsItem = new JMenuItem(Globals.lang("MODS")),
-      tablerefsabsbibItem = new JMenuItem(Globals.lang("HTML table")),
+      tablerefsabsbibItem = new JMenuItem(Globals.lang("HTML table (with Abstract & BibTeX)")),
+      tablerefsItem = new JMenuItem(Globals.lang("HTML table")),
       rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
       endnoteItem = new JMenuItem(Globals.lang("Endnote")),
       openofficeItem = new JMenuItem("OpenOffice Calc"),
@@ -2078,6 +2082,9 @@ class FetchCiteSeerAction
               } else if (source == odsItem) {
                   lfFileName = "ods";
                   extension = ".ods";
+              } else if (source == tablerefsItem) {
+                  lfFileName = "tablerefs";
+                  extension = ".html";
               } else if (source == tablerefsabsbibItem) {
                   lfFileName = "tablerefsabsbib";
                   extension = ".html";
@@ -2109,6 +2116,8 @@ class FetchCiteSeerAction
           }
       };
 
+      tablerefsItem.addActionListener(listener);
+      menu.add(tablerefsItem);
       tablerefsabsbibItem.addActionListener(listener);
       menu.add(tablerefsabsbibItem);
       htmlItem.addActionListener(listener);
@@ -2148,7 +2157,11 @@ class FetchCiteSeerAction
       String[] s = prefs.customExports.getElementAt(i);
       customExportMenu.add(new CustomExportAction(s[0], s[2], s[1]));
     }
-
+      // Add separator if any custom exports have been added:
+      if (prefs.customExports.size() > 0)
+        customExportMenu.addSeparator();
+      // Add the "Manage" action:
+      customExportMenu.add(customExpAction);
   }
 
     /**
