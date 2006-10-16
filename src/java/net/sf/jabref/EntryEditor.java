@@ -446,8 +446,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 			}
 		};
 
-        DefaultFormBuilder builder = new DefaultFormBuilder
-                (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));
+        //DefaultFormBuilder builder = new DefaultFormBuilder
+        //        (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));
         source.setEditable(true); // prefs.getBoolean("enableSourceEditing"));
 		source.setLineWrap(true);
 		source.setTabSize(GUIGlobals.INDENT);
@@ -462,7 +462,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 		JScrollPane sp = new JScrollPane(source, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		builder.append(sp);
+		//builder.append(sp);
+        
+        srcPanel.setLayout(new BorderLayout());
+        srcPanel.add(sp, BorderLayout.CENTER);
 
     }
 
@@ -481,7 +484,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 					+ "reopen editor to display/edit source.");
 				source.setEditable(false);
 			}
-		}
+
+
+        }
 	}
 
 	/**
