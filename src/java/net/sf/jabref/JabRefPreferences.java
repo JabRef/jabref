@@ -298,7 +298,8 @@ public class JabRefPreferences {
         defaults.put("floatMarkedEntries", Boolean.TRUE);
 
         defaults.put("useNativeFileDialogOnMac", Boolean.TRUE);
-        
+
+        defaults.put("lastUsedExport", null);
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 

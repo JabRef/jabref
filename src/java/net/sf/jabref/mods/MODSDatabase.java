@@ -24,10 +24,21 @@ public class MODSDatabase {
 	}
 	
 	public MODSDatabase(BibtexDatabase bibtex) {
-		this();
-		Collection c = bibtex.getEntries();
-		for(Iterator iter = c.iterator(); iter.hasNext(); ) {
-			BibtexEntry entry = (BibtexEntry) iter.next();
+		Set keySet = bibtex.getKeySet();
+        addEntries(bibtex, keySet);
+    }
+
+    public MODSDatabase(BibtexDatabase bibtex, Set keySet) {
+        if (keySet == null)
+            keySet = bibtex.getKeySet();
+        addEntries(bibtex, keySet);
+    }
+
+
+    private void addEntries(BibtexDatabase database, Set keySet) {
+        entries = new HashSet();
+        for(Iterator iter = keySet.iterator(); iter.hasNext(); ) {
+			BibtexEntry entry = database.getEntryById((String)iter.next());
 			MODSEntry newMods = new MODSEntry(entry);
 			entries.add(newMods);
 		}

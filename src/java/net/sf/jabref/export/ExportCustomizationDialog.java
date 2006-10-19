@@ -48,7 +48,7 @@ public class ExportCustomizationDialog extends JDialog {
          Globals.prefs.customExports.addFormat(newFormat);
          table.revalidate();
          table.repaint();
-         frame.setUpCustomExportMenu();
+         ExportFormats.initAllExports();
        }
      }
     });
@@ -66,7 +66,7 @@ public class ExportCustomizationDialog extends JDialog {
          old[2] = ecd.extension();
          table.revalidate();
          table.repaint();
-         frame.setUpCustomExportMenu();
+         ExportFormats.initAllExports();
        }
      }
     });
@@ -78,7 +78,7 @@ public class ExportCustomizationDialog extends JDialog {
         Globals.prefs.customExports.remove(row);
         table.revalidate();
         table.repaint();
-        frame.setUpCustomExportMenu();
+        ExportFormats.initAllExports();
       }
     });
 

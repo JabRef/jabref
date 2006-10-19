@@ -10,6 +10,7 @@ import net.sf.jabref.*;
 
 import java.io.*;
 import java.util.zip.*;
+import java.util.Set;
 import java.net.URL;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
@@ -18,12 +19,17 @@ import javax.xml.transform.stream.*;
 /**
  * @author alver
  */
-public class OpenDocumentSpreadsheetCreator {
+public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
-    private OpenDocumentSpreadsheetCreator() {
+    public OpenDocumentSpreadsheetCreator() {
+        super(Globals.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
+    }
+
+    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws Exception {
+        exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
     public static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
@@ -50,11 +56,11 @@ public class OpenDocumentSpreadsheetCreator {
         }
     }
 
-    public static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database) throws Exception {
+    public static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set keySet) throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
-        exportOpenDocumentSpreadsheetXML(tmpFile, database);
+        exportOpenDocumentSpreadsheetXML(tmpFile, database, keySet);
 
         // Then add the content to the zip file:
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile));
@@ -64,8 +70,8 @@ public class OpenDocumentSpreadsheetCreator {
         tmpFile.delete();
     }
 
-    public static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database) {
-        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database);
+    public static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set keySet) {
+        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {
             Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");

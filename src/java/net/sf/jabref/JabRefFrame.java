@@ -25,13 +25,6 @@
 
  */
 
-// created by : ?
-//
-// modified : r.nagel 23.08.2004
-//               - insert new Menuitem New Database -> New Database from Aux
-// modified : juan 10.02.2005
-//               - insert new Menuitem to the Export menu -> Openoffice
-//                 export filter
 package net.sf.jabref;
 
 import net.sf.jabref.gui.*;
@@ -53,6 +46,8 @@ import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.ExportFormats;
+
 import java.lang.reflect.*;
 import javax.swing.event.*;
 import net.sf.jabref.wizard.integrity.gui.*;
@@ -160,6 +155,8 @@ public class JabRefFrame
                                          "Save selected as ...",
                                          "Save selected as ...",
                                          GUIGlobals.getIconUrl("saveAs")),
+      exportAll = ExportFormats.getExportAction(this, false),
+      exportSelected = ExportFormats.getExportAction(this, true),
       nextTab = new ChangeTabAction(true),
       prevTab = new ChangeTabAction(false),
       sortTabs = new SortTabsAction(this),
@@ -989,8 +986,6 @@ public JabRefPreferences prefs() {
         helpMenu = subMenu("Help");
 
     setUpImportMenus();
-    setUpExportMenu(exportMenu);
-    setUpCustomExportMenu();
 
     newDatabaseMenu.add(newDatabaseAction) ;
     newDatabaseMenu.add(newSubDatabaseAction) ;
@@ -1004,8 +999,10 @@ public JabRefPreferences prefs() {
     file.add(save);
     file.add(saveAs);
     file.add(saveSelectedAs);
-    file.add(exportMenu);
-    file.add(customExportMenu);
+
+      file.add(exportAll);
+      file.add(exportSelected);
+
     file.addSeparator();
     file.add(databaseProperties);
       file.addSeparator();
@@ -1028,7 +1025,7 @@ public JabRefPreferences prefs() {
     //=====================================
     file.add(quit);
     mb.add(file);
-    //edit.add(test);
+    edit.add(test);
     edit.add(undo);
     edit.add(redo);
     edit.addSeparator();
@@ -2032,137 +2029,6 @@ class FetchCiteSeerAction
         return fileHistory;
     }
 
-  JMenuItem
-      htmlItem = new JMenuItem(Globals.lang("HTML")),
-      simpleHtmlItem = new JMenuItem(Globals.lang("Simple HTML")),
-      //plainTextItem = new JMenuItem(Globals.lang("Plain text")),
-      docbookItem = new JMenuItem(Globals.lang("Docbook")),
-      bibtexmlItem = new JMenuItem(Globals.lang("BibTeXML")),
-      modsItem = new JMenuItem(Globals.lang("MODS")),
-      tablerefsabsbibItem = new JMenuItem(Globals.lang("HTML table (with Abstract & BibTeX)")),
-      tablerefsItem = new JMenuItem(Globals.lang("HTML table")),
-      rtfItem = new JMenuItem(Globals.lang("Harvard RTF")),
-      endnoteItem = new JMenuItem(Globals.lang("Endnote")),
-      openofficeItem = new JMenuItem("OpenOffice Calc"),
-      odsItem = new JMenuItem("OpenDocument Spreadsheet");
-
-
-
-
-  private void setUpExportMenu(JMenu menu) {
-      ActionListener listener = new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-              JMenuItem source = (JMenuItem) e.getSource();
-              String lfFileName = null, extension = null;
-              if (source == htmlItem) {
-                  lfFileName = "html";
-                  extension = ".html";
-              }
-              else if (source == simpleHtmlItem) {
-                  lfFileName = "simplehtml";
-                  extension = ".html";
-              } else if (source == docbookItem) {
-                  lfFileName = "docbook";
-                  extension = ".xml";
-              } else if (source == bibtexmlItem) {
-                  lfFileName = "bibtexml";
-                  extension = ".xml";
-              } else if (source == modsItem) {
-                  lfFileName = "mods";
-                  extension = ".xml";
-              } else if (source == rtfItem) {
-                  lfFileName = "harvard";
-                  extension = ".rtf";
-              } else if (source == endnoteItem) {
-                  lfFileName = "endnote";
-                  extension = ".txt";
-              } else if (source == openofficeItem) {
-                  lfFileName = "oocalc";
-                  extension = ".sxc";
-              } else if (source == odsItem) {
-                  lfFileName = "ods";
-                  extension = ".ods";
-              } else if (source == tablerefsItem) {
-                  lfFileName = "tablerefs";
-                  extension = ".html";
-              } else if (source == tablerefsabsbibItem) {
-                  lfFileName = "tablerefsabsbib";
-                  extension = ".html";
-              }// We need to find out:
-              // 1. The layout definition string to use. Or, rather, we
-              //    must provide a Reader for the layout definition.
-              // 2. The preferred extension for the layout format.
-              // 3. The name of the file to use.
-              final String chosenFile = Globals.getNewFile(ths, new File(prefs.get("workingDirectory")),
-                      extension, JFileChooser.SAVE_DIALOG, false);
-              final String exportName = lfFileName;
-              if (chosenFile == null)
-                  return;
-
-              (new Thread() {
-                  public void run() {
-                      try {
-                          FileActions.performExport(basePanel().database(), exportName,
-                                  chosenFile, basePanel().getEncoding());
-                          output(Globals.lang("Exported database to file") + " '" +
-                                  chosenFile + "'.");
-                      }
-                      catch (Exception ex) {
-                          ex.printStackTrace();
-                      }
-                  }
-              }).start();
-
-          }
-      };
-
-      tablerefsItem.addActionListener(listener);
-      menu.add(tablerefsItem);
-      tablerefsabsbibItem.addActionListener(listener);
-      menu.add(tablerefsabsbibItem);
-      htmlItem.addActionListener(listener);
-      menu.add(htmlItem);
-      simpleHtmlItem.addActionListener(listener);
-      menu.add(simpleHtmlItem);
-      //plainTextItem.addActionListener(listener);
-      //menu.add(plainTextItem);
-      bibtexmlItem.addActionListener(listener);
-      menu.add(bibtexmlItem);
-      docbookItem.addActionListener(listener);
-      menu.add(docbookItem);
-      modsItem.addActionListener(listener);
-      menu.add(modsItem);
-      rtfItem.addActionListener(listener);
-      menu.add(rtfItem);
-      endnoteItem.addActionListener(listener);
-      menu.add(endnoteItem);
-      openofficeItem.addActionListener(listener);
-      odsItem.addActionListener(listener);
-      menu.add(openofficeItem);
-      menu.add(odsItem);
-      menu.add(exportCSV);
-
-      menu.addSeparator();
-      menu.add(expandEndnoteZip);
-
-  }
-
-  /**
-   * Interrogates the list of custom export formats defined, and adds them to the custom
-   * export menu.
-   */
-  public void setUpCustomExportMenu() {
-    customExportMenu.removeAll();
-    for (int i=0; i<prefs.customExports.size(); i++) {
-      String[] s = prefs.customExports.getElementAt(i);
-      customExportMenu.add(new CustomExportAction(s[0], s[2], s[1]));
-    }
-      // Add separator if any custom exports have been added:
-      if (prefs.customExports.size() > 0)
-        customExportMenu.addSeparator();
-      // Add the "Manage" action:
-      customExportMenu.add(customExpAction);
-  }
 
     /**
      * Set the preview active state for all BasePanel instances.
@@ -2250,61 +2116,6 @@ class SaveSessionAction
         output(Globals.lang("Saved session") + ".");
       }
 
-    }
-  }
-
-  class CustomExportAction extends AbstractAction {
-
-    String extension, lfFileName, directory;
-
-    public CustomExportAction(String name, String ext, String lf) {
-      super(name);
-      File lfFile = new File(lf);
-      extension = ext;
-      String filename = lfFile.getName();
-
-      lfFileName = filename.substring(0, filename.length()-7);
-      directory = lfFile.getParent()+File.separator;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      // We need to find out:
-      // 1. The layout definition string to use. Or, rather, we
-      //    must provide a Reader for the layout definition.
-      // 2. The preferred extension for the layout format.
-      // 3. The name of the file to use.
-      File outFile;
-      String chosenFile = Globals.getNewFile(ths,
-              new File(prefs.get("workingDirectory")),
-                                             extension,
-                                             JFileChooser.SAVE_DIALOG, false);
-
-      if (chosenFile != null)
-        outFile = new File(chosenFile);
-
-      else {
-        return;
-      }
-
-      final String lfName = lfFileName;
-      final File oFile = outFile;
-
-      (new Thread() {
-        public void run() {
-          try {
-            FileActions.exportDatabase
-                (basePanel().database, directory,
-                 lfName, oFile, basePanel().getEncoding());
-            output(Globals.lang("Exported database to file") + " '" +
-                   oFile.getPath() + "'.");
-          }
-          catch (Exception ex) {
-            //ex.printStackTrace();
-            JOptionPane.showMessageDialog(ths, ex.getMessage(), Globals.lang("Error"),
-                                          JOptionPane.ERROR_MESSAGE);
-          }
-        }
-      }).start();
     }
   }
 

@@ -10,8 +10,8 @@ import net.sf.jabref.*;
 
 import java.io.*;
 import java.util.zip.*;
+import java.util.Set;
 import java.net.URL;
-import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
@@ -19,12 +19,17 @@ import javax.xml.transform.stream.*;
 /**
  * @author alver
  */
-public class OpenOfficeDocumentCreator {
+public class OpenOfficeDocumentCreator extends ExportFormat {
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
-    private OpenOfficeDocumentCreator() {
+    public OpenOfficeDocumentCreator() {
+        super(Globals.lang("OpenOffice Calc"), "oocalc", null, null, ".sxc");
+    }
+
+    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws Exception {
+        exportOpenOfficeCalc(new File(file), database, keySet);
     }
 
     public static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
@@ -51,11 +56,13 @@ public class OpenOfficeDocumentCreator {
         }
     }
 
-    public static void exportOpenOfficeCalc(File file, BibtexDatabase database) throws Exception {
+    public static void exportOpenOfficeCalc(File file, BibtexDatabase database,
+        Set keySet) throws Exception {
+
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
-        exportOpenOfficeCalcXML(tmpFile, database);
+        exportOpenOfficeCalcXML(tmpFile, database, keySet);
 
         // Then add the content to the zip file:
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile));
@@ -65,8 +72,8 @@ public class OpenOfficeDocumentCreator {
         tmpFile.delete();
     }
 
-    public static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database) {
-        OOCalcDatabase od = new OOCalcDatabase(database);
+    public static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set keySet) {
+        OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
         try {
             Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF8");

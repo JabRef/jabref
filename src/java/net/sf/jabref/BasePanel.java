@@ -65,6 +65,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -72,10 +73,7 @@ import javax.swing.undo.CannotUndoException;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.RtfSelection;
-import net.sf.jabref.export.SaveException;
-import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.*;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
@@ -333,8 +331,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
 
+                    ExportFormats.initAllExports();
+                    JFileChooser fc = ExportFormats.createExportFileChooser("/home/alver/Documents");
+                    fc.showSaveDialog(frame);
+                    File file = fc.getSelectedFile();
+                    if (file == null)
+                        return;
+                    FileFilter ff = fc.getFileFilter();
+                    if (ff instanceof ExportFileFilter) {
+                        ExportFormat format = ((ExportFileFilter)ff).getExportFormat();
+                        format.performExport(database, file.getPath(), "UTF8", null);
+                        // Make sure we remember which filter was used, to set the default
+                        // for next time:
+                        Globals.prefs.put("lastUsedExport", format.getConsoleName());
 
-
+                    }
 
                 }
             });
@@ -1371,7 +1382,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
               try {
                   BibtexEntry[] bes = mainTable.getSelectedEntries();
                   StringWriter sw = new StringWriter();
-                  FileActions.exportEntries(database, bes, format, custom, directory, sw);
+                  System.out.println("actual export to clipboard not implemented...");
+                  //FileActions.exportEntries(database, bes, format, custom, directory, sw);
                   ClipboardOwner owner = new ClipboardOwner() {
                     public void lostOwnership(Clipboard clipboard, Transferable content) {}
                   };

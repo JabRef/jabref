@@ -86,6 +86,9 @@ public class JabRef {
                 
         Globals.importFormatReader.resetImportFormats();
         BibtexEntryType.loadCustomEntryTypes(prefs);
+        // Build the list of available export formats:
+        ExportFormats.initAllExports();
+
         // Read list(s) of journal names and abbreviations:
         //Globals.turnOnFileLogging();
 
@@ -201,25 +204,8 @@ public class JabRef {
             System.out.println(Globals.lang("Available import formats") + ":\n"
                 + importFormats);
 
-            // To specify export formats, we need to take the custom export formats
-            // into account.
-            // So we iterate through the custom formats and add them.
-            String outFormats = ": bibtexml, docbook, endnote, harvard, html, mods, ods, oocalc, simplehtml";
-            int length = outFormats.length();
-
-            for (int i = 0; i < Globals.prefs.customExports.size(); i++) {
-                String[] format = Globals.prefs.customExports.getElementAt(i);
-
-                if ((length + format[0].length()) > 50) {
-                    outFormats = outFormats + ",\n\t" + format[0];
-                    length = format[0].length();
-                } else {
-                    outFormats = outFormats + ", " + format[0];
-                    length += (1 + format[0].length());
-                }
-            }
-
-            System.out.println(Globals.lang("Available export formats") + outFormats
+            String outFormats = ExportFormats.getConsoleExportList(70, 20, "\t");
+            System.out.println(Globals.lang("Available export formats") + ": " + outFormats
                 + ".");
             System.exit(0);
         }
@@ -377,53 +363,21 @@ public class JabRef {
                     // This signals that the latest import should be stored in the given
                     // format to the given file.
                     ParserResult pr = (ParserResult) loaded.elementAt(loaded.size() - 1);
-
-                    // We first try to find a matching custom export format.
-                    boolean foundCustom = false;
-
-                    for (int i = 0; i < Globals.prefs.customExports.size(); i++) {
-                        String[] format = Globals.prefs.customExports.getElementAt(i);
-
-                        if (format[0].equals(data[1])) {
-                            // Found the correct export format here.
-                            
-                            try {
-                                File lfFile = new File(format[1]);
-
-                                //System.out.println(lfFile.getName());
-                                String fname = (lfFile.getName().split("\\."))[0];
-                                FileActions.exportDatabase(pr.getDatabase(),
-                                    lfFile.getParent() + File.separator, fname,
-                                    new File(data[0]), pr.getEncoding());
-                                System.out.println(Globals.lang("Exporting") + ": "
-                                    + data[0]);
-                            } catch (Exception ex) {
-                                //ex.printStackTrace();
-                                System.err.println(Globals.lang("Could not export file")
-                                    + " '" + data[0] + "': " + ex.getMessage());
-                            }
-
-                            foundCustom = true;
-
-                            break;
-                        }
-                    }
-
-                    if (!foundCustom) {
+                    System.out.println(Globals.lang("Exporting") + ": " + data[0]);
+                    ExportFormat format = ExportFormats.getExportFormat(data[1]);
+                    if (format != null) {
+                        // We have an ExportFormat instance:
                         try {
-                            System.out.println(Globals.lang("Exporting") + ": " + data[0]);
-                            FileActions.performExport(pr.getDatabase(), data[1], data[0],
-                                    pr.getEncoding());
-                            //FileActions.exportDatabase(pr.getDatabase(), data[1],
-                            //    new File(data[0]), pr.getEncoding());
-                        } catch (NullPointerException ex2) {
-                            System.err.println(Globals.lang("Unknown export format")
-                                + ": " + data[1]);
+                            format.performExport(pr.getDatabase(), data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
                             System.err.println(Globals.lang("Could not export file")
                                 + " '" + data[0] + "': " + ex.getMessage());
                         }
                     }
+                    else
+                        System.err.println(Globals.lang("Unknown export format")
+                                + ": " + data[1]);
+
                 }
             } else
                 System.err.println(Globals.lang(

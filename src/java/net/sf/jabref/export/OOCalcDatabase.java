@@ -24,25 +24,7 @@ import ca.odell.glazedlists.SortedList;
 public class OOCalcDatabase {
     protected Collection entries;
 
-        /*protected final static String TYPE_COL = "BibliographyType";
-
-        protected final static Map columns = new LinkedHashMap();
-        static {
-
-            columns.put(TYPE_COL, "dummy");
-            columns.put("ISBN", "isbn");
-            coulmns.put("Identifier", "\bibtexkey");
-            coulmns.put("", "");
-            coulmns.put("", "");
-
-        }*/
-
-    public OOCalcDatabase() {
-        //entries = new HashSet();
-    }
-
-    public OOCalcDatabase(BibtexDatabase bibtex) {
-        this();
+    public OOCalcDatabase(BibtexDatabase bibtex, Set keySet) {
         // Make a list of comparators for sorting the entries:
         List comparators = new ArrayList();
         comparators.add(new FieldComparator("author"));
@@ -50,7 +32,15 @@ public class OOCalcDatabase {
         comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         BasicEventList entryList = new BasicEventList();
-        entryList.addAll(bibtex.getEntries());
+        // Set up a list of all entries, if keySet==null, or the entries whose
+        // ids are in keySet, otherwise:
+        if (keySet == null)
+            entryList.addAll(bibtex.getEntries());
+        else {
+            for (Iterator i=keySet.iterator(); i.hasNext();)
+                entryList.add(bibtex.getEntryById((String)i.next()));
+        }
+        
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
 
     }
