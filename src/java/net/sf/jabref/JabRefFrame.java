@@ -157,6 +157,8 @@ public class JabRefFrame
                                          GUIGlobals.getIconUrl("saveAs")),
       exportAll = ExportFormats.getExportAction(this, false),
       exportSelected = ExportFormats.getExportAction(this, true),
+      importCurrent = ImportFormats.getImportAction(this, false),
+      importNew = ImportFormats.getImportAction(this, true),
       nextTab = new ChangeTabAction(true),
       prevTab = new ChangeTabAction(false),
       sortTabs = new SortTabsAction(this),
@@ -993,9 +995,10 @@ public JabRefPreferences prefs() {
     file.add(newDatabaseAction);
     file.add(open); //opendatabaseaction
     file.add(mergeDatabaseAction);
-    file.add(importMenu);
     //file.add(importMenu);
-    file.add(importNewMenu);
+    //file.add(importNewMenu);
+      file.add(importNew);
+      file.add(importCurrent);
     file.add(save);
     file.add(saveAs);
     file.add(saveSelectedAs);

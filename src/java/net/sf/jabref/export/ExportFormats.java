@@ -111,7 +111,8 @@ public class ExportFormats {
 
             public void actionPerformed(ActionEvent e) {
                 ExportFormats.initAllExports();
-                JFileChooser fc = ExportFormats.createExportFileChooser("/home/alver/Documents");
+                JFileChooser fc = ExportFormats.createExportFileChooser
+                        (Globals.prefs.get("exportWorkingDirectory"));
                 fc.showSaveDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null)
@@ -148,6 +149,7 @@ public class ExportFormats {
                         // Make sure we remember which filter was used, to set the default
                         // for next time:
                         Globals.prefs.put("lastUsedExport", format.getConsoleName());
+                        Globals.prefs.put("exportWorkingDirectory", file.getParent());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

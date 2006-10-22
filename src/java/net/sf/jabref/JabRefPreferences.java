@@ -132,6 +132,7 @@ public class JabRefPreferences {
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
+        defaults.put("importWorkingDirectory", System.getProperty("user.home"));        
         defaults.put("autoOpenForm", Boolean.TRUE);
         defaults.put("entryTypeFormHeightFactor", new Integer(1));
         defaults.put("entryTypeFormWidth", new Integer(1));

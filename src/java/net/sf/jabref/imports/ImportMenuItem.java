@@ -189,9 +189,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         }
 
         public void done(int entriesImported) {
+
+            /*
             final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
             BibtexDatabase toAddTo = panel.database();
-            /*
+
             // Add the strings, if any:
             for (Iterator i = bibtexResult.getDatabase().getStringKeySet().iterator(); i.hasNext();) {
                 BibtexString s = bibtexResult.getDatabase().getString(i.next());
@@ -216,10 +218,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
             }
             */
-            if ((worker != null) && (worker.bibtexResult != null)) {
-                frame.output(Globals.lang("Imported entries") + ": " + entriesImported);
-                //        + "  " + Globals.lang("Format used") + ": " + worker.formatName);
-            }
+            frame.output(Globals.lang("Imported entries") + ": " + entriesImported);
+
         }
 
         public void cancelled() {
