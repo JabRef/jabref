@@ -33,10 +33,19 @@ public class CustomExportList extends TreeSet {
       return formats;
   }
 
+
   private void readPrefs() {
     int i=0;
     String[] s = null;
     while ((s = prefs.getStringArray("customExportFormat"+i)) != null) {
+        ExportFormat format = createFormat(s);
+        formats.put(format.getConsoleName(), format);
+      super.add(s);
+      i++;
+    }
+  }
+
+    private ExportFormat createFormat(String[] s) {
         String lfFileName;
         if (s[1].endsWith(".layout"))
             lfFileName = s[1].substring(0, s[1].length()-7);
@@ -44,11 +53,8 @@ public class CustomExportList extends TreeSet {
             lfFileName = s[1];
         ExportFormat format = new ExportFormat(s[0], s[0], lfFileName, null, s[2]);
         format.setCustomExport(true);
-        formats.put(format.getConsoleName(), format);
-      super.add(s);
-      i++;
+        return format;
     }
-  }
 
   public String[] getElementAt(int pos) {
     return (String[])(array[pos]);
@@ -56,10 +62,14 @@ public class CustomExportList extends TreeSet {
 
   public void addFormat(String[] s) {
     super.add(s);
+      ExportFormat format = createFormat(s);
+      formats.put(format.getConsoleName(), format);
     sort();
   }
 
   public void remove(int pos) {
+      String[] toRemove = (String[])array[pos];
+      formats.remove(toRemove[0]);
     super.remove(array[pos]);
     sort();
   }

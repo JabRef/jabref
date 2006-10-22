@@ -272,13 +272,13 @@
 			</fileset>
 		</copy>
 
-		<!-- the fonts are used by the new about dialog -->
+		<!-- the fonts are used by the new about dialog
 		<mkdir dir="${build.fonts}" />
 		<copy todir="${build.fonts}">
 			<fileset dir="${fonts.dir}">
 				<include name="*" />
 			</fileset>
-		</copy>
+		</copy> -->
 
 		<mkdir dir="${build.help}" />
 		<copy todir="${build.help}">

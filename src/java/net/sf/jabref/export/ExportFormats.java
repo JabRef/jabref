@@ -119,7 +119,20 @@ public class ExportFormats {
                 FileFilter ff = fc.getFileFilter();
                 if (ff instanceof ExportFileFilter) {
                     try {
-                        ExportFormat format = ((ExportFileFilter) ff).getExportFormat();
+                        ExportFileFilter eff = (ExportFileFilter)ff;
+                        String path = file.getPath();
+                        if (!path.endsWith(eff.getExportFormat().getExtension()))
+                            path = path+eff.getExportFormat().getExtension();
+                        file = new File(path);
+                        if (file.exists()) {
+                            // Warn that the file exists:
+                            if (JOptionPane.showConfirmDialog(frame,
+                                    "'"+file.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                                    Globals.lang("Export"), JOptionPane.OK_CANCEL_OPTION)
+                                != JOptionPane.OK_OPTION)
+                                return;    
+                        }
+                        ExportFormat format = eff.getExportFormat();
                         Set entryIds = null;
                         if (selectedOnly) {
                             BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
@@ -130,7 +143,8 @@ public class ExportFormats {
                             }
                         }
                         format.performExport(frame.basePanel().database(),
-                                file.getPath(), "UTF8", entryIds);
+                                file.getPath(), frame.basePanel().getEncoding(),
+                                entryIds);
                         // Make sure we remember which filter was used, to set the default
                         // for next time:
                         Globals.prefs.put("lastUsedExport", format.getConsoleName());
@@ -148,13 +162,16 @@ public class ExportFormats {
         String lastUsedFormat = Globals.prefs.get("lastUsedExport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
+        TreeSet filters = new TreeSet();
         for (Iterator i = exportFormats.keySet().iterator(); i.hasNext();) {
             String formatName = (String)i.next();
             ExportFormat format = (ExportFormat)exportFormats.get(formatName);
-            fc.addChoosableFileFilter(format.getFileFilter());
+            filters.add(format.getFileFilter());
             if (formatName.equals(lastUsedFormat))
                 defaultFilter = format.getFileFilter();
-
+        }
+        for (Iterator i=filters.iterator(); i.hasNext();) {
+            fc.addChoosableFileFilter((ExportFileFilter)i.next());
         }
         fc.setAcceptAllFileFilterUsed(false);
         if (defaultFilter != null)
