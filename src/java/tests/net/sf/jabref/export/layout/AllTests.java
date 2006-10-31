@@ -9,6 +9,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for test.net.sf.jabref.layout");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LayoutTest.class);
+		suite.addTestSuite(RTFCharsTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -3,18 +3,32 @@ package net.sf.jabref.export.layout.format;
 import net.sf.jabref.export.layout.*;
 import net.sf.jabref.Globals;
 
+/**
+ * Transform a LaTeX-String to RTF.
+ * 
+ * This method will:
+ * 
+ *   1.) Remove LaTeX-Command sequences.
+ *   
+ *   2.) Replace LaTeX-Special chars with RTF aquivalents.
+ *   
+ *   3.) Replace emph and textit and textbf with their RTF replacements.
+ *   
+ *   4.) Take special care to save all unicode characters correctly. 
+ * 
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ *
+ */
 public class RTFChars implements LayoutFormatter {
 
 	public String format(String field) {
 
-		int i;
-		field = firstFormat(field);
 		StringBuffer sb = new StringBuffer("");
 		StringBuffer currentCommand = null;
-		char c;
 		boolean escaped = false, incommand = false;
-		for (i = 0; i < field.length(); i++) {
-			c = field.charAt(i);
+		for (int i = 0; i < field.length(); i++) {
+			char c = field.charAt(i);
 			if (escaped && (c == '\\')) {
 				sb.append('\\');
 				escaped = false;
@@ -29,10 +43,10 @@ public class RTFChars implements LayoutFormatter {
 			} else if (Character.isLetter((char) c)
 				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + (char) c) >= 0)) {
 				escaped = false;
-				if (!incommand)
+				if (!incommand){
 					sb.append((char) c);
-				// Else we are in a command, and should not keep the letter.
-				else {
+				} else {
+					// Else we are in a command, and should not keep the letter.
 					currentCommand.append((char) c);
 
 					testCharCom: if ((currentCommand.length() == 1)
@@ -45,7 +59,6 @@ public class RTFChars implements LayoutFormatter {
 						String command = currentCommand.toString();
 						i++;
 						c = field.charAt(i);
-						// System.out.println("next: "+(char)c);
 						String combody;
 						if (c == '{') {
 							IntAndString part = getPart(field, i);
@@ -53,17 +66,15 @@ public class RTFChars implements LayoutFormatter {
 							combody = part.s;
 						} else {
 							combody = field.substring(i, i + 1);
-							// System.out.println("... "+combody);
 						}
-						// System.out.println(command+combody);
-						Object result = Globals.RTFCHARS.get(command + combody);
+						String result = (String)Globals.RTFCHARS.get(command + combody);
 
 						if (result != null)
-							sb.append((String) result);
+							sb.append(result);
 
 						incommand = false;
 						escaped = false;
-
+				
 					}
 
 				}
@@ -100,14 +111,19 @@ public class RTFChars implements LayoutFormatter {
 			}
 		}
 
-		return sb.toString();
-		// field.replaceAll("\\\\emph", "").replaceAll("\\\\em",
-		// "").replaceAll("\\\\textbf", "");
-	}
+		char[] chars = sb.toString().toCharArray();
+		sb = new StringBuffer();
 
-	private String firstFormat(String s) {
-		return s;// s.replaceAll("&|\\\\&","&amp;");//.replaceAll("--",
-					// "&mdash;");
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars[i];
+
+			if (c < 128) 
+				sb.append(c);
+			 else
+				sb.append("\\u").append((long) c).append('?');
+		}
+
+		return sb.toString();
 	}
 
 	private IntAndString getPart(String text, int i) {
