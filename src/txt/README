@@ -84,6 +84,7 @@ Change log:
           entries" functionality. Export filter is now chosen using the file type
           dropdown menu in the file dialog.
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
+        - Added warning dialog when exporting failed.
 2.2b    - Added Mark Schenk's advanced HTML export filter.
         - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.

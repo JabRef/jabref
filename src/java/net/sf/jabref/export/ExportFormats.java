@@ -14,10 +14,9 @@ import java.io.File;
 /**
  * User: alver
  * 
- * Date: Oct 18, 2006
+ * Date: Oct 18, 2006 
  * 
- * Time: 9:35:08 PM
- * 
+ * Time: 9:35:08 PM 
  */
 public class ExportFormats {
 
@@ -51,7 +50,6 @@ public class ExportFormats {
 
 		// openofficeItem = new JMenuItem("OpenOffice Calc"),
 		// odsItem = new JMenuItem("OpenDocument Spreadsheet");
-
 	}
 
 	/**
@@ -151,20 +149,28 @@ public class ExportFormats {
 								entryIds.add(bibtexEntry.getId());
 							}
 						}
-						format.performExport(frame.basePanel().database(), file.getPath(), frame
-							.basePanel().getEncoding(), entryIds);
+						
 						// Make sure we remember which filter was used, to set
-						// the default
-						// for next time:
+						// the default for next time:
 						Globals.prefs.put("lastUsedExport", format.getConsoleName());
 						Globals.prefs.put("exportWorkingDirectory", file.getParent());
+						
+						format.performExport(frame.basePanel().database(), file.getPath(), frame
+							.basePanel().getEncoding(), entryIds);
+						
 					} catch (Exception ex) {
 						ex.printStackTrace();
+
+						frame.output(Globals.lang("Could not save file") + " - " + ex.getMessage());
+						
+						// Need to warn the user that saving failed!
+						JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file")
+							+ ".\n" + ex.getMessage(), Globals.lang("Save database"),
+							JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
 		}
-		;
 
 		return new ExportAction(frame, selectedOnly);
 	}

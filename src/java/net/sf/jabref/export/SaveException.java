@@ -33,7 +33,7 @@ import net.sf.jabref.BibtexEntry;
  * Exception thrown if saving goes wrong. If caused by a specific
  * entry, keeps track of which entry caused the problem.
  */
-public class SaveException extends Throwable
+public class SaveException extends Exception
 {
     //~ Instance fields ////////////////////////////////////////////////////////
 

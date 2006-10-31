@@ -71,7 +71,7 @@ public class ExportFormat {
      * @param database The database to export from.
      * @param file The filename to write to.
      * @param encoding The encoding to use.
-     * @param entries A Set containing the IDs of all entries that should be exported.
+     * @param entries (may be null) A Set containing the IDs of all entries that should be exported.
      *  If null, all entries will be exported.
      * @throws Exception
      */
@@ -161,22 +161,16 @@ public class ExportFormat {
             layoutHelper = new LayoutHelper(reader);
             endLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
             reader.close();
-
         } catch (IOException ex) {
-            //  // If an exception was cast, export filter doesn't have an end file.
+            // If an exception was thrown, export filter doesn't have an end file.
         }
+        
         // Write the header
         if (endLayout != null) {
             ps.write(endLayout.doLayout(database));
         }
 
-
-        try {
-            finalizeSaveSession(ss);
-        } catch (SaveException e) {
-            e.printStackTrace();
-        }
-
+        finalizeSaveSession(ss);
     }
 
     public SaveSession getSaveSession(final String encoding, final File outFile)
