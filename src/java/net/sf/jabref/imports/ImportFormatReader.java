@@ -480,7 +480,7 @@ public class ImportFormatReader {
         //System.out.println("Import failed");
       }
     }
-
+      System.out.println("Used format: "+usedFormat);
     // Finally, if all else fails, see if it is a BibTeX file:	
     if (entryList == null) {
 	try {

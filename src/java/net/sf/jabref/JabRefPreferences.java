@@ -316,11 +316,8 @@ public class JabRefPreferences {
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
 
         // TODO: remove temporary registering of external file types?
-        externalFileTypes.put("pdf", new ExternalFileType("PDF", "pdf", "acroread", null));
-        externalFileTypes.put("ps", new ExternalFileType("PostScript", "ps", "gs", null));
-        externalFileTypes.put("doc", new ExternalFileType("Word file", "doc", "oowriter", null));
-        externalFileTypes.put("odt", new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
-
+        updateExternalFileTypes();
+        
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -816,6 +813,16 @@ public class JabRefPreferences {
             (Util.nCase(name), req, opt);
 
 
+    }
+
+    /**
+     *
+     */
+    public void updateExternalFileTypes() {
+        externalFileTypes.put("pdf", new ExternalFileType("PDF", "pdf", get("pdfviewer"), null));
+        externalFileTypes.put("ps", new ExternalFileType("PostScript", "ps", get("psviewer"), null));
+        externalFileTypes.put("doc", new ExternalFileType("Word file", "doc", "oowriter", null));
+        externalFileTypes.put("odt", new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
     }
 
     /**

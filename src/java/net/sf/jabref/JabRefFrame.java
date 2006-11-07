@@ -975,192 +975,194 @@ public JabRefPreferences prefs() {
   }
 
   private void fillMenu() {
-    //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+      //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
       mb.setBorder(null);
-    JMenu file = subMenu("File"),
-        edit = subMenu("Edit"),
-        bibtex = subMenu("BibTeX"),
-        view = subMenu("View"),
-        tools = subMenu("Tools"),
-        web = subMenu("Web search"),
-        options = subMenu("Options"),
-        newSpec = subMenu("New entry..."),
-        helpMenu = subMenu("Help");
+      JMenu file = subMenu("File"),
+              sessions = subMenu("Sessions"),
+              edit = subMenu("Edit"),
+              bibtex = subMenu("BibTeX"),
+              view = subMenu("View"),
+              tools = subMenu("Tools"),
+              web = subMenu("Web search"),
+              options = subMenu("Options"),
+              newSpec = subMenu("New entry..."),
+              helpMenu = subMenu("Help");
 
-    setUpImportMenus();
+      setUpImportMenus();
 
-    newDatabaseMenu.add(newDatabaseAction) ;
-    newDatabaseMenu.add(newSubDatabaseAction) ;
+      newDatabaseMenu.add(newDatabaseAction);
+      newDatabaseMenu.add(newSubDatabaseAction);
 
-    file.add(newDatabaseAction);
-    file.add(open); //opendatabaseaction
-    file.add(mergeDatabaseAction);
-    //file.add(importMenu);
-    //file.add(importNewMenu);
+      file.add(newDatabaseAction);
+      file.add(open); //opendatabaseaction
+      file.add(mergeDatabaseAction);
+      file.add(save);
+      file.add(saveAs);
+      file.add(saveSelectedAs);
+      file.addSeparator();
+      //file.add(importMenu);
+      //file.add(importNewMenu);
       file.add(importNew);
       file.add(importCurrent);
-    file.add(save);
-    file.add(saveAs);
-    file.add(saveSelectedAs);
-
       file.add(exportAll);
       file.add(exportSelected);
 
-    file.addSeparator();
-    file.add(databaseProperties);
+      file.addSeparator();
+      file.add(databaseProperties);
       file.addSeparator();
 
+      sessions.add(loadSessionAction);
+      sessions.add(saveSessionAction);
+      file.add(sessions);
       file.add(fileHistory);
-    //file.addSeparator();
-    file.add(loadSessionAction);
-    file.add(saveSessionAction);
-    file.addSeparator();
-    file.add(close);
-    //==============================
-    // NB: I added this because my frame borders are so tiny that I cannot click
-    // on the "x" close button. Anyways, I think it is good to have an "exit" button
-    // I was too lazy to make a new ExitAction
-    //JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
-    //exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
-    // above keybinding should be from user define
-    //exit_mItem.addActionListener(new CloseAction() );
-    //file.add( exit_mItem);
-    //=====================================
-    file.add(quit);
-    mb.add(file);
-    edit.add(test);
-    edit.add(undo);
-    edit.add(redo);
-    edit.addSeparator();
+      //file.addSeparator();
 
-    edit.add(cut);
-    edit.add(copy);
-    edit.add(paste);
-    //edit.add(remove);
-    edit.add(delete);
-    edit.add(copyKey);
-    edit.add(copyCiteKey);
-    //edit.add(exportToClipboard);
-    edit.addSeparator();
-    edit.add(mark);
-    edit.add(unmark);
-    edit.add(unmarkAll);
-    edit.addSeparator();
-    edit.add(selectAll);
-    mb.add(edit);
-    view.add(nextTab);
-    view.add(prevTab);
+      file.addSeparator();
+      file.add(close);
+      //==============================
+      // NB: I added this because my frame borders are so tiny that I cannot click
+      // on the "x" close button. Anyways, I think it is good to have an "exit" button
+      // I was too lazy to make a new ExitAction
+      //JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
+      //exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
+      // above keybinding should be from user define
+      //exit_mItem.addActionListener(new CloseAction() );
+      //file.add( exit_mItem);
+      //=====================================
+      file.add(quit);
+      mb.add(file);
+      //edit.add(test);
+      edit.add(undo);
+      edit.add(redo);
+      edit.addSeparator();
+
+      edit.add(cut);
+      edit.add(copy);
+      edit.add(paste);
+      //edit.add(remove);
+      edit.add(delete);
+      edit.add(copyKey);
+      edit.add(copyCiteKey);
+      //edit.add(exportToClipboard);
+      edit.addSeparator();
+      edit.add(mark);
+      edit.add(unmark);
+      edit.add(unmarkAll);
+      edit.addSeparator();
+      edit.add(selectAll);
+      mb.add(edit);
+      view.add(nextTab);
+      view.add(prevTab);
       view.add(sortTabs);
-    view.addSeparator();
-    view.add(toggleGroups);
-    view.add(togglePreview);
-    view.add(switchPreview);
-    view.addSeparator();
-    view.add(toggleHighlightAny);
-    view.add(toggleHighlightAll);
-    mb.add(view);
+      view.addSeparator();
+      view.add(toggleGroups);
+      view.add(togglePreview);
+      view.add(switchPreview);
+      view.addSeparator();
+      view.add(toggleHighlightAny);
+      view.add(toggleHighlightAll);
+      mb.add(view);
 
-    bibtex.add(newEntryAction);
-    for (int i = 0; i < newSpecificEntryAction.length; i++) {
-      newSpec.add(newSpecificEntryAction[i]);
-    }
-    bibtex.add(newSpec);
-    bibtex.add(plainTextImport);
-    bibtex.addSeparator();
-    bibtex.add(editEntry);
-    bibtex.add(importCiteSeer);
-    bibtex.add(editPreamble);
-    bibtex.add(editStrings);
-    mb.add(bibtex);
+      bibtex.add(newEntryAction);
+      for (int i = 0; i < newSpecificEntryAction.length; i++) {
+          newSpec.add(newSpecificEntryAction[i]);
+      }
+      bibtex.add(newSpec);
+      bibtex.add(plainTextImport);
+      bibtex.addSeparator();
+      bibtex.add(editEntry);
+      bibtex.add(importCiteSeer);
+      bibtex.add(editPreamble);
+      bibtex.add(editStrings);
+      mb.add(bibtex);
 
-    tools.add(normalSearch);
-    tools.add(incrementalSearch);
-    tools.add(replaceAll);
-    tools.add(new MassSetFieldAction(this));
-    tools.add( makeKeyAction);
+      tools.add(normalSearch);
+      tools.add(incrementalSearch);
+      tools.add(replaceAll);
+      tools.add(new MassSetFieldAction(this));
+      tools.add(makeKeyAction);
 
-     // [kiar] I think we should group these festures
-     tools.add(checkAndFix) ;
-     checkAndFix.add(dupliCheck);
-     checkAndFix.add(strictDupliCheck);
-     checkAndFix.add(autoSetPdf);
-     checkAndFix.add(autoSetPs);
-     checkAndFix.add(integrityCheckAction) ;
+      // [kiar] I think we should group these festures
+      tools.add(checkAndFix);
+      checkAndFix.add(dupliCheck);
+      checkAndFix.add(strictDupliCheck);
+      checkAndFix.add(autoSetPdf);
+      checkAndFix.add(autoSetPs);
+      checkAndFix.add(integrityCheckAction);
 
 
+      tools.addSeparator();
+      tools.add(manageSelectors);
 
-    tools.addSeparator();
-    tools.add(manageSelectors);
+      tools.add(pushExternalButton.getMenuAction());
+      tools.add(writeXmpAction);
 
-    tools.add(pushExternalButton.getMenuAction());
-    tools.add(writeXmpAction);
-    
-    //tools.add(emacsPushAction);
-    //tools.add(lyxPushAction);
-    //tools.add(winEdtPushAction);
-    //tools.add(latexEditorPushAction);
-    //tools.add(fetchAuthorMedline);
-    tools.addSeparator();
-    tools.add(openFile);
-    tools.add(openUrl);
-    tools.addSeparator();
-    tools.add(newSubDatabaseAction);
+      //tools.add(emacsPushAction);
+      //tools.add(lyxPushAction);
+      //tools.add(winEdtPushAction);
+      //tools.add(latexEditorPushAction);
+      //tools.add(fetchAuthorMedline);
+      tools.addSeparator();
+      tools.add(openFile);
+      tools.add(openUrl);
+      tools.addSeparator();
+      tools.add(newSubDatabaseAction);
 
       tools.addSeparator();
       tools.add(abbreviateIso);
       tools.add(abbreviateMedline);
       tools.add(unabbreviate);
 
-    mb.add(tools);
+      mb.add(tools);
 
-    web.add(fetchMedline);
-    web.add(citeSeerPanelAction);
-    web.add(fetchCiteSeer);
-    ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
-    web.add(ieex.getAction());
+      web.add(fetchMedline);
+      web.add(citeSeerPanelAction);
+      web.add(fetchCiteSeer);
+      ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
+      web.add(ieex.getAction());
 
       mb.add(web);
 
-    options.add(showPrefs);
-    AbstractAction customizeAction = new CustomizeEntryTypeAction();
-    AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
-    options.add(customizeAction);
-    options.add(genFieldsCustomization);
-    options.add(customExpAction);
-    options.add(customImpAction);
-    options.add(manageJournals);
+      options.add(showPrefs);
+      AbstractAction customizeAction = new CustomizeEntryTypeAction();
+      AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
+      options.add(customizeAction);
+      options.add(genFieldsCustomization);
+      options.add(customExpAction);
+      options.add(customImpAction);
+      options.add(manageJournals);
 
-    /*options.add(new AbstractAction("Font") {
-    public void actionPerformed(ActionEvent e) {
-        // JDialog dl = new EntryCustomizationDialog(ths);
-        Font f=new FontSelectorDialog
-      (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
-     if(f==null)
-      return;
-     else
-      GUIGlobals.CURRENTFONT=f;
-     // updatefont
-     prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
-     prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
-     prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
-     if (tabbedPane.getTabCount() > 0) {
-      for (int i=0; i<tabbedPane.getTabCount(); i++) {
-       baseAt(i).entryTable.updateFont();
-       baseAt(i).refreshTable();
+      /*options.add(new AbstractAction("Font") {
+      public void actionPerformed(ActionEvent e) {
+          // JDialog dl = new EntryCustomizationDialog(ths);
+          Font f=new FontSelectorDialog
+        (ths, GUIGlobals.CURRENTFONT).getSelectedFont();
+       if(f==null)
+        return;
+       else
+        GUIGlobals.CURRENTFONT=f;
+       // updatefont
+       prefs.put("fontFamily", GUIGlobals.CURRENTFONT.getFamily());
+       prefs.putInt("fontStyle", GUIGlobals.CURRENTFONT.getStyle());
+       prefs.putInt("fontSize", GUIGlobals.CURRENTFONT.getSize());
+       if (tabbedPane.getTabCount() > 0) {
+        for (int i=0; i<tabbedPane.getTabCount(); i++) {
+         baseAt(i).entryTable.updateFont();
+         baseAt(i).refreshTable();
+        }
+       }
       }
-     }
-    }
-    });*/
+      });*/
 
-    //options.add(selectKeys);
-    mb.add(options);
+      //options.add(selectKeys);
+      mb.add(options);
 
-    helpMenu.add(help);
-    helpMenu.add(contents);
-    helpMenu.addSeparator();
+      helpMenu.add(help);
+      helpMenu.add(contents);
+      helpMenu.addSeparator();
 //old about    helpMenu.add(about);
-    helpMenu.add(about);
-    mb.add(helpMenu);
+      helpMenu.add(about);
+      mb.add(helpMenu);
       helpMenu.addSeparator();
       helpMenu.add(errorConsole);
   }
@@ -1355,7 +1357,8 @@ public JabRefPreferences prefs() {
 			highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
 			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
 			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-			abbreviateMedline, unabbreviate, ieex.getAction() }));
+			abbreviateMedline, unabbreviate, ieex.getAction(), exportAll, exportSelected,
+            importCurrent}));
 
 		openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 

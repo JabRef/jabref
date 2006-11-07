@@ -22,35 +22,41 @@ public class ExportFormats {
 
 	private static Map exportFormats = new TreeMap();
 
-	public static void initAllExports() {
-		exportFormats.clear();
-		initBuiltinExports();
-		TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
-		for (Iterator i = customExports.keySet().iterator(); i.hasNext();) {
-			putFormat((ExportFormat) customExports.get(i.next()));
-		}
-	}
+    public static void initAllExports() {
+        exportFormats.clear();
+        initBuiltinExports();
+        TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
+        for (Iterator i=customExports.keySet().iterator(); i.hasNext();) {
+            putFormat((ExportFormat)customExports.get(i.next()));
+        }
+    }
 
-	public static void initBuiltinExports() {
-		putFormat(new ExportFormat(Globals.lang("HTML"), "html", "html", null, ".html"));
-		putFormat(new ExportFormat(Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null,
-			".html"));
-		putFormat(new ExportFormat(Globals.lang("Docbook"), "docbook", "docbook", null, ".xml"));
-		putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
-		putFormat(new ModsExportFormat());
-		putFormat(new ExportFormat(Globals.lang("HTML table"), "tablerefs", "tablerefs",
-			"tablerefs", ".html"));
-		putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
-			"tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
-		putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard", "harvard",
-			".rtf"));
-		putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote", "endnote", ".txt"));
-		putFormat(new OpenOfficeDocumentCreator());
-		putFormat(new OpenDocumentSpreadsheetCreator());
+    public static void initBuiltinExports() {
+        putFormat(new ExportFormat(
+                Globals.lang("HTML"), "html", "html", null, ".html"));
+        putFormat(new ExportFormat(
+                Globals.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
+        putFormat(new ExportFormat(Globals.lang("Docbook"), "docbook", "docbook", null, ".xml"));
+        putFormat(new ExportFormat(Globals.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
+        putFormat(new ModsExportFormat());
+        putFormat(new ExportFormat(Globals.lang("HTML table"),
+                "tablerefs", "tablerefs", "tablerefs", ".html"));
+        putFormat(new ExportFormat(Globals.lang("HTML table (with Abstract & BibTeX)"),
+                "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
+        putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
+                "harvard", ".rtf"));
+        putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
+                "endnote", ".txt"));
+        putFormat(new OpenOfficeDocumentCreator());
+        putFormat(new OpenDocumentSpreadsheetCreator());
 
-		// openofficeItem = new JMenuItem("OpenOffice Calc"),
-		// odsItem = new JMenuItem("OpenDocument Spreadsheet");
-	}
+        //openofficeItem = new JMenuItem("OpenOffice Calc"),
+        //odsItem = new JMenuItem("OpenDocument Spreadsheet");
+
+    }
+
+
+
 
 	/**
 	 * Build a string listing all available export formats.
@@ -175,7 +181,8 @@ public class ExportFormats {
 		return new ExportAction(frame, selectedOnly);
 	}
 
-	public static JFileChooser createExportFileChooser(String currentDir) {
+    
+    public static JFileChooser createExportFileChooser(String currentDir) {
 		String lastUsedFormat = Globals.prefs.get("lastUsedExport");
 		FileFilter defaultFilter = null;
 		JFileChooser fc = new JFileChooser(currentDir);
@@ -199,5 +206,6 @@ public class ExportFormats {
 	private static void putFormat(ExportFormat format) {
 		exportFormats.put(format.getConsoleName(), format);
 	}
+
 
 }
