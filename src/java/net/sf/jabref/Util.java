@@ -870,8 +870,52 @@ public class Util {
 		return s.substring(beginIndex, endIndex);
 	}
 
+	public static ArrayList parseMethodsCalls(String calls) throws RuntimeException {
+		
+		ArrayList result = new ArrayList();
+		
+		char[] c = calls.toCharArray();
+		
+		int i = 0;
+		
+		while (i < c.length){
+		
+			int start = i;
+			if (Character.isJavaIdentifierStart(c[i])){
+				i++;
+				while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')){
+					i++;
+				}
+				if (i < c.length && c[i] == '('){
+					
+					String method = calls.substring(start, i);
+					
+					i++; i++; 
+					
+					int startParam = i;
+					i++;
+					
+					while (i + 1 < c.length && !(c[i] == '"' && c[i+1] == ')')){
+						i++;
+					}
+					
+					String param = calls.substring(startParam, i);
+					
+					result.add(new String[]{method, param});
+				} else {
+					String method = calls.substring(start, i);
+					result.add(new String[]{method});
+				}
+			}
+			i++;
+		}
+		
+		return result;
+	}
+	
+	
 	/**
-	 * Accepts a string like [author:toLowerCase,toUpperCase], whereas the first
+	 * Accepts a string like [author:toLowerCase("escapedstring"),toUpperCase], whereas the first
 	 * string signifies the bibtex-field to get while the others are the names
 	 * of layouters that will be applied.
 	 * 
@@ -885,22 +929,32 @@ public class Util {
 
 		fieldAndFormat = stripBrackets(fieldAndFormat);
 
-		String[] fieldAndFormatStrings = fieldAndFormat.split(":");
-
-		if (fieldAndFormatStrings.length == 0)
+		int colon = fieldAndFormat.indexOf(':');
+		
+		String beforeColon, afterColon;
+		if (colon == -1){
+			beforeColon = fieldAndFormat;
+			afterColon = null;
+		} else {
+			beforeColon = fieldAndFormat.substring(0, colon);
+			afterColon = fieldAndFormat.substring(colon+1);
+		}
+		beforeColon = beforeColon.trim();
+		
+		if (beforeColon.length() == 0){
 			return null;
-
-		String fieldValue = getField(fieldAndFormatStrings[0].trim(), entry, database);
+		}
+		
+		String fieldValue = getField(beforeColon, entry, database);
 
 		if (fieldValue == null)
 			return null;
 
-		if (fieldAndFormatStrings.length == 1)
+		if (afterColon == null || afterColon.length() == 0)
 			return fieldValue;
 
 		try {
-			LayoutFormatter[] formatters = LayoutEntry.getOptionalLayout(fieldAndFormatStrings[1],
-				"");
+			LayoutFormatter[] formatters = LayoutEntry.getOptionalLayout(afterColon, "");
 			for (int i = 0; i < formatters.length; i++) {
 				fieldValue = formatters[i].format(fieldValue);
 			}

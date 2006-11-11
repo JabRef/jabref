@@ -438,7 +438,7 @@ public class JabRefPreferences {
         String names = get(key);
         if (names == null)
             return null;
-        //Util.pr(key+"\n"+names);
+
         StringReader rd = new StringReader(names);
         Vector arr = new Vector();
         String rs;

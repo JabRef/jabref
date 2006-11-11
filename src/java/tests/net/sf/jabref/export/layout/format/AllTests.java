@@ -15,6 +15,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorAndsCommaReplacerTest.class);
 		suite.addTestSuite(AuthorFirstFirstTest.class);
 		suite.addTestSuite(AuthorFirstLastOxfordCommasTest.class);
+		suite.addTestSuite(BibtexNameLayoutFormatterTest.class);
 		suite.addTestSuite(AuthorOrgSciTest.class);
 		suite.addTestSuite(AuthorAbbreviatorTest.class);
 		suite.addTestSuite(CompositeFormatTest.class);

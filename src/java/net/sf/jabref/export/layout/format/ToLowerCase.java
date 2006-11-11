@@ -24,22 +24,15 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-
 /**
  * Remove brackets formatter.
- *
+ * 
  * @author $author$
  * @version $Revision$
  */
-public class ToLowerCase implements LayoutFormatter
-{
-    //~ Methods ////////////////////////////////////////////////////////////////
+public class ToLowerCase implements LayoutFormatter {
 
-    public String format(String fieldText)
-    {
-        return fieldText.toLowerCase();
-    }
+	public String format(String fieldText) {
+		return fieldText.toLowerCase();
+	}
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

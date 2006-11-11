@@ -40,6 +40,8 @@ import javax.swing.table.*;
  *
  * With this design, it should be very easy to add new tabs later.
  *
+ * @deprecated Use PrefsDialog3 instead!
+ *
  */
 public class PrefsDialog2 extends JDialog {
 
@@ -71,14 +73,15 @@ public class PrefsDialog2 extends JDialog {
         getContentPane().add(lower);
 
         // ----------------------------------------------------------------
-        // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
+        // Add new tabs to be displayed in the preferences here. 
+        // Remember, tabs must implement PrefsTab.
         // ----------------------------------------------------------------
         tabbed.addTab(Globals.lang("General"), new GeneralTab(frame, _prefs));
         tabbed.addTab(Globals.lang("Appearance"), new TablePrefsTab(_prefs, parent));
         //tabbed.addTab(Globals.lang("External programs"), new ExternalProgramsTab(_prefs));
         tabbed.addTab(Globals.lang("Key pattern"), new TabLabelPattern(_prefs, parent.helpDiag));
         tabbed.addTab(Globals.lang("Entry preview"), new PreviewPrefsTab(_prefs));
-	
+        
 	if (!Globals.ON_MAC)
 	    tabbed.addTab(Globals.lang("Advanced"), new AdvancedTab(_prefs, parent.helpDiag));
         JButton

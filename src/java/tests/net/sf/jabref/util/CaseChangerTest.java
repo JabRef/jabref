@@ -50,4 +50,9 @@ public class CaseChangerTest extends TestCase {
 		
 		assertEquals("Upper Each First", CaseChanger.changeCase("upper each First", 3));
 	}
+	
+	public void testPreserveBrackets(){
+		
+		
+	}
 }

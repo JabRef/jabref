@@ -31,6 +31,8 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.AuthorList;
 
 /**
+ * Author First First prints ....
+ * 
  * 
  * @author  $Author$
  * @version $Revision$ $Date$

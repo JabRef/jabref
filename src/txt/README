@@ -86,6 +86,7 @@ Change log:
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
         - Added warning dialog when exporting failed.
         - Added fix for exporting special chars in RTF like ισω...
+        - Added NameFormat LayoutFormatter based on Bibtex method name.format$
 2.2b    - Added Mark Schenk's advanced HTML export filter.
         - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.

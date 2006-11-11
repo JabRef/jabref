@@ -173,6 +173,30 @@ public class UtilTest extends TestCase {
 		assertNotNull(entry);
 	}
 
+	public void testParseMethodCalls(){
+		
+		assertEquals(1, Util.parseMethodsCalls("bla").size());
+		assertEquals("bla", ((String[])(Util.parseMethodsCalls("bla").get(0)))[0]);
+		
+		assertEquals(1, Util.parseMethodsCalls("bla,").size());
+		assertEquals("bla", ((String[])(Util.parseMethodsCalls("bla,").get(0)))[0]);
+
+		assertEquals(1, Util.parseMethodsCalls("_bla.bla.blub,").size());
+		assertEquals("_bla.bla.blub", ((String[])(Util.parseMethodsCalls("_bla.bla.blub,").get(0)))[0]);
+
+		
+		assertEquals(2, Util.parseMethodsCalls("bla,foo").size());
+		assertEquals("bla", ((String[])(Util.parseMethodsCalls("bla,foo").get(0)))[0]);
+		assertEquals("foo", ((String[])(Util.parseMethodsCalls("bla,foo").get(1)))[0]);
+		
+		assertEquals(2, Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
+		assertEquals("bla", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[0]);
+		assertEquals("foo", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
+		assertEquals("test", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
+		assertEquals("fark", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
+	}
+	
+	
 	public void testFieldAndFormat(){
 		assertEquals("Eric von Hippel and Georg von Krogh", Util.getFieldAndFormat("[author]", entry, database));
 		
@@ -180,7 +204,17 @@ public class UtilTest extends TestCase {
 		
 		assertEquals(null, Util.getFieldAndFormat("[unknownkey]", entry, database));
 		
+		assertEquals(null, Util.getFieldAndFormat("[:]", entry, database));
+		
+		assertEquals(null, Util.getFieldAndFormat("[:ToLowerCase]", entry, database));
+		
+		assertEquals("eric von hippel and georg von krogh", Util.getFieldAndFormat("[author:net.sf.jabref.export.layout.format.ToLowerCase]", entry, database));
+		
 		assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey]", entry, database));
+		
+		assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey:]", entry, database));
+		
+		assertEquals("testtest", Util.getFieldAndFormat("[author:net.sf.jabref.export.layout.format.NameFormat(\"*@*@test\")]", entry, database));
 	}
 	
 	public void testExpandBrackets(){
@@ -212,6 +246,8 @@ public class UtilTest extends TestCase {
                     Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
             assertEquals("http://www.vg.no/fil%20e.html",
                     Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+            
+           
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

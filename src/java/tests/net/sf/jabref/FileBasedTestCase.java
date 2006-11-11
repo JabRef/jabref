@@ -217,5 +217,8 @@ public class FileBasedTestCase extends TestCase {
 		// TODO: This is not a great way to do this, sure ;-)
 	}
 	
+	public void testVoid(){
+		// to remove warning
+	}
 	
 }

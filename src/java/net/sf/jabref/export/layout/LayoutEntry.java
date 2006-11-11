@@ -25,15 +25,18 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export.layout;
 
-import wsi.ra.tool.WSITools;
-
-import wsi.ra.types.StringInt;
-
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.NameFormatterTab;
+import net.sf.jabref.Util;
+import net.sf.jabref.export.layout.format.NameFormat;
+import wsi.ra.tool.WSITools;
+import wsi.ra.types.StringInt;
 
 
 /**
@@ -381,50 +384,66 @@ public class LayoutEntry
   }
   // added section - end (arudert)
 
-    /**
-     * @param string
-     * @return
-     */
-    public static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix)
-        throws Exception
-    {
-      String[] formatters = formatterName.split(",");
-      //System.out.println(":"+formatterName);
-        LayoutFormatter[] formatter = new LayoutFormatter[formatters.length];
-        for (int i=0; i<formatter.length; i++) {
-          //System.out.println(":::"+formatters[i]);
-          try
-          {
-            try {
-              formatter[i] = (LayoutFormatter) Class.forName(classPrefix + formatters[i])
-                  .newInstance();
-            } catch (Throwable ex2) {
-              formatter[i] = (LayoutFormatter) Class.forName(formatters[i])
-                  .newInstance();
-            }
-          }
-          catch (ClassNotFoundException ex)
-          {
-            throw new Exception(Globals.lang("Formatter not found")+": "+formatters[i]);
-          }
-          catch (InstantiationException ex)
-          {
-            throw new Exception(formatterName + " can not be instantiated.");
-          }
-          catch (IllegalAccessException ex)
-          {
-            throw new Exception(formatterName + " can't be accessed.");
-          }
+  
+  public static LayoutFormatter getLayoutFormatter(String className, String classPrefix) throws Exception {
+		LayoutFormatter f = null;
 
-          if (formatter == null)
-          {
-            throw new Exception(Globals.lang("Formatter not found")+": "+formatters[i]);
-          }
-        }
+		if (className.length() > 0) {
+			try {
+				try {
+					f = (LayoutFormatter) Class.forName(classPrefix + className).newInstance();
+				} catch (Throwable ex2) {
+					f = (LayoutFormatter) Class.forName(className).newInstance();
+				}
+			} catch (ClassNotFoundException ex) {
+				throw new Exception(Globals.lang("Formatter not found") + ": " + className);
+			} catch (InstantiationException ex) {
+				throw new Exception(className + " can not be instantiated.");
+			} catch (IllegalAccessException ex) {
+				throw new Exception(className + " can't be accessed.");
+			}
+		}
+		return f;
+  	}
+  
+  	/**
+	 * @param string
+	 * @return
+	 */
+	public static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix)
+		throws Exception {
 
-        return formatter;
-    }
+		ArrayList formatterStrings = Util.parseMethodsCalls(formatterName);
 
+		ArrayList results = new ArrayList(formatterStrings.size());
+		
+		Map userNameFormatter = NameFormatterTab.getNameFormatters();
+
+		for (int i = 0; i < formatterStrings.size(); i++) {
+
+			String[] strings = (String[]) formatterStrings.get(i);
+
+			String className = strings[0].trim();
+
+			try {
+				LayoutFormatter f = getLayoutFormatter(className, classPrefix);
+				results.add(f);
+			} catch(Exception e){
+				
+				String formatterParameter = (String)userNameFormatter.get(className);
+				
+				if (formatterParameter == null){
+					throw new Exception(Globals.lang("Formatter not found") + ": " + className);
+				} else {
+					NameFormat nf = new NameFormat();
+					nf.setParameter(formatterParameter);
+					results.add(nf);
+				}
+			}
+		}
+
+		return (LayoutFormatter[]) results.toArray(new LayoutFormatter[] {});
+	}
 
     // changed section begin - arudert
     /**

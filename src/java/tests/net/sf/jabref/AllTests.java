@@ -9,8 +9,10 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for test.net.sf.jabref");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(UtilTest.class);
+		suite.addTestSuite(FileBasedTestCase.class);
 		suite.addTestSuite(UtilFindFileTest.class);
 		suite.addTestSuite(AuthorListTest.class);
+		suite.addTestSuite(JabRefTestCase.class);
 		//$JUnit-END$
 
 		suite.addTest(tests.net.sf.jabref.export.layout.format.AllTests.suite());
@@ -18,7 +20,8 @@ public class AllTests {
 		suite.addTest(tests.net.sf.jabref.search.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.util.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.export.layout.AllTests.suite());
-		
+		suite.addTest(tests.net.sf.jabref.bst.AllTests.suite());
+
 		return suite;
 	}
 

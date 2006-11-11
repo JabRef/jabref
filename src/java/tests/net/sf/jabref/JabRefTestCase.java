@@ -17,4 +17,8 @@ public class JabRefTestCase extends TestCase {
 		}
 	}
 	
+	public void testVoid(){
+		// to remove warning
+	}
+	
 }

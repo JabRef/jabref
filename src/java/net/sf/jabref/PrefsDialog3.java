@@ -88,7 +88,8 @@ public class PrefsDialog3 extends JDialog {
         KEY = Globals.lang("Key pattern"),
         PRE = Globals.lang("Entry preview"),
         //JOU = Globals.lang("Journal names"),
-        ADV = Globals.lang("Advanced");
+        ADV = Globals.lang("Advanced"),
+        NAM = Globals.lang("Name formatter");
 
     ArrayList al = new ArrayList();
     al.add(GEN);
@@ -101,6 +102,8 @@ public class PrefsDialog3 extends JDialog {
     //al.add(JOU);
     al.add(PRE);
     al.add(ADV);
+    al.add(NAM);
+    
     main.setLayout(cardLayout);
 
     main.add(new GeneralTab(frame, _prefs), GEN);
@@ -112,7 +115,8 @@ public class PrefsDialog3 extends JDialog {
     main.add(new TableColumnsTab(_prefs, parent), COL);
     main.add(new TabLabelPattern(_prefs, parent.helpDiag), KEY);
     main.add(new PreviewPrefsTab(_prefs), PRE);
-
+    main.add(new NameFormatterTab(parent.helpDiag), NAM);
+    
     //main.add(new ManageJournalsPanel(frame), JOU);
 
     upper.setBorder(BorderFactory.createEtchedBorder());
@@ -130,10 +134,7 @@ public class PrefsDialog3 extends JDialog {
             if (e.getValueIsAdjusting())
             return;
             String o = (String)chooser.getSelectedValue();
-            //Util.pr(o);
             cardLayout.show(main, o);
-            //main.revalidate();
-            //main.repaint();
         }
         });
 

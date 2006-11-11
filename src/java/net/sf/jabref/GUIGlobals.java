@@ -153,6 +153,7 @@ public class GUIGlobals {
 	remoteHelp = "RemoteHelp.html",
 	journalAbbrHelp = "JournalAbbreviations.html",
 	regularExpressionSearchHelp = "ExternalFiles.html#RegularExpressionSearch",
+	nameFormatterHelp = "CustomExports.html#NameFormatter",
 	previewHelp = "PreviewHelp.html";
 
 //	Colors.

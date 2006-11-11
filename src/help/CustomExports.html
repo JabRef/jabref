@@ -154,6 +154,71 @@ to have been run earlier.
   class name only, like with the standard formatters. Otherwise, you must call the formatter by its fully
   qualified name (including package name). In any case, the formatter must be in your classpath when running
   JabRef.
+  
+<H2>Using Custom Name Formatters</H2>
+
+<p>With JabRef 2.2 it is now possible to define custom name formatters using the bibtex-sty-file syntax. 
+This allows ultimate flexibility, but is a cumbersome to write</p>
+<p>You can define your own formatter in the preference tab "Name Formatter" using the following format
+and then use it with the name given to it as any other name formatter</p>
+
+<code>
+  &lt;case1&gt;@&lt;range11&gt;@&lt;format&gt;@&lt;range12&gt;@&lt;format&gt;@&lt;range13&gt;...@@</br>
+  &lt;case2&gt;@&lt;range21&gt;@... and so on.
+</code>
+
+<p>This format first splits the task to format a list of author into cases depending on
+how many authors there are (this is since some formats differ depending on how many authors there are). 
+Each individual case is separated by @@ and contains instructions on how to format each author in the case.
+These instructions are separated by a @.<p>
+<p>Cases are identified using integers (1,2,3,etc.) or the character * (matches any number of authors) and will tell 
+the formatter to apply the following instructions if there are a number of less or equal of authors given.</p>
+<p>For example</p>
+<code>
+   case1 = 2<br/>
+   case2 = 3<br/>
+   case3 = *<br/>
+</code>
+
+<p>
+  Ranges are either <code>&lt;integer&gt;..&lt;integer&gt;</code>, <code>&lt;integer&gt;</code> or the character <code>*</code> using a 1 based index for indexing 
+  authors from the given list of authors. Integer indexes can be negative to denote them to start from 
+  the end of the list where -1 is the last author.
+</p>
+
+<p>For instance with an authorlist of "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay":<p>
+<ul>
+  <li> 1..3 will affect Joe, Mary and Bruce</li>
+  <li> 4..4 will affect Arthur </li>
+  <li> * will affect all of them</li>
+  <li> 2..-1 will affect Mary, Bruce and Arthur</li>
+</ul>
+
+<p>The <code>&lt;format&gt;</code>-strings use the Bibtex formatter format:
+ 
+<p> 
+  The four letter v, f, l, j indicate the name parts von, first, last, jr which 
+  are used within curly braces. A single letter v, f, l, j indicates that the name should be abbreviated.
+  If one of these letters or letter pairs is encountered JabRef will output all the respective names 
+  (possibly abbreviated), but the whole expression in curly braces is only printed if the name part exists.
+  
+  For instance if the format is "{ll} {vv {von Part}} {ff}" and the names are "Mary Kay and John von Neumann",
+  then JabRef will output "Kay  Mary" (with two space between last and first) and "Neuman von von Part John".  
+  
+  I give some examples but would rather point you to the bibtex documentation.<p>
+</p>
+<code>"{ll}, {f}."</code> will turn <code>"Joe Doe"</code> into <code>"Doe, J."</code>
+
+<p> Complete example:</p>
+
+<p> To turn: </p>
+<p><code>"Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"</code></p>
+<p>into</p>
+<p><code>"Doe, J., Jane, M., Bar, B. and Kay, A."</code></p>
+<p>you would use</p>
+<p><code>1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.</code></p>
+
+<p>If somebody would like to write a better tutorial about this: Write a mail to one of the JabRef mailinglists!</p>
 
 <H3>Conditional output</H3>
 
