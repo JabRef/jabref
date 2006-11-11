@@ -315,77 +315,62 @@ public class LayoutHelper
         return null;
     }
 
-    private Object parse() throws IOException
-    {
-        //_meta = new HashMap(); // Metadata in comments for Bibkeeper.
-        skipWhitespace();
+    private Object parse() throws IOException {
+		skipWhitespace();
 
-        int c;
+		int c;
 
-        StringBuffer buffer = null;
-        int previous = -1;
-        boolean justParsedTag = false;
-        boolean escaped = false;
+		StringBuffer buffer = null;
+		boolean escaped = false;
 
-        while (!_eof)
-        {
-            c = read();
+		while (!_eof) {
+			c = read();
 
-            //System.out.println((char)c);
-            if (c == -1)
-            {
-                _eof = true;
-                parsedEntries.add(new StringInt(buffer.toString(),
-                        IS_LAYOUT_TEXT));
+			if (c == -1) {
+				_eof = true;
 
-                //System.out.println("aha: " + buffer.toString());
-                return null;
-            }
+				/*
+				 * CO 2006-11-11: Added check for null, otherwise a Layout that
+				 * finishs with a curly brace throws a NPE
+				 */
+				if (buffer != null)
+					parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
 
-            if ((c == '\\') && (peek() != '\\') && !escaped)
-            //&& (justParsedTag || (previous != '\\')))
-            {
-                if (buffer != null)
-                {
-                    parsedEntries.add(new StringInt(buffer.toString(),
-                            IS_LAYOUT_TEXT));
-                    
-                    buffer = null;
-                }
+				return null;
+			}
 
-                parseField();
+			if ((c == '\\') && (peek() != '\\') && !escaped) {
+				if (buffer != null) {
+					parsedEntries.add(new StringInt(buffer.toString(), IS_LAYOUT_TEXT));
 
-                // To make sure the next character, if it is a backslash, doesn't get ignored,
-                // since "previous" now holds a backslash:
-                justParsedTag = true;
-                escaped = false;
-            }
-            else
-            {
-                justParsedTag = false;
+					buffer = null;
+				}
 
-                if (buffer == null)
-                {
-                    buffer = new StringBuffer(100);
-                }
+				parseField();
 
-                if ((c != '\\') || escaped)//(previous == '\\')))
-                {
-                    buffer.append((char) c);
-                }
+				// To make sure the next character, if it is a backslash,
+				// doesn't get ignored, since "previous" now holds a backslash:
+				escaped = false;
+			} else {
+				if (buffer == null) {
+					buffer = new StringBuffer(100);
+				}
 
-                escaped = (c == '\\') && !escaped;
-            }
+				if ((c != '\\') || escaped)// (previous == '\\')))
+				{
+					buffer.append((char) c);
+				}
 
-            previous = c;
-        }
+				escaped = (c == '\\') && !escaped;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
     /**
-     *
-     */
+	 * 
+	 */
     private void parseField() throws IOException
     {
         int c;
@@ -395,7 +380,7 @@ public class LayoutHelper
         while (!_eof)
         {
             c = read();
-            //System.out.print((char)c);
+            // System.out.print((char)c);
             if (c == -1)
             {
                 _eof = true;
