@@ -24,10 +24,14 @@
  */
 package net.sf.jabref;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
-import java.awt.*;
+import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -43,6 +47,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -63,6 +70,8 @@ public class EntryEditorTab {
 
 	private FieldEditor activeField = null;
 
+	private Component firstComponent;
+
 	public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField, String name) {
 		if (fields != null)
 			this.fields = (String[]) fields.toArray(new String[0]);
@@ -82,6 +91,33 @@ public class EntryEditorTab {
 
 
     void newSetupPanel(boolean addKeyField, String title) {
+    	
+    	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
+		ActionMap am = panel.getActionMap();
+
+		im.put(Globals.prefs.getKey("Entry editor, previous entry"), "prev");
+		am.put("prev", parent.prevEntryAction);
+		im.put(Globals.prefs.getKey("Entry editor, next entry"), "next");
+		am.put("next", parent.nextEntryAction);
+
+		im.put(Globals.prefs.getKey("Entry editor, store field"), "store");
+		am.put("store", parent.storeFieldAction);
+		im.put(Globals.prefs.getKey("Entry editor, next panel"), "right");
+		im.put(Globals.prefs.getKey("Entry editor, next panel 2"), "right");
+		am.put("left", parent.switchLeftAction);
+		im.put(Globals.prefs.getKey("Entry editor, previous panel"), "left");
+		im.put(Globals.prefs.getKey("Entry editor, previous panel 2"), "left");
+		am.put("right", parent.switchRightAction);
+		im.put(Globals.prefs.getKey("Help"), "help");
+		am.put("help", parent.helpAction);
+		im.put(Globals.prefs.getKey("Save database"), "save");
+		am.put("save", parent.saveDatabaseAction);
+		im.put(Globals.prefs.getKey("Next tab"), "nexttab");
+		am.put("nexttab", parent.frame.nextTab);
+		im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
+		am.put("prevtab", parent.frame.prevTab);
+    	
+    	  	
         panel.setName(title);
         //String rowSpec = "left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref";
         String colSpec = "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
@@ -153,6 +189,11 @@ public class EntryEditorTab {
 			// Create the text area:
 			final FieldTextArea ta = new FieldTextArea(fields[i], null);
 			JComponent ex = parent.getExtra(fields[i], ta);
+			
+			if (firstComponent == null){
+				firstComponent = ex;
+			}
+			
 			setupJTextComponent(ta);
 
 			// Store the editor for later reference:
@@ -280,7 +321,10 @@ public class EntryEditorTab {
 
 	public void activate() {
 		if (activeField != null){
-			activeField.requestFocus();
+			/**
+			 * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
+			 */
+			new FocusRequester(activeField.getTextComponent());
 		}
 	}
 

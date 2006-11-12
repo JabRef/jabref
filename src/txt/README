@@ -88,6 +88,7 @@ Change log:
         - Added fix for exporting special chars in RTF like ισω...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
         - [ 1594123 ] Fixed: Failure to import big numbers in Bibtex
+        - [ 1594169 ] Fixed: Entry editor navigation between panels faulty
 2.2b    - Added Mark Schenk's advanced HTML export filter.
         - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.
