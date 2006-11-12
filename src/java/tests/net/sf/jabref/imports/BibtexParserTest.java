@@ -142,6 +142,30 @@ public class BibtexParserTest extends TestCase {
 		}
 	}
 
+	
+	/**
+	 * Test for [ 1594123 ] Failure to import big numbers
+	 * 
+	 * Issue Reported by Ulf Martin.
+	 * 
+	 * @throws IOException
+	 */
+	public void testBigNumbers() throws IOException {
+		
+		ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,"
+			+ "isbn = 1234567890123456789,\n"
+			+ "isbn2 = {1234567890123456789},\n"
+			+ "small = 1234,\n"
+			+ "}"));
+
+		Collection c = result.getDatabase().getEntries();
+		BibtexEntry e = (BibtexEntry) c.iterator().next();
+
+		assertEquals("1234567890123456789", (String)e.getField("isbn"));
+		assertEquals("1234567890123456789", (String)e.getField("isbn2"));
+		assertEquals("1234", (String)e.getField("small"));
+	}
+
 	public void testNewlineHandling() throws IOException {
 
 		ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,"
