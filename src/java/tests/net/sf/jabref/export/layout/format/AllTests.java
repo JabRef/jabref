@@ -26,6 +26,7 @@ public class AllTests {
 		suite.addTestSuite(AuthorLastFirstOxfordCommasTest.class);
 		suite.addTestSuite(AuthorFirstAbbrLastCommasTest.class);
 		suite.addTestSuite(AuthorLastFirstCommasTest.class);
+		suite.addTestSuite(DOICheckTest.class);
 		suite.addTestSuite(AuthorLastFirstAbbrOxfordCommasTest.class);
 		suite.addTestSuite(NoSpaceBetweenAbbreviationsTest.class);
 		//$JUnit-END$

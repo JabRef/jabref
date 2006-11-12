@@ -4,5 +4,5 @@
 	<td>\year</td>
 	<td>\format[HTMLChars]{\journal}\format[HTMLChars]{\booktitle}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school} &nbsp;</td>
 	<td>\format[ToLowerCase]{\bibtextype}</td>
-	<td>\begin{doi}<a href="\format{\doi}">DOI</a>\end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url} &nbsp;</td>
+	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a>\end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url} &nbsp;</td>
 </tr>
