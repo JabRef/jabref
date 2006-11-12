@@ -165,6 +165,35 @@ public class BibtexParserTest extends TestCase {
 		assertEquals("1234567890123456789", (String)e.getField("isbn2"));
 		assertEquals("1234", (String)e.getField("small"));
 	}
+	
+	public void testBigNumbers2() throws IOException {
+
+		
+		ParserResult result = BibtexParser.parse(new StringReader("" +
+				"@string{bourdieu = {Bourdieu, Pierre}}" +
+				"@book{bourdieu-2002-questions-sociologie, " +
+				"	Address = {Paris}," +
+				"	Author = bourdieu," +
+				"	Isbn = 2707318256," +
+				"	Publisher = {Minuit}," +
+				"	Title = {Questions de sociologie}," +
+				"	Year = 2002" +
+				"}"));
+
+		Collection c = result.getDatabase().getEntries();
+		assertEquals(1, c.size());
+
+		BibtexEntry e = (BibtexEntry) c.iterator().next();
+
+		assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
+		assertEquals(BibtexEntryType.BOOK, e.getType());
+		assertEquals("2707318256", (String)e.getField("isbn"));
+		assertEquals("Paris", (String)e.getField("address"));
+		assertEquals("Minuit", (String)e.getField("publisher"));
+		assertEquals("Questions de sociologie", (String)e.getField("Title"));
+		assertEquals("#bourdieu#", (String)e.getField("Author"));
+		assertEquals("2002", (String)e.getField("Year"));
+	}
 
 	public void testNewlineHandling() throws IOException {
 
