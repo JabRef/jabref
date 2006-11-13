@@ -27,7 +27,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
-
 /**
  * 
  * A Bibtex Virtual machine that can execute .bst files.
@@ -38,7 +37,7 @@ import org.antlr.runtime.tree.Tree;
  * 
  * @author $Author$
  * @version $Revision$ ($Date$)
- *
+ * 
  */
 
 public class VM implements Warn {
@@ -400,7 +399,7 @@ public class VM implements Warn {
 		});
 
 		buildInFunctions.put("format.name$", new FormatNameFunction(this));
-		
+
 		buildInFunctions.put("if$", new BstFunction() {
 			/**
 			 * Pops the top three literals (they are two function literals and
@@ -488,7 +487,7 @@ public class VM implements Warn {
 					stack.push(VM.TRUE);
 					return;
 				}
-				
+
 				if (!(o1 instanceof String)) {
 					warn("Not a string or missing field in operation missing$");
 					stack.push(VM.TRUE);
@@ -529,7 +528,7 @@ public class VM implements Warn {
 					throw new VMException("Need a string at the top of the stack for num.names$");
 				}
 				String s = (String) o1;
-				
+
 				stack.push(new Integer(AuthorList.getAuthorList(s).size()));
 			}
 		});
@@ -564,13 +563,13 @@ public class VM implements Warn {
 
 		/**
 		 * Pops the top (string) literal, removes nonalphanumeric characters
-		 * except for white-space characters and hyphens and ties (these all
-		 * get converted to a space), removes certain alphabetic characters
+		 * except for white-space characters and hyphens and ties (these all get
+		 * converted to a space), removes certain alphabetic characters
 		 * contained in the control sequences associated with a \special
 		 * character", and pushes the resulting string.
 		 */
 		buildInFunctions.put("purify$", new PurifyFunction(this));
-		
+
 		buildInFunctions.put("quote$", new BstFunction() {
 			/**
 			 * Pushes the string consisting of the double-quote character.
@@ -625,7 +624,7 @@ public class VM implements Warn {
 
 				Integer len = (Integer) o1;
 				Integer start = (Integer) o2;
-				
+
 				int lenI = len.intValue();
 				int startI = start.intValue();
 
@@ -765,15 +764,14 @@ public class VM implements Warn {
 
 		/**
 		 * Pops the top two literals (the integer literal len and a string
-		 * literal, in that order). It pushes the substring of the (at most)
-		 * len consecutive text characters starting from the beginning of
-		 * the string. This function is similar to substring$, but this one
-		 * considers a \special character", even if it's missing its
-		 * matching right brace, to be a single text character (rather than
-		 * however many ASCII characters it actually comprises), and this
-		 * function doesn't consider braces to be text characters;
-		 * furthermore, this function appends any needed matching right
-		 * braces.
+		 * literal, in that order). It pushes the substring of the (at most) len
+		 * consecutive text characters starting from the beginning of the
+		 * string. This function is similar to substring$, but this one
+		 * considers a \special character", even if it's missing its matching
+		 * right brace, to be a single text character (rather than however many
+		 * ASCII characters it actually comprises), and this function doesn't
+		 * consider braces to be text characters; furthermore, this function
+		 * appends any needed matching right braces.
 		 */
 		buildInFunctions.put("text.prefix$", new TextPrefixFunction(this));
 
@@ -853,7 +851,7 @@ public class VM implements Warn {
 			 * the buffer fills up).
 			 */
 			public void execute(BstEntry context) {
-				String s = (String)stack.pop();
+				String s = (String) stack.pop();
 				System.out.println(s);
 				VM.this.bbl.append(s);
 			}
@@ -991,24 +989,24 @@ public class VM implements Warn {
 	 * @param child
 	 */
 	private void read() {
-		
+
 		Iterator i = entries.iterator();
-		while (i.hasNext()){
-			BstEntry e = (BstEntry)i.next();
-		
+		while (i.hasNext()) {
+			BstEntry e = (BstEntry) i.next();
+
 			Iterator j = e.fields.entrySet().iterator();
-			while (j.hasNext()){
-				Map.Entry mEntry = (Map.Entry)j.next();
-				
-				Object fieldValue = e.entry.getField((String)mEntry.getKey());
+			while (j.hasNext()) {
+				Map.Entry mEntry = (Map.Entry) j.next();
+
+				Object fieldValue = e.entry.getField((String) mEntry.getKey());
 
 				mEntry.setValue((fieldValue == null ? null : fieldValue.toString()));
 			}
 		}
 
 		i = entries.iterator();
-		while (i.hasNext()){
-			BstEntry e = (BstEntry)i.next();
+		while (i.hasNext()) {
+			BstEntry e = (BstEntry) i.next();
 			if (!e.fields.containsKey("crossref")) {
 				e.fields.put("crossref", null);
 			}
@@ -1063,42 +1061,42 @@ public class VM implements Warn {
 
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
-		
+
 				Iterator j = entries.iterator();
-				while (j.hasNext()){
-					BstEntry entry = (BstEntry)j.next();
+				while (j.hasNext()) {
+					BstEntry entry = (BstEntry) j.next();
 					entry.fields.put(name, null);
 				}
 			}
 		}
 		{ // Integers
 			Tree t = child.getChild(1);
-			//						assert t.getType() == Bst.IDLIST;
+			// assert t.getType() == Bst.IDLIST;
 
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
 				Iterator j = entries.iterator();
-				while (j.hasNext()){
-					BstEntry entry = (BstEntry)j.next();
+				while (j.hasNext()) {
+					BstEntry entry = (BstEntry) j.next();
 					entry.integers.put(name, new Integer(0));
 				}
 			}
 		}
 		{ // Strings
 			Tree t = child.getChild(2);
-//			assert t.getType() == Bst.IDLIST;
+			// assert t.getType() == Bst.IDLIST;
 
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
 				Iterator j = entries.iterator();
-				while (j.hasNext()){
-					BstEntry entry = (BstEntry)j.next();
+				while (j.hasNext()) {
+					BstEntry entry = (BstEntry) j.next();
 					entry.strings.put(name, null);
 				}
 			}
 			Iterator j = entries.iterator();
-			while (j.hasNext()){
-				BstEntry entry = (BstEntry)j.next();
+			while (j.hasNext()) {
+				BstEntry entry = (BstEntry) j.next();
 				entry.strings.put("sort.key$", null);
 			}
 		}
@@ -1106,20 +1104,20 @@ public class VM implements Warn {
 
 	private void reverse(Tree child) {
 
-		BstFunction f = (BstFunction)functions.get(child.getChild(0).getText());
+		BstFunction f = (BstFunction) functions.get(child.getChild(0).getText());
 
 		ListIterator i = entries.listIterator(entries.size());
 		while (i.hasPrevious()) {
-			f.execute((BstEntry)i.previous());
+			f.execute((BstEntry) i.previous());
 		}
 	}
 
 	private void iterate(Tree child) {
-		BstFunction f = (BstFunction)functions.get(child.getChild(0).getText());
-		
+		BstFunction f = (BstFunction) functions.get(child.getChild(0).getText());
+
 		Iterator i = entries.iterator();
 		while (i.hasNext()) {
-			f.execute((BstEntry)i.next());
+			f.execute((BstEntry) i.next());
 		}
 	}
 
@@ -1132,9 +1130,10 @@ public class VM implements Warn {
 	private void sort(Tree child) {
 		Collections.sort(entries, new Comparator() {
 			public int compare(Object x1, Object x2) {
-				BstEntry o1 = (BstEntry)x1;
-				BstEntry o2 = (BstEntry)x2;
-				return ((String)o1.strings.get("sort.key$")).compareTo(o2.strings.get("sort.key$"));
+				BstEntry o1 = (BstEntry) x1;
+				BstEntry o2 = (BstEntry) x2;
+				return ((String) o1.strings.get("sort.key$")).compareTo((String) o2.strings
+					.get("sort.key$"));
 			}
 		});
 	}
@@ -1177,7 +1176,6 @@ public class VM implements Warn {
 						String s = c.getText();
 						push(s.substring(1, s.length() - 1));
 					}
-						;
 						break;
 					case Bst.INTEGER:
 						push(new Integer(Integer.parseInt(c.getText().substring(1))));
@@ -1236,7 +1234,7 @@ public class VM implements Warn {
 		}
 
 		if (functions.containsKey(name)) {
-			((BstFunction)functions.get(name)).execute(context);
+			((BstFunction) functions.get(name)).execute(context);
 			return;
 		}
 
@@ -1299,7 +1297,7 @@ public class VM implements Warn {
 		// Map<String, String> fields = new HashMap<String, String>();
 
 		// Map<String, Integer> integers = new HashMap<String, Integer>();
-		
+
 		Map strings = new HashMap();
 
 		Map fields = new HashMap();
@@ -1315,7 +1313,7 @@ public class VM implements Warn {
 		}
 	}
 
-	//			Vector<BstEntry> entries;
+	// Vector<BstEntry> entries;
 	Vector entries;
 
 	// Map<String, String> strings = new HashMap<String, String>();
@@ -1343,23 +1341,15 @@ public class VM implements Warn {
 	}
 
 	/*
-	 * public Map<String, String> getStrings() {
-		return strings;
-	}
-
-	public Map<String, Integer> getIntegers() {
-		return integers;
-	}
-
-	public Vector<BstEntry> getEntries() {
-		return entries;
-	}
-
-	public Map<String, BstFunction> getFunctions() {
-		return functions;
-	}
+	 * public Map<String, String> getStrings() { return strings; }
+	 * 
+	 * public Map<String, Integer> getIntegers() { return integers; }
+	 * 
+	 * public Vector<BstEntry> getEntries() { return entries; }
+	 * 
+	 * public Map<String, BstFunction> getFunctions() { return functions; }
 	 */
-	
+
 	public Map getStrings() {
 		return strings;
 	}
