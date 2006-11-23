@@ -38,11 +38,7 @@ idList0
 	: '{' identifier* '}' -> ^(IDLIST identifier*);
 
 function 
-	: '<' | '>' | '=' | '+' | '-' | ':=' | '*' | 'add.period$' | 'call.type$' | 'change.case$' | 'chr.to.int$'
-	| 'cite$' | 'duplicat$' | 'empty$' | 'format.name$' | 'if$' | 'int.to.chr$' | 'int.to.str$' | 'missing$'
-	| 'newline$' | 'num.names$' | 'pop$' | 'preamble$' | 'purify$' | 'quote$' | 'skip$' | 'stack$' | 'substring$'
-	| 'swap$' | 'text.length$' | 'text.prefix$' | 'top$' | 'type$' | 'warning$' | 'while$' | 'width$'
-	| 'write$' | identifier;
+	: '<' | '>' | '=' | '+' | '-' | ':=' | '*' | identifier;
 	
 stack 
 	: '{' stackitem+ '}' -> ^(STACK stackitem+);

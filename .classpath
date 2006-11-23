@@ -22,8 +22,8 @@
 	<classpathentry kind="lib" path="lib/looks-2.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/JempBox-0.1.0-dev.jar" sourcepath="/JempBoxCVS"/>
 	<classpathentry kind="lib" path="lib/PDFBox-0.7.3-dev-reduced.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-3.0b4.jar"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0b5.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.0.4.jar"/>

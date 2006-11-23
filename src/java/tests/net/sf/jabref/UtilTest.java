@@ -6,8 +6,11 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JWindow;
@@ -15,6 +18,8 @@ import javax.swing.JWindow;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.NameFormatterTab;
 import net.sf.jabref.Util;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
@@ -213,9 +218,41 @@ public class UtilTest extends TestCase {
 		assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey]", entry, database));
 		
 		assertEquals("HipKro03", Util.getFieldAndFormat("[bibtexkey:]", entry, database));
-		
-		assertEquals("testtest", Util.getFieldAndFormat("[author:net.sf.jabref.export.layout.format.NameFormat(\"*@*@test\")]", entry, database));
 	}
+	
+	public void testUserFieldAndFormat(){
+	
+		String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
+		if (names == null)
+			names = new String[]{};
+		
+		String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
+		if (formats == null)
+			formats = new String[]{};
+		
+		try {
+		
+			List f = new LinkedList(Arrays.asList(formats));
+			List n = new LinkedList(Arrays.asList(names));
+			
+			n.add("testMe123454321");
+			f.add("*@*@test");
+
+			String[] newNames = (String[])n.toArray(new String[n.size()]);
+			String[] newFormats = (String[])f.toArray(new String[f.size()]);
+			
+			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, newNames);
+			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, newFormats);
+			
+			assertEquals("testtest", Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
+		
+		} finally {
+			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
+			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+		}
+	}
+	
+	
 	
 	public void testExpandBrackets(){
 				

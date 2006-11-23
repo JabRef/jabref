@@ -92,8 +92,8 @@ public class VM implements Warn {
 	public static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
 		BstLexer lex = new BstLexer(bst);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
-		Bst parser = new Bst(tokens);
-		Bst.program_return r = parser.program();
+		BstParser parser = new BstParser(tokens);
+		BstParser.program_return r = parser.program();
 		return (CommonTree) r.getTree();
 	}
 
@@ -925,34 +925,34 @@ public class VM implements Warn {
 		for (int i = 0; i < tree.getChildCount(); i++) {
 			Tree child = tree.getChild(i);
 			switch (child.getType()) {
-			case Bst.STRINGS:
+			case BstParser.STRINGS:
 				strings(child);
 				break;
-			case Bst.INTEGERS:
+			case BstParser.INTEGERS:
 				integers(child);
 				break;
-			case Bst.FUNCTION:
+			case BstParser.FUNCTION:
 				function(child);
 				break;
-			case Bst.EXECUTE:
+			case BstParser.EXECUTE:
 				execute(child);
 				break;
-			case Bst.SORT:
+			case BstParser.SORT:
 				sort(child);
 				break;
-			case Bst.ITERATE:
+			case BstParser.ITERATE:
 				iterate(child);
 				break;
-			case Bst.REVERSE:
+			case BstParser.REVERSE:
 				reverse(child);
 				break;
-			case Bst.ENTRY:
+			case BstParser.ENTRY:
 				entry(child);
 				break;
-			case Bst.READ:
+			case BstParser.READ:
 				read();
 				break;
-			case Bst.MACRO:
+			case BstParser.MACRO:
 				macro(child);
 				break;
 			}
@@ -1172,18 +1172,18 @@ public class VM implements Warn {
 				try {
 
 					switch (c.getType()) {
-					case Bst.STRING: {
+					case BstParser.STRING: {
 						String s = c.getText();
 						push(s.substring(1, s.length() - 1));
 					}
 						break;
-					case Bst.INTEGER:
+					case BstParser.INTEGER:
 						push(new Integer(Integer.parseInt(c.getText().substring(1))));
 						break;
-					case Bst.QUOTED:
+					case BstParser.QUOTED:
 						push(new Identifier(c.getText().substring(1)));
 						break;
-					case Bst.STACK:
+					case BstParser.STACK:
 						push(c);
 						break;
 					default:

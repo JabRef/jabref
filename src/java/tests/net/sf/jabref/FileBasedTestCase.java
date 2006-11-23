@@ -143,11 +143,11 @@ public class FileBasedTestCase extends TestCase {
 	public void setUp() throws Exception {
 
 		Globals.prefs = JabRefPreferences.getInstance();
-
 		oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY);
+		oldPdfDirectory = Globals.prefs.get("pdfDirectory");
 
 		Globals.prefs.putBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY, false);
-
+		
 		getBibtexEntry();
 		assertNotNull(database);
 		assertNotNull(entry);
@@ -156,10 +156,8 @@ public class FileBasedTestCase extends TestCase {
 		try {
 			root = createTempDir("UtilFindFileTest");
 
-			oldPdfDirectory = Globals.prefs.get("pdfDirectory");
-
 			Globals.prefs.put("pdfDirectory", root.getPath());
-
+		
 			File subDir1 = new File(root, "Organization Science");
 			subDir1.mkdir();
 
