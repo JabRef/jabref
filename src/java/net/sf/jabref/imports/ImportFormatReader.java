@@ -455,33 +455,31 @@ public class ImportFormatReader {
     int bestResult = 0;
 
     // Cycle through all importers:
-    for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
-      ImportFormat imFo = (ImportFormat)i.next();
+		for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
+			ImportFormat imFo = (ImportFormat) i.next();
 
-      try {
-        //System.out.println("Trying format: "+imFo.getFormatName());
-        List entries = importFromFile(imFo, filename);
+			try {
+				// System.out.println("Trying format: "+imFo.getFormatName());
+				List entries = importFromFile(imFo, filename);
 
-        if (entries != null)
-          purgeEmptyEntries(entries);
+				if (entries != null)
+					purgeEmptyEntries(entries);
 
-        int entryCount = ((entries != null) ? entries.size() : 0);
+				int entryCount = ((entries != null) ? entries.size() : 0);
 
-        //System.out.println("Entries: "+entryCount);
-        //BibtexDatabase base = importFile(formats[i], filename);
-        if (entryCount > bestResult) {
-          bestResult = entryCount;
-          usedFormat = imFo.getFormatName();
-          entryList = entries;
-            //System.out.println("Looks good: "+imFo.getFormatName());
-        }
-      } catch (IOException ex) {
-	  //ex.printStackTrace();
-        //System.out.println("Import failed");
-      }
-    }
+				// System.out.println("Entries: "+entryCount);
+				// BibtexDatabase base = importFile(formats[i], filename);
+				if (entryCount > bestResult) {
+					bestResult = entryCount;
+					usedFormat = imFo.getFormatName();
+					entryList = entries;
+					// System.out.println("Looks good: "+imFo.getFormatName());
+				}
+			} catch (Exception e) {
+			}
+		}
       System.out.println("Used format: "+usedFormat);
-    // Finally, if all else fails, see if it is a BibTeX file:	
+    // Finally, if all else fails, see if it is a BibTeX file:
     if (entryList == null) {
 	try {
 	    ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));

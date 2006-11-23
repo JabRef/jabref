@@ -2,9 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry excluding="java/|extensions/API/|help/de/|help/fr/|help/no/|images/font/|osx/osxadapter/|windows/nsis/|extensions/|osx/|tests/|txt/|windows/" kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/aelfred-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/ccl.jar"/>
 	<classpathentry kind="lib" path="lib/jalopy-1.0b10.jar"/>
 	<classpathentry kind="lib" path="lib/jalopy-ant-0.6.1.jar"/>
@@ -22,12 +20,15 @@
 	<classpathentry kind="lib" path="lib/glazedlists-1.5.0_java14.jar"/>
 	<classpathentry kind="lib" path="lib/microba.jar"/>
 	<classpathentry kind="lib" path="lib/looks-2.0.4.jar"/>
-	<classpathentry sourcepath="/JempBoxCVS" kind="lib" path="lib/JempBox-0.1.0-dev.jar"/>
+	<classpathentry kind="lib" path="lib/JempBox-0.1.0-dev.jar" sourcepath="/JempBoxCVS"/>
 	<classpathentry kind="lib" path="lib/PDFBox-0.7.3-dev-reduced.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-3.0b4.jar"/>
+	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="lib" path="lib/pmd-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JDK1.4"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

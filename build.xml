@@ -27,6 +27,8 @@
              $Author$
 
    modified:
+             23.11.2006 c.oezbek
+             - tried to fix classpath issues
              28.07.2005 r.nagel
              - insert dynamic build info generation (resource/build.properties)
              - copy fonts directory, used by the new about dialog
@@ -57,7 +59,6 @@
 	<property name="build.tmp" value="${build.dir}/tmp" />
 	<property name="build.osx" value="${build.dir}/classes/osxadapter" />
 	<property name="build.lib" value="${build.dir}/lib" />
-	<property name="build.bin" value="${build.dir}/bin" />
 	<property name="build.win" value="${build.dir}/windows" />
 	<property name="build.images" value="${build.dir}/images" />
 	<property name="build.fonts" value="${build.dir}/images/font" />
@@ -108,51 +109,38 @@
 	<!-- Build classpath -->
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
-		<fileset dir="${library.directory}">
-			<include name="*.jar" />
-		</fileset>
+		<pathelement path="${build.dir}" />
+		<pathelement location="${library.directory}/antlr.jar" />
+		<pathelement location="${library.directory}/antlr-3.0b4.jar" />
+		<pathelement location="${library.directory}/looks-2.0.4.jar" />
+		<pathelement location="${library.directory}/forms-1.0.4.jar" />
+		<pathelement location="${library.directory}/spin.jar" />
+		<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
+		<pathelement location="${library.directory}/microba.jar" />
+        <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
+        <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
 	</path>
-
-	<!-- Runs project (e.g. in NetBeans 4) -->
-	<target name="run" depends="jars">
+	
+	<target name="run" depends="build">
+		<java classname="net.sf.jabref.JabRef" fork="true">
+			<classpath refid="classpath"/>
+		</java>
+	</target>
+	
+	<!-- Runs project -->
+	<target name="runFromJar" depends="jars">
 		<java classname="net.sf.jabref.JabRef" fork="true">
 			<classpath>
 				<pathelement location="${build.lib}/jabref.jar" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/forms-1.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
-				<pathelement location="${library.directory}/microba.jar" />
 			</classpath>
 		</java>
 	</target>
 
-	<!-- Target used for profiling with the Netbeans profiler. -->
-	<!--<target name="profile" depends="jars">
-        <nbprofile classname="net.sf.jabref.JabRef">
-        <classpath>
-            <pathelement location="${build.lib}/jabref.jar"/>
-            <pathelement location="${library.directory}/antlr.jar" />
-            <pathelement location="${library.directory}/looks-2.0.4.jar" />
-            <pathelement location="${library.directory}/forms-1.0.4.jar" />
-            <pathelement location="${library.directory}/spin.jar" />
-            <pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
-        </classpath>
-         </nbprofile>
-    </target>-->
 	<target name="profile" depends="jars" description="Profile JabRef">
 		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
 
 		<nbprofiledirect>
-			<classpath>
-				<pathelement location="${build.lib}/jabref.jar" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/forms-1.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
-			</classpath>
+			<classpath refid="classpath"/>
 		</nbprofiledirect>
 
 		<property environment="env" />
@@ -160,38 +148,17 @@
 			<jvmarg value="${profiler.info.jvmargs.agent}" />
 			<jvmarg line="${profiler.info.jvmargs}" />
 			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
-			<classpath>
-				<pathelement location="${build.lib}/jabref.jar" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/forms-1.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
-                <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
-                <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
-            </classpath>
+			<classpath refid="classpath"/>
 		</java>
 	</target>
 
 	<!-- Compiles project -->
 	<target name="compile">
 		<mkdir dir="${build.classes}" />
-		<!--deprecation="on"-->
 		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
-			<classpath>
-				<pathelement path="${build.classes}" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/forms-1.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-				<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
-				<pathelement location="${library.directory}/microba.jar" />
-                <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
-                <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
-
-            </classpath>
+			<classpath refid="classpath"/>
 		</javac>
 	</target>
 
@@ -200,15 +167,10 @@
 		<mkdir dir="${build.classes}" />
 		<!--deprecation="on"-->
 		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
-			<classpath>
-				<pathelement path="${build.classes}" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-			</classpath>
+			<classpath refid="classpath"/>
 		</javac>
-
 	</target>
+
 	<!-- Builds the OSXAdapter -->
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
@@ -224,7 +186,7 @@
 	</target>
 
 	<!-- Jars up project -->
-	<target name="jars" depends="build">
+	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
 		<mkdir dir="${build.tmp}" />
 		<jar destfile="${build.lib}/jabref.jar">
@@ -256,7 +218,6 @@
 
 	<!-- copy all necessary files and insert version informations -->
 	<target name="build" depends="compile, buildinfos" description="Build project">
-		<mkdir dir="${build.bin}" />
 
 		<mkdir dir="${build.resource}" />
 
@@ -301,7 +262,7 @@
 	<!-- todo : replace it by the replace task :-),
           src/resource/build.properties = template
           build/resource/build.properties = real info file
--->
+	-->
 	<target name="buildinfos">
 		<tstamp />
 		<!-- get date -->
@@ -387,7 +348,7 @@ version=${jabref.version}</echo>
 		</zip>
 	</target>
 
-	<target name="clean" depends="-win.installer.clean" description="Clean project">
+	<target name="clean" depends="win.installer.clean" description="Clean project">
 		<delete dir="${build.dir}" />
 	</target>
 
@@ -395,6 +356,7 @@ version=${jabref.version}</echo>
 	<target name="unjarlib" description="Unpacks jars from library">
 		<mkdir dir="${build.tmp}" />
 		<unjar src="${library.directory}/antlr.jar" dest="${build.tmp}" />
+		<unjar src="${library.directory}/antlr-3.0b4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
@@ -419,12 +381,12 @@ version=${jabref.version}</echo>
 	<!-- Don't forget to set nsis.executable property                               -->
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
-	<target name="-win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
+	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
 		<delete dir="${win.installer.dir}/dist" />
 		<delete file="${win.installer.dir}/JabRefSetup.exe" />
 	</target>
 
-	<target name="-win.installer.prepare" depends="jars" if="is.windows" description="Copy files in place to be used by the installer">
+	<target name="win.installer.prepare" depends="jars" if="is.windows" description="Copy files in place to be used by the installer">
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
 		<!--    	<copy file="${build.lib}/${jabref.bin}.jar" 
@@ -438,13 +400,13 @@ version=${jabref.version}</echo>
 		</copy>
 	</target>
 
-	<target name="-win.installer.exewrapper" depends="-win.installer.prepare" if="is.windows" description="Create Exe-Wrapper">
+	<target name="win.installer.exewrapper" depends="win.installer.prepare" if="is.windows" description="Create Exe-Wrapper">
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DJARFILE=${jabref.bin}.jar' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
 		</exec>
 	</target>
 
-	<target name="win.installer.build" depends="-win.installer.exewrapper" if="is.windows" description="Create Windows-Installer.">
+	<target name="win.installer.build" depends="win.installer.exewrapper" if="is.windows" description="Create Windows-Installer.">
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
@@ -555,14 +517,7 @@ Number (CCN)           maintenance
 					<include name="**/*Test.class" />
 				</fileset>
 			</batchtest>
-
-			<classpath>
-				<pathelement location="${build.lib}/jabref.jar" />
-				<pathelement location="${library.directory}/antlr.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/looks-2.0.4.jar" />
-				<pathelement location="${library.directory}/spin.jar" />
-            </classpath>
+			<classpath refid="classpath"/>
 		</junit>
 	</target>
  
