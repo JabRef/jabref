@@ -33,11 +33,11 @@ public class UtilFindFileTest extends FileBasedTestCase {
 	public void testFindFileRelative() throws IOException {
 
 		// Most basic case
-		assertEqualPaths("HipKro03.pdf", findFile(root.getAbsolutePath() + "/test/",
+		assertEqualPaths("/HipKro03.pdf", findFile(root.getAbsolutePath() + "/test/",
 			"[bibtexkey].pdf"));
 
 		// Including directory
-		assertEqualPaths("test/HipKro03.pdf", findFile(root.getAbsolutePath(),
+		assertEqualPaths("/test/HipKro03.pdf", findFile(root.getAbsolutePath(),
 			"test/[bibtexkey].pdf"));
 
 		// No relative paths
@@ -57,7 +57,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 
 		{
 			String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath());
-			assertEqualPaths("HipKro03 - Hello.pdf", pdf);
+			assertEqualPaths("/HipKro03 - Hello.pdf", pdf);
 
 			File fullPath = Util.expandFilename(pdf, root.getAbsolutePath());
 			assertTrue(fullPath.exists());
@@ -65,7 +65,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 		{
 			String pdf = Util.findPdf(entry, "pdf", root.getAbsolutePath() + "/pdfs/");
 
-			assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+			assertEqualPaths("/sub/HipKro03-sub.pdf", pdf);
 
 			File fullPath = Util.expandFilename(pdf, root.getAbsolutePath() + "/pdfs/");
 			assertTrue(fullPath.exists());
@@ -78,7 +78,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 			String[] dirsToSearch = new String[] { root.getAbsolutePath(),
 				root.getAbsolutePath() + "/pdfs/" };
 			String pdf = Util.findPdf(entry, "pdf", dirsToSearch);
-			assertEqualPaths("HipKro03 - Hello.pdf", pdf);
+			assertEqualPaths("/HipKro03 - Hello.pdf", pdf);
 
 			File fullPath = Util.expandFilename(pdf, dirsToSearch);
 			assertTrue(fullPath.exists());
@@ -107,7 +107,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 			String[] dirsToSearch = new String[] { root.getAbsolutePath() + "/pdfs/",
 				root.getAbsolutePath() };
 			String pdf = Util.findPdf(entry, "pdf", dirsToSearch);
-			assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
+			assertEqualPaths("/sub/HipKro03-sub.pdf", pdf);
 
 			File fullPath = Util.expandFilename(pdf, dirsToSearch);
 			assertTrue(fullPath.exists());
@@ -137,7 +137,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 	public void testFindFile() throws IOException {
 
 		// Simple case
-		assertEqualPaths("HipKro03.pdf", Util.findFile(entry, database, root.getAbsolutePath()
+		assertEqualPaths("/HipKro03.pdf", Util.findFile(entry, database, root.getAbsolutePath()
 			+ "/test/", "[bibtexkey].pdf", true));
 
 		// Not found
@@ -147,7 +147,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
 		// Test current dir
 		assertEqualPaths(new File(new File("."), "build.xml").getCanonicalPath(), Util.findFile(
 			entry, database, "./build.xml"));
-		assertEqualPaths("build.xml", Util.findFile(entry, database, ".", "build.xml", true));
+		assertEqualPaths("/build.xml", Util.findFile(entry, database, ".", "build.xml", true));
 
 		// Test keys in path and regular expression in file
 		assertEqualPaths(new File(root, "/2003/Paper by HipKro03.pdf").getCanonicalPath(), Util
@@ -163,11 +163,11 @@ public class UtilFindFileTest extends FileBasedTestCase {
 			.getCanonicalPath(), Util.findFile(entry, database, root.getAbsolutePath() + "/*/"
 			+ "[bibtexkey] - Hello\\\\.pdf"));
 
-		assertEqualPaths("TE.ST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+		assertEqualPaths("/TE.ST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
 			"TE\\\\.ST", true));
-		assertEqualPaths(".TEST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+		assertEqualPaths("/.TEST", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
 			"\\\\.TEST", true));
-		assertEqualPaths("TEST[", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
+		assertEqualPaths("/TEST[", Util.findFile(entry, database, root.getAbsolutePath() + "/test/",
 			"TEST\\\\[", true));
 
 		// Test *

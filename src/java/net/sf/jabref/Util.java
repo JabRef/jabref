@@ -1012,7 +1012,12 @@ public class Util {
 		
 		if (found != null){
 			try {
-				return found.substring(root.getCanonicalPath().length() + 1);
+				/**
+				 * [ 1601651 ] PDF subdirectory - missing first character
+				 * 
+				 * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
+				 */
+				return found.substring(root.getCanonicalPath().length());
 			} catch (IOException e) {
 				return null;
 			}
