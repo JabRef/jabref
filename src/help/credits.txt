@@ -25,11 +25,13 @@ Alexis Gallagher
 Sascha Hunold
 Bernd Kalbfuss
 Martin Kähmer
+Christian Kopf
 Alex Montgomery
 John Relph
 Moritz Ringler
 Rudolf Seemann
 Mike Smoot
+Ulrich Stärk
 Martin Stolle
 David Weitzman
 Seb Wills

@@ -87,6 +87,8 @@ Change log:
         - Added warning dialog when exporting failed.
         - Added fix for exporting special chars in RTF like ισω...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
+        - Added Fetch from ArXiv.org to Web Search
+          [ 1587342 ] Quering ArXiv (and any OAI2 Repository)
         - [ 1594123 ] Fixed: Failure to import big numbers in Bibtex
         - [ 1594169 ] Fixed: Entry editor navigation between panels faulty
         - [ 1588028 ] Fixed: Export HTML table has relative DOI URL

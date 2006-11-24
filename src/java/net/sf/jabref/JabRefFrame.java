@@ -64,8 +64,7 @@ import com.jgoodies.looks.HeaderStyle;
 /**
  * The main window of the application.
  */
-public class JabRefFrame
-    extends JFrame {
+public class JabRefFrame extends JFrame {
 
    // CO: Code Smells...
 	JabRefFrame ths = this;
@@ -301,6 +300,8 @@ public class JabRefFrame
     CiteSeerFetcherPanel citeSeerFetcherPanel;
     IEEEXploreFetcher ieeexplorerFetcher;
     GeneralFetcher ieex;
+    OAI2Fetcher arxivFetcher;
+    GeneralFetcher arxiv;
     SearchManager2 searchManager;
     public GroupSelector groupSelector;
 
@@ -408,6 +409,7 @@ public class JabRefFrame
 		Globals.helpDiag = this.helpDiag;
 
 		ieeexplorerFetcher = new IEEEXploreFetcher();
+		arxivFetcher = new OAI2Fetcher();
 		medlineFetcher = new MedlineFetcher(sidePaneManager);
 		citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
 		citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
@@ -1119,7 +1121,9 @@ public JabRefPreferences prefs() {
       web.add(citeSeerPanelAction);
       web.add(fetchCiteSeer);
       ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
+      arxiv = new GeneralFetcher(sidePaneManager, this, arxivFetcher);
       web.add(ieex.getAction());
+      web.add(arxiv.getAction());
 
       mb.add(web);
 
@@ -1357,7 +1361,7 @@ public JabRefPreferences prefs() {
 			highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
 			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
 			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-			abbreviateMedline, unabbreviate, ieex.getAction(), exportAll, exportSelected,
+			abbreviateMedline, unabbreviate, ieex.getAction(), arxiv.getAction(), exportAll, exportSelected,
             importCurrent}));
 
 		openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));

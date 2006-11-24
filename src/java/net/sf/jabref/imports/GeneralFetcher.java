@@ -44,9 +44,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         action = new FetcherAction();
 
         help = new HelpAction(Globals.helpDiag, fetcher.getHelpPage(), "Help");
-
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));
+
         JPanel main = new JPanel();
         main.setLayout(gbl);
         con.fill = GridBagConstraints.BOTH;
@@ -59,14 +59,24 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         con.fill = GridBagConstraints.BOTH;
         gbl.setConstraints(tf, con);
         main.add(tf);
+        
+        // Go Button
         con.weighty = 0;
-        con.gridwidth = 1;
+        if (fetcher.getHelpPage() != null){
+        	con.gridwidth = 1;
+        } else {
+        	con.gridwidth = GridBagConstraints.REMAINDER;
+        }
         gbl.setConstraints(go, con);
         main.add(go);
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        gbl.setConstraints(helpBut, con);
-        main.add(helpBut);
-
+        
+        // Help Button
+		if (fetcher.getHelpPage() != null) {
+			con.gridwidth = GridBagConstraints.REMAINDER;
+			gbl.setConstraints(helpBut, con);
+			main.add(helpBut);
+		}
+        
         JPanel pan = fetcher.getOptionsPanel();
         if (pan != null) {
             gbl.setConstraints(pan, con);
