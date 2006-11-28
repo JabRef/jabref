@@ -5,7 +5,7 @@
 
 <H1>Suchfunktionen</H1>
 
-Es gibt drei verschiedene Suchmethoden in JabRef.
+<!--Es gibt drei verschiedene Suchmethoden in JabRef.-->
 
 <p>
 <em>STRG-F</em> &ouml;ffnet oder aktiviert den Suchdialog. Dr&uuml;ckt man mehrmals auf <em>STRG-F</em>, so werden die verschiedenen Suchmodi ausgew&auml;hlt. Bei der direkten Suche springt man mit <em>STRG-F</em> zum n&auml;chsten Treffer.
@@ -16,13 +16,9 @@ Es gibt drei verschiedene Suchmethoden in JabRef.
 
 Bei der direkten Suche sucht das Programm sofort, sobald Sie einen Buchstaben eingeben. Die Statuszeile informiert Sie &uuml;ber den Sucherfolg. Mit den Tastaturk&uuml;rzeln wird das Programm dazu veranlasst, nach dem n&auml;chsten Vorkommen des aktuellen Suchbegriffs zu suchen. Falls es keine weiteren Vorkommen gibt, informiert die Statuszeile sie dar&uuml;ber. Bei erneuter Wiederholung startet die Suche vom Anfang der Datei. Die Suchreihenfolge richtet sich nach der aktuellen Sortierung Ihrer Datei. Um die direkte Suche zu verlassen, dr&uuml;cken Sie ESC oder klicken Sie auf "Zur&uuml;cksetzen".
 
-<H2>Suche mit Markierung</H2>
+<H2>Normale Suche</H2>
 
-Wenn Sie die Suchoption "Markieren" w&auml;hlen, sucht das Programm in Ihrer Datei nach allen Vorkommen ihres Suchbegriffs, sobald Sie auf ENTER dr&uuml;cken. Alle Treffer werden ausgew&auml;hlt.
-
-<H2>Float-Suche</H2>
-
-Die Suche mit der Option "Float" ist &auml;hnlich wie die Suche mit Markierung, nur dass die Treffer nicht ausgew&auml;hlt, sondern an den Anfang der Tabelle sortiert werden. Eintr&auml;ge, die nicht mit dem Suchbegriff &uuml;bereinstimmen, werden unter den Treffern aufgelistet und zus&auml;tzlich grau hinterlegt. Um die Anzeige der Suchergebnisse abzuschalten, dr&uuml;cken Sie ESC oder klicken auf "Zur&uuml;cksetzen".
+Hierbei sucht das Programm nach allen Vorkommen der W&ouml;rter ihres Suchausdrucks, sobald Sie ENTER dr&uuml;cken. Nur Eintr&auml;ge, die alle W&ouml;rter enthalten, gelten als Treffer. Um nach festen Ausdr&uuml;cken zu suchen, m&uuml;ssen Sie die W&ouml;rter in doppelte Anf&uuml;hrungszeichen einfassen. Zum Beispiel findet die Suchanfrage <b>progress "marine acquaculture"</b> Eintr&auml;ge, die sowohl das wort "progress" als auch den Ausdruck "marine acquaculture" aufweisen. Alle Eintr&auml;ge, die keine Treffer sind, werden entweder ausgeblendet, so dass nur die Treffer sichtbar sind (Option <b>Filter</b>), oder sie werden grau dargestellt, w&auml;hrend die Treffer oben angezeigt werden (Option <b>Oben einsortieren</b>). Um die Trefferanzeige zu beenden, dr&uuml;cken Sie ESC oder klicken auf die Schaltfl&auml;che <b>Zur&uuml;cksetzen</b> im Suchen-Dialog.
 
 <a name="advanced"><H2>Feldbezeichner und logische Operatoren</H2></a>
 
@@ -44,7 +40,7 @@ Das "="-Zeichen ist eigentlich eine Abk&uuml;rzung f&uuml;r "enth&auml;lt" ("con
 <p>
 entrytype = thesis
 <p>
-&hellip; findet z.B. Eintr&auml;ge, deren Typ (wie in der Spalte "Entrytype" dargestellt) das Wort "thesis" enth&auml;lt (z.B. "phdthesis" und "mastersthesis"). Ebenso erlaubt das Pseudofeld "bibtexkey" die Suche nach BibTeX keys, z.B.:
+&hellip; findet z.B. Eintr&auml;ge, deren Typ (wie in der Spalte "Entrytype" dargestellt) das Wort "thesis" enth&auml;lt (z.B. "phdthesis" und "mastersthesis"). Ebenso erlaubt das Pseudofeld "bibtexkey" die Suche nach BibTeX-Keys, z.B.:
 <p>
 bibtexkey = miller2005
 

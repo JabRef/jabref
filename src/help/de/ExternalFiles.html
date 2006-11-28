@@ -54,4 +54,33 @@ wird das Feld entsprechend gesetzt.
 &uuml;berhaupt zu benutzen. Der Nachteil ist in diesem Fall allerdings, dass das PDF-Icon in der Tabellenansicht
 nicht angezeigt wird, solange das PDF-Feld leer bleibt.
 
+<H2>Dateispezifische PDF- und PS-Verzeichnisse</H2>
+<P>
+Sie k&ouml;nnen f&uuml;r jede Datei eigene PDF- und PS-Verzeichnisse angeben (<b>Datei -> Eigenschaften der Datei</b>). Diese Verzeichnisse ersetzen dann die Standardverzeichnisse.
+</P>
+
+<a name="RegularExpressionSearch">
+<H2>Die Suche mit regul&auml;ren Ausdr&uuml;cken f&uuml;r automatische Verkn&uuml;pfungen nutzen</H2>
+</a>
+<p>
+Wenn Sie Dateinamen verwenden, die dem bibtexkey erg&auml;nzt um die Dateiendung entsprechen, findet JabRef diese Dateien automatisch.
+</p><p>
+Ab Version 2.2 ist mit Hilfe von regul&auml;ren Ausdr&uuml;cken eine gr&ouml;&szlig;ere Flexibilit&auml;t beim Benennen der Dateien gew&auml;hrleistet. In den meisten F&auml;llen d&uuml;rfte das Standardverhalten bereits ausreichend sein.
+</p><p>
+In den Einstellungen zu externen Programmen (<b>Optionen -> Einstellungen -> Externe Programme</b>) findet sich eine Option "Suche mit regul&auml;rem Ausdruck benutzen". Wenn Sie diese Option aktivieren, k&ouml;nnen Sie f&uuml;r die Suche in PDF-Verzeichnissen einen eigenen regul&auml;ren Ausdruck angeben.
+</p><p>
+Die folgende Syntax wird verwendet:
+</p>
+<ul>
+  <li><code>*</code> - Suche in allen direkten Unterverzeichnissen, NICHT im aktuellen Verzeichnis und in Unterverzeichnissen zweiter oder tieferer Ebene.</li>
+  <li><code>**</code> - Rekursive Suche in allen Unterverzeichnissen UND im aktuellen Verzeichnis.</li>
+  <li><code>.</code> und <code>..</code> - Das aktuelle Verzeichnis und das Elternverzeichnis (eine Ebene h&ouml;her).</li>
+  <li><code>[title]</code> - Alle Ausdr&uuml;cke in eckigen Klammern werden durch den Inhalt des entsprechenden Felds ersetzt.</li>
+  <li><code>[extension]</code> - Wird durch die Dateiendung des Feldes, das Sie benutzen, ersetzt.</li>
+  <li>Anderer Text wird als regul&auml;rer Ausdruck interpretiert. Aber Vorsicht: <em>backslashes</em> m&uuml;ssen mit einem weiteren <em>backslash</em> <em>escaped</em> werden (<tt>\\</tt>), damit sie nicht mit Separatoren in Pfad-Angaben verwechselt werden.</li>
+</ul>
+<p>
+Der Standard ist <code>**/.*[bibtexkey].*\\.[extension]</code>. Damit wird in allen Unterverzeichnissen des Ordners der entsprechenden Dateiendung (z.B. das PDF-Verzeichnis) nach allen Dateien mit der richtigen Dateiendung gesucht, die den bibtexkey in ihrem Namen haben.
+</p>
+</body>
 </HTML>
