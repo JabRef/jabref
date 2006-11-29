@@ -47,13 +47,13 @@
      ========================================================================================== -->
 
 	<!-- some version information -->
-	<property name="jabref.bin" value="JabRef-2.1" />
-	<property name="jabref.version" value="2.2b" />
+	<property name="jabref.version" value="2.2b2" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
 
 
 	<!-- Set the properties for intermediate directory -->
+	<property name="build.jar" value="JabRef-${jabref.version}.jar" />
 	<property name="build.dir" value="build" />
 	<property name="build.classes" value="${build.dir}/classes" />
 	<property name="build.tmp" value="${build.dir}/tmp" />
@@ -88,18 +88,20 @@
 	<!-- Set the properties for library directories -->
 	<property name="library.directory" value="lib" />
 
-	<!-- Load user dependent properties -->
-	<property file="build.properties" />
-	<!-- 
-           * For instance define the NSIS-compiler:
-           *   nsis.executable="d:\prog\dev\NSIS\makensis.exe" 
-           *-->
+<!--    <property name="nsis.executable" value="makensis.exe"/> -->
 
-	<!-- win.installer can only be build under Windows -->
+	<!-- Load user dependent properties -->
+	<!-- For instance to redefine the NSIS-compiler write 
+		nsis.executable="d:\prog\dev\NSIS\makensis.exe"
+	  -->
+	<property file="user.properties" />
+
+	<!-- win.installer can only be build under Windows if the nsis.executable is found -->
 	<condition property="is.windows">
 		<and>
 			<os family="windows" />
 			<isset property="nsis.executable" />
+<!--			<available file="${nsis.executable}" /> -->
 		</and>
 	</condition>
 
@@ -117,21 +119,21 @@
 		<pathelement location="${library.directory}/spin.jar" />
 		<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
 		<pathelement location="${library.directory}/microba.jar" />
-        <pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
-        <pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
+		<pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
+		<pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
 	</path>
-	
+
 	<target name="run" depends="build">
 		<java classname="net.sf.jabref.JabRef" fork="true">
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</java>
 	</target>
-	
+
 	<!-- Runs project -->
 	<target name="runFromJar" depends="jars">
 		<java classname="net.sf.jabref.JabRef" fork="true">
 			<classpath>
-				<pathelement location="${build.lib}/jabref.jar" />
+				<pathelement location="${build.lib}/${build.jar}" />
 			</classpath>
 		</java>
 	</target>
@@ -140,7 +142,7 @@
 		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
 
 		<nbprofiledirect>
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</nbprofiledirect>
 
 		<property environment="env" />
@@ -148,7 +150,7 @@
 			<jvmarg value="${profiler.info.jvmargs.agent}" />
 			<jvmarg line="${profiler.info.jvmargs}" />
 			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</java>
 	</target>
 
@@ -158,7 +160,7 @@
 		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</javac>
 	</target>
 
@@ -167,7 +169,7 @@
 		<mkdir dir="${build.classes}" />
 		<!--deprecation="on"-->
 		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</javac>
 	</target>
 
@@ -189,7 +191,7 @@
 	<target name="jars" depends="build, unjarlib">
 		<mkdir dir="${build.lib}" />
 		<mkdir dir="${build.tmp}" />
-		<jar destfile="${build.lib}/jabref.jar">
+		<jar destfile="${build.lib}/${build.jar}">
 
 			<fileset dir="${build.classes}" />
 			<fileset dir="${build.tmp}" />
@@ -362,9 +364,9 @@ version=${jabref.version}</echo>
 		<unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/glazedlists-1.7.0_java14.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
-        <unjar src="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" dest="${build.tmp}" />
-        <unjar src="${library.directory}/JempBox-0.1.0-dev.jar" dest="${build.tmp}" />
-        <delete dir="${build.tmp}/META-INF" />
+		<unjar src="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" dest="${build.tmp}" />
+		<unjar src="${library.directory}/JempBox-0.1.0-dev.jar" dest="${build.tmp}" />
+		<delete dir="${build.tmp}/META-INF" />
 		<!-- rename the microba license file -->
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
 	</target>
@@ -386,11 +388,18 @@ version=${jabref.version}</echo>
 		<delete file="${win.installer.dir}/JabRefSetup.exe" />
 	</target>
 
-	<target name="win.installer.prepare" depends="jars" if="is.windows" description="Copy files in place to be used by the installer">
+	<target name="win.installer" if="is.windows" description="Copy files in place to be used by the installer">
+
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
+
 		<!--    	<copy file="${build.lib}/${jabref.bin}.jar" 
     		todir="${win.installer.dir}/dist" /> -->
+
+		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}"/>
+		
+		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}"/>
+		
 		<copy todir="${win.installer.dir}/dist">
 			<fileset dir="${txt.dir}">
 				<include name="gpl.txt" />
@@ -398,15 +407,13 @@ version=${jabref.version}</echo>
 				<include name="README" />
 			</fileset>
 		</copy>
-	</target>
 
-	<target name="win.installer.exewrapper" depends="win.installer.prepare" if="is.windows" description="Create Exe-Wrapper">
+		<!-- "Create Exe-Wrapper" -->
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
-			<arg line="'/DJARFILE=${jabref.bin}.jar' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
+			<arg line="'/DJARFILE=${build.jar}' '/DVERSION=${jabref.version}' '/DAPPICON=../../../${images.dir}/JabRef.ico' ${win.installer.dir}/launcher.nsi" />
 		</exec>
-	</target>
 
-	<target name="win.installer.build" depends="win.installer.exewrapper" if="is.windows" description="Create Windows-Installer.">
+		<!-- Finally create Windows-Installer -->
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
@@ -517,8 +524,8 @@ Number (CCN)           maintenance
 					<include name="**/*Test.class" />
 				</fileset>
 			</batchtest>
-			<classpath refid="classpath"/>
+			<classpath refid="classpath" />
 		</junit>
 	</target>
- 
+
 </project>

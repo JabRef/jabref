@@ -2,8 +2,10 @@
 # 29.12.2005 01:09:51
 
 !ifndef VERSION
-	!define VERSION "2.1"
+	!define VERSION "2.2"
 !endif
+
+!define EXENAME "JabRef-${VERSION}-Setup.exe"
 
 Name "JabRef ${VERSION}"
 
@@ -17,7 +19,7 @@ Name "JabRef ${VERSION}"
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\JabRef"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
-!define MUI_STARTMENUPAGE_DEFAULT_FOLDER "JabRef"
+!define MUI_STARTMENUPAGE_DEFAULT_FOLDER "JabRef ${VERSION}"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall-full.ico"
 !define MUI_FINISHPAGE_RUN $INSTDIR/JabRef.exe
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
@@ -49,7 +51,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile JabRefSetup.exe
+OutFile "${EXENAME}"
 InstallDir "$PROGRAMFILES\JabRef"
 CRCCheck on
 XPStyle on
