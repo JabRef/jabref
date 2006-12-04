@@ -54,8 +54,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
@@ -69,7 +71,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -538,8 +539,6 @@ public class Util {
 			} catch (IOException e) {
 				System.err.println("An error occured on the command: "
 					+ Globals.prefs.get("htmlviewer") + " " + link);
-			} catch (URISyntaxException e2) {
-				e2.printStackTrace();
 			}
 		} else if (fieldName.equals("ps")) {
 			try {
@@ -697,11 +696,7 @@ public class Util {
 			if (link.startsWith("doi:"))
 				link = Globals.DOI_LOOKUP_PREFIX + link;
 
-			try {
-				link = sanitizeUrl(link);
-			} catch (URISyntaxException ex) {
-				ex.printStackTrace();
-			}
+			link = sanitizeUrl(link);
 
 			if (Globals.ON_MAC) {
 				String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
@@ -715,37 +710,36 @@ public class Util {
 
 		}
 	}
-
 	/**
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
+	 * 
+	 * Old Version can be found in CVS version 114 of Util.java.
 	 * 
 	 * @param link
 	 *            The URL to sanitize.
 	 * @return Sanitized URL
 	 */
-	public static String sanitizeUrl(String link) throws URISyntaxException {
-		String scheme = "http";
-		String ssp;
-		if (link.indexOf("//") > 0)
-			ssp = "//" + link.substring(2 + link.indexOf("//"));
-		else
-			ssp = "//" + link;
+	public static String sanitizeUrl(String link) {
 
-        // The following is an ugly hack to fix the problem where a %20 in the
-        // original string (correct encoding of a space) gets returned as %2520
-        // because the URI constructor doesn't recognize that the % is the start of
-        // a sequence. The problem is that other such sequences will meet the same fate.
-        // If we need to take care of all these up front, we might as well not use URI
-        // at all.
-        // Another option is to do two times, hiding the %xx sequences in one of them,
-        // and see if one of the URLs looks good...
-        ssp = ssp.replaceAll("%20", " ");
+		link = link.replaceAll("\\+", "%2B");
 
-        URI uri = new URI(scheme, ssp, null);
-		return uri.toASCIIString();
+		try {
+			link = URLDecoder.decode(link, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+
+		/**
+		 * Fix for: [ 1574773 ] sanitizeUrl() breaks ftp:// and file:///
+		 * 
+		 * http://sourceforge.net/tracker/index.php?func=detail&aid=1574773&group_id=92314&atid=600306
+		 */
+		try {
+			return new URI(null, link, null).toASCIIString();
+		} catch (URISyntaxException e) {
+			return link;
+		}
 	}
-
 	/**
 	 * Searches the given directory and subdirectories for a pdf file with name
 	 * as given + ".pdf"

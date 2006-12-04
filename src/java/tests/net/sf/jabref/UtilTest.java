@@ -274,21 +274,24 @@ public class UtilTest extends TestCase {
 	}
 
     public void testSanitizeUrl() {
-        try {
-
+    
             assertEquals("http://www.vg.no", Util.sanitizeUrl("http://www.vg.no"));
             assertEquals("http://www.vg.no/fil%20e.html",
                     Util.sanitizeUrl("http://www.vg.no/fil e.html"));
             assertEquals("http://www.vg.no/fil%20e.html",
                     Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
-            assertEquals("http://www.vg.no/fil%20e.html",
+            assertEquals("www.vg.no/fil%20e.html",
                     Util.sanitizeUrl("www.vg.no/fil%20e.html"));
-            
-           
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
+    
+            /**
+             * Additional testcases provided by Hannes Restel and Micha Beckmann.
+             */
+            assertEquals("ftp://www.vg.no", Util.sanitizeUrl("ftp://www.vg.no"));
+            assertEquals("file://doof.txt", Util.sanitizeUrl("file://doof.txt"));            
+            assertEquals("file:///", Util.sanitizeUrl("file:///"));
+            assertEquals("/src/doof.txt", Util.sanitizeUrl("/src/doof.txt"));
+            assertEquals("/", Util.sanitizeUrl("/"));
+            assertEquals("/home/user/example.txt", Util.sanitizeUrl("/home/user/example.txt"));
     }
 
     public void test2to4DigitsYear(){
