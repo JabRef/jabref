@@ -81,7 +81,8 @@ appear in your chosen languages.
 
 Change log:
 
-2.2b3	- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
+2.2b3	- [ 1570570 ] New Feature: Deselect all duplicates on import
+		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
 2.2b2   - Redesigned export functions to simplify GUI and provide "Export selected
           entries" functionality. Export filter is now chosen using the file type
           dropdown menu in the file dialog.

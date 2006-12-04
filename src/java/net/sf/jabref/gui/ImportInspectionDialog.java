@@ -31,21 +31,22 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 
+
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: 20.mar.2005
- * Time: 22:02:35
- * To change this template use File | Settings | File Templates.
+ * Dialog to allow the selection of entries as part of an Import
+ * 
+ * @author alver
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ *
  */
 public class ImportInspectionDialog extends JDialog {
+	
     private ImportInspectionDialog ths = this;
     private BasePanel panel;
     private JabRefFrame frame;
     private MetaData metaData;
     private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
-    //private MyTableModel tableModel = new MyTableModel();
-    //private JTable table = new MyTable(tableModel);
     private JTable glTable;
     private TableComparatorChooser comparatorChooser;
     private EventSelectionModel selectionModel;
@@ -64,11 +65,11 @@ public class ImportInspectionDialog extends JDialog {
     private JPopupMenu popup = new JPopupMenu();
     private JButton selectAll = new JButton(Globals.lang("Select all"));
     private JButton deselectAll = new JButton(Globals.lang("Deselect all"));
+    private JButton deselectAllDuplicates = new JButton(Globals.lang("Deselect all duplicates"));
     private JButton stop = new JButton(Globals.lang("Stop"));
     private JButton delete = new JButton(Globals.lang("Delete"));
     private JButton help = new JButton(Globals.lang("Help"));
     private PreviewPanel preview;
-    private ListSelectionListener previewListener = null;
     private boolean generatedKeys = false; // Set to true after keys have been generated.
     private boolean defaultSelected = true;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
@@ -86,7 +87,6 @@ public class ImportInspectionDialog extends JDialog {
         PS_COL = 3,
         URL_COL = 4,
         PAD = 5;
-
 
     /**
      * The "defaultSelected" boolean value determines if new entries added are selected for import or not.
@@ -137,7 +137,6 @@ public class ImportInspectionDialog extends JDialog {
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
-
         setWidths();
 
         getContentPane().setLayout(new BorderLayout());
@@ -145,7 +144,6 @@ public class ImportInspectionDialog extends JDialog {
         JPanel centerPan = new JPanel();
         centerPan.setLayout(new BorderLayout());
 
-        //contentPane.setTopComponent(new JScrollPane(table));
         contentPane.setTopComponent(new JScrollPane(glTable));
         contentPane.setBottomComponent(new JScrollPane(preview));
 
@@ -181,6 +179,7 @@ public class ImportInspectionDialog extends JDialog {
         ButtonStackBuilder builder = new ButtonStackBuilder();
         builder.addGridded(selectAll);
         builder.addGridded(deselectAll);
+        builder.addGridded(deselectAllDuplicates);
         builder.addRelatedGap();
         builder.addGridded(delete);
         builder.addRelatedGap();
@@ -197,6 +196,8 @@ public class ImportInspectionDialog extends JDialog {
         stop.addActionListener(new StopListener());
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
+        deselectAllDuplicates.addActionListener(new DeselectDuplicatesButtonListener());
+        deselectAllDuplicates.setEnabled(false);
         delete.addActionListener(deleteListener);
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -241,6 +242,7 @@ public class ImportInspectionDialog extends JDialog {
             if (((panel != null) && (Util.containsDuplicate(panel.database(), entry) != null))
                 || (internalDuplicate(this.entries, entry) != null)) {
                 entry.setGroupHit(true);
+                deselectAllDuplicates.setEnabled(true);
             }
             this.entries.getReadWriteLock().writeLock().lock();
             this.entries.add(entry);
@@ -602,7 +604,6 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     private void setWidths() {
-        DeleteListener deleteListener = new DeleteListener();
         TableColumnModel cm = glTable.getColumnModel();
         cm.getColumn(0).setPreferredWidth(55);
         cm.getColumn(0).setMinWidth(55);
@@ -694,7 +695,18 @@ public class ImportInspectionDialog extends JDialog {
             glTable.repaint();
         }
     }
-
+    
+    class DeselectDuplicatesButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            for (int i = 0; i < glTable.getRowCount(); i++) {
+                if(glTable.getValueAt(i, DUPL_COL) != null){
+                	glTable.setValueAt(Boolean.valueOf(false), i, 0);
+                }
+            }
+            glTable.repaint();
+        }
+    }
+    
     class EntrySelectionListener implements ListEventListener {
 
         public void listChanged(ListEvent listEvent) {
@@ -732,7 +744,6 @@ public class ImportInspectionDialog extends JDialog {
         public void mouseReleased(MouseEvent e) {
             // Check if the user has right-clicked. If so, open the right-click menu.
             if (e.isPopupTrigger()) {
-                int[] rows = glTable.getSelectedRows();
                 popup.show(glTable, e.getX(), e.getY());
                 return;
             }
@@ -741,7 +752,6 @@ public class ImportInspectionDialog extends JDialog {
         public void mousePressed(MouseEvent e) {
             // Check if the user has right-clicked. If so, open the right-click menu.
             if (e.isPopupTrigger()) {
-                int[] rows = glTable.getSelectedRows();
                 popup.show(glTable, e.getX(), e.getY());
                 return;
             }
