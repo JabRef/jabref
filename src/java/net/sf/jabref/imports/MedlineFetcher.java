@@ -79,7 +79,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         help = new HelpAction(Globals.helpDiag, GUIGlobals.medlineHelp, "Help");
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0,0,0,0));
-        //tf.setMinimumSize(new Dimension(1,1));
+        tf.setPreferredSize(new Dimension(1,tf.getPreferredSize().height));
         //add(hd, BorderLayout.NORTH);
         //ok.setToolTipText(Globals.lang("Fetch Medline"));
         JPanel main = new JPanel();

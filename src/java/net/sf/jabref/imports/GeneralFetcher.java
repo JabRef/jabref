@@ -46,6 +46,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         help = new HelpAction(Globals.helpDiag, fetcher.getHelpPage(), "Help");
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));
+        tf.setPreferredSize(new Dimension(1,tf.getPreferredSize().height));
 
         JPanel main = new JPanel();
         main.setLayout(gbl);

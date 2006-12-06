@@ -1,9 +1,6 @@
 package net.sf.jabref.imports;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -62,7 +59,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
         this.citeSeerFetcher = fetcher;
         helpBut.addActionListener(help);
         helpBut.setMargin(new Insets(0, 0, 0, 0));
-        //tf.setMinimumSize(new Dimension(1,1));
+        tf.setPreferredSize(new Dimension(1,tf.getPreferredSize().height));
         //add(hd, BorderLayout.NORTH);
         //ok.setToolTipText(Globals.lang("Fetch Medline"));
         JPanel main = new JPanel();
