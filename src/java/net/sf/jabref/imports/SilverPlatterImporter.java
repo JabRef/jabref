@@ -129,12 +129,24 @@ public class SilverPlatterImporter extends ImportFormat {
                         m = frest.indexOf(", ");
                         if (m + 2 < frest.length()){
                             String yr = frest.substring(m + 2).trim();
-                            h.put("year", yr);
+                            try {
+                                Integer.parseInt(yr);
+                                h.put("year", yr);
+                            } catch (NumberFormatException ex) {
+                                // Let's assume that this wasn't a number, since it
+                                // couldn't be parsed as an integer.
+                            }
+
                         }
+
                     }
+                } else if (f3.equals("AF")) {
+                    h.put("school", frest.trim());
+
                 }else if (f3.equals("DT")){
                     frest = frest.trim();
                     if (frest.equals("Monograph")) Type = "book";
+                    else if (frest.startsWith("Dissertation")) Type = "phdthesis";
                     else if (frest.toLowerCase().indexOf("journal") >= 0) Type = "article";
                     else if (frest.equals("Contribution") || frest.equals("Chapter")){
                         Type = "incollection";
