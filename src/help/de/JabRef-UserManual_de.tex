@@ -1,6 +1,7 @@
 \documentclass[10pt,normalheadings]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
+\usepackage{textcomp}
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
 
@@ -16,6 +17,7 @@
 \usepackage{setspace}
 \usepackage{amssymb}
 \usepackage{soul}
+\usepackage{hanging}
 
 \makeatletter
 %%%%% LyX command %%%%%
@@ -47,8 +49,9 @@
 }
 
 %%%%% Environment "revhist" (for revision history) %%%%%
-\newenvironment{revhist}
-    {\list{--}{\setlength\itemsep{0pt}\setlength{\parsep}{0pt}}}
+\newenvironment{revhist}[1]
+    {\subsection*{#1}
+     \list{--}{\setlength\itemsep{0pt}\setlength{\parsep}{0pt}}}
     {\endlist}
 
 %%%%% PDF 1.2 for Acrobat 3 onwards %%%%%
@@ -88,6 +91,19 @@
     \color{dkblue}\textit{#1}#2}}%
   \end{center}%
 }%
+%%% for the FAQ 
+\newcounter{faq}
+\newcommand{\faq}[2]{\refstepcounter{faq}%
+  \medskip\noindent\colorbox{pyellow}{\parbox{0.9\textwidth}{%
+    \hangpara{0.11\textwidth}{1}%
+    \color{dkblue}Frage \thefaq: \textit{#1}}}\par\smallskip%
+  \begin{hangparas}{0.11\textwidth}{0}%
+    #2\par%
+  \end{hangparas}
+}%
+%\newcommand{\faq}[2]{%
+%  \subsection{#1}
+%  #2}%
 %%% for CTAN references
 \newcommand{\ctan}[1]{%
   {CTAN: \color{dkblue}#1}%
@@ -246,7 +262,9 @@ Ihren \bibtex{}-Dateien, aber es müssen dennoch Regeln beachtet werden,
 wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden,
 dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
 
-\subsubsection{\bibtex{} Felder}
+\noindent Im Folgenden können nur einige allgemeine Hinweise gegeben werden. Ausführlichere Einführungen und weitere Erläuterungen zu \bibtex{} finden Sie bei \cite{Fenn2006,Markey2005,btxdoc,btxhak,Raichle2002}.
+
+\subsubsection{\bibtex{}-Felder}
 
 Es gibt viele unterschiedliche Felder in \bibtex{} und einige zusätzliche Felder, die Sie in \jabref{} einsetzen können.
 Grundsätzlich können Sie \LaTeX{}-Befehle in Feldern, die Text beinhalten, einsetzen. \bibtex{} wird Ihr Literaturverzeichnis automatisch formatieren und je nach \bibtex{} style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass Anfangsbuchstaben groß bleiben, müssen Sie die Wörter in geschweifte Klammern einschließen, wie im Wort \{Belgien\}.\footnote{Anm. d. Übers.: Die meisten deutschen \bibtex{}-Stile behalten die Großbuchstaben ohnehin bei.}
@@ -317,13 +335,12 @@ Falls die Bücher einer Reihe nummeriert sind, wird die entsprechende Nummer im F
     Dieses Feld wird für die meisten Eintragstypen benötigt.
 \end{itemize}
 
-\subsubsection{Andere Felder}
+\subsubsection{Weitere Felder}
 
 Bibliographie-Stile für \bibtex{} wurden von vielen Leuten entwickelt,
 und einige haben weitere Felder erstellt. Es folgt eine kleine Auswahl.
 
-Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{} unterstützt, können aber eingebunden werden (siehe \nameref{CustomEntriesHelp} %Eintragstypen anpassen
-).
+Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{} unterstützt, können aber eingebunden werden (siehe Abschnitt~\ref{CustomEntriesHelp} \nameref{CustomEntriesHelp}).
 
 \begin{itemize}
   \item \emph{affiliation*}\\
@@ -357,7 +374,6 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
   \item \emph{urldate}\\
     Das Datum, an dem eine Webseite zuletzt besucht wurde.
 \end{itemize}
-Für weitere Erläuterungen zu \bibtex{} wird verwiesen auf \cite{Markey2005,btxdoc,btxhak,Raichle2002}.
 
 
 \clearpage 
@@ -2134,9 +2150,9 @@ Strömbäck   (*$\to$*) Stroembaeck
 Waßenhoven  (*$\to$*) Wassenhoven
 \end{lstlisting}
 
-\subsubsection{Ersetzen eines Regulären Ausdrucks}
+\subsubsection{Ersetzen eines regulären Ausdrucks}
 
-Nachdem das Key-Muster angewendet wurde, um einen \bibtex{}-Key zu erstellen, können Sie den Key-Generator nach einem bestimmten Regulären Ausdruck suchen und ihn durch eine Zeichenfolge ersetzen lassen. Der Reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key-Muster eingegeben. Falls das Feld zur Ersetzung des Regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden Regulären Ausdrücke einfach gelöscht.
+Nachdem das Key-Muster angewendet wurde, um einen \bibtex{}-Key zu erstellen, können Sie den Key-Generator nach einem bestimmten regulären Ausdruck suchen und ihn durch eine Zeichenfolge ersetzen lassen. Der reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key-Muster eingegeben. Falls das Feld zur Ersetzung des regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden regulären Ausdrücke einfach gelöscht.
 
 \subsection{Eintragsvorschau}
 
@@ -2649,13 +2665,23 @@ F1\tabularnewline
 \end{longtable}
 
 \clearpage 
-\section{Weitere Hilfen}
-Falls Sie weitere Fragen zu \jabref{} haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
+\section{Häufige Fragen und Antworten (FAQ)}\label{sec:faq}
+%\secttoc
+
+Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref{}-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
 \begin{enumerate}
-	\item Schauen Sie in der \href{http://jabref.sourceforge.net/faq.php}{FAQ-Liste} auf der \jabref{}-Homepage nach.
 	\item Durchsuchen Sie die \href{http://sourceforge.net/forum/?group_id=92314}{Foren} auf der Projektseite bei Sourceforge.
 	\item Stellen Sie Ihre Frage in der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
 \end{enumerate}
+
+\faq{Läuft \jabref{} unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Leider führt eine unserer Abhängigkeiten derzeit (13.\,9.\,2006) zu einem Absturz, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath. Lassen Sie uns bitte wissen, falls eine neuere Version bei Ihnen läuft. Falls Sie eine Idee haben oder wissen, wie JabRef unter Classpath laufen könnte, teilen Sie uns dies bitte mit.}
+
+\faq{\label{faq-linux}\jabref{} startet nicht unter Linux. Was kann ich tun?}{\jabref{} läuft unter Linux, wenn Sie eine Java Runtime Environment (JRE) von Sun in der Version~1.4.2 oder einer neueren Version verwenden. Falls \jabref{} dennoch nicht starten sollte, können Sie folgende Fehlersuche durchführen:
+Starten Sie \texttt{java -{-}version} von der Kommandozeile. Falls dabei kein Produkt von Sun Microsystems verwendet wird (sondern beispielsweise angezeigt wird, dass Sie GCJ VM verwenden), selbst wenn Sie die JRE von Sun installiert haben, müssen Sie Ihr Setup anpassen. Da das Vorgehen dafür sehr von Ihrer Linux-Distribution abhängt, können wir keine Hinweise für jede mögliche Konstellation geben.
+Unter Debian/Ubuntu können Sie die Einstellungen anpassen, indem Sie \texttt{sudo update-alternatives -{-}config java} aufrufen (dazu brauchen Sie admin-Rechte). In dem Dialog, der daraufhin erscheint, wählen Sie die Sun JDK oder JRE. Alternativ können Sie auch nach der Java-Programmdatei suchen und diese direkt ausführen. In Ubuntu findet man Java gewöhnlich unter \texttt{/usr\slash{}lib\slash{}jvm\slash{}java-1.5.0-sun\slash{}jre\slash{}bin\slash{}java}.
+Wenn Sie keine admin-Rechte auf dem Computer haben, können Sie die Sun JRE in ihrem Home-Verzeichnis installieren. Sie müssen dann darauf achten, dass Sie die richtige Programmdatei aufrufen. Wenn Sie die JRE z.\,B. in einen Ordner namens ">java"< in ihrem Home-Verzeichnis installiert haben, geben Sie \texttt{\texttildelow{}/java/jre/bin/java -jar JabRef-2.1.jar} (bzw. die entsprechende Versionsnummer) in der Kommandozeile ein.}
+
+\clearpage\faq{Ich arbeite unter Ubuntu und \jabref{} startet, wenn ich auf das Icon klicke, aber nicht von der Kommandozeile. Wo liegt das Problem?}{Sie haben mehrere Java Virtual Machines installiert und von der Kommandozeile wird die falsche gewählt. Schauen Sie unter Frage \ref{faq-linux} nach, wie Sie die Einstellungen ändern können.}
 
 \clearpage 
 \section{Entwicklung}
@@ -2689,7 +2715,7 @@ haben, möchte ich Thomas Fritz und Axel Junge für ihre hilfreichen Tipps und
 Anregungen zum Handbuch danken.
 
 Seit den Anfängen als \emph{BibKeeper} (von Morten O.~Alver) und \emph{JBibtexManager} (von Nizar N.~Batada) haben
-zahlreiche Personen dazu beigetragen, das \jabrefversion{} zu dem
+zahlreiche Personen dazu beigetragen, dass \jabrefversion{} zu dem
 geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Programm beigetragen hat, können Sie im Programm unter \menu{Hilfe \msep{} Über JabRef} nachsehen.
 
 \subsection{Lizenz}
@@ -2708,13 +2734,21 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \label{RevisionHistory}
 
-\subsection*{30.\,11.\,2006}
-\begin{revhist}
+%\subsection*{9.\,12.\,2006}
+\begin{revhist}{9.\,12.\,2006}
+\item Abschnitte ">Weitere Hilfen"< in ">Häufige Fragen und Antworten (FAQ)"< umbenannt
+\item FAQs von der Homepage übersetzt und integriert
+\item Literaturverzeichnis um Eintrag von \cite{Fenn2006} ergänzt
+\item Ein paar kleinere Änderungen
+\end{revhist}
+
+%\subsection*{30.\,11.\,2006}
+\begin{revhist}{30.\,11.\,2006}
 \item Abschnitte ">Weitere Hilfen"< hinzugefügt
 \end{revhist}
 
-\subsection*{28.\,11.\,2006}
-\begin{revhist}
+%\subsection*{28.\,11.\,2006}
+\begin{revhist}{28.\,11.\,2006}
 \item Abschnitte ">Abkürzung von Zeitschriftentiteln"<, ">XMP-Metadaten"<, ">IEEExplore"< und ">Externer Zugriff"< hinzugefügt
 \item Abschnitte ">Einführung in \bibtex{}"<, ">Das Hauptfenster"<, ">Links zu externen Dateien"< und ">Jabref und Online-Datenbanken"< erweitert
 \item Abschnitt ">Suchfunktionen"< aktualisiert
@@ -2724,25 +2758,23 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \item Einige kleinere Änderungen
 \end{revhist}
 
-\subsection*{30.\,1.\,2006}
-\begin{revhist}
+%\subsection*
+\begin{revhist}{30.\,1.\,2006}
 \item Abschnitt >>\jabref{}-Bibliographien in OpenOffice.org benutzen<< aktualisiert
 \item Abschnitt zur Erzeugung der \bibtex{}-Keys aktualisiert
 \item Neues Kapitel (>>Externe Importfilter<<), geschrieben von Andreas Rudert
 \item Einige kleinere Änderungen
 \end{revhist}
 
-\subsection*{6.\,12.\,2005}
-%\renewcommand{\labelitemi}{}
-
-\begin{revhist}
+%\subsection*{6.\,12.\,2005}
+\begin{revhist}{6.\,12.\,2005}
 \item Lizenzbedingungen für das Handbuch hinzugefügt
 \item von PDF~1.4 auf PDF~1.2 umgestellt
 \item mehrere kleinere Änderungen
 \end{revhist}
 
-\subsection*{16.\,11.\,2005}
-\begin{revhist}
+%\subsection*{16.\,11.\,2005}
+\begin{revhist}{16.\,11.\,2005}
 \item Erstentwurf von Dominik Waßenhoven, basierend
 auf dem unveröffentlichten englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
 und den Hilfeseiten des Programms
