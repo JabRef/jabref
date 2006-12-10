@@ -35,8 +35,11 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
-    private int lastPressed = '\n';
+    private int[] lastPressed = new int[20];
+    private int lastPressedCount = 0;
     private int lastQuickJumpRow = -1;
+    private long lastPressedTime = 0;
+    private long QUICK_JUMP_TIMEOUT = 2000;
 
     //private int lastCharPressed = -1;
 
@@ -363,7 +366,16 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
 	    //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
 	    && (e.getModifiers() == 0)) {
+            long time = System.currentTimeMillis();
+            if (time - lastPressedTime > QUICK_JUMP_TIMEOUT)
+                lastPressedCount = 0; // Reset last pressed character
+            // Update timestamp:
+            lastPressedTime = time;
+            // Add the new char to the search array:
             int c = e.getKeyChar();
+            if (lastPressedCount < lastPressed.length)
+                lastPressed[lastPressedCount++] = c;
+
             int sortingColumn = table.getSortingColumn(0);
             if (sortingColumn == -1)
                 return; // No sorting? TODO: look up by author, etc.?
@@ -371,12 +383,11 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             // such as binary search. But the table may not be sorted properly,
             // due to marked entries, search etc., which rules out the binary search.
             int startRow = 0;
-            if ((c == lastPressed) && (lastQuickJumpRow >= 0)) {
+            /*if ((c == lastPressed) && (lastQuickJumpRow >= 0)) {
                 if (lastQuickJumpRow < table.getRowCount()-1)
                     startRow = lastQuickJumpRow+1;
-            }
+            }*/
 
-            lastPressed = c;
             boolean done = false;
             while (!done) {
                 for (int i=startRow; i<table.getRowCount(); i++) {
@@ -384,12 +395,20 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                     if (o == null)
                         continue;
                     String s = o.toString().toLowerCase();
-                    if ((s.length() >= 1) && (s.charAt(0) == c)) {
-                        table.setRowSelectionInterval(i, i);
-                        table.ensureVisible(i);
-                        lastQuickJumpRow = i;
-                        return;
-                    }
+                    if (s.length() >= lastPressedCount)
+                        for (int j=0; j<lastPressedCount; j++) {
+                            if (s.charAt(j) != lastPressed[j])
+                                break; // Escape the loop immediately when we find a mismatch
+                            else if (j == lastPressedCount-1) {
+                                // We found a match:
+                                table.setRowSelectionInterval(i, i);
+                                table.ensureVisible(i);
+                                lastQuickJumpRow = i;
+                                return;
+                            }
+                        }
+                    //if ((s.length() >= 1) && (s.charAt(0) == c)) {
+                    //}
                 }
                 // Finished, no result. If we didn't start at the beginning of
                 // the table, try that. Otherwise, exit the while loop.
@@ -400,6 +419,9 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
 
             }
             
+        } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
+            lastPressedCount = 0;
+
         }
     }
 
@@ -414,6 +436,6 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     }
 
     public void focusLost(FocusEvent e) {
-        lastPressed = -1; // Reset quick jump when focus is lost.
+        lastPressedCount = 0; // Reset quick jump when focus is lost.
     }
 }

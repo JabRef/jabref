@@ -81,7 +81,9 @@ appear in your chosen languages.
 
 Change log:
 
-2.2b3	- [ 1570570 ] New Feature: Deselect all duplicates on import
+2.2b3	- Modified quick jump behaviour so sequences of letters can be found. Timeout or
+          ESC resets the search.
+        - [ 1570570 ] New Feature: Deselect all duplicates on import
 		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
 		- [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
 		- [ 1608391 ] Fixed: Medline Search Editbox size gets to big
