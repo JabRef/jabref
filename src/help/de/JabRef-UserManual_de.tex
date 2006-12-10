@@ -78,6 +78,8 @@
 \newcommand{\versionnr}{2.2} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref{}~\versionnr}
+%%% version date
+\newcommand{\versiondate}{10.\,12.\,2006} %
 %%% BibTeX-shortcut
 \newcommand{\bibtex}{\texorpdfstring{Bib\kern-.125em\TeX}{BibTeX}}
 %%% for Menu references
@@ -116,7 +118,7 @@
 %%%%% Headings %%%%%
 \usepackage{scrpage2}
 \pagestyle{scrheadings}
-\ihead{\FileTitle}
+\ihead{\FileTitle{} (\versiondate{})}
 \chead{}
 \ohead{\headmark}
 \ifoot{}
@@ -1566,7 +1568,8 @@ Um die XMP-Funktionen in \jabref{} zu nutzen, gehen Sie folgendermaßen vor:
   \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref{} ziehen.
   \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors.
   \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
-  \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. 
+  \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
+  \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. 
 \end{itemize}
 
 \subsubsection{bibteXMP Dateiformat}
@@ -2665,7 +2668,7 @@ F1\tabularnewline
 \end{longtable}
 
 \clearpage 
-\section{Häufige Fragen und Antworten (FAQ)}\label{sec:faq}
+\section{Häufige Fragen und Antworten}\label{sec:faq}
 %\secttoc
 
 Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref{}-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
@@ -2674,7 +2677,7 @@ Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/
 	\item Stellen Sie Ihre Frage in der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
 \end{enumerate}
 
-\faq{Läuft \jabref{} unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Leider führt eine unserer Abhängigkeiten derzeit (13.\,9.\,2006) zu einem Absturz, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath. Lassen Sie uns bitte wissen, falls eine neuere Version bei Ihnen läuft. Falls Sie eine Idee haben oder wissen, wie JabRef unter Classpath laufen könnte, teilen Sie uns dies bitte mit.}
+\faq{Läuft \jabref{} unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Am 13.~November~2006 hat Sun sein Java unter die GNU General Public License (Version~2) gestellt, so dass die Antwort ">Ja"< lautet. Ansonsten ist zu sagen, dass eine unserer Abhängigkeiten derzeit zu einem Absturz führt, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath.}
 
 \faq{\label{faq-linux}\jabref{} startet nicht unter Linux. Was kann ich tun?}{\jabref{} läuft unter Linux, wenn Sie eine Java Runtime Environment (JRE) von Sun in der Version~1.4.2 oder einer neueren Version verwenden. Falls \jabref{} dennoch nicht starten sollte, können Sie folgende Fehlersuche durchführen:
 Starten Sie \texttt{java -{-}version} von der Kommandozeile. Falls dabei kein Produkt von Sun Microsystems verwendet wird (sondern beispielsweise angezeigt wird, dass Sie GCJ VM verwenden), selbst wenn Sie die JRE von Sun installiert haben, müssen Sie Ihr Setup anpassen. Da das Vorgehen dafür sehr von Ihrer Linux-Distribution abhängt, können wir keine Hinweise für jede mögliche Konstellation geben.
@@ -2710,9 +2713,7 @@ der dann für das Projekt freigeschaltet werden kann.
 
 \subsection{Danksagung}
 
-Neben den Entwicklern, die die Hilfe-Seiten des Programms geschrieben
-haben, möchte ich Thomas Fritz und Axel Junge für ihre hilfreichen Tipps und
-Anregungen zum Handbuch danken.
+Neben den Entwicklern, die die Hilfe-Seiten des Programms geschrieben haben, möchte ich Thomas Fritz, Axel Junge und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch danken.
 
 Seit den Anfängen als \emph{BibKeeper} (von Morten O.~Alver) und \emph{JBibtexManager} (von Nizar N.~Batada) haben
 zahlreiche Personen dazu beigetragen, dass \jabrefversion{} zu dem
@@ -2734,7 +2735,16 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \label{RevisionHistory}
 
-%\subsection*{9.\,12.\,2006}
+%\begin{revhist}{\versiondate}%Datum
+%\item Änderung
+%\end{revhist}
+
+\begin{revhist}{\versiondate}%10.\,12.\,2006
+\item Abschnitt ">XMP-Metadaten"< leicht verbessert
+\item FAQ zu freien Java-APIs aktualisiert (Suns Java ist jetzt selbst frei)
+\item Wie immer: kleinere Änderungen
+\end{revhist}
+
 \begin{revhist}{9.\,12.\,2006}
 \item Abschnitte ">Weitere Hilfen"< in ">Häufige Fragen und Antworten (FAQ)"< umbenannt
 \item FAQs von der Homepage übersetzt und integriert
@@ -2742,12 +2752,10 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \item Ein paar kleinere Änderungen
 \end{revhist}
 
-%\subsection*{30.\,11.\,2006}
 \begin{revhist}{30.\,11.\,2006}
 \item Abschnitte ">Weitere Hilfen"< hinzugefügt
 \end{revhist}
 
-%\subsection*{28.\,11.\,2006}
 \begin{revhist}{28.\,11.\,2006}
 \item Abschnitte ">Abkürzung von Zeitschriftentiteln"<, ">XMP-Metadaten"<, ">IEEExplore"< und ">Externer Zugriff"< hinzugefügt
 \item Abschnitte ">Einführung in \bibtex{}"<, ">Das Hauptfenster"<, ">Links zu externen Dateien"< und ">Jabref und Online-Datenbanken"< erweitert
@@ -2758,7 +2766,6 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \item Einige kleinere Änderungen
 \end{revhist}
 
-%\subsection*
 \begin{revhist}{30.\,1.\,2006}
 \item Abschnitt >>\jabref{}-Bibliographien in OpenOffice.org benutzen<< aktualisiert
 \item Abschnitt zur Erzeugung der \bibtex{}-Keys aktualisiert
@@ -2766,14 +2773,12 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \item Einige kleinere Änderungen
 \end{revhist}
 
-%\subsection*{6.\,12.\,2005}
 \begin{revhist}{6.\,12.\,2005}
 \item Lizenzbedingungen für das Handbuch hinzugefügt
 \item von PDF~1.4 auf PDF~1.2 umgestellt
 \item mehrere kleinere Änderungen
 \end{revhist}
 
-%\subsection*{16.\,11.\,2005}
 \begin{revhist}{16.\,11.\,2005}
 \item Erstentwurf von Dominik Waßenhoven, basierend
 auf dem unveröffentlichten englischen \emph{Initial Draft} von Nizar Batada (20.\,2.\,2004)
