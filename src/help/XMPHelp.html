@@ -26,7 +26,8 @@ To use the XMP-feature in JabRef you can do the following:
   <li>To <b>write the bibliographic information to the associated PDF</b> do the following: Double click the entry in the main view, go to the "General" tab and click on "Write XMP".</li>
   <li>If you want <b>to annotate all the PDFs in a given database</b> you can select "Tools -> Write XMP for database"</li>
   <li>To verify if it worked you can open the PDF in Adobe Acrobat and select
-  "File -> Document Properties -> Additional Metadata -> Advanced". In the tree to the right you should see an entry called "http://purl.org/net/bibteXMP"
+  "File -> Document Properties -> Additional Metadata -> Advanced". In the tree to the right you should see an entry called "http://purl.org/net/bibteXMP". This works only with Adobe Acrobat, not with Adobe Reader.</li>
+  <li>If you don't have Adobe Acrobat, you can use <i>pdfinfo</i> instead in order to see the XMP metadata. <i>pdfinfo</i> is part of Xpdf (<code>www.foolabs.com/xpdf</code>) and Poppler (<code>http://poppler.freedesktop.org</code>).</li>
 <ul>
 
 <h2>BibteXmp Fileformat</h2>
