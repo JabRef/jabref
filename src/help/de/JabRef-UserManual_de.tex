@@ -1569,7 +1569,7 @@ Um die XMP-Funktionen in \jabref{} zu nutzen, gehen Sie folgendermaßen vor:
   \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors.
   \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
   \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
-  \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. 
+  \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. Rufen Sie dazu auf der Kommandozeile einfach \lstinline{pdfinfo -meta <PDF-Datei>} auf, dann werden die entsprechenden Metadaten angezeigt.
 \end{itemize}
 
 \subsubsection{bibteXMP Dateiformat}
