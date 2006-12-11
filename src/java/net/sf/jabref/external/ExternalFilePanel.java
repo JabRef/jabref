@@ -51,7 +51,9 @@ public class ExternalFilePanel extends JPanel {
 
 	private EntryEditor entryEditor;
 
-	private JabRefFrame frame;
+    private FieldEditor fieldEditor;
+
+    private JabRefFrame frame;
 
 	private OpenFileFilter off;
 
@@ -60,10 +62,12 @@ public class ExternalFilePanel extends JPanel {
 	private MetaData metaData;
 
 	public ExternalFilePanel(final String fieldName, final MetaData metaData,
-		final BibtexEntry entry, final OpenFileFilter off) {
+		final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
 		this(null, metaData, null, fieldName, off, null);
 		this.entry = entry;
-	}
+        this.entryEditor = null;
+        this.fieldEditor = editor;
+    }
 
 	public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,
 		final EntryEditor entryEditor, final String fieldName, final OpenFileFilter off,
@@ -73,8 +77,9 @@ public class ExternalFilePanel extends JPanel {
 		this.metaData = metaData;
 		this.off = off;
 		this.entryEditor = entryEditor;
+        this.fieldEditor = null;
 
-		setLayout(new GridLayout(2, 2));
+        setLayout(new GridLayout(2, 2));
 
 		browseBut = new JButton(Globals.lang("Browse"));
 		download = new JButton(Globals.lang("Download"));
@@ -234,7 +239,7 @@ public class ExternalFilePanel extends JPanel {
 		if (entryEditor != null)
 			targetEntry = entryEditor.getEntry();
 		else
-			targetEntry = null;
+			targetEntry = entry;
 
 		(new Thread() {
 
@@ -321,14 +326,18 @@ public class ExternalFilePanel extends JPanel {
 					 * Check if we should update the editor text field, or
 					 * update the target entry directly:
 					 */
-					if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
+                    if (entryEditor == null || entryEditor.getEntry() != targetEntry) {
 						/*
 						 * Editor has probably changed to show a different
 						 * entry. So we must update the target entry directly
 						 * and not set the text of the editor.
 						 */
 						targetEntry.setField(fieldName, textToSet);
-						updateEditor = false;
+                        if (fieldEditor != null) {
+                            fieldEditor.setText(textToSet);
+                            fieldEditor.setEnabled(true);
+                        }
+                        updateEditor = false;
 					} else {
 						/*
 						 * Need to set the fieldEditor first before running
@@ -360,7 +369,7 @@ public class ExternalFilePanel extends JPanel {
 						fieldEditor.setText(originalText);
 						fieldEditor.setEnabled(true);
 					}
-				}
+                }
 			}
 		}).start();
 	}

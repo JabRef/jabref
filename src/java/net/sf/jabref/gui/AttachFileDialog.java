@@ -65,7 +65,7 @@ public class AttachFileDialog extends JDialog {
     private void initGui() {
 
         final ExternalFilePanel extPan = new ExternalFilePanel(fieldName, metaData, entry,
-                      Util.getFileFilterForField(fieldName));
+                      editor, Util.getFileFilterForField(fieldName));
 
         browse.addActionListener(new ActionListener () {
             public void actionPerformed(ActionEvent event) {
