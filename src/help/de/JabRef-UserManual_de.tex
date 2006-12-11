@@ -5,6 +5,9 @@
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
 
+%%% version date
+\newcommand{\versiondate}{in Bearb.}
+
 %%%%% Page Dimensions %%%%%
 \usepackage{geometry}
 \geometry{verbose,a5paper,tmargin=2cm,bmargin=2cm,lmargin=1cm,rmargin=1cm}
@@ -75,11 +78,9 @@
   }%
 }
 %%% version number
-\newcommand{\versionnr}{2.2} %
+\newcommand{\versionnr}{2.2\,{\small beta3}} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref{}~\versionnr}
-%%% version date
-\newcommand{\versiondate}{10.\,12.\,2006} %
 %%% BibTeX-shortcut
 \newcommand{\bibtex}{\texorpdfstring{Bib\kern-.125em\TeX}{BibTeX}}
 %%% for Menu references
@@ -177,8 +178,7 @@ bookmarksopenlevel=1,%
 \makeatother
 \begin{document}
 
-\subject{\includegraphics[%
-  scale=0.25]{../../images/JabRef-splash.png}}
+\subject{\includegraphics[scale=.5]{../../images/JabRef-icon-48.png}}
 
 
 \title{\jabrefversion{}\\
@@ -213,7 +213,7 @@ zu starten.
 \begin{center}{\scriptsize Copyright \textcopyright{} 2005--2006, Dominik
 Waßenhoven}
 \end{center}
-{\scriptsize Dieser Inhalt ist unter einem Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Germany Lizenzvertrag lizenziert. Um die Lizenz anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken Sie einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
+{\scriptsize Der Inhalt dieses Handbuchs wird unter den Bedingungen der Creative Commons Public License ">Namensnennung"=NichtKommerziell"=Weitergabe unter gleichen Bedingungen 2.0 Deutschland"< zur Verfügung gestellt. Um den Lizenzvertrag anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
 
 \end{quote}
 \thispagestyle{empty}
@@ -269,7 +269,7 @@ dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
 \subsubsection{\bibtex{}-Felder}
 
 Es gibt viele unterschiedliche Felder in \bibtex{} und einige zusätzliche Felder, die Sie in \jabref{} einsetzen können.
-Grundsätzlich können Sie \LaTeX{}-Befehle in Feldern, die Text beinhalten, einsetzen. \bibtex{} wird Ihr Literaturverzeichnis automatisch formatieren und je nach \bibtex{} style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass Anfangsbuchstaben groß bleiben, müssen Sie die Wörter in geschweifte Klammern einschließen, wie im Wort \{Belgien\}.\footnote{Anm. d. Übers.: Die meisten deutschen \bibtex{}-Stile behalten die Großbuchstaben ohnehin bei.}
+Grundsätzlich können Sie \LaTeX{}-Befehle in Feldern, die Text beinhalten, einsetzen. \bibtex{} wird Ihr Literaturverzeichnis automatisch formatieren und je nach \bibtex{} style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass Anfangsbuchstaben groß bleiben, müssen Sie die Wörter in geschweifte Klammern einschließen, wie im Wort \{Belgien\}.\footnote{Die meisten deutschen \bibtex{}-Stile behalten die Großbuchstaben ohnehin bei.}
 
 Hinweise zu einigen Feldtypen:
 \begin{itemize}
@@ -385,13 +385,13 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
 \subsection{System-Voraussetzungen}
 
 \jabref{} ist in Java programmiert und somit betriebssystemunabhängig,
-kann prinzipiell also unter Windows, Mac OS X, Linux und anderen UNIXen
+kann prinzipiell also unter Windows, Mac OS X, Linux und anderen UNIX-Systemen
 betrieben werden. Voraussetzung ist allerdings, dass die \emph{Java
 Virtual Machine} mindestens in der Version~1.4.2 installiert ist.
 Sie ist kostenlos und kann unter \url{http://java.sun.com/} heruntergeladen
-werden. Im Normalfall sollte das \emph{Java Runtime Environment} ausreichen;
+werden. Im Normalfall sollte das \emph{Java Runtime Environment} (JRE) ausreichen;
 nur wenn Sie \jabref{} kompilieren möchten, benötigen Sie das \emph{Java
-Development Kit}.
+Development Kit} (JDK).
 
 
 \subsection{Windows}
@@ -498,7 +498,7 @@ alle Datensätze und einige der Datenfelder auf"|listet.
 
 Mit einem Doppelklick auf eine Tabellenzeile können Sie den Inhalt bearbeiten (der \nameref{EntryEditorHelp} wird geöffnet). Sie können mit den Pfeiltasten innerhalb der Tabelle navigieren. Wenn Sie einen Buchstaben drücken, springen Sie zu dem ersten Eintrag, der mit diesem Buchstaben beginnt (abhängig von der Spalte, nach der Sie die Tabelle sortiert haben).
 
-Die Sortierung der Tabelle erfolgt nach einem Feld Ihrer Wahl. Sie können das Standardverhalten unter \menu{Optionen \msep{} Einstellungen \msep{} Tabellenansicht} angeben. Um die Sortierreihenfolge schnell zu ändern, klicken Sie einfach auf die Kopfzeile einer Spalte; damit haben Sie das primäre Sortierkriterium definiert. Klicken Sie erneut auf den Spaltenkopf, um die Sortierrichtung umzukehren. Ein weiterer Klick sorgt dafür, dass die Spalte nicht mehr zur Sortierung herangezogen wird. Halten Sie die CONTROL-Taste beim Klicken auf einen Spaltenknopf gedrückt, um eine zweite Spalte als sekundäres Sortierkriterium festzulegen. Sie können beliebig viele Spalten zur Sortierung heranziehen.
+Die Sortierung der Tabelle erfolgt nach einem Feld Ihrer Wahl. Sie können das Standardverhalten unter \menu{Optionen \msep{} Einstellungen \msep{} Tabellenansicht} angeben. Um die Sortierreihenfolge schnell zu ändern, klicken Sie einfach auf die Kopfzeile einer Spalte; damit haben Sie das primäre Sortierkriterium definiert. Klicken Sie erneut auf den Spaltenkopf, um die Sortierrichtung umzukehren. Ein weiterer Klick sorgt dafür, dass die Spalte nicht mehr zur Sortierung herangezogen wird. Halten Sie die CTRL-Taste beim Klicken auf einen Spaltenknopf gedrückt, um eine zweite Spalte als sekundäres Sortierkriterium festzulegen. Sie können beliebig viele Spalten zur Sortierung heranziehen.
 
 Welche Felder (Spalten) in der Tabelle angezeigt werden sollen, können
 Sie im \menu{Einstellungs}-Dialog auswählen. Auch die Breite der
@@ -897,7 +897,7 @@ anderen Gruppen sollten nun markiert sein.
 
 \subsubsection{Arten von Gruppen}
 
-In \jabref{}~1.8 gibt es vier verschiedene Arten von Gruppen:
+In \jabrefversion{} gibt es vier verschiedene Arten von Gruppen:
 
 \begin{enumerate}
 \item Die Gruppe \emph{Alle Einträge}, die~-- wie der Name vermuten lässt~--
@@ -1011,22 +1011,19 @@ Standardmäßig ist eine Gruppe \emph{unabhängig} von ihrer Position
 im Gruppenbaum. Ist eine Gruppe ausgewählt, wird nur der Inhalt dieser
 Gruppe angezeigt. Es ist jedoch~-- besonders beim Verwenden dynamischer
 Gruppen~-- oft nützlich, eine Untergruppe zu erstellen, die \emph{ihre
-Obergruppe verfeinert}.%
-\footnote{In \jabref{}~1.8.1 sind die entsprechenden Optionen noch nicht ins
-Deutsche übersetzt. Gemeint sind hier \emph{refining (sub-)groups}.%
-} Wenn diese Untergruppe ausgewählt wird, werden alle Einträge dieser
+Obergruppe verfeinert}. Wenn diese Untergruppe ausgewählt wird, werden alle Einträge dieser
 Gruppe und ihrer Obergruppe angezeigt. Erstellen Sie z.\,B. eine
 Obergrupe, die Einträge mit dem Stichwort \emph{Verteilung} enthält,
-sowie eine verfeinernde Untergruppe mit Einträgen, die das Stichwort
+sowie eine einbeziehende Untergruppe mit Einträgen, die das Stichwort
 \emph{Gauß} enthalten. Wenn Sie nun die Untergruppe auswählen, werden
 alle Einträge angezeigt, die beiden Bedingungen entsprechen, also
 alle, die mit Gauß'scher Verteilung zu tun haben. Indem Sie nun eine
 weitere Untergruppe für \emph{Laplace} anlegen, die dieselbe Obergruppe
 verfeinert, können Sie die Gruppierung einfach erweitern. Im Gruppenbaum
-haben solche Gruppen, die ihre Obergruppen verfeinern, ein spezielles
+haben solche Gruppen, die ihre Obergruppen einbeziehen, ein spezielles
 Icon. (Dieses Verhalten kann in den Einstellungen abgestellt werden.)
 
-Das logische Gegenstück zu einer solchen verfeinernden Untergruppe
+Das logische Gegenstück zu einer solchen einbeziehenden Untergruppe
 ist eine Gruppe, die \emph{ihre Untergruppen berücksichtigt}.%
 \footnote{Im Englischen \emph{including (super-)groups}.%
 } Wird sie ausgewählt, werden nicht nur die Einträge dieser Gruppe,
@@ -1110,12 +1107,12 @@ Rückgängig- oder Wiederholen-Vorgang, der mit Gruppen zusammenhängt)
 ist ein händisches Aktualisieren nötig.
 
 
-\paragraph{Verfeinernde Untergruppen und einbeziehende Obergruppen mischen}
+\paragraph{Einbeziehende Unter- und Obergruppen mischen}
 
-Wenn eine verfeinernde Gruppe die Untergruppe von einer Gruppe ist,
+Wenn eine einbeziehende Gruppe die Untergruppe von einer Gruppe ist,
 die ihre Untergruppen berücksichtigt~-- also sozusagen die Geschwister
-der verfeinernden Gruppe~--, dann werden diese Geschwister ignoriert,
-sobald die verfeinernde Gruppe ausgewählt wird.
+der einbeziehenden Gruppe~--, dann werden diese Geschwister ignoriert,
+sobald die einbeziehende Gruppe ausgewählt wird.
 
 
 \subsection{Markieren von Einträgen}
@@ -2735,11 +2732,16 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \label{RevisionHistory}
 
-%\begin{revhist}{\versiondate}%Datum
+%\begin{revhist}{\versiondate}%Datum}
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%10.\,12.\,2006
+\begin{revhist}{\versiondate}%Datum}
+\item Grafik auf Titelseite ausgetauscht
+\item Ein paar kleinere Änderungen
+\end{revhist}
+
+\begin{revhist}{10.\,12.\,2006}
 \item Abschnitt ">XMP-Metadaten"< leicht verbessert
 \item FAQ zu freien Java-APIs aktualisiert (Suns Java ist jetzt selbst frei)
 \item Wie immer: kleinere Änderungen
