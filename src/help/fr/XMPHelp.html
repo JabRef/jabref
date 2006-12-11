@@ -28,7 +28,15 @@ Pour utiliser la fonction XMP dans JabRef, vous pouvez faire les choses suivante
   la fen&ecirc;tre principale, allez dans l'onglet "General" et cliquer sur "Ecrire XMP".</li>
   <li>Si vous voulez <b>annoter tous les PDFs dans une base de donn&eacute;es d&eacute;termin&eacute;e</b> vous pouvez s&eacute;lectionner "Outils -> Ecrire XMP pour la base de donn&eacute;es"</li>
   <li>Pour v&eacute;rifier si cela a fonctionn&eacute;, vous pouvez ouvrir le PDF dans Adobe Acrobat et s&eacute;lectionner
-  "Fichier -> Propri&eacute;t&eacute;s du Document -> M&eacute;tadonn&eacute;es additionnelles -> Avanc&eacute;". Dans l'arborescence sur la droite vous devriez voir une entr&eacute;e nomm&eacute;e "http://purl.org/net/bibteXMP".
+  "Fichier -> Propri&eacute;t&eacute;s du Document -> M&eacute;tadonn&eacute;es additionnelles -> Avanc&eacute;". 
+ Dans l'arborescence sur la droite vous devriez voir une entr&eacute;e nomm&eacute;e "http://purl.org/net/bibteXMP".
+  Cela fonctionne uniquement avec Adobe Acrobat, et pas avec Adobe Reader.</li>
+  <li>Si vous n'avez pas Adobe Acrobat, vous pouvez utiliser <i>pdfinfo</i> &agrave;  la place afin de voir les m&eacute;tadonn&eacute;es XMP. <i>pdfinfo</i> fait partie de Xpdf (<code>www.foolabs.com/xpdf</code>) et Poppler (<code>http://poppler.freedesktop.org</code>).</li>
+
+
+
+
+
 </ul>
 
 <h2>Format de fichier BibteXmp</h2>
@@ -89,7 +97,7 @@ sera transform&eacute; en
 </table>
 
 <p>
-Faites attention aux pièges suivants si vous essayer de traiter les métadonnées bibtexXMP&nbsp;:
+Faites attention aux pièges suivants si vous essayez de traiter les métadonnées bibtexXMP&nbsp;:
 </p>
 <p>
 <ul>
