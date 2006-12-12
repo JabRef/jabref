@@ -87,7 +87,16 @@ public class ExportFormats {
 		return sb.toString();
 	}
 
-	/**
+    /**
+     * Get a Map of all export formats.
+     * @return A Map containing all export formats, mapped to their console names.
+     */
+    public static Map getExportFormats() {
+        // It is perhaps overly paranoid to make a defensive copy in this case:
+        return Collections.unmodifiableMap(exportFormats);
+    }
+
+    /**
 	 * Look up the named export format.
 	 * 
 	 * @param consoleName

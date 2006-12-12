@@ -1328,81 +1328,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                   });
 
 
-              actions.put("exportToClipboard", new AbstractWorker() {
-              String message = null;
-              public void run() {
-              if (mainTable.getSelected().size() == 0) {
-                  message = Globals.lang("No entries selected")+".";
-                  getCallBack().update();
-                  return;
-              }
-
-              // Make a list of possible formats:
-              Map formats = new HashMap();
-              formats.put("BibTeXML", "bibtexml");
-              formats.put("DocBook", "docbook");
-              formats.put("HTML", "html");
-                          formats.put("RTF (Harvard)", "harvard/harvard");
-              formats.put("Simple HTML", "simplehtml");
-              for (int i = 0; i < Globals.prefs.customExports.size(); i++) {
-                  Object o = (Globals.prefs.customExports.getElementAt(i))[0];
-                  formats.put(o, o);
-              }
-                          Object[] array = formats.keySet().toArray();
-                          Arrays.sort(array);
-              JList list = new JList(array);
-              list.setBorder(BorderFactory.createEtchedBorder());
-              list.setSelectionInterval(0,0);
-              list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-              int answer =
-                  JOptionPane.showOptionDialog(frame, list, Globals.lang("Select format"),
-                               JOptionPane.YES_NO_OPTION,
-                               JOptionPane.QUESTION_MESSAGE, null,
-                               new String[] {Globals.lang("Ok"), Globals.lang("Cancel")},
-                               Globals.lang("Ok"));
-
-              if (answer == JOptionPane.NO_OPTION)
-                  return;
-
-              String lfName = (String)(formats.get(list.getSelectedValue()));
-              final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
-              String dir = null;
-              if (custom) {
-                  int index = list.getSelectedIndex()-Globals.STANDARD_EXPORT_COUNT;
-                  dir = (String)(Globals.prefs.customExports.getElementAt(index)[1]);
-                  File f = new File(dir);
-                  lfName = f.getName();
-                  lfName = lfName.substring(0, lfName.indexOf("."));
-                  // Remove file name - we want the directory only.
-                  dir = f.getParent()+System.getProperty("file.separator");
-              }
-              final String format = lfName,
-                  directory = dir;
-
-              try {
-                  BibtexEntry[] bes = mainTable.getSelectedEntries();
-                  StringWriter sw = new StringWriter();
-                  System.out.println("actual export to clipboard not implemented...");
-                  //FileActions.exportEntries(database, bes, format, custom, directory, sw);
-                  ClipboardOwner owner = new ClipboardOwner() {
-                    public void lostOwnership(Clipboard clipboard, Transferable content) {}
-                  };
-                  //StringSelection ss = new StringSelection(sw.toString());
-                  RtfSelection rs = new RtfSelection(sw.toString());
-                     Toolkit.getDefaultToolkit().getSystemClipboard()
-                        .setContents(rs, owner);
-                  message = Globals.lang("Entries exported to clipboard")+": "+bes.length;
-              } catch (Exception ex) {
-                  ex.printStackTrace();
-              }
-              }
-
-              public void update() {
-              output(message);
-              }
-
-          });
-
+          actions.put("exportToClipboard", new ExportToClipboardAction(frame, database()));
+        
         actions.put("writeXMP", new WriteXMPAction(this));
         
         actions.put("abbreviateIso", new AbbreviateAction(this, true));
