@@ -102,9 +102,9 @@ public class ExportToClipboardAction extends AbstractWorker {
             HashSet entries = new HashSet(bes.length);
             for (int i = 0; i < bes.length; i++)
                 entries.add(bes[i].getId());
-
+            // Write to file:
             format.performExport(database, tmp.getPath(), panel.getEncoding(), entries);
-
+            // Read the file and put the contents on the clipboard:
             StringBuffer sb = new StringBuffer();
             reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());
             int s;
@@ -122,7 +122,6 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Globals.lang("Entries exported to clipboard") + ": " + bes.length;
 
         } catch (Exception e) {
-            // TODO: report failure while writing to temporary file.
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             message = Globals.lang("Error exporting to clipboard");
             return;

@@ -150,6 +150,7 @@ public class Globals {
 	public static SidePaneManager sidePaneManager;
 
 	public static final String NEWLINE = System.getProperty("line.separator");
+        public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
 
 	/**
 	 * true if we have unix newlines

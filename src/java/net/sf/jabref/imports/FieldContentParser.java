@@ -163,7 +163,7 @@ public class FieldContentParser {
 
             res.deleteCharAt(q);
             res.insert(q, Globals.NEWLINE+"\t");
-            p = q+1;
+            p = q+Globals.NEWLINE_LENGTH;
 
         }
     }
