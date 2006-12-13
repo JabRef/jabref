@@ -42,7 +42,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     }
 
     public void init() {
-
         // Get all entries, and make sure there are selected entries:
     	sel = panel.getSelectedEntries();
     	if (sel.length < 1) {
@@ -67,7 +66,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     }
 
     public void run() {
-
         if (!goOn){
             panel.output(Globals.lang("No entries selected."));
             return;
@@ -80,7 +78,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         final OpenFileFilter off = Util.getFileFilterForField(fieldName);
 
-        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, off);
+        ExternalFilePanel extPan = new ExternalFilePanel(fieldName, panel.metaData(), null, null, off);
         FieldTextField editor = new FieldTextField(fieldName, "", false);
 
         // Find the default directory for this field type:
@@ -89,6 +87,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         // First we try to autoset fields
         if (autoSet) {
             for (int i=0; i<sel.length; i++) {
+
                 final Object old = sel[i].getField(fieldName);
                 // Check if a link is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
