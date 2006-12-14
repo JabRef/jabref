@@ -737,6 +737,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Abbreviate", "ctrl alt A");
         defKeyBinds.put("Unabbreviate", "ctrl alt shift A");
         defKeyBinds.put("Search IEEXplore", "F8");
+        defKeyBinds.put("Fetch ArXiv.org", "shift F8");
         defKeyBinds.put("Write XMP", "ctrl F4");
 
         //defKeyBinds.put("Select value", "ctrl B");
