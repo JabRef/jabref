@@ -3,11 +3,11 @@ package tests.net.sf.jabref.imports;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.KeyCollisionException;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
@@ -96,6 +96,79 @@ public class BibtexParserTest extends TestCase {
 			"This was created with JabRef 2.1 beta 2." + "\n" + "Encoding: Cp1252" + "\n")));
 	}
 
+	public void testFromString() throws Exception {
+
+		{ // Simple case
+			Collection c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
+			assertEquals(1, c.size());
+
+			BibtexEntry e = (BibtexEntry) c.iterator().next();
+			assertEquals("test", e.getCiteKey());
+			assertEquals(2, e.getAllFields().length);
+			Object[] o = e.getAllFields();
+			assertTrue(o[0].toString().equals("author") || o[1].toString().equals("author"));
+			assertEquals("Ed von Test", e.getField("author"));
+		}
+		{ // Empty String
+			Collection c = BibtexParser.fromString("");
+			assertEquals(0, c.size());
+
+		}
+		{ // Error
+			Collection c = BibtexParser.fromString("@@article@@{{{{{{}");
+			assertEquals(null, c);
+		}
+
+	}
+
+	public void testFromSingle2() {
+		/**
+		 * More
+		 */
+		Collection c = BibtexParser.fromString("@article{canh05,"
+			+ "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
+			+ "@inProceedings{foo," + "  author={Norton Bar}}");
+
+		assertEquals(2, c.size());
+
+		Iterator i = c.iterator();
+		BibtexEntry a = (BibtexEntry) i.next();
+		BibtexEntry b = (BibtexEntry) i.next();
+
+		if (a.getCiteKey().equals("foo")) {
+			BibtexEntry tmp = a;
+			a = b;
+			b = tmp;
+		}
+
+		assertEquals("canh05", a.getCiteKey());
+		assertEquals("Crowston, K. and Annabi, H.", a.getField("author"));
+		assertEquals("Title A", a.getField("title"));
+		assertEquals(BibtexEntryType.ARTICLE, a.getType());
+
+		assertEquals("foo", b.getCiteKey());
+		assertEquals("Norton Bar", b.getField("author"));
+		assertEquals(BibtexEntryType.INPROCEEDINGS, b.getType());
+	}
+
+	public void testFromStringSingle() {
+		BibtexEntry a = BibtexParser.singleFromString("@article{canh05,"
+			+ "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n");
+
+		assertEquals("canh05", a.getCiteKey());
+		assertEquals("Crowston, K. and Annabi, H.", a.getField("author"));
+		assertEquals("Title A", a.getField("title"));
+		assertEquals(BibtexEntryType.ARTICLE, a.getType());
+		
+		BibtexEntry b = BibtexParser.singleFromString("@article{canh05,"
+			+ "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
+			+ "@inProceedings{foo," + "  author={Norton Bar}}");
+
+		if (!(b.getCiteKey().equals("canh05") || b.getCiteKey().equals("foo"))){
+			fail();
+		}
+	}
+
 	public void testParse() throws IOException {
 
 		// Test Standard parsing
@@ -133,16 +206,15 @@ public class BibtexParserTest extends TestCase {
 		BibtexEntry e2 = (BibtexEntry) c.iterator().next();
 
 		assertNotSame(e.getId(), e2.getId());
-		
+
 		Object[] o = e.getAllFields();
-		for (int i = 0; i < o.length; i++){
-			if (!e.getField(o[i].toString()).equals(e2.getField(o[i].toString()))){
+		for (int i = 0; i < o.length; i++) {
+			if (!e.getField(o[i].toString()).equals(e2.getField(o[i].toString()))) {
 				fail("e and e2 differ in field " + o[i].toString());
 			}
 		}
 	}
 
-	
 	/**
 	 * Test for [ 1594123 ] Failure to import big numbers
 	 * 
@@ -151,34 +223,26 @@ public class BibtexParserTest extends TestCase {
 	 * @throws IOException
 	 */
 	public void testBigNumbers() throws IOException {
-		
+
 		ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,"
-			+ "isbn = 1234567890123456789,\n"
-			+ "isbn2 = {1234567890123456789},\n"
-			+ "small = 1234,\n"
-			+ "}"));
+			+ "isbn = 1234567890123456789,\n" + "isbn2 = {1234567890123456789},\n"
+			+ "small = 1234,\n" + "}"));
 
 		Collection c = result.getDatabase().getEntries();
 		BibtexEntry e = (BibtexEntry) c.iterator().next();
 
-		assertEquals("1234567890123456789", (String)e.getField("isbn"));
-		assertEquals("1234567890123456789", (String)e.getField("isbn2"));
-		assertEquals("1234", (String)e.getField("small"));
+		assertEquals("1234567890123456789", (String) e.getField("isbn"));
+		assertEquals("1234567890123456789", (String) e.getField("isbn2"));
+		assertEquals("1234", (String) e.getField("small"));
 	}
-	
+
 	public void testBigNumbers2() throws IOException {
 
-		
-		ParserResult result = BibtexParser.parse(new StringReader("" +
-				"@string{bourdieu = {Bourdieu, Pierre}}" +
-				"@book{bourdieu-2002-questions-sociologie, " +
-				"	Address = {Paris}," +
-				"	Author = bourdieu," +
-				"	Isbn = 2707318256," +
-				"	Publisher = {Minuit}," +
-				"	Title = {Questions de sociologie}," +
-				"	Year = 2002" +
-				"}"));
+		ParserResult result = BibtexParser.parse(new StringReader(""
+			+ "@string{bourdieu = {Bourdieu, Pierre}}"
+			+ "@book{bourdieu-2002-questions-sociologie, " + "	Address = {Paris},"
+			+ "	Author = bourdieu," + "	Isbn = 2707318256," + "	Publisher = {Minuit},"
+			+ "	Title = {Questions de sociologie}," + "	Year = 2002" + "}"));
 
 		Collection c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
@@ -187,12 +251,12 @@ public class BibtexParserTest extends TestCase {
 
 		assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
 		assertEquals(BibtexEntryType.BOOK, e.getType());
-		assertEquals("2707318256", (String)e.getField("isbn"));
-		assertEquals("Paris", (String)e.getField("address"));
-		assertEquals("Minuit", (String)e.getField("publisher"));
-		assertEquals("Questions de sociologie", (String)e.getField("Title"));
-		assertEquals("#bourdieu#", (String)e.getField("Author"));
-		assertEquals("2002", (String)e.getField("Year"));
+		assertEquals("2707318256", (String) e.getField("isbn"));
+		assertEquals("Paris", (String) e.getField("address"));
+		assertEquals("Minuit", (String) e.getField("publisher"));
+		assertEquals("Questions de sociologie", (String) e.getField("title"));
+		assertEquals("#bourdieu#", (String) e.getField("author"));
+		assertEquals("2002", (String) e.getField("year"));
 	}
 
 	public void testNewlineHandling() throws IOException {
@@ -210,7 +274,7 @@ public class BibtexParserTest extends TestCase {
 		assertEquals("canh05", e.getCiteKey());
 		assertEquals(BibtexEntryType.ARTICLE, e.getType());
 
-		assertEquals("Hallo World this is not an exercise .", (String)e.getField("title"));
-		assertEquals("Hallo World this is not an exercise .", (String)e.getField("tabs"));
+		assertEquals("Hallo World this is not an exercise .", (String) e.getField("title"));
+		assertEquals("Hallo World this is not an exercise .", (String) e.getField("tabs"));
 	}
 }

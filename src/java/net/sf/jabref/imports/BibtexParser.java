@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2003-06 David Weitzman, Nizar N. Batada, Morten O. Alver
+ Copyright (C) 2003-06 David Weitzman, Nizar N. Batada, Morten O. Alver, Christopher Oezbek
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -31,6 +31,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.StringReader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -69,6 +71,7 @@ import net.sf.jabref.Util;
  * @author Christopher Oezbek 
  */
 public class BibtexParser {
+	
 	private PushbackReader _in;
 
 	private BibtexDatabase _db;
@@ -105,7 +108,42 @@ public class BibtexParser {
 		BibtexParser parser = new BibtexParser(in);
 		return parser.parse();
 	}
-
+	
+	
+	/**
+	 * Parses BibtexEntries from the given string and returns the collection of all entries found.
+	 * 
+	 * @param bibtexString
+	 * 
+	 * @return Returns null if an error occurred, returns an empty collection if no entries where found. 
+	 */
+	public static Collection fromString(String bibtexString){
+		StringReader reader = new StringReader(bibtexString);
+		BibtexParser parser = new BibtexParser(reader); 
+		try {
+			return parser.parse().getDatabase().getEntries();
+		} catch (Exception e){
+			return null;
+		}
+	}
+	
+	/**
+	 * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
+	 * 
+	 * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
+	 * 
+	 * @param bibtexString
+	 * 
+	 * @return The bibtexentry or null if non was found or an error occurred.
+	 */
+	public static BibtexEntry singleFromString(String bibtexString) {
+		Collection c = fromString(bibtexString);
+		if (c == null){
+			return null;
+		}
+		return (BibtexEntry)c.iterator().next();
+	}	
+	
 	/**
 	 * Check whether the source is in the correct format for this importer.
 	 */
@@ -486,7 +524,7 @@ public class BibtexParser {
 	private String parseFieldContent() throws IOException {
 		skipWhitespace();
 		StringBuffer value = new StringBuffer();
-		int c, j = '.';
+		int c = '.';
 
 		while (((c = peek()) != ',') && (c != '}') && (c != ')')) {
 
