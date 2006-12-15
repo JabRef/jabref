@@ -33,6 +33,28 @@ public class UtilTest extends TestCase {
 		assertEquals("Aa", Util.nCase("AA"));
 	}
 
+	public void testGetPublicationDate(){
+	
+		assertEquals("2003-02", Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }")));
+		
+		assertEquals("2003-03", Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")));
+		
+		assertEquals("2003", Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, year = {2003}}")));
+		
+		assertEquals(null, Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, month = 3 }")));
+		
+		assertEquals(null, Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, author={bla}}")));
+
+		assertEquals("2003-12", Util.getPublicationDate(BibtexParser
+			.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }")));
+		
+	}
+
 	public void testCheckName() {
 		assertEquals("aa.bib", Util.checkName("aa"));
 		assertEquals(".bib", Util.checkName(""));
@@ -338,6 +360,19 @@ public class UtilTest extends TestCase {
     	assertEquals(10,Util.getMonthNumber("nov"));
     	assertEquals(11,Util.getMonthNumber("dec"));
     	
+    	assertEquals(0, Util.getMonthNumber("#jan#"));
+    	assertEquals(1, Util.getMonthNumber("#feb#"));
+    	assertEquals(2, Util.getMonthNumber("#mar#"));
+    	assertEquals(3, Util.getMonthNumber("#apr#"));
+    	assertEquals(4, Util.getMonthNumber("#may#"));
+    	assertEquals(5, Util.getMonthNumber("#jun#"));
+    	assertEquals(6, Util.getMonthNumber("#jul#"));
+    	assertEquals(7, Util.getMonthNumber("#aug#"));
+    	assertEquals(8, Util.getMonthNumber("#sep#"));
+    	assertEquals(9, Util.getMonthNumber("#oct#"));
+    	assertEquals(10,Util.getMonthNumber("#nov#"));
+    	assertEquals(11,Util.getMonthNumber("#dec#"));
+    	
     	assertEquals(0, Util.getMonthNumber("January"));
     	assertEquals(1, Util.getMonthNumber("February"));
     	assertEquals(2, Util.getMonthNumber("March"));
@@ -377,6 +412,7 @@ public class UtilTest extends TestCase {
 
     	assertEquals(-1,Util.getMonthNumber(";lkjasdf"));
     	assertEquals(-1,Util.getMonthNumber("3.2"));
+    	assertEquals(-1,Util.getMonthNumber("#test#"));
     	assertEquals(-1,Util.getMonthNumber(""));
     }
 }

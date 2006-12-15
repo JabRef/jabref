@@ -33,7 +33,6 @@
 // modified :  - r.nagel 20.04.2006
 //               make the DateFormatter abstract and splitt the easyDate methode
 //               (now we cannot change the dateformat dynamicly, sorry)
-
 package net.sf.jabref;
 
 import java.awt.BorderLayout;
@@ -67,6 +66,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -107,15 +107,24 @@ import com.jgoodies.forms.layout.FormLayout;
  * @version 1.0
  */
 public class Util {
-	// A static Object for date formatting. Please do not create the object
-	// here,
-	// because there are some references from the Globals class.....
+
+	/**
+	 * A static Object for date formatting. Please do not create the object
+	 * here, because there are some references from the Globals class.....
+	 * 
+	 */
 	private static SimpleDateFormat dateFormatter = null;
 
-	// Colors are defined here.
+	/*
+	 * Colors are defined here.
+	 * 
+	 */
 	public static Color fieldsCol = new Color(180, 180, 200);
 
-	// Integer values for indicating result of duplicate check (for entries):
+	/*
+	 * Integer values for indicating result of duplicate check (for entries):
+	 * 
+	 */
 	final static int TYPE_MISMATCH = -1, NOT_EQUAL = 0, EQUAL = 1, EMPTY_IN_ONE = 2,
 		EMPTY_IN_TWO = 3;
 
@@ -232,6 +241,32 @@ public class Util {
 			}
 		}
 		return toSet;
+	}
+
+	/**
+	 * Will return the publication date of the given bibtex entry in conformance
+	 * to ISO 8601, i.e. either YYYY or YYYY-MM.
+	 * 
+	 * @param entry
+	 * @return will return the publication date of the entry or null if no year
+	 *         was found.
+	 */
+	public static String getPublicationDate(BibtexEntry entry) {
+
+		Object o = entry.getField("year");
+		if (o == null)
+			return null;
+
+		String year = toFourDigitYear(o.toString());
+
+		o = entry.getField("month");
+		if (o != null) {
+			int month = Util.getMonthNumber(o.toString());
+			if (month != -1) {
+				return year + "-" + (month + 1 < 10 ? "0" : "") + (month + 1);
+			}
+		}
+		return year;
 	}
 
 	public static String shaveString(String s) {
@@ -475,8 +510,8 @@ public class Util {
 
 			// Find the default directory for this field type:
 			String dir = metaData.getFileDirectory(fieldName);
-			
-			File file = expandFilename(link, new String[]{dir, "."});
+
+			File file = expandFilename(link, new String[] { dir, "." });
 
 			// Check that the file exists:
 			if ((file == null) || !file.exists()) {
@@ -572,8 +607,8 @@ public class Util {
 					 * String[] spl = link.split("\\\\"); StringBuffer sb = new
 					 * StringBuffer(); for (int i = 0; i < spl.length; i++) { if
 					 * (i > 0) sb.append("\\"); if (spl[i].indexOf(" ") >= 0)
-					 * spl[i] = "\"" + spl[i] + "\""; sb.append(spl[i]);
-					 *  } //pr(sb.toString()); link = sb.toString();
+					 * spl[i] = "\"" + spl[i] + "\""; sb.append(spl[i]); }
+					 * //pr(sb.toString()); link = sb.toString();
 					 * 
 					 * String cmd = "cmd.exe /c start " + link;
 					 * 
@@ -659,7 +694,7 @@ public class Util {
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
 		if (dir != null) {
-			File tmp = expandFilename(link, new String[]{dir, "."});
+			File tmp = expandFilename(link, new String[] { dir, "." });
 			if (tmp != null)
 				file = tmp;
 		}
@@ -710,6 +745,7 @@ public class Util {
 
 		}
 	}
+
 	/**
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
@@ -740,6 +776,7 @@ public class Util {
 			return link;
 		}
 	}
+
 	/**
 	 * Searches the given directory and subdirectories for a pdf file with name
 	 * as given + ".pdf"
@@ -770,11 +807,12 @@ public class Util {
 	 * 
 	 * The search pattern will be read from the preferences.
 	 * 
-	 * The [extension]-tags in this pattern will be replace by the given extension parameter.
+	 * The [extension]-tags in this pattern will be replace by the given
+	 * extension parameter.
 	 * 
 	 */
 	public static String findPdf(BibtexEntry entry, String extension, String directory) {
-		return findPdf(entry, extension, new String[]{directory});
+		return findPdf(entry, extension, new String[] { directory });
 	}
 
 	/**
@@ -783,17 +821,17 @@ public class Util {
 	public static String findPdf(BibtexEntry entry, String extension, String[] directories) {
 
 		String regularExpression;
-		if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)){
+		if (Globals.prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY)) {
 			regularExpression = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
 		} else {
-			regularExpression = Globals.prefs.get(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY);
+			regularExpression = Globals.prefs
+				.get(JabRefPreferences.DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY);
 		}
 		regularExpression = regularExpression.replaceAll("\\[extension\\]", extension);
-		
+
 		return findFile(entry, null, directories, regularExpression, true);
 	}
-	
-	
+
 	/**
 	 * Searches the given directory and file name pattern for a file for the
 	 * bibtexentry.
@@ -803,21 +841,17 @@ public class Util {
 	 * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
 	 * 
 	 * Requirements:
-	 * 
 	 *  - Be able to find the associated PDF in a set of given directories.
-	 *  
-	 *  - Be able to return a relative path or absolute path. 
-	 *
+	 *  - Be able to return a relative path or absolute path.
 	 *  - Be fast.
-	 *  
 	 *  - Allow for flexible naming schemes in the PDFs.
 	 * 
 	 * Syntax scheme for file:
 	 * <ul>
-	 *   <li>* Any subDir</li>
-	 *   <li>** Any subDir (recursiv)</li>
-	 *   <li>[key] Key from bibtex file and database</li> 
-	 *   <li>.* Anything else is taken to be a Regular expression.</li>
+	 * <li>* Any subDir</li>
+	 * <li>** Any subDir (recursiv)</li>
+	 * <li>[key] Key from bibtex file and database</li>
+	 * <li>.* Anything else is taken to be a Regular expression.</li>
 	 * </ul>
 	 * 
 	 * @param entry
@@ -825,14 +859,13 @@ public class Util {
 	 * @param database
 	 *            non-null
 	 * @param directory
-	 * 				A set of root directories to start the search from.
-	 * 				Paths are returned relative to these directories if
-	 * 				relative is set to true. These directories will not 
-	 * 				be expanded or anything. Use the file attribute for 
-	 * 				this.
+	 *            A set of root directories to start the search from. Paths are
+	 *            returned relative to these directories if relative is set to
+	 *            true. These directories will not be expanded or anything. Use
+	 *            the file attribute for this.
 	 * @param file
 	 *            non-null
-	 *            
+	 * 
 	 * @param relative
 	 *            whether to return relative file paths or absolute ones
 	 * 
@@ -842,10 +875,10 @@ public class Util {
 	public static String findFile(BibtexEntry entry, BibtexDatabase database, String[] directory,
 		String file, boolean relative) {
 
-		for (int i = 0; i < directory.length; i++){
-		
+		for (int i = 0; i < directory.length; i++) {
+
 			String result = findFile(entry, database, directory[i], file, relative);
-			if (result != null){
+			if (result != null) {
 				return result;
 			}
 		}
@@ -865,53 +898,53 @@ public class Util {
 	}
 
 	public static ArrayList parseMethodsCalls(String calls) throws RuntimeException {
-		
+
 		ArrayList result = new ArrayList();
-		
+
 		char[] c = calls.toCharArray();
-		
+
 		int i = 0;
-		
-		while (i < c.length){
-		
+
+		while (i < c.length) {
+
 			int start = i;
-			if (Character.isJavaIdentifierStart(c[i])){
+			if (Character.isJavaIdentifierStart(c[i])) {
 				i++;
-				while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')){
+				while (i < c.length && (Character.isJavaIdentifierPart(c[i]) || c[i] == '.')) {
 					i++;
 				}
-				if (i < c.length && c[i] == '('){
-					
+				if (i < c.length && c[i] == '(') {
+
 					String method = calls.substring(start, i);
-					
-					i++; i++; 
-					
+
+					i++;
+					i++;
+
 					int startParam = i;
 					i++;
-					
-					while (i + 1 < c.length && !(c[i] == '"' && c[i+1] == ')')){
+
+					while (i + 1 < c.length && !(c[i] == '"' && c[i + 1] == ')')) {
 						i++;
 					}
-					
+
 					String param = calls.substring(startParam, i);
-					
-					result.add(new String[]{method, param});
+
+					result.add(new String[] { method, param });
 				} else {
 					String method = calls.substring(start, i);
-					result.add(new String[]{method});
+					result.add(new String[] { method });
 				}
 			}
 			i++;
 		}
-		
+
 		return result;
 	}
-	
-	
+
 	/**
-	 * Accepts a string like [author:toLowerCase("escapedstring"),toUpperCase], whereas the first
-	 * string signifies the bibtex-field to get while the others are the names
-	 * of layouters that will be applied.
+	 * Accepts a string like [author:toLowerCase("escapedstring"),toUpperCase],
+	 * whereas the first string signifies the bibtex-field to get while the
+	 * others are the names of layouters that will be applied.
 	 * 
 	 * @param fieldAndFormat
 	 * @param entry
@@ -924,21 +957,21 @@ public class Util {
 		fieldAndFormat = stripBrackets(fieldAndFormat);
 
 		int colon = fieldAndFormat.indexOf(':');
-		
+
 		String beforeColon, afterColon;
-		if (colon == -1){
+		if (colon == -1) {
 			beforeColon = fieldAndFormat;
 			afterColon = null;
 		} else {
 			beforeColon = fieldAndFormat.substring(0, colon);
-			afterColon = fieldAndFormat.substring(colon+1);
+			afterColon = fieldAndFormat.substring(colon + 1);
 		}
 		beforeColon = beforeColon.trim();
-		
-		if (beforeColon.length() == 0){
+
+		if (beforeColon.length() == 0) {
 			return null;
 		}
-		
+
 		String fieldValue = getField(beforeColon, entry, database);
 
 		if (fieldValue == null)
@@ -974,37 +1007,37 @@ public class Util {
 
 	/**
 	 * Convenience function for absolute search.
-     *
-     * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
+	 * 
+	 * Uses findFile(BibtexEntry, BibtexDatabase, (String)null, String, false).
 	 */
-	public static String findFile(BibtexEntry entry, BibtexDatabase database, String file){
-		return findFile(entry, database, (String)null, file, false);
-	}	
-	
+	public static String findFile(BibtexEntry entry, BibtexDatabase database, String file) {
+		return findFile(entry, database, (String) null, file, false);
+	}
+
 	/**
 	 * Internal Version of findFile, which also accepts a current directory to
 	 * base the search on.
 	 * 
 	 */
-	public static String findFile(BibtexEntry entry,
-		BibtexDatabase database, String directory, String file, boolean relative) {
+	public static String findFile(BibtexEntry entry, BibtexDatabase database, String directory,
+		String file, boolean relative) {
 
 		File root;
-		if (directory == null){
+		if (directory == null) {
 			root = new File(".");
 		} else {
 			root = new File(directory);
 		}
 		if (!root.exists())
 			return null;
-	
+
 		String found = findFile(entry, database, root, file);
-		
-		if (directory == null || !relative){
+
+		if (directory == null || !relative) {
 			return found;
 		}
-		
-		if (found != null){
+
+		if (found != null) {
 			try {
 				/**
 				 * [ 1601651 ] PDF subdirectory - missing first character
@@ -1018,18 +1051,19 @@ public class Util {
 		}
 		return null;
 	}
-	
-	/**
-	 * The actual work-horse. Will find absolute filepaths starting from the given directory using the given regular expression string for search.
-	 */
-	protected static String findFile(BibtexEntry entry,
-		BibtexDatabase database, File directory, String file) {
 
-		if (file.startsWith("/")){
+	/**
+	 * The actual work-horse. Will find absolute filepaths starting from the
+	 * given directory using the given regular expression string for search.
+	 */
+	protected static String findFile(BibtexEntry entry, BibtexDatabase database, File directory,
+		String file) {
+
+		if (file.startsWith("/")) {
 			directory = new File(".");
 			file = file.substring(1);
 		}
-		
+
 		// Escape handling...
 		Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
 		StringBuffer s = new StringBuffer();
@@ -1039,16 +1073,16 @@ public class Util {
 		m.appendTail(s);
 		file = s.toString();
 		String[] fileParts = file.split("/");
-		
+
 		if (fileParts.length == 0)
 			return null;
-		
-		if (fileParts.length > 1){
+
+		if (fileParts.length > 1) {
 
 			for (int i = 0; i < fileParts.length - 1; i++) {
 
-				String dirToProcess = fileParts[i];	
-				
+				String dirToProcess = fileParts[i];
+
 				dirToProcess = expandBrackets(dirToProcess, entry, database);
 
 				if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
@@ -1072,8 +1106,8 @@ public class Util {
 
 					for (int sub = 0; sub < subDirs.length; sub++) {
 						if (subDirs[sub].isDirectory()) {
-							String result = findFile(entry, database,
-								subDirs[sub], restOfFileString);
+							String result = findFile(entry, database, subDirs[sub],
+								restOfFileString);
 							if (result != null)
 								return result;
 						}
@@ -1114,7 +1148,8 @@ public class Util {
 					return null;
 				}
 
-				final Pattern toMatch = Pattern.compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
+				final Pattern toMatch = Pattern
+					.compile(dirToProcess.replaceAll("\\\\\\\\", "\\\\"));
 
 				File[] matches = directory.listFiles(new FilenameFilter() {
 					public boolean accept(File arg0, String arg1) {
@@ -1134,7 +1169,8 @@ public class Util {
 		// Last step check if the given file can be found in this directory
 		String filenameToLookFor = expandBrackets(fileParts[fileParts.length - 1], entry, database);
 
-		final Pattern toMatch = Pattern.compile("^" + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$");
+		final Pattern toMatch = Pattern.compile("^"
+			+ filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + "$");
 
 		File[] matches = directory.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
@@ -1210,20 +1246,21 @@ public class Util {
 	 * Converts a relative filename to an absolute one, if necessary. Returns
 	 * null if the file does not exist.
 	 * 
-	 * Will look in each of the given dirs starting from the beginning and returning the first found file to match if any.
+	 * Will look in each of the given dirs starting from the beginning and
+	 * returning the first found file to match if any.
 	 */
 	public static File expandFilename(String name, String[] dir) {
-		
+
 		for (int i = 0; i < dir.length; i++) {
 			File result = expandFilename(name, dir[i]);
-			if (result != null){
+			if (result != null) {
 				return result;
 			}
 		}
-	
+
 		return null;
 	}
-	
+
 	/**
 	 * Converts a relative filename to an absolute one, if necessary. Returns
 	 * null if the file does not exist.
@@ -2113,42 +2150,46 @@ public class Util {
 		return (s.equals("0") || (s.indexOf(Globals.prefs.WRAPPED_USERNAME) >= 0));
 	}
 
-    /**
-     * Set a given field to a given value for all entries in a Collection.
-     * This method DOES NOT update any UndoManager, but returns a relevant
-     * CompoundEdit that should be registered by the caller.
-     *
-     * @param entries The entries to set the field for.
-     * @param field The name of the field to set.
-     * @param text The value to set. This value can be null, indicating that the
-     *      field should be cleared.
-     * @param overwriteValues Indicate whether the value should be set even if
-     *      an entry already has the field set.
-     * @return A CompoundEdit for the entire operation.
-     */
-    public static UndoableEdit massSetField(Collection entries,
-                                            String field, String text,
-                                            boolean overwriteValues) {
-        
-        NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
-        for (Iterator i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
-            Object oldVal = entry.getField(field);
-            // If we are not allowed to overwrite values, check if there is a nonempty
-            // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && (((String)oldVal).length() > 0))
-                continue;
-            if (text != null)
-                entry.setField(field, text);
-            else
-                entry.clearField(field);
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
-        }
-        ce.end();
-        return ce;
-    }
+	/**
+	 * Set a given field to a given value for all entries in a Collection. This
+	 * method DOES NOT update any UndoManager, but returns a relevant
+	 * CompoundEdit that should be registered by the caller.
+	 * 
+	 * @param entries
+	 *            The entries to set the field for.
+	 * @param field
+	 *            The name of the field to set.
+	 * @param text
+	 *            The value to set. This value can be null, indicating that the
+	 *            field should be cleared.
+	 * @param overwriteValues
+	 *            Indicate whether the value should be set even if an entry
+	 *            already has the field set.
+	 * @return A CompoundEdit for the entire operation.
+	 */
+	public static UndoableEdit massSetField(Collection entries, String field, String text,
+		boolean overwriteValues) {
 
-    /**
+		NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
+		for (Iterator i = entries.iterator(); i.hasNext();) {
+			BibtexEntry entry = (BibtexEntry) i.next();
+			Object oldVal = entry.getField(field);
+			// If we are not allowed to overwrite values, check if there is a
+			// nonempty
+			// value already for this entry:
+			if (!overwriteValues && (oldVal != null) && (((String) oldVal).length() > 0))
+				continue;
+			if (text != null)
+				entry.setField(field, text);
+			else
+				entry.clearField(field);
+			ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
+		}
+		ce.end();
+		return ce;
+	}
+
+	/**
 	 * Make a list of supported character encodings that can encode all
 	 * characters in the given String.
 	 * 
@@ -2166,7 +2207,6 @@ public class Util {
 		}
 		return encodings;
 	}
-	
 
 	/**
 	 * Will convert a two digit year using the following scheme (describe at
@@ -2183,14 +2223,14 @@ public class Util {
 	 * @return
 	 */
 	public static String toFourDigitYear(String year) {
-		if (thisYear == 0){
+		if (thisYear == 0) {
 			thisYear = Calendar.getInstance().get(Calendar.YEAR);
 		}
 		return toFourDigitYear(year, thisYear);
 	}
-	
+
 	public static int thisYear;
-	
+
 	/**
 	 * Will convert a two digit year using the following scheme (describe at
 	 * http://www.filemaker.com/help/02-Adding%20and%20view18.html):
@@ -2216,7 +2256,7 @@ public class Util {
 
 			if (yearNumber == thisYearTwoDigits) {
 				return String.valueOf(thisYear);
-			} 
+			}
 			// 20 , 90
 			// 99 > 30
 			if ((yearNumber + 100 - thisYearTwoDigits) % 100 > 30) {
@@ -2236,36 +2276,33 @@ public class Util {
 			return year;
 		}
 	}
-	
+
 	/**
 	 * Will return an integer indicating the month of the entry from 0 to 11.
 	 * 
 	 * -1 signals a unknown month string.
 	 * 
 	 * This method accepts three types of months given:
-	 * 
-	 * - Single and Double Digit months from 1 to 12 (01 to 12)
-	 * 
-	 * - 3 Digit BibTex strings (jan
-	 * 
-	 * - Full English Month identifiers.
+	 *  - Single and Double Digit months from 1 to 12 (01 to 12)
+	 *  - 3 Digit BibTex strings (jan, feb, mar...)
+	 *  - Full English Month identifiers.
 	 * 
 	 * @param month
 	 * @return
 	 */
-	public static int getMonthNumber(String month){
-		
-		month = month.toLowerCase();
-		
-		for (int i = 0; i < Globals.MONTHS.length; i++){
-			if (month.startsWith(Globals.MONTHS[i])){
+	public static int getMonthNumber(String month) {
+
+		month = month.replaceAll("#", "").toLowerCase();
+
+		for (int i = 0; i < Globals.MONTHS.length; i++) {
+			if (month.startsWith(Globals.MONTHS[i])) {
 				return i;
 			}
 		}
-		
+
 		try {
 			return Integer.parseInt(month) - 1;
-		} catch (NumberFormatException e){
+		} catch (NumberFormatException e) {
 		}
 		return -1;
 	}
