@@ -45,6 +45,13 @@ public class PushToEmacs implements PushToApplication {
         couldNotRunClient=false;
         StringBuffer command = new StringBuffer("(insert\"\\\\")
                 .append(Globals.prefs.get("citeCommand")).append("{");
+         // Trickiness required for Emacs under Windoze:
+         // wincommand = "(insert \\\"\\\\cite{Blah2001}\\\")";
+         // so that cmd receives: (insert \"\\cite{Blah2001}\")
+         // so that emacs receives: (insert "\cite{Blah2001}")
+         // so that emacs inserts: \cite{Blah2001}
+         String wincommand = "(insert \\\"\\\\" +
+            Globals.prefs.get("citeCommand") + "{" + keys + "}\\\")";
 
         try {
             command.append(keys);
@@ -55,7 +62,7 @@ public class PushToEmacs implements PushToApplication {
 		:
 		// Linux client:
 		new String[]{"gnuclient", "-batch", "-eval",
-			       command.toString()};
+			       wincommand};
             final Process p = Runtime.getRuntime().exec(com);
 
             Runnable errorListener = new Runnable() {
