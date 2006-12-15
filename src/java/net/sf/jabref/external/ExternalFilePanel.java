@@ -144,7 +144,7 @@ public class ExternalFilePanel extends JPanel {
 			frame.output(s);
 	}
 
-	public void pushXMP(String fieldName, FieldEditor editor) {
+	public void pushXMP(String fieldName, final FieldEditor editor) {
 
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(fieldName);
@@ -161,22 +161,32 @@ public class ExternalFilePanel extends JPanel {
 
 		if (file == null) {
 			output(Globals.lang("No file associated"));
+			return;
 		}
+		
+		final File finalFile = file;
 
-		try {
-			XMPUtil.writeXMP(file, getEntry());
-			output(Globals.lang("Wrote BibtexEntry as XMP to " + file.getName()));
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(editor.getParent(), Globals
-				.lang("Error writing XMP to file: " + e.getLocalizedMessage()), Globals
-				.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-			Globals.logger("Error while writing XMP " + file.getAbsolutePath());
-		} catch (TransformerException e) {
-			JOptionPane.showMessageDialog(editor.getParent(), Globals
-				.lang("Error converting Bibtex to XMP: " + e.getLocalizedMessage()), Globals
-				.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
-			Globals.logger("Error while converting BibtexEntry to XMP " + file.getAbsolutePath());
-		}
+		(new Thread() {
+			public void run() {
+				output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
+				try {
+					XMPUtil.writeXMP(finalFile, getEntry());
+					output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
+						"Error writing XMP to file: %0", e.getLocalizedMessage()), Globals
+						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+					Globals.logger(Globals.lang("Error while writing XMP %0", finalFile
+						.getAbsolutePath()));
+				} catch (TransformerException e) {
+					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
+						"Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), Globals
+						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
+					Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
+						finalFile.getAbsolutePath()));
+				}
+			}
+		}).start();
 	}
 
 	public void browseFile(final String fieldName, final FieldEditor editor) {
