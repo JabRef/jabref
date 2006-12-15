@@ -71,6 +71,7 @@ public class PushToEmacs implements PushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (sb.toString().trim().length() > 0) {
+			System.out.println(sb.toString());
                         couldNotConnect = true;
                         return;
                     }
