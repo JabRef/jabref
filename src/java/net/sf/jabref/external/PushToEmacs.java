@@ -49,8 +49,13 @@ public class PushToEmacs implements PushToApplication {
         try {
             command.append(keys);
             command.append("}\")");
-            String[] com = new String[]{"gnuclient", "-batch", "-eval",
-                command.toString()};
+            String[] com = Globals.ON_WIN ?
+		// Windows gnuclient:
+		new String[] {"gnuclient", "-qe", "'"+command.toString()+"'"}
+		:
+		// Linux client:
+		new String[]{"gnuclient", "-batch", "-eval",
+			       command.toString()};
             final Process p = Runtime.getRuntime().exec(com);
 
             Runnable errorListener = new Runnable() {
