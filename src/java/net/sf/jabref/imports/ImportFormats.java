@@ -97,7 +97,6 @@ public class ImportFormats {
                                 Globals.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-
                     ImportMenuItem imi = new ImportMenuItem(frame,
                             openInNew, format);
                     imi.automatedImport(new String[] {file.getAbsolutePath()});

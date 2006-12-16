@@ -368,6 +368,7 @@ public class LabelPatternUtil {
         // No dupes found, so we can just go ahead.
         if (!_label.equals(oldKey))
             _db.setCiteKeyForEntry(_entry.getId(), _label);
+        
     }
     else {
 
@@ -407,7 +408,7 @@ public class LabelPatternUtil {
             _db.setCiteKeyForEntry(_entry.getId(), moddedKey);
         }
     }
-
+    
     return _entry;
     /** End of edit, Morten Alver 2004.02.04.  */
 

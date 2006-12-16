@@ -81,7 +81,9 @@ appear in your chosen languages.
 
 Change log:
 
-2.2b3	- Modified quick jump behaviour so sequences of letters can be found. Timeout or
+2.2b3	- Option to autogenerate key for imported entries now also affects entries imported
+          without using the import inspection window.
+        - Modified quick jump behaviour so sequences of letters can be found. Timeout or
           ESC resets the search.
         - [ 1570570 ] New Feature: Deselect all duplicates on import
 		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///

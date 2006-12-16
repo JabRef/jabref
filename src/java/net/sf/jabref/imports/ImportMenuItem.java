@@ -1,6 +1,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -135,6 +136,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         diag.setVisible(true);
                         diag.toFront();
                     } else {
+                        boolean generateKeys = Globals.prefs.getBoolean("generateKeysAfterInspection");
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
                         for (Iterator i = bibtexResult.getDatabase().getEntries().iterator();
                              i.hasNext();) {
@@ -158,6 +160,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                 // Add the entry, if we are supposed to:
                                 if (keepEntry) {
                                     toAddTo.insertEntry(entry);
+                                    // Generate key, if we are supposed to:
+                                    if (generateKeys) {
+                                        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), toAddTo, entry);
+                                        //System.out.println("gen:"+entry.getCiteKey());
+                                    }
+                                    
                                     ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
                                 }
                             } catch (KeyCollisionException e) {

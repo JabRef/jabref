@@ -38,7 +38,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	
     private JCheckBox dontOverwrite = new JCheckBox(Globals.lang("Do not overwrite existing keys")),
         warnBeforeOverwriting = new JCheckBox(Globals.lang("Warn before overwriting existing keys")),
-        generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)"));
+        generateOnSave = new JCheckBox(Globals.lang("Generate keys before saving (for entries without a key)")),
+        autoGenerateOnImport = new JCheckBox(Globals.lang("Generate keys for imported entries"));
 
 
     private JLabel lblEntryType, lblKeyPattern;
@@ -84,6 +85,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
          //Globals.prefs.put("basenamePatternReplacement", basenamePatternReplacement.getText());
          Globals.prefs.put("KeyPatternRegex", KeyPatternRegex.getText());
          Globals.prefs.put("KeyPatternReplacement", KeyPatternReplacement.getText());
+         Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerateOnImport.isSelected());
          Globals.prefs.putBoolean("generateKeysBeforeSaving", generateOnSave.isSelected());
          LabelPatternUtil.updateDefaultPattern();
 
@@ -268,6 +270,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
         builder.nextLine();
         builder.append(pan);
+        builder.append(autoGenerateOnImport);
+        builder.nextLine();
+        builder.append(pan);
         builder.append(warnBeforeOverwriting);
         builder.append(dontOverwrite);
         builder.nextLine();
@@ -388,6 +393,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         defaultPat.setText(Globals.prefs.get("defaultLabelPattern"));
         dontOverwrite.setSelected(Globals.prefs.getBoolean("avoidOverwritingKey"));
         generateOnSave.setSelected(Globals.prefs.getBoolean("generateKeysBeforeSaving"));
+        autoGenerateOnImport.setSelected(Globals.prefs.getBoolean("generateKeysAfterInspection"));
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
