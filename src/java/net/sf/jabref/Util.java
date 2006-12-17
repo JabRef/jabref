@@ -173,7 +173,6 @@ public class Util {
 
 	public synchronized static String createNeutralId() {
 		return idFormat.format(idCounter++);
-		// return String.valueOf(idCounter++);
 	}
 
 	/**
