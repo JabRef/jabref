@@ -144,30 +144,34 @@ public class ExternalFilePanel extends JPanel {
 			frame.output(s);
 	}
 
-	public void pushXMP(String fieldName, final FieldEditor editor) {
+	public void pushXMP(final String fieldName, final FieldEditor editor) {
 
-		// Find the default directory for this field type, if any:
-		String dir = metaData.getFileDirectory(fieldName);
-		File file = null;
-		if (dir != null) {
-			File tmp = Util.expandFilename(editor.getText(), new String[] { dir, "." });
-			if (tmp != null)
-				file = tmp;
-		}
-
-		if (file == null) {
-			file = new File(editor.getText());
-		}
-
-		if (file == null) {
-			output(Globals.lang("No file associated"));
-			return;
-		}
-		
-		final File finalFile = file;
 
 		(new Thread() {
 			public void run() {
+
+				output(Globals.lang("Looking for pdf..."));
+				
+				// Find the default directory for this field type, if any:
+				String dir = metaData.getFileDirectory(fieldName);
+				File file = null;
+				if (dir != null) {
+					File tmp = Util.expandFilename(editor.getText(), new String[] { dir, "." });
+					if (tmp != null)
+						file = tmp;
+				}
+
+				if (file == null) {
+					file = new File(editor.getText());
+				}
+
+				if (file == null) {
+					output(Globals.lang("No file associated"));
+					return;
+				}
+				
+				final File finalFile = file;
+
 				output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
 				try {
 					XMPUtil.writeXMP(finalFile, getEntry());
@@ -178,12 +182,15 @@ public class ExternalFilePanel extends JPanel {
 						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
 					Globals.logger(Globals.lang("Error while writing XMP %0", finalFile
 						.getAbsolutePath()));
+					output(Globals.lang("Error writing XMP to '%0'...", finalFile.getName()));
+					
 				} catch (TransformerException e) {
 					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
 						"Error converting Bibtex to XMP: %0", e.getLocalizedMessage()), Globals
 						.lang("Writing XMP"), JOptionPane.ERROR_MESSAGE);
 					Globals.logger(Globals.lang("Error while converting BibtexEntry to XMP %0",
 						finalFile.getAbsolutePath()));
+					output(Globals.lang("Error converting XMP to '%0'...", finalFile.getName()));
 				}
 			}
 		}).start();

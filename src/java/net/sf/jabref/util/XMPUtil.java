@@ -9,31 +9,58 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.Util;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 
+import org.jempbox.impl.DateConverter;
 import org.jempbox.impl.XMLUtil;
 import org.jempbox.xmp.XMPMetadata;
+import org.jempbox.xmp.XMPSchema;
+import org.jempbox.xmp.XMPSchemaDublinCore;
+import org.pdfbox.cos.COSDictionary;
+import org.pdfbox.cos.COSName;
 import org.pdfbox.exceptions.COSVisitorException;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentCatalog;
+import org.pdfbox.pdmodel.PDDocumentInformation;
 import org.pdfbox.pdmodel.common.PDMetadata;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * XMPUtils provide support for reading and writing BibTex data as XMP-Metadata
  * in PDF-documents.
  * 
  * @author Christopher Oezbek <oezi@oezi.de>
+ * 
+ * TODO:
+ * 
+ * Also read information from Dublin Core and Document Information if BibtexXMP
+ * is missing.
+ * 
+ * Also write information as Dublin Core and Document Information.
+ * 
+ * Synchronization
  * 
  * @version $Revision$ ($Date$)
  */
@@ -78,8 +105,7 @@ public class XMPUtil {
 	}
 
 	/**
-	 * Try to read the given BibTexEntry from the XMP-stream of the given
-	 * PDF-file.
+	 * Try to read the BibTexEntries from the XMP-stream of the given PDF-file.
 	 * 
 	 * @param file
 	 *            The file to read from.
@@ -110,22 +136,270 @@ public class XMPUtil {
 	 */
 	public static List readXMP(InputStream inputStream) throws IOException {
 
-		XMPMetadata meta = readRawXMP(inputStream);
-
-		// If we did not find any metadata, there is nothing to return.
-		if (meta == null)
-			return null;
-
-		List schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
 		List result = new LinkedList();
 
-		Iterator it = schemas.iterator();
-		while (it.hasNext()) {
-			XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
+		PDDocument document = null;
 
-			result.add(bib.getBibtexEntry());
+		try {
+			document = PDDocument.load(inputStream);
+			if (document.isEncrypted()) {
+				throw new EncryptionNotSupportedException(
+					"Error: Cannot read metadata from encrypted document.");
+			}
+
+			XMPMetadata meta = getXMPMetadata(document);
+
+			// If we did not find any metadata, there is nothing to return.
+			if (meta == null)
+				return null;
+
+			List schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+
+			Iterator it = schemas.iterator();
+			while (it.hasNext()) {
+				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
+
+				result.add(bib.getBibtexEntry());
+			}
+
+			// If we did not find anything have a look if a Dublin Core exists
+			if (result.size() == 0) {
+				schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+				it = schemas.iterator();
+				while (it.hasNext()) {
+					XMPSchemaDublinCore dc = (XMPSchemaDublinCore) it.next();
+
+					BibtexEntry entry = getBibtexEntryFromDublinCore(dc);
+
+					if (entry != null)
+						result.add(entry);
+				}
+			}
+
+			if (result.size() == 0) {
+				BibtexEntry entry = getBibtexEntryFromDocumentInformation(document
+					.getDocumentInformation());
+
+				if (entry != null)
+					result.add(entry);
+			}
+		} finally {
+			if (document != null)
+				document.close();
 		}
 		return result;
+	}
+
+	public static BibtexEntry getBibtexEntryFromDocumentInformation(PDDocumentInformation di) {
+
+		BibtexEntry entry = new BibtexEntry();
+
+		String s = di.getAuthor();
+		if (s != null)
+			entry.setField("author", s);
+
+		s = di.getTitle();
+		if (s != null)
+			entry.setField("title", s);
+
+		s = di.getKeywords();
+		if (s != null)
+			entry.setField("keywords", s);
+
+		s = di.getSubject();
+		if (s != null)
+			entry.setField("abstract", s);
+
+		COSDictionary dict = di.getDictionary();
+		Iterator it = dict.keyList().iterator();
+		while (it.hasNext()) {
+			String key = ((COSName) it.next()).getName();
+			if (key.startsWith("bibtex/")) {
+				String value = dict.getString(key);
+				key = key.substring("bibtex/".length());
+				if (key.equals("entrytype")) {
+					BibtexEntryType type = BibtexEntryType.getStandardType(value);
+					if (type != null)
+						entry.setType(type);
+				} else
+					entry.setField(key, value);
+			}
+		}
+
+		// Return null if no values were found
+		return (entry.getAllFields().length > 0 ? entry : null);
+	}
+
+	public static BibtexEntry getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema) {
+
+		BibtexEntry entry = new BibtexEntry();
+
+		/**
+		 * Contributor -> Editor
+		 */
+		List contributors = dcSchema.getContributors();
+		if (contributors != null) {
+			Iterator it = contributors.iterator();
+			StringBuffer sb = null;
+			while (it.hasNext()) {
+				if (sb != null) {
+					sb.append(" and ");
+				} else {
+					sb = new StringBuffer();
+				}
+				sb.append(it.next());
+			}
+			if (sb != null)
+				entry.setField("editor", sb.toString());
+		}
+
+		/**
+		 * Author -> Creator
+		 */
+		List creators = dcSchema.getCreators();
+		if (creators != null) {
+			Iterator it = creators.iterator();
+			StringBuffer sb = null;
+			while (it.hasNext()) {
+				if (sb != null) {
+					sb.append(" and ");
+				} else {
+					sb = new StringBuffer();
+				}
+				sb.append(it.next());
+			}
+			if (sb != null)
+				entry.setField("author", sb.toString());
+		}
+
+		/**
+		 * Year + Month -> Date
+		 */
+		List dates = dcSchema.getSequenceList("dc:date");
+		if (dates != null && dates.size() > 0) {
+			String date = ((String) dates.get(0)).trim();
+			Calendar c = null;
+			try {
+				c = DateConverter.toCalendar(date);
+			} catch (Exception e) {
+
+			}
+			if (c != null) {
+				entry.setField("year", String.valueOf(c.get(Calendar.YEAR)));
+				if (date.length() > 4) {
+					entry.setField("month", Globals.MONTHS[c.get(Calendar.MONTH)]);
+				}
+			}
+		}
+
+		/**
+		 * Abstract -> Description
+		 */
+		String s = dcSchema.getDescription();
+		if (s != null)
+			entry.setField("abstract", s);
+
+		/**
+		 * Identifier -> DOI
+		 */
+		s = dcSchema.getIdentifier();
+		if (s != null)
+			entry.setField("doi", s);
+
+		/**
+		 * Publisher -> Publisher
+		 */
+		List publishers = dcSchema.getPublishers();
+		if (publishers != null) {
+			Iterator it = dcSchema.getPublishers().iterator();
+			StringBuffer sb = null;
+			while (it.hasNext()) {
+				if (sb != null) {
+					sb.append(" and ");
+				} else {
+					sb = new StringBuffer();
+				}
+				sb.append(it.next());
+			}
+			if (sb != null)
+				entry.setField("publishers", sb.toString());
+		}
+
+		/**
+		 * Relation -> bibtexkey
+		 * 
+		 * We abuse the relationship attribute to store all other values in the
+		 * bibtex document
+		 */
+		List relationships = dcSchema.getRelationships();
+		if (relationships != null) {
+			Iterator it = relationships.iterator();
+			while (it.hasNext()) {
+				s = (String) it.next();
+				if (s.startsWith("bibtex/")) {
+					s = s.substring("bibtex/".length());
+					int i = s.indexOf('/');
+					if (i != -1) {
+						entry.setField(s.substring(0, i), s.substring(i + 1));
+					}
+				}
+			}
+		}
+
+		/**
+		 * Rights -> Rights
+		 */
+		s = dcSchema.getRights();
+		if (s != null)
+			entry.setField("rights", s);
+
+		/**
+		 * Source -> Source
+		 */
+		s = dcSchema.getSource();
+		if (s != null)
+			entry.setField("source", s);
+
+		/**
+		 * Subject -> Keywords
+		 */
+		List subjects = dcSchema.getSubjects();
+		if (subjects != null) {
+			Iterator it = subjects.iterator();
+			StringBuffer sb = null;
+			while (it.hasNext()) {
+				if (sb != null) {
+					sb.append(", ");
+				} else {
+					sb = new StringBuffer();
+				}
+				sb.append(it.next());
+			}
+			if (sb != null)
+				entry.setField("keywords", sb.toString());
+		}
+
+		/**
+		 * Title -> Title
+		 */
+		s = dcSchema.getTitle();
+		if (s != null)
+			entry.setField("title", s);
+
+		/**
+		 * Type -> Type
+		 */
+		List l = dcSchema.getTypes();
+		if (l != null && l.size() > 0) {
+			s = (String) l.get(0);
+			if (s != null) {
+				BibtexEntryType type = BibtexEntryType.getStandardType(s);
+				if (type != null)
+					entry.setType(type);
+			}
+		}
+
+		return (entry.getAllFields().length > 0 ? entry : null);
 	}
 
 	/**
@@ -153,7 +427,7 @@ public class XMPUtil {
 		TransformerException {
 		List l = new LinkedList();
 		l.add(entry);
-		writeXMP(file, l);
+		writeXMP(file, l, true);
 	}
 
 	/**
@@ -182,7 +456,6 @@ public class XMPUtil {
 		}
 
 		x.save(outputStream);
-
 	}
 
 	/**
@@ -227,21 +500,26 @@ public class XMPUtil {
 				throw new EncryptionNotSupportedException(
 					"Error: Cannot read metadata from encrypted document.");
 			}
-			PDDocumentCatalog catalog = document.getDocumentCatalog();
-			PDMetadata metaRaw = catalog.getMetadata();
 
-			if (metaRaw == null) {
-				return null;
-			}
-
-			XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-			meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
-			return meta;
+			return getXMPMetadata(document);
 
 		} finally {
 			if (document != null)
 				document.close();
 		}
+	}
+
+	protected static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
+		PDDocumentCatalog catalog = document.getDocumentCatalog();
+		PDMetadata metaRaw = catalog.getMetadata();
+
+		if (metaRaw == null) {
+			return null;
+		}
+
+		XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+		meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+		return meta;
 	}
 
 	/**
@@ -263,6 +541,388 @@ public class XMPUtil {
 		}
 	}
 
+	protected static void writeToDCSchema(XMPSchemaDublinCore dcSchema, BibtexEntry entry) {
+
+		// Set all the values including key and entryType
+		Object[] fields = entry.getAllFields();
+
+		for (int j = 0; j < fields.length; j++) {
+
+			if (fields[j].equals("editor")) {
+				String o = entry.getField(fields[j].toString()).toString();
+
+				/**
+				 * Editor -> Contributor
+				 * 
+				 * Field: dc:contributor
+				 * 
+				 * Type: bag ProperName
+				 * 
+				 * Category: External
+				 * 
+				 * Description: Contributors to the resource (other than the
+				 * authors).
+				 * 
+				 * Bibtex-Fields used: editor
+				 */
+
+				String authors = o.toString();
+				AuthorList list = AuthorList.getAuthorList(authors);
+
+				int n = list.size();
+				for (int i = 0; i < n; i++) {
+					dcSchema.addContributor(list.getAuthor(i).getFirstLast(false));
+				}
+				continue;
+			}
+
+			/**
+			 * ? -> Coverage
+			 * 
+			 * Unmapped
+			 * 
+			 * dc:coverage Text External The extent or scope of the resource.
+			 */
+
+			/**
+			 * Author -> Creator
+			 * 
+			 * Field: dc:creator
+			 * 
+			 * Type: seq ProperName
+			 * 
+			 * Category: External
+			 * 
+			 * Description: The authors of the resource (listed in order of
+			 * precedence, if significant).
+			 * 
+			 * Bibtex-Fields used: author
+			 */
+			if (fields[j].equals("author")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				String authors = o.toString();
+				AuthorList list = AuthorList.getAuthorList(authors);
+
+				int n = list.size();
+				for (int i = 0; i < n; i++) {
+					dcSchema.addCreator(list.getAuthor(i).getFirstLast(false));
+				}
+				continue;
+			}
+
+			if (fields[j].equals("month")) {
+				// Dealt with in year
+				continue;
+			}
+
+			if (fields[j].equals("year")) {
+
+				/**
+				 * Year + Month -> Date
+				 * 
+				 * Field: dc:date
+				 * 
+				 * Type: seq Date
+				 * 
+				 * Category: External
+				 * 
+				 * Description: Date(s) that something interesting happened to
+				 * the resource.
+				 * 
+				 * Bibtex-Fields used: year, month
+				 */
+				String publicationDate = Util.getPublicationDate(entry);
+				if (publicationDate != null) {
+					dcSchema.addSequenceValue("dc:date", publicationDate);
+				}
+				continue;
+			}
+			/**
+			 * Abstract -> Description
+			 * 
+			 * Field: dc:description
+			 * 
+			 * Type: Lang Alt
+			 * 
+			 * Category: External
+			 * 
+			 * Description: A textual description of the content of the
+			 * resource. Multiple values may be present for different languages.
+			 * 
+			 * Bibtex-Fields used: abstract
+			 */
+			if (fields[j].equals("abstract")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				dcSchema.setDescription(o.toString());
+				continue;
+			}
+
+			/**
+			 * DOI -> identifier
+			 * 
+			 * Field: dc:identifier
+			 * 
+			 * Type: Text
+			 * 
+			 * Category: External
+			 * 
+			 * Description: Unique identifier of the resource.
+			 * 
+			 * Bibtex-Fields used: doi
+			 */
+			if (fields[j].equals("doi")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				dcSchema.setIdentifier(o.toString());
+				continue;
+			}
+
+			/**
+			 * ? -> Language
+			 * 
+			 * Unmapped
+			 * 
+			 * dc:language bag Locale Internal An unordered array specifying the
+			 * languages used in the resource.
+			 */
+
+			/**
+			 * Publisher -> Publisher
+			 * 
+			 * Field: dc:publisher
+			 * 
+			 * Type: bag ProperName
+			 * 
+			 * Category: External
+			 * 
+			 * Description: Publishers.
+			 * 
+			 * Bibtex-Fields used: doi
+			 */
+			if (fields[j].equals("publisher")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				dcSchema.addPublisher(o.toString());
+				continue;
+			}
+
+			/**
+			 * ? -> Rights
+			 * 
+			 * Unmapped
+			 * 
+			 * dc:rights Lang Alt External Informal rights statement, selected
+			 * by language.
+			 */
+
+			/**
+			 * ? -> Source
+			 * 
+			 * Unmapped
+			 * 
+			 * dc:source Text External Unique identifier of the work from which
+			 * this resource was derived.
+			 */
+
+			/**
+			 * Keywords -> Subject
+			 * 
+			 * Field: dc:subject
+			 * 
+			 * Type: bag Text
+			 * 
+			 * Category: External
+			 * 
+			 * Description: An unordered array of descriptive phrases or
+			 * keywords that specify the topic of the content of the resource.
+			 * 
+			 * Bibtex-Fields used: doi
+			 */
+			if (fields[j].equals("keywords")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				String[] keywords = o.toString().split(",");
+				for (int i = 0; i < keywords.length; i++) {
+					dcSchema.addSubject(keywords[i].trim());
+				}
+				continue;
+			}
+
+			/**
+			 * Title -> Title
+			 * 
+			 * Field: dc:title
+			 * 
+			 * Type: Lang Alt
+			 * 
+			 * Category: External
+			 * 
+			 * Description: The title of the document, or the name given to the
+			 * resource. Typically, it will be a name by which the resource is
+			 * formally known.
+			 * 
+			 * Bibtex-Fields used: title
+			 */
+			if (fields[j].equals("title")) {
+				String o = entry.getField(fields[j].toString()).toString();
+				dcSchema.setTitle(o.toString());
+				continue;
+			}
+
+			/**
+			 * bibtextype -> relation
+			 * 
+			 * Field: dc:relation
+			 * 
+			 * Type: bag Text
+			 * 
+			 * Category: External
+			 * 
+			 * Description: Relationships to other documents.
+			 * 
+			 * Bibtex-Fields used: bibtextype
+			 */
+			/**
+			 * All others (including the bibtex key) get packaged in the
+			 * relation attribute
+			 */
+			String o = entry.getField(fields[j].toString()).toString();
+			dcSchema.addRelation("bibtex/" + fields[j].toString() + "/" + o);
+		}
+
+		/**
+		 * ? -> Format
+		 * 
+		 * Unmapped
+		 * 
+		 * dc:format MIMEType Internal The file format used when saving the
+		 * resource. Tools and applications should set this property to the save
+		 * format of the data. It may include appropriate qualifiers.
+		 */
+		dcSchema.setFormat("application/pdf");
+
+		/**
+		 * Type -> Type
+		 * 
+		 * Field: dc:type
+		 * 
+		 * Type: bag open Choice
+		 * 
+		 * Category: External
+		 * 
+		 * Description: A document type; for example, novel, poem, or working
+		 * paper.
+		 * 
+		 * Bibtex-Fields used: title
+		 */
+		Object o = entry.getType().getName();
+		if (o != null)
+			dcSchema.addType(o.toString());
+	}
+
+	/**
+	 * Try to write the given BibTexEntry as a DublinCore XMP Schema
+	 * 
+	 * Existing DublinCore schemas in the document are not modified.
+	 * 
+	 * @param document
+	 *            The pdf document to write to.
+	 * @param entry
+	 *            The Bibtex entry that is written as a schema.
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
+	public static void writeDublinCore(PDDocument document, BibtexEntry entry) throws IOException,
+		TransformerException {
+
+		List l = new ArrayList();
+		l.add(entry);
+
+		writeDublinCore(document, l);
+	}
+
+	/**
+	 * Try to write the given BibTexEntries as DublinCore XMP Schemas
+	 * 
+	 * Existing DublinCore schemas in the document are removed
+	 * 
+	 * @param document
+	 *            The pdf document to write to.
+	 * @param c
+	 *            The Bibtex entries that are written as schemas
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
+	public static void writeDublinCore(PDDocument document, Collection c) throws IOException,
+		TransformerException {
+
+		PDDocumentCatalog catalog = document.getDocumentCatalog();
+		PDMetadata metaRaw = catalog.getMetadata();
+
+		XMPMetadata meta;
+		if (metaRaw != null) {
+			meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+		} else {
+			meta = new XMPMetadata();
+		}
+
+		// Remove all current Dublin-Core schemas
+		List schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+		Iterator it = schemas.iterator();
+		while (it.hasNext()) {
+			XMPSchema bib = (XMPSchema) it.next();
+			bib.getElement().getParentNode().removeChild(bib.getElement());
+		}
+
+		it = c.iterator();
+		while (it.hasNext()) {
+			BibtexEntry entry = (BibtexEntry) it.next();
+			XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
+			writeToDCSchema(dcSchema, entry);
+			meta.addSchema(dcSchema);
+		}
+
+		// Save to stream and then input that stream to the PDF
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		meta.save(os);
+		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+		PDMetadata metadataStream = new PDMetadata(document, is, false);
+		catalog.setMetadata(metadataStream);
+	}
+
+	/**
+	 * Try to write the given BibTexEntry in the Document Information (the
+	 * properties of the pdf).
+	 * 
+	 * Existing fields values are overriden if the bibtex entry has the
+	 * corresponding value set.
+	 * 
+	 * @param document
+	 *            The pdf document to write to.
+	 * @param entry
+	 *            The Bibtex entry that is written into the PDF properties.
+	 */
+	public static void writeDocumentInformation(PDDocument document, BibtexEntry entry) {
+
+		PDDocumentInformation di = document.getDocumentInformation();
+
+		// Set all the values including key and entryType
+		Object[] fields = entry.getAllFields();
+
+		for (int i = 0; i < fields.length; i++) {
+			if (fields[i].equals("author")) {
+				di.setAuthor(entry.getField("author").toString());
+			} else if (fields[i].equals("title")) {
+				di.setTitle(entry.getField("title").toString());
+			} else if (fields[i].equals("keywords")) {
+				di.setKeywords(entry.getField("keywords").toString());
+			} else if (fields[i].equals("abstract")) {
+				di.setSubject(entry.getField("abstract").toString());
+			} else {
+				di.setCustomMetadataValue("bibtex/" + fields[i].toString(), entry.getField(
+					fields[i].toString()).toString());
+			}
+		}
+		di.setCustomMetadataValue("bibtex/entrytype", entry.getType().getName());
+	}
+
 	/**
 	 * Try to write the given BibTexEntry in the XMP-stream of the given
 	 * PDF-file.
@@ -277,13 +937,15 @@ public class XMPUtil {
 	 *            The file to write the entries to.
 	 * @param bibtexEntries
 	 *            The entries to write to the file.
+	 * @param writePDFInfo
+	 *            Write information also in PDF document properties
 	 * @throws TransformerException
 	 *             If the entry was malformed or unsupported.
 	 * @throws IOException
 	 *             If the file could not be written to or could not be found.
 	 */
-	public static void writeXMP(File file, Collection bibtexEntries) throws IOException,
-		TransformerException {
+	public static void writeXMP(File file, Collection bibtexEntries, boolean writePDFInfo)
+		throws IOException, TransformerException {
 
 		PDDocument document = null;
 
@@ -293,6 +955,12 @@ public class XMPUtil {
 				throw new EncryptionNotSupportedException(
 					"Error: Cannot add metadata to encrypted document.");
 			}
+
+			if (writePDFInfo && bibtexEntries.size() == 1) {
+				writeDocumentInformation(document, (BibtexEntry) bibtexEntries.iterator().next());
+				writeDublinCore(document, bibtexEntries);
+			}
+
 			PDDocumentCatalog catalog = document.getDocumentCatalog();
 			PDMetadata metaRaw = catalog.getMetadata();
 
@@ -450,7 +1118,7 @@ public class XMPUtil {
 				if (c.size() == 0) {
 					System.err.println("Could not find BibtexEntry in " + args[0]);
 				} else {
-					XMPUtil.writeXMP(new File(args[1]), c);
+					XMPUtil.writeXMP(new File(args[1]), c, false);
 					System.out.println("XMP written.");
 				}
 				break;
@@ -488,7 +1156,7 @@ public class XMPUtil {
 	 * Will try to read XMP metadata from the given file, returning whether
 	 * metadata was found.
 	 * 
-	 * Caution: This method is as expensive as reading the actual metadata
+	 * Caution: This method is as expensive as it is reading the actual metadata
 	 * itself from the PDF.
 	 * 
 	 * @param is

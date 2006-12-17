@@ -38,6 +38,7 @@ import org.jempbox.xmp.XMPSchemaMediaManagement;
 import org.pdfbox.exceptions.COSVisitorException;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentCatalog;
+import org.pdfbox.pdmodel.PDDocumentInformation;
 import org.pdfbox.pdmodel.PDPage;
 import org.pdfbox.pdmodel.common.PDMetadata;
 import org.pdfbox.util.XMLUtil;
@@ -177,12 +178,19 @@ public class XMPUtilTest extends TestCase {
 	}
 
 	public BibtexEntry t3BibtexEntry() {
-		BibtexEntry e = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.OTHER);
+		BibtexEntry e = new BibtexEntry();
+		e.setType(BibtexEntryType.INPROCEEDINGS);
 		e.setField("title", "Hypersonic ultra-sound");
 		e.setField("bibtexkey", "Clarkson06");
 		e.setField("author", "Kelly Clarkson and Ozzy Osbourne");
+		e.setField("journal", "International Journal of High Fidelity");
+		e.setField("booktitle", "Catch-22");
 		e.setField("editor", "Huey Duck and Dewey Duck and Louie Duck");
 		e.setField("pdf", "YeKis03 - Towards.pdf");
+		e.setField("keywords", "peanut,butter,jelly");
+		e.setField("year", "1982");
+		e.setField("month", "#jul#");
+		e.setField("abstract", "The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
 		return e;
 	}
 
@@ -196,7 +204,14 @@ public class XMPUtilTest extends TestCase {
 			+ "  <rdf:li>Ozzy Osbourne</rdf:li>" + "</rdf:Seq></bibtex:author>"
 			+ "<bibtex:editor><rdf:Seq>" + "  <rdf:li>Huey Duck</rdf:li>"
 			+ "  <rdf:li>Dewey Duck</rdf:li>" + "  <rdf:li>Louie Duck</rdf:li>"
-			+ "</rdf:Seq></bibtex:editor>" + "<bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>");
+			+ "</rdf:Seq></bibtex:editor>" + "<bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>"
+			+ "<bibtex:journal>Internation Journal of High Fidelity</bibtex:journal>"
+			+ "<bibtex:booktitle>Catch-22</bibtex:booktitle>"
+			+ "<bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>"
+			+ "<bibtex:keywords>peanut,butter,jelly</bibtex:keywords>"
+			+ "<bibtex:entrytype>Inproceedings</bibtex:entrytype>"
+			+ "<bibtex:year>1982</bibtex:year>" + "<bibtex:month>#jul#</bibtex:month>" +
+					"<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
 	}
 
 	/**
@@ -430,8 +445,8 @@ public class XMPUtilTest extends TestCase {
 
 		{
 			String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
-				+ "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n" +
-						"<bibtex:abstract>\n\nAbstract preserve\n\t Whitespace\n\n</bibtex:abstract>";
+				+ "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n"
+				+ "<bibtex:abstract>\n\nAbstract preserve\n\t Whitespace\n\n</bibtex:abstract>";
 
 			writeManually(pdfFile, bibtexXPacket(bibtexDescription(bibtex)));
 
@@ -492,14 +507,34 @@ public class XMPUtilTest extends TestCase {
 			+ "  <xapMM:VersionID>" + "   <rdf:Seq>" + "    <rdf:li>17</rdf:li>" + "   </rdf:Seq>"
 			+ "  </xapMM:VersionID>" + " </rdf:Description>" + ""
 			+ " <rdf:Description rdf:about=''" + "  xmlns:dc='http://purl.org/dc/elements/1.1/'>"
+			+ "  <dc:format>application/pdf</dc:format>" + "</rdf:Description>";
+
+		writeManually(pdfFile, bibtexXPacket(s));
+
+		// Nothing there yet, but should not crash
+		assertEquals(0, XMPUtil.readXMP(pdfFile).size());
+
+		s = " <rdf:Description rdf:about=''" + "  xmlns:xmp='http://ns.adobe.com/xap/1.0/'>"
+			+ "  <xmp:CreatorTool>Acrobat PDFMaker 7.0.7</xmp:CreatorTool>"
+			+ "  <xmp:ModifyDate>2006-08-07T18:50:24+02:00</xmp:ModifyDate>"
+			+ "  <xmp:CreateDate>2006-08-07T14:44:24+02:00</xmp:CreateDate>"
+			+ "  <xmp:MetadataDate>2006-08-07T18:50:24+02:00</xmp:MetadataDate>"
+			+ " </rdf:Description>" + "" + " <rdf:Description rdf:about=''"
+			+ "  xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/'>"
+			+ "  <xapMM:DocumentID>uuid:843cd67d-495e-4c1e-a4cd-64178f6b3299</xapMM:DocumentID>"
+			+ "  <xapMM:InstanceID>uuid:1e56b4c0-6782-440d-ba76-d2b3d87547d1</xapMM:InstanceID>"
+			+ "  <xapMM:VersionID>" + "   <rdf:Seq>" + "    <rdf:li>17</rdf:li>" + "   </rdf:Seq>"
+			+ "  </xapMM:VersionID>" + " </rdf:Description>" + ""
+			+ " <rdf:Description rdf:about=''" + "  xmlns:dc='http://purl.org/dc/elements/1.1/'>"
 			+ "  <dc:format>application/pdf</dc:format>" + "  <dc:title>" + "   <rdf:Alt>"
 			+ "    <rdf:li xml:lang='x-default'>Questionnaire.pdf</rdf:li>" + "   </rdf:Alt>"
 			+ "  </dc:title>" + "" + "</rdf:Description>";
 
 		writeManually(pdfFile, bibtexXPacket(s));
 
-		// Nothing there yet, but should not crash
-		assertEquals(0, XMPUtil.readXMP(pdfFile).size());
+		// Title is Questionnaire.pdf so the DublinCore fallback should hit
+		// in...
+		assertEquals(1, XMPUtil.readXMP(pdfFile).size());
 
 		{
 			// Now write new packet and check if it was correctly written
@@ -551,7 +586,7 @@ public class XMPUtilTest extends TestCase {
 				Calendar c = Calendar.getInstance();
 				c.clear();
 				c.set(Calendar.YEAR, 2006);
-				c.set(Calendar.MONTH, 8);
+				c.set(Calendar.MONTH, Calendar.AUGUST);
 				c.set(Calendar.DATE, 7);
 				c.set(Calendar.HOUR, 14);
 				c.set(Calendar.MINUTE, 44);
@@ -632,7 +667,7 @@ public class XMPUtilTest extends TestCase {
 				Calendar c = Calendar.getInstance();
 				c.clear();
 				c.set(Calendar.YEAR, 2006);
-				c.set(Calendar.MONTH, 8);
+				c.set(Calendar.MONTH, 7);
 				c.set(Calendar.DATE, 7);
 				c.set(Calendar.HOUR, 14);
 				c.set(Calendar.MINUTE, 44);
@@ -697,6 +732,8 @@ public class XMPUtilTest extends TestCase {
 		assertEquals(expected.getCiteKey(), actual.getCiteKey());
 		assertEquals(expected.getType(), actual.getType());
 
+		assertEquals(expected.getAllFields().length, actual.getAllFields().length);
+
 		Object[] o = expected.getAllFields();
 
 		for (int i = 0; i < o.length; i++) {
@@ -730,7 +767,8 @@ public class XMPUtilTest extends TestCase {
 		assertTrue(0 < xmp.indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
 			|| 0 < xmp.indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
 		assertTrue(0 < xmp.indexOf("<rdf:Description"));
-		assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>") || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
+		assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>")
+			|| 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
 		/* Test contents of string */
 		writeManually(pdfFile, xmp);
@@ -799,7 +837,7 @@ public class XMPUtilTest extends TestCase {
 		l.add(t2BibtexEntry());
 		l.add(t3BibtexEntry());
 
-		XMPUtil.writeXMP(pdfFile, l);
+		XMPUtil.writeXMP(pdfFile, l, false);
 
 		l = XMPUtil.readXMP(pdfFile);
 
@@ -816,6 +854,145 @@ public class XMPUtilTest extends TestCase {
 
 		assertEquals(t2BibtexEntry(), a);
 		assertEquals(t3BibtexEntry(), b);
+	}
+
+	public void testReadWriteDC() throws IOException, TransformerException {
+		List l = new LinkedList();
+		l.add(t3BibtexEntry());
+
+		XMPUtil.writeXMP(pdfFile, l, true);
+
+		PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
+		try {
+			if (document.isEncrypted()) {
+				System.err.println("Error: Cannot add metadata to encrypted document.");
+				System.exit(1);
+			}
+
+			assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation()
+				.getAuthor());
+			assertEquals("Hypersonic ultra-sound", document.getDocumentInformation().getTitle());
+			assertEquals("Huey Duck and Dewey Duck and Louie Duck", document
+				.getDocumentInformation().getCustomMetadataValue("bibtex/editor"));
+			assertEquals("Clarkson06", document.getDocumentInformation().getCustomMetadataValue(
+				"bibtex/bibtexkey"));
+			assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
+
+			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDocumentInformation(document
+				.getDocumentInformation()));
+
+			PDDocumentCatalog catalog = document.getDocumentCatalog();
+			PDMetadata metaRaw = catalog.getMetadata();
+
+			if (metaRaw == null) {
+				fail();
+			}
+
+			XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+			meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+
+			// Check Dublin Core
+			List schemas = meta.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
+
+			assertEquals(1, schemas.size());
+
+			XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas.iterator().next();
+			assertNotNull(dcSchema);
+
+			assertEquals("Hypersonic ultra-sound", dcSchema.getTitle());
+			assertEquals("1982-07", dcSchema.getSequenceList("dc:date").get(0));
+			assertEquals("Kelly Clarkson", dcSchema.getCreators().get(0));
+			assertEquals("Ozzy Osbourne", dcSchema.getCreators().get(1));
+			assertEquals("Huey Duck", dcSchema.getContributors().get(0));
+			assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
+			assertEquals("Louie Duck", dcSchema.getContributors().get(2));
+			assertEquals("Inproceedings", dcSchema.getTypes().get(0));
+			assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+			assertEquals("peanut", dcSchema.getSubjects().get(0));
+			assertEquals("butter", dcSchema.getSubjects().get(1));
+			assertEquals("jelly", dcSchema.getSubjects().get(2));
+
+			/**
+			 * Bibtexkey, Journal, pdf, booktitle
+			 */
+			assertEquals(4, dcSchema.getRelationships().size());
+			
+			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
+
+		} finally {
+			document.close();
+		}
+
+	}
+	
+	
+	public void testWriteSingleUpdatesDCAndInfo() throws IOException, TransformerException {
+		List l = new LinkedList();
+		l.add(t3BibtexEntry());
+
+		XMPUtil.writeXMP(pdfFile, l, true);
+
+		PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile());
+		try {
+			if (document.isEncrypted()) {
+				System.err.println("Error: Cannot add metadata to encrypted document.");
+				System.exit(1);
+			}
+
+			assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation()
+				.getAuthor());
+			assertEquals("Hypersonic ultra-sound", document.getDocumentInformation().getTitle());
+			assertEquals("Huey Duck and Dewey Duck and Louie Duck", document
+				.getDocumentInformation().getCustomMetadataValue("bibtex/editor"));
+			assertEquals("Clarkson06", document.getDocumentInformation().getCustomMetadataValue(
+				"bibtex/bibtexkey"));
+			assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
+
+			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDocumentInformation(document
+				.getDocumentInformation()));
+
+			PDDocumentCatalog catalog = document.getDocumentCatalog();
+			PDMetadata metaRaw = catalog.getMetadata();
+
+			if (metaRaw == null) {
+				fail();
+			}
+
+			XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+			meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+
+			// Check Dublin Core
+			List schemas = meta.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
+
+			assertEquals(1, schemas.size());
+
+			XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas.iterator().next();
+			assertNotNull(dcSchema);
+
+			assertEquals("Hypersonic ultra-sound", dcSchema.getTitle());
+			assertEquals("1982-07", dcSchema.getSequenceList("dc:date").get(0));
+			assertEquals("Kelly Clarkson", dcSchema.getCreators().get(0));
+			assertEquals("Ozzy Osbourne", dcSchema.getCreators().get(1));
+			assertEquals("Huey Duck", dcSchema.getContributors().get(0));
+			assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
+			assertEquals("Louie Duck", dcSchema.getContributors().get(2));
+			assertEquals("Inproceedings", dcSchema.getTypes().get(0));
+			assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+			assertEquals("peanut", dcSchema.getSubjects().get(0));
+			assertEquals("butter", dcSchema.getSubjects().get(1));
+			assertEquals("jelly", dcSchema.getSubjects().get(2));
+
+			/**
+			 * Bibtexkey, Journal, pdf, booktitle
+			 */
+			assertEquals(4, dcSchema.getRelationships().size());
+			
+			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
+
+		} finally {
+			document.close();
+		}
+
 	}
 
 	public void testReadRawXMP() throws Exception {
@@ -840,7 +1017,7 @@ public class XMPUtilTest extends TestCase {
 		XMPMetadata metadata = XMPUtil.readRawXMP(pdfFile);
 
 		List schemas = metadata.getSchemas();
-		assertEquals(1, schemas.size());
+		assertEquals(2, schemas.size());
 		schemas = metadata.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
 		assertEquals(1, schemas.size());
 		XMPSchemaBibtex bib = (XMPSchemaBibtex) schemas.get(0);
@@ -956,14 +1133,15 @@ public class XMPUtilTest extends TestCase {
 			assertTrue(0 < xmp.indexOf("xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'")
 				|| 0 < xmp.indexOf("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
 			assertTrue(0 < xmp.indexOf("<rdf:Description"));
-			assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>") || 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
+			assertTrue(0 < xmp.indexOf("<?xpacket end='w'?>")
+				|| 0 < xmp.indexOf("<?xpacket end=\"w\"?>"));
 
 			/* Test contents of string */
 			writeManually(pdfFile, xmp);
 			List l = XMPUtil.readXMP(pdfFile);
 			assertEquals(1, l.size());
 
-			assertEquals(t1BibtexEntry(), (BibtexEntry)l.get(0));
+			assertEquals(t1BibtexEntry(), (BibtexEntry) l.get(0));
 		}
 	}
 

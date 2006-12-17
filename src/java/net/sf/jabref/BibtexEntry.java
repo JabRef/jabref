@@ -51,6 +51,10 @@ public class BibtexEntry
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit, groupHit;
 
+    public BibtexEntry(){
+    	this(Util.createNeutralId());
+    }
+    
     public BibtexEntry(String id)
     {
         this(id, BibtexEntryType.OTHER);

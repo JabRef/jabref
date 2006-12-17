@@ -46,8 +46,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 * @param element
 	 *            The existing XML element.
 	 */
-	public XMPSchemaBibtex(Element e) {
-		super(e);
+	public XMPSchemaBibtex(Element e, String namespace) {
+		super(e, KEY);
 	}
 
 	protected String makeProperty(String propertyName) {
@@ -123,16 +123,37 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.addSequenceDateValue(makeProperty(field), date);
 	}
 
+	public static String getContents(NodeList seqList){
+		
+		Element seqNode = (Element) seqList.item(0);
+		StringBuffer seq = null;
+
+		NodeList items = seqNode.getElementsByTagName("rdf:li");
+		for (int j = 0; j < items.getLength(); j++) {
+			Element li = (Element) items.item(j);
+			if (seq == null) {
+				seq = new StringBuffer();
+			} else {
+				seq.append(" and ");
+			}
+			seq.append(getTextContent(li));
+		}
+		if (seq != null) {
+			return seq.toString();
+		}
+		return null;
+	}
+	
 	/**
-	 * Returns a map of all properties and their values. LIs in seqs are
-	 * concatenated using " and ".
+	 * Returns a map of all properties and their values. LIs and bags in seqs
+	 * are concatenated using " and ".
 	 * 
 	 * @return Map from name of textproperty (String) to value (String). For
 	 *         instance: "year" => "2005". Empty map if none found.
 	 * @throws TransformerException
 	 */
-	public Map getAllProperties() {
-		NodeList nodes = getElement().getChildNodes();
+	public static Map getAllProperties(XMPSchema schema, String namespaceName) {
+		NodeList nodes = schema.getElement().getChildNodes();
 
 		Map result = new HashMap();
 
@@ -152,41 +173,41 @@ public class XMPSchemaBibtex extends XMPSchema {
 			String nodeName = node.getNodeName();
 
 			String[] split = nodeName.split(":");
-			if (split.length == 2 && split[0].equals("bibtex")) {
-
+			
+			if (split.length == 2 && split[0].equals(namespaceName)) {
 				NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
 				if (seqList.getLength() > 0) {
-					Element seqNode = (Element) seqList.item(0);
-					StringBuffer seq = null;
 
-					NodeList items = seqNode.getElementsByTagName("rdf:li");
-					for (int j = 0; j < items.getLength(); j++) {
-						Element li = (Element) items.item(j);
-						if (seq == null) {
-							seq = new StringBuffer();
-						} else {
-							seq.append(" and ");
-						}
-						seq.append(getTextContent(li));
-					}
+					String seq = getContents(seqList);
+					
 					if (seq != null) {
-						result.put(split[1], seq.toString());
+						result.put(split[1], seq);
 					}
 				} else {
-					result.put(split[1], getTextContent(node));
+					NodeList bagList = ((Element) node).getElementsByTagName("rdf:Bag");
+					if (bagList.getLength() > 0) {
+
+						String seq = getContents(bagList);
+						
+						if (seq != null) {
+							result.put(split[1], seq);
+						}
+					} else {
+						result.put(split[1], getTextContent(node));
+					}
 				}
 			}
 		}
 
 		// Then check Attributes
-		NamedNodeMap attrs = getElement().getAttributes();
+		NamedNodeMap attrs = schema.getElement().getAttributes();
 		int m = attrs.getLength();
 		for (int j = 0; j < m; j++) {
 			Node attr = attrs.item(j);
 
 			String nodeName = attr.getNodeName();
 			String[] split = nodeName.split(":");
-			if (split.length == 2 && split[0].equals("bibtex")) {
+			if (split.length == 2 && split[0].equals(namespaceName)) {
 				result.put(split[1], attr.getNodeValue());
 			}
 		}
@@ -249,7 +270,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		BibtexEntry e = new BibtexEntry(Util.createNeutralId(), t);
 
 		// Get Text Properties
-		Map text = getAllProperties();
+		Map text = getAllProperties(this, "bibtex");
 		text.remove("entrytype");
 		e.setField(text);
 		return e;

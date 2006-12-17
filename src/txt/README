@@ -85,6 +85,8 @@ Change log:
           without using the import inspection window.
         - Modified quick jump behaviour so sequences of letters can be found. Timeout or
           ESC resets the search.
+        - Improved XMP support: JabRef now reads and write DublinCore and Legacy Document Properties
+          Caution needs to be used though since, JabRef does overwrite existing values.
         - [ 1570570 ] New Feature: Deselect all duplicates on import
 		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
 		- [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused

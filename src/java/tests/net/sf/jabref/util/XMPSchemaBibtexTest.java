@@ -46,7 +46,7 @@ public class XMPSchemaBibtexTest extends JabRefTestCase {
 		DocumentBuilder builder = builderFactory.newDocumentBuilder();
 		Element e = builder.newDocument().createElement("rdf:Description");
 
-		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e);
+		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e, "bibtex");
 
 		assertEquals(e, bibtex.getElement());
 		assertEquals("rdf:Description", bibtex.getElement().getTagName());
@@ -201,7 +201,7 @@ public class XMPSchemaBibtexTest extends JabRefTestCase {
 		bibtex.setTextProperty("note", "BlaBla Ta Ta\nHello World");
 		bibtex.setPersonList("author", "Mouse, Mickey and Bond, James");
 		
-		Map s = bibtex.getAllProperties();
+		Map s = XMPSchemaBibtex.getAllProperties(bibtex, "bibtex");
 		
 		assertEquals(5, s.size());
 		assertTrue(s.containsKey("title"));
