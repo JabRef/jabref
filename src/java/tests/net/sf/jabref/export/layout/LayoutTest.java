@@ -7,6 +7,7 @@ import java.util.Collection;
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 import net.sf.jabref.imports.BibtexParser;
@@ -16,6 +17,9 @@ public class LayoutTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
+		if (Globals.prefs == null){
+			Globals.prefs = JabRefPreferences.getInstance();
+		}
 	}
 
 	protected void tearDown() throws Exception {
