@@ -1,20 +1,19 @@
 package net.sf.jabref.gui;
 
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.FilterList;
-import ca.odell.glazedlists.matchers.Matcher;
-import ca.odell.glazedlists.swing.EventTableModel;
-import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
-import net.sf.jabref.*;
-import net.sf.jabref.imports.ImportFormatReader;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import javax.swing.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.SearchRuleSet;
+import net.sf.jabref.Util;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * Created by IntelliJ IDEA.

@@ -58,12 +58,21 @@ public class FieldComparator implements Comparator {
 			f2 = e2.getField(field);
 		}
 
+		/*
+		 * [ 1598777 ] Month sorting
+		 * 
+		 * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
+		 */
+		int localMultiplier = multiplier;
+		if (isMonthField)
+			localMultiplier = -localMultiplier;
+		
 		// Catch all cases involving null:
 		if (f1 == null)
-			return f2 == null ? 0 : multiplier;
+			return f2 == null ? 0 : localMultiplier;
 
 		if (f2 == null)
-			return -multiplier;
+			return -localMultiplier;
 
 		// Now we now that both f1 and f2 are != null
 		if (isNameField) {
@@ -87,8 +96,6 @@ public class FieldComparator implements Comparator {
 			 */
 			f1 = new Integer(Util.getMonthNumber((String)f1));			
 			f2 = new Integer(Util.getMonthNumber((String)f2));
-			// Somehow this is twisted
-			multiplier = -multiplier;
 		}
 
 		int result = 0;
@@ -105,7 +112,7 @@ public class FieldComparator implements Comparator {
 			result = ours.compareTo(theirs);
 		}
 
-		return result * multiplier;
+		return result * localMultiplier;
 	}
 
 	/**
