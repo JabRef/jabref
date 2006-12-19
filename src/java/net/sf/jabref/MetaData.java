@@ -239,7 +239,7 @@ public class MetaData {
     }
 
     private void wrapStringBuffer(StringBuffer sb, int lineLength) {
-        for (int i=lineLength; i<sb.length(); i+=lineLength+1) {
+        for (int i=lineLength; i<sb.length(); i+=lineLength+Globals.NEWLINE_LENGTH) {
             sb.insert(i, Globals.NEWLINE);
         }
     }
