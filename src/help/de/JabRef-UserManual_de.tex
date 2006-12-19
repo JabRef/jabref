@@ -6,7 +6,7 @@
 \setcounter{tocdepth}{4}
 
 %%% version date
-\newcommand{\versiondate}{in Bearb.}
+\newcommand{\versiondate}{in Bearb.}%19.\,12.\,2006
 
 %%%%% Page Dimensions %%%%%
 \usepackage{geometry}
@@ -78,7 +78,7 @@
   }%
 }
 %%% version number
-\newcommand{\versionnr}{2.2\,{\small beta3}} %
+\newcommand{\versionnr}{2.2} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref{}~\versionnr}
 %%% BibTeX-shortcut
@@ -515,13 +515,13 @@ und ausgeschaltet werden. Die Farbanzeige illustriert, ob Ihre Daten
 vollständig sind, indem sie die Zellen wie folgt darstellt:
 
 \begin{itemize}
-\item Eine \textcolor{red}{rote} Zelle in der linken Spalte kennzeichnet
+\item Eine \colorbox{red}{\textcolor{white}{rote}} Zelle in der linken Spalte kennzeichnet
 einen unvollständigen Eintrag.
-\item Eine \textcolor{yellow}{gelbe} Zelle in der linken Spalte kennzeichnet
+\item Eine \colorbox{yellow}{gelbe} Zelle in der linken Spalte kennzeichnet
 einen Eintrag, der nicht alle benötigten Felder selbst enthält, der
 aber einen Querverweis enthält.
-\item Eine \textcolor{blue}{blaue} Zelle kennzeichnet ein benötigtes Feld.
-\item Eine \textcolor{green}{grüne} Zelle kennzeichnet ein optionales Feld.
+\item Eine \colorbox{blue}{\textcolor{white}{blaue}} Zelle kennzeichnet ein benötigtes Feld.
+\item Eine \colorbox{green}{grüne} Zelle kennzeichnet ein optionales Feld.
 \item Eine farblose (weiße) Zelle kennzeichnet ein Feld, das von \bibtex{}
 für diesen Eintragstyp nicht benutzt wird. Das Feld kann selbstverständlich
 in \jabref{} bearbeitet werden.
