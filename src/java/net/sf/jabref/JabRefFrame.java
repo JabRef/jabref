@@ -102,6 +102,7 @@ public class JabRefFrame extends JFrame {
 	JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
 		.lang("Status")
 		+ ":", SwingConstants.LEFT);
+    JProgressBar progressBar = new JProgressBar();
 
 	// SearchManager searchManager = new SearchManager(ths, prefs);
 
@@ -639,8 +640,11 @@ public JabRefPreferences prefs() {
     }
   }
 
+
   private void initLayout() {
     tabbedPane.putClientProperty(Options.NO_CONTENT_BORDER_KEY, Boolean.TRUE);
+
+    setProgressBarVisible(false);
 
       pushExternalButton = new PushToApplicationButton(this,
               PushToApplicationButton.applications);
@@ -706,9 +710,14 @@ public JabRefPreferences prefs() {
     status.add(statusLabel);
     con.weightx = 1;
     con.insets = new Insets(0, 4, 0, 0);
-    con.gridwidth = GridBagConstraints.REMAINDER;
+    con.gridwidth = 1;
     gbl.setConstraints(statusLine, con);
     status.add(statusLine);
+    con.weightx = 0;
+    con.gridwidth = GridBagConstraints.REMAINDER;
+    gbl.setConstraints(progressBar, con);
+    status.add(progressBar);
+    con.weightx = 1;
     con.gridwidth = GridBagConstraints.REMAINDER;
     statusLabel.setForeground(GUIGlobals.validFieldColor.darker());
     con.insets = new Insets(0, 0, 0, 0);
@@ -2075,6 +2084,59 @@ class FetchCiteSeerAction
     }
 
 
+    /** Set the visibility of the progress bar in the right end of the
+      * status line at the bottom of the frame.
+      *
+      * If not called on the event dispatch thread, this method uses
+      * SwingUtilities.invokeLater() to do the actual operation on the EDT.
+      */
+    public void setProgressBarVisible(final boolean visible) {
+	if (SwingUtilities.isEventDispatchThread())
+	    progressBar.setVisible(visible);
+	else SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    progressBar.setVisible(visible);
+		}
+	    });
+    }
+
+
+    /**
+     * Sets the current value of the progress bar.
+      *
+      * If not called on the event dispatch thread, this method uses
+      * SwingUtilities.invokeLater() to do the actual operation on the EDT.
+     */
+    public void setProgressBarValue(final int value) {
+	if (SwingUtilities.isEventDispatchThread())
+	    progressBar.setValue(value);
+	else SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    progressBar.setValue(value);
+		}
+	    });
+
+    }
+
+    /**
+     * Sets the maximum value of the progress bar. Always call this method
+     * before using the progress bar, to set a maximum value appropriate to
+     * the task at hand.
+      *
+      * If not called on the event dispatch thread, this method uses
+      * SwingUtilities.invokeLater() to do the actual operation on the EDT.
+     */
+    public void setProgressBarMaximum(final int value) {
+	if (SwingUtilities.isEventDispatchThread())
+	    progressBar.setMaximum(value);
+	else SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    progressBar.setMaximum(value);
+		}
+	    });
+
+
+    }
 
 class SaveSessionAction
       extends MnemonicAwareAction {

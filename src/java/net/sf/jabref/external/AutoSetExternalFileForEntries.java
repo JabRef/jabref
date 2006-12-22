@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
+import java.util.Collection;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -45,8 +46,12 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         // Get all entries, and make sure there are selected entries:
     	sel = panel.getSelectedEntries();
     	if (sel.length < 1) {
-            goOn = false;
-            return;
+	    // No entries selected. Assume all entries should be treated:
+	    Collection col = panel.database().getEntries();
+	    sel = new BibtexEntry[col.size()];
+	    sel = (BibtexEntry[])col.toArray(sel);
+            //goOn = false;
+            //return;
         }
 
         // Ask about rules for the operation:
@@ -70,7 +75,13 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             panel.output(Globals.lang("No entries selected."));
             return;
         }
-
+	panel.frame().setProgressBarValue(0);
+	panel.frame().setProgressBarVisible(true);
+	int weightAutoSet = 10; // autoSet takes 10 (?) times longer than checkExisting
+	int progressBarMax = (autoSet ? weightAutoSet*sel.length : 0) 
+	    + (checkExisting ? sel.length : 0);
+	panel.frame().setProgressBarMaximum(progressBarMax);
+	int progress = 0;
         skipped=0;
         entriesChanged=0;
         brokenLinks=0;
@@ -87,6 +98,8 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         // First we try to autoset fields
         if (autoSet) {
             for (int i=0; i<sel.length; i++) {
+		progress += weightAutoSet;
+		panel.frame().setProgressBarValue(progress);
 
                 final Object old = sel[i].getField(fieldName);
                 // Check if a link is already set, and if so, if we are allowed to overwrite it:
@@ -116,6 +129,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
         // The following loop checks all external links that are already set.
         if (checkExisting) {
             mainLoop: for (int i=0; i<sel.length; i++) {
+		panel.frame().setProgressBarValue(progress++);
                 final Object old = sel[i].getField(fieldName);
                 // Check if a link is set:
                 if ((old != null) && !((String)old).equals("")) {
@@ -175,6 +189,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
                 new String[] {fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
+	panel.frame().setProgressBarVisible(false);
         if (entriesChanged > 0) {
             panel.markBaseChanged();
         }
