@@ -10,6 +10,8 @@ import java.io.File;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener {
 
+    public static final String NAME = "fileUpdate";
+
 	JButton test = new JButton(Globals.lang("Review changes"));
 
 	BasePanel panel;
@@ -43,6 +45,14 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
 		add(main, BorderLayout.CENTER);
 		test.addActionListener(this);
+	}
+
+	/**
+	 * Unregister when this component closes. We need that to avoid showing
+	 * two such external change warnings at the same time, only the latest one.
+	 */
+	public void componentClosing() {
+	    manager.unregisterComponent(NAME);
 	}
 
 	/**

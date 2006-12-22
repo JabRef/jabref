@@ -80,7 +80,7 @@ public class SidePaneManager {
 	}
 
 	public synchronized boolean hasComponent(String name) {
-		return (components.get("name") != null);
+		return (components.get(name) != null);
 	}
 
 	public boolean isComponentVisible(String name) {
@@ -141,6 +141,23 @@ public class SidePaneManager {
 			updateView();
 		}
 	}
+
+    public synchronized void hideComponent(String name) {
+	SidePaneComponent comp = (SidePaneComponent)components.get(name);
+	if (comp == null)
+	    return;
+	if (visible.contains(comp)) {
+	    comp.componentClosing();
+	    visible.remove(comp);
+	    updateView();
+	}
+    }
+
+	public synchronized void unregisterComponent(String name) {
+	    components.remove(name);
+	}
+
+
 
 	/**
 	 * Update all side pane components to show information from the given

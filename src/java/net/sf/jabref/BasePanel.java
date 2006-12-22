@@ -2342,35 +2342,43 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       //Util.pr("File '"+file.getPath()+"' has been modified.");
       updatedExternally = true;
 
+      final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this);
+
       // Adding the sidepane component is Swing work, so we must do this in the Swing
       // thread:
       Thread t = new Thread() {
-        public void run() {
-            // Test: running scan automatically in background
-            ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this);
-            scanner.changeScan(BasePanel.this.getFile());
-            try {
-                scanner.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+	      public void run() {
+		  
+		  // Check if there is already a notification about external
+		  // changes:
+		  boolean hasAlready = sidePaneManager.hasComponent(FileUpdatePanel.NAME);
+		  if (hasAlready) {
+		      sidePaneManager.hideComponent(FileUpdatePanel.NAME);
+		      sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
+		  }
+		  FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this,
+							    sidePaneManager, getFile(), scanner);
+		  sidePaneManager.register(FileUpdatePanel.NAME, pan);
+		  sidePaneManager.show(FileUpdatePanel.NAME);
+		  setUpdatedExternally(false);
+		  //scanner.displayResult();
+	      }
+	  };
 
-            if (scanner.changesFound()) {
-                FileUpdatePanel pan = new FileUpdatePanel(frame, BasePanel.this,
-                        sidePaneManager, getFile(), scanner);
-          sidePaneManager.register("fileUpdate", pan);
-          sidePaneManager.show("fileUpdate");
-                setUpdatedExternally(false);
-                //scanner.displayResult();
-            } else {
-                setUpdatedExternally(false);
-                //System.out.println("No changes found.");
-        }
+      // Test: running scan automatically in background
+      scanner.changeScan(BasePanel.this.getFile());
+      try {
+	  scanner.join();
+      } catch (InterruptedException e) {
+	  e.printStackTrace();
+      }
 
-        }
-      };
-      SwingUtilities.invokeLater(t);
-
+      if (scanner.changesFound()) {
+	  SwingUtilities.invokeLater(t);
+      } else {
+	  setUpdatedExternally(false);
+	  //System.out.println("No changes found.");
+      }
     }
 
       public void fileRemoved() {
