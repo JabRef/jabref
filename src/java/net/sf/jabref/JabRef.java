@@ -79,7 +79,12 @@ public class JabRef {
 
     public JabRef(String[] args) {
 
-    	ths = this;
+        ths = this;
+
+        // The following two lines signal that the system proxy settings should be used:
+        System.setProperty("java.net.useSystemProxies", "true");
+        System.getProperties().put( "proxySet", "true" );
+
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         Globals.prefs = prefs;
         Globals.setLanguage(prefs.get("language"), "");
