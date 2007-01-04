@@ -1031,11 +1031,11 @@ public class Util {
 			return null;
 
 		String found = findFile(entry, database, root, file);
-
+                
 		if (directory == null || !relative) {
 			return found;
 		}
-
+                
 		if (found != null) {
 			try {
 				/**
@@ -1043,7 +1043,13 @@ public class Util {
 				 * 
 				 * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
 				 */
-				return found.substring(root.getCanonicalPath().length());
+                            // Changed by M. Alver 2007.01.04:
+                            // Remove first character if it is a directory separator character:
+                            String tmp = found.substring(root.getCanonicalPath().length());
+                            if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
+                                tmp = tmp.substring(1);
+                            return tmp;
+				//return found.substring(root.getCanonicalPath().length());
 			} catch (IOException e) {
 				return null;
 			}

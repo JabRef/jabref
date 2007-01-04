@@ -437,7 +437,8 @@ public class ExternalFilePanel extends JPanel {
 
 				String found = Util.findPdf(getEntry(), fieldName, (String[]) list
 					.toArray(new String[list.size()]));// , off);
-
+                                        
+                                
 				// To activate findFile:
 				// String found = Util.findFile(getEntry(), null, dir,
 				// ".*[bibtexkey].*");
