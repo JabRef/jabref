@@ -1,12 +1,13 @@
 package net.sf.jabref.imports;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JOptionPane;
@@ -15,11 +16,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
+import net.sf.jabref.gui.ImportInspectionDialog;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
  * 
@@ -30,7 +36,7 @@ import net.sf.jabref.gui.ImportInspectionDialog;
  * @author Christian Kopf
  * 
  * @version $Revision$ ($Date$)
- *
+ * 
  */
 public class OAI2Fetcher implements EntryFetcher, Runnable {
 
@@ -69,11 +75,11 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 	private JabRefFrame frame;
 
 	/* some archives - like arxive.org - might expect of you to wait some time */
-	
-	private boolean shouldWait(){
+
+	private boolean shouldWait() {
 		return waitTime > 0;
 	}
-	
+
 	private long waitTime = -1;
 
 	private Date lastCall;
@@ -123,14 +129,15 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 	/**
 	 * Construct the query URL
 	 * 
-	 * @param be
-	 *            The BibtexEntry containing the field OAI2_IDENTIFIER_FIELD
+	 * @param key
+	 *            The key of the OAI2 entry that the url should poitn to.
+	 *            
 	 * @return a String denoting the query URL
 	 */
-	public String constructUrl(BibtexEntry be) {
+	public String constructUrl(String key) {
 		String identifier = "";
 		try {
-			identifier = URLEncoder.encode((String) be.getField(OAI2_IDENTIFIER_FIELD), "UTF-8");
+			identifier = URLEncoder.encode((String) key, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
@@ -143,33 +150,66 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 		sb.append("&metadataPrefix=").append(oai2MetaDataPrefix);
 		return sb.toString();
 	}
+	
+	/**
+	 * Strip subccategories from ArXiv key.
+	 * 
+	 * @param key The key to fix.
+	 * @return Fixed key.
+	 */
+	public static String fixKey(String key){
+		int dot = key.indexOf('.');
+		int slash = key.indexOf('/');
+		
+		if (dot > -1 && dot < slash)
+			key = key.substring(0, dot) + key.substring(slash, key.length());
+	
+		return key;
+	}
 
 	/**
 	 * Import an entry from an OAI2 archive. The BibtexEntry provided has to
 	 * have the field OAI2_IDENTIFIER_FIELD set to the search string.
 	 * 
-	 * @param be
-	 *            The BibtexEntry to store the results in.
+	 * @param key
+	 *            The OAI2 key to fetch from ArXiv.
+	 * @return The imnported BibtexEntry or null if none.
 	 */
-	public void importOai2Entry(BibtexEntry be) {
-		String url = constructUrl(be);
+	public BibtexEntry importOai2Entry(String key) {
+		/**
+		 * Fix for problem reported in mailing-list: 
+		 *   https://sourceforge.net/forum/message.php?msg_id=4087158
+		 */
+		key = fixKey(key);
+		
+		String url = constructUrl(key);
 		try {
 			URL oai2Url = new URL(url);
 			HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
 			oai2Connection.setRequestProperty("User-Agent", "Jabref");
 			InputStream inputStream = oai2Connection.getInputStream();
+	
+			/* create an empty BibtexEntry and set the oai2identifier field */
+			BibtexEntry be = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
+			be.setField(OAI2_IDENTIFIER_FIELD, key);
 			DefaultHandler handlerBase = new OAI2Handler(be);
 			/* parse the result */
 			saxParser.parse(inputStream, handlerBase);
+			return be;
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(frame, Globals.lang(
 				"An Exception ocurred while accessing '%0'", url)
 				+ "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
 		} catch (SAXException e) {
 			JOptionPane.showMessageDialog(frame, Globals.lang(
-				"An SAXException ocurred while parsing '%0'", url), Globals.lang(getKeyName()),
-				JOptionPane.ERROR_MESSAGE);
-		}
+				"An SAXException ocurred while parsing '%0':", url)
+				+ "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+		} catch (RuntimeException e){
+			JOptionPane.showMessageDialog(frame, Globals.lang(
+				"An Error occurred while fetching from OAI2 source (%0):", url)
+				+ "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
+		} 
+		return null;
 	}
 
 	public String getHelpPage() {
@@ -242,17 +282,16 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 				/* the cancel button has been hit */
 				if (!shouldContinue)
 					break;
-				/* create an empty BibtexEntry and set the oai2identifier field */
-				BibtexEntry be = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.ARTICLE);
-				be.setField(OAI2_IDENTIFIER_FIELD, key);
-				/* query the archive and load the results into the BibtexEntry */
-				importOai2Entry(be);
 				
+				/* query the archive and load the results into the BibtexEntry */
+				BibtexEntry be = importOai2Entry(key);
+
 				if (shouldWait())
 					lastCall = new Date();
 				
 				/* add the entry to the inspection dialog */
-				dialog.addEntry(be);
+				if (be != null)
+					dialog.addEntry(be);
 
 				/* update the dialogs progress bar */
 				dialog.setProgress(i + 1, keys.length);

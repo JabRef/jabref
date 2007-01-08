@@ -40,7 +40,8 @@ public class OAI2Handler extends DefaultHandler {
 
 	
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if(localName.equals("id")) {
+		
+        if(localName.equals("id")) {
 			nextField = "id";
 			assigned = true;
 		} else if(localName.equals("keyname")) {
@@ -70,7 +71,10 @@ public class OAI2Handler extends DefaultHandler {
 		} else if(localName.equals("report-no")) {
 			nextField = "reportno";
 			assigned = true;
-		}
+		} else if(localName.equals("error")) {
+		    nextField = "error";
+            assigned = true;
+        }
 	}
 
 	
@@ -87,7 +91,9 @@ public class OAI2Handler extends DefaultHandler {
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		String content = new String(ch,start,length);
 		if(assigned) {
-			if(nextField.equals("id")) {
+		    if (nextField.equals("error")) {
+                throw new RuntimeException(content);
+            } else if(nextField.equals("id")) {
 				be.setField("eprint",content);
 			} else if(nextField.equals("keyname")) {
 				keyname = content;
@@ -124,8 +130,4 @@ public class OAI2Handler extends DefaultHandler {
 			assigned = false;
 		}
 	}
-	
-	
-	
-	
 }

@@ -78,22 +78,37 @@ public class OAI2ImportTest extends TestCase {
 	
 	public void testUrlConstructor() {
 		OAI2Fetcher fetcher = new OAI2Fetcher();
-		be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, "hep-ph/0408155");
-		assertEquals("http://arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Ahep-ph%2F0408155&metadataPrefix=arXiv",fetcher.constructUrl(be));
+		assertEquals("http://arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Ahep-ph%2F0408155&metadataPrefix=arXiv",fetcher.constructUrl("hep-ph/0408155"));
 	}
 	
-	/*
-	public void testOnline() {
+	public void testFixKey(){
+		assertEquals("", OAI2Fetcher.fixKey(""));
+		assertEquals("test", OAI2Fetcher.fixKey("test"));
+        assertEquals("math/0601001", OAI2Fetcher.fixKey("math.RA/0601001"));
+        assertEquals("math/0601001", OAI2Fetcher.fixKey("math.QA/0601001"));
+        assertEquals("hep-ph/0408155",OAI2Fetcher.fixKey("hep-ph/0408155"));
+	}
+	
+	public void testOnline() throws InterruptedException {
+        try {
+            OAI2Fetcher fetcher = new OAI2Fetcher();
+            be = fetcher.importOai2Entry("math.QA/0601001");
+            assertEquals("math/0601001",(String)be.getField("eprint"));
+        } catch (Exception e) {
+            fail();
+            e.printStackTrace();
+        }
+        
+        Thread.sleep(30000);
+        
 		try {
 			OAI2Fetcher fetcher = new OAI2Fetcher();
-			be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, "hep-ph/0408155");
-			
-			fetcher.importOai2Entry(be);
+			be = fetcher.importOai2Entry("hep-ph/0408155");
 			
 			assertEquals("hep-ph/0408155",(String)be.getField("eprint"));
 		} catch (Exception e) {
-			//fail("Exception");
+			fail();
 			e.printStackTrace();
 		}
-	}*/
+	}
 }
