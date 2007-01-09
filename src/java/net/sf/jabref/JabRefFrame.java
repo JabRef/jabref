@@ -547,7 +547,7 @@ public JabRefPreferences prefs() {
           }
         }
         if (baseAt(i).getFile() != null) {
-          filenames.add(baseAt(i).getFile().getPath());
+          filenames.add(baseAt(i).getFile().getAbsolutePath());
         }
       }
     }

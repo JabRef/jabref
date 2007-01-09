@@ -89,6 +89,7 @@ Change log:
         - Improved XMP support: JabRef now reads and write DublinCore and Legacy Document Properties
           Caution needs to be used though since, JabRef does overwrite existing values.
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
+        - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
         - [ 1570570 ] New Feature: Deselect all duplicates on import
 	- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
