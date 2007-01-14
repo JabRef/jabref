@@ -210,4 +210,16 @@ public abstract class AbstractGroup {
 	// using fromString(String).
 
 	// by general AbstractGroup contract, equals() must be implemented
+        
+        /**
+         * Update the group, if necessary, to handle the situation where the group
+         * is applied to a different BibtexDatabase than it was created for. This
+         * is for instance used when updating the group tree due to an external change.
+         *
+         * @param db The database to refresh for.
+         */
+        public void refreshForNewDatabase(BibtexDatabase db) {
+            // Default is to do nothing. Group types that are affected by a change
+            // of database must override this method.
+        }
 }

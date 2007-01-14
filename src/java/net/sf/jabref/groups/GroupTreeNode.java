@@ -104,7 +104,22 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 			copy.add(((GroupTreeNode) getChildAt(i)).deepCopy());
 		return copy;
 	}
-
+        
+        /**
+         * Update all groups, if necessary, to handle the situation where the group
+         * tree is applied to a different BibtexDatabase than it was created for. This
+         * is for instance used when updating the group tree due to an external change.
+         *
+         * @param db The database to refresh for.
+         */
+        public void refreshGroupsForNewDatabase(BibtexDatabase db) {
+            for (int i = 0; i < getChildCount(); ++i) {
+                GroupTreeNode node = (GroupTreeNode)getChildAt(i);
+                node.getGroup().refreshForNewDatabase(db);
+                node.refreshGroupsForNewDatabase(db);
+            }
+        }
+      
 	/**
 	 * @return An indexed path from the root node to this node. The elements in
 	 *         the returned array represent the child index of each node in the

@@ -237,4 +237,29 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
         }
         return sb.toString();
     }
+    
+    /**
+     * Update the group to handle the situation where the group
+     * is applied to a different BibtexDatabase than it was created for.
+     * This group type contains a Set of BibtexEntry objects, and these will not
+     * be the same objects as in the new database. We must reset the entire Set with
+     * matching entries from the new database.
+     *
+     * @param db The database to refresh for.
+     */
+        public void refreshForNewDatabase(BibtexDatabase db) {
+            Set newSet = new HashSet();
+            for (Iterator i=m_entries.iterator(); i.hasNext();) {
+                BibtexEntry entry = (BibtexEntry)i.next();
+                BibtexEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
+                /*if (sameEntry == null) {
+                    System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
+                } else {
+                    System.out.println("'"+entry.getCiteKey()+"' ok");
+                }*/
+                newSet.add(sameEntry);
+            }
+            m_entries.clear();
+            m_entries.addAll(newSet);
+        }
 }

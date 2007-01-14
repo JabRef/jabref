@@ -28,6 +28,10 @@ public class GroupChange extends Change {
             root.setGroup(m_changedGroups.getGroup());
             for (int i = 0; i < m_changedGroups.getChildCount(); ++i)        
                 root.add(((GroupTreeNode) m_changedGroups.getChildAt(i)).deepCopy());
+            // the group tree is now appled to a different BibtexDatabase than it was created
+            // for, which affects groups such as ExplicitGroup (which links to BibtexEntry objects).
+            // We must traverse the tree and refresh all groups:
+            root.refreshGroupsForNewDatabase(panel.database());
         }
         panel.getGroupSelector().revalidateGroups();
         undoEdit.addEdit(undo);
