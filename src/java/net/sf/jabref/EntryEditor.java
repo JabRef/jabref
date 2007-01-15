@@ -480,7 +480,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 				source.setText(srcString);
 				lastSourceStringAccepted = srcString;
 			} catch (IOException ex) {
-				source.setText("Error: " + ex.getMessage() + "\n\n" + "Correct the entry, and "
+				source.setText(Globals.lang("Error")+": " + ex.getMessage() + "\n\n" + 
+                                        Globals.lang("Correct the entry, and "
 					+ "reopen editor to display/edit source.");
 				source.setEditable(false);
 			}
