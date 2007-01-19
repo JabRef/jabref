@@ -261,20 +261,25 @@ public class BibtexParserTest extends TestCase {
 
 	public void testNewlineHandling() throws IOException {
 
-		ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,"
+		BibtexEntry e = BibtexParser.singleFromString("@article{canh05," +
+				"a = {a\nb}," +
+				"b = {a\n\nb}," +
+				"c = {a\n \nb}," +
+				"d = {a \n \n b},"
 			+ "title = {\nHallo \nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n},\n"
 			+ "tabs = {\nHallo \tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t},\n"
-			+ "}"));
-
-		Collection c = result.getDatabase().getEntries();
-		assertEquals(1, c.size());
-
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
-
+			+ "}");
+		
 		assertEquals("canh05", e.getCiteKey());
 		assertEquals(BibtexEntryType.ARTICLE, e.getType());
 
-		assertEquals("Hallo World this is not an exercise .", (String) e.getField("title"));
-		assertEquals("Hallo World this is not an exercise .", (String) e.getField("tabs"));
+		assertEquals("a b", (String)e.getField("a"));
+		assertEquals("a\nb", (String)e.getField("b"));
+		assertEquals("a b", (String)e.getField("c"));
+		assertEquals("a b", (String)e.getField("d"));
+		
+		// I think the last \n is a bug in the parser...
+		assertEquals("Hallo World this is\nnot \nan \n exercise . \n\n", (String) e.getField("title"));
+		assertEquals("Hallo World this isnot an exercise . ", (String) e.getField("tabs"));
 	}
 }

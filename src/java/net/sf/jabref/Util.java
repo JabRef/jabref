@@ -195,51 +195,35 @@ public class Util {
 	 * references are enclosed in a pair of '#' characters.
 	 */
 	public static String parseField(String content) {
+		
 		if (content.length() == 0)
 			return content;
-		String toSet = "";
-		boolean string;
-		// Keeps track of whether the next item is
-		// a reference to a string, or normal content. First we must
-		// check which we begin with. We simply check if we can find
-		// a '#' before either '"' or '{'.
-		int hash = content.indexOf('#'), wr1 = content.indexOf('"'), wr2 = content.indexOf('{'), end = content
-			.length();
-		if (hash == -1)
-			hash = end;
-		if (wr1 == -1)
-			wr1 = end;
-		if (wr2 == -1)
-			wr2 = end;
-		string = ((wr1 == end) && (wr2 == end)) || (hash < Math.min(wr1, wr2));
-
-		// System.out.println("FileLoader: "+content+" "+string+" "+hash+"
-		// "+wr1+" "+wr2);
-		StringTokenizer tok = new StringTokenizer(content, "#", true);
-		// 'tok' splits at the '#' sign, and keeps delimiters
-
-		while (tok.hasMoreTokens()) {
-			String str = tok.nextToken();
-			if (str.equals("#"))
-				string = !string;
-			else {
-				if (string) {
-					// This part should normally be a string, but if it's
+		
+		String[] strings = content.split("#");
+		StringBuffer result = new StringBuffer();
+		for (int i = 0; i < strings.length; i++){
+			String s = strings[i].trim();
+			if (s.length() > 0){
+				char c = s.charAt(0);
+				// String reference or not?
+				if (c == '{' || c == '"'){
+					result.append(shaveString(strings[i]));	
+				} else {
+					// This part should normally be a string reference, but if it's
 					// a pure number, it is not.
-					String s = shaveString(str);
+					String s2 = shaveString(s);
 					try {
-						Integer.parseInt(s);
+						Integer.parseInt(s2);
 						// If there's no exception, it's a number.
-						toSet = toSet + s;
+						result.append(s2);
 					} catch (NumberFormatException ex) {
-						toSet = toSet + "#" + shaveString(str) + "#";
+						// otherwise append with hashes...
+						result.append("#").append(s2).append("#");
 					}
-
-				} else
-					toSet = toSet + shaveString(str);
+				}
 			}
 		}
-		return toSet;
+		return result.toString();
 	}
 
 	/**
@@ -309,7 +293,6 @@ public class Util {
 			}
 		}
 		s = s.substring(beg, end);
-		// Util.pr(s);
 		return s;
 	}
 

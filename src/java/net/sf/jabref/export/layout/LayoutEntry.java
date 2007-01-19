@@ -161,32 +161,16 @@ public class LayoutEntry {
 		}
 	}
 
-	// ~ Methods
-	// ////////////////////////////////////////////////////////////////
-
 	public String doLayout(BibtexEntry bibtex, BibtexDatabase database) {
 
-		if (type == LayoutHelper.IS_LAYOUT_TEXT) {
+		switch (type) {
+		case LayoutHelper.IS_LAYOUT_TEXT:
 			return text;
-		} else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
-			if (text.equals("bibtextype")) {
-				return bibtex.getType().getName();
-			}
-
+		case LayoutHelper.IS_SIMPLE_FIELD:
+			return getField(bibtex, text, database);
+		case LayoutHelper.IS_FIELD_START:
+		case LayoutHelper.IS_GROUP_START: {
 			String field = getField(bibtex, text, database);
-
-			if (field == null) {
-
-				return null;
-			} else {
-
-				return field;
-
-			}
-		} else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_GROUP_START)) {
-
-			String field = getField(bibtex, text, database);
-			// String field = (String) bibtex.getField(text);
 
 			if ((field == null)
 				|| ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper
@@ -203,14 +187,11 @@ public class LayoutEntry {
 				for (int i = 0; i < layoutEntries.length; i++) {
 					fieldText = layoutEntries[i].doLayout(bibtex, database);
 
-					// System.out.println("'" + fieldText + "'");
 					if (fieldText == null) {
 						if ((i + 1) < layoutEntries.length) {
 							if (layoutEntries[i + 1].doLayout(bibtex, database).trim().length() == 0) {
-								// System.out.println("MISSING: "+bibtex);
 								i++;
 								previousSkipped = true;
-
 								continue;
 							}
 						}
@@ -240,9 +221,11 @@ public class LayoutEntry {
 
 				return sb.toString();
 			}
-		} else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END)) {
-		} else if (type == LayoutHelper.IS_OPTION_FIELD) {
-			// System.out.println("doLayout IS_OPTION_FIELD '"+text+"'");
+		}
+		case LayoutHelper.IS_FIELD_END:
+		case LayoutHelper.IS_GROUP_END:
+			return "";
+		case LayoutHelper.IS_OPTION_FIELD: {
 			String fieldEntry;
 
 			if (text.equals("bibtextype")) {
@@ -253,9 +236,6 @@ public class LayoutEntry {
 				String field = text.startsWith("\\") ? getField(bibtex, text.substring(1), database)
 					: getText(text, database);
 				// changed section end - arudert
-
-				// String field = (String) bibtex.getField(text);
-
 				if (field == null) {
 					fieldEntry = "";
 				} else {
@@ -272,12 +252,9 @@ public class LayoutEntry {
 
 			return fieldEntry;
 		}
-
-		// else if (type == LayoutHelper.IS_OPTION_FIELD_PARAM)
-		// {
-		// }
-
-		return "";
+		default:
+			return "";
+		}
 	}
 
 	// added section - begin (arudert)

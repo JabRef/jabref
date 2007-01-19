@@ -140,8 +140,6 @@ public class Layout
         }
     }
 
-    //~ Methods ////////////////////////////////////////////////////////////////
-
     /**
      * Returns the processed bibtex entry. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
@@ -150,14 +148,11 @@ public class Layout
      */
     public String doLayout(BibtexEntry bibtex, BibtexDatabase database)
     {
-        //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuffer sb = new StringBuffer(100);
-        String fieldText;
-        boolean previousSkipped = false;
 
         for (int i = 0; i < layoutEntries.length; i++)
         {
-            fieldText = layoutEntries[i].doLayout(bibtex, database);
+            String fieldText = layoutEntries[i].doLayout(bibtex, database);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the
@@ -165,47 +160,8 @@ public class Layout
             // no side effects.
             if (fieldText == null)
                 fieldText = "";
-            /*if (fieldText == null)
-            {
-                if ((i + 1) < layoutEntries.length)
-                {
-                    if (layoutEntries[i + 1].doLayout(bibtex, database).trim().length() == 0)
-                    {
-                        //sb.append("MISSING");
-                        i++;
-                        previousSkipped = true;
-
-                        continue;
-                    }
-                }
-            }
-            else*/
-            {
-                // if previous was skipped --> remove leading line breaks
-                if (previousSkipped)
-                {
-                    int eol = 0;
-
-                    while ((eol < fieldText.length()) &&
-                            ((fieldText.charAt(eol) == '\n') ||
-                            (fieldText.charAt(eol) == '\r')))
-                    {
-                        eol++;
-                    }
-
-                    if (eol < fieldText.length())
-                    {
-                        sb.append(fieldText.substring(eol));
-                    }
-                }
-                else
-                {
-                    //System.out.println("ENTRY-BLOCK: " + layoutEntries[i].doLayout(bibtex));
-                    sb.append(fieldText);
-                }
-            }
-
-            previousSkipped = false;
+            
+            sb.append(fieldText);
         }
 
         return sb.toString();
