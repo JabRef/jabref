@@ -5,8 +5,10 @@
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
 
-%%% version date
-\newcommand{\versiondate}{18.\,1.\,2007}
+%%%%% author, version of file %%%%%
+\newcommand{\versiondate}{19.\,1.\,2007}
+\def\FileAuthor{Dominik Waßenhoven}
+\def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
 %%%%% Page Dimensions %%%%%
 \usepackage{geometry}
@@ -112,10 +114,6 @@
   {CTAN: \color{dkblue}#1}%
 }
 
-%%%%% author, version of file %%%%%
-\def\FileAuthor{Dominik Waßenhoven}
-\def\FileTitle{\jabrefversion{} Benutzerhandbuch}
-
 %%%%% Headings %%%%%
 \usepackage{scrpage2}
 \pagestyle{scrheadings}
@@ -189,7 +187,7 @@ Benutzerhandbuch}
 {\normalsize (\href{mailto:domwass@users.sourceforge.net}{domwass@users.sourceforge.net})}}
 
 
-\date{{}}
+\date{\small \versiondate}
 
 \maketitle
 \begin{abstract}
@@ -2771,7 +2769,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%18.\,1.\,2007}
+\begin{revhist}{\versiondate}%19.\,1.\,2007}
 \item Abschnitt ">\nameref{Eintragstypen}"< hinzugefügt
 \item Grafik auf Titelseite ausgetauscht
 \item Ein paar kleinere Änderungen
