@@ -148,10 +148,9 @@ public class BibtexParser {
 	 * Check whether the source is in the correct format for this importer.
 	 */
 	public static boolean isRecognizedFormat(Reader inOrig) throws IOException {
-		// Our strategy is to look for the "PY <year>" line.
+		// Our strategy is to look for the "@<type>    {" line.
 		BufferedReader in = new BufferedReader(inOrig);
 
-		// Pattern pat1 = Pattern.compile("PY: \\d{4}");
 		Pattern pat1 = Pattern.compile("@[a-zA-Z]*\\s*\\{");
 
 		String str;
