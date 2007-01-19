@@ -15,18 +15,19 @@ import net.sf.jabref.imports.ParserResult;
 
 public class LayoutTest extends TestCase {
 
+	/**
+	 * Initialize Preferences.
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		if (Globals.prefs == null){
+		if (Globals.prefs == null) {
 			Globals.prefs = JabRefPreferences.getInstance();
 		}
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
-	/* TEST DATA */
+	/**
+	 * Return Test data.
+	 */
 	public String t1BibtexString() {
 		return "@article{canh05,\n"
 			+ "  author = {This\nis\na\ntext},\n"
@@ -59,13 +60,17 @@ public class LayoutTest extends TestCase {
 		return sb.toString();
 	}
 
+	public void testLayoutBibtextype() throws Exception {
+		assertEquals("Other", layout("\\bibtextype", "@other{bla, author={This\nis\na\ntext}}"));
+		assertEquals("Article", layout("\\bibtextype", "@article{bla, author={This\nis\na\ntext}}"));
+		assertEquals("Misc", layout("\\bibtextype", "@misc{bla, author={This\nis\na\ntext}}"));
+	}
+
 	public void testHTMLChar() throws Exception {
 		String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
 			"@other{bla, author={This\nis\na\ntext}}");
 
 		assertEquals("This is a text ", layoutText);
-
-		// This fails!
 
 		layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author}",
 			"@other{bla, author={This\nis\na\ntext}}");
@@ -76,7 +81,6 @@ public class LayoutTest extends TestCase {
 			"@other{bla, author={This\nis\na\n\ntext}}");
 
 		assertEquals("This is a<p>text ", layoutText);
-
 	}
 
 	/**
@@ -86,19 +90,12 @@ public class LayoutTest extends TestCase {
 	 */
 	public void testLayout() throws Exception {
 
-		String layoutFile = "<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}</font>";
-
-		StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-		Layout layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(layout.doLayout(t1BibtexEntry(), null));
-		String layoutText = sb.toString();
+		String layoutText = layout(
+			"<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>",
+			t1BibtexString());
 
 		assertEquals(
 			"<font face=\"arial\"><BR><BR><b>Abstract: </b> &ntilde; &ntilde; &iacute; &#305; &#305;</font>",
 			layoutText);
-
 	}
-
 }

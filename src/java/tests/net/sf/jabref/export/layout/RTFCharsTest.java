@@ -18,6 +18,7 @@ public class RTFCharsTest extends TestCase {
 		assertEquals("R\\u233?flexions sur le timing de la quantit\\u233?", layout.format("Réflexions sur le timing de la quantité"));
 
 		assertEquals("h\\u225allo", layout.format("h\\'allo"));
+		assertEquals("h\\u225allo", layout.format("h\\'allo"));
 	}
 
 	public void testLaTeXHighlighting(){

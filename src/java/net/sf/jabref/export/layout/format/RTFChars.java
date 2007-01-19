@@ -128,7 +128,7 @@ public class RTFChars implements LayoutFormatter {
 
 	private IntAndString getPart(String text, int i) {
 		char c;
-		int count = 0;// , i=index;
+		int count = 0;
 		StringBuffer part = new StringBuffer();
 		while ((count >= 0) && (i < text.length())) {
 			i++;
@@ -140,8 +140,6 @@ public class RTFChars implements LayoutFormatter {
 
 			part.append((char) c);
 		}
-		// System.out.println("part: "+part.toString()+"\nformatted:
-		// "+format(part.toString()));
 		return new IntAndString(part.length(), format(part.toString()));
 	}
 
