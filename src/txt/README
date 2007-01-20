@@ -81,22 +81,23 @@ appear in your chosen languages.
 
 Change log:
 
-2.2	- Added progress bar to indicate progress when synchronizing PS/PDF links.
-	- Option to autogenerate key for imported entries now also affects entries imported
+2.2b3	- Added progress bar to indicate progress when synchronizing PS/PDF links.
+		- Option to autogenerate key for imported entries now also affects entries imported
           without using the import inspection window.
         - Modified quick jump behaviour so sequences of letters can be found. Timeout or
           ESC resets the search.
         - Improved XMP support: JabRef now reads and write DublinCore and Legacy Document Properties
           Caution needs to be used though since, JabRef does overwrite existing values.
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
-	- Fixed bug that made explicit groups appear empty after updating group tree from external
-	  change.
+		- Fixed bug that made explicit groups appear empty after updating group tree from external
+		  change.
+		- New windows installer thanks to Uwe Stöhr.
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
         - [ 1570570 ] New Feature: Deselect all duplicates on import
-	- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
-	- [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
-	- [ 1608391 ] Fixed: Medline Search Editbox size gets to big
+		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
+		- [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
+        - [ 1608391 ] Fixed: Medline Search Editbox size gets to big
 2.2b2   - Redesigned export functions to simplify GUI and provide "Export selected
           entries" functionality. Export filter is now chosen using the file type
           dropdown menu in the file dialog.
