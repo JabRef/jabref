@@ -118,4 +118,8 @@ public class GroupsPrefsTab extends JPanel implements PrefsTab {
 		return true;
 	}
 
+	public String getTabName() {
+		return Globals.lang("Groups");
+	}
+
 }

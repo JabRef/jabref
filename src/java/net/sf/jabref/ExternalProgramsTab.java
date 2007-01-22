@@ -6,6 +6,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+/**
+ * 
+ * 
+ *  @version $Revision$ ($Date$)
+ *  @deprecated Use ExternalTab instead.
+ */
 class ExternalProgramsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
@@ -128,6 +134,9 @@ class ExternalProgramsTab extends JPanel implements PrefsTab {
 	return true;
     }
 
+	public String getTabName() {
+		return Globals.lang("External programs");
+	}
 }
 
 

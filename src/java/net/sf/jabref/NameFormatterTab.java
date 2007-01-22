@@ -304,4 +304,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 	public boolean readyToClose() {
 		return true;
 	}
+
+	public String getTabName() {
+        return Globals.lang("Name formatter");
+	}
 }

@@ -157,7 +157,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     public boolean readyToClose() {
 	   
         try {
-            int size = Integer.parseInt(remoteServerPort.getText());
+            Integer.parseInt(remoteServerPort.getText());
             return true; // Ok, the number was legal.
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
@@ -168,5 +168,9 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         }
 
     }
+
+	public String getTabName() {
+		return "Advanced";
+	}
 
 }

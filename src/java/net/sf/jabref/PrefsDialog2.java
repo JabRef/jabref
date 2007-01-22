@@ -32,6 +32,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined
  * in separate classes. Tabs MUST implement the PrefsTab interface,

@@ -1,25 +1,34 @@
 package net.sf.jabref;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.util.Vector;
-import javax.swing.*;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.builder.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private String[] _choices;
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
     private Vector tableRows = new Vector(10);
-    private Font font = GUIGlobals.CURRENTFONT,	menuFont;
     private JabRefFrame frame;
-    private int oldMenuFontSize;
 
     class TableRow {
         String name;
@@ -116,10 +125,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             ("1dlu, 8dlu, left:pref, 4dlu, fill:pref",//, 4dlu, fill:60dlu, 4dlu, fill:pref",
              "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        JLabel lab;
         JPanel pan = new JPanel();
-
-
         JPanel tabPanel = new JPanel();
         tabPanel.setLayout(new BorderLayout());
         JScrollPane sp = new JScrollPane
@@ -319,77 +325,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         return true;
     }
 
+	public String getTabName() {
+	    return Globals.lang("Entry table columns");
+	}
 }
-
-        /*
-        Boolean[] sel = new Boolean[GUIGlobals.ALL_FIELDS.length];
-        boolean found;
-        _choices = GUIGlobals.ALL_FIELDS;
-        _sel = sel;
-        String[] columns = prefs.getStringArray("columnNames");
-        for (int i=0; i<_choices.length; i++) {
-            found = false;
-            for (int j=0; j<columns.length; j++)
-                if (columns[j].equals(_choices[i]))
-                    found = true;
-            if (found)
-                sel[i] = new Boolean(true);
-            else
-                sel[i] = new Boolean(false);
-        }
-
-        TableModel tm = new AbstractTableModel() {
-                public int getRowCount() { return (_choices.length-1)/2; }
-                public int getColumnCount() { return 4; }
-                public Object getValueAt(int row, int column) {
-                    switch (column) {
-                    case 0:
-                        return _choices[row];
-                    case 1:
-                        return _sel[row];
-                    case 2:
-                        return _choices[getRowCount()+row];
-                    case 3:
-                        return _sel[getRowCount()+row];
-                    }
-                    return null; // Unreachable.
-                }
-                public Class getColumnClass(int column) {
-                    if ((column == 0) || (column == 2)) return String.class;
-                    else return Boolean.class;
-                }
-                public boolean isCellEditable(int row, int col) {
-                    if ((col == 1) || (col == 3)) return true;
-                    else return false;
-                }
-                public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-                    if (columnIndex == 1)
-                        _sel[rowIndex] = (Boolean)aValue;
-                    if (columnIndex == 3)
-                        _sel[getRowCount()+rowIndex] = (Boolean)aValue;
-                }
-
-            };
-
-        JTable table = new JTable(tm);
-        table.setRowSelectionAllowed(false);
-        table.setColumnSelectionAllowed(false);
-        //table.getInputMap().put(GUIGlobals.exitDialog, "close");
-        //table.getActionMap().put("close", new CancelAction());
-        JPanel
-            tablePanel = new JPanel(),
-            innerTablePanel = new JPanel();
-
-        table.setShowVerticalLines(false);
-        innerTablePanel.setBorder(BorderFactory.createEtchedBorder());
-        //innerTablePanel.setBorder(BorderFactory.createLoweredBevelBorder());
-        innerTablePanel.add(table);
-        tablePanel.add(innerTablePanel);
-
-
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(90);
-        cm.getColumn(1).setPreferredWidth(25);
-        cm.getColumn(2).setPreferredWidth(90);
-        cm.getColumn(3).setPreferredWidth(25);
-        */

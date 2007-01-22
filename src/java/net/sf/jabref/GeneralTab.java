@@ -311,4 +311,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         return true;
     }
 
+	public String getTabName() {
+		return Globals.lang("General");
+	}
 }

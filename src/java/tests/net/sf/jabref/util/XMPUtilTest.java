@@ -11,11 +11,13 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
@@ -38,7 +40,6 @@ import org.jempbox.xmp.XMPSchemaMediaManagement;
 import org.pdfbox.exceptions.COSVisitorException;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentCatalog;
-import org.pdfbox.pdmodel.PDDocumentInformation;
 import org.pdfbox.pdmodel.PDPage;
 import org.pdfbox.pdmodel.common.PDMetadata;
 import org.pdfbox.util.XMLUtil;
@@ -190,7 +191,10 @@ public class XMPUtilTest extends TestCase {
 		e.setField("keywords", "peanut,butter,jelly");
 		e.setField("year", "1982");
 		e.setField("month", "#jul#");
-		e.setField("abstract", "The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
+		e
+			.setField(
+				"abstract",
+				"The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
 		return e;
 	}
 
@@ -200,18 +204,24 @@ public class XMPUtilTest extends TestCase {
 
 	public String t3XMP() {
 		return bibtexDescription("<bibtex:title>Hypersonic ultra-sound</bibtex:title>\n"
-			+ "<bibtex:author><rdf:Seq>\n" + "  <rdf:li>Kelly Clarkson</rdf:li>"
-			+ "  <rdf:li>Ozzy Osbourne</rdf:li>" + "</rdf:Seq></bibtex:author>"
-			+ "<bibtex:editor><rdf:Seq>" + "  <rdf:li>Huey Duck</rdf:li>"
-			+ "  <rdf:li>Dewey Duck</rdf:li>" + "  <rdf:li>Louie Duck</rdf:li>"
-			+ "</rdf:Seq></bibtex:editor>" + "<bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>"
+			+ "<bibtex:author><rdf:Seq>\n"
+			+ "  <rdf:li>Kelly Clarkson</rdf:li>"
+			+ "  <rdf:li>Ozzy Osbourne</rdf:li>"
+			+ "</rdf:Seq></bibtex:author>"
+			+ "<bibtex:editor><rdf:Seq>"
+			+ "  <rdf:li>Huey Duck</rdf:li>"
+			+ "  <rdf:li>Dewey Duck</rdf:li>"
+			+ "  <rdf:li>Louie Duck</rdf:li>"
+			+ "</rdf:Seq></bibtex:editor>"
+			+ "<bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>"
 			+ "<bibtex:journal>Internation Journal of High Fidelity</bibtex:journal>"
 			+ "<bibtex:booktitle>Catch-22</bibtex:booktitle>"
 			+ "<bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>"
 			+ "<bibtex:keywords>peanut,butter,jelly</bibtex:keywords>"
 			+ "<bibtex:entrytype>Inproceedings</bibtex:entrytype>"
-			+ "<bibtex:year>1982</bibtex:year>" + "<bibtex:month>#jul#</bibtex:month>" +
-					"<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
+			+ "<bibtex:year>1982</bibtex:year>"
+			+ "<bibtex:month>#jul#</bibtex:month>"
+			+ "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
 	}
 
 	/**
@@ -298,6 +308,74 @@ public class XMPUtilTest extends TestCase {
 		assertEquals("2003", e.getField("year"));
 		assertEquals("öptímzàtîôn", e.getField("title"));
 		assertEquals(BibtexEntryType.OTHER, e.getType());
+	}
+
+	/**
+	 * Make sure that the privacy filter works.
+	 * 
+	 * @throws IOException Should not happen.
+	 * @throws TransformerException Should not happen.
+	 */
+	public void testPrivacyFilter() throws IOException, TransformerException {
+
+		JabRefPreferences prefs = JabRefPreferences.getInstance();
+
+		boolean use = prefs.getBoolean("useXmpPrivacyFilter");
+		String[] privacyFilters = prefs.getStringArray("xmpPrivacyFilters");
+
+		try {
+			{ // First set:
+				prefs.putBoolean("useXmpPrivacyFilter", true);
+				prefs.putStringArray("xmpPrivacyFilter", new String[] { "author;title;note" });
+
+				BibtexEntry e = t1BibtexEntry();
+
+				XMPUtil.writeXMP(pdfFile, e);
+
+				List l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+				assertEquals(1, l.size());
+				BibtexEntry x = (BibtexEntry) l.get(0);
+
+				TreeSet ts = new TreeSet(Arrays.asList(x.getAllFields()));
+
+				assertEquals(8, ts.size());
+
+				ts.contains("bibtextype");
+				ts.contains("bibtexkey");
+				ts.contains("booktitle");
+				ts.contains("year");
+				ts.contains("owner");
+				ts.contains("timestamp");
+				ts.contains("year");
+				ts.contains("url");
+			}
+			{ // First set:
+				prefs.putBoolean("useXmpPrivacyFilter", true);
+				prefs.putStringArray("xmpPrivacyFilter",
+					new String[] { "author;title;note;booktitle;year;owner;timestamp" });
+
+				BibtexEntry e = t1BibtexEntry();
+
+				XMPUtil.writeXMP(pdfFile, e);
+
+				List l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
+				assertEquals(1, l.size());
+				BibtexEntry x = (BibtexEntry) l.get(0);
+
+				TreeSet ts = new TreeSet(Arrays.asList(x.getAllFields()));
+
+				assertEquals(8, ts.size());
+
+				ts.contains("bibtextype");
+				ts.contains("bibtexkey");
+				ts.contains("year");
+				ts.contains("url");
+			}
+
+		} finally {
+			prefs.putBoolean("useXmpPrivacyFilter", use);
+			prefs.putStringArray("xmpPrivacyFilter", privacyFilters);
+		}
 	}
 
 	/**
@@ -916,7 +994,7 @@ public class XMPUtilTest extends TestCase {
 			 * Bibtexkey, Journal, pdf, booktitle
 			 */
 			assertEquals(4, dcSchema.getRelationships().size());
-			
+
 			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
 
 		} finally {
@@ -924,8 +1002,7 @@ public class XMPUtilTest extends TestCase {
 		}
 
 	}
-	
-	
+
 	public void testWriteSingleUpdatesDCAndInfo() throws IOException, TransformerException {
 		List l = new LinkedList();
 		l.add(t3BibtexEntry());
@@ -986,7 +1063,7 @@ public class XMPUtilTest extends TestCase {
 			 * Bibtexkey, Journal, pdf, booktitle
 			 */
 			assertEquals(4, dcSchema.getRelationships().size());
-			
+
 			assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
 
 		} finally {

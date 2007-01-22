@@ -53,12 +53,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author Christopher Oezbek <oezi@oezi.de>
  * 
- * TODO:
- * 
- * Also read information from Dublin Core and Document Information if BibtexXMP
- * is missing.
- * 
- * Also write information as Dublin Core and Document Information.
+ * TODO: 
  * 
  * Synchronization
  * 

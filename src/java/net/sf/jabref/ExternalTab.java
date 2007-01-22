@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -21,8 +20,6 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	// private JComboBox language = new
-	// JComboBox(GUIGlobals.LANGUAGES.keySet().toArray());
 	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, citeCommand;
 
 	ItemListener regExpListener;
@@ -200,4 +197,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		return true;
 	}
 
+	public String getTabName() {
+		return Globals.lang("External programs");
+	}
 }

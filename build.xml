@@ -101,7 +101,6 @@
 		<and>
 			<os family="windows" />
 			<isset property="nsis.executable" />
-<!--			<available file="${nsis.executable}" /> -->
 		</and>
 	</condition>
 
@@ -384,17 +383,19 @@ version=${jabref.version}</echo>
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<target name="win.installer.clean" description="Delete Installer and Exe-Wrapper + Temp-files">
-		<delete dir="${win.installer.dir}/dist" />
+		<delete failonerror="false" dir="${win.installer.dir}/dist" />
 		<delete file="${win.installer.dir}/JabRefSetup.exe" />
 	</target>
 
-	<target name="win.installer" if="is.windows" description="Copy files in place to be used by the installer">
+	<target name="win.installer" description="Copy files in place to be used by the installer" depends="jars">
 
+		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists"/>
+		
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
 
-		<!--    	<copy file="${build.lib}/${jabref.bin}.jar" 
-    		todir="${win.installer.dir}/dist" /> -->
+		<copy file="${build.lib}/${build.jar}" 
+    		todir="${win.installer.dir}/dist" />
 
 		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}"/>
 		
@@ -417,6 +418,9 @@ version=${jabref.version}</echo>
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
+		
+		<delete dir="${win.installer.dir}/dist" />
+		
 	</target>
 
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

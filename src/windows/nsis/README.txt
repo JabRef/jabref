@@ -12,7 +12,6 @@ What is here?
 
   * dist
     * Should contain everything that is supposed to be shipped to the user.
-    * Run target win.installer.prepare to let this be created and filled.
   * launcher.nsi - Will create the exe-wrapper.
   * setup.nsi - Will create the installer.
   * fileassoc.nsh - Helper script to set file-associations
@@ -27,6 +26,7 @@ Requirements + Current Status
 	  * Display GPL [done]
 	  * Add file association for .bib (if desired) [done]
 	  * Install into custom start-menu location (if desired) [done]
+	  * Can only run as administrator [done, Uwe]
 	  * Install onto desktop (if desired)
 	  * Install onto quicklaunch (if desired)
 	
@@ -36,3 +36,8 @@ Requirements + Current Status
 	    
 	All:
 	  * Localization
+	  
+Credits
+
+	Uwe Stöhr rewrote the installer and fixed a lot of issues with the old one.
+		  

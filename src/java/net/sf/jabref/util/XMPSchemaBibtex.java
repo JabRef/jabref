@@ -1,18 +1,22 @@
 package net.sf.jabref.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
 
 import org.jempbox.xmp.XMPMetadata;
@@ -123,8 +127,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.addSequenceDateValue(makeProperty(field), date);
 	}
 
-	public static String getContents(NodeList seqList){
-		
+	public static String getContents(NodeList seqList) {
+
 		Element seqNode = (Element) seqList.item(0);
 		StringBuffer seq = null;
 
@@ -143,7 +147,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns a map of all properties and their values. LIs and bags in seqs
 	 * are concatenated using " and ".
@@ -173,13 +177,13 @@ public class XMPSchemaBibtex extends XMPSchema {
 			String nodeName = node.getNodeName();
 
 			String[] split = nodeName.split(":");
-			
+
 			if (split.length == 2 && split[0].equals(namespaceName)) {
 				NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
 				if (seqList.getLength() > 0) {
 
 					String seq = getContents(seqList);
-					
+
 					if (seq != null) {
 						result.put(split[1], seq);
 					}
@@ -188,7 +192,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 					if (bagList.getLength() > 0) {
 
 						String seq = getContents(bagList);
-						
+
 						if (seq != null) {
 							result.put(split[1], seq);
 						}
@@ -227,7 +231,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		Iterator it = entries.iterator();
 		while (it.hasNext()) {
 			Map.Entry entry = (Map.Entry) it.next();
-			String key = (String)entry.getKey();
+			String key = (String) entry.getKey();
 			if (preserveWhiteSpace.containsKey(key))
 				continue;
 			entry.setValue(((String) entry.getValue()).replaceAll("\\s+", " ").trim());
@@ -235,7 +239,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 		return result;
 	}
-	
+
 	public static HashMap preserveWhiteSpace = new HashMap();
 	static {
 		preserveWhiteSpace.put("abstract", null);
@@ -246,13 +250,30 @@ public class XMPSchemaBibtex extends XMPSchema {
 	public void setBibtexEntry(BibtexEntry entry) {
 		// Set all the values including key and entryType
 		Object[] fields = entry.getAllFields();
+		Object[] results;
+		int resultsSize;
+		
+		JabRefPreferences prefs = JabRefPreferences.getInstance();
+		if (prefs.getBoolean("useXmpPrivacyFilter")) {
+			TreeSet filters = new TreeSet(Arrays.asList(prefs.getStringArray("xmpPrivacyFilter")));
+			results = new Object[fields.length];
+			resultsSize = 0;
+			for (int i = 0; i < fields.length; i++) {
+				if (!filters.contains(fields[i])) {
+					results[resultsSize++] = fields[i];
+				}
+			}
+		} else {
+			results = fields;
+			resultsSize = fields.length;
+		}
 
-		for (int i = 0; i < fields.length; i++) {
-			if (fields[i].equals("author") || fields[i].equals("editor")) {
-				setPersonList(fields[i].toString(), entry.getField(fields[i].toString()).toString());
+		for (int i = 0; i < resultsSize; i++){
+			String s = results[i].toString();
+			if (s.equals("author") || s.equals("editor")) {
+				setPersonList(s, entry.getField(s).toString());
 			} else {
-				setTextProperty(fields[i].toString(), entry.getField(fields[i].toString())
-					.toString());
+				setTextProperty(s, entry.getField(s).toString());
 			}
 		}
 		setTextProperty("entrytype", entry.getType().getName());

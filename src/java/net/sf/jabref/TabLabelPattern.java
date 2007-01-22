@@ -409,4 +409,8 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
 	    //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
     }
+
+	public String getTabName() {
+	    return Globals.lang("Key pattern");
+	}
 }

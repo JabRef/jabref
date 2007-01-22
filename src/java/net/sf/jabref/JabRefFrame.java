@@ -490,8 +490,8 @@ AboutAction aboutAction = new AboutAction();
               public void run() {
                   output(Globals.lang("Opening preferences..."));
                   if (prefsDialog == null) {
-                      prefsDialog = new PrefsDialog3(ths, prefs);
-                      Util.placeDialog(prefsDialog, ths);
+                      prefsDialog = new PrefsDialog3(JabRefFrame.this);
+                      Util.placeDialog(prefsDialog, JabRefFrame.this);
                   }
                   else
                       prefsDialog.setValues();

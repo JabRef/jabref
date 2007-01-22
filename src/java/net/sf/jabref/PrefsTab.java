@@ -1,7 +1,15 @@
 
 package net.sf.jabref;
 
-
+/**
+ * A prefsTab is a component displayed in the PreferenceDialog.
+ * 
+ * It needs to extend from Component.
+ * 
+ * @author $Author$
+ * @version $Revision$ ($Date$)
+ *
+ */
 public interface PrefsTab {
 
     /**
@@ -31,4 +39,10 @@ public interface PrefsTab {
      */
     public boolean readyToClose();
 
+    /**
+     * Should return the localized identifier to use for the tab.
+     * 
+     * @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
+     */
+    public String getTabName();  
 }

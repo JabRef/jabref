@@ -1,14 +1,23 @@
 package net.sf.jabref;
 
-import java.util.Vector;
-import javax.swing.*;
-import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.*;
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.builder.*;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sf.jabref.gui.ColorSetupPanel;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
@@ -169,8 +178,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public boolean readyToClose() {
         try {
             // Test if font size is a number:
-            int size = Integer.parseInt(fontSize.getText());
-
+            Integer.parseInt(fontSize.getText());
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog
                     (null, Globals.lang("You must enter an integer value in the text field for") + " '" +
@@ -182,4 +190,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     }
 
+	public String getTabName() {
+	    return Globals.lang("Appearance");
+	}  
 }
