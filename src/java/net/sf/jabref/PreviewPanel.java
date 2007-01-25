@@ -5,6 +5,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.RenderingHints.Key;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -25,7 +28,7 @@ import net.sf.jabref.export.layout.LayoutHelper;
  * @version $Revision$ ($Date$)
  *
  */
-public class PreviewPanel extends JEditorPane {
+public class PreviewPanel extends JEditorPane implements VetoableChangeListener {
 
 	public String CONTENT_TYPE = "text/html";
 
@@ -53,7 +56,7 @@ public class PreviewPanel extends JEditorPane {
 	public PreviewPanel(BibtexDatabase database, MetaData metaData, BibtexEntry entry, String layoutFile) {
 		this(metaData, layoutFile);
 		this.database = database;
-		this.entry = entry;
+		setEntry(entry);
 
 		try {
 			readLayout();
@@ -116,13 +119,18 @@ public class PreviewPanel extends JEditorPane {
 	}
 
 	public void setEntry(BibtexEntry newEntry) {
-		entry = newEntry;
-		try {
-			readLayout();
-			update();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+            if (newEntry != entry) {
+                if (entry != null)
+                    entry.removePropertyChangeListener(this);
+                newEntry.addPropertyChangeListener(this);
+            }
+            entry = newEntry;
+            try {
+                    readLayout();
+                    update();
+            } catch (Exception ex) {
+                    ex.printStackTrace();
+            }
 	}
 
 	public void update() {
@@ -158,4 +166,16 @@ public class PreviewPanel extends JEditorPane {
 		super.paintComponent(g2);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
 	}
+
+    /**
+     * The PreviewPanel has registered itself as an event listener with the currently displayed
+     * BibtexEntry. If the entry changes, an event is received here, and we can update the
+     * preview immediately.
+     */
+    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+        /*if (entry != null)
+            System.out.println("Updating: "+entry.getCiteKey());*/
+        
+        update();
+    }
 }

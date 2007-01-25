@@ -73,6 +73,7 @@ public class SidePaneManager {
 			}
 		});
 		sidep = new SidePane();
+                sidep.setVisible(false);
 	}
 
 	public SidePane getPanel() {
@@ -177,8 +178,9 @@ public class SidePaneManager {
 		if (visible.size() > 0) {
 			boolean wasVisible = sidep.isVisible();
 			sidep.setVisible(true);
-			if (!wasVisible)
-				frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+			if (!wasVisible) {
+                            frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                        }
 		} else
 			sidep.setVisible(false);
 	}

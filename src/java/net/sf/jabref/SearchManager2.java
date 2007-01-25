@@ -247,7 +247,8 @@ settings.add(select);
         pan.add(help);
         main.add(pan);
         main.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
-        add(main, BorderLayout.CENTER);
+        
+        setContent(main);
 
     searchField.getInputMap().put(Globals.prefs.getKey("Repeat incremental search"),
                       "repeat");
