@@ -179,10 +179,18 @@ public class SidePaneManager {
 			boolean wasVisible = sidep.isVisible();
 			sidep.setVisible(true);
 			if (!wasVisible) {
-                            frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                            int width = Globals.prefs.getInt("sidePaneWidth");
+                            if (width > 0)
+                                frame.contentPane.setDividerLocation(width);
+                            else
+                                frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
                         }
-		} else
-			sidep.setVisible(false);
+		} else {
+                    if (sidep.isVisible())
+                        Globals.prefs.putInt("sidePaneWidth", frame.contentPane.getDividerLocation());
+                    sidep.setVisible(false);
+                    
+                }
 	}
 
 	public void revalidate() {

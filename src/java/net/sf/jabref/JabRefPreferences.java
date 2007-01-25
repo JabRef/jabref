@@ -303,6 +303,8 @@ public class JabRefPreferences {
         defaults.put("useNativeFileDialogOnMac", Boolean.TRUE);
 
         defaults.put("lastUsedExport", null);
+        defaults.put("sidePaneWidth", new Integer(-1));
+        
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
 

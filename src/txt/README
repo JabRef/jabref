@@ -82,23 +82,25 @@ appear in your chosen languages.
 Change log:
 
 2.2b3	- Added progress bar to indicate progress when synchronizing PS/PDF links.
-		- Option to autogenerate key for imported entries now also affects entries imported
+        - Option to autogenerate key for imported entries now also affects entries imported
           without using the import inspection window.
         - Modified quick jump behaviour so sequences of letters can be found. Timeout or
           ESC resets the search.
+        - Width of side pane is now remembered.
         - Improved XMP support: 
-          - JabRef now reads and write DublinCore and Legacy Document Properties
-            Caution needs to be used though since, JabRef does overwrite existing values.
-          - XMP privacy filter can be used to prevent sensible fields to be exported.
+        - JabRef now reads and write DublinCore and Legacy Document Properties
+          Caution needs to be used though since, JabRef does overwrite existing values.
+        - XMP privacy filter can be used to prevent sensible fields to be exported.
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
-		- Fixed bug that made explicit groups appear empty after updating group tree from external
-		  change.
-		- New windows installer thanks to Uwe Stöhr.
+        - Fixed bug that made explicit groups appear empty after updating group tree from external
+          change.
+        - New windows installer thanks to Uwe Stöhr.
+        - [ 1641247 ] Fixed: No update of preview after generating bibtex key
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
         - [ 1570570 ] New Feature: Deselect all duplicates on import
-		- [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
-		- [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
+        - [ 1574773 ] Fixed: sanitizeUrl() breaks ftp:// and file:///
+        - [ 1609991 ] Fixed: Silverplatter Import: Publisher and Year confused
         - [ 1608391 ] Fixed: Medline Search Editbox size gets to big
 2.2b2   - Redesigned export functions to simplify GUI and provide "Export selected
           entries" functionality. Export filter is now chosen using the file type
@@ -112,7 +114,7 @@ Change log:
         - [ 1594123 ] Fixed: Failure to import big numbers in Bibtex
         - [ 1594169 ] Fixed: Entry editor navigation between panels faulty
         - [ 1588028 ] Fixed: Export HTML table has relative DOI URL
-		- [ 1601651 ] Fixed: PDF subdirectory - missing first character
+        - [ 1601651 ] Fixed: PDF subdirectory - missing first character
 2.2b    - Added Mark Schenk's advanced HTML export filter.
         - Added options to copy/move/link to dragged linkable file (pdf, ps, etc.).
         - Removed unnecessary output text when scanning for external file changes.
@@ -151,7 +153,7 @@ Change log:
         - [ 1542552 ] Fixed: Wrong author import from ISI file.
         - [ 1534537 ] Fixed: resize groups interface
         - [ 1465610 ] Fixed: (Double-)Names containing hyphen (-) not handled correctly
-		- [ 1436014 ] Fixed: No comma added to separate keywords
+        - [ 1436014 ] Fixed: No comma added to separate keywords
 		- [ 1548875 ] Fixed: download pdf produces unsupported filename
 		- [ 1545601 ] Fixed: downloading pdf corrupts pdf field text
         - [ 1285977 ] Fixed: Impossible to properly sort a numeric field

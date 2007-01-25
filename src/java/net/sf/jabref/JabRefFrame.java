@@ -559,7 +559,10 @@ public JabRefPreferences prefs() {
       prefs.putInt("sizeX", ths.getSize().width);
       prefs.putInt("sizeY", ths.getSize().height);
       prefs.putBoolean("searchPanelVisible", sidePaneManager.isComponentVisible("search"));
-
+      // Store divider location for side pane:
+      int width = contentPane.getDividerLocation();
+      if (width > 0) 
+          prefs.putInt("sidePaneWidth", width);
       if (prefs.getBoolean("openLastEdited")) {
         // Here we store the names of allcurrent filea. If
         // there is no current file, we remove any
