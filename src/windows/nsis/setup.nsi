@@ -117,10 +117,13 @@ Var UserName
 # Installer languages
 !insertmacro MUI_LANGUAGE "English" # first language is the default language
 !insertmacro MUI_LANGUAGE "German"
+!insertmacro MUI_LANGUAGE "French"
+!insertmacro MUI_LANGUAGE "Italian"
 
 !include "installer_languages\english.nsh"
 !include "installer_languages\german.nsh"
-
+!include "installer_languages\french.nsh"
+!include "installer_languages\italian.nsh"
 
 # Installer attributes
 OutFile JabRefSetup.exe
