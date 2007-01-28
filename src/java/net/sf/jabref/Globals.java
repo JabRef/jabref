@@ -215,7 +215,7 @@ public class Globals {
 			translation = key;
 
 			// Thread.dumpStack(); // For debugging
-			logger("Warning: could not get translation for \"" + key + "\"");
+			//logger("Warning: could not get translation for \"" + key + "\"");
 		}
 		if ((translation != null) && (translation.length() != 0)) {
 			translation = translation.replaceAll("_", " ");
