@@ -658,7 +658,7 @@ public class Globals {
 		// According to ISO 8859-1 the "\times" symbol should be placed here
 		// (#215).
 		// Omitting this, because it is a mathematical symbol.
-		HTMLCHARS.put("O", "&OSlash;"); // #216
+		HTMLCHARS.put("O", "&Oslash;"); // #216
 		HTMLCHARS.put("`U", "&Ugrave;"); // #217
 		HTMLCHARS.put("'U", "&Uacute;"); // #218
 		HTMLCHARS.put("^U", "&Ucirc;"); // #219
@@ -1118,7 +1118,7 @@ public class Globals {
 		// According to ISO 8859-1 the "\times" symbol should be placed here
 		// (#215).
 		// Omitting this, because it is a mathematical symbol.
-		RTFCHARS.put("O", "\\u216O"); // "OSlash"
+		RTFCHARS.put("O", "\\u216O"); // "Oslash"
 		// RTFCHARS.put("`U", "\\u217"); // "Ugrave" exists in standard
 		// codepage
 		RTFCHARS.put("'U", "\\u218U"); // "Uacute"
