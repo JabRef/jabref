@@ -30,6 +30,7 @@ public class ResourceExtractor implements Worker {
     /** Creates a new instance of ResourceExtractor */
     public ResourceExtractor(final Component parent, final String filename, File destination) {
          resource = JabRef.class.getResource(filename);
+         //System.out.println(filename+"\n"+resource);
          this.parent = parent;
          this.destination = destination;
     }

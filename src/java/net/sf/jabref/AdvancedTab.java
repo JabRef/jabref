@@ -170,7 +170,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     }
 
 	public String getTabName() {
-		return "Advanced";
+		return Globals.lang("Advanced");
 	}
 
 }

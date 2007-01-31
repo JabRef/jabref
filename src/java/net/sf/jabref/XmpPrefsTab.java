@@ -235,6 +235,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 	}
 
 	public String getTabName() {
-		return "XMP Metadata";
+		return Globals.lang("XMP metadata");
 	}
 }

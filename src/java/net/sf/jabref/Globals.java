@@ -282,9 +282,8 @@ public class Globals {
 		} catch (MissingResourceException ex) {
 			translation = key;
 
-			// System.err.println("Warning: could not get menu item translation
-			// for \""
-			// + key + "\"");
+			//System.err.println("Warning: could not get menu item translation for \""
+			//+ key + "\"");
 
 		}
 		if ((translation != null) && (translation.length() != 0)) {

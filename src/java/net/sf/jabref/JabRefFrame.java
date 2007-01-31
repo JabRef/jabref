@@ -1127,6 +1127,10 @@ public JabRefPreferences prefs() {
       tools.add(abbreviateMedline);
       tools.add(unabbreviate);
 
+      // TODO: Temporary for 2.2 release: we should perhaps find a better solution:
+      tools.addSeparator();
+      tools.add(new ExpandEndnoteFilters(ths));
+      
       mb.add(tools);
 
       web.add(fetchMedline);
