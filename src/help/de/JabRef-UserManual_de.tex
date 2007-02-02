@@ -6,7 +6,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{19.\,1.\,2007}
+\newcommand{\versiondate}{1.\,2.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -208,7 +208,7 @@ zu starten.
 \end{abstract}
 \begin{quote}
 \begin{spacing}{0.7}
-\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2006, Dominik
+\begin{center}{\scriptsize Copyright \textcopyright{} 2005--2007, Dominik
 Waßenhoven}
 \end{center}
 {\scriptsize Der Inhalt dieses Handbuchs wird unter den Bedingungen der Creative Commons Public License ">Namensnennung"=NichtKommerziell"=Weitergabe unter gleichen Bedingungen 2.0 Deutschland"< zur Verfügung gestellt. Um den Lizenzvertrag anzusehen, gehen Sie bitte zu \href{http://creativecommons.org/licenses/by-nc-sa/2.0/de/}{http://creativecommons.org\slash{}licenses\slash{}by-nc-sa\slash{}2.0\slash{}de\slash{}} oder schicken einen Brief an Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA. \par}\end{spacing}
@@ -226,14 +226,14 @@ Waßenhoven}
 \section{Einleitung}
 \secttoc
 
-\subsection{Über dieses Handbuch}
+\subsection{Über dieses Handbuch}\label{subsec:about}
 
 Dieses Handbuch will eine kurze Einführung zu den nützlichsten Funktionen
 von \jabref{} bieten, ohne dabei eine erschöpfende Beschreibung aller
 Funktionalitäten dieser Software zu liefern. \emph{}\jabref{} ist
 das Ergebnis der Verschmelzung von \emph{BibKeeper} und \emph{JBibtexManager}.
 Weitere Informationen gibt es im Internet unter \url{http://jabref.sourceforge.net}
-sowie im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}.
+sowie im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}. Wer dann immer noch keine Antwort auf seine Frage oder keine Lösung zu seinem Problem hat, kann über die Foren oder die Mailingliste auf der Projektseite bei Sourceforge weitere Hilfe bekommen (siehe dazu den Abschnitt \nameref{sec:faq}).
 
 Die Anleitungen basieren auf den Hilfeseiten des Programms. Da dieses
 Handbuch und die Hilfeseiten unabhängig voneinander gepflegt und aktualisiert
@@ -254,7 +254,6 @@ Dokuments als auch für Links ins Internet.
 Abschnitt >>Versionsgeschichte<< (S.\,\pageref{RevisionHistory})
 Auskunft.
 
-
 \subsection{Einführung in \bibtex{}}
 
 \label{BibtexHelp}\tip[]{\jabref{} hilft Ihnen bei der Arbeit mit
@@ -262,7 +261,7 @@ Ihren \bibtex{}-Dateien, aber es müssen dennoch Regeln beachtet werden,
 wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden,
 dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
 
-\noindent Im Folgenden können nur einige allgemeine Hinweise gegeben werden. Ausführlichere Einführungen und weitere Erläuterungen zu \bibtex{} finden Sie bei \cite{Fenn2006,Markey2005,btxdoc,btxhak,Raichle2002}.
+\noindent Im Folgenden können nur einige allgemeine Hinweise gegeben werden. Ausführlichere Einführungen und weitere Erläuterungen zu \bibtex{} finden Sie bei \cite{Fenn2006,Markey2005,btxdoc,btxhak,Raichle2002,btxfaq}.
 
 \subsubsection{\bibtex{}-Eintragstypen}
 \label{Eintragstypen}
@@ -1297,7 +1296,7 @@ ist es oftmals leichter, diese Arbeiten durchzuführen, bevor die neuen
 Einträge zwischen die bereits bestehenden sortiert wurden.
 
 
-\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}
+\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}\label{subsubsec:jabref-endnote}
 
 \begin{quote}
 \label{EndnoteFilters}\emph{\jabref{} kann Dateien so exportieren,
@@ -1312,7 +1311,6 @@ Schwierigkeit zu umgehen:
 \begin{enumerate}
 \item Benutzen Sie den eingebauten Filter und bessern Sie die Datei später
 aus.
-
 
 Um die Datei in EndNote zu öffnen, erstellen Sie eine neue Datei oder
 öffnen eine bestehende Datei in EndNote. Dann wählen Sie \menu{Datei}
@@ -1329,9 +1327,7 @@ das Ganze für das Feld \emph{Secondary Author} (Zweiter Autor).
 
 \item Installieren Sie den \emph{EndNote Import from JabRef Filter}.
 
-
-Folgen Sie den Anweisungen im Abschnitt >>Erweiterte Benutzung<<
-(siehe unten, Seite~\pageref{EndNote_erweitert}). Um die Datei in
+Folgen Sie den Anweisungen im Abschnitt \nameref{EndNote_erweitert}. Um die Datei in
 EndNote zu öffnen, erstellen Sie eine neue Datei oder öffnen eine
 bestehende Datei in EndNote. Dann wählen Sie \menu{Datei} \msep{}
 \menu{Importieren}, klicken auf \menu{Datei wählen}, wählen die
@@ -1394,21 +1390,20 @@ erscheinen. Der vorgegebene EndNote-Importfilter kann darüberhinaus
 das Feld \emph{author} nicht richtig analysieren. Der \emph{EndNote
 Import from JabRef Filter} kann dies. Außerdem erkennt dieser Filter
 ein Feld \texttt{endnotereftype}, das die vorgegebene Zuordnung überschreibt.
-Um den Filter zu installieren, extrahieren Sie die EndNote Extras
-(\menu{Datei} \msep{} \menu{Exportieren} \msep{} \menu{EndNote Filter-Set auspacken})
+Um den Filter zu installieren, nutzen Sie die EndNote Extras
+(\menu{Extras \msep{} EndNote Filter-Set entpacken})
 und entpacken die Zip-Datei, die dabei erstellt wird. Dann folgen
 Sie den Angaben in der Datei \texttt{readme.txt}.
 
 
-\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}
+\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}\label{subsubsec:endnote-jabref}
 
 EndNote hat einen Export-Stil \bibtex{}, der allerdings nicht alle
 Eintragstypen und Felder von \bibtex{} und auch nicht die zusätzlich
 von \jabref{} genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
 \emph{key} usw.) unterstützt. Falls Sie diese Felder nutzen wollen,
-extrahieren Sie die EndNote Extras (\menu{Datei} \msep{} \menu{Exportieren}
-\msep{} \menu{EndNote Filter-Set auspacken}), entpacken die Zip-Datei,
-die dabei erstellt wird und folgen den Anweisungenx in der Datei \texttt{readme.txt}.
+verwenden Sie die EndNote Extras (\menu{Extras \msep{} EndNote Filter-Set entpacken}), extrahieren die Zip-Datei,
+die dabei erstellt wird und folgen den Anweisungen in der Datei \texttt{readme.txt}.
 
 
 \subsubsection[JabRef-Bibliographien in OpenOffice.org benutzen]{\jabref{}-Bibliographien in OpenOffice.org benutzen}
@@ -2704,7 +2699,8 @@ F1\tabularnewline
 Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref{}-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
 \begin{enumerate}
 	\item Durchsuchen Sie die \href{http://sourceforge.net/forum/?group_id=92314}{Foren} auf der Projektseite bei Sourceforge.
-	\item Stellen Sie Ihre Frage in der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
+	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_id=36852}{Archiv} der \jabref{}-Mailingliste.
+	\item Stellen Sie Ihre Frage in einem der Foren oder auf der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
 \end{enumerate}
 
 \faq{Läuft \jabref{} unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Am 13.~November~2006 hat Sun sein Java unter die GNU General Public License (Version~2) gestellt, so dass die Antwort ">Ja"< lautet. Ansonsten ist zu sagen, dass eine unserer Abhängigkeiten derzeit zu einem Absturz führt, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath.}
@@ -2765,11 +2761,17 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \label{RevisionHistory}
 
-%\begin{revhist}{\versiondate}%Datum}
+%\begin{revhist}{\versiondate}%endgültiges Datum}
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%19.\,1.\,2007}
+\begin{revhist}{\versiondate}%endgültiges Datum}
+\item Abschnitte \nameref{subsubsec:jabref-endnote}, \nameref{subsubsec:endnote-jabref}, \nameref{subsec:about} und \nameref{sec:faq} überarbeitet
+\item Literaturverzeichnis um Eintrag von \cite{btxfaq} ergänzt
+\item Und noch ein paar kleine Änderungen
+\end{revhist}
+
+\begin{revhist}{19.\,1.\,2007}
 \item Abschnitt ">\nameref{Eintragstypen}"< hinzugefügt
 \item Grafik auf Titelseite ausgetauscht
 \item Ein paar kleinere Änderungen
