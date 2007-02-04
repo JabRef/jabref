@@ -676,6 +676,7 @@ public class JabRefPreferences {
         defKeyBinds.put("Open database", "ctrl O");
         defKeyBinds.put("Save database", "ctrl S");
         defKeyBinds.put("Save database as ...", "ctrl shift S");
+        defKeyBinds.put("Save all", "ctrl alt S");
         defKeyBinds.put("Close database", "ctrl W");
         defKeyBinds.put("New entry", "ctrl N");
         defKeyBinds.put("Cut", "ctrl X");

@@ -27,6 +27,7 @@
 
 package net.sf.jabref;
 
+import net.sf.jabref.export.SaveAllAction;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.label.*;
 import net.sf.jabref.export.FileActions;
@@ -151,6 +152,7 @@ public class JabRefFrame extends JFrame {
       saveAs = new GeneralAction("saveAs", "Save database as ...",
                                  "Save database as ...",
                                  prefs.getKey("Save database as ...")),
+      saveAll = new SaveAllAction(ths),
       saveSelectedAs = new GeneralAction("saveSelectedAs",
                                          "Save selected as ...",
                                          "Save selected as ...",
@@ -753,7 +755,7 @@ public JabRefPreferences prefs() {
    * Returns the indexed BasePanel.
    * @param i Index of base
    */
-  BasePanel baseAt(int i) {
+  public BasePanel baseAt(int i) {
     return (BasePanel) tabbedPane.getComponentAt(i);
   }
 
@@ -1012,6 +1014,7 @@ public JabRefPreferences prefs() {
       file.add(mergeDatabaseAction);
       file.add(save);
       file.add(saveAs);
+      file.add(saveAll);
       file.add(saveSelectedAs);
       file.addSeparator();
       //file.add(importMenu);
@@ -1213,7 +1216,8 @@ public JabRefPreferences prefs() {
     tlb.addAction(newDatabaseAction);
     tlb.addAction(open);
     tlb.addAction(save);
-
+    tlb.addAction(saveAll);
+    
     tlb.addSeparator();
     tlb.addAction(cut);
     tlb.addAction(copy);
@@ -1378,7 +1382,7 @@ public JabRefPreferences prefs() {
 			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
 			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
 			abbreviateMedline, unabbreviate, ieex.getAction(), arxiv.getAction(), exportAll, exportSelected,
-            importCurrent}));
+            importCurrent, saveAll}));
 
 		openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
