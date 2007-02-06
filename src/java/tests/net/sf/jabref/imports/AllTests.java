@@ -9,8 +9,9 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for tests.net.sf.jabref.imports");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(OAI2ImportTest.class);
-		suite.addTestSuite(BibtexParserTest.class);
 		suite.addTestSuite(IsiImporterTest.class);
+		suite.addTestSuite(CopacImporterTest.class);
+		suite.addTestSuite(BibtexParserTest.class);
 		//$JUnit-END$
 		return suite;
 	}

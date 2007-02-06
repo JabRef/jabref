@@ -81,14 +81,11 @@ appear in your chosen languages.
 
 Change log:
 
-<<<<<<< README
-2.x     - Added feature to save all open databases.
-2.2	- Added progress bar to indicate progress when synchronizing PS/PDF links.
-	- Option to autogenerate key for imported entries now also affects entries imported
-=======
-2.2b3	- Added progress bar to indicate progress when synchronizing PS/PDF links.
+2.3b1   - Added feature to save all open databases.
+        - Fixed wrong dependency in OAI2 Fetcher.
+        - Support for COPAC file format added.
+2.2  	- Added progress bar to indicate progress when synchronizing PS/PDF links.
         - Option to autogenerate key for imported entries now also affects entries imported
->>>>>>> 1.210
           without using the import inspection window.
         - Modified quick jump behaviour so sequences of letters can be found. Timeout or
           ESC resets the search.

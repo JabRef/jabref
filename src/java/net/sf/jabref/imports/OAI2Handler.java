@@ -41,37 +41,37 @@ public class OAI2Handler extends DefaultHandler {
 	
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		
-        if(localName.equals("id")) {
+        if(qName.equals("id")) {
 			nextField = "id";
 			assigned = true;
-		} else if(localName.equals("keyname")) {
+		} else if(qName.equals("keyname")) {
 			nextField = "keyname";
 			assigned = true;
-		} else if(localName.equals("author")) {
+		} else if(qName.equals("author")) {
 			keyname = "";
 			forenames = "";
-		} else if(localName.equals("forenames")) {
+		} else if(qName.equals("forenames")) {
 			nextField = "forenames";
 			assigned = true;
-		} else if(localName.equals("journal-ref")) {
+		} else if(qName.equals("journal-ref")) {
 			nextField = "journal-ref";
 			assigned = true;
-		} else if(localName.equals("datestamp")) {
+		} else if(qName.equals("datestamp")) {
 			nextField = "datestamp";
 			assigned = true;
-		} else if(localName.equals("title")) {
+		} else if(qName.equals("title")) {
 			nextField = "title";
 			assigned = true;
-		} else if(localName.equals("abstract")) {
+		} else if(qName.equals("abstract")) {
 			nextField = "abstract";
 			assigned = true;
-		} else if(localName.equals("comments")) {
+		} else if(qName.equals("comments")) {
 			nextField = "comments";
 			assigned = true;
-		} else if(localName.equals("report-no")) {
+		} else if(qName.equals("report-no")) {
 			nextField = "reportno";
 			assigned = true;
-		} else if(localName.equals("error")) {
+		} else if(qName.equals("error")) {
 		    nextField = "error";
             assigned = true;
         }
@@ -79,7 +79,7 @@ public class OAI2Handler extends DefaultHandler {
 
 	
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if(localName.equals("author")) {
+		if(qName.equals("author")) {
 			String temp = forenames + " " + keyname;
 			if(!authors.equals(""))
 				authors += " and ";

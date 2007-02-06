@@ -24,38 +24,27 @@
  */
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import java.util.regex.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.Util;
 
 
-/*
- * // int jabrefframe BibtexDatabase database=new BibtexDatabase(); String
- * filename=Globals.getNewFile(); ArrayList bibitems=readISI(filename); // is
- * there a getFileName(); Iterator it = bibitems.iterator();
- * while(it.hasNext()){ BibtexEntry entry = (BibtexEntry)it.next();
- * entry.setId(Util.createId(entry.getType(), database); try {
- * database.insertEntry(entry); } catch (KeyCollisionException ex) {
- *  } }
- */
 public class ImportFormatReader {
 
     public static String BIBTEX_FORMAT = "BibTeX";
-    private final static String SPACE_MARKER = "__SPC__";
-    private final static Pattern bracketsPattern = Pattern.compile("\\{.*\\}"),
-	spaceMarkerPattern = Pattern.compile(SPACE_MARKER);
 
   /** all import formats, in the defalt order of import formats */
   private SortedSet formats = new TreeSet();
@@ -85,6 +74,7 @@ public class ImportFormatReader {
     formats.add(new BiomailImporter());
     formats.add(new RepecNepImporter());  
     formats.add(new PdfXmpImporter());
+    formats.add(new CopacImporter());
     
     // add all custom importers
     for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {

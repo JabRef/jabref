@@ -3,7 +3,6 @@ package tests.net.sf.jabref.imports;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;

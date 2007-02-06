@@ -167,6 +167,12 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 		return key;
 	}
 
+	public static String correctLineBreaks(String s){
+		s = s.replaceAll("\\n(?!\\s*\\n)", " ");
+		s = s.replaceAll("\\s*\\n\\s*", "\n");
+		return s.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+	}
+	
 	/**
 	 * Import an entry from an OAI2 archive. The BibtexEntry provided has to
 	 * have the field OAI2_IDENTIFIER_FIELD set to the search string.
@@ -195,6 +201,14 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 			DefaultHandler handlerBase = new OAI2Handler(be);
 			/* parse the result */
 			saxParser.parse(inputStream, handlerBase);
+			
+			/* Correct line breaks and spacing */
+			Object[] fields = be.getAllFields();
+			for (int i = 0; i < fields.length; i++){
+				String name = fields[i].toString();
+				
+				be.setField(name, correctLineBreaks(be.getField(name).toString()));
+			}
 			return be;
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(frame, Globals.lang(
@@ -299,8 +313,9 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 			/* inform the inspection dialog, that we're done */
 			dialog.entryListComplete();
 			frame.output("");
-		} catch (InterruptedException e) {
-
+		} catch (Exception e) {
+			frame.output("Error while fetching from OIA2: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }
