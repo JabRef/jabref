@@ -208,15 +208,14 @@ public class Globals {
 	public static String lang(String key, String[] params) {
 		String translation = null;
 		try {
-			if (Globals.messages != null) {
+			if (Globals.messages != null) 
 				translation = Globals.messages.getString(key.replaceAll(" ", "_"));
-			}
 		} catch (MissingResourceException ex) {
-			translation = key;
-
-			// Thread.dumpStack(); // For debugging
 			//logger("Warning: could not get translation for \"" + key + "\"");
 		}
+		if (translation == null)
+			translation = key;
+
 		if ((translation != null) && (translation.length() != 0)) {
 			translation = translation.replaceAll("_", " ");
 			StringBuffer sb = new StringBuffer();

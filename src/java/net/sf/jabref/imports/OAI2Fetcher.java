@@ -216,11 +216,11 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 				+ "\n\n" + e.toString(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
 		} catch (SAXException e) {
 			JOptionPane.showMessageDialog(frame, Globals.lang(
-				"An SAXException ocurred while parsing '%0':", url)
+				"An SAXException ocurred while parsing '%0':", new String[]{url})
 				+ "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
 		} catch (RuntimeException e){
 			JOptionPane.showMessageDialog(frame, Globals.lang(
-				"An Error occurred while fetching from OAI2 source (%0):", url)
+				"An Error occurred while fetching from OAI2 source (%0):", new String[]{url})
 				+ "\n\n" + e.getMessage(), Globals.lang(getKeyName()), JOptionPane.ERROR_MESSAGE);
 		} 
 		return null;

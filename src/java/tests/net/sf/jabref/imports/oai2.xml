@@ -13,7 +13,15 @@
 </header>
 <metadata>
  <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arXiv.org/OAI/arXiv.xsd">
- <id>hep-ph/0408155</id><authors><author><keyname>Giudice</keyname><forenames>G. F.</forenames></author><author><keyname>Riotto</keyname><forenames>A.</forenames></author><author><keyname>Zaffaroni</keyname><forenames>A.</forenames></author></authors><title>Heavy Particles from Inflation</title><categories>hep-ph astro-ph hep-th</categories><comments>23 pages</comments><report-no>CERN-PH-TH/2004-151</report-no><journal-ref>Nucl.Phys. B710 (2005) 511-525</journal-ref><doi>10.1016/j.nuclphysb.2004.12.037</doi><abstract>  We describe a simple and efficient mechanism by which very heavy particles
+ <id>hep-ph/0408155</id>
+ <authors>
+ 	<author><keyname>Giudice</keyname><forenames>G. F.</forenames></author>
+ 	<author><keyname>Riotto</keyname><forenames>A.</forenames></author>
+ 	<author><keyname>Zaffaroni</keyname><forenames>A.</forenames></author>
+ 	<author><keyname>López-Peña</keyname><forenames>J.</forenames></author>
+ </authors>
+ 
+ 	<title>Heavy Particles from Inflation</title><categories>hep-ph astro-ph hep-th</categories><comments>23 pages</comments><report-no>CERN-PH-TH/2004-151</report-no><journal-ref>Nucl.Phys. B710 (2005) 511-525</journal-ref><doi>10.1016/j.nuclphysb.2004.12.037</doi><abstract>  We describe a simple and efficient mechanism by which very heavy particles
 are copiously created from a primordial inflationary epoch. It works for scalar
 fields which are massless or very light during inflation and acquire a large
 mass right after the end of inflation. Such particles can exist in realistic
