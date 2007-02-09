@@ -250,14 +250,29 @@ public class XMPUtilTest extends TestCase {
 		if (Globals.prefs == null) {
 			Globals.prefs = JabRefPreferences.getInstance();
 		}
+		
+		// Store Privacy Settings
+		prefs = JabRefPreferences.getInstance();
 
+		use = prefs.getBoolean("useXmpPrivacyFilter");
+		privacyFilters = prefs.getStringArray("xmpPrivacyFilters");
+
+		// The code assumes privacy filters to be off
+		prefs.putBoolean("useXmpPrivacyFilter", false);
 	}
+	
+	JabRefPreferences prefs;
+	boolean use;
+	String[] privacyFilters;
 
 	/**
 	 * Delete the temporary file.
 	 */
 	public void tearDown() {
 		pdfFile.delete();
+		
+		prefs.putBoolean("useXmpPrivacyFilter", use);
+		prefs.putStringArray("xmpPrivacyFilter", privacyFilters);
 	}
 
 	/**
@@ -318,12 +333,7 @@ public class XMPUtilTest extends TestCase {
 	 */
 	public void testPrivacyFilter() throws IOException, TransformerException {
 
-		JabRefPreferences prefs = JabRefPreferences.getInstance();
-
-		boolean use = prefs.getBoolean("useXmpPrivacyFilter");
-		String[] privacyFilters = prefs.getStringArray("xmpPrivacyFilters");
-
-		try {
+		
 			{ // First set:
 				prefs.putBoolean("useXmpPrivacyFilter", true);
 				prefs.putStringArray("xmpPrivacyFilter", new String[] { "author;title;note" });
@@ -372,10 +382,6 @@ public class XMPUtilTest extends TestCase {
 				ts.contains("url");
 			}
 
-		} finally {
-			prefs.putBoolean("useXmpPrivacyFilter", use);
-			prefs.putStringArray("xmpPrivacyFilter", privacyFilters);
-		}
 	}
 
 	/**
