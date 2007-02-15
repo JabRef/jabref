@@ -7,6 +7,7 @@ import net.sf.jabref.gui.ImportInspectionDialog;
 import javax.swing.*;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.ConnectException;
 import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -186,8 +187,13 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             dialog.entryListComplete();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (ConnectException e) {
+            JOptionPane.showMessageDialog(frame, Globals.lang("Connection to IEEEXplore failed"),
+                    Globals.lang("Search IEEExplore"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            frame.unblock(); // We call this to ensure no lockup.
         }
 
 
@@ -424,6 +430,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
      * @throws IOException
      */
     public String getResults(URL source) throws IOException {
+        
         InputStream in = source.openStream();
         StringBuffer sb = new StringBuffer();
         byte[] buffer = new byte[256];
