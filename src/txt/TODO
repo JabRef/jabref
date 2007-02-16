@@ -7,3 +7,6 @@ Chris:
   * Plugin-Architecture for LayoutFormatters.
   * Allow search relativ to bibtex-file
   
+Morten:
+* See if the old Bibkeeper autocomplete stuff is still in there
+   somewhere, and if it is still usable
