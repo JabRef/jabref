@@ -65,6 +65,8 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 	public FieldTextArea(String fieldName_, String content) {
 		super(content);
 
+        updateFont();
+                
 		// Add the global focus listener, so a menu item can see if this field
 		// was focused when an action was called.
 		addFocusListener(Globals.focusListener);
@@ -120,7 +122,12 @@ public class FieldTextArea extends JTextArea implements FieldEditor {
 		return this;
 	}
 
-	public void paste(String textToInsert) {
+
+    public void updateFont() {
+        setFont(GUIGlobals.CURRENTFONT);
+    }
+
+    public void paste(String textToInsert) {
 		int sel = getSelectionEnd() - getSelectionStart();
 		if (sel > 0) // selected text available
 			replaceSelection(textToInsert);

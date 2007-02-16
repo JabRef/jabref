@@ -80,7 +80,8 @@ public interface FieldEditor {
 
 	public void setEnabled(boolean enabled);
 
-	/**
+    public void updateFont();
+    /**
 	 * paste text into component, it should also take some selected text into
 	 * account
 	 */

@@ -25,6 +25,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 package net.sf.jabref;
+import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
@@ -38,14 +39,39 @@ import javax.swing.plaf.metal.*;
 //======================================================================
 public class JabRefFileChooser extends JFileChooser
 {
+
+    // Remember size at previous use, so the user doesn't need to resize every time:
+    private static Dimension lastSize = null;
+
     public JabRefFileChooser()
     {
         super();
+        
     }
 
     public JabRefFileChooser(File file){
         super(file);
     }
+
+    /*public int showOpenDialog(Component parent) throws HeadlessException {
+        if (lastSize != null) {
+            setSize(lastSize);
+            System.out.println("Setting size: "+lastSize);
+        }
+        int answer = super.showOpenDialog(parent);
+        lastSize = getSize();
+        return answer;
+    }*/
+
+    /*public int showSaveDialog(Component parent) throws HeadlessException {
+        if (lastSize != null) {
+            setSize(lastSize);
+            System.out.println("Setting size: "+lastSize);
+        }
+        int answer = super.showSaveDialog(parent);
+        lastSize = getSize();
+        return answer;
+    }*/
 
     //========================================================
     //

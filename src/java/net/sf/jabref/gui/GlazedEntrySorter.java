@@ -97,7 +97,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
         }
         list.getReadWriteLock().writeLock().unlock();
 
-
     }
 
 

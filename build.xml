@@ -15,7 +15,7 @@
                help mailing list:      must be inserted
 
    Precondition: 1. Ant should be installed.
-                 2. JAVA_HOME environment variable contains the path to JDK1.4 or higher
+                 2. JAVA_HOME environment variable contains the path to JDK1.5 or higher
                  3. ANT_HOME environment variable contains the path to ant's home directory
 
    Language: XML
@@ -116,7 +116,7 @@
 		<pathelement location="${library.directory}/looks-2.0.4.jar" />
 		<pathelement location="${library.directory}/forms-1.0.4.jar" />
 		<pathelement location="${library.directory}/spin.jar" />
-		<pathelement location="${library.directory}/glazedlists-1.7.0_java14.jar" />
+		<pathelement location="${library.directory}/glazedlists-1.7.0_java15.jar" />
 		<pathelement location="${library.directory}/microba.jar" />
 		<pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
 		<pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
@@ -156,7 +156,7 @@
 	<!-- Compiles project -->
 	<target name="compile">
 		<mkdir dir="${build.classes}" />
-		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
 			<classpath refid="classpath" />
@@ -167,7 +167,7 @@
 	<target name="compiletest">
 		<mkdir dir="${build.classes}" />
 		<!--deprecation="on"-->
-		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.4" target="1.4">
+		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.5" target="1.5">
 			<classpath refid="classpath" />
 		</javac>
 	</target>
@@ -176,7 +176,7 @@
 	<target name="osx">
 		<mkdir dir="${build.classes}" />
 
-		<javac srcdir="${osx.dir}" debug="on" destdir="${build.classes}" target="1.4">
+		<javac srcdir="${osx.dir}" debug="on" destdir="${build.classes}" target="1.5">
 		</javac>
 	</target>
 
@@ -361,7 +361,7 @@ version=${jabref.version}</echo>
 		<unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/glazedlists-1.7.0_java14.jar" dest="${build.tmp}" />
+		<unjar src="${library.directory}/glazedlists-1.7.0_java15.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" dest="${build.tmp}" />
 		<unjar src="${library.directory}/JempBox-0.1.0-dev.jar" dest="${build.tmp}" />

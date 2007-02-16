@@ -26,13 +26,15 @@ public class DuplicateResolverDialog extends JDialog {
         KEEP_BOTH = 0,
         KEEP_UPPER = 1,
         KEEP_LOWER = 2,
+        AUTOREMOVE_EXACT = 3,
         BREAK      = 5,  // close
         IMPORT_AND_DELETE_OLD = 1,
         IMPORT_AND_KEEP_OLD = 0,
         DO_NOT_IMPORT = 2,
         DUPLICATE_SEARCH = 1,
         IMPORT_CHECK = 2,
-    INSPECTION = 3;
+        INSPECTION = 3,
+        DUPLICATE_SEARCH_WITH_EXACT = 4;
 
     final Dimension DIM = new Dimension(650, 600);
 
@@ -42,7 +44,8 @@ public class DuplicateResolverDialog extends JDialog {
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
     JButton first, second, both,
-        cancel = new JButton(Globals.lang("Cancel"));
+        cancel = new JButton(Globals.lang("Cancel")),
+        removeExact = null;
     JPanel options = new JPanel(),
         main = new JPanel(),
         source = new JPanel();
@@ -73,6 +76,12 @@ public class DuplicateResolverDialog extends JDialog {
               first = new JButton(Globals.lang("Remove old entry"));
               second = new JButton(Globals.lang("Remove entry from import"));
               both = new JButton(Globals.lang("Keep both"));
+              break;
+          case DUPLICATE_SEARCH_WITH_EXACT:
+              first = new JButton(Globals.lang("Keep upper"));
+              second = new JButton(Globals.lang("Keep lower"));
+              both = new JButton(Globals.lang("Keep both"));
+              removeExact = new JButton(Globals.lang("Automatically remove exact duplicates"));
               break;
           default:
               first = new JButton(Globals.lang("Import and remove old entry"));
@@ -129,6 +138,8 @@ public class DuplicateResolverDialog extends JDialog {
     source.add(sp);
     tabbed.add(Globals.lang("Short form"), main);
     tabbed.add(Globals.lang("Complete record"), source);
+    if (removeExact != null)
+        options.add(removeExact);
     options.add(first);
     options.add(second);
     options.add(both);
@@ -160,6 +171,15 @@ public class DuplicateResolverDialog extends JDialog {
         dispose();
       }
     });
+
+    if (removeExact != null)
+        removeExact.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                status = AUTOREMOVE_EXACT;
+                block = false;
+                dispose();
+            }
+        });
 
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

@@ -187,13 +187,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		List fieldList = null;
 		if (fields != null)
 			fieldList = java.util.Arrays.asList(fields);
-		reqPan = new EntryEditorTab(fieldList, this, true, Globals.lang("Required fields"));
+		reqPan = new EntryEditorTab(panel, fieldList, this, true, Globals.lang("Required fields"));
 		tabbed.addTab(Globals.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
 			.getPane(), Globals.lang("Show required fields"));
 		tabs.add(reqPan);
 
 		if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
-			optPan = new EntryEditorTab(java.util.Arrays.asList(entry.getOptionalFields()), this,
+			optPan = new EntryEditorTab(panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
 				false, Globals.lang("Optional fields"));
 			tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
 				.getPane(), Globals.lang("Show optional fields"));
@@ -202,7 +202,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 		EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
 		for (int i = 0; i < tabList.getTabCount(); i++) {
-			EntryEditorTab newTab = new EntryEditorTab(tabList.getTabFields(i), this, false,
+			EntryEditorTab newTab = new EntryEditorTab(panel, tabList.getTabFields(i), this, false,
 				tabList.getTabName(i));
 			tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
 			tabs.add(newTab);

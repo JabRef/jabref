@@ -261,7 +261,7 @@ public class JabRefFrame extends JFrame {
                                   "Open URL or DOI",
                                   prefs.getKey("Open URL or DOI")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
-      strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
+      //strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
       plainTextImport = new GeneralAction("plainTextImport",
                                           "New entry from plain text",
                                           prefs.getKey("New from plain text")),
@@ -1102,7 +1102,7 @@ public JabRefPreferences prefs() {
       // [kiar] I think we should group these festures
       tools.add(checkAndFix);
       checkAndFix.add(dupliCheck);
-      checkAndFix.add(strictDupliCheck);
+      //checkAndFix.add(strictDupliCheck);
       checkAndFix.add(autoSetPdf);
       checkAndFix.add(autoSetPs);
       checkAndFix.add(integrityCheckAction);
@@ -1377,7 +1377,7 @@ public JabRefPreferences prefs() {
 			selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
 			makeKeyAction, emacsPushAction, lyxPushAction, winEdtPushAction, normalSearch,
 			incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
-			openFile, openUrl, togglePreview, dupliCheck, strictDupliCheck, highlightAll,
+			openFile, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
 			highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
 			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
 			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
@@ -2088,6 +2088,7 @@ class FetchCiteSeerAction
 
     /**
      * This method reverts the cursor to normal, and stops blocking input to the JFrame's contents.
+     * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
         getGlassPane().setVisible(false);

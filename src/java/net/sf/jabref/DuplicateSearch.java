@@ -33,16 +33,18 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
+import java.util.Vector;
+import javax.swing.JOptionPane;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
-import java.util.Vector;
 
 public class DuplicateSearch extends Thread {
 
   BasePanel panel;
   BibtexEntry[] bes;
   final Vector duplicates = new Vector();
-
+  boolean autoRemoveExactDuplicates = false;
+  
   public DuplicateSearch(BasePanel bp) {
     panel = bp;
   }
@@ -50,6 +52,9 @@ public class DuplicateSearch extends Thread {
 public void run() {
   NamedCompound ce = null;
   int duplicateCounter = 0;
+  
+  autoRemoveExactDuplicates = false;
+  
   panel.output(Globals.lang("Searching for duplicates..."));
   Object[] keys = panel.database.getKeySet().toArray();
   if ((keys == null) || (keys.length < 2))
@@ -95,40 +100,59 @@ public void run() {
       }
     } else  // duplicates found
     {
-      BibtexEntry[] be = ( BibtexEntry[] ) duplicates.get( current ) ;
-      current++ ;
-      if ( ( panel.database.getEntryById( be[0].getId() ) != null ) &&
-           ( panel.database.getEntryById( be[1].getId() ) != null ) )
-      {
 
-        drd = new DuplicateResolverDialog( panel.frame, be[0], be[1],
-                                           DuplicateResolverDialog.DUPLICATE_SEARCH) ;
-        drd.setVisible(true); // drd.show(); -> deprecated since 1.5
+        BibtexEntry[] be = (BibtexEntry[]) duplicates.get(current);
+        current++;
+        if ((panel.database.getEntryById(be[0].getId()) != null) &&
+                (panel.database.getEntryById(be[1].getId()) != null)) {
+            // Check if they are exact duplicates:
+            boolean askAboutExact = false;
+            if (Util.compareEntriesStrictly(be[0], be[1]) > 1) {
+                if (autoRemoveExactDuplicates) {
+                    // TODO: the following line (possibly) prevents ArrayIndexOutOfBoundsException
+                    // from the EventList providing data for the main table. This shouldn't be the
+                    // case...
+                    try { Thread.sleep(10); } catch (InterruptedException ex) {};
+                    //
+                    if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
+                    panel.database.removeEntry(be[1].getId());
+                    panel.markBaseChanged();
+                    ce.addEdit(new UndoableRemoveEntry(panel.database, be[1], panel));
+                    duplicateCounter++;
 
-        duplicateCounter++ ;
-        int answer = drd.getSelected() ;
-        if ( answer == DuplicateResolverDialog.KEEP_UPPER )
-        {
-          if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
-          panel.database.removeEntry( be[1].getId() ) ;
-          panel.markBaseChanged() ;
-          ce.addEdit( new UndoableRemoveEntry( panel.database, be[1], panel ) ) ;
+                    continue;
+                } else {
+                    askAboutExact = true;
+                }
+            }
+
+            drd = new DuplicateResolverDialog(panel.frame, be[0], be[1],
+                    askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
+                            DuplicateResolverDialog.DUPLICATE_SEARCH);
+            drd.setVisible(true);
+
+            duplicateCounter++;
+            int answer = drd.getSelected();
+            if ((answer == DuplicateResolverDialog.KEEP_UPPER)
+                    || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
+                if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
+                panel.database.removeEntry(be[1].getId());
+                panel.markBaseChanged();
+                ce.addEdit(new UndoableRemoveEntry(panel.database, be[1], panel));
+                if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
+                    autoRemoveExactDuplicates = true; // Remember choice
+            } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
+                panel.database.removeEntry(be[0].getId());
+                panel.markBaseChanged();
+                ce.addEdit(new UndoableRemoveEntry(panel.database, be[0], panel));
+            } else if (answer == DuplicateResolverDialog.BREAK) {
+                st.setFinished(); // thread killing
+                current = Integer.MAX_VALUE;
+                duplicateCounter--; // correct counter
+            }
+            drd.dispose();
         }
-        else if ( answer == DuplicateResolverDialog.KEEP_LOWER )
-        {
-          if ( ce == null ) ce = new NamedCompound(Globals.lang("duplicate removal")) ;
-          panel.database.removeEntry( be[0].getId() ) ;
-          panel.markBaseChanged() ;
-          ce.addEdit( new UndoableRemoveEntry( panel.database, be[0], panel ) ) ;
-        }
-        else if ( answer == DuplicateResolverDialog.BREAK )
-        {
-          st.setFinished() ; // thread killing
-          current = Integer.MAX_VALUE ;
-          duplicateCounter-- ; // correct counter
-        }
-        drd.dispose();
-      }
     }
   }
 

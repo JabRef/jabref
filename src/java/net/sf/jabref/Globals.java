@@ -387,7 +387,7 @@ public class Globals {
 			off = new OpenFileFilter(extension);
 
 		Object files = getNewFileImpl(owner, directory, extension, null, off,
-			JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true);
+			JFileChooser.OPEN_DIALOG, updateWorkingdirectory, false, true, null);
 
 		if (files instanceof String[]) {
 			return (String[]) files;
@@ -403,29 +403,37 @@ public class Globals {
 	public static String getNewFile(JFrame owner, File directory, String extension, int dialogType,
 		boolean updateWorkingDirectory) {
 		return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
-			false);
+			false, null);
 	}
 
+        public static String getNewFile(JFrame owner, File directory, String extension, int dialogType,
+		boolean updateWorkingDirectory, JComponent accessory) {
+		return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
+			false, accessory);
+	}
+
+        
 	public static String getNewFile(JFrame owner, File directory, String extension,
 		String description, int dialogType, boolean updateWorkingDirectory) {
 		return getNewFile(owner, directory, extension, description, dialogType,
-			updateWorkingDirectory, false);
+			updateWorkingDirectory, false, null);
 	}
 
 	public static String getNewDir(JFrame owner, File directory, String extension, int dialogType,
 		boolean updateWorkingDirectory) {
 		return getNewFile(owner, directory, extension, null, dialogType, updateWorkingDirectory,
-			true);
+			true, null);
 	}
 
 	public static String getNewDir(JFrame owner, File directory, String extension,
 		String description, int dialogType, boolean updateWorkingDirectory) {
 		return getNewFile(owner, directory, extension, description, dialogType,
-			updateWorkingDirectory, true);
+			updateWorkingDirectory, true, null);
 	}
 
 	private static String getNewFile(JFrame owner, File directory, String extension,
-		String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly) {
+		String description, int dialogType, boolean updateWorkingDirectory, boolean dirOnly,
+                JComponent accessory) {
 
 		OpenFileFilter off = null;
 
@@ -435,12 +443,12 @@ public class Globals {
 			off = new OpenFileFilter(extension);
 
 		return (String) getNewFileImpl(owner, directory, extension, description, off, dialogType,
-			updateWorkingDirectory, dirOnly, false);
+			updateWorkingDirectory, dirOnly, false, accessory);
 	}
 
 	private static Object getNewFileImpl(JFrame owner, File directory, String extension,
 		String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
-		boolean dirOnly, boolean multipleSelection) {
+		boolean dirOnly, boolean multipleSelection, JComponent accessory) {
 
 		if (ON_MAC && prefs.getBoolean("useNativeFileDialogOnMac")) {
 
@@ -451,6 +459,8 @@ public class Globals {
 		JFileChooser fc = null;
 		try {
 			fc = new JabRefFileChooser(directory);
+                        if (accessory != null)
+                            fc.setAccessory(accessory);
 		} catch (InternalError errl) {
 			// This try/catch clause was added because a user reported an
 			// InternalError getting thrown on WinNT, presumably because of a

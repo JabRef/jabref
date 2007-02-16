@@ -8,5 +8,6 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Problem in DuplicateSearch
 * See if the old Bibkeeper autocomplete stuff is still in there
    somewhere, and if it is still usable

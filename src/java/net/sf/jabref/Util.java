@@ -61,20 +61,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,6 +83,7 @@ import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.gui.AutoCompleter;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1447,18 +1435,20 @@ public class Util {
 			return ((double) score) / allFields.size();
 	}
 
-	/**
-	 * This methods assures all words in the given entry are recorded in their
-	 * respective Completers, if any.
-	 */
-	/*
-	 * public static void updateCompletersForEntry(Hashtable autoCompleters,
-	 * BibtexEntry be) {
-	 * 
-	 * for (Iterator j=autoCompleters.keySet().iterator(); j.hasNext();) {
-	 * String field = (String)j.next(); Completer comp =
-	 * (Completer)autoCompleters.get(field); comp.addAll(be.getField(field)); } }
-	 */
+    /**
+     * This methods assures all words in the given entry are recorded in their
+     * respective Completers, if any.
+     */
+    public static void updateCompletersForEntry(HashMap autoCompleters,
+                                                BibtexEntry be) {
+
+        for (Iterator j = autoCompleters.keySet().iterator(); j.hasNext();) {
+            String field = (String) j.next();
+            AutoCompleter comp = (AutoCompleter) autoCompleters.get(field);
+            comp.addAll(be.getField(field));
+        }
+    }
+
 
 	/**
 	 * Sets empty or non-existing owner fields of bibtex entries inside a List

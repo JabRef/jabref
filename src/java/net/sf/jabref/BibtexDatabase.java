@@ -49,7 +49,6 @@ public class BibtexDatabase
     String _preamble = null;
     HashMap _strings = new HashMap();
     Vector _strings_ = new Vector();
-    Hashtable _autoCompleters = null;
     Set changeListeners = new HashSet();
     private BibtexDatabase ths = this;
 
@@ -214,16 +213,6 @@ public class BibtexDatabase
 
         entry.addPropertyChangeListener(listener);
 
-        // Possibly add a FieldChangeListener, which is there to add
-        // new words to the autocompleter's dictionary. In case the
-        // entry is non-empty (pasted), update completers.
-        /*if (_autoCompleters != null) {
-            entry.addPropertyChangeListener(new FieldChangeListener
-                                            (_autoCompleters, entry));
-            Util.updateCompletersForEntry(_autoCompleters,
-                                          entry);
-        }
-        */
         _entries.put(id, entry);
 
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ADDED_ENTRY, entry));
@@ -529,16 +518,5 @@ public class BibtexDatabase
         changeListeners.remove(l);
     }
 
-    /*
-    public void setCompleters(Hashtable autoCompleters) {
-        _autoCompleters = autoCompleters;
 
-        for (Iterator i=getKeySet().iterator(); i.hasNext();) {
-            BibtexEntry be = getEntryById((String)(i.next()));
-            be.addPropertyChangeListener(new FieldChangeListener
-                                         (autoCompleters, be));
-
-            Util.updateCompletersForEntry(autoCompleters, be);
-        }
-        }*/
 }

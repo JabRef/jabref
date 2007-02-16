@@ -64,7 +64,7 @@ public class JabRefPreferences {
     // Object containing custom export formats:
     public CustomExportList customExports;
 
-    /** Set with all custom {@link ImportFormat}s */
+    /** Set with all custom {@link net.sf.jabref.imports.ImportFormat}s */
     public CustomImportList customImports;
 
     // Object containing info about customized entry editor tabs.
@@ -162,7 +162,7 @@ public class JabRefPreferences {
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
-        defaults.put("autoCompFields", new byte[] {0, 1, 28});
+        defaults.put("autoCompleteFields", "author;editor;keywords");
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
@@ -304,6 +304,12 @@ public class JabRefPreferences {
 
         defaults.put("lastUsedExport", null);
         defaults.put("sidePaneWidth", new Integer(-1));
+
+        defaults.put("importInspectionDialogWidth", new Integer(650));
+        defaults.put("importInspectionDialogHeight", new Integer(650));
+
+        //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
+        //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
         
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         //Util.pr(System.getProperty("java.io.tempdir"));
@@ -492,7 +498,7 @@ public class JabRefPreferences {
 
     /**
      * Looks up a color definition in preferences, and returns an array containing the RGB values.
-     * @param key The key for this setting.
+     * @param value The key for this setting.
      * @return The RGB values corresponding to this color setting.
      */
     public int[] getRgb(String value) {

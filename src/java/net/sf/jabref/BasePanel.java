@@ -44,26 +44,22 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
@@ -78,10 +74,7 @@ import net.sf.jabref.external.AutoSetExternalFileForEntries;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.gui.GlazedEntrySorter;
-import net.sf.jabref.gui.MainTable;
-import net.sf.jabref.gui.MainTableFormat;
-import net.sf.jabref.gui.MainTableSelectionListener;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.journals.AbbreviateAction;
@@ -104,6 +97,8 @@ import ca.odell.glazedlists.matchers.Matcher;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -136,7 +131,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    //Hashtable autoCompleters = new Hashtable();
+    HashMap autoCompleters = new HashMap();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -235,9 +230,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
       setupActions();
       setupMainPanel();
-      /*if (Globals.prefs.getBoolean("autoComplete")) {
-            db.setCompleters(autoCompleters);
-            }*/
 
       metaData.setFile(file);
 
@@ -289,7 +281,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void setupActions() {
-
+        
         actions.put("undo", undoAction);
         actions.put("redo", redoAction);
 
@@ -419,28 +411,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     // If the option is set, autogenerate keys for all entries that are
                     // lacking keys, before saving:
-                    if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
-                        BibtexEntry bes;
-                        NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
-                        boolean any = false;
-                        for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
-                            bes = database.getEntryById((String)i.next());
-                            String oldKey = bes.getCiteKey();
-                            if ((oldKey == null) || (oldKey.equals(""))) {
-                                LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
-                                ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
-                                    (String)bes.getField(BibtexFields.KEY_FIELD)));
-                                any = true;
-                            }
-                        }
-                        // Store undo information, if any:
-                        if (any) {
-                            ce.end();
-                            undoManager.addEdit(ce);
-                        }
-                    }
-                    // Done with autosetting keys. Now save the database:
-
+                    autoGenerateKeysBeforeSaving();
+                    
+                    // Now save the database:
                     success = saveDatabase(getFile(), false, encoding);
 
                     //Util.pr("Testing resolve string... BasePanel line 237");
@@ -470,38 +443,65 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
-        actions.put("saveAs", new BaseAction () {
-                public void action() throws Throwable {
-
-                  String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
-                                                         JFileChooser.SAVE_DIALOG, false);
-
-                  if (chosenFile != null) {
-                    metaData.setFile(new File(chosenFile));
-                    if (!metaData.getFile().exists() ||
-                        (JOptionPane.showConfirmDialog
-                         (frame, "'"+metaData.getFile().getName()+"' "+Globals.lang("exists. Overwrite file?"),
-                          Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                         == JOptionPane.OK_OPTION)) {
-
-                      runCommand("save");
-
-                      // Register so we get notifications about outside changes to the file.
-                      try {
-                        fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(BasePanel.this,getFile());
-                      } catch (IOException ex) {
-                        ex.printStackTrace();
-                      }
-
-                      Globals.prefs.put("workingDirectory", metaData.getFile().getParent());
-                      frame.getFileHistory().newFile(metaData.getFile().getPath());
-                    }
-                    else {
-                      metaData.setFile(null);
-                    }
-                   }
+        actions.put("saveAs", new BaseAction() {
+            public void action() throws Throwable {
+                
+                JPanel options = new JPanel();
+                DefaultFormBuilder builder = new DefaultFormBuilder(options, new FormLayout("left:pref", "pref, pref, pref"));
+                //options.setLayout(new GridLayout(2,1));
+                ButtonGroup bg = new ButtonGroup();
+                JRadioButton sAll = new JRadioButton("<html>All entries</html>");
+                JRadioButton sSel = new JRadioButton("<html>Selected<br>entries</html>");
+                sAll.setSelected(true);
+                bg.add(sAll);
+                bg.add(sSel);
+                builder.append(Globals.lang("Include")+":");
+                builder.append(sAll);
+                builder.append(sSel);
+                builder.appendGlueRow();
+                options.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+                String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
+                            JFileChooser.SAVE_DIALOG, false, options);
+                if (chosenFile == null)
+                    return; // cancelled
+                Globals.prefs.put("workingDirectory", metaData.getFile().getParent());
+                // Check if the file already exists:
+                if ((new File(chosenFile)).exists() && (JOptionPane.showConfirmDialog
+                                (frame, "'"+metaData.getFile().getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                                Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
+                                != JOptionPane.OK_OPTION)) {
+                    return; // cancelled
+                    
                 }
-            });
+                // Save:
+                if (sAll.isSelected()) {
+                    //
+                    // Normal save
+                    //
+                    if (chosenFile != null) {
+                        metaData.setFile(new File(chosenFile));
+                        runCommand("save");
+                        // Register so we get notifications about outside changes to the file.
+                        try {
+                            fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(BasePanel.this,getFile());
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        frame.getFileHistory().newFile(metaData.getFile().getPath());
+                    }
+                }
+                else {
+                    //
+                    // Save selected entries
+                    //
+                    File expFile = new File(chosenFile);
+                    saveDatabase(expFile, true, encoding);
+                    frame.getFileHistory().newFile(expFile.getPath());
+                    frame.output(Globals.lang("Saved selected to")+" '"
+                                 +expFile.getPath()+"'.");
+                }
+            }
+        });
 
         actions.put("saveSelectedAs", new BaseAction () {
                 public void action() throws Throwable {
@@ -525,7 +525,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
             });
-
+    
         // The action for copying selected entries.
         actions.put("copy", new BaseAction() {
                 public void action() {
@@ -1144,12 +1144,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
               });
 
-              actions.put("strictDupliCheck", new BaseAction() {
+              /*actions.put("strictDupliCheck", new BaseAction() {
                 public void action() {
                   StrictDuplicateSearch ds = new StrictDuplicateSearch(BasePanel.this);
                   ds.start();
                 }
-              });
+              });*/
 
               actions.put("plainTextImport", new BaseAction() {
                 public void action()
@@ -1723,24 +1723,32 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         setLayout(new BorderLayout());
         removeAll();
         add(splitPane, BorderLayout.CENTER);
-        //add(contentPane, BorderLayout.CENTER);
 
-        //add(sidePaneManager.getPanel(), BorderLayout.WEST);
-        //add(splitPane, BorderLayout.CENTER);
+        // Set up AutoCompleters for this panel:
+        if (Globals.prefs.getBoolean("autoComplete")) {
+            instantiateAutoCompleters();
+        }
 
-    //setLayout(gbl);
-    //con.fill = GridBagConstraints.BOTH;
-    //con.weighty = 1;
-    //con.weightx = 0;
-    //gbl.setConstraints(sidePaneManager.getPanel(), con);
-    //con.weightx = 1;
-    //gbl.setConstraints(splitPane, con);
-        //mainPanel.setDividerLocation(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION);
-        //setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
-        //setResizeWeight(0);
         splitPane.revalidate();
         revalidate();
         repaint();
+    }
+
+    public AutoCompleter getAutoCompleter(String fieldName) {
+        return (AutoCompleter)autoCompleters.get(fieldName);
+    }
+
+    private void instantiateAutoCompleters() {
+        autoCompleters.clear();
+        String[] completeFields = Globals.prefs.getStringArray("autoCompleteFields");
+        for (int i = 0; i < completeFields.length; i++) {
+            String field = completeFields[i];
+            autoCompleters.put(field, new AutoCompleter(field));
+        }
+        for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
+            BibtexEntry entry = database.getEntryById((String)i.next());
+            Util.updateCompletersForEntry(autoCompleters, entry);
+        }
     }
 
 
@@ -2274,7 +2282,34 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else return true;
 
     }
-
+    
+    /**
+     * If the relevant option is set, autogenerate keys for all entries that are
+     * lacking keys.
+     */
+    public void autoGenerateKeysBeforeSaving() {
+        if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
+            BibtexEntry bes;
+            NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
+            boolean any = false;
+            for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
+                bes = database.getEntryById((String)i.next());
+                String oldKey = bes.getCiteKey();
+                if ((oldKey == null) || (oldKey.equals(""))) {
+                    LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
+                    ce.addEdit(new UndoableKeyChange(database, bes.getId(), null,
+                        (String)bes.getField(BibtexFields.KEY_FIELD)));
+                    any = true;
+                }
+            }
+            // Store undo information, if any:
+            if (any) {
+                ce.end();
+                undoManager.addEdit(ce);
+            }
+        }
+    }
+    
     /**
      * Activates or deactivates the entry preview, depending on the argument.
      * When deactivating, makes sure that any visible preview is hidden.

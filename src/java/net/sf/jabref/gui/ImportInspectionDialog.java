@@ -201,8 +201,22 @@ public class ImportInspectionDialog extends JDialog {
         delete.addActionListener(deleteListener);
         help.addActionListener(new HelpAction(frame.helpDiag, GUIGlobals.importInspectionHelp));
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-        setSize(new Dimension(650, 650));
-        //contentPane.setDividerLocation(0.6f);
+
+        // Remember and default to last size:
+        setSize(new Dimension(Globals.prefs.getInt("importInspectionDialogWidth"),
+                Globals.prefs.getInt("importInspectionDialogHeight")));
+        addWindowListener(new WindowAdapter() {
+
+            public void windowOpened(WindowEvent e) {
+                contentPane.setDividerLocation(0.5f);
+            }
+
+            public void windowClosed(WindowEvent e) {
+                Globals.prefs.putInt("importInspectionDialogWidth", getSize().width);
+                Globals.prefs.putInt("importInspectionDialogHeight", getSize().height);
+            }
+        });
+
     }
 
     public void setProgress(int current, int max) {

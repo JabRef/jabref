@@ -42,7 +42,9 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	public FieldTextField(String fieldName_, String content, boolean changeColorOnFocus) {
 		super(content);
 
-		// Add the global focus listener, so a menu item can see if this field
+        updateFont();
+
+        // Add the global focus listener, so a menu item can see if this field
 		// was focused when
 		// an action was called.
 		addFocusListener(Globals.focusListener);
@@ -87,16 +89,21 @@ public class FieldTextField extends JTextField implements FieldEditor {
 
 	public JComponent getTextComponent() {
 		return this;
-	}
 
-	public void paint(Graphics g) {
+    }
+
+    public void updateFont() {
+        setFont(GUIGlobals.CURRENTFONT);
+    }
+
+    public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		if (antialias)
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		super.paint(g2);
 	}
 
-	public void paste(String textToInsert) {
+    public void paste(String textToInsert) {
 		int sel = getSelectionEnd() - getSelectionStart();
 		if (sel < 1) {
 			int cPos = getCaretPosition();

@@ -28,9 +28,6 @@ import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -50,6 +47,8 @@ import javax.swing.text.JTextComponent;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.AutoCompleter;
+import net.sf.jabref.gui.AutoCompleteListener;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -72,7 +71,8 @@ public class EntryEditorTab {
 
 	private Component firstComponent;
 
-	public EntryEditorTab(List fields, EntryEditor parent, boolean addKeyField, String name) {
+	public EntryEditorTab(BasePanel panel, List fields, EntryEditor parent,
+                          boolean addKeyField, String name) {
 		if (fields != null)
 			this.fields = (String[]) fields.toArray(new String[0]);
 		else
@@ -80,7 +80,7 @@ public class EntryEditorTab {
 
 		this.parent = parent;
 
-		newSetupPanel(addKeyField, name);
+		setupPanel(panel, addKeyField, name);
 
 		/*
 		 * The following line makes sure focus cycles inside tab instead of
@@ -90,7 +90,7 @@ public class EntryEditorTab {
 	}
 
 
-    void newSetupPanel(boolean addKeyField, String title) {
+    void setupPanel(BasePanel bPanel, boolean addKeyField, String title) {
     	
     	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
 		ActionMap am = panel.getActionMap();
@@ -140,6 +140,12 @@ public class EntryEditorTab {
             JComponent ex = parent.getExtra(fields[i], ta);
             setupJTextComponent(ta);
 
+            // Add autocompleter listener, if required for this field:
+            AutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
+            if (autoComp != null) {
+                ta.addKeyListener(new AutoCompleteListener(autoComp));
+            }
+
             // Store the editor for later reference:
             editors.put(fields[i], ta);
             if (i == 0)
@@ -179,97 +185,6 @@ public class EntryEditorTab {
 		}
     }
 
-    void setupPanel(boolean addKeyField, String title) {
-		GridBagLayout gbl = new GridBagLayout();
-		GridBagConstraints con = new GridBagConstraints();
-		panel.setLayout(gbl);
-		double totalWeight = 0;
-
-		for (int i = 0; i < fields.length; i++) {
-			// Create the text area:
-			final FieldTextArea ta = new FieldTextArea(fields[i], null);
-			JComponent ex = parent.getExtra(fields[i], ta);
-			
-			if (firstComponent == null){
-				firstComponent = ex;
-			}
-			
-			setupJTextComponent(ta);
-
-			// Store the editor for later reference:
-			editors.put(fields[i], ta);
-			if (i == 0)
-				activeField = ta;
-
-			// The label for this field:
-			con.insets = new Insets(5, 5, 0, 0);
-			con.anchor = GridBagConstraints.WEST;
-			con.fill = GridBagConstraints.BOTH;
-			con.gridwidth = 1;
-			con.weightx = 0;
-			con.weighty = 0;
-			con.anchor = GridBagConstraints.NORTH;
-			con.fill = GridBagConstraints.BOTH;
-			gbl.setConstraints(ta.getLabel(), con);
-			panel.add(ta.getLabel());
-
-			// The field itself:
-			con.fill = GridBagConstraints.BOTH;
-			con.weightx = 1;
-			con.weighty = BibtexFields.getFieldWeight(fields[i]);
-			totalWeight += con.weighty;
-			// The gridwidth depends on whether we will add an extra component
-			// to the right:
-			if (ex != null)
-				con.gridwidth = 1;
-			else
-				con.gridwidth = GridBagConstraints.REMAINDER;
-			gbl.setConstraints(ta.getPane(), con);
-			panel.add(ta.getPane());
-
-			// Possibly an extra component:
-			if (ex != null) {
-				con.gridwidth = GridBagConstraints.REMAINDER;
-				con.anchor = GridBagConstraints.NORTH;
-				con.fill = GridBagConstraints.HORIZONTAL;
-				con.weightx = 0;
-				gbl.setConstraints(ex, con);
-				panel.add(ex);
-			}
-			panel.setName(title);
-		}
-
-		// Add the edit field for Bibtex-key.
-		if (addKeyField) {
-			con.insets.top += 25;
-			con.insets.bottom = 10;
-			con.gridwidth = 1;
-			con.weighty = 0;
-			con.weightx = 0;
-			con.fill = GridBagConstraints.HORIZONTAL;
-			con.anchor = GridBagConstraints.SOUTHWEST;
-
-			final FieldTextField tf = new FieldTextField(BibtexFields.KEY_FIELD, (String) parent
-				.getEntry().getField(BibtexFields.KEY_FIELD), true);
-			setupJTextComponent(tf);
-
-			editors.put("bibtexkey", tf);
-			/*
-			 * If the key field is the only field, we should have only one
-			 * editor, and this one should be set as active initially:
-			 */
-			if (editors.size() == 1)
-				activeField = tf;
-
-			gbl.setConstraints(tf.getLabel(), con);
-			panel.add(tf.getLabel());
-			con.gridwidth = GridBagConstraints.REMAINDER;
-			con.weightx = 1;
-
-			gbl.setConstraints(tf, con);
-			panel.add(tf);
-		}
-	}
 
 	BibtexEntry entry;
 
@@ -433,7 +348,8 @@ public class EntryEditorTab {
 		} catch (Throwable t) {
 			System.err.println(t);
 		}
-	}
+
+    }
 
 	/*
 	 * Focus listener that fires the storeFieldAction when a FieldTextArea loses
