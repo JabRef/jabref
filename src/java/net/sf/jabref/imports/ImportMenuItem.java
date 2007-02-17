@@ -165,7 +165,9 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                                         LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), toAddTo, entry);
                                         //System.out.println("gen:"+entry.getCiteKey());
                                     }
-                                    
+                                    // Let the autocompleters, if any, harvest words from the entry: 
+                                    Util.updateCompletersForEntry(panel.getAutoCompleters(), entry);
+
                                     ce.addEdit(new UndoableInsertEntry(toAddTo, entry, panel));
                                 }
                             } catch (KeyCollisionException e) {

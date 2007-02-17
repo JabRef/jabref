@@ -1,5 +1,7 @@
 package net.sf.jabref.gui;
 
+import net.sf.jabref.AuthorList;
+
 import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -29,9 +31,11 @@ public class AutoCompleter {
         if (s == null)
             return;
         if (nameField) {
-            String[] names = s.toString().split(" and ");
+            AuthorList list = AuthorList.getAuthorList(s.toString());
+            String processed = list.getAuthorsLastFirstAnds(false);
+            String[] names = processed.split(" and ");
             for (int i = 0; i < names.length; i++) {
-                String name = names[i].trim();
+                String name = names[i];
                 addWord(name);
             }
         } else {

@@ -1734,6 +1734,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         repaint();
     }
 
+    public HashMap getAutoCompleters() {
+        return autoCompleters;
+    }
+    
     public AutoCompleter getAutoCompleter(String fieldName) {
         return (AutoCompleter)autoCompleters.get(fieldName);
     }

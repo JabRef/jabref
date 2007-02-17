@@ -81,7 +81,9 @@ appear in your chosen languages.
 
 Change log:
 
-2.3b1   - Added feature to save all open databases.
+2.3b1   - Added autocompletion feature for author/editors and other fields.
+	- Added feature to save all open databases.
+	- Fixed bug that caused lockup when connection to IEEExplore fails.
         - Fixed wrong dependency in OAI2/ArXiv Fetcher.
         - Fixed problem with foreign characters in OAI2/ArXiv Fetcher.
         - Fixed problem with key generation in OAI2/ArXiv Fetcher.
