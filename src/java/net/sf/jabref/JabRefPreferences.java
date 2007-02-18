@@ -162,7 +162,7 @@ public class JabRefPreferences {
         defaults.put("searchPanePosX", new Integer(0));
         defaults.put("searchPanePosY", new Integer(0));
         defaults.put("autoComplete", Boolean.TRUE);
-        defaults.put("autoCompleteFields", "author;editor;keywords");
+        defaults.put("autoCompleteFields", "author;editor;journal;publisher;keywords");
         defaults.put("groupSelectorVisible", Boolean.TRUE);
         defaults.put("groupFloatSelections", Boolean.TRUE);
         defaults.put("groupIntersectSelections", Boolean.TRUE);
