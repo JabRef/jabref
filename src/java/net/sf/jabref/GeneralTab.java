@@ -12,8 +12,8 @@ import com.jgoodies.forms.builder.*;
 
 public class GeneralTab extends JPanel implements PrefsTab {
 
-    private JCheckBox autoOpenForm, backup, openLast, showSource,
-    defSource, editSource, defSort, ctrlClick, disableOnMultiple,
+    private JCheckBox backup, openLast,
+    defSort, ctrlClick,
     useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
@@ -32,16 +32,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _frame = frame;
         setLayout(new BorderLayout());
 
-        autoOpenForm = new JCheckBox(Globals.lang("Open editor when a new entry is created"));
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
-        defSource = new JCheckBox(Globals.lang("Show BibTeX source by default"));
-        showSource = new JCheckBox(Globals.lang("Show BibTeX source panel"));
-        editSource = new JCheckBox(Globals.lang("Enable source editing"));
         defSort = new JCheckBox(Globals.lang("Sort Automatically"));
         ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
-        disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
         useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
             +Globals.lang("Date format")+ ":");
@@ -73,19 +68,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
 
         Insets marg = new Insets(0,12,3,0);
         useImportInspectorForSingle.setMargin(marg);
-        editSource.setMargin(marg);
-        defSource.setMargin(marg);
         inspectionWarnDupli.setMargin(marg);
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
-        // We need a listener on showSource to enable and disable the source panel-related choices:
-        showSource.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent event) {
-                defSource.setEnabled(showSource.isSelected());
-                editSource.setEnabled(showSource.isSelected());
-            }
-        }
-        );
         // We need a listener on useImportInspector to enable and disable the
         // import inspector related choices;
         useImportInspector.addChangeListener(new ChangeListener() {
@@ -121,19 +106,14 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder3.append(nonWrappableFields);
         builder.add(builder3.getPanel(), cc.xyw(2, 9, 3));
 
-        builder.addSeparator(Globals.lang("Entry editor"), cc.xyw(1, 11, 5));
-        builder.add(autoOpenForm, cc.xy(2, 13));
-        builder.add(disableOnMultiple, cc.xy(2, 15));
-        builder.add(showSource, cc.xy(2, 17));
-        builder.add(defSource, cc.xy(2, 19));
-        builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 21, 5));
-        builder.add(useImportInspector, cc.xy(2, 23));
-        builder.add(useImportInspectorForSingle, cc.xy(2, 25));
-        builder.add(inspectionWarnDupli, cc.xy(2, 27));
-        builder.add(ctrlClick, cc.xy(2, 29));
-        builder.add(confirmDelete, cc.xy(2, 31));
-        builder.add(keyDuplicateWarningDialog, cc.xy(2, 33));
-        builder.add(keyEmptyWarningDialog, cc.xy(2, 35));
+        builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 11, 5));
+        builder.add(useImportInspector, cc.xy(2, 13));
+        builder.add(useImportInspectorForSingle, cc.xy(2, 15));
+        builder.add(inspectionWarnDupli, cc.xy(2, 17));
+        builder.add(ctrlClick, cc.xy(2, 19));
+        builder.add(confirmDelete, cc.xy(2, 21));
+        builder.add(keyDuplicateWarningDialog, cc.xy(2, 23));
+        builder.add(keyEmptyWarningDialog, cc.xy(2, 25));
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
                 ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
@@ -163,7 +143,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.append(lab);
         builder2.append(encodings);
 
-        builder.add(builder2.getPanel(), cc.xyw(2, 37, 3));
+        builder.add(builder2.getPanel(), cc.xyw(2, 27, 3));
 
 
         JPanel pan = builder.getPanel();
@@ -173,16 +153,11 @@ public class GeneralTab extends JPanel implements PrefsTab {
     }
 
     public void setValues() {
-        autoOpenForm.setSelected(_prefs.getBoolean("autoOpenForm"));
         openLast.setSelected(_prefs.getBoolean("openLastEdited"));
         allowEditing.setSelected(_prefs.getBoolean("allowTableEditing"));
         backup.setSelected(_prefs.getBoolean("backup"));
-        defSource.setSelected(_prefs.getBoolean("defaultShowSource"));
-        showSource.setSelected(_prefs.getBoolean("showSource"));
-        editSource.setSelected(_prefs.getBoolean("enableSourceEditing"));
         defSort.setSelected(_prefs.getBoolean("defaultAutoSort"));
         ctrlClick.setSelected(_prefs.getBoolean("ctrlClick"));
-        disableOnMultiple.setSelected(_prefs.getBoolean("disableOnMultipleSelection"));
         useOwner.setSelected(_prefs.getBoolean("useOwner"));
         useTimeStamp.setSelected(_prefs.getBoolean("useTimeStamp"));
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
@@ -202,9 +177,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         useImportInspector.setSelected(_prefs.getBoolean("useImportInspectionDialog"));
         useImportInspectorForSingle.setSelected(_prefs.getBoolean("useImportInspectionDialogForSingle"));
         inspectionWarnDupli.setSelected(_prefs.getBoolean("warnAboutDuplicatesInInspection"));
-        // Two choices only make sense when the source panel is visible:
-        defSource.setEnabled(showSource.isSelected());
-        editSource.setEnabled(showSource.isSelected());
         useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
         inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
         bracesAroundCapitalsFields.setText(_prefs.get("putBracesAroundCapitals"));
@@ -231,12 +203,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
     }
 
     public void storeSettings() {
-        _prefs.putBoolean("autoOpenForm", autoOpenForm.isSelected());
         _prefs.putBoolean("backup", backup.isSelected());
         _prefs.putBoolean("openLastEdited", openLast.isSelected());
-        _prefs.putBoolean("defaultShowSource", defSource.isSelected());
-        _prefs.putBoolean("enableSourceEditing", editSource.isSelected());
-        _prefs.putBoolean("disableOnMultipleSelection", disableOnMultiple.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
         _prefs.putBoolean("useTimeStamp", useTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
@@ -270,18 +238,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         // If either of the two last entries were changed, run the update for special field handling:
         if (updateSpecialFields)
                 _prefs.updateSpecialFieldHandling();
-
-        // We want to know if the following setting has been modified:
-        boolean oldShowSource = _prefs.getBoolean("showSource");
-        _prefs.putBoolean("showSource", showSource.isSelected());
-        if (oldShowSource != showSource.isSelected()) {
-            // The source panel has been enabled or disabled, so we need to
-            // remove all entry editors from cache:
-            for (int j=0; j<_frame.getTabbedPane().getTabCount(); j++) {
-	            BasePanel bp = (BasePanel)_frame.getTabbedPane().getComponentAt(j);
-	            bp.entryEditors.clear();
-            }
-        }
 
 
         if (!GUIGlobals.LANGUAGES.get(language.getSelectedItem()).equals(_prefs.get("language"))) {
