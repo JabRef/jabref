@@ -46,6 +46,7 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.journals.JournalAbbreviations;
 import net.sf.jabref.gui.date.*;
+import net.sf.jabref.gui.AutoCompleter;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -1044,7 +1045,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 							// fe.setLabelColor(GUIGlobals.nullFieldColor);
 							fe.setBackground(GUIGlobals.validFieldBackground);
 
-						// Add an UndoableFieldChange to the baseframe's
+                        // See if we need to update an AutoCompleter instance:
+                        AutoCompleter aComp = panel.getAutoCompleter(fe.getFieldName());
+                        if (aComp != null)
+                            aComp.addAll(toSet);
+
+                        // Add an UndoableFieldChange to the baseframe's
 						// undoManager.
 						panel.undoManager.addEdit(new UndoableFieldChange(entry, fe.getFieldName(),
 							oldValue, toSet));
