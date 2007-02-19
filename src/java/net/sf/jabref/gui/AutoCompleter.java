@@ -15,11 +15,15 @@ public class AutoCompleter {
 
     private TreeSet words = new TreeSet();
     private HashMap hm = new HashMap();
-    private boolean nameField = false;
+    private boolean nameField = false, // Attempt to store entire names?
+	entireField = false; // Set to true if the entire field should be stored 
+		             // suitable e.g. for journal or publisher fields.
 
     public AutoCompleter(String fieldName) {
         if (fieldName.equals("author") || fieldName.equals("editor"))
             nameField = true;
+	else if (fieldName.equals("journal") || fieldName.equals("publisher"))
+	    entireField = true;
     }
 
     public void addWord(String word) {
@@ -38,6 +42,8 @@ public class AutoCompleter {
                 String name = names[i];
                 addWord(name);
             }
+	} else if (entireField) {
+	    addWord(s.toString().trim());
         } else {
             StringTokenizer tok = new StringTokenizer(s.toString(), " .,\n");
             while (tok.hasMoreTokens()) {
