@@ -146,6 +146,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     sb.append(Globals.getOpeningBrace());
     boolean escape = false, inCommandName = false, inCommand = false,
         inCommandOption = false;
+    int nestedEnvironments = 0;
     StringBuffer commandName = new StringBuffer();
     char c;
     for (int i=start_pos; i<end_pos; i++) {
@@ -185,14 +186,25 @@ public class LatexFieldFormatter implements FieldFormatter {
         }
         // If we are in a command body, see if it has ended:
         if (inCommand && (c == '}')) {
+            //System.out.println("nestedEnvironments = " + nestedEnvironments);
             //System.out.println("Done with command: '"+commandName.toString()+"'");
+            if (commandName.toString().equals("begin")) {
+                nestedEnvironments++;
+            }
+            if (nestedEnvironments > 0 && commandName.toString().equals("end")) {
+                nestedEnvironments--;
+            }
+            //System.out.println("nestedEnvironments = " + nestedEnvironments);
+            
             commandName.delete(0, commandName.length());
             inCommand = false;
         }
 
         // We add a backslash before any ampersand characters, with one exception: if
         // we are inside an \\url{...} command, we should write it as it is. Maybe.
-        if ((c == '&') && !escape && !(inCommand && commandName.toString().equals("url"))) {
+        if ((c == '&') && !escape && 
+            !(inCommand && commandName.toString().equals("url")) && 
+            (nestedEnvironments == 0)) {
             sb.append("\\&");
         }
         else
