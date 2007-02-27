@@ -27,7 +27,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	JabRefPreferences _prefs;
 
-	private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
+    private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
 		citeseerColumn;
 
 	private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
@@ -91,24 +91,24 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		priSort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (priSort.getSelectedIndex() > 0) {
-					priField.setText(BibtexFields.getFieldName(priSort.getSelectedIndex() - 1));
-					priSort.setSelectedIndex(0);
+                    priField.setText(priSort.getSelectedItem().toString());
+                    priSort.setSelectedIndex(0);
 				}
 			}
 		});
 		secSort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (secSort.getSelectedIndex() > 0) {
-					secField.setText(BibtexFields.getFieldName(secSort.getSelectedIndex() - 1));
-					secSort.setSelectedIndex(0);
+                    secField.setText(secSort.getSelectedItem().toString());
+                    secSort.setSelectedIndex(0);
 				}
 			}
 		});
 		terSort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (terSort.getSelectedIndex() > 0) {
-					terField.setText(BibtexFields.getFieldName(terSort.getSelectedIndex() - 1));
-					terSort.setSelectedIndex(0);
+					terField.setText(terSort.getSelectedItem().toString());
+                    terSort.setSelectedIndex(0);
 				}
 			}
 		});
