@@ -641,7 +641,8 @@ public class Util {
 	 * @param link
 	 *            The file name.
 	 */
-	public static void openExternalFileAnyFormat(MetaData metaData, String link) throws IOException {
+	public static void openExternalFileAnyFormat(MetaData metaData, String link,
+                                                 ExternalFileType fileType) throws IOException {
 
 		// For other platforms we'll try to find the file type:
 		File file = new File(link);
@@ -657,9 +658,6 @@ public class Util {
 		 * extension. What to do? throw new IOException(Globals.lang("No file
 		 * extension. Could not find viewer for file.")); }
 		 */
-
-		// Now we know the extension, check if it is one we know about:
-		ExternalFileType fileType = Globals.prefs.getExternalFileType(extension);
 
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
@@ -1328,10 +1326,11 @@ public class Util {
 		// The check if they have the same required fields:
 		String[] fields = one.getType().getRequiredFields();
 
-		if (fields == null)
-			return false;
-
-		float req = compareFieldSet(fields, one, two);
+        float req;
+        if (fields == null)
+			req = 1;
+        else
+            req = compareFieldSet(fields, one, two);
 		fields = one.getType().getOptionalFields();
 
 		if (fields != null) {

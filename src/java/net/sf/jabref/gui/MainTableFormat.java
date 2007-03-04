@@ -29,7 +29,8 @@ public class MainTableFormat implements TableFormat {
     ,
     URL_ = {"url", "doi"}
     ,
-    CITESEER = {"citeseerurl"};
+    CITESEER = {"citeseerurl"},
+    FILE = {"file"};
 
     BasePanel panel;
 
@@ -165,7 +166,9 @@ public class MainTableFormat implements TableFormat {
             iconCols.put(new Integer(coln++), URL_);
         if (Globals.prefs.getBoolean("citeseerColumn"))
             iconCols.put(new Integer(coln++), CITESEER);
-
+        if (Globals.prefs.getBoolean("fileColumn"))
+            iconCols.put(new Integer(coln++), FILE);
+        
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();
 

@@ -71,7 +71,7 @@ public class JabRefPreferences {
     private EntryEditorTabList tabList = null;
 
     // Map containing all registered external file types:
-    private Map externalFileTypes = new HashMap();
+    private TreeSet externalFileTypes = new TreeSet();
 
     // The only instance of this class:
     private static JabRefPreferences singleton = null;
@@ -186,7 +186,7 @@ public class JabRefPreferences {
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
     // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put("generalFields", "crossref;keywords;doi;url;urldate;citeseerurl;"+
+        defaults.put("generalFields", "crossref;keywords;file;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");
 
         defaults.put("useCustomIconTheme", Boolean.FALSE);
@@ -232,6 +232,7 @@ public class JabRefPreferences {
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
         defaults.put("pdfColumn", Boolean.TRUE);
         defaults.put("urlColumn", Boolean.TRUE);
+        defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("citeseerColumn", Boolean.FALSE);
         defaults.put("useOwner", Boolean.TRUE);
         defaults.put("allowTableEditing", Boolean.FALSE);
@@ -325,9 +326,6 @@ public class JabRefPreferences {
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = "["+get("defaultOwner")+"]";
 
-        // TODO: remove temporary registering of external file types?
-        updateExternalFileTypes();
-        
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -831,10 +829,29 @@ public class JabRefPreferences {
      *
      */
     public void updateExternalFileTypes() {
-        externalFileTypes.put("pdf", new ExternalFileType("PDF", "pdf", get("pdfviewer"), null));
-        externalFileTypes.put("ps", new ExternalFileType("PostScript", "ps", get("psviewer"), null));
-        externalFileTypes.put("doc", new ExternalFileType("Word file", "doc", "oowriter", null));
-        externalFileTypes.put("odt", new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
+        externalFileTypes.add(new ExternalFileType("PDF", "pdf", get("pdfviewer"), GUIGlobals.getImage("pdfSmall")));
+        externalFileTypes.add(new ExternalFileType("PostScript", "ps", get("psviewer"), GUIGlobals.getImage("psSmall")));
+        externalFileTypes.add(new ExternalFileType("Word file", "doc", "oowriter", null));
+        externalFileTypes.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
+    }
+
+    public ExternalFileType[] getExternalFileTypeSelection() {
+        return (ExternalFileType[])externalFileTypes.toArray
+                (new ExternalFileType[externalFileTypes.size()]);
+    }
+
+    /**
+     * Look up the external file type registered with this name, if any.
+     * @param name The file type name.
+     * @return The ExternalFileType registered, or null if none.
+     */
+    public ExternalFileType getExternalFileTypeByName(String name) {
+        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = (ExternalFileType) iterator.next();
+            if (type.getName().equals(name))
+                return type;
+        }
+        return null;
     }
 
     /**
@@ -842,8 +859,13 @@ public class JabRefPreferences {
      * @param extension The file extension.
      * @return The ExternalFileType registered, or null if none.
      */
-    public ExternalFileType getExternalFileType(String extension) {
-        return (ExternalFileType)externalFileTypes.get(extension);
+    public ExternalFileType getExternalFileTypeByExt(String extension) {
+        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = (ExternalFileType) iterator.next();
+            if (type.getExtension().equals(extension))
+                return type;
+        }
+        return null;
     }
 
 

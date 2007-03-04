@@ -34,9 +34,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Vector;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import spin.Spin;
 
 public class DuplicateSearch extends Thread {
 
@@ -54,7 +56,6 @@ public void run() {
   int duplicateCounter = 0;
   
   autoRemoveExactDuplicates = false;
-  
   panel.output(Globals.lang("Searching for duplicates..."));
   Object[] keys = panel.database.getKeySet().toArray();
   if ((keys == null) || (keys.length < 2))
@@ -109,11 +110,6 @@ public void run() {
             boolean askAboutExact = false;
             if (Util.compareEntriesStrictly(be[0], be[1]) > 1) {
                 if (autoRemoveExactDuplicates) {
-                    // TODO: the following line (possibly) prevents ArrayIndexOutOfBoundsException
-                    // from the EventList providing data for the main table. This shouldn't be the
-                    // case...
-                    try { Thread.sleep(10); } catch (InterruptedException ex) {};
-                    //
                     if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
                     panel.database.removeEntry(be[1].getId());
                     panel.markBaseChanged();
@@ -126,13 +122,19 @@ public void run() {
                 }
             }
 
-            drd = new DuplicateResolverDialog(panel.frame, be[0], be[1],
+            DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
                     askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
                             DuplicateResolverDialog.DUPLICATE_SEARCH);
-            drd.setVisible(true);
+            ((CallBack)(Spin.over(cb))).update();
+
+            /*drd = new DuplicateResolverDialog(panel.frame, be[0], be[1],
+                    askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
+                            DuplicateResolverDialog.DUPLICATE_SEARCH);
+            drd.setVisible(true);*/
 
             duplicateCounter++;
-            int answer = drd.getSelected();
+            //int answer = drd.getSelected();
+            int answer = cb.getSelected();
             if ((answer == DuplicateResolverDialog.KEEP_UPPER)
                     || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
                 if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
@@ -151,7 +153,7 @@ public void run() {
                 current = Integer.MAX_VALUE;
                 duplicateCounter--; // correct counter
             }
-            drd.dispose();
+            //drd.dispose();
         }
     }
   }
@@ -214,5 +216,32 @@ class SearcherThread extends Thread {
     finished = true ;
   }
 }
+
+    class DuplicateCallBack implements CallBack {
+        private int reply = -1;
+        DuplicateResolverDialog diag;
+        private JabRefFrame frame;
+        private BibtexEntry one;
+        private BibtexEntry two;
+        private int dialogType;
+
+        public DuplicateCallBack(JabRefFrame frame, BibtexEntry one, BibtexEntry two,
+                                 int dialogType) {
+
+            this.frame = frame;
+            this.one = one;
+            this.two = two;
+            this.dialogType = dialogType;
+        }
+        public int getSelected() {
+            return reply;
+        }
+        public void update() {
+            diag = new DuplicateResolverDialog(frame, one, two, dialogType);
+            diag.setVisible(true);
+            diag.dispose();
+            reply = diag.getSelected();
+        }
+    }
 
 }

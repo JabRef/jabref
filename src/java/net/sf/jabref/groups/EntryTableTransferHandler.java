@@ -316,7 +316,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 			if ((index >= 0) && (index < fileNames[i].length())) {
 				extension = fileNames[i].substring(index + 1).toLowerCase();
 				// System.out.println(extension);
-				fileType = Globals.prefs.getExternalFileType(extension);
+				fileType = Globals.prefs.getExternalFileTypeByExt(extension);
 			}
 			if (extension.equals("bib")) {
 				File f = new File(fileNames[i]);

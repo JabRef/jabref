@@ -59,7 +59,8 @@ public class FieldTextMenu implements MouseListener
     inputMenu.add( copyAct ) ;
     inputMenu.addSeparator();
     inputMenu.add(new ReplaceAction());
-    inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
+    if (myFieldName.getTextComponent() instanceof JTextComponent)
+        inputMenu.add(new CaseChangeMenu((JTextComponent) myFieldName.getTextComponent()));
   }
 
   public void mouseClicked(MouseEvent e)

@@ -161,6 +161,12 @@ public class BibtexFields
     add( new BibtexSingleField( "keywords", false, GUIGlobals.SMALL_W  ) ) ;
     //FIELD_EXTRAS.put("keywords", "selector");
 
+
+    dummy = new BibtexSingleField(GUIGlobals.FILE_FIELD, false);
+    dummy.setEditorType(GUIGlobals.FILE_LIST_EDITOR);
+    add(dummy);
+
+
     add( new BibtexSingleField( "search", false, 75 ) ) ;
 
 
@@ -281,6 +287,16 @@ public class BibtexFields
       return sField.getExtras() ;
     }
     return null ;
+  }
+
+
+  public static int getEditorType(String name) {
+    BibtexSingleField sField = getField( name ) ;
+    if (sField != null)
+    {
+      return sField.getEditorType();
+    }
+    return GUIGlobals.STANDARD_EDITOR;      
   }
 
   public static double getFieldWeight( String name )
@@ -407,6 +423,8 @@ public class BibtexFields
 
     private int length = GUIGlobals.DEFAULT_FIELD_LENGTH ;
     private double weight = GUIGlobals.DEFAULT_FIELD_WEIGHT ;
+
+    private int editorType = GUIGlobals.STANDARD_EDITOR;
 
     // a alternative displayname, e.g. used for
     // "citeseercitationcount"="Popularity"
@@ -599,6 +617,14 @@ public class BibtexFields
     public String getExtras()
     {
       return extras ;
+    }
+
+    public void setEditorType(int type) {
+        editorType = type;
+    }
+
+    public int getEditorType() {
+        return editorType;
     }
     // -----------------------------------------------------------------------
 

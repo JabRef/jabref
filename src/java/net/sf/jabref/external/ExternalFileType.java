@@ -1,5 +1,6 @@
 package net.sf.jabref.external;
 
+import javax.swing.*;
 import java.net.URL;
 
 /**
@@ -9,13 +10,13 @@ import java.net.URL;
  * Time: 4:27:05 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ExternalFileType {
+public class ExternalFileType implements Comparable {
 
     protected String name, extension, openWith;
-    protected URL icon;
+    protected ImageIcon icon;
 
     public ExternalFileType(String name, String extension, String openWith,
-                            URL icon) {
+                            ImageIcon icon) {
         this.name = name;
         this.extension = extension;
         this.openWith = openWith;
@@ -51,11 +52,19 @@ public class ExternalFileType {
         this.openWith = openWith;
     }
 
-    public URL getIcon() {
+    public ImageIcon getIcon() {
         return icon;
     }
 
-    public void setIcon(URL icon) {
+    public void setIcon(ImageIcon icon) {
         this.icon = icon;
+    }
+
+    public String toString() {
+        return getName();
+    }
+
+    public int compareTo(Object o) {
+        return getName().compareTo(((ExternalFileType)o).getName());
     }
 }

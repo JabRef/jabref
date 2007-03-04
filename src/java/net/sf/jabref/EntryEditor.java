@@ -188,13 +188,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 		List fieldList = null;
 		if (fields != null)
 			fieldList = java.util.Arrays.asList(fields);
-		reqPan = new EntryEditorTab(panel, fieldList, this, true, Globals.lang("Required fields"));
+		reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, Globals.lang("Required fields"));
 		tabbed.addTab(Globals.lang("Required fields"), GUIGlobals.getImage("required"), reqPan
 			.getPane(), Globals.lang("Show required fields"));
 		tabs.add(reqPan);
 
 		if ((entry.getOptionalFields() != null) && (entry.getOptionalFields().length >= 1)) {
-			optPan = new EntryEditorTab(panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
+			optPan = new EntryEditorTab(frame, panel, java.util.Arrays.asList(entry.getOptionalFields()), this,
 				false, Globals.lang("Optional fields"));
 			tabbed.addTab(Globals.lang("Optional fields"), GUIGlobals.getImage("optional"), optPan
 				.getPane(), Globals.lang("Show optional fields"));
@@ -203,7 +203,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 		EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
 		for (int i = 0; i < tabList.getTabCount(); i++) {
-			EntryEditorTab newTab = new EntryEditorTab(panel, tabList.getTabFields(i), this, false,
+			EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
 				tabList.getTabName(i));
 			tabbed.addTab(tabList.getTabName(i), GUIGlobals.getImage("general"), newTab.getPane());
 			tabs.add(newTab);
@@ -994,15 +994,67 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
 		public void actionPerformed(ActionEvent e) {
 
-			if (e.getSource() instanceof FieldTextArea) {
+            if (e.getSource() instanceof FieldTextField) {
+				// Storage from bibtex key field.
+				FieldTextField fe = (FieldTextField) e.getSource();
+				String oldValue = entry.getCiteKey();
+				String newValue = fe.getText();
+
+				if (newValue.equals(""))
+					newValue = null;
+
+				if (((oldValue == null) && (newValue == null))
+					|| ((oldValue != null) && (newValue != null) && oldValue.equals(newValue)))
+					return; // No change.
+
+				// Make sure the key is legal:
+				String cleaned = Util.checkLegalKey(newValue);
+				if ((cleaned != null) && !cleaned.equals(newValue)) {
+					JOptionPane.showMessageDialog(frame, Globals.lang("Invalid BibTeX key"),
+						Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+					fe.setBackground(GUIGlobals.invalidFieldBackground);
+					return;
+				} else {
+					fe.setBackground(/*
+										 * fe.getTextComponent().hasFocus() ?
+										 * GUIGlobals.activeEditor :
+										 */
+					GUIGlobals.validFieldBackground);
+				}
+
+				boolean isDuplicate = panel.database.setCiteKeyForEntry(entry.getId(), newValue);
+
+				if (newValue != null) {
+					if (isDuplicate)
+						warnDuplicateBibtexkey();
+					else
+						panel.output(Globals.lang("BibTeX key is unique."));
+				} else { // key is null/empty
+					warnEmptyBibtexkey();
+				}
+
+				// Add an UndoableKeyChange to the baseframe's undoManager.
+				panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
+					oldValue, newValue));
+
+				if ((newValue != null) && (newValue.length() > 0))
+					// fe.setLabelColor(GUIGlobals.validFieldColor);
+					fe.setBackground(GUIGlobals.validFieldBackground);
+				else
+					// fe.setLabelColor(GUIGlobals.nullFieldColor);
+					fe.setBackground(GUIGlobals.validFieldBackground);
+
+				updateSource();
+				panel.markBaseChanged();
+			}
+            else if (e.getSource() instanceof FieldEditor) {
 				String toSet = null;
 				FieldEditor fe = (FieldEditor) e.getSource();
 				boolean set;
 				// Trim the whitespace off this value
 				String currentText = fe.getText();
 				String trim = currentText.trim();
-				
-				if (trim.length() > 0) {
+                if (trim.length() > 0) {
 					toSet = trim;
 				}
 
@@ -1075,61 +1127,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 					// We set the field and label color.
 					fe.setBackground(GUIGlobals.validFieldBackground);
 				}
-			} else if (e.getSource() instanceof FieldTextField) {
-				// Storage from bibtex key field.
-				FieldTextField fe = (FieldTextField) e.getSource();
-				String oldValue = entry.getCiteKey();
-				String newValue = fe.getText();
-
-				if (newValue.equals(""))
-					newValue = null;
-
-				if (((oldValue == null) && (newValue == null))
-					|| ((oldValue != null) && (newValue != null) && oldValue.equals(newValue)))
-					return; // No change.
-
-				// Make sure the key is legal:
-				String cleaned = Util.checkLegalKey(newValue);
-				if ((cleaned != null) && !cleaned.equals(newValue)) {
-					JOptionPane.showMessageDialog(frame, Globals.lang("Invalid BibTeX key"),
-						Globals.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-					fe.setBackground(GUIGlobals.invalidFieldBackground);
-					return;
-				} else {
-					fe.setBackground(/*
-										 * fe.getTextComponent().hasFocus() ?
-										 * GUIGlobals.activeEditor :
-										 */
-					GUIGlobals.validFieldBackground);
-				}
-
-				boolean isDuplicate = panel.database.setCiteKeyForEntry(entry.getId(), newValue);
-
-				if (newValue != null) {
-					if (isDuplicate)
-						warnDuplicateBibtexkey();
-					else
-						panel.output(Globals.lang("BibTeX key is unique."));
-				} else { // key is null/empty
-					warnEmptyBibtexkey();
-				}
-
-				// Add an UndoableKeyChange to the baseframe's undoManager.
-				panel.undoManager.addEdit(new UndoableKeyChange(panel.database, entry.getId(),
-					oldValue, newValue));
-
-				if ((newValue != null) && (newValue.length() > 0))
-					// fe.setLabelColor(GUIGlobals.validFieldColor);
-					fe.setBackground(GUIGlobals.validFieldBackground);
-				else
-					// fe.setLabelColor(GUIGlobals.nullFieldColor);
-					fe.setBackground(GUIGlobals.validFieldBackground);
-
-				updateSource();
-				panel.markBaseChanged();
 			} else if ((source.isEditable())
 				&& (!source.getText().equals(lastSourceStringAccepted))) {
-				boolean accepted = storeSource(true);
+                boolean accepted = storeSource(true);
 
 				if (accepted) {
 				}

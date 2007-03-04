@@ -218,7 +218,20 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                     }
 
                     try {
-                        Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
+                        // See if this is a simple file link field, or if it is a file-list
+                        // field that can specify a list of links:
+                        if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+                            // We use a FileListTableModel to parse the field content:
+                            FileListTableModel fileList = new FileListTableModel();
+                            fileList.setContent((String)link);
+                            // If there are one or more links, open the first one:
+                            if (fileList.getRowCount() > 0) {
+                                FileListEntry entry = fileList.getEntry(0);
+                                Util.openExternalFileAnyFormat(panel.metaData(), entry.getLink(),
+                                        entry.getType());
+                            }
+                        } else
+                            Util.openExternalViewer(panel.metaData(), (String)link, fieldName);
                     }
                     catch (IOException ex) {
                         panel.output(Globals.lang("Error") + ": " + ex.getMessage());
@@ -260,13 +273,33 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         BibtexEntry entry = (BibtexEntry) tableRows.get(row);
         JPopupMenu menu = new JPopupMenu();
         int count = 0;
-        for (int i=0; i<iconType.length; i++) {
-            Object o = entry.getField(iconType[i]);
-            if (o != null) {
-                menu.add(new ExternalFileMenuItem((String)o, (String)o,
-                        GUIGlobals.getTableIcon(iconType[i]).getIcon(),
-                        panel.metaData()));
+
+        // See if this is a simple file link field, or if it is a file-list
+        // field that can specify a list of links:
+        if (iconType[0].equals(GUIGlobals.FILE_FIELD)) {
+            // We use a FileListTableModel to parse the field content:
+            Object o = entry.getField(iconType[0]);
+            FileListTableModel fileList = new FileListTableModel();
+            fileList.setContent((String)o);
+            // If there are one or more links, open the first one:
+            for (int i=0; i<fileList.getRowCount(); i++) {
+                FileListEntry flEntry = fileList.getEntry(i);
+                menu.add(new ExternalFileMenuItem(flEntry.getDescription(),
+                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                        flEntry.getType()));
                 count++;
+            }
+
+        }
+        else {
+            for (int i=0; i<iconType.length; i++) {
+                Object o = entry.getField(iconType[i]);
+                if (o != null) {
+                    menu.add(new ExternalFileMenuItem((String)o, (String)o,
+                            GUIGlobals.getTableIcon(iconType[i]).getIcon(),
+                            panel.metaData()));
+                    count++;
+                }
             }
         }
         if (count == 0) {

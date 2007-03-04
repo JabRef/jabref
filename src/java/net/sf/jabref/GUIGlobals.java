@@ -184,7 +184,14 @@ public class GUIGlobals {
 	DEFAULT_FIELD_WEIGHT = 1,
 	MAX_FIELD_WEIGHT = 2;
 
-	public static final double
+    // constants for editor types:
+    public static final int
+        STANDARD_EDITOR=1,
+        FILE_LIST_EDITOR=2;
+
+    public static final String FILE_FIELD = "file";
+
+    public static final double
 	SMALL_W = 0.30,
 	MEDIUM_W = 0.5,
 	LARGE_W = 1.5 ;
@@ -278,7 +285,7 @@ public class GUIGlobals {
 	 * @return The URL to the actual image to use.
 	 */
 	public static URL getIconUrl(String name) {
-		if (iconMap.containsKey(name)) {
+        if (iconMap.containsKey(name)) {
 			String path = (String)iconMap.get(name);
 			URL url = GUIGlobals.class.getResource(path);
 			if (url == null)
@@ -382,8 +389,12 @@ public class GUIGlobals {
 		lab = new JLabel(getImage("psSmall"));
 		lab.setToolTipText(Globals.lang("Open")+" PS");
 		tableIcons.put("ps", lab);
+        lab = new JLabel(getImage("psSmall"));
+        lab.setToolTipText(Globals.lang("Open file"));
+        tableIcons.put("file", lab);
 
-		//jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
+
+        //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);
 	}
 
 }

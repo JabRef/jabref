@@ -49,6 +49,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.AutoCompleter;
 import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.FileListEditor;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -71,7 +72,7 @@ public class EntryEditorTab {
 
 	private Component firstComponent;
 
-	public EntryEditorTab(BasePanel panel, List fields, EntryEditor parent,
+	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List fields, EntryEditor parent,
                           boolean addKeyField, String name) {
 		if (fields != null)
 			this.fields = (String[]) fields.toArray(new String[0]);
@@ -80,7 +81,7 @@ public class EntryEditorTab {
 
 		this.parent = parent;
 
-		setupPanel(panel, addKeyField, name);
+		setupPanel(frame, panel, addKeyField, name);
 
 		/*
 		 * The following line makes sure focus cycles inside tab instead of
@@ -90,7 +91,7 @@ public class EntryEditorTab {
 	}
 
 
-    void setupPanel(BasePanel bPanel, boolean addKeyField, String title) {
+    void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField, String title) {
     	
     	InputMap im = panel.getInputMap(JComponent.WHEN_FOCUSED);
 		ActionMap am = panel.getActionMap();
@@ -136,14 +137,21 @@ public class EntryEditorTab {
 
         for (int i = 0; i < fields.length; i++) {
             // Create the text area:
-            final FieldTextArea ta = new FieldTextArea(fields[i], null);
+            int editorType = BibtexFields.getEditorType(fields[i]);
+
+            final FieldEditor ta;
+            if (editorType == GUIGlobals.FILE_LIST_EDITOR)
+                ta = new FileListEditor(frame, fields[i], null);
+            else
+                ta = new FieldTextArea(fields[i], null);
+
             JComponent ex = parent.getExtra(fields[i], ta);
-            setupJTextComponent(ta);
+            setupJTextComponent(ta.getTextComponent());
 
             // Add autocompleter listener, if required for this field:
             AutoCompleter autoComp = bPanel.getAutoCompleter(fields[i]);
             if (autoComp != null) {
-                ta.addKeyListener(new AutoCompleteListener(autoComp));
+                ta.getTextComponent().addKeyListener(new AutoCompleteListener(autoComp));
             }
 
             // Store the editor for later reference:
@@ -305,7 +313,7 @@ public class EntryEditorTab {
 	 * 
 	 * @param component
 	 */
-	public void setupJTextComponent(final JTextComponent component) {
+	public void setupJTextComponent(final JComponent component) {
 
 		component.addFocusListener(fieldListener);
 
@@ -408,7 +416,7 @@ public class EntryEditorTab {
 		}
 
 		public void focusLost(FocusEvent e) {
-			synchronized (this) {
+            synchronized (this) {
 				if (c != null) {
 					c.getDocument().removeDocumentListener(d);
 					c = null;

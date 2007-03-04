@@ -506,8 +506,12 @@ public class JabRef {
             // Jabref version.
             Util.performCompatibilityUpdate();
 
+
             // Set up custom or default icon theme:
             GUIGlobals.setUpIconTheme();
+
+            // TODO: remove temporary registering of external file types?
+            Globals.prefs.updateExternalFileTypes();
 
            // This property is set to make the Mac OSX Java VM move the menu bar to
             // the top
