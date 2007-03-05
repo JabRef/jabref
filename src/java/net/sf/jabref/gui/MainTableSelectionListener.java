@@ -284,7 +284,10 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             // If there are one or more links, open the first one:
             for (int i=0; i<fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
-                menu.add(new ExternalFileMenuItem(flEntry.getDescription(),
+                String description = flEntry.getDescription();
+                if ((description == null) || (description.trim().length() == 0))
+                    description = flEntry.getLink();
+                menu.add(new ExternalFileMenuItem(description,
                         flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
                         flEntry.getType()));
                 count++;

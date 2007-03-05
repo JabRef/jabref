@@ -134,7 +134,8 @@ public class JabRefPreferences {
         defaults.put("numberColWidth",new Integer(GUIGlobals.NUMBER_COL_LENGTH));
         defaults.put("workingDirectory", System.getProperty("user.home"));
         defaults.put("exportWorkingDirectory", System.getProperty("user.home"));
-        defaults.put("importWorkingDirectory", System.getProperty("user.home"));        
+        defaults.put("importWorkingDirectory", System.getProperty("user.home"));
+        defaults.put("fileWorkingDirectory", System.getProperty("user.home"));
         defaults.put("autoOpenForm", Boolean.TRUE);
         defaults.put("entryTypeFormHeightFactor", new Integer(1));
         defaults.put("entryTypeFormWidth", new Integer(1));
@@ -831,8 +832,13 @@ public class JabRefPreferences {
     public void updateExternalFileTypes() {
         externalFileTypes.add(new ExternalFileType("PDF", "pdf", get("pdfviewer"), GUIGlobals.getImage("pdfSmall")));
         externalFileTypes.add(new ExternalFileType("PostScript", "ps", get("psviewer"), GUIGlobals.getImage("psSmall")));
-        externalFileTypes.add(new ExternalFileType("Word file", "doc", "oowriter", null));
-        externalFileTypes.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", null));
+        externalFileTypes.add(new ExternalFileType("Word file", "doc", "oowriter", GUIGlobals.getImage("openoffice")));
+        externalFileTypes.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", GUIGlobals.getImage("openoffice")));
+        externalFileTypes.add(new ExternalFileType("PowerPoint file", "ppt", "ooimpress", GUIGlobals.getImage("openoffice")));
+        externalFileTypes.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", GUIGlobals.getImage("openoffice")));
+        externalFileTypes.add(new ExternalFileType("PNG image", "png", "gimp", GUIGlobals.getImage("picture")));
+        externalFileTypes.add(new ExternalFileType("GIF image", "gif", "gimp", GUIGlobals.getImage("picture")));
+        externalFileTypes.add(new ExternalFileType("Text file", "txt", "emacs", GUIGlobals.getImage("emacs")));
     }
 
     public ExternalFileType[] getExternalFileTypeSelection() {

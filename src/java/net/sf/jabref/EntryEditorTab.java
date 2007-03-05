@@ -141,7 +141,7 @@ public class EntryEditorTab {
 
             final FieldEditor ta;
             if (editorType == GUIGlobals.FILE_LIST_EDITOR)
-                ta = new FileListEditor(frame, fields[i], null);
+                ta = new FileListEditor(frame, fields[i], null, parent);
             else
                 ta = new FieldTextArea(fields[i], null);
 

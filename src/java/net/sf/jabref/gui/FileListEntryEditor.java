@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
+import net.sf.jabref.BrowseAction;
 import net.sf.jabref.external.ExternalFileType;
 
 import java.awt.*;
@@ -15,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
+import java.io.File;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -39,9 +41,13 @@ public class FileListEntryEditor {
         types = new JComboBox(Globals.prefs.getExternalFileTypeSelection());
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu", ""));
+                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
         builder.append(Globals.lang("Link"));
         builder.append(link);
+        BrowseListener browse = new BrowseListener(parent, link);
+        JButton browseBut = new JButton(Globals.lang("Browse"));
+        browseBut.addActionListener(browse);
+        builder.append(browseBut);
         builder.nextLine();
         builder.append(Globals.lang("Description"));
         builder.append(description);
@@ -123,5 +129,32 @@ public class FileListEntryEditor {
 
     public boolean okPressed() {
         return okPressed;
+    }
+
+    class BrowseListener implements ActionListener {
+        private JFrame parent;
+        private JTextField comp;
+
+        public BrowseListener(JFrame parent, JTextField comp) {
+            this.parent = parent;
+            this.comp = comp;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            File initial = new File(comp.getText().trim());
+            if (comp.getText().trim().length() == 0) {
+                // Nothing in the field. Go to the last file dir used:
+                initial = new File(Globals.prefs.get("fileWorkingDirectory"));
+            }
+            String chosen = Globals.getNewFile(parent, initial, Globals.NONE,
+                JFileChooser.OPEN_DIALOG, false);
+            if (chosen != null) {
+                File newFile = new File(chosen);
+                // Store the directory for next time:
+                Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+                comp.setText(newFile.getPath());
+                comp.requestFocus();
+            }
+        }
     }
 }

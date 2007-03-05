@@ -4,10 +4,7 @@ import net.sf.jabref.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 
 /**
  * Created by Morten O. Alver 2007.02.22
@@ -18,14 +15,17 @@ public class FileListEditor extends JTable implements FieldEditor {
     FileListEntryEditor editor = null;
     private JabRefFrame frame;
     private String fieldName;
+    private EntryEditor entryEditor;
     private JPanel panel;
     private FileListTableModel tableModel;
     private JScrollPane sPane;
-    private JButton add, remove;
+    private JButton add, remove, up, down;
 
-    public FileListEditor(JabRefFrame frame, String fieldName, String content) {
+    public FileListEditor(JabRefFrame frame, String fieldName, String content,
+                          EntryEditor entryEditor) {
         this.frame = frame;
         this.fieldName = fieldName;
+        this.entryEditor = entryEditor;
         label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
         tableModel = new FileListTableModel();
         setText(content);
@@ -36,8 +36,12 @@ public class FileListEditor extends JTable implements FieldEditor {
 
         add = new JButton(GUIGlobals.getImage("add"));
         remove = new JButton(GUIGlobals.getImage("remove"));
+        up = new JButton(GUIGlobals.getImage("up"));
+        down = new JButton(GUIGlobals.getImage("down"));
         add.setMargin(new Insets(0,0,0,0));
         remove.setMargin(new Insets(0,0,0,0));
+        up.setMargin(new Insets(0,0,0,0));
+        down.setMargin(new Insets(0,0,0,0));
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addEntry();
@@ -48,16 +52,31 @@ public class FileListEditor extends JTable implements FieldEditor {
                 removeEntries();
             }
         });
+        up.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                moveEntry(-1);
+            }
+        });
+        down.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                moveEntry(1);
+            }
+        });
 
-        JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
-        tlb.add(add);
-        tlb.add(remove);
-
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new GridLayout(2,2));
+        buttons.add(add);
+        buttons.add(up);
+        buttons.add(remove);
+        buttons.add(down);
+        
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
-        panel.add(tlb, BorderLayout.EAST);
+        panel.add(buttons, BorderLayout.EAST);
     }
+
+
 
     public String getFieldName() {
         return fieldName;
@@ -118,6 +137,7 @@ public class FileListEditor extends JTable implements FieldEditor {
         FileListEntry entry = new FileListEntry("", "", null);
         if (editListEntry(entry))
             tableModel.addEntry(row, entry);
+        entryEditor.updateField(this);
     }
 
     private void removeEntries() {
@@ -126,6 +146,24 @@ public class FileListEditor extends JTable implements FieldEditor {
             for (int i = rows.length-1; i>=0; i--) {
                 tableModel.removeEntry(rows[i]);
             }
+        entryEditor.updateField(this);
+    }
+
+    private void moveEntry(int i) {
+        int[] sel = getSelectedRows();
+        if ((sel.length != 1) || (tableModel.getRowCount() < 2))
+            return;
+        int toIdx = sel[0]+i;
+        if (toIdx >= tableModel.getRowCount())
+            toIdx -= tableModel.getRowCount();
+        if (toIdx < 0)
+            toIdx += tableModel.getRowCount();
+        FileListEntry entry = tableModel.getEntry(sel[0]);
+        tableModel.removeEntry(sel[0]);
+        tableModel.addEntry(toIdx, entry);
+        entryEditor.updateField(this);
+        setRowSelectionInterval(toIdx, toIdx);
+
     }
 
     private boolean editListEntry(FileListEntry entry) {
@@ -137,6 +175,7 @@ public class FileListEditor extends JTable implements FieldEditor {
         editor.setVisible(true);
         if (editor.okPressed())
             tableModel.fireTableDataChanged();
+        entryEditor.updateField(this);
         return editor.okPressed();
     }
     
