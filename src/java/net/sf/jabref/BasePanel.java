@@ -323,22 +323,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
 
-                    ExportFormats.initAllExports();
-                    JFileChooser fc = ExportFormats.createExportFileChooser("/home/alver/Documents");
-                    fc.showSaveDialog(frame);
-                    File file = fc.getSelectedFile();
-                    if (file == null)
-                        return;
-                    FileFilter ff = fc.getFileFilter();
-                    if (ff instanceof ExportFileFilter) {
-                        ExportFormat format = ((ExportFileFilter)ff).getExportFormat();
-                        format.performExport(database, file.getPath(), "UTF8", null);
-                        // Make sure we remember which filter was used, to set the default
-                        // for next time:
-                        Globals.prefs.put("lastUsedExport", format.getConsoleName());
-
-                    }
-
+                    NamedCompound ce = Util.upgradePdfPsToFile(database,
+                            new String[] {"pdf", "ps"});
+                    undoManager.addEdit(ce);
+                    markBaseChanged();
                 }
             });
 

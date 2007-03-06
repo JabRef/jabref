@@ -160,15 +160,15 @@ public class MainTableFormat implements TableFormat {
         // We add those that are enabled in preferences.
         iconCols.clear();
         int coln = 1;
+        if (Globals.prefs.getBoolean("fileColumn"))
+            iconCols.put(new Integer(coln++), FILE);
         if (Globals.prefs.getBoolean("pdfColumn"))
             iconCols.put(new Integer(coln++), PDF);
         if (Globals.prefs.getBoolean("urlColumn"))
             iconCols.put(new Integer(coln++), URL_);
         if (Globals.prefs.getBoolean("citeseerColumn"))
             iconCols.put(new Integer(coln++), CITESEER);
-        if (Globals.prefs.getBoolean("fileColumn"))
-            iconCols.put(new Integer(coln++), FILE);
-        
+
         // Add 1 to the number of icon columns to get padleft.
         padleft = 1 + iconCols.size();
 

@@ -1048,7 +1048,7 @@ public JabRefPreferences prefs() {
       //=====================================
       file.add(quit);
       mb.add(file);
-      //edit.add(test);
+      edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();

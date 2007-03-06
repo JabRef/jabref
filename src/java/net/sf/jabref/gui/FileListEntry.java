@@ -5,7 +5,7 @@ import net.sf.jabref.external.ExternalFileType;
 /**
  * This class represents a file link for a Bibtex entry.
 */
-class FileListEntry {
+public class FileListEntry {
     private String link;
     private String description;
     private ExternalFileType type;

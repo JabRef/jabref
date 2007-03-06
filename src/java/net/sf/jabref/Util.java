@@ -74,6 +74,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
@@ -84,6 +85,9 @@ import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.gui.AutoCompleter;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.gui.FileListEntry;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1584,7 +1588,53 @@ public class Util {
 
 	}
 
-	// -------------------------------------------------------------------------------
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained
+     * in the field GUIGlobals.FILE_FIELD.
+     * @param database The database to modify.
+     * @param fields The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
+        NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
+        for (Iterator i = database.getEntryMap().keySet().iterator(); i.hasNext();) {
+            BibtexEntry entry = (BibtexEntry) database.getEntryMap().get(i.next());
+            FileListTableModel tableModel = new FileListTableModel();
+            // If there are already links in the file field, keep those on top:
+            Object oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
+            if (oldFileContent != null) {
+                tableModel.setContent((String) oldFileContent);
+            }
+            int oldRowCount = tableModel.getRowCount();
+            for (int j = 0; j < fields.length; j++) {
+                Object o = entry.getField(fields[j]);
+                if (o != null) {
+                    String s = (String) o;
+                    if (s.trim().length() > 0) {
+                        File f = new File(s);
+                        String extension = "";
+                        if ((s.lastIndexOf('.') >= 0) && (s.lastIndexOf('.') < s.length() - 1)) {
+                            extension = s.substring(s.lastIndexOf('.') + 1);
+                        }
+                        FileListEntry flEntry = new FileListEntry(f.getName(), s,
+                                Globals.prefs.getExternalFileTypeByExt(fields[j]));
+                        tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                        entry.clearField(fields[j]);
+                        ce.addEdit(new UndoableFieldChange(entry, fields[j], o, null));
+                    }
+                }
+            }
+            if (tableModel.getRowCount() != oldRowCount) {
+                String newValue = tableModel.getStringRepresentation();
+                entry.setField(GUIGlobals.FILE_FIELD, newValue);
+                ce.addEdit(new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD, oldFileContent, newValue));
+            }
+        }
+        ce.end();
+        return ce;
+    }
+
+    // -------------------------------------------------------------------------------
 
 	/**
 	 * extends the filename with a default Extension, if no Extension '.x' could
