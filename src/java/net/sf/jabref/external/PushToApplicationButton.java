@@ -43,7 +43,7 @@ public class PushToApplicationButton implements ActionListener {
       applications.add(new PushToEmacs());
       applications.add(new PushToWinEdt());
       applications.add(new PushToLatexEditor());
-
+      applications.add(new PushToVim());
     }
 
 
