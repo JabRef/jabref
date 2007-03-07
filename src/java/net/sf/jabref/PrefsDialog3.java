@@ -91,7 +91,7 @@ public class PrefsDialog3 extends JDialog {
 		tabs.add(new PreviewPrefsTab(prefs));
 		tabs.add(new NameFormatterTab(parent.helpDiag));
 		tabs.add(new XmpPrefsTab());
-                tabs.add(new AdvancedTab(prefs, parent.helpDiag));
+        tabs.add(new AdvancedTab(prefs, parent.helpDiag));
 		
 		Iterator it = tabs.iterator();
 		String[] names = new String[tabs.size()];

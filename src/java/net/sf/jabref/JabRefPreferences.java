@@ -182,7 +182,7 @@ public class JabRefPreferences {
         defaults.put("searchPanelVisible", Boolean.FALSE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
         defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
-        defaults.put("latexEditorPath", "C:\\TEMP\\Led.exe");
+        defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);

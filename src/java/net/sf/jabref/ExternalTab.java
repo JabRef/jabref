@@ -20,7 +20,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, citeCommand;
+	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, led, citeCommand;
 
 	ItemListener regExpListener;
 
@@ -39,8 +39,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		lyx = new JTextField(30);
 		winEdt = new JTextField(30);
 		citeCommand = new JTextField(30);
+        led = new JTextField(30);
 
-		regExpTextField = new JTextField(30);
+        regExpTextField = new JTextField(30);
 
 		useRegExpComboBox = new JCheckBox(Globals.lang("Use Regular Expression Search"));
 		regExpListener = new ItemListener() {
@@ -140,7 +141,14 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		browse = new BrowseAction(_frame, winEdt, false);
 		builder.append(new JButton(browse));
 		builder.nextLine();
-		builder.append(pan);
+        lab = new JLabel(Globals.lang("Path to LatexEditor (LEd.exe)") + ":");
+        builder.append(pan);
+        builder.append(lab);
+        builder.append(led);
+        browse = new BrowseAction(_frame, led, false);
+        builder.append(new JButton(browse));
+        builder.nextLine();
+        builder.append(pan);
 		builder.append(Globals.lang("Cite command (for Emacs/WinEdt)") + ":");
 		builder.append(citeCommand);
 		// builder.appendSeparator();
@@ -168,7 +176,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 		lyx.setText(_prefs.get("lyxpipe"));
 		winEdt.setText(_prefs.get("winEdtPath"));
-		citeCommand.setText(_prefs.get("citeCommand"));
+        led.setText(_prefs.get("latexEditorPath"));
+        citeCommand.setText(_prefs.get("citeCommand"));
 
 		regExpTextField.setText(_prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
 		useRegExpComboBox.setSelected(_prefs.getBoolean(JabRefPreferences.USE_REG_EXP_SEARCH_KEY));
@@ -190,7 +199,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		_prefs.put("htmlviewer", html.getText());
 		_prefs.put("lyxpipe", lyx.getText());
 		_prefs.put("winEdtPath", winEdt.getText());
-		_prefs.put("citeCommand", citeCommand.getText());
+        _prefs.put("latexEditorPath", led.getText());
+        _prefs.put("citeCommand", citeCommand.getText());
 	}
 
 	public boolean readyToClose() {
