@@ -322,7 +322,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
-
+                    //CheckBoxFileChooser cb = new CheckBoxFileChooser(new File(""), "Selected only");
+                    //cb.showSaveDialog(frame);
                     NamedCompound ce = Util.upgradePdfPsToFile(database,
                             new String[] {"pdf", "ps"});
                     undoManager.addEdit(ce);
@@ -452,14 +453,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             JFileChooser.SAVE_DIALOG, false, options);
                 if (chosenFile == null)
                     return; // cancelled
-                Globals.prefs.put("workingDirectory", metaData.getFile().getParent());
+                File f = new File(chosenFile);
                 // Check if the file already exists:
-                if ((new File(chosenFile)).exists() && (JOptionPane.showConfirmDialog
-                                (frame, "'"+metaData.getFile().getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                if (f.exists() && (JOptionPane.showConfirmDialog
+                                (frame, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
                                 Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                                 != JOptionPane.OK_OPTION)) {
                     return; // cancelled
-                    
                 }
                 // Save:
                 if (sAll.isSelected()) {
@@ -467,7 +467,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Normal save
                     //
                     if (chosenFile != null) {
-                        metaData.setFile(new File(chosenFile));
+                        metaData.setFile(f);
+                        Globals.prefs.put("workingDirectory", f.getParent());
                         runCommand("save");
                         // Register so we get notifications about outside changes to the file.
                         try {

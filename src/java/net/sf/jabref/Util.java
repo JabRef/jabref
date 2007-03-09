@@ -804,7 +804,25 @@ public class Util {
 		return findFile(entry, null, directories, regularExpression, true);
 	}
 
-	/**
+    /**
+     * Convenience menthod for findPDF. Searches for a file of the given type.
+     * @param entry The BibtexEntry to search for a link for.
+     * @param fileType The file type to search for.
+     * @return The link to the file found, or null if not found.
+     */
+    public static String findFile(BibtexEntry entry, ExternalFileType fileType, List extraDirs) {
+
+        List dirs = new ArrayList();
+        dirs.addAll(extraDirs);
+        if (Globals.prefs.hasKey(fileType.getExtension()+"Directory")) {
+            dirs.add(Globals.prefs.get(fileType.getExtension()+"Directory"));
+            System.out.println(Globals.prefs.get(fileType.getExtension()+"Directory"));
+        }
+        String [] directories = (String[])dirs.toArray(new String[dirs.size()]);
+        return findPdf(entry, fileType.getExtension(), directories);
+    }
+
+    /**
 	 * Searches the given directory and file name pattern for a file for the
 	 * bibtexentry.
 	 * 

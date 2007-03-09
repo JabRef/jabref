@@ -1074,7 +1074,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 				}
 
 				if (set) {
-					try {
+                    try {
 						// The following statement attempts to write the
 						// new contents into a StringWriter, and this will
 						// cause an IOException if the field is not

@@ -8,7 +8,7 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Problem with ArrayIndexOutOfRange excaption in DuplicateSearch. Hælvett!
+* Problem with ArrayIndexOutOfRange exception in DuplicateSearch. Hælvett!
 * Fix Save/Export file dialog stuff
 * Test Push to Vim under Windows
 * Add interface for configuring external file types/viewers

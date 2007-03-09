@@ -1,10 +1,17 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.io.File;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Created by Morten O. Alver 2007.02.22
@@ -19,7 +26,7 @@ public class FileListEditor extends JTable implements FieldEditor {
     private JPanel panel;
     private FileListTableModel tableModel;
     private JScrollPane sPane;
-    private JButton add, remove, up, down;
+    private JButton add, remove, up, down, auto;
 
     public FileListEditor(JabRefFrame frame, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -38,6 +45,7 @@ public class FileListEditor extends JTable implements FieldEditor {
         remove = new JButton(GUIGlobals.getImage("remove"));
         up = new JButton(GUIGlobals.getImage("up"));
         down = new JButton(GUIGlobals.getImage("down"));
+        auto = new JButton(Globals.lang("Auto"));
         add.setMargin(new Insets(0,0,0,0));
         remove.setMargin(new Insets(0,0,0,0));
         up.setMargin(new Insets(0,0,0,0));
@@ -62,18 +70,24 @@ public class FileListEditor extends JTable implements FieldEditor {
                 moveEntry(1);
             }
         });
+        auto.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                autoSetLinks();
+            }
+        });
 
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(2,2));
-        buttons.add(add);
-        buttons.add(up);
-        buttons.add(remove);
-        buttons.add(down);
-        
+        DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
+                ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+        builder.append(up);
+        builder.append(add);
+        builder.append(auto);
+        builder.append(down);
+        builder.append(remove);
+                
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
-        panel.add(buttons, BorderLayout.EAST);
+        panel.add(builder.getPanel(), BorderLayout.EAST);
     }
 
 
@@ -163,7 +177,6 @@ public class FileListEditor extends JTable implements FieldEditor {
         tableModel.addEntry(toIdx, entry);
         entryEditor.updateField(this);
         setRowSelectionInterval(toIdx, toIdx);
-
     }
 
     private boolean editListEntry(FileListEntry entry) {
@@ -178,7 +191,39 @@ public class FileListEditor extends JTable implements FieldEditor {
         entryEditor.updateField(this);
         return editor.okPressed();
     }
-    
+
+    private void autoSetLinks() {
+        BibtexEntry entry = entryEditor.getEntry();
+        String field = null;
+        boolean foundAny = false;
+        ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        for (int i = 0; i < types.length; i++) {
+            ExternalFileType type = types[i];
+            //System.out.println("Looking for "+type.getName());
+            String found = Util.findFile(entry, type, new ArrayList());
+            if (found != null) {
+                //System.out.println("Found: "+found);
+                File f= new File(found);
+                boolean alreadyHas = false;
+                for (int j=0; j<tableModel.getRowCount(); j++) {
+                    FileListEntry existingEntry = tableModel.getEntry(j);
+                    if (new File(existingEntry.getLink()).equals(f)) {
+                        alreadyHas = true;
+                        break;
+                    }
+                }
+                if (!alreadyHas) {
+                    FileListEntry flEntry = new FileListEntry(f.getName(), found, type);
+                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                    foundAny = true;
+                }
+            }
+        }
+        if (foundAny) {
+            entryEditor.updateField(this);
+        }
+    }
+
     class TableClickListener extends MouseAdapter {
 
         public void mouseClicked(MouseEvent e) {

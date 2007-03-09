@@ -13,7 +13,7 @@ import java.util.Iterator;
 */
 public class FileListTableModel extends AbstractTableModel {
 
-    private ArrayList list = new ArrayList();
+    private final ArrayList list = new ArrayList();
 
     public FileListTableModel() {
     }
@@ -45,21 +45,25 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     public FileListEntry getEntry(int index) {
-        return (FileListEntry)list.get(index);
+        synchronized (list) {
+            return (FileListEntry)list.get(index);
+        }
     }
 
     public void removeEntry(int index) {
         synchronized (list) {
             list.remove(index);
+            fireTableRowsDeleted(index, index);
         }
-        fireTableRowsDeleted(index, index);
+
     }
 
     public void addEntry(int index, FileListEntry entry) {
         synchronized (list) {
             list.add(index, entry);
+            fireTableRowsInserted(index, index);
         }
-        fireTableRowsInserted(index, index);
+
     }
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
@@ -108,12 +112,16 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private FileListEntry decodeEntry(ArrayList contents) {
-        if (contents.size() < 3) {
-            return null;
-        }
-        return new FileListEntry((String)contents.get(0),
-                (String)contents.get(1),
-                Globals.prefs.getExternalFileTypeByName((String)contents.get(2)));
+        return new FileListEntry(getElementIfAvailable(contents, 0),
+                getElementIfAvailable(contents, 1),
+                Globals.prefs.getExternalFileTypeByName
+                        (getElementIfAvailable(contents, 2)));
+    }
+
+    private String getElementIfAvailable(ArrayList contents, int index) {
+        if (index < contents.size())
+            return (String)contents.get(index);
+        else return "";
     }
 
     /**
@@ -151,5 +159,14 @@ public class FileListTableModel extends AbstractTableModel {
             sb.append(c);
         }
         return sb.toString();
+    }
+
+    public void print() {
+        System.out.println("----");
+        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+            FileListEntry fileListEntry = (FileListEntry) iterator.next();
+            System.out.println(fileListEntry);
+        }
+        System.out.println("----");
     }
 }
