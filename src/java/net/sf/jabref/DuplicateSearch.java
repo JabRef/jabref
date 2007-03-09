@@ -34,6 +34,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.swing.*;
 
 import net.sf.jabref.undo.NamedCompound;
@@ -52,7 +54,7 @@ public class DuplicateSearch extends Thread {
   }
 
 public void run() {
-  NamedCompound ce = null;
+  final NamedCompound ce = new NamedCompound(Globals.lang("duplicate removal"));
   int duplicateCounter = 0;
   
   autoRemoveExactDuplicates = false;
@@ -85,8 +87,10 @@ public void run() {
   }
 */
 
+   final ArrayList toRemove = new ArrayList();
   while (!st.finished() || (current < duplicates.size()))
   {
+
     if (current >= duplicates.size() )
     {
       // wait until the search thread puts something into duplicates vector
@@ -102,20 +106,16 @@ public void run() {
     } else  // duplicates found
     {
 
+
         BibtexEntry[] be = (BibtexEntry[]) duplicates.get(current);
         current++;
-        if ((panel.database.getEntryById(be[0].getId()) != null) &&
-                (panel.database.getEntryById(be[1].getId()) != null)) {
+        if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
             // Check if they are exact duplicates:
             boolean askAboutExact = false;
             if (Util.compareEntriesStrictly(be[0], be[1]) > 1) {
                 if (autoRemoveExactDuplicates) {
-                    if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
-                    panel.database.removeEntry(be[1].getId());
-                    panel.markBaseChanged();
-                    ce.addEdit(new UndoableRemoveEntry(panel.database, be[1], panel));
+                    toRemove.add(be[1]);
                     duplicateCounter++;
-
                     continue;
                 } else {
                     askAboutExact = true;
@@ -127,51 +127,52 @@ public void run() {
                             DuplicateResolverDialog.DUPLICATE_SEARCH);
             ((CallBack)(Spin.over(cb))).update();
 
-            /*drd = new DuplicateResolverDialog(panel.frame, be[0], be[1],
-                    askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
-                            DuplicateResolverDialog.DUPLICATE_SEARCH);
-            drd.setVisible(true);*/
-
             duplicateCounter++;
-            //int answer = drd.getSelected();
             int answer = cb.getSelected();
             if ((answer == DuplicateResolverDialog.KEEP_UPPER)
                     || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
-                if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
-                panel.database.removeEntry(be[1].getId());
-                panel.markBaseChanged();
-                ce.addEdit(new UndoableRemoveEntry(panel.database, be[1], panel));
+                toRemove.add(be[1]);
                 if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)
                     autoRemoveExactDuplicates = true; // Remember choice
             } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
-                if (ce == null) ce = new NamedCompound(Globals.lang("duplicate removal"));
-                panel.database.removeEntry(be[0].getId());
-                panel.markBaseChanged();
-                ce.addEdit(new UndoableRemoveEntry(panel.database, be[0], panel));
+                toRemove.add(be[0]);
             } else if (answer == DuplicateResolverDialog.BREAK) {
                 st.setFinished(); // thread killing
                 current = Integer.MAX_VALUE;
                 duplicateCounter--; // correct counter
             }
-            //drd.dispose();
         }
     }
   }
 
   if (drd != null)
     drd.dispose();
+    final int dupliC = duplicateCounter;
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            // Now, do the actual removal:
+            if (toRemove.size() > 0) {
+                for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
+                    BibtexEntry entry = (BibtexEntry) iterator.next();
+                    panel.database.removeEntry(entry.getId());
+                    ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
+                }
+                panel.markBaseChanged();
+            }
+            panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
+                       +" " +Globals.lang("pairs processed") +": " +dupliC );
 
-  panel.output(Globals.lang("Duplicate pairs found") + ": " + duplicates.size()
-               +" " +Globals.lang("pairs processed") +": " +duplicateCounter );
+            if (ce != null)
+            {
+                ce.end();
+                panel.undoManager.addEdit(ce);
+            }
 
-  if (ce != null)
-  {
-    ce.end();
-    //Util.pr("ox");
-    panel.undoManager.addEdit(ce);
-    //markBaseChanged();
-    //refreshTable();
-  }
+        }
+
+    });
+
+
 }
 
 
