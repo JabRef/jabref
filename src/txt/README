@@ -84,7 +84,8 @@ Change log:
 2.3b1   - Added autocompletion feature for author/editors and other fields.
 	- Added feature to save all open databases.
 	- Added support for pushing citations to Vim when Vim server is enabled.
-	- Added missing option for specifying the path to LEd.exe
+	- Added missing option for specifying the path to LEd.exe.
+	- Synchronize external links now searches entire database, not selected entries.
 	- Improved handling of external links. The 'file' field can now specify a list
 	  of external links, and arbitrary file types are supported. Old-style PDF and
 	  PS links can be moved automatically into the 'file' field.

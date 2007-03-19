@@ -43,16 +43,17 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     }
 
     public void init() {
-        // Get all entries, and make sure there are selected entries:
+        /*// Get all entries, and make sure there are selected entries:
     	sel = panel.getSelectedEntries();
     	if (sel.length < 1) {
 	    // No entries selected. Assume all entries should be treated:
+	    */
 	    Collection col = panel.database().getEntries();
 	    sel = new BibtexEntry[col.size()];
 	    sel = (BibtexEntry[])col.toArray(sel);
             //goOn = false;
             //return;
-        }
+        //}
 
         // Ask about rules for the operation:
         if (optDiag == null)
