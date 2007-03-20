@@ -6,7 +6,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%5.\,3.\,2007}
+\newcommand{\versiondate}{20.\,3.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -397,7 +397,7 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
   \item \emph{location*}\\
     Der Ort, der mit einem Werk in Verbindung steht, z.\,B. die Stadt, in der eine Konferenz stattgefunden hat.
   \item \emph{LCCN*}\\
-    Die \emph{Library of Congress Call Number}.  Manchmal heißt das Feld auch \texttt{lib-congress}.
+    Die \emph{Library of Congress Call Number}.  Das Feld kann auch \texttt{lib-congress} heißen.
   \item \emph{mrnumber*}\\
     Die \emph{Mathematical Reviews}-Nummer.
   \item \emph{price*}\\
@@ -466,19 +466,17 @@ Mit einem Doppelklick auf die Batch-Datei starten Sie \jabref{}.
 
 \begin{enumerate}
 \item mit dem \emph{Java Runtime Environment}:
-
-
+\begin{lstlisting}
 \texttt{jre -new -jar <Pfad zur jar-Datei>}
-
+\end{lstlisting}
 oder
-
+\begin{lstlisting}
 \texttt{jrew -new -jar <Pfad zur jar-Datei>}
-
+\end{lstlisting}
 \item mit dem \emph{Java Development Kit}:
-
-
+\begin{lstlisting}
 \texttt{java -jar <Pfad zur jar-Datei>}
-
+\end{lstlisting}
 \end{enumerate}
 Es wird empfohlen, \jabref{} mit dem Java 5.0 JRE zu benutzen. Falls
 Sie dies tun, sollten Sie die Option \texttt{-Dswing.aatext=true}
@@ -486,8 +484,14 @@ vor der Option \texttt{-jar} einfügen, um das Benutzen von Anti-Alias-Schriften
 im Programm zu ermöglichen.
 
 Die jar-Datei, die \jabref{} enthält, kann entpackt werden mit den
-Kommandos \texttt{jar xf <Pfad zur jar-Datei>} bzw. \texttt{jar xf
-<Pfad zur jar-Datei> <Liste der Dateien, die entpackt werden sollen>}.
+Kommandos 
+\begin{lstlisting}
+\texttt{jar xf <Pfad zur jar-Datei>} 
+\end{lstlisting}
+bzw. 
+\begin{lstlisting}
+\texttt{jar xf <Pfad zur jar-Datei> <Liste der Dateien, die entpackt werden sollen>}
+\end{lstlisting}
 Das Entpacken der jar-Datei ist nicht notwendig, um das Programm zu
 starten!
 
@@ -735,7 +739,7 @@ und wie Sie dieses Aussehen verändern können, erfahren Sie unter Abschnitt~\ref{
 \begin{quote}
 \emph{STRG-F öffnet oder aktiviert den Suchdialog.
 Drückt man mehrmals auf STRG-F, so werden die verschiedenen Suchmodi
-ausgewählt. Mit STRG-SHIFT-F öffnet oder aktiviert man den Suchdialog
+ausgewählt. STRG-SHIFT-F öffnet oder aktiviert den Suchdialog
 und wählt gleichzeitig die direkte Suche aus. Bei der direkten Suche
 springt man mit STRG-F oder STRG-SHIFT-F zum nächsten Treffer.}
 \end{quote}
@@ -1136,15 +1140,15 @@ nach dem automatischen Erstellen von Hand löschen.)
 Der \menu{Aktualisieren}-Button in der Gruppenansicht aktualisiert
 die Tabelle in Bezug auf die aktuell ausgewählten Gruppen. Normalerweise
 erfolgt dies automatisch, aber in seltenen Fällen (z.\,B. nach einem
-Rückgängig- oder Wiederholen-Vorgang, der mit Gruppen zusammenhängt)
+Rückgängig- oder Wiederholen"=Vorgang, der mit Gruppen zusammenhängt)
 ist ein händisches Aktualisieren nötig.
 
 
 \paragraph{Einbeziehende Unter- und Obergruppen mischen}
 
-Wenn eine einbeziehende Gruppe die Untergruppe von einer Gruppe ist,
-die ihre Untergruppen berücksichtigt~-- also sozusagen die Geschwister
-der einbeziehenden Gruppe~--, dann werden diese Geschwister ignoriert,
+Ist eine einbeziehende Gruppe die Untergruppe von einer Gruppe,
+die ihre Untergruppen berücksichtigt~-- hat sie also sozusagen Geschwister~--, 
+dann werden diese Geschwister ignoriert,
 sobald die einbeziehende Gruppe ausgewählt wird.
 
 
@@ -1436,7 +1440,7 @@ Anschließend wählen Sie \menu{Extras} \msep{} \menu{Literaturdatenbank}. Ihre Da
 \item Exportieren Sie Ihre Datei in das \texttt{.sxc}-Format.
 \item Starten Sie OpenOffice.org.
 \item Wählen Sie \menu{Extras} \msep{} \menu{Datenquellen}.
-\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen z.\,B. in \emph{Bibliographie-alt}. 
+\item Wählen Sie die \emph{Bibliography}-Datei und ändern ihren Namen beispielsweise in \emph{Bibliographie-alt}. 
 \item Drücken Sie \menu{Anwenden}.
 \item Klicken Sie \menu{Neue Datenquelle}. Ein neuer Eintrag erscheint. Ändern Sie den Namen zu \emph{Bibliography}.
 \item Ändern Sie den \menu{Dateityp} zu \menu{Tabelle}. Klicken Sie den \menu{\ldots}-Button in der Zeile \menu{Datenquellen URL}. Wählen Sie die \texttt{.sxc}-Datei, die Sie exportiert haben.
@@ -1496,7 +1500,7 @@ ein URL oder DOI zu verlinken.
 \subsubsection{Externe Betrachter einrichten}
 
 \jabref{} benötigt Informationen darüber, welche Programme es für
-PDF- und PS-Dateien und Internetseiten benutzen soll. In der Standardeinstellung
+PDF- und PS"=Dateien und Internetseiten benutzen soll. In der Standardeinstellung
 werden sie auf Werte gesetzt, die wahrscheinlich zu Ihrem Betriebssystem
 passen, so dass eine gute Chance besteht, dass Sie diese Werte nicht
 zu verändern brauchen.
@@ -1948,7 +1952,7 @@ ist, auch nicht in die neue Datei geschrieben werden kann.
 \tip[]{Beachten Sie, dass das Aktivieren dieser Funktion mit Windows XP SP2 (und möglicherweise auch mit anderen Konfigurationen) zu einer Meldung führen kann, die besagt, dass bestimmte Funktionen des Programms von der Windows-Firewall geblockt wurden. Sie können die Firewall anweisen, weiterhin zu blocken, denn die Firewall beeinträchtigt den Externen Zugriff von \jabref{} nicht.}
 Falls das Abhören von externen Zugriffen aktiviert ist, versucht \jabref{} beim Programmstart, den entsprechenden Port abzuhören. Das bedeutet, dass andere Anwendungen Informationen durch diesen Port an \jabref{} senden können. \jabref{} akzeptiert dabei nur lokale Verbindungen, um das Risiko eines Eingriffs von außerhalb auszuschließen.
 
-Mit dem externen Zugriff kann eine zweite Instanz von \jabref{} erkennen, dass eine erste Instanz bereits läuft. In diesem Fall leitet die zweite Instanz ihre Kommandozeilen-Optionen an die erste Instanz weiter und beendet sich selbst direkt im Anschluss~-- sofern die zweite Instanz nicht ausdrücklich instruiert wurde, im Stand-Alone-Modus (als selbständige Instanz) zu starten.
+Mit dem externen Zugriff kann eine zweite Instanz von \jabref{} erkennen, dass eine erste Instanz bereits läuft. In diesem Fall leitet die zweite Instanz ihre Kommandozeilen"=Optionen an die erste Instanz weiter und beendet sich selbst direkt im Anschluss~-- sofern die zweite Instanz nicht ausdrücklich instruiert wurde, im Stand-Alone-Modus (als selbständige Instanz) zu starten.
 
 Die erste \jabref{}-Instanz liest die Kommandozeilenoptionen und führt die erforderlichen Aktionen aus, z.\,B. das Lesen oder Importieren einer Datei oder das Anhängen einer Datei an die aktive Datenbank. Falls eine Datei mit der Option \texttt{-{-}importToOpen} importiert wird, werden die Einträge an die aktive Datei angehängt. Falls keine Datei geöffnet ist, wird eine neue Datei angelegt.
 
@@ -2112,7 +2116,7 @@ Autor vorhanden ist. Ein Plus (+) wird angehängt, falls es mehr als
 drei Autoren gibt.
 \end{labeling}
 
-\tip[Anmerkung: ]{Falls es keinen Autor gibt (z.\,B. bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth...{]}}-Feldmarken den oder die Herausgeber, die im editor-Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label-Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author-Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B.: \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
+\tip[Anmerkung: ]{Falls es keinen Autor gibt (etwa bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth\ldots{]}}"=Feldmarken den oder die Herausgeber, die im editor-Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label-Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author-Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B.: \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
 
 \begin{labeling}{veryveryveryshorttitle}
 \item [\texttt{{[}edtr{]}}]Der Nachname des ersten Herausgebers.
@@ -2191,7 +2195,7 @@ Abschnitt~\ref{CustomExports}).
 \subsection{Exportfilter}
 
 \label{CustomExports}Mit \jabref{} können Sie Ihre eigenen Exportfilter
-definieren und genau so wie die Standard-Exportfilter benutzen. Ein
+definieren und genau so wie die Standard"=Exportfilter benutzen. Ein
 Exportfilter wird durch eine oder mehrere \emph{Layout-Dateien} definiert,
 die mittels eingebauter Formatierprogramme das Format der exportierten
 Dateien festlegen. Ihre Layout-Datei müssen Sie in einem separaten
@@ -2261,7 +2265,7 @@ so allgemein gehalten wird, dass sie die meisten Eintragstypen abdeckt.
 
 \paragraph{Das Format der Layout-Datei}
 
-Layout-Dateien werden mit einem einfachen markup-Format erstellt,
+Layout"=Dateien werden mit einem einfachen markup"=Format erstellt,
 bei dem die Kommandos mit einem >>backslash<< (\texttt{\textbackslash{}})
 eingeleitet werden. Alle Textbestandteile, die nicht als Kommando
 identifiziert werden, gelangen direkt in die Ausgabedatei.
@@ -2335,10 +2339,9 @@ werden.
 \end{labeling}
 Falls keiner der verfügbaren Formatierer das Ergebnis erzielt, das
 Sie erreichen möchten, können Sie Ihren eigenen Formatierer hinzufügen,
-indem Sie das \texttt{net.sf.jabref.ex\allowbreak port.layout.LayoutFormatter}-Interface
-implementieren. Wenn Sie Ihre Klasse (class) in das Paket \texttt{net.sf.jabref.export.}\allowbreak \texttt{layout.format}
-einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
-so wie auch die Standard-Formatierer. Ansonsten müssen Sie den Formatierer
+indem Sie das \texttt{net.sf.jabref\allowbreak .export.layout.LayoutFormatter}-Interface
+implementieren. Wenn Sie in das Paket \texttt{net.sf.jabref.export.layout.format} Ihre Klasse (class) einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
+so wie auch die Standard"=Formatierer. Ansonsten müssen Sie den Formatierer
 mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
 muss der Formatierer in ihrem classpath sein, wenn Sie \jabref{}
 starten.
@@ -2456,10 +2459,12 @@ Angenommen, wir wollen Dateien der folgenden Form importieren:
 
 \subparagraph{SimpleCsvImporter Erstellen}
 
-Erzeugen Sie in einem Text-Editor eine von \texttt{ImportFormat} abgeleitete Klasse,
-die die Methoden \texttt{getFormatName()}, 
+Erzeugen Sie in einem Text"=Editor eine Klasse, die von von \texttt{ImportFormat} abgeleitet
+ist und die folgende Methoden implementiert:\\
+\texttt{getFormatName()}, 
 \texttt{isRecognizedFormat()}
-und \texttt{importEntries()} implementiert. Hier ein Beispiel:
+und \texttt{importEntries()}.\\
+Hier ein Beispiel:
 \begin{lstlisting}
 import java.io.*;
 import java.util.*;
@@ -2501,9 +2506,7 @@ public class SimpleCsvImporter extends ImportFormat {
 
 \subparagraph{SimpleCsvImporter übersetzen}
 
-Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, Sie haben
-sie unter \texttt{/meinpfad/SimpleCsvImporter.java} gespeichert. Nehmen wir weiter an,
-die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
+Beachten Sie, dass die Beispielklasse im Default"=Package liegt. Angenommen, sie liegt unter \texttt{/meinpfad\slash{}SimpleCsvImporter.java}, die Datei \texttt{JabRef-2.0.jar} ist im gleichen Verzeichnis wie
 \texttt{SimpleCsvImporter.java} und Java ist in Ihrem Kommandopfad. 
 Kompilieren Sie die Klasse mit JSDK 1.4 zum Beispiel mit folgendem Kommandozeilen"=Aufruf: 
 \begin{lstlisting}
@@ -2732,7 +2735,7 @@ der dann für das Projekt freigeschaltet werden kann.
 
 \subsection{Danksagung}
 
-Neben den Entwicklern, die die Hilfe-Seiten des Programms geschrieben haben, möchte ich Thomas Fritz, Axel Junge und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch danken.
+Neben den Entwicklern, die die Hilfe"=Seiten des Programms geschrieben haben, danke ich Thomas Fritz, Axel Junge und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch.
 
 Seit den Anfängen als \emph{BibKeeper} (von Morten O.~Alver) und \emph{JBibtexManager} (von Nizar N.~Batada) haben
 zahlreiche Personen dazu beigetragen, dass \jabrefversion{} zu dem
@@ -2758,7 +2761,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%endgültiges Datum}
+\begin{revhist}{\versiondate}%20.\,3.\,2007}
 \item Abschnitt \nameref{subsubsec:Hinzufuegen-Exportfilter} angepasst
 \item Kleinere Änderungen
 \end{revhist}
