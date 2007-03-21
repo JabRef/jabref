@@ -6,7 +6,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{20.\,3.\,2007}
+\newcommand{\versiondate}{in Bearb.}%21.\,3.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -63,22 +63,28 @@
 \pdfoptionpdfminorversion 2
 
 %%%%% Colors %%%%%
-\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
 \definecolor{dkblue}{rgb}{0,0.1,0.5} % dark blue
 \definecolor{dkred}{rgb}{0.66,0.04,0.04} % dark red
 \definecolor{pyellow}{rgb}{1,0.97,0.75} % pale yellow
 
 %%%%% New commands %%%%%
 %%% JabRef "logo"
-\newcommand{\jabref}{%
-\mbox{%
-  \textit{%
-    {\color{dkred}J}\hspace{-.015em}{\color{black}ab}%
-    \hspace{-.02em}%
-    {\color{dkblue}R}\hspace{-.025em}\raisebox{.15ex}{\color{black}ef}%
-    }%
-  }%
+\DeclareRobustCommand{\jabref}{%
+  \raisebox{-.32ex}{\color{dkred}J}\kern-.06em%
+    \hbox{$\m@th$% %% force math size calculations
+          \csname S@\f@size\endcsname
+          \fontsize\sf@size\z@
+          \math@fontsfalse\selectfont
+          \color{orange}A\kern-.025emB}%
+  \kern-.06em\-R\hspace{-.08em}%
+    \raisebox{.16ex}{$\m@th$% %% force math size calculations
+          \csname S@\f@size\endcsname
+          \fontsize\sf@size\z@
+          \math@fontsfalse\selectfont
+          E\kern-.025emF}%
 }
+
 %%% version number
 \newcommand{\versionnr}{2.2} %
 %%% JabRef logo with version nr
@@ -2761,7 +2767,11 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%20.\,3.\,2007}
+\begin{revhist}{\versiondate}%endgültiges Datum}
+\item \jabref{}-Logo geändert
+\end{revhist}
+
+\begin{revhist}{20.\,3.\,2007}
 \item Abschnitt \nameref{subsubsec:Hinzufuegen-Exportfilter} angepasst
 \item Kleinere Änderungen
 \end{revhist}
