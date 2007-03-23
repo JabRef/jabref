@@ -1,3 +1,7 @@
+%%%%% To do %%%%%
+% DW 2007-03-23
+% - eid erläutern?
+% - Bibliographie mit biblatex statt jurabib?
 \documentclass[10pt,normalheadings]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
@@ -6,7 +10,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%21.\,3.\,2007}
+\newcommand{\versiondate}{in Bearb.}%23.\,3.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -468,20 +472,20 @@ start javaw -jar JabRef.jar
 Mit einem Doppelklick auf die Batch-Datei starten Sie \jabref{}.
 
 
-\subsection{Starten von der Kommandozeile}
+\subsection{Starten von der Kommandozeile}\label{subsec:Starten-Kommandozeile}
 
 \begin{enumerate}
 \item mit dem \emph{Java Runtime Environment}:
 \begin{lstlisting}
-\texttt{jre -new -jar <Pfad zur jar-Datei>}
+jre -new -jar <Pfad zur jar-Datei>
 \end{lstlisting}
 oder
 \begin{lstlisting}
-\texttt{jrew -new -jar <Pfad zur jar-Datei>}
+jrew -new -jar <Pfad zur jar-Datei>
 \end{lstlisting}
 \item mit dem \emph{Java Development Kit}:
 \begin{lstlisting}
-\texttt{java -jar <Pfad zur jar-Datei>}
+java -jar <Pfad zur jar-Datei>
 \end{lstlisting}
 \end{enumerate}
 Es wird empfohlen, \jabref{} mit dem Java 5.0 JRE zu benutzen. Falls
@@ -492,18 +496,17 @@ im Programm zu ermöglichen.
 Die jar-Datei, die \jabref{} enthält, kann entpackt werden mit den
 Kommandos 
 \begin{lstlisting}
-\texttt{jar xf <Pfad zur jar-Datei>} 
+jar xf <Pfad zur jar-Datei>
 \end{lstlisting}
 bzw. 
 \begin{lstlisting}
-\texttt{jar xf <Pfad zur jar-Datei> <Liste der Dateien, die entpackt werden sollen>}
+jar xf <Pfad zur jar-Datei> <Liste der Dateien, die entpackt werden sollen>
 \end{lstlisting}
 Das Entpacken der jar-Datei ist nicht notwendig, um das Programm zu
 starten!
 
-Weitere Hinweise zur Installation finden Sie auf der \jabref{}-Homepage
-unter \url{http://jabref.sourceforge.net} und in der Datei INSTALL
-(zum Kompilieren aus den \emph{sourcen}).
+Weitere Hinweise zur Installation finden Sie in der Datei INSTALL
+(zum Kompilieren aus den \emph{sourcen}) und auf der \href{http://jabref.sourceforge.net}{\jabref{}-Homepage}.
 
 
 \clearpage 
@@ -2741,7 +2744,7 @@ der dann für das Projekt freigeschaltet werden kann.
 
 \subsection{Danksagung}
 
-Neben den Entwicklern, die die Hilfe"=Seiten des Programms geschrieben haben, danke ich Thomas Fritz, Axel Junge und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch.
+Neben den Entwicklern, die die Hilfe"=Seiten des Programms geschrieben haben, danke ich Thomas Fritz, Axel Junge, Jan Suhr und Tobias Wolf für ihre hilfreichen Tipps und Anmerkungen zum Handbuch.
 
 Seit den Anfängen als \emph{BibKeeper} (von Morten O.~Alver) und \emph{JBibtexManager} (von Nizar N.~Batada) haben
 zahlreiche Personen dazu beigetragen, dass \jabrefversion{} zu dem
@@ -2768,6 +2771,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
+\item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
 \item \jabref{}-Logo geändert
 \end{revhist}
 
