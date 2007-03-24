@@ -8,6 +8,7 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Resolve string reference in non-Bibtex fields issue.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?
 * Fix Save/Export file dialog stuff

@@ -75,6 +75,7 @@ public class ImportFormatReader {
     formats.add(new RepecNepImporter());  
     formats.add(new PdfXmpImporter());
     formats.add(new CopacImporter());
+    formats.add(new MsBibImporter());
     
     // add all custom importers
     for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {
@@ -187,7 +188,7 @@ public class ImportFormatReader {
    * 
    * <p>Elements are in default order.</p>
    * 
-   * @return all custom importers, elements are of type {@link InputFormat}
+   * @return all custom importers, elements are of type InputFormat
    */
   public SortedSet getCustomImportFormats() {
     SortedSet result = new TreeSet();
@@ -205,7 +206,7 @@ public class ImportFormatReader {
    * 
    * <p>Elements are in default order.</p>
    * 
-   * @return all custom importers, elements are of type {@link InputFormat}
+   * @return all custom importers, elements are of type InputFormat
    */
   public SortedSet getBuiltInInputFormats() {
     SortedSet result = new TreeSet();
@@ -223,7 +224,7 @@ public class ImportFormatReader {
    * 
    * <p>Elements are in default order.</p>
    * 
-   * @return all custom importers, elements are of type {@link InputFormat}
+   * @return all custom importers, elements are of type InputFormat
    */
   public SortedSet getImportFormats() {
     return this.formats;
