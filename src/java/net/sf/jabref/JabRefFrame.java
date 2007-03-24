@@ -68,7 +68,7 @@ import com.jgoodies.looks.HeaderStyle;
 public class JabRefFrame extends JFrame {
 
    // CO: Code Smells...
-	JabRefFrame ths = this;
+    JabRefFrame ths = this;
     UIFSplitPane contentPane = new UIFSplitPane();
 
     JabRefPreferences prefs = Globals.prefs; //new JabRefPreferences();
@@ -96,30 +96,30 @@ public class JabRefFrame extends JFrame {
 
     JMenuBar mb = new JMenuBar();
 
-	GridBagLayout gbl = new GridBagLayout();
+    GridBagLayout gbl = new GridBagLayout();
 
-	GridBagConstraints con = new GridBagConstraints();
+    GridBagConstraints con = new GridBagConstraints();
 
-	JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
-		.lang("Status")
-		+ ":", SwingConstants.LEFT);
+    JLabel statusLine = new JLabel("", SwingConstants.LEFT), statusLabel = new JLabel(Globals
+        .lang("Status")
+        + ":", SwingConstants.LEFT);
     JProgressBar progressBar = new JProgressBar();
 
-	// SearchManager searchManager = new SearchManager(ths, prefs);
+    // SearchManager searchManager = new SearchManager(ths, prefs);
 
-	private FileHistory fileHistory = new FileHistory(prefs, this);
+    private FileHistory fileHistory = new FileHistory(prefs, this);
 
-	LabelMaker labelMaker;
+    LabelMaker labelMaker;
 
-	// The help window.
-	public HelpDialog helpDiag = new HelpDialog(this);
+    // The help window.
+    public HelpDialog helpDiag = new HelpDialog(this);
 
-	// Here we instantiate menu/toolbar actions. Actions regarding
-	// the currently open database are defined as a GeneralAction
-	// with a unique command string. This causes the appropriate
-	// BasePanel's runCommand() method to be called with that command.
-	// Note: GeneralAction's constructor automatically gets translations
-	// for the name and message strings.
+    // Here we instantiate menu/toolbar actions. Actions regarding
+    // the currently open database are defined as a GeneralAction
+    // with a unique command string. This causes the appropriate
+    // BasePanel's runCommand() method to be called with that command.
+    // Note: GeneralAction's constructor automatically gets translations
+    // for the name and message strings.
 
   // References to the toggle buttons in the toolbar:
   public JToggleButton groupToggle, searchToggle, previewToggle, highlightAny,
@@ -135,27 +135,27 @@ public class JabRefFrame extends JFrame {
       newSubDatabaseAction = new NewSubDatabaseAction(),
       integrityCheckAction = new IntegrityCheckAction(),
       help = new HelpAction("JabRef help", helpDiag,
-                            GUIGlobals.baseFrameHelp, "JabRef help",
+                            GUIGlobals.baseFrameHelp, Globals.lang("JabRef help"),
                             prefs.getKey("Help")),
       contents = new HelpAction("Help contents", helpDiag,
-                                GUIGlobals.helpContents, "Help contents",
+                                GUIGlobals.helpContents, Globals.lang("Help contents"),
                                 GUIGlobals.getIconUrl("helpContents")),
       about = new HelpAction("About JabRef", helpDiag,
-                             GUIGlobals.aboutPage, "About JabRef",
+                             GUIGlobals.aboutPage, Globals.lang("About JabRef"),
                              GUIGlobals.getIconUrl("about")),
       editEntry = new GeneralAction("edit", "Edit entry",
-                               "Edit entry",
+                               Globals.lang("Edit entry"),
                                prefs.getKey("Edit entry")),
       save = new GeneralAction("save", "Save database",
-                               "Save database",
+                               Globals.lang("Save database"),
                                prefs.getKey("Save database")),
       saveAs = new GeneralAction("saveAs", "Save database as ...",
-                                 "Save database as ...",
+                                 Globals.lang("Save database as ..."),
                                  prefs.getKey("Save database as ...")),
       saveAll = new SaveAllAction(ths),
       saveSelectedAs = new GeneralAction("saveSelectedAs",
                                          "Save selected as ...",
-                                         "Save selected as ...",
+                                         Globals.lang("Save selected as ..."),
                                          GUIGlobals.getIconUrl("saveAs")),
       exportAll = ExportFormats.getExportAction(this, false),
       exportSelected = ExportFormats.getExportAction(this, true),
@@ -164,37 +164,37 @@ public class JabRefFrame extends JFrame {
       nextTab = new ChangeTabAction(true),
       prevTab = new ChangeTabAction(false),
       sortTabs = new SortTabsAction(this),
-      undo = new GeneralAction("undo", "Undo", "Undo",
+      undo = new GeneralAction("undo", "Undo", Globals.lang("Undo"),
                                prefs.getKey("Undo")),
-      redo = new GeneralAction("redo", "Redo", "Redo",
+      redo = new GeneralAction("redo", "Redo", Globals.lang("Redo"),
                                prefs.getKey("Redo")),
-      /*cut = new GeneralAction("cut", "Cut", "Cut",
+      /*cut = new GeneralAction("cut", "Cut", Globals.lang("Cut"),
          GUIGlobals.cutIconFile,
          prefs.getKey("Cut")),*/
-      delete = new GeneralAction("delete", "Delete", "Delete",
+      delete = new GeneralAction("delete", "Delete", Globals.lang("Delete"),
                                  prefs.getKey("Delete")),
-      /*copy = new GeneralAction("copy", "Copy", "Copy",
+      /*copy = new GeneralAction("copy", "Copy", Globals.lang("Copy"),
                                GUIGlobals.copyIconFile,
                                prefs.getKey("Copy")),*/
       copy = new EditAction("copy", GUIGlobals.getIconUrl("copy")),
       paste = new EditAction("paste", GUIGlobals.getIconUrl("paste")),
       cut = new EditAction("cut", GUIGlobals.getIconUrl("cut")),
       mark = new GeneralAction("markEntries", "Mark entries",
-                               "Mark entries",
+                               Globals.lang("Mark entries"),
                                prefs.getKey("Mark entries")),
        unmark = new GeneralAction("unmarkEntries", "Unmark entries",
-                                  "Unmark entries",
+                                  Globals.lang("Unmark entries"),
                                   prefs.getKey("Unmark entries")),
        unmarkAll = new GeneralAction("unmarkAll", "Unmark all"),
       manageSelectors = new GeneralAction("manageSelectors", "Manage content selectors"),
       saveSessionAction = new SaveSessionAction(),
       loadSessionAction = new LoadSessionAction(),
       incrementalSearch = new GeneralAction("incSearch", "Incremental search",
-                                            "Start incremental search",
+                                            Globals.lang("Start incremental search"),
                                             prefs.getKey("Incremental search")),
-      normalSearch = new GeneralAction("search", "Search", "Search",
+      normalSearch = new GeneralAction("search", "Search", Globals.lang("Search"),
                                        prefs.getKey("Search")),
-      toggleSearch = new GeneralAction("toggleSearch", "Search", "Toggle search panel"),
+      toggleSearch = new GeneralAction("toggleSearch", "Search", Globals.lang("Toggle search panel")),
 
       fetchCiteSeer = new FetchCiteSeerAction(),
       importCiteSeer = new ImportCiteSeerAction(),
@@ -208,7 +208,7 @@ public class JabRefFrame extends JFrame {
                                       prefs.getKey("Copy \\cite{BibTeX key}")),
       mergeDatabaseAction = new GeneralAction("mergeDatabase",
                                               "Append database",
-                                              "Append contents from a BibTeX database into the currently viewed database",
+                                              Globals.lang("Append contents from a BibTeX database into the currently viewed database"),
                                               GUIGlobals.getIconUrl("open")),
       //prefs.getKey("Open")),
       /*remove = new GeneralAction("remove", "Remove", "Remove selected entries",
@@ -219,32 +219,32 @@ public class JabRefFrame extends JFrame {
                                      prefs.getKey("Replace string")),
 
       editPreamble = new GeneralAction("editPreamble", "Edit preamble",
-                                       "Edit preamble",
+                                       Globals.lang("Edit preamble"),
                                        prefs.getKey("Edit preamble")),
       editStrings = new GeneralAction("editStrings", "Edit strings",
-                                      "Edit strings",
+                                      Globals.lang("Edit strings"),
                                       prefs.getKey("Edit strings")),
       toggleGroups = new GeneralAction("toggleGroups",
                                        "Toggle groups interface",
-                                       "Toggle groups interface",
+                                       Globals.lang("Toggle groups interface"),
                                        prefs.getKey("Toggle groups interface")),
       togglePreview = new GeneralAction("togglePreview",
                                         "Toggle entry preview",
-                                        "Toggle entry preview",
+                                        Globals.lang("Toggle entry preview"),
                                         prefs.getKey("Toggle entry preview")),
       toggleHighlightAny = new GeneralAction("toggleHighlightGroupsMatchingAny",
                                         "Highlight groups matching any selected entry",
-                                        "Highlight groups matching any selected entry",
+                                        Globals.lang("Highlight groups matching any selected entry"),
                                         GUIGlobals.getIconUrl("groupsHighlightAny")),
       toggleHighlightAll = new GeneralAction("toggleHighlightGroupsMatchingAll",
                                         "Highlight groups matching all selected entries",
-                                        "Highlight groups matching all selected entries",
+                                        Globals.lang("Highlight groups matching all selected entries"),
                                         GUIGlobals.getIconUrl("groupsHighlightAll")),
       switchPreview = new GeneralAction("switchPreview",
                                         "Switch preview layout",
                                         prefs.getKey("Switch preview layout")),
        makeKeyAction = new GeneralAction("makeKey", "Autogenerate BibTeX keys",
-                                        "Autogenerate BibTeX keys",
+                                        Globals.lang("Autogenerate BibTeX keys"),
                                         prefs.getKey("Autogenerate BibTeX keys")),
 
       lyxPushAction = new PushToApplicationAction(ths, new PushToLyx()),
@@ -252,13 +252,15 @@ public class JabRefFrame extends JFrame {
       winEdtPushAction = new PushToApplicationAction(ths, new PushToWinEdt()),
       latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
       
-      writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs", "Will write XMP-metadata to the PDFs linked from selected entries.", prefs.getKey("Write XMP")),
+      writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
+                                        Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
+                                        prefs.getKey("Write XMP")),
       
       openFile = new GeneralAction("openFile", "Open PDF or PS",
-                                   "Open PDF or PS",
+                                   Globals.lang("Open PDF or PS"),
                                    prefs.getKey("Open PDF or PS")),
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
-                                  "Open URL or DOI",
+                                  Globals.lang("Open URL or DOI"),
                                   prefs.getKey("Open URL or DOI")),
       dupliCheck = new GeneralAction("dupliCheck", "Find duplicates"),
       //strictDupliCheck = new GeneralAction("strictDupliCheck", "Find and remove exact duplicates"),
@@ -276,14 +278,14 @@ public class JabRefFrame extends JFrame {
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
 
     abbreviateMedline = new GeneralAction("abbreviateMedline", "Abbreviate journal names (MEDLINE)",
-                "Abbreviate journal names of the selected entries (MEDLINE abbreviation)"),
+                Globals.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
   abbreviateIso = new GeneralAction("abbreviateIso", "Abbreviate journal names (ISO)",
-                          "Abbreviate journal names of the selected entries (ISO abbreviation)",
+                          Globals.lang("Abbreviate journal names of the selected entries (ISO abbreviation)"),
                           Globals.prefs.getKey("Abbreviate")),
 
 
     unabbreviate = new GeneralAction("unabbreviate", "Unabbreviate journal names",
-                    "Unabbreviate journal names of the selected entries",
+                    Globals.lang("Unabbreviate journal names of the selected entries"),
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
@@ -348,88 +350,88 @@ public class JabRefFrame extends JFrame {
 
   private void init() {
 
-		macOSXRegistration();
-		MyGlassPane glassPane = new MyGlassPane();
-		setGlassPane(glassPane);
-		// glassPane.setVisible(true);
+        macOSXRegistration();
+        MyGlassPane glassPane = new MyGlassPane();
+        setGlassPane(glassPane);
+        // glassPane.setVisible(true);
 
-		setTitle(GUIGlobals.frameTitle);
-		setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				(new CloseAction()).actionPerformed(null);
-			}
-		});
+        setTitle(GUIGlobals.frameTitle);
+        setIconImage(GUIGlobals.getImage("jabrefIcon").getImage());
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                (new CloseAction()).actionPerformed(null);
+            }
+        });
 
-		initLabelMaker();
+        initLabelMaker();
 
-		initSidePane();
-		
-		initLayout();
-		
-		initActions();
-		
-		if (Globals.prefs.getBoolean("rememberWindowLocation")) {
-			setSize(new Dimension(prefs.getInt("sizeX"), prefs.getInt("sizeY")));
-			setLocation(new Point(prefs.getInt("posX"), prefs.getInt("posY")));
-		}
-		tabbedPane.setBorder(null);
-		tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
+        initSidePane();
+        
+        initLayout();
+        
+        initActions();
+        
+        if (Globals.prefs.getBoolean("rememberWindowLocation")) {
+            setSize(new Dimension(prefs.getInt("sizeX"), prefs.getInt("sizeY")));
+            setLocation(new Point(prefs.getInt("posX"), prefs.getInt("posY")));
+        }
+        tabbedPane.setBorder(null);
+        tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
 
-		/*
-		 * The following state listener makes sure focus is registered with the
-		 * correct database when the user switches tabs. Without this,
-		 * cut/paste/copy operations would some times occur in the wrong tab.
-		 */
-		tabbedPane.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				markActiveBasePanel();
+        /*
+         * The following state listener makes sure focus is registered with the
+         * correct database when the user switches tabs. Without this,
+         * cut/paste/copy operations would some times occur in the wrong tab.
+         */
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                markActiveBasePanel();
 
-				BasePanel bp = basePanel();
-				if (bp != null) {
-					groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-					searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
-					previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
-					highlightAny
-						.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
-					highlightAll
-						.setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
-					Globals.focusListener.setFocused(bp.mainTable);
+                BasePanel bp = basePanel();
+                if (bp != null) {
+                    groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+                    searchToggle.setSelected(sidePaneManager.isComponentVisible("search"));
+                    previewToggle.setSelected(Globals.prefs.getBoolean("previewEnabled"));
+                    highlightAny
+                        .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAny"));
+                    highlightAll
+                        .setSelected(Globals.prefs.getBoolean("highlightGroupsMatchingAll"));
+                    Globals.focusListener.setFocused(bp.mainTable);
 
-					new FocusRequester(bp.mainTable);
-				}
-			}
-		});
-	}
+                    new FocusRequester(bp.mainTable);
+                }
+            }
+        });
+    }
 
 
 
-	private void initSidePane() {
-		sidePaneManager = new SidePaneManager(this);
+    private void initSidePane() {
+        sidePaneManager = new SidePaneManager(this);
 
-		Globals.sidePaneManager = this.sidePaneManager;
-		Globals.helpDiag = this.helpDiag;
+        Globals.sidePaneManager = this.sidePaneManager;
+        Globals.helpDiag = this.helpDiag;
 
-		ieeexplorerFetcher = new IEEEXploreFetcher();
-		arxivFetcher = new OAI2Fetcher();
-		medlineFetcher = new MedlineFetcher(sidePaneManager);
-		citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
-		citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
-			(CiteSeerFetcher) citeSeerFetcher);
-		groupSelector = new GroupSelector(this, sidePaneManager);
-		searchManager = new SearchManager2(this, sidePaneManager);
+        ieeexplorerFetcher = new IEEEXploreFetcher();
+        arxivFetcher = new OAI2Fetcher();
+        medlineFetcher = new MedlineFetcher(sidePaneManager);
+        citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
+        citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
+            (CiteSeerFetcher) citeSeerFetcher);
+        groupSelector = new GroupSelector(this, sidePaneManager);
+        searchManager = new SearchManager2(this, sidePaneManager);
 
-		sidePaneManager.register("fetchMedline", medlineFetcher);
-		sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
-		sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
-		sidePaneManager.register("groups", groupSelector);
-		sidePaneManager.register("search", searchManager);
+        sidePaneManager.register("fetchMedline", medlineFetcher);
+        sidePaneManager.register("CiteSeerProgress", citeSeerFetcher);
+        sidePaneManager.register("CiteSeerPanel", citeSeerFetcherPanel);
+        sidePaneManager.register("groups", groupSelector);
+        sidePaneManager.register("search", searchManager);
 
-		// Show the search panel if it was visible at last shutdown:
-		if (Globals.prefs.getBoolean("searchPanelVisible"))
-			sidePaneManager.show("search");
-	}
+        // Show the search panel if it was visible at last shutdown:
+        if (Globals.prefs.getBoolean("searchPanelVisible"))
+            sidePaneManager.show("search");
+    }
 
 
 AboutAction aboutAction = new AboutAction();
@@ -1369,62 +1371,62 @@ public JabRefPreferences prefs() {
   protected List openDatabaseOnlyActions = new LinkedList();
   protected List severalDatabasesOnlyActions = new LinkedList();
   
-	protected void initActions() {
-		openDatabaseOnlyActions = new LinkedList();
-		openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
-			mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
-			redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
-			selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
-			makeKeyAction, emacsPushAction, lyxPushAction, winEdtPushAction, normalSearch,
-			incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
-			openFile, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
-			highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
-			closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
-			toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-			abbreviateMedline, unabbreviate, ieex.getAction(), arxiv.getAction(), exportAll, exportSelected,
+    protected void initActions() {
+        openDatabaseOnlyActions = new LinkedList();
+        openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
+            mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
+            redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
+            selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
+            makeKeyAction, emacsPushAction, lyxPushAction, winEdtPushAction, normalSearch,
+            incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
+            openFile, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+            highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
+            closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
+            toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
+            abbreviateMedline, unabbreviate, ieex.getAction(), arxiv.getAction(), exportAll, exportSelected,
             importCurrent, saveAll}));
 
-		openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
+        openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-		severalDatabasesOnlyActions = new LinkedList();
-		severalDatabasesOnlyActions.addAll(Arrays
-			.asList(new Object[] { nextTab, prevTab, sortTabs }));
+        severalDatabasesOnlyActions = new LinkedList();
+        severalDatabasesOnlyActions.addAll(Arrays
+            .asList(new Object[] { nextTab, prevTab, sortTabs }));
 
-		tabbedPane.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent event) {
-				updateEnabledState();
-			}
-		});
-		
-		
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                updateEnabledState();
+            }
+        });
+        
+        
 
-	}
+    }
 
-	public static void setEnabled(List l, boolean enabled) {
-		Iterator i = l.iterator();
-		while (i.hasNext()) {
-			Object o = i.next();
-			if (o instanceof Action)
-				((Action)o).setEnabled(enabled);
-			if (o instanceof Component)
-				((Component)o).setEnabled(enabled);
-		}
-	}
+    public static void setEnabled(List l, boolean enabled) {
+        Iterator i = l.iterator();
+        while (i.hasNext()) {
+            Object o = i.next();
+            if (o instanceof Action)
+                ((Action)o).setEnabled(enabled);
+            if (o instanceof Component)
+                ((Component)o).setEnabled(enabled);
+        }
+    }
 
-	protected int previousTabCount = -1;
-	
-	/**
+    protected int previousTabCount = -1;
+    
+    /**
      * Enable or Disable all actions based on the number of open tabs.
      * 
      * The action that are affected are set in initActions.
      */
     protected void updateEnabledState() {
-		int tabCount = tabbedPane.getTabCount();
-		if (tabCount != previousTabCount){
-			previousTabCount = tabCount;
-			setEnabled(openDatabaseOnlyActions, tabCount > 0);
-			setEnabled(severalDatabasesOnlyActions, tabCount > 1);
-		}
+        int tabCount = tabbedPane.getTabCount();
+        if (tabCount != previousTabCount){
+            previousTabCount = tabCount;
+            setEnabled(openDatabaseOnlyActions, tabCount > 0);
+            setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+        }
     }
 
   /**
@@ -1514,56 +1516,56 @@ public JabRefPreferences prefs() {
   }
 
   // The action for closing the current database and leaving the window open.
-	CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
+    CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
 
-	class CloseDatabaseAction extends MnemonicAwareAction {
-		public CloseDatabaseAction() {
-			super(GUIGlobals.getImage("close"));
-			putValue(NAME, "Close database");
-			putValue(SHORT_DESCRIPTION, Globals.lang("Close the current database"));
-			putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
-		}
+    class CloseDatabaseAction extends MnemonicAwareAction {
+        public CloseDatabaseAction() {
+            super(GUIGlobals.getImage("close"));
+            putValue(NAME, "Close database");
+            putValue(SHORT_DESCRIPTION, Globals.lang("Close the current database"));
+            putValue(ACCELERATOR_KEY, prefs.getKey("Close database"));
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			// Ask here if the user really wants to close, if the base
-			// has not been saved since last save.
-			boolean close = true;
-			if (basePanel() == null) { // when it is initially empty
-				return; // nbatada nov 7
-			}
+        public void actionPerformed(ActionEvent e) {
+            // Ask here if the user really wants to close, if the base
+            // has not been saved since last save.
+            boolean close = true;
+            if (basePanel() == null) { // when it is initially empty
+                return; // nbatada nov 7
+            }
 
-			if (basePanel().baseChanged) {
-				int answer = JOptionPane.showConfirmDialog(ths, Globals
-					.lang("Database has changed. Do you want to save " + "before closing?"),
-					Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
-				if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
-					close = false; // The user has cancelled.
-				}
-				if (answer == JOptionPane.YES_OPTION) {
-					// The user wants to save.
-					try {
-						basePanel().runCommand("save");
-					} catch (Throwable ex) {
-						// Something prevented the file
-						// from being saved. Break!!!
-						close = false;
-					}
+            if (basePanel().baseChanged) {
+                int answer = JOptionPane.showConfirmDialog(ths, Globals
+                    .lang("Database has changed. Do you want to save " + "before closing?"),
+                    Globals.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION);
+                if ((answer == JOptionPane.CANCEL_OPTION) || (answer == JOptionPane.CLOSED_OPTION)) {
+                    close = false; // The user has cancelled.
+                }
+                if (answer == JOptionPane.YES_OPTION) {
+                    // The user wants to save.
+                    try {
+                        basePanel().runCommand("save");
+                    } catch (Throwable ex) {
+                        // Something prevented the file
+                        // from being saved. Break!!!
+                        close = false;
+                    }
 
-				}
-			}
+                }
+            }
 
-			if (close) {
-				basePanel().cleanUp();
-				tabbedPane.remove(basePanel());
-				if (tabbedPane.getTabCount() > 0) {
-					markActiveBasePanel();
-				}
-				updateEnabledState(); // Man, this is what I call a bug that this is not called.
-				output(Globals.lang("Closed database") + ".");
-				System.gc(); // Test
-			}
-		}
-	}
+            if (close) {
+                basePanel().cleanUp();
+                tabbedPane.remove(basePanel());
+                if (tabbedPane.getTabCount() > 0) {
+                    markActiveBasePanel();
+                }
+                updateEnabledState(); // Man, this is what I call a bug that this is not called.
+                output(Globals.lang("Closed database") + ".");
+                System.gc(); // Test
+            }
+        }
+    }
 
 
   // The action concerned with opening a new database.
@@ -1800,40 +1802,40 @@ class FetchCiteSeerAction
     }
 
   class FetchMedlineAction extends MnemonicAwareAction {
-		public FetchMedlineAction() {
-			super(GUIGlobals.getImage("medline"));
-			putValue(NAME, "Fetch Medline");
-			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
-		}
+        public FetchMedlineAction() {
+            super(GUIGlobals.getImage("medline"));
+            putValue(NAME, "Fetch Medline");
+            putValue(ACCELERATOR_KEY, prefs.getKey("Fetch Medline"));
+            putValue(SHORT_DESCRIPTION, Globals.lang("Fetch Medline by ID"));
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			if (tabbedPane.getTabCount() > 0) {
-				sidePaneManager.toggle("fetchMedline");
-				if (sidePaneManager.isComponentVisible("fetchMedline")) {
-					new FocusRequester(medlineFetcher.getTextField());
-				}
-			}
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            if (tabbedPane.getTabCount() > 0) {
+                sidePaneManager.toggle("fetchMedline");
+                if (sidePaneManager.isComponentVisible("fetchMedline")) {
+                    new FocusRequester(medlineFetcher.getTextField());
+                }
+            }
+        }
+    }
 
   class CiteSeerPanelAction extends MnemonicAwareAction {
-		public CiteSeerPanelAction() {
-			super(GUIGlobals.getImage("medline"));
-			putValue(NAME, "Fetch CiteSeer");
-			putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
-			putValue(SHORT_DESCRIPTION, Globals.lang("Fetch CiteSeer by ID"));
-		}
+        public CiteSeerPanelAction() {
+            super(GUIGlobals.getImage("medline"));
+            putValue(NAME, "Fetch CiteSeer");
+            putValue(ACCELERATOR_KEY, prefs.getKey("Fetch CiteSeer"));
+            putValue(SHORT_DESCRIPTION, Globals.lang("Fetch CiteSeer by ID"));
+        }
 
-		public void actionPerformed(ActionEvent e) {
-			if (tabbedPane.getTabCount() > 0) {
-				sidePaneManager.toggle("CiteSeerPanel");
-				if (sidePaneManager.isComponentVisible("CiteSeerPanel")) {
-					new FocusRequester(citeSeerFetcherPanel.getTextField());
-				}
-			}
-		}
-	}
+        public void actionPerformed(ActionEvent e) {
+            if (tabbedPane.getTabCount() > 0) {
+                sidePaneManager.toggle("CiteSeerPanel");
+                if (sidePaneManager.isComponentVisible("CiteSeerPanel")) {
+                    new FocusRequester(citeSeerFetcherPanel.getTextField());
+                }
+            }
+        }
+    }
 
   // The action for opening the preferences dialog.
   AbstractAction showPrefs = new ShowPrefsAction();
@@ -2092,7 +2094,7 @@ class FetchCiteSeerAction
      */
     public void unblock() {
         getGlassPane().setVisible(false);
-        //	getGlassPane().setCursor(Cursor.WAIT_CURSOR);
+        //  getGlassPane().setCursor(Cursor.WAIT_CURSOR);
     }
 
 
@@ -2103,13 +2105,13 @@ class FetchCiteSeerAction
       * SwingUtilities.invokeLater() to do the actual operation on the EDT.
       */
     public void setProgressBarVisible(final boolean visible) {
-	if (SwingUtilities.isEventDispatchThread())
-	    progressBar.setVisible(visible);
-	else SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    progressBar.setVisible(visible);
-		}
-	    });
+    if (SwingUtilities.isEventDispatchThread())
+        progressBar.setVisible(visible);
+    else SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            progressBar.setVisible(visible);
+        }
+        });
     }
 
 
@@ -2120,13 +2122,13 @@ class FetchCiteSeerAction
       * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarValue(final int value) {
-	if (SwingUtilities.isEventDispatchThread())
-	    progressBar.setValue(value);
-	else SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    progressBar.setValue(value);
-		}
-	    });
+    if (SwingUtilities.isEventDispatchThread())
+        progressBar.setValue(value);
+    else SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            progressBar.setValue(value);
+        }
+        });
 
     }
 
@@ -2139,13 +2141,13 @@ class FetchCiteSeerAction
       * SwingUtilities.invokeLater() to do the actual operation on the EDT.
      */
     public void setProgressBarMaximum(final int value) {
-	if (SwingUtilities.isEventDispatchThread())
-	    progressBar.setMaximum(value);
-	else SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    progressBar.setMaximum(value);
-		}
-	    });
+    if (SwingUtilities.isEventDispatchThread())
+        progressBar.setMaximum(value);
+    else SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+            progressBar.setMaximum(value);
+        }
+        });
 
 
     }
