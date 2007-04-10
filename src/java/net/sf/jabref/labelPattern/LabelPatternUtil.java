@@ -184,9 +184,13 @@ public class LabelPatternUtil {
                     int num = Integer.parseInt(val.substring(7));
                                         _sbvalue.append(authIniN(authString,num));
                   }
-                                  else if (val.equals("auth.auth.ea")) {
+                  else if (val.equals("auth.auth.ea")) {
                     _sbvalue.append(authAuthEa(authString));
                   }
+                  else if (val.equals("auth.etal")) {
+                    _sbvalue.append(authEtal(authString));
+                  }
+
                   else if (val.equals("authshort")) {
                     _sbvalue.append(authshort(authString));
                   }
@@ -609,6 +613,31 @@ public class LabelPatternUtil {
         author.append(".").append((tokens[1].split(","))[0]);
     if (tokens.length > 2)
       author.append(".ea");
+
+    return author.toString();
+  }
+
+  /**
+   * auth.etal format:
+   * Isaac Newton and James Maxwell and Albert Einstein (1960)
+   * Isaac Newton and James Maxwell (1960)
+   *  give:
+   * Newton.etal
+   * Newton.Maxwell
+   */
+  private static String authEtal(String authorField) {
+    authorField = AuthorList.fixAuthorForAlphabetization(authorField);
+    StringBuffer author = new StringBuffer();
+
+    String[] tokens = authorField.split("\\band\\b");
+    if (tokens.length == 0) {
+      return "";
+    }
+    author.append((tokens[0].split(","))[0]);
+    if (tokens.length == 2)
+        author.append(".").append((tokens[1].split(","))[0]);
+    else if (tokens.length > 2)
+      author.append(".etal");
 
     return author.toString();
   }

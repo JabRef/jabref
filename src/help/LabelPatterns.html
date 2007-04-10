@@ -32,6 +32,8 @@ no more than N characters.<BR>
 <li><b>[<code>authN</code>]</b>: The first N characters of the first author's last name<BR>
 <li><b>[<code>authN_M</code>]</b>: The first N characters of the Mth author's last name<BR>
 <li><b>[<code>auth.auth.ea</code>]</b>: The last name of the first two authors, and ".ea" if there are more than two.<BR>
+<li><b>[<code>auth.etal</code>]</b>: The last name of the first author, and the last name of the second author if there are two
+    authors or ".etal" if there are more than two.<BR>    
 <li><b>[<code>authshort</code>]</b>: The last name if one author is given; the first character of up to three authors' last names if more than one author is given. A plus character is added, if there are more than three authors.<BR>
 </ul>
 <b>Note:</b> If there is no author (as in the case of an edited book), then all of the above <b><code>[auth...]</code></b> markers will use the editor(s) (if any) as a fallback. Thus, the editor(s) of a book with no author will be treated as the author(s) for label-generation purposes. If you do not want this behaviour, i.e. you require a marker which expands to nothing if there is no author, use  <b><code>pureauth</code></b> instead of <b><code>auth</code></b> in the above codes. For example, <b><code>[pureauth]</code></b>, or <b><code>[pureauthors3]</code></b>.
