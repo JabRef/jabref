@@ -65,7 +65,7 @@ public class JabRef {
     boolean graphicFailure = false;
 
     StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase;
-    BooleanOption helpO, disableGui, blank, loadSess, showVersion;
+    BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
     /*
     * class StringArrayOption extends ArrayOption { public public void
     * modify(String value) { } public void modify(String[] value) { } public
@@ -148,6 +148,7 @@ public class JabRef {
         exportFile = new StringOption("");
         helpO = new BooleanOption();
         disableGui = new BooleanOption();
+        disableSplash = new BooleanOption();
         blank = new BooleanOption();
         loadSess = new BooleanOption();
         showVersion = new BooleanOption();
@@ -164,6 +165,8 @@ public class JabRef {
                 Globals.lang("Display version"), showVersion);
         options.register("nogui", 'n',
             Globals.lang("No GUI. Only process command line options."), disableGui);
+        options.register("nosplash", 's',
+                Globals.lang("Do not show splash window at startup"), disableSplash);
         options.register("import", 'i',
             Globals.lang("Import file") + ": " + Globals.lang("filename")
             + "[,import format]", importFile);
@@ -219,7 +222,7 @@ public class JabRef {
         // that the GUI
         // should not be opened. This is used to decide whether we should show the
         // splash screen or not.
-        if (initialStartup && !disableGui.isInvoked()) {
+        if (initialStartup && !disableGui.isInvoked() && !disableSplash.isInvoked()) {
             try {
 
                 splashScreen = SplashScreen.splash();
