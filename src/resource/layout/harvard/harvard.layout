@@ -1,4 +1,4 @@
-\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,RTFChars]{\author} (\year),
+\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,RTFChars]{\author} (\year), 
 '\format[RTFChars]{\title}'
 \begin{journal}
 , }{\\i \format[RTFChars]{\journal}} {\\b \volume}{

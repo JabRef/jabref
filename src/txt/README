@@ -89,6 +89,7 @@ Change log:
 	- Improved handling of external links. The 'file' field can now specify a list
 	  of external links, and arbitrary file types are supported. Old-style PDF and
 	  PS links can be moved automatically into the 'file' field.
+	- Fixed minor bug in Harvard export with missing space between year and title.
 	- Fixed bug that caused lockup when connection to IEEExplore fails.
         - Fixed wrong dependency in OAI2/ArXiv Fetcher.
         - Fixed problem with foreign characters in OAI2/ArXiv Fetcher.
