@@ -9,6 +9,7 @@ Chris:
   
 Morten:
 * [auth_etal] marker (Auth1, Auth1_Auth2, Auth1_etal)
+* Option to not show splash screen.
 * Medline import filter: import institution?
 * Resolve string reference in non-Bibtex fields issue.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
