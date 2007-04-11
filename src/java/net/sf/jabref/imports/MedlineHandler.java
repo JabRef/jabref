@@ -45,9 +45,10 @@ public class MedlineHandler extends DefaultHandler
 		inMedlineID = false,		inURL=false,
 		inIssue = false,			inPubDate = false,
 		inUrl=false, inForename=false, inAbstractText=false, inMedlineDate=false,
-		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false;
+		inPubMedID=false, inDescriptorName=false,inDoi=false,inPii=false,
+        inAffiliation=false;
     String title="", journal="", keywords ="",author="",
-		lastName="",year="",forename="", abstractText="";
+		lastName="",year="",forename="", abstractText="", affiliation="";
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
 		pubmedid="",doi="",pii="";
@@ -116,7 +117,7 @@ public class MedlineHandler extends DefaultHandler
 
 			}
 		}
-
+        else if(localName.equals("Affiliation")){ inAffiliation=true; }
 
 
 		return;
@@ -187,7 +188,8 @@ public class MedlineHandler extends DefaultHandler
 			}
 			if(!pii.equals(""))
 			    b.setField("pii",pii);
-
+            if(!affiliation.equals(""))
+                b.setField("institution",affiliation);
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added "pmid" bibtex field
             // Older references do not have doi entries, but every
             // medline entry has a unique pubmed ID (aka primary ID).
@@ -207,7 +209,8 @@ public class MedlineHandler extends DefaultHandler
 			forename="";
 			lastName="";
 			abstractText="";
-			pubmedid="";
+            affiliation="";
+            pubmedid="";
 			month="";volume="";lastname="";initials="";number="";page="";medlineID="";url="";
 			MedlineDate="";
             descriptors.clear();
@@ -250,7 +253,8 @@ public class MedlineHandler extends DefaultHandler
 			inInitials=false;
 		}
 		else if(localName.equals("AbstractText")){ inAbstractText=false;}
-		else if(localName.equals("ArticleId")){
+        else if(localName.equals("Affiliation")){ inAffiliation=false; }
+        else if(localName.equals("ArticleId")){
 			if(inDoi)
 				inDoi=false;
 			else if(inPii)
@@ -283,6 +287,7 @@ public class MedlineHandler extends DefaultHandler
 		else if(inMedlineDate){ MedlineDate += new String(data,start,length);}
 		else if(inDoi){ doi=new String(data,start,length);}
 		else if(inPii){ pii=new String(data,start,length);}
+        else if(inAffiliation){ affiliation = new String(data,start,length);}
     }
 
     // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added fixPageRange method

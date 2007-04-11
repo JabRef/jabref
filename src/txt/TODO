@@ -9,7 +9,7 @@ Chris:
   
 Morten:
 * Medline import filter: import institution?
-* Resolve string reference in non-Bibtex fields issue.
+* [Could not reproduce, wait for input] Resolve string reference in non-Bibtex fields issue.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?
 * Fix Save/Export file dialog stuff
