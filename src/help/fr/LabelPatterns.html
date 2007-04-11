@@ -32,6 +32,7 @@ Les marqueurs de champs sp&eacute;ciaux&nbsp;:
 <li><b>[<code>authN</code>]</b>&nbsp;: Les N premi&egrave;res lettres du premier auteur.<BR>
 <li><b>[<code>authN_M</code>]</b>&nbsp;: Les N premi&egrave;res lettres du nom des M premiers auteurs.<BR>
 <li><b>[<code>auth.auth.ea</code>]</b>&nbsp;: Le nom des deux premiers auteurs suivi de ".ea" lorsqu'ils sont plus de deux.<BR>
+<li><b>[<code>auth.etal</code>]</b>: Le nom du premier auteur et le nom du second auteur, ou ".etal" s'il y en a plus de deux.<BR>
 <li><b>[<code>authshort</code>]</b>&nbsp;: Le nom s'il n'y a qu'un seul auteur. Jusqu'&agrave; trois auteurs, le premier caract&egrave;re du nom de chacun d'eux. Au del&agrave; de trois auteurs, le caract&egrave;re plus (+) est ajout&eacute;.<BR>
 </ul>
 <b>Note&nbsp;:</b> S'il n'y a pas d'auteur (dans le cas d'un livre &eacute;dit&eacute;), alors tous les marqueurs <b><code>[auth...]</code></b> ci-dessus utiliseront l'&eacute;diteur(s) (s'il y en a) comme alternative. Ainsi l'&eacute;diteur(s) d'un livre sans auteur sera trait&eacute; comme l'auteur(s) pour la g&eacute;n&eacute;ration des clefs.
@@ -51,7 +52,7 @@ Si vous ne d&eacute;sirez pas ce comportement, c'est &agrave; dire si vous voule
 <li><b>[<code>shortyear</code>]</b>&nbsp;: Les 2 derniers chiffres de l'ann&eacute;e de publication<BR>
 <li><b>[<code>veryshorttitle</code>]</b>&nbsp;: Le premier mot du titre qui ne soit pas 'the', 'a', 'an'.<BR>
 </ul>
- 
+
  <p>
  Un nom de champs (ou celui de l'un des pseudo-champs vu au dessus) peut, de fa&ccedil;on optionnelle, &ecirc;tre suivi par un ou plusieurs modificateurs. Les modificateurs sont appliqu&eacute;s dans l'ordre
 o&ugrave; ils sont sp&eacute;cifi&eacute;s.
@@ -64,17 +65,17 @@ o&ugrave; ils sont sp&eacute;cifi&eacute;s.
 <P>
 Si vous n'avez pas d&eacute;fini de mod&egrave;le de clef pour un type d'entr&eacute;es donn&eacute;, le <b>Mod&egrave;le de clef par
 d&eacute;faut</b> sera utilis&eacute;. Vous pouvez changer le mod&egrave;le par d&eacute;faut - son param&eacute;trage se
-trouve au-dessus de la liste des types d'entr&eacute;es dans la section 
+trouve au-dessus de la liste des types d'entr&eacute;es dans la section
 <b>Param&eacute;trage des clefs</b> de la fen&ecirc;tre <b>Pr&eacute;f&eacute;rences</b>.
 
 <P>
 La clef utilis&eacute;e par d&eacute;faut est [auth][year]; elle produit des clefs du type <code>Yared1998</code>. Si la clef n'est pas unique dans la base de donn&eacute;e, elle est modifi&eacute;e par l'ajout d'une des lettres de a &agrave; z et ceci jusqu'a ce quelle soit unique. De cette fa&ccedil;on, les &eacute;tiquettes ressemblent &agrave;&nbsp;:
 </p>
 
-<blockquote> 
-<code>Yared1998</code><BR> 
+<blockquote>
+<code>Yared1998</code><BR>
 <code>Yared1998a</code><BR>
-<code>Yared1998b</code> 
+<code>Yared1998b</code>
 </blockquote>
 
 <h2>Remplacement d'expressions r&eacute;guli&egrave;res</h2>
