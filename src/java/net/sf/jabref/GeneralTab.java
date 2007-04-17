@@ -18,9 +18,10 @@ public class GeneralTab extends JPanel implements PrefsTab {
     confirmDelete, allowEditing, /*preserveFormatting, */useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
     private JRadioButton
-        saveOriginalOrder, saveAuthorOrder, saveTableOrder;
+        saveOriginalOrder, saveAuthorOrder, saveTableOrder,
+        resolveStringsStandard, resolveStringsAll;
     private JTextField defOwnerField, timeStampFormat, timeStampField,
-            bracesAroundCapitalsFields, nonWrappableFields;
+            bracesAroundCapitalsFields, nonWrappableFields, doNotResolveStringsFor;
     JabRefPreferences _prefs;
     JabRefFrame _frame;
     private JComboBox language = new JComboBox(GUIGlobals.LANGUAGES.keySet().toArray()),
@@ -50,6 +51,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
         bg.add(saveAuthorOrder);
         bg.add(saveOriginalOrder);
         bg.add(saveTableOrder);
+        resolveStringsAll = new JRadioButton(Globals.lang("Resolve strings for all fields except")+":");
+        resolveStringsStandard = new JRadioButton(Globals.lang("Resolve strings for standard BibTeX fields only"));
+        bg = new ButtonGroup();
+        bg.add(resolveStringsAll);
+        bg.add(resolveStringsStandard);
+        doNotResolveStringsFor = new JTextField(30);
         autoDoubleBraces = new JCheckBox(
                 //+ Globals.lang("Store fields with double braces, and remove extra braces when loading.<BR>"
                 //+ "Double braces signal that BibTeX should preserve character case.") + "</HTML>");
@@ -105,15 +112,23 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder3.append(label);
         builder3.append(nonWrappableFields);
         builder.add(builder3.getPanel(), cc.xyw(2, 9, 3));
+        builder.add(resolveStringsStandard, cc.xyw(2, 11, 5));
+        DefaultFormBuilder builder4 = new DefaultFormBuilder
+                (new FormLayout("left:pref, 4dlu, fill:pref",""));
+        builder4.append(resolveStringsAll);
+        builder4.append(doNotResolveStringsFor);
+        builder.add(builder4.getPanel(), cc.xyw(2, 13, 1));
+        //builder.add(resolveStringsAll, cc.xy(2, 13));
+        //builder.add(doNotResolveStringsFor, cc.xyw(4, 13, 3));
 
-        builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 11, 5));
-        builder.add(useImportInspector, cc.xy(2, 13));
-        builder.add(useImportInspectorForSingle, cc.xy(2, 15));
-        builder.add(inspectionWarnDupli, cc.xy(2, 17));
-        builder.add(ctrlClick, cc.xy(2, 19));
-        builder.add(confirmDelete, cc.xy(2, 21));
-        builder.add(keyDuplicateWarningDialog, cc.xy(2, 23));
-        builder.add(keyEmptyWarningDialog, cc.xy(2, 25));
+        builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 15, 5));
+        builder.add(useImportInspector, cc.xy(2, 17));
+        builder.add(useImportInspectorForSingle, cc.xy(2, 19));
+        builder.add(inspectionWarnDupli, cc.xy(2, 21));
+        builder.add(ctrlClick, cc.xy(2, 23));
+        builder.add(confirmDelete, cc.xy(2, 25));
+        builder.add(keyDuplicateWarningDialog, cc.xy(2, 27));
+        builder.add(keyEmptyWarningDialog, cc.xy(2, 29));
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
                 ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
@@ -143,7 +158,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.append(lab);
         builder2.append(encodings);
 
-        builder.add(builder2.getPanel(), cc.xyw(2, 27, 3));
+        builder.add(builder2.getPanel(), cc.xyw(2, 31, 3));
 
 
         JPanel pan = builder.getPanel();
@@ -171,6 +186,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
             saveTableOrder.setSelected(true);
         //preserveFormatting.setSelected(_prefs.getBoolean("preserveFieldFormatting"));
         autoDoubleBraces.setSelected(_prefs.getBoolean("autoDoubleBraces"));
+        resolveStringsAll.setSelected(_prefs.getBoolean("resolveStringsAllFields"));
+        resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
+        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
         defOwnerField.setText(_prefs.get("defaultOwner"));
         timeStampFormat.setText(_prefs.get("timeStampFormat"));
         timeStampField.setText(_prefs.get("timeStampField"));
@@ -216,6 +234,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("ctrlClick", ctrlClick.isSelected());
         //_prefs.putBoolean("preserveFieldFormatting", preserveFormatting.isSelected());
         _prefs.putBoolean("autoDoubleBraces", autoDoubleBraces.isSelected());
+        _prefs.putBoolean("resolveStringsAllFields", resolveStringsAll.isSelected());
+        _prefs.put("doNotResolveStringsFor", doNotResolveStringsFor.getText().trim());
+        doNotResolveStringsFor.setText(_prefs.get("doNotResolveStringsFor"));
         _prefs.putBoolean("useImportInspectionDialog", useImportInspector.isSelected());
         _prefs.putBoolean("useImportInspectionDialogForSingle", useImportInspectorForSingle.isSelected());
         _prefs.putBoolean("warnAboutDuplicatesInInspection", inspectionWarnDupli.isSelected());

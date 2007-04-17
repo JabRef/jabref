@@ -46,7 +46,23 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     // If the field is non-standard, we will just append braces,
     // wrap and write.
-    if (!BibtexFields.isStandardField(fieldName) && !Globals.BIBTEX_STRING.equals(fieldName)) {
+    boolean resolveStrings = true;
+    if (Globals.prefs.getBoolean("resolveStringsAllFields")) {
+        // Resolve strings for all fields except some:
+        String[] exceptions = Globals.prefs.getStringArray("doNotResolveStringsFor");
+        for (int i = 0; i < exceptions.length; i++) {
+            if (exceptions[i].equals(fieldName)) {
+                resolveStrings = false;
+                break;
+            }
+        }
+    }
+    else {
+        // Default operation - we only resolve strings for standard fields:
+        resolveStrings = BibtexFields.isStandardField(fieldName)
+                || Globals.BIBTEX_STRING.equals(fieldName);
+    }
+    if (!resolveStrings) {
           int brc = 0;
           boolean ok = true;
           for (int i=0; i<text.length(); i++) {

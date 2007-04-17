@@ -22,10 +22,15 @@ name in each entry, the characters '#JTB#' (without quotes) are put into the
 identically each time.
 
 <P>
-A string reference can appear anywhere in any field, always by enclosing
+A string reference can appear anywhere in a field, always by enclosing
 the string's name in a pair of '#' characters. This syntax is specific for
 JabRef, and differs slightly from the <em>bibtex</em> notation that
-is produced when you save your database.
+is produced when you save your database. Strings can by default be used for all
+standard BibTeX files, and in <b>Preferences -> General -> File</b> you can opt to
+enable strings for non-standard fields as well. In the latter case you can specify a
+set of fields that are excepted from string resolving, and here it is recommended
+to include the 'url' field and other fields that may need to contain the '#' character
+and that are may be processed by BibTeX/LaTeX.
 
 <P>
 A string may in the same way be referred in the content of another

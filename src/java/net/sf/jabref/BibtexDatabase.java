@@ -323,7 +323,7 @@ public class BibtexDatabase
     }
 
     /**
-     * Resolves any references to strings contained in this database,
+     * Resolves any references to strings contained in this field content,
      * if possible.
      */
     public String resolveForStrings(String content) {
