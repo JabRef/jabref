@@ -10,7 +10,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%18.\,4.\,2007}
+\newcommand{\versiondate}{18.\,4.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -1211,11 +1211,12 @@ genügt die Zeichenfolge \texttt{\#JTB\#} im Feld \emph{journal}, und
 es ist sichergestellt, dass der Name jedesmal in identischer Schreibweise
 ausgegeben wird.
 
-Der Verweis auf einen String kann an jeder Stelle in einem beliebigen
-Feld erscheinen, wobei der Name des Strings immer von einem Paar \texttt{\#}-Zeichen
+Der Verweis auf einen String kann an jeder Stelle eines Feldes erscheinen, 
+wobei der Name des Strings immer von einem Paar \texttt{\#}-Zeichen
 eingeschlossen werden muss. Diese Syntax gilt nur für \jabref{} und
 weicht ein wenig von der \bibtex{}-Syntax ab, die erzeugt wird, wenn
-Sie Ihre Datei speichern.
+Sie Ihre Datei speichern. Strings können für alle Standard-\bibtex{}-Felder verwendet werden.
+Unter \menu{Optionen \msep{} Einstellungen \msep{} Allgemein} können Sie im Bereich \menu{Datei} festlegen, ob Strings auch in Nicht-Standard-Feldern benutzt werden dürfen. In diesem Fall können Sie Felder bestimmen, die von der Auflösung der Strings ausgenommen werden; hierbei wird empfohlen, das Feld \texttt{url} und andere Felder anzugeben, die das Zeichen \texttt{\#} enthalten können und die von \bibtex\slash\LaTeX{} abgearbeitet werden können.
 
 In derselben Weise kann man auch im Inhalt eines Strings auf einen
 anderen String verweisen, vorausgesetzt, dass der String, auf den
@@ -2073,9 +2074,9 @@ den Feldern \emph{abstract} und \emph{annote}.
 
 
 \subsection{Automatische Erstellung von \bibtex{}-Keys}
-
+\label{LabelPatterns}
 \begin{quote}
-\label{LabelPatterns}Im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
+Im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
 kann man die Felder bestimmen, die zur automatischen Generierung der
 \bibtex{}-Keys herangezogen werden.
 \end{quote}
@@ -2123,6 +2124,7 @@ ersten Autors.
 M-ten Autors.
 \item [\texttt{{[}auth.auth.ea{]}}]Die Nachnamen der beiden ersten Autoren
 und \texttt{.ea}, falls es mehr als zwei Autoren sind.
+\item [\texttt{{[}auth.etal{]}}]Der Nachname des ersten Autors und der Nachname des zweiten Autors bei zwei Autoren bzw. \texttt{.etal} bei mehr als zwei Autoren.
 \item [\texttt{{[}authshort{]}}]Der Nachname bei einem Autor; der erste
 Buchstabe der Nachnamen von bis zu drei Autoren, falls mehr als ein
 Autor vorhanden ist. Ein Plus (+) wird angehängt, falls es mehr als
@@ -2293,6 +2295,7 @@ Feld ausgewertet, das dann direkt in die Ausgabe kopiert wird.
 
 
 \paragraph{Feldformatierer}
+\label{par:Feldformatierer}
 
 Oft muss der Feldinhalt vor der Ausgabe verarbeitet werden. Dies wird
 mit Hilfe eines \emph{Feldformatierers} gemacht~-- einer java class,
@@ -2319,36 +2322,56 @@ beliebige Anzahl an Formatierern auflisten.
 \jabref{} bietet die folgenden Formatierer, wobei einige von anderen
 abhängen:
 
-\begin{labeling}{veryveryveryshorttitle}
+\begin{labeling}{MMMM}
 \item [\texttt{HTMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie
 \texttt{\{\textbackslash{}\textasciicircum{}a\}} oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}}
 durch ihre HTML-Entsprechungen.
+\item [\texttt{HTMLParagraphs}]interpretiert zwei aufeinanderfolgende Zeilenumbrüche (z.\,B. \lstinline{\n \n}) als Beginn eines neuen Absatzes und erstellt dementsprechend Absatz-HTML-Tags.
 \item [\texttt{XMLChars}]ersetzt \TeX{}-spezifische Sonderzeichen wie \texttt{\{\textbackslash{}\textasciicircum{}a\}}
 oder \texttt{\{\textbackslash{}\char`\"{}\{o\}\}} durch ihre XML-Entsprechungen.
 \item [\texttt{CreateDocBookAuthors}]formatiert das author-Feld im DocBook-Stil.
+\item [\texttt{CreateDocBookEditors}]\emph{Dokumentation folgt.}
+\item [\texttt{CurrentDate}]gibt das aktuelle Datum aus. Ohne Argument gibt dieser Formatierer das aktuelle Datum im Format ">JJJJ.MM.TT HH:MM:SS Z"< (Datum, Zeit und Zeitzone) aus. Mit einem anderen Format-String als Argument kann das Datum angepasst werden. So ergibt \lstinline{\format[CurrentDate]}\texttt{\{}\lstinline{yyyy.MM.dd}\texttt{\}} nur das Datum, z.\,B. ">2005.11.30"<.
 \item [\texttt{AuthorFirstFirst}]formatiert die Felder \emph{author}/\emph{editor}
 mit den Vornamen zuerst.
 \item [\texttt{AuthorFirstFirstCommas}]formatiert die Felder \emph{author}/\emph{editor}
 mit den Vornamen zuerst und abgetrennt durch Kommas.
+\item [\texttt{AuthorFirstAbbrLastCommas}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorFirstAbbrLastOxfordCommas}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorFirstLastOxfordCommas}]\emph{Dokumentation folgt.}
 \item [\texttt{AuthorLastFirst}]formatiert die Felder \emph{author}/\emph{editor}
 mit den Nachnamen zuerst.
 \item [\texttt{AuthorLastFirstAbbreviator}]kürzt die Vornamen aller Autoren.
 Dieser Formatierer kann nur angewendet werden, wenn \texttt{AuthorLastFirst}
 bereits benutzt wurde.
+\item [\texttt{AuthorLastFirstCommas}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorLastFirstOxfordCommas}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorLastFirstAbbrCommas}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorLastFirstAbbrOxfordCommas}]\emph{Dokumentation folgt.}
 \item [\texttt{AuthorAndsReplacer}]ersetzt >>and<< zwischen den Namen
 durch >>;<<, zwischen den letzten beiden Autoren steht >>\&<<.
 \item [\texttt{AuthorAndsCommaReplacer}]ersetzt >>and<< zwischen den
 Namen durch ein Komma (,) sowie >>\&<< zwischen den beiden letzten.
+\item [\texttt{AuthorOrgSci}]Der erste Autor erscheint als "Nachname, Vorname", alle anderen als "Vorname Nachname". Vornamen werden abgekürzt.
+\item [\texttt{AuthorAbbreviator}]\emph{Dokumentation folgt.}
+\item [\texttt{AuthorNatBib}]formatiert Autorennamen im Natbib-Stil, also nur mit Nachnamen; zwei Autoren werden durch ein ">and"< voneinander getrennt, bei mehr als zwei Autoren wird der erste angegeben, gefolgt von ">et al."<
+\item [\texttt{NoSpaceBetweenAbbreviations}]Leerzeichen zwischen mehreren abgekürzten Vornamen werden gelöscht.
 \item [\texttt{FormatPagesForHTML}]ersetzt >>\texttt{-{}-}<< durch >>\texttt{-}<<.
 \item [\texttt{FormatPagesForXML}]ersetzt >>\texttt{-{}-}<< durch einen
 XML en-dash (>>--<<).
 \item [\texttt{RemoveBrackets}]entfernt alle geschweiften Klammern (>>\{<<
 und >>\}<<).
+\item [\texttt{RemoveBracketsAddComma}]\emph{Dokumentation folgt.}
+\item [\texttt{RemoveWhitespace}]\emph{Dokumentation folgt.}
 \item [\texttt{RemoveLatexCommands}]entfernt \LaTeX{} Kommandos wie \texttt{\textbackslash{}em},
 \texttt{\textbackslash{}textbf} etc. Zusammen mit \texttt{HTMLChars}
 oder \texttt{XMLChars} sollte dieser Formatierer zuletzt aufgerufen
 werden.
 \item [\texttt{ToLowerCase}]macht aus allen Buchstaben Kleinbuchstaben.
+\item [\texttt{CompositeFormat}]\emph{Dokumentation folgt.}
+\item [\texttt{GetOpenOfficeType}]\emph{Dokumentation folgt.}
+\item [\texttt{RTFChars}]\emph{Dokumentation folgt.}
+\item [\texttt{ResolvePDF}]\emph{Dokumentation folgt.}
 \end{labeling}
 Falls keiner der verfügbaren Formatierer das Ergebnis erzielt, das
 Sie erreichen möchten, können Sie Ihren eigenen Formatierer hinzufügen,
@@ -2774,7 +2797,8 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%endgültiges Datum}
+\begin{revhist}{\versiondate}%18.\,4.\,2007}
+\item Abschnitte \nameref{StringEditorHelp}, \nameref{par:Feldformatierer} und \nameref{LabelPatterns} aktualisiert
 \item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
 \item \jabref{}-Logo geändert
 \item Ein paar Kleinigkeiten

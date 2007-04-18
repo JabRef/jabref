@@ -102,24 +102,52 @@ Formatierern auflisten.
 <ul>
 <li><code>HTMLChars</code> : ersetzt TeX-spezifische Sonderzeichen (z.B. {\^a} oder {\"{o}})
   durch ihre HTML-Entsprechungen.
+<li><code>HTMLParagraphs</code> : interpretiert zwei aufeinanderfolgende Zeilenumbr&uuml;che (z.B. \n   \n) als Beginn eines neuen Absatzes und erstellt dementsprechend Absatz-HTML-Tags.
 <li><code>XMLChars</code> : ersetzt TeX-spezifische Sonderzeichen (z.B. {\^a} oder {\"{o}})
   durch ihre XML-Entsprechungen.
+
 <li><code>CreateDocBookAuthors</code> : formatiert das author-Feld im DocBook-Stil.
+<li><code>CreateDocBookEditors</code> : Dokumentation folgt.
+
+<li><code>CurrentDate</code> : gibt das aktuelle Datum aus. Ohne Argument gibt dieser Formatierer das aktuelle Datum im Format "JJJJ.MM.TT HH:MM:SS Z" (Datum, Zeit und Zeitzone) aus. Mit einem anderen Format-String als Argument kann das Datum angepasst werden. So ergibt <code>\format[CurrentDate]{yyyy.MM.dd}</code> nur das Datum, z.B. 2005.11.30.
+
 <li><code>AuthorFirstFirst</code> : formatiert die Felder author/editor mit den Vornamen zuerst.
 <li><code>AuthorFirstFirstCommas</code> : formatiert die Felder author/editor mit den Vornamen zuerst
 und abgetrennt durch Kommas.
+<li><code>AuthorFirstAbbrLastCommas</code> : Dokumentation folgt.
+<li><code>AuthorFirstAbbrLastOxfordCommas</code> : Dokumentation folgt.
+<li><code>AuthorFirstLastOxfordCommas </code> : Dokumentation folgt.
+
 <li><code>AuthorLastFirst</code> : formatiert die Felder author/editor mit den Nachnamen zuerst.
 <li><code>AuthorLastFirstAbbreviator</code> : k&uuml;rzt die Vornamen aller Autoren.
 Dieser Formatierer kann nur angewendet werden, wenn <code>AuthorLastFirst</code> bereits benutzt wurde.
+<li><code>AuthorLastFirstCommas</code> : Dokumentation folgt.
+<li><code>AuthorLastFirstOxfordCommas</code> : Dokumentation folgt.
+<li><code>AuthorLastFirstAbbrCommas</code> : Dokumentation folgt.
+<li><code>AuthorLastFirstAbbrOxfordCommas</code> : Dokumentation folgt.
+
 <li><code>AuthorAndsReplacer</code> : ersetzt "and" zwischen den Namen durch ";", zwischen den letzten beiden Autoren steht "&amp;".
 <li><code>AuthorAndsCommaReplacer</code> : ersetzt "and" zwischen den Namen durch "," sowie "&" zwischen den beiden letzten.
+
+<li><code>AuthorOrgSci</code> : Der erste Autor erscheint als "Nachname, Vorname", alle anderen als "Vorname Nachname". Vornamen werden abgek&uuml;rzt.
+<li><code>AuthorAbbreviator</code> : Dokumentation folgt.
+<li><code>AuthorNatBib</code> : formatiert Autorennamen im Natbib-Stil, also nur mit Nachnamen; zwei Autoren werden durch ein "and" voneinander getrennt, bei mehr als zwei Autoren wird der erste angegeben, gefolgt von "et al."
+<li><code>NoSpaceBetweenAbbreviations</code> : Leerzeichen zwischen mehreren abgek&uuml;rzten Vornamen werden gel&ouml;scht.
+
 <li><code>FormatPagesForHTML</code> : ersetzt "--" durch "-".
 <li><code>FormatPagesForXML</code> : ersetzt "--" durch einen XML en-dash (Gedanken- bzw. Bis-Strich).
 <li><code>RemoveBrackets</code> : entfernt alle geschweiften Klammern "{" oder "}".
+<li><code>RemoveBracketsAddComma</code> : Dokumentation folgt.
+<li><code>RemoveWhitespace</code> : Dokumentation folgt.
 <li><code>RemoveLatexCommands</code> : entfernt LaTeX Kommandos wie <code>\em</code>, <code>\textbf</code>
 etc. Zusammen mit <code>HTMLChars</code> oder <code>XMLChars</code> sollte dieser Formatierer
 zuletzt aufgerufen werden.
 <li><code>ToLowerCase</code> : macht aus allen Buchstaben Kleinbuchstaben.
+
+<li><code>CompositeFormat</code> : Dokumentation folgt.
+<li><code>GetOpenOfficeType</code> : Dokumentation folgt.
+<li><code>RTFChars</code> : Dokumentation folgt.
+<li><code>ResolvePDF</code> : Dokumentation folgt.
 </ul>
 
 <p>Falls keiner der verf&uuml;gbaren Formatierer das Ergebnis erzielt, das Sie erreichen m&ouml;chten,
