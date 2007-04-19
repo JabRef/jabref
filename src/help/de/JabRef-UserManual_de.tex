@@ -1,6 +1,5 @@
 %%%%% To do %%%%%
 % DW 2007-03-23
-% - eid erläutern?
 % - Bibliographie mit biblatex statt jurabib?
 \documentclass[10pt,normalheadings]{scrartcl}
 \usepackage[T1]{fontenc}
@@ -10,7 +9,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{18.\,4.\,2007}
+\newcommand{\versiondate}{in Bearb.}%18.\,4.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -265,9 +264,7 @@ mit dunkelblauer Schrift dargestellt. Hyperlinks sind ebenfalls dunkelblau
 und anklickbar~-- das gilt sowohl für die Navigation innerhalb des
 Dokuments als auch für Links ins Internet.
 
-Über den Stand und die >>Geschichte<< dieses Handbuchs gibt der
-Abschnitt >>Versionsgeschichte<< (S.\,\pageref{RevisionHistory})
-Auskunft.
+Wenn Ihnen in diesem Handbuch Fehler auf"|fallen oder wenn Sie Anregungen zum Handbuch haben, würde ich mich über eine kurze Nachricht per \href{mailto:domwass@users.sourceforge.net}{E-Mail} freuen. Über den Stand und die Versionen dieses Handbuchs gibt der Abschnitt ">\nameref{RevisionHistory}"< Auskunft.
 
 \subsection{Einführung in \bibtex{}}
 
@@ -400,6 +397,10 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
     Ein Inhaltsverzeichnis.
   \item \emph{copyright*}\\
     Copyright-Informationen.
+  \item \emph{doi}\\
+    Der \emph{Digital Object Identifier} ist eine permanente Kennung von Dokumenten.
+  \item \emph{eid}\\
+    Der EID \emph{(Electronic identifier)} wird für elektronische Zeitschriften benutzt, die auch im Druck erscheinen. Mit dieser Nummer, die die Seitenzahlen ersetzt, lässt sich der Artikel in der gedruckten Ausgabe finden. Der EID wird manchmal auch \emph{citation number} genannt.
   \item \emph{ISBN*}\\
     Die Internationale Standardbuchnummer.
   \item \emph{ISSN*}\\
@@ -2731,7 +2732,7 @@ F1\tabularnewline
 Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref{}-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
 \begin{enumerate}
 	\item Durchsuchen Sie die \href{http://sourceforge.net/forum/?group_id=92314}{Foren} auf der Projektseite bei Sourceforge.
-	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_id=36852}{Archiv} der \jabref{}-Mailingliste.
+	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_name=jabref-users}{Archiv} der \jabref{}-Mailingliste.
 	\item Stellen Sie Ihre Frage in einem der Foren oder auf der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
 \end{enumerate}
 
@@ -2797,7 +2798,13 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\item Änderung
 %\end{revhist}
 
-\begin{revhist}{\versiondate}%18.\,4.\,2007}
+\begin{revhist}{\versiondate}%endgültiges Datum}
+\item Beschreibung der Felder ">doi"< und ">eid"< ergänzt
+\item Fehler im Link zum Mail-Archiv beseitigt
+\item Einleitung leicht ergänzt
+\end{revhist}
+
+\begin{revhist}{18.\,4.\,2007}
 \item Abschnitte \nameref{StringEditorHelp}, \nameref{par:Feldformatierer} und \nameref{LabelPatterns} aktualisiert
 \item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
 \item \jabref{}-Logo geändert
