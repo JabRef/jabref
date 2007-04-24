@@ -8,6 +8,7 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Optimize import detection by first trying last used format
 * [SOLVED?] Medline import filter: import institution?
 * [Could not reproduce, wait for input] Resolve string reference in non-Bibtex fields issue.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
