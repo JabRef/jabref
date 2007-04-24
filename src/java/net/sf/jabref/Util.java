@@ -44,16 +44,7 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -2351,4 +2342,97 @@ public class Util {
 		}
 		return -1;
 	}
+
+
+    /**
+     * Encodes a two-dimensional String array into a single string, using ':' and
+     * ';' as separators. The characters ':' and ';' are escaped with '\'.
+     * @param values The String array.
+     * @return The encoded String.
+     */
+    public static String encodeStringArray(String[][] values) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            sb.append(encodeStringArray(values[i]));
+            if (i < values.length-1)
+                sb.append(';');
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Encodes a String array into a single string, using ':' as separator.
+     * The characters ':' and ';' are escaped with '\'.
+     * @param entry The String array.
+     * @return The encoded String.
+     */
+    public static String encodeStringArray(String[] entry) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < entry.length; i++) {
+            sb.append(encodeString(entry[i]));
+            if (i < entry.length-1)
+                sb.append(':');
+
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Decodes an encoded double String array back into array form. The array
+     * is assumed to be square, and delimited by the characters ';' (first dim) and
+     * ':' (second dim).
+     * @param value The encoded String to be decoded.
+     * @return The decoded String array.
+     */
+    public static String[][] decodeStringDoubleArray(String value) {
+        ArrayList<ArrayList<String>> newList = new ArrayList<ArrayList<String>>();
+        StringBuilder sb = new StringBuilder();
+        ArrayList<String> thisEntry = new ArrayList<String>();
+        boolean escaped = false;
+        for (int i=0; i<value.length(); i++) {
+            char c = value.charAt(i);
+            if (!escaped && (c == '\\')) {
+                escaped = true;
+                continue;
+            }
+            else if (!escaped && (c == ':')) {
+                thisEntry.add(sb.toString());
+                sb = new StringBuilder();
+            }
+            else if (!escaped && (c == ';')) {
+                thisEntry.add(sb.toString());
+                sb = new StringBuilder();
+                newList.add(thisEntry);
+                thisEntry = new ArrayList<String>();
+            }
+            else sb.append(c);
+            escaped = false;
+        }
+        if (sb.length() > 0)
+            thisEntry.add(sb.toString());
+        if (thisEntry.size() > 0)
+            newList.add(thisEntry);
+
+        // Convert to String[][]:
+        String[][] res = new String[newList.size()][newList.get(0).size()];
+        for (int i = 0; i < res.length; i++) {
+            for (int j = 0; j < res[i].length; j++) {
+                res[i][j] = newList.get(i).get(j);
+            }
+        }
+        return res;
+    }
+
+    private static String encodeString(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if ((c == ';') || (c == ':') || (c == '\\'))
+                sb.append('\\');
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+
 }

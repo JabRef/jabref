@@ -37,6 +37,7 @@ import net.sf.jabref.imports.CustomImportList;
 import java.awt.*;
 import java.util.prefs.*;
 import java.util.*;
+import java.util.List;
 import java.awt.event.*;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.ExternalFileType;
@@ -829,18 +830,32 @@ public class JabRefPreferences {
     }
 
     /**
-     *
+     * Set up the list of external file types, either from default values, or from values
+     * recorded in Preferences.
      */
     public void updateExternalFileTypes() {
-        externalFileTypes.add(new ExternalFileType("PDF", "pdf", get("pdfviewer"), GUIGlobals.getImage("pdfSmall")));
-        externalFileTypes.add(new ExternalFileType("PostScript", "ps", get("psviewer"), GUIGlobals.getImage("psSmall")));
-        externalFileTypes.add(new ExternalFileType("Word file", "doc", "oowriter", GUIGlobals.getImage("openoffice")));
-        externalFileTypes.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", GUIGlobals.getImage("openoffice")));
-        externalFileTypes.add(new ExternalFileType("PowerPoint file", "ppt", "ooimpress", GUIGlobals.getImage("openoffice")));
-        externalFileTypes.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", GUIGlobals.getImage("openoffice")));
-        externalFileTypes.add(new ExternalFileType("PNG image", "png", "gimp", GUIGlobals.getImage("picture")));
-        externalFileTypes.add(new ExternalFileType("GIF image", "gif", "gimp", GUIGlobals.getImage("picture")));
-        externalFileTypes.add(new ExternalFileType("Text file", "txt", "emacs", GUIGlobals.getImage("emacs")));
+        if (prefs.get("externalFileTypes", null) == null)
+            setDefaultExternalFileTypes();
+        else {
+            String[][] vals = Util.decodeStringDoubleArray(prefs.get("externalFileTypes", ""));
+            for (int i = 0; i < vals.length; i++) {
+                ExternalFileType type = new ExternalFileType(vals[i]);
+                externalFileTypes.add(type);
+            }
+        }
+    }
+
+
+    private void setDefaultExternalFileTypes() {
+        externalFileTypes.add(new ExternalFileType("PDF", "pdf", get("pdfviewer"), "pdfSmall"));
+        externalFileTypes.add(new ExternalFileType("PostScript", "ps", get("psviewer"), "psSmall"));
+        externalFileTypes.add(new ExternalFileType("Word file", "doc", "oowriter", "openoffice"));
+        externalFileTypes.add(new ExternalFileType("OpenDocument text", "odt", "oowriter", "openoffice"));
+        externalFileTypes.add(new ExternalFileType("PowerPoint file", "ppt", "ooimpress", "openoffice"));
+        externalFileTypes.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", "openoffice"));
+        externalFileTypes.add(new ExternalFileType("PNG image", "png", "gimp", "picture"));
+        externalFileTypes.add(new ExternalFileType("GIF image", "gif", "gimp", "picture"));
+        externalFileTypes.add(new ExternalFileType("Text file", "txt", "emacs", "emacs"));
     }
 
     public ExternalFileType[] getExternalFileTypeSelection() {
@@ -876,6 +891,36 @@ public class JabRefPreferences {
         return null;
     }
 
+
+    /**
+     * Reset the List of external file types after user customization.
+     * @param types The new List of external file types. This is the complete list, not
+     *  just new entries.
+     */
+    public void setExternalFileTypes(List<ExternalFileType> types) {
+        externalFileTypes.clear();
+        for (Iterator<ExternalFileType> iterator = types.iterator(); iterator.hasNext();) {
+            externalFileTypes.add(iterator.next());
+        }
+        String[][] array = new String[externalFileTypes.size()][];
+        int i=0;
+        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = (ExternalFileType) iterator.next();
+            array[i] = type.getStringArrayRepresentation();
+            i++;
+        }
+        System.out.println("Encoded: '"+Util.encodeStringArray(array)+"'");
+        put("externalFileTypes", Util.encodeStringArray(array));
+    }
+
+    /**
+     * Set the list of external file types back to the default, and the list stored
+     * in preferences, if any.
+     */
+    public void resetExternalFileTypesToDefault() {
+        setDefaultExternalFileTypes();
+        prefs.remove("externalFileTypes");
+    }
 
     /**
      * Removes all information about custom entry types with tags of

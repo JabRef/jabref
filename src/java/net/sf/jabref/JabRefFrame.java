@@ -271,7 +271,6 @@ public class JabRefFrame extends JFrame {
 
       customExpAction = new CustomizeExportsAction(),
       customImpAction = new CustomizeImportsAction(),
-      exportCSV = new ExportCSV(),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
@@ -2331,25 +2330,7 @@ class SaveSessionAction
     }
   }
 
-    class ExportCSV extends MnemonicAwareAction {
-        public ExportCSV() {
-            putValue(NAME, "Tab-separated file");
-        }
-        public void actionPerformed(ActionEvent e) {
-            String chosenFile = Globals.getNewFile(ths, new File(prefs.get("workingDirectory")), ".csv",
-                                                   JFileChooser.SAVE_DIALOG, true);
-            if (chosenFile == null)
-                return;
-            try {
-                FileActions.exportToCSV(basePanel().database(), new File(chosenFile),
-                                        prefs);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-        }
-    }
-
+ 
     class CustomizeEntryTypeAction extends MnemonicAwareAction {
         public CustomizeEntryTypeAction() {
             putValue(NAME, "Customize entry types");

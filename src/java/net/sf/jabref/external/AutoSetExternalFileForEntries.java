@@ -10,7 +10,6 @@ import java.io.File;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Vector;
 import java.util.Collection;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -103,7 +102,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 		panel.frame().setProgressBarValue(progress);
 
                 final Object old = sel[i].getField(fieldName);
-                // Check if a link is already set, and if so, if we are allowed to overwrite it:
+                // Check if a extension is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
                 extPan.setEntry(sel[i]);
@@ -132,7 +131,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             mainLoop: for (int i=0; i<sel.length; i++) {
 		panel.frame().setProgressBarValue(progress++);
                 final Object old = sel[i].getField(fieldName);
-                // Check if a link is set:
+                // Check if a extension is set:
                 if ((old != null) && !((String)old).equals("")) {
                     // Get an absolute path representation:
                     File file = Util.expandFilename((String)old, new String[]{dir, "."});;
@@ -143,7 +142,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                             JOptionPane.showOptionDialog(panel.frame(),
                             Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
                                 new String[] {(String)old, sel[i].getCiteKey()}),
-                                    Globals.lang("Broken link"),
+                                    Globals.lang("Broken extension"),
                                     JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);
                         switch (answer) {
@@ -246,7 +245,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                             "Attempt to autoset %0 links for your entries. Autoset works if "
                             +"a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.", fn)
                     +"</HTML>");
-            //            description.setVerticalAlignment(JLabel.TOP);
+            //            name.setVerticalAlignment(JLabel.TOP);
             builder.appendSeparator(Globals.lang("Autoset"));
             builder.append(description);
             builder.nextLine();
@@ -259,7 +258,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             builder.appendSeparator(Globals.lang("Check links"));
 
             description = new JLabel("<HTML>"+
-                    Globals.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will "
+                    Globals.lang("This makes JabRef look up each %0 extension and check if the file exists. If not, you will "
                                     +"be given options<BR>to resolve the problem.", fn)
                 +"</HTML>");
             builder.append(description);

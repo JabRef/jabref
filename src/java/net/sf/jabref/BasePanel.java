@@ -72,6 +72,7 @@ import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.export.*;
 import net.sf.jabref.external.AutoSetExternalFileForEntries;
 import net.sf.jabref.external.WriteXMPAction;
+import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
@@ -324,10 +325,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void action() throws Throwable {
                     //CheckBoxFileChooser cb = new CheckBoxFileChooser(new File(""), "Selected only");
                     //cb.showSaveDialog(frame);
-                    NamedCompound ce = Util.upgradePdfPsToFile(database,
+
+                    ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
+                    efte.setVisible(true);
+
+                    /*NamedCompound ce = Util.upgradePdfPsToFile(database,
                             new String[] {"pdf", "ps"});
                     undoManager.addEdit(ce);
-                    markBaseChanged();
+                    markBaseChanged();*/
                 }
             });
 

@@ -34,8 +34,8 @@ import com.jgoodies.forms.layout.FormLayout;
  * 
  * Options for handling the files are: 1) Link to the file in its current
  * position (disabled if the file is remote) 2) Copy the file to ??? directory,
- * rename after bibtex key, and link 3) Move the file to ??? directory, rename
- * after bibtex key, and link
+ * rename after bibtex key, and extension 3) Move the file to ??? directory, rename
+ * after bibtex key, and extension
  */
 public class DroppedFileHandler {
     private JabRefFrame frame;
@@ -257,31 +257,31 @@ public class DroppedFileHandler {
                 linkInPlace.setText(Globals.lang("Link from new entries."));
 
                 copyRadioButton.setText(Globals.lang(
-                    "Copy to %0 directory and link from new entries.", fileType.getName()));
+                    "Copy to %0 directory and extension from new entries.", fileType.getName()));
                 moveRadioButton.setText(Globals.lang(
-                    "Move to %0 directory and link from new entries.", fileType.getName()));
+                    "Move to %0 directory and extension from new entries.", fileType.getName()));
             } else {
                 linkInPlace.setText(Globals.lang("Link from new entry"));
 
                 copyRadioButton.setText(Globals.lang(
-                    "Copy to %0 directory and link from new entry.", fileType.getName()));
+                    "Copy to %0 directory and extension from new entry.", fileType.getName()));
                 moveRadioButton.setText(Globals.lang(
-                    "Move to %0 directory and link from new entry.", fileType.getName()));
+                    "Move to %0 directory and extension from new entry.", fileType.getName()));
             }
         } else {
             if (multipleEntries) {
                 linkInPlace.setText(Globals.lang("Link from entries."));
 
-                copyRadioButton.setText(Globals.lang("Copy to %0 directory and link from entries.",
+                copyRadioButton.setText(Globals.lang("Copy to %0 directory and extension from entries.",
                     fileType.getName()));
-                moveRadioButton.setText(Globals.lang("Move to %0 directory and link from entries.",
+                moveRadioButton.setText(Globals.lang("Move to %0 directory and extension from entries.",
                     fileType.getName()));
             } else {
                 linkInPlace.setText(Globals.lang("Link from entry"));
 
-                copyRadioButton.setText(Globals.lang("Copy to %0 directory and link from entry.",
+                copyRadioButton.setText(Globals.lang("Copy to %0 directory and extension from entry.",
                     fileType.getName()));
-                moveRadioButton.setText(Globals.lang("Move to %0 directory and link from entry.",
+                moveRadioButton.setText(Globals.lang("Move to %0 directory and extension from entry.",
                     fileType.getName()));
 
             }
@@ -301,10 +301,10 @@ public class DroppedFileHandler {
     }
     
     /**
-     * Make a link to the file.
+     * Make a extension to the file.
      * 
      * @param entry
-     *            The entry to link from.
+     *            The entry to extension from.
      * @param fileType
      *            The FileType associated with the file.
      * @param filename
