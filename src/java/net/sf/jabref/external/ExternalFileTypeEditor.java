@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -33,8 +35,10 @@ public class ExternalFileTypeEditor extends JDialog {
         remove = new JButton(GUIGlobals.getImage("remove")),
         edit = new JButton(GUIGlobals.getImage("edit")),
         toDefaults = new JButton(Globals.lang("Default"));
+    private EditListener editListener = new EditListener();
 
     public ExternalFileTypeEditor(JabRefFrame frame) {
+        super(frame, Globals.lang("Manage external file types"), true);
         this.frame = frame;
         init();
     }
@@ -92,7 +96,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
         add.addActionListener(new AddListener());
         remove.addActionListener(new RemoveListener());
-        edit.addActionListener(new EditListener());
+        edit.addActionListener(editListener);
         fileTypes = new ArrayList<ExternalFileType>();
         setValues();
         
@@ -100,6 +104,7 @@ public class ExternalFileTypeEditor extends JDialog {
         tableModel = new FileTypeTableModel();
         table = new JTable(tableModel);
         table.setDefaultRenderer(ImageIcon.class, new IconRenderer());
+        table.addMouseListener(new TableClickListener());
 
         table.getColumnModel().getColumn(0).setMaxWidth(24);
         table.getColumnModel().getColumn(0).setMinWidth(24);
@@ -254,13 +259,34 @@ public class ExternalFileTypeEditor extends JDialog {
         }
     }
 
+    class TableClickListener extends MouseAdapter {
+
+        private void handleClick(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                editListener.actionPerformed(null);
+            }
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            handleClick(e);
+        }
+
+        public void mousePressed(MouseEvent e) {
+            handleClick(e);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            handleClick(e);
+        }
+    }
+
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
         private JabRefFrame frame;
         ExternalFileTypeEditor editor = null;
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
             super();
-            putValue(NAME, "Customize external file types");
+            putValue(NAME, "Manage external file types");
             this.frame = frame;
         }
 

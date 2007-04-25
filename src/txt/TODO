@@ -8,12 +8,12 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Optimize import detection by first trying last used format
+* Enable icon customization of external file types.
+* [???] Optimize import detection by first trying last used format
 * [SOLVED?] Medline import filter: import institution?
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?
 * Fix Save/Export file dialog stuff
-* Test Push to Vim under Windows
 * Add menu option for upgrading external links.
 * Possibly: add autodetection of "old" links, and offer of upgrading ..?
 

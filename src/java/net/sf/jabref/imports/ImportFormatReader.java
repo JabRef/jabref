@@ -445,6 +445,11 @@ public class ImportFormatReader {
     String usedFormat = null;
     int bestResult = 0;
 
+      /**String lastImport = Globals.prefs.get("lastAutodetectedImport");
+      for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
+			ImportFormat imFo = (ImportFormat) i.next();
+      **/    
+
     // Cycle through all importers:
 		for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
 			ImportFormat imFo = (ImportFormat) i.next();

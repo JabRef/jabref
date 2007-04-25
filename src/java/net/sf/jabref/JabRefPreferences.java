@@ -313,6 +313,8 @@ public class JabRefPreferences {
         defaults.put("importInspectionDialogWidth", new Integer(650));
         defaults.put("importInspectionDialogHeight", new Integer(650));
 
+        //defaults.put("lastAutodetectedImport", "");
+
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
         //defaults.put("confirmAutoRemoveExactDuplicates", Boolean.TRUE);
         
