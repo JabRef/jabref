@@ -10,12 +10,10 @@ Chris:
 Morten:
 * Optimize import detection by first trying last used format
 * [SOLVED?] Medline import filter: import institution?
-* [Could not reproduce, wait for input] Resolve string reference in non-Bibtex fields issue.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?
 * Fix Save/Export file dialog stuff
 * Test Push to Vim under Windows
-* Add interface for configuring external file types/viewers
 * Add menu option for upgrading external links.
 * Possibly: add autodetection of "old" links, and offer of upgrading ..?
 

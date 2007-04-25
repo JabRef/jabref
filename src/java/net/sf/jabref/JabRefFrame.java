@@ -271,6 +271,7 @@ public class JabRefFrame extends JFrame {
 
       customExpAction = new CustomizeExportsAction(),
       customImpAction = new CustomizeImportsAction(),
+      customFileTypesAction = ExternalFileTypeEditor.getAction(this),
       exportToClipboard = new GeneralAction("exportToClipboard", "Export selected entries to clipboard"),
       expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
@@ -1154,6 +1155,7 @@ public JabRefPreferences prefs() {
       options.add(genFieldsCustomization);
       options.add(customExpAction);
       options.add(customImpAction);
+      options.add(customFileTypesAction);
       options.add(manageJournals);
 
       /*options.add(new AbstractAction("Font") {
