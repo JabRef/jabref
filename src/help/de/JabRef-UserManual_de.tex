@@ -9,7 +9,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%18.\,4.\,2007}
+\newcommand{\versiondate}{in Bearb.}%27.\,4.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -89,7 +89,7 @@
 }
 
 %%% version number
-\newcommand{\versionnr}{2.2} %
+\newcommand{\versionnr}{2.3\,(beta)} %
 %%% JabRef logo with version nr
 \newcommand{\jabrefversion}{\jabref{}~\versionnr}
 %%% BibTeX logo
@@ -277,7 +277,7 @@ dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
 
 \subsubsection{\bibtex{}-Eintragstypen}
 \label{Eintragstypen}
-Je nachdem, ob sie ein Buch, einen Zeitschriftenartikel, einen Sammelband oder~\ldots{} referenzieren möchten, hält \bibtex{} unterschiedliche Eintragstypen bereit. Hier folgt eine kurze Aufstellung der meist gebrauchten Eintragstypen.\footnote{Vgl. \cite[12--17]{Markey2005}; \cite[7--9]{btxdoc}.} Manche Paktete (wie ">jurabib"<) stellen weitere Eintragstypen zur Verfügung, die Sie natürlich auch in \jabref{} verwenden können (siehe dazu Abschnitt \nameref{CustomEntriesHelp}). Für die Verwendung dieser spezifischen Typen schauen Sie bitte in die jeweilige Dokumentation.
+Je nachdem, ob sie ein Buch, einen Zeitschriftenartikel, einen Sammelband oder ein anderes Dokument referenzieren möchten, hält \bibtex{} unterschiedliche Eintragstypen bereit. Hier folgt eine kurze Aufstellung der meist gebrauchten Eintragstypen.\footnote{Vgl. \cite[12--17]{Markey2005}; \cite[7--9]{btxdoc}.} Manche Paktete (wie ">jurabib"<) stellen weitere Eintragstypen zur Verfügung, die Sie natürlich auch in \jabref{} verwenden können (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}). Für die Verwendung dieser spezifischen Typen schauen Sie bitte in die jeweilige Dokumentation.
 
 \begin{itemize}
 \item \emph{@article}\\
@@ -386,7 +386,7 @@ Falls die Bücher einer Reihe nummeriert sind, wird die entsprechende Nummer im F
 Bibliographie-Stile für \bibtex{} wurden von vielen Leuten entwickelt,
 und einige haben weitere Felder erstellt. Es folgt eine kleine Auswahl.
 
-Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{} unterstützt, können aber eingebunden werden (siehe Abschnitt~\ref{CustomEntriesHelp} \nameref{CustomEntriesHelp}).
+Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{} unterstützt, können aber eingebunden werden (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}).
 
 \begin{itemize}
   \item \emph{affiliation*}\\
@@ -406,7 +406,7 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
   \item \emph{ISSN*}\\
     Die Internationale Standardseriennummer (für Zeitschriften).
   \item \emph{keywords}\\
-    Stichworte, können in \jabref{} gut zum Gruppieren verwendet werden.
+    Stichworte~-- sie können in \jabref{} gut zum Gruppieren verwendet werden.
   \item \emph{language*}\\
     Die Sprache des Werks.
   \item \emph{location*}\\
@@ -420,7 +420,7 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
   \item \emph{size*}\\
     Die physische Größe eines Dokuments.
   \item \emph{url}\\
-    Der \emph{Uniform Resource Locator} (URL, "einheitlicher Quellenanzeiger"), der auf eine Webseite im Internet verweist.
+    Der \emph{Uniform Resource Locator} (URL, ">einheitlicher Quellenanzeiger"<), der auf eine Webseite im Internet verweist.
   \item \emph{urldate}\\
     Das Datum, an dem eine Webseite zuletzt besucht wurde.
 \end{itemize}
@@ -530,7 +530,7 @@ in anderen Formaten in \jabref{} importieren.
 einfach neue Einträge hinzufügen, ohne sich daran erinnern zu müssen,
 welche Informationen benötigt werden. Außerdem kann \jabref{} \bibtex{}-Keys
 automatisch generieren. \jabref{} ist sehr nützlich, wenn Sie \bibtex{}
-oder CiteMaker benutzen, kann aber auch für diejenigen sinnvoll sein,
+oder CiteMaker verwenden, kann aber auch für diejenigen sinnvoll sein,
 die andere Bibliographie-Systeme benutzen oder schlicht und einfach
 ihre Literaturquellen organisieren wollen.
 
@@ -2799,9 +2799,11 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
+\item Versionsnummer angepasst
 \item Beschreibung der Felder ">doi"< und ">eid"< ergänzt
 \item Fehler im Link zum Mail-Archiv beseitigt
 \item Einleitung leicht ergänzt
+\item Generelle Überarbeitung des Dokuments
 \end{revhist}
 
 \begin{revhist}{18.\,4.\,2007}
