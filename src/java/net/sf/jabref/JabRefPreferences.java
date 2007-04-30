@@ -98,7 +98,9 @@ public class JabRefPreferences {
 			defaults.put("psviewer", "cmd.exe /c start /b");
 			defaults.put("htmlviewer", "cmd.exe /c start /b");
 			defaults.put("lookAndFeel", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
-		} else {
+            defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
+            defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
+        } else {
 			defaults.put("pdfviewer", "acroread");
 			defaults.put("psviewer", "gv");
 			defaults.put("htmlviewer", "mozilla");
@@ -182,8 +184,6 @@ public class JabRefPreferences {
         defaults.put("highlightGroupsMatchingAll", Boolean.FALSE);
         defaults.put("searchPanelVisible", Boolean.FALSE);
         defaults.put("defaultEncoding", System.getProperty("file.encoding"));
-        defaults.put("winEdtPath", "C:\\Program Files\\WinEdt Team\\WinEdt\\WinEdt.exe");
-        defaults.put("latexEditorPath", "C:\\Program Files\\LEd\\LEd.exe");
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);

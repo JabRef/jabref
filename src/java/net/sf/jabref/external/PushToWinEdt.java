@@ -20,6 +20,7 @@ import java.io.IOException;
 public class PushToWinEdt implements PushToApplication {
 
     private boolean couldNotCall=false;
+    private boolean notDefined=false;
 
     public String getName() {
         return Globals.lang("Insert selected citations into WinEdt");
@@ -44,9 +45,14 @@ public class PushToWinEdt implements PushToApplication {
     public void pushEntries(BibtexEntry[] entries, String keyString) {
 
         couldNotCall = false;
+        notDefined = false;
 
         String winEdt = Globals.prefs.get("winEdtPath");
-        //winEdt = "osascript";
+        if ((winEdt == null) || (winEdt.trim().length() == 0)) {
+            notDefined = true;
+            return;
+        }
+
         try {
             StringBuffer toSend = new StringBuffer("\"[InsText('\\")
                     .append(Globals.prefs.get("citeCommand")).append("{")
@@ -65,7 +71,11 @@ public class PushToWinEdt implements PushToApplication {
     }
 
     public void operationCompleted(BasePanel panel) {
-        if (couldNotCall) {
+        if (notDefined) {
+            panel.output(Globals.lang("Error") + ": "+
+                    Globals.lang("Path to %0 not defined", getApplicationName())+".");
+        }
+        else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
                     +Globals.prefs.get("winEdtPath") + "'.");
         }

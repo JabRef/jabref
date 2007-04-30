@@ -18,6 +18,7 @@ import java.io.IOException;
 public class PushToLatexEditor implements PushToApplication {
 
     private boolean couldNotCall=false;
+    private boolean notDefined=false;
 
     public String getName() {
         return Globals.menuTitle("Insert selected citations into LatexEditor");
@@ -42,8 +43,14 @@ public class PushToLatexEditor implements PushToApplication {
     public void pushEntries(BibtexEntry[] entries, String keyString) {
 
         couldNotCall = false;
+        notDefined = false;
 
         String led = Globals.prefs.get("latexEditorPath");
+
+        if ((led == null) || (led.trim().length() == 0)) {
+            notDefined = true;
+            return;
+        }
 
         try {
             StringBuffer toSend = new StringBuffer("-i \\")
@@ -61,7 +68,11 @@ public class PushToLatexEditor implements PushToApplication {
     }
 
     public void operationCompleted(BasePanel panel) {
-        if (couldNotCall) {
+        if (notDefined) {
+            panel.output(Globals.lang("Error") + ": "+
+                    Globals.lang("Path to %0 not defined", getApplicationName())+".");
+        }
+        else if (couldNotCall) {
             panel.output(Globals.lang("Error") + ": " + Globals.lang("Could not call executable") + " '"
                     +Globals.prefs.get("latexEditorPath") + "'.");
         }
