@@ -108,6 +108,8 @@ public class JabRefPreferences {
 		}
         defaults.put("useDefaultLookAndFeel", Boolean.TRUE);
         defaults.put("lyxpipe", System.getProperty("user.home")+File.separator+".lyx/lyxpipe");
+        defaults.put("vim", "vim");
+        defaults.put("vimServer", "vim");
         defaults.put("posX", new Integer(0));
         defaults.put("posY", new Integer(0));
         defaults.put("sizeX", new Integer(840));

@@ -20,7 +20,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, led, citeCommand;
+	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, led,
+        citeCommand, vim, vimServer;
 
 	ItemListener regExpListener;
 
@@ -38,7 +39,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		html = new JTextField(30);
 		lyx = new JTextField(30);
 		winEdt = new JTextField(30);
-		citeCommand = new JTextField(30);
+		vim = new JTextField(30);
+		vimServer = new JTextField(30);
+        citeCommand = new JTextField(30);
         led = new JTextField(30);
 
         regExpTextField = new JTextField(30);
@@ -149,6 +152,21 @@ public class ExternalTab extends JPanel implements PrefsTab {
         builder.append(new JButton(browse));
         builder.nextLine();
         builder.append(pan);
+        lab = new JLabel(Globals.lang("Path to Vim") + ":");
+		builder.append(lab);
+		builder.append(vim);
+		browse = new BrowseAction(_frame, vim, false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+		lab = new JLabel(Globals.lang("Vim Server Name") + ":");
+		builder.append(pan);
+		builder.append(lab);
+		builder.append(vimServer);
+		browse = new BrowseAction(_frame, vimServer, false);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+        builder.append(pan);
+
 		builder.append(Globals.lang("Cite command (for Emacs/WinEdt)") + ":");
 		builder.append(citeCommand);
 		// builder.appendSeparator();
@@ -176,6 +194,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 		lyx.setText(_prefs.get("lyxpipe"));
 		winEdt.setText(_prefs.get("winEdtPath"));
+        vim.setText(_prefs.get("vim"));
+		vimServer.setText(_prefs.get("vimServer"));
         led.setText(_prefs.get("latexEditorPath"));
         citeCommand.setText(_prefs.get("citeCommand"));
 
@@ -199,6 +219,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		_prefs.put("htmlviewer", html.getText());
 		_prefs.put("lyxpipe", lyx.getText());
 		_prefs.put("winEdtPath", winEdt.getText());
+        _prefs.put("vim", vim.getText());
+        _prefs.put("vimServer", vimServer.getText());
         _prefs.put("latexEditorPath", led.getText());
         _prefs.put("citeCommand", citeCommand.getText());
 	}
