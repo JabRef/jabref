@@ -8,7 +8,6 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Manage word selector: use ButtonBarBuilder for OK/Cancel etc.
 * Include Stephan Rave's modifications to PushToVim.
 * Enable icon customization of external file types.
 * [???] Optimize import detection by first trying last used format

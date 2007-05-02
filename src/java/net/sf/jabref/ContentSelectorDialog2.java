@@ -1,5 +1,8 @@
 package net.sf.jabref;
 
+import com.jgoodies.forms.builder.ButtonStackBuilder;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -405,13 +408,16 @@ public class ContentSelectorDialog2 extends JDialog {
 	wordEditPan.add(wordEditField);
 
 	// Add buttons:
-	buttonPan.add(help);
-	buttonPan.add(Box.createHorizontalStrut(10));
-	buttonPan.add(ok);
-	buttonPan.add(apply);
-	buttonPan.add(cancel);
+        ButtonBarBuilder bsb = new ButtonBarBuilder(buttonPan);
+        bsb.addGlue();
+        bsb.addGridded(ok);
+	    bsb.addGridded(apply);
+        bsb.addGridded(cancel);
+        bsb.addRelatedGap();
+        bsb.addGridded(help);
+        bsb.addGlue();
 
-	// Add panels to dialog:
+    // Add panels to dialog:
 	con.fill = GridBagConstraints.BOTH;
 	getContentPane().setLayout(gbl);
 	con.weightx = 1;
