@@ -40,6 +40,9 @@ public class ParserResult {
     private File file = null;
     private ArrayList warnings = new ArrayList();
     private String encoding = null; // Which encoding was used?
+
+
+    private String jabrefVersion = null; // Which JabRef version wrote the file, if any?
     private boolean toOpenTab = false;
 
     public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
@@ -58,6 +61,23 @@ public class ParserResult {
 
     public void setToOpenTab(boolean toOpenTab) {
         this.toOpenTab = toOpenTab;
+    }
+
+
+    /**
+     * Find which version of JabRef, if any, produced this bib file.
+     * @return The version number string, or null if no JabRef signature could be read.
+     */
+    public String getJabrefVersion() {
+        return jabrefVersion;
+    }
+
+    /**
+     * Set the JabRef version number string for this parser result.
+     * @param jabrefVersion The version number string.                                         
+     */
+    public void setJabrefVersion(String jabrefVersion) {
+        this.jabrefVersion = jabrefVersion;
     }
 
     public BibtexDatabase getDatabase() {

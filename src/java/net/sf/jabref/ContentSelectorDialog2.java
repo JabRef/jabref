@@ -389,7 +389,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	con.gridheight = 1;
 	con.fill = GridBagConstraints.NONE;
 	con.anchor = GridBagConstraints.WEST;
-	gbl.setConstraints(newField, con);
+    gbl.setConstraints(newField, con);
 	fieldPan.add(newField);
 	gbl.setConstraints(newWord, con);
 	wordPan.add(newWord);

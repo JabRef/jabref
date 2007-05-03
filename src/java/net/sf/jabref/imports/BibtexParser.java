@@ -235,11 +235,21 @@ public class BibtexParser {
 		if (_pr != null)
 			return _pr;
 
-		_db = new BibtexDatabase(); // Bibtex related contents.
+        _db = new BibtexDatabase(); // Bibtex related contents.
 		_meta = new HashMap(); // Metadata in comments for Bibkeeper.
 		entryTypes = new HashMap(); // To store custem entry types parsed.
 		_pr = new ParserResult(_db, _meta, entryTypes);
-		skipWhitespace();
+
+        // First see if we can find the version number of the JabRef version that
+        // wrote the file:
+        String versionNum = readJabRefVersionNumber();
+        if (versionNum != null)
+            _pr.setJabrefVersion(versionNum);
+        else {
+            // No version number found. However, we have only
+        }
+
+        skipWhitespace();
 
 		try {
 			while (!_eof) {
@@ -874,4 +884,58 @@ public class BibtexParser {
 			}
 		}
 	}
+
+    /**
+     * Read the JabRef signature, if any, and find what version number is given.
+     * This method advances the file reader only as far as the end of the first line of
+     * the JabRef signature, or up until the point where the read characters don't match
+     * the signature. This should ensure that the parser can continue from that spot without
+     * resetting the reader, without the risk of losing important contents.
+     *
+     * @return The version number, or null if not found.
+     * @throws IOException
+     */
+    private String readJabRefVersionNumber() throws IOException {
+        StringBuffer headerText = new StringBuffer();
+        
+        boolean keepon = true;
+        int piv = 0;
+        int c;
+
+        // We start by reading the standard part of the signature, which precedes
+        // the version number:
+        //                     This file was created with JabRef X.y.
+        while (keepon) {
+            c = peek();
+            headerText.append((char) c);
+            if (((piv == 0) && Character.isWhitespace((char) c))
+                    || (c == GUIGlobals.SIGNATURE.charAt(piv))) {
+                piv++;
+                read();
+            }
+            else {
+                keepon = false;
+                return null;
+            }
+
+            // Check if we've reached the end of the signature's standard part:
+            if (piv == GUIGlobals.SIGNATURE.length()) {
+                keepon = false;
+
+                // Found the standard part. Now read the version number:
+                StringBuilder sb = new StringBuilder();
+                while (((c=read()) != '\n') && (c != -1))
+                    sb.append((char)c);
+                String versionNum = sb.toString().trim();
+                // See if it fits the X.y. pattern:
+                if (Pattern.compile("[1-9]+\\.[1-9A-Za-z ]+\\.").matcher(versionNum).matches()) {
+                    // It matched. Remove the last period and return:
+                    return versionNum.substring(0, versionNum.length()-1);
+                }
+
+            }
+        }
+
+        return null;
+    }
 }

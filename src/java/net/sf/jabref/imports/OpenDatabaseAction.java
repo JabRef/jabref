@@ -91,6 +91,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // Should this be done _after_ we know it was successfully opened?
                 String encoding = Globals.prefs.get("defaultEncoding");
                 ParserResult pr = loadDatabase(file, encoding);
+
                 if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) {
                     JOptionPane.showMessageDialog(null, Globals.lang("Error opening file" + " '" + fileName + "'"),
                             Globals.lang("Error"),
