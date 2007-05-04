@@ -1,5 +1,6 @@
 /*
  * Created on Oct 29, 2004
+ * Updated on May 03, 2007
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -18,12 +19,13 @@ import java.io.*;
 import java.util.regex.*;
 /**
  * @author Michael Wrighton
+ * @author S M Mahbub Murshed
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class PageNumbers {
-	String freeform;
+	String freeform = null;
 	int start, end;
 	
 	public PageNumbers(String s) {
@@ -31,7 +33,8 @@ public class PageNumbers {
 	}
 	
 	protected void parsePageNums(String s) {
-		Pattern p = Pattern.compile("(\\d+)--(\\d+)");
+		s = s.replaceAll("–","-"); // Remove special dash that looks like same but is not
+		Pattern p = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
 		Matcher m = p.matcher(s);
 		if (m.matches()) {
 			start = Integer.parseInt(m.group(1));
@@ -58,4 +61,15 @@ public class PageNumbers {
 		}
 		return result;
 	}
+	
+    public String toString(String seperator) {
+    	if (freeform != null)
+    		return freeform; 
+		return (start+seperator+end);
+    }
+
+	public String toString() {
+		return toString("--");
+    }
+ 
 }
