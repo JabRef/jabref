@@ -101,15 +101,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
 
                 addNewDatabase(pr, file, raisePanel);
-
+                
             } catch (Exception ex) {
                 //ex.printStackTrace();
                 Util.showQuickErrorDialog(frame, Globals.lang("Open database"), ex);
-                /*
-                JOptionPane.showMessageDialog
-                        (frame, ex.getMessage(),
-                                Globals.lang("Open database"), JOptionPane.ERROR_MESSAGE);
-                                */
             }
         }
     }

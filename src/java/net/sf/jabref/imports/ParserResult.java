@@ -43,6 +43,7 @@ public class ParserResult {
 
 
     private String jabrefVersion = null; // Which JabRef version wrote the file, if any?
+    private int jabrefMajorVersion = 0, jabrefMinorVersion = 0; // Numeric version representation
     private boolean toOpenTab = false;
 
     public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
@@ -78,6 +79,23 @@ public class ParserResult {
      */
     public void setJabrefVersion(String jabrefVersion) {
         this.jabrefVersion = jabrefVersion;
+    }
+
+
+    public int getJabrefMajorVersion() {
+        return jabrefMajorVersion;
+    }
+
+    public void setJabrefMajorVersion(int jabrefMajorVersion) {
+        this.jabrefMajorVersion = jabrefMajorVersion;
+    }
+
+    public int getJabrefMinorVersion() {
+        return jabrefMinorVersion;
+    }
+
+    public void setJabrefMinorVersion(int jabrefMinorVersion) {
+        this.jabrefMinorVersion = jabrefMinorVersion;
     }
 
     public BibtexDatabase getDatabase() {

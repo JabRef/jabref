@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
@@ -243,8 +244,10 @@ public class BibtexParser {
         // First see if we can find the version number of the JabRef version that
         // wrote the file:
         String versionNum = readJabRefVersionNumber();
-        if (versionNum != null)
+        if (versionNum != null) {
             _pr.setJabrefVersion(versionNum);
+            setMajorMinorVersions();
+        }
         else {
             // No version number found. However, we have only
         }
@@ -937,5 +940,22 @@ public class BibtexParser {
         }
 
         return null;
+    }
+
+    /**
+     * After a JabRef version number has been parsed and put into _pr,
+     * parse the version number to determine the JabRef major and minor version
+     * number
+     */
+    private void setMajorMinorVersions() {
+        String v = _pr.getJabrefVersion();
+        Pattern p = Pattern.compile("([0-9]+)\\.([0-9]+).*");
+        Matcher m = p.matcher(v);
+        if (!m.matches())
+            return;
+        if (m.groupCount() >= 2) {
+            _pr.setJabrefMajorVersion(Integer.parseInt(m.group(1)));
+            _pr.setJabrefMinorVersion(Integer.parseInt(m.group(2)));
+        }
     }
 }
