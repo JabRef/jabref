@@ -1,5 +1,6 @@
 /*
  * Created on Oct 25, 2004
+ * Updated on May 03, 2007
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -59,6 +60,16 @@ public class PersonName {
     public String getSurname()
     {
         return surname;
+    }
+
+    public String getFirstname()
+    {
+        return givenName;
+    }
+
+    public String getMiddlename()
+    {
+        return middleName;
     }
 
     public String toString() {
