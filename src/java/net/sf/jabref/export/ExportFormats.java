@@ -49,7 +49,8 @@ public class ExportFormats {
                 "endnote", ".txt"));
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
-        putFormat(new MsBibExporter());
+        putFormat(new MSBibExportFormat());
+        // putFormat(new MsBibExporter());
                 
         //openofficeItem = new JMenuItem("OpenOffice Calc"),
         //odsItem = new JMenuItem("OpenDocument Spreadsheet");
