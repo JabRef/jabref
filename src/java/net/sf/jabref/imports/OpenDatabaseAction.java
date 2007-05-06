@@ -1,6 +1,7 @@
 package net.sf.jabref.imports;
 
 import net.sf.jabref.*;
+import net.sf.jabref.external.FileLinksUpgradeWarning;
 
 import javax.swing.*;
 import java.io.*;
@@ -10,9 +11,22 @@ import java.util.*;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
-    boolean showDialog;
 
+    boolean showDialog;
     private JabRefFrame frame;
+
+    // List of actions that may need to be called after opening the file. Such as
+    // upgrade actions etc. that may depend on the JabRef version that wrote the file:
+    private static ArrayList<PostOpenAction> postOpenActions =
+            new ArrayList<PostOpenAction>();
+
+    static {
+        // Add the action for checking for new custom entry types loaded from
+        // the bib file:
+        postOpenActions.add(new CheckForNewEntryTypesAction());
+        // Add the action for the new external file handling system in version 2.3:
+        postOpenActions.add(new FileLinksUpgradeWarning());
+    }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(GUIGlobals.getImage("open"));
@@ -100,8 +114,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     return;
                 }
 
-                addNewDatabase(pr, file, raisePanel);
-                
+                BasePanel panel = addNewDatabase(pr, file, raisePanel);
+
+                // After adding the database, go through our list and see if
+                // any post open actions need to be done. For instance, checking
+                // if we found new entry types that can be imported, or checking
+                // if the database contents should be modified due to new features
+                // in this version of JabRef:
+                performPostOpenActions(panel, pr, true);
+
             } catch (Exception ex) {
                 //ex.printStackTrace();
                 Util.showQuickErrorDialog(frame, Globals.lang("Open database"), ex);
@@ -109,7 +130,25 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    public void addNewDatabase(ParserResult pr, File file,
+    /**
+     * Go through the list of post open actions, and perform those that need
+     * to be performed.
+     * @param panel The BasePanel where the database is shown.
+     * @param pr The result of the bib file parse operation.
+     */
+    public static void performPostOpenActions(BasePanel panel, ParserResult pr,
+                                              boolean mustRaisePanel) {
+        for (Iterator<PostOpenAction> iterator = postOpenActions.iterator(); iterator.hasNext();) {
+            PostOpenAction action = iterator.next();
+            if (action.isActionNecessary(pr)) {
+                if (mustRaisePanel)
+                    panel.frame().getTabbedPane().setSelectedComponent(panel);
+                action.performAction(panel, pr);
+            }
+        }
+    }
+
+    public BasePanel addNewDatabase(ParserResult pr, File file,
                                boolean raisePanel) {
 
         String fileName = file.getPath();
@@ -138,53 +177,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }).start();
         }
         BasePanel bp = new BasePanel(frame, db, file, meta, pr.getEncoding());
-        /*
-         if (Globals.prefs.getBoolean("autoComplete")) {
-         db.setCompleters(autoCompleters);
-         }
-        */
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(new OpenItSwingHelper(bp, file, raisePanel));
-
-        // See if any custom entry types were imported, but disregard those we already know:
-        for (Iterator i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
-            String typeName = ((String) i.next()).toLowerCase();
-            if (BibtexEntryType.ALL_TYPES.get(typeName) != null)
-                i.remove();
-        }
-        if (pr.getEntryTypes().size() > 0) {
-
-
-            StringBuffer sb = new StringBuffer(Globals.lang("Custom entry types found in file") + ": ");
-            Object[] types = pr.getEntryTypes().keySet().toArray();
-            Arrays.sort(types);
-            for (int i = 0; i < types.length; i++) {
-                sb.append(types[i].toString()).append(", ");
-            }
-            String s = sb.toString();
-            int answer = JOptionPane.showConfirmDialog(frame,
-                    s.substring(0, s.length() - 2) + ".\n"
-                            + Globals.lang("Remember these entry types?"),
-                    Globals.lang("Custom entry types"),
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-            if (answer == JOptionPane.YES_OPTION) {
-                // Import
-                HashMap et = pr.getEntryTypes();
-                for (Iterator i = et.keySet().iterator(); i.hasNext();) {
-                    BibtexEntryType typ = (BibtexEntryType) et.get(i.next());
-                    //System.out.println(":"+typ.getName()+"\n"+typ.toString());
-                    BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
-                }
-
-            }
-        }
 
         frame.output(Globals.lang("Opened database") + " '" + fileName +
                 "' " + Globals.lang("with") + " " +
                 db.getEntryCount() + " " + Globals.lang("entries") + ".");
 
+        return bp;
     }
 
     public static ParserResult loadDatabase(File fileToOpen, String encoding)

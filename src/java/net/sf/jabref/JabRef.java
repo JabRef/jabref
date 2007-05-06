@@ -695,8 +695,9 @@ lastEdLoop:
             if (loaded.size() > 0) {
                 for (Iterator i=loaded.iterator(); i.hasNext();) {
                     ParserResult pr = (ParserResult)i.next();
-		    jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), first);
-		    first = false;
+		            BasePanel panel = jrf.addTab(pr.getDatabase(), pr.getFile(),
+                            pr.getMetaData(), pr.getEncoding(), first);
+                    first = false;
                 }
             }
 
@@ -729,6 +730,17 @@ lastEdLoop:
                         Globals.lang("Warnings"),
                         JOptionPane.WARNING_MESSAGE);
                 }
+            }
+
+            // After adding the databases, go through each and see if
+            // any post open actions need to be done. For instance, checking
+            // if we found new entry types that can be imported, or checking
+            // if the database contents should be modified due to new features
+            // in this version of JabRef:
+            for (int i = 0; i < loaded.size(); i++) {
+                ParserResult pr = (ParserResult) loaded.elementAt(i);
+                BasePanel panel = jrf.baseAt(i);
+                OpenDatabaseAction.performPostOpenActions(panel, pr, true);
             }
 
             //Util.pr(": Finished adding panels");

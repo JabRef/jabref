@@ -28,7 +28,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	JabRefPreferences _prefs;
 
     private JCheckBox autoResizeMode, priDesc, secDesc, terDesc, floatMarked, pdfColumn, urlColumn,
-		citeseerColumn;
+		fileColumn, citeseerColumn;
 
 	private JRadioButton namesAsIs, namesFf, namesFl, namesNatbib, abbrNames, noAbbrNames,
 		lastNamesOnly;
@@ -74,7 +74,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		noAbbrNames = new JRadioButton(Globals.lang("Do not abbreviate names"));
 		abbrNames = new JRadioButton(Globals.lang("Abbreviate names"));
 		lastNamesOnly = new JRadioButton(Globals.lang("Show last names only"));
-		pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
+        fileColumn = new JCheckBox(Globals.lang("Show file column"));
+        pdfColumn = new JCheckBox(Globals.lang("Show PDF/PS column"));
 		urlColumn = new JCheckBox(Globals.lang("Show URL/DOI column"));
 		citeseerColumn = new JCheckBox(Globals.lang("Show CiteSeer column"));
 
@@ -134,10 +135,13 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		builder.appendSeparator(Globals.lang("Special table columns"));
 		builder.nextLine();
 		builder.append(pan);
-		builder.append(pdfColumn);
+		builder.append(fileColumn);
 		builder.nextLine();
-		builder.append(pan);
-		builder.append(urlColumn);
+        builder.append(pan);
+        builder.append(pdfColumn);
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(urlColumn);
 		builder.nextLine();
 		builder.append(pan);
 		builder.append(citeseerColumn);
@@ -214,9 +218,11 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		autoResizeMode
 			.setSelected((_prefs.getInt("autoResizeMode") == JTable.AUTO_RESIZE_ALL_COLUMNS));
-		pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
+		fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
+        pdfColumn.setSelected(_prefs.getBoolean("pdfColumn"));
 		urlColumn.setSelected(_prefs.getBoolean("urlColumn"));
-		citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
+        fileColumn.setSelected(_prefs.getBoolean("fileColumn"));
+        citeseerColumn.setSelected(_prefs.getBoolean("citeseerColumn"));
 
 		priField.setText(_prefs.get("priSort"));
 		secField.setText(_prefs.get("secSort"));
@@ -263,7 +269,8 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		_prefs.putBoolean("namesLastOnly", lastNamesOnly.isSelected());
 		_prefs.putBoolean("abbrAuthorNames", abbrNames.isSelected());
 
-		_prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
+        _prefs.putBoolean("fileColumn", fileColumn.isSelected());
+        _prefs.putBoolean("pdfColumn", pdfColumn.isSelected());
 		_prefs.putBoolean("urlColumn", urlColumn.isSelected());
 		_prefs.putBoolean("citeseerColumn", citeseerColumn.isSelected());
 		_prefs.putInt("autoResizeMode",

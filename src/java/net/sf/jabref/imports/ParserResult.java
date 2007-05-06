@@ -31,6 +31,7 @@ import java.io.File;
 import net.sf.jabref.*;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.awt.event.ActionListener;
 
 public class ParserResult {
 
@@ -99,7 +100,7 @@ public class ParserResult {
     }
 
     public BibtexDatabase getDatabase() {
-	return base;
+    	return base;
     }
 
     public HashMap getMetaData() {
