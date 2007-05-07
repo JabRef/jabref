@@ -64,6 +64,28 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             filesToOpen.add(new File(Util.checkName(e.getActionCommand())));
         }
 
+        BasePanel toRaise = null;
+        int initialCount = filesToOpen.size(), removed = 0;
+        
+        // Check if any of the files are already open:
+        for (Iterator iterator = filesToOpen.iterator(); iterator.hasNext();) {
+            File file = (File) iterator.next();
+            for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
+                BasePanel bp = (BasePanel)frame.baseAt(i);
+                if ((bp.getFile() != null) && bp.getFile().equals(file)) {
+                    iterator.remove();
+                    removed++;
+                    // See if we removed the final one. If so, we must perhaps
+                    // raise the BasePanel in question:
+                    if (removed == initialCount) {
+                        toRaise = bp;
+                    }
+                    break;
+                }
+            }
+        }
+
+
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (filesToOpen.size() > 0) {
@@ -72,10 +94,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 public void run() {
                     for (Iterator i=theFiles.iterator(); i.hasNext();)
                         openIt((File)i.next(), true);
+
                 }
             }).start();
             for (Iterator i=theFiles.iterator(); i.hasNext();)
                 frame.getFileHistory().newFile(((File)i.next()).getPath());
+        }
+        // If no files are remaining to open, this could mean that a file was
+        // already open. If so, we may have to raise the correct tab:
+        else if (toRaise != null) {
+            frame.output(Globals.lang("File '%0' is already open.", toRaise.getFile().getPath()));
+            frame.getTabbedPane().setSelectedComponent(toRaise);
         }
     }
 

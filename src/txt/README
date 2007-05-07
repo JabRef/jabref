@@ -87,6 +87,7 @@ Change log:
 	- Added missing option for specifying the path to LEd.exe.
 	- Added -s/--nosplash command line option for disabling the splash screen.
 	- Added new field marker [auth.etal] for key generation.
+	- When opening databases, already open files are now skipped.
 	- Synchronize external links now searches entire database, not selected entries.
 	- Medline import now adds <Affiliation> information into the "institution" field.
 	- Improved handling of external links. The 'file' field can now specify a list
@@ -114,7 +115,7 @@ Change log:
         - Support for OAI2 identifiers with subcategories, e.g. math.RA/0601001
         - Fixed bug that made explicit groups appear empty after updating group tree from external
           change.
-        - New windows installer thanks to Uwe Stöhr.
+        - New windows installer thanks to Uwe Stï¿½hr.
         - [ 1641247 ] Fixed: No update of preview after generating bibtex key
         - [ 1631548 ] Fixed: Absolute paths should be stored for last open files.
         - [ 1598777 ] Fixed: Month sorting
@@ -127,7 +128,7 @@ Change log:
           dropdown menu in the file dialog.
         - Fixed bug that caused UnsupportedEncodingException on Windows when saving.
         - Added warning dialog when exporting failed.
-        - Added fix for exporting special chars in RTF like éóù...
+        - Added fix for exporting special chars in RTF like ï¿½ï¿½ï¿½...
         - Added NameFormat LayoutFormatter based on Bibtex method name.format$
         - Added Fetch from ArXiv.org to Web Search
           [ 1587342 ] Quering ArXiv (and any OAI2 Repository)
