@@ -32,10 +32,13 @@ import com.jgoodies.forms.layout.FormLayout;
  * This class holds the functionality of autolinking to a file that's dropped
  * onto an entry.
  * 
- * Options for handling the files are: 1) Link to the file in its current
- * position (disabled if the file is remote) 2) Copy the file to ??? directory,
- * rename after bibtex key, and extension 3) Move the file to ??? directory, rename
- * after bibtex key, and extension
+ * Options for handling the files are:
+ * 
+ * 1) Link to the file in its current position (disabled if the file is remote)
+ * 
+ * 2) Copy the file to ??? directory, rename after bibtex key, and extension
+ * 
+ * 3) Move the file to ??? directory, rename after bibtex key, and extension
  */
 public class DroppedFileHandler {
     private JabRefFrame frame;
@@ -50,8 +53,6 @@ public class DroppedFileHandler {
     private JCheckBox renameCheckBox = new JCheckBox();
 
     private JPanel optionsPanel = new JPanel();
-
-    private JPanel importAsNewPanel = new JPanel();
 
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {
 
@@ -145,14 +146,14 @@ public class DroppedFileHandler {
             return false;
         }
 
-        List l = null;
+        List xmpEntriesInFile = null;
         try {
-            l = XMPUtil.readXMP(fileName);
+            xmpEntriesInFile = XMPUtil.readXMP(fileName);
         } catch (Exception e) {
             return false;
         }
 
-        if ((l == null) || (l.size() == 0)) {
+        if ((xmpEntriesInFile == null) || (xmpEntriesInFile.size() == 0)) {
             return false;
         }
 
@@ -183,8 +184,8 @@ public class DroppedFileHandler {
          * importer.automatedImport(new String[] { fileName });
          */
 
-        boolean isSingle = l.size() == 1;
-        BibtexEntry single = (isSingle ? (BibtexEntry) l.get(0) : null);
+        boolean isSingle = xmpEntriesInFile.size() == 1;
+        BibtexEntry single = (isSingle ? (BibtexEntry) xmpEntriesInFile.get(0) : null);
 
         reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
             isSingle, (isSingle ? single.getCiteKey() : "Cannot rename for several entries."),
@@ -211,7 +212,7 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator it = l.iterator();
+            Iterator it = xmpEntriesInFile.iterator();
 
             while (it.hasNext()) {
                 try {
@@ -246,48 +247,29 @@ public class DroppedFileHandler {
         }
         
         ChangeListener cl = new ChangeListener() {
-            public void stateChanged(ChangeEvent arg0) {
-                renameCheckBox.setEnabled(!linkInPlace.isSelected() && allowRename
-                    && (!multipleEntries));
-            }
-        };
+			public void stateChanged(ChangeEvent arg0) {
+				renameCheckBox.setEnabled(!linkInPlace.isSelected()
+						&& allowRename && (!multipleEntries));
+			}
+		};
 
-        if (newEntry) {
-            if (multipleEntries) {
-                linkInPlace.setText(Globals.lang("Link from new entries."));
+		if (multipleEntries) {
+			linkInPlace.setText(Globals
+					.lang("Leave files in their current directory."));
+			copyRadioButton.setText(Globals.lang("Copy files to %0.", fileType
+					.getName()));
 
-                copyRadioButton.setText(Globals.lang(
-                    "Copy to %0 directory and extension from new entries.", fileType.getName()));
-                moveRadioButton.setText(Globals.lang(
-                    "Move to %0 directory and extension from new entries.", fileType.getName()));
-            } else {
-                linkInPlace.setText(Globals.lang("Link from new entry"));
-
-                copyRadioButton.setText(Globals.lang(
-                    "Copy to %0 directory and extension from new entry.", fileType.getName()));
-                moveRadioButton.setText(Globals.lang(
-                    "Move to %0 directory and extension from new entry.", fileType.getName()));
-            }
-        } else {
-            if (multipleEntries) {
-                linkInPlace.setText(Globals.lang("Link from entries."));
-
-                copyRadioButton.setText(Globals.lang("Copy to %0 directory and extension from entries.",
-                    fileType.getName()));
-                moveRadioButton.setText(Globals.lang("Move to %0 directory and extension from entries.",
-                    fileType.getName()));
-            } else {
-                linkInPlace.setText(Globals.lang("Link from entry"));
-
-                copyRadioButton.setText(Globals.lang("Copy to %0 directory and extension from entry.",
-                    fileType.getName()));
-                moveRadioButton.setText(Globals.lang("Move to %0 directory and extension from entry.",
-                    fileType.getName()));
-
-            }
-
-        }
-
+			moveRadioButton.setText(Globals.lang("Move files to %0.", fileType
+					.getName()));
+		} else {
+			linkInPlace.setText(Globals
+					.lang("Leave file in its current directory."));
+			copyRadioButton.setText(Globals.lang("Copy file to %0.", fileType
+					.getName()));
+			moveRadioButton.setText(Globals.lang("Move file to %0.", fileType
+					.getName()));
+		}
+		
         renameCheckBox.setText("Rename to match citekey: " + citekeyOrReason);
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
