@@ -1,4 +1,5 @@
 %%%%% To do %%%%%
+% generelle Durchsicht: weiter bei Funktionen -> Gruppen
 % DW 2007-03-23
 % - Bibliographie mit biblatex statt jurabib?
 \documentclass[10pt,normalheadings]{scrartcl}
@@ -9,7 +10,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%27.\,4.\,2007}
+\newcommand{\versiondate}{in Bearb.}%8.\,5.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -158,6 +159,7 @@ LaTeX
 BibTeX
 Da-tei-na-men
 Me-nü-be-feh-le
+For-mat-erken-nung% verhindert Trennung "Formater-kennung"
 }
 
 %%%%% Bibliography %%%%%
@@ -181,8 +183,6 @@ pdfstartview=FitH,%
 bookmarksopen=true,%
 bookmarksopenlevel=1,%
 }
-
-\hyphenation{For-mat-erken-nung}
 
 \makeatother
 
@@ -246,8 +246,8 @@ Dieses Handbuch will eine kurze Einführung zu den nützlichsten Funktionen
 von \jabref{} bieten, ohne dabei eine erschöpfende Beschreibung aller
 Funktionalitäten dieser Software zu liefern. \emph{}\jabref{} ist
 das Ergebnis der Verschmelzung von \emph{BibKeeper} und \emph{JBibtexManager}.
-Weitere Informationen gibt es im Internet unter \url{http://jabref.sourceforge.net}
-sowie im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}. Wer dann immer noch keine Antwort auf seine Frage oder keine Lösung zu seinem Problem hat, kann über die Foren oder die Mailingliste auf der Projektseite bei Sourceforge weitere Hilfe bekommen (siehe dazu den Abschnitt \nameref{sec:faq}).
+Weitere Informationen gibt es im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}
+sowie im Internet unter \url{http://jabref.sourceforge.net}. Wer dann immer noch keine Antwort auf seine Frage oder keine Lösung zu seinem Problem hat, kann über die Foren oder die Mailingliste auf der Projektseite bei Sourceforge weitere Hilfe bekommen (siehe dazu den Abschnitt \nameref{sec:faq}).
 
 Die Anleitungen basieren auf den Hilfeseiten des Programms. Da dieses
 Handbuch und die Hilfeseiten unabhängig voneinander gepflegt und aktualisiert
@@ -338,7 +338,7 @@ Die zweite Form sollte für Autoren mit zwei oder mehr Nachnamen benutzt werden, 
   \item \emph{crossref}\\
     Der \texttt{key} eines Eintrags, auf den ein Querverweis gesetzt wird. Damit lassen sich beispielsweise die Daten eines Sammelbandes in einem Eintrag für einen Aufsatztitel wiederverwenden, ohne sie bei jedem Aufsatztitel explizit einzutragen. Die Funktionalität von \texttt{crossref} ist jedoch nicht in jedem Fall praktikabel.
   \item \emph{edition}\\
-    Die Auflage eines Buch, z.\,B. \texttt{Zweite}. Die Ordnungszahl sollte mit einem Großbuchstaben beginnen; sie wird von den Standardstilen gegebenenfalls in Kleinbuchstaben umgewandelt. Manche Stile verlangen hier eine Ziffer.
+    Die Auflage eines Buchs, z.\,B. \texttt{Zweite}. Die Ordnungszahl sollte mit einem Großbuchstaben beginnen; sie wird von den Standardstilen gegebenenfalls in Kleinbuchstaben umgewandelt. Manche Stile verlangen hier eine Ziffer.
   \item \emph{editor}\\
     Dieses Feld ist analog zu dem \emph{author}-Feld.
 Falls zusätzlich ein \texttt{author}-Feld angegeben wird, bezeichnet das \texttt{editor}-Feld den Herausgeber des Buches oder des Sammelbandes, in dem die referenzierte Literatur erschienen ist.
@@ -351,7 +351,7 @@ Falls zusätzlich ein \texttt{author}-Feld angegeben wird, bezeichnet das \texttt
 Mit Hilfe von ">Strings"< können Zeitschriftennamen abgekürzt werden. Zum Erstellen eines solchen Strings können Sie den \nameref{StringEditorHelp} benutzen oder die Funktionalität zur \nameref{JournalAbbreviations} %Abkürzung von Zeitschriftentiteln 
 verwenden.
   \item \emph{key}\\
-    Dieses Feld wird zur Sortierung, zur Erstellung von Labels (falls kein \texttt{author} vorhanden ist) und für Querverweise (\texttt{crossref}) verwendet. Verwechseln Sie dieses Feld nicht mit dem \texttt{Bibtexkey}, der für die \texttt{\textbackslash cite}-Kommandos gebraucht wird und am Anfang jedes Eintrags erscheint (im \bibtex{}-Quelltext).
+    Dieses Feld wird zur Sortierung, zur Erstellung von Labels (falls kein \texttt{author} vorhanden ist) und für Querverweise (\texttt{crossref}) verwendet. Verwechseln Sie dieses Feld nicht mit dem \texttt{Bibtexkey}, der für die \texttt{\textbackslash cite}-Kommandos gebraucht wird und am Anfang jedes Eintrags erscheint (im \bibtex{}"=Quelltext).
   \item \emph{month}\\
     Der Monat, in dem ein Werk veröffentlicht oder geschrieben wurde. Benutzen Sie am besten die englischen Abkürzungen (jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec).
   \item \emph{note}\\
@@ -362,7 +362,7 @@ Die Nummer einer Zeitschrift, eines technischen Reports oder eines Bandes innerh
     Die Organisation, die einen Konferenzband fördert.
   \item \emph{pages}\\
     Die Seitenzahl(en) oder der Seitenzahlbereich, z.\,B. \texttt{42-111} oder \texttt{7,41,73-97} or \texttt{43+} (das \texttt{+} deutet auf folgende Seiten, die nicht einen einfachen Bereich umfassen).
-Ein einfacher Bindestrich (wie in \texttt{7-33}) wird in einen doppelten Bindestrich (\texttt{-{-}}) verwandelt, der in TeX den bis-Strich anzeigt (also 7--33).
+Ein einfacher Bindestrich (wie in \texttt{7-33}) wird in einen doppelten Bindestrich (\texttt{-{-}}) verwandelt, der in der Ausgabe als bis-Strich erscheint (also 7--33).
   \item \emph{publisher}\\
     Der Name des Verlags.
   \item \emph{school}\\
@@ -523,7 +523,7 @@ Weitere Hinweise zur Installation finden Sie in der Datei INSTALL
 \bibtex{}-Dateien. Es benutzt kein eigenes Dateiformat, d.\,h. dass
 Sie Ihre Dateien direkt im \bibtex{}-Format (Dateiendung \texttt{.bib})
 laden und speichern. Sie können aber auch bibliographische Datenbanken
-in anderen Formaten in \jabref{} importieren.
+anderer Formate in \jabref{} importieren.
 
 \jabref{} unterstützt Sortier- und Suchfunktionen, um einen Überblick
 über den Inhalt Ihrer Datei zu bekommen. Sie können der Datei ganz
@@ -547,9 +547,9 @@ die Tableiste mit Tabs (Reitern) für jede Ihrer geöffneten Dateien.
 Wenn Sie einen dieser Tabs anklicken, erscheint eine Tabelle, die
 alle Datensätze und einige der Datenfelder auf"|listet.
 
-Mit einem Doppelklick auf eine Tabellenzeile können Sie den Inhalt bearbeiten (der \nameref{EntryEditorHelp} wird geöffnet). Sie können mit den Pfeiltasten innerhalb der Tabelle navigieren. Wenn Sie einen Buchstaben drücken, springen Sie zu dem ersten Eintrag, der mit diesem Buchstaben beginnt (abhängig von der Spalte, nach der Sie die Tabelle sortiert haben).
+	Mit einem Doppelklick auf eine Tabellenzeile können Sie den Inhalt bearbeiten (der \nameref{EntryEditorHelp} wird geöffnet). Sie können mit den Pfeiltasten innerhalb der Tabelle navigieren. Wenn Sie einen Buchstaben drücken, springen Sie zu dem ersten Eintrag, der mit diesem Buchstaben beginnt (abhängig von der Spalte, nach der Sie die Tabelle sortiert haben).
 
-Die Sortierung der Tabelle erfolgt nach einem Feld Ihrer Wahl. Sie können das Standardverhalten unter \menu{Optionen \msep{} Einstellungen \msep{} Tabellenansicht} angeben. Um die Sortierreihenfolge schnell zu ändern, klicken Sie einfach auf die Kopfzeile einer Spalte; damit haben Sie das primäre Sortierkriterium definiert. Klicken Sie erneut auf den Spaltenkopf, um die Sortierrichtung umzukehren. Ein weiterer Klick sorgt dafür, dass die Spalte nicht mehr zur Sortierung herangezogen wird. Halten Sie die CTRL-Taste beim Klicken auf einen Spaltenknopf gedrückt, um eine zweite Spalte als sekundäres Sortierkriterium festzulegen. Sie können beliebig viele Spalten zur Sortierung heranziehen.
+Die Sortierung der Tabelle erfolgt nach einem Feld Ihrer Wahl. Sie können das Standardverhalten unter \menu{Optionen \msep{} Einstellungen \msep{} Tabellenansicht} angeben. Um die Sortierreihenfolge schnell zu ändern, klicken Sie einfach auf die Kopfzeile einer Spalte; damit haben Sie das primäre Sortierkriterium definiert. Klicken Sie erneut auf den Spaltenkopf, um die Sortierrichtung umzukehren. Ein weiterer Klick sorgt dafür, dass die Spalte nicht mehr zur Sortierung herangezogen wird. Halten Sie die STRG-Taste beim Klicken auf einen Spaltenknopf gedrückt, um eine zweite Spalte als sekundäres Sortierkriterium festzulegen. Sie können beliebig viele Spalten zur Sortierung heranziehen.
 
 Welche Felder (Spalten) in der Tabelle angezeigt werden sollen, können
 Sie im \menu{Einstellungs}-Dialog auswählen. Auch die Breite der
@@ -614,22 +614,23 @@ in einem Texteditor machen würden, mit einer Ausnahme: um einen String
 mit je einem \#, z.\,B.
 
 \begin{lstlisting}
-\#jan\# 1997
+#jan# 1997
 \end{lstlisting}
 was interpretiert wird als String mit dem Namen \texttt{jan} gefolgt
 von \texttt{1997}. Vergleichen Sie dazu auch die Hinweise zum \nameref{StringEditorHelp}.
 
 
-\subsection{Eintrags-Editor}
+\subsection{Eintrags"=Editor}
 
 \label{EntryEditorHelp}
 
 \begin{quote}
-\emph{Geöffnet wird der Eintrags-Editor im Hauptfenster durch einen
-Doppelklick auf die linke Spalte eines Eintrags (bzw. irgendwo auf
-die Zeile des Eintrags, wenn \menu{Bearbeiten in der Tabelle zulassen}
-im Dialog \menu{Optionen}} \msep{} \emph{\menu{Einstellungen}}
-\msep{} \emph{\menu{Allgemein} nicht ausgewählt ist), oder durch
+\emph{Geöffnet wird der Eintrags"=Editor im Hauptfenster durch einen
+Doppelklick auf die linke Spalte eines Eintrags %(bzw. irgendwo auf
+%die Zeile des Eintrags, wenn \menu{Bearbeiten in der Tabelle zulassen}
+%im Dialog \menu{Optionen}} \msep{} \emph{\menu{Einstellungen}}
+%\msep{} \emph{\menu{Allgemein} nicht ausgewählt ist)
+oder durch
 Drücken auf ENTER. Der Eintrags-Editor wird geschlossen, indem man
 auf ESC drückt.}
 \end{quote}
@@ -641,15 +642,13 @@ genannt werden und für alle Eintragstypen gelten.
 
 Sie können die Felder, die für die einzelnen Eintragstypen als benötigt
 und optional angesehen werden, und auch die Allgemeinen Felder anpassen.
-Schlagen Sie unter Abschnitt~\ref{CustomEntriesHelp} nach, wenn
-Sie mehr Informationen darüber erhalten möchten.
-
+Näheres dazu erfahren Sie im Abschnitt \nameref{CustomEntriesHelp}.
 
 \subsubsection{Die Panels des Eintrags-Editors}
 
 Der Eintrags-Editor besteht in der Standardeinstellung aus fünf Panels:
 \emph{Benötigte Felder}, \emph{Optionale Felder}, \emph{General},
-\emph{Abstract} und \emph{\bibtex{}} \emph{Quelltext}, wobei \emph{General}
+\emph{Abstract} und \emph{\bibtex{}"=Quelltext}, wobei \emph{General}
 und \emph{Abstract} vom Benutzer angepasst werden können (siehe dazu
 Abschnitt~\ref{GeneralFields}). In den ersten drei Panels können
 Sie mit TAB und SHIFT-TAB zwischen den einzelnen Feldern hin- und
@@ -658,37 +657,38 @@ Tabs klicken. Mit den folgenden Tastaturkürzeln können Sie ebenfalls
 zwischen den Panels navigieren:
 
 \begin{itemize}
-\item CTRL-TAB oder CTRL-+ wechselt zum Panel rechts vom aktuellen Panel,
-\item CTRL-SHIFT-TAB oder CTRL-$-$ (MINUS) wechselt dementsprechend zum
+\item STRG-TAB oder STRG-+ wechselt zum Panel rechts vom aktuellen Panel,
+\item STRG-SHIFT-TAB oder STRG-{-} (MINUS) wechselt dementsprechend zum
 Panel links vom aktuellen Panel.
 \end{itemize}
 Außerdem können Sie zum nächsten oder vorherigen Eintrag wechseln,
 indem Sie >>STRG-SHIFT-$\downarrow$<< bzw. >>STRG-SHIFT-$\uparrow$<<
 oder die Pfeil-Buttons in der linken Toolbar drücken.
 
-Das Panel \emph{\bibtex{} Quelltext} zeigt, wie der Eintrag aussehen
+Das Panel \emph{\bibtex{}"=Quelltext} zeigt, wie der Eintrag aussehen
 wird, wenn die Datei im \texttt{bib}-Format gespeichert wird. Wenn
-Sie wollen, können Sie den \bibtex{} Quelltext direkt bearbeiten.
+Sie wollen, können Sie den \bibtex{}"=Quelltext direkt bearbeiten.
 Sobald Sie zu einem anderen Panel wechseln, STRG-S drücken oder den
 Eintrags-Editor schließen, wird \jabref{} versuchen, den Inhalt des
-Quelltext-Panels zu analysieren. Falls dabei Probleme auftreten, werden
+Quelltext"=Panels zu analysieren. Falls dabei Probleme auftreten, werden
 Sie benachrichtigt und erhalten die Möglichkeit, den Eintrag noch
-einmal zu überarbeiten oder den vorherigen Inhalt wiederherzustellen.
+einmal zu überarbeiten oder den vorherigen Inhalt wiederherzustellen. (Nähere
+Einzelheiten dazu finden Sie im Abschnitt \nameref{subsub:feldkonsistenz}.)
 Wenn in den \menu{Einstellungen} (unter \menu{Allgemein}) die Option
-\menu{Quelltext standardmäßig anzeigen} gewählt wurde, wird das Quelltext-Panel
+\menu{Quelltext standardmäßig anzeigen} gewählt wurde, wird das Quelltext"=Panel
 beim Öffnen des Eintrags-Editors als erstes angezeigt. Wenn Sie lieber
 den Quelltext bearbeiten als die anderen Panels zu benutzen, sollten
 Sie diese Option wählen.
 
 \tip{Wenn Ihre Datei Felder enthält, die \jabref{} nicht kennt,
-erscheinen diese im Quelltext-Panel.}
+erscheinen diese im Quelltext"=Panel.}
 
 \tip[Und noch ein Tipp: ]{Die \emph{PDF-} und \emph{URL}-Felder unterstützen
 Drag \& Drop. Sie können z.\,B. ein URL aus Ihrem Browser dort einfügen.}
 
 
 \subsubsection{Überprüfung der Feldkonsistenz}
-
+\label{subsub:feldkonsistenz}
 Wenn der Inhalt eines Feldes geändert wird, überprüft \jabref{},
 ob der neue Inhalt akzeptiert werden kann. Bei Feldern, die von \bibtex{}
 genutzt werden, wird der Inhalt zum einen auf die richtige Klammerung
@@ -697,29 +697,29 @@ mit geschweiften Klammern, aber auch auf die Benutzung des Zeichens
 >>Doppelkreuz<< oder >>Raute<< genannt) darf \emph{nur} paarweise
 benutzt werden, um damit den Namen eines \bibtex{}-Strings einzuschließen.
 Beachten Sie, dass \jabref{} nicht überprüft, ob der angeführte String
-tatsächlich vorhanden ist (der \bibtex{}-Stil, den Sie benutzen, kann
-eine beliebige Anzahl von Strings definieren, die \jabref{} nicht
-kennt).
+tatsächlich vorhanden ist, da der \bibtex{}-Stil, den Sie benutzen, 
+eine beliebige Anzahl von Strings definieren kann, die \jabref{} nicht
+kennt.
 
 Falls die Inhalte nicht akzeptabel sind, wird das Feld mit roter Farbe
 hinterlegt, was auf einen Fehler hindeutet. In diesem Fall werden
 die Änderungen nicht gespeichert.
 
-
-\subsection{Integritätsprüfung}
-
-\begin{quote}
-\emph{Erreichbar über das Menü \menu{Extras}} \msep{} \emph{\menu{Überprüfung der Integrität}.}
-\end{quote}
-Mit dieser Funktion überprüft \jabref{} alle Einträge auf deren Gültigkeit
-und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
-kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
-(Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
-entsprechenden \bibtex{}-Key erstellt. Wenn Sie einen Hinweis auswählen,
-erscheint der Inhalt des Feldes, das beanstandet wird. Sie können
-nun den Feldinhalt verändern und die Veränderungen mit Klick auf die
-Schaltfläche \menu{Übernehmen} speichern.
-
+%
+%\subsection{Integritätsprüfung}
+%
+%\begin{quote}
+%\emph{Erreichbar über das Menü \menu{Extras}} \msep{} \emph{\menu{Überprüfung der Integrität}.}
+%\end{quote}
+%Mit dieser Funktion überprüft \jabref{} alle Einträge auf deren Gültigkeit
+%und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
+%kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
+%(Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
+%entsprechenden \bibtex{}-Key erstellt. Wenn Sie einen Hinweis auswählen,
+%erscheint der Inhalt des Feldes, das beanstandet wird. Sie können
+%nun den Feldinhalt verändern und die Veränderungen mit Klick auf die
+%Schaltfläche \menu{Übernehmen} speichern.
+%
 
 \subsection{\bibtex{}-Keys}
 
@@ -744,7 +744,7 @@ Einträge der Datei \bibtex{}-Keys erzeugt. Falls dabei Keys überschrieben
 werden, gibt \jabref{} eine Warnmeldung aus.
 
 Wie die \bibtex{}-Keys aussehen, die \jabref{} automatisch generiert,
-und wie Sie dieses Aussehen verändern können, erfahren Sie unter Abschnitt~\ref{LabelPatterns} \nameref{LabelPatterns}.
+und wie Sie dieses Aussehen verändern können, erfahren Sie im Abschnitt~\ref{LabelPatterns} \nameref{LabelPatterns}.
 
 
 \subsection{Suchfunktionen}
@@ -772,7 +772,7 @@ Sie ESC oder klicken Sie auf \menu{Zurücksetzen}.
 
 \subsubsection{Normale Suche}
 
-Hierbei sucht das Programm nach allen Vorkommen der Wörter ihres Suchausdrucks, sobald Sie ENTER drücken. Nur Einträge, die alle Wörter enthalten, gelten als Treffer. Um nach festen Ausdrücken zu suchen, müssen Sie die Wörter in doppelte Anführungszeichen einfassen. Zum Beispiel findet die Suchanfrage \texttt{progress \textquotedbl marine acquaculture\textquotedbl} Einträge, die sowohl das wort ">progress"< als auch den Ausdruck ">marine acquaculture"< aufweisen. Alle Einträge, die keine Treffer sind, werden entweder ausgeblendet, so dass nur die Treffer sichtbar sind (Option \menu{Filter}), oder sie werden grau dargestellt, während die Treffer oben angezeigt werden (Option \menu{Oben einsortieren}). Um die Trefferanzeige zu beenden, drücken Sie ESC oder klicken auf die Schaltfläche \menu{Zurücksetzen} im Suchen-Dialog.
+Hierbei sucht das Programm nach allen Vorkommen der Wörter ihres Suchausdrucks, sobald Sie ENTER drücken. Nur Einträge, die alle Wörter enthalten, gelten als Treffer. Um nach festen Ausdrücken zu suchen, müssen Sie die Wörter in doppelte Anführungszeichen einfassen. Zum Beispiel findet die Suchanfrage \texttt{progress \textquotedbl marine acquaculture\textquotedbl} Einträge, die sowohl das wort ">progress"< als auch den Ausdruck ">marine acquaculture"< aufweisen. Alle Einträge, die keine Treffer sind, werden entweder ausgeblendet, so dass nur die Treffer sichtbar sind (Suchmodus \menu{Filter}), oder sie werden grau dargestellt, während die Treffer oben angezeigt werden (Suchmodus \menu{Oben einsortieren}). Um die Trefferanzeige zu beenden, drücken Sie ESC oder klicken auf die Schaltfläche \menu{Zurücksetzen} im Suchen-Dialog.
 
 \subsubsection{Suchoptionen}
 
@@ -786,8 +786,10 @@ anschließend STRG-M, so haben Sie alle Treffer markiert (vgl. Abschnitt ">\namer
 ohne die bisherigen Ergebnisse zu >>verlieren<<.}
 
 \subsubsection{Feldbezeichner und logische Operatoren}
+\label{SearchHelp_advanced}
 
-\label{SearchHelp_advanced}Um nur einige bestimmte Felder zu durchsuchen
+\tip[Achtung! ]{Die folgenden Hinweise gelten nicht für die direkte Suche.}
+Um nur einige bestimmte Felder zu durchsuchen
 und\slash{}oder logische Operatoren im Suchbegriff zu benutzen, wird
 eine spezielle Syntax zur Verfügung gestellt. Um beispielsweise nach
 Einträgen mit dem Autor >>Miller<< zu suchen, geben Sie
@@ -795,12 +797,11 @@ Einträgen mit dem Autor >>Miller<< zu suchen, geben Sie
 \begin{lstlisting}
 author = miller
 \end{lstlisting}
-in das Suchfeld ein. \emph{(Achtung! Das funktioniert nicht bei der
-direkten Suche!)} Falls der Suchbegriff Leerzeichen enthält, schließen
+in das Suchfeld ein. Falls der Suchbegriff Leerzeichen enthält, schließen
 Sie ihn in Anführungszeichen ein. Benutzen Sie \emph{nie} Leerzeichen
 in dem Feldbezeichner. Mehrere Feldbezeichner werden durch >>|<<
 voneinander getrennt. Um beispielsweise nach Einträgen über Karl den
-Großen zu suchen, geben Sie folgendes ein:
+Großen zu suchen, geben Sie Folgendes ein:
 
 \begin{lstlisting}
 title|keywords = "Karl der Große"
@@ -1191,7 +1192,7 @@ oder wenn Sie sich merken wollen, welche Artikel oder Bücher Sie noch
 einmal genauer ansehen müssen.
 
 
-\subsection{String-Editor}
+\subsection{String"=Editor}
 \label{StringEditorHelp}
 
 \begin{quote}
@@ -1492,7 +1493,7 @@ hervorgehoben. Um zu kontrollieren, welche Textbereiche Sie einem
 bestimmten \bibtex{}-Feld zugewiesen haben, wählen Sie das Feld im
 rechten Bereich aus; der zugeordnete Text wird nun rot hervorgehoben.
 
-Sie können sich das Ergebnis des Importvorgangs jederzeit im Tab \menu{BibTeX Quelltext}
+Sie können sich das Ergebnis des Importvorgangs jederzeit im Tab \menu{BibTeX"=Quelltext}
 des Importdialogs ansehen. Hier können keine Änderungen vorgenommen
 werden; das ist erst möglich, sobald der Text tatsächlich importiert
 und ein neuer Eintrag angelegt wurde. Auf mögliche Fehler werden Sie
