@@ -105,7 +105,7 @@ public class DroppedFileHandler {
         // Show dialog
         boolean newEntry = false;
         boolean rename = entry.getCiteKey() != null && entry.getCiteKey().length() > 0;
-        String citeKeyOrReason = (rename ? entry.getCiteKey() : "Entry has no citekey");
+        String citeKeyOrReason = (rename ? entry.getCiteKey() : Globals.lang("Entry has no citekey"));
         int reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to file %0", fileName),
             fileType, rename, citeKeyOrReason, newEntry, false);
 
@@ -188,7 +188,7 @@ public class DroppedFileHandler {
         BibtexEntry single = (isSingle ? (BibtexEntry) xmpEntriesInFile.get(0) : null);
 
         reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
-            isSingle, (isSingle ? single.getCiteKey() : "Cannot rename for several entries."),
+            isSingle, (isSingle ? single.getCiteKey() : Globals.lang("Cannot rename for several entries.")),
             false, !isSingle);
 
         boolean success = true;
@@ -270,7 +270,7 @@ public class DroppedFileHandler {
 					.getName()));
 		}
 		
-        renameCheckBox.setText("Rename to match citekey: " + citekeyOrReason);
+        renameCheckBox.setText(Globals.lang("Rename to match citekey") + ": " + citekeyOrReason);
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
