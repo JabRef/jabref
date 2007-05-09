@@ -10,7 +10,6 @@ Chris:
 Morten:
 * [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
-* [???] Optimize import detection by first trying last used format
 * [SOLVED?] Medline import filter: import institution?
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?

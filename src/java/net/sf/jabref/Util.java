@@ -78,10 +78,7 @@ import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.gui.AutoCompleter;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEditor;
-import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -639,14 +636,9 @@ public class Util {
 	 * @param link
 	 *            The file name.
 	 */
-	public static void openExternalFileAnyFormat(JabRefFrame frame, MetaData metaData, String link,
+	public static void openExternalFileAnyFormat(MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
-        
-        if (fileType instanceof UnknownExternalFileType) {
-            openExternalFileUnknown(frame, metaData, link, (UnknownExternalFileType)fileType);
-            return;
-        }
 
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
@@ -718,36 +710,80 @@ public class Util {
 		}
 	}
 
-public static void openExternalFileUnknown(JabRefFrame frame, MetaData metaData, String link,
-                                                 UnknownExternalFileType fileType) throws IOException {
+public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
+                                           String link, UnknownExternalFileType fileType) throws IOException {
 
-    int answer = JOptionPane.showConfirmDialog(frame, Globals.lang("This external link is of the type '%0', which is undefined. Do you want to add th file type?",
+    String[] options = new String[] {Globals.lang("Define '%0'", fileType.getName()),
+            Globals.lang("Change file type"), Globals.lang("Cancel")};
+    String defOption = options[0];
+    int answer = JOptionPane.showOptionDialog(frame, Globals.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
             fileType.getName()),
-            Globals.lang("Undefined file type"), JOptionPane.YES_NO_OPTION);
-    if (answer == JOptionPane.NO_OPTION) {
+            Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, defOption);
+    if (answer == JOptionPane.CANCEL_OPTION) {
         frame.output(Globals.lang("Unable to open file."));
         return;
     }
-    // User wants to define the new file type. Show the dialog:
-    ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "new");
-    ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
-    editor.setVisible(true);
-    if (editor.okPressed()) {
-        // Get the old list of types, add this one, and update the list in prefs:
-        List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
-        ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
-        for (int i = 0; i < oldTypes.length; i++) {
-            fileTypes.add(oldTypes[i]);
+    else if (answer == JOptionPane.YES_OPTION) {
+        // User wants to define the new file type. Show the dialog:
+        ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "new");
+        ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
+        editor.setVisible(true);
+        if (editor.okPressed()) {
+            // Get the old list of types, add this one, and update the list in prefs:
+            List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+            ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+            for (int i = 0; i < oldTypes.length; i++) {
+                fileTypes.add(oldTypes[i]);
+            }
+            fileTypes.add(newType);
+            Collections.sort(fileTypes);
+            Globals.prefs.setExternalFileTypes(fileTypes);
+            // Finally, open the file:
+            openExternalFileAnyFormat(metaData, link, newType);
+        } else {
+            // Cancelled:
+            frame.output(Globals.lang("Unable to open file."));
+            return;
         }
-        fileTypes.add(newType);
-        Collections.sort(fileTypes);
-        Globals.prefs.setExternalFileTypes(fileTypes);
-        // Finally, open the file:
-        openExternalFileAnyFormat(frame, metaData, link, newType);
-    } else {
-        // Cancelled:
-        frame.output(Globals.lang("Unable to open file."));
-        return;
+    }
+    else {
+        // User wants to change the type of this link.
+        // First get a model of all file links for this entry:
+        FileListTableModel tModel = new FileListTableModel();
+        String oldValue = (String)entry.getField(GUIGlobals.FILE_FIELD);
+        tModel.setContent(oldValue);
+        FileListEntry flEntry = null;
+        // Then find which one we are looking at:
+        for (int i=0; i<tModel.getRowCount(); i++) {
+            FileListEntry iEntry = tModel.getEntry(i);
+            if (iEntry.getLink().equals(link)) {
+                flEntry = iEntry;
+                break;
+            }
+        }
+        if (flEntry == null) {
+            // This shouldn't happen, so I'm not sure what to put in here:
+            throw new RuntimeException("Could not find the file list entry "+link+" in "+entry.toString());
+        }
+
+        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry);
+        editor.setVisible(true);
+        if (editor.okPressed()) {
+            // Store the changes and add an undo edit:
+            String newValue = tModel.getStringRepresentation();
+            UndoableFieldChange ce = new UndoableFieldChange(entry, GUIGlobals.FILE_FIELD,
+                    oldValue, newValue);
+            entry.setField(GUIGlobals.FILE_FIELD, newValue);
+            frame.basePanel().undoManager.addEdit(ce);
+            frame.basePanel().markBaseChanged();
+            // Finally, open the link:
+            openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
+        } else {
+            // Cancelled:
+            frame.output(Globals.lang("Unable to open file."));
+            return;
+        }
     }
 }
     /**

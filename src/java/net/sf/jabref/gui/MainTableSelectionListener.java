@@ -242,7 +242,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                             // If there are one or more links, open the first one:
                             if (fileList.getRowCount() > 0) {
                                 FileListEntry entry = fileList.getEntry(0);
-                                Util.openExternalFileAnyFormat(panel.frame(), panel.metaData(), entry.getLink(),
+                                Util.openExternalFileAnyFormat(panel.metaData(), entry.getLink(),
                                         entry.getType());
                             }
                         } else
@@ -302,7 +302,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                 String description = flEntry.getDescription();
                 if ((description == null) || (description.trim().length() == 0))
                     description = flEntry.getLink();
-                menu.add(new ExternalFileMenuItem(panel.frame(), description,
+                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
                         flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
                         flEntry.getType()));
                 count++;
@@ -313,7 +313,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             for (int i=0; i<iconType.length; i++) {
                 Object o = entry.getField(iconType[i]);
                 if (o != null) {
-                    menu.add(new ExternalFileMenuItem(panel.frame(), (String)o, (String)o,
+                    menu.add(new ExternalFileMenuItem(panel.frame(), entry, (String)o, (String)o,
                             GUIGlobals.getTableIcon(iconType[i]).getIcon(),
                             panel.metaData()));
                     count++;

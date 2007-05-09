@@ -1,9 +1,6 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.Util;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.*;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -18,32 +15,35 @@ import java.io.File;
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
+    private BibtexEntry entry;
     final String link;
     final MetaData metaData;
     final ExternalFileType fileType;
     final JabRefFrame frame;
 
-    public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon, MetaData metaData,
+    public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
+                                String link, Icon icon,
+                                MetaData metaData,
                                 ExternalFileType fileType) {
         super(name, icon);
         this.frame = frame;
+        this.entry = entry;
         this.link = link;
         this.metaData = metaData;
         this.fileType = fileType;
         addActionListener(this);
     }
 
-    public ExternalFileMenuItem(JabRefFrame frame, String name, String link, Icon icon, MetaData metaData) {
-        this(frame, name, link, icon, metaData, null);
+    public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
+                                String link, Icon icon, MetaData metaData) {
+        this(frame, entry, name, link, icon, metaData, null);
     }
 
     public void actionPerformed(ActionEvent e) {
         
         try {
-
-            if (this.fileType != null)
-                Util.openExternalFileAnyFormat(frame, metaData, link, fileType);
-            else {
+            ExternalFileType type = fileType;
+            if (this.fileType == null) {
                 // We don't already know the file type, so we try to deduce it from the extension:
                 File file = new File(link);
                 // We try to check the extension for the file:
@@ -52,10 +52,17 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
                     .trim().toLowerCase() : null;
                 // Now we know the extension, check if it is one we know about:
-                ExternalFileType fileType = Globals.prefs.getExternalFileTypeByExt(extension);
-
-                Util.openExternalFileAnyFormat(frame, metaData, link, fileType);
+                type = Globals.prefs.getExternalFileTypeByExt(extension);
             }
+
+            if (type instanceof UnknownExternalFileType)
+                Util.openExternalFileUnknown(frame, entry, metaData, link, 
+                        (UnknownExternalFileType)type);
+            else
+                Util.openExternalFileAnyFormat(metaData, link, type);
+
+
+
         } catch (IOException e1) {
             e1.printStackTrace();
         }
