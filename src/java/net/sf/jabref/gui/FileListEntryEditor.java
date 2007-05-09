@@ -12,10 +12,7 @@ import net.sf.jabref.BrowseAction;
 import net.sf.jabref.external.ExternalFileType;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.io.File;
 
 /**
@@ -39,7 +36,11 @@ public class FileListEntryEditor {
         this.entry = entry;
 
         types = new JComboBox(Globals.prefs.getExternalFileTypeSelection());
-
+        types.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                ok.setEnabled(types.getSelectedItem() != null);
+            }
+        });
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""));
         builder.append(Globals.lang("Link"));

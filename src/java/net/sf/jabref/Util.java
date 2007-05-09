@@ -70,6 +70,9 @@ import javax.swing.undo.CompoundEdit;
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.external.ExternalFileTypeEditor;
+import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.KeywordGroup;
 import net.sf.jabref.imports.CiteSeerFetcher;
@@ -636,10 +639,16 @@ public class Util {
 	 * @param link
 	 *            The file name.
 	 */
-	public static void openExternalFileAnyFormat(MetaData metaData, String link,
+	public static void openExternalFileAnyFormat(JabRefFrame frame, MetaData metaData, String link,
                                                  ExternalFileType fileType) throws IOException {
 
-		// For other platforms we'll try to find the file type:
+        
+        if (fileType instanceof UnknownExternalFileType) {
+            openExternalFileUnknown(frame, metaData, link, (UnknownExternalFileType)fileType);
+            return;
+        }
+
+        // For other platforms we'll try to find the file type:
 		File file = new File(link);
 
 		// We try to check the extension for the file:
@@ -709,7 +718,39 @@ public class Util {
 		}
 	}
 
-	/**
+public static void openExternalFileUnknown(JabRefFrame frame, MetaData metaData, String link,
+                                                 UnknownExternalFileType fileType) throws IOException {
+
+    int answer = JOptionPane.showConfirmDialog(frame, Globals.lang("This external link is of the type '%0', which is undefined. Do you want to add th file type?",
+            fileType.getName()),
+            Globals.lang("Undefined file type"), JOptionPane.YES_NO_OPTION);
+    if (answer == JOptionPane.NO_OPTION) {
+        frame.output(Globals.lang("Unable to open file."));
+        return;
+    }
+    // User wants to define the new file type. Show the dialog:
+    ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "new");
+    ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
+    editor.setVisible(true);
+    if (editor.okPressed()) {
+        // Get the old list of types, add this one, and update the list in prefs:
+        List<ExternalFileType> fileTypes = new ArrayList<ExternalFileType>();
+        ExternalFileType[] oldTypes = Globals.prefs.getExternalFileTypeSelection();
+        for (int i = 0; i < oldTypes.length; i++) {
+            fileTypes.add(oldTypes[i]);
+        }
+        fileTypes.add(newType);
+        Collections.sort(fileTypes);
+        Globals.prefs.setExternalFileTypes(fileTypes);
+        // Finally, open the file:
+        openExternalFileAnyFormat(frame, metaData, link, newType);
+    } else {
+        // Cancelled:
+        frame.output(Globals.lang("Unable to open file."));
+        return;
+    }
+}
+    /**
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
 	 * 
@@ -1628,6 +1669,7 @@ public class Util {
                         FileListEntry flEntry = new FileListEntry(f.getName(), s,
                                 Globals.prefs.getExternalFileTypeByExt(fields[j]));
                         tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                        
                         entry.clearField(fields[j]);
                         ce.addEdit(new UndoableFieldChange(entry, fields[j], o, null));
                     }

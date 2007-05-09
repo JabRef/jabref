@@ -41,6 +41,7 @@ import java.util.List;
 import java.awt.event.*;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.UnknownExternalFileType;
 
 public class JabRefPreferences {
 
@@ -314,6 +315,8 @@ public class JabRefPreferences {
 
         defaults.put("importInspectionDialogWidth", new Integer(650));
         defaults.put("importInspectionDialogHeight", new Integer(650));
+
+        defaults.put("showFileLinksUpgradeWarning", Boolean.TRUE);
 
         //defaults.put("lastAutodetectedImport", "");
 
@@ -883,7 +886,8 @@ public class JabRefPreferences {
             if (type.getName().equals(name))
                 return type;
         }
-        return null;
+        // Return an instance that signifies an unknown file type:
+        return new UnknownExternalFileType(name);
     }
 
     /**

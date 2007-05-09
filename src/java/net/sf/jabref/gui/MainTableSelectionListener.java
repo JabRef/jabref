@@ -14,11 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 15, 2005
- * Time: 3:02:52 AM
- * To change this template use File | Settings | File Templates.
+ * List event, mouse, key and focus listener for the main table that makes up the
+ * most part of the BasePanel for a single bib database.
  */
 public class MainTableSelectionListener implements ListEventListener, MouseListener,
         KeyListener, FocusListener {
@@ -112,8 +109,27 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     }
 
     private void updatePreview(final BibtexEntry toShow, final boolean changedPreview) {
-        if (workingOnPreview)
+        updatePreview(toShow, changedPreview, 0);
+    }
+
+    private void updatePreview(final BibtexEntry toShow, final boolean changedPreview, int repeats) {
+        if (workingOnPreview) {
+            if (repeats > 0)
+                return; // We've already waited once. Give up on this selection.
+            Timer t = new Timer(50, new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    updatePreview(toShow, changedPreview, 1);
+                }
+            });
+            t.setRepeats(false);
+            t.start();
             return;
+        }
+        EventList list = table.getSelected();
+        // Check if the entry to preview is still selected:
+        if ((list.size() != 1) || ((BibtexEntry)list.get(0) != toShow)) {
+            return;
+        }
         final int mode = panel.getMode();
         workingOnPreview = true;
         final Runnable update = new Runnable() {
@@ -163,8 +179,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     }
 
      public void mousePressed(MouseEvent e) {
-
-
+         
         // First find the column on which the user has clicked.
         final int col = table.columnAtPoint(e.getPoint()),
                 row = table.rowAtPoint(e.getPoint());
@@ -227,7 +242,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                             // If there are one or more links, open the first one:
                             if (fileList.getRowCount() > 0) {
                                 FileListEntry entry = fileList.getEntry(0);
-                                Util.openExternalFileAnyFormat(panel.metaData(), entry.getLink(),
+                                Util.openExternalFileAnyFormat(panel.frame(), panel.metaData(), entry.getLink(),
                                         entry.getType());
                             }
                         } else
@@ -287,7 +302,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                 String description = flEntry.getDescription();
                 if ((description == null) || (description.trim().length() == 0))
                     description = flEntry.getLink();
-                menu.add(new ExternalFileMenuItem(description,
+                menu.add(new ExternalFileMenuItem(panel.frame(), description,
                         flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
                         flEntry.getType()));
                 count++;
@@ -298,7 +313,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             for (int i=0; i<iconType.length; i++) {
                 Object o = entry.getField(iconType[i]);
                 if (o != null) {
-                    menu.add(new ExternalFileMenuItem((String)o, (String)o,
+                    menu.add(new ExternalFileMenuItem(panel.frame(), (String)o, (String)o,
                             GUIGlobals.getTableIcon(iconType[i]).getIcon(),
                             panel.metaData()));
                     count++;

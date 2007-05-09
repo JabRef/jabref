@@ -126,11 +126,7 @@ public class FieldContentParser {
      * @return the wrapped String.
      */
     public static String wrap(String in, int wrapAmount){
-        // JZ: due to the formatting/wrapping bug, I temporarily disabled
-        // the below code to prevent JabRef from modifying .bib files in
-        // a way that may require manual correction.
-        //return in;
-
+        
         String[] lines = in.split("\n");
         StringBuffer res = new StringBuffer();
         addWrappedLine(res, lines[0], wrapAmount);

@@ -22,6 +22,8 @@ import java.io.File;
  */
 public class ExternalFileTypeEntryEditor {
 
+    JFrame fParent = null;
+    JDialog dParent = null;
     JDialog diag;
     JTextField extension = new JTextField(),
         name = new JTextField(),
@@ -34,9 +36,18 @@ public class ExternalFileTypeEntryEditor {
     private ExternalFileType entry;
     private boolean okPressed = false;
 
-    public ExternalFileTypeEntryEditor(JDialog parent, ExternalFileType entry) {
-        this.entry = entry;
+    public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
+        fParent = parent;
+        init(entry);
+    }
 
+    public ExternalFileTypeEntryEditor(JDialog parent, ExternalFileType entry) {
+        dParent = parent;
+        init(entry);
+    }
+
+    private void init(ExternalFileType entry) {
+        this.entry = entry;
         icon.setText(null);
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
@@ -53,9 +64,7 @@ public class ExternalFileTypeEntryEditor {
         builder.nextLine();
         builder.append(Globals.lang("Application"));
         builder.append(application);
-        BrowseListener browse = new BrowseListener(parent, application);
         JButton browseBut = new JButton(Globals.lang("Browse"));
-        browseBut.addActionListener(browse);
         builder.append(browseBut);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -77,11 +86,22 @@ public class ExternalFileTypeEntryEditor {
             }
         });
 
-        diag = new JDialog(parent, Globals.lang("Edit file type"), true);
+        if (dParent != null)
+            diag = new JDialog(dParent, Globals.lang("Edit file type"), true);
+        else
+            diag = new JDialog(fParent, Globals.lang("Edit file type"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        Util.placeDialog(diag, parent);
+
+        BrowseListener browse = new BrowseListener(diag, application);
+        browseBut.addActionListener(browse);
+
+        if (dParent != null)
+            diag.setLocationRelativeTo(dParent);
+        else
+            diag.setLocationRelativeTo(fParent);
+        //Util.placeDialog(diag, parent);
 
         setValues(entry);
     }
