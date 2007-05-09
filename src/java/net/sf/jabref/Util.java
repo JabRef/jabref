@@ -713,6 +713,7 @@ public class Util {
 public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry, MetaData metaData,
                                            String link, UnknownExternalFileType fileType) throws IOException {
 
+    String cancelMessage = Globals.lang("Unable to open file.");
     String[] options = new String[] {Globals.lang("Define '%0'", fileType.getName()),
             Globals.lang("Change file type"), Globals.lang("Cancel")};
     String defOption = options[0];
@@ -721,7 +722,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             Globals.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, defOption);
     if (answer == JOptionPane.CANCEL_OPTION) {
-        frame.output(Globals.lang("Unable to open file."));
+        frame.output(cancelMessage);
         return;
     }
     else if (answer == JOptionPane.YES_OPTION) {
@@ -743,7 +744,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             openExternalFileAnyFormat(metaData, link, newType);
         } else {
             // Cancelled:
-            frame.output(Globals.lang("Unable to open file."));
+            frame.output(cancelMessage);
             return;
         }
     }
@@ -781,7 +782,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             openExternalFileAnyFormat(metaData, flEntry.getLink(), flEntry.getType());
         } else {
             // Cancelled:
-            frame.output(Globals.lang("Unable to open file."));
+            frame.output(cancelMessage);
             return;
         }
     }
