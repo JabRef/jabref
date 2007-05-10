@@ -80,13 +80,13 @@
           \csname S@\f@size\endcsname
           \fontsize\sf@size\z@
           \math@fontsfalse\selectfont
-          \color{orange}A\kern-.025emB}%
-  \kern-.06em\-R\hspace{-.08em}%
+          \color{orange}A\kern-.025emB}\-%
+  \hbox{\kern-.06em\-R\hspace{-.08em}%
     \raisebox{.16ex}{$\m@th$% %% force math size calculations
           \csname S@\f@size\endcsname
           \fontsize\sf@size\z@
           \math@fontsfalse\selectfont
-          E\kern-.025emF}%
+          E\kern-.025emF}}%
 }
 
 %%% version number
@@ -347,8 +347,8 @@ Falls zusätzlich ein \texttt{author}-Feld angegeben wird, bezeichnet das \texttt
   \item \emph{institution}\\
     Die fördernde Institutions eines technischen Reports.
   \item \emph{journal}\\
-    Ein Zeitschriftenname.
-Mit Hilfe von ">Strings"< können Zeitschriftennamen abgekürzt werden. Zum Erstellen eines solchen Strings können Sie den \nameref{StringEditorHelp} benutzen oder die Funktionalität zur \nameref{JournalAbbreviations} %Abkürzung von Zeitschriftentiteln 
+    Der Name einer Zeitschrift.
+Mit Hilfe von ">Strings"< können Zeitschriftentitel abgekürzt werden. Zum Erstellen eines solchen Strings können Sie den \nameref{StringEditorHelp} benutzen oder die Funktionalität zur \nameref{JournalAbbreviations} %Abkürzung von Zeitschriftentiteln 
 verwenden.
   \item \emph{key}\\
     Dieses Feld wird zur Sortierung, zur Erstellung von Labels (falls kein \texttt{author} vorhanden ist) und für Querverweise (\texttt{crossref}) verwendet. Verwechseln Sie dieses Feld nicht mit dem \texttt{Bibtexkey}, der für die \texttt{\textbackslash cite}-Kommandos gebraucht wird und am Anfang jedes Eintrags erscheint (im \bibtex{}"=Quelltext).
@@ -705,21 +705,22 @@ Falls die Inhalte nicht akzeptabel sind, wird das Feld mit roter Farbe
 hinterlegt, was auf einen Fehler hindeutet. In diesem Fall werden
 die Änderungen nicht gespeichert.
 
-%
-%\subsection{Integritätsprüfung}
-%
-%\begin{quote}
-%\emph{Erreichbar über das Menü \menu{Extras}} \msep{} \emph{\menu{Überprüfung der Integrität}.}
-%\end{quote}
-%Mit dieser Funktion überprüft \jabref{} alle Einträge auf deren Gültigkeit
-%und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
-%kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
-%(Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
-%entsprechenden \bibtex{}-Key erstellt. Wenn Sie einen Hinweis auswählen,
-%erscheint der Inhalt des Feldes, das beanstandet wird. Sie können
-%nun den Feldinhalt verändern und die Veränderungen mit Klick auf die
-%Schaltfläche \menu{Übernehmen} speichern.
-%
+
+\subsection{Integritätsprüfung}
+
+\begin{quote}
+\emph{Erreichbar über das Menü \menu{Extras \msep{} Datenbank durchsuchen
+\msep{} Überprüfung der Integrität}.}
+\end{quote}
+Mit dieser Funktion überprüft \jabref{} alle Einträge auf deren Gültigkeit
+und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
+kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
+(Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
+entsprechenden \bibtex{}-Key erstellt. Wenn Sie einen Hinweis auswählen,
+erscheint der Inhalt des Feldes, das beanstandet wird. Sie können
+nun den Feldinhalt verändern und die Veränderungen mit Klick auf die
+Schaltfläche \menu{Übernehmen} speichern.
+
 
 \subsection{\bibtex{}-Keys}
 
@@ -949,7 +950,7 @@ anderen Gruppen sollten nun markiert sein.
 
 \subsubsection{Arten von Gruppen}
 
-In \jabrefversion{} gibt es vier verschiedene Arten von Gruppen:
+In \jabref{} gibt es vier verschiedene Arten von Gruppen:
 
 \begin{enumerate}
 \item Die Gruppe \emph{Alle Einträge}, die~-- wie der Name vermuten lässt~--
@@ -1063,7 +1064,7 @@ Standardmäßig ist eine Gruppe \emph{unabhängig} von ihrer Position
 im Gruppenbaum. Ist eine Gruppe ausgewählt, wird nur der Inhalt dieser
 Gruppe angezeigt. Es ist jedoch~-- besonders beim Verwenden dynamischer
 Gruppen~-- oft nützlich, eine Untergruppe zu erstellen, die \emph{ihre
-Obergruppe verfeinert}. Wenn diese Untergruppe ausgewählt wird, werden alle Einträge dieser
+Obergruppe einbezieht}. Wenn diese Untergruppe ausgewählt wird, werden alle Einträge dieser
 Gruppe und ihrer Obergruppe angezeigt. Erstellen Sie z.\,B. eine
 Obergrupe, die Einträge mit dem Stichwort \emph{Verteilung} enthält,
 sowie eine einbeziehende Untergruppe mit Einträgen, die das Stichwort
@@ -1071,14 +1072,13 @@ sowie eine einbeziehende Untergruppe mit Einträgen, die das Stichwort
 alle Einträge angezeigt, die beiden Bedingungen entsprechen, also
 alle, die mit Gauß'scher Verteilung zu tun haben. Indem Sie nun eine
 weitere Untergruppe für \emph{Laplace} anlegen, die dieselbe Obergruppe
-verfeinert, können Sie die Gruppierung einfach erweitern. Im Gruppenbaum
+einbezieht, können Sie die Gruppierung einfach erweitern. Im Gruppenbaum
 haben solche Gruppen, die ihre Obergruppen einbeziehen, ein spezielles
 Icon. (Dieses Verhalten kann in den Einstellungen abgestellt werden.)
 
 Das logische Gegenstück zu einer solchen einbeziehenden Untergruppe
-ist eine Gruppe, die \emph{ihre Untergruppen berücksichtigt}.%
-\footnote{Im Englischen \emph{including (super-)groups}.%
-} Wird sie ausgewählt, werden nicht nur die Einträge dieser Gruppe,
+ist eine Gruppe, die \emph{ihre Untergruppen berücksichtigt}.
+Wird sie ausgewählt, werden nicht nur die Einträge dieser Gruppe,
 sondern auch diejenigen aller Untergruppen angezeigt. Im Gruppenbaum
 hat auch diese Art von Gruppen ein spezielles Icon. (Dieses Verhalten
 kann in den Einstellungen abgestellt werden.)
@@ -1140,7 +1140,7 @@ wenn Ihre Datei geeignete Stichworte für alle Einträge enthält. Mit
 dem automatischen Erstellen von Gruppen basierend auf dem Feld \emph{keywords}
 können Sie also ohne großen Aufwand ein Grundgerüst von Gruppen anlegen.
 
-Sie können auch Buchstaben angeben, die ignoriert werden sollen, z.\,B.
+Sie können auch Zeichen angeben, die ignoriert werden sollen, z.\,B.
 Kommas, die zwischen einzelnen Stichworten stehen. Diese werden als
 Worttrenner behandelt und nicht als Teile des Wortes selbst. Dieser
 Schritt ist wichtig, damit kombinierte Stichworte wie etwa \emph{Gauß'sche
@@ -1218,7 +1218,7 @@ wobei der Name des Strings immer von einem Paar \texttt{\#}-Zeichen
 eingeschlossen werden muss. Diese Syntax gilt nur für \jabref{} und
 weicht ein wenig von der \bibtex{}-Syntax ab, die erzeugt wird, wenn
 Sie Ihre Datei speichern. Strings können für alle Standard-\bibtex{}-Felder verwendet werden.
-Unter \menu{Optionen \msep{} Einstellungen \msep{} Allgemein} können Sie im Bereich \menu{Datei} festlegen, ob Strings auch in Nicht-Standard-Feldern benutzt werden dürfen. In diesem Fall können Sie Felder bestimmen, die von der Auflösung der Strings ausgenommen werden; hierbei wird empfohlen, das Feld \texttt{url} und andere Felder anzugeben, die das Zeichen \texttt{\#} enthalten können und die von \bibtex\slash\LaTeX{} abgearbeitet werden können.
+Unter \menu{Optionen \msep{} Einstellungen \msep{} Allgemein} können Sie im Bereich \menu{Datei} festlegen, ob Strings auch in Nicht-Standard-Feldern benutzt werden dürfen. In diesem Fall können Sie Felder bestimmen, die von der Auflösung der Strings ausgenommen werden; hierbei wird empfohlen, das Feld \texttt{url} und andere Felder anzugeben, die das Zeichen \texttt{\#} enthalten können und die von \bibtex\slash\LaTeX{} verarbeitet werden können.
 
 In derselben Weise kann man auch im Inhalt eines Strings auf einen
 anderen String verweisen, vorausgesetzt, dass der String, auf den
@@ -1246,10 +1246,10 @@ Die Abkürzung von Zeitschriftentiteln können Sie vom Eintragseditor oder vom Men
     \item \caps{ISO}-Abkürzung, z.\,B. ">Aquacult. Eng."<
     \item \caps{MEDLINE}-Abkürzung, z.\,B. ">Aquacult Eng"<
 \end{itemize}
-Falls der Zeitschriftenname sich nicht in Ihren Zeitschriftenlisten findet, wird das Feld nicht verändert.
+Falls der Zeitschriftentitel sich nicht in Ihren Zeitschriftenlisten findet, wird das Feld nicht verändert.
 
-Um die Zeitschriftennamen mehrerer Einträge auf einmal zu konvertieren, können Sie eine beliebige Anzahl von Einträgen auswählen und im Menü \menu{Extras} einen der Einträge \menu{Zeitschriftennamen abkürzen (ISO)}, \menu{Zeitschriftennamen abkürzen (MEDLINE)} und \menu{Abkürzung der Zeitschriften aufheben} wählen.
-Diese drei Aktionen sorgen dafür, dass bei allen ausgewählten Einträgen die Zeitschriftennamen, die in den Zeitschriftenlisten gefunden werden konnten, abgekürzt oder komplett ausgeschrieben werden.
+Um die Zeitschriftentitel mehrerer Einträge auf einmal zu konvertieren, können Sie eine beliebige Anzahl von Einträgen auswählen und im Menü \menu{Extras} einen der Einträge \menu{Zeitschriftentitel abkürzen (ISO)}, \menu{Zeitschriftentitel abkürzen (MEDLINE)} und \menu{Abkürzung der Zeitschriften aufheben} wählen.
+Diese drei Aktionen sorgen dafür, dass bei allen ausgewählten Einträgen die Zeitschriftentitel, die in den Zeitschriftenlisten gefunden werden konnten, abgekürzt oder komplett ausgeschrieben werden.
 
 \subsubsection{Zeitschriftenlisten verwalten}
 
@@ -1257,24 +1257,24 @@ Sie können mehrere Zeitschriftenlisten als externe Textdateien benutzen, die mit
 
 \paragraph{Ihre persönliche Zeitschriften-Abkürzungsliste}
 
-Ihre persönliche Liste verwalten Sie im oberen Teil des \menu{Abkürzung der Zeitschriftennamen}-Dialogs.
+Ihre persönliche Liste verwalten Sie im oberen Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel}.
 Wählen Sie \menu{Neue Datei} und geben einen Dateinamen ein oder klicken auf den \menu{Durchsuchen}-Button. Wenn Sie bereits eine Datei haben, die Sie als Grundlage nehmen wollen, wählen Sie stattdessen \menu{Bestehende Datei} und benutzen den \menu{Durchsuchen}-Button zum Auswählen dieser Datei. Die Tabelle zeigt dann den Inhalt der Liste, die Sie ausgewählt haben.
 
-Sie können mit Hilfe der \menu{+} und \menu{--} Buttons an der rechten Seite Einträge hinzufügen oder entfernen. Für jeden Eintrag müssen Sie den vollständigen Zeitschriftennamen und die ISO-Abkürzung angeben (z.\,B. ">Aquacultural Engineering"< und ">Aquacult. Eng."<). Mit einem Doppelklick auf die Tabellenzeile können Sie die Einträge bearbeiten.
+Sie können mit Hilfe der \menu{+} und \menu{--} Buttons an der rechten Seite Einträge hinzufügen oder entfernen. Für jeden Eintrag müssen Sie den vollständigen Zeitschriftentitel und die ISO-Abkürzung angeben (z.\,B. ">Aquacultural Engineering"< und ">Aquacult. Eng."<). Mit einem Doppelklick auf die Tabellenzeile können Sie die Einträge bearbeiten.
 
 Sobald Sie auf \menu{OK} klicken (oder wenn Sie eine bestehende Datei ausgewält haben), enthält die Tabelle mindestens eine Zeile. Der Tabelleninhalt wird in die ausgewählte Datei geschrieben und die Zeitschriftenliste von \jabref{} wird aktualisiert.
 
 \paragraph{Externe Zeitschriftenlisten}
 
-Zusätzlich zu Ihrer persönlichen Liste können Sie mehrere externe Listen verlinken. Diese Verknüpfungen werden im unteren Teil des \menu{Abkürzung der Zeitschriftennamen}-Dialogs verwaltet. Externe Listen sind den persönlichen Listen ähnlich~-- der einzige Unterschied ist, dass Sie nicht mit \jabref{} selbst verwaltet werden können.
+Zusätzlich zu Ihrer persönlichen Liste können Sie mehrere externe Listen verlinken. Diese Verknüpfungen werden im unteren Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel} verwaltet. Externe Listen sind den persönlichen Listen ähnlich~-- der einzige Unterschied ist, dass Sie nicht mit \jabref{} selbst verwaltet werden können.
 
 Um eine externe Liste hinzuzufügen, klicken Sie zunächst auf den \menu{+} Knopf, falls nötig (das fügt eine weitere Zeile hinzu). Dann benutzen Sie entweder den \menu{Durchsuchen}- oder den \menu{Herunterladen}-Button.
     \begin{itemize}
     \item Mit dem \menu{Durchsuchen}-Knopf können Sie eine auf Ihrem Computer bestehende Datei auswählen.
-    \item Mit dem \menu{Herunterladen}-Knopf können Sie eine Liste aus dem Internet herunterladen, indem Sie eine \caps{URL} angeben. Die Datei wird auf Ihrem Computer gespeichert und mit \jabref{} verlinkt.
-    Die \caps{URL} ist standardmäßig die Adresse einer Zeitschriftenliste auf der \jabref{}-Homepage. Diese Liste ist unvollständig, wird in Zukunft aber ausgebaut.
+    \item Mit dem \menu{Herunterladen}-Knopf können Sie eine Liste aus dem Internet herunterladen, indem Sie einen URL angeben. Die Datei wird auf Ihrem Computer gespeichert und mit \jabref{} verlinkt.
+    Der URL ist standardmäßig die Adresse einer Zeitschriftenliste auf der \jabref{}-Homepage. Diese Liste ist unvollständig, wird in Zukunft aber ausgebaut.
     \end{itemize}
-Jeder Eintrag in Ihrer persönlichen Liste überschreibt einen Eintrag mit demselben vollständigen Zeitschriftennamen in einer Ihrer externen Listen. In ähnlicher Weise werden die externen Listen in der Reihenfolge, wie sie aufgelistet werden, abgearbeitet.
+Jeder Eintrag in Ihrer persönlichen Liste überschreibt einen Eintrag mit demselben vollständigen Zeitschriftentitel in einer Ihrer externen Listen. In ähnlicher Weise werden die externen Listen in der Reihenfolge, wie sie aufgelistet werden, abgearbeitet.
 
 \subsection{Wortauswahl verwalten}
 
@@ -1298,8 +1298,7 @@ Um ein neues Wort hinzuzufügen, schreiben Sie es einfach in das Auswahlfeld
 \menu{Verwalten} können Sie hinzugefügte Wörter auch wieder löschen.
 
 
-\subsection{Import und Export}
-
+\subsection{Import}
 
 \subsubsection{Import-Kontrollfenster}
 
@@ -1316,16 +1315,26 @@ Einträgen zu Gruppen. Wenn Sie in eine bestehende Datei importieren,
 ist es oftmals leichter, diese Arbeiten durchzuführen, bevor die neuen
 Einträge zwischen die bereits bestehenden sortiert wurden.
 
+\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}\label{subsubsec:endnote-jabref}
 
-\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}\label{subsubsec:jabref-endnote}
+EndNote hat einen Export-Stil \bibtex{}, der allerdings nicht alle
+Eintragstypen und Felder von \bibtex{} und auch nicht die zusätzlich
+von \jabref{} genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
+\emph{key} usw.) unterstützt. Falls Sie diese Felder nutzen wollen,
+verwenden Sie die EndNote Extras (\menu{Extras \msep{} EndNote Filter-Set entpacken}), extrahieren die Zip-Datei,
+die dabei erstellt wird und folgen den Anweisungen in der Datei \texttt{readme.txt}.
+
+\subsection{Export}
+\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}
+\label{EndnoteFilters}
 
 \begin{quote}
-\label{EndnoteFilters}\emph{\jabref{} kann Dateien so exportieren,
+\emph{\jabref{} kann Dateien so exportieren,
 dass EndNote sie lesen kann. Um diese Funktion zu nutzen, wählen Sie
-\menu{Datei}} \msep{} \emph{\menu{Exportieren}} \msep{} \emph{\menu{Endnote}
-und wählen dann den Namen der Export-Datei.}
+\menu{Datei \msep{} Exportieren}, dann bei \emph{Dateityp} \menu{Endnote} und
+geben den Namen der Export"=Datei an.}
 \end{quote}
-Der Standard-EndNote-Importfilter kann nicht richtig mit mehreren
+Der Standard"=Importfilter von EndNote kann nicht richtig mit mehreren
 Autoren oder Editoren umgehen. Es gibt zwei Möglichkeiten, um diese
 Schwierigkeit zu umgehen:
 
@@ -1340,9 +1349,9 @@ wählen die aus \jabref{} exportierte Datei aus und drücken auf \menu{Auswählen}.
 Anschließend drücken Sie auf \menu{Import Optionen} und wählen \menu{EndNote Import}.
 Mit einem Klick auf \menu{Importieren} starten Sie den Importvorgang.
 Anschließend gehen Sie zum Menüpunkt \menu{Bearbeiten} \msep{} \menu{Text ändern}
-und ändern \emph{Any Field} in \emph{Author}. Geben Sie >>~and~<<
-in das Suchfeld ein (ohne Anführungszeichen) sowie ein RETURN-Zeichen
-in das Feld Ändern (Option-Return unter Mac OS X, STRG-Return unter
+und ändern \emph{Any Field} in \emph{Author}. Geben Sie \lstinline{_and_}
+in das Suchfeld ein (die Unterstriche stehen für Leerzeichen) sowie ein RETURN-Zeichen
+in das Feld \emph{Ändern} (Option-Return unter Mac OS X, STRG-Return unter
 Windows XP). Dann klicken Sie auf \menu{Ändern}. Wiederholen Sie
 das Ganze für das Feld \emph{Secondary Author} (Zweiter Autor).
 
@@ -1397,7 +1406,6 @@ durch ein angehängtes Komma. Dadurch werden Einträge, die \LaTeX{}-Befehle
 mit Klammern enthalten, als Eintrag mit mehreren Autoren gewertet
 und demzufolge unpassend formatiert.
 
-
 \subsubsection{Erweiterte Benutzung: EndNote Extras}
 
 \label{EndNote_erweitert}Einige Felder, die von \bibtex{} genutzt
@@ -1407,7 +1415,7 @@ der Referenztypen funktioniert, werden die Feldnamen in EndNote nicht
 korrekt dargestellt (z.\,B. wird das PDF-Feld \emph{Custom 1} heißen
 statt \emph{pdf}). Darüber hinaus können diese Felder bei neuen Einträgen
 in EndNote nicht genutzt werden, weil sie nicht im Eintragsdialog
-erscheinen. Der vorgegebene EndNote-Importfilter kann darüberhinaus
+erscheinen. Der vorgegebene Importfilter von EndNote kann darüberhinaus
 das Feld \emph{author} nicht richtig analysieren. Der \emph{EndNote
 Import from JabRef Filter} kann dies. Außerdem erkennt dieser Filter
 ein Feld \texttt{endnotereftype}, das die vorgegebene Zuordnung überschreibt.
@@ -1415,17 +1423,6 @@ Um den Filter zu installieren, nutzen Sie die EndNote Extras
 (\menu{Extras \msep{} EndNote Filter-Set entpacken})
 und entpacken die Zip-Datei, die dabei erstellt wird. Dann folgen
 Sie den Angaben in der Datei \texttt{readme.txt}.
-
-
-\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}\label{subsubsec:endnote-jabref}
-
-EndNote hat einen Export-Stil \bibtex{}, der allerdings nicht alle
-Eintragstypen und Felder von \bibtex{} und auch nicht die zusätzlich
-von \jabref{} genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
-\emph{key} usw.) unterstützt. Falls Sie diese Felder nutzen wollen,
-verwenden Sie die EndNote Extras (\menu{Extras \msep{} EndNote Filter-Set entpacken}), extrahieren die Zip-Datei,
-die dabei erstellt wird und folgen den Anweisungen in der Datei \texttt{readme.txt}.
-
 
 \subsubsection[JabRef-Bibliographien in OpenOffice.org benutzen]{\jabref{}-Bibliographien in OpenOffice.org benutzen}
 
@@ -1474,14 +1471,14 @@ oder die Tastenkombination STRG-SHIFT-N wählen.}
 \end{quote}
 Dieser Dialog ermöglicht das schnelle Einfügen von Einträgen aus normalem
 Text. Wählen Sie zunächst aus, welcher Eintragstyp erstellt werden
-soll. Fügen Sie dann einfach Text aus der Zwischenablage ein (mit
-dem Kontextmenü im Textfeld mit der Wasserzeichenschrift >>Text einfügen<<
-oder über den Button \menu{Einfügen}) oder wählen über den Button
-\menu{Datei öffnen} eine Datei aus, die Sie in den Dialog laden wollen.
+soll. Fügen Sie dann einfach Text aus der Zwischenablage ein (über das
+Kontextmenü im Textfeld mit der Wasserzeichenschrift >>Text einfügen<<
+oder über den Button \menu{Einfügen}). Alternativ können Sie über den Button
+\menu{Datei öffnen} eine Datei auswählen, um sie in den Dialog zu laden.
 
 Jetzt markieren Sie z.\,B. den Textbereich, der zum Titel des neuen
-Eintrags werden soll, und machen im rechten Teil des Dialogfensters
-im Bereich >>verfügbare BibTeX Felder<< einen Doppelklick auf \emph{title}.
+Eintrags werden soll, und führen im rechten Teil des Dialogfensters
+im Bereich \menu{Verfügbare BibTeX"=Felder} einen Doppelklick auf \emph{title} aus.
 So gehen Sie für alle weiteren Felder des neuen Eintrags vor. Sie
 können einem Feld natürlich auch mehrere Textbereiche zuordnen. Achten
 Sie dazu darauf, dass die Option \menu{anfügen} aktiviert ist, ansonsten
@@ -1504,13 +1501,12 @@ klicken Sie auf die Schaltfläche \menu{Übernehmen}. Nun erstellt
 \jabref{} den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
 hat.
 
-
 \subsection{Links zu externen Dateien}
 
 \label{ExternalFiles}Mit \jabref{} können Sie Ihre Einträge mit
 den entsprechenden PDF- oder PS-Dateien, die sich auf Ihrem Computer
 befinden, verlinken. Ebenso ist es möglich, Dateien im Internet über
-ein URL oder DOI zu verlinken.
+einen URL oder DOI zu verlinken.
 
 
 \subsubsection{Externe Betrachter einrichten}
@@ -1531,7 +1527,7 @@ Sie den Unterpunkt \menu{Externe Programme} im Dialog \menu{Optionen}}
 
 Es gibt verschiedene Möglichkeiten, wie man externe Dateien oder Internetseiten
 aus \jabref{} öffnen kann. Im Eintrags-Editor können Sie einfach
-auf das Textfeld, das ein DOI oder URL enthält, doppelklicken. In
+auf das Textfeld, das einen DOI oder URL enthält, doppelklicken. In
 der Tabellenansicht können Sie einen Eintrag auswählen und die Menüeinträge
 (unter \menu{Extras}), die Tastenkombinationen (in der Standardeinstellung
 F4 für PDF/PS und F3 für DOI/URL) oder das Kontextmenü (mit der rechten
@@ -1562,8 +1558,8 @@ oder mit mehreren Benutzern von verschiedenen Netzwerkarbeitsplätzen
 aus an derselben Datei arbeiten können.
 
 Wenn Sie Ihren PDF-Dateien dann noch Namen geben, die mit dem \bibtex{}-Key
-des entsprechenden Eintrags übereinstimmen (plus \texttt{.pdf} im
-Dateinamen), sucht \jabref{} in Ihrem Standard-PDF-Ordner und dessen
+des entsprechenden Eintrags übereinstimmen (abgesehen von der Dateiendung \texttt{.pdf}), 
+sucht \jabref{} in Ihrem Standard-PDF-Ordner und dessen
 Unterordnern nach der richtigen PDF-Datei. Sobald die korrekt benannte
 PDF-Datei sich dort befindet, klicken Sie auf die Schaltfläche \menu{Auto}
 neben dem PDF-Feld im Eintrags-Editor. Wenn die PDF-Datei gefunden
@@ -1576,7 +1572,7 @@ nicht angezeigt wird, solange das PDF-Feld leer bleibt.
 
 \subsubsection{Dateispezifische PDF- und PS-Verzeichnisse}
 
-Sie können für jede Datei eigene PDF- und PS-Verzeichnisse angeben (\menu{Datei \msep{} Eigenschaften der Datei}). Diese Verzeichnisse ersetzen dann die Standardverzeichnisse.
+Sie können für jede Datei eigene PDF- und PS-Verzeichnisse angeben \emph{(}\menu{Datei \msep{} Eigenschaften der Datei}\emph{)}. Diese Verzeichnisse ersetzen dann die Standardverzeichnisse.
 
 \subsubsection{Die Suche mit regulären Ausdrücken für automatische Verknüpfungen nutzen}
 \label{RegularExpressionSearch}
@@ -1585,14 +1581,15 @@ Wenn Sie Dateinamen verwenden, die dem bibtexkey ergänzt um die Dateiendung ents
 
 Ab Version~2.2 ist mit Hilfe von regulären Ausdrücken eine größere Flexibilität beim Benennen der Dateien gewährleistet. In den meisten Fällen dürfte das Standardverhalten bereits ausreichend sein.
 
-In den Einstellungen zu externen Programmen (\menu{Optionen \msep{} Einstellungen \msep{} Externe Programme}) findet sich eine Option ">Suche mit regulärem Ausdruck benutzen"<. Wenn Sie diese Option aktivieren, können Sie für die Suche in PDF-Verzeichnissen einen eigenen regulären Ausdruck angeben.
+In den Einstellungen zu externen Programmen \emph{(}\menu{Optionen \msep{} Einstellungen \msep{} Externe Programme}\emph{)} findet sich eine Option ">Suche mit regulärem Ausdruck benutzen"<. Wenn Sie diese Option aktivieren, können Sie für die Suche in PDF-Verzeichnissen einen eigenen regulären Ausdruck angeben.
 
 Die folgende Syntax wird verwendet:
 
 \begin{labeling}{MextensionM}
   \item [\texttt{*}] Suche in allen direkten Unterverzeichnissen, NICHT im aktuellen Verzeichnis und in Unterverzeichnissen zweiter oder tieferer Ebene.
   \item [\texttt{**}] Rekursive Suche in allen Unterverzeichnissen UND im aktuellen Verzeichnis.
-  \item [\texttt{.} und  \texttt{..}] Das aktuelle Verzeichnis und das Elternverzeichnis (eine Ebene höher).
+  \item [\texttt{.}] Das aktuelle Verzeichnis.
+  \item [\texttt{..}] Das Elternverzeichnis (eine Ebene höher).
   \item [\texttt{{[}title{]}}] Alle Ausdrücke in eckigen Klammern werden durch den Inhalt des entsprechenden Felds ersetzt.
   \item [\texttt{{[}extension{]}}] Wird durch die Dateiendung des Feldes, das Sie benutzen, ersetzt.
   \item Anderer Text wird als regulärer Ausdruck interpretiert. Aber Vorsicht: \emph{backslashes} müssen mit einem weiteren \emph{backslash} \emph{escaped} werden (\texttt{\textbackslash\textbackslash}), damit sie nicht mit Separatoren in Pfad-Angaben verwechselt werden.
@@ -1612,7 +1609,7 @@ Um die XMP-Funktionen in \jabref{} zu nutzen, gehen Sie folgendermaßen vor:
 
 \begin{itemize}
   \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref{} ziehen.
-  \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors.
+  \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors (neben dem \emph{pdf}"=Feld).
   \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
   \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
   \item Wer kein Adobe Acrobat zur Verfügung hat, kann stattdessen das Programm ">pdfinfo"<\footnote{Dieses Programm ist Teil von \href{http://www.foolabs.com/xpdf/}{Xpdf} und \href{http://poppler.freedesktop.org/}{Poppler}.} verwenden, um die XMP-Metadaten zu überprüfen. Rufen Sie dazu auf der Kommandozeile einfach \lstinline{pdfinfo -meta <PDF-Datei>} auf, dann werden die entsprechenden Metadaten angezeigt.
@@ -1711,10 +1708,6 @@ CiteSeer-Felder herunterladen, indem Sie \menu{BibTeX} \msep{} \menu{Felder von 
 auswählen. Achten Sie darauf, dass Sie die Zeile(n) ausgewählt haben,
 die Sie aktualisieren wollen.
 
-Mit einem Set von Literaturangaben können Sie eine Liste von Dokumenten generieren, die die Elemente dieses Sets zitieren. Dazu muss jede Literaturangabe in einer Datei ein \emph{citeseerurl}-Feld mit dem eben beschriebenen Format haben.%
-%\footnote{Hinweis des Übersetzers (DW): Offen gesagt habe ich diesen Absatz nicht wirklich verstanden, was daran liegen mag, dass ich CiteSeer nicht kenne und deshalb auch die Funktionsweise nicht nachvollziehen kann. Für Hinweise, Erklärungen oder eine bessere Übersetzung wäre ich deshalb dankbar.%
-%}
-
 \paragraph{Eine Datei mit zitierenden Literaturangaben erzeugen}
 
 Mit einem Satz von Literaturangaben können Sie eine Liste der Dokumente
@@ -1728,7 +1721,7 @@ Sie \menu{Zitierende Literatur von CiteSeer abrufen} auswählen.
 
 \begin{quote}
 \label{MedlineHelp}\caps{MEDLINE} ist die wichtigste Datenbank der \emph{U.\,S. National Library of Medicine}. Sie enthält Literaturangaben von Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der Biomedizin.
-\jabref{} kann Literaturangaben von der Medline-Datenbank
+\jabref{} kann Literaturangaben der Medline"=Datenbank
 herunterladen. Um diese Funktion zu nutzen, wählen Sie \menu{Extras}
 \msep{} \menu{Medline abrufen}, so dass der Medline-Dialog im linken
 Seitenfeld erscheint.
@@ -1755,7 +1748,7 @@ Datei zugeordnet.
 \label{IEEEXploreHelp}
 
 \begin{quote} 
-\emph{IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.}
+IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.
 \end{quote}
 \jabref{} kann Literaturangaben der IEEEXplore-Datenbank herunterladen.
 Um diese Funktion zu nutzen, wählen Sie \menu{Internet \msep{} IEEEXplore abfragen}
@@ -1794,7 +1787,7 @@ und \emph{timestamp}.
 
 \begin{quote}
 \label{TimeStampHelp}\emph{Die Benutzung des Zeitstempels kann unter
-\menu{Einstellungen}} \msep{} \emph{\menu{Allgemeines} an- und
+\menu{Einstellungen}} \msep{} \emph{\menu{Allgemein} an- und
 abgestellt sowie verändert werden.}
 \end{quote}
 \jabref{} kann automatisch das Feld \emph{timestamp} setzen, das
@@ -1815,13 +1808,11 @@ beziehen sich auf Mittwoch, den 14. September 2005, 17:45 Uhr):
 Diese Bezeichner können mit Interpunktion und Leerzeichen kombiniert
 werden. Hier einige Beispiele:
 
-\begin{quote}
-\texttt{yyyy.MM.dd} $\to$ 2005.09.14
-
-\texttt{yy-MM-dd} $\to$ 05-09-14
-
-\texttt{yyyy.MM.dd~HH:mm} $\to$ 2005.09.14 17:45
-\end{quote}
+\begin{labeling}{dd.MM.yyyy-HH:m}
+\item [\texttt{yyyy.MM.dd}]$\to$ 2005.09.14
+\item [\texttt{yy-MM-dd}]$\to$ 05-09-14
+\item [\texttt{dd.MM.yyyy~HH:mm}]$\to$ 14.09.2005 17:45
+\end{labeling}
 
 \subsubsection{Besitzer \emph{(owner)}}
 
@@ -1879,7 +1870,6 @@ Diese Option unterdrückt sowohl das \jabref{}-Fenster als auch den
 Eröffnungsbildschirm, der normalerweise beim Programmstart angezeigt
 wird. Das Programm wird beendet, sobald die Kommandozeilen-Optionen
 abgearbeitet wurden.
-
 Diese Option ist nützlich, um Dateikonvertierungen von der Kommandozeile
 oder mit Hilfe eines Scripts durchzuführen.
 
@@ -1962,7 +1952,7 @@ ist, auch nicht in die neue Datei geschrieben werden kann.
 \subsubsection{Externer Zugriff}
 \label{RemoteHelp}
 \begin{quote}
-\emph{Diese Funktion kann unter \menu{Einstellungen \msep{} Erweitert} eingestellt werden.}
+\emph{Diese Funktion kann unter \menu{Optionen \msep{} Einstellungen \msep{} Erweitert} verwaltet werden.}
 \end{quote}
 
 \tip[]{Beachten Sie, dass das Aktivieren dieser Funktion mit Windows XP SP2 (und möglicherweise auch mit anderen Konfigurationen) zu einer Meldung führen kann, die besagt, dass bestimmte Funktionen des Programms von der Windows-Firewall geblockt wurden. Sie können die Firewall anweisen, weiterhin zu blocken, denn die Firewall beeinträchtigt den Externen Zugriff von \jabref{} nicht.}
@@ -2075,7 +2065,7 @@ enthält, sowie einen zweiten Tab namens >>Zusammenfassung<< mit
 den Feldern \emph{abstract} und \emph{annote}.
 
 
-\subsection{Automatische Erstellung von \bibtex{}-Keys}
+\subsection{Automatische Erstellung von \bibtex{}"=Keys}
 \label{LabelPatterns}
 \begin{quote}
 Im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
@@ -2800,6 +2790,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
+\item Abschnitt ">Import und Export"< in zwei Abschnitte unterteilt
 \item Versionsnummer angepasst
 \item Beschreibung der Felder ">doi"< und ">eid"< ergänzt
 \item Fehler im Link zum Mail-Archiv beseitigt
@@ -2808,7 +2799,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \end{revhist}
 
 \begin{revhist}{18.\,4.\,2007}
-\item Abschnitte \nameref{StringEditorHelp}, \nameref{par:Feldformatierer} und \nameref{LabelPatterns} aktualisiert
+\item Abschnitte \nameref{LabelPatterns}, \nameref{par:Feldformatierer} und \nameref{StringEditorHelp} aktualisiert
 \item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
 \item \jabref{}-Logo geändert
 \item Ein paar Kleinigkeiten
@@ -2820,7 +2811,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \end{revhist}
 
 \begin{revhist}{1.\,2.\,2007}
-\item Abschnitte \nameref{subsubsec:jabref-endnote}, \nameref{subsubsec:endnote-jabref}, \nameref{subsec:about} und \nameref{sec:faq} überarbeitet
+\item Abschnitte \nameref{EndnoteFilters}, \nameref{subsubsec:endnote-jabref}, \nameref{subsec:about} und \nameref{sec:faq} überarbeitet
 \item Literaturverzeichnis um Eintrag von \cite{btxfaq} ergänzt
 \item Und noch ein paar kleine Änderungen
 \end{revhist}
