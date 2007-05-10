@@ -247,11 +247,7 @@ public class JabRefFrame extends JFrame {
                                         Globals.lang("Autogenerate BibTeX keys"),
                                         prefs.getKey("Autogenerate BibTeX keys")),
 
-      lyxPushAction = new PushToApplicationAction(ths, new PushToLyx()),
 
-      winEdtPushAction = new PushToApplicationAction(ths, new PushToWinEdt()),
-      latexEditorPushAction = new PushToApplicationAction(ths, new PushToLatexEditor()),
-      
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
@@ -289,8 +285,8 @@ public class JabRefFrame extends JFrame {
             Globals.prefs.getKey("Unabbreviate")),
     manageJournals = new ManageJournalsAction(this),
     databaseProperties = new DatabasePropertiesAction(),
-    emacsPushAction = new PushToApplicationAction(ths, new PushToEmacs()),
-
+    upgradeExternalLinks = new GeneralAction("upgradeLinks", "Upgrade external links",
+            Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD)),
       errorConsole = Globals.errorConsole.getAction(this),
     test = new GeneralAction("test", "Test");
 
@@ -1108,7 +1104,8 @@ public JabRefPreferences prefs() {
       checkAndFix.add(autoSetPdf);
       checkAndFix.add(autoSetPs);
       checkAndFix.add(integrityCheckAction);
-
+      checkAndFix.addSeparator();
+      checkAndFix.add(upgradeExternalLinks);
 
       tools.addSeparator();
       tools.add(manageSelectors);
@@ -1378,7 +1375,7 @@ public JabRefPreferences prefs() {
             mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
             redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
             selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
-            makeKeyAction, emacsPushAction, lyxPushAction, winEdtPushAction, normalSearch,
+            makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
             openFile, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
