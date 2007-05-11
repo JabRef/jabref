@@ -8,6 +8,8 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Implement Auto feature for new external links
+* Implement Download feature for new external links
 * [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
 * [SOLVED?] Medline import filter: import institution?
