@@ -8,16 +8,14 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Fix handling of unknown type links when left-clicking table icon.
 * Implement Auto feature for new external links
 * Implement Download feature for new external links
 * [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
-* [SOLVED?] Medline import filter: import institution?
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?
 * Fix Save/Export file dialog stuff
-* Add menu option for upgrading external links.
+
 
 
 

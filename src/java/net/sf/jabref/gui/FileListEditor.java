@@ -2,13 +2,14 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.DownloadExternalFile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.io.File;
+import java.io.IOException;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -26,7 +27,7 @@ public class FileListEditor extends JTable implements FieldEditor {
     private JPanel panel;
     private FileListTableModel tableModel;
     private JScrollPane sPane;
-    private JButton add, remove, up, down, auto;
+    private JButton add, remove, up, down, auto, download;
 
     public FileListEditor(JabRefFrame frame, String fieldName, String content,
                           EntryEditor entryEditor) {
@@ -46,6 +47,7 @@ public class FileListEditor extends JTable implements FieldEditor {
         up = new JButton(GUIGlobals.getImage("up"));
         down = new JButton(GUIGlobals.getImage("down"));
         auto = new JButton(Globals.lang("Auto"));
+        download = new JButton(Globals.lang("Download"));
         add.setMargin(new Insets(0,0,0,0));
         remove.setMargin(new Insets(0,0,0,0));
         up.setMargin(new Insets(0,0,0,0));
@@ -75,7 +77,11 @@ public class FileListEditor extends JTable implements FieldEditor {
                 autoSetLinks();
             }
         });
-
+        download.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                downloadFile();
+            }
+        });
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.append(up);
@@ -83,7 +89,7 @@ public class FileListEditor extends JTable implements FieldEditor {
         builder.append(auto);
         builder.append(down);
         builder.append(remove);
-                
+        builder.append(download);        
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
@@ -181,7 +187,7 @@ public class FileListEditor extends JTable implements FieldEditor {
 
     private boolean editListEntry(FileListEntry entry) {
         if (editor == null) {
-            editor = new FileListEntryEditor(frame, entry);
+            editor = new FileListEntryEditor(frame, entry, false);
         }
         else
             editor.setEntry(entry);
@@ -222,6 +228,30 @@ public class FileListEditor extends JTable implements FieldEditor {
         if (foundAny) {
             entryEditor.updateField(this);
         }
+    }
+
+    /**
+     * Run a file download operation.
+     */
+    private void downloadFile() {
+        String bibtexKey = entryEditor.getEntry().getCiteKey();
+        DownloadExternalFile def = new DownloadExternalFile(frame,
+                frame.basePanel().metaData(), bibtexKey);
+        try {
+            def.download(this);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * This is the callback method that the DownloadExternalFile class uses to report the result
+     * of a download operation. This call may never come, if the user cancelled the operation.
+     * @param file The FileListEntry linking to the resulting local file.
+     */
+    public void downloadComplete(FileListEntry file) {
+        tableModel.addEntry(tableModel.getRowCount(), file);
+        entryEditor.updateField(this);
     }
 
     class TableClickListener extends MouseAdapter {

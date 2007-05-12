@@ -65,13 +65,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.KeywordGroup;
@@ -768,7 +766,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             throw new RuntimeException("Could not find the file list entry "+link+" in "+entry.toString());
         }
 
-        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry);
+        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false);
         editor.setVisible(true);
         if (editor.okPressed()) {
             // Store the changes and add an undo edit:

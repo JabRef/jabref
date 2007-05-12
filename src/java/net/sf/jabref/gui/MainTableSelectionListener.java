@@ -236,14 +236,18 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
                         if (fieldName.equals(GUIGlobals.FILE_FIELD)) {
+
                             // We use a FileListTableModel to parse the field content:
                             FileListTableModel fileList = new FileListTableModel();
                             fileList.setContent((String)link);
                             // If there are one or more links, open the first one:
                             if (fileList.getRowCount() > 0) {
-                                FileListEntry entry = fileList.getEntry(0);
-                                Util.openExternalFileAnyFormat(panel.metaData(), entry.getLink(),
-                                        entry.getType());
+                                FileListEntry flEntry = fileList.getEntry(0);
+                                ExternalFileMenuItem item = new ExternalFileMenuItem
+                                        (panel.frame(), entry, "",
+                                        flEntry.getLink(), flEntry.getType().getIcon(),
+                                        panel.metaData(), flEntry.getType());
+                                item.actionPerformed(null);
                             }
                         } else
                             Util.openExternalViewer(panel.metaData(), (String)link, fieldName);

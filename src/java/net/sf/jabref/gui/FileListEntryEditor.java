@@ -20,6 +20,9 @@ import java.io.File;
  *
  * The information to be edited includes the file description, the link itself and the
  * file type. The dialog also includes convenience buttons for quick linking.
+ *
+ * For use when downloading files, this class also offers a progress bar and a "Downloading..."
+ * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
 
@@ -28,11 +31,13 @@ public class FileListEntryEditor {
     JButton ok = new JButton(Globals.lang("Ok")),
             cancel = new JButton(Globals.lang("Cancel"));
     JComboBox types;
+    JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
+    JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
 
     private FileListEntry entry;
     private boolean okPressed = false;
 
-    public FileListEntryEditor(JFrame parent, FileListEntry entry) {
+    public FileListEntryEditor(JFrame parent, FileListEntry entry, boolean showProgressBar) {
         this.entry = entry;
 
         types = new JComboBox(Globals.prefs.getExternalFileTypeSelection());
@@ -56,6 +61,11 @@ public class FileListEntryEditor {
         builder.nextLine();
         builder.append(Globals.lang("File type"));
         builder.append(types);
+        if (showProgressBar) {
+            builder.nextLine();
+            builder.append(downloadLabel);
+            builder.append(prog);
+        }
         
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -103,6 +113,18 @@ public class FileListEntryEditor {
         Util.placeDialog(diag, parent);
 
         setValues(entry);
+    }
+
+    public void setOkEnabled(boolean enabled) {
+        ok.setEnabled(enabled);
+    }
+
+    public JProgressBar getProgressBar() {
+        return prog;
+    }
+
+    public JLabel getProgressBarLabel() {
+        return downloadLabel;
     }
 
     public void setEntry(FileListEntry entry) {
