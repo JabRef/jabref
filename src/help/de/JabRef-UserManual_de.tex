@@ -1,8 +1,7 @@
 %%%%% To do %%%%%
-% generelle Durchsicht: weiter bei Funktionen -> Gruppen
 % DW 2007-03-23
 % - Bibliographie mit biblatex statt jurabib?
-\documentclass[10pt,normalheadings]{scrartcl}
+\documentclass[10pt,normalheadings,ngerman]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{textcomp}
@@ -10,7 +9,7 @@
 \setcounter{tocdepth}{4}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%8.\,5.\,2007}
+\newcommand{\versiondate}{in Bearb.}%15.\,5.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -41,7 +40,7 @@
   frame=none,
   %backgroundcolor=\color{pyellow},
   language=[LaTeX]TeX,
-  basicstyle=\ttfamily\small,
+  basicstyle=\ttfamily,%\small,
   commentstyle=\color{red},
   keywordstyle=, % LaTeX-Befehle werden nicht fett dargestellt
   numbers=none,%left/right
@@ -102,7 +101,7 @@
 %%% yellow box with dark blue text
 \newcommand{\tip}[2][Tipp: ]{%
   \begin{center}%
-  \colorbox{pyellow}{\parbox{0.7\textwidth}{%
+  \colorbox{pyellow}{\parbox{0.85\textwidth}{%
     \color{dkblue}\textit{#1}#2}}%
   \end{center}%
 }%
@@ -154,13 +153,6 @@
 
 %%%%% Language %%%%%
 \usepackage[ngerman]{babel}
-\hyphenation{
-LaTeX
-BibTeX
-Da-tei-na-men
-Me-nü-be-feh-le
-For-mat-erken-nung% verhindert Trennung "Formater-kennung"
-}
 
 %%%%% Bibliography %%%%%
 \usepackage{jurabib}
@@ -182,6 +174,14 @@ pdfauthor={\FileAuthor},%
 pdfstartview=FitH,%
 bookmarksopen=true,%
 bookmarksopenlevel=1,%
+}
+
+\hyphenation{
+LaTeX
+BibTeX
+Da-tei-na-men
+Me-nü-be-feh-le
+For-mat-erken-nung% verhindert Trennung "Formater-kennung"
 }
 
 \makeatother
@@ -460,7 +460,7 @@ ein Tool zum Kompilieren von MSI-Dateien aus einer XML-Spezifikation
 
 
 \subsubsection{Batch-Datei (jar)}
-
+\label{subsub:jar}
 Wenn Sie die ausführbare jar-Datei (\texttt{.jar}) heruntergeladen
 haben, probieren Sie zunächst, ob ein Doppelklick darauf das Programm
 startet~-- dies funktioniert zumindest auf einigen Systemen. Falls
@@ -536,11 +536,9 @@ ihre Literaturquellen organisieren wollen.
 
 \subsection{Das Hauptfenster}
 
-\begin{quote}
 \tip[]{Die meisten Menüfunktionen, auf die im Folgenden hingewiesen
 wird, haben Tastenkürzel, und viele Funktionen können über die Werkzeugleiste
 aufgerufen werden.}
-\end{quote}
 \label{BaseFrameHelp}Im Hauptfenster, in dem Sie mit Ihrer Datei
 arbeiten, befindet sich unter der Menüleiste und der Werkzeugleiste
 die Tableiste mit Tabs (Reitern) für jede Ihrer geöffneten Dateien.
@@ -1168,9 +1166,10 @@ sobald die einbeziehende Gruppe ausgewählt wird.
 
 
 \subsection{Markieren von Einträgen}
+\label{MarkingHelp}
 
 \begin{quote}
-\label{MarkingHelp}\emph{Mit der Tastenkombination STRG-M können
+\emph{Mit der Tastenkombination STRG-M können
 Sie Einträge markieren und diese Markierung mit STRG-SHIFT-M wieder
 aufheben. Diese Aktionen sind auch im Menü \menu{Bearbeiten} zu finden.}
 \end{quote}
@@ -1682,9 +1681,7 @@ Einige Links zu XMP und PDFs mit Anmerkungen (englisch):
 \subsubsection{CiteSeer}
 
 \label{CiteSeerHelp}
-\begin{quote}
-CiteSeer ist eine digitale Bibliothek und Suchmaschine für wissenschaftliche Literatur, vornehmlich zu den Bereichen Computer und Informatik.
-\end{quote}
+\tip[]{CiteSeer ist eine digitale Bibliothek und Suchmaschine für wissenschaftliche Literatur, vornehmlich zu den Bereichen Computer und Informatik.}
 \jabref{} kann Informationen über eine bestimmte
 Literaturangabe aus der CiteSeer-Datenbank herunterladen. Um diesen
 Vorgang zu starten, fügen Sie Ihrer Datei einen neuen Eintrag hinzu
@@ -1718,14 +1715,13 @@ beschriebenen Format entspricht. Sie können diese Funktion nutzen, indem
 Sie \menu{Zitierende Literatur von CiteSeer abrufen} auswählen.
 
 \subsubsection{Medline}
+\label{MedlineHelp}
 
-\begin{quote}
-\label{MedlineHelp}\caps{MEDLINE} ist die wichtigste Datenbank der \emph{U.\,S. National Library of Medicine}. Sie enthält Literaturangaben von Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der Biomedizin.
+\tip[]{MEDLINE ist die wichtigste Datenbank der \emph{U.\,S. National Library of Medicine}. Sie enthält Literaturangaben von Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der Biomedizin.
 \jabref{} kann Literaturangaben der Medline"=Datenbank
-herunterladen. Um diese Funktion zu nutzen, wählen Sie \menu{Extras}
-\msep{} \menu{Medline abrufen}, so dass der Medline-Dialog im linken
-Seitenfeld erscheint.
-\end{quote}
+herunterladen. Um diese Funktion zu nutzen, wählen Sie \menu{Extras
+\msep{} Medline abrufen}, so dass der Medline-Dialog im linken
+Seitenfeld erscheint.}
 Es gibt zwei Möglichkeiten, die Auswahl der Einträge vorzunehmen,
 die heruntergeladen werden sollen:
 
@@ -1747,9 +1743,7 @@ Datei zugeordnet.
 \subsubsection{IEEEXplore}
 \label{IEEEXploreHelp}
 
-\begin{quote} 
-IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.
-\end{quote}
+\tip[]{IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.}
 \jabref{} kann Literaturangaben der IEEEXplore-Datenbank herunterladen.
 Um diese Funktion zu nutzen, wählen Sie \menu{Internet \msep{} IEEEXplore abfragen}
 und geben in dem Dialog, der im linken Bildschirmbereich erscheint, Ihre
@@ -1784,9 +1778,10 @@ und \emph{timestamp}.
 
 
 \subsubsection{Zeitstempel \emph{(timestamp)}}
+\label{TimeStampHelp}
 
 \begin{quote}
-\label{TimeStampHelp}\emph{Die Benutzung des Zeitstempels kann unter
+\emph{Die Benutzung des Zeitstempels kann unter
 \menu{Einstellungen}} \msep{} \emph{\menu{Allgemein} an- und
 abgestellt sowie verändert werden.}
 \end{quote}
@@ -2031,11 +2026,11 @@ Liste.
 
 Um eines oder mehrere Felder zu löschen, wählen Sie sie in der Liste
 aus und klicken auf \menu{Löschen}. Die Reihenfolge der Felder können
-Sie ändern, indem Sie einen Feldnamen auswählen und die Pfeiltasten
+Sie ändern, indem Sie einen Feldnamen auswählen und die Pfeil"=Buttons
 benutzen, um das Feld nach oben oder nach unten zu verschieben.
 
 Es gibt eine Beschränkung beim Anpassen der Eintragstypen; bestimmte
-Typen haben eine und/oder-Bedingung in ihren benötigten Feldern. Ein
+Typen haben eine ">und/oder"<"=Bedingung in ihren benötigten Feldern. Ein
 \emph{book}-Eintrag ist beispielsweise komplett, wenn entweder das
 Feld \emph{author} oder \emph{editor} oder beide gesetzt sind. Diese
 Art von Bedingung kann in einem angepassten Eintragstyp nicht realisiert
@@ -2068,12 +2063,11 @@ den Feldern \emph{abstract} und \emph{annote}.
 \subsection{Automatische Erstellung von \bibtex{}"=Keys}
 \label{LabelPatterns}
 \begin{quote}
-Im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
+\emph{Unter \menu{Optionen \msep{} Einstellungen \msep{} BibTeX"=Key"=Muster} 
 kann man die Felder bestimmen, die zur automatischen Generierung der
-\bibtex{}-Keys herangezogen werden.
+\bibtex{}"=Keys herangezogen werden.}
 \end{quote}
-Standardmäßig verwendet \jabref{} ein vorgegebenes Muster (default
-pattern) zur Generierung von \bibtex{}-Keys, das Keys wie z.\,B.
+\jabref{} verwendet ein Standardmuster zur Generierung von \bibtex{}"=Keys, das Keys wie z.\,B.
 \texttt{Yared1998} erzeugt. Falls der \bibtex{}-Key in der geöffneten
 Datei nicht eindeutig sein sollte, wird einer der Buchstaben a-z angefügt,
 bis ein eindeutiger Key gefunden ist. Dementsprechend könnten die
@@ -2085,8 +2079,8 @@ Yared1998a
 Yared1998b
 (*\ldots*)
 \end{lstlisting}
-\jabref{} verwendet Feldmarken, um das Aussehen der \bibtex{}-Keys
-zu bestimmen. Das Key-Muster kann für jeden der vorgegebenen Eintragstypen
+Um das Aussehen der \bibtex{}-Keys zu bestimmen, benutzt \jabref{}
+Feldmarken. Das Key"=Muster kann für jeden der vorgegebenen Eintragstypen
 bestimmt werden. Es kann beliebigen Text enthalten, unabhängig von
 und zusätzlich zu den Feldmarken, die angeben, dass ein bestimmtes
 Feld des Eintrags an dieser Stelle des Keys eingefügt werden soll.
@@ -2101,7 +2095,7 @@ können Sie auch neue spezielle Feldmarken vorschlagen.
 
 \subsubsection{Spezielle Feldmarken}
 
-\begin{labeling}{veryveryveryshorttitle}
+\begin{labeling}{auth.auth.eaMM}
 \item [\texttt{{[}auth{]}}]Der Nachname des ersten Autors.
 \item [\texttt{{[}authors{]}}]Die Nachnamen aller Autoren.
 \item [\texttt{{[}authorsN{]}}]Die Nachnamen von bis zu N Autoren. Falls
@@ -2123,9 +2117,9 @@ Autor vorhanden ist. Ein Plus (+) wird angehängt, falls es mehr als
 drei Autoren gibt.
 \end{labeling}
 
-\tip[Anmerkung: ]{Falls es keinen Autor gibt (etwa bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth\ldots{]}}"=Feldmarken den oder die Herausgeber, die im editor-Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label-Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author-Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B.: \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
+\tip[Anmerkung: ]{Falls es keinen Autor gibt (etwa bei einem Buch mit Herausgeber), benutzen die genannten \texttt{{[}auth\ldots{]}}"=Feldmarken den oder die Herausgeber, die im editor"=Feld angegeben wurden. Also werden die Herausgeber eines Buches ohne Autor für die Label"=Erstellung wie Autoren behandelt. Falls Sie dieses Verhalten nicht wünschen und die Feldmarke stattdessen bei einem leeren author"=Feld zu nichts expandieren soll, müssen Sie stattdessen >>pureauth<< verwenden, z.\,B. \texttt{{[}pureauth{]}} oder \texttt{{[}pureauthors3{]}.}}
 
-\begin{labeling}{veryveryveryshorttitle}
+\begin{labeling}{veryshorttitleMM}
 \item [\texttt{{[}edtr{]}}]Der Nachname des ersten Herausgebers.
 \item [\texttt{{[}editors{]}}]Die Nachnamen aller Herausgeber.
 \item [\texttt{{[}edtrIniN{]}}]Der Anfang des Nachnamens von jedem Herausgeber,
@@ -2158,20 +2152,20 @@ angewendet, in der sie angegeben wurden.
 \begin{labeling}{00.00.0000}
 \item [\texttt{:abbr}]Kürzt den Text, der von einem Feldnamen oder speziellen
 Feldmarken gebildet wird. Nur der erste Buchstabe und weitere Buchstaben,
-die auf ein Leerzeichen folgen, werden berücksichtigt. Zum Beispiel
-würde \texttt{{[}journal:}~\\
-\texttt{abbr{]}} die Zeitschrift >>Jorunal of Fish Biology<< zu
+die auf ein Leerzeichen folgen, werden berücksichtigt. So würde beispielsweise
+\texttt{[journal:abbr]} die Zeitschrift >>Journal of Fish Biology<< zu
 >>JoFB<< wandeln.
 \item [\texttt{:lower}]Wandelt den von der Feldmarke eingefügten Text in
 Kleinbuchstaben. So wird beispielsweise bei \texttt{{[}auth:lower{]}}
 der Nachname des ersten Autors in Kleinbuchstaben ausgegeben.
 \end{labeling}
-Das Standard-Key-Muster, das \bibtex{}-Keys wie \texttt{Yared1998}
+Das Standardmuster, das \bibtex{}-Keys wie \texttt{Yared1998}
 erzeugt, ist \texttt{{[}auth{]}{[}year{]}}. Wenn Sie keine Key-Muster
 für einen bestimmten Eintragstyp angeben, wird dieses vorgegebene
 Muster verwendet. Sie können das vorgegebene Muster natürlich ebenfalls
-anpassen~-- seine Einstellung befindet sich über der Liste der Eintragstypen
-im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}.
+anpassen%~-- seine Einstellung befindet sich über der Liste der Eintragstypen
+%im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
+.
 
 Beachten Sie, dass \jabref{} Umlaute und Buchstaben mit Akzenten
 sowie das ß beim Erstellen von \bibtex{}-Keys verändert, um möglichen
@@ -2185,7 +2179,7 @@ Waßenhoven  (*$\to$*) Wassenhoven
 
 \subsubsection{Ersetzen eines regulären Ausdrucks}
 
-Nachdem das Key-Muster angewendet wurde, um einen \bibtex{}-Key zu erstellen, können Sie den Key-Generator nach einem bestimmten regulären Ausdruck suchen und ihn durch eine Zeichenfolge ersetzen lassen. Der reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key-Muster eingegeben. Falls das Feld zur Ersetzung des regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden regulären Ausdrücke einfach gelöscht.
+Nachdem das Key"=Muster angewendet wurde, um einen \bibtex{}"=Key zu erstellen, können Sie den Key"=Generator nach einem bestimmten regulären Ausdruck suchen und diesen durch eine Zeichenfolge ersetzen lassen. Der reguläre Ausdruck und die Zeichenfolge, die ihn ersetzen soll, werden in den Textfeldern unter der Liste der Key"=Muster eingegeben. Falls das Feld zur Ersetzung des regulären Ausdrucks leer ist, werden die mit der Suche übereinstimmenden regulären Ausdrücke einfach gelöscht.
 
 \subsection{Eintragsvorschau}
 
@@ -2203,10 +2197,10 @@ Abschnitt~\ref{CustomExports}).
 
 \label{CustomExports}Mit \jabref{} können Sie Ihre eigenen Exportfilter
 definieren und genau so wie die Standard"=Exportfilter benutzen. Ein
-Exportfilter wird durch eine oder mehrere \emph{Layout-Dateien} definiert,
+Exportfilter wird durch eine oder mehrere \emph{Layout"=Dateien} definiert,
 die mittels eingebauter Formatierprogramme das Format der exportierten
 Dateien festlegen. Ihre Layout-Datei müssen Sie in einem separaten
-Texteditor erstellen.
+Text\-editor erstellen.
 
 
 \subsubsection{Hinzufügen eines Exportfilters}\label{subsubsec:Hinzufuegen-Exportfilter}
@@ -2216,9 +2210,9 @@ mit der Endung \texttt{.layout} vorhanden ist. Um einen neuen, eigenen
 Exportfilter hinzuzufügen, öffnen Sie das Dialogfenster \menu{Optionen}
 \msep{} \menu{Verwalte externe Exportfilter} und klicken auf die
 Schaltfläche \menu{Neu}. Es öffnet sich ein neues Fenster, in dem
-Sie einen Namen (der als Auswahl im Dateityp-Dropdownmenü erscheint, wenn man \menu{Datei \msep{} Exportieren} im JabRef-Hauptfenster wählt), eine Pfadangabe zur \texttt{.layout}-Datei und die
+Sie einen Namen (der als Auswahl im Dateityp"=Dropdownmenü erscheint, wenn man \menu{Datei \msep{} Exportieren} im JabRef"=Hauptfenster wählt), eine Pfadangabe zur \texttt{.layout}-Datei und die
 gewünschte Dateiendung für den Exportfilter angeben können. Wenn Sie
-den Exportfilter benutzen, wird diese Endung im Datei-Dialog automatisch
+den Exportfilter benutzen, wird diese Endung im Datei"=Dialog automatisch
 vorgeschlagen.
 
 
@@ -2226,7 +2220,7 @@ vorgeschlagen.
 
 Um einen Eindruck zu bekommen, wie Exportfilter auszusehen haben,
 suchen Sie am besten auf unserer Homepage nach dem Paket, das die
-Layout-Dateien der Standard-Exportfilter enthält.
+Layout"=Dateien der Standard"=Exportfilter enthält.
 
 Nehmen wir einmal an, dass wir einen HTML-Exportfilter erstellen wollen.
 Der Exportfilter muss lediglich aus einer einzigen \texttt{.layout}-Datei
@@ -2234,7 +2228,7 @@ bestehen, die in diesem Fall \texttt{html.layout} genannt werden könnte.
 Sie können darüber hinaus auch zwei Dateien mit den Namen \texttt{html.begin.layout}
 und \texttt{html.end.layout} anlegen. Die erste dieser beiden Dateien
 enthält den Kopfteil der Ausgabe, die zweite den Fußteil. \jabref{}
-sucht jedes Mal, wenn der Exportfilter benutzt wird, nach diesen Dateien
+sucht jedesmal wenn der Exportfilter benutzt wird nach diesen Dateien
 und fügt sie~-- falls sie gefunden werden~-- wörtlich vor bzw. nach
 den einzelnen Einträgen in die Ausgabe ein.
 
@@ -2254,25 +2248,25 @@ aussehen:
 </BODY>
 </HTML>
 \end{lstlisting}
-Die Datei \texttt{html.layout} stellt die \emph{Standard}-Formatvorlage
+Die Datei \texttt{html.layout} stellt die \emph{Standard}"=Formatvorlage
 für den Export eines einzelnen Eintrags bereit. Falls Sie unterschiedliche
 Formatvorlagen für verschiedene Eintragstypen anwenden wollen, müssen
-Sie Eintrags-spezifische \texttt{.layout}-Dateien erstellen. Diese
-müssen sich ebenfalls in demselben Verzeichnis wie die Haupt-Layout-Datei
+Sie typspezifische \texttt{.layout}"=Dateien erstellen. Diese
+müssen sich ebenfalls in demselben Verzeichnis wie die Haupt"=Layout"=Datei
 befinden und den Namensbestandteil \texttt{.entrytype} enthalten.
 Der Name des Eintragstyps muss komplett in Kleinbuchstaben geschrieben
 werden. In unserem Beispiel wollen wir eine Formatvorlage für Einträge
 des Typs \emph{book} haben, die in der Datei \texttt{html.book.layout}
 abgelegt wird. Für eine Dissertation würden wir die Datei \texttt{html.phdthesis.layout}
-anlegen~-- und so weiter. Diese Dateien sind der Standard-Layout-Datei
+anlegen~-- und so weiter. Diese Dateien sind der Standard"=Layout"=Datei
 sehr ähnlich, nur dass sie lediglich für Einträge des entsprechenden
-Typs genutzt werden. Achten Sie darauf, dass die Standard-Layout-Datei
+Typs genutzt werden. Achten Sie darauf, dass die Standard"=Layout"=Datei
 so allgemein gehalten wird, dass sie die meisten Eintragstypen abdeckt.
 
 
 \paragraph{Das Format der Layout-Datei}
 
-Layout"=Dateien werden mit einem einfachen markup"=Format erstellt,
+Layout"=Dateien werden mit einem einfachen mark\-up"=Format erstellt,
 bei dem die Kommandos mit einem >>backslash<< (\texttt{\textbackslash{}})
 eingeleitet werden. Alle Textbestandteile, die nicht als Kommando
 identifiziert werden, gelangen direkt in die Ausgabedatei.
@@ -2367,8 +2361,8 @@ werden.
 \end{labeling}
 Falls keiner der verfügbaren Formatierer das Ergebnis erzielt, das
 Sie erreichen möchten, können Sie Ihren eigenen Formatierer hinzufügen,
-indem Sie das \texttt{net.sf.jabref\allowbreak .export.layout.LayoutFormatter}-Interface
-implementieren. Wenn Sie in das Paket \texttt{net.sf.jabref.export.layout.format} Ihre Klasse (class) einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
+indem Sie das \lstinline{net.sf.jabref.export.layout.LayoutFormatter}-Interface
+implementieren. Wenn Sie in das Paket \lstinline{net.sf.jabref.export.layout.format} Ihre Klasse (class) einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
 so wie auch die Standard"=Formatierer. Ansonsten müssen Sie den Formatierer
 mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
 muss der Formatierer in ihrem classpath sein, wenn Sie \jabref{}
@@ -2397,7 +2391,7 @@ verhindern:
 \end{lstlisting}
 Die Kommandos \texttt{\textbackslash{}begin} und \texttt{\textbackslash{}end}
 sorgen dafür, dass der Text, den sie einschließen, nur dann ausgegeben
-wird, falls das Feld, auf das in den geschweiften Klammern verwiesen
+wird, wenn das Feld, auf das in den geschweiften Klammern verwiesen
 wird, für den zu exportierenden Eintrag definiert und damit nicht
 leer ist.
 
@@ -2429,36 +2423,34 @@ New Category: \format[HTMLChars]{\keywords}
 \subsection{Importfilter}
 
 \noindent \jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
-zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java
-\emph{Klassen}, die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
+zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java"=\emph{Klassen},
+die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
 und daraus \bibtex{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
-von SourceForge erhalten haben (siehe Abschnitt >>Ihre Arbeit anderen zur Verfügung stellen<<, 
-S.\,\pageref{subsec:Ihre-Arbeit}). Sie können auch
-mit Grundkenntnissen der Java-Programmierung eigene Importer für für Sie wichtige Referenzquellen 
+von SourceForge erhalten haben (siehe Abschnitt ">\nameref{subsec:Ihre-Arbeit}"<). Sie können auch
+mit Grundkenntnissen der Java"=Programmierung eigene Importer für Referenzquellen, die für Sie wichtig sind,
 erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref{} neu zu
 kompilieren.
 
 \paragraph{Vorrangsregeln}
 
 Externe Importfilter haben Vorrang vor Standard-Importern. So können Sie mit Ihren Importern
-die existierenden in der automatischen Formaterkennung und an der Kommandozeile in \jabref{} überschreiben.
-Externe Importfilter selbst sind dann nach Namen sortiert.
+die existierenden Importer in der automatischen Formaterkennung und an der Kommandozeile in \jabref{} überschreiben. Externe Importfilter selbst sind dann nach Namen sortiert.
 
 \subsubsection{Einen externen Importfilter hinzufügen}
 
 Stellen Sie sicher, dass Sie den Importer in kompilierter Form haben (eine oder mehrere
 \texttt{.class} Dateien) und dass die Klassendateien
-in einer Verzeichnisstruktur entsprechend ihrer Package-Struktur liegen. 
+in einer Verzeichnisstruktur entsprechend ihrer Package"=Struktur liegen. 
 Um einen neuen externen Importfilter hinzuzufügen, öffnen Sie den Dialog 
-\menu{Optionen} \msep{} \menu{Verwalte externe Importfilter}, und klicken Sie auf
-\menu{Aus Klassenpfad hinzufügen}. Ein Dateiauswahl-Fenster erscheint, 
-mit dem Sie den Klassenpfad des Importers wählen, dass heißt den obersten Ordner,
-in dem die Package-Struktur Ihres Importers beginnt. In einem zweiten Dateiauswahl-Fenster
-wählen Sie die \emph{.class}-Datei Ihres Importers, die von \texttt{\textbackslash{}ImportFormat} abgeleitet
+\menu{Optionen \msep{} Verwalte externe Importfilter}, und klicken Sie auf
+\menu{Aus Klassenpfad hinzufügen}. Ein Dateiauswahl"=Fenster erscheint, 
+mit dem Sie den Klassenpfad des Importers wählen, das heißt den obersten Ordner,
+in dem die Package"=Struktur Ihres Importers beginnt. In einem zweiten Dateiauswahl"=Fenster
+wählen Sie die \emph{.class}"=Datei Ihres Importers, die von \texttt{\textbackslash{}ImportFormat} abgeleitet
 ist. Wenn Sie \menu{Klasse auswählen} klicken, erscheint Ihr neuer Importer
 in der Liste der externen Importfilter. Alle externen Importfilter erscheinen in den
-\jabref{}-Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} \menu{Externe Importfilter} und 
-\menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter}.
+\jabref{}"=Untermenüs \menu{Datei \msep{} Importieren \msep{} Externe Importfilter} und 
+\menu{Datei \msep{} Importieren und Anhängen \msep{} Externe Importfilter}.
 
 \tip[Bitte beachten Sie: ]{Wenn Sie die Klassen in ein anderes Verzeichnis verschieben,
 müssen Sie den Importer entfernen und neu hinzufügen. Wenn Sie einen Importfilter
@@ -2487,7 +2479,7 @@ Angenommen, wir wollen Dateien der folgenden Form importieren:
 
 \subparagraph{SimpleCsvImporter Erstellen}
 
-Erzeugen Sie in einem Text"=Editor eine Klasse, die von von \texttt{ImportFormat} abgeleitet
+Erzeugen Sie in einem Text"=Editor eine Klasse, die von \texttt{ImportFormat} abgeleitet
 ist und die folgende Methoden implementiert:\\
 \texttt{getFormatName()}, 
 \texttt{isRecognizedFormat()}
@@ -2559,10 +2551,10 @@ Mit externen Layout-Dateien und Importfiltern ist es einfach, Ihre eigenen Expor
 mit anderen Anwendern gemeinsam zu benutzen. Falls Sie einen Exportfilter oder einen Importfilter
 für ein Format erstellt haben, das noch nicht von \jabref{} unterstützt wird,
 oder falls Sie einen bestehenden Exportfilter oder Importfilter verbessern, möchten
-wir Sie ermutigen, Ihre Arbeit auf der \href{http://sourceforge.net/projects/jabref/}{SourceForge.net-Seite} bereitzustellen.
+wir Sie ermutigen, Ihre Arbeit auf der \href{http://sourceforge.net/projects/jabref/}{SourceForge.net"=Seite} bereitzustellen.
 Dasselbe gilt für Formatierklassen, die Sie schreiben. Wir würden
-uns freuen, eine Sammlung von bereitgestellten Layout-Dateien verteilen
-zu können oder die Standard-Export-Filter, -Formatierer und -Importfilter
+uns freuen, eine Sammlung von bereitgestellten Layout"=Dateien verteilen
+zu können oder die Standard"=Exportfilter, -Formatierer und -Importfilter
 zu erweitern.
 
 \clearpage 
@@ -2736,6 +2728,12 @@ Wenn Sie keine admin-Rechte auf dem Computer haben, können Sie die Sun JRE in ih
 
 \clearpage\faq{Ich arbeite unter Ubuntu und \jabref{} startet, wenn ich auf das Icon klicke, aber nicht von der Kommandozeile. Wo liegt das Problem?}{Sie haben mehrere Java Virtual Machines installiert und von der Kommandozeile wird die falsche gewählt. Schauen Sie unter Frage \ref{faq-linux} nach, wie Sie die Einstellungen ändern können.}
 
+\faq{Wie kann ich verhindern, dass \jabref{} beim Speichern der .bib"=Datei in bestimmten Feldern (wie \texttt{title}) Zeilenumbrüche einfügt?}{Öfnnen Sie \menu{Optionen \msep{} Einstellungen}. Im Bereich \menu{Allgemein} gibt es die Option \menu{Beim Speichern keinen Zeilenumbruch in den folgenden Feldern einfügen}. Diese Option enthält eine Liste von Feldnamen. Feldern, das Sie dieser Liste hinzufügen (abgetrennt mit einem Semikolon) wird beim Speichern kein Zeilenumbruch hinzugefügt.}
+
+\faq{Mein Virenscanner sagt mir, dass \jabref{} ein Virus ist. Ist der Server gefährdet?}{Nein, aber der Windows"=Installer benutzt das \href{http://nsis.sourceforge.net/}{Nullsoft Scriptable Install System (NSIS)} in der Version~2.18 (seit \jabref{}~2.1), das unglücklicherweise Installer produziert, die von einigen Virenscannern als Virus eingeschätzt werden. Wenn Sie mehr darüber erfahren wollen, sehen Sie sich die \href{http://forums.winamp.com/showthread.php?postid=1977648}{Diskussion im NSIS"=Forum} oder die \href{http://nsis.sourceforge.net/NSIS_False_Positives}{Liste der NSIS ">false positives"<} an.
+
+Als Workaround und falls Sie Bedenken haben, den Installer zu benutzen, können Sie immer die plattformunabhängige jar"=Datei benutzen (siehe dazu Abschnitt ">\nameref{subsub:jar}"<).}
+
 \clearpage 
 \section{Entwicklung}
 \secttoc
@@ -2791,8 +2789,9 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
 \item Abschnitt ">Import und Export"< in zwei Abschnitte unterteilt
+\item Abschnitt \nameref{sec:faq} ergänzt
 \item Versionsnummer angepasst
-\item Beschreibung der Felder ">doi"< und ">eid"< ergänzt
+\item Beschreibung der Felder ">doi"< und ">eid"< hinzugefügt
 \item Fehler im Link zum Mail-Archiv beseitigt
 \item Einleitung leicht ergänzt
 \item Generelle Überarbeitung des Dokuments
