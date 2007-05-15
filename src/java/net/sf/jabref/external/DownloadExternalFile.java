@@ -198,6 +198,6 @@ public class DownloadExternalFile {
 
     public String getFileDirectory(String link) {
         // TODO: getFileDirectory()
-        return "/home/alver";
+        return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
     }
 }
