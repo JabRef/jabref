@@ -450,13 +450,16 @@ public class MSBibEntry {
 		nodeLst = ((Element)(nodeLst.item(0))).getElementsByTagName(_bcol+"NameList");
 		if(nodeLst.getLength()<=0)
 			return result;
+		NodeList person = ((Element)(nodeLst.item(0))).getElementsByTagName(_bcol+"Person");
+		if(person.getLength()<=0)
+			return result;
 
 		result = new LinkedList();
-		for(int i=0;i<nodeLst.getLength();i++)
+		for(int i=0;i<person.getLength();i++)
 		{
-			NodeList firstName = ((Element)(nodeLst.item(i))).getElementsByTagName(_bcol+"First");
-			NodeList lastName = ((Element)(nodeLst.item(i))).getElementsByTagName(_bcol+"Last");
-			NodeList middleName = ((Element)(nodeLst.item(i))).getElementsByTagName(_bcol+"Middle");
+			NodeList firstName  = ((Element)(person.item(i))).getElementsByTagName(_bcol+"First");
+			NodeList lastName   = ((Element)(person.item(i))).getElementsByTagName(_bcol+"Last");
+			NodeList middleName = ((Element)(person.item(i))).getElementsByTagName(_bcol+"Middle");
 			PersonName name = new PersonName();
 			if(firstName.getLength()>0)
 				name.setFirstname(firstName.item(0).getTextContent());
@@ -808,7 +811,7 @@ public class MSBibEntry {
 		for(Iterator iter = authorsLst.iterator(); iter.hasNext();) {
 			PersonName name = (PersonName) iter.next();
 			if(First == false)
-				allAuthors += "; ";
+				allAuthors += " and ";
 			allAuthors += name.getFullname();
 			First = false;
 		}
