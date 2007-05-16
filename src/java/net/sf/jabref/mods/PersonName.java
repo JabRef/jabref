@@ -14,18 +14,29 @@ import wsi.ra.tool.WSITools;
 import net.sf.jabref.AuthorList;
 
 /**
- * @author Michael Wrighton
+ * @author Michael Wrighton, S M Mahbub Murshed
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * S M Mahbub Murshed : added few functions for convenience. May 15, 2007
  */
 public class PersonName {
     protected String givenName = null;
     protected String surname = null;
     protected String middleName = null;
 
+    public PersonName() {
+    }
+
     public PersonName(String name) {
         parseName(name);
+    }
+
+    public PersonName(String firstName, String _middleName, String lastName) {
+        givenName = firstName;
+        middleName = _middleName;
+        surname = lastName;
     }
 
     protected void parseName(String author) {
@@ -62,14 +73,42 @@ public class PersonName {
         return surname;
     }
 
+    public void setSurname(String lastName)
+    {
+        surname = lastName;
+    }
+
     public String getFirstname()
     {
         return givenName;
     }
 
+    public void setFirstname(String firstName)
+    {
+        givenName = firstName;
+    }
+
     public String getMiddlename()
     {
         return middleName;
+    }
+
+    public void setMiddlename(String _middleName)
+    {
+        middleName = _middleName;
+    }
+
+    public String getFullname()
+    {
+    	String fullName = "";
+    	if(givenName != null && givenName != "")
+    		fullName += givenName + " "; 
+    	if(middleName != null && middleName != "")
+    		fullName += middleName + " ";
+    	if(surname != null && surname != "")
+    		fullName += surname;
+    	
+    	return fullName.trim();
     }
 
     public String toString() {
