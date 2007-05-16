@@ -33,7 +33,6 @@ public class PageNumbers {
 	}
 	
 	protected void parsePageNums(String s) {
-		s = s.replaceAll("–","-"); // Remove special dash that looks like same but is not
 		Pattern p = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
 		Matcher m = p.matcher(s);
 		if (m.matches()) {
