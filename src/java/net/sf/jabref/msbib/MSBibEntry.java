@@ -30,6 +30,10 @@ import java.util.regex.*;
  * History
  * May 03, 2007 - Added export functionality
  * May 15, 2007 - Added import functionality
+ * May 16, 2007 - Changed all interger entries to strings,
+ * 				  except LCID which must be an integer.
+ * 				  To avoid exception during integer parsing
+ *				  the exception is caught and LCID is set to zero.
  */
 public class MSBibEntry {
 	protected String sourceType = "Misc";
@@ -65,16 +69,16 @@ public class MSBibEntry {
 	
 	protected PageNumbers pages = null;
 	protected String volume = null;
-	protected int numberOfVolumes = -1;
+	protected String numberOfVolumes = null;
 	protected String edition = null;
 	protected String standardNumber = null;	
 	protected String publisher = null;
 	
 	protected String address = null;
 	protected String bookTitle = null;
-	protected int chapterNumber = -1;
+	protected String chapterNumber = null;
 	protected String journalName = null;
-	protected int issue = -1;
+	protected String issue = null;
 	protected String periodicalTitle = null;
 	protected String conferenceName = null;
 	protected String department = null;
@@ -148,7 +152,13 @@ public class MSBibEntry {
 
 		temp = getFromXml(_bcol+"LCID", entry);
 		if(temp!=null)
-			LCID = Integer.parseInt(temp);
+		{
+			try {
+			LCID = Integer.parseInt(temp); }
+			catch (Exception e) {
+				LCID = 0;
+			}
+		}
 
 		title = getFromXml(_bcol+"Title", entry);
 		year = getFromXml(_bcol+"Year", entry);
@@ -164,9 +174,7 @@ public class MSBibEntry {
 
 		volume = getFromXml(_bcol+"Volume", entry);
 
-		temp = getFromXml(_bcol+"NumberVolumes", entry);
-		if(temp!=null)
-			numberOfVolumes = Integer.parseInt(temp);
+		numberOfVolumes = getFromXml(_bcol+"NumberVolumes", entry);
 
 		edition = getFromXml(_bcol+"Edition", entry);
 		
@@ -190,15 +198,11 @@ public class MSBibEntry {
 
 		bookTitle = getFromXml(_bcol+"BookTitle", entry);
 
-		temp = getFromXml(_bcol+"ChapterNumber", entry);
-		if(temp!=null)
-			chapterNumber = Integer.parseInt(temp);
+		chapterNumber = getFromXml(_bcol+"ChapterNumber", entry);
 
 		journalName = getFromXml(_bcol+"JournalName", entry);
 
-		temp = getFromXml(_bcol+"Issue", entry);
-		if(temp!=null)
-			issue = Integer.parseInt(temp);
+		issue = getFromXml(_bcol+"Issue", entry);
 
 		periodicalTitle = getFromXml(_bcol+"PeriodicalTitle", entry);
 		
@@ -287,7 +291,7 @@ public class MSBibEntry {
 			volume = bibtex.getField("volume").toString();
 
 		if (bibtex.getField(MSBIB+"numberofvolume") != null)
-			numberOfVolumes = Integer.parseInt(bibtex.getField(MSBIB+"numberofvolume").toString());
+			numberOfVolumes = bibtex.getField(MSBIB+"numberofvolume").toString();
 
 		if (bibtex.getField("edition") != null)
 			edition = bibtex.getField("edition").toString();
@@ -312,13 +316,13 @@ public class MSBibEntry {
 			bookTitle = bibtex.getField("booktitle").toString();
 
 		if (bibtex.getField("chapter") != null)
-			chapterNumber = Integer.parseInt(bibtex.getField("chapter").toString());
+			chapterNumber = bibtex.getField("chapter").toString();
 
 		if (bibtex.getField("journal") != null)
 			journalName = bibtex.getField("journal").toString();
 
 		if (bibtex.getField("issue") != null)
-			issue = Integer.parseInt(bibtex.getField("issue").toString());
+			issue = bibtex.getField("issue").toString();
 
 		if (bibtex.getField(MSBIB+"periodical") != null)
 			periodicalTitle = bibtex.getField(MSBIB+"periodical").toString();
@@ -440,6 +444,15 @@ public class MSBibEntry {
 		// TODO: add lanaguage to LCID mapping
 		
 		return iLCID;
+	}
+
+	// http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+	protected String getLanguage(int LCID)
+	{
+		String language = "english";
+		// TODO: add lanaguage to LCID mapping
+		
+		return language;
 	}
 	
 	protected List getSpecificAuthors(String type, Element authors, String _bcol) {
@@ -724,7 +737,7 @@ public class MSBibEntry {
 	   		if(pages !=null )
 	   			addField(d,msbibEntry,"Pages",pages.toString("-"));
 	   		addField(d,msbibEntry,"Volume",volume);
-	   		addField(d,msbibEntry,"NumberVolumes",Integer.toString(numberOfVolumes));
+	   		addField(d,msbibEntry,"NumberVolumes",numberOfVolumes);
 	   		addField(d,msbibEntry,"Edition",edition);
 	   		addField(d,msbibEntry,"StandardNumber",standardNumber);
 	   		addField(d,msbibEntry,"Publisher",publisher);
@@ -732,10 +745,10 @@ public class MSBibEntry {
 	   		addAdrress(d,msbibEntry,address);
 	   		
 	   		addField(d,msbibEntry,"BookTitle",bookTitle);
-	   		addField(d,msbibEntry,"ChapterNumber",Integer.toString(chapterNumber));
+	   		addField(d,msbibEntry,"ChapterNumber",chapterNumber);
 
 	   		addField(d,msbibEntry,"JournalName",journalName);
-	   		addField(d,msbibEntry,"Issue",Integer.toString(issue));
+	   		addField(d,msbibEntry,"Issue",issue);
 	   		addField(d,msbibEntry,"PeriodicalTitle",periodicalTitle);
 	   		addField(d,msbibEntry,"ConferenceName",conferenceName);
 
@@ -970,7 +983,7 @@ public class MSBibEntry {
 //		if(GUID != null)
 //			hm.put("GUID",GUID);
 		if(LCID >= 0)
-			hm.put("language",Integer.toString(LCID));
+			hm.put("language",getLanguage(LCID));
 		if(title != null)
 			hm.put("title",title);
 		if(year != null)
@@ -1000,8 +1013,8 @@ public class MSBibEntry {
 			hm.put("pages",pages.toString("--"));
 		if(volume !=null )
 			hm.put("volume",volume);
-		if(numberOfVolumes >= 0 )
-			hm.put(MSBIB+"numberofvolume",Integer.toString(numberOfVolumes));
+		if(numberOfVolumes !=null )
+			hm.put(MSBIB+"numberofvolume",numberOfVolumes);
 		if(edition !=null )
 			hm.put("edition",edition);
 		if(edition !=null )
@@ -1016,12 +1029,12 @@ public class MSBibEntry {
 			hm.put("address",address);
 		if(bookTitle !=null )
 			hm.put("booktitle",bookTitle);
-		if(chapterNumber >= 0 )
-			hm.put("chapter",Integer.toString(chapterNumber));
+		if(chapterNumber !=null )
+			hm.put("chapter",chapterNumber);
 		if(journalName !=null )
 			hm.put("journal",journalName);
-		if(issue >= 0 )
-			hm.put("number",Integer.toString(issue));
+		if(issue !=null )
+			hm.put("number",issue);
 		if(periodicalTitle !=null )
 			hm.put("organization",periodicalTitle);
 		if(conferenceName !=null )
