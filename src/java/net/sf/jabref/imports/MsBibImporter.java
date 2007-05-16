@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.InputStream;
 import java.io.IOException;
+import net.sf.jabref.msbib.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
+
 
 /**
  * Importer for the MS Office 2007 XML bibliography format
@@ -25,24 +29,43 @@ public class MsBibImporter extends ImportFormat {
             not of the MsBib type, and true otherwise. Returning true is the safe choice
             if not certain.
          */
-
+    	Document docin = null;
+    	try {
+    	DocumentBuilder dbuild = DocumentBuilderFactory.
+    								newInstance().
+    								newDocumentBuilder();
+   		docin = dbuild.parse(in);   		
+    	} catch (Exception e) {
+	   		return false;
+    	}
+    	if(docin!= null && docin.getDocumentElement().getTagName().contains("Sources") == false)
+    		return false;
+//   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
+//   		if(rootLst.getLength()==0)
+//   			rootLst = docin.getElementsByTagName("Sources");
+//   		if(rootLst.getLength()==0)
+//   			return false;
+    	// System.out.println(docin.getDocumentElement().getTagName());
         return true;
     }
 
+    /**
+	 * String used to identify this import filter on the command line.
+	 * 
+	 * @override
+	 * @return "msbib"
+	 */
+	public String getCLIid() {
+		return "msbib";
+	}
+
     public List importEntries(InputStream in) throws IOException {
 
-        System.out.println("Hello world MsBibImporter");
+        MSBibDatabase dbase = new MSBibDatabase();
 
-        List entries = new ArrayList();
-        /*
-            This method should read the input stream until the end, and add any entries
-            found to a List which is returned. If the stream doesn't contain any useful
-            data (is of the wrong format?) you can return null to signal that this is the
-            wrong import filter.
-         */
+        List entries = dbase.importEntries(in);
 
-        return null;
-        //return entries;
+        return entries;
     }
 
     public String getFormatName() {
