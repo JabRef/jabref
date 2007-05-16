@@ -6,18 +6,23 @@
 package net.sf.jabref.msbib;
 import net.sf.jabref.*;
 import java.util.*;
+import java.io.InputStream;
+import java.io.IOException;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 /**
  * @author S M Mahbub Murshed
  * @email udvranto@yahoo.com
  *
- * @version 1.0.0
+ * @version 2.0.0
  * @see http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/
  * @see http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/
  * 
- * Date: May 03, 2007
+ * Date: May 15, 2007; May 03, 2007
  * 
+ * History:
+ * May 03, 2007 - Added suport for export
+ * May 15, 2007 - Added suport for import
  */
 public class MSBibDatabase {
 	protected Set entries;
@@ -27,6 +32,10 @@ public class MSBibDatabase {
 		entries = new HashSet();
 	}
 	
+	public MSBibDatabase(InputStream stream) throws IOException {
+		importEntries(stream);
+    }
+
 	public MSBibDatabase(BibtexDatabase bibtex) {
 		Set keySet = bibtex.getKeySet();
         addEntries(bibtex, keySet);
@@ -38,6 +47,39 @@ public class MSBibDatabase {
         addEntries(bibtex, keySet);
     }
 
+    public List importEntries(InputStream stream) throws IOException {
+    	entries = new HashSet();	
+    	ArrayList bibitems = new ArrayList();
+    	Document docin = null;
+    	try {
+    	DocumentBuilder dbuild = DocumentBuilderFactory.
+    								newInstance().
+    								newDocumentBuilder();
+   		docin = dbuild.parse(stream);
+    	} catch (Exception e) {
+	   		System.out.println("Exception caught..." + e);
+	   		e.printStackTrace();
+    	}
+   		String bcol = "b:";
+   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
+   		if(rootLst.getLength()==0) {   			
+   			rootLst = docin.getElementsByTagName("Sources");
+   			bcol = "";
+   		}
+   		if(rootLst.getLength()==0)
+   			return bibitems;
+//    	if(docin!= null && docin.getDocumentElement().getTagName().contains("Sources") == false)
+//    		return bibitems;
+
+   		NodeList sourceList = ((Element)(rootLst.item(0))).getElementsByTagName(bcol+"Source");
+   		for(int i=0; i<sourceList.getLength(); i++) {
+   			MSBibEntry entry = new MSBibEntry((Element)sourceList.item(i),bcol);
+   			entries.add(entry);
+   			bibitems.add(entry.getBibtexRepresentation());   			
+   		}
+   		
+   		return bibitems;
+    }
 
     private void addEntries(BibtexDatabase database, Set keySet) {
         entries = new HashSet();
