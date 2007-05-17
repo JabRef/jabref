@@ -102,14 +102,22 @@ public class DownloadExternalFile {
         if (editor.okPressed()) {
             File toFile = new File(entry.getLink());
             // If this is a relative link, we should perhaps append the directory:
+            String dirPrefix = directory+System.getProperty("file.separator");
             if (!toFile.isAbsolute()) {
-                toFile = new File(directory+System.getProperty("file.separator")+entry.getLink());
+                toFile = new File(dirPrefix+entry.getLink());
             }
             try {
                 boolean success = Util.copyFile(tmp, toFile, false);
                 if (!success) {
                     // OOps, the file exists!
                     System.out.println("File already exists! DownloadExternalFile.download()");
+                }
+
+                // If the local file is in or below the main file directory, change the
+                // path to relative:
+                if (entry.getLink().startsWith(directory) &&
+                        (entry.getLink().length() > dirPrefix.length())) {
+                    entry.setLink(entry.getLink().substring(dirPrefix.length()));
                 }
 
                 callback.downloadComplete(entry);
@@ -124,28 +132,6 @@ public class DownloadExternalFile {
             if (downloadFinished)
                 tmp.delete();
         }
-        /*
-        if (!new File(directory).exists()) {
-            JOptionPane.showMessageDialog(frame, Globals.lang(
-                    "Could not find download directory: %0", directory),
-                    Globals.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-
-
-        String textToSet = file.getPath();
-        if (textToSet.startsWith(directory)) {
-            // Construct path relative to pdf base dir
-            textToSet = textToSet.substring(directory.length(), textToSet.length());
-
-            // Remove leading path separator
-            if (textToSet.startsWith(File.separator)) {
-                textToSet = textToSet.substring(File.separator.length());
-            }
-        }
-        */
-        //callback.downloadComplete(textToSet);
 
     }
 

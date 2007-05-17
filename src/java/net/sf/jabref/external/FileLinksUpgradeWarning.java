@@ -58,15 +58,20 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn");
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FIELDS_TO_LOOK_FOR);
+        // If the "file" directory is not set, offer to migrate pdf/ps dir:
+        boolean offerSetFileDir = !Globals.prefs.hasKey(GUIGlobals.FILE_FIELD+"Directory")
+                && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
-        if (!offerChangeDatabase && !offerChangeSettings)
+        if (!offerChangeDatabase && !offerChangeSettings && !offerSetFileDir)
                     return; // Nothing to do, just return.
                 
-        JCheckBox changeSettings = new JCheckBox("Change table column and General fields settings to use the new feature",
+        JCheckBox changeSettings = new JCheckBox(Globals.lang("Change table column and General fields settings to use the new feature"),
                 offerChangeSettings);
-        JCheckBox changeDatabase = new JCheckBox("Upgrade old external file links to use the new feature",
+        JCheckBox changeDatabase = new JCheckBox(Globals.lang("Upgrade old external file links to use the new feature"),
                 offerChangeDatabase);
-        JCheckBox doNotShowDialog = new JCheckBox("Do not show these options in the future",
+        JCheckBox setFileDir = new JCheckBox(Globals.lang("Set main external file directory")+":", offerSetFileDir);
+        JTextField fileDir = new JTextField(30);
+        JCheckBox doNotShowDialog = new JCheckBox(Globals.lang("Do not show these options in the future"),
                 false);
 
         StringBuilder sb = new StringBuilder("<html>");
@@ -92,6 +97,17 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             b.append(changeDatabase);
             b.nextLine();
         }
+        if (offerSetFileDir) {
+            if (Globals.prefs.hasKey("pdfDirectory"))
+                fileDir.setText(Globals.prefs.get("pdfDirectory"));
+            else
+                fileDir.setText(Globals.prefs.get("psDirectory"));
+            JPanel pan = new JPanel();
+            pan.add(setFileDir);
+            pan.add(fileDir);
+            b.append(pan);
+            b.nextLine();
+        }
         b.append("");
         b.nextLine();
         b.append(doNotShowDialog);
@@ -102,7 +118,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             Globals.prefs.putBoolean("showFileLinksUpgradeWarning", false);
 
         if (answer == JOptionPane.YES_OPTION)
-            makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected());
+            makeChanges(panel, pr, changeSettings.isSelected(), changeDatabase.isSelected(),
+                    setFileDir.isSelected() ? fileDir.getText() : null);
     }
 
     /**
@@ -128,15 +145,20 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * This method performs the actual changes.
      * @param panel
      * @param pr
+     * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
     public void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
-                            boolean upgradeDatabase) {
+                            boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
             NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FIELDS_TO_LOOK_FOR);
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
+        }
+
+        if (fileDir != null) {
+            Globals.prefs.put(GUIGlobals.FILE_FIELD+"Directory", fileDir);
         }
 
         if (upgradePrefs) {

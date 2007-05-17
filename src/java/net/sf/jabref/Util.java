@@ -655,8 +655,12 @@ public class Util {
 
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
-		if (dir != null) {
-			File tmp = expandFilename(link, new String[] { dir, "." });
+        // Include the standard "file" directory:
+        String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+        // Include the directory of the bib file:
+        String databaseDir = metaData.getFile().getParent();
+        if (dir != null) {
+			File tmp = expandFilename(link, new String[] { dir, fileDir, databaseDir });
 			if (tmp != null)
 				file = tmp;
 		}

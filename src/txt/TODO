@@ -9,8 +9,8 @@ Chris:
   
 Morten:
 * Add "Copy all externally linked files for this set of entries"-feature
-* Implement Auto feature for new external links
-* Implement Download feature for new external links
+* [DONE?] Implement Auto feature for new external links
+* Download feature for new external links: handle case when file already exists
 * [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?

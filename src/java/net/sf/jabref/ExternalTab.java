@@ -20,7 +20,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 	JabRefFrame _frame;
 
-	JTextField pdfDir, regExpTextField, psDir, pdf, ps, html, lyx, winEdt, led,
+	JTextField pdfDir, regExpTextField, fileDir, psDir, pdf, ps, html, lyx, winEdt, led,
         citeCommand, vim, vimServer;
 
 	ItemListener regExpListener;
@@ -34,7 +34,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 		psDir = new JTextField(30);
 		pdfDir = new JTextField(30);
-		pdf = new JTextField(30);
+        fileDir = new JTextField(30);
+        pdf = new JTextField(30);
 		ps = new JTextField(30);
 		html = new JTextField(30);
 		lyx = new JTextField(30);
@@ -73,17 +74,26 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
-		builder.appendSeparator(Globals.lang("PDF and PS links"));
+		builder.appendSeparator(Globals.lang("External file links"));
 		JPanel pan = new JPanel();
 		builder.append(pan);
-		JLabel lab = new JLabel(Globals.lang("Main PDF directory") + ":");
+		JLabel lab = new JLabel(Globals.lang("Main %0 directory", GUIGlobals.FILE_FIELD) + ":");
+		builder.append(lab);
+		builder.append(fileDir);
+		browse = new BrowseAction(_frame, fileDir, true);
+		builder.append(new JButton(browse));
+		builder.nextLine();
+
+        pan = new JPanel();
+		builder.append(pan);
+		lab = new JLabel(Globals.lang("Main PDF directory") + ":");
 		builder.append(lab);
 		builder.append(pdfDir);
 		browse = new BrowseAction(_frame, pdfDir, true);
 		builder.append(new JButton(browse));
 		builder.nextLine();
 
-		pan = new JPanel();
+        pan = new JPanel();
 		builder.append(pan);
 		lab = new JLabel(Globals.lang("Main PS directory") + ":");
 		builder.append(lab);
@@ -179,7 +189,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	public void setValues() {
 		pdfDir.setText(_prefs.get("pdfDirectory"));
 		psDir.setText(_prefs.get("psDirectory"));
-		if (!Globals.ON_WIN) {
+        fileDir.setText(_prefs.get(GUIGlobals.FILE_FIELD+"Directory"));
+        if (!Globals.ON_WIN) {
 			pdf.setText(_prefs.get("pdfviewer"));
 			ps.setText(_prefs.get("psviewer"));
 			html.setText(_prefs.get("htmlviewer"));
@@ -214,7 +225,8 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		// We should maybe do some checking on the validity of the contents?
 		_prefs.put("pdfDirectory", pdfDir.getText());
 		_prefs.put("psDirectory", psDir.getText());
-		_prefs.put("pdfviewer", pdf.getText());
+        _prefs.put(GUIGlobals.FILE_FIELD+"Directory", fileDir.getText());
+        _prefs.put("pdfviewer", pdf.getText());
 		_prefs.put("psviewer", ps.getText());
 		_prefs.put("htmlviewer", html.getText());
 		_prefs.put("lyxpipe", lyx.getText());
