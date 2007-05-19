@@ -42,7 +42,7 @@ public class MSBibEntry {
 	protected String tag = null;
 	protected String GUID = null;
 	protected int LCID = -1;
-	
+
 	protected List authors = null;
 	protected List bookAuthors = null;
 	protected List editors = null;
@@ -156,7 +156,7 @@ public class MSBibEntry {
 			try {
 			LCID = Integer.parseInt(temp); }
 			catch (Exception e) {
-				LCID = 0;
+				LCID = -1;
 			}
 		}
 
@@ -305,6 +305,8 @@ public class MSBibEntry {
 			standardNumber += ":LCCN:"+ bibtex.getField("LCCN").toString();
 		if (bibtex.getField("mrnumber") != null)
 			standardNumber += ":MRN:"+ bibtex.getField("mrnumber").toString();
+		if(standardNumber.equals(""))
+			standardNumber = null;
 
 		if (bibtex.getField("publisher") != null)
 			publisher = bibtex.getField("publisher").toString();
@@ -408,22 +410,23 @@ public class MSBibEntry {
 		if(FORMATXML)
 		{
 			title = format(title);
-			shortTitle = format(shortTitle);
-			publisher = format(publisher);
-			conferenceName = format(conferenceName);
-			department = format(department);
-			institution = format(institution);
-			internetSiteTitle = format(internetSiteTitle);
-			publicationTitle = format(publicationTitle);
-			albumTitle = format(albumTitle);
-			theater = format(theater);
-			distributor = format(distributor);
-			broadcastTitle = format(broadcastTitle);
-			broadcaster = format(broadcaster);
-			station = format(station);
-			court = format(court);
-			reporter = format(reporter);
-			bibTex_Series = format(bibTex_Series);
+			// shortTitle = format(shortTitle);
+			// publisher = format(publisher);
+			// conferenceName = format(conferenceName);
+			// department = format(department);
+			// institution = format(institution);
+			// internetSiteTitle = format(internetSiteTitle);
+			// publicationTitle = format(publicationTitle);
+			// albumTitle = format(albumTitle);
+			// theater = format(theater);
+			// distributor = format(distributor);
+			// broadcastTitle = format(broadcastTitle);
+			// broadcaster = format(broadcaster);
+			// station = format(station);
+			// court = format(court);
+			// reporter = format(reporter);
+			// bibTex_Series = format(bibTex_Series);
+			bibTex_Abstract = format(bibTex_Abstract);
 		}
 	}
 
@@ -510,9 +513,9 @@ public class MSBibEntry {
 		
 		if (authors.indexOf(" and ") == -1)
 		{
-			if(FORMATXML)
-				result.add(new PersonName(chars.format(authors)));
-			else
+//			if(FORMATXML)
+//				result.add(new PersonName(chars.format(authors)));
+//			else
 				result.add(new PersonName(authors));
 		}
         else
@@ -520,9 +523,9 @@ public class MSBibEntry {
             String[] names = authors.split(" and ");
             for (int i=0; i<names.length; i++)
             {
-            	if(FORMATXML)
-            		result.add(new PersonName(chars.format(names[i])));
-            	else
+//            	if(FORMATXML)
+//            		result.add(new PersonName(chars.format(names[i])));
+//            	else
             		result.add(new PersonName(names[i]));
             }
         }
@@ -603,29 +606,21 @@ public class MSBibEntry {
 //	{
 //		String healedValue = value;
 //
-//		// Remove special dash that looks like same but is not		
-//		healedValue = healedValue.replace('–','-');
-//		healedValue = healedValue.replace('—','-');
-//		
-//		// String literals
-//		healedValue = healedValue.replaceAll("‘","`");
-//		healedValue = healedValue.replaceAll("’","'");
-//		healedValue = healedValue.replaceAll("“","\"");
-//		healedValue = healedValue.replaceAll("”","\"");
-//		
-//		// HTML subscript value
-//		healedValue = healedValue.replaceAll("<sub>","_");
-//		healedValue = healedValue.replaceAll("</sub>","");
-//
-////		restore converted to html-char
-////		Pattern p = Pattern.compile("&#(\\d{1,4});");
-////		Matcher m = p.matcher(healedValue);
-////		while (m.find())
-////		{
-////			int n = Integer.parseInt(m.group(1));
-////			char ch = Character.forDigit(n,10);
-////			healedValue = healedValue.replaceAll("&#"+m.group(1)+";",""+ch);
-////		}
+////		if(value.contains("A net energy gain"))
+////			System.out.println(value);
+////		restore converted html-char
+//		Pattern p = Pattern.compile("&#([0-9A-Fa-f]{2,4});");
+//		// Pattern p = Pattern.compile("&#(\\d{1,4});");
+//		Matcher m = p.matcher(healedValue);
+//		while (m.find())
+//		{
+//			int n = Integer.parseInt(m.group(1),16);
+//			char ch = Character.forDigit(n,10);
+//			System.out.println(m.group(1));
+//			System.out.println(""+n);
+//			System.out.println(""+ch);			
+//			healedValue = healedValue.replaceAll("\\&#"+m.group(1)+";",""+ch);
+//		}
 //		
 //		return healedValue;
 //	}
@@ -635,8 +630,13 @@ public class MSBibEntry {
 			return;
 		Element elem = d.createElement(bcol+name);
  		// elem.appendChild(d.createTextNode(healXML(value)));
-		elem.appendChild(d.createTextNode(value));
-   		parent.appendChild(elem);
+//		Text txt = d.createTextNode(value);
+//		if(!txt.getTextContent().equals(value))
+//			System.out.println("Values dont match!");
+//			// throw new Exception("Values dont match!");
+//		elem.appendChild(txt);
+		elem.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));		
+		parent.appendChild(elem);
 	}
 
 	public void addAuthor(Document d, Element allAuthors, String entryName, List authorsLst) {
@@ -708,7 +708,8 @@ public class MSBibEntry {
 
    			addField(d,msbibEntry,"Tag",tag);
    			addField(d,msbibEntry,"GUID",GUID);
-   			addField(d,msbibEntry,"LCID",Integer.toString(LCID));
+   			if(LCID >= 0)
+   				addField(d,msbibEntry,"LCID",Integer.toString(LCID));
    			addField(d,msbibEntry,"Title",title);
    			addField(d,msbibEntry,"Year",year);
    			addField(d,msbibEntry,"ShortTitle",shortTitle);
@@ -1108,6 +1109,38 @@ public class MSBibEntry {
 		entry.setField(hm);
 		return entry;
 	}
+
+	/**
+	 * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * 
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public String stripNonValidXMLCharacters(String in) {
+        StringBuffer out = new StringBuffer(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
+        if (in == null || ("".equals(in))) return ""; // vacancy test.
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) ||
+                (current == 0xA) ||
+                (current == 0xD) ||
+                ((current >= 0x20) && (current <= 0xD7FF)) ||
+                ((current >= 0xE000) && (current <= 0xFFFD)) ||
+                ((current >= 0x10000) && (current <= 0x10FFFF)))
+                out.append(current);
+        }
+        return out.toString();
+    }
+
 	/*
 	 * render as XML
 	 */
