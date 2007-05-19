@@ -34,7 +34,9 @@ class MSBibExportFormat extends ExportFormat {
     }
 
     public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws IOException {
-        SaveSession ss = getSaveSession(encoding, new File(file));
+    	// forcing to use UTF8 output format for some problems with
+    	// xml export in other encodings
+        SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MSBibDatabase md = new MSBibDatabase(database, keySet);
 
