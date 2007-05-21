@@ -90,24 +90,32 @@ public class DownloadExternalFile {
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix = getSuffix(res);
         String suggestedName = getSuggestedFileName(res, suffix);
-        String directory = getFileDirectory(res);
+        final String directory = getFileDirectory(res);
         File file = new File(new File(directory), suggestedName);
         FileListEntry entry = new FileListEntry("", file.getPath(),
                 Globals.prefs.getExternalFileTypeByExt(suffix));
         editor = new FileListEntryEditor(frame, entry, true);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
+        editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
+            public boolean confirmClose(FileListEntry entry) {
+                File f = expandFilename(directory, entry.getLink());
+                if (f.exists()) {
+                    return JOptionPane.showConfirmDialog
+                        (frame, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
+                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION)
+                            == JOptionPane.OK_OPTION;
+                } else
+                    return true;
+            }
+        });
         editor.setVisible(true);
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = new File(entry.getLink());
-            // If this is a relative link, we should perhaps append the directory:
             String dirPrefix = directory+System.getProperty("file.separator");
-            if (!toFile.isAbsolute()) {
-                toFile = new File(dirPrefix+entry.getLink());
-            }
+            File toFile = expandFilename(directory, entry.getLink());
             try {
-                boolean success = Util.copyFile(tmp, toFile, false);
+                boolean success = Util.copyFile(tmp, toFile, true);
                 if (!success) {
                     // OOps, the file exists!
                     System.out.println("File already exists! DownloadExternalFile.download()");
@@ -133,6 +141,23 @@ public class DownloadExternalFile {
                 tmp.delete();
         }
 
+    }
+
+    /**
+     * Construct a File object pointing to the file linked, whether the link is
+     * absolute or relative to the main directory.
+     * @param directory The main directory.
+     * @param link The absolute or relative link.
+     * @return The expanded File.
+     */
+    private File expandFilename(String directory, String link) {
+        File toFile = new File(link);
+        // If this is a relative link, we should perhaps append the directory:
+        String dirPrefix = directory+System.getProperty("file.separator");
+        if (!toFile.isAbsolute()) {
+            toFile = new File(dirPrefix+link);
+        }
+        return toFile;
     }
 
     /**

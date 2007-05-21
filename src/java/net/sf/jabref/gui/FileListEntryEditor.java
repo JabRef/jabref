@@ -10,10 +10,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
 import net.sf.jabref.BrowseAction;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileFilter;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -33,6 +35,7 @@ public class FileListEntryEditor {
     JComboBox types;
     JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
     JLabel downloadLabel = new JLabel(Globals.lang("Downloading..."));
+    ConfirmCloseFileListEntryEditor externalConfirm = null;
 
     private FileListEntry entry;
     private boolean okPressed = false;
@@ -75,6 +78,14 @@ public class FileListEntryEditor {
 
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // If necessary, ask the external confirm object whether we are ready to close.
+                if (externalConfirm != null) {
+                    // Construct an updated FileListEntry:
+                    FileListEntry testEntry = new FileListEntry("", "", null);
+                    storeSettings(testEntry);
+                    if (!externalConfirm.confirmClose(testEntry))
+                        return;
+                }
                 diag.dispose();
                 storeSettings(FileListEntryEditor.this.entry);
                 okPressed = true;
@@ -113,6 +124,10 @@ public class FileListEntryEditor {
         Util.placeDialog(diag, parent);
 
         setValues(entry);
+    }
+
+    public void setExternalConfirm(ConfirmCloseFileListEntryEditor eC) {
+        this.externalConfirm = eC;
     }
 
     public void setOkEnabled(boolean enabled) {
