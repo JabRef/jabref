@@ -127,7 +127,7 @@ public class FileListTableModel extends AbstractTableModel {
     /**
      * Transform the file list shown in the table into a flat string representable
      * as a BibTeX field:
-     * @return
+     * @return String representation.
      */
     public String getStringRepresentation() {
         StringBuilder sb = new StringBuilder();
@@ -138,6 +138,22 @@ public class FileListTableModel extends AbstractTableModel {
                 sb.append(';');
         }
         return sb.toString();
+    }
+
+    /**
+     * Transform the file list shown in the table into a HTML string representation
+     * suitable for displaying the contents in a tooltip.
+     * @return Tooltip representation.
+     */
+    public String getToolTipHTMLRepresentation() {
+        StringBuilder sb = new StringBuilder("<html>");
+        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+            FileListEntry entry = (FileListEntry) iterator.next();
+            sb.append(entry.getDescription()).append(" (").append(entry.getLink()).append(')');
+            if (iterator.hasNext())
+                sb.append("<br>");
+        }
+        return sb.append("</html>").toString();
     }
 
     private String encodeEntry(FileListEntry entry) {

@@ -30,7 +30,7 @@ public class MainTableFormat implements TableFormat {
     URL_ = {"url", "doi"}
     ,
     CITESEER = {"citeseerurl"},
-    FILE = {"file"};
+    FILE = {GUIGlobals.FILE_FIELD};
 
     BasePanel panel;
 

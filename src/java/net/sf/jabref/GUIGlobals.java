@@ -391,7 +391,7 @@ public class GUIGlobals {
 		tableIcons.put("ps", lab);
         lab = new JLabel(getImage("psSmall"));
         lab.setToolTipText(Globals.lang("Open file"));
-        tableIcons.put("file", lab);
+        tableIcons.put(GUIGlobals.FILE_FIELD, lab);
 
 
         //jabRefFont = new Font("arial", Font.ITALIC/*+Font.BOLD*/, 20);

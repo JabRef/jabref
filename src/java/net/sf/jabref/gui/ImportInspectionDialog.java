@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.AbstractGroup;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.List;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
@@ -77,16 +79,18 @@ public class ImportInspectionDialog extends JDialog {
     private JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs.getBoolean("generateKeysAfterInspection"));
     private JLabel
         duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
+        fileLabel = new JLabel(GUIGlobals.getImage("psSmall")),
         pdfLabel = new JLabel(GUIGlobals.getImage("pdfSmall")),
         psLabel = new JLabel(GUIGlobals.getImage("psSmall")),
         urlLabel = new JLabel(GUIGlobals.getImage("wwwSmall"));
 
     private final int
         DUPL_COL = 1,
-        PDF_COL = 2,
-        PS_COL = 3,
-        URL_COL = 4,
-        PAD = 5;
+        FILE_COL = 2,
+        PDF_COL = 3,
+        PS_COL = 4,
+        URL_COL = 5,
+        PAD = 6;
 
     /**
      * The "defaultSelected" boolean value determines if new entries added are selected for import or not.
@@ -160,6 +164,7 @@ public class ImportInspectionDialog extends JDialog {
         }
 
         // Add "Attach file" menu choices to right click menu:
+        popup.add(new DownloadFile());
         popup.add(new AttachFile("pdf"));
         popup.add(new AttachFile("ps"));
         popup.add(new AttachUrl());
@@ -336,6 +341,38 @@ public class ImportInspectionDialog extends JDialog {
             }
         }*/
         return selected;
+    }
+
+    /**
+     * Generate key for the selected entry only.
+     */
+    public void generateKeySelectedEntry() {
+        if (selectionModel.getSelected().size() != 1)
+                return;
+        BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+        entries.getReadWriteLock().writeLock().lock();
+        BibtexDatabase database = null;
+        // Relate to the existing database, if any:
+        if (panel != null)
+            database = panel.database();
+        // ... or create a temporary one:
+        else
+            database = new BibtexDatabase();
+        try {
+            entry.setId(Util.createNeutralId());
+            // Add the entry to the database we are working with:
+            database.insertEntry(entry);
+        } catch (KeyCollisionException ex) {
+            ex.printStackTrace();
+        }
+        // Generate a unique key:
+        LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, entry);
+        // Remove the entry from the database again, since we only added it in order to
+        // make sure the key was unique:
+        database.removeEntry(entry.getId());
+        
+        entries.getReadWriteLock().writeLock().lock();
+        glTable.repaint();
     }
 
     /**
@@ -851,6 +888,52 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
+    class DownloadFile extends JMenuItem implements ActionListener,
+        DownloadExternalFile.DownloadCallback {
+
+        BibtexEntry entry = null;
+
+        public DownloadFile() {
+            super(Globals.lang("Download file"));
+            addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectionModel.getSelected().size() != 1)
+                return;
+            entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            String bibtexKey = entry.getCiteKey();
+            if (bibtexKey == null) {
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
+                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (answer == JOptionPane.OK_OPTION) {
+                    generateKeySelectedEntry();
+                    bibtexKey = entry.getCiteKey();
+                }
+            }
+            DownloadExternalFile def = new DownloadExternalFile(frame, metaData, bibtexKey);
+            try {
+                def.download(this);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public void downloadComplete(FileListEntry file) {
+            ImportInspectionDialog.this.toFront(); // Hack
+            FileListTableModel model = new FileListTableModel();
+            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            if (oldVal != null)
+                model.setContent(oldVal);
+            model.addEntry(model.getRowCount(), file);
+            entries.getReadWriteLock().writeLock().lock();
+            entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+            entries.getReadWriteLock().writeLock().unlock();
+            glTable.repaint();
+        }
+    }
 
     class AttachFile extends JMenuItem implements ActionListener {
         String fileType;
@@ -909,7 +992,9 @@ public class ImportInspectionDialog extends JDialog {
         for (int i = 2; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            if (i == PDF_COL)
+            if (i == FILE_COL)
+                comparators.add(new IconComparator(new String[] {GUIGlobals.FILE_FIELD}));
+            else if (i == PDF_COL)
                 comparators.add(new IconComparator(new String[] {"pdf"}));
             else if (i == PS_COL)
                 comparators.add(new IconComparator(new String[] {"ps"}));
@@ -994,6 +1079,14 @@ public class ImportInspectionDialog extends JDialog {
                 Object o;
                 switch (i) {
                     case DUPL_COL: return entry.isGroupHit() ?  duplLabel : null;
+                    case FILE_COL:
+                        o = entry.getField(GUIGlobals.FILE_FIELD);
+                        if (o != null) {
+                            FileListTableModel model = new FileListTableModel();
+                            model.setContent((String)o);
+                            fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
+                            return fileLabel;
+                        } else return null;
                     case PDF_COL:
                         o = entry.getField("pdf");
                         if (o != null) {

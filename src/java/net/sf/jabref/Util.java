@@ -657,13 +657,13 @@ public class Util {
 		String dir = metaData.getFileDirectory(extension);
         // Include the standard "file" directory:
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+
         // Include the directory of the bib file:
         String databaseDir = metaData.getFile().getParent();
-        if (dir != null) {
-			File tmp = expandFilename(link, new String[] { dir, fileDir, databaseDir });
-			if (tmp != null)
-				file = tmp;
-		}
+        File tmp = expandFilename(link, new String[] { dir, fileDir, databaseDir });
+        if (tmp != null)
+            file = tmp;
+
 
 		// Check if we have arrived at an existing file:
 		if (file.exists() && (fileType != null)) {
@@ -887,7 +887,6 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
         dirs.addAll(extraDirs);
         if (Globals.prefs.hasKey(fileType.getExtension()+"Directory")) {
             dirs.add(Globals.prefs.get(fileType.getExtension()+"Directory"));
-            System.out.println(Globals.prefs.get(fileType.getExtension()+"Directory"));
         }
         String [] directories = (String[])dirs.toArray(new String[dirs.size()]);
         return findPdf(entry, fileType.getExtension(), directories);
@@ -1319,11 +1318,13 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	public static File expandFilename(String name, String[] dir) {
 
 		for (int i = 0; i < dir.length; i++) {
-			File result = expandFilename(name, dir[i]);
-			if (result != null) {
-				return result;
-			}
-		}
+            if (dir[i] != null) {
+                File result = expandFilename(name, dir[i]);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
 
 		return null;
 	}
@@ -1352,7 +1353,8 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 				// if (name.startsWith("ftp"))
 
 				file = new File(name);
-				if (file.exists())
+
+                if (file.exists())
 					return file;
 				// Ok, try to fix / and \ problems:
 				if (Globals.ON_WIN) {

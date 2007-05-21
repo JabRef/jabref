@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
  */
 public class DownloadExternalFile {
     private JabRefFrame frame;
+    private JDialog dialog;
     private MetaData metaData;
     private String bibtexKey;
     private FileListEntryEditor editor;
@@ -44,7 +45,7 @@ public class DownloadExternalFile {
      * @param callback The object to which the filename should be reported when download
      *                 is complete.
      */
-    public void download(final FileListEditor callback) throws IOException {
+    public void download(final DownloadCallback callback) throws IOException {
 
         final String res = JOptionPane.showInputDialog(frame,
                 Globals.lang("Enter URL to download"));
@@ -89,10 +90,10 @@ public class DownloadExternalFile {
 
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix = getSuffix(res);
-        String suggestedName = getSuggestedFileName(res, suffix);
+        String suggestedName = bibtexKey != null ? getSuggestedFileName(res, suffix) : "";
         final String directory = getFileDirectory(res);
         File file = new File(new File(directory), suggestedName);
-        FileListEntry entry = new FileListEntry("", file.getPath(),
+        FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getPath() : "",
                 Globals.prefs.getExternalFileTypeByExt(suffix));
         editor = new FileListEntryEditor(frame, entry, true);
         editor.getProgressBar().setIndeterminate(true);
@@ -100,6 +101,12 @@ public class DownloadExternalFile {
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
             public boolean confirmClose(FileListEntry entry) {
                 File f = expandFilename(directory, entry.getLink());
+                if (f.isDirectory()) {
+                    JOptionPane.showMessageDialog(frame,
+                            Globals.lang("Target file cannot be a directory."), Globals.lang("Download file"),
+                            JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
                 if (f.exists()) {
                     return JOptionPane.showConfirmDialog
                         (frame, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
@@ -175,6 +182,7 @@ public class DownloadExternalFile {
         if (suffix == null) {
             System.out.println("Link has no obvious extension (DownloadExternalFile.download()");
         }
+
         String plannedName = bibtexKey + "." + suffix;
 
         /*
@@ -210,5 +218,13 @@ public class DownloadExternalFile {
     public String getFileDirectory(String link) {
         // TODO: getFileDirectory()
         return metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+    }
+
+    /**
+     * Callback interface that users of this class must implement in order to receive
+     * notification when download is complete.
+     */
+    public interface DownloadCallback {
+        public void downloadComplete(FileListEntry file);
     }
 }

@@ -87,7 +87,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     SwitchRightAction switchRightAction = new SwitchRightAction();
 
     // The action which generates a bibtexkey for this entry.
-    GenerateKeyAction generateKeyAction;
+    public GenerateKeyAction generateKeyAction;
 
     SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 

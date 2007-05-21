@@ -17,7 +17,8 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * Created by Morten O. Alver 2007.02.22
  */
-public class FileListEditor extends JTable implements FieldEditor {
+public class FileListEditor extends JTable implements FieldEditor,
+        DownloadExternalFile.DownloadCallback {
 
     FieldNameLabel label;
     FileListEntryEditor editor = null;
@@ -203,10 +204,13 @@ public class FileListEditor extends JTable implements FieldEditor {
         String field = null;
         boolean foundAny = false;
         ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        ArrayList dirs = new ArrayList();
+        if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD+"Directory"))
+            dirs.add(Globals.prefs.get(GUIGlobals.FILE_FIELD+"Directory"));
         for (int i = 0; i < types.length; i++) {
             ExternalFileType type = types[i];
             //System.out.println("Looking for "+type.getName());
-            String found = Util.findFile(entry, type, new ArrayList());
+            String found = Util.findFile(entry, type, dirs);
             if (found != null) {
                 //System.out.println("Found: "+found);
                 File f= new File(found);
@@ -235,6 +239,17 @@ public class FileListEditor extends JTable implements FieldEditor {
      */
     private void downloadFile() {
         String bibtexKey = entryEditor.getEntry().getCiteKey();
+        if (bibtexKey == null) {
+            int answer = JOptionPane.showConfirmDialog(frame,
+                    Globals.lang("This entry has no BibTeX key. Generate key now?"),
+                    Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (answer == JOptionPane.OK_OPTION) {
+                ActionListener l = entryEditor.generateKeyAction;
+                l.actionPerformed(null);
+                bibtexKey = entryEditor.getEntry().getCiteKey();
+            }
+        }
         DownloadExternalFile def = new DownloadExternalFile(frame,
                 frame.basePanel().metaData(), bibtexKey);
         try {
