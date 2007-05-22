@@ -10,6 +10,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
+import java.beans.PropertyChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -95,6 +96,27 @@ public class FileListEditor extends JTable implements FieldEditor,
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
+
+        // Add an input/action pair for deleting entries:
+        getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
+        getActionMap().put("delete", new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int row = getSelectedRow();
+                removeEntries();
+                row = Math.min(row, getRowCount()-1);
+                if (row >= 0)
+                    setRowSelectionInterval(row, row);
+            }
+        });
+
+        // Add an input/action pair for inserting an entry:
+        getInputMap().put(KeyStroke.getKeyStroke("INSERT"), "insert");
+        getActionMap().put("insert", new AbstractAction() {
+
+            public void actionPerformed(ActionEvent actionEvent) {
+                addEntry();
+            }
+        });
     }
 
 

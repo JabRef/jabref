@@ -10,7 +10,6 @@ Chris:
 Morten:
 * Implement "Set file link" feature in ImportInspectionDialog.
 * Add modal progress dialog or threading in Auto feature for external links?
-* Fix behaviour of "Delete" key in FileListEditor (should not delete entry)
 * Add "Copy all externally linked files for this set of entries"-feature
 * [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
