@@ -166,6 +166,7 @@ public class ImportInspectionDialog extends JDialog {
         // Add "Attach file" menu choices to right click menu:
         popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
+        popup.add(new AutoSetLinks());
         popup.add(new AttachFile("pdf"));
         popup.add(new AttachFile("ps"));
         popup.add(new AttachUrl());
@@ -933,6 +934,32 @@ public class ImportInspectionDialog extends JDialog {
             entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
             entries.getReadWriteLock().writeLock().unlock();
             glTable.repaint();
+        }
+    }
+
+    class AutoSetLinks extends JMenuItem implements ActionListener {
+
+        public AutoSetLinks() {
+            super(Globals.lang("Autoset external links"));
+            addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectionModel.getSelected().size() != 1)
+                return;
+            BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            // TODO: check if bibtex key is set
+            FileListTableModel model = new FileListTableModel();
+            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            if (oldVal != null)
+                model.setContent(oldVal);
+            // We have a static utility method for searching for all relevant links:
+            if (FileListEditor.autoSetLinks(entry, model)) {
+                entries.getReadWriteLock().writeLock().lock();
+                entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+                entries.getReadWriteLock().writeLock().unlock();
+                glTable.repaint();
+            }
         }
     }
 

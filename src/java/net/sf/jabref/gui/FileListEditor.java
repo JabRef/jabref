@@ -223,6 +223,21 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private void autoSetLinks() {
         BibtexEntry entry = entryEditor.getEntry();
+        if (autoSetLinks(entry, tableModel))
+            entryEditor.updateField(this);
+    }
+
+    /**
+     * Automatically add links for this entry to the table model given as an argument, based on
+     * the globally stored list of external file types. The entry itself is not modified. The entry's
+     * bibtex key must have been set.
+     *
+     * @param entry The BibtexEntry to find links for.
+     * @param tableModel The table model to insert links into. Already existing links are not duplicated or removed.
+     * @return true if any new links were found, false otherwise.
+     */
+    public static boolean autoSetLinks(BibtexEntry entry, FileListTableModel tableModel) {
+
         String field = null;
         boolean foundAny = false;
         ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
@@ -251,9 +266,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                 }
             }
         }
-        if (foundAny) {
-            entryEditor.updateField(this);
-        }
+        return foundAny;
     }
 
     /**
