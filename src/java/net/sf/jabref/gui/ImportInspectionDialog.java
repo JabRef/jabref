@@ -164,6 +164,7 @@ public class ImportInspectionDialog extends JDialog {
         }
 
         // Add "Attach file" menu choices to right click menu:
+        popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
         popup.add(new AttachFile("pdf"));
         popup.add(new AttachFile("ps"));
@@ -918,6 +919,50 @@ public class ImportInspectionDialog extends JDialog {
                 def.download(this);
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }
+        }
+
+        public void downloadComplete(FileListEntry file) {
+            ImportInspectionDialog.this.toFront(); // Hack
+            FileListTableModel model = new FileListTableModel();
+            String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+            if (oldVal != null)
+                model.setContent(oldVal);
+            model.addEntry(model.getRowCount(), file);
+            entries.getReadWriteLock().writeLock().lock();
+            entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+            entries.getReadWriteLock().writeLock().unlock();
+            glTable.repaint();
+        }
+    }
+
+    class LinkLocalFile extends JMenuItem implements ActionListener,
+        DownloadExternalFile.DownloadCallback {
+
+        BibtexEntry entry = null;
+
+        public LinkLocalFile() {
+            super(Globals.lang("Add file link"));
+            addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent) {
+            if (selectionModel.getSelected().size() != 1)
+                return;
+            entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            FileListEntry flEntry = new FileListEntry("", "", null);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false);
+            editor.setVisible(true);                                                 
+            if (editor.okPressed()) {
+                FileListTableModel model = new FileListTableModel();
+                String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
+                if (oldVal != null)
+                    model.setContent(oldVal);
+                model.addEntry(model.getRowCount(), flEntry);
+                entries.getReadWriteLock().writeLock().lock();
+                entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+                entries.getReadWriteLock().writeLock().unlock();
+                glTable.repaint();
             }
         }
 
