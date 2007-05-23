@@ -8,6 +8,7 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Fix bug in RIS parser (no authors)
 * Fix threading of "Autolink" feature in ImportInspectionDialog.
 * Add modal progress dialog or threading in Auto feature for external links?
 * Add "Copy all externally linked files for this set of entries"-feature
