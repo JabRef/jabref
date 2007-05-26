@@ -10,7 +10,6 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
-import java.beans.PropertyChangeListener;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -222,51 +221,110 @@ public class FileListEditor extends JTable implements FieldEditor,
     }
 
     private void autoSetLinks() {
+        auto.setEnabled(false);
         BibtexEntry entry = entryEditor.getEntry();
-        if (autoSetLinks(entry, tableModel))
-            entryEditor.updateField(this);
+        int tableSize = tableModel.getRowCount();
+        JDialog diag = new JDialog(frame, true);
+        autoSetLinks(entry, tableModel, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                auto.setEnabled(true);
+                if (e.getID() > 0) {
+                    entryEditor.updateField(FileListEditor.this);
+                    frame.output(Globals.lang("Finished autosetting external links."));
+                }
+                else frame.output(Globals.lang("Finished autosetting external links.")
+                    +" "+Globals.lang("No files found."));
+            }
+        }, diag);
+
     }
 
     /**
      * Automatically add links for this entry to the table model given as an argument, based on
      * the globally stored list of external file types. The entry itself is not modified. The entry's
      * bibtex key must have been set.
+     * The operation is done in a new thread, which is returned for the caller to wait for
+     * if needed.
      *
      * @param entry The BibtexEntry to find links for.
      * @param tableModel The table model to insert links into. Already existing links are not duplicated or removed.
-     * @return true if any new links were found, false otherwise.
+     * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is
+     *  finished. The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added.
+     *  This parameter can be null, which means that no callback will be notified.
+     * @param diag An instantiated modal JDialog which will be used to display the progress of the autosetting.
+     *      This parameter can be null, which means that no progress update will be shown.
+     * @return the thread performing the autosetting
      */
-    public static boolean autoSetLinks(BibtexEntry entry, FileListTableModel tableModel) {
+    public static Thread autoSetLinks(final BibtexEntry entry, final FileListTableModel tableModel,
+                                      final ActionListener callback, final JDialog diag) {
 
-        String field = null;
-        boolean foundAny = false;
-        ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-        ArrayList dirs = new ArrayList();
-        if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD+"Directory"))
-            dirs.add(Globals.prefs.get(GUIGlobals.FILE_FIELD+"Directory"));
-        for (int i = 0; i < types.length; i++) {
-            ExternalFileType type = types[i];
-            //System.out.println("Looking for "+type.getName());
-            String found = Util.findFile(entry, type, dirs);
-            if (found != null) {
-                //System.out.println("Found: "+found);
-                File f= new File(found);
-                boolean alreadyHas = false;
-                for (int j=0; j<tableModel.getRowCount(); j++) {
-                    FileListEntry existingEntry = tableModel.getEntry(j);
-                    if (new File(existingEntry.getLink()).equals(f)) {
-                        alreadyHas = true;
-                        break;
-                    }
-                }
-                if (!alreadyHas) {
-                    FileListEntry flEntry = new FileListEntry(f.getName(), found, type);
-                    tableModel.addEntry(tableModel.getRowCount(), flEntry);
-                    foundAny = true;
-                }
-            }
+        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, types.length-1);
+        prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        final JLabel label = new JLabel(Globals.lang("Searching for")+
+                ":                                            ");
+        if (diag != null) {
+            diag.setTitle(Globals.lang("Autosetting links"));
+            diag.getContentPane().add(prog, BorderLayout.CENTER);
+            diag.getContentPane().add(label, BorderLayout.SOUTH);
+
+            diag.pack();
+            diag.setLocationRelativeTo(diag.getParent());
         }
-        return foundAny;
+        Runnable r = new Runnable() {
+
+            public void run() {
+                boolean foundAny = false;
+                ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+                ArrayList dirs = new ArrayList();
+                if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
+                    dirs.add(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
+                for (int i = 0; i < types.length; i++) {
+                    final ExternalFileType type = types[i];
+                    //System.out.println("Looking for "+type.getName());
+                    String found = Util.findFile(entry, type, dirs);
+                    if (found != null) {
+                        //System.out.println("Found: "+found);
+                        File f = new File(found);
+                        boolean alreadyHas = false;
+                        for (int j = 0; j < tableModel.getRowCount(); j++) {
+                            FileListEntry existingEntry = tableModel.getEntry(j);
+                            if (new File(existingEntry.getLink()).equals(f)) {
+                                alreadyHas = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyHas) {
+                            FileListEntry flEntry = new FileListEntry(f.getName(), found, type);
+                            tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                            foundAny = true;
+                        }
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        label.setText(Globals.lang("Searching for")+": "+type.getName());
+                        prog.setValue(prog.getValue()+1);
+                    }
+                });
+                }
+                final int id = foundAny ? 1 : 0;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (diag != null)
+                            diag.dispose();
+                        if (callback != null)
+                            callback.actionPerformed(new ActionEvent(this, id, ""));
+                    }
+                });
+
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+        if (diag != null) {
+            diag.setVisible(true);
+        }
+        return t;
     }
 
     /**

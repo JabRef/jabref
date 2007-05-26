@@ -25,7 +25,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // the bib file:
         postOpenActions.add(new CheckForNewEntryTypesAction());
         // Add the action for the new external file handling system in version 2.3:
-        postOpenActions.add(new FileLinksUpgradeWarning());
+        //postOpenActions.add(new FileLinksUpgradeWarning());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {

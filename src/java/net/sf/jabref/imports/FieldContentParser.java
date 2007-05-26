@@ -17,7 +17,14 @@ public class FieldContentParser {
      * or may not be the same as the argument given.
      */
     public StringBuffer format(StringBuffer content) {
-
+        /*System.out.println("Content: '"+content+"'");
+        byte[] bt = content.toString().getBytes();
+        for (int i = 0; i < bt.length; i++) {
+            byte b = bt[i];
+            System.out.print(b+" ");
+        }
+        System.out.println("");
+        */
         //boolean rep = false;
 
         int i=0;
@@ -26,27 +33,25 @@ public class FieldContentParser {
         // TODO: 2005.12.3: Added replace from \r to \n, to work around a reported problem of words stiched together.
         // But: we need to find out why these lone \r characters appear in his file.
         content = new StringBuffer(content.toString().replaceAll("\r\n","\n").replaceAll("\r", "\n"));
-        //if (rep) System.out.println(content.toString());
-        /*while (i<content.length()) {
-            if (content.charAt(i) == '\r')
-                content.deleteCharAt(i);
-            else i++;
-        }
 
-        i=0;*/
         while (i<content.length()) {
 
             int c = content.charAt(i);
             if (c == '\n') {
-                if ((content.length()>i+2) && (content.charAt(i+1)=='\t')
-                    && !Character.isWhitespace(content.charAt(i+2))) {
-                    // We have \n\t followed by non-whitespace, which indicates
-                    // a wrap made by JabRef. Remove and insert space if necessary.
+                if ((content.length()>i+1) && (content.charAt(i+1)=='\t')
+                    && ((content.length()==i+2) || !Character.isWhitespace(content.charAt(i+2)))) {
+                    // We have either \n\t followed by non-whitespace, or \n\t at the
+                    // end. Bothe cases indicate a wrap made by JabRef. Remove and insert space if necessary.
 
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
                     // Add space only if necessary:
-                    if ((i>0) && !Character.isWhitespace(content.charAt(i-1))) {
+                    // Note 2007-05-26, mortenalver: the following line was modified. It previously
+                    // didn't add a space if the line break was at i==0. This caused some occurences of
+                    // "string1 # { and } # string2" constructs lose the space in front of the "and" because
+                    // the line wrap caused a JabRef linke break at the start of a value containing the " and ".
+                    // The bug was caused by a protective check for i>0 to avoid intexing char -1 in content.
+                    if ((i==0) || !Character.isWhitespace(content.charAt(i-1))) {
                         content.insert(i, ' ');
                         // Increment i because of the inserted character:
                         i++;
@@ -57,7 +62,6 @@ public class FieldContentParser {
                     && !Character.isWhitespace(content.charAt(i+3))) {
                     // We have \n\t followed by ' ' followed by non-whitespace, which indicates
                     // a wrap made by JabRef <= 1.7.1. Remove:
-
                     content.deleteCharAt(i); // \n
                     content.deleteCharAt(i); // \t
                     // Remove space only if necessary:
@@ -114,7 +118,7 @@ public class FieldContentParser {
                 i++;
 
         }
-
+        
         return content;
     }
 

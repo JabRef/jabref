@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -58,10 +59,23 @@ public class FileListTableModel extends AbstractTableModel {
 
     }
 
-    public void addEntry(int index, FileListEntry entry) {
+    /**
+     * Add an entry to the table model, and fire a change event. The change event
+     * is fired on the event dispatch thread.
+     * @param index The row index to insert the entry at.
+     * @param entry The entry to insert.
+     */
+    public void addEntry(final int index, final FileListEntry entry) {
         synchronized (list) {
             list.add(index, entry);
-            fireTableRowsInserted(index, index);
+            if (!SwingUtilities.isEventDispatchThread()) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        fireTableRowsInserted(index, index);
+                    }
+                });
+            } else
+                fireTableRowsInserted(index, index);
         }
 
     }
@@ -185,4 +199,6 @@ public class FileListTableModel extends AbstractTableModel {
         }
         System.out.println("----");
     }
+
+   
 }

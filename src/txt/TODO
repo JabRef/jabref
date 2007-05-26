@@ -8,12 +8,10 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Add "Synchronize file links" feature.
-* Fix bug in RIS parser (no authors)
-* Fix threading of "Autolink" feature in ImportInspectionDialog.
-* Add modal progress dialog or threading in Auto feature for external links?
+* Fix bad performance of autosetting links.
+* Activate OpenDatabaseAction: file links upgrade warning.
 * Add "Copy all externally linked files for this set of entries"-feature
-* [can't reproduce?] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
+* [see feedback] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?

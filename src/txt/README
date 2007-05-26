@@ -30,7 +30,7 @@ box for details.
 
 Requirements:
 JabRef runs on any system equipped with the Java Virtual Machine
-(1.4.2 or newer), which can be downloaded at no cost from
+(1.5 or newer), which can be downloaded at no cost from
 http://java.sun.com. If you do not plan to compile JabRef, the Java
 Runtime Environment may be a better choice than the Java Development
 Kit.
@@ -55,9 +55,8 @@ or, if you are using the Java Runtime Environment:
      jre -new -jar <path to jar> or
      jrew -new -jar <path to jar>
 
-We recommend running JabRef under the Java 5.0 JRE. If you do, you should add
-the option "-Dswing.aatext=true" before the "-jar" option, to activate
-antialiased text throughout the application.
+If you run JabRef under Java 1.5, you can add the option "-Dswing.aatext=true" before the
+"-jar" option, to activate antialiased text throughout the application.
 
 
 The jar file containing JabRef can be unpacked with the command:
@@ -93,6 +92,8 @@ Change log:
 	- Improved handling of external links. The 'file' field can now specify a list
 	  of external links, and arbitrary file types are supported. Old-style PDF and
 	  PS links can be moved automatically into the 'file' field.
+	- Fixed bug in RIS and Refer/Endnote imports. Entries with editors but no authors
+	  are now imported properly.
 	- Fixed missing export formatter AuthorFirstFirstCommas.
 	- Fixed minor bug in Harvard export with missing space between year and title.
 	- Fixed bug that caused lockup when connection to IEEExplore fails.

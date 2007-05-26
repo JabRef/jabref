@@ -272,6 +272,7 @@ public class JabRefFrame extends JFrame {
       expandEndnoteZip = new ExpandEndnoteFilters(this),
         autoSetPdf = new GeneralAction("autoSetPdf", Globals.lang("Synchronize %0 links", "PDF"), Globals.prefs.getKey("Synchronize PDF")),
         autoSetPs = new GeneralAction("autoSetPs", Globals.lang("Synchronize %0 links", "PS"), Globals.prefs.getKey("Synchronize PS")),
+        autoSetFile = new GeneralAction("autoSetFile", Globals.lang("Synchronize file links"), Globals.prefs.getKey("Synchronize files")),
 
     abbreviateMedline = new GeneralAction("abbreviateMedline", "Abbreviate journal names (MEDLINE)",
                 Globals.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
@@ -1101,6 +1102,7 @@ public JabRefPreferences prefs() {
       tools.add(checkAndFix);
       checkAndFix.add(dupliCheck);
       //checkAndFix.add(strictDupliCheck);
+      checkAndFix.add(autoSetFile);
       checkAndFix.add(autoSetPdf);
       checkAndFix.add(autoSetPs);
       checkAndFix.add(integrityCheckAction);

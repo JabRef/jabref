@@ -947,19 +947,35 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectionModel.getSelected().size() != 1)
                 return;
-            BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
-            // TODO: check if bibtex key is set
-            FileListTableModel model = new FileListTableModel();
+            final BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            String bibtexKey = entry.getCiteKey();
+            if (bibtexKey == null) {
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        Globals.lang("This entry has no BibTeX key. Generate key now?"),
+                        Globals.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (answer == JOptionPane.OK_OPTION) {
+                    generateKeySelectedEntry();
+                    bibtexKey = entry.getCiteKey();
+                } else return; // Can't go on without the bibtex key.
+            }
+            final FileListTableModel model = new FileListTableModel();
             String oldVal = (String)entry.getField(GUIGlobals.FILE_FIELD);
             if (oldVal != null)
                 model.setContent(oldVal);
             // We have a static utility method for searching for all relevant links:
-            if (FileListEditor.autoSetLinks(entry, model)) {
-                entries.getReadWriteLock().writeLock().lock();
-                entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
-                entries.getReadWriteLock().writeLock().unlock();
-                glTable.repaint();
-            }
+            JDialog diag = new JDialog(ImportInspectionDialog.this, true);
+            FileListEditor.autoSetLinks(entry, model, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getID() > 0) {
+                        entries.getReadWriteLock().writeLock().lock();
+                        entry.setField(GUIGlobals.FILE_FIELD, model.getStringRepresentation());
+                        entries.getReadWriteLock().writeLock().unlock();
+                        glTable.repaint();
+                    }
+                }
+            }, diag);
+
         }
     }
 
@@ -969,7 +985,7 @@ public class ImportInspectionDialog extends JDialog {
         BibtexEntry entry = null;
 
         public LinkLocalFile() {
-            super(Globals.lang("Add file link"));
+            super(Globals.lang("Link local file"));
             addActionListener(this);
         }
 

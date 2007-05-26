@@ -43,12 +43,12 @@ public class EndnoteImporter extends ImportFormat {
 
     // Our strategy is to look for the "%A *" line.
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-    Pattern pat1 = Pattern
-        .compile("%A .*");
+    Pattern pat1 = Pattern.compile("%A .*"),
+            pat2 = Pattern.compile("%E .*");
     String str;
     while ((str = in.readLine()) != null){
-        if (pat1.matcher(str).find())
-        return true;
+        if (pat1.matcher(str).matches() || pat2.matcher(str).matches())
+            return true;
     }
     return false;
     }
@@ -81,12 +81,12 @@ public class EndnoteImporter extends ImportFormat {
 
     String[] entries = sb.toString().split(ENDOFRECORD);
     HashMap hm = new HashMap();
-    String Author = "", Type = "", Editor = "";
+    String author = "", Type = "", editor = "";
     for (int i = 0; i < entries.length; i++){
         hm.clear();
-        Author = "";
+        author = "";
         Type = "";
-        Editor = "";
+        editor = "";
         boolean IsEditedBook = false;
         String[] fields = entries[i].trim().substring(1).split("\n%");
         //String lastPrefix = "";
@@ -112,11 +112,11 @@ public class EndnoteImporter extends ImportFormat {
         String val = fields[j].substring(2);
 
         if (prefix.equals("A")){
-            if (Author.equals("")) Author = val;
-            else Author += " and " + val;
+            if (author.equals("")) author = val;
+            else author += " and " + val;
         }else if (prefix.equals("E")){
-            if (Editor.equals("")) Editor = val;
-            else Editor += " and " + val;
+            if (editor.equals("")) editor = val;
+            else editor += " and " + val;
         }else if (prefix.equals("T")) hm.put("title", val);
         else if (prefix.equals("0")){
             if (val.indexOf("Journal") == 0) Type = "article";
@@ -174,14 +174,14 @@ public class EndnoteImporter extends ImportFormat {
 
         // For Edited Book, EndNote puts the editors in the author field.
         // We want them in the editor field so that bibtex knows it's an edited book
-        if (IsEditedBook && Editor.equals("")) {
-           Editor = Author;
-           Author = "";
+        if (IsEditedBook && editor.equals("")) {
+           editor = author;
+           author = "";
         }
 
         //fixauthorscomma
-        if (!Author.equals("")) hm.put("author", fixAuthor(Author));
-        if (!Editor.equals("")) hm.put("editor", fixAuthor(Editor));
+        if (!author.equals("")) hm.put("author", fixAuthor(author));
+        if (!editor.equals("")) hm.put("editor", fixAuthor(editor));
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
                         .getEntryType(Type)); // id assumes an existing database so don't
         // create one here

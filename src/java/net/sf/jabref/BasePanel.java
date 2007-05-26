@@ -70,10 +70,7 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.export.*;
-import net.sf.jabref.external.AutoSetExternalFileForEntries;
-import net.sf.jabref.external.WriteXMPAction;
-import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.UpgradeExternalLinks;
+import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
@@ -1332,6 +1329,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put("unabbreviate", new UnabbreviateAction(this));
         actions.put("autoSetPdf", new AutoSetExternalFileForEntries(this, "pdf"));
         actions.put("autoSetPs", new AutoSetExternalFileForEntries(this, "ps"));
+        actions.put("autoSetFile", new SynchronizeFileField(this));
         actions.put("upgradeLinks", new UpgradeExternalLinks(this));
 
     }

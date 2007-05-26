@@ -44,15 +44,14 @@ public class RisImporter extends ImportFormat {
 
     // Our strategy is to look for the "AU  - *" line.
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-    Pattern pat1 = Pattern
-        .compile("AU  - .*"),
-        pat2 = Pattern
-        .compile("A1  - .*");
+    Pattern pat1 = Pattern.compile("AU  - .*"),
+        pat2 = Pattern.compile("A1  - .*"),
+        pat3 = Pattern.compile("A2  - .*");
 
     String str;
     while ((str = in.readLine()) != null){
-        if (pat1.matcher(str).find() || pat2.matcher(str).find())
-        return true;
+        if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find())
+            return true;
     }
     return false;
     }
@@ -74,7 +73,7 @@ public class RisImporter extends ImportFormat {
 
 
     for (int i = 0; i < entries.length - 1; i++){
-            String Type = "", Author = "", Editor = "", StartPage = "", EndPage = "",
+            String type = "", author = "", editor = "", startPage = "", endPage = "",
                 comment = "";
             HashMap hm = new HashMap();
 
@@ -100,15 +99,15 @@ public class RisImporter extends ImportFormat {
             String lab = entry.substring(0, 2);
             String val = entry.substring(6).trim();
             if (lab.equals("TY")){
-            if (val.equals("BOOK")) Type = "book";
-            else if (val.equals("JOUR") || val.equals("MGZN")) Type = "article";
-                        else if (val.equals("THES")) Type = "phdthesis";
-                        else if (val.equals("UNPB")) Type = "unpublished";
-                        else if (val.equals("RPRT")) Type = "techreport";
-                        else if (val.equals("CONF")) Type = "inproceedings";
-                        else if (val.equals("CHAP")) Type = "incollection";//"inbook";
+            if (val.equals("BOOK")) type = "book";
+            else if (val.equals("JOUR") || val.equals("MGZN")) type = "article";
+                        else if (val.equals("THES")) type = "phdthesis";
+                        else if (val.equals("UNPB")) type = "unpublished";
+                        else if (val.equals("RPRT")) type = "techreport";
+                        else if (val.equals("CONF")) type = "inproceedings";
+                        else if (val.equals("CHAP")) type = "incollection";//"inbook";
 
-            else Type = "other";
+            else type = "other";
             }else if (lab.equals("T1") || lab.equals("TI")) hm.put("title", val);//Title
             // =
             // val;
@@ -116,27 +115,27 @@ public class RisImporter extends ImportFormat {
                 hm.put("booktitle", val);
             }
             else if (lab.equals("A1") || lab.equals("AU")){
-                if (Author.equals("")) // don't add " and " for the first author
-                    Author = val;
-                else Author += " and " + val;
+                if (author.equals("")) // don't add " and " for the first author
+                    author = val;
+                else author += " and " + val;
             }
             else if (lab.equals("A2")){
-                if (Editor.equals("")) // don't add " and " for the first editor
-                    Editor = val;
-                else Editor += " and " + val;
+                if (editor.equals("")) // don't add " and " for the first editor
+                    editor = val;
+                else editor += " and " + val;
             } else if (lab.equals("JA") || lab.equals("JF") || lab.equals("JO")) {
-                if (Type.equals("inproceedings"))
+                if (type.equals("inproceedings"))
                     hm.put("booktitle", val);
                 else
                     hm.put("journal", val);
             }
 
-            else if (lab.equals("SP")) StartPage = val;
+            else if (lab.equals("SP")) startPage = val;
             else if (lab.equals("PB"))
                 hm.put("publisher", val);
             else if (lab.equals("AD") || lab.equals("CY"))
                 hm.put("address", val);
-            else if (lab.equals("EP")) EndPage = val;
+            else if (lab.equals("EP")) endPage = val;
                     else if (lab.equals("SN"))
                         hm.put("issn", val);
             else if (lab.equals("VL")) hm.put("volume", val);
@@ -178,21 +177,21 @@ public class RisImporter extends ImportFormat {
         }
         }
         // fix authors
-        if (Author.length() > 0) {
-            Author = AuthorList.fixAuthor_lastNameFirst(Author);
-            hm.put("author", Author);
+        if (author.length() > 0) {
+            author = AuthorList.fixAuthor_lastNameFirst(author);
+            hm.put("author", author);
         }
-        if (Editor.length() > 0) {
-            Editor = AuthorList.fixAuthor_lastNameFirst(Editor);
-            hm.put("editor", Editor);
+        if (editor.length() > 0) {
+            editor = AuthorList.fixAuthor_lastNameFirst(editor);
+            hm.put("editor", editor);
         }
         if (comment.length() > 0) {
             hm.put("comment", comment);
         }
 
-        hm.put("pages", StartPage + "--" + EndPage);
+        hm.put("pages", startPage + "--" + endPage);
         BibtexEntry b = new BibtexEntry(BibtexFields.DEFAULT_BIBTEXENTRY_ID, Globals
-                        .getEntryType(Type)); // id assumes an existing database so don't
+                        .getEntryType(type)); // id assumes an existing database so don't
 
         // Remove empty fields:
         ArrayList toRemove = new ArrayList();
