@@ -7,6 +7,7 @@
 \usepackage{textcomp}
 \setcounter{secnumdepth}{2}
 \setcounter{tocdepth}{4}
+\usepackage{xspace}
 
 %%%%% author, version of file %%%%%
 \newcommand{\versiondate}{in Bearb.}%21.\,5.\,2007}
@@ -29,10 +30,7 @@
 
 \makeatletter
 %%%%% LyX command %%%%%
-\providecommand{\LyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
-
-%%%%% Because html converters don't know tabularnewline %%%%%
-\providecommand{\tabularnewline}{\\}
+\providecommand{\LyX}{L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@\xspace}
 
 %%%%% Listings %%%%%
 \usepackage{listings}
@@ -74,26 +72,28 @@
 %%%%% New commands %%%%%
 %%% JabRef "logo"
 \DeclareRobustCommand{\jabref}{%
-  \raisebox{-.32ex}{\color{dkred}J}\kern-.06em%
-    \hbox{$\m@th$% %% force math size calculations
-          \csname S@\f@size\endcsname
-          \fontsize\sf@size\z@
-          \math@fontsfalse\selectfont
-          \color{orange}A\kern-.025emB}\-%
-  \hbox{\kern-.06em\-R\hspace{-.08em}%
-    \raisebox{.16ex}{$\m@th$% %% force math size calculations
-          \csname S@\f@size\endcsname
-          \fontsize\sf@size\z@
-          \math@fontsfalse\selectfont
-          E\kern-.025emF}}%
+  \texorpdfstring{% TeX string
+	  \raisebox{-.32ex}{\color{dkred}J}\kern-.06em%
+	    \hbox{$\m@th$% %% force math size calculations
+	          \csname S@\f@size\endcsname
+	          \fontsize\sf@size\z@
+	          \math@fontsfalse\selectfont
+	          \color{orange}A\kern-.025emB}\-%
+	  \hbox{\kern-.06em\-R\hspace{-.08em}%
+	    \raisebox{.16ex}{$\m@th$% %% force math size calculations
+	          \csname S@\f@size\endcsname
+	          \fontsize\sf@size\z@
+	          \math@fontsfalse\selectfont
+	          E\kern-.025emF}}\xspace}%
+	  {JabRef\xspace}% PDF string
 }
 
 %%% version number
-\newcommand{\versionnr}{2.3\,(beta)} %
+\newcommand{\versionnr}{\texorpdfstring{2.3\,(beta)}{2.3 (beta)}} %
 %%% JabRef logo with version nr
-\newcommand{\jabrefversion}{\jabref{}~\versionnr}
+\newcommand{\jabrefversion}{\jabref~\versionnr}
 %%% BibTeX logo
-\newcommand{\bibtex}{\texorpdfstring{Bib\kern-.125em\TeX}{BibTeX}}
+\newcommand{\bibtex}{\texorpdfstring{Bib\kern-.125em\TeX\xspace}{BibTeX}}
 %%% for Menu references
 \newcommand{\menu}[1]{\texorpdfstring{{\color{dkred}\textit{#1}}}{#1}}
 %%% Menu separator
@@ -115,12 +115,10 @@
     #2\par%
   \end{hangparas}
 }%
-%\newcommand{\faq}[2]{%
-%  \subsection{#1}
-%  #2}%
+
 %%% for CTAN references
 \newcommand{\ctan}[1]{%
-  {CTAN: \color{dkblue}#1}%
+  {\textsc{ctan}: \color{dkred}#1}%
 }
 
 %%%%% Headings %%%%%
@@ -137,6 +135,7 @@
 %%%%% Fonts %%%%%
 \usepackage{charter}
 \addtokomafont{sectioning}{\rmfamily} % Headings with serifs
+\renewcommand{\headfont}{\normalfont\itshape} % Headlines italic, not slanted ***
 \usepackage[scaled=.83]{beramono}
 
 %%%%% Other stuff %%%%%
@@ -144,7 +143,7 @@
 %\usepackage{microtype} % micro typography
 
 %%%%% Mini TOCs %%%%%
-\usepackage[ngerman]{minitoc}
+\usepackage{minitoc}
 \mtcsetrules{secttoc}{off}
 %\mtcsetdepth{secttoc}{3}
 \mtcsetfont{secttoc}{subsection}{}
@@ -152,11 +151,27 @@
 %\mtcsettitlefont{secttoc}{\itshape}
 
 %%%%% Language %%%%%
-\usepackage[ngerman]{babel}
+\usepackage{babel}
 
 %%%%% Bibliography %%%%%
 \usepackage{jurabib}
-\jurabibsetup{annote=true,authorformat=year}
+\jurabibsetup{%
+  annote=true,
+  authorformat=year,
+  dotafter=bibentry
+}
+\renewcommand{\biblnfont}{}			% Autoren-Nachnamen (Standard: fett)
+\renewcommand{\bibfnfont}{}			% Autoren-Vornamen (Standard: fett)
+\renewcommand{\bibelnfont}{}			% Hrsg-Nachnamen (Standard: fett)
+\renewcommand{\bibefnfont}{}			% Hrsg-Vornamen (Standard: fett)
+\renewcommand{\bibtfont}{\textit}	% Titel (Bücher)
+\renewcommand{\bibbtfont}{\textit}	% Titel (Sammelwerke)
+\renewcommand{\bibjtfont}{\textit}	% Titel (Zeitschriften)
+\renewcommand{\bibpldelim}{(}			% runde Klammern bei...
+\renewcommand{\bibprdelim}{)}			% ...Zeitschriften (Jahr)
+\renewcommand{\ajtsep}{}				% kein Komma nach Zs-Titeln
+\renewcommand{\biburlprefix}{\jblangle\textsc{url: }}	% Klammer und Text vor einer URL (Standard: "URL: ")
+
 \renewcommand{\bib@heading}{\addsec{Kommentiertes Literaturverzeichnis}}
 
 %%%%% Hyperref %%%%%
@@ -175,6 +190,7 @@ pdfstartview=FitH,%
 bookmarksopen=true,%
 bookmarksopenlevel=1,%
 }
+\urlstyle{rm}
 
 \hyphenation{
 LaTeX
@@ -205,17 +221,17 @@ Benutzerhandbuch}
 \maketitle
 
 \begin{abstract}
-\jabref{} ist eine grafische Java-Anwendung zur Bearbeitung von \bibtex{}-Dateien
-(.bib). Mit \jabref{} können Literaturangaben in Gruppen organisiert
+\jabref ist eine grafische Java-Anwendung zur Bearbeitung von \bibtex{}-Dateien
+(.bib). Mit \jabref können Literaturangaben in Gruppen organisiert
 und mit einem einfachen Klick die Ansicht auf eine einzelne Gruppe,
 eine Schnittmenge von Gruppen oder die Gesamtmenge mehrerer Gruppen
-eingegrenzt werden. \jabref{} kann Literaturangaben sortieren (für
+eingegrenzt werden. \jabref kann Literaturangaben sortieren (für
 alle Standard-\bibtex{}-Felder) und automatisch \bibtex{}-Keys erzeugen.
-Auch Links zu PDF-Dateien oder Webseiten können mit \jabref{} einfach
+Auch Links zu PDF-Dateien oder Webseiten können mit \jabref einfach
 erstellt werden.
 
-\jabref{} kann verschiedene Dateiformate importieren und exportieren,
-außerdem können die Exportfilter angepasst werden. \jabref{} kann
+\jabref kann verschiedene Dateiformate importieren und exportieren,
+außerdem können die Exportfilter angepasst werden. \jabref kann
 auch von der Kommandozeile gestartet werden, um von einem Importformat
 in ein Exportformat zu konvertieren, ohne die grafische Benutzeroberfläche
 zu starten.
@@ -243,8 +259,8 @@ Waßenhoven}
 \subsection{Über dieses Handbuch}\label{subsec:about}
 
 Dieses Handbuch will eine kurze Einführung zu den nützlichsten Funktionen
-von \jabref{} bieten, ohne dabei eine erschöpfende Beschreibung aller
-Funktionalitäten dieser Software zu liefern. \emph{}\jabref{} ist
+von \jabref bieten, ohne dabei eine erschöpfende Beschreibung aller
+Funktionalitäten dieser Software zu liefern. \emph{}\jabref ist
 das Ergebnis der Verschmelzung von \emph{BibKeeper} und \emph{JBibtexManager}.
 Weitere Informationen gibt es im Programm selbst unter \menu{Hilfe} \msep{} \menu{Inhalt}
 sowie im Internet unter \url{http://jabref.sourceforge.net}. Wer dann immer noch keine Antwort auf seine Frage oder keine Lösung zu seinem Problem hat, kann über die Foren oder die Mailingliste auf der Projektseite bei Sourceforge weitere Hilfe bekommen (siehe dazu den Abschnitt \nameref{sec:faq}).
@@ -268,7 +284,7 @@ Wenn Ihnen in diesem Handbuch Fehler auf"|fallen oder wenn Sie Anregungen zum Ha
 
 \subsection{Einführung in \bibtex{}}
 
-\label{BibtexHelp}\tip[]{\jabref{} hilft Ihnen bei der Arbeit mit
+\label{BibtexHelp}\tip[]{\jabref hilft Ihnen bei der Arbeit mit
 Ihren \bibtex{}-Dateien, aber es müssen dennoch Regeln beachtet werden,
 wenn Sie Ihre Einträge bearbeiten. Nur so kann sichergestellt werden,
 dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
@@ -277,7 +293,7 @@ dass \bibtex{} Ihre Datei richtig verarbeiten kann.}
 
 \subsubsection{\bibtex{}-Eintragstypen}
 \label{Eintragstypen}
-Je nachdem, ob sie ein Buch, einen Zeitschriftenartikel, einen Sammelband oder ein anderes Dokument referenzieren möchten, hält \bibtex{} unterschiedliche Eintragstypen bereit. Hier folgt eine kurze Aufstellung der meist gebrauchten Eintragstypen.\footnote{Vgl. \cite[12--17]{Markey2005}; \cite[7--9]{btxdoc}.} Manche Paktete (wie ">jurabib"<) stellen weitere Eintragstypen zur Verfügung, die Sie natürlich auch in \jabref{} verwenden können (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}). Für die Verwendung dieser spezifischen Typen schauen Sie bitte in die jeweilige Dokumentation.
+Je nachdem, ob sie ein Buch, einen Zeitschriftenartikel, einen Sammelband oder ein anderes Dokument referenzieren möchten, hält \bibtex{} unterschiedliche Eintragstypen bereit. Hier folgt eine kurze Aufstellung der meist gebrauchten Eintragstypen.\footnote{Vgl. \cite[12--17]{Markey2005}; \cite[7--9]{btxdoc}.} Manche Paktete (wie ">jurabib"<) stellen weitere Eintragstypen zur Verfügung, die Sie natürlich auch in \jabref verwenden können (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}). Für die Verwendung dieser spezifischen Typen schauen Sie bitte in die jeweilige Dokumentation.
 
 \begin{itemize}
 \item \emph{@article}\\
@@ -312,7 +328,7 @@ Ein Dokument mit Autor und Titel, unveröffentlicht.
 
 \subsubsection{\bibtex{}-Felder}
 
-Es gibt viele unterschiedliche Felder in \bibtex{} und einige zusätzliche Felder, die Sie in \jabref{} einsetzen können.
+Es gibt viele unterschiedliche Felder in \bibtex{} und einige zusätzliche Felder, die Sie in \jabref einsetzen können.
 Grundsätzlich können Sie \LaTeX{}-Befehle in Feldern, die Text beinhalten, einsetzen. \bibtex{} wird Ihr Literaturverzeichnis automatisch formatieren und je nach \bibtex{} style (Stildatei .bst) Großbuchstaben verkleinern. Um sicherzustellen, dass Anfangsbuchstaben groß bleiben, müssen Sie die Wörter in geschweifte Klammern einschließen, wie im Wort \{Belgien\}.\footnote{Die meisten deutschen \bibtex{}-Stile behalten die Großbuchstaben ohnehin bei.}
 
 Hinweise zu einigen Feldtypen:
@@ -386,7 +402,7 @@ Falls die Bücher einer Reihe nummeriert sind, wird die entsprechende Nummer im F
 Bibliographie-Stile für \bibtex{} wurden von vielen Leuten entwickelt,
 und einige haben weitere Felder erstellt. Es folgt eine kleine Auswahl.
 
-Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{} unterstützt, können aber eingebunden werden (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}).
+Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref unterstützt, können aber eingebunden werden (mehr dazu im Abschnitt \nameref{CustomEntriesHelp}).
 
 \begin{itemize}
   \item \emph{affiliation*}\\
@@ -406,7 +422,7 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
   \item \emph{ISSN*}\\
     Die Internationale Standardseriennummer (für Zeitschriften).
   \item \emph{keywords}\\
-    Stichworte~-- sie können in \jabref{} gut zum Gruppieren verwendet werden.
+    Stichworte~-- sie können in \jabref gut zum Gruppieren verwendet werden.
   \item \emph{language*}\\
     Die Sprache des Werks.
   \item \emph{location*}\\
@@ -431,14 +447,14 @@ Feldnamen, die mit einem Stern* versehen sind, werden nicht direkt von \jabref{}
 \secttoc
 
 \subsection{System-Voraussetzungen}
-
-\jabref{} ist in Java programmiert und somit betriebssystemunabhängig,
+\label{subsec:System-Voraussetzungen}
+\jabref ist in Java programmiert und somit betriebssystemunabhängig,
 kann prinzipiell also unter Windows, Mac OS X, Linux und anderen UNIX-Systemen
 betrieben werden. Voraussetzung ist allerdings, dass die \emph{Java
-Virtual Machine} mindestens in der Version~1.4.2 installiert ist.
+Virtual Machine} mindestens in der Version~1.5 installiert ist.\footnote{Bis zur Version 2.2 von \jabref reichte Java~1.4.2 aus.}
 Sie ist kostenlos und kann unter \url{http://java.sun.com/} heruntergeladen
 werden. Im Normalfall sollte das \emph{Java Runtime Environment} (JRE) ausreichen;
-nur wenn Sie \jabref{} kompilieren möchten, benötigen Sie das \emph{Java
+nur wenn Sie \jabref kompilieren möchten, benötigen Sie das \emph{Java
 Development Kit} (JDK).
 
 
@@ -447,8 +463,8 @@ Development Kit} (JDK).
 
 \subsubsection{Installer (msi)}
 
-\jabref{} gibt es im Windows Installer-Format (\texttt{.msi}). Ein
-Doppelklick auf die MSI-Datei installiert \jabref{} und fügt dem
+\jabref gibt es im Windows Installer-Format (\texttt{.msi}). Ein
+Doppelklick auf die MSI-Datei installiert \jabref und fügt dem
 Startmenü eine Verknüpfung hinzu. Falls Java nicht installiert ist,
 wird eine Warnmeldung ausgegeben.%
 \footnote{Die Windows-Installation wurde von Dale Visser erstellt, der dazu
@@ -464,7 +480,7 @@ ein Tool zum Kompilieren von MSI-Dateien aus einer XML-Spezifikation
 Wenn Sie die ausführbare jar-Datei (\texttt{.jar}) heruntergeladen
 haben, probieren Sie zunächst, ob ein Doppelklick darauf das Programm
 startet~-- dies funktioniert zumindest auf einigen Systemen. Falls
-\jabref{} nicht direkt startet (Windows also nicht weiß, was es mit
+\jabref nicht direkt startet (Windows also nicht weiß, was es mit
 einer jar-Datei anfangen soll), fahren Sie folgendermaßen fort:
 
 Erstellen Sie in dem Ordner, in dem Sie die Datei \emph{JabRef.jar}
@@ -474,7 +490,7 @@ Diese Datei soll nur eine Zeile enthalten:
 \begin{lstlisting}
 start javaw -jar JabRef.jar
 \end{lstlisting}
-Mit einem Doppelklick auf die Batch-Datei starten Sie \jabref{}.
+Mit einem Doppelklick auf die Batch-Datei starten Sie \jabref.
 
 
 \subsection{Starten von der Kommandozeile}\label{subsec:Starten-Kommandozeile}
@@ -493,12 +509,11 @@ jrew -new -jar <Pfad zur jar-Datei>
 java -jar <Pfad zur jar-Datei>
 \end{lstlisting}
 \end{enumerate}
-Es wird empfohlen, \jabref{} mit dem Java 5.0 JRE zu benutzen. Falls
-Sie dies tun, sollten Sie die Option \texttt{-Dswing.aatext=true}
-vor der Option \texttt{-jar} einfügen, um das Benutzen von Anti-Alias-Schriften
+Es wird empfohlen, \jabref mit Java 1.5 zu benutzen und die Option \lstinline{-Dswing.aatext=true}
+vor der Option \lstinline{-jar} einfügen, um das Benutzen von Anti-Alias-Schriften
 im Programm zu ermöglichen.
 
-Die jar-Datei, die \jabref{} enthält, kann entpackt werden mit den
+Die jar-Datei, die \jabref enthält, kann entpackt werden mit den
 Kommandos 
 \begin{lstlisting}
 jar xf <Pfad zur jar-Datei>
@@ -511,7 +526,7 @@ Das Entpacken der jar-Datei ist nicht notwendig, um das Programm zu
 starten!
 
 Weitere Hinweise zur Installation finden Sie in der Datei INSTALL
-(zum Kompilieren aus den \emph{sourcen}) und auf der \href{http://jabref.sourceforge.net}{\jabref{}-Homepage}.
+(zum Kompilieren aus den \emph{sourcen}) und auf der \href{http://jabref.sourceforge.net}{\jabref-Homepage}.
 
 
 \clearpage 
@@ -519,17 +534,17 @@ Weitere Hinweise zur Installation finden Sie in der Datei INSTALL
 \secttoc
 \bigskip
 
-\noindent \label{JabRefHelp}\jabref{} ist ein Programm zur Verwaltung von
+\noindent \label{JabRefHelp}\jabref ist ein Programm zur Verwaltung von
 \bibtex{}-Dateien. Es benutzt kein eigenes Dateiformat, d.\,h. dass
 Sie Ihre Dateien direkt im \bibtex{}-Format (Dateiendung \texttt{.bib})
 laden und speichern. Sie können aber auch bibliographische Datenbanken
-anderer Formate in \jabref{} importieren.
+anderer Formate in \jabref importieren.
 
-\jabref{} unterstützt Sortier- und Suchfunktionen, um einen Überblick
+\jabref unterstützt Sortier- und Suchfunktionen, um einen Überblick
 über den Inhalt Ihrer Datei zu bekommen. Sie können der Datei ganz
 einfach neue Einträge hinzufügen, ohne sich daran erinnern zu müssen,
-welche Informationen benötigt werden. Außerdem kann \jabref{} \bibtex{}-Keys
-automatisch generieren. \jabref{} ist sehr nützlich, wenn Sie \bibtex{}
+welche Informationen benötigt werden. Außerdem kann \jabref \bibtex{}-Keys
+automatisch generieren. \jabref ist sehr nützlich, wenn Sie \bibtex{}
 oder CiteMaker verwenden, kann aber auch für diejenigen sinnvoll sein,
 die andere Bibliographie-Systeme benutzen oder schlicht und einfach
 ihre Literaturquellen organisieren wollen.
@@ -573,7 +588,7 @@ aber einen Querverweis enthält.
 \item Eine \colorbox{green}{grüne} Zelle kennzeichnet ein optionales Feld.
 \item Eine farblose (weiße) Zelle kennzeichnet ein Feld, das von \bibtex{}
 für diesen Eintragstyp nicht benutzt wird. Das Feld kann selbstverständlich
-in \jabref{} bearbeitet werden.
+in \jabref bearbeitet werden.
 \end{itemize}
 
 \subsubsection{Einen neuen Eintrag hinzufügen}
@@ -603,7 +618,7 @@ und drücken auf ENTER.
 
 \subsubsection{Einen \bibtex{}-String in einem Feld verwenden}
 
-In \jabref{} schreiben Sie den Inhalt aller Felder so, wie Sie es
+In \jabref schreiben Sie den Inhalt aller Felder so, wie Sie es
 in einem Texteditor machen würden, mit einer Ausnahme: um einen String
 (eine Art Abkürzung) zu verwenden, umschließen Sie den Namen des Strings
 mit je einem \#, z.\,B.
@@ -660,7 +675,7 @@ Das Panel \emph{\bibtex{}"=Quelltext} zeigt, wie der Eintrag aussehen
 wird, wenn die Datei im \texttt{bib}-Format gespeichert wird. Wenn
 Sie wollen, können Sie den \bibtex{}"=Quelltext direkt bearbeiten.
 Sobald Sie zu einem anderen Panel wechseln, STRG-S drücken oder den
-Eintrags-Editor schließen, wird \jabref{} versuchen, den Inhalt des
+Eintrags-Editor schließen, wird \jabref versuchen, den Inhalt des
 Quelltext"=Panels zu analysieren. Falls dabei Probleme auftreten, werden
 Sie benachrichtigt und erhalten die Möglichkeit, den Eintrag noch
 einmal zu überarbeiten oder den vorherigen Inhalt wiederherzustellen. (Nähere
@@ -671,7 +686,7 @@ beim Öffnen des Eintrags-Editors als erstes angezeigt. Wenn Sie lieber
 den Quelltext bearbeiten als die anderen Panels zu benutzen, sollten
 Sie diese Option wählen.
 
-\tip{Wenn Ihre Datei Felder enthält, die \jabref{} nicht kennt,
+\tip{Wenn Ihre Datei Felder enthält, die \jabref nicht kennt,
 erscheinen diese im Quelltext"=Panel.}
 
 \tip[Und noch ein Tipp: ]{Die \emph{PDF-} und \emph{URL}-Felder unterstützen
@@ -680,16 +695,16 @@ Drag \& Drop. Sie können z.\,B. ein URL aus Ihrem Browser dort einfügen.}
 
 \subsubsection{Überprüfung der Feldkonsistenz}
 \label{subsub:feldkonsistenz}
-Wenn der Inhalt eines Feldes geändert wird, überprüft \jabref{},
+Wenn der Inhalt eines Feldes geändert wird, überprüft \jabref,
 ob der neue Inhalt akzeptiert werden kann. Bei Feldern, die von \bibtex{}
 genutzt werden, wird der Inhalt zum einen auf die richtige Klammerung
 mit geschweiften Klammern, aber auch auf die Benutzung des Zeichens
 \texttt{\#} hin überprüft. Das >>hash<<-Symbol (im Deutschen oft
 >>Doppelkreuz<< oder >>Raute<< genannt) darf \emph{nur} paarweise
 benutzt werden, um damit den Namen eines \bibtex{}-Strings einzuschließen.
-Beachten Sie, dass \jabref{} nicht überprüft, ob der angeführte String
+Beachten Sie, dass \jabref nicht überprüft, ob der angeführte String
 tatsächlich vorhanden ist, da der \bibtex{}-Stil, den Sie benutzen, 
-eine beliebige Anzahl von Strings definieren kann, die \jabref{} nicht
+eine beliebige Anzahl von Strings definieren kann, die \jabref nicht
 kennt.
 
 Falls die Inhalte nicht akzeptabel sind, wird das Feld mit roter Farbe
@@ -703,7 +718,7 @@ die Änderungen nicht gespeichert.
 \emph{Erreichbar über das Menü \menu{Extras \msep{} Datenbank durchsuchen
 \msep{} Überprüfung der Integrität}.}
 \end{quote}
-Mit dieser Funktion überprüft \jabref{} alle Einträge auf deren Gültigkeit
+Mit dieser Funktion überprüft \jabref alle Einträge auf deren Gültigkeit
 und versucht Fehler aufzudecken. Mit dem \menu{Überprüfen}-Button
 kann der Vorgang gestartet werden. Es wird eine Liste mit Hinweisen
 (Info-Icon) und möglichen Fehlern (Ausrufezeichen-Icon) sowie dem
@@ -719,7 +734,7 @@ Damit man sich in einem \LaTeX{}-Dokument auf einen Literaturverweis
 beziehen kann, braucht man einen eindeutigen \bibtex{}-Key. Eindeutig
 heißt, dass er nur einmal vergeben sein darf. Es wird nach Groß"~
 und Kleinschreibung unterschieden, \texttt{Yared1998} ist also nicht
-identisch mit \texttt{yared1998}. \jabref{} bietet einige Möglichkeiten,
+identisch mit \texttt{yared1998}. \jabref bietet einige Möglichkeiten,
 um auch bei größeren Datenbanken den Überblick über die \bibtex{}-Keys
 nicht zu verlieren.
 
@@ -733,9 +748,9 @@ oder mit dem Zauberstab-Button im Eintrags-Editor veranlassen können.
 Falls Sie sich nicht im Eintrags-Editor befinden, werden mit Hilfe
 von STRG-G oder dem Zauberstab-Button aus der Menüleiste für alle
 Einträge der Datei \bibtex{}-Keys erzeugt. Falls dabei Keys überschrieben
-werden, gibt \jabref{} eine Warnmeldung aus.
+werden, gibt \jabref eine Warnmeldung aus.
 
-Wie die \bibtex{}-Keys aussehen, die \jabref{} automatisch generiert,
+Wie die \bibtex{}-Keys aussehen, die \jabref automatisch generiert,
 und wie Sie dieses Aussehen verändern können, erfahren Sie im Abschnitt~\ref{LabelPatterns} \nameref{LabelPatterns}.
 
 
@@ -752,7 +767,7 @@ springt man mit STRG-F oder STRG-SHIFT-F zum nächsten Treffer.}
 
 \subsubsection{Direkte Suche}
 
-Bei der direkten Suche sucht \jabref{} unmittelbar, wenn Sie einen
+Bei der direkten Suche sucht \jabref unmittelbar, wenn Sie einen
 Buchstaben eingeben. Die Statuszeile informiert Sie über den Sucherfolg.
 Mit STRG-F oder STRG-SHIFT-F wird zum nächsten Vorkommen des aktuellen
 Suchbegriffs gesprungen. Falls es keine weiteren Vorkommen gibt, informiert
@@ -836,7 +851,7 @@ Die beiden Hauptunterschiede sind:
 
 \begin{enumerate}
 \item Während eine Datei auf einer Festplatte immer in genau einem Ordner
-abgelegt ist, kann ein Literatureintrag in \jabref{} mehreren Gruppen
+abgelegt ist, kann ein Literatureintrag in \jabref mehreren Gruppen
 angehören.
 \item Gruppen benutzen bestimmte Kriterien, um ihren Inhalt dynamisch zu
 bestimmen. Neue Einträge, die den Kriterien einer Gruppe entsprechen,
@@ -853,7 +868,7 @@ erläutert.
 
 Gruppendefinitionen sind dateispezifisch; sie werden als \texttt{@COMMENT}-Block
 in der \texttt{bib}-Datei gespeichert und von allen Benutzern gemeinsam
-benutzt. (Künftige Versionen von \jabref{} werden möglicherweise
+benutzt. (Künftige Versionen von \jabref werden möglicherweise
 benutzerabhängige Gruppen unterstützen.)
 
 
@@ -929,7 +944,7 @@ Einträge wie zuvor, sofern beide Gruppen dieselben Einträge enthalten).
 \item [\ldots]\textbf{sehen, welche Gruppen sich überschneiden}
 
 
-Mit \jabref{} können Sie ganz einfach herausfinden, welche Gruppen
+Mit \jabref können Sie ganz einfach herausfinden, welche Gruppen
 sich mit den aktuell ausgewählten Gruppen überschneiden (d.\,h. welche
 Gruppen zumindest einen Eintrag enthalten, der auch in der aktuell
 ausgewählten Gruppe ist). Klicken Sie auf \menu{Einstellungen} und
@@ -941,7 +956,7 @@ anderen Gruppen sollten nun markiert sein.
 
 \subsubsection{Arten von Gruppen}
 
-In \jabref{} gibt es vier verschiedene Arten von Gruppen:
+In \jabref gibt es vier verschiedene Arten von Gruppen:
 
 \begin{enumerate}
 \item Die Gruppe \emph{Alle Einträge}, die~-- wie der Name vermuten lässt~--
@@ -1026,8 +1041,8 @@ sein. Das obige Beispiel würde alle Einträge zu einer Gruppe zusammenfassen,
 die sich auf etwas Elektrisches beziehen. Benutzt man das Feld \emph{author},
 kann man sich Einträge eines bestimmten Autors gruppieren lassen,
 usw. Die Suche ist als reine Textsuche oder mit einem regulären Ausdruck
-möglich. Im ersten Fall erlaubt \jabref{} das manuelle Zuweisen zu
-und Entfernen aus einer Gruppe; dazu fügt \jabref{} den Suchausdruck
+möglich. Im ersten Fall erlaubt \jabref das manuelle Zuweisen zu
+und Entfernen aus einer Gruppe; dazu fügt \jabref den Suchausdruck
 dem entsprechenden Feld zu bzw. entfernt ihn daraus. Das macht nur
 für das Feld \emph{keywords} oder für selbstdefinierte Felder Sinn,
 aber offensichtlich nicht für Felder wie \emph{author} oder \emph{year}.
@@ -1207,7 +1222,7 @@ ausgegeben wird.
 
 Der Verweis auf einen String kann an jeder Stelle eines Feldes erscheinen, 
 wobei der Name des Strings immer von einem Paar \texttt{\#}-Zeichen
-eingeschlossen werden muss. Diese Syntax gilt nur für \jabref{} und
+eingeschlossen werden muss. Diese Syntax gilt nur für \jabref und
 weicht ein wenig von der \bibtex{}-Syntax ab, die erzeugt wird, wenn
 Sie Ihre Datei speichern. Strings können für alle Standard-\bibtex{}-Felder verwendet werden.
 Unter \menu{Optionen \msep{} Einstellungen \msep{} Allgemein} können Sie im Bereich \menu{Datei} festlegen, ob Strings auch in Nicht-Standard-Feldern benutzt werden dürfen. In diesem Fall können Sie Felder bestimmen, die von der Auflösung der Strings ausgenommen werden; hierbei wird empfohlen, das Feld \texttt{url} und andere Felder anzugeben, die das Zeichen \texttt{\#} enthalten können und die von \bibtex\slash\LaTeX{} verarbeitet werden können.
@@ -1217,7 +1232,7 @@ anderen String verweisen, vorausgesetzt, dass der String, auf den
 verwiesen wird, bereits \emph{vorher} definiert ist.
 
 Während die Reihenfolge der Strings in Ihrer \bibtex{}-Datei in einigen
-Fällen wichtig ist, brauchen Sie sich bei der Benutzung von \jabref{}
+Fällen wichtig ist, brauchen Sie sich bei der Benutzung von \jabref
 darüber keine Gedanken zu machen. Die Strings werden in alphabetischer
 Reihenfolge im String-Editor aufgelistet und in derselben Reihenfolge
 gespeichert, außer wenn eine andere Reihenfolge von \bibtex{} verlangt
@@ -1228,7 +1243,7 @@ wird.
 \begin{quote}
 \emph{Diese Funktion kann unter \menu{Optionen \msep{} Abkürzungen der Zeitschriften verwalten} eingestellt werden.}
 \end{quote}
-\jabref{} kann automatisch zwischen Zeitschriftentiteln in abgekürzter und ausführlicher Form hin- und herschalten, sofern die Titel in einer Ihrer Zeitschriftenlisten enthalten ist. Sie können mehrere dieser Listen benutzen, die Sie als externe Textdateien anlegen.
+\jabref kann automatisch zwischen Zeitschriftentiteln in abgekürzter und ausführlicher Form hin- und herschalten, sofern die Titel in einer Ihrer Zeitschriftenlisten enthalten ist. Sie können mehrere dieser Listen benutzen, die Sie als externe Textdateien anlegen.
 
 \subsubsection{Benutzungshinweise}
 
@@ -1245,7 +1260,7 @@ Diese drei Aktionen sorgen dafür, dass bei allen ausgewählten Einträgen die Zeit
 
 \subsubsection{Zeitschriftenlisten verwalten}
 
-Sie können mehrere Zeitschriftenlisten als externe Textdateien benutzen, die mit \jabref{} verlinkt sind. Die primäre Liste kann in \jabref{} selbst verwaltet werden.
+Sie können mehrere Zeitschriftenlisten als externe Textdateien benutzen, die mit \jabref verlinkt sind. Die primäre Liste kann in \jabref selbst verwaltet werden.
 
 \paragraph{Ihre persönliche Zeitschriften-Abkürzungsliste}
 
@@ -1254,17 +1269,17 @@ Wählen Sie \menu{Neue Datei} und geben einen Dateinamen ein oder klicken auf den
 
 Sie können mit Hilfe der \menu{+} und \menu{--} Buttons an der rechten Seite Einträge hinzufügen oder entfernen. Für jeden Eintrag müssen Sie den vollständigen Zeitschriftentitel und die ISO-Abkürzung angeben (z.\,B. ">Aquacultural Engineering"< und ">Aquacult. Eng."<). Mit einem Doppelklick auf die Tabellenzeile können Sie die Einträge bearbeiten.
 
-Sobald Sie auf \menu{OK} klicken (oder wenn Sie eine bestehende Datei ausgewält haben), enthält die Tabelle mindestens eine Zeile. Der Tabelleninhalt wird in die ausgewählte Datei geschrieben und die Zeitschriftenliste von \jabref{} wird aktualisiert.
+Sobald Sie auf \menu{OK} klicken (oder wenn Sie eine bestehende Datei ausgewält haben), enthält die Tabelle mindestens eine Zeile. Der Tabelleninhalt wird in die ausgewählte Datei geschrieben und die Zeitschriftenliste von \jabref wird aktualisiert.
 
 \paragraph{Externe Zeitschriftenlisten}
 
-Zusätzlich zu Ihrer persönlichen Liste können Sie mehrere externe Listen verlinken. Diese Verknüpfungen werden im unteren Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel} verwaltet. Externe Listen sind den persönlichen Listen ähnlich~-- der einzige Unterschied ist, dass Sie nicht mit \jabref{} selbst verwaltet werden können.
+Zusätzlich zu Ihrer persönlichen Liste können Sie mehrere externe Listen verlinken. Diese Verknüpfungen werden im unteren Teil des Dialogs \menu{Abkürzung der Zeitschriftentitel} verwaltet. Externe Listen sind den persönlichen Listen ähnlich~-- der einzige Unterschied ist, dass Sie nicht mit \jabref selbst verwaltet werden können.
 
 Um eine externe Liste hinzuzufügen, klicken Sie zunächst auf den \menu{+} Knopf, falls nötig (das fügt eine weitere Zeile hinzu). Dann benutzen Sie entweder den \menu{Durchsuchen}- oder den \menu{Herunterladen}-Button.
     \begin{itemize}
     \item Mit dem \menu{Durchsuchen}-Knopf können Sie eine auf Ihrem Computer bestehende Datei auswählen.
-    \item Mit dem \menu{Herunterladen}-Knopf können Sie eine Liste aus dem Internet herunterladen, indem Sie einen URL angeben. Die Datei wird auf Ihrem Computer gespeichert und mit \jabref{} verlinkt.
-    Der URL ist standardmäßig die Adresse einer Zeitschriftenliste auf der \jabref{}-Homepage. Diese Liste ist unvollständig, wird in Zukunft aber ausgebaut.
+    \item Mit dem \menu{Herunterladen}-Knopf können Sie eine Liste aus dem Internet herunterladen, indem Sie einen URL angeben. Die Datei wird auf Ihrem Computer gespeichert und mit \jabref verlinkt.
+    Der URL ist standardmäßig die Adresse einer Zeitschriftenliste auf der \jabref-Homepage. Diese Liste ist unvollständig, wird in Zukunft aber ausgebaut.
     \end{itemize}
 Jeder Eintrag in Ihrer persönlichen Liste überschreibt einen Eintrag mit demselben vollständigen Zeitschriftentitel in einer Ihrer externen Listen. In ähnlicher Weise werden die externen Listen in der Reihenfolge, wie sie aufgelistet werden, abgearbeitet.
 
@@ -1307,21 +1322,21 @@ Einträgen zu Gruppen. Wenn Sie in eine bestehende Datei importieren,
 ist es oftmals leichter, diese Arbeiten durchzuführen, bevor die neuen
 Einträge zwischen die bereits bestehenden sortiert wurden.
 
-\subsubsection[EndNote -> JabRef]{EndNote $\to$~\jabref{}}\label{subsubsec:endnote-jabref}
+\subsubsection[EndNote -> \jabref]{EndNote $\to$~\jabref}\label{subsubsec:endnote-jabref}
 
 EndNote hat einen Export-Stil \bibtex{}, der allerdings nicht alle
 Eintragstypen und Felder von \bibtex{} und auch nicht die zusätzlich
-von \jabref{} genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
+von \jabref genutzten Allgemeinen Felder (\emph{pdf}, \emph{owner},
 \emph{key} usw.) unterstützt. Falls Sie diese Felder nutzen wollen,
 verwenden Sie die EndNote Extras (\menu{Extras \msep{} EndNote Filter-Set entpacken}), extrahieren die Zip-Datei,
 die dabei erstellt wird und folgen den Anweisungen in der Datei \texttt{readme.txt}.
 
 \subsection{Export}
-\subsubsection[JabRef -> EndNote]{\jabref{} $\to$~EndNote}
+\subsubsection[\jabref -> EndNote]{\jabref $\to$~EndNote}
 \label{EndnoteFilters}
 
 \begin{quote}
-\emph{\jabref{} kann Dateien so exportieren,
+\emph{\jabref kann Dateien so exportieren,
 dass EndNote sie lesen kann. Um diese Funktion zu nutzen, wählen Sie
 \menu{Datei \msep{} Exportieren}, dann bei \emph{Dateityp} \menu{Endnote} und
 geben den Namen der Export"=Datei an.}
@@ -1337,7 +1352,7 @@ aus.
 Um die Datei in EndNote zu öffnen, erstellen Sie eine neue Datei oder
 öffnen eine bestehende Datei in EndNote. Dann wählen Sie \menu{Datei}
 \msep{} \menu{Importieren}, klicken mit der Maus auf \menu{Datei wählen},
-wählen die aus \jabref{} exportierte Datei aus und drücken auf \menu{Auswählen}.
+wählen die aus \jabref exportierte Datei aus und drücken auf \menu{Auswählen}.
 Anschließend drücken Sie auf \menu{Import Optionen} und wählen \menu{EndNote Import}.
 Mit einem Klick auf \menu{Importieren} starten Sie den Importvorgang.
 Anschließend gehen Sie zum Menüpunkt \menu{Bearbeiten} \msep{} \menu{Text ändern}
@@ -1402,7 +1417,7 @@ und demzufolge unpassend formatiert.
 
 \label{EndNote_erweitert}Einige Felder, die von \bibtex{} genutzt
 werden, gehören nicht zu EndNotes vorgegebenen Referenztypen. Während
-der Import in \jabref{} und der Export nach \jabref{} ohne ein Ändern
+der Import in \jabref und der Export nach \jabref ohne ein Ändern
 der Referenztypen funktioniert, werden die Feldnamen in EndNote nicht
 korrekt dargestellt (z.\,B. wird das PDF-Feld \emph{Custom 1} heißen
 statt \emph{pdf}). Darüber hinaus können diese Felder bei neuen Einträgen
@@ -1416,16 +1431,16 @@ Um den Filter zu installieren, nutzen Sie die EndNote Extras
 und entpacken die Zip-Datei, die dabei erstellt wird. Dann folgen
 Sie den Angaben in der Datei \texttt{readme.txt}.
 
-\subsubsection[JabRef-Bibliographien in OpenOffice.org benutzen]{\jabref{}-Bibliographien in OpenOffice.org benutzen}
+\subsubsection{\jabref-Bibliographien in OpenOffice.org benutzen}
 
-\jabref{} kann Ihre Datei sowohl in das OpenOffice.org 1.1 \texttt{.sxc}"=Tabellenkalkulationsformat als auch in das OpenDocument \texttt{.ods}"=Tabellenkalkulationsformat, das von OpenOffice.org 2.0 benutzt wird, exportieren.
+\jabref kann Ihre Datei sowohl in das OpenOffice.org 1.1 \texttt{.sxc}"=Tabellenkalkulationsformat als auch in das OpenDocument \texttt{.ods}"=Tabellenkalkulationsformat, das von OpenOffice.org 2.0 benutzt wird, exportieren.
 
 In beiden Fällen besteht die exportierte Tabelle aus einem Arbeitsblatt, das die Einträge in Reihen
 und die unterschiedlichen Felder in Spalten enthält. Die Reihenfolge und Benennung der Spalten ist kompatibel
 zu den Literaturverzeichnis-Funktionen von OpenOffice.org (OOo 1.1: \texttt{.sxc}, OOo 2.0: \texttt{.ods}).
 
 \paragraph{Die exportierte Datei als Bibliographiedatenbank in OpenOffice 2.0 (oder neuer) benutzen}
-Gehen Sie folgendermaßen vor, um eine Tabelle, die von \jabref{} exportiert wurde, als Bibliographiedatenbank in OpenOffice.org zu benutzen:
+Gehen Sie folgendermaßen vor, um eine Tabelle, die von \jabref exportiert wurde, als Bibliographiedatenbank in OpenOffice.org zu benutzen:
 
 \begin{itemize}
 \item Exportieren Sie Ihre Datenbank in das \texttt{.ods} -Format.
@@ -1490,12 +1505,12 @@ im Tab \menu{Hinweise und Warnungen} aufmerksam gemacht.
 
 Haben Sie alle Textstellen den gewünschten \bibtex{}-Feldern zugewiesen,
 klicken Sie auf die Schaltfläche \menu{Übernehmen}. Nun erstellt
-\jabref{} den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
+\jabref den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
 hat.
 
 \subsection{Links zu externen Dateien}
 
-\label{ExternalFiles}Mit \jabref{} können Sie Ihre Einträge mit
+\label{ExternalFiles}Mit \jabref können Sie Ihre Einträge mit
 den entsprechenden PDF- oder PS-Dateien, die sich auf Ihrem Computer
 befinden, verlinken. Ebenso ist es möglich, Dateien im Internet über
 einen URL oder DOI zu verlinken.
@@ -1503,7 +1518,7 @@ einen URL oder DOI zu verlinken.
 
 \subsubsection{Externe Betrachter einrichten}
 
-\jabref{} benötigt Informationen darüber, welche Programme es für
+\jabref benötigt Informationen darüber, welche Programme es für
 PDF- und PS"=Dateien und Internetseiten benutzen soll. In der Standardeinstellung
 werden sie auf Werte gesetzt, die wahrscheinlich zu Ihrem Betriebssystem
 passen, so dass eine gute Chance besteht, dass Sie diese Werte nicht
@@ -1518,7 +1533,7 @@ Sie den Unterpunkt \menu{Externe Programme} im Dialog \menu{Optionen}}
 \subsubsection{Externe Dateien oder Links öffnen}
 
 Es gibt verschiedene Möglichkeiten, wie man externe Dateien oder Internetseiten
-aus \jabref{} öffnen kann. Im Eintrags-Editor können Sie einfach
+aus \jabref öffnen kann. Im Eintrags-Editor können Sie einfach
 auf das Textfeld, das einen DOI oder URL enthält, doppelklicken. In
 der Tabellenansicht können Sie einen Eintrag auswählen und die Menüeinträge
 (unter \menu{Extras}), die Tastenkombinationen (in der Standardeinstellung
@@ -1538,7 +1553,7 @@ URL oder DOI (nur URL, wenn beide vorhanden sind).
 
 \subsubsection{Der Standard-Ordner für PDF-Dateien}
 
-PDF-Dateien erhalten von \jabref{} eine >>Spezialbehandlung<<,
+PDF-Dateien erhalten von \jabref eine >>Spezialbehandlung<<,
 um das Verlinken mit den entsprechenden Einträgen so einfach wie möglich
 zu gestalten. Um diese >>Spezialbehandlung<< nutzen zu können, müssen
 Sie im Unterpunkt \menu{Externe Programme} des Dialogs \menu{Optionen}
@@ -1551,7 +1566,7 @@ aus an derselben Datei arbeiten können.
 
 Wenn Sie Ihren PDF-Dateien dann noch Namen geben, die mit dem \bibtex{}-Key
 des entsprechenden Eintrags übereinstimmen (abgesehen von der Dateiendung \texttt{.pdf}), 
-sucht \jabref{} in Ihrem Standard-PDF-Ordner und dessen
+sucht \jabref in Ihrem Standard-PDF-Ordner und dessen
 Unterordnern nach der richtigen PDF-Datei. Sobald die korrekt benannte
 PDF-Datei sich dort befindet, klicken Sie auf die Schaltfläche \menu{Auto}
 neben dem PDF-Feld im Eintrags-Editor. Wenn die PDF-Datei gefunden
@@ -1569,7 +1584,7 @@ Sie können für jede Datei eigene PDF- und PS-Verzeichnisse angeben \emph{(}\menu
 \subsubsection{Die Suche mit regulären Ausdrücken für automatische Verknüpfungen nutzen}
 \label{RegularExpressionSearch}
 
-Wenn Sie Dateinamen verwenden, die dem bibtexkey ergänzt um die Dateiendung entsprechen, findet \jabref{} diese Dateien automatisch.
+Wenn Sie Dateinamen verwenden, die dem bibtexkey ergänzt um die Dateiendung entsprechen, findet \jabref diese Dateien automatisch.
 
 Ab Version~2.2 ist mit Hilfe von regulären Ausdrücken eine größere Flexibilität beim Benennen der Dateien gewährleistet. In den meisten Fällen dürfte das Standardverhalten bereits ausreichend sein.
 
@@ -1593,14 +1608,14 @@ Der Standard ist \lstinline{**/.*[bibtexkey].*\\.[extension]}. Damit wird in all
 
 XMP ist ein Standard, der von Adobe Systems entwickelt wurde, um Metadaten (Daten, die Informationen über andere Daten enthalten) in Dateien zu speichern. Ein bekanntes Beispiel für Metadaten sind ID3-Tags, die zur Beschreibung von Künstlern, Albumtiteln und Liednamen einer MP3-Datei verwendet werden. Mit Hilfe von Metadaten können MP3-Dateien unabhängig von ihrem Dateinamen identifiziert und z.B. von MP3-Playern ausgelesen und angezeigt werden.
 
-Mit der XMP-Unterstützung versucht das \jabref{}-Team, die Vorteile von Metadaten in die Welt der Literaturmanager einzuführen. Sie können \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors wählen und damit alle \bibtex{}-Informationen in die verlinkte PDF-Datei schreiben. Wenn Sie diese PDF-Datei mit anderen austauschen, können diese die Datei in das \jabref{}-Fenster ziehen und haben damit alle Informationen zur Verfügung, die Sie eingegeben haben.
+Mit der XMP-Unterstützung versucht das \jabref-Team, die Vorteile von Metadaten in die Welt der Literaturmanager einzuführen. Sie können \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors wählen und damit alle \bibtex{}-Informationen in die verlinkte PDF-Datei schreiben. Wenn Sie diese PDF-Datei mit anderen austauschen, können diese die Datei in das \jabref-Fenster ziehen und haben damit alle Informationen zur Verfügung, die Sie eingegeben haben.
 
 \subsubsection{Benutzung}
 
-Um die XMP-Funktionen in \jabref{} zu nutzen, gehen Sie folgendermaßen vor:
+Um die XMP-Funktionen in \jabref zu nutzen, gehen Sie folgendermaßen vor:
 
 \begin{itemize}
-  \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref{} ziehen.
+  \item Zum \emph{Importieren einer einzelnen PDF-Datei mit Metadaten} wählen Sie \menu{Datei \msep{} Importieren in {[}neue{|}aktuelle{]} Datenbank} und im anschließenden Dialog als Dateiformat \menu{PDF mit XMP-Anmerkungen} aus. Sie können die PDF-Datei stattdessen auch mit der Maus auf das Hauptfenster von \jabref ziehen.
   \item Um \emph{bibliographische Informationen in eine verlinkte PDF-Datei zu schreiben}, klicken Sie auf \menu{XMP schreiben} im \menu{Allgemein}-Tab des Eintragseditors (neben dem \emph{pdf}"=Feld).
   \item Wenn Sie \emph{alle PDFs einer Datei mit Metadaten versehen} wollen, wählen Sie \menu{Extras \msep{} XMP-Metadaten in PDFs schreiben}.
   \item Um zu überprüfen, ob das Schreiben der Metadaten funktioniert hat, öffnen Sie die Datei in Adobe Acrobat und wählen \menu{Datei \msep{} Dokumenteigenschaften} und dann unter dem Reiter \menu{Beschreibung} die Schaltfläche \menu{Zusätzliche Metadaten}. Wenn Sie links ">Erweitert"< auswählen, sollten Sie im rechten Teil des Dialogs einen Eintrag \texttt{http://jabref.sourceforge.net/bibteXMP} sehen, der die entsprechenden Metadaten enthält. Dies geht nur mit dem Vollprogramm Adobe Acrobat, nicht mit dem Adobe Reader.
@@ -1609,7 +1624,7 @@ Um die XMP-Funktionen in \jabref{} zu nutzen, gehen Sie folgendermaßen vor:
 
 \subsubsection{bibteXMP Dateiformat}
 
-XMP nutzt zum Speichern der Daten eine Teilmenge des \emph{Resource Description Framework} (RDF). Für \jabref{} wird ein neues Metadatenformat benutzt, das \bibtex{} sehr gut abbildet. Alle Felder und Werte werden in Knoten eines XML-Dokuments verwandelt. Nur Autoren und Herausgeber werden als \texttt{rdf:Seq}-Strukturen gespeichert, so dass die trennenden ">and"< weggelassen werden können. Alle Strings und crossrefs werden in den Metadaten aufgelöst.
+XMP nutzt zum Speichern der Daten eine Teilmenge des \emph{Resource Description Framework} (RDF). Für \jabref wird ein neues Metadatenformat benutzt, das \bibtex{} sehr gut abbildet. Alle Felder und Werte werden in Knoten eines XML-Dokuments verwandelt. Nur Autoren und Herausgeber werden als \texttt{rdf:Seq}-Strukturen gespeichert, so dass die trennenden ">and"< weggelassen werden können. Alle Strings und crossrefs werden in den Metadaten aufgelöst.
  
 Das folgende einfache Minimal-Schema wird benutzt:
 \begin{itemize}
@@ -1669,13 +1684,13 @@ Einige Links zu XMP und PDFs mit Anmerkungen (englisch):
   \item \href{http://partners.adobe.com/public/developer/en/xmp/sdk/xmpspecification.pdf}{Adobe XMP Spezifikation}
 \end{itemize}
 
-\subsection[JabRef und Online-Datenbanken]{\jabref{} und Online-Datenbanken}
+\subsection{\jabref und Online-Datenbanken}
 
 \subsubsection{CiteSeer}
 
 \label{CiteSeerHelp}
 \tip[]{CiteSeer ist eine digitale Bibliothek und Suchmaschine für wissenschaftliche Literatur, vornehmlich zu den Bereichen Computer und Informatik.}
-\jabref{} kann Informationen über eine bestimmte
+\jabref kann Informationen über eine bestimmte
 Literaturangabe aus der CiteSeer-Datenbank herunterladen. Um diesen
 Vorgang zu starten, fügen Sie Ihrer Datei einen neuen Eintrag hinzu
 und belegen das Feld \emph{citeseerurl} mit einem Link zur entsprechenden
@@ -1711,7 +1726,7 @@ Sie \menu{Zitierende Literatur von CiteSeer abrufen} auswählen.
 \label{MedlineHelp}
 
 \tip[]{MEDLINE ist die wichtigste Datenbank der \emph{U.\,S. National Library of Medicine}. Sie enthält Literaturangaben von Zeitschriftenartikeln der Lebenswissenschaften, vornehmlich der Biomedizin.
-\jabref{} kann Literaturangaben der Medline"=Datenbank
+\jabref kann Literaturangaben der Medline"=Datenbank
 herunterladen. Um diese Funktion zu nutzen, wählen Sie \menu{Extras
 \msep{} Medline abrufen}, so dass der Medline-Dialog im linken
 Seitenfeld erscheint.}
@@ -1737,7 +1752,7 @@ Datei zugeordnet.
 \label{IEEEXploreHelp}
 
 \tip[]{IEEEXplore bietet Zugang zu Literatur in den Bereichen Elektrotechnik, Informatik und Elektronik.}
-\jabref{} kann Literaturangaben der IEEEXplore-Datenbank herunterladen.
+\jabref kann Literaturangaben der IEEEXplore-Datenbank herunterladen.
 Um diese Funktion zu nutzen, wählen Sie \menu{Internet \msep{} IEEEXplore abfragen}
 und geben in dem Dialog, der im linken Bildschirmbereich erscheint, Ihre
 Suchausdrücke ein. Drücken Sie anschließend die
@@ -1749,7 +1764,7 @@ angezeigt.
 Sie können die \emph{abstracts} zusammen mit den Literaturangaben herunterladen,
 indem Sie einen Haken bei \menu{Abstracts berücksichtigen} setzen. Das verursacht
 eine deutlich höhere Anzahl von Netzwerk-Anfragen; um die Webseite von IEEEXplore
-nicht übermäßig zu belasten, lädt \jabref{} \emph{abstracts} nur bei einer Suche,
+nicht übermäßig zu belasten, lädt \jabref \emph{abstracts} nur bei einer Suche,
 deren Ergebnis eine bestimmte Trefferanzahl nicht übersteigt.
 
 \subsubsection{Benutzung eines Proxy-Servers}
@@ -1762,9 +1777,9 @@ sind dokumentiert unter \url{http://java.sun.com/j2se/1.4.2/docs/guide/net/prope
 java -Dhttp.proxyHost="hostname" -Dhttp.proxyPort="portnumber"
 \end{lstlisting}
 
-\subsection[JabRef mit mehreren Benutzern verwenden]{\jabref{} mit mehreren Benutzern verwenden}
+\subsection{\jabref mit mehreren Benutzern verwenden}
 
-\jabref{} bietet einige Funktionen, die besonders dann von Nutzen
+\jabref bietet einige Funktionen, die besonders dann von Nutzen
 sind, wenn eine Datenbank von mehreren Benutzern~-- z.\,B. über
 ein Netzwerk~-- bearbeitet wird. Das sind vor allem die Felder \emph{owner}
 und \emph{timestamp}.
@@ -1778,7 +1793,7 @@ und \emph{timestamp}.
 \menu{Einstellungen}} \msep{} \emph{\menu{Allgemein} an- und
 abgestellt sowie verändert werden.}
 \end{quote}
-\jabref{} kann automatisch das Feld \emph{timestamp} setzen, das
+\jabref kann automatisch das Feld \emph{timestamp} setzen, das
 das Datum enthält, an dem der Eintrag zur Datei hinzugefügt wurde.
 Die Formatierung des Zeitstempels wird von einem Ausdruck mit Bezeichnern
 bestimmt, die die Position verschiedener Bestandteile des Datums angeben.
@@ -1804,7 +1819,7 @@ werden. Hier einige Beispiele:
 
 \subsubsection{Besitzer \emph{(owner)}}
 
-\label{OwnerHelp}\jabref{} kann allen neuen Einträgen, die zu einer
+\label{OwnerHelp}\jabref kann allen neuen Einträgen, die zu einer
 Datei hinzugefügt oder in sie importiert werden, Ihren Benutzernamen
 beigeben. Diese Funktion können Sie im Menü \menu{Einstellungen}
 \msep{} \menu{Allgemein} ein- und ausschalten. Dort können Sie auch
@@ -1815,9 +1830,9 @@ Der Name wird in dem Feld \emph{owner} eingetragen, das in der Standardeinstellu
 im Tab \emph{General fields} des Eintragseditors angezeigt wird.
 
 
-\subsection[JabRef von der Kommandozeile]{\jabref{} von der Kommandozeile}
+\subsection{\jabref von der Kommandozeile}
 
-\label{CommandLine}Obwohl \jabref{} in erster Linie ein Programm
+\label{CommandLine}Obwohl \jabref in erster Linie ein Programm
 mit grafischer Benutzeroberfläche ist, bietet es einige nützliche
 Optionen für die Kommandozeile und kann sogar Dateikonvertierungen
 durchführen, ohne die grafische Benutzeroberfläche zu öffnen.
@@ -1849,12 +1864,12 @@ vorgestellt.
 \begin{itemize}
 \item Hilfe: \texttt{-h}
 
-Diese Option veranlasst \jabref{}, eine Zusammenfassung der Kommandozeilen-Optionen
+Diese Option veranlasst \jabref, eine Zusammenfassung der Kommandozeilen-Optionen
 anzuzeigen und das Programm unmittelbar darauf zu schließen.
 
 \item Kein GUI-Modus: \texttt{-n}
 
-Diese Option unterdrückt sowohl das \jabref{}-Fenster als auch den
+Diese Option unterdrückt sowohl das \jabref-Fenster als auch den
 Eröffnungsbildschirm, der normalerweise beim Programmstart angezeigt
 wird. Das Programm wird beendet, sobald die Kommandozeilen-Optionen
 abgearbeitet wurden.
@@ -1863,16 +1878,16 @@ oder mit Hilfe eines Scripts durchzuführen.
 
 \item Sitzung laden: \texttt{-l}
 
-Diese Option veranlasst \jabref{}, eine gespeicherte Sitzung zu laden,
+Diese Option veranlasst \jabref, eine gespeicherte Sitzung zu laden,
 sofern eine vorhanden ist, bevor sich das Hauptfenster öffnet.
 
 \item Datei importieren: \texttt{-i Dateiname{[},Importformat{]}}
 
-Bei dieser Option importiert oder lädt \jabref{} eine bestimmte Datei.
+Bei dieser Option importiert oder lädt \jabref eine bestimmte Datei.
 Wenn nur ein Dateiname angegeben wird oder ein Komma und ein {*}-Zeichen
-hinter dem Dateinamen stehen, versucht \jabref{}, das Dateiformat
+hinter dem Dateinamen stehen, versucht \jabref, das Dateiformat
 automatisch zu erkennen. Das sollte bei allen \bibtex{}-Dateien ebenso
-funktionieren wie bei Dateien, die in einem der von \jabref{} unterstützten
+funktionieren wie bei Dateien, die in einem der von \jabref unterstützten
 Importformate vorliegen. Wenn dem Dateinamen ein Komma und ein Importformat
 folgen, wird der angegebene Importfilter benutzt. Mit der Option \texttt{-h}
 können Sie sich eine Liste der verfügbaren Importformate anzeigen
@@ -1882,14 +1897,14 @@ Wenn Sie zusätzlich eine Export-Option angeben, wird der Import immer
 zuerst ausgeführt, bevor die importierte oder geladene Datei an den
 Exportfilter übergeben wird. Falls die grafische Oberfläche nicht
 mit der Option \texttt{-n} unterdrückt wird, werden alle geladenen
-oder importierten Dateien im Hauptfenster von \jabref{} angezeigt.
+oder importierten Dateien im Hauptfenster von \jabref angezeigt.
 
 Die Option \texttt{-i} kann nur einmal angegeben werden und nimmt
 als Argument maximal eine Datei.
 
 \item Datei exportieren: \texttt{-o Dateiname{[},Exportformat{]}}
 
-Diese Option veranlasst \jabref{}, eine Datei zu speichern oder zu
+Diese Option veranlasst \jabref, eine Datei zu speichern oder zu
 exportieren, die von derselben Kommandozeile geladen oder importiert
 wurde. Wenn eine Datei mit der Option \texttt{-i} importiert wurde,
 wird diese Datei exportiert. Ansonsten wird die Datei exportiert,
@@ -1907,7 +1922,7 @@ Mit der Option \texttt{-h} können Sie sich eine Liste der verfügbaren
 Exportformate anzeigen lassen.
 
 Falls die Option \texttt{-n} nicht aufgerufen wurde, wird jeder Exportvorgang
-durchgeführt, bevor das \jabref{}-Fenster geöffnet wird. Dort werden
+durchgeführt, bevor das \jabref-Fenster geöffnet wird. Dort werden
 dann die importierten Dateien angezeigt.
 
 Die Option \texttt{-o} kann nur einmal angegeben werden und nimmt
@@ -1915,21 +1930,21 @@ als Argument maximal eine Datei.
 
 \item Einstellungen exportieren: \texttt{-x Dateiname}
 
-Mit dieser Option können Sie \jabref{} veranlassen, alle Benutzer-Einstellungen
-in eine XML-Datei zu speichern. Nach dem Export startet \jabref{}
+Mit dieser Option können Sie \jabref veranlassen, alle Benutzer-Einstellungen
+in eine XML-Datei zu speichern. Nach dem Export startet \jabref
 normal.
 
 \item Einstellungen importieren: \texttt{-p Dateiname}
 
-Mit dieser Option importiert \jabref{} Benutzer-Einstellungen, die
+Mit dieser Option importiert \jabref Benutzer-Einstellungen, die
 mit der Option \texttt{-x} exportiert wurden. Nach dem Import startet
-\jabref{} normal.
+\jabref normal.
 
 \item Nur benutzte Einträge exportieren: \texttt{-a Dateiname{[}.aux{]},neueBibDatei{[}.bib{]}}
 
 Manchmal ist es nützlich, eine \bibtex{}-Datei zu haben, die nur die
 benutzten Einträge enthält. Eine Liste dieser benutzten Einträge findet
-sich in einer .aux-Datei (sobald Sie \LaTeX{} aufgerufen haben). \jabref{}
+sich in einer .aux-Datei (sobald Sie \LaTeX{} aufgerufen haben). \jabref
 kann diese Datei analysieren, um eine neue \bibtex{}-Datei zu erstellen,
 die nur die bekannten und benutzten Einträge enthält. Das bedeutet,
 dass ein Eintrag, der in der Standard-\bibtex{}-Datei nicht definiert
@@ -1943,12 +1958,12 @@ ist, auch nicht in die neue Datei geschrieben werden kann.
 \emph{Diese Funktion kann unter \menu{Optionen \msep{} Einstellungen \msep{} Erweitert} verwaltet werden.}
 \end{quote}
 
-\tip[]{Beachten Sie, dass das Aktivieren dieser Funktion mit Windows XP SP2 (und möglicherweise auch mit anderen Konfigurationen) zu einer Meldung führen kann, die besagt, dass bestimmte Funktionen des Programms von der Windows-Firewall geblockt wurden. Sie können die Firewall anweisen, weiterhin zu blocken, denn die Firewall beeinträchtigt den Externen Zugriff von \jabref{} nicht.}
-Falls das Abhören von externen Zugriffen aktiviert ist, versucht \jabref{} beim Programmstart, den entsprechenden Port abzuhören. Das bedeutet, dass andere Anwendungen Informationen durch diesen Port an \jabref{} senden können. \jabref{} akzeptiert dabei nur lokale Verbindungen, um das Risiko eines Eingriffs von außerhalb auszuschließen.
+\tip[]{Beachten Sie, dass das Aktivieren dieser Funktion mit Windows XP SP2 (und möglicherweise auch mit anderen Konfigurationen) zu einer Meldung führen kann, die besagt, dass bestimmte Funktionen des Programms von der Windows-Firewall geblockt wurden. Sie können die Firewall anweisen, weiterhin zu blocken, denn die Firewall beeinträchtigt den Externen Zugriff von \jabref nicht.}
+Falls das Abhören von externen Zugriffen aktiviert ist, versucht \jabref beim Programmstart, den entsprechenden Port abzuhören. Das bedeutet, dass andere Anwendungen Informationen durch diesen Port an \jabref senden können. \jabref akzeptiert dabei nur lokale Verbindungen, um das Risiko eines Eingriffs von außerhalb auszuschließen.
 
-Mit dem externen Zugriff kann eine zweite Instanz von \jabref{} erkennen, dass eine erste Instanz bereits läuft. In diesem Fall leitet die zweite Instanz ihre Kommandozeilen"=Optionen an die erste Instanz weiter und beendet sich selbst direkt im Anschluss~-- sofern die zweite Instanz nicht ausdrücklich instruiert wurde, im Stand-Alone-Modus (als selbständige Instanz) zu starten.
+Mit dem externen Zugriff kann eine zweite Instanz von \jabref erkennen, dass eine erste Instanz bereits läuft. In diesem Fall leitet die zweite Instanz ihre Kommandozeilen"=Optionen an die erste Instanz weiter und beendet sich selbst direkt im Anschluss~-- sofern die zweite Instanz nicht ausdrücklich instruiert wurde, im Stand-Alone-Modus (als selbständige Instanz) zu starten.
 
-Die erste \jabref{}-Instanz liest die Kommandozeilenoptionen und führt die erforderlichen Aktionen aus, z.\,B. das Lesen oder Importieren einer Datei oder das Anhängen einer Datei an die aktive Datenbank. Falls eine Datei mit der Option \texttt{-{-}importToOpen} importiert wird, werden die Einträge an die aktive Datei angehängt. Falls keine Datei geöffnet ist, wird eine neue Datei angelegt.
+Die erste \jabref-Instanz liest die Kommandozeilenoptionen und führt die erforderlichen Aktionen aus, z.\,B. das Lesen oder Importieren einer Datei oder das Anhängen einer Datei an die aktive Datenbank. Falls eine Datei mit der Option \texttt{-{-}importToOpen} importiert wird, werden die Einträge an die aktive Datei angehängt. Falls keine Datei geöffnet ist, wird eine neue Datei angelegt.
 
 \clearpage 
 \section{Anpassung}
@@ -1963,7 +1978,7 @@ Die erste \jabref{}-Instanz liest die Kommandozeilenoptionen und führt die erfor
 \msep{} \emph{\menu{Eintragstypen anpassen}.}
 \end{quote}
 Wenn Sie einen Eintragstyp anpassen, definieren Sie sowohl sein Erscheinungsbild
-im Eintragseditor als auch die Bedingungen, nach denen \jabref{}
+im Eintragseditor als auch die Bedingungen, nach denen \jabref
 einen Eintrag als vollständig akzeptiert. Sie können die bestehenden
 Eintragstypen verändern und neue hinzufügen.
 
@@ -2060,7 +2075,7 @@ den Feldern \emph{abstract} und \emph{annote}.
 kann man die Felder bestimmen, die zur automatischen Generierung der
 \bibtex{}"=Keys herangezogen werden.}
 \end{quote}
-\jabref{} verwendet ein Standardmuster zur Generierung von \bibtex{}"=Keys, das Keys wie z.\,B.
+\jabref verwendet ein Standardmuster zur Generierung von \bibtex{}"=Keys, das Keys wie z.\,B.
 \texttt{Yared1998} erzeugt. Falls der \bibtex{}-Key in der geöffneten
 Datei nicht eindeutig sein sollte, wird einer der Buchstaben a-z angefügt,
 bis ein eindeutiger Key gefunden ist. Dementsprechend könnten die
@@ -2072,7 +2087,7 @@ Yared1998a
 Yared1998b
 (*\ldots*)
 \end{lstlisting}
-Um das Aussehen der \bibtex{}-Keys zu bestimmen, benutzt \jabref{}
+Um das Aussehen der \bibtex{}-Keys zu bestimmen, benutzt \jabref
 Feldmarken. Das Key"=Muster kann für jeden der vorgegebenen Eintragstypen
 bestimmt werden. Es kann beliebigen Text enthalten, unabhängig von
 und zusätzlich zu den Feldmarken, die angeben, dass ein bestimmtes
@@ -2160,7 +2175,7 @@ anpassen%~-- seine Einstellung befindet sich über der Liste der Eintragstypen
 %im Tab \menu{Key-Muster} des Dialogs \menu{Einstellungen}
 .
 
-Beachten Sie, dass \jabref{} Umlaute und Buchstaben mit Akzenten
+Beachten Sie, dass \jabref Umlaute und Buchstaben mit Akzenten
 sowie das ß beim Erstellen von \bibtex{}-Keys verändert, um möglichen
 Problemen vorzubeugen. Hierzu einige Beispiele:
 
@@ -2188,7 +2203,7 @@ Abschnitt~\ref{CustomExports}).
 
 \subsection{Exportfilter}
 
-\label{CustomExports}Mit \jabref{} können Sie Ihre eigenen Exportfilter
+\label{CustomExports}Mit \jabref können Sie Ihre eigenen Exportfilter
 definieren und genau so wie die Standard"=Exportfilter benutzen. Ein
 Exportfilter wird durch eine oder mehrere \emph{Layout"=Dateien} definiert,
 die mittels eingebauter Formatierprogramme das Format der exportierten
@@ -2220,7 +2235,7 @@ Der Exportfilter muss lediglich aus einer einzigen \texttt{.layout}-Datei
 bestehen, die in diesem Fall \texttt{html.layout} genannt werden könnte.
 Sie können darüber hinaus auch zwei Dateien mit den Namen \texttt{html.begin.layout}
 und \texttt{html.end.layout} anlegen. Die erste dieser beiden Dateien
-enthält den Kopfteil der Ausgabe, die zweite den Fußteil. \jabref{}
+enthält den Kopfteil der Ausgabe, die zweite den Fußteil. \jabref
 sucht jedesmal wenn der Exportfilter benutzt wird nach diesen Dateien
 und fügt sie~-- falls sie gefunden werden~-- wörtlich vor bzw. nach
 den einzelnen Einträgen in die Ausgabe ein.
@@ -2298,7 +2313,7 @@ ruft z.\,B. zunächst den Formatierer \emph{ToLowerCase} auf, \emph{HTMLChars}
 formatiert anschließend das Ergebnis. Auf diese Weise können Sie eine
 beliebige Anzahl an Formatierern auflisten.
 
-\jabref{} bietet die folgenden Formatierer, wobei einige von anderen
+\jabref bietet die folgenden Formatierer, wobei einige von anderen
 abhängen:
 
 \begin{labeling}{MMMM}
@@ -2358,7 +2373,7 @@ indem Sie das \lstinline{net.sf.jabref.export.layout.LayoutFormatter}-Interface
 implementieren. Wenn Sie in das Paket \lstinline{net.sf.jabref.export.layout.format} Ihre Klasse (class) einfügen, können Sie den Formatierer mit seinem Klassennamen aufrufen,
 so wie auch die Standard"=Formatierer. Ansonsten müssen Sie den Formatierer
 mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
-muss der Formatierer in ihrem classpath sein, wenn Sie \jabref{}
+muss der Formatierer in ihrem classpath sein, wenn Sie \jabref
 starten.
 
 
@@ -2415,19 +2430,19 @@ New Category: \format[HTMLChars]{\keywords}
 
 \subsection{Importfilter}
 
-\noindent \jabref{} bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
+\noindent \jabref bietet Ihnen die Möglichkeit, ganz ähnlich den Standard-Importern, eigene Importer 
 zu definieren und zu benutzen. Man definiert einen Importer durch eine oder mehrere Java"=\emph{Klassen},
 die Dateiinhalte aus einem sogenannten \emph{Input stream} lesen
 und daraus \bibtex{}-Einträge erzeugen. Sie können vorkompilierte Importer einbinden, die Sie vielleicht 
 von SourceForge erhalten haben (siehe Abschnitt ">\nameref{subsec:Ihre-Arbeit}"<). Sie können auch
 mit Grundkenntnissen der Java"=Programmierung eigene Importer für Referenzquellen, die für Sie wichtig sind,
-erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref{} neu zu
+erstellen oder neue, verbesserte Versionen existierender Importer einbinden, ohne \jabref neu zu
 kompilieren.
 
 \paragraph{Vorrangsregeln}
 
 Externe Importfilter haben Vorrang vor Standard-Importern. So können Sie mit Ihren Importern
-die existierenden Importer in der automatischen Formaterkennung und an der Kommandozeile in \jabref{} überschreiben. Externe Importfilter selbst sind dann nach Namen sortiert.
+die existierenden Importer in der automatischen Formaterkennung und an der Kommandozeile in \jabref überschreiben. Externe Importfilter selbst sind dann nach Namen sortiert.
 
 \subsubsection{Einen externen Importfilter hinzufügen}
 
@@ -2442,16 +2457,16 @@ in dem die Package"=Struktur Ihres Importers beginnt. In einem zweiten Dateiausw
 wählen Sie die \emph{.class}"=Datei Ihres Importers, die von \texttt{\textbackslash{}ImportFormat} abgeleitet
 ist. Wenn Sie \menu{Klasse auswählen} klicken, erscheint Ihr neuer Importer
 in der Liste der externen Importfilter. Alle externen Importfilter erscheinen in den
-\jabref{}"=Untermenüs \menu{Datei \msep{} Importieren \msep{} Externe Importfilter} und 
+\jabref"=Untermenüs \menu{Datei \msep{} Importieren \msep{} Externe Importfilter} und 
 \menu{Datei \msep{} Importieren und Anhängen \msep{} Externe Importfilter}.
 
 \tip[Bitte beachten Sie: ]{Wenn Sie die Klassen in ein anderes Verzeichnis verschieben,
 müssen Sie den Importer entfernen und neu hinzufügen. Wenn Sie einen Importfilter
-mit einem bereits vorhandenen Namen registrieren, ersetzt \jabref{} den vorhandenen
+mit einem bereits vorhandenen Namen registrieren, ersetzt \jabref den vorhandenen
 externen Importfilter. Auch wenn es in manchen Fällen möglich ist, einen schon registrierten
-Importer zu aktualisieren ohne \jabref{} neu zu starten (nämlich dann,
-wenn der Importer nicht im Klassenpfad von \jabref{} ist), empfehlen wir, grundsätzlich
-\jabref{} neu zu starten, wenn Sie ein Update eines externen Importers durchgeführt haben.
+Importer zu aktualisieren ohne \jabref neu zu starten (nämlich dann,
+wenn der Importer nicht im Klassenpfad von \jabref ist), empfehlen wir, grundsätzlich
+\jabref neu zu starten, wenn Sie ein Update eines externen Importers durchgeführt haben.
 Sie können auch Importer aus ZIP- oder JAR-Archiven registrieren, wählen Sie einfach
 \emph{\menu{Aus Archiv-Datei hinzufügen}}, dann das ZIP- oder JAR-Archiv und dann den Eintrag
 (Klassendatei), der den neuen Importer darstellt.}
@@ -2529,20 +2544,20 @@ Nun sollte dort auch eine Datei \texttt{/mypath/SimpleCsvImporter.class} liegen.
 
 \subparagraph{SimpleCsvImporter registrieren}
 
-Öffnen Sie in \jabref{} \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
+Öffnen Sie in \jabref \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
 auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und 
 klicken Sie \menu{Klassenpfad auswählen}. Wählen Sie dann die Datei \texttt{SimpleCsvImporter.class}
 und klicken Sie \menu{Klasse auswählen}. Ihr Importfilter sollte nun in der Liste der
 externen Importfilter unter dem Namen >>Simple CSV Importer<< erscheinen und,
 sobald Sie \menu{Schließen} gewählt haben, auch in den Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} 
 \menu{Externe Importfilter} und \menu{Datei} \msep{} \menu{Importieren und Anhängen} \msep{} \menu{Externe Importfilter} 
-des \jabref{}-Hauptfensters auftauchen.
+des \jabref-Hauptfensters auftauchen.
 
 \subsection{Teilen Sie Ihre Arbeit mit anderen}
 \label{subsec:Ihre-Arbeit}
 Mit externen Layout-Dateien und Importfiltern ist es einfach, Ihre eigenen Export-Formate und Importfilter
 mit anderen Anwendern gemeinsam zu benutzen. Falls Sie einen Exportfilter oder einen Importfilter
-für ein Format erstellt haben, das noch nicht von \jabref{} unterstützt wird,
+für ein Format erstellt haben, das noch nicht von \jabref unterstützt wird,
 oder falls Sie einen bestehenden Exportfilter oder Importfilter verbessern, möchten
 wir Sie ermutigen, Ihre Arbeit auf der \href{http://sourceforge.net/projects/jabref/}{SourceForge.net"=Seite} bereitzustellen.
 Dasselbe gilt für Formatierklassen, die Sie schreiben. Wir würden
@@ -2579,7 +2594,7 @@ Sitzung speichern&
 F11\tabularnewline
 Sitzung laden&
 F12\tabularnewline
-\jabref{} beenden&
+\jabref beenden&
 STRG-Q\tabularnewline
 \end{longtable}
 
@@ -2664,7 +2679,7 @@ F9\tabularnewline
 \textbf{Externe Programme / Internet}&
 \tabularnewline
 \endfirsthead
-Literaturangaben in \LyX{} einfügen&
+Literaturangaben in \LyX einfügen&
 STRG-L\tabularnewline
 Literaturangaben in WinEdt einfügen&
 STRG-SHIFT-W\tabularnewline
@@ -2705,25 +2720,25 @@ F1\tabularnewline
 \section{Häufige Fragen und Antworten}\label{sec:faq}
 %\secttoc
 
-Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref{}-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
+Die folgenden Fragen und Antworten sind der \href{http://jabref.sourceforge.net/faq.php}{\jabref-Homepage} entnommen. Falls Sie darüber hinaus Fragen haben, die das Handbuch nicht beantworten konnte, haben Sie folgende Möglichkeiten, zu einer Antwort zu kommen:
 \begin{enumerate}
 	\item Durchsuchen Sie die \href{http://sourceforge.net/forum/?group_id=92314}{Foren} auf der Projektseite bei Sourceforge.
-	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_name=jabref-users}{Archiv} der \jabref{}-Mailingliste.
-	\item Stellen Sie Ihre Frage in einem der Foren oder auf der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref{}-Mailingliste}.
+	\item Durchsuchen Sie das \href{http://sourceforge.net/mailarchive/forum.php?forum_name=jabref-users}{Archiv} der \jabref-Mailingliste.
+	\item Stellen Sie Ihre Frage in einem der Foren oder auf der \href{http://sourceforge.net/mail/?group_id=92314}{\jabref-Mailingliste}.
 \end{enumerate}
 
-\faq{Läuft \jabref{} unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Am 13.~November~2006 hat Sun sein Java unter die GNU General Public License (Version~2) gestellt, so dass die Antwort ">Ja"< lautet. Ansonsten ist zu sagen, dass eine unserer Abhängigkeiten derzeit zu einem Absturz führt, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath.}
+\faq{Läuft \jabref unter freiem Java (Classpath, Kaffee GCJ etc.)?}{Am 13.~November~2006 hat Sun sein Java unter die GNU General Public License (Version~2) gestellt, so dass die Antwort ">Ja"< lautet. Ansonsten ist zu sagen, dass eine unserer Abhängigkeiten derzeit zu einem Absturz führt, wenn mit einer anderen Java API als der von Sun gearbeitet wird. Das gilt für Version 0.92 von Classpath.}
 
-\faq{\label{faq-linux}\jabref{} startet nicht unter Linux. Was kann ich tun?}{\jabref{} läuft unter Linux, wenn Sie eine Java Runtime Environment (JRE) von Sun in der Version~1.4.2 oder einer neueren Version verwenden. Falls \jabref{} dennoch nicht starten sollte, können Sie folgende Fehlersuche durchführen:
+\faq{\label{faq-linux}\jabref startet nicht unter Linux. Was kann ich tun?}{\jabref läuft unter Linux, wenn Sie eine Java Runtime Environment (JRE) von Sun in der Version~1.4.2 oder einer neueren Version verwenden. Falls \jabref dennoch nicht starten sollte, können Sie folgende Fehlersuche durchführen:
 Starten Sie \texttt{java -{-}version} von der Kommandozeile. Falls dabei kein Produkt von Sun Microsystems verwendet wird (sondern beispielsweise angezeigt wird, dass Sie GCJ VM verwenden), selbst wenn Sie die JRE von Sun installiert haben, müssen Sie Ihr Setup anpassen. Da das Vorgehen dafür sehr von Ihrer Linux-Distribution abhängt, können wir keine Hinweise für jede mögliche Konstellation geben.
 Unter Debian/Ubuntu können Sie die Einstellungen anpassen, indem Sie \texttt{sudo update-alternatives -{-}config java} aufrufen (dazu brauchen Sie admin-Rechte). In dem Dialog, der daraufhin erscheint, wählen Sie die Sun JDK oder JRE. Alternativ können Sie auch nach der Java-Programmdatei suchen und diese direkt ausführen. In Ubuntu findet man Java gewöhnlich unter \texttt{/usr\slash{}lib\slash{}jvm\slash{}java-1.5.0-sun\slash{}jre\slash{}bin\slash{}java}.
 Wenn Sie keine admin-Rechte auf dem Computer haben, können Sie die Sun JRE in ihrem Home-Verzeichnis installieren. Sie müssen dann darauf achten, dass Sie die richtige Programmdatei aufrufen. Wenn Sie die JRE z.\,B. in einen Ordner namens ">java"< in ihrem Home-Verzeichnis installiert haben, geben Sie \texttt{\texttildelow{}/java/jre/bin/java -jar JabRef-2.1.jar} (bzw. die entsprechende Versionsnummer) in der Kommandozeile ein.}
 
-\clearpage\faq{Ich arbeite unter Ubuntu und \jabref{} startet, wenn ich auf das Icon klicke, aber nicht von der Kommandozeile. Wo liegt das Problem?}{Sie haben mehrere Java Virtual Machines installiert und von der Kommandozeile wird die falsche gewählt. Schauen Sie unter Frage \ref{faq-linux} nach, wie Sie die Einstellungen ändern können.}
+\clearpage\faq{Ich arbeite unter Ubuntu und \jabref startet, wenn ich auf das Icon klicke, aber nicht von der Kommandozeile. Wo liegt das Problem?}{Sie haben mehrere Java Virtual Machines installiert und von der Kommandozeile wird die falsche gewählt. Schauen Sie unter Frage \ref{faq-linux} nach, wie Sie die Einstellungen ändern können.}
 
-\faq{Wie kann ich verhindern, dass \jabref{} beim Speichern der .bib"=Datei in bestimmten Feldern (wie \texttt{title}) Zeilenumbrüche einfügt?}{Öfnnen Sie \menu{Optionen \msep{} Einstellungen}. Im Bereich \menu{Allgemein} gibt es die Option \menu{Beim Speichern keinen Zeilenumbruch in den folgenden Feldern einfügen}. Diese Option enthält eine Liste von Feldnamen. Feldern, das Sie dieser Liste hinzufügen (abgetrennt mit einem Semikolon) wird beim Speichern kein Zeilenumbruch hinzugefügt.}
+\faq{Wie kann ich verhindern, dass \jabref beim Speichern der .bib"=Datei in bestimmten Feldern (wie \texttt{title}) Zeilenumbrüche einfügt?}{Öfnnen Sie \menu{Optionen \msep{} Einstellungen}. Im Bereich \menu{Allgemein} gibt es die Option \menu{Beim Speichern keinen Zeilenumbruch in den folgenden Feldern einfügen}. Diese Option enthält eine Liste von Feldnamen. Feldern, das Sie dieser Liste hinzufügen (abgetrennt mit einem Semikolon) wird beim Speichern kein Zeilenumbruch hinzugefügt.}
 
-\faq{Mein Virenscanner sagt mir, dass \jabref{} ein Virus ist. Ist der Server gefährdet?}{Nein, aber der Windows"=Installer benutzt das \href{http://nsis.sourceforge.net/}{Nullsoft Scriptable Install System (NSIS)} in der Version~2.18 (seit \jabref{}~2.1), das unglücklicherweise Installer produziert, die von einigen Virenscannern als Virus eingeschätzt werden. Wenn Sie mehr darüber erfahren wollen, sehen Sie sich die \href{http://forums.winamp.com/showthread.php?postid=1977648}{Diskussion im NSIS"=Forum} oder die \href{http://nsis.sourceforge.net/NSIS_False_Positives}{Liste der NSIS ">false positives"<} an.
+\faq{Mein Virenscanner sagt mir, dass \jabref ein Virus ist. Ist der Server gefährdet?}{Nein, aber der Windows"=Installer benutzt das \href{http://nsis.sourceforge.net/}{Nullsoft Scriptable Install System (NSIS)} in der Version~2.18 (seit \jabref~2.1), das unglücklicherweise Installer produziert, die von einigen Virenscannern als Virus eingeschätzt werden. Wenn Sie mehr darüber erfahren wollen, sehen Sie sich die \href{http://forums.winamp.com/showthread.php?postid=1977648}{Diskussion im NSIS"=Forum} oder die \href{http://nsis.sourceforge.net/NSIS_False_Positives}{Liste der NSIS ">false positives"<} an.
 
 Als Workaround und falls Sie Bedenken haben, den Installer zu benutzen, können Sie immer die plattformunabhängige jar"=Datei benutzen (siehe dazu Abschnitt ">\nameref{subsub:jar}"<).}
 
@@ -2732,12 +2747,12 @@ Als Workaround und falls Sie Bedenken haben, den Installer zu benutzen, können S
 \secttoc
 \bigskip
 
-\noindent \jabref{} ist ein \emph{Open Source} Projekt, das heißt, dass jede(r)
+\noindent \jabref ist ein \emph{Open Source} Projekt, das heißt, dass jede(r)
 dazu beitragen kann, das Programm zu verbessern und weiterzuentwickeln.
 Wenn Sie Anregungen, Wünsche oder Fragen haben, ist die erste Anlaufstelle
 die \href{http://sourceforge.net/projects/jabref/}{Projektseite bei \emph{Sourceforge}}.
 Dort gibt es Foren, in denen Sie Ihre Fragen stellen können, und eine
-Mailingliste rund um \jabref{}. Auch Ihre Wünsche \emph{(Feature
+Mailingliste rund um \jabref. Auch Ihre Wünsche \emph{(Feature
 Requests)} und Fehlermeldungen \emph{(Bug Reports)} können Sie dort
 loswerden. Um sich direkt als Entwickler einzubringen, wenden Sie
 sich an einen der beiden Maintainer (Morten O. Alver und Nizar N.
@@ -2762,7 +2777,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 
 \subsection{Lizenz}
 
-\jabref{} ist frei verfügbar unter den Bedingungen der \href{http://www.gnu.org/copyleft/gpl.html}{GNU General Public License}. Es gibt unterschiedliche Softwarepakete, die von \jabref{} genutzt werden. Wenn Sie sich über die Lizenzbestimmungen dieser Fremdsoftware informieren wollen, schauen Sie bitte unter \menu{Hilfe \msep{} Über JabRef} nach.
+\jabref ist frei verfügbar unter den Bedingungen der \href{http://www.gnu.org/copyleft/gpl.html}{GNU General Public License}. Es gibt unterschiedliche Softwarepakete, die von \jabref genutzt werden. Wenn Sie sich über die Lizenzbestimmungen dieser Fremdsoftware informieren wollen, schauen Sie bitte unter \menu{Hilfe \msep{} Über JabRef} nach.
 
 \appendix
 \newpage
@@ -2783,7 +2798,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \begin{revhist}{\versiondate}%endgültiges Datum}
 \item Abschnitt ">Import und Export"< in zwei Abschnitte unterteilt
 \item Abschnitt \nameref{sec:faq} ergänzt
-\item Abschnitt \nameref{EntryEditorHelp} angepasst
+\item Abschnitte \nameref{EntryEditorHelp} und \nameref{subsec:System-Voraussetzungen} angepasst
 \item Versionsnummer angepasst
 \item Beschreibung der Felder ">doi"< und ">eid"< hinzugefügt
 \item Fehler im Link zum Mail-Archiv beseitigt
@@ -2794,7 +2809,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \begin{revhist}{18.\,4.\,2007}
 \item Abschnitte \nameref{LabelPatterns}, \nameref{par:Feldformatierer} und \nameref{StringEditorHelp} aktualisiert
 \item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
-\item \jabref{}-Logo geändert
+\item \jabref-Logo geändert
 \item Ein paar Kleinigkeiten
 \end{revhist}
 
@@ -2843,7 +2858,7 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \end{revhist}
 
 \begin{revhist}{30.\,1.\,2006}
-\item Abschnitt >>\jabref{}-Bibliographien in OpenOffice.org benutzen<< aktualisiert
+\item Abschnitt >>\jabref-Bibliographien in OpenOffice.org benutzen<< aktualisiert
 \item Abschnitt zur Erzeugung der \bibtex{}-Keys aktualisiert
 \item Neues Kapitel (>>Externe Importfilter<<), geschrieben von Andreas Rudert
 \item Einige kleinere Änderungen
