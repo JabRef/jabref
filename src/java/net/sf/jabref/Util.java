@@ -845,6 +845,83 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 			return null;
 	}
 
+	public static Map<BibtexEntry, List<File>> findAssociatedFiles(Collection<BibtexEntry> entries, Collection<String> extensions, Collection<File> directories){
+		HashMap<BibtexEntry, List<File>> result = new HashMap<BibtexEntry, List<File>>();
+	
+		// First scan directories
+		Set<File> filesWithExtension = findFiles(extensions, directories);
+		
+		// Initialize Result-Set
+		for (BibtexEntry entry : entries){
+			result.put(entry, new ArrayList<File>());
+		}
+		
+		// Now look for keys
+		nextFile:
+		for (File file : filesWithExtension){
+			
+			String name = file.getName();
+			for (BibtexEntry entry : entries){
+				if (name.contains(entry.getCiteKey())){
+					result.get(entry).add(file);
+					continue nextFile;
+				}
+			}			
+		}
+		
+		return result;
+	}
+	
+	public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
+		Set<File> result = new HashSet<File>();
+		
+		for (File directory : directories){
+			result.addAll(findFiles(extensions, directory));
+		}
+		
+		return result;
+	}
+
+	private static Collection<? extends File> findFiles(Collection<String> extensions, File directory) {
+		Set<File> result = new HashSet<File>();
+		
+		File[] children = directory.listFiles();
+		if (children == null)
+			return result; // No permission?
+
+		for (File child : children){
+			if (child.isDirectory()) {
+				result.addAll(findFiles(extensions, child));
+			} else {
+				
+				String extension = getFileExtension(child);
+					
+				if (extension != null){
+					if (extensions.contains(extension)){
+						result.add(child);
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+
+	/**
+	 * Returns the extension of a file or null if the file does not have one (no . in name).
+	 * 
+	 * @param file
+	 * 
+	 * @return The extension, trimmed and in lowercase.
+	 */
+	public static String getFileExtension(File file) {
+		String name = file.getName();
+		int pos = name.lastIndexOf('.');
+		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
+			.trim().toLowerCase() : null;
+		return extension;
+	}
+
 	/**
 	 * New version of findPdf that uses findFiles.
 	 * 
@@ -936,7 +1013,6 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		String file, boolean relative) {
 
 		for (int i = 0; i < directory.length; i++) {
-
 			String result = findFile(entry, database, directory[i], file, relative);
 			if (result != null) {
 				return result;
@@ -1104,13 +1180,13 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 				 * 
 				 * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
 				 */
-                            // Changed by M. Alver 2007.01.04:
-                            // Remove first character if it is a directory separator character:
-                            String tmp = found.substring(root.getCanonicalPath().length());
-                            if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
-                                tmp = tmp.substring(1);
-                            return tmp;
-				//return found.substring(root.getCanonicalPath().length());
+                // Changed by M. Alver 2007.01.04:
+                // Remove first character if it is a directory separator character:
+                String tmp = found.substring(root.getCanonicalPath().length());
+                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar))
+                    tmp = tmp.substring(1);
+                return tmp;
+                //return found.substring(root.getCanonicalPath().length());
 			} catch (IOException e) {
 				return null;
 			}

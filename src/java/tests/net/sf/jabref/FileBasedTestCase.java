@@ -202,7 +202,19 @@ public class FileBasedTestCase extends TestCase {
 
 			File foo = new File(dirTest, "foo.dat");
 			foo.createNewFile();
+			
+			File graphicsDir = new File(root, "graphicsDir");
+			graphicsDir.mkdir();
+			
+			File graphicsSubDir = new File(graphicsDir, "subDir");
+			graphicsSubDir.mkdir();
+			
+			File jpg = new File(graphicsSubDir, "testHipKro03test.jpg");
+			jpg.createNewFile();
 
+			File png = new File(graphicsSubDir, "testHipKro03test.png");
+			png.createNewFile();
+			
 		} catch (Exception e) {
 			throw new RuntimeException();
 		}

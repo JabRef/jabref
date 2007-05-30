@@ -2,16 +2,13 @@ package tests.net.sf.jabref;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import junit.framework.TestCase;
-import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.Util;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.ParserResult;
 
 /**
  * Testing Util.findFile for finding files based on regular expressions.
@@ -72,6 +69,19 @@ public class UtilFindFileTest extends FileBasedTestCase {
 		}
 	}
 
+	public void testFindAssociatedFiles() throws IOException {
+		Collection<BibtexEntry> entries = Arrays.asList(new BibtexEntry[]{entry});
+		Collection<String> extensions = Arrays.asList(new String[]{"jpg", "pdf"});
+		Collection<File> dirs = Arrays.asList(new File[] { new File(root.getAbsoluteFile() + "/pdfs/"), new File(root.getAbsoluteFile() + "/graphicsDir/") });
+		
+		Map<BibtexEntry, List<File>> results = Util.findAssociatedFiles(entries, extensions, dirs);
+		
+		assertEquals(2, results.get(entry).size());
+		assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/testHipKro03test.jpg")));
+		assertFalse(results.get(entry).contains(new File(root.getAbsoluteFile() + "/graphicsDir/subDir/testHipKro03test.png")));
+		assertTrue(results.get(entry).contains(new File(root.getAbsoluteFile() + "/pdfs/sub/HipKro03-sub.pdf")));
+	}
+	
 	public void testFindPdfInMultiple() throws IOException {
 
 		{

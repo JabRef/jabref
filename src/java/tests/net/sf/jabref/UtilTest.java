@@ -3,7 +3,6 @@ package tests.net.sf.jabref;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -65,7 +64,7 @@ public class UtilTest extends TestCase {
 
 	public void testCreateNeutralId() {
 		
-		HashSet set = new HashSet();
+		HashSet<String> set = new HashSet<String>();
 		for (int i = 0; i < 10000; i++){
 			String string = Util.createNeutralId();
 			assertFalse(set.contains(string));
@@ -254,14 +253,14 @@ public class UtilTest extends TestCase {
 		
 		try {
 		
-			List f = new LinkedList(Arrays.asList(formats));
-			List n = new LinkedList(Arrays.asList(names));
+			List<String> f = new LinkedList<String>(Arrays.asList(formats));
+			List<String> n = new LinkedList<String>(Arrays.asList(names));
 			
 			n.add("testMe123454321");
 			f.add("*@*@test");
 
-			String[] newNames = (String[])n.toArray(new String[n.size()]);
-			String[] newFormats = (String[])f.toArray(new String[f.size()]);
+			String[] newNames = n.toArray(new String[n.size()]);
+			String[] newFormats = f.toArray(new String[f.size()]);
 			
 			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, newNames);
 			Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, newFormats);
