@@ -1,13 +1,17 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.UnknownExternalFileType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 import java.io.File;
 import java.io.IOException;
 
@@ -239,6 +243,77 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     }
 
+
+    public static Thread autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce,
+                                      final Set<BibtexEntry> changedEntries) {
+
+        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+        final JLabel label = new JLabel(Globals.lang("Searching for files"));
+        Runnable r = new Runnable() {
+
+            public void run() {
+                boolean foundAny = false;
+                ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
+                ArrayList<File> dirs = new ArrayList<File>();
+                if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
+                    dirs.add(new File(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")));
+                Collection<String> extensions = new ArrayList<String>();
+                for (int i = 0; i < types.length; i++) {
+                    final ExternalFileType type = types[i];
+                    extensions.add(type.getExtension());
+                }
+                // Run the search operation:
+                Map<BibtexEntry, java.util.List<File>> result =
+                        Util.findAssociatedFiles(entries, extensions, dirs);
+
+                // Iterate over the entries:
+                for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
+                    BibtexEntry anEntry = i.next();
+                    FileListTableModel tableModel = new FileListTableModel();
+                    Object oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
+                    if (oldVal != null)
+                        tableModel.setContent((String)oldVal);
+                    List<File> files = result.get(anEntry);
+                    for (File f : files) {
+                        boolean alreadyHas = false;
+                        for (int j = 0; j < tableModel.getRowCount(); j++) {
+                            FileListEntry existingEntry = tableModel.getEntry(j);
+                            if (new File(existingEntry.getLink()).equals(f)) {
+                                alreadyHas = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyHas) {
+                            int index = f.getPath().indexOf('.');
+                            if ((index >= 0) && (index < f.getPath().length()-1)) {
+                                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
+                                    (f.getPath().substring(index+1));
+                                FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
+                                tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                            } else {
+                                FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(),
+                                        new UnknownExternalFileType(""));
+                                tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                            }
+                            String newVal = tableModel.getStringRepresentation();
+                            if (newVal.length() == 0)
+                                newVal = null;
+                            UndoableFieldChange change = new UndoableFieldChange(anEntry,
+                                    GUIGlobals.FILE_FIELD, oldVal, newVal);
+                            ce.addEdit(change);
+                            anEntry.setField(GUIGlobals.FILE_FIELD, newVal);
+                            changedEntries.add(anEntry);
+                        }
+                    }
+                }
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+        return t;
+    }
+
+
     /**
      * Automatically add links for this entry to the table model given as an argument, based on
      * the globally stored list of external file types. The entry itself is not modified. The entry's
@@ -258,11 +333,13 @@ public class FileListEditor extends JTable implements FieldEditor,
     public static Thread autoSetLinks(final BibtexEntry entry, final FileListTableModel tableModel,
                                       final ActionListener callback, final JDialog diag) {
 
+        final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+        entries.add(entry);
         final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, types.length-1);
+        prog.setIndeterminate(true);
         prog.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        final JLabel label = new JLabel(Globals.lang("Searching for")+
-                ":                                            ");
+        final JLabel label = new JLabel(Globals.lang("Searching for files"));
         if (diag != null) {
             diag.setTitle(Globals.lang("Autosetting links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
@@ -276,16 +353,23 @@ public class FileListEditor extends JTable implements FieldEditor,
             public void run() {
                 boolean foundAny = false;
                 ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-                ArrayList dirs = new ArrayList();
+                ArrayList<File> dirs = new ArrayList<File>();
                 if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
-                    dirs.add(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory"));
+                    dirs.add(new File(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")));
+                Collection<String> extensions = new ArrayList<String>();
                 for (int i = 0; i < types.length; i++) {
                     final ExternalFileType type = types[i];
-                    //System.out.println("Looking for "+type.getName());
-                    String found = Util.findFile(entry, type, dirs);
-                    if (found != null) {
-                        //System.out.println("Found: "+found);
-                        File f = new File(found);
+                    extensions.add(type.getExtension());
+                }
+                // Run the search operation:
+                Map<BibtexEntry, java.util.List<File>> result =
+                        Util.findAssociatedFiles(entries, extensions, dirs);
+
+                // Iterate over the entries:
+                for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
+                    BibtexEntry anEntry = i.next();
+                    List<File> files = result.get(anEntry);
+                    for (File f : files) {
                         boolean alreadyHas = false;
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
@@ -295,17 +379,21 @@ public class FileListEditor extends JTable implements FieldEditor,
                             }
                         }
                         if (!alreadyHas) {
-                            FileListEntry flEntry = new FileListEntry(f.getName(), found, type);
-                            tableModel.addEntry(tableModel.getRowCount(), flEntry);
-                            foundAny = true;
+                            int index = f.getPath().indexOf('.');
+                            if ((index >= 0) && (index < f.getPath().length()-1)) {
+                                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
+                                    (f.getPath().substring(index+1));
+                                FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
+                                tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                                foundAny = true;
+                            } else {
+                                FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(),
+                                        new UnknownExternalFileType(""));
+                                tableModel.addEntry(tableModel.getRowCount(), flEntry);
+                                foundAny = true;
+                            }
                         }
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        label.setText(Globals.lang("Searching for")+": "+type.getName());
-                        prog.setValue(prog.getValue()+1);
-                    }
-                });
                 }
                 final int id = foundAny ? 1 : 0;
                 SwingUtilities.invokeLater(new Runnable() {

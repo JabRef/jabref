@@ -7,6 +7,9 @@ import net.sf.jabref.undo.UndoableFieldChange;
 
 import javax.swing.*;
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.io.File;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -34,7 +37,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
     private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
 
-    private int skipped = 0, entriesChanged = 0, brokenLinks = 0;
+    private int skipped = 0, brokenLinks = 0, entriesChangedCount = 0;
 
     public SynchronizeFileField(BasePanel panel) {
         this.panel = panel;
@@ -74,7 +77,6 @@ public class SynchronizeFileField extends AbstractWorker {
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
         skipped = 0;
-        entriesChanged = 0;
         brokenLinks = 0;
         final NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 
@@ -85,10 +87,24 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // Find the default directory for this field type:
         String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
+        Set<BibtexEntry> changedEntries = new HashSet<BibtexEntry>();
 
         // First we try to autoset fields
         if (autoSet) {
+            Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
             for (int i = 0; i < sel.length; i++) {
+                entries.add(sel[i]);
+            }
+            // Start the autosetting process:
+
+            Thread t = FileListEditor.autoSetLinks(entries, ce, changedEntries);
+            // Wait for the autosetting to finish:
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            /*
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);
 
@@ -97,12 +113,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 if (old != null)
                     tableModel.setContent((String)old);
                 Thread t = FileListEditor.autoSetLinks(sel[i], tableModel, null, null);
-                // Wait for the autosetting to finish:
-                try {
-                    t.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
                 if (!tableModel.getStringRepresentation().equals(old)) {
                     String toSet = tableModel.getStringRepresentation();
                     if (toSet.length() == 0)
@@ -111,9 +122,11 @@ public class SynchronizeFileField extends AbstractWorker {
                     sel[i].setField(fieldName, toSet);
                     entriesChanged++;
                 }
-            }
+            }    */
 
         }
+        progress += sel.length*weightAutoSet;
+        panel.frame().setProgressBarValue(progress);
         //System.out.println("Done setting");
         // The following loop checks all external links that are already set.
         if (checkExisting) {
@@ -164,7 +177,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         ce.addEdit(new UndoableFieldChange(sel[i], fieldName, old,
                                 toSet));
                         sel[i].setField(fieldName, toSet);
-                        entriesChanged++;
+                        changedEntries.add(sel[i]);
                         //System.out.println("Changed to: "+tableModel.getStringRepresentation());
                     }
 
@@ -173,7 +186,8 @@ public class SynchronizeFileField extends AbstractWorker {
             }
         }
 
-        if (entriesChanged > 0) {
+        entriesChangedCount = changedEntries.size();
+        if (entriesChangedCount > 0) {
             // Add the undo edit:
             ce.end();
             panel.undoManager.addEdit(ce);
@@ -187,9 +201,9 @@ public class SynchronizeFileField extends AbstractWorker {
             return;
 
         panel.output(Globals.lang("Finished synchronizing %0 links. Entries changed%c %1.",
-                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChanged)}));
+                new String[]{fieldName.toUpperCase(), String.valueOf(entriesChangedCount)}));
         panel.frame().setProgressBarVisible(false);
-        if (entriesChanged > 0) {
+        if (entriesChangedCount > 0) {
             panel.markBaseChanged();
         }
     }
