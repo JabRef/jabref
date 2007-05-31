@@ -243,7 +243,21 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     }
 
-
+    /**
+     * Automatically add links for this set of entries, based on the globally stored list of
+     * external file types. The entries are modified, and corresponding UndoEdit elements
+     * added to the NamedCompound given as argument. Furthermore, all entries which are modified
+     * are added to the Set of entries given as an argument.
+     *
+     * The entries' bibtex keys must have been set - entries lacking key are ignored.
+     * The operation is done in a new thread, which is returned for the caller to wait for
+     * if needed.
+     *
+     * @param entries A collection of BibtexEntry objects to find links for.
+     * @param ce A NamedCompound to add UndoEdit elements to.
+     * @param changedEntries A Set of BibtexEntry objects to which all modified entries is added.
+     * @return the thread performing the autosetting
+     */
     public static Thread autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce,
                                       final Set<BibtexEntry> changedEntries) {
 
