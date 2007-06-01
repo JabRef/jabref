@@ -289,16 +289,19 @@ public class FileListEditor extends JTable implements FieldEditor,
                         tableModel.setContent((String)oldVal);
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
+			f = relativizePath(f, dirs);
                         boolean alreadyHas = false;
+			//System.out.println("File: "+f.getPath());
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
-                            if (new File(existingEntry.getLink()).equals(f)) {
+			    //System.out.println("Comp: "+existingEntry.getLink());
+			    if (new File(existingEntry.getLink()).equals(f)) {
                                 alreadyHas = true;
                                 break;
                             }
                         }
                         if (!alreadyHas) {
-                            int index = f.getPath().indexOf('.');
+                            int index = f.getPath().lastIndexOf('.');
                             if ((index >= 0) && (index < f.getPath().length()-1)) {
                                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
                                     (f.getPath().substring(index+1));
@@ -384,6 +387,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     BibtexEntry anEntry = i.next();
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
+			f = relativizePath(f, dirs);
                         boolean alreadyHas = false;
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
@@ -393,7 +397,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                             }
                         }
                         if (!alreadyHas) {
-                            int index = f.getPath().indexOf('.');
+                            int index = f.getPath().lastIndexOf('.');
                             if ((index >= 0) && (index < f.getPath().length()-1)) {
                                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
                                     (f.getPath().substring(index+1));
@@ -428,6 +432,24 @@ public class FileListEditor extends JTable implements FieldEditor,
         }
         return t;
     }
+
+    /**
+     * If the file is below one of the directories in a list, return a File specifying
+     * a path relative to that directory.
+     */
+    public static File relativizePath(File f, ArrayList<File> dirs) {
+	String pth = f.getPath();
+	for (File dir : dirs) {
+	    if (pth.startsWith(dir.getPath())) {
+		String subs = pth.substring(dir.getPath().length());
+		if ((subs.length() > 0) && ((subs.charAt(0) == '/') || (subs.charAt(0) == '\\')))
+		    subs = subs.substring(1);
+	    return new File(subs);	    
+	    }
+	}
+	return f;
+    }
+
 
     /**
      * Run a file download operation.
