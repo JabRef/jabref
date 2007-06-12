@@ -36,7 +36,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
            // Else we are in a command, and should not keep the letter.
          else {
            currentCommand.append( (char) c);
-           testCharCom: if ((currentCommand.length() == 1)
+           if ((currentCommand.length() == 1)
                && (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
              // This indicates that we are in a command of the type \^o or \~{n}
  /*            if (i >= field.length()-1)
@@ -90,21 +90,5 @@ public class RemoveLatexCommands implements LayoutFormatter {
     }
 
     return sb.toString();
-        //field.replaceAll("\\\\emph", "").replaceAll("\\\\em", "").replaceAll("\\\\textbf", "");
-  }
-
-  private String getPart(String text) {
-    char c;
-    boolean found = false;
-    StringBuffer part = new StringBuffer();
-    while (!found && (i < text.length())) {
-      i++;
-      c = text.charAt(i);
-      if (c == '}')
-        found = true;
-      else
-        part.append((char)c);
-    }
-    return part.toString();
   }
 }

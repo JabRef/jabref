@@ -80,7 +80,9 @@ appear in your chosen languages.
 
 Change log:
 
-2.3b1   - Added autocompletion feature for author/editors and other fields.
+2.3b1   
+	- Added RemoveTilde LayoutFormatter to deal with Bibtex non-breakable spaces.
+	- Added autocompletion feature for author/editors and other fields.
 	- Added feature to save all open databases.
 	- Added support for pushing citations to Vim when Vim server is enabled.
 	- Added missing option for specifying the path to LEd.exe.

@@ -1,8 +1,6 @@
 package tests.net.sf.jabref.export.layout.format;
 
 import junit.framework.TestCase;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.AuthorLastFirstCommas;
 import net.sf.jabref.export.layout.format.NameFormat;
 
 public class BibtexNameLayoutFormatterTest extends TestCase {
