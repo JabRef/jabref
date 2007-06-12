@@ -8,9 +8,11 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
+* Should native file dialog option be visible on all OSes?
+  May be necessary for Vista.
 * Activate OpenDatabaseAction: file links upgrade warning.
+* Test external file types with and without application set on Windows.
 * Add "Copy all externally linked files for this set of entries"-feature
-* [see feedback] Fix bug in spacing with string references: http://sourceforge.net/tracker/index.php?func=detail&aid=1711135&group_id=92314&atid=600306
 * Enable icon customization of external file types.
 * Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
 	- strange performance bug in creation of duplicate resolver dialog?

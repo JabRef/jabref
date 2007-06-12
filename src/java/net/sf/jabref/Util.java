@@ -623,10 +623,26 @@ public class Util {
 		} else {
 			cmd = "cmd.exe /c start " + link;
 		}
-		Process child = Runtime.getRuntime().exec(cmd);
+
+        Runtime.getRuntime().exec(cmd);
 	}
 
-	/**
+    /**
+     * Opens a file on a Windows system, using the given application.
+     *
+     * @param link The file name.
+     * @param application Link to the app that opens the file.
+     * @throws IOException
+     */
+    public static void openFileWithApplicationOnWindows(String link, String application)
+        throws IOException {
+
+        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
+
+		Runtime.getRuntime().exec(application + " " + link);
+    }
+
+    /**
 	 * Open an external file, attempting to use the correct viewer for it.
 	 * 
 	 * @param metaData
@@ -673,7 +689,11 @@ public class Util {
 					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), file.getPath() };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
-					openFileOnWindows(file.getPath(), true);
+                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                        // Application is specified. Use it:
+                        openFileWithApplicationOnWindows(file.getPath(), fileType.getOpenWith());
+                    } else
+                        openFileOnWindows(file.getPath(), true);
 				} else {
 					String[] cmdArray = new String[] { fileType.getOpenWith(), file.getPath() };
 					Runtime.getRuntime().exec(cmdArray);
