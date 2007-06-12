@@ -81,6 +81,7 @@ appear in your chosen languages.
 Change log:
 
 2.3b1   
+	- Added MIS Quarterly Export Format 
 	- Added RemoveTilde LayoutFormatter to deal with Bibtex non-breakable spaces.
 	- Added autocompletion feature for author/editors and other fields.
 	- Added feature to save all open databases.

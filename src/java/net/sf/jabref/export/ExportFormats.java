@@ -20,18 +20,12 @@ import java.io.File;
  */
 public class ExportFormats {
 
-	private static Map exportFormats = new TreeMap();
+	private static Map<String,ExportFormat> exportFormats = new TreeMap<String,ExportFormat>();
 
     public static void initAllExports() {
         exportFormats.clear();
-        initBuiltinExports();
-        TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
-        for (Iterator i=customExports.keySet().iterator(); i.hasNext();) {
-            putFormat((ExportFormat)customExports.get(i.next()));
-        }
-    }
 
-    public static void initBuiltinExports() {
+        // Initialize Build-In Export Formats
         putFormat(new ExportFormat(
                 Globals.lang("HTML"), "html", "html", null, ".html"));
         putFormat(new ExportFormat(
@@ -45,23 +39,23 @@ public class ExportFormats {
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
         putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
+        putFormat(new ExportFormat(Globals.lang("MIS Quarterly"), "misq", "misq",
+                "misq", ".rtf"));
         putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
                 "endnote", ".txt"));
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
-        // putFormat(new MsBibExporter());
-                
-        //openofficeItem = new JMenuItem("OpenOffice Calc"),
-        //odsItem = new JMenuItem("OpenDocument Spreadsheet");
-
+    
+        // Now add custom export formats
+        TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
+        for (Iterator i=customExports.keySet().iterator(); i.hasNext();) {
+            putFormat((ExportFormat)customExports.get(i.next()));
+        }
     }
 
-
-
-
 	/**
-	 * Build a string listing all available export formats.
+	 * Build a string listing of all available export formats.
 	 * 
 	 * @param maxLineLength
 	 *            The max line length before a line break must be added.
@@ -96,7 +90,7 @@ public class ExportFormats {
     public static Map getExportFormats() {
         // It is perhaps overly paranoid to make a defensive copy in this case:
         return Collections.unmodifiableMap(exportFormats);
-    }
+    } 
 
     /**
 	 * Look up the named export format.
@@ -123,6 +117,9 @@ public class ExportFormats {
 	public static AbstractAction getExportAction(JabRefFrame frame, boolean selectedOnly) {
 
 		class ExportAction extends MnemonicAwareAction {
+
+			private static final long serialVersionUID = 639463604530580554L;
+
 			private JabRefFrame frame;
 
 			private boolean selectedOnly;
@@ -157,10 +154,10 @@ public class ExportFormats {
 								return;
 						}
 						ExportFormat format = eff.getExportFormat();
-						Set entryIds = null;
+						Set<String> entryIds = null;
 						if (selectedOnly) {
 							BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
-							entryIds = new HashSet();
+							entryIds = new HashSet<String>();
 							for (int i = 0; i < selected.length; i++) {
 								BibtexEntry bibtexEntry = selected[i];
 								entryIds.add(bibtexEntry.getId());
@@ -197,7 +194,7 @@ public class ExportFormats {
 		String lastUsedFormat = Globals.prefs.get("lastUsedExport");
 		FileFilter defaultFilter = null;
 		JFileChooser fc = new JFileChooser(currentDir);
-		TreeSet filters = new TreeSet();
+		TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
 		for (Iterator i = exportFormats.keySet().iterator(); i.hasNext();) {
 			String formatName = (String) i.next();
 			ExportFormat format = (ExportFormat) exportFormats.get(formatName);
@@ -217,6 +214,5 @@ public class ExportFormats {
 	private static void putFormat(ExportFormat format) {
 		exportFormats.put(format.getConsoleName(), format);
 	}
-
 
 }
