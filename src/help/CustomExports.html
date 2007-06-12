@@ -142,6 +142,8 @@ to have been run earlier.
 <li><code>RemoveWhitespace</code> : to be documented.
 <li><code>RemoveLatexCommands</code> : removes LaTeX commands like <code>\em</code>, <code>\textbf</code>, etc. If
   used together with <code>HTMLChars</code> or <code>XMLChars</code>, this formatter should be called last.
+<li><code>RemoveTilde</code> : replaces the tilde character used in LaTeX as a non-breakable space by a regular space. Useful 
+in combination with the NameFormatter discussed in the next section.
 <li><code>ToLowerCase</code> : turns all characters into lower case.
 
 <li><code>CompositeFormat</code> : to be documented.
@@ -164,7 +166,7 @@ to have been run earlier.
 <p>With JabRef 2.2 it is now possible to define custom name formatters using the bibtex-sty-file syntax. 
 This allows ultimate flexibility, but is a cumbersome to write</p>
 <p>You can define your own formatter in the preference tab "Name Formatter" using the following format
-and then use it with the name given to it as any other name formatter</p>
+and then use it with the name given to it as any other formatter</p>
 
 <code>
   &lt;case1&gt;@&lt;range11&gt;@&lt;format&gt;@&lt;range12&gt;@&lt;format&gt;@&lt;range13&gt;...@@<br>
