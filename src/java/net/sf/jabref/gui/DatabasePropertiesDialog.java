@@ -1,10 +1,6 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.BasePanel;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.BrowseAction;
+import net.sf.jabref.*;
 
 import javax.swing.*;
 
@@ -31,8 +27,9 @@ public class DatabasePropertiesDialog extends JDialog {
     BasePanel panel = null;
     JComboBox encoding;
     JButton ok, cancel;
-    JTextField pdfDir = new JTextField(40), psDir = new JTextField(40);
-    String oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
+    JTextField fileDir = new JTextField(40),
+            pdfDir = new JTextField(40), psDir = new JTextField(40);
+    String oldFileVal="", oldPdfVal="", oldPsVal=""; // Remember old values to see if they are changed.
 
     public DatabasePropertiesDialog(JFrame parent) {
         super(parent, Globals.lang("Database properties"), false);
@@ -49,8 +46,10 @@ public class DatabasePropertiesDialog extends JDialog {
 
     public final void init(JFrame parent) {
 
+        JButton browseFile = new JButton(Globals.lang("Browse"));
         JButton browsePdf = new JButton(Globals.lang("Browse"));
         JButton browsePs = new JButton(Globals.lang("Browse"));
+        browseFile.addActionListener(new BrowseAction(parent, fileDir, true));
         browsePdf.addActionListener(new BrowseAction(parent, pdfDir, true));
         browsePs.addActionListener(new BrowseAction(parent, psDir, true));
 
@@ -61,6 +60,10 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.append(encoding);
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Override default file directories"));
+        builder.nextLine();
+        builder.append(Globals.lang("File directory"));
+        builder.append(fileDir);
+        builder.append(browseFile);
         builder.nextLine();
         builder.append(Globals.lang("PDF directory"));
         builder.append(pdfDir);
@@ -103,6 +106,15 @@ public class DatabasePropertiesDialog extends JDialog {
     public void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
+        Vector fileD = metaData.getData(GUIGlobals.FILE_FIELD+"Directory");
+        if (fileD == null)
+            fileDir.setText("");
+        else {
+            // Better be a little careful about how many entries the Vector has:
+            if (fileD.size() >= 1)
+                fileDir.setText(((String)fileD.get(0)).trim());
+        }
+
         Vector pdfD = metaData.getData("pdfDirectory");
         if (pdfD == null)
             pdfDir.setText("");
@@ -122,6 +134,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         // Store original values to see if they get changed:
+        oldFileVal = fileDir.getText();
         oldPdfVal = pdfDir.getText();
         oldPsVal = psDir.getText();
     }
@@ -132,7 +145,16 @@ public class DatabasePropertiesDialog extends JDialog {
         panel.setEncoding(newEncoding);
 
         Vector dir = new Vector(1);
-        String text = pdfDir.getText().trim();
+        String text = fileDir.getText().trim();
+        if (text.length() > 0) {
+            dir.add(text);
+            metaData.putData(GUIGlobals.FILE_FIELD+"Directory", dir);
+        }
+        else
+            metaData.remove(GUIGlobals.FILE_FIELD+"Directory");
+
+        dir = new Vector(1);
+        text = pdfDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
             metaData.putData("pdfDirectory", dir);
