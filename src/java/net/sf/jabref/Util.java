@@ -659,7 +659,7 @@ public class Util {
 
 		// We try to check the extension for the file:
 		String name = file.getName();
-		int pos = name.indexOf('.');
+		int pos = name.lastIndexOf('.');
 		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
 			.trim().toLowerCase() : null;
 
@@ -790,7 +790,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
             throw new RuntimeException("Could not find the file list entry "+link+" in "+entry.toString());
         }
 
-        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false);
+        FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, metaData);
         editor.setVisible(true);
         if (editor.okPressed()) {
             // Store the changes and add an undo edit:

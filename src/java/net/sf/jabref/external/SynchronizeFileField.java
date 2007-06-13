@@ -153,7 +153,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 case 1:
                                     // Assign new file.
                                     FileListEntryEditor flEditor = new FileListEntryEditor
-                                            (panel.frame(), flEntry, false);
+                                            (panel.frame(), flEntry, false, panel.metaData());
                                     flEditor.setVisible(true);
                                     break;
                                 case 2:

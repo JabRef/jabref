@@ -965,7 +965,7 @@ public class ImportInspectionDialog extends JDialog {
                 model.setContent(oldVal);
             // We have a static utility method for searching for all relevant links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            FileListEditor.autoSetLinks(entry, model, new ActionListener() {
+            FileListEditor.autoSetLinks(entry, model, metaData, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (e.getID() > 0) {
                         entries.getReadWriteLock().writeLock().lock();
@@ -994,7 +994,7 @@ public class ImportInspectionDialog extends JDialog {
                 return;
             entry = (BibtexEntry) selectionModel.getSelected().get(0);
             FileListEntry flEntry = new FileListEntry("", "", null);
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, metaData);
             editor.setVisible(true);                                                 
             if (editor.okPressed()) {
                 FileListTableModel model = new FileListTableModel();

@@ -95,7 +95,7 @@ public class DownloadExternalFile {
         File file = new File(new File(directory), suggestedName);
         FileListEntry entry = new FileListEntry("", bibtexKey != null ? file.getPath() : "",
                 Globals.prefs.getExternalFileTypeByExt(suffix));
-        editor = new FileListEntryEditor(frame, entry, true);
+        editor = new FileListEntryEditor(frame, entry, true, metaData);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {

@@ -27,6 +27,7 @@ public class FileListEditor extends JTable implements FieldEditor,
     FieldNameLabel label;
     FileListEntryEditor editor = null;
     private JabRefFrame frame;
+    private MetaData metaData;
     private String fieldName;
     private EntryEditor entryEditor;
     private JPanel panel;
@@ -34,9 +35,10 @@ public class FileListEditor extends JTable implements FieldEditor,
     private JScrollPane sPane;
     private JButton add, remove, up, down, auto, download;
 
-    public FileListEditor(JabRefFrame frame, String fieldName, String content,
+    public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
                           EntryEditor entryEditor) {
         this.frame = frame;
+        this.metaData = metaData;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
         label = new FieldNameLabel(" " + Util.nCase(fieldName) + " ");
@@ -213,7 +215,7 @@ public class FileListEditor extends JTable implements FieldEditor,
 
     private boolean editListEntry(FileListEntry entry) {
         if (editor == null) {
-            editor = new FileListEntryEditor(frame, entry, false);
+            editor = new FileListEntryEditor(frame, entry, false, metaData);
         }
         else
             editor.setEntry(entry);
@@ -229,7 +231,7 @@ public class FileListEditor extends JTable implements FieldEditor,
         BibtexEntry entry = entryEditor.getEntry();
         int tableSize = tableModel.getRowCount();
         JDialog diag = new JDialog(frame, true);
-        autoSetLinks(entry, tableModel, new ActionListener() {
+        autoSetLinks(entry, tableModel, metaData, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
                 if (e.getID() > 0) {
@@ -340,6 +342,7 @@ public class FileListEditor extends JTable implements FieldEditor,
      *
      * @param entry The BibtexEntry to find links for.
      * @param tableModel The table model to insert links into. Already existing links are not duplicated or removed.
+     * @param metaData The MetaData providing the relevant file directory, if any.
      * @param callback An ActionListener that is notified (on the event dispatch thread) when the search is
      *  finished. The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added.
      *  This parameter can be null, which means that no callback will be notified.
@@ -348,7 +351,8 @@ public class FileListEditor extends JTable implements FieldEditor,
      * @return the thread performing the autosetting
      */
     public static Thread autoSetLinks(final BibtexEntry entry, final FileListTableModel tableModel,
-                                      final ActionListener callback, final JDialog diag) {
+                                      final MetaData metaData, final ActionListener callback,
+                                      final JDialog diag) {
 
         final Collection<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         entries.add(entry);
@@ -371,8 +375,8 @@ public class FileListEditor extends JTable implements FieldEditor,
                 boolean foundAny = false;
                 ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                 ArrayList<File> dirs = new ArrayList<File>();
-                if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
-                    dirs.add(new File(Globals.prefs.get(GUIGlobals.FILE_FIELD + "Directory")));
+                if (metaData.getFileDirectory(GUIGlobals.FILE_FIELD) != null)
+                    dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
                 Collection<String> extensions = new ArrayList<String>();
                 for (int i = 0; i < types.length; i++) {
                     final ExternalFileType type = types[i];
@@ -387,7 +391,7 @@ public class FileListEditor extends JTable implements FieldEditor,
                     BibtexEntry anEntry = i.next();
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
-			f = relativizePath(f, dirs);
+			        f = relativizePath(f, dirs);
                         boolean alreadyHas = false;
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);

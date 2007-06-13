@@ -6,9 +6,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 import javax.swing.*;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
-import net.sf.jabref.BrowseAction;
+import net.sf.jabref.*;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 
@@ -16,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -38,10 +37,13 @@ public class FileListEntryEditor {
     ConfirmCloseFileListEntryEditor externalConfirm = null;
 
     private FileListEntry entry;
+    private MetaData metaData;
     private boolean okPressed = false;
 
-    public FileListEntryEditor(JFrame parent, FileListEntry entry, boolean showProgressBar) {
+    public FileListEntryEditor(JFrame parent, FileListEntry entry, boolean showProgressBar,
+                               MetaData metaData) {
         this.entry = entry;
+        this.metaData = metaData;
 
         types = new JComboBox(Globals.prefs.getExternalFileTypeSelection());
         types.addItemListener(new ItemListener() {
@@ -190,6 +192,14 @@ public class FileListEntryEditor {
                 File newFile = new File(chosen);
                 // Store the directory for next time:
                 Globals.prefs.put("fileWorkingDirectory", newFile.getParent());
+
+                // If the file is below the file directory, make the path relative:
+                ArrayList<File> dirs = new ArrayList<File>();
+                dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
+                if (dirs.size() > 0) {
+                    newFile = FileListEditor.relativizePath(newFile, dirs);
+                }
+
                 comp.setText(newFile.getPath());
                 comp.requestFocus();
             }

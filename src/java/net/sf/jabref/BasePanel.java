@@ -42,6 +42,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -53,14 +54,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
@@ -96,8 +89,8 @@ import ca.odell.glazedlists.matchers.Matcher;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
+
+import javax.swing.*;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -321,11 +314,45 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
+
+                    ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+                    BibtexEntry[] sel = getSelectedEntries();
+                    for (int i = 0; i < sel.length; i++) {
+                        BibtexEntry bibtexEntry = sel[i];
+                        entries.add(bibtexEntry);
+                    }
+                    final List<FileListEntry> links =
+                            AccessLinksForEntries.getExternalLinksForEntries(entries);
+                    for (Iterator<FileListEntry> iterator = links.iterator(); iterator.hasNext();) {
+                        FileListEntry entry = iterator.next();
+                        System.out.println("Link: "+entry.getLink());
+                    };
+
+                    final JProgressBar prog = new JProgressBar();
+                    prog.setIndeterminate(true);
+                    final JDialog diag = new JDialog(frame, false);
+                    diag.getContentPane().add(prog, BorderLayout.CENTER);
+                    diag.pack();
+                    diag.setLocationRelativeTo(frame);
+                    diag.setVisible(true);
+                    Thread t = new Thread(new Runnable() {
+                        public void run() {
+                            AccessLinksForEntries.copyExternalLinksToDirectory(links,
+                                new File("/home/alver/tmp"), metaData, prog, false,
+                                    new ActionListener() {
+                                        public void actionPerformed(ActionEvent actionEvent) {
+                                            diag.dispose();
+                                        }
+                                    });
+                        }
+                    });
+                    t.start();
+                    
                     //CheckBoxFileChooser cb = new CheckBoxFileChooser(new File(""), "Selected only");
                     //cb.showSaveDialog(frame);
 
-                    ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
-                    efte.setVisible(true);
+                    //ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
+                    //efte.setVisible(true);
 
                     /*NamedCompound ce = Util.upgradePdfPsToFile(database,
                             new String[] {"pdf", "ps"});
