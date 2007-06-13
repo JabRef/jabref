@@ -226,6 +226,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     public BibtexEntry getEntry() {
         return entry;
     }
+    
+    public BibtexDatabase getDatabase(){
+    	return panel.getDatabase();
+    }
 
     private void setupToolBar() {
         tlb = new JToolBar(JToolBar.VERTICAL);

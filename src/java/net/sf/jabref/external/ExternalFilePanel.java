@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexFields;
 import net.sf.jabref.EntryEditor;
@@ -47,6 +48,8 @@ import net.sf.jabref.util.XMPUtil;
  */
 public class ExternalFilePanel extends JPanel {
 
+	private static final long serialVersionUID = 3653290879640642718L;
+
 	private JButton browseBut, download, auto, xmp;
 
 	private EntryEditor entryEditor;
@@ -57,7 +60,9 @@ public class ExternalFilePanel extends JPanel {
 
 	private OpenFileFilter off;
 
-	private BibtexEntry entry = null;
+	private BibtexEntry entry;
+	
+	private BibtexDatabase database;
 
 	private MetaData metaData;
 
@@ -127,8 +132,13 @@ public class ExternalFilePanel extends JPanel {
 	 * Change which entry this panel is operating on. This is used only when
 	 * this panel is not attached to an entry editor.
 	 */
-	public void setEntry(BibtexEntry entry) {
+	public void setEntry(BibtexEntry entry, BibtexDatabase database) {
 		this.entry = entry;
+		this.database = database;
+	}
+	
+	public BibtexDatabase getDatabase(){
+		return (database != null ? database : entryEditor.getDatabase());
 	}
 
 	public BibtexEntry getEntry() {
@@ -172,9 +182,10 @@ public class ExternalFilePanel extends JPanel {
 				
 				final File finalFile = file;
 
+		
 				output(Globals.lang("Writing XMP to '%0'...", finalFile.getName()));
 				try {
-					XMPUtil.writeXMP(finalFile, getEntry());
+					XMPUtil.writeXMP(finalFile, getEntry(), getDatabase());
 					output(Globals.lang("Wrote XMP to '%0'.", finalFile.getName()));
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(editor.getParent(), Globals.lang(
@@ -415,8 +426,6 @@ public class ExternalFilePanel extends JPanel {
 			+ fieldName + "'...");
 		Thread t = (new Thread() {
 			public void run() {
-				Object o = getKey();
-
 				/*
 				 * Find the following directories to look in for:
 				 * 
@@ -426,7 +435,7 @@ public class ExternalFilePanel extends JPanel {
 				 * 
 				 * JabRef-directory.
 				 */
-				LinkedList list = new LinkedList();
+				LinkedList<String> list = new LinkedList<String>();
 				list.add(metaData.getFileDirectory(fieldName));
 
 				/*

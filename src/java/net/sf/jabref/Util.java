@@ -1128,7 +1128,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 			return null;
 		}
 
-		String fieldValue = getField(beforeColon, entry, database);
+		String fieldValue = BibtexDatabase.getResolvedField(beforeColon, entry, database);
 
 		if (fieldValue == null)
 			return null;
@@ -1146,19 +1146,6 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		}
 
 		return fieldValue;
-	}
-
-	public static String getField(String field, BibtexEntry bibtex, BibtexDatabase database) {
-
-		if (field.equals("bibtextype"))
-			return bibtex.getType().getName();
-
-		String res = (String) bibtex.getField(field);
-
-		if ((res != null) && (database != null))
-			res = database.resolveForStrings(res);
-
-		return res;
 	}
 
 	/**
@@ -2613,5 +2600,19 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
         return sb.toString();
     }
 
+    /**
+	 * Static equals that can also return the right result when one of the
+	 * objects is null.
+	 * 
+	 * @param one
+	 *            The object whose equals method is called if the first is not
+	 *            null.
+	 * @param two
+	 *            The object passed to the first one if the first is not null.
+	 * @return <code>one == null ? two == null : one.equals(two);</code>
+	 */
+	public static boolean equals(Object one, Object two) {
+		return one == null ? two == null : one.equals(two);
+	}
 
 }

@@ -106,7 +106,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
-                extPan.setEntry(sel[i]);
+                extPan.setEntry(sel[i], panel.getDatabase());
                 editor.setText((old != null) ? (String) old : "");
                 Thread t = extPan.autoSetFile(fieldName, editor);
                 // Wait for the autoset process to finish:

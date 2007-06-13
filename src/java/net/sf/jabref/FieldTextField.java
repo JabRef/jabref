@@ -26,10 +26,14 @@
  */
 package net.sf.jabref;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 public class FieldTextField extends JTextField implements FieldEditor {
 

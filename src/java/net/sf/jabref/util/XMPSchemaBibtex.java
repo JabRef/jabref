@@ -1,19 +1,18 @@
 package net.sf.jabref.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.JabRefPreferences;
@@ -159,7 +158,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	public static Map getAllProperties(XMPSchema schema, String namespaceName) {
 		NodeList nodes = schema.getElement().getChildNodes();
 
-		Map result = new HashMap();
+		Map<String, String> result = new HashMap<String, String>();
 
 		if (nodes == null) {
 			return result;
@@ -227,12 +226,10 @@ public class XMPSchemaBibtex extends XMPSchema {
 		 * single space, and any leading or trailing spaces are deleted."
 		 * </cite>
 		 */
-		Set entries = result.entrySet();
-		Iterator it = entries.iterator();
-		while (it.hasNext()) {
-			Map.Entry entry = (Map.Entry) it.next();
-			String key = (String) entry.getKey();
-			if (preserveWhiteSpace.containsKey(key))
+		
+		for (Map.Entry<String, String> entry : result.entrySet()){
+			String key = entry.getKey();
+			if (preserveWhiteSpace.contains(key))
 				continue;
 			entry.setValue(((String) entry.getValue()).replaceAll("\\s+", " ").trim());
 		}
@@ -240,14 +237,14 @@ public class XMPSchemaBibtex extends XMPSchema {
 		return result;
 	}
 
-	public static HashMap preserveWhiteSpace = new HashMap();
+	public static HashSet<String> preserveWhiteSpace = new HashSet<String>();
 	static {
-		preserveWhiteSpace.put("abstract", null);
-		preserveWhiteSpace.put("note", null);
-		preserveWhiteSpace.put("review", null);
+		preserveWhiteSpace.add("abstract");
+		preserveWhiteSpace.add("note");
+		preserveWhiteSpace.add("review");
 	}
 
-	public void setBibtexEntry(BibtexEntry entry) {
+	public void setBibtexEntry(BibtexEntry entry, BibtexDatabase database) {
 		// Set all the values including key and entryType
 		Object[] fields = entry.getAllFields();
 		Object[] results;
@@ -255,7 +252,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 		if (prefs.getBoolean("useXmpPrivacyFilter")) {
-			TreeSet filters = new TreeSet(Arrays.asList(prefs.getStringArray("xmpPrivacyFilter")));
+			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilter")));
 			results = new Object[fields.length];
 			resultsSize = 0;
 			for (int i = 0; i < fields.length; i++) {
@@ -267,13 +264,14 @@ public class XMPSchemaBibtex extends XMPSchema {
 			results = fields;
 			resultsSize = fields.length;
 		}
-
+		
 		for (int i = 0; i < resultsSize; i++){
-			String s = results[i].toString();
-			if (s.equals("author") || s.equals("editor")) {
-				setPersonList(s, entry.getField(s).toString());
+			String field = results[i].toString();
+			String value = BibtexDatabase.getResolvedField(field, entry, database);
+			if (field.equals("author") || field.equals("editor")) {
+				setPersonList(field, value);
 			} else {
-				setTextProperty(s, entry.getField(s).toString());
+				setTextProperty(field, value);
 			}
 		}
 		setTextProperty("entrytype", entry.getType().getName());
@@ -295,7 +293,6 @@ public class XMPSchemaBibtex extends XMPSchema {
 		text.remove("entrytype");
 		e.setField(text);
 		return e;
-
 	}
 
 	/**

@@ -431,11 +431,8 @@ public class FileActions
                                    HashMap fieldFormatters, Writer out)
     throws IOException {
 
-    String s = (String)entry.getField(field);
-    if (s == null) {
-        return;
-    }
-        s = database.resolveForStrings(s);
+    String s = BibtexDatabase.getResolvedField(field, entry, database);
+    	
     Object form = fieldFormatters.get(field);
     if (form == null)
         form = fieldFormatters.get("default");

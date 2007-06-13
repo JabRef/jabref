@@ -36,12 +36,19 @@ Modified for use in JabRef
 
 package net.sf.jabref;
 
-import java.beans.*;
-import java.util.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
-
-import net.sf.jabref.groups.GroupSelector;
 
 public class BibtexDatabase
 {
@@ -145,7 +152,7 @@ public class BibtexDatabase
         return (BibtexEntry) _entries.get(id);
     }
 
-    public synchronized Collection getEntries() {
+    public synchronized Collection<BibtexEntry> getEntries() {
             return _entries.values();
     }
 
@@ -327,6 +334,9 @@ public class BibtexDatabase
      * if possible.
      */
     public String resolveForStrings(String content) {
+    	if (content == null){
+    		throw new IllegalArgumentException("Content for resolveForStrings must not be null.");
+    	}
         return resolveContent(content, new HashSet());
     }
 
@@ -518,5 +528,42 @@ public class BibtexDatabase
         changeListeners.remove(l);
     }
 
+	/**
+	 * Returns the text stored in the given field of the given bibtex entry
+	 * which belongs to the given database.
+	 * 
+	 * If a database is given, this function will try to resolve any string
+	 * references in the field-value.
+	 * 
+	 * @param field
+	 *            The field to return the value of.
+	 * @param bibtex maybenull
+	 *            The bibtex entry which contains the field.
+	 * @param database maybenull
+	 *            The database of the bibtex entry.
+	 * @return The resolved field value or null if not found.
+	 */
+	public static String getResolvedField(String field, BibtexEntry bibtex,
+			BibtexDatabase database) {
+	
+		if (field.equals("bibtextype"))
+			return bibtex.getType().getName();
+	
+		return getText((String) bibtex.getField(field), database);
+	}
 
+	/**
+	 * Returns a text with references resolved according to an optionally given
+	 * database.
+	
+	 * @param toResolve maybenull The text to resolve.
+	 * @param database maybenull The database to use for resolving the text.
+	 * @return The resolved text or the original text if either the text or the database are null
+	 */
+	public static String getText(String toResolve, BibtexDatabase database) {
+		if (toResolve != null && database != null)
+			return database.resolveForStrings(toResolve);
+		
+		return toResolve;
+	}
 }

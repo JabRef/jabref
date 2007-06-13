@@ -101,8 +101,8 @@ public class LayoutEntry {
 		String blockStart = null;
 		String blockEnd = null;
 		StringInt si;
-		Vector blockEntries = null;
-		Vector tmpEntries = new Vector();
+		Vector<StringInt> blockEntries = null;
+		Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>();
 		LayoutEntry le;
 		si = (StringInt) parsedEntries.get(0);
 		blockStart = si.s;
@@ -124,7 +124,7 @@ public class LayoutEntry {
 			} else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
 			} else if ((si.i == LayoutHelper.IS_FIELD_START)
 				|| (si.i == LayoutHelper.IS_GROUP_START)) {
-				blockEntries = new Vector();
+				blockEntries = new Vector<StringInt>();
 				blockStart = si.s;
 			} else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
 				if (blockStart.equals(si.s)) {
@@ -167,10 +167,10 @@ public class LayoutEntry {
 		case LayoutHelper.IS_LAYOUT_TEXT:
 			return text;
 		case LayoutHelper.IS_SIMPLE_FIELD:
-			return getField(bibtex, text, database);
+			return BibtexDatabase.getResolvedField(text, bibtex, database);
 		case LayoutHelper.IS_FIELD_START:
 		case LayoutHelper.IS_GROUP_START: {
-			String field = getField(bibtex, text, database);
+			String field = BibtexDatabase.getResolvedField(text, bibtex, database);
 
 			if ((field == null)
 				|| ((type == LayoutHelper.IS_GROUP_START) && (field.equalsIgnoreCase(LayoutHelper
@@ -233,8 +233,8 @@ public class LayoutEntry {
 			} else {
 				// changed section begin - arudert
 				// resolve field (recognized by leading backslash) or text
-				String field = text.startsWith("\\") ? getField(bibtex, text.substring(1), database)
-					: getText(text, database);
+				String field = text.startsWith("\\") ? BibtexDatabase.getResolvedField(text.substring(1), bibtex, database)
+					: BibtexDatabase.getText(text, database);
 				// changed section end - arudert
 				if (field == null) {
 					fieldEntry = "";
@@ -278,7 +278,7 @@ public class LayoutEntry {
 			throw new UnsupportedOperationException(
 				"field and group ends not allowed in begin or end layout");
 		} else if (type == LayoutHelper.IS_OPTION_FIELD) {
-			String field = getText(text, database);
+			String field = BibtexDatabase.getText(text, database);
 			if (option != null) {
 				for (int i = 0; i < option.length; i++) {
 					field = option[i].format(field);
@@ -324,7 +324,7 @@ public class LayoutEntry {
 
 		ArrayList formatterStrings = Util.parseMethodsCalls(formatterName);
 
-		ArrayList results = new ArrayList(formatterStrings.size());
+		ArrayList<LayoutFormatter> results = new ArrayList<LayoutFormatter>(formatterStrings.size());
 
 		Map userNameFormatter = NameFormatterTab.getNameFormatters();
 
@@ -354,41 +354,4 @@ public class LayoutEntry {
 		return (LayoutFormatter[]) results.toArray(new LayoutFormatter[] {});
 	}
 
-	// changed section begin - arudert
-	/**
-	 * Returns a text with references resolved according to an optionally given
-	 * database.
-	 */
-	private String getText(String text, BibtexDatabase database) {
-		String res = text;
-		// changed section end - arudert
-		if ((res != null) && (database != null))
-			res = database.resolveForStrings(res);
-		return res;
-	}
-
-	// changed section end - arudert
-
-	private String getField(BibtexEntry bibtex, String field, BibtexDatabase database) {
-
-		// Change: Morten Alver, May 23, 2006. Formatter argument uses this
-		// method to
-		// resolve field values. We need this part to resolve \bibtextype
-		// correctly in
-		// constructs like \format[ToLowerCase]{\bibtextype}:
-		if (field.equals("bibtextype")) {
-			return bibtex.getType().getName();
-		}
-		// end change Morten Alver
-
-		String res = (String) bibtex.getField(field);
-
-		if ((res != null) && (database != null))
-			res = database.resolveForStrings(res);
-
-		return res;
-	}
 }
-// /////////////////////////////////////////////////////////////////////////////
-// END OF FILE.
-// /////////////////////////////////////////////////////////////////////////////

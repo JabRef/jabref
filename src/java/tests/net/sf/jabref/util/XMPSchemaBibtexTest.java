@@ -220,7 +220,7 @@ public class XMPSchemaBibtexTest extends JabRefTestCase {
 		XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 		
 		BibtexEntry e = FileBasedTestCase.getBibtexEntry();
-		bibtex.setBibtexEntry(e);
+		bibtex.setBibtexEntry(e, null);
 		
 		BibtexEntry e2 = bibtex.getBibtexEntry();
 

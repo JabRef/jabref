@@ -108,7 +108,7 @@ public class Globals {
 		"aug", "sep", "oct", "nov", "dec" };
 
 	// Map that maps from month string labels to
-	public static Map MONTH_STRINGS = new HashMap();
+	public static Map<String, String> MONTH_STRINGS = new HashMap<String, String>();
 	static {
 		MONTH_STRINGS.put("jan", "January");
 		MONTH_STRINGS.put("feb", "February");
@@ -125,13 +125,13 @@ public class Globals {
 
 		// Build list of encodings, by filtering out all that are not supported
 		// on this system:
-		List encodings = new ArrayList();
+		List<String> encodings = new ArrayList<String>();
 		for (int i = 0; i < ALL_ENCODINGS.length; i++) {
 			if (Charset.isSupported(ALL_ENCODINGS[i])) {
 				encodings.add(ALL_ENCODINGS[i]);
 			}
 		}
-		ENCODINGS = (String[]) encodings.toArray(new String[0]);
+		ENCODINGS = encodings.toArray(new String[0]);
 
 	}
 
@@ -552,9 +552,10 @@ public class Globals {
 
 	public static String SPECIAL_COMMAND_CHARS = "\"`^~'c";
 
-	public static HashMap HTML_CHARS = new HashMap(), HTMLCHARS = new HashMap(),
-		XML_CHARS = new HashMap(), ASCII2XML_CHARS = new HashMap(), UNICODE_CHARS = new HashMap(),
-		RTFCHARS = new HashMap(), URL_CHARS = new HashMap();
+	public static HashMap<String, String> HTML_CHARS = new HashMap<String, String>(), HTMLCHARS = new HashMap<String, String>(),
+		XML_CHARS = new HashMap<String, String>(), ASCII2XML_CHARS = new HashMap<String, String>(), UNICODE_CHARS = new HashMap<String, String>(),
+		RTFCHARS = new HashMap<String, String>(), URL_CHARS = new HashMap<String,String>();
+
 	static {
 
 		// System.out.println(journalAbbrev.getAbbreviatedName("Journal of Fish

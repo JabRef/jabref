@@ -114,7 +114,7 @@ import java.util.WeakHashMap;
  */
 public class AuthorList {
 
-	private Vector authors; // of Author
+	private Vector<Author> authors; 
 
 	// Variables for storing computed strings, so they only need be created
 	// once:
@@ -148,7 +148,7 @@ public class AuthorList {
 	// Tokens of one author name.
 	// Each token occupies TGL consecutive entries in this vector (as described
 	// below)
-	private Vector tokens;
+	private Vector<Object> tokens;
 
 	private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for
 
@@ -189,24 +189,24 @@ public class AuthorList {
 	private static final int TOKEN_WORD = 3;
 
 	// Constant Hashtable containing names of TeX special characters
-	private static final java.util.Hashtable tex_names = new java.util.Hashtable();
+	private static final java.util.HashSet<String> tex_names = new java.util.HashSet<String>();
 	// and static constructor to initialize it
 	static {
-		tex_names.put("aa", "aa"); // only keys are important in this table
-		tex_names.put("ae", "ae");
-		tex_names.put("l", "l");
-		tex_names.put("o", "o");
-		tex_names.put("oe", "oe");
-		tex_names.put("i", "i");
-		tex_names.put("AA", "AA");
-		tex_names.put("AE", "AE");
-		tex_names.put("L", "L");
-		tex_names.put("O", "O");
-		tex_names.put("OE", "OE");
-		tex_names.put("j", "j");
+		tex_names.add("aa");
+		tex_names.add("ae");
+		tex_names.add("l");
+		tex_names.add("o");
+		tex_names.add("oe");
+		tex_names.add("i");
+		tex_names.add("AA");
+		tex_names.add("AE");
+		tex_names.add("L");
+		tex_names.add("O");
+		tex_names.add("OE");
+		tex_names.add("j");
 	}
 
-	static WeakHashMap authorCache = new WeakHashMap();
+	static WeakHashMap<String, AuthorList> authorCache = new WeakHashMap<String, AuthorList>();
 
 	/**
 	 * Parses the parameter strings and stores preformatted author information.
@@ -219,7 +219,7 @@ public class AuthorList {
 	 *            bibtex field.
 	 */
 	protected AuthorList(String bibtex_authors) {
-		authors = new Vector(5); // 5 seems to be reasonable initial size
+		authors = new Vector<Author>(5); // 5 seems to be reasonable initial size
 		orig = bibtex_authors; // initialization
 		token_start = 0;
 		token_end = 0; // of parser
@@ -333,7 +333,7 @@ public class AuthorList {
 	 */
 	private Author getAuthor() {
 
-		tokens = new Vector(); // initialization
+		tokens = new Vector<Object>(); // initialization
 		von_start = -1;
 		last_start = -1;
 		comma_first = -1;
@@ -542,7 +542,7 @@ public class AuthorList {
 			if (current_backslash >= 0 && !Character.isLetter(c)) {
 				if (!first_letter_is_found) {
 					String tex_cmd_name = orig.substring(current_backslash + 1, token_end);
-					if (tex_names.get(tex_cmd_name) != null) {
+					if (tex_names.contains(tex_cmd_name)) {
 						token_case = Character.isUpperCase(tex_cmd_name.charAt(0));
 						first_letter_is_found = true;
 					}
@@ -724,6 +724,10 @@ public class AuthorList {
 		authorsLastFirst[abbrInt] = res.toString();
 		return authorsLastFirst[abbrInt];
 	}
+	
+	public String toString(){
+		return getAuthorsLastFirstAnds(false);
+	}
 
 	/**
 	 * Returns the list of authors separated by "and"s with first names after
@@ -813,7 +817,21 @@ public class AuthorList {
 		authorsFirstFirst[abbrInt] = res.toString();
 		return authorsFirstFirst[abbrInt];
 	}
-
+	
+	/**
+	 * Compare this object with the given one. 
+	 * 
+	 * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+	 */
+	public boolean equals(Object o) {
+		if (!(o instanceof AuthorList)) {
+			return false;
+		}
+		AuthorList a = (AuthorList) o;
+		
+		return this.authors.equals(a.authors);
+	}
+	
 	/**
 	 * Returns the list of authors separated by "and"s with first names before
 	 * last name; first names are not abbreviated.
@@ -885,6 +903,7 @@ public class AuthorList {
 	 * all other methods are provided for completeness.
 	 */
 	public static class Author {
+		
 		private final String first_part;
 
 		private final String first_abbr;
@@ -895,6 +914,23 @@ public class AuthorList {
 
 		private final String jr_part;
 
+		/**
+		 * Compare this object with the given one. 
+		 * 
+		 * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+		 */
+		public boolean equals(Object o) {
+			if (!(o instanceof Author)) {
+				return false;
+			}
+			Author a = (Author) o;
+			return Util.equals(first_part, a.first_part)
+					&& Util.equals(first_abbr, a.first_abbr)
+					&& Util.equals(von_part, a.von_part)
+					&& Util.equals(last_part, a.last_part)
+					&& Util.equals(jr_part, a.jr_part);
+		}
+		
 		/**
 		 * Creates the Author object. If any part of the name is absent, <CODE>null</CODE>
 		 * must be passes; otherwise other methods may return erroneous results.

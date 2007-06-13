@@ -19,10 +19,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.border.BevelBorder;
 
 import net.sf.jabref.AbstractWorker;
 import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.FocusRequester;
 import net.sf.jabref.Globals;
@@ -45,6 +45,8 @@ public class WriteXMPAction extends AbstractWorker {
 	BasePanel panel;
 
 	BibtexEntry[] entries;
+	
+	BibtexDatabase database;
 
 	OptionsDialog optDiag;
 
@@ -63,7 +65,8 @@ public class WriteXMPAction extends AbstractWorker {
 
 		if (entries.length == 0) {
 
-			entries = (BibtexEntry[]) panel.getDatabase().getEntries().toArray(new BibtexEntry[0]);
+			database = panel.getDatabase();
+			entries = database.getEntries().toArray(new BibtexEntry[]{});
 
 			if (entries.length == 0) {
 
@@ -124,7 +127,7 @@ public class WriteXMPAction extends AbstractWorker {
 				optDiag.progressArea.append("    " + file.getPath() + "\n");
 			} else {
 				try {
-					XMPUtil.writeXMP(file, entry);
+					XMPUtil.writeXMP(file, entry, database);
 					optDiag.progressArea.append("  " + Globals.lang("Ok") + ".\n");
 					entriesChanged++;
 				} catch (Exception e) {
