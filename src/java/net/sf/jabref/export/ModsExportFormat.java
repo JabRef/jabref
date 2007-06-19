@@ -23,7 +23,7 @@ class ModsExportFormat extends ExportFormat {
     }
 
     public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws IOException {
-        SaveSession ss = getSaveSession(encoding, new File(file));
+        SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
 
