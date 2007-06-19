@@ -43,6 +43,8 @@ public class MODSEntry {
 	
 	public static String BIBTEX = "bibtex_";
 	
+	private final boolean CHARFORMAT = false;
+	
 	public MODSEntry() {
 		extensionFields = new HashMap();
 		handledExtensions = new HashSet();
@@ -60,15 +62,29 @@ public class MODSEntry {
 	
 	protected void populateFromBibtex(BibtexEntry bibtex) {
 		LayoutFormatter chars = new XMLChars();
-		if (bibtex.getField("title") != null)
-			title = chars.format(bibtex.getField("title").toString());
+		if (bibtex.getField("title") != null) {
+			if(CHARFORMAT)
+				title = chars.format(bibtex.getField("title").toString());
+			else
+				title = bibtex.getField("title").toString();
+		}
 		
-		if (bibtex.getField("publisher") != null)
-			publisher = chars.format(bibtex.getField("publisher").toString());
+		if (bibtex.getField("publisher") != null) {
+			if(CHARFORMAT)
+				publisher = chars.format(bibtex.getField("publisher").toString());
+			else
+				publisher = bibtex.getField("publisher").toString();
+		}
+			
 		if (bibtex.getField("bibtexkey") != null)
 			id = bibtex.getField("bibtexkey").toString();
-		if (bibtex.getField("place") != null)
-			place = chars.format(bibtex.getField("place").toString());
+		if (bibtex.getField("place") != null) {
+			if(CHARFORMAT)
+				place = chars.format(bibtex.getField("place").toString());
+			else
+				place = bibtex.getField("place").toString();
+		}
+			
 		date = getDate(bibtex);	
 		genre = getMODSgenre(bibtex);
 		if (bibtex.getField("author") != null)
@@ -106,13 +122,21 @@ public class MODSEntry {
 		List result = new LinkedList();
 		LayoutFormatter chars = new XMLChars();
 		
-		if (authors.indexOf(" and ") == -1)
-          result.add(new PersonName(chars.format(authors)));
+		if (authors.indexOf(" and ") == -1) {
+			if(CHARFORMAT)
+				result.add(new PersonName(chars.format(authors)));
+			else
+				result.add(new PersonName(authors));
+		}
         else
         {
             String[] names = authors.split(" and ");
-            for (int i=0; i<names.length; i++)
-              result.add(new PersonName(chars.format(names[i])));
+            for (int i=0; i<names.length; i++) {
+            	if(CHARFORMAT)
+            		result.add(new PersonName(chars.format(names[i])));
+            	else
+            		result.add(new PersonName(names[i]));
+            }
         }
 		return result;
 	}
@@ -164,7 +188,7 @@ public class MODSEntry {
 	   		if(title != null) {
 	   			Element titleInfo = d.createElement("titleInfo");
 	   			Element mainTitle = d.createElement("title");
-	   			mainTitle.appendChild(d.createTextNode(title));
+	   			mainTitle.appendChild(d.createTextNode(stripNonValidXMLCharacters(title)));
 	   			titleInfo.appendChild(mainTitle);
 		   		mods.appendChild(titleInfo);
 	   		}
@@ -176,13 +200,13 @@ public class MODSEntry {
 	   				if (name.getSurname() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "family");
-	   					namePart.appendChild(d.createTextNode(name.getSurname()));
+	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
 	   					modsName.appendChild(namePart);
 	   				}
 	   				if (name.getGivenNames() != null) {
 	   					Element namePart = d.createElement("namePart");
 	   					namePart.setAttribute("type", "given");
-	   					namePart.appendChild(d.createTextNode(name.getGivenNames()));
+	   					namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
 	   					modsName.appendChild(namePart);
 	   				}
 	   				Element role = d.createElement("role");
@@ -199,33 +223,33 @@ public class MODSEntry {
 	   		mods.appendChild(originInfo);
 	   		if (this.publisher != null) {
 	   			Element publisher = d.createElement("publisher");
-				publisher.appendChild(d.createTextNode(this.publisher));
+				publisher.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.publisher)));
 	   			originInfo.appendChild(publisher);
 	   		}
 	   		if (date != null) {
 	   			Element dateIssued = d.createElement("dateIssued");
-	   			dateIssued.appendChild(d.createTextNode(date));
+	   			dateIssued.appendChild(d.createTextNode(stripNonValidXMLCharacters(date)));
 	   			originInfo.appendChild(dateIssued);
 	   		}
 	   		Element issuance = d.createElement("issuance");
-	   		issuance.appendChild(d.createTextNode(this.issuance));
+	   		issuance.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.issuance)));
 	   		originInfo.appendChild(issuance);
 	   		
 	   		if (id != null) {
 	   			Element idref = d.createElement("identifier");
-	   			idref.appendChild(d.createTextNode(id));
+	   			idref.appendChild(d.createTextNode(stripNonValidXMLCharacters(id)));
 	   			mods.appendChild(idref);
 	   			mods.setAttribute("ID", id);
 		   		
 	   		}
 	   		Element typeOfResource = d.createElement("typeOfResource");
-	   		typeOfResource.appendChild(d.createTextNode(type));
+	   		typeOfResource.appendChild(d.createTextNode(stripNonValidXMLCharacters(type)));
 	   		mods.appendChild(typeOfResource);
 	   		
 	   		if (genre != null) {
 	   			Element genreElement = d.createElement("genre");
 	   			genreElement.setAttribute("authority", "marc");
-	   			genreElement.appendChild(d.createTextNode(genre));
+	   			genreElement.appendChild(d.createTextNode(stripNonValidXMLCharacters(genre)));
 	   			mods.appendChild(genreElement);
 	   		}
 	   		
@@ -247,7 +271,7 @@ public class MODSEntry {
 	   			if (handledExtensions.contains(field))
 	   				continue;
 	   			Element theData = d.createElement(field);
-	   			theData.appendChild(d.createTextNode(value));
+	   			theData.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));
 	   			extension.appendChild(theData);
 	   			mods.appendChild(extension);
 	   		}
@@ -262,6 +286,37 @@ public class MODSEntry {
 	   	// return result;
 	   }
 	
+	/**
+	 * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * 
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public String stripNonValidXMLCharacters(String in) {
+        StringBuffer out = new StringBuffer(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
+        if (in == null || ("".equals(in))) return ""; // vacancy test.
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) ||
+                (current == 0xA) ||
+                (current == 0xD) ||
+                ((current >= 0x20) && (current <= 0xD7FF)) ||
+                ((current >= 0xE000) && (current <= 0xFFFD)) ||
+                ((current >= 0x10000) && (current <= 0x10FFFF)))
+                out.append(current);
+        }
+        return out.toString();
+    }
+
 	/*
 	 * render as XML
 	 */
