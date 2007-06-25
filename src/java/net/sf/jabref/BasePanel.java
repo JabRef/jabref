@@ -186,7 +186,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private boolean suppressOutput = false;
 
-    private HashMap actions = new HashMap();
+    private HashMap<String, Object> actions = new HashMap<String, Object>();
     private SidePaneManager sidePaneManager;
 
     /**

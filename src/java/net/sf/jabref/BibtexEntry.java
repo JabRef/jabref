@@ -228,10 +228,6 @@ public class BibtexEntry
                                                "' is reserved");
         }
 
-        // This mechanism is probably not really necessary.
-        //Object normalValue = FieldTypes.normalize(name, value);
-
-
         Object oldValue = _fields.get(name);
 
         try {
@@ -395,7 +391,6 @@ public class BibtexEntry
         clone._fields = (Map)((HashMap)_fields).clone();
         return clone;
     }
-
 
     public String toString() {
         return getType().getName()+":"+getField(BibtexFields.KEY_FIELD);

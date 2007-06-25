@@ -26,12 +26,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.imports;
 
-import java.util.HashMap;
 import java.io.File;
-import net.sf.jabref.*;
-import java.util.Vector;
 import java.util.ArrayList;
-import java.awt.event.ActionListener;
+import java.util.HashMap;
+
+import net.sf.jabref.BibtexDatabase;
 
 public class ParserResult {
 
@@ -39,7 +38,7 @@ public class ParserResult {
     private BibtexDatabase base;
     private HashMap metaData, entryTypes;
     private File file = null;
-    private ArrayList warnings = new ArrayList();
+    private ArrayList<String> warnings = new ArrayList<String>();
     private String encoding = null; // Which encoding was used?
 
 

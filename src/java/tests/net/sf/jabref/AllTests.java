@@ -8,11 +8,12 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for test.net.sf.jabref");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(UtilTest.class);
-		suite.addTestSuite(FileBasedTestCase.class);
+		suite.addTestSuite(BibtexDatabaseTest.class);
+		suite.addTestSuite(JabRefTestCase.class);
 		suite.addTestSuite(UtilFindFileTest.class);
 		suite.addTestSuite(AuthorListTest.class);
-		suite.addTestSuite(JabRefTestCase.class);
+		suite.addTestSuite(FileBasedTestCase.class);
+		suite.addTestSuite(UtilTest.class);
 		//$JUnit-END$
 
 		suite.addTest(tests.net.sf.jabref.export.layout.format.AllTests.suite());

@@ -85,7 +85,8 @@ public class XMPUtil {
 	 *            The entry to write.
 	 * @param database
 	 *            maybenull An optional database which the given bibtex entries
-	 *            belong to, which will be used to resolve strings.
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @throws TransformerException
 	 *             If the entry was malformed or unsupported.
 	 * @throws IOException
@@ -185,6 +186,21 @@ public class XMPUtil {
 		return result;
 	}
 
+	/**
+	 * Helper function for retrieving a BibtexEntry from the
+	 * PDDocumentInformation in a PDF file.
+	 * 
+	 * To understand how to get hold of a PDDocumentInformation have a look in
+	 * the test cases for XMPUtil.
+	 * 
+	 * The BibtexEntry is build by mapping individual fields in the document
+	 * information (like author, title, keywords) to fields in a bibtex entry.
+	 * 
+	 * @param di
+	 *            The document information from which to build a BibtexEntry.
+	 * 
+	 * @return The bibtex entry found in the document information.
+	 */
 	public static BibtexEntry getBibtexEntryFromDocumentInformation(
 			PDDocumentInformation di) {
 
@@ -227,6 +243,21 @@ public class XMPUtil {
 		return (entry.getAllFields().length > 0 ? entry : null);
 	}
 
+	/**
+	 * Helper function for retrieving a BibtexEntry from the DublinCore metadata
+	 * in a PDF file.
+	 * 
+	 * To understand how to get hold of a XMPSchemaDublinCore have a look in the
+	 * test cases for XMPUtil.
+	 * 
+	 * The BibtexEntry is build by mapping individual fields in the dublin core
+	 * (like creator, title, subject) to fields in a bibtex entry.
+	 * 
+	 * @param di
+	 *            The document information from which to build a BibtexEntry.
+	 * 
+	 * @return The bibtex entry found in the document information.
+	 */
 	public static BibtexEntry getBibtexEntryFromDublinCore(
 			XMPSchemaDublinCore dcSchema) {
 
@@ -285,8 +316,8 @@ public class XMPUtil {
 			if (c != null) {
 				entry.setField("year", String.valueOf(c.get(Calendar.YEAR)));
 				if (date.length() > 4) {
-					entry.setField("month", "#" + Globals.MONTHS[c
-							.get(Calendar.MONTH)] + "#");
+					entry.setField("month", "#"
+							+ Globals.MONTHS[c.get(Calendar.MONTH)] + "#");
 				}
 			}
 		}
@@ -419,7 +450,8 @@ public class XMPUtil {
 	 *            The entry to write.
 	 * @param database
 	 *            maybenull An optional database which the given bibtex entries
-	 *            belong to, which will be used to resolve strings.
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @throws TransformerException
 	 *             If the entry was malformed or unsupported.
 	 * @throws IOException
@@ -441,14 +473,22 @@ public class XMPUtil {
 	 *            The BibtexEntries to write XMP-metadata for.
 	 * @param database
 	 *            maybenull An optional database which the given bibtex entries
-	 *            belong to, which will be used to resolve strings.
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @throws TransformerException
 	 *             Thrown if the bibtexEntries could not transformed to XMP.
 	 * @throws IOException
 	 *             Thrown if an IOException occured while writing to the stream.
+	 * 
+	 * @see #toXMP(Collection, OutputStream) if you don't need strings to be
+	 *      resolved.
 	 */
-	public static void toXMP(Collection bibtexEntries, BibtexDatabase database,
-			OutputStream outputStream) throws IOException, TransformerException {
+	public static void toXMP(Collection<BibtexEntry> bibtexEntries,
+			BibtexDatabase database, OutputStream outputStream)
+			throws IOException, TransformerException {
+
+		if (database != null)
+			bibtexEntries = database.resolveForStrings(bibtexEntries, true);
 
 		XMPMetadata x = new XMPMetadata();
 
@@ -457,29 +497,31 @@ public class XMPUtil {
 			BibtexEntry e = (BibtexEntry) it.next();
 			XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
 			x.addSchema(schema);
-			schema.setBibtexEntry(e, database);
+			schema.setBibtexEntry(e);
 		}
 
 		x.save(outputStream);
 	}
 
 	/**
-	 * Convenience method for toXMP(Collection, OutputStream) returning a String
-	 * containing the XMP-metadata of the given collection of BibtexEntries.
+	 * Convenience method for toXMP(Collection<BibtexEntry>, BibtexDatabase,
+	 * OutputStream) returning a String containing the XMP-metadata of the given
+	 * collection of BibtexEntries.
 	 * 
 	 * The resulting metadata string is wrapped as a complete XMP-document.
 	 * 
 	 * @param bibtexEntries
-	 *            The BibtexEntries to return XMP-metadata for. *
+	 *            The BibtexEntries to return XMP-metadata for. 
 	 * @param database
 	 *            maybenull An optional database which the given bibtex entries
-	 *            belong to, which will be used to resolve strings.
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @return The XMP representation of the given bibtexEntries.
 	 * @throws TransformerException
 	 *             Thrown if the bibtexEntries could not transformed to XMP.
 	 */
-	public static String toXMP(Collection bibtexEntries, BibtexDatabase database)
-			throws TransformerException {
+	public static String toXMP(Collection<BibtexEntry> bibtexEntries,
+			BibtexDatabase database) throws TransformerException {
 		try {
 			ByteArrayOutputStream bs = new ByteArrayOutputStream();
 			toXMP(bibtexEntries, database, bs);
@@ -519,8 +561,7 @@ public class XMPUtil {
 		}
 	}
 
-	protected static XMPMetadata getXMPMetadata(PDDocument document)
-			throws IOException {
+	static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
 		PDDocumentCatalog catalog = document.getDocumentCatalog();
 		PDMetadata metaRaw = catalog.getMetadata();
 
@@ -553,8 +594,11 @@ public class XMPUtil {
 		}
 	}
 
-	protected static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
-			BibtexEntry entry) {
+	static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
+			BibtexEntry entry, BibtexDatabase database) {
+
+		if (database != null)
+			entry = database.resolveForStrings(entry, false);
 
 		// Set all the values including key and entryType
 		Object[] fields = entry.getAllFields();
@@ -840,16 +884,20 @@ public class XMPUtil {
 	 *            The pdf document to write to.
 	 * @param entry
 	 *            The Bibtex entry that is written as a schema.
+	 * @param database
+	 *            maybenull An optional database which the given bibtex entries
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	public static void writeDublinCore(PDDocument document, BibtexEntry entry)
-			throws IOException, TransformerException {
+	public static void writeDublinCore(PDDocument document, BibtexEntry entry,
+			BibtexDatabase database) throws IOException, TransformerException {
 
-		List<BibtexEntry> l = new ArrayList<BibtexEntry>();
-		l.add(entry);
+		List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+		entries.add(entry);
 
-		writeDublinCore(document, l);
+		writeDublinCore(document, entries, database);
 	}
 
 	/**
@@ -859,13 +907,21 @@ public class XMPUtil {
 	 * 
 	 * @param document
 	 *            The pdf document to write to.
-	 * @param c
+	 * @param entries
 	 *            The Bibtex entries that are written as schemas
+	 * @param database
+	 *            maybenull An optional database which the given bibtex entries
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
-	public static void writeDublinCore(PDDocument document, Collection c)
+	public static void writeDublinCore(PDDocument document,
+			Collection<BibtexEntry> entries, BibtexDatabase database)
 			throws IOException, TransformerException {
+
+		if (database != null)
+			entries = database.resolveForStrings(entries, false);
 
 		PDDocumentCatalog catalog = document.getDocumentCatalog();
 		PDMetadata metaRaw = catalog.getMetadata();
@@ -886,11 +942,9 @@ public class XMPUtil {
 			bib.getElement().getParentNode().removeChild(bib.getElement());
 		}
 
-		it = c.iterator();
-		while (it.hasNext()) {
-			BibtexEntry entry = (BibtexEntry) it.next();
+		for (BibtexEntry entry : entries) {
 			XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
-			writeToDCSchema(dcSchema, entry);
+			writeToDCSchema(dcSchema, entry, null);
 			meta.addSchema(dcSchema);
 		}
 
@@ -912,12 +966,19 @@ public class XMPUtil {
 	 * @param document
 	 *            The pdf document to write to.
 	 * @param entry
-	 *            The Bibtex entry that is written into the PDF properties.
+	 *            The Bibtex entry that is written into the PDF properties. *
+	 * @param database
+	 *            maybenull An optional database which the given bibtex entries
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 */
 	public static void writeDocumentInformation(PDDocument document,
-			BibtexEntry entry) {
+			BibtexEntry entry, BibtexDatabase database) {
 
 		PDDocumentInformation di = document.getDocumentInformation();
+
+		if (database != null)
+			entry = database.resolveForStrings(entry, false);
 
 		// Set all the values including key and entryType
 		Object[] fields = entry.getAllFields();
@@ -957,7 +1018,8 @@ public class XMPUtil {
 	 *            The entries to write to the file. *
 	 * @param database
 	 *            maybenull An optional database which the given bibtex entries
-	 *            belong to, which will be used to resolve strings. *
+	 *            belong to, which will be used to resolve strings. If the
+	 *            database is null the strings will not be resolved.
 	 * @param writePDFInfo
 	 *            Write information also in PDF document properties
 	 * @throws TransformerException
@@ -965,9 +1027,12 @@ public class XMPUtil {
 	 * @throws IOException
 	 *             If the file could not be written to or could not be found.
 	 */
-	public static void writeXMP(File file, Collection bibtexEntries,
-			BibtexDatabase database, boolean writePDFInfo) throws IOException,
-			TransformerException {
+	public static void writeXMP(File file,
+			Collection<BibtexEntry> bibtexEntries, BibtexDatabase databasee,
+			boolean writePDFInfo) throws IOException, TransformerException {
+
+		if (databasee != null)
+			bibtexEntries = databasee.resolveForStrings(bibtexEntries, false);
 
 		PDDocument document = null;
 
@@ -980,8 +1045,8 @@ public class XMPUtil {
 
 			if (writePDFInfo && bibtexEntries.size() == 1) {
 				writeDocumentInformation(document, (BibtexEntry) bibtexEntries
-						.iterator().next());
-				writeDublinCore(document, bibtexEntries);
+						.iterator().next(), null);
+				writeDublinCore(document, bibtexEntries, null);
 			}
 
 			PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1011,7 +1076,7 @@ public class XMPUtil {
 				BibtexEntry e = (BibtexEntry) it.next();
 				XMPSchemaBibtex bibtex = new XMPSchemaBibtex(meta);
 				meta.addSchema(bibtex);
-				bibtex.setBibtexEntry(e, database);
+				bibtex.setBibtexEntry(e, null);
 			}
 
 			// Save to stream and then input that stream to the PDF
@@ -1039,7 +1104,7 @@ public class XMPUtil {
 	/**
 	 * Print usage information for the command line tool xmpUtil.
 	 * 
-	 * @see net.sf.jabref.util.XMUtil.main()
+	 * @see XMPUtil#main(String[])
 	 */
 	protected static void usage() {
 		System.out.println("Read or write XMP-metadata from or to pdf file.");
@@ -1115,13 +1180,15 @@ public class XMPUtil {
 
 				ParserResult result = BibtexParser
 						.parse(new FileReader(args[0]));
-				Collection c = result.getDatabase().getEntries();
+				Collection<BibtexEntry> entries = result.getDatabase()
+						.getEntries();
 
-				if (c.size() == 0) {
+				if (entries.size() == 0) {
 					System.err.println("Could not find BibtexEntry in "
 							+ args[0]);
 				} else {
-					System.out.println(XMPUtil.toXMP(c, result.getDatabase()));
+					System.out.println(XMPUtil.toXMP(entries, result
+							.getDatabase()));
 				}
 
 			} else {
@@ -1147,14 +1214,15 @@ public class XMPUtil {
 				ParserResult result = BibtexParser
 						.parse(new FileReader(args[0]));
 
-				Collection c = result.getDatabase().getEntries();
+				Collection<BibtexEntry> entries = result.getDatabase()
+						.getEntries();
 
-				if (c.size() == 0) {
+				if (entries.size() == 0) {
 					System.err.println("Could not find BibtexEntry in "
 							+ args[0]);
 				} else {
-					XMPUtil.writeXMP(new File(args[1]), c,
-							result.getDatabase(), false);
+					XMPUtil.writeXMP(new File(args[1]), entries, result
+							.getDatabase(), false);
 					System.out.println("XMP written.");
 				}
 				break;

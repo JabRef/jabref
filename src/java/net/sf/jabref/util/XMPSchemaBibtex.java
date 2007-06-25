@@ -244,6 +244,15 @@ public class XMPSchemaBibtex extends XMPSchema {
 		preserveWhiteSpace.add("review");
 	}
 
+	public void setBibtexEntry(BibtexEntry entry) {
+		setBibtexEntry(entry, null);
+	}
+	
+	/**
+	 * 
+	 * @param entry
+	 * @param database maybenull
+	 */
 	public void setBibtexEntry(BibtexEntry entry, BibtexDatabase database) {
 		// Set all the values including key and entryType
 		Object[] fields = entry.getAllFields();
