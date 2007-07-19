@@ -12,7 +12,7 @@ JabRef vous permet de d&eacute;finir et d'utiliser vos propres filtres d'exporta
 <h2>Ajout d'un filtre d'exportation personnalis&eacute; </h2>
 
 <p>
-La seule obligation pour avoir un filtre d'exportation valide est l'existence d'un fichier avec l'extension <b>.layout</b>. Pour ajouter un nouveau filtre d'exportation, on utilise le menu <b>Options -> G&eacute;rer les exportations personnalis&eacute;es</b>, et on clique sur <b>Ajouter nouvelle</b>. Une nouvelle boite de dialogue appara&icirc;t et vous permet de sp&eacute;cifier le nom du nouveau filtre d'exportation (ce nom appara&icirc;tra ensuite comme l'un des choix du menu d&eacute;roulant "Type de fichier" de la fen&ecirc;tre de dialogue affect&eacute;e au menu <b>Fichier -> Exporter</b> de la fen&ecirc;tre principale de JabRef), le chemin du fichier <b>.layout</b>, et l'extension de fichier pr&eacute;f&eacute;r&eacute;e par le filtre d'exportation (c'est cette extension qui sera sugg&eacute;r&eacute;e dans la boite de dialogue lorsque le filtre sera utilisé).
+La seule obligation pour avoir un filtre d'exportation valide est l'existence d'un fichier avec l'extension <b>.layout</b>. Pour ajouter un nouveau filtre d'exportation, on utilise le menu <b>Options -&gt; G&eacute;rer les exportations personnalis&eacute;es</b>, et on clique sur <b>Ajouter nouvelle</b>. Une nouvelle boite de dialogue appara&icirc;t et vous permet de sp&eacute;cifier le nom du nouveau filtre d'exportation (ce nom appara&icirc;tra ensuite comme l'un des choix du menu d&eacute;roulant "Type de fichier" de la fen&ecirc;tre de dialogue affect&eacute;e au menu <b>Fichier -&gt; Exporter</b> de la fen&ecirc;tre principale de JabRef), le chemin du fichier <b>.layout</b>, et l'extension de fichier pr&eacute;f&eacute;r&eacute;e par le filtre d'exportation (c'est cette extension qui sera sugg&eacute;r&eacute;e dans la boite de dialogue lorsque le filtre sera utilis&eacute;).
 </p>
 
 
@@ -108,30 +108,115 @@ JabRef fournit les formateurs suivants, certains d'entre eux d&eacute;pendant d'
 
 <ul>
 <li><code>HTMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation HTML.
+<li><code>HTMLParagraphs</code>&nbsp;: interpr&egrave;te deux retours-chariot cons&eacute;cutifs (comme \n   \n) comme le d&eacute;but d'un nouveau paragraphe et cr&eacute;e les balises html de paragraphes appropri&eacute;es.
 <li><code>XMLChars</code>&nbsp;: remplace les caract&egrave;res sp&eacute;ciaux sp&eacute;cifiques &agrave; TeX  (par exemple&nbsp;: {\^a} ou {\"{o}}) par leur repr&eacute;sentation XML.
+
 <li><code>CreateDocBookAuthors</code>&nbsp;: formate le contenu du champ author selon le style DocBook.
+<li><code>CreateDocBookEditors</code>&nbsp;: &agrave; documenter.
+
 <li><code>CurrentDate</code>&nbsp;: renvoie la date actuelle. Sans argument, ce formateur renvoie la date et l'heure actuelle au format "yyyy.MM.dd hh:mm:ss z" (date, heure et fuseau horaire). En donnant une cha&icirc;ne de format diff&eacute;rent comme argument, le format de la date peut-&ecirc;tre adapt&eacute;. Par exemple,
 <code>\format[CurrentDate]{yyyy.MM.dd}</code> renverra uniquement la date, comme par exemple 2005.11.30.
+
 <li><code>AuthorFirstFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier.
 <li><code>AuthorFirstFirstCommas</code>&nbsp;: formate le contenu des champs author/editor en mettant les pr&eacute;noms en premier et des virgules comme s&eacute;parateurs.
+<li><code>AuthorFirstAbbrLastCommas</code>&nbsp;: &agrave; documenter.
+<li><code>AuthorFirstAbbrLastOxfordCommas</code>&nbsp;: &agrave; documenter.
+<li><code>AuthorFirstLastOxfordCommas</code>&nbsp;: &agrave; documenter.
+
 <li><code>AuthorLastFirst</code>&nbsp;: formate le contenu des champs author/editor en mettant le nom de famille en premier.
 <li><code>AuthorLastFirstAbbreviator</code>&nbsp;: r&eacute;duit les pr&eacute;noms de tous les auteurs &agrave; leurs initiales. Ce formateur n&eacute;cessite d'avoir pr&eacute;alablement utilis&eacute; AuthorLastFirst.
+<li><code>AuthorLastFirstCommas</code>&nbsp;: &agrave; documenter.
+<li><code>AuthorLastFirstOxfordCommas</code>&nbsp;: &agrave; documenter.
+<li><code>AuthorLastFirstAbbrCommas</code>&nbsp;: &agrave; documenter.
+<li><code>AuthorLastFirstAbbrOxfordCommas</code>&nbsp;: &agrave; documenter.
+
 <li><code>AuthorAndsReplacer</code>&nbsp;: remplace "and" par ";" entre les premiers noms et par "&" entre les deux derniers.
 <li><code>AuthorAndsCommaReplacer</code>&nbsp;: remplace "and" entre les noms par une virgule (",") et "&" entre les deux derniers.
-<li><code>AuthorOrgSci</code>&nbsp;: premier auteur selon "nom, prénom" et tous les autres selon "pr&eacute;nom nom". Les prénoms sont abrégés.
+<li><code>AuthorOrgSci</code>&nbsp;: premier auteur selon "nom, pr&eacute;nom" et tous les autres selon "pr&eacute;nom nom". Les pr&eacute;noms sont abr&eacute;g&eacute;s.
 <li><code>AuthorAbbreviator</code>&nbsp;: A documenter.
-<li><code>AuthorNatBib</code>&nbsp;: Formats des noms d'auteurs dans le style NatBin, avec les noms propres s&eacute;par&eacute;s par "and" s'il y a deux auteurs, ou le premier nom suivi de "et al." s'il y en a plus de deux.
+<li><code>AuthorNatBib</code>&nbsp;: Formats des noms d'auteurs dans le style NatBib, avec les noms propres s&eacute;par&eacute;s par "and"
+s'il y a deux auteurs, ou le premier nom suivi de "et al." s'il y en a plus de deux.
+<li><code>NoSpaceBetweenAbbreviations</code> : Les espaces entre les initiales des pr&eacute;noms sont supprim&eacute;s.
 <li><code>FormatPagesForHTML</code>&nbsp;: remplace "--" par "-".
   <li><code>FormatPagesForXML</code>&nbsp;: remplace "--" par un tiret XML.
+
 <li><code>RemoveBrackets</code>&nbsp;: supprime toutes les accolades "{" ou "}".
-<li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes les commandes LaTeX comme <code>\em</code>, <code>\textbf</code>, etc. Lorsqu'il est utilis&eacute; avec <code>HTMLChars</code> ou <code>XMLChars</code>, ce formateur doit &ecirc;tre appel&eacute; en dernier.
-<li><code>RemoveTilde</code>&nbsp;: remplace le caract&egrave;re tilde (utilis&eacute; dans LaTeX comme un espace insécable) par un espace normal. Utile en combinaison avec NameFormatter comme discut&eacute; dans la prochaine section.
+<li><code>RemoveBracketsAddComma</code>&nbsp;: &agrave; documenter.
+<li><code>RemoveWhitespace</code>&nbsp;: &agrave; documenter.
+<li><code>RemoveLatexCommands</code>&nbsp;: supprime toutes les commandes LaTeX comme <code>\em</code>, <code>\textbf</code>, etc. Lorsqu'il
+est utilis&eacute; avec <code>HTMLChars</code> ou <code>XMLChars</code>, ce formateur doit &ecirc;tre appel&eacute; en dernier.
+<li><code>RemoveTilde</code>&nbsp;: remplace le caract&egrave;re tilde (utilis&eacute; dans LaTeX comme un espace ins&eacute;cable) par un espace normal. Utile en combinaison avec NameFormatter comme discut&eacute; dans la prochaine section.
 <li><code>ToLowerCase</code>&nbsp;: bascule tous les caract&egrave;res en minuscules.
+
+<li><code>CompositeFormat</code>&nbsp;: &agrave; documenter.
+<li><code>GetOpenOfficeType</code>&nbsp;: &agrave; documenter.
+<li><code>RTFChars</code>&nbsp;: &agrave; documenter.
+<li><code>ResolvePDF</code>&nbsp;: &agrave; documenter.
 </ul>
 
 <p>
 Si aucun des formateurs disponibles ne peut faire ce que vous d&eacute;sirez, vous pouvez ajouter le votre &agrave; l'interface <code> net.sf.jabref.export.layout.LayoutFormatter</code>. Si vous ins&eacute;rez votre propre classe dans <code>net.sf.jabref.export.layout.format</code>, vous pouvez appeler votre formateur en utilisant son nom de classe, comme pour les formateurs standards. Sinon, vous devez appeler le formateur par son nom complet (incluant le nom du package). Dans les deux cas, le formateur doit &ecirc;tre dans votre chemin de classe lorsque vous lancez JabRef
 </p>
+
+
+<h2 id="NameFormatter">Utiliser des formateurs de nom personnalis&eacute;</h2>
+
+<p>Avec JabRef 2.2, il est maintenant possible de d&eacute;finir des formateurs de nom personnalis&eacute;s et utilisant la syntaxe des fichiers de style BibTeX.
+Cela permet une flexibilit&eacute; totale, mais c'est fastidieux &agrave; &eacute;crire</p>
+<p>Vous pouvez d&eacute;finir votre propre formateur dans l'onglet "Formateur de nom" des pr&eacute;f&eacute;rences en utilisant le format suivant
+et en l'utilisant ensuite avec le nom que vous avez d&eacute;fini comme de n'importe quel autre formateur</p>
+
+<code>
+  &lt;cas1&gt;@&lt;gamme11&gt;@&lt;format&gt;@&lt;gamme12&gt;@&lt;format&gt;@&lt;gamme13&gt;...@@<br>
+  &lt;cas2&gt;@&lt;gamme21&gt;@... et ainsi de suite.
+</code>
+
+<p>Ce format commence par s&eacute;parer la tache de formatage de la liste d'auteurs dans des cas d&eacute;pendant du
+nombre d'auteurs qu'il y a (c'est ainsi car certains formats diff&egrave;rent en fonction du nombre d'auteurs).
+Chaque cas individuel est s&eacute;par&eacute; par @@ et contient les instructions sur la fa&ccedil;on de formater chaque auteur dans le cas consid&eacute;r&eacute;.
+Ces instructions sont s&eacute;par&eacute;es par un @.</p>
+<p>Les cas sont identifi&eacute;s en utilisant des entiers (1, 2, 3, etc.) ou le caract&egrave;re * (correspondant &agrave; n'importe quel nombre d'auteurs) et sp&eacute;cifieront le formateur &agrave; appliquer s'il y a un nombre inf&eacute;rieur ou &eacute;gal d'auteurs.
+</p>
+<p>
+Les gammes sont soit <code>&lt;entier&gt;..&lt;entier&gt;</code>, <code>&lt;entier&gt;</code> ou le caract&egrave;re <code>*</code> en utilisant un index bas&eacute; sur 1 pour indexer les auteurs d'une liste donn&eacute;e d'auteurs.
+Les index entiers peuvent être n&eacute;gatif afin de signifier qu'ils commencent par
+la fin de la liste où -1 est le dernier auteur.
+</p>
+
+<p>Par exemple, avec une liste d'auteurs comme "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay":</p>
+<ul>
+  <li> 1..3 affectera Joe, Mary and Bruce</li>
+  <li> 4..4 affectera Arthur </li>
+  <li> * les affectera tous</li>
+  <li> 2..-1 affectera Mary, Bruce and Arthur</li>
+</ul>
+
+<p>Les chaînes de <code>&lt;format&gt;</code> utilisent le format du formateur BibTeX&nbsp;:</p>
+
+<p>
+Les quatre lettres v, f, l et j indiquent les parties du nom von, first, last et jr qui
+sont utilis&eacute;es entre accolades. Une unique lettre v, f, l ou j indique que le nom doit être abr&eacute;g&eacute;.
+Si l'une de ces lettres ou paires de lettres sont rencontr&eacute;es, JabRef retournera tous les noms respectifs
+(potentiellement abr&eacute;g&eacute;s), mais l'expression totale entre accolades est uniquement imprim&eacute;e si la partie du nom existe.</p>
+
+<p>Par exemple, si le format est "{ll} {vv {von Part}} {ff}" et si les noms sont "Mary Kay and John von Neumann",
+ alors JabRef retournera "Kay  Mary" (avec deux espaces entre le nom propre et le pr&eacute;nom) et "Neuman von von Part John".</p>
+
+<p>Je donne ici deux exemples, mais je pr&eacute;f&egrave;rerai vous diriger vers la documentations BibTeX.</p>
+
+<p>Exemple court&nbsp;: <code>"{ll}, {f.}"</code> va convertir <code>"Joe Doe"</code> en <code>"Doe, J."</code></p>
+
+<p>Exemple long&nbsp;:</p>
+<blockquote>
+<p> Pour convertir&nbsp;: </p>
+<p><code>"Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"</code></p>
+<p>en</p>
+<p><code>"Doe, J., Jane, M., Bar, B. and Kay, A."</code></p>
+<p>vous devrez utiliser</p>
+<p><code>1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.</code></p>
+</blockquote>
+<p>Si quelqu'un souhaite &eacute;crire un meilleur didacticiel sur ce sujet, envoyez un courriel sur l'une des listes de diffusion de JabRef&nbsp;!</p>
+
 
 <h3>Les sorties conditionnelles</h3>
 <p>
@@ -177,5 +262,11 @@ Par exemple, on suppose que l'on d&eacute;sire faire des groupes &agrave; partir
 <p>
 Avec les fichiers gabarit externes, il est relativement simple de partager des formats d'exportation entre utilisateurs. Si vous &eacute;crivez un filtre d'exportation pour un format non support&eacute; par JabRef, ou si vous am&eacute;liorez un filtre d&eacute;j&agrave; existant, nous vous encourageons &agrave; d&eacute;poser votre travail sur notre page SourceForge.net. La m&ecirc;me chose est possible pour les nouvelles classes de formateur que vous avez &eacute;crites. Nous serons heureux de distribuer une collection des fichiers gabarit soumis ou de les ajouter &agrave; la s&eacute;rie des filtres d'exportation standard ou des formateurs.
 </p>
+<p>A partir de JabRef 2.4b1 vous pouvez aussi empaqueter votre format d'exportation ("ExportFormat") ou formateur de gabarit ("LayoutFormatter") comme un greffon ("plug-in").
+Si vous le faites, vous pouvez fournir un unique fichier zip à d'autres utilisateurs afin qu'ils utilisent votre format d'exportation.
+Pour un example, télécharger le source de JabRef et jeter un oeil au répertoire
+<code>src/plugins/</code>. N'hésitez pas à participer aux forums sur Sourceforge, puisque nous ne disposons
+pas encore d'une documentation volumineuse.</p>
+
 </body>
 </html>
