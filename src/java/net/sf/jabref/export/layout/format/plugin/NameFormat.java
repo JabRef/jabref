@@ -1,4 +1,4 @@
-package net.sf.jabref.export.layout.format;
+package net.sf.jabref.export.layout.format.plugin;
 
 import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexEntry;

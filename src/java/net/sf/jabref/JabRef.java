@@ -24,39 +24,47 @@
  */
 package net.sf.jabref;
 
-import net.sf.jabref.export.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.auximport.*;
-import net.sf.jabref.remote.RemoteListener;
+import gnu.dtools.ritopt.BooleanOption;
+import gnu.dtools.ritopt.Options;
+import gnu.dtools.ritopt.StringOption;
 
-import gnu.dtools.ritopt.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
-
-import java.io.*;
 import java.io.File;
-
-import java.util.*;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import net.sf.jabref.export.*;
+import net.sf.jabref.imports.ImportFormatReader;
+import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.remote.RemoteListener;
+import net.sf.jabref.wizard.auximport.AuxCommandLine;
+
+import com.jgoodies.looks.FontPolicies;
+import com.jgoodies.looks.FontPolicy;
 import com.jgoodies.looks.FontSet;
 import com.jgoodies.looks.FontSets;
-import com.jgoodies.looks.FontPolicy;
-import com.jgoodies.looks.FontPolicies;
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.windows.WindowsLookAndFeel;
 
-//import javax.swing.UIManager;
-//import javax.swing.UIDefaults;
-//import javax.swing.UnsupportedLookAndFeelException;
+/**
+ * JabRef Main Class - The application gets started here.
+ *
+ */
 public class JabRef {
-    public static JabRef ths;
+    
+	public static JabRef singleton;
     public static RemoteListener remoteListener = null;
     public JabRefFrame jrf;
     public Options options;
@@ -66,81 +74,90 @@ public class JabRef {
 
     StringOption importFile, exportFile, exportPrefs, importPrefs, auxImExport, importToOpenBase;
     BooleanOption helpO, disableGui, blank, loadSess, showVersion, disableSplash;
-    /*
-    * class StringArrayOption extends ArrayOption { public public void
-    * modify(String value) { } public void modify(String[] value) { } public
-    * Object[] getObjectArray() { return null; } public String getTypeName() {
-    * return "Strings"; } public String getStringValue() { return ""; } public
-    * Object getObject() { return null; } }
-    */
+    
     public static void main(String[] args) {
         new JabRef(args);
     }
 
-    public JabRef(String[] args) {
+    protected JabRef(String[] args) {
 
-        ths = this;
+		singleton = this;
 
-        // The following two lines signal that the system proxy settings should be used:
-        System.setProperty("java.net.useSystemProxies", "true");
-        System.getProperties().put( "proxySet", "true" );
+		// The following two lines signal that the system proxy settings should
+		// be used:
+		System.setProperty("java.net.useSystemProxies", "true");
+		System.getProperties().put("proxySet", "true");
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-        Globals.prefs = prefs;
-        Globals.setLanguage(prefs.get("language"), "");
-                
-        Globals.importFormatReader.resetImportFormats();
-        BibtexEntryType.loadCustomEntryTypes(prefs);
-        // Build the list of available export formats:
-        ExportFormats.initAllExports();
+		JabRefPreferences prefs = JabRefPreferences.getInstance();
+		Globals.prefs = prefs;
+		Globals.setLanguage(prefs.get("language"), "");
 
-        // Read list(s) of journal names and abbreviations:
-        //Globals.turnOnFileLogging();
+		/*
+		 * The Plug-in System is started automatically on the first call to
+		 * PluginCore.getManager().
+		 * 
+		 * Plug-ins are activated on the first call to their getInstance method.
+		 */
+		
+		/* Build list of Import and Export formats */
+		Globals.importFormatReader.resetImportFormats();
+		BibtexEntryType.loadCustomEntryTypes(prefs);
+		ExportFormats.initAllExports();
+		
+		// Read list(s) of journal names and abbreviations:
+		Globals.initializeJournalNames();
 
-        Globals.initializeJournalNames();
+		// Check for running JabRef
+		if (Globals.prefs.getBoolean("useRemoteServer")) {
+			remoteListener = RemoteListener.openRemoteListener(this);
 
-        if (Globals.prefs.getBoolean("useRemoteServer")) {
-            remoteListener = RemoteListener.openRemoteListener(this);
-            if (remoteListener != null) {
-                remoteListener.start();
-            }
+			if (remoteListener == null) {
+				// Unless we are alone, try to contact already running JabRef:
+				if (RemoteListener.sendToActiveJabRefInstance(args)) {
 
-        // Unless we are alone, try to contact already running JabRef:
-	    if (remoteListener == null) {
-		    if (RemoteListener.sendToActiveJabRefInstance(args)) {
-                // We have successfully sent our command line options through the socket to
-                // another JabRef instance. So we assume it's all taken care of, and quit.
-                System.out.println(Globals.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                System.exit(0);
-            }
-        }
+					/*
+					 * We have successfully sent our command line options
+					 * through the socket to another JabRef instance. So we
+					 * assume it's all taken care of, and quit.
+					 */
+					System.out
+							.println(Globals
+									.lang("Arguments passed on to running JabRef instance. Shutting down."));
+					System.exit(0);
+				}
+			} else {
+				// No listener found, thus we are the first instance to be
+				// started.
+				remoteListener.start();
+			}
+		}
+
+		/*
+		 * See if the user has a personal journal list set up. If so, add these
+		 * journal names and abbreviations to the list:
+		 */
+		String personalJournalList = prefs.get("personalJournalList");
+		if (personalJournalList != null) {
+			try {
+				Globals.journalAbbrev.readJournalList(new File(
+						personalJournalList));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		/*
+		 * Make sure of a proper cleanup when quitting (e.g. deleting temporary
+		 * files).
+		 * 
+		 * CO 2007-07-12: Since this is deprecated, commented out:
+		 * 
+		 * System.runFinalizersOnExit(true);
+		 * 
+		 */
+		
+		openWindow(processArguments(args, true));
 	}
-
-      /**
-       * See if the user has a personal journal list set up. If so, add these
-       * journal names and abbreviations to the list:
-       */
-      String personalJournalList = prefs.get("personalJournalList");
-      if (personalJournalList != null) {
-          try {
-              Globals.journalAbbrev.readJournalList(new File(personalJournalList));
-          } catch (FileNotFoundException e) {
-              e.printStackTrace();
-          }
-      }
-
-        
-        //System.setProperty("sun.awt.noerasebackground", "true");
-        
-        //System.out.println(java.awt.Toolkit.getDefaultToolkit().getDesktopProperty("awt.dynamicLayoutSupported"));
-        // Make sure of a proper cleanup when quitting (e.g. deleting temporary
-        // files).
-        System.runFinalizersOnExit(true);
-
-        Vector loaded = processArguments(args, true);
-        openWindow(loaded);
-        //System.out.println("1");
-    }
 
     private void setupOptions() {
 

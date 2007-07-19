@@ -132,7 +132,6 @@ public class Globals {
 			}
 		}
 		ENCODINGS = encodings.toArray(new String[0]);
-
 	}
 
 	public static GlobalFocusListener focusListener = new GlobalFocusListener();
@@ -157,10 +156,11 @@ public class Globals {
 	 */
 	public static final boolean UNIX_NEWLINE = NEWLINE.equals("\n");
 
+	/**
+	 * 	"Fieldname" to indicate that a field should be treated as a bibtex 
+	 * string. Used when writing database to file.
+	 */
 	public static final String BIBTEX_STRING = "__string";
-
-	// "Fieldname" to indicate that a field should be treated as a bibtex
-	// string. Used when writing database to file.
 
 	public static void logger(String s) {
 		Logger.global.info(s);
@@ -170,21 +170,20 @@ public class Globals {
 		Logger.global.setLevel(java.util.logging.Level.SEVERE);
 	}
 
-	// should be only called once
+	/**
+	 * Should be only called once
+	 */
 	public static void turnOnConsoleLogging() {
 		Logger.global.addHandler(consoleHandler);
-
 	}
 
+	/**
+	 * Should be only called once
+	 */
 	public static void turnOnFileLogging() {
 		Logger.global.setLevel(java.util.logging.Level.ALL);
 		java.util.logging.Handler handler;
 		handler = new ConsoleHandler();
-		/*
-		 * try { handler = new FileHandler(logfile); // this will overwrite }
-		 * catch (IOException e) { //can't open log file so use console
-		 * e.printStackTrace(); }
-		 */
 		Logger.global.addHandler(handler);
 
 		handler.setFilter(new Filter() { // select what gets logged

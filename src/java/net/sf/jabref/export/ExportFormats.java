@@ -1,15 +1,21 @@
 package net.sf.jabref.export;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.BibtexEntry;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.util.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
+import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExtension;
 
 /**
  * User: alver
@@ -39,14 +45,23 @@ public class ExportFormats {
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
         putFormat(new ExportFormat(Globals.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
-        putFormat(new ExportFormat(Globals.lang("MIS Quarterly"), "misq", "misq",
-                "misq", ".rtf"));
         putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
                 "endnote", ".txt"));
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
     
+        // Add Export Formats contributed by Plugins
+        JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
+		if (plugin != null){
+			for (ExportFormatTemplateExtension e : plugin.getExportFormatTemplateExtensions()){
+				ExportFormat format = PluginBasedExportFormat.getFormat(e);
+				if (format != null){
+					putFormat(format);
+				}
+			}
+		}
+        
         // Now add custom export formats
         TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
         for (Iterator i=customExports.keySet().iterator(); i.hasNext();) {

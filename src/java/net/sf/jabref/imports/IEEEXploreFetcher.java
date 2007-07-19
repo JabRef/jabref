@@ -1,27 +1,31 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.net.URLDownload;
-import net.sf.jabref.*;
+import java.awt.BorderLayout;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
-import javax.swing.*;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.ConnectException;
-import java.io.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.List;
-import java.util.ArrayList;
-import java.awt.*;
-
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Mar 25, 2006
- * Time: 1:09:32 PM
- * To change this template use File | Settings | File Templates.
- */
 public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
     ImportInspectionDialog dialog = null;
@@ -212,7 +216,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     private void parse(ImportInspectionDialog dialog, String text, int startIndex, int firstEntryNumber) {
         piv = startIndex;
         int entryNumber = firstEntryNumber;
-        List entries = new ArrayList();
+        List<BibtexEntry> entries = new ArrayList<BibtexEntry>();
         BibtexEntry entry;
         while (((entry = parseNextEntry(text, piv, entryNumber)) != null)
             && (shouldContinue)) {

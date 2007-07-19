@@ -33,12 +33,16 @@ modified slightly by nizar batada for JabRef
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
-import javax.swing.border.*;
-import javax.swing.event.*;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * A font chooser widget.
@@ -47,6 +51,9 @@ import javax.swing.*;
  * @version $Id$
  * <p>
  * $Log$
+ * Revision 1.8  2007/07/19 01:35:35  coezbek
+ * JabRef 2.4b1 Plug-In System established. Yeah!
+ *
  * Revision 1.7  2006/04/26 08:46:57  kiar
  * fix dialog.show() deprecation messages, change build.xml
  *
@@ -83,7 +90,9 @@ import javax.swing.*;
 
 class FontSelector extends JButton {
 
-        static final String PLAIN="plain";
+	private static final long serialVersionUID = 7745223550102664896L;
+
+	static final String PLAIN="plain";
         static final String BOLD="bold";
         static final String BOLD_ITALIC="bold-italic";
         static final String ITALIC="italic";
@@ -150,15 +159,11 @@ class FontSelector extends JButton {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- *
- */
 public class FontSelectorDialog extends JDialog {
 
-        /**
-         *
-         */
-            static final String PLAIN="plain";
+	private static final long serialVersionUID = -8670346696048738055L;
+
+	static final String PLAIN="plain";
         static final String BOLD="bold";
         static final String BOLD_ITALIC="bold-italic";
         static final String ITALIC="italic";
@@ -217,7 +222,8 @@ public class FontSelectorDialog extends JDialog {
                    |  working on introducing this in the table view.      |
                    -------------------------------------------------------- */
                 preview = new JLabel(Globals.lang("Font Preview")) {
-                        public void paint(Graphics g) {
+					private static final long serialVersionUID = -4191591634265068189L;
+						public void paint(Graphics g) {
                             Graphics2D g2 = (Graphics2D)g;
                             g2.setRenderingHint
                                 (RenderingHints.KEY_ANTIALIASING,
@@ -311,9 +317,9 @@ public class FontSelectorDialog extends JDialog {
         private String[] getFontList(){
                 try{
                         Class GEClass = Class.forName("java.awt.GraphicsEnvironment");
-                        Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment", null).invoke(null, null);
+                        Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
-                        String[] nameArray = (String[])GEClass.getMethod("getAvailableFontFamilyNames", null).invoke(GEInstance, null);
+                        String[] nameArray = (String[])GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
                         Vector nameVector = new Vector(nameArray.length);
 
                         for(int i = 0, j; i < nameArray.length; i++){

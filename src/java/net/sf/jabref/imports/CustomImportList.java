@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.TreeSet;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -39,7 +40,7 @@ import net.sf.jabref.JabRefPreferences;
  * <p>The collection can be stored and retrieved from Preferences. It is sorted by the default
  * order of {@link ImportFormat}.</p>
  */
-public class CustomImportList extends TreeSet {
+public class CustomImportList extends TreeSet<CustomImportList.Importer> {
 
   /**
    * Object with data for a custom importer.

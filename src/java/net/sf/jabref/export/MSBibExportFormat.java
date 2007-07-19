@@ -1,36 +1,26 @@
 package net.sf.jabref.export;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.msbib.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.OutputKeys;
-import java.util.Set;
-import java.io.IOException;
-import java.io.File;
-/*
- * @author S M Mahbub Murshed 
-* @email udvranto@yahoo.com
-*
-* @version 1.0.0
-* @see http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/
-* @see http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/
-* 
-* Date: May 03, 2007
-* 
-*/
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.msbib.MSBibDatabase;
 
 /**
  * ExportFormat for exporting in MSBIB XML format.
  */
 class MSBibExportFormat extends ExportFormat {
-    public MSBibExportFormat() {
-        super(Globals.lang("MS Office 2007"), "MSBib", null, null, ".xml");
 
+	public MSBibExportFormat() {
+        super(Globals.lang("MS Office 2007"), "MSBib", null, null, ".xml");
     }
 
     public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws IOException {

@@ -24,30 +24,24 @@
  */
 package net.sf.jabref.imports;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.ImportFormatExtension;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
+import net.sf.jabref.plugin.PluginCore;
 
 
 public class ImportFormatReader {
 
     public static String BIBTEX_FORMAT = "BibTeX";
 
-  /** all import formats, in the defalt order of import formats */
-  private SortedSet formats = new TreeSet();
+  /** all import formats, in the default order of import formats */
+  private SortedSet<ImportFormat> formats = new TreeSet<ImportFormat>();
 
   public ImportFormatReader() {
     super();
@@ -61,7 +55,6 @@ public class ImportFormatReader {
     formats.add(new CsaImporter());   
     formats.add(new IsiImporter());
     formats.add(new EndnoteImporter());
-    formats.add(new MedlineImporter());
     formats.add(new BibteXMLImporter());
     formats.add(new BiblioscapeImporter());
     formats.add(new SixpackImporter());
@@ -76,12 +69,25 @@ public class ImportFormatReader {
     formats.add(new PdfXmpImporter());
     formats.add(new CopacImporter());
     formats.add(new MsBibImporter());
-    
-    // add all custom importers
-    for (Iterator i = Globals.prefs.customImports.iterator(); i.hasNext(); ) {
-      CustomImportList.Importer importer = (CustomImportList.Importer)i.next();
 
-      try {
+    /**
+     * Get import formats that are plug-ins
+     */
+    JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+	if (jabrefPlugin != null){
+		for (ImportFormatExtension ext : jabrefPlugin.getImportFormatExtensions()){
+			ImportFormat importFormat = ext.getImportFormat();
+			if (importFormat != null){
+				formats.add(importFormat);
+			}
+		}
+	}
+	
+	/**
+	 * Get custom import formats
+	 */
+    for (CustomImportList.Importer importer : Globals.prefs.customImports){
+       try {
         ImportFormat imFo = importer.getInstance();
         formats.add(imFo);
       } catch(Exception e) {
@@ -101,14 +107,12 @@ public class ImportFormatReader {
    * @return  Import Format or <code>null</code> if none matches
    */
   public ImportFormat getByCliId(String cliId) {
-    ImportFormat result = null;
-    for (Iterator i = formats.iterator(); i.hasNext() && result == null; ) {
-      ImportFormat format = (ImportFormat)i.next();
+    for (ImportFormat format : formats){
       if (format.getCLIId().equals(cliId)) {
-        result = format;
+        return format;
       }
     }
-    return result;
+    return null;
   }
   
   public List importFromStream(String format, InputStream in)

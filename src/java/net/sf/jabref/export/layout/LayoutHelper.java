@@ -26,27 +26,24 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export.layout;
 
-import wsi.ra.types.StringInt;
-
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.Vector;
+
+import wsi.ra.types.StringInt;
 
 
 /**
- * DOCUMENT ME!
+ * Helper class to get a Layout object.
+ * 
+ * <code>
+ * LayoutHelper helper = new LayoutHelper(...a reader...);
+ * Layout layout = helper.getLayoutFromText();
+ * </code>
  *
- * @author $author$
- * @version $Revision$
  */
-public class LayoutHelper
-{
-    //~ Static fields/initializers /////////////////////////////////////////////
+public class LayoutHelper {
 
     public static final int IS_LAYOUT_TEXT = 1;
     public static final int IS_SIMPLE_FIELD = 2;
@@ -55,20 +52,14 @@ public class LayoutHelper
     public static final int IS_OPTION_FIELD = 5;
     public static final int IS_GROUP_START = 6;
     public static final int IS_GROUP_END = 7;
+
     private static String currentGroup = null;
     
-    //~ Instance fields ////////////////////////////////////////////////////////
-
-
-    //public static final int IS_OPTION_FIELD_PARAM = 6;
     private PushbackReader _in;
     private Vector parsedEntries = new Vector();
 
-    //private HashMap _meta;
     private boolean _eof = false;
     private int line = 1;
-
-    //~ Constructors ///////////////////////////////////////////////////////////
 
     public LayoutHelper(Reader in)
     {
@@ -79,8 +70,6 @@ public class LayoutHelper
 
         _in = new PushbackReader(in);
     }
-
-    //~ Methods ////////////////////////////////////////////////////////////////
 
     public Layout getLayoutFromText(String classPrefix) throws Exception
     {
@@ -114,9 +103,6 @@ public class LayoutHelper
         currentGroup = newGroup;
     }
     
-    /**
-     *
-     */
     private String getBracketedField(int _field) throws IOException
     {
         StringBuffer buffer = null;
@@ -525,136 +511,4 @@ public class LayoutHelper
 
         _in.unread(c);
     }
-
-    //
-    //	private String parseFieldContent() throws IOException
-    //	{
-    //		skipWhitespace();
-    //		consume('=');
-    //		skipWhitespace();
-    //		StringBuffer value = new StringBuffer();
-    //		int c, j = '.';
-    //
-    //		while (((c = peek()) != ',') && (c != '}') && (c != ')'))
-    //		{
-    //
-    //			if (_eof)
-    //			{
-    //				throw new RuntimeException(
-    //					"Error in line " + line + ": EOF in mid-string");
-    //			}
-    //			if (c == '"')
-    //			{
-    //				// value is a string
-    //				consume('"');
-    //
-    //				while (!((peek() == '"') && (j != '\\')))
-    //				{
-    //					j = read();
-    //					if (_eof || (j == -1) || (j == 65535))
-    //					{
-    //						throw new RuntimeException(
-    //							"Error in line " + line + ": EOF in mid-string");
-    //					}
-    //
-    //					value.append((char) j);
-    //				}
-    //
-    //				consume('"');
-    //
-    //			}
-    //			skipWhitespace();
-    //		}
-    //		//Util.pr("Returning field content: "+value.toString());
-    //		return value.toString();
-    //
-    //	}
-    //
-    //	private StringBuffer parseBracketedText() throws IOException
-    //	{
-    //		//Util.pr("Parse bracketed text");
-    //		StringBuffer value = new StringBuffer();
-    //
-    //		consume('{');
-    //
-    //		int brackets = 0;
-    //
-    //		while (!((peek() == '}') && (brackets == 0)))
-    //		{
-    //
-    //			int j = read();
-    //			if ((j == -1) || (j == 65535))
-    //			{
-    //				throw new RuntimeException(
-    //					"Error in line " + line + ": EOF in mid-string");
-    //			}
-    //			else if (j == '{')
-    //				brackets++;
-    //			else if (j == '}')
-    //				brackets--;
-    //
-    //			// If we encounter whitespace of any kind, read it as a
-    //			// simple space, and ignore any others that follow immediately.
-    //			if (Character.isWhitespace((char) j))
-    //			{
-    //				value.append(' ');
-    //				skipWhitespace();
-    //			}
-    //			else
-    //				value.append((char) j);
-    //
-    //		}
-    //
-    //		consume('}');
-    //
-    //		return value;
-    //	}
-    //	private void consume(char expected) throws IOException
-    //	{
-    //		int c = read();
-    //
-    //		if (c != expected)
-    //		{
-    //			throw new RuntimeException(
-    //				"Error in line "
-    //					+ line
-    //					+ ": Expected "
-    //					+ expected
-    //					+ " but received "
-    //					+ (char) c);
-    //		}
-    //
-    //	}
-    //
-    //	private void consumeUncritically(char expected) throws IOException
-    //	{
-    //		int c;
-    //		while (((c = read()) != expected) && (c != -1) && (c != 65535));
-    //		if ((c == -1) || (c == 65535))
-    //			_eof = true;
-    //	}
-    //
-    //	private void consume(char expected1, char expected2) throws IOException
-    //	{
-    //		// Consumes one of the two, doesn't care which appears.
-    //
-    //		int c = read();
-    //
-    //		if ((c != expected1) && (c != expected2))
-    //		{
-    //			throw new RuntimeException(
-    //				"Error in line "
-    //					+ line
-    //					+ ": Expected "
-    //					+ expected1
-    //					+ " or "
-    //					+ expected2
-    //					+ " but received "
-    //					+ (int) c);
-    //		}
-    //
-    //	}
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

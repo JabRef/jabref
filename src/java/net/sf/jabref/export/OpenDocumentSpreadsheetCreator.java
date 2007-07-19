@@ -6,15 +6,20 @@
 
 package net.sf.jabref.export;
 
-import net.sf.jabref.*;
-
 import java.io.*;
-import java.util.zip.*;
-import java.util.Set;
 import java.net.URL;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
 
 /**
  * @author alver

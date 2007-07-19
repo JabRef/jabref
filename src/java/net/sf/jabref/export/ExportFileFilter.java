@@ -12,10 +12,11 @@ public class ExportFileFilter extends FileFilter implements Comparable {
     private String extension, name;
 
     public ExportFileFilter(ExportFormat format) {
-        this.format = format;
-        this.extension = format.getExtension();
-        this.name = format.getDisplayName()+" (*"+format.getExtension()+")";
-    }
+		this.format = format;
+		this.extension = format.getExtension();
+		this.name = format.getDisplayName() + " (*" + format.getExtension()
+				+ ")";
+	}
 
     public ExportFormat getExportFormat() {
         return format;

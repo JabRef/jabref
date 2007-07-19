@@ -414,4 +414,15 @@ public class UtilTest extends TestCase {
     	assertEquals(-1,Util.getMonthNumber("#test#"));
     	assertEquals(-1,Util.getMonthNumber(""));
     }
+    
+    public void testToUpperCharFirst(){
+    	
+    	assertEquals("", Util.toUpperFirstLetter(""));
+    	assertEquals("A", Util.toUpperFirstLetter("a"));
+    	assertEquals("A", Util.toUpperFirstLetter("A"));
+    	assertEquals("An", Util.toUpperFirstLetter("an"));
+    	assertEquals("AN", Util.toUpperFirstLetter("AN"));
+    	assertEquals("TestTest", Util.toUpperFirstLetter("testTest"));
+        
+    }
 }

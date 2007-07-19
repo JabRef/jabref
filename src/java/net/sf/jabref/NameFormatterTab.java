@@ -18,7 +18,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.export.layout.format.NameFormat;
+import net.sf.jabref.export.layout.format.plugin.NameFormat;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -29,9 +29,9 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
 	public static final String NAME_FORMATER_KEY = "nameFormatterNames";
 
-	public static Map getNameFormatters(){
+	public static Map<String, String> getNameFormatters(){
 		
-		Map result = new HashMap();
+		Map<String, String> result = new HashMap<String, String>();
 
 		String[] names = Globals.prefs.getStringArray(NAME_FORMATER_KEY);
 		String[] formats = Globals.prefs.getStringArray(NAME_FORMATTER_VALUE);
@@ -59,7 +59,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
 	private int rowCount = -1;
 
-	private Vector tableRows = new Vector(10);
+	private Vector<TableRow> tableRows = new Vector<TableRow>(10);
 
 	class TableRow {
 		String name;
@@ -99,7 +99,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 			public Object getValueAt(int row, int column) {
 				if (row >= tableRows.size())
 					return "";
-				TableRow tr = (TableRow) tableRows.elementAt(row);
+				TableRow tr = tableRows.elementAt(row);
 				if (tr == null)
 					return "";
 				switch (column) {
@@ -115,7 +115,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 				return (col == 0 ? Globals.lang("Formatter Name") : Globals.lang("Format String"));
 			}
 
-			public Class getColumnClass(int column) {
+			public Class<String> getColumnClass(int column) {
 				if (column == 0)
 					return String.class;
 				else
@@ -133,7 +133,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 				while (row >= tableRows.size())
 					tableRows.add(new TableRow());
 
-				TableRow rowContent = (TableRow) tableRows.elementAt(row);
+				TableRow rowContent = tableRows.elementAt(row);
 
 				if (col == 0)
 					rowContent.name = value.toString();
@@ -281,7 +281,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 			// First we remove all rows with empty names.
 			int i = 0;
 			while (i < tableRows.size()) {
-				if (((TableRow) tableRows.elementAt(i)).name.equals(""))
+				if (tableRows.elementAt(i).name.equals(""))
 					tableRows.removeElementAt(i);
 				else
 					i++;
@@ -290,7 +290,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 			String[] names = new String[tableRows.size()], formats = new String[tableRows.size()];
 
 			for (i = 0; i < tableRows.size(); i++) {
-				TableRow tr = (TableRow) tableRows.elementAt(i);
+				TableRow tr = tableRows.elementAt(i);
 				names[i] = tr.name;
 				formats[i] = tr.format;
 			}

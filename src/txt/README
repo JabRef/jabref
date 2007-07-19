@@ -80,9 +80,20 @@ appear in your chosen languages.
 
 Change log:
 
+2.4b1
+	- JabRef can now be extended by plugins (using the Java Plugin Framework (JPF) as the
+	  underlying technology). Currently extension points exist for:
+		- ImportFormat
+		- ExportFormat
+		- LayoutFormatter
+		- EntryFetcher 
+	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
+	  classes for making JPF easier. Current version used: 0.4
+	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
+
 2.3b1   
 	- Added MIS Quarterly export format.
-    - Added support for COPAC file format.
+	- Added support for COPAC file format.
 	- Added RemoveTilde LayoutFormatter to deal with Bibtex non-breakable spaces.
 	- Added autocompletion feature for author/editors and other fields.
 	- Added feature to save all open databases.
@@ -102,9 +113,9 @@ Change log:
 	- Fixed missing export formatter AuthorFirstFirstCommas.
 	- Fixed minor bug in Harvard export with missing space between year and title.
 	- Fixed bug that caused lockup when connection to IEEExplore fails.
-        - Fixed wrong dependency in OAI2/ArXiv Fetcher.
-        - Fixed problem with foreign characters in OAI2/ArXiv Fetcher.
-        - Fixed problem with key generation in OAI2/ArXiv Fetcher.
+	- Fixed wrong dependency in OAI2/ArXiv Fetcher.
+	- Fixed problem with foreign characters in OAI2/ArXiv Fetcher.
+	- Fixed problem with key generation in OAI2/ArXiv Fetcher.
 	- Fixed bug in duplicate search that made misc entries never get
 	  detected as duplicates.
 	- Fixed bug in XMP reimport from DublinCore related to month strings.

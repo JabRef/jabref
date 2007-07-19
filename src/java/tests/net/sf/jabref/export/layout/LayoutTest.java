@@ -44,9 +44,9 @@ public class LayoutTest extends TestCase {
 
 	public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
 		ParserResult result = BibtexParser.parse(new StringReader(s));
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
-		return (BibtexEntry) c.iterator().next();
+		return c.iterator().next();
 	}
 
 	public String layout(String layoutFile, String entry) throws Exception {
@@ -81,6 +81,13 @@ public class LayoutTest extends TestCase {
 			"@other{bla, author={This\nis\na\n\ntext}}");
 
 		assertEquals("This is a<p>text ", layoutText);
+	}
+	
+	public void testPluginLoading() throws Exception {
+		String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}",
+			"@other{bla, author={Joe Doe and Jane, Moon}}");
+
+		assertEquals("Joe Doe, Moon Jane", layoutText);
 	}
 
 	/**

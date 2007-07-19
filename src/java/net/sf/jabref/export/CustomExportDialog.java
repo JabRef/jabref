@@ -26,16 +26,21 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.Vector;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+
+import javax.swing.*;
+
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.Util;
-import net.sf.jabref.Globals;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.Sizes;
 
 /**
  * Dialog for creating or modifying custom exports.
@@ -58,11 +63,10 @@ class CustomExportDialog extends JDialog {
     main = new JPanel(),
     buttons = new JPanel();
     private boolean ok_pressed = false;
-    private Vector groups;
     private int index;
     private JabRefFrame parent;
 
-    private String /*name, regexp, field,*/ oldName, oldRegexp, oldField;
+    private String oldName, oldRegexp, oldField;
 
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
@@ -79,28 +83,6 @@ class CustomExportDialog extends JDialog {
     public CustomExportDialog(JabRefFrame parent_) {
     super(parent_, Globals.lang("Edit custom export"), true);
     parent = parent_;
-    //groups = groups_;
-    //index = index_;
-    /*if (index >= 0) {
-            // Group entry already exists.
-            try {
-            oldField = (String)groups.elementAt(index);
-            field.setText(oldField);
-            oldName = (String)groups.elementAt(index+1);
-            name.setText(oldName);
-            oldRegexp = (String)groups.elementAt(index+2);
-            regexp.setText(oldRegexp);
-
-            // We disable these text fields, since changing field
-            // or regexp would leave the entries added to the
-            // group hanging.
-            field.setEnabled(false);
-            regexp.setEnabled(false);
-            } catch (ArrayIndexOutOfBoundsException ex) {
-            }
-        } else
-            field.setText(defaultField);
-    */
     ActionListener okListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
 

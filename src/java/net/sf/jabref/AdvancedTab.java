@@ -137,7 +137,7 @@ public class AdvancedTab extends JPanel implements PrefsTab {
         if (useRemoteServer.isSelected() && (JabRef.remoteListener == null)) {
             // Start the listener now.
 
-            JabRef.remoteListener = RemoteListener.openRemoteListener(JabRef.ths);
+            JabRef.remoteListener = RemoteListener.openRemoteListener(JabRef.singleton);
             if (JabRef.remoteListener != null) {
                 JabRef.remoteListener.start();
             }

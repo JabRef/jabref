@@ -6,11 +6,20 @@
  */
 package net.sf.jabref.export;
 
-import net.sf.jabref.export.layout.format.*;
-import net.sf.jabref.*;
 import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.jabref.*;
+import net.sf.jabref.export.layout.format.GetOpenOfficeType;
+import net.sf.jabref.export.layout.format.RemoveBrackets;
+import net.sf.jabref.export.layout.format.RemoveWhitespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.SortedList;
 
@@ -18,8 +27,6 @@ import ca.odell.glazedlists.SortedList;
  * @author Morten O. Alver.
  * Based on net.sf.jabref.MODSDatabase by Michael Wrighton
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class OOCalcDatabase {
     protected Collection entries;

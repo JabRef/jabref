@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   Example Ant build file how to create a jar for distribution 
+   for an export plugin.
+
+   Version:  $Revision$
+             $Date$
+             $Author$
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<project name="net.sf.jabref.export.misq" default="jar" basedir=".">
+
+	<!-- Properties -->
+	<property name="version" value="1.0" />
+	<property name="jar" value="../${ant.project.name}-${version}.jar" />
+
+	<!-- Jars up project -->
+	<target name="jar">
+		<jar destfile="${jar}">
+			<fileset dir="."/>
+		</jar>
+	</target>
+
+	<target name="clean" description="Clean project">
+		<delete file="${jar}" />
+	</target>
+
+</project>

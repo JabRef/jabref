@@ -42,15 +42,14 @@
 
 <project name="JabRef" default="jars" basedir=".">
 
-	<!-- ==========================================================================================
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         PROPERTY SETUP
-     ========================================================================================== -->
+     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
 
 	<!-- some version information -->
-	<property name="jabref.version" value="2.2" />
+	<property name="jabref.version" value="2.4b1" />
 	<property name="jabref.placeholder.version" value="@version@" />
 	<!-- used by replace task -->
-
 
 	<!-- Set the properties for intermediate directory -->
 	<property name="build.jar" value="JabRef-${jabref.version}.jar" />
@@ -73,6 +72,7 @@
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
 	<property name="src.tests" value="src/java/tests" />
+	<property name="plugin.dir" value="src/plugins/" />
 	<property name="txt.dir" value="src/txt" />
 	<property name="java.dir" value="${src.dir}/java" />
 	<property name="osx.dir" value="${src.dir}/osx" />
@@ -84,11 +84,9 @@
 	<property name="help.dir" value="${src.dir}/help" />
 	<property name="extensions.dir" value="${src.dir}/extensions" />
 	<property name="layout.dir" value="${src.dir}/resource/layout" />
+	<property name="lib.dir" value="lib" />
 
-	<!-- Set the properties for library directories -->
-	<property name="library.directory" value="lib" />
-
-<!--    <property name="nsis.executable" value="makensis.exe"/> -->
+	<!--    <property name="nsis.executable" value="makensis.exe"/> -->
 
 	<!-- Load user dependent properties -->
 	<!-- For instance to redefine the NSIS-compiler write 
@@ -104,22 +102,37 @@
 		</and>
 	</condition>
 
-	<taskdef name="jarbundler" classpath="${library.directory}/jarbundler-1.4.jar" classname="com.loomcom.ant.tasks.jarbundler.JarBundler" />
+	<fileset id="jarsFileset" dir="${lib.dir}">
+		<include name="antlr.jar" />
+		<include name="antlr-3.0b5.jar" />
+		<include name="looks-2.0.4.jar" />
+		<include name="forms-1.0.4.jar" />
+		<include name="spin.jar" />
+		<include name="glazedlists-1.7.0_java15.jar" />
+		<include name="microba.jar" />
+		<include name="PDFBox-0.7.3-dev-reduced.jar" />
+		<include name="JempBox-0.1.0-dev.jar" />
 
+		<!-- Plugin runtime dependencies -->
+		<include name="plugin/JPFCodeGenerator-rt.jar" />
+		<include name="plugin/jpf.jar" />
+		<include name="plugin/jpf-boot.jar" />
+		<include name="plugin/commons-logging.jar" />
+	</fileset>
 
 	<!-- Build classpath -->
 	<path id="classpath">
 		<pathelement path="${build.classes}" />
 		<pathelement path="${build.dir}" />
-		<pathelement location="${library.directory}/antlr.jar" />
-		<pathelement location="${library.directory}/antlr-3.0b5.jar" />
-		<pathelement location="${library.directory}/looks-2.0.4.jar" />
-		<pathelement location="${library.directory}/forms-1.0.4.jar" />
-		<pathelement location="${library.directory}/spin.jar" />
-		<pathelement location="${library.directory}/glazedlists-1.7.0_java15.jar" />
-		<pathelement location="${library.directory}/microba.jar" />
-		<pathelement location="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" />
-		<pathelement location="${library.directory}/JempBox-0.1.0-dev.jar" />
+		<fileset refid="jarsFileset" />
+	</path>
+
+	<!-- Classpath for running the code generator -->
+	<path id="codegenerator">
+		<pathelement location="${lib.dir}/plugin/JPFCodeGenerator.jar" />
+		<pathelement location="${lib.dir}/plugin/jpf.jar" />
+		<pathelement location="${lib.dir}/plugin/jpf-boot.jar" />
+		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
 	</path>
 
 	<target name="run" depends="build">
@@ -129,32 +142,32 @@
 	</target>
 
 	<!-- Runs project -->
-	<target name="runFromJar" depends="jars">
-		<java classname="net.sf.jabref.JabRef" fork="true">
+	<target name="runFromJar">
+		<java dir="${build.lib}" classname="net.sf.jabref.JabRef" fork="true">
 			<classpath>
 				<pathelement location="${build.lib}/${build.jar}" />
 			</classpath>
 		</java>
 	</target>
 
-	<target name="profile" depends="jars" description="Profile JabRef">
-		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+	<!-- Only rerun the code generator if plug-in xml or jars are newer than generated java file. -->
+	<uptodate property="needsNoRegenerate" targetfile="${java.dir}/net/sf/jabref/plugin/core/generated/_JabRefPlugin.java">
+		<srcfiles dir=".">
+			<include name="${plugin.dir}/**/plugin.xml" />
+			<include name="${lib.dir}/plugin/*.jar" />
+		</srcfiles>
+	</uptodate>
 
-		<nbprofiledirect>
-			<classpath refid="classpath" />
-		</nbprofiledirect>
-
-		<property environment="env" />
-		<java fork="true" classname="net.sf.jabref.JabRef" dir="${build.dir}" jvm="${profiler.info.jvm}">
-			<jvmarg value="${profiler.info.jvmargs.agent}" />
-			<jvmarg line="${profiler.info.jvmargs}" />
-			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
-			<classpath refid="classpath" />
+	<!-- Run the JPF Code Generator -->
+	<target name="generate" unless="needsNoRegenerate">
+		<java classname="net.sf.jabref.plugin.util.CodeGenerator" fork="true">
+			<arg value="${plugin.dir}" />
+			<classpath refid="codegenerator" />
 		</java>
 	</target>
 
 	<!-- Compiles project -->
-	<target name="compile">
+	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
 		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
 			<src path="${java.dir}" />
@@ -183,7 +196,7 @@
 	<!-- Copies in the OSXAdapter class, which is compilable only on Mac  -->
 	<target name="non_osx">
 		<mkdir dir="${build.osx}" />
-		<copy file="${library.directory}/OSXAdapter.class" todir="${build.osx}" />
+		<copy file="${lib.dir}/OSXAdapter.class" todir="${build.osx}" />
 	</target>
 
 	<!-- Jars up project -->
@@ -201,7 +214,13 @@
 				<include name="help/no/**" />
 				<include name="resource/**" />
 			</fileset>
-			<fileset dir="${library.directory}">
+			
+			<!-- Add Plugins -->
+			<fileset dir="${src.dir}">
+				<include name="plugins/**"/>
+			</fileset>
+				
+			<fileset dir="${lib.dir}">
 				<include name="EndNote.zip" />
 			</fileset>
 			<fileset dir="${txt.dir}">
@@ -356,15 +375,9 @@ version=${jabref.version}</echo>
 	<!-- Unpacks jar needed jar files from lib directory into temp directory. -->
 	<target name="unjarlib" description="Unpacks jars from library">
 		<mkdir dir="${build.tmp}" />
-		<unjar src="${library.directory}/antlr.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/antlr-3.0b5.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/looks-2.0.4.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/forms-1.0.4.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/spin.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/glazedlists-1.7.0_java15.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/microba.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/PDFBox-0.7.3-dev-reduced.jar" dest="${build.tmp}" />
-		<unjar src="${library.directory}/JempBox-0.1.0-dev.jar" dest="${build.tmp}" />
+		<unjar dest="${build.tmp}">
+			<fileset refid="jarsFileset" />
+		</unjar>
 		<delete dir="${build.tmp}/META-INF" />
 		<!-- rename the microba license file -->
 		<move file="${build.tmp}/license.txt" tofile="${build.tmp}/microba-license.txt" />
@@ -372,7 +385,7 @@ version=${jabref.version}</echo>
 
 
 	<target name="osxjar">
-		<jarbundler dir="${build.lib}" name="JabRef" mainclass="net.sf.jabref.JabRef" jars="${build.lib}/${build.jar}" icon="${images.dir}/JabRef-Logo.icns" version="${jabref.version}" jvmversion="1.4+" stubfile="${library.directory}/JavaApplicationStub" />
+		<jarbundler dir="${build.lib}" name="JabRef" mainclass="net.sf.jabref.JabRef" jars="${build.lib}/${build.jar}" icon="${images.dir}/JabRef-Logo.icns" version="${jabref.version}" jvmversion="1.4+" stubfile="${lib.dir}/JavaApplicationStub" />
 	</target>
 
 
@@ -389,18 +402,17 @@ version=${jabref.version}</echo>
 
 	<target name="win.installer" description="Copy files in place to be used by the installer" depends="jars">
 
-		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists"/>
-		
+		<fail unless="is.windows" message="Not running on windows or NSIS not found. Please make sure that user.properties exists" />
+
 		<!-- Gather everything that will go into the installer in dist -->
 		<mkdir dir="${win.installer.dir}/dist" />
 
-		<copy file="${build.lib}/${build.jar}" 
-    		todir="${win.installer.dir}/dist" />
+		<copy file="${build.lib}/${build.jar}" todir="${win.installer.dir}/dist" />
 
-		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}"/>
-		
-		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}"/>
-		
+		<available property="win.installer.jar.available" file="${win.installer.dir}/dist/${build.jar}" />
+
+		<fail unless="win.installer.jar.available" message="Did not find jar: ${build.jar}" />
+
 		<copy todir="${win.installer.dir}/dist">
 			<fileset dir="${txt.dir}">
 				<include name="gpl.txt" />
@@ -418,9 +430,41 @@ version=${jabref.version}</echo>
 		<exec dir="." executable="${nsis.executable}" failonerror="true">
 			<arg line="'/DVERSION=${jabref.version}' ${win.installer.dir}/setup.nsi" />
 		</exec>
-		
+
 		<delete dir="${win.installer.dir}/dist" />
-		
+
+	</target>
+
+	<target name="test">
+		<junit printsummary="yes" fork="yes" haltonfailure="no">
+			<batchtest fork="yes" todir="/tmp/testres">
+				<fileset dir="${build.classes}">
+					<include name="**/*Tester.class" />
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+			<classpath refid="classpath" />
+		</junit>
+	</target>
+
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
+	   Auxiliary targets
+	  +++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<target name="profile" depends="jars" description="Profile JabRef">
+		<fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+
+		<nbprofiledirect>
+			<classpath refid="classpath" />
+		</nbprofiledirect>
+
+		<property environment="env" />
+		<java fork="true" classname="net.sf.jabref.JabRef" dir="${build.dir}" jvm="${profiler.info.jvm}">
+			<jvmarg value="${profiler.info.jvmargs.agent}" />
+			<jvmarg line="${profiler.info.jvmargs}" />
+			<env key="LD_LIBRARY_PATH" path="${profiler.info.agentpath}:${env.LD_LIBRARY_PATH}" />
+			<classpath refid="classpath" />
+		</java>
 	</target>
 
 	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -432,7 +476,7 @@ version=${jabref.version}</echo>
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
 			<classpath>
 				<pathelement path="${classpath}" />
-				<fileset dir="${library.directory}">
+				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -468,7 +512,7 @@ version=${jabref.version}</echo>
 		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask">
 			<classpath>
 				<pathelement path="${classpath}" />
-				<fileset dir="${library.directory}">
+				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -485,7 +529,7 @@ version=${jabref.version}</echo>
 		<taskdef name="javancss" classname="javancss.JavancssAntTask">
 			<classpath>
 				<pathelement path="${classpath}" />
-				<fileset dir="${library.directory}">
+				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -508,7 +552,7 @@ Number (CCN)           maintenance
 		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
 			<classpath>
 				<pathelement path="${classpath}" />
-				<fileset dir="${library.directory}">
+				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
@@ -520,16 +564,6 @@ Number (CCN)           maintenance
 		</jalopy>
 	</target>
 
-	<target name="test">
-		<junit printsummary="yes" fork="yes" haltonfailure="no">
-			<batchtest fork="yes" todir="/tmp/testres">
-				<fileset dir="${build.classes}">
-					<include name="**/*Tester.class" />
-					<include name="**/*Test.class" />
-				</fileset>
-			</batchtest>
-			<classpath refid="classpath" />
-		</junit>
-	</target>
+	<taskdef name="jarbundler" classpath="${lib.dir}/jarbundler-1.4.jar" classname="com.loomcom.ant.tasks.jarbundler.JarBundler" />
 
 </project>

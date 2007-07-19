@@ -27,47 +27,51 @@
 
 package net.sf.jabref;
 
-import net.sf.jabref.export.SaveAllAction;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.label.*;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.ExpandEndnoteFilters;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.auximport.gui.*;
-
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
-import java.io.*;
-import java.net.URL;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import net.sf.jabref.export.ExpandEndnoteFilters;
+import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.SaveAllAction;
+import net.sf.jabref.external.ExternalFileTypeEditor;
+import net.sf.jabref.external.PushToApplicationButton;
+import net.sf.jabref.groups.EntryTableTransferHandler;
+import net.sf.jabref.groups.GroupSelector;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.imports.*;
+import net.sf.jabref.journals.ManageJournalsAction;
+import net.sf.jabref.label.*;
+import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
-import net.sf.jabref.export.ExportCustomizationDialog;
-import net.sf.jabref.export.ExportFormats;
-
-import java.lang.reflect.*;
-import javax.swing.event.*;
-import net.sf.jabref.wizard.integrity.gui.*;
-import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.journals.ManageJournalsAction;
-import net.sf.jabref.external.*;
 import net.sf.jabref.util.MassSetFieldAction;
-import com.jgoodies.uif_lite.component.UIFSplitPane;
-import com.jgoodies.looks.Options;
-import com.jgoodies.looks.HeaderStyle;
+import net.sf.jabref.wizard.auximport.gui.FromAuxDialog;
+import net.sf.jabref.wizard.integrity.gui.IntegrityWizard;
 
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
+import com.jgoodies.uif_lite.component.UIFSplitPane;
 
 /**
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame {
 
-   // CO: Code Smells...
+    // CO: Code Smells...
     JabRefFrame ths = this;
     UIFSplitPane contentPane = new UIFSplitPane();
 
@@ -300,10 +304,10 @@ public class JabRefFrame extends JFrame {
     MedlineFetcher medlineFetcher;
     CiteSeerFetcher citeSeerFetcher;
     CiteSeerFetcherPanel citeSeerFetcherPanel;
-    IEEEXploreFetcher ieeexplorerFetcher;
-    GeneralFetcher ieex;
-    OAI2Fetcher arxivFetcher;
-    GeneralFetcher arxiv;
+    
+    List<EntryFetcher> fetchers = new LinkedList<EntryFetcher>();
+    List<Action> fetcherActions = new LinkedList<Action>();
+
     SearchManager2 searchManager;
     public GroupSelector groupSelector;
 
@@ -410,8 +414,19 @@ public class JabRefFrame extends JFrame {
         Globals.sidePaneManager = this.sidePaneManager;
         Globals.helpDiag = this.helpDiag;
 
-        ieeexplorerFetcher = new IEEEXploreFetcher();
-        arxivFetcher = new OAI2Fetcher();
+        /*
+         * Load fetchers that are plug-in extensions
+         */
+        JabRefPlugin jabrefPlugin = JabRefPlugin.getInstance(PluginCore.getManager());
+    	if (jabrefPlugin != null){
+    		for (EntryFetcherExtension ext : jabrefPlugin.getEntryFetcherExtensions()){
+    			EntryFetcher fetcher = ext.getEntryFetcher();
+    			if (fetcher != null){
+    				fetchers.add(fetcher);
+    			}
+    		}
+    	}
+        
         medlineFetcher = new MedlineFetcher(sidePaneManager);
         citeSeerFetcher = new CiteSeerFetcher(sidePaneManager);
         citeSeerFetcherPanel = new CiteSeerFetcherPanel(sidePaneManager,
@@ -1140,10 +1155,15 @@ public JabRefPreferences prefs() {
       web.add(fetchMedline);
       web.add(citeSeerPanelAction);
       web.add(fetchCiteSeer);
-      ieex = new GeneralFetcher(sidePaneManager, this, ieeexplorerFetcher);
-      arxiv = new GeneralFetcher(sidePaneManager, this, arxivFetcher);
-      web.add(ieex.getAction());
-      web.add(arxiv.getAction());
+      
+      /*
+       * Add all entryFetchers
+       */
+      for (EntryFetcher fetcher : fetchers){
+    	  GeneralFetcher generalFetcher = new GeneralFetcher(sidePaneManager, this, fetcher);
+    	  web.add(generalFetcher.getAction());
+    	  fetcherActions.add(generalFetcher.getAction());
+      }
 
       mb.add(web);
 
@@ -1368,11 +1388,11 @@ public JabRefPreferences prefs() {
     }
   }
 
-  protected List openDatabaseOnlyActions = new LinkedList();
-  protected List severalDatabasesOnlyActions = new LinkedList();
+  protected List<Object> openDatabaseOnlyActions = new LinkedList<Object>();
+  protected List<Action> severalDatabasesOnlyActions = new LinkedList<Action>();
   
     protected void initActions() {
-        openDatabaseOnlyActions = new LinkedList();
+        openDatabaseOnlyActions = new LinkedList<Object>();
         openDatabaseOnlyActions.addAll(Arrays.asList(new Object[] { manageSelectors,
             mergeDatabaseAction, newSubDatabaseAction, close, save, saveAs, saveSelectedAs, undo,
             redo, cut, delete, copy, paste, mark, unmark, unmarkAll, editEntry, importCiteSeer,
@@ -1383,14 +1403,16 @@ public JabRefPreferences prefs() {
             highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
-            abbreviateMedline, unabbreviate, ieex.getAction(), arxiv.getAction(), exportAll, exportSelected,
+            abbreviateMedline, unabbreviate, exportAll, exportSelected,
             importCurrent, saveAll}));
+        
+        openDatabaseOnlyActions.addAll(fetcherActions);
 
         openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-        severalDatabasesOnlyActions = new LinkedList();
+        severalDatabasesOnlyActions = new LinkedList<Action>();
         severalDatabasesOnlyActions.addAll(Arrays
-            .asList(new Object[] { nextTab, prevTab, sortTabs }));
+            .asList(new Action[] { nextTab, prevTab, sortTabs }));
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent event) {
@@ -2032,18 +2054,16 @@ class FetchCiteSeerAction
       SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
       JMenu submenu = new JMenu(Globals.lang("Custom importers"));
       submenu.setMnemonic(KeyEvent.VK_S);
-      /*if (customImporters.size() == 0) {
-        submenu.setEnabled(false);
-        submenu.setToolTipText(Globals.lang("No custom imports registered yet."));
-      } else {*/
-        // Put in all formatters registered in ImportFormatReader:
+      
+      // Put in all formatters registered in ImportFormatReader:
         for (Iterator i=customImporters.iterator(); i.hasNext();) {
             ImportFormat imFo = (ImportFormat)i.next();
             submenu.add(new ImportMenuItem(ths, intoNew, imFo));
         }
-      //}
+      
       if (customImporters.size() > 0)
           submenu.addSeparator();
+      
       submenu.add(customImpAction);
 
       importMenu.add(submenu);

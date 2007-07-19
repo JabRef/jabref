@@ -25,17 +25,15 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export.layout;
 
-import wsi.ra.types.StringInt;
-
 import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
-import java.io.IOException;
+import wsi.ra.types.StringInt;
 
 
 /**
- * DOCUMENT ME!
+ * Main class for formatting DOCUMENT ME!
  *
  * @author $author$
  * @version $Revision$

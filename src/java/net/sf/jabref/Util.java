@@ -35,13 +35,7 @@
 //               (now we cannot change the dateformat dynamicly, sorry)
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -53,30 +47,27 @@ import java.nio.charset.CharsetEncoder;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.export.layout.LayoutEntry;
 import net.sf.jabref.export.layout.LayoutFormatter;
 import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
+import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.KeywordGroup;
+import net.sf.jabref.gui.AutoCompleter;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.imports.CiteSeerFetcher;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
-import net.sf.jabref.gui.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1053,9 +1044,9 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		return s.substring(beginIndex, endIndex);
 	}
 
-	public static ArrayList parseMethodsCalls(String calls) throws RuntimeException {
+	public static ArrayList<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
-		ArrayList result = new ArrayList();
+		ArrayList<String[]> result = new ArrayList<String[]>();
 
 		char[] c = calls.toCharArray();
 
@@ -1383,6 +1374,9 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	public static String join(String[] strings, String separator, int from, int to) {
 		if (strings.length == 0 || from >= to)
 			return "";
+		
+		from = Math.max(from, 0);
+		to = Math.min(strings.length, to);
 
 		StringBuffer sb = new StringBuffer();
 		for (int i = from; i < to - 1; i++) {
@@ -2615,4 +2609,27 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		return one == null ? two == null : one.equals(two);
 	}
 
+	/**
+	 * Returns the given string but with the first character turned into an
+	 * upper case character.
+	 * 
+	 * Example: testTest becomes TestTest
+	 * 
+	 * @param string
+	 *            The string to change the first character to upper case to.
+	 * @return A string has the first character turned to upper case and the
+	 *         rest unchanged from the given one.
+	 */
+	public static String toUpperFirstLetter(String string){
+		if (string == null)
+			throw new IllegalArgumentException();
+		
+		if (string.length() == 0)
+			return string;
+		
+		return Character.toUpperCase(string.charAt(0)) + string.substring(1);
+	}
+	
+	
+	
 }

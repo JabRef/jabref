@@ -1,7 +1,7 @@
 package tests.net.sf.jabref.export.layout.format;
 
 import junit.framework.TestCase;
-import net.sf.jabref.export.layout.format.NameFormat;
+import net.sf.jabref.export.layout.format.plugin.NameFormat;
 
 public class BibtexNameLayoutFormatterTest extends TestCase {
 
