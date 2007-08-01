@@ -22,7 +22,7 @@ public class LabelPatternUtil {
   // All single characters that we can use for extending a key to make it unique:
   private static String CHARS = "abcdefghijklmnopqrstuvwxyz";
 
-  public static ArrayList DEFAULT_LABELPATTERN;
+  public static ArrayList<String> DEFAULT_LABELPATTERN;
   static {
       updateDefaultPattern();
   }
@@ -44,9 +44,9 @@ public class LabelPatternUtil {
    * is a string representation of the key pattern (the parameter),
    * the second item is the spacer character (a <code>String</code>).
    */
-  public static ArrayList split(String labelPattern) {
+  public static ArrayList<String> split(String labelPattern) {
     // A holder for fields of the entry to be used for the key
-    ArrayList _alist = new ArrayList();
+    ArrayList<String> _alist = new ArrayList<String>();
 
     // Before we do anything, we add the parameter to the ArrayLIst
     _alist.add(labelPattern);
@@ -107,8 +107,8 @@ public class LabelPatternUtil {
                                       BibtexDatabase database,
                                       BibtexEntry _entry) {
     _db = database;
-    ArrayList _al;
-    String _spacer, _label;
+    ArrayList<String> _al;
+    String _label;
     StringBuffer _sb = new StringBuffer();
     boolean forceUpper = false, forceLower = false;
 
@@ -425,7 +425,6 @@ public class LabelPatternUtil {
      * @return The String to append.
      */
     private static String getAddition(int number) {
-        String s = "";
         if (number >= CHARS.length()) {
             int lastChar = number % CHARS.length();
             return getAddition(number/CHARS.length()-1) + CHARS.substring(lastChar, lastChar+1);
@@ -647,14 +646,12 @@ public class LabelPatternUtil {
    */
   private static String authN_M(String authorField, int n, int m) {
     authorField = AuthorList.fixAuthorForAlphabetization(authorField);
-    StringBuffer author = new StringBuffer();
 
     String[] tokens = authorField.split("\\band\\b");
     if ((tokens.length <= m) || (n<0) || (m<0)) {
       return "";
     }
     String lastName = (tokens[m].split(","))[0].trim();
-    //System.out.println(lastName);
     if (lastName.length() <= n)
       return lastName;
     else

@@ -28,10 +28,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.util.Comparator;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
-public class BibtexStringComparator implements Comparator {
+public class BibtexStringComparator implements Comparator<BibtexString> {
 
     protected boolean considerRefs;
     private static final String MARKER = "__MARKER__";
@@ -46,9 +44,7 @@ public class BibtexStringComparator implements Comparator {
         this.considerRefs = considerRefs;
     }
 
-    public int compare(Object one, Object two) {
-        BibtexString s1 = (BibtexString) one;
-        BibtexString s2 = (BibtexString) two;
+    public int compare(BibtexString s1, BibtexString s2) {
 
         /*
          If crossreferences are to be considered, the following block sorts by the number of string

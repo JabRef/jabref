@@ -1,16 +1,22 @@
 package net.sf.jabref;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.
  */
 public class BrowseAction extends AbstractAction implements ActionListener {
 
-    JFrame frame=null;
+	private static final long serialVersionUID = 3007593430933681310L;
+
+	JFrame frame=null;
     //JDialog dialog=null;
     JTextField comp;
     boolean dir;

@@ -30,11 +30,7 @@ import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -126,7 +122,8 @@ public class UrlDragDrop implements DropTargetListener {
      *
      * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
      */
-    public void drop(DropTargetDropEvent dtde) {
+    
+	public void drop(DropTargetDropEvent dtde) {
         Transferable tsf = dtde.getTransferable();
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
         //try with an URL
@@ -188,10 +185,11 @@ public class UrlDragDrop implements DropTargetListener {
         }catch (IOException ioex){
             logger.log(Level.WARNING, "!should not happen!", ioex);
         }
-
+        
         try{
             //try with a File List
-            List filelist = (List) tsf
+        	@SuppressWarnings("unchecked")
+        	List<File> filelist = (List<File>) tsf
                     .getTransferData(DataFlavor.javaFileListFlavor);
             if (filelist.size() > 1){
                 JOptionPane
@@ -201,7 +199,7 @@ public class UrlDragDrop implements DropTargetListener {
                                 JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            File fl = (File) filelist.get(0);
+            File fl = filelist.get(0);
             feditor.setText(fl.toURI().toURL().toString());
             editor.updateField(feditor);
 

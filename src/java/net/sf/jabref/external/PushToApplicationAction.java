@@ -1,12 +1,12 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.*;
-import java.util.List;
-import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.*;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.

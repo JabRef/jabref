@@ -45,8 +45,11 @@
 
 package net.sf.jabref ;
 
-import java.util.* ;
-import net.sf.jabref.util.*;
+import java.util.HashMap;
+import java.util.Vector;
+
+import net.sf.jabref.util.TXMLReader;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -75,14 +78,14 @@ public class BibtexFields
   private static final BibtexFields runtime = new BibtexFields() ;
 
   // contains all bibtex-field objects (BibtexSingleField)
-  private HashMap fieldSet = null ;
+  private HashMap<String, BibtexSingleField> fieldSet;
 
   // contains all known (and public) bibtex fieldnames
-  private Object[] PUBLIC_FIELDS = null ;
+  private String[] PUBLIC_FIELDS = null ;
 
   private BibtexFields()
   {
-    fieldSet = new HashMap() ;
+    fieldSet = new HashMap<String, BibtexSingleField>();
     BibtexSingleField dummy = null ;
 
     // FIRST: all standard fields
@@ -212,10 +215,8 @@ public class BibtexFields
     readXML( Globals.additionalFields ) ;
 
     // collect all public fields for the PUBLIC_FIELDS array
-    Vector pFields = new Vector( fieldSet.size()) ;
-    for(Iterator iter = fieldSet.values().iterator(); iter.hasNext() ; )
-    {
-      BibtexSingleField sField = (BibtexSingleField) iter.next() ;
+    Vector<String> pFields = new Vector<String>( fieldSet.size()) ;
+    for (BibtexSingleField sField : fieldSet.values()){
       if (sField.isPublic() )
       {
         pFields.add( sField.getFieldName() );
@@ -224,7 +225,7 @@ public class BibtexFields
       }
     }
 
-    PUBLIC_FIELDS = pFields.toArray() ;
+    PUBLIC_FIELDS = pFields.toArray(new String[pFields.size()]);
     // sort the entries
     java.util.Arrays.sort( PUBLIC_FIELDS );
   }
@@ -255,7 +256,7 @@ public class BibtexFields
         if (fName != null)  // something found ?
         {
           fName = fName.toLowerCase() ;
-          BibtexSingleField dummy = (BibtexSingleField) fieldSet.get( fName ) ;
+          BibtexSingleField dummy = fieldSet.get( fName ) ;
           if (dummy == null)  // unknown field
           {
             dummy = new BibtexSingleField(reader, entry) ;
@@ -376,7 +377,7 @@ public class BibtexFields
   }
 
   /** returns an string-array with all fieldnames */
-  public static Object[] getAllFieldNames()
+  public static String[] getAllFieldNames()
   {
     return runtime.PUBLIC_FIELDS ;
   }

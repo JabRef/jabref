@@ -1,14 +1,22 @@
 package net.sf.jabref.gui;
 
-import java.util.* ;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
 
-import java.awt.* ;
-import java.awt.event.* ;
-import javax.swing.* ;
+import javax.swing.*;
 
-import com.jgoodies.forms.builder.* ;
-import com.jgoodies.forms.layout.* ;
-import net.sf.jabref.* ;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Created by IntelliJ IDEA.

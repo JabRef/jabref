@@ -1,9 +1,11 @@
 package net.sf.jabref.collab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableInsertString;
 import net.sf.jabref.undo.UndoableStringChange;
 
 public class StringNameChange extends Change {

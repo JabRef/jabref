@@ -30,8 +30,8 @@
 
 package net.sf.jabref.about ;
 
-import java.awt.* ;
-import java.awt.image.* ;
+import java.awt.Color;
+import java.awt.image.RGBImageFilter;
 
 /**
  * An image filter to highlight an image by brightening or darkening

@@ -22,15 +22,20 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.SearchRule;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.

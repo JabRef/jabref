@@ -24,11 +24,7 @@
  */
 package net.sf.jabref;
 
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.KeyboardFocusManager;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -36,20 +32,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
+import net.sf.jabref.gui.AutoCompleteListener;
+import net.sf.jabref.gui.AutoCompleter;
+import net.sf.jabref.gui.FileListEditor;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.AutoCompleter;
-import net.sf.jabref.gui.AutoCompleteListener;
-import net.sf.jabref.gui.FileListEditor;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.

@@ -22,11 +22,14 @@
 
 package net.sf.jabref.groups;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 /**
  * @author jzieren

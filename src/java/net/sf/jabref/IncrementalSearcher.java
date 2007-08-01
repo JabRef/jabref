@@ -1,6 +1,5 @@
 package net.sf.jabref;
 
-import java.util.regex.Pattern;
 
 public class IncrementalSearcher {
 

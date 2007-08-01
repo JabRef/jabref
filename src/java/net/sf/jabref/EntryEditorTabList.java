@@ -1,6 +1,8 @@
 package net.sf.jabref;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class for holding the information about customizable entry editor tabs.

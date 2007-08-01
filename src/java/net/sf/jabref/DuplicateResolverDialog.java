@@ -1,17 +1,14 @@
 package net.sf.jabref;
 
-import javax.swing.JDialog;
-import java.awt.HeadlessException;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.*;
-import java.awt.Insets;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import net.sf.jabref.export.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.StringWriter;
+
+import javax.swing.*;
+
+import net.sf.jabref.export.LatexFieldFormatter;
 
 
 // created by : ?

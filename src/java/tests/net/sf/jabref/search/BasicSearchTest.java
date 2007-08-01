@@ -2,11 +2,9 @@ package tests.net.sf.jabref.search;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
 import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.Util;
 import net.sf.jabref.search.BasicSearch;
-
-import java.util.ArrayList;
 
 /**
  * Test case for BasicSearch.

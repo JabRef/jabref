@@ -1,9 +1,13 @@
 package net.sf.jabref.collab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
-import net.sf.jabref.*;
-import net.sf.jabref.groups.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.Globals;
+import net.sf.jabref.groups.AllEntriesGroup;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.UndoableModifySubtree;
 import net.sf.jabref.undo.NamedCompound;
 
 public class GroupChange extends Change {

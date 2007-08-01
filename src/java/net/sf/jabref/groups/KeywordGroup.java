@@ -23,12 +23,14 @@
 package net.sf.jabref.groups;
 
 import java.util.Map;
-import java.util.regex.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.undo.*;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
 import net.sf.jabref.util.QuotedStringTokenizer;
 
 /**

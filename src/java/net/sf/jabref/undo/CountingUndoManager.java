@@ -26,8 +26,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
-import javax.swing.*;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.BasePanel;
 

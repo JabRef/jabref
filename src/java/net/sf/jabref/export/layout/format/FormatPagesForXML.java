@@ -1,6 +1,6 @@
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.*;
+import net.sf.jabref.export.layout.LayoutFormatter;
 
 public class FormatPagesForXML implements LayoutFormatter {
 

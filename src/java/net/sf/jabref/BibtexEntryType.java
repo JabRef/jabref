@@ -29,10 +29,10 @@ Modified for use in JabRef.
 */
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.TreeMap;
 
-public abstract class BibtexEntryType implements Comparable
+public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 {
 
     public static final BibtexEntryType OTHER =
@@ -655,8 +655,8 @@ public abstract class BibtexEntryType implements Comparable
 
     public abstract String getName();
 
-    public int compareTo(Object o) {
-	return getName().compareTo(((BibtexEntryType)o).getName());
+    public int compareTo(BibtexEntryType o) {
+	return getName().compareTo(o.getName());
     }
 
     public abstract String[] getOptionalFields();
@@ -695,8 +695,8 @@ public abstract class BibtexEntryType implements Comparable
 	return false;
     }
 
-    public static TreeMap ALL_TYPES = new TreeMap();
-    public static TreeMap STANDARD_TYPES = new TreeMap();
+    public static TreeMap<String, BibtexEntryType> ALL_TYPES = new TreeMap<String, BibtexEntryType>();
+    public static TreeMap<String, BibtexEntryType> STANDARD_TYPES = new TreeMap<String, BibtexEntryType>();
     static {
 	// Put the standard entry types into the type map.
 	ALL_TYPES.put("article", ARTICLE);
@@ -717,7 +717,7 @@ public abstract class BibtexEntryType implements Comparable
 
 	// We need a record of the standard types, in case the user wants
 	// to remove a customized version. Therefore we clone the map.
-	STANDARD_TYPES = (TreeMap)ALL_TYPES.clone();
+	STANDARD_TYPES = new TreeMap<String, BibtexEntryType>(ALL_TYPES);
     }
 
     /**
@@ -783,7 +783,7 @@ public abstract class BibtexEntryType implements Comparable
      * JabRefFrame when the program closes.
      */
     public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-	Iterator i=ALL_TYPES.keySet().iterator();
+	Iterator<String> i=ALL_TYPES.keySet().iterator();
 	int number = 0;
 	//Vector customTypes = new Vector(10, 10);
 	while (i.hasNext()) {

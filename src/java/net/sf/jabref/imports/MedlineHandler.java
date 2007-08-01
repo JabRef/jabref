@@ -1,11 +1,14 @@
 package net.sf.jabref.imports;
 import java.util.ArrayList;
-import java.util.TreeSet;
 import java.util.Iterator;
+import java.util.TreeSet;
 
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 /*
@@ -36,7 +39,7 @@ import net.sf.jabref.*;
 
 public class MedlineHandler extends DefaultHandler
 {
-    ArrayList bibitems= new ArrayList();
+    ArrayList<BibtexEntry> bibitems= new ArrayList<BibtexEntry>();
     boolean inTitle=false,			inYear = false,
 		inJournal = false,			inMonth = false,
 		inVolume = false,			inAuthorList = false,
@@ -52,13 +55,13 @@ public class MedlineHandler extends DefaultHandler
     String month="",volume="",lastname="",initials="",number="",page="",medlineID="",url="",MedlineDate="";
     String series="",editor="",booktitle="",type="article",key="",address="",
 		pubmedid="",doi="",pii="";
-    ArrayList authors=new ArrayList();
-    TreeSet descriptors = new TreeSet(); // To gather keywords
+    ArrayList<String> authors=new ArrayList<String>();
+    TreeSet<String> descriptors = new TreeSet<String>(); // To gather keywords
     int rowNum=0;
 
     private static final String KEYWORD_SEPARATOR = "; ";
 
-    public ArrayList getItems(){ return bibitems;}
+    public ArrayList<BibtexEntry> getItems(){ return bibitems;}
 
     public MedlineHandler(){
 		super();
@@ -106,10 +109,7 @@ public class MedlineHandler extends DefaultHandler
 		else if(localName.equals("AbstractText")){ inAbstractText=true;}
 		else if(localName.equals("ArticleId")){
 			for (int i = 0; i < atts.getLength(); i++) {
-				String name = atts.getQName(i);
-				String type = atts.getType(i);
 				String value = atts.getValue(i);
-				//System.out.println("name:" + name + " type: " + type + " value: " + value);
 				if(value.equals("doi"))
 					inDoi=true;
 				else if(value.equals("pii"))
@@ -156,8 +156,8 @@ public class MedlineHandler extends DefaultHandler
 			
 			// Build a string from the collected keywords:
             StringBuffer sb = new StringBuffer();
-            for (Iterator iterator = descriptors.iterator(); iterator.hasNext();) {
-                String s = (String) iterator.next();
+            for (Iterator<String> iterator = descriptors.iterator(); iterator.hasNext();) {
+                String s = iterator.next();
                 sb.append(s);
                 if (iterator.hasNext())
                     sb.append(KEYWORD_SEPARATOR);

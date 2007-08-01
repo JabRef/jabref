@@ -33,11 +33,12 @@ import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.tree.*;
-import javax.swing.undo.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.undo.NamedCompound;
 
 public class GroupSelector extends SidePaneComponent implements

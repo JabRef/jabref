@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.util.XMPUtil;
 
@@ -23,7 +24,7 @@ public class PdfXmpImporter extends ImportFormat {
 	/**
 	 * Returns a list of all BibtexEntries found in the inputstream.
 	 */
-	public List importEntries(InputStream in) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream in) throws IOException {
 		return XMPUtil.readXMP(in);
 	}
 

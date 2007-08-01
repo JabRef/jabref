@@ -1,6 +1,6 @@
 package net.sf.jabref;
 
-import java.io.*;
+import java.io.Writer;
 
 /**
  * This class is used to represent an unknown entry type, e.g. encountered

@@ -3,9 +3,6 @@ package net.sf.jabref.bst;
 // $ANTLR 3.0b5 Bst.g 2006-11-23 23:20:24
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 public class BstLexer extends Lexer {
     public static final int LETTER=21;

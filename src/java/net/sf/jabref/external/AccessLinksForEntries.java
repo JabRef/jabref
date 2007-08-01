@@ -1,17 +1,19 @@
 package net.sf.jabref.external;
 
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.Util;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-
-import javax.swing.*;
-import java.util.*;
-import java.io.File;
-import java.io.IOException;
-import java.awt.event.ActionListener;
 
 /**
  * This class handles the task of looking up all external files linked for a set

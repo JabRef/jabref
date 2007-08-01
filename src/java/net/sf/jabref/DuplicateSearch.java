@@ -33,10 +33,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
-import javax.swing.*;
+import java.util.Vector;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
@@ -46,7 +47,7 @@ public class DuplicateSearch extends Thread {
 
   BasePanel panel;
   BibtexEntry[] bes;
-  final Vector duplicates = new Vector();
+  final Vector<BibtexEntry[]> duplicates = new Vector<BibtexEntry[]>();
   boolean autoRemoveExactDuplicates = false;
   
   public DuplicateSearch(BasePanel bp) {
@@ -87,7 +88,7 @@ public void run() {
   }
 */
 
-   final ArrayList toRemove = new ArrayList();
+   final ArrayList<BibtexEntry> toRemove = new ArrayList<BibtexEntry>();
   while (!st.finished() || (current < duplicates.size()))
   {
 
@@ -107,7 +108,7 @@ public void run() {
     {
 
 
-        BibtexEntry[] be = (BibtexEntry[]) duplicates.get(current);
+        BibtexEntry[] be = duplicates.get(current);
         current++;
         if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
             // Check if they are exact duplicates:
@@ -152,8 +153,8 @@ public void run() {
         public void run() {
             // Now, do the actual removal:
             if (toRemove.size() > 0) {
-                for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry) iterator.next();
+                for (Iterator<BibtexEntry> iterator = toRemove.iterator(); iterator.hasNext();) {
+                    BibtexEntry entry = iterator.next();
                     panel.database.removeEntry(entry.getId());
                     ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
                 }

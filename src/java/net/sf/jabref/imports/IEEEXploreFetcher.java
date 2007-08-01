@@ -1,11 +1,7 @@
 package net.sf.jabref.imports;
 
 import java.awt.BorderLayout;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,12 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 public class IEEEXploreFetcher implements Runnable, EntryFetcher {

@@ -63,8 +63,8 @@ public class InspecImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-        ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuffer sb = new StringBuffer();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String str;
@@ -77,7 +77,7 @@ public class InspecImporter extends ImportFormat {
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
-        HashMap h = new HashMap();
+        HashMap<String, String> h = new HashMap<String, String>();
         for (int i = 0; i < entries.length; i++){
             if (entries[i].indexOf("Record") != 0) continue;
             h.clear();

@@ -86,14 +86,14 @@ public class IsiImporter extends ImportFormat {
 
 	static Pattern subsupPattern = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
-	static public void processSubSup(HashMap map) {
+	static public void processSubSup(HashMap<String, String> map) {
 
 		String[] subsup = { "title", "abstract", "review", "notes" };
 
 		for (int i = 0; i < subsup.length; i++) {
 			if (map.containsKey(subsup[i])) {
 
-				Matcher m = subsupPattern.matcher((String) map.get(subsup[i]));
+				Matcher m = subsupPattern.matcher(map.get(subsup[i]));
 				StringBuffer sb = new StringBuffer();
 
 				while (m.find()) {
@@ -117,7 +117,7 @@ public class IsiImporter extends ImportFormat {
 		}
 	}
 
-	static public void processCapitalization(HashMap map) {
+	static public void processCapitalization(HashMap<String, String> map) {
 
 		String[] subsup = { "title", "journal", "publisher" };
 
@@ -125,7 +125,7 @@ public class IsiImporter extends ImportFormat {
 
 			if (map.containsKey(subsup[i])) {
 
-				String s = (String) map.get(subsup[i]);
+				String s = map.get(subsup[i]);
 
 				if (s.toUpperCase().equals(s)) {
 					s = CaseChanger.changeCase(s, CaseChanger.UPPER_EACH_FIRST);
@@ -139,12 +139,12 @@ public class IsiImporter extends ImportFormat {
 	 * Parse the entries in the source, and return a List of BibtexEntry
 	 * objects.
 	 */
-	public List importEntries(InputStream stream) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 		if (stream == null) {
 			throw new IOException("No stream given.");
 		}
 
-		ArrayList bibitems = new ArrayList();
+		ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
 		StringBuffer sb = new StringBuffer();
 
 		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -178,7 +178,7 @@ public class IsiImporter extends ImportFormat {
 
 		String[] entries = sb.toString().split("::");
 
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 
 		// skip the first entry as it is either empty or has document header
 		for (int i = 0; i < entries.length; i++) {
@@ -223,7 +223,7 @@ public class IsiImporter extends ImportFormat {
 
 					// if there is already someone there then append with "and"
 					if (hm.get("author") != null)
-						author = (String) hm.get("author") + " and " + author;
+						author = hm.get("author") + " and " + author;
 
 					hm.put("author", author);
 				} else if (beg.equals("TI"))
@@ -233,7 +233,7 @@ public class IsiImporter extends ImportFormat {
 				else if (beg.equals("ID") || beg.equals("KW")) {
 				
 					value = value.replaceAll("EOLEOL", " ");
-					String existingKeywords = (String) hm.get("keywords");
+					String existingKeywords = hm.get("keywords");
 					if (existingKeywords != null && existingKeywords.indexOf(value) == -1) {
 						existingKeywords += ", " + value;
 					} else {
@@ -307,14 +307,14 @@ public class IsiImporter extends ImportFormat {
 			// id assumes an existing database so don't
 
 			// Remove empty fields:
-			ArrayList toRemove = new ArrayList();
-			for (Iterator it = hm.keySet().iterator(); it.hasNext();) {
+			ArrayList<Object> toRemove = new ArrayList<Object>();
+			for (Iterator<String> it = hm.keySet().iterator(); it.hasNext();) {
 				Object key = it.next();
-				String content = (String) hm.get(key);
+				String content = hm.get(key);
 				if ((content == null) || (content.trim().length() == 0))
 					toRemove.add(key);
 			}
-			for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
+			for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
 				hm.remove(iterator.next());
 
 			}

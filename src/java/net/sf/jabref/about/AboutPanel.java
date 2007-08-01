@@ -37,20 +37,28 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.sf.jabref.about ;
 
-import java.io.* ;
-import java.util.* ;
+import java.awt.*;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageProducer;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import java.awt.* ;
-import java.awt.image.* ;
-import javax.swing.* ;
-import javax.swing.border.* ;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
 
-import net.sf.jabref.* ;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 
 // AboutPanel class
 public class AboutPanel extends JComponent
 {
-  private Vector textBlocks ;
+  private Vector<TextBlock> textBlocks ;
   private String versionStr ;
   private String buildStr ;
   private AnimationThread thread;
@@ -115,7 +123,7 @@ public class AboutPanel extends JComponent
 
     setBorder ( BorderFactory.createBevelBorder( BevelBorder.RAISED)) ;
 
-    textBlocks = new Vector( 50 ) ;
+    textBlocks = new Vector<TextBlock>( 50 ) ;
 
     loadAboutText() ;
 
@@ -274,19 +282,14 @@ public class AboutPanel extends JComponent
       g.drawString( "JabRef", (getWidth() - fm.stringWidth("JabRef")) /2, fm.getHeight()+10) ;
 
 
-      for ( Enumeration myE = textBlocks.elements() ; myE.hasMoreElements() ; )
-      {
-        TextBlock block = (TextBlock) myE.nextElement() ;
-
+      for ( TextBlock block : textBlocks){
         if (block.isVisible()) // only if Block is marked as visible
         {
           // print Heading
           AboutTextLine head = block.getHeading() ;
           drawLine(head, g) ;
 
-          for ( Enumeration myEnum = block.getEnumeration() ; myEnum.hasMoreElements() ; )
-          {
-            AboutTextLine line = ( AboutTextLine ) myEnum.nextElement() ;
+          for (AboutTextLine line : block){
             drawLine(line, g) ;
           }
         }
@@ -391,16 +394,14 @@ public class AboutPanel extends JComponent
         {
           int counter = 0 ;
 
-          for ( Enumeration myE = textBlocks.elements() ; myE.hasMoreElements() ; )
+          for ( Enumeration<TextBlock> myE = textBlocks.elements() ; myE.hasMoreElements() ; )
           {
-            TextBlock block = ( TextBlock ) myE.nextElement() ;
+            TextBlock block = myE.nextElement() ;
             AboutTextLine head = block.getHeading() ;
             counter = performStep(head) ;
 
-            for ( Enumeration myEnum = block.getEnumeration() ; myEnum.hasMoreElements() ; )
-            {
-              AboutTextLine line = ( AboutTextLine ) myEnum.nextElement() ;
-              counter += performStep( line ) ;
+            for (AboutTextLine line : block){
+            	counter += performStep( line ) ;
             }
           }
           if (counter < 1)

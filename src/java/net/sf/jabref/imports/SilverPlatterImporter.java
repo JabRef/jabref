@@ -61,8 +61,8 @@ public class SilverPlatterImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-        ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         boolean isChapter = false;
         String str;
@@ -75,7 +75,7 @@ public class SilverPlatterImporter extends ImportFormat {
         in.close();
         String[] entries = sb.toString().split("__::__");
         String Type = "";
-        HashMap h = new HashMap();
+        HashMap<String, String> h = new HashMap<String, String>();
         entryLoop: for (int i = 0; i < entries.length; i++){
             if (entries[i].trim().length() < 6) continue entryLoop;
             //System.out.println("'"+entries[i]+"'");

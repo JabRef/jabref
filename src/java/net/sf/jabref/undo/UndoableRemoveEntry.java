@@ -26,9 +26,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
-import net.sf.jabref.*;
-import java.util.HashMap;
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Util;
 
 /**
  * This class represents the removal of an entry. The constructor needs

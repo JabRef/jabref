@@ -26,7 +26,10 @@
  */
 package net.sf.jabref;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.SwingUtilities;
@@ -39,7 +42,7 @@ public class DatabaseSearch extends Thread {
 	String searchValueField = null;
 	boolean reorder, select, grayOut;
 	ErrorMessageDisplay errorDisplay;
-	Set matches = new HashSet();
+	Set<BibtexEntry> matches = new HashSet<BibtexEntry>();
 	public DatabaseSearch(ErrorMessageDisplay errorDisplay,
 			Hashtable searchOptions, SearchRuleSet searchRules,
 			BasePanel panel, String searchValueField, boolean reorder,
@@ -61,10 +64,10 @@ public class DatabaseSearch extends Thread {
 		BibtexEntry bes = null;
 		int hits = 0;
 
-		for (Iterator i = thisDatabase.getKeySet().iterator(); i.hasNext();) {
-			// 1. search all required fields using searchString
+		for (String id : thisDatabase.getKeySet()){
 
-			bes = thisDatabase.getEntryById((String) i.next());
+			// 1. search all required fields using searchString
+			bes = thisDatabase.getEntryById(id);
 			if (bes == null)
 				continue;
 			// (thisTableModel.getNameFromNumber(row));
@@ -101,7 +104,7 @@ public class DatabaseSearch extends Thread {
 		});
 	}
 	
-	public Iterator matches() {
+	public Iterator<BibtexEntry> matches() {
 		return matches.iterator();
 	}
 }

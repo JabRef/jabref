@@ -26,9 +26,10 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
-import java.util.HashMap;
-import net.sf.jabref.*;
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
 
 /**
  * This class represents the change of type for an entry.

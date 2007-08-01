@@ -35,13 +35,20 @@
 
 package net.sf.jabref ;
 
-import java.awt.* ;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.URL;
+
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
-import java.net.*;
-import java.awt.datatransfer.*;
-import net.sf.jabref.util.*;
+
+import net.sf.jabref.util.CaseChangeMenu;
 
 public class FieldTextMenu implements MouseListener
 {

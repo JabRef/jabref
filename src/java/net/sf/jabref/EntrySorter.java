@@ -32,21 +32,21 @@ import java.util.*;
 public class EntrySorter implements DatabaseChangeListener {
 
     //TreeSet set;
-    final ArrayList set;
-    Comparator comp;
+    final ArrayList<BibtexEntry> set;
+    Comparator<BibtexEntry> comp;
     String[] idArray;
     BibtexEntry[] entryArray;
     //static BibtexEntry[] DUMMY = new BibtexEntry[0];
     private boolean outdated = false;
     private boolean changed = false;
 
-    public EntrySorter(Map entries, Comparator comp) {
+    public EntrySorter(Map<String, BibtexEntry> entries, Comparator<BibtexEntry> comp) {
 	    //set = new TreeSet(comp);
-        set = new ArrayList();
+        set = new ArrayList<BibtexEntry>();
         this.comp = comp;
-        Set keySet = entries.keySet();
+        Set<String> keySet = entries.keySet();
 	    if (keySet != null) {
-    	    Iterator i = keySet.iterator();
+    	    Iterator<String> i = keySet.iterator();
     	    while (i.hasNext()) {
     		    set.add(entries.get(i.next()));
             }
@@ -85,9 +85,9 @@ public class EntrySorter implements DatabaseChangeListener {
             idArray = new String[count];
             entryArray = new BibtexEntry[count];
 	        int piv = 0;
-	        for (Iterator i=set.iterator(); i.hasNext();) {
+	        for (Iterator<BibtexEntry> i=set.iterator(); i.hasNext();) {
 	            //        for (int i=0; i<idArray.length; i++) {
-    	        BibtexEntry entry = (BibtexEntry)i.next();
+    	        BibtexEntry entry = i.next();
     	        idArray[piv] = entry.getId();
     	        entryArray[piv] = entry;
     	        piv++;
@@ -150,39 +150,4 @@ public class EntrySorter implements DatabaseChangeListener {
     	}
 
     }
-
-    /** Add an entry to the sorted set, making sure it is put in the right position
-     *
-     * @param entry The entry to add
-     */
-    private void addEntry(BibtexEntry entry) {
-        int pos = -Collections.binarySearch(set, entry, comp) - 1;
-        set.add(pos, entry);
-    }
-
-/* Old version, from when set was a TreeSet.
-
-    public void databaseChanged(DatabaseChangeEvent e) {
-    synchronized(set) {
-        if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
-            set.add(e.getEntry());
-        }
-        else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
-            set.remove(e.getEntry());
-        }
-        else if (e.getType() == DatabaseChangeEvent.CHANGING_ENTRY) {
-            set.remove(e.getEntry());
-            changing = true;
-        }
-        else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
-            // Remove and re-add the entry, to make sure it is in the
-            // correct sort position.
-            set.add(e.getEntry());
-            changing = false;
-        }
-
-    }
-
-}
-*/
 }

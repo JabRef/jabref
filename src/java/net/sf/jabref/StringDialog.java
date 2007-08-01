@@ -27,14 +27,21 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.TreeSet;
+
 import javax.swing.*;
-import javax.swing.table.*;
-import java.util.*;
-import net.sf.jabref.undo.*;
-import net.sf.jabref.export.LatexFieldFormatter;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
+
+import net.sf.jabref.export.LatexFieldFormatter;
+import net.sf.jabref.undo.UndoableInsertString;
+import net.sf.jabref.undo.UndoableRemoveString;
+import net.sf.jabref.undo.UndoableStringChange;
 
 public class StringDialog extends JDialog {
 
@@ -43,7 +50,7 @@ public class StringDialog extends JDialog {
     JabRefFrame frame;
     BasePanel panel;
     JabRefPreferences prefs;
-    TreeSet stringsSet; // Our locally sorted set of strings.
+    TreeSet<BibtexString> stringsSet; // Our locally sorted set of strings.
     Object[] strings;
 
     // Layout objects.
@@ -168,10 +175,9 @@ public class StringDialog extends JDialog {
 
     private void sortStrings() {
 	// Rebuild our sorted set of strings:
-	stringsSet = new TreeSet(new BibtexStringComparator(false));
-	Iterator i = base.getStringKeySet().iterator();
-	for (;i.hasNext();) {
-	    stringsSet.add(base.getString(i.next()));
+	stringsSet = new TreeSet<BibtexString>(new BibtexStringComparator(false));
+	for (String s : base.getStringKeySet()){
+	    stringsSet.add(base.getString(s));
 	}
 	strings = stringsSet.toArray();
     }

@@ -1,16 +1,18 @@
 package net.sf.jabref.export;
 
-import javax.swing.JDialog;
-import java.awt.*;
-import net.sf.jabref.*;
-import javax.swing.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.*;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.Sizes;
 
 /**
  * <p>Title: </p>

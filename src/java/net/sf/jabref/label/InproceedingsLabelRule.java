@@ -26,17 +26,16 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.label;
 
-import net.sf.jabref.*;
-import java.util.StringTokenizer ;
+import java.util.StringTokenizer;
+
+import net.sf.jabref.BibtexEntry;
 
 public class InproceedingsLabelRule extends DefaultLabelRule {
 
     // this is the rule used handle articles
     // we try (first author)/(year)/(first unique booktitle word)
     public String applyRule(BibtexEntry oldEntry){
-        String oldLabel = (String) (oldEntry.getField(BibtexFields.KEY_FIELD)) ;
         String newLabel = "" ;
-
 
         StringTokenizer authorTokens = null ;
         // use the author token
@@ -67,7 +66,7 @@ public class InproceedingsLabelRule extends DefaultLabelRule {
             boolean done = false ;
             while(tempString!=null && !done ){
                 tempString = tempString.replaceAll(",","").trim() ;
-                if(tempString.trim().length() > 3 && !KeyWord.isKeyWord(tempString))  {
+                if(tempString.trim().length() > 3 && !KeyWord.getKeyWord().isKeyWord(tempString))  {
                     done = true ;
                 }
                 else{

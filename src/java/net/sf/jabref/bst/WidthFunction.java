@@ -30,7 +30,7 @@ public class WidthFunction implements BstFunction {
 	}
 
 	public void execute(BstEntry context) {
-		Stack stack = vm.getStack();
+		Stack<Object> stack = vm.getStack();
 
 		if (stack.size() < 1) {
 			throw new VMException("Not enough operands on stack for operation width$");

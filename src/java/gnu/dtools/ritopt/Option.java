@@ -7,7 +7,6 @@ package gnu.dtools.ritopt;
  *    $Id$
  */
 
-import java.util.*;
 
 /**
  * This is the principal base class for all Option classes. It contains

@@ -39,8 +39,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.sf.jabref.about ;
 
-import java.util.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.Random;
+
 import javax.swing.UIManager;
 
 // a single About Line

@@ -3,19 +3,33 @@
  * Updated on May 03, 2007
  * */
 package net.sf.jabref.msbib;
-import net.sf.jabref.*;
-import net.sf.jabref.export.layout.format.*;
-import net.sf.jabref.export.layout.*;
-import net.sf.jabref.mods.*;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
-import java.util.*;
-import java.io.*;
-import java.util.regex.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.XMLChars;
+import net.sf.jabref.mods.PageNumbers;
+import net.sf.jabref.mods.PersonName;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * @author S M Mahbub Murshed
@@ -43,21 +57,21 @@ public class MSBibEntry {
 	protected String GUID = null;
 	protected int LCID = -1;
 
-	protected List authors = null;
-	protected List bookAuthors = null;
-	protected List editors = null;
-	protected List translators = null;
-	protected List producerNames = null;
-	protected List composers = null;
-	protected List conductors = null;
-	protected List performers = null;
-	protected List writers = null;
-	protected List directors = null;
-	protected List compilers = null;
-	protected List interviewers = null;
-	protected List interviewees = null;
-	protected List inventors = null;
-	protected List counsels = null;
+	protected List<PersonName> authors = null;
+	protected List<PersonName> bookAuthors = null;
+	protected List<PersonName> editors = null;
+	protected List<PersonName> translators = null;
+	protected List<PersonName> producerNames = null;
+	protected List<PersonName> composers = null;
+	protected List<PersonName> conductors = null;
+	protected List<PersonName> performers = null;
+	protected List<PersonName> writers = null;
+	protected List<PersonName> directors = null;
+	protected List<PersonName> compilers = null;
+	protected List<PersonName> interviewers = null;
+	protected List<PersonName> interviewees = null;
+	protected List<PersonName> inventors = null;
+	protected List<PersonName> counsels = null;
 
 	protected String title = null;
 	protected String year = null;
@@ -458,8 +472,8 @@ public class MSBibEntry {
 		return language;
 	}
 	
-	protected List getSpecificAuthors(String type, Element authors, String _bcol) {
-		List result = null;
+	protected List<PersonName> getSpecificAuthors(String type, Element authors, String _bcol) {
+		List<PersonName> result = null;
 		NodeList nodeLst = authors.getElementsByTagName(_bcol+type);
 		if(nodeLst.getLength()<=0)
 			return result;
@@ -470,7 +484,7 @@ public class MSBibEntry {
 		if(person.getLength()<=0)
 			return result;
 
-		result = new LinkedList();
+		result = new LinkedList<PersonName>();
 		for(int i=0;i<person.getLength();i++)
 		{
 			NodeList firstName  = ((Element)(person.item(i))).getElementsByTagName(_bcol+"First");
@@ -507,15 +521,11 @@ public class MSBibEntry {
 		counsels = getSpecificAuthors("Counsel",authorsElem,_bcol);		
 	}
 
-	protected List getAuthors(String authors) {
-		List result = new LinkedList();
-		LayoutFormatter chars = new XMLChars();
+	protected List<PersonName> getAuthors(String authors) {
+		List<PersonName> result = new LinkedList<PersonName>();
 		
 		if (authors.indexOf(" and ") == -1)
 		{
-//			if(FORMATXML)
-//				result.add(new PersonName(chars.format(authors)));
-//			else
 				result.add(new PersonName(authors));
 		}
         else
@@ -523,9 +533,6 @@ public class MSBibEntry {
             String[] names = authors.split(" and ");
             for (int i=0; i<names.length; i++)
             {
-//            	if(FORMATXML)
-//            		result.add(new PersonName(chars.format(names[i])));
-//            	else
             		result.add(new PersonName(names[i]));
             }
         }
@@ -591,6 +598,7 @@ public class MSBibEntry {
 	public Document getDOMrepresentation() {
 		Document result = null;
 		try {
+			// TODO No clue what this is doing!!
 			DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
 		//	result = getDOMrepresentation(d);
@@ -601,29 +609,6 @@ public class MSBibEntry {
 		}
 		return result;
 	}
-	
-//	private String healXML(String value)
-//	{
-//		String healedValue = value;
-//
-////		if(value.contains("A net energy gain"))
-////			System.out.println(value);
-////		restore converted html-char
-//		Pattern p = Pattern.compile("&#([0-9A-Fa-f]{2,4});");
-//		// Pattern p = Pattern.compile("&#(\\d{1,4});");
-//		Matcher m = p.matcher(healedValue);
-//		while (m.find())
-//		{
-//			int n = Integer.parseInt(m.group(1),16);
-//			char ch = Character.forDigit(n,10);
-//			System.out.println(m.group(1));
-//			System.out.println(""+n);
-//			System.out.println(""+ch);			
-//			healedValue = healedValue.replaceAll("\\&#"+m.group(1)+";",""+ch);
-//		}
-//		
-//		return healedValue;
-//	}
 
 	public void addField(Document d,Element parent, String name, String value) {
 		if(value == null)
@@ -639,13 +624,13 @@ public class MSBibEntry {
 		parent.appendChild(elem);
 	}
 
-	public void addAuthor(Document d, Element allAuthors, String entryName, List authorsLst) {
+	public void addAuthor(Document d, Element allAuthors, String entryName, List<PersonName> authorsLst) {
 		if(authorsLst == null)
 			return;
 		Element authorTop = d.createElement(bcol+entryName);
 		Element nameList = d.createElement(bcol+"NameList");
-		for(Iterator iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = (PersonName) iter.next();
+		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
+			PersonName name = iter.next();
 			Element person = d.createElement(bcol+"Person");
 			addField(d, person,"Last",name.getSurname());
 			addField(d, person,"Middle",name.getMiddlename());
@@ -699,7 +684,7 @@ public class MSBibEntry {
 	}
 
 	public Element getDOMrepresentation(Document d) {
-		Node result = null;		
+	
 	   	try {
 	   		Element msbibEntry = d.createElement(bcol+"Source");
 
@@ -800,7 +785,7 @@ public class MSBibEntry {
 	   	// return null;
 	   }
 	
-	protected void parseSingleStandardNumber(String type,String bibtype, String standardNum, HashMap hm) {
+	protected void parseSingleStandardNumber(String type,String bibtype, String standardNum, HashMap<String, String> hm) {
 		// teste using http://www.javaregex.com/test.html
 		Pattern p = Pattern.compile(":"+type+":(.[^:]+)");
 		Matcher m = p.matcher(standardNum);
@@ -808,7 +793,7 @@ public class MSBibEntry {
 			hm.put(bibtype,m.group(1));
 	}
 
-	protected void parseStandardNumber(String standardNum, HashMap hm) {
+	protected void parseStandardNumber(String standardNum, HashMap<String, String> hm) {
 		if(standardNumber == null)
 			return;
 		parseSingleStandardNumber("ISBN","ISBN",standardNum,hm);
@@ -817,13 +802,13 @@ public class MSBibEntry {
 		parseSingleStandardNumber("MRN","mrnumber",standardNum,hm);
 	}
 
-	public void addAuthor(HashMap hm, String type, List authorsLst) {
+	public void addAuthor(HashMap<String, String> hm, String type, List<PersonName> authorsLst) {
 		if(authorsLst == null)
 			return;
 		String allAuthors = "";
 		boolean First = true;
-		for(Iterator iter = authorsLst.iterator(); iter.hasNext();) {
-			PersonName name = (PersonName) iter.next();
+		for(Iterator<PersonName> iter = authorsLst.iterator(); iter.hasNext();) {
+			PersonName name = iter.next();
 			if(First == false)
 				allAuthors += " and ";
 			allAuthors += name.getFullname();
@@ -977,7 +962,7 @@ public class MSBibEntry {
 //		else
 //			entry.setType(BibtexEntryType.MISC);
 
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		
 		if(tag != null)
 			hm.put("bibtexkey",tag);

@@ -5,14 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -40,7 +33,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 	JCheckBox privacyFilterCheckBox = new JCheckBox(Globals
 		.lang("Do not write the following fields to XMP Metadata:"));
 
-	Vector tableRows = new Vector(10);
+	Vector<Object> tableRows = new Vector<Object>(10);
 
 	/**
 	 * Customization of external program paths.
@@ -70,7 +63,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 				return Globals.lang("Field to filter");
 			}
 
-			public Class getColumnClass(int column) {
+			public Class<?> getColumnClass(int column) {
 				return String.class;
 			}
 

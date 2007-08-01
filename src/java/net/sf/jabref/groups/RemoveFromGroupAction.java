@@ -27,7 +27,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
     protected GroupTreeNode m_node;

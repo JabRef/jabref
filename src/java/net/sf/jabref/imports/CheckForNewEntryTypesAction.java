@@ -1,13 +1,14 @@
 package net.sf.jabref.imports;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Globals;
-
-import javax.swing.*;
-import java.util.Iterator;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * This action checks whether any new custom entry types were loaded from this

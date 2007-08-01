@@ -1,9 +1,12 @@
 package net.sf.jabref;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+
 import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.event.*;
 
 /**
  * <p>Title: MergeDialog</p>

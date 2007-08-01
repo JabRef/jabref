@@ -6,11 +6,19 @@
 
 package net.sf.jabref.gui;
 
-import net.sf.jabref.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.event.*;
+
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.CustomEntryType;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the

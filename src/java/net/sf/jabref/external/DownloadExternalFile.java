@@ -1,16 +1,18 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.FileListEditor;
-import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.net.URLDownload;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.*;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.net.URLDownload;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks

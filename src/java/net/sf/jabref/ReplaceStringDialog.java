@@ -26,10 +26,17 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
-import net.sf.jabref.undo.*;
+
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the

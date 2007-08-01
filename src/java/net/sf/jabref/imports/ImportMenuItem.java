@@ -1,21 +1,23 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.ImportInspectionDialog;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.*;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableInsertEntry;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 
 // TODO: could separate the "menu item" functionality from the importing functionality
 public class ImportMenuItem extends JMenuItem implements ActionListener {

@@ -1,22 +1,14 @@
 package net.sf.jabref.external;
 
+import java.io.IOException;
+
+import javax.swing.Icon;
+
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Iterator;
-import java.io.IOException;
-
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Apr 4, 2006
- * Time: 10:01:44 PM
- * To change this template use File | Settings | File Templates.
- */
 public class PushToWinEdt implements PushToApplication {
 
     private boolean couldNotCall=false;

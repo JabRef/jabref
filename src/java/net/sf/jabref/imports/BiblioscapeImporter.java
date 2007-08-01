@@ -1,16 +1,13 @@
 package net.sf.jabref.imports;
 
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.util.*;
+
 import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Globals;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -46,13 +43,13 @@ public class BiblioscapeImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 
-        ArrayList bibItems = new ArrayList();
+        ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap hm = new HashMap();
-        HashMap lines = new HashMap();
+        HashMap<String, String> hm = new HashMap<String, String>();
+        HashMap<String, StringBuffer> lines = new HashMap<String, StringBuffer>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null){
             if (line.length() == 0) continue; // ignore empty lines, e.g. at file
@@ -65,11 +62,9 @@ public class BiblioscapeImporter extends ImportFormat {
           String address = null;
           String titleST = null;
           String titleTI = null;
-          Vector comments = new Vector();
+          Vector<String> comments = new Vector<String>();
           // add item
-          Object[] l = lines.entrySet().toArray();
-          for (int i = 0; i < l.length; ++i){
-            Map.Entry entry = (Map.Entry) l[i];
+          for (Map.Entry<String, StringBuffer> entry : lines.entrySet()){
             if (entry.getKey().equals("AU")) hm.put("author", entry.getValue()
                 .toString());
             else if (entry.getKey().equals("TI")) titleTI = entry.getValue()

@@ -26,15 +26,23 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 
 /**

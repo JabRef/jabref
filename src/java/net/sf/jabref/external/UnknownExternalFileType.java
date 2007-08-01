@@ -1,6 +1,5 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.GUIGlobals;
 
 /**
  * This subclass of ExternalFileType is used to mark types that are unknown.

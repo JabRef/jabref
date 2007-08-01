@@ -1,11 +1,14 @@
 package net.sf.jabref.imports;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+
+import net.sf.jabref.BibtexEntry;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -41,7 +44,7 @@ public class MedlineImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 
 	// Obtain a factory object for creating SAX parsers
 	SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -52,7 +55,7 @@ public class MedlineImporter extends ImportFormat {
 	parserFactory.setNamespaceAware(true);
 	
 	// Now create a SAXParser object
-	ArrayList bibItems = null;
+	ArrayList<BibtexEntry> bibItems = null;
 	try{
 	    SAXParser parser = parserFactory.newSAXParser(); //May throw exceptions
 	    MedlineHandler handler = new MedlineHandler();

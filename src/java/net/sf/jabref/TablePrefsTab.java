@@ -7,18 +7,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -37,8 +28,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 
 	private JTextField priField, secField, terField;
 
-	private JabRefFrame frame;
-
 	/**
 	 * Customization of external program paths.
 	 * 
@@ -47,7 +36,6 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 	 */
 	public TablePrefsTab(JabRefPreferences prefs, JabRefFrame frame) {
 		_prefs = prefs;
-		this.frame = frame;
 		setLayout(new BorderLayout());
 
 		/**
@@ -57,7 +45,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
 		 * 
 		 * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
 		 */
-		Vector v = new Vector(Arrays.asList(BibtexFields.getAllFieldNames()));
+		Vector<String> v = new Vector<String>(Arrays.asList(BibtexFields.getAllFieldNames()));
 		v.add(BibtexFields.KEY_FIELD);
 		Collections.sort(v);
 		Object[] allPlusKey = v.toArray();

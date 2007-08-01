@@ -6,10 +6,16 @@
 
 package net.sf.jabref.export;
 
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
-import net.sf.jabref.*;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.Worker;
 import net.sf.jabref.util.ResourceExtractor;
 import spin.Spin;
 

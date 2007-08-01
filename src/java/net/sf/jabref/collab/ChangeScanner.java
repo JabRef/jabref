@@ -1,12 +1,18 @@
 package net.sf.jabref.collab;
 
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.sf.jabref.*;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.imports.*;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.imports.OpenDatabaseAction;
+import net.sf.jabref.imports.ParserResult;
 
 
 public class ChangeScanner extends Thread {

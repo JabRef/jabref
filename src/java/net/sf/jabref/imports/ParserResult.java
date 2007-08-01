@@ -36,7 +36,7 @@ public class ParserResult {
 
     public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     private BibtexDatabase base;
-    private HashMap metaData, entryTypes;
+    private HashMap<String, String> metaData, entryTypes;
     private File file = null;
     private ArrayList<String> warnings = new ArrayList<String>();
     private String encoding = null; // Which encoding was used?
@@ -46,7 +46,7 @@ public class ParserResult {
     private int jabrefMajorVersion = 0, jabrefMinorVersion = 0; // Numeric version representation
     private boolean toOpenTab = false;
 
-    public ParserResult(BibtexDatabase base, HashMap metaData, HashMap entryTypes) {
+    public ParserResult(BibtexDatabase base, HashMap<String, String> metaData, HashMap entryTypes) {
 	this.base = base;
 	this.metaData = metaData;
 	this.entryTypes = entryTypes;
@@ -102,7 +102,7 @@ public class ParserResult {
     	return base;
     }
 
-    public HashMap getMetaData() {
+    public HashMap<String, String> getMetaData() {
 	return metaData;
     }
 

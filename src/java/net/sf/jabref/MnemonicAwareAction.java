@@ -28,7 +28,9 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
 /**
  * This class extends {@link AbstractAction} with the ability to set
  * the mnemonic key based on a '&' character inserted in front of

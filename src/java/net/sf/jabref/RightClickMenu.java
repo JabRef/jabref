@@ -27,15 +27,14 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref;
 
 import java.awt.Font;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.groups.*;
-import net.sf.jabref.undo.NamedCompound;
 
 public class RightClickMenu extends JPopupMenu
     implements PopupMenuListener {
@@ -205,10 +204,9 @@ public class RightClickMenu extends JPopupMenu
      */
     public void populateTypeMenu() {
         typeMenu.removeAll();
-        for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
-             i.hasNext();) {
+        for (String key : BibtexEntryType.ALL_TYPES.keySet()){
             typeMenu.add(new ChangeTypeAction
-                             (BibtexEntryType.getType((String)i.next()), panel));
+                             (BibtexEntryType.getType(key), panel));
         }
     }
 

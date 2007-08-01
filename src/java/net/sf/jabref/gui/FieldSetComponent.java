@@ -6,18 +6,24 @@
 
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Util;
-import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashSet;
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+
+import javax.swing.*;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionListener;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 /**
  *

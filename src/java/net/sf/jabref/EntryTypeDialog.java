@@ -27,12 +27,19 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
 
 import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class EntryTypeDialog extends JDialog implements ActionListener {
 

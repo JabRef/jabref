@@ -22,18 +22,28 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 public class GroupsTree extends JTree implements DragSourceListener,
 		DropTargetListener, DragGestureListener {
@@ -77,7 +87,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 						DnDConstants.ACTION_MOVE, this);
 		// Eliminates right mouse clicks as valid actions
 		dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
-		DropTarget dropTarget = new DropTarget(this, this);
+		new DropTarget(this, this);
 		setCellRenderer(cellRenderer);
 		setFocusable(false);
 		setToggleClickCount(0);

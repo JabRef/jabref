@@ -26,9 +26,9 @@
  */
 package net.sf.jabref;
 
-import net.sf.jabref.export.layout.format.RemoveBrackets;
+import java.util.Map;
 
-import java.util.*;
+import net.sf.jabref.export.layout.format.RemoveBrackets;
 
 public class SimpleSearchRule implements SearchRule {
 
@@ -39,8 +39,8 @@ public class SimpleSearchRule implements SearchRule {
         m_caseSensitiveSearch = caseSensitive;
     }
 
-    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
-        String searchString = (String) searchStrings.values().iterator().next();
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
+        String searchString = searchStrings.values().iterator().next();
 
         if (!m_caseSensitiveSearch)
             searchString = searchString.toLowerCase();

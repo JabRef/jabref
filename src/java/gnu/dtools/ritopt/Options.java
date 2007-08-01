@@ -8,9 +8,11 @@ package gnu.dtools.ritopt;
 
  */
 
-import java.util.*;
 import java.io.*;
-import net.sf.jabref.*;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import net.sf.jabref.Globals;
 
 /**
  * This class functions as a repository for options and their modules. It

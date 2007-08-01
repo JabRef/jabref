@@ -42,15 +42,20 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.sf.jabref.about ;
 
-import javax.swing.* ;
-import java.net.* ;
-import java.io.*;
-import java.awt.*;
-import javax.swing.border.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+
+import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
-import net.sf.jabref.*;
 
 public class ExtendedInfoPanel extends JPanel implements AnimationListener, ActionListener
 {

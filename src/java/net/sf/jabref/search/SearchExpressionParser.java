@@ -3,15 +3,7 @@
 package net.sf.jabref.search;
 import java.io.StringReader;
 
-import antlr.ASTFactory;
-import antlr.ASTPair;
-import antlr.NoViableAltException;
-import antlr.ParserSharedInputState;
-import antlr.RecognitionException;
-import antlr.Token;
-import antlr.TokenBuffer;
-import antlr.TokenStream;
-import antlr.TokenStreamException;
+import antlr.*;
 import antlr.collections.AST;
 import antlr.collections.impl.ASTArray;
 import antlr.collections.impl.BitSet;

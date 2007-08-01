@@ -23,71 +23,52 @@ USA
 Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
-*/
+ */
 package net.sf.jabref.label;
 
-import java.util.Hashtable ; 
+import java.util.HashSet;
 
-public class KeyWord{
+public class KeyWord extends HashSet<String> {
 
-   
-    private KeyWord(){
-        // puts all keywords in 
-        setKeyWords() ; 
-    }
+	private static KeyWord singleton;
 
-    private static void setKeyWords(){
-        keyWordTable.put("society","society") ; 
-        keyWordTable.put("transaction","transaction") ; 
-        keyWordTable.put("transactions","transactions") ; 
-        keyWordTable.put( "journal" , "journal" )  ; 
-        keyWordTable.put( "review" , "review" )  ; 
-        keyWordTable.put( "revue" , "revue" )  ; 
-        keyWordTable.put( "communication" , "communication" )  ; 
-        keyWordTable.put( "communications" , "communications" )  ; 
-        keyWordTable.put( "letters" , "letters" )  ; 
-        keyWordTable.put( "advances" , "advances" )  ; 
-        keyWordTable.put( "proceedings" , "proceedings" )  ; 
-        keyWordTable.put( "proceeding" , "proceeding" )  ; 
-        keyWordTable.put( "international" , "international" )  ; 
-        keyWordTable.put( "joint" , "joint" )  ; 
-        keyWordTable.put( "conference" , "conference" )  ; 
-    }
+	private KeyWord() {
+		// puts all keywords in
+		add("society");
+		add("transaction");
+		add("transactions");
+		add("journal");
+		add("review");
+		add("revue");
+		add("communication");
+		add("communications");
+		add("letters");
+		add("advances");
+		add("proceedings");
+		add("proceeding");
+		add("international");
+		add("joint");
+		add("conference");
+	}
+ 
+	public static KeyWord getKeyWord() {
+		if (singleton == null)
+			singleton = new KeyWord();
+		return singleton;
+	}
 
+	public boolean isKeyWord(String matchWord) {
+		if (contains(matchWord.toLowerCase())) {
+			return true;
+		}
+		return false;
+	}
 
-    // accessors, if users, or anyone would want to change these defaults
-    // later
-    public static void addKeyWord(String newKeyWord){
-		keyWordTable.put(newKeyWord,newKeyWord) ; 
-    }
-
-    public static String removeKeyWord(String newKeyWord){
-		return (String) keyWordTable.remove(newKeyWord) ; 
-
-    }
-
-    
-   public static boolean isKeyWord(String matchWord){
-       if(keyWordTable.size()==0){
-		   setKeyWords() ; 
-       }
-       if(keyWordTable.containsKey(matchWord.toLowerCase())) {
-            return true ; 
-       }
-       return false ; 
-   }
-
-   public static boolean isKeyWordMatchCase(String matchWord){
-       if(keyWordTable.size()==0){
-		   setKeyWords() ; 
-       }
-       if(keyWordTable.containsKey(matchWord)) {
-            return true ; 
-       }
-       return false ; 
-   }
-
-   private static Hashtable keyWordTable = new Hashtable() ; 
+	public boolean isKeyWordMatchCase(String matchWord) {
+		if (contains(matchWord)) {
+			return true;
+		}
+		return false;
+	}
 
 }
-

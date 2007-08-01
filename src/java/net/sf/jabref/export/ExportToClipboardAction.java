@@ -1,15 +1,20 @@
 package net.sf.jabref.export;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.MainTable;
-
-import javax.swing.*;
-import java.util.*;
-import java.io.*;
-import java.awt.datatransfer.ClipboardOwner;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.*;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
+import net.sf.jabref.*;
 
 /**
  * Created by IntelliJ IDEA.

@@ -3,25 +3,21 @@
  */
 package net.sf.jabref;
 
-import java.util.Iterator;
-import java.util.HashMap;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Font;
-import java.awt.Container;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.labelPattern.LabelPattern;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
-import com.jgoodies.forms.layout.FormLayout;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * The Preferences panel for key generation.
@@ -31,7 +27,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
     private String def = Globals.lang("Default");
     private GridBagLayout gbl = new GridBagLayout();
     private GridBagConstraints con = new GridBagConstraints();
-    private HashMap textFields = new HashMap();
+    private HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
 
 	private JabRefPreferences _prefs;
 	private LabelPattern _keypatterns = null;
@@ -94,11 +90,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 	    _keypatterns = new LabelPattern(defKeyPattern);
 	    
 	    // then we rebuild... 
-	    Iterator i=textFields.keySet().iterator();
+	    Iterator<String> i=textFields.keySet().iterator();
 	    //String defa = (String)LabelPatternUtil.DEFAULT_LABELPATTERN.get(0);
 	    while (i.hasNext()) {
-		String s = (String)i.next(),
-		    text = ((JTextField)textFields.get(s)).getText();
+		String s = i.next(),
+		    text = textFields.get(s).getText();
 		if (!"".equals(text.trim())) //(!defa.equals(text))
 		    _keypatterns.addLabelPattern(s, text);
 	    }
@@ -214,12 +210,10 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-	    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
-	    while (i.hasNext()) {
-		String s = (String)i.next();
-		textFields.put(s, addEntryType(pan, s, y));
-		y++;
-	    }
+        for (String s : BibtexEntryType.ALL_TYPES.keySet()) {
+			textFields.put(s, addEntryType(pan, s, y));
+			y++;
+		}
 
 	    con.fill = GridBagConstraints.BOTH;
 	    con.gridx = 0;
@@ -362,11 +356,11 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 
 		    if (evt.getSource() == btnDefaultAll) {
 			// All to default
-			Iterator i=textFields.keySet().iterator();
+			Iterator<String> i=textFields.keySet().iterator();
 			while (i.hasNext()) {
-			    String s = (String)i.next();
+			    String s = i.next();
 			    //_keypatterns.removeLabelPattern(s);
-			    JTextField tf = (JTextField)textFields.get(s);
+			    JTextField tf = textFields.get(s);
                             tf.setText("");
     			    /*tf.setText(_keypatterns.getParent()
 				       .getValue(s).get(0).toString());*/
@@ -376,7 +370,7 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
 		    }
 
 		    //_keypatterns.removeLabelPattern(evt.getActionCommand());
-		    JTextField tf = (JTextField)textFields.get(evt.getActionCommand());
+		    JTextField tf = textFields.get(evt.getActionCommand());
                     tf.setText("");
 		    /*tf.setText(_keypatterns.getParent()
 			       .getValue(evt.getActionCommand()).get(0).toString());*/
@@ -397,9 +391,9 @@ public class TabLabelPattern extends JPanel implements PrefsTab{
         warnBeforeOverwriting.setSelected(Globals.prefs.getBoolean("warnBeforeOverwritingKey"));
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
-	    for (Iterator i=textFields.keySet().iterator(); i.hasNext();) {
-            String name = (String)i.next();
-            JTextField tf = (JTextField)textFields.get(name);
+	    for (Iterator<String> i=textFields.keySet().iterator(); i.hasNext();) {
+            String name = i.next();
+            JTextField tf = textFields.get(name);
     	    setValue(tf, name);
     	}
 

@@ -26,12 +26,17 @@
  */
 package net.sf.jabref;
 
-import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.event.*;
-import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
+
+import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 
 public abstract class SidePaneComponent extends SimpleInternalFrame {
 

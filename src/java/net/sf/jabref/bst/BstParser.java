@@ -2,14 +2,14 @@ package net.sf.jabref.bst;
 
 // $ANTLR 3.0b5 Bst.g 2006-11-23 23:20:24
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.antlr.runtime.*;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.TreeAdaptor;
 
-import org.antlr.runtime.tree.*;
-
+@SuppressWarnings({"unused", "unchecked"})
 public class BstParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "IDLIST", "STACK", "ENTRY", "COMMANDS", "STRINGS", "INTEGERS", "FUNCTION", "MACRO", "STRING", "READ", "EXECUTE", "ITERATE", "REVERSE", "SORT", "IDENTIFIER", "INTEGER", "QUOTED", "LETTER", "NUMERAL", "WS", "LINE_COMMENT", "'{'", "'}'", "'<'", "'>'", "'='", "'+'", "'-'", "':='", "'*'"
@@ -110,7 +110,8 @@ public class BstParser extends Parser {
 
 
             // AST REWRITE
-            int i_0 = 0;
+            
+			int i_0 = 0;
             retval.tree = root_0;
             root_0 = (Object)adaptor.nil();
             // 14:21: -> ^( COMMANDS ( commands )+ )
@@ -165,6 +166,7 @@ public class BstParser extends Parser {
 
     // $ANTLR start commands
     // Bst.g:16:1: commands : ( STRINGS^^ idList | INTEGERS^^ idList | FUNCTION^^ id stack | MACRO^^ id '{'! STRING '}'! | READ^^ | EXECUTE^^ '{'! function '}'! | ITERATE^^ '{'! function '}'! | REVERSE^^ '{'! function '}'! | ENTRY^^ idList0 idList0 idList0 | SORT^^ );
+    @SuppressWarnings("unused")
     public commands_return commands() throws RecognitionException {   
         commands_return retval = new commands_return();
         retval.start = input.LT(1);
@@ -608,7 +610,8 @@ public class BstParser extends Parser {
 
     // $ANTLR start idList
     // Bst.g:34:1: idList : '{' ( identifier )+ '}' -> ^( IDLIST ( identifier )+ ) ;
-    public idList_return idList() throws RecognitionException {   
+    
+	public idList_return idList() throws RecognitionException {   
         idList_return retval = new idList_return();
         retval.start = input.LT(1);
 

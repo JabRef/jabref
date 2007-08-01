@@ -6,22 +6,9 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.HelpAction;
-import net.sf.jabref.SidePaneComponent;
-import net.sf.jabref.SidePaneManager;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.undo.NamedCompound;
 
@@ -97,8 +84,6 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
     public void actionPerformed(ActionEvent e) {
         if (citeSeerFetcher.activateImportFetcher()) {
             (new Thread() {
-
-                BibtexEntry entry;
 
                 class Update implements ImportInspectionDialog.CallBack {
 

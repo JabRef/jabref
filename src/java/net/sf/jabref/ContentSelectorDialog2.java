@@ -1,18 +1,17 @@
 package net.sf.jabref;
 
-import com.jgoodies.forms.builder.ButtonStackBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.*;
+
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import java.awt.event.*;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.TreeSet;
-import java.util.ArrayList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class ContentSelectorDialog2 extends JDialog {
 

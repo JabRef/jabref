@@ -25,23 +25,16 @@
 
  */
 package net.sf.jabref.imports;
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.BibtexEntryType;
 import net.sf.jabref.Util;
-import net.sf.jabref.imports.ImportFormat;
-import net.sf.jabref.imports.ImportFormatReader;
 
 
 /**
@@ -166,7 +159,7 @@ import net.sf.jabref.imports.ImportFormatReader;
  */
 public class RepecNepImporter extends ImportFormat {
 
-  private final static Collection recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL", "By"});
+  private final static Collection<String> recognizedFields = Arrays.asList(new String[]{"Keywords", "JEL", "Date", "URL", "By"});
   
   private int line = 0;
   private String lastLine = "";
@@ -228,7 +221,7 @@ public class RepecNepImporter extends ImportFormat {
     return startOfMessage.indexOf("NEP: New Economics Papers") >= 0 || startOfMessage.indexOf("nep.repec.org") >= 0;
   }
 
-  private boolean startsWithKeyword(Collection keywords) {
+  private boolean startsWithKeyword(Collection<String> keywords) {
     boolean result = this.lastLine.indexOf(':') > 0;
     if (result) {
       String possibleKeyword = this.lastLine.substring(0, this.lastLine.indexOf(':'));
@@ -430,8 +423,8 @@ public class RepecNepImporter extends ImportFormat {
    *  (non-Javadoc)
    * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
    */
-  public List importEntries(InputStream stream) throws IOException {    
-  	ArrayList bibitems = new ArrayList();
+  public List<BibtexEntry> importEntries(InputStream stream) throws IOException {    
+  	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     String paperNoStr = null;
     this.line = 0;
     

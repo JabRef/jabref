@@ -26,14 +26,8 @@
  */
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
@@ -84,13 +78,11 @@ public class SidePane extends JPanel {
 		super.add(sp);
 	}
 
-	public void setComponents(Collection comps) {
+	public void setComponents(Collection<SidePaneComponent> comps) {
 		mainPanel.removeAll();
 
 		constraint.weighty = 0;
-		Iterator i = comps.iterator();
-		while (i.hasNext()){
-			Component c = (Component) i.next();
+		for (Component c : comps){
 			gridBagLayout.setConstraints(c, constraint);
 			mainPanel.add(c);
 		}

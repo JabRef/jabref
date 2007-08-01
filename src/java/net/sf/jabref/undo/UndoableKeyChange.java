@@ -26,9 +26,9 @@ http://www.gnu.org/copyleft/gpl.html
 */
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.Util;
 import net.sf.jabref.Globals;
 
 /**

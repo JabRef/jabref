@@ -1,29 +1,33 @@
 package net.sf.jabref.journals;
 
-import net.sf.jabref.*;
-import net.sf.jabref.net.URLDownload;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.ButtonStackBuilder;
-
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.*;
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Collections;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HelpAction;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.net.URLDownload;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.ButtonStackBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Created by IntelliJ IDEA.

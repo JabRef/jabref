@@ -1,12 +1,14 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+
+import javax.swing.Icon;
+import javax.swing.JMenuItem;
+
+import net.sf.jabref.*;
 
 /**
  * The menu item used in the popup menu for opening external resources associated

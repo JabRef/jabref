@@ -1,14 +1,18 @@
 package net.sf.jabref;
 
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.*;
-import java.util.Iterator;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.builder.*;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class GeneralTab extends JPanel implements PrefsTab {
 

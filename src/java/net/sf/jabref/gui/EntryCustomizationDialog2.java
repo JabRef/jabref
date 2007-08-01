@@ -6,21 +6,18 @@
 
 package net.sf.jabref.gui;
 
-import net.sf.jabref.*;
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.Set;
+
+import javax.swing.*;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

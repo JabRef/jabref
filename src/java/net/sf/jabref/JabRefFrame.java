@@ -532,9 +532,9 @@ public JabRefPreferences prefs() {
     // Ask here if the user really wants to close, if the base
     // has not been saved since last save.
     boolean close = true;
-    Vector filenames = new Vector();
+    Vector<String> filenames = new Vector<String>();
     if (tabbedPane.getTabCount() > 0) {
-      loop: for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+      for (int i = 0; i < tabbedPane.getTabCount(); i++) {
         if (baseAt(i).baseChanged) {
           tabbedPane.setSelectedIndex(i);
           int answer = JOptionPane.showConfirmDialog
@@ -617,9 +617,9 @@ public JabRefPreferences prefs() {
   private void macOSXRegistration() {
     if (Globals.osName.equals(Globals.MAC)) {
       try {
-        Class osxAdapter = Class.forName("osxadapter.OSXAdapter");
+        Class<?> osxAdapter = Class.forName("osxadapter.OSXAdapter");
 
-        Class[] defArgs = {
+        Class<?>[] defArgs = {
             JabRefFrame.class};
         Method registerMethod = osxAdapter.getDeclaredMethod(
             "registerMacOSXApplication", defArgs);
@@ -1316,61 +1316,7 @@ public JabRefPreferences prefs() {
 
   }
 
-  private class JabRefLabel
-      extends JPanel {
-    private String label;
-    public JabRefLabel(String name) {
-      label = name;
-    }
-
-    public void paint(Graphics g) {
-      Graphics2D g2 = (Graphics2D) g;
-      g2.setColor(GUIGlobals.nullFieldColor);
-      g2.setFont(GUIGlobals.jabRefFont);
-      FontMetrics fm = g2.getFontMetrics();
-      int width = fm.stringWidth(label);
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                          RenderingHints.VALUE_ANTIALIAS_ON);
-      g2.drawString(label, getWidth() - width - 7, getHeight() - 10);
-
-
-    }
-  }
-
-  private JMenuItem mItem(AbstractAction a, KeyStroke ks) {
-    // Set up a menu item with action and accelerator key.
-    JMenuItem mi = new JMenuItem();
-    mi.setAction(a);
-    if (ks != null) {
-      mi.setAccelerator(ks);
-    }
-    return mi;
-  }
-
-  //private void setupMainPanel() {
-
-
-  /*public Completer getAutoCompleter(String field) {
-    return (Completer)autoCompleters.get(field);
-    }
-
-
-       public void assignAutoCompleters() {
-    // Set up which fields should have autocompletion. This should
-    // probably be made customizable. Existing Completer objects are
-    // forgotten. The completers must be updated towards the database.
-    byte[] fields = prefs.getByteArray("autoCompFields");
-    autoCompleters = new Hashtable();
-    for (int i=0; i<fields.length; i++) {
-   autoCompleters.put(GUIGlobals.ALL_FIELDS[fields[i]], new Completer());
-    }
-
-       }
-
-       public void updateAutoCompleters() {
-    if (database != null)
-   database.setCompleters(autoCompleters);
-   }*/
+  
 
  public void output(final String s) {
 
@@ -1389,7 +1335,7 @@ public JabRefPreferences prefs() {
   }
 
   protected List<Object> openDatabaseOnlyActions = new LinkedList<Object>();
-  protected List<Action> severalDatabasesOnlyActions = new LinkedList<Action>();
+  protected List<Object> severalDatabasesOnlyActions = new LinkedList<Object>();
   
     protected void initActions() {
         openDatabaseOnlyActions = new LinkedList<Object>();
@@ -1410,7 +1356,7 @@ public JabRefPreferences prefs() {
 
         openDatabaseOnlyActions.addAll(Arrays.asList(newSpecificEntryAction));
 
-        severalDatabasesOnlyActions = new LinkedList<Action>();
+        severalDatabasesOnlyActions = new LinkedList<Object>();
         severalDatabasesOnlyActions.addAll(Arrays
             .asList(new Action[] { nextTab, prevTab, sortTabs }));
 
@@ -1424,10 +1370,13 @@ public JabRefPreferences prefs() {
 
     }
 
-    public static void setEnabled(List l, boolean enabled) {
-        Iterator i = l.iterator();
-        while (i.hasNext()) {
-            Object o = i.next();
+    /**
+     * Takes a list of Object and calls the method setEnabled on them, depending on whether it is an Action or a Component.
+     * @param list List that should contain Actions and Components.
+     * @param enabled 
+     */
+    public static void setEnabled(List<Object> list, boolean enabled) {
+        for (Object o : list){
             if (o instanceof Action)
                 ((Action)o).setEnabled(enabled);
             if (o instanceof Component)
@@ -1475,7 +1424,7 @@ public JabRefPreferences prefs() {
     }
   }
 
-  public BasePanel addTab(BibtexDatabase db, File file, HashMap meta, String encoding, boolean raisePanel) {
+  public BasePanel addTab(BibtexDatabase db, File file, HashMap<String, String> meta, String encoding, boolean raisePanel) {
       BasePanel bp = new BasePanel(ths, db, file, meta, encoding);
       addTab(bp, file, raisePanel);
       return bp;
@@ -1499,7 +1448,7 @@ public JabRefPreferences prefs() {
 
     public void actionPerformed(ActionEvent e) {
       KeyBindingsDialog d = new KeyBindingsDialog
-          ( (HashMap) prefs.getKeyBindings().clone(),
+          ( new HashMap<String, String>(prefs.getKeyBindings()),
            prefs.getDefaultKeys());
       d.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       d.pack(); //setSize(300,500);
@@ -1626,8 +1575,6 @@ class ImportCiteSeerAction
                         (new Thread() {
 
                                 BasePanel currentBp;
-                                BibtexEntry toShow;
-                                //String id;
                                 int[] clickedOn = null;
 
                                 class UpdateComponent implements Runnable {
@@ -1661,7 +1608,6 @@ class ImportCiteSeerAction
                                                 Globals.lang("CiteSeer Import Error"),
                                                 JOptionPane.WARNING_MESSAGE);
                                         }
-                                        toShow = (BibtexEntry)currentBp.mainTable.getSelected().get(0);
                                         if (clickedOn != null) {
                                                 citeSeerFetcher.beginImportCiteSeerProgress();
                                                 NamedCompound citeseerNamedCompound =
@@ -1885,7 +1831,7 @@ class FetchCiteSeerAction
    * @param openInNew Should the entries be imported into a new database?
    * @param callBack The callback for the ImportInspectionDialog to use.
    */
-  public void addImportedEntries(final BasePanel panel, final List entries, String filename, boolean openInNew,
+  public void addImportedEntries(final BasePanel panel, final List<BibtexEntry> entries, String filename, boolean openInNew,
                                  ImportInspectionDialog.CallBack callBack) {
       // Use the import inspection dialog if it is enabled in preferences, and (there are more than
       // one entry or the inspection dialog is also enabled for single entries):
@@ -1922,7 +1868,7 @@ class FetchCiteSeerAction
      * @param intoNew Determines if the entries will be put in a new database or in the current
      * one.
      */
-  public int addBibEntries(java.util.List bibentries, String filename,
+  public int addBibEntries(List<BibtexEntry> bibentries, String filename,
                            boolean intoNew) {
           if (bibentries == null || bibentries.size() == 0) {
 
@@ -1941,10 +1887,7 @@ class FetchCiteSeerAction
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.
       BibtexDatabase database = new BibtexDatabase();
-      Iterator it = bibentries.iterator();
-      while (it.hasNext()) {
-        BibtexEntry entry = (BibtexEntry) it.next();
-
+      for (BibtexEntry entry : bibentries){
         try {
           entry.setId(Util.createNeutralId());
           database.insertEntry(entry);
@@ -1954,7 +1897,7 @@ class FetchCiteSeerAction
           System.err.println("KeyCollisionException [ addBibEntries(...) ]");
         }
       }
-      HashMap meta = new HashMap();
+      HashMap<String, String> meta = new HashMap<String, String>();
       // Metadata are only put in bibtex files, so we will not find it
       // in imported files. Instead we pass an empty HashMap.
       BasePanel bp = new BasePanel(ths, database, null, meta, Globals.prefs.get("defaultEncoding"));
@@ -1980,16 +1923,15 @@ class FetchCiteSeerAction
       BibtexDatabase database = basePanel.database;
       int oldCount = database.getEntryCount();
       NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
-      Iterator it = bibentries.iterator();
 
-      mainLoop: while (it.hasNext()) {
-        BibtexEntry entry = (BibtexEntry) it.next();
+      mainLoop: 
+      for (BibtexEntry entry : bibentries){
         boolean dupli = false;
         // Check for duplicates among the current entries:
         if (checkForDuplicates) {
-            loop: for (Iterator i2=database.getKeySet().iterator();
+            loop: for (Iterator<String> i2=database.getKeySet().iterator();
                        i2.hasNext();) {
-                BibtexEntry existingEntry = database.getEntryById((String)i2.next());
+                BibtexEntry existingEntry = database.getEntryById(i2.next());
                 if (Util.isDuplicate(entry, existingEntry,
                                      Globals.duplicateThreshold)) {
                     DuplicateResolverDialog drd = new DuplicateResolverDialog

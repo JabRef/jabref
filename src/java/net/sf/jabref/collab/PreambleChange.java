@@ -1,16 +1,12 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.BibtexEntry;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+
 import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
+import net.sf.jabref.Globals;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoablePreambleChange;
-import net.sf.jabref.KeyCollisionException;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
-import net.sf.jabref.Globals;
 
 public class PreambleChange extends Change {
 

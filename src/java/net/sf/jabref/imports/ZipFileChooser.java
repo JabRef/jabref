@@ -26,23 +26,27 @@
  */
 package net.sf.jabref.imports;
 
-import javax.swing.JDialog;
-import java.awt.*;
-import net.sf.jabref.*;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
+
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.Util;
 
 
 /**
@@ -144,7 +148,6 @@ class ZipFileChooser extends JDialog {
     }
   }
 
-  private CustomImportList.Importer selectedImporter = null;
   private JButton okButton = new JButton(Globals.lang("Ok"));
   private JButton cancelButton = new JButton(Globals.lang("Cancel"));
 
@@ -172,15 +175,15 @@ class ZipFileChooser extends JDialog {
    * @return  entries that can be selected
    */
   private ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
-    List entries = new ArrayList();
-    Enumeration e = zipFile.entries();
+    List<ZipEntry> entries = new ArrayList<ZipEntry>();
+    Enumeration<? extends ZipEntry> e = zipFile.entries();
     while (e.hasMoreElements()) {
       ZipEntry entry = (ZipEntry)e.nextElement();
       if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
         entries.add(entry); 
       }
     }
-    return (ZipEntry[])entries.toArray(new ZipEntry[]{});
+    return entries.toArray(new ZipEntry[]{});
   }
   
   /**

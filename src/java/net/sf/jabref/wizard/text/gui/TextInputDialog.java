@@ -50,19 +50,27 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
-import java.io.* ;
-import java.net.* ;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URL;
 
-import java.awt.* ;
-import java.awt.event.* ;
-import javax.swing.* ;
-import javax.swing.border.* ;
-import javax.swing.event.* ;
-import javax.swing.text.* ;
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.*;
 
-import net.sf.jabref.* ;
-import net.sf.jabref.wizard.integrity.gui.* ;
-import net.sf.jabref.wizard.text.* ;
+import net.sf.jabref.*;
+import net.sf.jabref.wizard.integrity.gui.IntegrityMessagePanel;
+import net.sf.jabref.wizard.text.TagToMarkedTextStore;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class TextInputDialog

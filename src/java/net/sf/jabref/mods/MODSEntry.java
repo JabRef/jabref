@@ -1,15 +1,23 @@
 package net.sf.jabref.mods;
-import net.sf.jabref.*;
-import net.sf.jabref.export.layout.format.*;
-import net.sf.jabref.export.layout.*;
-
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
+import java.io.StringWriter;
 import java.util.*;
-import java.io.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.XMLChars;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * @author Michael Wrighton
  *

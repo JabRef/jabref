@@ -1,15 +1,18 @@
 package net.sf.jabref.imports;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefFrame;
 import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.BibtexEntry;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.util.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,30 +24,23 @@ import java.io.File;
 public class ImportFormats {
 
     public static JFileChooser createImportFileChooser(String currentDir) {
-        SortedSet builtImporters = Globals.importFormatReader.getBuiltInInputFormats();
-        SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
-        SortedSet importers = new TreeSet();
-        for (Iterator i = builtImporters.iterator(); i.hasNext();) {
-            importers.add(i.next());
-        }
-        for (Iterator i = customImporters.iterator(); i.hasNext();) {
-            importers.add(i.next());
-        }
+
+        SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
+        
         String lastUsedFormat = Globals.prefs.get("lastUsedImport");
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet filters = new TreeSet();
-        for (Iterator i = importers.iterator(); i.hasNext();) {
-            ImportFormat format = (ImportFormat)i.next();
+        TreeSet<ImportFileFilter> filters = new TreeSet<ImportFileFilter>();
+        for (ImportFormat format : importers){
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
             if (format.getFormatName().equals(lastUsedFormat))
                 defaultFilter = filter;
         }
-        for (Iterator i=filters.iterator(); i.hasNext();) {
-            fc.addChoosableFileFilter((ImportFileFilter)i.next());
+        for (ImportFileFilter filter : filters){
+            fc.addChoosableFileFilter(filter);
         }
-        //fc.setAcceptAllFileFilterUsed(false);
+
         if (defaultFilter != null)
             fc.setFileFilter(defaultFilter);
         else
@@ -82,13 +78,11 @@ public class ImportFormats {
                 if (file == null)
                     return;
                 FileFilter ff = fc.getFileFilter();
-                ImportFileFilter iff = null;
                 ImportFormat format = null;
                 if (ff instanceof ImportFileFilter)
                     format = ((ImportFileFilter)ff).getImportFormat();
 
                 try {
-                    String path = file.getPath();
                     if (!file.exists()) {
                         // Warn that the file doesn't exists:
                         JOptionPane.showMessageDialog(frame,

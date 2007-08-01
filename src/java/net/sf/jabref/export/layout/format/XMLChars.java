@@ -22,11 +22,11 @@
 
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
-import java.util.regex.*;
 import java.util.Iterator;
-import net.sf.jabref.Util;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.Globals;
+import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Changes {\^o} or {\^{o}} to ?

@@ -1,7 +1,10 @@
 package net.sf.jabref.export;
 
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 
 public class RtfSelection implements Transferable {

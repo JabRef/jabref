@@ -5,15 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -27,7 +19,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private boolean tableChanged = false;
     private JTable colSetup;
     private int rowCount = -1, ncWidth = -1;
-    private Vector tableRows = new Vector(10);
+    private Vector<TableRow> tableRows = new Vector<TableRow>(10);
     private JabRefFrame frame;
 
     class TableRow {
@@ -83,9 +75,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 public String getColumnName(int col) {
                     return (col == 0 ? Globals.lang("Field name") : Globals.lang("Column width"));
                 }
-                public Class getColumnClass(int column) {
-                    if (column == 0) return String.class;
-                    else return Integer.class;
+                public Class<?> getColumnClass(int column) {
+                    if (column == 0) 
+                    	return String.class;
+                    else 
+                    	return Integer.class;
                 }
                 public boolean isCellEditable(int row, int col) {
                     return !((row == 0) && (col == 0));
@@ -101,7 +95,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                           return;
                         }
 
-                    TableRow rowContent = (TableRow)tableRows.elementAt(row-1);
+                    TableRow rowContent = tableRows.elementAt(row-1);
 
                     if (col == 0) {
                         rowContent.name = value.toString();
@@ -296,7 +290,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i=0;
             while (i < tableRows.size()) {
-                if (((TableRow)tableRows.elementAt(i)).name.equals(""))
+                if (tableRows.elementAt(i).name.equals(""))
                     tableRows.removeElementAt(i);
                 else i++;
             }
@@ -307,7 +301,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             _prefs.putInt("numberColWidth", ncWidth);
             for (i=0; i<tableRows.size(); i++) {
-                TableRow tr = (TableRow)tableRows.elementAt(i);
+                TableRow tr = tableRows.elementAt(i);
                 names[i] = tr.name;
                 nWidths[i] = tr.length;
                 widths[i] = ""+tr.length;

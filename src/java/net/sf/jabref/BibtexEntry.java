@@ -30,14 +30,18 @@ Modified for use in JabRef.
 
 package net.sf.jabref;
 
-import net.sf.jabref.export.FieldFormatter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeSet;
 
-import java.util.*;
-import java.io.*;
+import net.sf.jabref.export.FieldFormatter;
 
 
 public class BibtexEntry

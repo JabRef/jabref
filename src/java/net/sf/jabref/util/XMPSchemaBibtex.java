@@ -1,22 +1,11 @@
 package net.sf.jabref.util;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 import org.jempbox.xmp.XMPMetadata;
 import org.jempbox.xmp.XMPSchema;

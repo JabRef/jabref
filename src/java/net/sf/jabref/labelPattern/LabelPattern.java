@@ -13,7 +13,7 @@ import java.util.Hashtable;
  * A parent LabelPattern can be set. 
  * @author Ulrik Stervbo (ulriks AT ruc.dk)
  */
-public class LabelPattern extends Hashtable{
+public class LabelPattern extends Hashtable<String, ArrayList<String>>{
 	/**
 	 * The parent of this LabelPattern.
 	 */
@@ -41,7 +41,6 @@ public class LabelPattern extends Hashtable{
 	}
 	
 	public void addLabelPattern(String type, String pattern){
-	    //put(type, pattern);
 	    put(type, LabelPatternUtil.split(pattern));
 	}
 	
@@ -74,20 +73,20 @@ public class LabelPattern extends Hashtable{
 	 * @return the object for the given key
 	 * @throws NullPointerException
 	 */
-	public final ArrayList getValue(String key){
-		Object _obj = get(key); // throws the NullPointerException
+	public final ArrayList<String> getValue(String key){
+		ArrayList<String> result = get(key); // throws the NullPointerException
 		// Test to see if we found anything
-		if(_obj == null){
+		if(result == null){
 			if(parent != null){
-				_obj = parent.getValue(key);
+				result = parent.getValue(key);
 			}
-			if(_obj == null){
+			if(result == null){
 			    // Not found - return the default value
 			    return LabelPatternUtil.DEFAULT_LABELPATTERN;
 			}
 		}
 
-		return (ArrayList)_obj;
+		return result;
 	}
 
         /**

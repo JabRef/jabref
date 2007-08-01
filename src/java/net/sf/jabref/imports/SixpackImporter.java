@@ -45,10 +45,10 @@ public class SixpackImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 
 	final String SEPARATOR = new String(new char[] { 0, 48 });
-	HashMap fI = new HashMap();
+	HashMap<String, String> fI = new HashMap<String, String>();
 	fI.put("id", "bibtexkey");
 	fI.put("au", "author");
 	fI.put("ti", "title");
@@ -77,7 +77,7 @@ public class SixpackImporter extends ImportFormat {
 	fI.put("cr", "crossref");
     fI.put("fi", "file");
 
-	ArrayList bibitems = new ArrayList();
+	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
 	BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 	in.readLine();
     String ln = in.readLine();
@@ -107,7 +107,7 @@ public class SixpackImporter extends ImportFormat {
 		entry = new BibtexEntry(Util.createNeutralId(), typ);
 		String fld;
 		for (int i = 0; i < Math.min(fieldDef.length, fields.length); i++){
-		    fld = (String) fI.get(fieldDef[i]);
+		    fld = fI.get(fieldDef[i]);
 		    if (fld != null){
 			if (fld.equals("author") || fld.equals("editor")) ImportFormatReader.setIfNecessary(entry,
 												      fld, fields[i].replaceAll(" and ", ", ").replaceAll(", ",

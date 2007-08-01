@@ -1,17 +1,19 @@
 package net.sf.jabref.gui;
 
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileMenuItem;
-
-import javax.swing.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.List;
+
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
+import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the

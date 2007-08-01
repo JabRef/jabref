@@ -1,14 +1,15 @@
 package net.sf.jabref;
 
+import java.awt.BorderLayout;
+
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.awt.*;
-import java.awt.event.*;
-import com.jgoodies.forms.layout.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.builder.*;
+import javax.swing.event.ChangeListener;
+
 import net.sf.jabref.remote.RemoteListener;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class AdvancedTab extends JPanel implements PrefsTab {
 

@@ -1,9 +1,9 @@
 package net.sf.jabref.external;
 
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
-
-import javax.swing.*;
 
 /**
  * Action for upgrading old-style (pre 2.3) PS/PDF links to the new "file" field.

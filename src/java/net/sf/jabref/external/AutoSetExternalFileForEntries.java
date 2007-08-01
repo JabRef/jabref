@@ -1,20 +1,21 @@
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Collection;
+
+import javax.swing.*;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.AttachFileDialog;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
-import javax.swing.*;
-import java.io.File;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the

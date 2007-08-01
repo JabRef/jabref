@@ -37,9 +37,12 @@
 
 package net.sf.jabref.wizard.text.gui ;
 
-import java.awt.* ;
-import java.awt.event.* ;
-import javax.swing.* ;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+
+import javax.swing.*;
 
 public class OverlayPanel extends JPanel
 {

@@ -1,29 +1,26 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.*;
-import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.search.HitOrMissComparator;
-import net.sf.jabref.groups.EntryTableTransferHandler;
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Comparator;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableColumnModel;
 
-import ca.odell.glazedlists.SortedList;
+import net.sf.jabref.*;
+import net.sf.jabref.groups.EntryTableTransferHandler;
+import net.sf.jabref.search.HitOrMissComparator;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
-import ca.odell.glazedlists.matchers.Matcher;
+import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.EventSelectionModel;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
 import ca.odell.glazedlists.swing.EventTableModel;
-
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Comparator;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 /**
  * The central table which displays the bibtex entries.

@@ -1,11 +1,13 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.*;
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.util.Iterator;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
+import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;

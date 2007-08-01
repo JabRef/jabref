@@ -75,11 +75,11 @@ public class CsaImporter extends ImportFormat {
     }
 
     // append to the "note" field
-    private void addNote(HashMap hm, String note) {
+    private void addNote(HashMap<String, String> hm, String note) {
 
         StringBuffer notebuf = new StringBuffer();
         if (hm.get("note") != null) {
-            notebuf.append((String)hm.get("note"));
+            notebuf.append(hm.get("note"));
             notebuf.append("\n");
         }
         notebuf.append(note);
@@ -87,7 +87,7 @@ public class CsaImporter extends ImportFormat {
     }
 
     // parse the date from the Source field
-    private String parseDate(HashMap hm, String fstr) {
+    private String parseDate(HashMap<String, String> hm, String fstr) {
 
         // find LAST matching date in string
         int match = -1;
@@ -154,7 +154,7 @@ public class CsaImporter extends ImportFormat {
 
         // check if journal year matches PY field
         if (hm.get("year") != null) {
-            String oyear = (String)hm.get("year");
+            String oyear = hm.get("year");
             if (!year.equals(oyear)) {
                 note.setLength(0);
                 note.append("Source Year: ");
@@ -195,10 +195,10 @@ public class CsaImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-        ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuffer sb = new StringBuffer();
-        HashMap hm = new HashMap();
+        HashMap<String, String> hm = new HashMap<String, String>();
 
         BufferedReader in =
             new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -206,7 +206,6 @@ public class CsaImporter extends ImportFormat {
         String Type = null;
         String str;
         boolean first = true;
-        int rline = 1;
         line = 1;
         str = readLine(in);
         while (true) {
@@ -221,7 +220,7 @@ public class CsaImporter extends ImportFormat {
                     // post-process Journal article
                     if (Type.equals("article") &&
                         hm.get("booktitle") != null) {
-                        String booktitle = (String)hm.get("booktitle");
+                        String booktitle = hm.get("booktitle");
                         hm.remove("booktitle");
                         hm.put("journal", booktitle);
                     }
@@ -240,7 +239,6 @@ public class CsaImporter extends ImportFormat {
                 if (str == null)
                     break;	// end of file
                 str = readLine(in);
-                rline = line;
                 continue;
             }
 
@@ -281,7 +279,6 @@ public class CsaImporter extends ImportFormat {
                                               ": DN out of order");
                     }
                     first = false;
-                    rline = fline; // save start of record
                 } else if (first == true) {
                     throw new IOException("format error at line " + fline +
                                               ": missing DN");
@@ -343,7 +340,7 @@ public class CsaImporter extends ImportFormat {
                 else if (fabbr.equals("PY")) {
                     ftype = "year";
                     if (hm.get("year") != null) {
-                        String oyear = (String)hm.get("year");
+                        String oyear = hm.get("year");
                         if (!fstr.equals(oyear)) {
                             StringBuffer note = new StringBuffer();
                             note.append("Source Year: ");

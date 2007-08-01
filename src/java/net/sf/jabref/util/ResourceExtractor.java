@@ -7,9 +7,13 @@
 package net.sf.jabref.util;
 
 import java.awt.Component;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.io.*;
-import net.sf.jabref.*;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.Worker;
 import net.sf.jabref.net.URLDownload;
 /**
  * This class performs the somewhat weird action of extracting a file from within the running JabRef jar,

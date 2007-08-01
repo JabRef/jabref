@@ -27,9 +27,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.export;
 
-import java.util.* ;
+import java.util.Vector;
 
-import net.sf.jabref.* ;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 public class LatexFieldFormatter implements FieldFormatter {
 

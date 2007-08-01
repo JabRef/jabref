@@ -1,8 +1,11 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
-import javax.swing.*;
-import java.beans.*;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.Globals;
 
 public class AuthorDialog extends JDialog {
 

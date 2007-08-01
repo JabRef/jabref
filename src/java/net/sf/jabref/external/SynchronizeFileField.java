@@ -1,23 +1,27 @@
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.*;
+
 import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.FileListEditor;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 
-import javax.swing.*;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
-import java.io.File;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.*;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -35,18 +39,18 @@ public class SynchronizeFileField extends AbstractWorker {
             {Globals.lang("Ignore"), Globals.lang("Assign new file"), Globals.lang("Clear field"),
                     Globals.lang("Quit synchronization")};
 
-    private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
+    private boolean goOn = true, autoSet = true, checkExisting = true;
 
-    private int skipped = 0, brokenLinks = 0, entriesChangedCount = 0;
+    private int brokenLinks = 0, entriesChangedCount = 0;
 
     public SynchronizeFileField(BasePanel panel) {
         this.panel = panel;
     }
 
     public void init() {
-        Collection col = panel.database().getEntries();
+        Collection<BibtexEntry> col = panel.database().getEntries();
         sel = new BibtexEntry[col.size()];
-        sel = (BibtexEntry[]) col.toArray(sel);
+        sel = col.toArray(sel);
 
         // Ask about rules for the operation:
         if (optDiag == null)
@@ -58,7 +62,6 @@ public class SynchronizeFileField extends AbstractWorker {
             return;
         }
         autoSet = !optDiag.autoSetNone.isSelected();
-        overWriteAllowed = optDiag.autoSetAll.isSelected();
         checkExisting = optDiag.checkLinks.isSelected();
 
         panel.output(Globals.lang("Synchronizing %0 links...", fieldName.toUpperCase()));
@@ -76,7 +79,6 @@ public class SynchronizeFileField extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        skipped = 0;
         brokenLinks = 0;
         final NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
 

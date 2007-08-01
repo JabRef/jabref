@@ -25,20 +25,24 @@
  */
 package net.sf.jabref;
 
-import java.io.*;
+import java.awt.FileDialog;
+import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.List;
 import java.util.logging.*;
-import java.util.logging.Filter;
 
-import java.awt.*;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
-import net.sf.jabref.collab.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.util.*;
+import net.sf.jabref.collab.FileUpdateMonitor;
+import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.util.ErrorConsole;
+import net.sf.jabref.util.TBuildInfo;
 
 public class Globals {
 

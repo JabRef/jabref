@@ -1,12 +1,16 @@
 package net.sf.jabref.imports;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.io.InputStream;
 import java.io.IOException;
-import net.sf.jabref.msbib.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.msbib.MSBibDatabase;
+
+import org.w3c.dom.Document;
 
 
 /**
@@ -59,11 +63,11 @@ public class MsBibImporter extends ImportFormat {
 		return "msbib";
 	}
 
-    public List importEntries(InputStream in) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream in) throws IOException {
 
         MSBibDatabase dbase = new MSBibDatabase();
 
-        List entries = dbase.importEntries(in);
+        List<BibtexEntry> entries = dbase.importEntries(in);
 
         return entries;
     }

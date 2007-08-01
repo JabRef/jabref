@@ -6,14 +6,22 @@
  */
 package net.sf.jabref.export;
 
-import net.sf.jabref.export.layout.format.*;
-import net.sf.jabref.*;
 import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.EventList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.jabref.*;
+import net.sf.jabref.export.layout.format.GetOpenOfficeType;
+import net.sf.jabref.export.layout.format.RemoveBrackets;
+import net.sf.jabref.export.layout.format.RemoveWhitespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
+
 import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.SortedList;
 
 /**
  * @author Morten O. Alver.

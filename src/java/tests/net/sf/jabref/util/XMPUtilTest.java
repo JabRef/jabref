@@ -1,35 +1,12 @@
 package tests.net.sf.jabref.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 
 import javax.xml.transform.TransformerException;
 
 import junit.framework.TestCase;
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.util.EncryptionNotSupportedException;

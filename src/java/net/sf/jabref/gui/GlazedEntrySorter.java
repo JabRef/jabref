@@ -1,14 +1,13 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.*;
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.event.ListEventAssembler;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-
 import java.util.*;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.DatabaseChangeEvent;
+import net.sf.jabref.DatabaseChangeListener;
+import net.sf.jabref.IdComparator;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
 
 /**
  * Created by IntelliJ IDEA.

@@ -26,23 +26,17 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.export;
 
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.nio.charset.UnsupportedCharsetException;
+import java.util.regex.Pattern;
 
-import net.sf.jabref.export.layout.Layout;
-import net.sf.jabref.export.layout.LayoutHelper;
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.format.*;
 import net.sf.jabref.*;
-import net.sf.jabref.mods.*;
+import net.sf.jabref.export.layout.LayoutFormatter;
+import net.sf.jabref.export.layout.format.AuthorLastFirst;
+import net.sf.jabref.export.layout.format.RemoveLatexCommands;
+import net.sf.jabref.export.layout.format.ResolvePDF;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.SortedList;
 

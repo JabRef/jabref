@@ -60,8 +60,8 @@ public class RisImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-    ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     StringBuffer sb = new StringBuffer();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     String str;
@@ -75,7 +75,7 @@ public class RisImporter extends ImportFormat {
     for (int i = 0; i < entries.length - 1; i++){
             String type = "", author = "", editor = "", startPage = "", endPage = "",
                 comment = "";
-            HashMap hm = new HashMap();
+            HashMap<String, String> hm = new HashMap<String, String>();
 
         String[] fields = entries[i].split("\n");
 
@@ -162,7 +162,7 @@ public class RisImporter extends ImportFormat {
             else if (lab.equals("KW")){
             if (!hm.containsKey("keywords")) hm.put("keywords", val);
             else{
-                String kw = (String) hm.get("keywords");
+                String kw = hm.get("keywords");
                 hm.put("keywords", kw + ", " + val);
             }
             }
@@ -194,14 +194,14 @@ public class RisImporter extends ImportFormat {
                         .getEntryType(type)); // id assumes an existing database so don't
 
         // Remove empty fields:
-        ArrayList toRemove = new ArrayList();
-        for (Iterator it = hm.keySet().iterator(); it.hasNext();) {
+        ArrayList<Object> toRemove = new ArrayList<Object>();
+        for (Iterator<String> it = hm.keySet().iterator(); it.hasNext();) {
             Object key = it.next();
-            String content = (String)hm.get(key);
+            String content = hm.get(key);
             if ((content == null) || (content.trim().length() == 0))
                 toRemove.add(key);
         }
-        for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
+        for (Iterator<Object> iterator = toRemove.iterator(); iterator.hasNext();) {
             hm.remove(iterator.next());
 
         }

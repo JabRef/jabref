@@ -1,10 +1,16 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
-import javax.swing.*;
-import java.io.*;
-import java.awt.event.*;
+import javax.swing.Icon;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 
 public class PushToLyx implements PushToApplication {
 

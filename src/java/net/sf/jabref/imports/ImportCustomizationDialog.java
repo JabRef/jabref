@@ -26,21 +26,22 @@
  */
 package net.sf.jabref.imports;
 
-import javax.swing.JDialog;
-import java.awt.*;
-import net.sf.jabref.*;
-import javax.swing.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.*;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.Sizes;
 
 /**
  * Dialog to manage custom importers.

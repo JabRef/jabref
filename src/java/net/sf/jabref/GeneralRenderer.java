@@ -1,8 +1,13 @@
 package net.sf.jabref;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

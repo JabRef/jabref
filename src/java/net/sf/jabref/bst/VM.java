@@ -3,15 +3,7 @@ package net.sf.jabref.bst;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,11 +11,7 @@ import net.sf.jabref.AuthorList;
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
@@ -76,7 +64,7 @@ public class VM implements Warn {
 
 	public static final Integer TRUE = new Integer(1);
 
-	private HashMap buildInFunctions;
+	private HashMap<String,BstFunction> buildInFunctions;
 
 	public File file;
 
@@ -104,7 +92,7 @@ public class VM implements Warn {
 	public VM(CommonTree tree) {
 		this.tree = tree;
 
-		this.buildInFunctions = new HashMap(37);
+		this.buildInFunctions = new HashMap<String, BstFunction>(37);
 
 		buildInFunctions.put(">", new BstFunction() {
 			/**
@@ -906,16 +894,15 @@ public class VM implements Warn {
 		return run(db.getEntries());
 	}
 
-	public String run(Collection bibtex) {
+	public String run(Collection<BibtexEntry> bibtex) {
 
 		reset();
 
 		{ // Create entries
-			entries = new Vector(bibtex.size());
-			ListIterator i = entries.listIterator();
-			Iterator j = bibtex.iterator();
-			while (j.hasNext()) {
-				i.add(new BstEntry((BibtexEntry) j.next()));
+			entries = new Vector<BstEntry>(bibtex.size());
+			ListIterator<BstEntry> i = entries.listIterator();
+			for (BibtexEntry entry : bibtex){
+				i.add(new BstEntry(entry));
 			}
 		}
 
@@ -966,16 +953,16 @@ public class VM implements Warn {
 
 		entries = null;
 
-		strings = new HashMap();
+		strings = new HashMap<String, String>();
 
-		integers = new HashMap();
+		integers = new HashMap<String, Integer>();
 		integers.put("entry.max$", new Integer(Integer.MAX_VALUE));
 		integers.put("global.max$", new Integer(Integer.MAX_VALUE));
 
-		functions = new HashMap();
+		functions = new HashMap<String, BstFunction>();
 		functions.putAll(buildInFunctions);
 
-		stack = new Stack();
+		stack = new Stack<Object>();
 	}
 
 	/**
@@ -990,15 +977,12 @@ public class VM implements Warn {
 	 */
 	private void read() {
 
-		Iterator i = entries.iterator();
+		Iterator<BstEntry> i = entries.iterator();
 		while (i.hasNext()) {
-			BstEntry e = (BstEntry) i.next();
+			BstEntry e = i.next();
 
-			Iterator j = e.fields.entrySet().iterator();
-			while (j.hasNext()) {
-				Map.Entry mEntry = (Map.Entry) j.next();
-
-				Object fieldValue = e.entry.getField((String) mEntry.getKey());
+			for (Map.Entry<String, String> mEntry : e.fields.entrySet()){
+				Object fieldValue = e.entry.getField(mEntry.getKey());
 
 				mEntry.setValue((fieldValue == null ? null : fieldValue.toString()));
 			}
@@ -1006,7 +990,7 @@ public class VM implements Warn {
 
 		i = entries.iterator();
 		while (i.hasNext()) {
-			BstEntry e = (BstEntry) i.next();
+			BstEntry e = i.next();
 			if (!e.fields.containsKey("crossref")) {
 				e.fields.put("crossref", null);
 			}
@@ -1062,9 +1046,7 @@ public class VM implements Warn {
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
 
-				Iterator j = entries.iterator();
-				while (j.hasNext()) {
-					BstEntry entry = (BstEntry) j.next();
+				for (BstEntry entry : entries){
 					entry.fields.put(name, null);
 				}
 			}
@@ -1075,9 +1057,8 @@ public class VM implements Warn {
 
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
-				Iterator j = entries.iterator();
-				while (j.hasNext()) {
-					BstEntry entry = (BstEntry) j.next();
+				
+				for (BstEntry entry : entries){
 					entry.integers.put(name, new Integer(0));
 				}
 			}
@@ -1088,15 +1069,11 @@ public class VM implements Warn {
 
 			for (int i = 0; i < t.getChildCount(); i++) {
 				String name = t.getChild(i).getText();
-				Iterator j = entries.iterator();
-				while (j.hasNext()) {
-					BstEntry entry = (BstEntry) j.next();
+				for (BstEntry entry : entries){
 					entry.strings.put(name, null);
 				}
 			}
-			Iterator j = entries.iterator();
-			while (j.hasNext()) {
-				BstEntry entry = (BstEntry) j.next();
+			for (BstEntry entry : entries){
 				entry.strings.put("sort.key$", null);
 			}
 		}
@@ -1104,20 +1081,20 @@ public class VM implements Warn {
 
 	private void reverse(Tree child) {
 
-		BstFunction f = (BstFunction) functions.get(child.getChild(0).getText());
+		BstFunction f = functions.get(child.getChild(0).getText());
 
-		ListIterator i = entries.listIterator(entries.size());
+		ListIterator<BstEntry> i = entries.listIterator(entries.size());
 		while (i.hasPrevious()) {
-			f.execute((BstEntry) i.previous());
+			f.execute(i.previous());
 		}
 	}
 
 	private void iterate(Tree child) {
-		BstFunction f = (BstFunction) functions.get(child.getChild(0).getText());
+		BstFunction f = functions.get(child.getChild(0).getText());
 
-		Iterator i = entries.iterator();
+		Iterator<BstEntry> i = entries.iterator();
 		while (i.hasNext()) {
-			f.execute((BstEntry) i.next());
+			f.execute(i.next());
 		}
 	}
 
@@ -1128,10 +1105,8 @@ public class VM implements Warn {
 	 * @param child
 	 */
 	private void sort(Tree child) {
-		Collections.sort(entries, new Comparator() {
-			public int compare(Object x1, Object x2) {
-				BstEntry o1 = (BstEntry) x1;
-				BstEntry o2 = (BstEntry) x2;
+		Collections.sort(entries, new Comparator<BstEntry>() {
+			public int compare(BstEntry o1, BstEntry o2) {
 				return ((String) o1.strings.get("sort.key$")).compareTo((String) o2.strings
 					.get("sort.key$"));
 			}
@@ -1234,7 +1209,7 @@ public class VM implements Warn {
 		}
 
 		if (functions.containsKey(name)) {
-			((BstFunction) functions.get(name)).execute(context);
+			functions.get(name).execute(context);
 			return;
 		}
 
@@ -1292,19 +1267,13 @@ public class VM implements Warn {
 
 		BibtexEntry entry;
 
-		// Map<String, String> strings = new HashMap<String, String>();
+		Map<String, String> strings = new HashMap<String, String>();
 
-		// Map<String, String> fields = new HashMap<String, String>();
+		Map<String, String> fields = new HashMap<String, String>();
 
-		// Map<String, Integer> integers = new HashMap<String, Integer>();
+		Map<String, Integer> integers = new HashMap<String, Integer>();
 
-		Map strings = new HashMap();
-
-		Map fields = new HashMap();
-
-		Map integers = new HashMap();
-
-		public Map getFields() {
+		public Map<String, String> getFields() {
 			return fields;
 		}
 
@@ -1313,21 +1282,16 @@ public class VM implements Warn {
 		}
 	}
 
-	// Vector<BstEntry> entries;
-	Vector entries;
-
-	// Map<String, String> strings = new HashMap<String, String>();
-	Map strings = new HashMap();
-
-	// Map<String, Integer> integers = new HashMap<String, Integer>();
-	Map integers = new HashMap();
-
-	// Map<String, BstFunction> functions = new HashMap<String, BstFunction>();
-	Map functions = new HashMap();
-
-	// Stack<Object> stack = new Stack<Object>();
-	Stack stack = new Stack();
-
+	Vector<BstEntry> entries;
+	
+	Map<String, String> strings = new HashMap<String, String>();
+	
+	Map<String, Integer> integers = new HashMap<String, Integer>();
+	
+	Map<String, BstFunction> functions = new HashMap<String, BstFunction>();
+	
+	Stack<Object> stack = new Stack<Object>();
+	
 	public void push(Integer integer) {
 		stack.push(integer);
 	}
@@ -1340,33 +1304,16 @@ public class VM implements Warn {
 		stack.push(identifier);
 	}
 
-	/*
-	 * public Map<String, String> getStrings() { return strings; }
-	 * 
-	 * public Map<String, Integer> getIntegers() { return integers; }
-	 * 
-	 * public Vector<BstEntry> getEntries() { return entries; }
-	 * 
-	 * public Map<String, BstFunction> getFunctions() { return functions; }
-	 */
+	
+	  public Map<String, String> getStrings() { return strings; }
+	  
+	  public Map<String, Integer> getIntegers() { return integers; }
+	  
+	  public Vector<BstEntry> getEntries() { return entries; }
+	  
+	 public Map<String, BstFunction> getFunctions() { return functions; }
 
-	public Map getStrings() {
-		return strings;
-	}
-
-	public Map getIntegers() {
-		return integers;
-	}
-
-	public Vector getEntries() {
-		return entries;
-	}
-
-	public Map getFunctions() {
-		return functions;
-	}
-
-	public Stack getStack() {
+	public Stack<Object> getStack() {
 		return stack;
 	}
 

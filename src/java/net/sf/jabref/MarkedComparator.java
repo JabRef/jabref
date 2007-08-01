@@ -9,17 +9,14 @@ import java.util.Comparator;
  * Time: 11:35:02 PM
  * To change this template use File | Settings | File Templates.
  */
-public class MarkedComparator implements Comparator {
+public class MarkedComparator implements Comparator<BibtexEntry> {
 
-    Comparator next;
+    Comparator<BibtexEntry> next;
 
-    public MarkedComparator(Comparator next) {
+    public MarkedComparator(Comparator<BibtexEntry> next) {
         this.next = next;
     }
-    public int compare(Object o1, Object o2) {
-
-        BibtexEntry e1 = (BibtexEntry)o1,
-            e2 = (BibtexEntry)o2;
+    public int compare(BibtexEntry e1, BibtexEntry e2) {
 
         if (e1 == e2)
             return 0;
@@ -28,7 +25,7 @@ public class MarkedComparator implements Comparator {
                 mrk2 = Util.isMarked(e2);
 
         if (mrk1 == mrk2)
-            return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+            return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
 
         else if (mrk2)
             return 1;

@@ -63,8 +63,8 @@ public class OvidImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-    ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     StringBuffer sb = new StringBuffer();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     String line;
@@ -79,7 +79,7 @@ public class OvidImporter extends ImportFormat {
     String items[] = sb.toString().split("<[0-9]+>");
 
     for (int i = 1; i < items.length; i++){
-        HashMap h = new HashMap();
+        HashMap<String, String> h = new HashMap<String, String>();
         String[] fields = items[i].split("__NEWFIELD__");
         for (int j = 0; j < fields.length; j++){
             int linebreak = fields[j].indexOf('\n');
@@ -175,7 +175,7 @@ public class OvidImporter extends ImportFormat {
             }
             // Add double hyphens to page ranges:
             if (h.get("pages") != null) {
-                h.put("pages", ((String)h.get("pages")).replaceAll("-", "--"));
+                h.put("pages", h.get("pages").replaceAll("-", "--"));
             }
 
         } else if (fieldName.equals("Abstract")) {
@@ -192,24 +192,24 @@ public class OvidImporter extends ImportFormat {
 
         // Now we need to check if a book entry has given editors in the author field;
         // if so, rearrange:
-        String auth = (String)h.get("author");
+        String auth = h.get("author");
         if ((auth != null) && (auth.indexOf(" [Ed]") >= 0)) {
             h.remove("author");
             h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
         }
 
         // Rearrange names properly:
-        auth = (String)h.get("author");
+        auth = h.get("author");
         if (auth != null)
             h.put("author", fixNames(auth));
-        auth = (String)h.get("editor");
+        auth = h.get("editor");
         if (auth != null)
             h.put("editor", fixNames(auth));
 
 
 
         // Set the entrytype properly:
-        String entryType = h.containsKey("entrytype") ? (String)h.get("entrytype") : "other";
+        String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
         h.remove("entrytype");
         if (entryType.equals("book")) {
             if (h.containsKey("chaptertitle")) {

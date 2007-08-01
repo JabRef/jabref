@@ -115,14 +115,14 @@ public class ImportFormatReader {
     return null;
   }
   
-  public List importFromStream(String format, InputStream in)
+  public List<BibtexEntry> importFromStream(String format, InputStream in)
     throws IOException {
     ImportFormat importer = getByCliId(format);
 
     if (importer == null)
       throw new IllegalArgumentException("Unknown import format: " + format);
 
-    List res = importer.importEntries(in);
+    List<BibtexEntry> res = importer.importEntries(in);
 
     // Remove all empty entries
     if (res != null)
@@ -131,7 +131,7 @@ public class ImportFormatReader {
     return res;
   }
 
-  public List importFromFile(String format, String filename)
+  public List<BibtexEntry> importFromFile(String format, String filename)
     throws IOException {
     ImportFormat importer = getByCliId(format);
 
@@ -141,8 +141,8 @@ public class ImportFormatReader {
     return importFromFile(importer, filename);
   }
 
-    public List importFromFile(ImportFormat importer, String filename) throws IOException {
-        List result = null;
+    public List<BibtexEntry> importFromFile(ImportFormat importer, String filename) throws IOException {
+        List<BibtexEntry> result = null;
         InputStream stream = null;
 
         try {
@@ -167,13 +167,13 @@ public class ImportFormatReader {
         return result;
     }
 
-  public static BibtexDatabase createDatabase(List bibentries) {
+  public static BibtexDatabase createDatabase(List<BibtexEntry> bibentries) {
     purgeEmptyEntries(bibentries);
 
     BibtexDatabase database = new BibtexDatabase();
 
-    for (Iterator i = bibentries.iterator(); i.hasNext();) {
-      BibtexEntry entry = (BibtexEntry) i.next();
+    for (Iterator<BibtexEntry> i = bibentries.iterator(); i.hasNext();) {
+      BibtexEntry entry = i.next();
 
       try {
         entry.setId(Util.createNeutralId());
@@ -194,10 +194,9 @@ public class ImportFormatReader {
    * 
    * @return all custom importers, elements are of type InputFormat
    */
-  public SortedSet getCustomImportFormats() {
-    SortedSet result = new TreeSet();
-    for (Iterator i = this.formats.iterator(); i.hasNext(); ) {
-      ImportFormat format = (ImportFormat)i.next();
+  public SortedSet<ImportFormat> getCustomImportFormats() {
+    SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+    for (ImportFormat format : formats){
       if (format.getIsCustomImporter()) {
         result.add(format);  
       }
@@ -212,25 +211,26 @@ public class ImportFormatReader {
    * 
    * @return all custom importers, elements are of type InputFormat
    */
-  public SortedSet getBuiltInInputFormats() {
-    SortedSet result = new TreeSet();
-    for (Iterator i = this.formats.iterator(); i.hasNext(); ) {
-      ImportFormat format = (ImportFormat)i.next();
-      if (!format.getIsCustomImporter()) {
-        result.add(format);  
-      }
-    }
-    return result;    
-  }
+  public SortedSet<ImportFormat> getBuiltInInputFormats() {
+		SortedSet<ImportFormat> result = new TreeSet<ImportFormat>();
+		for (ImportFormat format : formats) {
+			if (!format.getIsCustomImporter()) {
+				result.add(format);
+			}
+		}
+		return result;
+	}
   
   /**
-   * All importers.
-   * 
-   * <p>Elements are in default order.</p>
-   * 
-   * @return all custom importers, elements are of type InputFormat
-   */
-  public SortedSet getImportFormats() {
+	 * All importers.
+	 * 
+	 * <p>
+	 * Elements are in default order.
+	 * </p>
+	 * 
+	 * @return all custom importers, elements are of type InputFormat
+	 */
+  public SortedSet<ImportFormat> getImportFormats() {
     return this.formats;
   }
 
@@ -244,8 +244,7 @@ public class ImportFormatReader {
   public String getImportFormatList() {
     StringBuffer sb = new StringBuffer();
 
-    for (Iterator i = this.formats.iterator(); i.hasNext();) {
-      ImportFormat imFo = (ImportFormat)i.next();
+    for (ImportFormat imFo : formats){
       int pad = Math.max(0, 14 - imFo.getFormatName().length());
       sb.append("  ");
       sb.append(imFo.getFormatName());
@@ -382,7 +381,7 @@ public class ImportFormatReader {
   public static BibtexDatabase import_File(String format, String filename)
     throws IOException {
     BibtexDatabase database = null;
-    List bibentries = null;
+    List<BibtexEntry> bibentries = null;
     File f = new File(filename);
 
     if (!f.exists())
@@ -404,10 +403,10 @@ public class ImportFormatReader {
     // Add entries to database.
     database = new BibtexDatabase();
 
-    Iterator it = bibentries.iterator();
+    Iterator<BibtexEntry> it = bibentries.iterator();
 
     while (it.hasNext()) {
-      BibtexEntry entry = (BibtexEntry) it.next();
+      BibtexEntry entry = it.next();
 
       try {
         entry.setId(Util.createNeutralId());
@@ -426,9 +425,9 @@ public class ImportFormatReader {
    * removes all entries that have no fields set. This is useful for rooting out
    * an unsucessful import (wrong format) that returns a number of empty entries.
    */
-  public static void purgeEmptyEntries(List entries) {
-    for (Iterator i = entries.iterator(); i.hasNext();) {
-      BibtexEntry entry = (BibtexEntry) i.next();
+  public static void purgeEmptyEntries(List<BibtexEntry> entries) {
+    for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
+      BibtexEntry entry = i.next();
 
       // Get all fields of the entry:
       Object[] o = entry.getAllFields();
@@ -455,12 +454,10 @@ public class ImportFormatReader {
       **/    
 
     // Cycle through all importers:
-		for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
-			ImportFormat imFo = (ImportFormat) i.next();
-
+    for (ImportFormat imFo : getImportFormats()){
 			try {
 				// System.out.println("Trying format: "+imFo.getFormatName());
-				List entries = importFromFile(imFo, filename);
+				List<BibtexEntry> entries = importFromFile(imFo, filename);
 
 				if (entries != null)
 					purgeEmptyEntries(entries);

@@ -30,15 +30,19 @@
 
 package net.sf.jabref;
 
-import java.awt.*;
-import java.util.*;
-//import java.util.List;
-import java.net.URL;
-import java.net.MalformedURLException;
-import javax.swing.*;
-import java.io.InputStream;
-import java.io.IOException;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.

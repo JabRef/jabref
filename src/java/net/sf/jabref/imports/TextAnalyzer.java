@@ -1,9 +1,12 @@
 package net.sf.jabref.imports;
 
-import java.util.TreeSet;
-import net.sf.jabref.*;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 public class TextAnalyzer {
 
@@ -19,7 +22,7 @@ public class TextAnalyzer {
 
   public void guessBibtexFields(String text) {
 
-      TreeSet usedParts = new TreeSet();
+      TreeSet<Substring> usedParts = new TreeSet<Substring>();
 
       text = "  "+text+"  ";
 
@@ -129,10 +132,10 @@ public class TextAnalyzer {
 
       // Then try to find title and authors.
       Substring ss;
-      Vector free = new Vector();
+      Vector<String> free = new Vector<String>();
       int piv = 0;
-      for (Iterator i=usedParts.iterator(); i.hasNext();) {
-        ss = (Substring)i.next();
+      for (Iterator<Substring> i=usedParts.iterator(); i.hasNext();) {
+        ss = i.next();
         if (ss.begin()-piv > 10) {
           Util.pr("... "+text.substring(piv, ss.begin()));
           free.add(clean(text.substring(piv, ss.begin())));
@@ -143,11 +146,8 @@ public class TextAnalyzer {
         free.add(clean(text.substring(piv)));
       }
       Util.pr("Free parts:");
-      for (Iterator i=free.iterator(); i.hasNext();) {
-        String part = (String)i.next();
-        int dots = part.split("\\.").length - 1;
-
-        Util.pr(": '"+i.next()+"'");
+      for (String s : free){
+        Util.pr(": '"+s+"'");
       }
     }
 
@@ -192,17 +192,24 @@ public class TextAnalyzer {
       return s.substring(left, Math.min(right+1, s.length()));
     }
 
-    private class Substring implements Comparable {
-      int begin, end;
-      public Substring(String name, int begin, int end) {
-        this.begin = begin;
-        this.end = end;
-      }
-      public int begin() { return begin; }
-      public int end() { return end; }
-      public int compareTo(Object o) {
-        Substring other = (Substring)o;
-        return (new Integer(begin)).compareTo(new Integer(other.begin()));
-      }
-        }
+    private class Substring implements Comparable<Substring> {
+		int begin, end;
+
+		public Substring(String name, int begin, int end) {
+			this.begin = begin;
+			this.end = end;
+		}
+
+		public int begin() {
+			return begin;
+		}
+
+		public int end() {
+			return end;
+		}
+
+		public int compareTo(Substring other) {
+			return (new Integer(begin)).compareTo(new Integer(other.begin()));
+		}
+	}
 }

@@ -5,21 +5,13 @@ import java.awt.Dialog;
 import java.io.StringReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.JDialog;
 import javax.swing.JWindow;
 
 import junit.framework.TestCase;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.NameFormatterTab;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 

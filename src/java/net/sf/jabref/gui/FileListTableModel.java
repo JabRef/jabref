@@ -1,12 +1,13 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelEvent;
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+
+import net.sf.jabref.Globals;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.

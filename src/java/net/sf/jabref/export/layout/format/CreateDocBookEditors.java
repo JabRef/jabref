@@ -21,12 +21,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.export.layout.format;
 
-import wsi.ra.tool.WSITools;
-
-import java.util.Vector;
-
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.imports.*;
 
 
 /**

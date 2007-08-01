@@ -26,9 +26,12 @@
  */
 package net.sf.jabref.groups;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Map;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.SearchRule;
+import net.sf.jabref.SearchRuleSet;
 
 /**
  * Subclass of SearchRuleSet that ANDs or ORs between its rules, eturning 0 or

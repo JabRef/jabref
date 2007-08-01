@@ -1,24 +1,21 @@
 package net.sf.jabref.util;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.undo.UndoableEdit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.*;
-import java.util.List;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.uif_lite.panel.SimpleInternalFrame;
 
 /**
  * An Action for launching mass field.

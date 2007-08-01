@@ -1,21 +1,15 @@
 // $ANTLR : "TreeParser.g" -> "SearchExpressionTreeParser.java"$
 
 package net.sf.jabref.search;
-import java.util.*;
-import java.util.regex.*;
-import net.sf.jabref.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import antlr.TreeParser;
-import antlr.Token;
-import antlr.collections.AST;
-import antlr.RecognitionException;
-import antlr.ANTLRException;
-import antlr.NoViableAltException;
+import net.sf.jabref.BibtexEntry;
 import antlr.MismatchedTokenException;
-import antlr.SemanticException;
-import antlr.collections.impl.BitSet;
-import antlr.ASTPair;
-import antlr.collections.impl.ASTArray;
+import antlr.NoViableAltException;
+import antlr.RecognitionException;
+import antlr.collections.AST;
 
 
 public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes

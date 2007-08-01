@@ -7,26 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
-import net.sf.jabref.AbstractWorker;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.FocusRequester;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.util.XMPUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

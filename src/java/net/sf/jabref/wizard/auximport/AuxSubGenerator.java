@@ -51,12 +51,17 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.auximport ;
 
-import java.io.* ;
-import java.util.regex.* ;
-import java.util.* ;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.sf.jabref.* ;
-import net.sf.jabref.imports.* ;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.Util;
 
 public class AuxSubGenerator
 {

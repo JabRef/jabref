@@ -1,28 +1,14 @@
 package net.sf.jabref.imports;
 
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import java.util.*;
-import net.sf.jabref.*;
-/*
-  Copyright (C) 2000-2004 E.L. Willighagen <egonw@sci.kun.nl>
+import java.util.ArrayList;
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or (at
-  your option) any later version.
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.BibtexFields;
+import net.sf.jabref.Util;
 
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-  USA
-
-*/
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Reader for the BibTeXML format. See
@@ -32,19 +18,18 @@ import net.sf.jabref.*;
  */
 public class BibTeXMLHandler extends DefaultHandler {
 
-    private ArrayList bibitems;
+    private ArrayList<BibtexEntry> bibitems;
 
     private BibtexEntry b; // the entry being read
 
     // XML parsing stuff
-    private String name; // the current element name
     private String currentChars;
 
     public BibTeXMLHandler() {
         super();
     }
 
-    public ArrayList getItems(){ return bibitems;}
+    public ArrayList<BibtexEntry> getItems(){ return bibitems;}
 
     // SAX parsing methods
 
@@ -52,7 +37,7 @@ public class BibTeXMLHandler extends DefaultHandler {
         String systemId) {}
 
     public void startDocument() {
-        bibitems = new ArrayList();
+        bibitems = new ArrayList<BibtexEntry>();
     }
 
     public void endDocument() {
@@ -65,7 +50,6 @@ public class BibTeXMLHandler extends DefaultHandler {
 
     public void startElement(String uri, String local, String raw, Attributes atts) {
         String name = raw;
-        this.name = name;
         if (name.equals("bibtex:entry")) {
             String articleID = null;
             for (int i = 0; i < atts.getLength(); i++) {

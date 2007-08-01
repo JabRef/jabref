@@ -7,7 +7,9 @@ package gnu.dtools.ritopt;
  *   $Id$
  */
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 /**
  * Reads data from an input stream and outputs to a print stream. This class

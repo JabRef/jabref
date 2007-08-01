@@ -39,14 +39,19 @@
 
 package net.sf.jabref.gui.date ;
 
-import java.awt.event.* ;
-import java.awt.*;
-import javax.swing.* ;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Date;
 
-import com.michaelbaranov.microba.calendar.* ;
-import net.sf.jabref.* ;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
-import java.util.*;
+import net.sf.jabref.FieldEditor;
+import net.sf.jabref.FocusRequester;
+import net.sf.jabref.Util;
+
+import com.michaelbaranov.microba.calendar.DatePicker;
 
 public class DatePickerButton implements ActionListener {
     private DatePicker datePicker = new DatePicker();

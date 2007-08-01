@@ -23,12 +23,16 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
@@ -58,11 +62,11 @@ public class AddToGroupAction extends AbstractAction {
     }
     public void actionPerformed(ActionEvent evt) {
         final BibtexEntry[] entries = m_panel.getSelectedEntries();
-        final Vector removeGroupsNodes = new Vector(); // used only when moving
+        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<GroupTreeNode>(); // used only when moving
         
         if (m_move) {
             // collect warnings for removal
-            Enumeration e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
+            Enumeration<GroupTreeNode> e = ((GroupTreeNode) m_node.getRoot()).preorderEnumeration();
             GroupTreeNode node;
             while (e.hasMoreElements()) {
                 node = (GroupTreeNode) e.nextElement();
@@ -77,7 +81,7 @@ public class AddToGroupAction extends AbstractAction {
             // for the one to which they are added! hence the magical +1
             AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size()+1];
             for (int i = 0; i < removeGroupsNodes.size(); ++i)
-                groups[i] = ((GroupTreeNode) removeGroupsNodes.elementAt(i)).getGroup();
+                groups[i] = removeGroupsNodes.elementAt(i).getGroup();
             groups[groups.length-1] = m_node.getGroup();
             if (!Util.warnAssignmentSideEffects(groups,
                     entries, m_panel.getDatabase(), m_panel.frame()))
@@ -99,7 +103,7 @@ public class AddToGroupAction extends AbstractAction {
         if (m_move) {
             // first remove
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                GroupTreeNode node = (GroupTreeNode) removeGroupsNodes.elementAt(i);
+                GroupTreeNode node = removeGroupsNodes.elementAt(i);
                 if (node.getGroup().containsAny(entries))
                     undoAll.addEdit(node.removeFromGroup(entries));
             }

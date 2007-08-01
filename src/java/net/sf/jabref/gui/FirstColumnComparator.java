@@ -1,9 +1,8 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Util;
-
 import java.util.Comparator;
+
+import net.sf.jabref.BibtexEntry;
 
 /**
  * Created by IntelliJ IDEA.

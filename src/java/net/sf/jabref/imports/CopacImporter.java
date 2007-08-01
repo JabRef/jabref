@@ -63,13 +63,13 @@ public class CopacImporter extends ImportFormat {
 	 * Parse the entries in the source, and return a List of BibtexEntry
 	 * objects.
 	 */
-	public List importEntries(InputStream stream) throws IOException {
+	public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 		if (stream == null)
 			throw new IOException("No stream given.");
 
 		BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
 
-		List entries = new LinkedList();
+		List<String> entries = new LinkedList<String>();
 
 		{ // Preprocess entries
 			String str;
@@ -100,9 +100,9 @@ public class CopacImporter extends ImportFormat {
 				entries.add(sb.toString());
 		}
 
-		List results = new LinkedList();
+		List<BibtexEntry> results = new LinkedList<BibtexEntry>();
 
-		Iterator it = entries.iterator();
+		Iterator<String> it = entries.iterator();
 		while (it.hasNext()) {
 
 			// Copac does not contain enough information on the type of the

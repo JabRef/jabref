@@ -1,10 +1,14 @@
 package net.sf.jabref.collab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.*;
-import net.sf.jabref.undo.UndoableStringChange;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexString;
+import net.sf.jabref.Globals;
+import net.sf.jabref.KeyCollisionException;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableInsertString;
 
 public class StringAddChange extends Change {
 

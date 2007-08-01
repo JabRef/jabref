@@ -36,15 +36,16 @@
 
 package net.sf.jabref.wizard.integrity.gui ;
 
-import java.io.* ;
-import java.net.* ;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
 
-import java.awt.* ;
-import java.awt.event.* ;
-import javax.swing.* ;
-import javax.swing.border.* ;
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 
-import net.sf.jabref.* ;
+import net.sf.jabref.*;
 
 public class IntegrityWizard
     extends JDialog

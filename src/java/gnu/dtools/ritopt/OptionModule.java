@@ -7,8 +7,9 @@ package gnu.dtools.ritopt;
  *    $Id$
  */
 
-import java.util.*;
-import java.io.*;
+import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * This class is used as a repository for options. The Options class maintains

@@ -26,7 +26,9 @@
 */
 package net.sf.jabref.label;
 
-import net.sf.jabref.*;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexFields;
 
 public class ArticleLabelRule extends DefaultLabelRule {
 

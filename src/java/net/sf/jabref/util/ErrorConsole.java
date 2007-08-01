@@ -1,12 +1,13 @@
 package net.sf.jabref.util;
 
-import net.sf.jabref.Globals;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import javax.swing.*;
-import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+
+import net.sf.jabref.Globals;
 
 /**
  * This class redirects the System.err stream so it goes both the way it normally

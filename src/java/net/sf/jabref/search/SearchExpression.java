@@ -6,16 +6,17 @@
 
 package net.sf.jabref.search;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
-import antlr.collections.AST;
 import java.io.StringReader;
-import java.util.*;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.regex.PatternSyntaxException;
+
 import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.SearchRule;
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
+import antlr.collections.AST;
 
 public class SearchExpression implements SearchRule {
 	private SearchExpressionTreeParser treeParser = new SearchExpressionTreeParser();

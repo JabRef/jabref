@@ -35,9 +35,11 @@
 
 package net.sf.jabref.wizard.text ;
 
-import java.util.*;
-import javax.swing.* ;
-import javax.swing.text.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import javax.swing.text.StyledDocument;
 
 
 public class TagToMarkedTextStore

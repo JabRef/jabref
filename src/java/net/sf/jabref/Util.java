@@ -301,10 +301,8 @@ public class Util {
 	 * is the HashMap GLobals.UNICODE_CHARS.
 	 */
 	public static String replaceSpecialCharacters(String s) {
-		for (Iterator i = Globals.UNICODE_CHARS.keySet().iterator(); i.hasNext();) {
-			String chr = (String) i.next(), replacer = (String) Globals.UNICODE_CHARS.get(chr);
-			// pr(chr+" "+replacer);
-			s = s.replaceAll(chr, replacer);
+		for (Map.Entry<String, String> chrAndReplace : Globals.UNICODE_CHARS.entrySet()){
+			s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
 		}
 		return s;
 	}
@@ -370,12 +368,12 @@ public class Util {
 		return out.toString();// .replaceAll("\n", "\n\t");
 	}
 
-	public static HashSet findDeliminatedWordsInField(BibtexDatabase db, String field,
+	public static HashSet<String> findDeliminatedWordsInField(BibtexDatabase db, String field,
 		String deliminator) {
-		HashSet res = new HashSet();
-		Iterator i = db.getKeySet().iterator();
-		while (i.hasNext()) {
-			BibtexEntry be = db.getEntryById(i.next().toString());
+		HashSet<String> res = new HashSet<String>();
+		
+		for (String s : db.getKeySet()){
+			BibtexEntry be = db.getEntryById(s);
 			Object o = be.getField(field);
 			if (o != null) {
 				String fieldValue = o.toString().trim();
@@ -401,12 +399,11 @@ public class Util {
 	 *            a <code>String</code> value
 	 * @return a <code>HashSet</code> value
 	 */
-	public static HashSet findAllWordsInField(BibtexDatabase db, String field, String remove) {
-		HashSet res = new HashSet();
+	public static HashSet<String> findAllWordsInField(BibtexDatabase db, String field, String remove) {
+		HashSet<String> res = new HashSet<String>();
 		StringTokenizer tok;
-		Iterator i = db.getKeySet().iterator();
-		while (i.hasNext()) {
-			BibtexEntry be = db.getEntryById(i.next().toString());
+		for (String s : db.getKeySet()){
+			BibtexEntry be = db.getEntryById(s);
 			Object o = be.getField(field);
 			if (o != null) {
 				tok = new StringTokenizer(o.toString(), remove, false);
@@ -510,19 +507,13 @@ public class Util {
 
 				if (Globals.ON_MAC) {
 					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
-					Process child = Runtime.getRuntime().exec(cmd);
+					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
 					openFileOnWindows(link, false);
-					/*
-					 * cmdArray[0] = Globals.prefs.get("htmlviewer");
-					 * cmdArray[1] = link; Process child =
-					 * Runtime.getRuntime().exec( cmdArray[0] + " " +
-					 * cmdArray[1]);
-					 */
 				} else {
 					cmdArray[0] = Globals.prefs.get("htmlviewer");
 					cmdArray[1] = link;
-					Process child = Runtime.getRuntime().exec(cmdArray);
+					Runtime.getRuntime().exec(cmdArray);
 				}
 
 			} catch (IOException e) {
@@ -533,7 +524,7 @@ public class Util {
 			try {
 				if (Globals.ON_MAC) {
 					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("psviewer"), link };
-					Process child = Runtime.getRuntime().exec(cmd);
+					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
 					openFileOnWindows(link, true);
 					/*
@@ -544,7 +535,7 @@ public class Util {
 				} else {
 					cmdArray[0] = Globals.prefs.get("psviewer");
 					cmdArray[1] = link;
-					Process child = Runtime.getRuntime().exec(cmdArray);
+					Runtime.getRuntime().exec(cmdArray);
 				}
 			} catch (IOException e) {
 				System.err.println("An error occured on the command: "
@@ -554,7 +545,7 @@ public class Util {
 			try {
 				if (Globals.ON_MAC) {
 					String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("pdfviewer"), link };
-					Process child = Runtime.getRuntime().exec(cmd);
+					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
 					openFileOnWindows(link, true);
 					/*
@@ -573,7 +564,7 @@ public class Util {
 					cmdArray[1] = link;
 					// Process child = Runtime.getRuntime().exec(cmdArray[0]+"
 					// "+cmdArray[1]);
-					Process child = Runtime.getRuntime().exec(cmdArray);
+					Runtime.getRuntime().exec(cmdArray);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -969,14 +960,14 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
      * @param fileType The file type to search for.
      * @return The link to the file found, or null if not found.
      */
-    public static String findFile(BibtexEntry entry, ExternalFileType fileType, List extraDirs) {
+    public static String findFile(BibtexEntry entry, ExternalFileType fileType, List<String> extraDirs) {
 
-        List dirs = new ArrayList();
+        List<String> dirs = new ArrayList<String>();
         dirs.addAll(extraDirs);
         if (Globals.prefs.hasKey(fileType.getExtension()+"Directory")) {
             dirs.add(Globals.prefs.get(fileType.getExtension()+"Directory"));
         }
-        String [] directories = (String[])dirs.toArray(new String[dirs.size()]);
+        String [] directories = dirs.toArray(new String[dirs.size()]);
         return findPdf(entry, fileType.getExtension(), directories);
     }
 
@@ -1256,7 +1247,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 				}
 				// Do for all direct and indirect subdirs
 				if (dirToProcess.equals("**")) {
-					List toDo = new LinkedList();
+					List<File> toDo = new LinkedList<File>();
 					toDo.add(directory);
 
 					String restOfFileString = join(fileParts, "/", i + 1, fileParts.length);
@@ -1270,7 +1261,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 					while (!toDo.isEmpty()) {
 
 						// Get all subdirs of each of the elements found in toDo
-						File[] subDirs = ((File) toDo.remove(0)).listFiles();
+						File[] subDirs = toDo.remove(0).listFiles();
 						if (subDirs == null) // No permission?
 							continue;
 
@@ -1526,9 +1517,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * @return The first duplicate entry found. null if no duplicates are found.
 	 */
 	public static BibtexEntry containsDuplicate(BibtexDatabase database, BibtexEntry entry) {
-		Collection entries = database.getEntries();
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			BibtexEntry other = (BibtexEntry) i.next();
+		for (BibtexEntry other : database.getEntries()){
 			if (isDuplicate(entry, other, Globals.duplicateThreshold))
 				return other; // Duplicate found.
 		}
@@ -1582,7 +1571,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	}
 
 	public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
-		HashSet allFields = new HashSet();// one.getAllFields());
+		HashSet<Object> allFields = new HashSet<Object>();// one.getAllFields());
 		Object[] o = one.getAllFields();
 		for (int i = 0; i < o.length; i++)
 			allFields.add(o[i]);
@@ -1590,7 +1579,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		for (int i = 0; i < o.length; i++)
 			allFields.add(o[i]);
 		int score = 0;
-		for (Iterator fld = allFields.iterator(); fld.hasNext();) {
+		for (Iterator<Object> fld = allFields.iterator(); fld.hasNext();) {
 			String field = (String) fld.next();
 			Object en = one.getField(field), to = two.getField(field);
 			if ((en != null) && (to != null) && (en.equals(to)))
@@ -1610,12 +1599,13 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
      * This methods assures all words in the given entry are recorded in their
      * respective Completers, if any.
      */
-    public static void updateCompletersForEntry(HashMap autoCompleters,
+    public static void updateCompletersForEntry(HashMap<String, AutoCompleter> autoCompleters,
                                                 BibtexEntry be) {
 
-        for (Iterator j = autoCompleters.keySet().iterator(); j.hasNext();) {
-            String field = (String) j.next();
-            AutoCompleter comp = (AutoCompleter) autoCompleters.get(field);
+    	for (Map.Entry<String, AutoCompleter> entry : autoCompleters.entrySet()){
+    		String field = entry.getKey();
+            AutoCompleter comp = entry.getValue();
+
             comp.addAll(be.getField(field));
         }
     }
@@ -1629,16 +1619,14 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * @param bibs
 	 *            List of bibtex entries
 	 */
-	public static void setAutomaticFields(List bibs) {
+	public static void setAutomaticFields(List<BibtexEntry> bibs) {
 		String defaultOwner = Globals.prefs.get("defaultOwner");
 		String timestamp = easyDateFormat();
 		boolean setOwner = Globals.prefs.getBoolean("useOwner"), setTimeStamp = Globals.prefs
 			.getBoolean("useTimeStamp");
 		String timeStampField = Globals.prefs.get("timeStampField");
 		// Iterate through all entries
-		for (int i = 0; i < bibs.size(); i++) {
-			// Get current entry
-			BibtexEntry curEntry = (BibtexEntry) bibs.get(i);
+		for (BibtexEntry curEntry : bibs){
 			setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
 				timestamp);
 
@@ -1765,8 +1753,8 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
      */
     public static NamedCompound upgradePdfPsToFile(BibtexDatabase database, String[] fields) {
         NamedCompound ce = new NamedCompound(Globals.lang("Move external links to 'file' field"));
-        for (Iterator i = database.getEntryMap().keySet().iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) database.getEntryMap().get(i.next());
+        
+        for (BibtexEntry entry : database.getEntryMap().values()){
             FileListTableModel tableModel = new FileListTableModel();
             // If there are already links in the file field, keep those on top:
             Object oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
@@ -1780,10 +1768,6 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
                     String s = (String) o;
                     if (s.trim().length() > 0) {
                         File f = new File(s);
-                        String extension = "";
-                        if ((s.lastIndexOf('.') >= 0) && (s.lastIndexOf('.') < s.length() - 1)) {
-                            extension = s.substring(s.lastIndexOf('.') + 1);
-                        }
                         FileListEntry flEntry = new FileListEntry(f.getName(), s,
                                 Globals.prefs.getExternalFileTypeByExt(fields[j]));
                         tableModel.addEntry(tableModel.getRowCount(), flEntry);
@@ -1929,11 +1913,11 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	public static String sortWordsAndRemoveDuplicates(String text) {
 
 		String[] words = text.split(", ");
-		SortedSet set = new TreeSet();
+		SortedSet<String> set = new TreeSet<String>();
 		for (int i = 0; i < words.length; i++)
 			set.add(words[i]);
 		StringBuffer sb = new StringBuffer();
-		for (Iterator i = set.iterator(); i.hasNext();) {
+		for (Iterator<String> i = set.iterator(); i.hasNext();) {
 			sb.append(i.next());
 			sb.append(", ");
 		}
@@ -1961,7 +1945,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 */
 	public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibtexEntry[] entries,
 		BibtexDatabase db, Component parent) {
-		Vector affectedFields = new Vector();
+		Vector<String> affectedFields = new Vector<String>();
 		for (int k = 0; k < groups.length; ++k) {
 			if (groups[k] instanceof KeywordGroup) {
 				KeywordGroup kg = (KeywordGroup) groups[k];
@@ -2314,9 +2298,8 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * @param ce
 	 */
 	private static void unmarkOldStyle(BibtexEntry be, BibtexDatabase database, NamedCompound ce) {
-		TreeSet owners = new TreeSet();
-		for (Iterator i = database.getEntries().iterator(); i.hasNext();) {
-			BibtexEntry entry = (BibtexEntry) i.next();
+		TreeSet<Object> owners = new TreeSet<Object>();
+		for (BibtexEntry entry : database.getEntries()){
 			Object o = entry.getField(BibtexFields.OWNER);
 			if (o != null)
 				owners.add(o);
@@ -2324,7 +2307,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 		}
 		owners.remove(Globals.prefs.get("defaultOwner"));
 		StringBuffer sb = new StringBuffer();
-		for (Iterator i = owners.iterator(); i.hasNext();) {
+		for (Iterator<Object> i = owners.iterator(); i.hasNext();) {
 			sb.append('[');
 			sb.append(i.next().toString());
 			sb.append(']');
@@ -2363,12 +2346,11 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 *            already has the field set.
 	 * @return A CompoundEdit for the entire operation.
 	 */
-	public static UndoableEdit massSetField(Collection entries, String field, String text,
+	public static UndoableEdit massSetField(Collection<BibtexEntry> entries, String field, String text,
 		boolean overwriteValues) {
 
 		NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			BibtexEntry entry = (BibtexEntry) i.next();
+		for (BibtexEntry entry : entries){
 			Object oldVal = entry.getField(field);
 			// If we are not allowed to overwrite values, check if there is a
 			// nonempty
@@ -2394,8 +2376,8 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 *            encodings.
 	 * @return A List of character encodings
 	 */
-	public static List findEncodingsForString(String characters) {
-		List encodings = new ArrayList();
+	public static List<String> findEncodingsForString(String characters) {
+		List<String> encodings = new ArrayList<String>();
 		for (int i = 0; i < Globals.ENCODINGS.length; i++) {
 			CharsetEncoder encoder = Charset.forName(Globals.ENCODINGS[i]).newEncoder();
 			if (encoder.canEncode(characters))

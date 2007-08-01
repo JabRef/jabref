@@ -1,15 +1,15 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.GUIGlobals;
+import javax.swing.ImageIcon;
 
-import javax.swing.*;
+import net.sf.jabref.GUIGlobals;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.
  * The class contains enough information to provide an icon, a standard extension
  * and a link to which application handles files of this type.
  */
-public class ExternalFileType implements Comparable {
+public class ExternalFileType implements Comparable<ExternalFileType> {
 
     protected String name, extension, openWith, iconName;
     protected ImageIcon icon;
@@ -102,7 +102,7 @@ public class ExternalFileType implements Comparable {
         return getName();
     }
 
-    public int compareTo(Object o) {
-        return getName().compareTo(((ExternalFileType)o).getName());
+    public int compareTo(ExternalFileType o) {
+        return getName().compareTo(o.getName());
     }
 }

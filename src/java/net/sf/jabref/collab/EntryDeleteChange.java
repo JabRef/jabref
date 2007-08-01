@@ -1,10 +1,9 @@
 package net.sf.jabref.collab;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import net.sf.jabref.*;
-
 import javax.swing.JScrollPane;
+
+import net.sf.jabref.*;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 

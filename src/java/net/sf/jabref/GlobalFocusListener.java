@@ -1,9 +1,10 @@
 package net.sf.jabref;
 
-import java.awt.event.FocusListener;
+import java.awt.Component;
 import java.awt.event.FocusEvent;
-import java.awt.*;
-import javax.swing.*;
+import java.awt.event.FocusListener;
+
+import javax.swing.JComponent;
 
 public class GlobalFocusListener implements FocusListener {
   Component focused = null;

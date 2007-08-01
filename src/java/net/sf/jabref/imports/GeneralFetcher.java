@@ -1,15 +1,13 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.gui.ImportInspectionDialog;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.*;
-import java.util.Hashtable;
-import java.util.Arrays;
+
+import net.sf.jabref.*;
+import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
  * <p>Title: </p>

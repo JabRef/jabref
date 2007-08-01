@@ -26,8 +26,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.label;
 
-import net.sf.jabref.*;
-import java.util.Hashtable ;
+import java.util.Hashtable;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.Util;
 
 
 /**
@@ -39,7 +43,7 @@ public class LabelMaker {
     public BibtexEntry applyRule(BibtexEntry newEntry, BibtexDatabase base){
 	String newKey = "";
         if(ruleTable.containsKey(newEntry.getType().getName())){
-            newKey = ((LabelRule)ruleTable.get(newEntry.getType().getName())).applyRule(newEntry) ;
+            newKey = ruleTable.get(newEntry.getType().getName()).applyRule(newEntry) ;
         }
         else{
 		newKey = applyDefaultRule(newEntry) ;
@@ -78,7 +82,7 @@ public class LabelMaker {
     }
 
     protected LabelRule defaultRule = new ArticleLabelRule() ;
-    protected Hashtable ruleTable = new Hashtable() ;
+    protected Hashtable<String, LabelRule> ruleTable = new Hashtable<String, LabelRule>() ;
 
 }
 

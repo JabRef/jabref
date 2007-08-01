@@ -1,16 +1,19 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.net.URL;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MnemonicAwareAction;
 
 /**
  * Customized UI component for pushing to external applications. Has a selection popup
@@ -21,15 +24,15 @@ import java.net.URL;
  */
 public class PushToApplicationButton implements ActionListener {
 
-    public static List applications;
+    public static List<PushToApplication> applications;
 
     private JabRefFrame frame;
-    private List pushActions;
+    private List<PushToApplication> pushActions;
     private JPanel comp;
     private JButton pushButton, menuButton;
     private int selected = 0;
     private JPopupMenu popup = null;
-    private HashMap actions = new HashMap();
+    private HashMap<PushToApplication, PushToApplicationAction> actions = new HashMap<PushToApplication, PushToApplicationAction>();
     private final Dimension buttonDim = new Dimension(23, 23);
     private static final URL ARROW_ICON = GUIGlobals.class.getResource("/images/secondary_sorted_reverse.png");
     private MenuAction mAction = new MenuAction();
@@ -38,7 +41,7 @@ public class PushToApplicationButton implements ActionListener {
      * Set up the current available choices:
      */
     static {
-      applications = new ArrayList();
+      applications = new ArrayList<PushToApplication>();
       applications.add(new PushToLyx());
       applications.add(new PushToEmacs());
       applications.add(new PushToWinEdt());
@@ -47,7 +50,7 @@ public class PushToApplicationButton implements ActionListener {
     }
 
 
-    public PushToApplicationButton(JabRefFrame frame, List pushActions) {
+    public PushToApplicationButton(JabRefFrame frame, List<PushToApplication> pushActions) {
         this.frame = frame;
         this.pushActions = pushActions;
         init();
@@ -92,8 +95,7 @@ public class PushToApplicationButton implements ActionListener {
     private void buildPopupMenu() {
         popup = new JPopupMenu();
         int j=0;
-        for (Iterator i = pushActions.iterator(); i.hasNext();) {
-            PushToApplication application = (PushToApplication) i.next();
+        for (PushToApplication application : pushActions){
             JMenuItem item = new JMenuItem(application.getApplicationName(),
                     application.getIcon());
             item.addActionListener(new PopupItemActionListener(j));
@@ -132,7 +134,7 @@ public class PushToApplicationButton implements ActionListener {
         PushToApplication toApp = (PushToApplication)pushActions.get(selected);
 
         // Lazy initialization of the push action:
-        PushToApplicationAction action = (PushToApplicationAction)actions.get(toApp);
+        PushToApplicationAction action = actions.get(toApp);
         if (action == null) {
             action = new PushToApplicationAction(frame, toApp);
             actions.put(toApp, action);

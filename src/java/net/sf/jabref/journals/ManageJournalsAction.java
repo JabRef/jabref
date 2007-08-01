@@ -1,11 +1,12 @@
 package net.sf.jabref.journals;
 
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 
 /**
  * Created by IntelliJ IDEA.

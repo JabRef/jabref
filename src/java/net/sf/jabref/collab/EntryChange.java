@@ -1,17 +1,17 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Util;
-import net.sf.jabref.KeyCollisionException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.TreeSet;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import java.util.TreeSet;
-import java.util.Iterator;
-import javax.swing.JTextPane;
-import net.sf.jabref.Globals;
-import java.util.Enumeration;
 import javax.swing.JScrollPane;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableFieldChange;
 

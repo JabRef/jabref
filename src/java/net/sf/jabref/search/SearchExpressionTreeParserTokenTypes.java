@@ -1,9 +1,6 @@
 // $ANTLR : "TreeParser.g" -> "SearchExpressionTreeParser.java"$
 
 package net.sf.jabref.search;
-import java.util.*;
-import java.util.regex.*;
-import net.sf.jabref.*;
 
 public interface SearchExpressionTreeParserTokenTypes {
 	int EOF = 1;

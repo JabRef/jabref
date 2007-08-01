@@ -7,7 +7,10 @@ package gnu.dtools.ritopt;
  *   $Id$
  */
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 /**
  * A SimpleProcess is used to execute a shell process, and redirect an

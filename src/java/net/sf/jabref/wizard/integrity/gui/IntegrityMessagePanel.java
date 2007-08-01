@@ -35,15 +35,23 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity.gui ;
 
-import java.awt.* ;
-import java.awt.event.* ;
-import javax.swing.* ;
-import javax.swing.event.* ;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-import net.sf.jabref.* ;
-import net.sf.jabref.undo.* ;
-import net.sf.jabref.wizard.integrity.* ;
-import net.sf.jabref.wizard.text.gui.* ;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import net.sf.jabref.*;
+import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.wizard.integrity.IntegrityCheck;
+import net.sf.jabref.wizard.integrity.IntegrityMessage;
+import net.sf.jabref.wizard.text.gui.HintListModel;
 
 public class IntegrityMessagePanel
     extends JPanel

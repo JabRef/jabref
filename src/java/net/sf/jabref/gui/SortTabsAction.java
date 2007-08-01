@@ -1,15 +1,16 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MnemonicAwareAction;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.TreeMap;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.TreeMap;
+
+import javax.swing.JTabbedPane;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.MnemonicAwareAction;
 
 /**
  * This action rearranges all tabs in the main tabbed pane of the given JabRefFrame

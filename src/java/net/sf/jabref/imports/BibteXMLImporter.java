@@ -1,13 +1,16 @@
 package net.sf.jabref.imports;
 
-import java.util.regex.Pattern;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+
+import net.sf.jabref.BibtexEntry;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -54,9 +57,9 @@ public class BibteXMLImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
 
-	ArrayList bibItems = new ArrayList();
+	ArrayList<BibtexEntry> bibItems = new ArrayList<BibtexEntry>();
 
 	// Obtain a factory object for creating SAX parsers
 	SAXParserFactory parserFactory = SAXParserFactory.newInstance();

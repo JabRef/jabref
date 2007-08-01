@@ -27,21 +27,24 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
+import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.io.*;
-import javax.swing.*;
-
-import net.sf.jabref.labelPattern.DefaultLabelPatterns;
-import net.sf.jabref.labelPattern.LabelPattern;
-import net.sf.jabref.export.CustomExportList;
-import net.sf.jabref.imports.CustomImportList;
-import java.awt.*;
-import java.util.prefs.*;
 import java.util.*;
-import java.util.List;
-import java.awt.event.*;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
+
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+
+import net.sf.jabref.export.CustomExportList;
 import net.sf.jabref.export.ExportComparator;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.imports.CustomImportList;
+import net.sf.jabref.labelPattern.DefaultLabelPatterns;
+import net.sf.jabref.labelPattern.LabelPattern;
 
 public class JabRefPreferences {
 
@@ -55,11 +58,12 @@ public class JabRefPreferences {
     public String WRAPPED_USERNAME;
 
     Preferences prefs;
-    public HashMap defaults = new HashMap(),
-        keyBinds = new HashMap(),
-        defKeyBinds = new HashMap();
-    private HashSet putBracesAroundCapitalsFields = new HashSet(4);
-    private HashSet nonWrappableFields = new HashSet(4);
+    public HashMap<String, Object> defaults = new HashMap<String, Object>();
+    public HashMap<String, String>
+        keyBinds = new HashMap<String, String>(),
+        defKeyBinds = new HashMap<String, String>();
+    private HashSet<String> putBracesAroundCapitalsFields = new HashSet<String>(4);
+    private HashSet<String> nonWrappableFields = new HashSet<String>(4);
     private static final LabelPattern KEY_PATTERN = new DefaultLabelPatterns();
     private static LabelPattern keyPattern;
 
@@ -73,7 +77,7 @@ public class JabRefPreferences {
     private EntryEditorTabList tabList = null;
 
     // Map containing all registered external file types:
-    private TreeSet externalFileTypes = new TreeSet();
+    private TreeSet<ExternalFileType> externalFileTypes = new TreeSet<ExternalFileType>();
 
     // The only instance of this class:
     private static JabRefPreferences singleton = null;
@@ -459,7 +463,7 @@ public class JabRefPreferences {
             return null;
 
         StringReader rd = new StringReader(names);
-        Vector arr = new Vector();
+        Vector<String> arr = new Vector<String>();
         String rs;
         try {
             while ((rs = getNextUnit(rd)) != null) {
@@ -468,7 +472,7 @@ public class JabRefPreferences {
         } catch (IOException ex) {}
         String[] res = new String[arr.size()];
         for (int i=0; i<res.length; i++)
-            res[i] = (String)arr.elementAt(i);
+            res[i] = arr.elementAt(i);
 
         return res;
     }
@@ -570,14 +574,14 @@ public class JabRefPreferences {
     /**
      * Returns the HashMap containing all key bindings.
      */
-    public HashMap getKeyBindings() {
+    public HashMap<String, String> getKeyBindings() {
         return keyBinds;
     }
 
     /**
      * Returns the HashMap containing default key bindings.
      */
-    public HashMap getDefaultKeys() {
+    public HashMap<String, String> getDefaultKeys() {
         return defKeyBinds;
     }
 
@@ -593,15 +597,15 @@ public class JabRefPreferences {
      * Stores new key bindings into Preferences, provided they
      * actually differ from the old ones.
      */
-    public void setNewKeyBindings(HashMap newBindings) {
+    public void setNewKeyBindings(HashMap<String, String> newBindings) {
         if (!newBindings.equals(keyBinds)) {
             // This confirms that the bindings have actually changed.
             String[] bindNames = new String[newBindings.size()],
                 bindings = new String[newBindings.size()];
             int index = 0;
-            for (Iterator i=newBindings.keySet().iterator();
+            for (Iterator<String> i=newBindings.keySet().iterator();
                  i.hasNext();) {
-                String nm = (String)i.next();
+                String nm = i.next();
                 String bnd = (String)newBindings.get(nm);
                 bindNames[index] = nm;
                 bindings[index] = bnd;
@@ -650,9 +654,7 @@ public class JabRefPreferences {
                 Globals.logger("BackingStoreException in JabRefPreferences.putKeyPattern");
             }
 
-            Iterator i = pattern.keySet().iterator();
-            while (i.hasNext()) {
-                String s = (String)i.next();
+            for (String s: pattern.keySet()){
                 if (!(pattern.get(s)).equals(parent.get(s)))
                     pre.put(s, pattern.getValue(s).get(0).toString());
             }
@@ -871,7 +873,7 @@ public class JabRefPreferences {
     }
 
     public ExternalFileType[] getExternalFileTypeSelection() {
-        return (ExternalFileType[])externalFileTypes.toArray
+        return externalFileTypes.toArray
                 (new ExternalFileType[externalFileTypes.size()]);
     }
 
@@ -881,8 +883,8 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByName(String name) {
-        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = (ExternalFileType) iterator.next();
+        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
             if (type.getName().equals(name))
                 return type;
         }
@@ -896,8 +898,8 @@ public class JabRefPreferences {
      * @return The ExternalFileType registered, or null if none.
      */
     public ExternalFileType getExternalFileTypeByExt(String extension) {
-        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = (ExternalFileType) iterator.next();
+        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
             if (type.getExtension().equals(extension))
                 return type;
         }
@@ -917,8 +919,8 @@ public class JabRefPreferences {
         }
         String[][] array = new String[externalFileTypes.size()][];
         int i=0;
-        for (Iterator iterator = externalFileTypes.iterator(); iterator.hasNext();) {
-            ExternalFileType type = (ExternalFileType) iterator.next();
+        for (Iterator<ExternalFileType> iterator = externalFileTypes.iterator(); iterator.hasNext();) {
+            ExternalFileType type = iterator.next();
             array[i] = type.getStringArrayRepresentation();
             i++;
         }

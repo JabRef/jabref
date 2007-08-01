@@ -1,9 +1,12 @@
 package net.sf.jabref;
 
-import javax.swing.JLabel;
-import javax.swing.Icon;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
 public class FieldNameLabel extends JLabel {
 

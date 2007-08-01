@@ -39,16 +39,7 @@ package net.sf.jabref;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
@@ -60,7 +51,7 @@ public class BibtexDatabase {
 
 	HashMap<String, BibtexString> _strings = new HashMap<String, BibtexString>();
 
-	Vector _strings_ = new Vector();
+	Vector<String> _strings_ = new Vector<String>();
 
 	Set<DatabaseChangeListener> changeListeners = new HashSet<DatabaseChangeListener>();
 
@@ -132,7 +123,7 @@ public class BibtexDatabase {
      * Returns a Set containing the keys to all entries.
      * Use getKeySet().iterator() to iterate over all entries.
      */
-    public synchronized Set getKeySet()
+    public synchronized Set<String> getKeySet()
     {
         return _entries.keySet();
     }
@@ -141,7 +132,7 @@ public class BibtexDatabase {
      * Returns an EntrySorter with the sorted entries from this base,
      * sorted by the given Comparator.
      */
-    public synchronized EntrySorter getSorter(java.util.Comparator comp) {
+    public synchronized EntrySorter getSorter(Comparator<BibtexEntry> comp) {
         EntrySorter sorter = new EntrySorter(_entries, comp);
         addDatabaseChangeListener(sorter);
         return sorter;
@@ -151,14 +142,14 @@ public class BibtexDatabase {
      * Just temporary, for testing purposes....
      * @return
      */
-    public Map getEntryMap() { return _entries; }
+    public Map<String, BibtexEntry> getEntryMap() { return _entries; }
 
     /**
      * Returns the entry with the given ID (-> entry_type + hashcode).
      */
     public synchronized BibtexEntry getEntryById(String id)
     {
-        return (BibtexEntry) _entries.get(id);
+        return _entries.get(id);
     }
 
     public synchronized Collection<BibtexEntry> getEntries() {
@@ -174,14 +165,14 @@ public class BibtexDatabase {
 
       int keyHash = key.hashCode() ; // key hash for better performance
 
-      Set keySet = _entries.keySet();
+      Set<String> keySet = _entries.keySet();
       if (keySet != null)
       {
-          Iterator it = keySet.iterator();
+          Iterator<String> it = keySet.iterator();
           boolean loop = it.hasNext() ;
           while(loop)
           {
-            String entrieID = (String) it.next() ;
+            String entrieID = it.next() ;
             BibtexEntry entry = getEntryById(entrieID) ;
             if ((entry != null) && (entry.getCiteKey() != null))
             {
@@ -241,7 +232,7 @@ public class BibtexDatabase {
      */
     public synchronized BibtexEntry removeEntry(String id)
     {
-        BibtexEntry oldValue = (BibtexEntry) _entries.remove(id);
+        BibtexEntry oldValue = _entries.remove(id);
         removeKeyFromSet(oldValue.getCiteKey());
 
         if (oldValue != null)
@@ -287,9 +278,8 @@ public class BibtexDatabase {
     public synchronized void addString(BibtexString string)
         throws KeyCollisionException
     {
-        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
-            if (((BibtexString)_strings.get(i.next())).getName().equals(string.getName()))
-                throw new KeyCollisionException("A string with this label already exists,");
+    	if (hasStringLabel(string.getName())){
+    		throw new KeyCollisionException("A string with this label already exists,");
         }
 
         if (_strings.containsKey(string.getId()))
@@ -309,7 +299,7 @@ public class BibtexDatabase {
      * Returns a Set of keys to all BibtexString objects in the database.
      * These are in no sorted order.
      */
-    public Set getStringKeySet() {
+    public Set<String> getStringKeySet() {
         return _strings.keySet();
     }
 
@@ -317,7 +307,7 @@ public class BibtexDatabase {
      * Returns the string at the given index.
      */
     public synchronized BibtexString getString(Object o) {
-        return (BibtexString)(_strings.get(o));
+        return (_strings.get(o));
     }
 
     /**
@@ -331,8 +321,8 @@ public class BibtexDatabase {
      * Returns true if a string with the given label already exists.
      */
     public synchronized boolean hasStringLabel(String label) {
-        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
-            if (((BibtexString)_strings.get(i.next())).getName().equals(label))
+    	for (BibtexString value : _strings.values()){
+             if (value.getName().equals(label))
                 return true;
         }
         return false;
@@ -412,8 +402,7 @@ public class BibtexDatabase {
     * If the string is undefined, returns null.
     */
     private String resolveString(String label, HashSet<String> usedIds) {
-        for (java.util.Iterator i=_strings.keySet().iterator(); i.hasNext();) {
-            BibtexString string = (BibtexString)_strings.get(i.next());
+    	for (BibtexString string : _strings.values()){
 
                 //Util.pr(label+" : "+string.getName());
             if (string.getName().toLowerCase().equals(label.toLowerCase())) {
@@ -556,7 +545,7 @@ public class BibtexDatabase {
                 if(allKeys.containsKey(key)){
                         // warning
                         exists=true;
-                        allKeys.put( key, new Integer( ((Integer)allKeys.get(key)).intValue() + 1));// incrementInteger( allKeys.get(key)));
+                        allKeys.put( key, new Integer( allKeys.get(key).intValue() + 1));// incrementInteger( allKeys.get(key)));
                 }else
                         allKeys.put( key, new Integer(1));
                 return exists;
@@ -569,7 +558,7 @@ public class BibtexDatabase {
     private void removeKeyFromSet(String key){
                 if((key == null) || key.equals("")) return;
                 if(allKeys.containsKey(key)){
-                        Integer tI = (Integer)allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+                        Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
                         if(tI.intValue()==1)
                                 allKeys.remove( key);
                         else
@@ -580,8 +569,8 @@ public class BibtexDatabase {
 
 
     public void fireDatabaseChanged(DatabaseChangeEvent e) {
-        for (Iterator i=changeListeners.iterator(); i.hasNext();) {
-            ((DatabaseChangeListener)i.next()).databaseChanged(e);
+    	for (DatabaseChangeListener listener : changeListeners){
+    		listener.databaseChanged(e);
         }
     }
 

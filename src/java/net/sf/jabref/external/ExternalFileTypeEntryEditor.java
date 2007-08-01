@@ -1,21 +1,18 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
-import net.sf.jabref.GUIGlobals;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.*;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
-import java.awt.*;
-import java.io.File;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * This class produces a dialog box for editing an external file type.

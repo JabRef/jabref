@@ -1,11 +1,12 @@
 package net.sf.jabref;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashSet;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-  HashSet extSet = new HashSet();
+  HashSet<String> extSet = new HashSet<String>();
   String desc;
 
   public OpenFileFilter(String[] extensions) {

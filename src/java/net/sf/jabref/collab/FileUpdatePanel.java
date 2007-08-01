@@ -1,12 +1,16 @@
 package net.sf.jabref.collab;
 
-import net.sf.jabref.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
-import java.io.IOException;
 import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.sf.jabref.*;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener {
 

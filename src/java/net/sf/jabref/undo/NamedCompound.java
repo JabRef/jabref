@@ -27,7 +27,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
+import javax.swing.undo.CompoundEdit;
+
 import net.sf.jabref.Globals;
 
 public class NamedCompound extends CompoundEdit {

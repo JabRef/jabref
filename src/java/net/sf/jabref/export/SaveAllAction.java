@@ -10,12 +10,8 @@
 package net.sf.jabref.export;
 
 import java.awt.event.ActionEvent;
-import net.sf.jabref.BasePanel;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
-import net.sf.jabref.Worker;
+
+import net.sf.jabref.*;
 import spin.Spin;
 
 /**

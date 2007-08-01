@@ -1,22 +1,24 @@
 package net.sf.jabref.journals;
 
-import net.sf.jabref.util.CaseChanger;
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.Globals;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.undo.UndoableFieldChange;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.undo.UndoManager;
 import javax.swing.undo.CompoundEdit;
-import java.io.*;
-import java.util.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.net.URL;
+import javax.swing.undo.UndoManager;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.EntryEditor;
+import net.sf.jabref.FieldEditor;
+import net.sf.jabref.Globals;
+import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.util.CaseChanger;
 
 /**
  * Created by IntelliJ IDEA.

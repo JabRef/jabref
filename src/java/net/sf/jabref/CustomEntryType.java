@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * This class is used to represent customized entry types.

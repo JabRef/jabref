@@ -1,12 +1,15 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.*;
-import net.sf.jabref.external.FileLinksUpgradeWarning;
-
-import javax.swing.*;
-import java.io.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.*;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.*;
 
 // The action concerned with opening an existing database.
 
@@ -38,7 +41,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        List filesToOpen = new ArrayList();
+        List<File> filesToOpen = new ArrayList<File>();
         //File fileToOpen = null;
 
         if (showDialog) {
@@ -68,8 +71,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int initialCount = filesToOpen.size(), removed = 0;
         
         // Check if any of the files are already open:
-        for (Iterator iterator = filesToOpen.iterator(); iterator.hasNext();) {
-            File file = (File) iterator.next();
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+            File file = iterator.next();
             for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel bp = (BasePanel)frame.baseAt(i);
                 if ((bp.getFile() != null) && bp.getFile().equals(file)) {
@@ -89,16 +92,16 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (filesToOpen.size() > 0) {
-            final List theFiles = Collections.unmodifiableList(filesToOpen);
+            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
             (new Thread() {
                 public void run() {
-                    for (Iterator i=theFiles.iterator(); i.hasNext();)
-                        openIt((File)i.next(), true);
+                    for (Iterator<File> i=theFiles.iterator(); i.hasNext();)
+                        openIt(i.next(), true);
 
                 }
             }).start();
-            for (Iterator i=theFiles.iterator(); i.hasNext();)
-                frame.getFileHistory().newFile(((File)i.next()).getPath());
+            for (Iterator<File> i=theFiles.iterator(); i.hasNext();)
+                frame.getFileHistory().newFile(i.next().getPath());
         }
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
@@ -182,7 +185,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         String fileName = file.getPath();
         BibtexDatabase db = pr.getDatabase();
-        HashMap meta = pr.getMetaData();
+        HashMap<String, String> meta = pr.getMetaData();
 
         if (pr.hasWarnings()) {
             final String[] wrns = pr.warnings();

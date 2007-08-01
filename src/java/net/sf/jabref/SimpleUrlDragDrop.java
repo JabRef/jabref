@@ -30,11 +30,7 @@ import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
@@ -94,27 +90,6 @@ public class SimpleUrlDragDrop implements DropTargetListener {
      * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
      */
     public void dragExit(DropTargetEvent dte) {
-    }
-
-    private static class JOptionChoice {
-
-        private String label;
-
-        private int id;
-
-        public JOptionChoice(String _label, int _id) {
-            label = _label;
-            id = _id;
-        }
-
-        public String toString() {
-            return label;
-        }
-
-        public int getId() {
-            return id;
-        }
-
     }
 
     /*

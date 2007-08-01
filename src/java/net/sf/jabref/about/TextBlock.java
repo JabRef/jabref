@@ -39,17 +39,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.sf.jabref.about ;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Vector;
 
-public class TextBlock
-{
-  private Vector textLines ;
+public class TextBlock implements Iterable<AboutTextLine> {
+
+  private Vector<AboutTextLine> textLines ;
   private AboutTextLine headLine ;
   private boolean visible ;
 
   public TextBlock()
   {
-    textLines = new Vector() ;
+    textLines = new Vector<AboutTextLine>() ;
     visible = false ;
   }
 
@@ -60,7 +61,9 @@ public class TextBlock
     textLines.add(line);
   }
 
-  public Enumeration getEnumeration() { return textLines.elements() ; }
+  public Iterator<AboutTextLine> iterator() { 
+	  return textLines.iterator(); 
+  }
 
 // ---------------------------------------------------------------------------
   public void setHeading(AboutTextLine head)

@@ -1,12 +1,15 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
-
-import javax.swing.*;
-import java.util.List;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
+
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 
 /**
  * Created by IntelliJ IDEA.

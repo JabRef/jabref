@@ -27,10 +27,15 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import net.sf.jabref.export.LatexFieldFormatter;
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.io.StringWriter;
+
 import javax.swing.JOptionPane;
+
+import net.sf.jabref.export.LatexFieldFormatter;
 
 /*
  * A transferable object containing an array of BibtexEntry objects. Used

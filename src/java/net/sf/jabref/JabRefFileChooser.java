@@ -25,13 +25,16 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 package net.sf.jabref;
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import javax.swing.plaf.*;
-import java.awt.event.*;
-import javax.swing.plaf.basic.*;
-import javax.swing.plaf.metal.*;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicFileChooserUI;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 
 //======================================================================
 // this class is a work around for the problem with regular filechooser:

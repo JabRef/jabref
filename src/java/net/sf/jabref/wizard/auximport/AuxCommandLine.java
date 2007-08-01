@@ -33,8 +33,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.auximport ;
 
-import net.sf.jabref.* ;
-import java.util.*;
+import java.util.Vector;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 public class AuxCommandLine
 {

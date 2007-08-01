@@ -33,16 +33,10 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Stack;
 
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.JViewport;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;

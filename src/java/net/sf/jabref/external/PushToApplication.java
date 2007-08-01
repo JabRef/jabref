@@ -1,9 +1,9 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BasePanel;
+import javax.swing.Icon;
 
-import javax.swing.*;
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexEntry;
 
 /**
  * Class that defines interaction with an external application in the form of

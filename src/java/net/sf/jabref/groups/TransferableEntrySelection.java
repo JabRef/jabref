@@ -22,11 +22,11 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.*;
-import java.io.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
-import javax.print.FlavorException;
 
 import net.sf.jabref.BibtexEntry;
 

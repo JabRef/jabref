@@ -26,12 +26,12 @@
  */
 package net.sf.jabref;
 
-import net.sf.jabref.export.layout.format.RemoveBrackets;
-
-import java.util.*;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.regex.Matcher;
+
+import net.sf.jabref.export.layout.format.RemoveBrackets;
 
 public class RegExpRule implements SearchRule {
 
@@ -42,12 +42,10 @@ public class RegExpRule implements SearchRule {
         m_caseSensitiveSearch = caseSensitive;
     }
 
-    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) throws PatternSyntaxException {
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) throws PatternSyntaxException {
 
         int score = 0;
-        Iterator e = searchStrings.values().iterator();
-
-        String searchString = (String) e.next();
+        String searchString = searchStrings.values().iterator().next();
 
         int flags = 0;
         if (!m_caseSensitiveSearch)

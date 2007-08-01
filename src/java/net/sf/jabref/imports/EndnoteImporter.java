@@ -1,17 +1,14 @@
 package net.sf.jabref.imports;
 
-import java.util.regex.Pattern;
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.Util;
-import net.sf.jabref.AuthorList;
-import net.sf.jabref.BibtexFields;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import net.sf.jabref.*;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -57,8 +54,8 @@ public class EndnoteImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-    ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     StringBuffer sb = new StringBuffer();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     String ENDOFRECORD = "__EOREOR__";
@@ -80,7 +77,7 @@ public class EndnoteImporter extends ImportFormat {
     }
 
     String[] entries = sb.toString().split(ENDOFRECORD);
-    HashMap hm = new HashMap();
+    HashMap<String, String> hm = new HashMap<String, String>();
     String author = "", Type = "", editor = "";
     for (int i = 0; i < entries.length; i++){
         hm.clear();

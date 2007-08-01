@@ -44,8 +44,8 @@ public class JstorImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-    ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     String s = "";
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     while ((s != null) && !s.startsWith("Item Type"))

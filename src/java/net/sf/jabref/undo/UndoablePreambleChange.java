@@ -26,8 +26,11 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.undo;
 
-import javax.swing.undo.*;
-import net.sf.jabref.*;
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.BasePanel;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.Globals;
 
 /**
  * This class represents a change in any field value. The relevant

@@ -4,12 +4,20 @@
  * */
 
 package net.sf.jabref.msbib;
-import net.sf.jabref.*;
-import java.util.*;
-import java.io.InputStream;
 import java.io.IOException;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
+import java.io.InputStream;
+import java.util.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 /**
  * @author S M Mahbub Murshed
  * @email udvranto@yahoo.com
@@ -25,11 +33,11 @@ import org.w3c.dom.*;
  * May 15, 2007 - Added suport for import
  */
 public class MSBibDatabase {
-	protected Set entries;
+	protected Set<MSBibEntry> entries;
 	
 	public MSBibDatabase() {
 		// maybe make this sorted later...
-		entries = new HashSet();
+		entries = new HashSet<MSBibEntry>();
 	}
 	
 	public MSBibDatabase(InputStream stream) throws IOException {
@@ -37,19 +45,19 @@ public class MSBibDatabase {
     }
 
 	public MSBibDatabase(BibtexDatabase bibtex) {
-		Set keySet = bibtex.getKeySet();
+		Set<String> keySet = bibtex.getKeySet();
         addEntries(bibtex, keySet);
     }
 
-    public MSBibDatabase(BibtexDatabase bibtex, Set keySet) {
+    public MSBibDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         if (keySet == null)
             keySet = bibtex.getKeySet();
         addEntries(bibtex, keySet);
     }
 
-    public List importEntries(InputStream stream) throws IOException {
-    	entries = new HashSet();	
-    	ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    	entries = new HashSet<MSBibEntry>();	
+    	ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     	Document docin = null;
     	try {
     	DocumentBuilder dbuild = DocumentBuilderFactory.
@@ -81,10 +89,10 @@ public class MSBibDatabase {
    		return bibitems;
     }
 
-    private void addEntries(BibtexDatabase database, Set keySet) {
-        entries = new HashSet();
-        for(Iterator iter = keySet.iterator(); iter.hasNext(); ) {
-			BibtexEntry entry = database.getEntryById((String)iter.next());
+    private void addEntries(BibtexDatabase database, Set<String> keySet) {
+        entries = new HashSet<MSBibEntry>();
+        for (String s : keySet){
+        	BibtexEntry entry = database.getEntryById(s);
 			MSBibEntry newMods = new MSBibEntry(entry);
 			entries.add(newMods);
 		}
@@ -101,8 +109,8 @@ public class MSBibDatabase {
 	   		msbibCollection.setAttribute("xmlns", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
 	   		msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");	   			   		 
 	   		
-	   		for(Iterator iter = entries.iterator(); iter.hasNext(); ) {
-	   			MSBibEntry entry = (MSBibEntry) iter.next();
+	   		for(Iterator<MSBibEntry> iter = entries.iterator(); iter.hasNext(); ) {
+	   			MSBibEntry entry = iter.next();
 	   			Node node = entry.getDOMrepresentation(result);
 	   			msbibCollection.appendChild(node);
 	   		}

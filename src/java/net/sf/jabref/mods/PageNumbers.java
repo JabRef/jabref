@@ -6,17 +6,12 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package net.sf.jabref.mods;
-import net.sf.jabref.export.layout.format.*;
-import net.sf.jabref.export.layout.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import org.w3c.dom.*;
-import java.util.*;
-import java.io.*;
-import java.util.regex.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * @author Michael Wrighton
  * @author S M Mahbub Murshed

@@ -28,33 +28,19 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.Vector;
 
-import javax.swing.filechooser.FileFilter;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -62,7 +48,10 @@ import javax.swing.undo.CannotUndoException;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.export.*;
+import net.sf.jabref.export.ExportToClipboardAction;
+import net.sf.jabref.export.FileActions;
+import net.sf.jabref.export.SaveException;
+import net.sf.jabref.export.SaveSession;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -74,12 +63,7 @@ import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
-import net.sf.jabref.undo.CountingUndoManager;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableChangeType;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import net.sf.jabref.undo.UndoableKeyChange;
-import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -89,8 +73,6 @@ import ca.odell.glazedlists.matchers.Matcher;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
-
-import javax.swing.*;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -123,7 +105,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     GridBagLayout gbl = new GridBagLayout();
     GridBagConstraints con = new GridBagConstraints();
 
-    HashMap autoCompleters = new HashMap();
+    HashMap<String, AutoCompleter> autoCompleters = new HashMap<String, AutoCompleter>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -147,7 +129,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     BibtexEntry showing = null;
     // To indicate which entry is currently shown.
-    public HashMap entryEditors = new HashMap();
+    public HashMap<String, EntryEditor> entryEditors = new HashMap<String, EntryEditor>();
     // To contain instantiated entry editors. This is to save time
     // in switching between entries.
 
@@ -206,7 +188,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public BasePanel(JabRefFrame frame, BibtexDatabase db, File file,
-                     HashMap meta, String encoding) {
+                     HashMap<String, String> meta, String encoding) {
 
         this.encoding = encoding;
        // System.out.println(encoding);
@@ -832,14 +814,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
         //int[] rows;
-        List entries;
+        List<BibtexEntry> entries;
         int numSelected;
         boolean cancelled = false;
 
         // Run first, in EDT:
         public void init() {
 
-                    entries = new ArrayList(Arrays.asList(getSelectedEntries()));
+                    entries = new ArrayList<BibtexEntry>(Arrays.asList(getSelectedEntries()));
                     //rows = entryTable.getSelectedRows() ;
                     numSelected = entries.size();
 
@@ -858,13 +840,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 public void run() {
                     BibtexEntry bes = null ;
                     NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
-                    //BibtexEntry be;
-                    Object oldValue;
-                    boolean hasShownWarning = false;
+
                     // First check if any entries have keys set already. If so, possibly remove
                     // them from consideration, or warn about overwriting keys.
-                    loop: for (Iterator i=entries.iterator(); i.hasNext();) {
-                        bes = (BibtexEntry)i.next();
+                    loop: for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                        bes = i.next();
                         if (bes.getField(BibtexFields.KEY_FIELD) != null) {
                             if (Globals.prefs.getBoolean("avoidOverwritingKey"))
                                 // Rmove the entry, because its key is already set:
@@ -889,19 +869,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     }
 
-                    HashMap oldvals = new HashMap();
+                    HashMap<BibtexEntry, Object> oldvals = new HashMap<BibtexEntry, Object>();
                     // Iterate again, removing already set keys. This is skipped if overwriting
                     // is disabled, since all entries with keys set will have been removed.
-                    if (!Globals.prefs.getBoolean("avoidOverwritingKey")) for (Iterator i=entries.iterator(); i.hasNext();) {
-                        bes = (BibtexEntry)i.next();
+                    if (!Globals.prefs.getBoolean("avoidOverwritingKey")) for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                        bes = i.next();
                         // Store the old value:
                         oldvals.put(bes, bes.getField(BibtexFields.KEY_FIELD));
                         database.setCiteKeyForEntry(bes.getId(), null);
                     }
 
                     // Finally, set the new keys:
-                    for (Iterator i=entries.iterator(); i.hasNext();) {
-                        bes = (BibtexEntry)i.next();
+                    for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+                        bes = i.next();
                         bes = LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
                         ce.addEdit(new UndoableKeyChange
                                    (database, bes.getId(), (String)oldvals.get(bes),
@@ -963,7 +943,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if ((bes != null) && (bes.length > 0)) {
                         storeCurrentEdit();
                         //String[] keys = new String[bes.length];
-                        Vector keys = new Vector();
+                        Vector<Object> keys = new Vector<Object>();
                         // Collect all non-null keys.
                         for (int i=0; i<bes.length; i++)
                             if (bes[i].getField(BibtexFields.KEY_FIELD) != null)
@@ -1001,7 +981,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     if ((bes != null) && (bes.length > 0)) {
                         storeCurrentEdit();
                         //String[] keys = new String[bes.length];
-                        Vector keys = new Vector();
+                        Vector<Object> keys = new Vector<Object>();
                         // Collect all non-null keys.
                         for (int i=0; i<bes.length; i++)
                             if (bes[i].getField(BibtexFields.KEY_FIELD) != null)
@@ -1518,7 +1498,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 database.insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList list = new ArrayList();
+                ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
                 list.add(be);
                 Util.setAutomaticFields(list);
 
@@ -1526,7 +1506,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
                 output(Globals.lang("Added new")+" '"+type.getName().toLowerCase()+"' "
                        +Globals.lang("entry")+".");
-                final int row = mainTable.findEntry(be);
+                mainTable.findEntry(be);
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
@@ -1755,12 +1735,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         repaint();
     }
 
-    public HashMap getAutoCompleters() {
+    public HashMap<String, AutoCompleter> getAutoCompleters() {
         return autoCompleters;
     }
     
     public AutoCompleter getAutoCompleter(String fieldName) {
-        return (AutoCompleter)autoCompleters.get(fieldName);
+        return autoCompleters.get(fieldName);
     }
 
     private void instantiateAutoCompleters() {
@@ -1912,7 +1892,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         if (entryEditors.containsKey(be.getType().getName())) {
             // We already have an editor for this entry type.
-            form = (EntryEditor)entryEditors.get
+            form = entryEditors.get
                 ((be.getType().getName()));
             form.switchTo(be);
             if (visName != null)
@@ -1954,7 +1934,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (entryEditors.containsKey(entry.getType().getName())) {
             EntryEditor visibleNow = currentEditor;
             // We already have an editor for this entry type.
-            form = (EntryEditor)entryEditors.get
+            form = entryEditors.get
                 ((entry.getType().getName()));
 
             form.switchTo(entry);
@@ -2116,15 +2096,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * the Manage dialog.
      */
     public void updateAllContentSelectors() {
-        for (Iterator i=entryEditors.keySet().iterator(); i.hasNext();) {
-            EntryEditor ed = (EntryEditor)entryEditors.get(i.next());
+        for (Iterator<String> i=entryEditors.keySet().iterator(); i.hasNext();) {
+            EntryEditor ed = entryEditors.get(i.next());
             ed.updateAllContentSelectors();
         }
     }
 
     public void rebuildAllEntryEditors() {
-        for (Iterator i=entryEditors.keySet().iterator(); i.hasNext();) {
-            EntryEditor ed = (EntryEditor)entryEditors.get(i.next());
+        for (Iterator<String> i=entryEditors.keySet().iterator(); i.hasNext();) {
+            EntryEditor ed = entryEditors.get(i.next());
             ed.rebuildPanels();
         }
 

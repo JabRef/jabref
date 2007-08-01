@@ -36,7 +36,8 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity ;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 
 public class IntegrityMessage implements Cloneable
 {

@@ -1,22 +1,21 @@
 package net.sf.jabref.imports;
 
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.imports.OpenDatabaseAction;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.*;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.ExplicitGroup;
-import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableInsertString;
-
-import javax.swing.*;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Enumeration;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

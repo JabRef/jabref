@@ -1,20 +1,22 @@
 package net.sf.jabref.gui;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.event.*;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.Util;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
+import net.sf.jabref.external.ExternalFileType;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.

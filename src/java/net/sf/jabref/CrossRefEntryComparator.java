@@ -35,15 +35,11 @@ import java.util.Comparator;
  * the purpose of always placing referenced entries after referring entries in
  * the .bib file. After this criterion comes comparisons of individual fields.
  */
-public class CrossRefEntryComparator implements Comparator {
+public class CrossRefEntryComparator implements Comparator<BibtexEntry> {
 
     private String crossRefField = "crossref";
 
-    public int compare(Object o1, Object o2) throws ClassCastException {
-	if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
-	   throw new ClassCastException("Trouble comparing objects. This shouldn't happen.");
-	BibtexEntry e1 = (BibtexEntry)o1,
-	    e2 = (BibtexEntry)o2;
+    public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
 
 	Object f1 = e1.getField(crossRefField),
 	    f2 = e2.getField(crossRefField);

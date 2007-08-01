@@ -39,8 +39,12 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity ;
 
-import net.sf.jabref.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
 
 public class IntegrityCheck
 {

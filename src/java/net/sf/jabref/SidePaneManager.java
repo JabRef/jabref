@@ -26,11 +26,7 @@
  */
 package net.sf.jabref;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -51,9 +47,9 @@ public class SidePaneManager {
 
 	SidePane sidep;
 
-	Map components = new LinkedHashMap();
+	Map<String, SidePaneComponent> components = new LinkedHashMap<String, SidePaneComponent>();
 
-	List visible = new LinkedList();
+	List<SidePaneComponent> visible = new LinkedList<SidePaneComponent>();
 
 	public SidePaneManager(JabRefFrame frame) {
 		this.frame = frame;
@@ -144,7 +140,7 @@ public class SidePaneManager {
 	}
 
     public synchronized void hideComponent(String name) {
-	SidePaneComponent comp = (SidePaneComponent)components.get(name);
+	SidePaneComponent comp = components.get(name);
 	if (comp == null)
 	    return;
 	if (visible.contains(comp)) {
@@ -167,9 +163,9 @@ public class SidePaneManager {
 	 * @param panel
 	 */
 	public void setActiveBasePanel(BasePanel panel) {
-		for (Iterator i = components.keySet().iterator(); i.hasNext();) {
+		for (Iterator<String> i = components.keySet().iterator(); i.hasNext();) {
 			Object key = i.next();
-			((SidePaneComponent) components.get(key)).setActiveBasePanel(panel);
+			components.get(key).setActiveBasePanel(panel);
 		}
 	}
 

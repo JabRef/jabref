@@ -12,25 +12,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.EntryEditor;
-import net.sf.jabref.FieldEditor;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.OpenFileFilter;
-import net.sf.jabref.UrlDragDrop;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.net.URLDownload;
 import net.sf.jabref.util.XMPUtil;
 

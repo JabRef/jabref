@@ -26,7 +26,9 @@ import java.util.Map;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.SearchRule;
 
 /**
  * A group of BibtexEntries.

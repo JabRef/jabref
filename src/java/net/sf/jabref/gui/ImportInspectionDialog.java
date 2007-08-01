@@ -1,37 +1,43 @@
 package net.sf.jabref.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.AllEntriesGroup;
+import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
-
-import javax.swing.*;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.*;
-import java.util.*;
-import java.util.List;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.TableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.uif_lite.component.UIFSplitPane;
-import ca.odell.glazedlists.*;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
-import ca.odell.glazedlists.swing.EventTableModel;
-import ca.odell.glazedlists.swing.EventSelectionModel;
 
 
 /**
@@ -59,9 +65,9 @@ public class ImportInspectionDialog extends JDialog {
         generate = new JButton(Globals.lang("Generate now"));
     private EventList entries = new BasicEventList();
     private SortedList sortedList;
-    private List entriesToDelete = new ArrayList(); // Duplicate resolving may require deletion of old entries.
+    private List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>(); // Duplicate resolving may require deletion of old entries.
     private String undoName;
-    private ArrayList callBacks = new ArrayList();
+    private ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
     private boolean newDatabase;
     private JMenu groupsAdd = new JMenu(Globals.lang("Add to group"));
     private JPopupMenu popup = new JPopupMenu();
@@ -75,7 +81,7 @@ public class ImportInspectionDialog extends JDialog {
     private boolean generatedKeys = false; // Set to true after keys have been generated.
     private boolean defaultSelected = true;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private Map groupAdditions = new HashMap();
+    private Map<BibtexEntry, Set> groupAdditions = new HashMap<BibtexEntry, Set>();
     private JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs.getBoolean("generateKeysAfterInspection"));
     private JLabel
         duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
@@ -239,7 +245,7 @@ public class ImportInspectionDialog extends JDialog {
      * @param entry The entry to add.
      */
     public void addEntry(BibtexEntry entry) {
-        List list = new ArrayList();
+        List<BibtexEntry> list = new ArrayList<BibtexEntry>();
         list.add(entry);
         addEntries(list);
     }
@@ -251,10 +257,9 @@ public class ImportInspectionDialog extends JDialog {
      *
      * @param entries
      */
-    public void addEntries(Collection entries) {
+    public void addEntries(Collection<BibtexEntry> entries) {
 
-        for (Iterator i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
+    	for (BibtexEntry entry : entries){
             // We exploit the entry's search status for indicating "Keep" status:
             entry.setSearchHit(defaultSelected);
             // We exploit the entry's group status for indicating duplicate status.
@@ -329,10 +334,10 @@ public class ImportInspectionDialog extends JDialog {
      *
      * @return a List containing the selected entries.
      */
-    public List getSelectedEntries() {
-        List selected = new ArrayList();
-        for (Iterator i=entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)i.next();
+    public List<BibtexEntry> getSelectedEntries() {
+        List<BibtexEntry> selected = new ArrayList<BibtexEntry>();
+        for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = i.next();
             if (entry.isSearchHit())
                 selected.add(entry);
         }
@@ -391,11 +396,11 @@ public class ImportInspectionDialog extends JDialog {
         // ... or create a temporary one:
         else
             database = new BibtexDatabase();
-        List keys = new ArrayList(entries.size());
+        List<String> keys = new ArrayList<String>(entries.size());
         // Iterate over the entries, add them to the database we are working with,
         // and generate unique keys:
-        for (Iterator i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
+        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = i.next();
             //if (newDatabase) {
             try {
                 entry.setId(Util.createNeutralId());
@@ -411,8 +416,8 @@ public class ImportInspectionDialog extends JDialog {
         // Remove the entries from the database again, since they are not supposed to
         // added yet. They only needed to be in it while we generated the keys, to keep
         // control over key uniqueness.
-        for (Iterator i = entries.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry) i.next();
+        for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
+            BibtexEntry entry = i.next();
             database.removeEntry(entry.getId());
         }
         entries.getReadWriteLock().writeLock().lock();
@@ -480,10 +485,10 @@ public class ImportInspectionDialog extends JDialog {
             for (Iterator i=selectionModel.getSelected().iterator(); i.hasNext();) {
                 BibtexEntry entry = (BibtexEntry)i.next();
                 // We store the groups this entry should be added to in a Set in the Map:
-                Set groups = (Set) groupAdditions.get(entry);
+                Set<GroupTreeNode> groups = groupAdditions.get(entry);
                 if (groups == null) {
                     // No previous definitions, so we create the Set now:
-                    groups = new HashSet();
+                    groups = new HashSet<GroupTreeNode>();
                     groupAdditions.put(entry, groups);
                 }
                 // Add the group:
@@ -514,9 +519,9 @@ public class ImportInspectionDialog extends JDialog {
             // First check if we are supposed to warn about duplicates. If so, see if there
             // are unresolved duplicates, and warn if yes.
             if (Globals.prefs.getBoolean("warnAboutDuplicatesInInspection")) {
-                for (Iterator i=entries.iterator(); i.hasNext();) {
+                for (Iterator<BibtexEntry> i=entries.iterator(); i.hasNext();) {
 
-                    BibtexEntry entry = (BibtexEntry)i.next();
+                    BibtexEntry entry = i.next();
                     // Only check entries that are to be imported. Keep status is indicated
                     // through the search hit status of the entry:
                     if (!entry.isSearchHit())
@@ -544,8 +549,8 @@ public class ImportInspectionDialog extends JDialog {
 
             // See if we should remove any old entries for duplicate resolving:
             if (entriesToDelete.size() > 0) {
-                for (Iterator i=entriesToDelete.iterator(); i.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry)i.next();
+                for (Iterator<BibtexEntry> i=entriesToDelete.iterator(); i.hasNext();) {
+                    BibtexEntry entry = i.next();
                     ce.addEdit(new UndoableRemoveEntry(panel.database(), entry, panel));
                     panel.database().removeEntry(entry.getId());
                 }
@@ -562,7 +567,7 @@ public class ImportInspectionDialog extends JDialog {
             // Remember the choice until next time:
             Globals.prefs.putBoolean("generateKeysAfterInspection", autoGenerate.isSelected());
 
-            final List selected = getSelectedEntries();
+            final List<BibtexEntry> selected = getSelectedEntries();
 
             if (selected.size() > 0) {
 
@@ -578,8 +583,8 @@ public class ImportInspectionDialog extends JDialog {
                 Util.setAutomaticFields(selected);
 
 
-                for (Iterator i = selected.iterator(); i.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry) i.next();
+                for (Iterator<BibtexEntry> i = selected.iterator(); i.hasNext();) {
+                    BibtexEntry entry = i.next();
                     //entry.clone();
 
                     // Remove settings to group/search hit status:
@@ -587,7 +592,7 @@ public class ImportInspectionDialog extends JDialog {
                     entry.setGroupHit(false);
 
                     // If this entry should be added to any groups, do it now:
-                    Set groups = (Set) groupAdditions.get(entry);
+                    Set groups = groupAdditions.get(entry);
                     if (!groupingCanceled && (groups != null)) {
                         if (entry.getField(BibtexFields.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the group.
@@ -642,8 +647,8 @@ public class ImportInspectionDialog extends JDialog {
                         frame.addTab(panel, null, true);
                     }
                     panel.markBaseChanged();
-                    for (Iterator i = callBacks.iterator(); i.hasNext();) {
-                        ((CallBack) i.next()).done(selected.size());
+                    for (Iterator<CallBack> i = callBacks.iterator(); i.hasNext();) {
+                        i.next().done(selected.size());
                     }
                 }
             });
@@ -653,8 +658,8 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     private void signalStopFetching() {
-        for (Iterator i = callBacks.iterator(); i.hasNext();) {
-            ((CallBack) i.next()).stopFetching();
+        for (Iterator<CallBack> i = callBacks.iterator(); i.hasNext();) {
+            i.next().stopFetching();
         }
     }
 
@@ -689,8 +694,8 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             signalStopFetching();
             dispose();
-            for (Iterator i = callBacks.iterator(); i.hasNext();) {
-                ((CallBack) i.next()).cancelled();
+            for (Iterator<CallBack> i = callBacks.iterator(); i.hasNext();) {
+                i.next().cancelled();
             }
         }
     }
@@ -727,7 +732,7 @@ public class ImportInspectionDialog extends JDialog {
     class MyTableModel extends DefaultTableModel {
 
 
-        public Class getColumnClass(int i) {
+        public Class<?> getColumnClass(int i) {
             if (i == 0)
                 return Boolean.class;
             else
@@ -1070,7 +1075,7 @@ public class ImportInspectionDialog extends JDialog {
 
     private void setupComparatorChooser() {
         // First column:
-        java.util.List comparators = comparatorChooser.getComparatorsForColumn(0);
+        java.util.List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
 
         comparators = comparatorChooser.getComparatorsForColumn(1);

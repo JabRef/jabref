@@ -27,13 +27,19 @@
 
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.groups.GroupsPrefsTab;
 import net.sf.jabref.gui.MainTable;
@@ -79,7 +85,7 @@ public class PrefsDialog3 extends JDialog {
 		// ----------------------------------------------------------------
 		// Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
 		// ----------------------------------------------------------------
-		ArrayList tabs = new ArrayList();
+		ArrayList<PrefsTab> tabs = new ArrayList<PrefsTab>();
 		tabs.add(new GeneralTab(frame, prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
@@ -93,7 +99,7 @@ public class PrefsDialog3 extends JDialog {
 		tabs.add(new XmpPrefsTab());
         tabs.add(new AdvancedTab(prefs, parent.helpDiag));
 		
-		Iterator it = tabs.iterator();
+		Iterator<PrefsTab> it = tabs.iterator();
 		String[] names = new String[tabs.size()];
 		int i = 0;
 		while (it.hasNext()) {

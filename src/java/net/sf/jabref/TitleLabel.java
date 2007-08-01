@@ -1,7 +1,8 @@
 package net.sf.jabref;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 public class TitleLabel extends JLabel {
 

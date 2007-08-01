@@ -30,7 +30,7 @@ import java.util.Map;
 
 public interface SearchRule{
 
-    public int applyRule(Map searchStrings,BibtexEntry bibtexEntry) ;
+    public int applyRule(Map<String, String> searchStrings,BibtexEntry bibtexEntry) ;
 
 }
 

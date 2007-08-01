@@ -7,7 +7,9 @@ package gnu.dtools.ritopt;
  *    $Id$
  */
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * This class facilitates the built-in menu feature for ritopt. When the

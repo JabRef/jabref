@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.components;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 /**
  * A JPanel that by default uses a BoxLayout.Y_AXIS

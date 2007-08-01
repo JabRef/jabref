@@ -22,12 +22,18 @@
 
 package net.sf.jabref.groups;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.jabref.*;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.Util;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its

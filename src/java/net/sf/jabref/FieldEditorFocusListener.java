@@ -1,8 +1,9 @@
 package net.sf.jabref;
 
-import java.awt.event.FocusListener;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusEvent;
-import java.awt.*;
+import java.awt.event.FocusListener;
 
 
 /**

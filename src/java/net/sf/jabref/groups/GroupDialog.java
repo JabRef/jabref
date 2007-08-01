@@ -26,21 +26,31 @@
  */
 package net.sf.jabref.groups;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.regex.*;
+import java.awt.CardLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.*;
+import net.sf.jabref.search.SearchExpressionParser;
 import antlr.collections.AST;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector

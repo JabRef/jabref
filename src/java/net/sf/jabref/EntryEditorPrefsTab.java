@@ -1,15 +1,15 @@
 package net.sf.jabref;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import java.awt.BorderLayout;
+import java.awt.Insets;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.awt.*;
-import java.util.Iterator;
-import java.text.SimpleDateFormat;
+import javax.swing.event.ChangeListener;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
 

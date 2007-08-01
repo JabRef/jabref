@@ -1,8 +1,10 @@
 package net.sf.jabref.imports;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+
+import net.sf.jabref.BibtexEntry;
 
 /**
  * Role of an importer for JabRef.
@@ -15,7 +17,7 @@ import java.util.List;
  * </li></ol>
  * </p>
  */
-public abstract class ImportFormat implements Comparable {
+public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     private boolean isCustomImporter;
     
@@ -35,7 +37,7 @@ public abstract class ImportFormat implements Comparable {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public abstract List importEntries(InputStream in) throws IOException;
+    public abstract List<BibtexEntry> importEntries(InputStream in) throws IOException;
 
 
     /**
@@ -143,9 +145,8 @@ public abstract class ImportFormat implements Comparable {
      *  (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object o) {
+    public int compareTo(ImportFormat importer) {
       int result = 0;
-      ImportFormat importer = (ImportFormat)o;
       if (getIsCustomImporter() == importer.getIsCustomImporter()) {
         result = getFormatName().compareTo(importer.getFormatName());
       } else {

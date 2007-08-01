@@ -45,8 +45,8 @@ public class ScifinderImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-    ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+    ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
     StringBuffer sb = new StringBuffer();
     BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
     String str;
@@ -55,7 +55,7 @@ public class ScifinderImporter extends ImportFormat {
     }
 
     String[] entries = sb.toString().split("START_RECORD");
-    HashMap hm = new HashMap();
+    HashMap<String, String> hm = new HashMap<String, String>();
     for (int i = 1; i < entries.length; i++){
         String[] fields = entries[i].split("FIELD ");
         String Type = "";

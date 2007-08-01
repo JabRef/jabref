@@ -1,10 +1,14 @@
 package net.sf.jabref;
 
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.LinkedList;
-import java.util.Iterator;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class FileHistory extends JMenu implements ActionListener {
 

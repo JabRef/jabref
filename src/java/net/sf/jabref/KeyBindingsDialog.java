@@ -27,12 +27,17 @@
 
 package net.sf.jabref;
 
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.*;
-import javax.swing.event.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeMap;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 //
@@ -43,18 +48,18 @@ class KeyBindingsDialog
   //JList list = new JList();
   JTextField keyTF = new JTextField();
   JButton ok, cancel, grabB, defB;
-  HashMap bindHM, defBinds;
+  HashMap<String, String> bindHM, defBinds;
   boolean clickedSave = false;
   int selectedRow = -1;
   boolean getAction() {
     return clickedSave;
   }
 
-  HashMap getNewKeyBindings() {
+  HashMap<String, String> getNewKeyBindings() {
     return bindHM;
   }
 
-  public KeyBindingsDialog(HashMap name2binding, HashMap defBinds) {
+  public KeyBindingsDialog(HashMap<String, String> name2binding, HashMap<String, String> defBinds) {
     super();
     this.defBinds = defBinds;
     setTitle(Globals.lang("Key bindings"));
@@ -188,71 +193,29 @@ class KeyBindingsDialog
         // Iterate all selected items
         for (int i = 0; i < selected.length; i++) {
           Object sel = selected[i];
-          keyTF.setText( (String) bindHM.get(sel));
+          keyTF.setText( bindHM.get(sel));
         }
       }
     }
   }
 
-  class MyListDataListener
-      implements ListDataListener {
-    // This method is called when new items have been added to the list
-    public void intervalAdded(ListDataEvent evt) {
-      DefaultListModel model = (DefaultListModel) evt.getSource();
-
-      // Get range of new  items
-      int start = evt.getIndex0();
-      int end = evt.getIndex1();
-      int count = end - start + 1;
-
-      // Get new items
-      for (int i = start; i <= end; i++) {
-        Object item = model.getElementAt(i);
-      }
-    }
-
-    // This method is called when items have been removed from the list
-    public void intervalRemoved(ListDataEvent evt) {
-      // Get range of removed items
-      int start = evt.getIndex0();
-      int end = evt.getIndex1();
-      int count = end - start + 1;
-
-      // The removed items are not available
-    }
-
-    // This method is called when items in the list are replaced
-    public void contentsChanged(ListDataEvent evt) {
-      DefaultListModel model = (DefaultListModel) evt.getSource();
-
-      // Get range of changed items
-      int start = evt.getIndex0();
-      int end = evt.getIndex1();
-      int count = end - start + 1;
-
-      // Get changed items
-      for (int i = start; i <= end; i++) {
-        Object item = model.getElementAt(i);
-      }
-    }
-  }
+  
 
   //setup so that clicking on list will display the current binding
   void setList() {
 
-    DefaultListModel listModel = new DefaultListModel();
-    Iterator it = bindHM.keySet().iterator();
+    Iterator<String> it = bindHM.keySet().iterator();
     String[][] tableData = new String[bindHM.size()][3];
     int i=0;
     while (it.hasNext()) {
-      String s = (String) it.next();
+      String s = it.next();
       tableData[i][2] = s;
-      tableData[i][1] = (String) bindHM.get(s);
+      tableData[i][1] = bindHM.get(s);
       tableData[i][0] = Globals.lang(s);
       i++;
       //listModel.addElement(s + " (" + bindHM.get(s) + ")");
    }
-   TreeMap sorted = new TreeMap();
+   TreeMap<String, String[]> sorted = new TreeMap<String, String[]>();
    for (i=0; i<tableData.length; i++)
      sorted.put(tableData[i][0], tableData[i]);
 
@@ -279,12 +242,12 @@ class KeyBindingsDialog
     class KeystrokeTableModel extends AbstractTableModel {
       String[][] data;
       //String[] trData;
-      public KeystrokeTableModel(TreeMap sorted) {
+      public KeystrokeTableModel(TreeMap<String, String[]> sorted) {
         data = new String[sorted.size()][3];
-        Iterator i = sorted.keySet().iterator();
+        Iterator<String> i = sorted.keySet().iterator();
         int row = 0;
         while (i.hasNext()) {
-          data[row++] = ((String[])sorted.get(i.next()));
+          data[row++] = sorted.get(i.next());
         }
         //for (int i=0; i<trData.length; i++)
         //  trData[i] = Globals.lang(data[i][0]);
@@ -341,7 +304,7 @@ class KeyBindingsDialog
   }
 
   String setToDefault(String name) {
-    String defKey = (String) defBinds.get(name);
+    String defKey = defBinds.get(name);
     bindHM.put(name, defKey);
     return defKey;
   }

@@ -27,29 +27,14 @@
 
 package net.sf.jabref.imports;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PushbackReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.sf.jabref.BibtexDatabase;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexEntryType;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.BibtexString;
-import net.sf.jabref.CustomEntryType;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.KeyCollisionException;
-import net.sf.jabref.UnknownEntryType;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 
 /**
  * Class for importing BibTeX-files.

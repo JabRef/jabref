@@ -1,10 +1,9 @@
 package net.sf.jabref.wizard.text.gui ;
 
+import java.util.Enumeration;
+import java.util.Vector;
+
 import javax.swing.DefaultListModel;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.event.TableModelListener;
-import java.util.*;
 
 public class HintListModel extends DefaultListModel
 {

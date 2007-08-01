@@ -1,7 +1,6 @@
 // $ANTLR : "Parser.g" -> "SearchExpressionParser.java"$
 
 package net.sf.jabref.search;
-import java.io.StringReader;
 
 public interface SearchExpressionParserTokenTypes {
 	int EOF = 1;

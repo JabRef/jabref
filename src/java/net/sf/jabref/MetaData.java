@@ -27,12 +27,16 @@
 package net.sf.jabref;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import net.sf.jabref.groups.*;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.VersionHandling;
 
-public class MetaData {
-    private HashMap metaData = new HashMap();
+public class MetaData implements Iterable<String> {
+    private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
@@ -43,19 +47,19 @@ public class MetaData {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(HashMap inData, BibtexDatabase db) {
+    public MetaData(HashMap<String, String> inData, BibtexDatabase db) {
         boolean groupsTreePresent = false;
-        Vector flatGroupsData = null;
-        Vector treeGroupsData = null;
+        Vector<String> flatGroupsData = null;
+        Vector<String> treeGroupsData = null;
         // The first version (0) lacked a version specification, 
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
         
-        if (inData != null) for (Iterator i = inData.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
-            data = new StringReader((String) inData.get(key));
+        if (inData != null) 
+        	for (String key : inData.keySet()){
+            data = new StringReader(inData.get(key));
             String unit;
-            Vector orderedData = new Vector();
+            Vector<String> orderedData = new Vector<String>();
             // We must allow for ; and \ in escape sequences.
             try {
                 while ((unit = getNextUnit(data)) != null) {
@@ -99,18 +103,18 @@ public class MetaData {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<String>());
+        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<String>());
     }
 
-    public Iterator iterator() {
+    public Iterator<String> iterator() {
         return metaData.keySet().iterator();
     }
 
-    public Vector getData(String key) {
-        return (Vector) metaData.get(key);
+    public Vector<String> getData(String key) {
+        return metaData.get(key);
     }
 
     public void remove(String key) {
@@ -123,7 +127,7 @@ public class MetaData {
      * reconstructed from their textual (String) representation if they are of
      * type String, and stored as an actual instance.
      */
-    public void putData(String key, Vector orderedData) {
+    public void putData(String key, Vector<String> orderedData) {
         metaData.put(key, orderedData);
     }
 
@@ -139,9 +143,9 @@ public class MetaData {
         // metadata directory takes precedence if defined.
         String key = fieldName + "Directory";
         String dir;
-        Vector vec = getData(key);
+        Vector<String> vec = getData(key);
         if ((vec != null) && (vec.size() > 0)) {
-            dir = (String)vec.get(0);
+            dir = vec.get(0);
             // If this directory is relative, we try to interpret it as relative to
             // the file path of this bib file:
             if (!(new File(dir)).isAbsolute() && (file != null)) {
@@ -162,7 +166,7 @@ public class MetaData {
         return dir;
     }
 
-    private void putGroups(Vector orderedData, BibtexDatabase db, int version) {
+    private void putGroups(Vector<String> orderedData, BibtexDatabase db, int version) {
         try {
             groupsRoot = VersionHandling.importGroups(orderedData, db, 
                     version);
@@ -190,10 +194,10 @@ public class MetaData {
      */
     public void writeMetaData(Writer out) throws IOException {
         // write all meta data except groups
-        for (Iterator i = metaData.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Iterator<String> i = metaData.keySet().iterator(); i.hasNext();) {
+            String key = i.next();
             StringBuffer sb = new StringBuffer();
-            Vector orderedData = (Vector) metaData.get(key);
+            Vector<String> orderedData = metaData.get(key);
             if (orderedData.size() >= 0) {
                 sb.append("@comment{").append(GUIGlobals.META_FLAG).append(key).append(":");
                 for (int j = 0; j < orderedData.size(); j++) {

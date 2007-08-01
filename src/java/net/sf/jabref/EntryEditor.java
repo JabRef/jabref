@@ -26,29 +26,38 @@ package net.sf.jabref;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.dnd.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
 import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
-import java.util.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.VetoableChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.export.LatexFieldFormatter;
-import net.sf.jabref.groups.*;
-import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.labelPattern.LabelPatternUtil;
-import net.sf.jabref.undo.*;
 import net.sf.jabref.external.ExternalFilePanel;
-import net.sf.jabref.journals.JournalAbbreviations;
-import net.sf.jabref.gui.date.*;
+import net.sf.jabref.groups.AbstractGroup;
+import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.gui.AutoCompleter;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.date.DatePickerButton;
+import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.journals.JournalAbbreviations;
+import net.sf.jabref.labelPattern.LabelPatternUtil;
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableFieldChange;
+import net.sf.jabref.undo.UndoableKeyChange;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 
 /**
  * GUI component that allows editing of the fields of a BibtexEntry. EntryEditor

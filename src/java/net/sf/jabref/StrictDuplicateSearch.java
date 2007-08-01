@@ -6,11 +6,14 @@
 
 package net.sf.jabref;
 
-import javax.swing.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableRemoveEntry;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.undo.NamedCompound;
+import net.sf.jabref.undo.UndoableRemoveEntry;
 
 /**
  *
@@ -27,9 +30,8 @@ public class StrictDuplicateSearch extends Thread {
     }
     
     public void run() {
-        HashSet toRemove = new HashSet();
+        HashSet<BibtexEntry> toRemove = new HashSet<BibtexEntry>();
         NamedCompound ce = new NamedCompound(Globals.lang("Remove duplicates"));
-        int duplicateCounter = 0;
         panel.output(Globals.lang("Searching for duplicates..."));
         Object[] keys = panel.database.getKeySet().toArray();
         if ((keys == null) || (keys.length < 2))
@@ -65,8 +67,8 @@ public class StrictDuplicateSearch extends Thread {
         
         panel.output(Globals.lang("Duplicates removed")+": "+toRemove.size());
         
-        for (Iterator i=toRemove.iterator(); i.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)i.next();
+        for (Iterator<BibtexEntry> i=toRemove.iterator(); i.hasNext();) {
+            BibtexEntry entry = i.next();
             panel.database.removeEntry(entry.getId());        
             ce.addEdit(new UndoableRemoveEntry(panel.database, entry, panel));
         }

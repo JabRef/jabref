@@ -26,20 +26,23 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Collection;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
+import java.util.Hashtable;
 
-import net.sf.jabref.search.*;
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import net.sf.jabref.search.BasicSearch;
 import net.sf.jabref.search.SearchExpression;
-import ca.odell.glazedlists.matchers.Matcher;
-import ca.odell.glazedlists.EventList;
+import net.sf.jabref.search.SearchExpressionParser;
+import net.sf.jabref.search.SearchMatcher;
 
 class SearchManager2 extends SidePaneComponent
     implements ActionListener, KeyListener, ItemListener, CaretListener, ErrorMessageDisplay {
@@ -53,8 +56,6 @@ class SearchManager2 extends SidePaneComponent
 
     //private JabRefFrame frame;
     private JTextField searchField = new JTextField("", 12);
-    private JLabel lab = //new JLabel(Globals.lang("Search")+":");
-    new JLabel(GUIGlobals.getImage("search"));
     private JPopupMenu settings = new JPopupMenu();
     private JButton openset = new JButton(Globals.lang("Settings"));
     private JButton escape = new JButton(Globals.lang("Clear"));
@@ -355,7 +356,7 @@ settings.add(select);
               return;
             }
         // Setup search parameters common to both normal and float.
-        Hashtable searchOptions = new Hashtable();
+        Hashtable<String, String> searchOptions = new Hashtable<String, String>();
         searchOptions.put("option",searchField.getText()) ;
         SearchRuleSet searchRules = new SearchRuleSet() ;
         SearchRule rule1;
@@ -391,17 +392,15 @@ settings.add(select);
 
     class SearchWorker extends AbstractWorker {
         private SearchRuleSet rules;
-        Hashtable searchTerm;
+        Hashtable<String, String> searchTerm;
         int hits = 0;
-        public SearchWorker(SearchRuleSet rules, Hashtable searchTerm) {
+        public SearchWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
             this.rules = rules;
             this.searchTerm = searchTerm;
         }
 
         public void run() {
-            Collection entries = panel.getDatabase().getEntries();
-            for (Iterator i=entries.iterator(); i.hasNext();) {
-                BibtexEntry entry = (BibtexEntry)i.next();
+        	for (BibtexEntry entry : panel.getDatabase().getEntries()){
                 boolean hit = rules.applyRule(searchTerm, entry) > 0;
                 entry.setSearchHit(hit);
                 if (hit) hits++;

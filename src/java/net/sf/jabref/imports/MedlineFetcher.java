@@ -1,23 +1,25 @@
 package net.sf.jabref.imports;
 
-import java.util.ArrayList;
-import java.net.*;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.Iterator;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
-import net.sf.jabref.undo.UndoableInsertEntry;
-import java.io.*;
-import net.sf.jabref.HelpAction;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 /**
@@ -40,7 +42,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         public int retmax;
         public int retstart;
         public String ids = "";
-    public ArrayList idList = new ArrayList();
+    public ArrayList<String> idList = new ArrayList<String>();
         public SearchResult()
             {
                 count = 0;
@@ -130,7 +132,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         if ( m.matches() ) {
             panel.frame().output(Globals.lang("Fetching Medline by ID..."));
 
-            ArrayList bibs = fetchMedline(idList);
+            ArrayList<BibtexEntry> bibs = fetchMedline(idList);
             if ((bibs != null) && (bibs.size() > 0)) {
                 //if (panel.prefs().getBoolean("useOwner")) {
                 //    Util.setDefaultOwner(bibs, panel.prefs().get("defaultOwner"));
@@ -183,9 +185,9 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
 //==================================================
 //
 //==================================================
-  public static ArrayList fetchMedline(String id)
+  public static ArrayList<BibtexEntry> fetchMedline(String id)
   {
-    ArrayList bibItems=null;
+    ArrayList<BibtexEntry> bibItems=null;
     try {
 
       String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" + id;
@@ -318,7 +320,7 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
                 System.out.println(": "+test[pelle]);
             } */
 
-            final ArrayList bibs = fetchMedline(result.ids);
+            final ArrayList<BibtexEntry> bibs = fetchMedline(result.ids);
             if (!keepOn)
                 break;
             diag.addEntries(bibs);
@@ -364,7 +366,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         try{
             URL ncbi = new URL(medlineUrl+term);
             // get the ids
-            HttpURLConnection ncbiCon=(HttpURLConnection)ncbi.openConnection();
             BufferedReader in =
                 new BufferedReader
                 (new InputStreamReader
@@ -422,7 +423,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
         StringBuffer sb=new StringBuffer();
         try{
             URL ncbi = new URL(retrieveUrl+id);
-            HttpURLConnection ncbiCon=(HttpURLConnection)ncbi.openConnection();
             BufferedReader in =
                 new BufferedReader
                 (new InputStreamReader
@@ -450,7 +450,6 @@ public class MedlineFetcher extends SidePaneComponent implements Runnable,
     public String getVitalData(String sb){
         StringBuffer result=new StringBuffer();
         Pattern articleTitle=Pattern.compile("<ArticleTitle>(.+)</ArticleTitle>");
-        Pattern authorName=Pattern.compile("<Author>(.+)</Author>");
         Matcher matcher;
         matcher=articleTitle.matcher(sb);
         if (matcher.find())

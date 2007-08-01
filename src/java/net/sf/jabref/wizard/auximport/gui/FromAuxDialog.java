@@ -35,16 +35,18 @@
 
 package net.sf.jabref.wizard.auximport.gui ;
 
-import java.awt.* ;
-import javax.swing.* ;
-import javax.swing.border.* ;
-import java.awt.event.* ;
-import java.io.File ;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
-import net.sf.jabref.* ;
-import net.sf.jabref.wizard.auximport.* ;
-import java.net.URL ;
-import java.io.IOException ;
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+
+import net.sf.jabref.*;
+import net.sf.jabref.wizard.auximport.AuxSubGenerator;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

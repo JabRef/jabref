@@ -1,15 +1,14 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.imports.ParserResult;
-import net.sf.jabref.imports.PostOpenAction;
-import net.sf.jabref.*;
-import net.sf.jabref.undo.NamedCompound;
+import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.regex.Pattern;
-import java.util.Iterator;
+
+import net.sf.jabref.*;
+import net.sf.jabref.imports.ParserResult;
+import net.sf.jabref.imports.PostOpenAction;
+import net.sf.jabref.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

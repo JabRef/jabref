@@ -5,10 +5,19 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package net.sf.jabref.mods;
-import net.sf.jabref.*;
-import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 /**
  * @author Michael Wrighton
  *

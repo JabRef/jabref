@@ -23,13 +23,17 @@
 package net.sf.jabref.groups;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
-import net.sf.jabref.search.*;
+import net.sf.jabref.search.SearchExpressionLexer;
+import net.sf.jabref.search.SearchExpressionParser;
+import net.sf.jabref.search.SearchExpressionTreeParser;
+import net.sf.jabref.search.SearchExpressionTreeParserTokenTypes;
 import net.sf.jabref.util.QuotedStringTokenizer;
 import antlr.RecognitionException;
 import antlr.collections.AST;
