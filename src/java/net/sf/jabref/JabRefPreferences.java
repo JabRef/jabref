@@ -543,7 +543,6 @@ public class JabRefPreferences {
         }
         if (s == null) {
           Globals.logger("Could not get key binding for \"" + bindName + "\"");
-          //throw new RuntimeException("");
         }
 
         if (Globals.ON_MAC)
@@ -754,6 +753,7 @@ public class JabRefPreferences {
         defKeyBinds.put("New from plain text", "ctrl shift N");
         defKeyBinds.put("Import Fields from CiteSeer", "ctrl shift C");
         defKeyBinds.put("Fetch citations from CiteSeer", "F7");
+        defKeyBinds.put("Synchronize files", "ctrl shift F4");
         defKeyBinds.put("Synchronize PDF", "shift F4");
         defKeyBinds.put("Synchronize PS", "ctrl F4");
         defKeyBinds.put("Abbreviate", "ctrl alt A");
