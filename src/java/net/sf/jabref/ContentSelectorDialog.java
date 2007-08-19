@@ -3,7 +3,6 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -113,15 +112,16 @@ public class ContentSelectorDialog extends JDialog {
     }
 
     private void fillWordSelector() {
-	wordSelector.removeAllItems();
-	wordSelector.addItem(WORD_FIRSTLINE_TEXT);
-	Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+currentField);
-	if ((items != null)) { // && (items.size() > 0)) {
-	    wordSet = new TreeSet<String>(items);
-	    for (Iterator<String> i=wordSet.iterator(); i.hasNext();)
-		wordSelector.addItem(i.next());
+		wordSelector.removeAllItems();
+		wordSelector.addItem(WORD_FIRSTLINE_TEXT);
+		Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX
+			+ currentField);
+		if ((items != null)) { // && (items.size() > 0)) {
+			wordSet = new TreeSet<String>(items);
+			for (String word : wordSet)
+				wordSelector.addItem(word);
+		}
 	}
-    }
 
     private void addWord() {
 	if (currentField == null)

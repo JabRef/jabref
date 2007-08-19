@@ -50,7 +50,7 @@ public class IsiImporterTest extends TestCase {
 
 	public void testProcessSubSup() {
 
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		hm.put("title", "/sub 3/");
 		IsiImporter.processSubSup(hm);
 		assertEquals("$_3$", hm.get("title"));

@@ -25,15 +25,13 @@
 package net.sf.jabref.imports;
 
 import java.io.*;
-import net.sf.jabref.plugin.core.JabRefPlugin;
-import net.sf.jabref.plugin.core.generated._JabRefPlugin.ImportFormatExtension;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import net.sf.jabref.util.Pair;
+import java.util.*;
 
 import net.sf.jabref.*;
 import net.sf.jabref.plugin.PluginCore;
+import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.ImportFormatExtension;
 
 
 public class ImportFormatReader {
@@ -167,7 +165,7 @@ public class ImportFormatReader {
         return result;
     }
 
-  public static BibtexDatabase createDatabase(List<BibtexEntry> bibentries) {
+  public static BibtexDatabase createDatabase(Collection<BibtexEntry> bibentries) {
     purgeEmptyEntries(bibentries);
 
     BibtexDatabase database = new BibtexDatabase();
@@ -179,7 +177,6 @@ public class ImportFormatReader {
         entry.setId(Util.createNeutralId());
         database.insertEntry(entry);
       } catch (KeyCollisionException ex) {
-        //ignore
         System.err.println("KeyCollisionException [ addBibEntries(...) ]");
       }
     }
@@ -425,73 +422,59 @@ public class ImportFormatReader {
    * removes all entries that have no fields set. This is useful for rooting out
    * an unsucessful import (wrong format) that returns a number of empty entries.
    */
-  public static void purgeEmptyEntries(List<BibtexEntry> entries) {
+  public static void purgeEmptyEntries(Collection<BibtexEntry> entries) {
     for (Iterator<BibtexEntry> i = entries.iterator(); i.hasNext();) {
       BibtexEntry entry = i.next();
 
-      // Get all fields of the entry:
-      Object[] o = entry.getAllFields();
-
       // If there are no fields, remove the entry:
-      if (o.length == 0)
+      if (entry.getAllFields().size() == 0)
         i.remove();
     }
   }
 
   /**
-   * Tries to import a file by iterating through the available import filters,
-   * and keeping the import that seems most promising. Returns an Object array
-   * with two elements, 0: the name of the format used, 1: a List of entries.
-   */
-  public Object[] importUnknownFormat(String filename) {
-    Object entryList = null;
-    String usedFormat = null;
-    int bestResult = 0;
+	 * Tries to import a file by iterating through the available import filters,
+	 * and keeping the import that seems most promising.
+	 * 
+	 * If all fails this method attempts to read this file as bibtex.
+	 * 
+	 * @throws IOException 
+	 */
+	public Pair<String, ParserResult> importUnknownFormat(String filename) throws IOException {
 
-      /**String lastImport = Globals.prefs.get("lastAutodetectedImport");
-      for (Iterator i = getImportFormats().iterator(); i.hasNext();) {
-			ImportFormat imFo = (ImportFormat) i.next();
-      **/    
+		Pair<String, ParserResult> result = null;
+		
+		// Cycle through all importers:
+		int bestResult = 0;
+		for (ImportFormat imFo : getImportFormats()) {
+			List<BibtexEntry> entries = importFromFile(imFo, filename);
 
-    // Cycle through all importers:
-    for (ImportFormat imFo : getImportFormats()){
-			try {
-				// System.out.println("Trying format: "+imFo.getFormatName());
-				List<BibtexEntry> entries = importFromFile(imFo, filename);
+			if (entries != null)
+				purgeEmptyEntries(entries);
 
-				if (entries != null)
-					purgeEmptyEntries(entries);
+			int entryCount = ((entries != null) ? entries.size() : 0);
 
-				int entryCount = ((entries != null) ? entries.size() : 0);
-
-				// System.out.println("Entries: "+entryCount);
-				// BibtexDatabase base = importFile(formats[i], filename);
-				if (entryCount > bestResult) {
-					bestResult = entryCount;
-					usedFormat = imFo.getFormatName();
-					entryList = entries;
-					// System.out.println("Looks good: "+imFo.getFormatName());
-				}
-			} catch (Exception e) {
+			if (entryCount > bestResult) {
+				bestResult = entryCount;
+				
+				result = new Pair<String, ParserResult>(imFo.getFormatName(),  
+				new ParserResult(entries));
 			}
 		}
-      System.out.println("Used format: "+usedFormat);
-    // Finally, if all else fails, see if it is a BibTeX file:
-    if (entryList == null) {
-	try {
-	    ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename), Globals.prefs.get("defaultEncoding"));
-	    if ((pr.getDatabase().getEntryCount() > 0)
-		|| (pr.getDatabase().getStringCount() > 0)) {
-		entryList = pr;
-        pr.setFile(new File(filename));
-		usedFormat = BIBTEX_FORMAT;
-	    }
-	} catch (Throwable ex) {
-	    //ex.printStackTrace();
-	}
-	
-    }
+		
+		if (result != null)
+			return result;
+		
+		// Finally, if all else fails, see if it is a BibTeX file:
+		ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+			Globals.prefs.get("defaultEncoding"));
+		if ((pr.getDatabase().getEntryCount() > 0)
+			|| (pr.getDatabase().getStringCount() > 0)) {
+			pr.setFile(new File(filename));
+			
+			return new Pair<String, ParserResult>(BIBTEX_FORMAT, pr);
+		}
 
-    return new Object[] { usedFormat, entryList };
-  }
+		return null;
+	}
 }

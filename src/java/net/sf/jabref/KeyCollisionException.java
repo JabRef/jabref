@@ -25,7 +25,7 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref;
 
-public class KeyCollisionException extends Exception
+public class KeyCollisionException extends RuntimeException
 {
     public KeyCollisionException()
     {

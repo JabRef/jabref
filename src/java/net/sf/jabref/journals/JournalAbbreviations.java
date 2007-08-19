@@ -32,10 +32,10 @@ public class JournalAbbreviations {
     static String TOOLTIPTEXT = "<HTML>"+Globals.lang("Switches between full and abbreviated journal name "
         +"if the journal name is known.")
         +"<BR>"+Globals.lang("To set up, go to <B>Tools -> Manage journal abbreviations</B>")+".</HTML>";
-    TreeMap fullNameKeyed = new TreeMap();
-    HashMap abbrNameKeyed = new HashMap();
-    HashMap abbrNoDotsToAbbr = new HashMap();
-    TreeMap all = new TreeMap();
+    TreeMap<String, String> fullNameKeyed = new TreeMap<String, String>();
+    HashMap<String, String> abbrNameKeyed = new HashMap<String, String>();
+    HashMap<String, String> abbrNoDotsToAbbr = new HashMap<String, String>();
+    TreeMap<String, String> all = new TreeMap<String, String>();
     CaseChanger caseChanger = new CaseChanger();
 
     public JournalAbbreviations() {
@@ -54,7 +54,7 @@ public class JournalAbbreviations {
      * Get an iterator for the known journals in alphabetical order.
      * @return Iterator for journal full names
      */
-    public Iterator fullNameIterator() {
+    public Iterator<String> fullNameIterator() {
         return fullNameKeyed.keySet().iterator();
     }
 
@@ -84,13 +84,13 @@ public class JournalAbbreviations {
         String s = journalName.toLowerCase();
         String abbr;
         if (fullNameKeyed.containsKey(s)) {
-            abbr = (String)fullNameKeyed.get(s);
+            abbr = fullNameKeyed.get(s);
         }
         else if (abbrNameKeyed.containsKey(s)) {
             abbr = journalName;
         }
         else if (abbrNoDotsToAbbr.containsKey(s)) {
-            abbr = (String)abbrNoDotsToAbbr.get(s);
+            abbr = abbrNoDotsToAbbr.get(s);
         } else
             return null;
 
@@ -245,7 +245,7 @@ public class JournalAbbreviations {
     }
 
 
-    public Map getJournals() {
+    public Map<String, String> getJournals() {
         return Collections.unmodifiableMap(all);
     }
 
@@ -295,8 +295,8 @@ public class JournalAbbreviations {
     public TableModel getTableModel() {
         Object[][] cells = new Object[fullNameKeyed.size()][2];
         int row = 0;
-        for (Iterator i=fullNameIterator(); i.hasNext();) {
-            String name = (String)i.next();
+        for (Iterator<String> i=fullNameIterator(); i.hasNext();) {
+            String name = i.next();
             cells[row][0] = getFullName(name);
             cells[row][1] = getAbbreviatedName(name, true);
             row++;

@@ -55,7 +55,7 @@ public class WSITools
      * @param  buf  Description of the Parameter
      * @return      Description of the Return Value
      */
-    public static boolean tokenize(Vector vcr, String buf)
+    public static boolean tokenize(Vector<String> vcr, String buf)
     {
         return tokenize(vcr, buf, " \t\n");
     }
@@ -66,7 +66,7 @@ public class WSITools
      * @param  delimstr  Description of the Parameter
      * @return           Description of the Return Value
      */
-    public static boolean tokenize(Vector vcr, String buf, String delimstr)
+    public static boolean tokenize(Vector<String> vcr, String buf, String delimstr)
     {
         vcr.clear();
         buf = buf + "\n";
@@ -88,7 +88,7 @@ public class WSITools
      * @param  limit     Description of the Parameter
      * @return           Description of the Return Value
      */
-    public static boolean tokenize(Vector vcr, String s, String delimstr,
+    public static boolean tokenize(Vector<String> vcr, String s, String delimstr,
         int limit)
     {
         System.out.println("Warning: tokenize \"" + s + "\"");

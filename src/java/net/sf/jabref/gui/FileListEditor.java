@@ -234,7 +234,6 @@ public class FileListEditor extends JTable implements FieldEditor,
     private void autoSetLinks() {
         auto.setEnabled(false);
         BibtexEntry entry = entryEditor.getEntry();
-        int tableSize = tableModel.getRowCount();
         JDialog diag = new JDialog(frame, true);
         autoSetLinks(entry, tableModel, metaData, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -268,12 +267,9 @@ public class FileListEditor extends JTable implements FieldEditor,
     public static Thread autoSetLinks(final Collection<BibtexEntry> entries, final NamedCompound ce,
                                       final Set<BibtexEntry> changedEntries) {
 
-        final ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
-        final JLabel label = new JLabel(Globals.lang("Searching for files"));
         Runnable r = new Runnable() {
 
             public void run() {
-                boolean foundAny = false;
                 ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
                 ArrayList<File> dirs = new ArrayList<File>();
                 if (Globals.prefs.hasKey(GUIGlobals.FILE_FIELD + "Directory"))
@@ -291,9 +287,9 @@ public class FileListEditor extends JTable implements FieldEditor,
                 for (Iterator<BibtexEntry> i=result.keySet().iterator(); i.hasNext();) {
                     BibtexEntry anEntry = i.next();
                     FileListTableModel tableModel = new FileListTableModel();
-                    Object oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
+                    String oldVal = anEntry.getField(GUIGlobals.FILE_FIELD);
                     if (oldVal != null)
-                        tableModel.setContent((String)oldVal);
+                        tableModel.setContent(oldVal);
                     List<File> files = result.get(anEntry);
                     for (File f : files) {
 			f = relativizePath(f, dirs);

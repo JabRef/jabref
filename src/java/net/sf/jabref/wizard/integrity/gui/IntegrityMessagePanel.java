@@ -187,7 +187,7 @@ public class IntegrityMessagePanel
         if (entry != null)
         {
 //          System.out.println("update") ;
-            Object oldContent = entry.getField(msg.getFieldName());
+            String oldContent = entry.getField(msg.getFieldName());
             UndoableFieldChange edit = new UndoableFieldChange(entry, msg.getFieldName(), oldContent,
                         content.getText());
             entry.setField(msg.getFieldName(), content.getText());

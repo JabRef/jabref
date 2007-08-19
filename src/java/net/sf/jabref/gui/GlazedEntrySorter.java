@@ -1,22 +1,3 @@
-package net.sf.jabref.gui;
-
-import java.util.*;
-
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.DatabaseChangeEvent;
-import net.sf.jabref.DatabaseChangeListener;
-import net.sf.jabref.IdComparator;
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
-
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 12, 2005
- * Time: 8:54:36 PM
- * To change this template use File | Settings | File Templates.
- */
-public class GlazedEntrySorter implements DatabaseChangeListener {
 /*
 Copyright (C) 2003 Morten O. Alver
 
@@ -43,26 +24,33 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
+package net.sf.jabref.gui;
 
-    //TreeSet list;
-    EventList list;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-    Comparator comp;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.DatabaseChangeEvent;
+import net.sf.jabref.DatabaseChangeListener;
+import net.sf.jabref.IdComparator;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+
+public class GlazedEntrySorter implements DatabaseChangeListener {
+
+	EventList<BibtexEntry> list;
+
     String[] idArray;
     BibtexEntry[] entryArray;
-    //static BibtexEntry[] DUMMY = new BibtexEntry[0];
-    private boolean outdated = false;
-    private boolean changed = false;
-
-    public GlazedEntrySorter(Map entries, Comparator comp) {
-        //list = new TreeSet(comp);
-        list = new BasicEventList();
-        //list2 = new SortedList(list, new FieldComparator(Globals.KEY_FIELD));
-        this.comp = comp;
+    
+    public GlazedEntrySorter(Map<String, BibtexEntry> entries) {
+        list = new BasicEventList<BibtexEntry>();
         list.getReadWriteLock().writeLock().lock();
-        Set keySet = entries.keySet();
+        Set<String> keySet = entries.keySet();
         if (keySet != null) {
-            Iterator i = keySet.iterator();
+            Iterator<String> i = keySet.iterator();
             while (i.hasNext()) {
                 list.add(entries.get(i.next()));
             }
@@ -76,20 +64,16 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
     }
 
-    public EventList getTheList() {
+    public EventList<BibtexEntry> getTheList() {
         return list;
     }
 
     public void databaseChanged(DatabaseChangeEvent e) {
         list.getReadWriteLock().writeLock().lock();
         if (e.getType() == DatabaseChangeEvent.ADDED_ENTRY) {
-            //int pos = -Collections.binarySearch(list, e.getEntry(), comp) - 1;
             list.add(e.getEntry());
-            //System.out.println("Added. Size: " + list.size());
-
         } else if (e.getType() == DatabaseChangeEvent.REMOVED_ENTRY) {
             list.remove(e.getEntry());
-            //System.out.println("Removed. Size: " + list.size());
         } else if (e.getType() == DatabaseChangeEvent.CHANGED_ENTRY) {
             int index = list.indexOf(e.getEntry());
             list.set(index, e.getEntry());

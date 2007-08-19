@@ -59,8 +59,8 @@ public class BiomailImporter extends ImportFormat {
      * Parse the entries in the source, and return a List of BibtexEntry
      * objects.
      */
-    public List importEntries(InputStream stream) throws IOException {
-        ArrayList bibitems = new ArrayList();
+    public List<BibtexEntry> importEntries(InputStream stream) throws IOException {
+        ArrayList<BibtexEntry> bibitems = new ArrayList<BibtexEntry>();
         StringBuffer sb = new StringBuffer();
 
         BufferedReader in =
@@ -91,7 +91,7 @@ public class BiomailImporter extends ImportFormat {
         String[] entries = sb.toString().split("::");
 
         // skip the first entry as it is either empty or has document header
-        HashMap hm = new HashMap();
+        HashMap<String, String> hm = new HashMap<String, String>();
 
         for (int i = 0; i < entries.length; i++) {
             String[] fields = entries[i].split(" ## ");
@@ -100,7 +100,6 @@ public class BiomailImporter extends ImportFormat {
                 fields = entries[i].split("\n");
 
             String Type = "";
-            String PT = "";
             String pages = "";
             String shortauthor = "";
             String fullauthor = "";
@@ -118,7 +117,7 @@ public class BiomailImporter extends ImportFormat {
                 value = value.trim();
 
                 if (beg.equals("PT  - ")) {
-                    PT = value.replaceAll("JOURNAL ARTICLE", "article").replaceAll("Journal Article", "article");
+                    // PT = value.replaceAll("JOURNAL ARTICLE", "article").replaceAll("Journal Article", "article");
                     Type = "article"; //make all of them PT?
                 } else if (beg.equals("TY  - ")) {
                     if ("CONF".equals(value))

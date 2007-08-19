@@ -124,8 +124,8 @@ public class ChangeScanner extends Thread {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet used = new HashSet(disk.getEntryCount());
-        HashSet notMatched = new HashSet(tmp.getEntryCount());
+        HashSet<String> used = new HashSet<String>(disk.getEntryCount());
+        HashSet<Integer> notMatched = new HashSet<Integer>(tmp.getEntryCount());
 
         // Loop through the entries of the "mem" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -169,9 +169,9 @@ public class ChangeScanner extends Thread {
         // for close matches.
         if (notMatched.size() > 0) {
 
-            fuzzyLoop: for (Iterator it=notMatched.iterator(); it.hasNext();) {
+            for (Iterator<Integer> it=notMatched.iterator(); it.hasNext();) {
 
-                Integer integ = (Integer)it.next();
+                Integer integ = it.next();
                 piv1 = integ.intValue();
 
 
@@ -302,19 +302,17 @@ public class ChangeScanner extends Thread {
         if ((nTmp == 0) && (nDisk == 0))
             return;
 
-        HashSet used = new HashSet();
-        HashSet usedInMem = new HashSet();
-        HashSet notMatched = new HashSet(onTmp.getStringCount());
+        HashSet<Object> used = new HashSet<Object>();
+        HashSet<Object> usedInMem = new HashSet<Object>();
+        HashSet<String> notMatched = new HashSet<String>(onTmp.getStringCount());
 
         // First try to match by string names.
         //int piv2 = -1;
-        mainLoop: for (Iterator i=onTmp.getStringKeySet().iterator(); i.hasNext();) {
-            Object tmpId = i.next();
-            BibtexString tmp = onTmp.getString(tmpId);
+        mainLoop: for (String key : onTmp.getStringKeySet()){
+            BibtexString tmp = onTmp.getString(key);
 
             //      for (int j=piv2+1; j<nDisk; j++)
-            for (Iterator j=onDisk.getStringKeySet().iterator(); j.hasNext();) {
-                Object diskId = j.next();
+            for (String diskId : onDisk.getStringKeySet()){
                 if (!used.contains(diskId)) {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
@@ -343,18 +341,14 @@ public class ChangeScanner extends Thread {
 
         // See if we can detect a name change for those entries that we couldn't match.
         if (notMatched.size() > 0) {
-            for (Iterator i = notMatched.iterator(); i.hasNext(); ) {
-                Object nmId = i.next();
-                BibtexString tmp = onTmp.getString(nmId);
+            for (Iterator<String> i = notMatched.iterator(); i.hasNext();){
+                BibtexString tmp = onTmp.getString(i.next());
 
                 // If we get to this point, we found no string with matching name. See if we
                 // can find one with matching content.
-                String tmpContent = tmp.getContent();
-                //for (Iterator i=onTmp.getStringKeySet().iterator(); i.hasNext();) {
-                for (Iterator j=onDisk.getStringKeySet().iterator(); j.hasNext();) {
-                    Object diskId = j.next();
-                    //for (int j = piv2 + 1; j < nDisk; j++)
-                    if (!used.contains(diskId)) {
+                for (String diskId : onDisk.getStringKeySet()){
+
+                	if (!used.contains(diskId)) {
                         BibtexString disk = onDisk.getString(diskId);
 
                         if (disk.getContent().equals(tmp.getContent())) {
@@ -363,15 +357,14 @@ public class ChangeScanner extends Thread {
 
                             // Try to find the matching one in memory:
                             BibtexString bsMem = null;
-                            findInMem: for (Iterator k=inMem.getStringKeySet().iterator(); k.hasNext();) {
-                                Object memId = k.next();
-                                //for (int k = 0; k < inMem.getStringCount(); k++) {
+                            
+                            for (String memId : inMem.getStringKeySet()){
                                 BibtexString bsMem_cand = inMem.getString(memId);
                                 if (bsMem_cand.getContent().equals(disk.getContent()) &&
                                 !usedInMem.contains(memId)) {
                                     usedInMem.add(memId);
                                     bsMem = bsMem_cand;
-                                    break findInMem;
+                                    break;
                                 }
                             }
 
@@ -389,8 +382,8 @@ public class ChangeScanner extends Thread {
 
         if (notMatched.size() > 0) {
             // Still one or more non-matched strings. So they must have been removed.
-            for (Iterator i = notMatched.iterator(); i.hasNext(); ) {
-                Object nmId = i.next();
+            for (Iterator<String> i = notMatched.iterator(); i.hasNext(); ) {
+                String nmId = i.next();
                 BibtexString tmp = onTmp.getString(nmId);
                 BibtexString mem = findString(inMem, tmp.getName(), usedInMem);
                 if (mem != null) { // The removed string is not removed from the mem version.
@@ -402,8 +395,8 @@ public class ChangeScanner extends Thread {
 
         // Finally, see if there are remaining strings in the disk database. They
         // must have been added.
-        for (Iterator i=onDisk.getStringKeySet().iterator(); i.hasNext();) {
-            Object diskId = i.next();
+        for (Iterator<String> i=onDisk.getStringKeySet().iterator(); i.hasNext();) {
+            String diskId = i.next();
             if (!used.contains(diskId)) {
                 BibtexString disk = onDisk.getString(diskId);
                 //System.out.println(disk.getName());
@@ -413,11 +406,11 @@ public class ChangeScanner extends Thread {
         }
     }
 
-    private BibtexString findString(BibtexDatabase base, String name, HashSet used) {
+    private BibtexString findString(BibtexDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name))
             return null;
-        for (Iterator i=base.getStringKeySet().iterator(); i.hasNext();) {
-            Object key = i.next();
+        for (Iterator<String> i=base.getStringKeySet().iterator(); i.hasNext();) {
+            String key = i.next();
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
                 used.add(key);
@@ -433,7 +426,6 @@ public class ChangeScanner extends Thread {
      * properly, so I rather only report the change.
      */
     public void scanGroups(MetaData inMem, MetaData onTmp, MetaData onDisk) {
-        final GroupTreeNode groupsMem = inMem.getGroups();
         final GroupTreeNode groupsTmp = onTmp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if (groupsTmp == null && groupsDisk == null)

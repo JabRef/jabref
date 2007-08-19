@@ -1,5 +1,7 @@
 package net.sf.jabref;
 
+import java.util.Set;
+
 
 public class IncrementalSearcher {
 
@@ -16,38 +18,33 @@ public class IncrementalSearcher {
 
     public boolean search(String pattern, BibtexEntry bibtexEntry) {
 	    hitInField = null;
-	    //if (!prefs.getBoolean("caseSensitiveSearch"))
-	    //    flags = Pattern.CASE_INSENSITIVE;
-	    //Pattern pattern = Pattern.compile(searchString, flags);
-	
-	    Object[] fields = bibtexEntry.getAllFields();
-	    return searchFields(fields, bibtexEntry, pattern);
-
+	    return searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
     }
 
-	protected boolean searchFields(Object[] fields, BibtexEntry bibtexEntry, 
+	protected boolean searchFields(Set<String> fields, BibtexEntry bibtexEntry, 
 				       String searchString) {
 	    boolean found = false;
 	    if (fields != null) {
-		for(int i = 0 ; i < fields.length ; i++){
+	    	
+	    	for (String field : fields){
 		    try {
 			/*Globals.logger("Searching field '"+fields[i].toString()
 				       +"' for '"
 				       +pattern.toString()+"'.");*/
-			if (bibtexEntry.getField(fields[i].toString()) != null) {
+			if (bibtexEntry.getField(field.toString()) != null) {
 			    if (prefs.getBoolean("caseSensitiveSearch")) {
-				if (bibtexEntry.getField(fields[i].toString())
+				if (bibtexEntry.getField(field.toString())
 				    .toString().indexOf(searchString) > -1)
 				    found = true;
 			    } else {
-				if (bibtexEntry.getField(fields[i].toString())
+				if (bibtexEntry.getField(field.toString())
 				    .toString().toLowerCase()
 				    .indexOf(searchString.toLowerCase()) > -1)
 				    found = true;
 			    }
 			    
 			    if (found) {
-				hitInField = fields[i].toString();
+				hitInField = field.toString();
 				return true;
 			    }
 			}

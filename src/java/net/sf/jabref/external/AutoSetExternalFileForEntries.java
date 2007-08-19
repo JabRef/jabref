@@ -35,7 +35,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
 
     private boolean goOn = true, autoSet = true, overWriteAllowed = true, checkExisting = true;
 
-    private int skipped = 0, entriesChanged = 0, brokenLinks = 0;
+    private int entriesChanged = 0, brokenLinks = 0;
 
 
     public AutoSetExternalFileForEntries(BasePanel panel, String fieldName) {
@@ -44,17 +44,9 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
     }
 
     public void init() {
-        /*// Get all entries, and make sure there are selected entries:
-    	sel = panel.getSelectedEntries();
-    	if (sel.length < 1) {
-	    // No entries selected. Assume all entries should be treated:
-	    */
-        Collection col = panel.database().getEntries();
-        sel = new BibtexEntry[col.size()];
-        sel = (BibtexEntry[]) col.toArray(sel);
-        //goOn = false;
-        //return;
-        //}
+
+    	Collection<BibtexEntry> col = panel.database().getEntries();
+        sel = col.toArray(new BibtexEntry[col.size()]);
 
         // Ask about rules for the operation:
         if (optDiag == null)
@@ -84,7 +76,6 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 + (checkExisting ? sel.length : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        skipped = 0;
         entriesChanged = 0;
         brokenLinks = 0;
         NamedCompound ce = new NamedCompound(Globals.lang("Autoset %0 field", fieldName));
@@ -103,7 +94,7 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
                 progress += weightAutoSet;
                 panel.frame().setProgressBarValue(progress);
 
-                final Object old = sel[i].getField(fieldName);
+                final String old = sel[i].getField(fieldName);
                 // Check if a extension is already set, and if so, if we are allowed to overwrite it:
                 if ((old != null) && !old.equals("") && !overWriteAllowed)
                     continue;
@@ -133,18 +124,18 @@ public class AutoSetExternalFileForEntries extends AbstractWorker {
             mainLoop:
             for (int i = 0; i < sel.length; i++) {
                 panel.frame().setProgressBarValue(progress++);
-                final Object old = sel[i].getField(fieldName);
+                final String old = sel[i].getField(fieldName);
                 // Check if a extension is set:
-                if ((old != null) && !((String) old).equals("")) {
+                if ((old != null) && !old.equals("")) {
                     // Get an absolute path representation:
-                    File file = Util.expandFilename((String) old, new String[]{dir, "."});
+                    File file = Util.expandFilename(old, new String[]{dir, "."});
 
                     if ((file == null) || !file.exists()) {
 
                         int answer =
                                 JOptionPane.showOptionDialog(panel.frame(),
                                         Globals.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                new String[]{(String) old, sel[i].getCiteKey()}),
+                                                new String[]{old, sel[i].getCiteKey()}),
                                         Globals.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]);

@@ -44,7 +44,7 @@ public class XMPUtil {
 	 * @return BibtexEntryies found in the PDF or an empty list
 	 * @throws IOException
 	 */
-	public static List readXMP(String filename) throws IOException {
+	public static List<BibtexEntry> readXMP(String filename) throws IOException {
 		return readXMP(new File(filename));
 	}
 
@@ -108,6 +108,7 @@ public class XMPUtil {
 	 *             Throws an IOException if the file cannot be read, so the user
 	 *             than remove a lock or cancel the operation.
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<BibtexEntry> readXMP(InputStream inputStream)
 			throws IOException {
 
@@ -128,10 +129,10 @@ public class XMPUtil {
 			if (meta == null)
 				return null;
 
-			List schemas = meta
+			List<XMPSchema> schemas = meta
 					.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
 
-			Iterator it = schemas.iterator();
+			Iterator<XMPSchema> it = schemas.iterator();
 			while (it.hasNext()) {
 				XMPSchemaBibtex bib = (XMPSchemaBibtex) it.next();
 
@@ -182,6 +183,7 @@ public class XMPUtil {
 	 * 
 	 * @return The bibtex entry found in the document information.
 	 */
+	@SuppressWarnings("unchecked")
 	public static BibtexEntry getBibtexEntryFromDocumentInformation(
 			PDDocumentInformation di) {
 
@@ -221,7 +223,7 @@ public class XMPUtil {
 		}
 
 		// Return null if no values were found
-		return (entry.getAllFields().length > 0 ? entry : null);
+		return (entry.getAllFields().size() > 0 ? entry : null);
 	}
 
 	/**
@@ -239,6 +241,7 @@ public class XMPUtil {
 	 * 
 	 * @return The bibtex entry found in the document information.
 	 */
+	@SuppressWarnings("unchecked")
 	public static BibtexEntry getBibtexEntryFromDublinCore(
 			XMPSchemaDublinCore dcSchema) {
 
@@ -410,7 +413,7 @@ public class XMPUtil {
 			}
 		}
 
-		return (entry.getAllFields().length > 0 ? entry : null);
+		return (entry.getAllFields().size() > 0 ? entry : null);
 	}
 
 	/**
@@ -473,7 +476,7 @@ public class XMPUtil {
 
 		XMPMetadata x = new XMPMetadata();
 
-		Iterator it = bibtexEntries.iterator();
+		Iterator<BibtexEntry> it = bibtexEntries.iterator();
 		while (it.hasNext()) {
 			BibtexEntry e = (BibtexEntry) it.next();
 			XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
@@ -582,12 +585,11 @@ public class XMPUtil {
 			entry = database.resolveForStrings(entry, false);
 
 		// Set all the values including key and entryType
-		Object[] fields = entry.getAllFields();
+		
+		for (String field : entry.getAllFields()){
 
-		for (int j = 0; j < fields.length; j++) {
-
-			if (fields[j].equals("editor")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("editor")) {
+				String o = entry.getField(field.toString()).toString();
 
 				/**
 				 * Editor -> Contributor
@@ -637,8 +639,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: author
 			 */
-			if (fields[j].equals("author")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("author")) {
+				String o = entry.getField(field.toString()).toString();
 				String authors = o.toString();
 				AuthorList list = AuthorList.getAuthorList(authors);
 
@@ -649,12 +651,12 @@ public class XMPUtil {
 				continue;
 			}
 
-			if (fields[j].equals("month")) {
+			if (field.equals("month")) {
 				// Dealt with in year
 				continue;
 			}
 
-			if (fields[j].equals("year")) {
+			if (field.equals("year")) {
 
 				/**
 				 * Year + Month -> Date
@@ -690,8 +692,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: abstract
 			 */
-			if (fields[j].equals("abstract")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("abstract")) {
+				String o = entry.getField(field.toString()).toString();
 				dcSchema.setDescription(o.toString());
 				continue;
 			}
@@ -709,8 +711,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: doi
 			 */
-			if (fields[j].equals("doi")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("doi")) {
+				String o = entry.getField(field.toString()).toString();
 				dcSchema.setIdentifier(o.toString());
 				continue;
 			}
@@ -737,8 +739,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: doi
 			 */
-			if (fields[j].equals("publisher")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("publisher")) {
+				String o = entry.getField(field.toString()).toString();
 				dcSchema.addPublisher(o.toString());
 				continue;
 			}
@@ -775,8 +777,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: doi
 			 */
-			if (fields[j].equals("keywords")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("keywords")) {
+				String o = entry.getField(field.toString()).toString();
 				String[] keywords = o.toString().split(",");
 				for (int i = 0; i < keywords.length; i++) {
 					dcSchema.addSubject(keywords[i].trim());
@@ -799,8 +801,8 @@ public class XMPUtil {
 			 * 
 			 * Bibtex-Fields used: title
 			 */
-			if (fields[j].equals("title")) {
-				String o = entry.getField(fields[j].toString()).toString();
+			if (field.equals("title")) {
+				String o = entry.getField(field.toString()).toString();
 				dcSchema.setTitle(o.toString());
 				continue;
 			}
@@ -822,8 +824,8 @@ public class XMPUtil {
 			 * All others (including the bibtex key) get packaged in the
 			 * relation attribute
 			 */
-			String o = entry.getField(fields[j].toString()).toString();
-			dcSchema.addRelation("bibtex/" + fields[j].toString() + "/" + o);
+			String o = entry.getField(field.toString()).toString();
+			dcSchema.addRelation("bibtex/" + field.toString() + "/" + o);
 		}
 
 		/**
@@ -897,6 +899,7 @@ public class XMPUtil {
 	 * @throws IOException
 	 * @throws TransformerException
 	 */
+	@SuppressWarnings("unchecked")
 	public static void writeDublinCore(PDDocument document,
 			Collection<BibtexEntry> entries, BibtexDatabase database)
 			throws IOException, TransformerException {
@@ -962,20 +965,20 @@ public class XMPUtil {
 			entry = database.resolveForStrings(entry, false);
 
 		// Set all the values including key and entryType
-		Object[] fields = entry.getAllFields();
+		Set<String> fields = entry.getAllFields();
 
-		for (int i = 0; i < fields.length; i++) {
-			if (fields[i].equals("author")) {
+		for (String field : fields){
+			if (field.equals("author")) {
 				di.setAuthor(entry.getField("author").toString());
-			} else if (fields[i].equals("title")) {
+			} else if (field.equals("title")) {
 				di.setTitle(entry.getField("title").toString());
-			} else if (fields[i].equals("keywords")) {
+			} else if (field.equals("keywords")) {
 				di.setKeywords(entry.getField("keywords").toString());
-			} else if (fields[i].equals("abstract")) {
+			} else if (field.equals("abstract")) {
 				di.setSubject(entry.getField("abstract").toString());
 			} else {
-				di.setCustomMetadataValue("bibtex/" + fields[i].toString(),
-						entry.getField(fields[i].toString()).toString());
+				di.setCustomMetadataValue("bibtex/" + field.toString(),
+						entry.getField(field.toString()).toString());
 			}
 		}
 		di
@@ -1008,6 +1011,7 @@ public class XMPUtil {
 	 * @throws IOException
 	 *             If the file could not be written to or could not be found.
 	 */
+	@SuppressWarnings("unchecked")
 	public static void writeXMP(File file,
 			Collection<BibtexEntry> bibtexEntries, BibtexDatabase databasee,
 			boolean writePDFInfo) throws IOException, TransformerException {
@@ -1145,9 +1149,9 @@ public class XMPUtil {
 
 			if (args[0].endsWith(".pdf")) {
 				// Read from pdf and write as BibTex
-				List l = XMPUtil.readXMP(new File(args[0]));
+				List<BibtexEntry> l = XMPUtil.readXMP(new File(args[0]));
 
-				Iterator it = l.iterator();
+				Iterator<BibtexEntry> it = l.iterator();
 				while (it.hasNext()) {
 					BibtexEntry e = (BibtexEntry) it.next();
 					StringWriter sw = new StringWriter();
@@ -1251,7 +1255,7 @@ public class XMPUtil {
 	 */
 	public static boolean hasMetadata(InputStream is) {
 		try {
-			List l = XMPUtil.readXMP(is);
+			List<BibtexEntry> l = XMPUtil.readXMP(is);
 			return l.size() > 0;
 		} catch (Exception e) {
 			return false;

@@ -33,7 +33,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -94,7 +93,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 GroupTreeNode autoGroupsRoot = new GroupTreeNode(
                         new ExplicitGroup(Globals.lang("Automatically created groups"),
                         		AbstractGroup.INCLUDING));
-                HashSet hs = null;
+                HashSet<String> hs = null;
                 if (nd.isSelected()) {
                     hs = Util
                             .findDeliminatedWordsInField(panel.getDatabase(),
@@ -104,9 +103,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     hs = Util.findAllWordsInField(panel.getDatabase(), field()
                             .toLowerCase().trim(), remove());
                 }
-                Iterator i = hs.iterator();
-                while (i.hasNext()) {
-                    String keyword = i.next().toString();
+                for (String keyword : hs){
                     KeywordGroup group = new KeywordGroup(keyword, field(),
                             keyword, false, false, AbstractGroup.INDEPENDENT);
                     autoGroupsRoot.add(new GroupTreeNode(group));

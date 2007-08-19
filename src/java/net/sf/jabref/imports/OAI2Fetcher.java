@@ -196,10 +196,7 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
             saxParser.parse(inputStream, handlerBase);
             
             /* Correct line breaks and spacing */
-            Object[] fields = be.getAllFields();
-            for (int i = 0; i < fields.length; i++){
-                String name = fields[i].toString();
-                
+            for (String name : be.getAllFields()){
                 be.setField(name, correctLineBreaks(be.getField(name).toString()));
             }
             return be;

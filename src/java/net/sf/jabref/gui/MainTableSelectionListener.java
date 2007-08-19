@@ -19,7 +19,7 @@ import ca.odell.glazedlists.event.ListEventListener;
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single bib database.
  */
-public class MainTableSelectionListener implements ListEventListener, MouseListener,
+public class MainTableSelectionListener implements ListEventListener<BibtexEntry>, MouseListener,
         KeyListener, FocusListener {
 
     PreviewPanel[] previewPanel = null;
@@ -27,7 +27,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     PreviewPanel preview;
     MainTable table;
     BasePanel panel;
-    EventList tableRows;
+    EventList<BibtexEntry> tableRows;
     private boolean previewActive = Globals.prefs.getBoolean("previewEnabled");
     private boolean workingOnPreview = false;
 
@@ -36,7 +36,6 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     // key strokes cycle between all entries starting with the same letter:
     private int[] lastPressed = new int[20];
     private int lastPressedCount = 0;
-    private int lastQuickJumpRow = -1;
     private long lastPressedTime = 0;
     private long QUICK_JUMP_TIMEOUT = 2000;
 
@@ -68,9 +67,8 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
         }
     }
 
-    public void listChanged(ListEvent e) {
-        //System.out.println(e);
-        EventList selected = e.getSourceList();
+    public void listChanged(ListEvent<BibtexEntry> e) {
+        EventList<BibtexEntry> selected = e.getSourceList();
         Object newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
@@ -127,9 +125,9 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             t.start();
             return;
         }
-        EventList list = table.getSelected();
+        EventList<BibtexEntry> list = table.getSelected();
         // Check if the entry to preview is still selected:
-        if ((list.size() != 1) || ((BibtexEntry)list.get(0) != toShow)) {
+        if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
         }
         final int mode = panel.getMode();
@@ -170,9 +168,8 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
     }
 
     public void mouseReleased(MouseEvent e) {
-        // First find the column on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint()),
-                row = table.rowAtPoint(e.getPoint());
+        // First find the row on which the user has clicked.
+        final int row = table.rowAtPoint(e.getPoint());
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger()) {
             processPopupTrigger(e, row);
@@ -392,7 +389,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             int sortingColumn = table.getSortingColumn(0);
             if (sortingColumn < 0)
                 return;
-            Comparator comp = table.getComparatorForColumn(sortingColumn);
+            Comparator<BibtexEntry> comp = table.getComparatorForColumn(sortingColumn);
             int piv = 1;
             while (((sortingColumn = table.getSortingColumn(piv)) >= 0)
                 && ((comp = table.getComparatorForColumn(sortingColumn)) != null)
@@ -405,7 +402,7 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
             // Ok, after all of this we should have either found a field name to go by
             String field = ((FieldComparator)comp).getFieldName();
             System.out.println(String.valueOf(e.getKeyChar())+" "+field);
-            SortedList list = table.getSortedForTable();
+            SortedList<BibtexEntry> list = table.getSortedForTable();
             BibtexEntry testEntry = new BibtexEntry("0");
             testEntry.setField(field, String.valueOf(e.getKeyChar()));
             int i = list.sortIndex(testEntry);
@@ -460,7 +457,6 @@ public class MainTableSelectionListener implements ListEventListener, MouseListe
                                 // We found a match:
                                 table.setRowSelectionInterval(i, i);
                                 table.ensureVisible(i);
-                                lastQuickJumpRow = i;
                                 return;
                             }
                         }

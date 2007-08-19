@@ -184,7 +184,8 @@ public class EndnoteImporter extends ImportFormat {
         // create one here
         b.setField(hm);
         //if (hm.isEmpty())
-        if (b.getAllFields().length > 0) bibitems.add(b);
+        if (b.getAllFields().size() > 0)
+        	bibitems.add(b);
 
     }
     return bibitems;

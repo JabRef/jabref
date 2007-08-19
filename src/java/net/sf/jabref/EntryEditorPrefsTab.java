@@ -32,7 +32,6 @@ public class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         disableOnMultiple = new JCheckBox(Globals.lang("Disable entry editor when multiple entries are selected"));
         autoComplete = new JCheckBox(Globals.lang("Enable word/name autocompletion"));
         autoCompFields = new JTextField(40);
-        JPanel general = new JPanel();
         Insets marg = new Insets(0,12,3,0);
         editSource.setMargin(marg);
         defSource.setMargin(marg);

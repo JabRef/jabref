@@ -9,13 +9,13 @@
 	<classpathentry kind="lib" path="lib/PDFBox-0.7.3-dev-reduced.jar"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-3.0b5.jar"/>
-	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java14.jar"/>
 	<classpathentry kind="lib" path="lib/forms-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/plugin/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/plugin/jpf.jar"/>
 	<classpathentry kind="lib" path="lib/plugin/jpf-boot.jar"/>
 	<classpathentry kind="lib" path="lib/plugin/JPFCodeGenerator-rt.jar" sourcepath="/JPFCodeGenerator/src"/>
+	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java15.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="build"/>

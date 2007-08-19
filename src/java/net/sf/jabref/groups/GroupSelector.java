@@ -533,7 +533,7 @@ public class GroupSelector extends SidePaneComponent implements
                         searchRules.addRule(((GroupTreeNode) selection[i]
                                         .getLastPathComponent()).getSearchRule());
                 }
-        Hashtable searchOptions = new Hashtable();
+        Hashtable<String, String> searchOptions = new Hashtable<String, String>();
         searchOptions.put("option", "dummy");
         GroupingWorker worker = new GroupingWorker(searchRules, searchOptions);
         worker.getWorker().run();
@@ -551,21 +551,19 @@ public class GroupSelector extends SidePaneComponent implements
 
     class GroupingWorker extends AbstractWorker {
         private SearchRuleSet rules;
-        private Hashtable searchTerm;
-        private ArrayList matches = new ArrayList();
+        private Hashtable<String, String> searchTerm;
+        private ArrayList<BibtexEntry> matches = new ArrayList<BibtexEntry>();
         private boolean showOverlappingGroupsP;
         int hits = 0;
 
-        public GroupingWorker(SearchRuleSet rules, Hashtable searchTerm) {
+        public GroupingWorker(SearchRuleSet rules, Hashtable<String, String> searchTerm) {
             this.rules = rules;
             this.searchTerm = searchTerm;
             showOverlappingGroupsP = showOverlappingGroups.isSelected();
         }
 
         public void run() {
-            Collection entries = panel.getDatabase().getEntries();
-            for (Iterator i = entries.iterator(); i.hasNext();) {
-                BibtexEntry entry = (BibtexEntry) i.next();
+            for (BibtexEntry entry : panel.getDatabase().getEntries()){
                 boolean hit = rules.applyRule(searchTerm, entry) > 0;
                 entry.setGroupHit(hit);
                 if (hit) {
@@ -1244,7 +1242,7 @@ public class GroupSelector extends SidePaneComponent implements
         }
         GroupTreeNode node;
         AbstractGroup group;
-        Vector vec = new Vector();
+        Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
         for (Enumeration e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
             node = (GroupTreeNode) e.nextElement();
             group = node.getGroup();
@@ -1264,7 +1262,7 @@ public class GroupSelector extends SidePaneComponent implements
         groupsTree.setHighlight3Cells(vec.toArray());
         // ensure that all highlighted nodes are visible
         for (int i = 0; i < vec.size(); ++i) {
-            node = (GroupTreeNode)((GroupTreeNode)vec.elementAt(i)).getParent();
+            node = (GroupTreeNode)vec.elementAt(i).getParent();
             if (node != null)
                 groupsTree.expandPath(new TreePath(node.getPath()));
         }
@@ -1273,17 +1271,17 @@ public class GroupSelector extends SidePaneComponent implements
 
     /** Show groups that, if selected, would show at least one
      * of the entries found in the specified search. */
-    protected void showOverlappingGroups(List matches) { //DatabaseSearch search) {
+    protected void showOverlappingGroups(List<BibtexEntry> matches) { //DatabaseSearch search) {
       GroupTreeNode node;
       SearchRule rule;
       BibtexEntry entry;
-      Vector vec = new Vector();
-      Map dummyMap = new HashMap(); // just because I don't want to use null...
+      Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
+      Map<String, String> dummyMap = new HashMap<String, String>(); // just because I don't want to use null...
       for (Enumeration e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
           node = (GroupTreeNode) e.nextElement();
           rule = node.getSearchRule();
-          for (Iterator it = matches.iterator(); it.hasNext(); ) {
-              entry = (BibtexEntry) it.next();
+          for (Iterator<BibtexEntry> it = matches.iterator(); it.hasNext(); ) {
+              entry = it.next();
               if (rule.applyRule(dummyMap, entry) == 0)
                       continue;
               vec.add(node);

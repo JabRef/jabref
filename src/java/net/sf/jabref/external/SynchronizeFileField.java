@@ -135,11 +135,11 @@ public class SynchronizeFileField extends AbstractWorker {
             mainLoop:
             for (int i = 0; i < sel.length; i++) {
                 panel.frame().setProgressBarValue(progress++);
-                final Object old = sel[i].getField(fieldName);
+                final String old = sel[i].getField(fieldName);
                 // Check if a extension is set:
                 if ((old != null) && !old.equals("")) {
                     FileListTableModel tableModel = new FileListTableModel();
-                    tableModel.setContent((String)old);
+                    tableModel.setContent(old);
                     for (int j=0; j<tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // Get an absolute path representation:

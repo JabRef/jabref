@@ -40,10 +40,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     private BibtexEntry entry;
     private String field;
-    private Object oldValue, newValue;
+    private String oldValue, newValue;
 
     public UndoableFieldChange(BibtexEntry entry, String field,
-			       Object oldValue, Object newValue) {
+			       String oldValue, String newValue) {
 	this.entry = entry;
 	this.field = field;
 	this.oldValue = oldValue;

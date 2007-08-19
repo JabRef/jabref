@@ -302,12 +302,20 @@ public class BibtexDatabase {
     public Set<String> getStringKeySet() {
         return _strings.keySet();
     }
+    
+    /**
+     * Returns a Collection of all BibtexString objects in the database.
+     * These are in no particular order.
+     */
+    public Collection<BibtexString> getStringValues() {
+        return _strings.values();
+    }
 
     /**
      * Returns the string at the given index.
      */
-    public synchronized BibtexString getString(Object o) {
-        return (_strings.get(o));
+    public synchronized BibtexString getString(String o) {
+        return _strings.get(o);
     }
 
     /**

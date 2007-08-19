@@ -84,8 +84,8 @@ public class ExportFormats {
 		StringBuffer sb = new StringBuffer();
 		int lastBreak = -firstLineSubtr;
 
-		for (Iterator i = exportFormats.keySet().iterator(); i.hasNext();) {
-			String name = (String) i.next();
+		for (Iterator<String> i = exportFormats.keySet().iterator(); i.hasNext();) {
+			String name = i.next();
 			if (sb.length() + 2 + name.length() - lastBreak > maxLineLength) {
 				sb.append(",\n");
 				lastBreak = sb.length();
@@ -102,7 +102,7 @@ public class ExportFormats {
      * Get a Map of all export formats.
      * @return A Map containing all export formats, mapped to their console names.
      */
-    public static Map getExportFormats() {
+    public static Map<String, ExportFormat> getExportFormats() {
         // It is perhaps overly paranoid to make a defensive copy in this case:
         return Collections.unmodifiableMap(exportFormats);
     } 
@@ -116,7 +116,7 @@ public class ExportFormats {
 	 *         registered.
 	 */
 	public static ExportFormat getExportFormat(String consoleName) {
-		return (ExportFormat) exportFormats.get(consoleName);
+		return exportFormats.get(consoleName);
 	}
 
 	/**
@@ -210,14 +210,14 @@ public class ExportFormats {
 		FileFilter defaultFilter = null;
 		JFileChooser fc = new JFileChooser(currentDir);
 		TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
-		for (Iterator i = exportFormats.keySet().iterator(); i.hasNext();) {
-			String formatName = (String) i.next();
-			ExportFormat format = (ExportFormat) exportFormats.get(formatName);
+		for (Iterator<String> i = exportFormats.keySet().iterator(); i.hasNext();) {
+			String formatName = i.next();
+			ExportFormat format = exportFormats.get(formatName);
 			filters.add(format.getFileFilter());
 			if (formatName.equals(lastUsedFormat))
 				defaultFilter = format.getFileFilter();
 		}
-		for (Iterator i = filters.iterator(); i.hasNext();) {
+		for (Iterator<FileFilter> i = filters.iterator(); i.hasNext();) {
 			fc.addChoosableFileFilter((ExportFileFilter) i.next());
 		}
 		fc.setAcceptAllFileFilterUsed(false);

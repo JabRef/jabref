@@ -27,8 +27,8 @@
 package net.sf.jabref;
 
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
@@ -38,13 +38,13 @@ public class DatabaseSearch extends Thread {
 	BasePanel panel = null;
 	BibtexDatabase thisDatabase = null;
 	SearchRuleSet thisRuleSet = null;
-	Hashtable thisSearchOptions = null;
+	Map<String, String> thisSearchOptions = null;
 	String searchValueField = null;
 	boolean reorder, select, grayOut;
 	ErrorMessageDisplay errorDisplay;
 	Set<BibtexEntry> matches = new HashSet<BibtexEntry>();
 	public DatabaseSearch(ErrorMessageDisplay errorDisplay,
-			Hashtable searchOptions, SearchRuleSet searchRules,
+			Map<String, String> searchOptions, SearchRuleSet searchRules,
 			BasePanel panel, String searchValueField, boolean reorder,
 			boolean grayOut, boolean select) {
 		this.panel = panel;

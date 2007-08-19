@@ -1,7 +1,6 @@
 package net.sf.jabref.imports;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.JOptionPane;
@@ -18,7 +17,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     public boolean isActionNecessary(ParserResult pr) {
         // See if any custom entry types were imported, but disregard those we already know:
-        for (Iterator i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
+        for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
             String typeName = ((String) i.next()).toLowerCase();
             if (BibtexEntryType.ALL_TYPES.get(typeName) != null)
                 i.remove();
@@ -41,12 +40,10 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 Globals.lang("Custom entry types"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
+        
         if (answer == JOptionPane.YES_OPTION) {
             // Import
-            HashMap et = pr.getEntryTypes();
-            for (Iterator i = et.keySet().iterator(); i.hasNext();) {
-                BibtexEntryType typ = (BibtexEntryType) et.get(i.next());
-                //System.out.println(":"+typ.getName()+"\n"+typ.toString());
+            for (BibtexEntryType typ : pr.getEntryTypes().values()){
                 BibtexEntryType.ALL_TYPES.put(typ.getName().toLowerCase(), typ);
             }
 

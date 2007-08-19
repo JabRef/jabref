@@ -9,10 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -49,7 +46,7 @@ public class ManageJournalsPanel extends JPanel{
     JTextField nameTf = new JTextField(),
         newNameTf = new JTextField(),
         abbrTf = new JTextField();
-    java.util.List externals = new ArrayList(); // To hold references to external journal lists.
+    List<ExternalFileEntry> externals = new ArrayList<ExternalFileEntry>(); // To hold references to external journal lists.
     JDialog dialog;
     JRadioButton newFile = new JRadioButton(Globals.lang("New file")),
         oldFile = new JRadioButton(Globals.lang("Existing file"));
@@ -225,8 +222,8 @@ public class ManageJournalsPanel extends JPanel{
     private void buildExternalsPanel() {
 
         DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("fill:pref:grow",""));
-        for (Iterator i=externals.iterator(); i.hasNext();) {
-            ExternalFileEntry efe = (ExternalFileEntry)i.next();
+        for (Iterator<ExternalFileEntry> i=externals.iterator(); i.hasNext();) {
+            ExternalFileEntry efe = i.next();
             builder.append(efe.getPanel());
             builder.nextLine();
         }
@@ -323,8 +320,8 @@ public class ManageJournalsPanel extends JPanel{
             FileWriter fw = null;
             try {
                 fw = new FileWriter(f, false);
-                for (Iterator i=tableModel.getJournals().iterator(); i.hasNext();) {
-                    JournalEntry entry = (JournalEntry)i.next();
+                for (Iterator<JournalEntry> i=tableModel.getJournals().iterator(); i.hasNext();) {
+                    JournalEntry entry = i.next();
                     fw.write(entry.name);
                     fw.write(" = ");
                     fw.write(entry.abbreviation);
@@ -350,9 +347,9 @@ public class ManageJournalsPanel extends JPanel{
         }
 
         // Store the list of external files set up:
-        ArrayList extFiles = new ArrayList();
-        for (Iterator i=externals.iterator(); i.hasNext();) {
-            ExternalFileEntry efe = (ExternalFileEntry)i.next();
+        ArrayList<String> extFiles = new ArrayList<String>();
+        for (Iterator<ExternalFileEntry> i=externals.iterator(); i.hasNext();) {
+            ExternalFileEntry efe = i.next();
             if (!efe.getValue().equals("")) {
                 extFiles.add(efe.getValue());
             }
@@ -360,7 +357,7 @@ public class ManageJournalsPanel extends JPanel{
         if (extFiles.size() == 0)
             Globals.prefs.put("externalJournalLists", "");
         else {
-            String[] list = (String[])extFiles.toArray(new String[extFiles.size()]);
+            String[] list = extFiles.toArray(new String[extFiles.size()]);
             Globals.prefs.putStringArray("externalJournalLists", list);
         }
 
@@ -430,24 +427,22 @@ public class ManageJournalsPanel extends JPanel{
     class AbbreviationsTableModel extends AbstractTableModel implements ActionListener {
 
         String[] names = new String[] {Globals.lang("Journal name"), Globals.lang("Abbreviation")};
-        ArrayList journals = null;
+        ArrayList<JournalEntry> journals = null;
 
         public AbbreviationsTableModel() {
 
 
         }
 
-        public void setJournals(Map journals) {
-            this.journals = new ArrayList();
-            for (Iterator i=journals.keySet().iterator(); i.hasNext();) {
-                String journal = (String)i.next(),
-                        abbr = (String)journals.get(journal);
-                this.journals.add(new JournalEntry(journal, abbr));
+        public void setJournals(Map<String, String> journals) {
+            this.journals = new ArrayList<JournalEntry>();
+            for (Map.Entry<String, String> entry : journals.entrySet()){
+                this.journals.add(new JournalEntry(entry.getKey(), entry.getValue()));
             }
             fireTableDataChanged();
         }
 
-        public ArrayList getJournals() {
+        public ArrayList<JournalEntry> getJournals() {
             return journals;
         }
 
@@ -461,13 +456,13 @@ public class ManageJournalsPanel extends JPanel{
 
         public Object getValueAt(int row, int col) {
             if (col == 0)
-                return ((JournalEntry)journals.get(row)).name;
+                return journals.get(row).name;
             else
-                return ((JournalEntry)journals.get(row)).abbreviation;
+                return journals.get(row).abbreviation;
         }
 
         public void setValueAt(Object object, int row, int col) {
-            JournalEntry entry = (JournalEntry)journals.get(row);
+            JournalEntry entry = journals.get(row);
             if (col == 0)
                 entry.name = (String)object;
             else
@@ -590,15 +585,14 @@ public class ManageJournalsPanel extends JPanel{
         public String getValue() { return tf.getText(); }
     }
 
-    class JournalEntry implements Comparable {
+    class JournalEntry implements Comparable<JournalEntry> {
         String name, abbreviation;
         public JournalEntry(String name, String abbreviation) {
             this.name = name;
             this.abbreviation = abbreviation;
         }
-        public int compareTo(Object other) {
-            JournalEntry entry = (JournalEntry)other;
-            return this.name.compareTo(entry.name);
+        public int compareTo(JournalEntry other) {
+            return this.name.compareTo(other.name);
         }
     }
 }

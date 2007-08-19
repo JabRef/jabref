@@ -1,10 +1,9 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.AuthorList;
-
-import java.util.TreeSet;
-import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
+
+import net.sf.jabref.AuthorList;
 
 /**
  * Created by Morten O. Alver, 16 Feb. 2007
@@ -13,8 +12,7 @@ public class AutoCompleter {
     final int SHORTEST_WORD = 4,
             SHORTEST_TO_COMPLETE = 2;
 
-    private TreeSet words = new TreeSet();
-    private HashMap hm = new HashMap();
+    private TreeSet<String> words = new TreeSet<String>();
     private boolean nameField = false, // Attempt to store entire names?
 	entireField = false; // Set to true if the entire field should be stored 
 		             // suitable e.g. for journal or publisher fields.

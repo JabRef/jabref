@@ -8,7 +8,7 @@ package gnu.dtools.ritopt;
  */
 
 import java.io.PrintStream;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -59,7 +59,7 @@ public class OptionModule implements OptionRegistrar {
      * A repository of options registered with this module.
      */
 
-    private java.util.HashMap options;
+    private HashMap<String, Option> options;
 
     /**
      * The name of this module.
@@ -118,7 +118,7 @@ public class OptionModule implements OptionRegistrar {
      */
 
     public OptionModule( String name ) {
-	options = new java.util.HashMap();
+	options = new HashMap<String, Option>();
 	this.name = name;
 	deprecated = false;
     }
@@ -222,17 +222,14 @@ public class OptionModule implements OptionRegistrar {
      *
      * @return A boolean value indicating whether the option passed exists.
      */
-
-    public boolean optionExists( char shortOption ) {
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    char c = next.getShortOption();
-	    if ( c != 0 && c == shortOption ) return true;
+	public boolean optionExists(char shortOption) {
+		for (Option next : options.values()) {
+			char c = next.getShortOption();
+			if (c != 0 && c == shortOption)
+				return true;
+		}
+		return false;
 	}
-	return false;
-    }
 
     /**
      * Returns whether the option referred by a long option exists in this
@@ -242,48 +239,45 @@ public class OptionModule implements OptionRegistrar {
      *
      * @return A boolean value indicating whether the option passed exists.
      */
-
-    public boolean optionExists( String longOption ) {
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    String s = next.getLongOption();
-	    if ( s != null && s.equals( longOption ) ) return true;
+	public boolean optionExists(String longOption) {
+		for (Option next : options.values()) {
+			String s = next.getLongOption();
+			if (s != null && s.equals(longOption))
+				return true;
+		}
+		return false;
 	}
-	return false;
-    }
 
     /**
-     * Return an iterator over the option repository contained in this module.
-     *
-     * @return An iterator over the repository.
-     */
+	 * Return an iterator over the option repository contained in this module.
+	 * 
+	 * @return An iterator over the repository.
+	 */
 
-    public Iterator getOptionIterator() {
-	return options.values().iterator();
-    }
+	public Iterator<Option> getOptionIterator() {
+		return options.values().iterator();
+	}
 
     /**
-     * Returns the option referred by the long option passed.
-     *
-     * @param shortOption The option to retrieve.
-     *
-     * @return An option referred to by this module. null is returned
-     *         if it does not exist.
-     */
+	 * Returns the option referred by the long option passed.
+	 * 
+	 * @param shortOption
+	 *            The option to retrieve.
+	 * 
+	 * @return An option referred to by this module. null is returned if it does
+	 *         not exist.
+	 */
 
-    public Option getOption( char shortOption ) {
-	Option retval = null;
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    char c = next.getShortOption();
-	    if ( c != '\0' && c == shortOption ) retval = next;
+    public Option getOption(char shortOption) {
+		Option retval = null;
+
+		for (Option next : options.values()) {
+			char c = next.getShortOption();
+			if (c != '\0' && c == shortOption)
+				retval = next;
+		}
+		return retval;
 	}
-	return retval;
-    }
 
     /**
      * Returns the option referred by the long option passed.
@@ -294,17 +288,15 @@ public class OptionModule implements OptionRegistrar {
      *         if it does not exist.
      */
 
-    public Option getOption( String longOption ) {
-	Option retval = null;
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    String s = next.getLongOption();
-	    if ( s != null && s.equals( longOption ) ) retval = next;
+    public Option getOption(String longOption) {
+		Option retval = null;
+		for (Option next : options.values()) {
+			String s = next.getLongOption();
+			if (s != null && s.equals(longOption))
+				retval = next;
+		}
+		return retval;
 	}
-	return retval;
-    }
 
     /**
      * Returns the help information as a String.
@@ -313,37 +305,32 @@ public class OptionModule implements OptionRegistrar {
      */
 
     public String getHelp() {
-	String retval = "";
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    retval += next.getHelp() + "\n";
+		String retval = "";
+		for (Option next : options.values()) {
+			retval += next.getHelp() + "\n";
+		}
+		return retval;
 	}
-	return retval;
-    }
 
     /**
-     * Writes the help information to a print stream.
-     *
-     * @param ps  The print stream to write to.
-     */
+	 * Writes the help information to a print stream.
+	 * 
+	 * @param ps
+	 *            The print stream to write to.
+	 */
 
-    public void writeFileToPrintStream( PrintStream ps ) {
-	Collection col = options.values();
-	Iterator it = col.iterator();
-	ps.println( ":" + name + ":" );
-	while ( it.hasNext() ) {
-	    Option next = (Option)it.next();
-	    ps.println( next.getOptionFileLine() );
+	public void writeFileToPrintStream(PrintStream ps) {
+		ps.println(":" + name + ":");
+		for (Option next : options.values()) {
+			ps.println(next.getOptionFileLine());
+		}
 	}
-    }
 
     /**
-     * Returns whether this module is deprecated.
-     *
-     * @return A boolean value indicating whether this module is deprecated.
-     */
+	 * Returns whether this module is deprecated.
+	 * 
+	 * @return A boolean value indicating whether this module is deprecated.
+	 */
 
     public boolean isDeprecated() {
 	return deprecated;

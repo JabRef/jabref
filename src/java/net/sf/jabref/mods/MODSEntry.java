@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 public class MODSEntry {
 	protected String entryType = "mods"; // could also be relatedItem
 	protected String id;
-	protected List authors = null;
+	protected List<PersonName> authors = null;
 	protected List editors = null;
 	// should really be handled with an enum
 	protected String issuance = "monographic";
@@ -47,14 +47,14 @@ public class MODSEntry {
 	protected Set handledExtensions;
 	
 	protected MODSEntry host;
-	Map extensionFields;
+	Map<String, String> extensionFields;
 	
 	public static String BIBTEX = "bibtex_";
 	
 	private final boolean CHARFORMAT = false;
 	
 	public MODSEntry() {
-		extensionFields = new HashMap();
+		extensionFields = new HashMap<String, String>();
 		handledExtensions = new HashSet();
 	
 	}
@@ -117,17 +117,16 @@ public class MODSEntry {
 	}
 	
 	protected void populateExtensionFields(BibtexEntry e) {
-		Object fields [] = e.getAllFields();
-		for(int i = 0; i < fields.length; i++) {
-			String field = (String) fields[i];
-			String value = (String) e.getField(field);
+		
+		for (String field : e.getAllFields()){
+			String value = e.getField(field);
 			field = BIBTEX + field;
 			extensionFields.put(field, value);
 		}
 	}
 	
-	protected List getAuthors(String authors) {
-		List result = new LinkedList();
+	protected List<PersonName> getAuthors(String authors) {
+		List<PersonName> result = new LinkedList<PersonName>();
 		LayoutFormatter chars = new XMLChars();
 		
 		if (authors.indexOf(" and ") == -1) {
@@ -201,8 +200,8 @@ public class MODSEntry {
 		   		mods.appendChild(titleInfo);
 	   		}
 	   		if (authors != null) {
-	   			for(Iterator iter = authors.iterator(); iter.hasNext();) {
-	   				PersonName name = (PersonName) iter.next();
+	   			for(Iterator<PersonName> iter = authors.iterator(); iter.hasNext();) {
+	   				PersonName name = iter.next();
 	   				Element modsName = d.createElement("name");
 	   				modsName.setAttribute("type", "personal");
 	   				if (name.getSurname() != null) {

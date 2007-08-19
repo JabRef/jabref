@@ -9,11 +9,10 @@ public class JabRefTestCase extends TestCase {
 		assertEquals(e.getCiteKey(), x.getCiteKey());
 		assertEquals(e.getType(), x.getType());
 
-		Object[] o = e.getAllFields();
-		assertEquals(o.length, x.getAllFields().length);
+		assertEquals(e.getAllFields().size(), x.getAllFields().size());
 
-		for (int i = 0; i < o.length; i++) {
-			assertEquals(e.getField(o.toString()), x.getField(o.toString()));
+		for (String name : e.getAllFields()){
+			assertEquals(e.getField(name), x.getField(name));
 		}
 	}
 	

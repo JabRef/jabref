@@ -140,7 +140,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (cancelled)
             return;
 
-        Collection entryList;
+        Collection<BibtexEntry> entryList;
         // If all entries should be treated, change the entries array:
         if (all.isSelected())
             entryList = bp.database().getEntries();

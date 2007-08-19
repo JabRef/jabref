@@ -37,11 +37,11 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
     protected FieldSetComponent reqComp, optComp;
     protected EntryTypeList typeComp;
     protected JButton ok, cancel, apply, helpButton, delete, importTypes, exportTypes;
-    protected final List preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
+    protected final List<String> preset = java.util.Arrays.asList(BibtexFields.getAllFieldNames());
     protected String lastSelected = null;
-    protected Map reqLists = new HashMap(),
-            optLists = new HashMap();
-    protected Set defaulted = new HashSet(), changed = new HashSet();
+    protected Map<String, List<String>> reqLists = new HashMap<String, List<String>>(),
+            optLists = new HashMap<String, List<String>>();
+    protected Set<String> defaulted = new HashSet<String>(), changed = new HashSet<String>();
 
     /** Creates a new instance of EntryCustomizationDialog2 */
     public EntryCustomizationDialog2(JabRefFrame frame) {
@@ -60,8 +60,8 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         main.setLayout(new BorderLayout());
         right.setLayout(new GridLayout(1, 2));
 
-        java.util.List entryTypes = new ArrayList();
-        for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
+        java.util.List<String> entryTypes = new ArrayList<String>();
+        for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
             entryTypes.add(i.next());
         }
 
@@ -72,12 +72,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         typeComp.setListSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         //typeComp.setEnabled(false);
-        reqComp = new FieldSetComponent(Globals.lang("Required fields"), new ArrayList(), preset, true, true);
+        reqComp = new FieldSetComponent(Globals.lang("Required fields"), new ArrayList<String>(), preset, true, true);
         reqComp.setEnabled(false);
         reqComp.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         ListDataListener dataListener = new DataListener();
         reqComp.addListDataListener(dataListener);
-        optComp = new FieldSetComponent(Globals.lang("Optional fields"), new ArrayList(), preset, true, true);
+        optComp = new FieldSetComponent(Globals.lang("Optional fields"), new ArrayList<String>(), preset, true, true);
         optComp.setEnabled(false);
         optComp.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         optComp.addListDataListener(dataListener);
@@ -134,15 +134,15 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
             if (type != null) {
                 String[] rf = type.getRequiredFields(),
                         of = type.getOptionalFields();
-                List req, opt;
+                List<String> req, opt;
                 if (rf != null)
                     req = java.util.Arrays.asList(rf);
                 else
-                    req = new ArrayList();
+                    req = new ArrayList<String>();
                 if (of != null)
                     opt = java.util.Arrays.asList(of);
                 else
-                    opt = new ArrayList();
+                    opt = new ArrayList<String>();
 
                 reqComp.setFields(req);
                 reqComp.setEnabled(true);
@@ -150,15 +150,15 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 optComp.setEnabled(true);
             } else {
                 // New entry, veintle
-                reqComp.setFields(new ArrayList());
+                reqComp.setFields(new ArrayList<String>());
                 reqComp.setEnabled(true);
-                optComp.setFields(new ArrayList());
+                optComp.setFields(new ArrayList<String>());
                 optComp.setEnabled(true);
                 new FocusRequester(reqComp);
             }
         } else {
-            reqComp.setFields((List)rl);
-            optComp.setFields((List)optLists.get(s));
+            reqComp.setFields((List<String>)rl);
+            optComp.setFields(optLists.get(s));
         }
 
         lastSelected = s;
@@ -170,14 +170,13 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         // Iterate over our map of required fields, and list those types if necessary:
 
         List types = typeComp.getFields();
-        boolean globalChangesMade = false;
-        for (Iterator i=reqLists.keySet().iterator(); i.hasNext();) {
-            String typeName = (String)i.next();
+        for (Iterator<String> i=reqLists.keySet().iterator(); i.hasNext();) {
+            String typeName = i.next();
             if (!types.contains(typeName))
                 continue;
 
-            List reqFields = (List)reqLists.get(typeName);
-            List optFields = (List)optLists.get(typeName);
+            List reqFields = reqLists.get(typeName);
+            List optFields = optLists.get(typeName);
             String[] reqStr = new String[reqFields.size()];
             reqFields.toArray(reqStr);
             String[] optStr = new String[optFields.size()];
@@ -194,7 +193,6 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 BibtexEntryType.removeType(nm);
 
                 updateTypesForEntries(nm);
-                globalChangesMade = true;
                 continue;
             }
 
@@ -211,13 +209,12 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 CustomEntryType typ = new CustomEntryType(Util.nCase(typeName), reqStr, optStr);
                 BibtexEntryType.ALL_TYPES.put(typeName.toLowerCase(), typ);
                 updateTypesForEntries(typ.getName());
-                globalChangesMade = true;
             }
         }
 
 
-        Set toRemove = new HashSet();
-        for (Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
+        Set<Object> toRemove = new HashSet<Object>();
+        for (Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator(); i.hasNext();) {
             Object o = i.next();
             if (!types.contains(o)) {
                 //System.out.println("Deleted entry type (TODO): "+o);
@@ -227,7 +224,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
 
         // Remove those that should be removed:
         if (toRemove.size() > 0) {
-            for (Iterator i=toRemove.iterator(); i.hasNext();)
+            for (Iterator<Object> i=toRemove.iterator(); i.hasNext();)
                 typeDeletion((String)i.next());
         }
 
@@ -327,12 +324,8 @@ private void updateTypesForEntries(String typeName) {
 private void updateTables() {
     if (frame.getTabbedPane().getTabCount() == 0)
         return;
-    //messageLabel.setText(Globals.lang("Updating entries..."));
-    BibtexDatabase base;
-    Iterator iter;
     for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
-        BasePanel bp = (BasePanel)frame.getTabbedPane().getComponentAt(i);
-        //bp.markBaseChanged();
+        frame.getTabbedPane().getComponentAt(i);
     }
 
 }
@@ -349,15 +342,15 @@ class DefaultListener implements ActionListener {
         if (type != null) {
             String[] rf = type.getRequiredFields(),
                     of = type.getOptionalFields();
-            List req, opt;
+            List<String> req, opt;
             if (rf != null)
                 req = java.util.Arrays.asList(rf);
             else
-                req = new ArrayList();
+                req = new ArrayList<String>();
             if (of != null)
                 opt = java.util.Arrays.asList(of);
             else
-                opt = new ArrayList();
+                opt = new ArrayList<String>();
 
             reqComp.setFields(req);
             reqComp.setEnabled(true);

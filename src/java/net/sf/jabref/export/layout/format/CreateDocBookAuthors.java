@@ -46,11 +46,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
         //     <author><firstname>J.</firstname><othername role="mi">W.</othername><surname>Godden</surname></author>
         //     <author><firstname>J.</firstname><surname>Bajorath</surname></author>
 
-        int index = 0;
-        int oldPos = 0;
-        String author;
         StringBuffer sb = new StringBuffer(100);
-        //fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
 
         if (fieldText.indexOf(" and ") == -1)
         {
@@ -85,7 +81,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
-        Vector v = new Vector();
+        Vector<String> v = new Vector<String>();
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
         WSITools.tokenize(v, authorMod, " \n\r");

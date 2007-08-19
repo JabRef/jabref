@@ -326,8 +326,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
      *            Paths that may have become invalid.
      * @return Refreshed paths that are all valid.
      */
-    public Enumeration refreshPaths(Enumeration paths) {
-        Vector freshPaths = new Vector();
+    public Enumeration<TreePath> refreshPaths(Enumeration paths) {
+        Vector<TreePath> freshPaths = new Vector<TreePath>();
         while (paths.hasMoreElements()) {
             freshPaths.add(new TreePath(
                     ((DefaultMutableTreeNode) ((TreePath) paths.nextElement())

@@ -114,11 +114,11 @@ public class GUIGlobals {
 	helpPre = "/help/",
 	fontPath = "/images/font/";
 
-	static HashMap tableIcons = new HashMap(); // Contains table icon mappings. Set up
+	static HashMap<String, JLabel> tableIcons = new HashMap<String, JLabel>(); // Contains table icon mappings. Set up
 	// further below.
 	public static Color activeEditor = new Color(230, 230, 255);
 
-	static HashMap iconMap;
+	static HashMap<String, String> iconMap;
 
 	public static JLabel getTableIcon(String fieldType) {
 		Object o = tableIcons.get(fieldType);
@@ -228,10 +228,10 @@ public class GUIGlobals {
 	IMPORT_DIALOG_COL_2_WIDTH = 200,
 	IMPORT_DIALOG_COL_3_WIDTH = 200;
 
-	public static final Map LANGUAGES;
+	public static final Map<String, String> LANGUAGES;
 
 	static {
-		LANGUAGES = new HashMap();
+		LANGUAGES = new HashMap<String, String>();
 		// LANGUAGES contains mappings for supported languages.
 		LANGUAGES.put("English", "en");
 		LANGUAGES.put("Deutsch", "de");
@@ -290,7 +290,7 @@ public class GUIGlobals {
 	 */
 	public static URL getIconUrl(String name) {
         if (iconMap.containsKey(name)) {
-			String path = (String)iconMap.get(name);
+			String path = iconMap.get(name);
 			URL url = GUIGlobals.class.getResource(path);
 			if (url == null)
 				// This may be a resource outside of the jar file, so we try a general URL:
@@ -327,8 +327,8 @@ public class GUIGlobals {
 	 * @return A HashMap containing all key-value pairs found.
 	 * @throws IOException
 	 */
-	private static HashMap readIconThemeFile(URL file, String prefix) throws IOException {
-		HashMap map = new HashMap();
+	private static HashMap<String, String> readIconThemeFile(URL file, String prefix) throws IOException {
+		HashMap<String, String> map = new HashMap<String, String>();
 		InputStream in = null;
 		try {
 			in = file.openStream();

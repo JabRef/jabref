@@ -84,7 +84,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     boolean tmp = true;
 
     private MainTableSelectionListener selectionListener = null;
-    private ListEventListener groupsHighlightListener;
+    private ListEventListener<BibtexEntry> groupsHighlightListener;
     UIFSplitPane contentPane = new UIFSplitPane();
 
     JSplitPane splitPane;
@@ -123,7 +123,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     //EntryTableModel tableModel = null;
     //public EntryTable entryTable = null;
     public MainTable mainTable = null;
-    public FilterList searchFilterList = null, groupFilterList = null;
+    public FilterList<BibtexEntry> searchFilterList = null, groupFilterList = null;
 
     public RightClickMenu rcm;
 
@@ -162,9 +162,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     // MetaData parses, keeps and writes meta data.
     MetaData metaData;
-    HashMap fieldExtras = new HashMap();
-    //## keep track of all keys for duplicate key warning and unique key generation
-    //private HashMap allKeys  = new HashMap();	// use a map instead of a set since i need to know how many of each key is inthere
 
     private boolean suppressOutput = false;
 
@@ -596,9 +593,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("delete", new BaseAction() {
                 public void action() {
-                  boolean cancelled = false;
                   BibtexEntry[] bes = mainTable.getSelectedEntries();
-                  int row0 = mainTable.getSelectedRow();
                   if ((bes != null) && (bes.length > 0)) {
 
                       boolean goOn = showDeleteConfirmationDialog(bes.length);
@@ -670,52 +665,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 ex.printStackTrace();
                             }
                         } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                            // We have determined that no TransferableBibtexEntry is available, but
-                            // there is a string, which we will handle according to context:
-                            int[] rows = mainTable.getSelectedRows();
-                                //cols = entryTable.getSelectedColumns();
-                            //Util.pr(rows.length+" x "+cols.length);
-                            /*if ((cols != null) && (cols.length == 1) && (cols[0] != 0)
-                                && (rows != null) && (rows.length == 1)) {
-                                // A single cell is highlighted, so paste the string straight into it without parsing
-                                try {
-                                    tableModel.setValueAt((String)(content.getTransferData(DataFlavor.stringFlavor)), rows[0], cols[0]);
-                                    refreshTable();
-                                    markBaseChanged();
-                                    output("Pasted cell contents");
-                                } catch (UnsupportedFlavorException ex) {
-                                    ex.printStackTrace();
-                                } catch (IOException ex) {
-                                    ex.printStackTrace();
-                                } catch (IllegalArgumentException ex) {
-                                    output("Can't paste.");
-                                }
-                            } else {*/
-                              // no single cell is selected, so try parsing the clipboard contents as bibtex entries instead
-                              try {
+                           try {
                                   BibtexParser bp = new BibtexParser
                                       (new java.io.StringReader( (String) (content.getTransferData(
                                       DataFlavor.stringFlavor))));
                                   BibtexDatabase db = bp.parse().getDatabase();
                                   Util.pr("Parsed " + db.getEntryCount() + " entries from clipboard text");
                                   if(db.getEntryCount()>0) {
-                                      Set keySet = db.getKeySet();
-                                      if (keySet != null) {
-                                          // Copy references to the entries into a BibtexEntry array.
-                                          // Could import directly from db, but going via bes allows re-use
-                                          // of the same pasting code as used for TransferableBibtexEntries
-                                          bes = new BibtexEntry[db.getEntryCount()];
-                                          Iterator it = keySet.iterator();
-                                          for (int i=0; it.hasNext();i++) {
-                                              bes[i]=db.getEntryById((String) (it.next()));
-                                          }
-                                      }
-                                  } /*else {
-                                    String cont = (String)(content.getTransferData(DataFlavor.stringFlavor));
-                                    Util.pr("----------------\n"+cont+"\n---------------------");
-                                    TextAnalyzer ta = new TextAnalyzer(cont);
-                                      output(Globals.lang("Unable to parse clipboard text as Bibtex entries."));
-                                      }*/
+                                      bes = db.getEntries().toArray(new BibtexEntry[db.getEntryCount()]);
+                                  }
                               } catch (UnsupportedFlavorException ex) {
                                   ex.printStackTrace();
                               } catch (Throwable ex) {
@@ -1117,9 +1075,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                       int counter = 0;
                       NamedCompound ce = new NamedCompound(Globals.lang("Replace string"));
                       if (!rsd.selOnly()) {
-                          for (Iterator i=database.getKeySet().iterator();
-                               i.hasNext();)
-                              counter += rsd.replace(database.getEntryById((String)i.next()), ce);
+                    	  for (BibtexEntry entry : database.getEntries()){
+                              counter += rsd.replace(entry, ce);
+                    	  }
                       } else {
                           BibtexEntry[] bes = mainTable.getSelectedEntries();
                           for (int i=0; i<bes.length; i++)
@@ -1262,11 +1220,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
               actions.put("unmarkAll", new BaseAction() {
                 public void action() {
                   NamedCompound ce = new NamedCompound(Globals.lang("Unmark all"));
-                  Set keySet = database.getKeySet();
-                  for (Iterator i = keySet.iterator(); i.hasNext(); ) {
-                    BibtexEntry be = database.getEntryById( (String) i.next());
+                  
+                  for (BibtexEntry be : database.getEntries()){
                     Util.unmarkEntry(be, database, ce);
-
                   }
                   ce.end();
                   undoManager.addEdit(ce);
@@ -1566,17 +1522,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void createMainTable() {
         //Comparator comp = new FieldComparator("author");
 
-        GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap(), null);
+        GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap());
         // Must initialize sort columns somehow:
 
         database.addDatabaseChangeListener(eventList);
-        groupFilterList = new FilterList(eventList.getTheList(), NoSearchMatcher.INSTANCE);
-        searchFilterList = new FilterList(groupFilterList, NoSearchMatcher.INSTANCE);
+        groupFilterList = new FilterList<BibtexEntry>(eventList.getTheList(), NoSearchMatcher.INSTANCE);
+        searchFilterList = new FilterList<BibtexEntry>(groupFilterList, NoSearchMatcher.INSTANCE);
         //final SortedList sortedList = new SortedList(searchFilterList, null);
         MainTableFormat tableFormat = new MainTableFormat(this);
         tableFormat.updateTableFormat();
         //EventTableModel tableModel = new EventTableModel(sortedList, tableFormat);
-        mainTable = new MainTable(/*tableModel, */tableFormat, searchFilterList, frame, this);
+        mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
         
         selectionListener = new MainTableSelectionListener(this, mainTable);
         mainTable.updateFont();
@@ -1586,8 +1542,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.addFocusListener(selectionListener);
         
         // Add the listener that will take care of highlighting groups as the selection changes:
-        groupsHighlightListener = new ListEventListener() {
-            public void listChanged(ListEvent listEvent) {
+        groupsHighlightListener = new ListEventListener<BibtexEntry>() {
+            public void listChanged(ListEvent<BibtexEntry> listEvent) {
                 if (Globals.prefs.getBoolean("highlightGroupsMatchingAny"))
                     getGroupSelector().showMatchingGroups(
                             mainTable.getSelectedEntries(), false);
@@ -1750,8 +1706,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String field = completeFields[i];
             autoCompleters.put(field, new AutoCompleter(field));
         }
-        for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
-            BibtexEntry entry = database.getEntryById((String)i.next());
+        for (BibtexEntry entry : database.getEntries()){
             Util.updateCompletersForEntry(autoCompleters, entry);
         }
     }
@@ -1766,7 +1721,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      *
      * @param meta Metadata to input.
      */
-    public void parseMetaData(HashMap meta) {
+    public void parseMetaData(HashMap<String, String> meta) {
         metaData = new MetaData(meta,database());
 
     }
@@ -1932,7 +1887,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public EntryEditor getEntryEditor(BibtexEntry entry) {
         EntryEditor form;
         if (entryEditors.containsKey(entry.getType().getName())) {
-            EntryEditor visibleNow = currentEditor;
             // We already have an editor for this entry type.
             form = entryEditors.get
                 ((entry.getType().getName()));
@@ -2196,7 +2150,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         searchFilterList.setMatcher(matcher);
     }
 
-    public void setGroupMatcher(Matcher matcher) {
+    public void setGroupMatcher(Matcher<BibtexEntry> matcher) {
         groupFilterList.setMatcher(matcher);
     }
 
@@ -2294,11 +2248,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void autoGenerateKeysBeforeSaving() {
         if (Globals.prefs.getBoolean("generateKeysBeforeSaving")) {
-            BibtexEntry bes;
             NamedCompound ce = new NamedCompound(Globals.lang("autogenerate keys"));
             boolean any = false;
-            for (Iterator i=database.getKeySet().iterator(); i.hasNext();) {
-                bes = database.getEntryById((String)i.next());
+            
+            for (BibtexEntry bes : database.getEntries()){
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || (oldKey.equals(""))) {
                     LabelPatternUtil.makeLabel(Globals.prefs.getKeyPattern(), database, bes);
@@ -2460,12 +2413,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A comma-separated list of the keys of the selected entries.
      */
     public String getKeysForSelection() {
-        List entries = mainTable.getSelected();
         StringBuffer result = new StringBuffer();
         String citeKey = "";//, message = "";
         boolean first = true;
-        for (Iterator i = entries.iterator(); i.hasNext();) {
-            BibtexEntry bes = (BibtexEntry) i.next();
+        for (BibtexEntry bes : mainTable.getSelected()){
             citeKey = (String) bes.getField(BibtexFields.KEY_FIELD);
             // if the key is empty we give a warning and ignore this entry
             if (citeKey == null || citeKey.equals(""))

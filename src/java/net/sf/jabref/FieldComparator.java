@@ -19,7 +19,7 @@ import java.util.Comparator;
  * TODO: Testcases
  * 
  */
-public class FieldComparator implements Comparator {
+public class FieldComparator implements Comparator<BibtexEntry> {
 
 	String field;
 
@@ -41,9 +41,7 @@ public class FieldComparator implements Comparator {
 		isMonthField = field.equals("month");
 	}
 
-	public int compare(Object o1, Object o2) {
-		BibtexEntry e1 = (BibtexEntry) o1, e2 = (BibtexEntry) o2;
-
+	public int compare(BibtexEntry e1, BibtexEntry e2) {
 		Object f1, f2;
 
 		if (isTypeHeader) {

@@ -23,7 +23,7 @@ USA
 Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
-*/
+ */
 
 package net.sf.jabref;
 
@@ -37,17 +37,21 @@ import java.util.Comparator;
  */
 public class CrossRefEntryComparator implements Comparator<BibtexEntry> {
 
-    private String crossRefField = "crossref";
+	private String crossRefField = "crossref";
 
-    public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
+	public int compare(BibtexEntry e1, BibtexEntry e2)
+		throws ClassCastException {
 
-	Object f1 = e1.getField(crossRefField),
-	    f2 = e2.getField(crossRefField);
+		Object f1 = e1.getField(crossRefField), f2 = e2.getField(crossRefField);
 
-	if ((f1 == null) && (f2 == null)) return 0; //secComparator.compare(e1, e2);
-	if ((f1 != null) && (f2 != null)) return 0; //secComparator.compare(e1, e2);
-	if (f1 != null) return -1;
-	else return 1;
-    }
+		if ((f1 == null) && (f2 == null))
+			return 0; // secComparator.compare(e1, e2);
+		if ((f1 != null) && (f2 != null))
+			return 0; // secComparator.compare(e1, e2);
+		if (f1 != null)
+			return -1;
+		else
+			return 1;
+	}
 
 }

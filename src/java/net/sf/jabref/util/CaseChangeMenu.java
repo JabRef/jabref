@@ -37,10 +37,10 @@ public class CaseChangeMenu extends JMenu implements ActionListener{
         /* case */
         super(Globals.lang("Change case"));
         parent = opener;
-        int m = cc.getNumModes();
+        int m = CaseChanger.getNumModes();
         changeCaseItems = new JMenuItem[m];
         for (int i=0;i<m;i++){
-            changeCaseItems[i]=new JMenuItem(Globals.lang(cc.getModeName(i)));
+            changeCaseItems[i]=new JMenuItem(Globals.lang(CaseChanger.getModeName(i)));
             changeCaseItems[i].addActionListener(this);
             this.add(changeCaseItems[i]);
         }
@@ -48,7 +48,7 @@ public class CaseChangeMenu extends JMenu implements ActionListener{
 
     public void actionPerformed(ActionEvent e) {
         Object source = (e.getSource());
-        for(int i=0, m=cc.getNumModes(); i<m; i++){
+        for(int i=0, m=CaseChanger.getNumModes(); i<m; i++){
             if(source == changeCaseItems[i]){
                 caseChange(i);
                 break;
@@ -57,6 +57,6 @@ public class CaseChangeMenu extends JMenu implements ActionListener{
     }
 
     private void caseChange(int mode){
-        parent.setText(cc.changeCase(parent.getText(), mode));
+        parent.setText(CaseChanger.changeCase(parent.getText(), mode));
     }
 }

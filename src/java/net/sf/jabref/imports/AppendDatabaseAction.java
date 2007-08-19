@@ -27,7 +27,7 @@ import net.sf.jabref.undo.UndoableInsertString;
 public class AppendDatabaseAction extends BaseAction {
     private JabRefFrame frame;
     private BasePanel panel;
-    private List filesToOpen = new ArrayList();
+    private List<File> filesToOpen = new ArrayList<File>();
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
         this.frame = frame;
@@ -67,8 +67,8 @@ public class AppendDatabaseAction extends BaseAction {
                 boolean importGroups, boolean importSelectorWords) {
         if (filesToOpen.size() == 0)
             return;
-        for (Iterator i = filesToOpen.iterator(); i.hasNext();) {
-            File file = (File)i.next();
+        for (Iterator<File> i = filesToOpen.iterator(); i.hasNext();) {
+            File file = i.next();
             try {
                 Globals.prefs.put("workingDirectory", file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
@@ -86,23 +86,24 @@ public class AppendDatabaseAction extends BaseAction {
         }
     }
 
-    public static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
+    @SuppressWarnings("unchecked")
+	public static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
                                 boolean importEntries, boolean importStrings,
                                 boolean importGroups, boolean importSelectorWords)
               throws KeyCollisionException {
 
           BibtexDatabase fromDatabase = pr.getDatabase();
-          ArrayList appendedEntries = new ArrayList();
-          ArrayList originalEntries = new ArrayList();
+          ArrayList<BibtexEntry> appendedEntries = new ArrayList<BibtexEntry>();
+          ArrayList<BibtexEntry> originalEntries = new ArrayList<BibtexEntry>();
           BibtexDatabase database = panel.database();
           BibtexEntry originalEntry;
           NamedCompound ce = new NamedCompound(Globals.lang("Append database"));
           MetaData meta = new MetaData(pr.getMetaData(), pr.getDatabase());
 
           if (importEntries) { // Add entries
-              Iterator i = fromDatabase.getKeySet().iterator();
-              while (i.hasNext()) {
-                  originalEntry = fromDatabase.getEntryById((String) i.next());
+              
+        	  for (String key : fromDatabase.getKeySet()){
+        	      originalEntry = fromDatabase.getEntryById(key);
                   BibtexEntry be = (BibtexEntry) (originalEntry.clone());
                   be.setId(Util.createNeutralId());
                   database.insertEntry(be);
@@ -113,13 +114,8 @@ public class AppendDatabaseAction extends BaseAction {
           }
 
           if (importStrings) {
-              BibtexString bs;
-              int pos = 0;
-              Iterator i = fromDatabase.getStringKeySet().iterator();
-              for (; i.hasNext();) {
-                  bs = (BibtexString) (fromDatabase.getString(i.next()).clone());
+              for (BibtexString bs : fromDatabase.getStringValues()){
                   if (!database.hasStringLabel(bs.getName())) {
-                      //pos = toDatabase.getStringCount();
                       database.addString(bs);
                       ce.addEdit(new UndoableInsertString(panel, database, bs));
                   }
@@ -137,7 +133,7 @@ public class AppendDatabaseAction extends BaseAction {
                               AbstractGroup.INDEPENDENT); // JZTODO lyrics
                       newGroups.setGroup(group);
                       for (int i = 0; i < appendedEntries.size(); ++i)
-                          group.addEntry((BibtexEntry) appendedEntries.get(i));
+                          group.addEntry(appendedEntries.get(i));
                   }
 
                   // groupsSelector is always created, even when no groups
@@ -150,27 +146,27 @@ public class AppendDatabaseAction extends BaseAction {
                   GroupTreeNode node;
                   ExplicitGroup group;
                   BibtexEntry entry;
-                  for (Enumeration e = newGroups.preorderEnumeration(); e.hasMoreElements();) {
-                      node = (GroupTreeNode) e.nextElement();
-                      if (!(node.getGroup() instanceof ExplicitGroup))
-                          continue;
-                      group = (ExplicitGroup) node.getGroup();
-                      for (int i = 0; i < originalEntries.size(); ++i) {
-                          entry = (BibtexEntry) originalEntries.get(i);
-                          if (group.contains(entry)) {
-                              group.removeEntry(entry);
-                              group.addEntry((BibtexEntry) appendedEntries.get(i));
-                          }
-                      }
-                  }
+                  
+                  for (Enumeration<GroupTreeNode> e = newGroups
+					.preorderEnumeration(); e.hasMoreElements();) {
+					node = (GroupTreeNode) e.nextElement();
+					if (!(node.getGroup() instanceof ExplicitGroup))
+						continue;
+					group = (ExplicitGroup) node.getGroup();
+					for (int i = 0; i < originalEntries.size(); ++i) {
+						entry = originalEntries.get(i);
+						if (group.contains(entry)) {
+							group.removeEntry(entry);
+							group.addEntry(appendedEntries.get(i));
+						}
+					}
+				}
                   frame.groupSelector.revalidateGroups();
               }
           }
 
           if (importSelectorWords) {
-              Iterator i = meta.iterator();
-              while (i.hasNext()) {
-                  String s = (String) i.next();
+        	  for (String s : meta){
                   if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
                       panel.metaData().putData(s, meta.getData(s));
                   }

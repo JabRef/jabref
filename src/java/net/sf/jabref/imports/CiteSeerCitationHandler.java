@@ -2,35 +2,26 @@ package net.sf.jabref.imports;
 
 
 
-import java.util.Hashtable;
+import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-/*
- * Created on Jun 13, 2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
-
 /**
  * @author mspiegel
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class CiteSeerCitationHandler extends DefaultHandler {
 
 	protected boolean correctDirection;
 	protected boolean getCitation;
-	protected Hashtable citationList;
+	protected Map<String, Boolean> citationList;
 
 	/**
 	 * @param identifierVector
 	 */
-	public CiteSeerCitationHandler(Hashtable citationHashTable) {
+	public CiteSeerCitationHandler(Map<String, Boolean> citationHashTable) {
 		citationList = citationHashTable;		
 	}
 

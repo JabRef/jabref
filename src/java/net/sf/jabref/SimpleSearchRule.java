@@ -48,9 +48,8 @@ public class SimpleSearchRule implements SearchRule {
         int counter = 0;
         Object fieldContentAsObject;
         String fieldContent;
-        Object[] fields = bibtexEntry.getAllFields();
-        for (int i = 0; i < fields.length; i++) {
-            fieldContentAsObject = bibtexEntry.getField(fields[i].toString()); 
+        for (String field : bibtexEntry.getAllFields()){
+            fieldContentAsObject = bibtexEntry.getField(field); 
             if (fieldContentAsObject != null)
                 try {
                     fieldContent = removeBrackets.format(fieldContentAsObject.toString());

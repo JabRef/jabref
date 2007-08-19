@@ -206,16 +206,16 @@ public class SearchGroup extends AbstractGroup implements SearchRule {
 	 * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
 	 *      net.sf.jabref.BibtexEntry)
 	 */
-	public boolean contains(Map searchOptions, BibtexEntry entry) {
+	public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
 		return applyRule(searchOptions, entry) == 0 ? false : true;
 	}
 
 	public boolean contains(BibtexEntry entry) {
 		// use dummy map
-		return contains(new HashMap(), entry);
+		return contains(new HashMap<String, String>(), entry);
 	}
 
-	public int applyRule(Map searchOptions, BibtexEntry entry) {
+	public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
 		if (m_ast == null) {
 			// the searchOptions object is a dummy; we need to insert
 			// the actual search expression.

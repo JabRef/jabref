@@ -206,7 +206,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 	 * @return All groups that contain the specified entry.
 	 */
 	public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
-		Vector matchingGroups = new Vector();
+		Vector<AbstractGroup> matchingGroups = new Vector<AbstractGroup>();
 		Enumeration e = preorderEnumeration();
 		AbstractGroup group;
 		while (e.hasMoreElements()) {
@@ -216,7 +216,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 		}
 		AbstractGroup[] matchingGroupsArray = new AbstractGroup[matchingGroups
 				.size()];
-		return (AbstractGroup[]) matchingGroups.toArray(matchingGroupsArray);
+		return matchingGroups.toArray(matchingGroupsArray);
 	}
 
 	public boolean canMoveUp() {

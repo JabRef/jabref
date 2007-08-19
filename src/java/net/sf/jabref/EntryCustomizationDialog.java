@@ -218,11 +218,11 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
     private void setTypeSelection() {
 	types_cb.removeAllItems();
 	types_cb.addItem("<new>");
-	Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator();
+	Iterator<String> i = BibtexEntryType.ALL_TYPES.keySet().iterator();
 	BibtexEntryType type;
 	String toSet;
 	while (i.hasNext()) {
-	    type = BibtexEntryType.getType((String)i.next());
+	    type = BibtexEntryType.getType(i.next());
 	    toSet = Util.nCase(type.getName());
 	    if (type instanceof CustomEntryType)
 		toSet = toSet + " *";
@@ -312,7 +312,7 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 
 			try {
 			    FileWriter out = new FileWriter(file);
-			    Iterator i=BibtexEntryType.ALL_TYPES.keySet().iterator();
+			    Iterator<String> i=BibtexEntryType.ALL_TYPES.keySet().iterator();
 			    while (i.hasNext()) {
 				Object o=BibtexEntryType.ALL_TYPES.get(i.next());
 				if (o instanceof CustomEntryType) {
@@ -387,17 +387,16 @@ class EntryCustomizationDialog extends JDialog implements ItemListener
 	    return;
 	messageLabel.setText(Globals.lang("Updating entries..."));
 	BibtexDatabase base;
-	Iterator iter;
+	
 	for (int i=0; i<parent.tabbedPane.getTabCount(); i++) {
 	    BasePanel bp = (BasePanel)parent.tabbedPane.getComponentAt(i);
 	    boolean anyChanges = false;
 	    bp.entryEditors.remove(typeName);
 	    //bp.rcm.populateTypeMenu(); // Update type menu for change type.
 	    base = bp.database;
-	    iter = base.getKeySet().iterator();
-	    while (iter.hasNext()) {
-		anyChanges = anyChanges |
-		    !(base.getEntryById((String)iter.next())).updateType();
+	   for (BibtexEntry e : base.getEntries()){
+		   anyChanges = anyChanges |
+		    !e.updateType();
 	    }
 	    if (anyChanges) {
 		bp.markBaseChanged();

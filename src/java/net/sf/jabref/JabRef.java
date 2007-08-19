@@ -36,8 +36,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -45,10 +43,10 @@ import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.jabref.export.*;
-import net.sf.jabref.imports.ImportFormatReader;
 import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.remote.RemoteListener;
+import net.sf.jabref.util.Pair;
 import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 import com.jgoodies.looks.FontPolicies;
@@ -207,14 +205,10 @@ public class JabRef {
         options.setUseMenu(false);
     }
 
-    public Vector processArguments(String[] args, boolean initialStartup) {
+    public Vector<ParserResult> processArguments(String[] args, boolean initialStartup) {
 
         setupOptions();
         String[] leftOver = options.process(args);
-
-
-
-        //Util.pr(": Options processed");
 
         if (initialStartup && showVersion.isInvoked()) {
             options.displayVersion();
@@ -241,9 +235,7 @@ public class JabRef {
         // splash screen or not.
         if (initialStartup && !disableGui.isInvoked() && !disableSplash.isInvoked()) {
             try {
-
                 splashScreen = SplashScreen.splash();
-
             } catch (Throwable ex) {
                 graphicFailure = true;
                 System.err.println(Globals.lang("Unable to create graphical interface")
@@ -251,10 +243,9 @@ public class JabRef {
             }
         }
 
-        //Util.pr("JabRef "+GUIGlobals.version);
         // Vector to put imported/loaded database(s) in.
-        Vector loaded = new Vector();
-        Vector toImport = new Vector();
+        Vector<ParserResult> loaded = new Vector<ParserResult>();
+        Vector<String> toImport = new Vector<String>();
         if (!blank.isInvoked() && (leftOver.length > 0))  {
             for (int i = 0; i < leftOver.length; i++) {
                 // Leftover arguments that have a "bib" extension are interpreted as
@@ -286,68 +277,15 @@ public class JabRef {
             }
         }
 
-        //Util.pr(": Checked blank");
-
         if (!blank.isInvoked() && importFile.isInvoked()) {
             toImport.add(importFile.getStringValue());
         }
 
-        if (toImport.size() > 0) for (int i = 0; i < toImport.size(); i++) {
-            String[] data = ((String) toImport.elementAt(i)).split(",");
-
-            try {
-
-                if ((data.length > 1) && !"*".equals(data[1])) {
-                    System.out.println(Globals.lang("Importing") + ": " + data[0]);
-                    List entries =
-                            Globals.importFormatReader.importFromFile(data[1],
-                                    data[0].replaceAll("~", System.getProperty("user.home")));
-                    BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                    ParserResult pr = new ParserResult(base, null, new HashMap());
-                    loaded.add(pr);
-
-                } else {
-                    // * means "guess the format":
-                    System.out.println(Globals.lang("Importing in unknown format")
-                            + ": " + data[0]);
-
-                    Object[] o =
-                            Globals.importFormatReader.importUnknownFormat(data[0]
-                                    .replaceAll("~", System.getProperty("user.home")));
-                    String formatName = (String) o[0];
-
-                    if (formatName == null) {
-                        System.err.println(Globals.lang("Error opening file") + " '" + data[0] + "'");
-                    } else if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
-                        ParserResult pr = (ParserResult) o[1];
-                        loaded.add(pr);
-
-                    } else {
-                        List entries = (java.util.List) o[1];
-                        if (entries != null)
-                            System.out.println(Globals.lang("Format used") + ": "
-                                    + formatName);
-                        else
-                            System.out.println(Globals.lang(
-                                    "Could not find a suitable import format."));
-
-                        if (entries != null) {
-                            BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                            ParserResult pr = new ParserResult(base, null, new HashMap());
-
-                            //pr.setFile(new File(data[0]));
-                            loaded.add(pr);
-                        }
-                    }
-                }
-            } catch (IOException ex) {
-                System.err.println(Globals.lang("Error opening file") + " '"
-                        + data[0] + "': " + ex.getMessage());
-            }
-
-
-        }
-
+        for (String filenameString : toImport) {
+			ParserResult pr = importFile(filenameString);
+			if (pr != null)
+				loaded.add(pr);
+		}
 
         if (!blank.isInvoked() && importToOpenBase.isInvoked()) {
             ParserResult res = importToOpenBase(importToOpenBase.getStringValue());
@@ -364,7 +302,7 @@ public class JabRef {
                     // format to the given file.
                     if (loaded.size() > 0) {
                         ParserResult pr =
-                            (ParserResult) loaded.elementAt(loaded.size() - 1);
+                            loaded.elementAt(loaded.size() - 1);
 
                         try {
                             System.out.println(Globals.lang("Saving") + ": " + data[0]);
@@ -387,7 +325,7 @@ public class JabRef {
                 } else if (data.length == 2) {
                     // This signals that the latest import should be stored in the given
                     // format to the given file.
-                    ParserResult pr = (ParserResult) loaded.elementAt(loaded.size() - 1);
+                    ParserResult pr = loaded.elementAt(loaded.size() - 1);
                     System.out.println(Globals.lang("Exporting") + ": " + data[0]);
                     ExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format != null) {
@@ -438,7 +376,7 @@ public class JabRef {
                 String[] data = auxImExport.getStringValue().split(",");
 
                 if (data.length == 2) {
-                    ParserResult pr = (ParserResult) loaded.firstElement();
+                    ParserResult pr = loaded.firstElement();
                     AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
                     BibtexDatabase newBase = acl.perform();
 
@@ -488,38 +426,7 @@ public class JabRef {
         return loaded;
     }
 
-    ParserResult importFiletypeUnknown(String fname) {
-        Object[] o =
-                Globals.importFormatReader.importUnknownFormat(fname
-                        .replaceAll("~", System.getProperty("user.home")));
-        String formatName = (String) o[0];
-
-        if (formatName == null) {
-            System.err.println(Globals.lang("Error opening file") + " '" + fname + "'");
-        } else if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
-            ParserResult pr = (ParserResult) o[1];
-            return pr;
-        } else {
-            List entries = (java.util.List) o[1];
-            if (entries != null)
-                System.out.println(Globals.lang("Format used") + ": "
-                        + formatName);
-            else
-                System.out.println(Globals.lang(
-                        "Could not find a suitable import format."));
-
-            if (entries != null) {
-                BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                ParserResult pr = new ParserResult(base, null, new HashMap());
-                return pr;
-            }
-        }
-        
-        // not reached
-        return null;
-    }
-
-    public void openWindow(Vector loaded) {
+    public void openWindow(Vector<ParserResult> loaded) {
         if (!graphicFailure && !disableGui.isInvoked()) {
             // Call the method performCompatibilityUpdate(), which does any
             // necessary changes for users with a preference set from an older
@@ -677,7 +584,7 @@ lastEdLoop:
                     File fileToOpen = new File(names[i]);
 
                     for (int j = 0; j < loaded.size(); j++) {
-                        ParserResult pr = (ParserResult) loaded.elementAt(j);
+                        ParserResult pr = loaded.elementAt(j);
 
                         if ((pr.getFile() != null) &&pr.getFile().equals(fileToOpen))
                             continue lastEdLoop;
@@ -710,9 +617,8 @@ lastEdLoop:
             // Add all loaded databases to the frame:
 	    boolean first = true;
             if (loaded.size() > 0) {
-                for (Iterator i=loaded.iterator(); i.hasNext();) {
-                    ParserResult pr = (ParserResult)i.next();
-		            BasePanel panel = jrf.addTab(pr.getDatabase(), pr.getFile(),
+                for (ParserResult pr : loaded){
+		            jrf.addTab(pr.getDatabase(), pr.getFile(),
                             pr.getMetaData(), pr.getEncoding(), first);
                     first = false;
                 }
@@ -734,7 +640,7 @@ lastEdLoop:
             startOOPlugin(jrf);
 
             for (int i = 0; i < loaded.size(); i++) {
-                ParserResult pr = (ParserResult) loaded.elementAt(i);
+                ParserResult pr = loaded.elementAt(i);
                 if (Globals.prefs.getBoolean("displayKeyWarningDialogAtStartup") && pr.hasWarnings()) {
                     String[] wrns = pr.warnings();
                     StringBuffer wrn = new StringBuffer();
@@ -755,7 +661,7 @@ lastEdLoop:
             // if the database contents should be modified due to new features
             // in this version of JabRef:
             for (int i = 0; i < loaded.size(); i++) {
-                ParserResult pr = (ParserResult) loaded.elementAt(i);
+                ParserResult pr = loaded.elementAt(i);
                 BasePanel panel = jrf.baseAt(i);
                 OpenDatabaseAction.performPostOpenActions(panel, pr, true);
             }
@@ -785,17 +691,16 @@ lastEdLoop:
 
 
         try {
-            Class c = Class.forName("net.sf.jabref.oo.OOTestPanel");
+            Class<?> c = Class.forName("net.sf.jabref.oo.OOTestPanel");
             Method m = c.getDeclaredMethod("open",
                     new Class[] {JabRefFrame.class});
             Object i = c.newInstance();
-            Object r = m.invoke(i, new Object[] {jrf});
+            m.invoke(i, new Object[] {jrf});
         } catch (Exception e) {
             // Do nothing.
             //System.out.println("OO plugin not found.");
             //e.printStackTrace();
         }
-        
     }
 
     public static ParserResult openBibFile(String name) {
@@ -825,61 +730,52 @@ lastEdLoop:
         return null;
     }
 
-    public static ParserResult importToOpenBase(String argument) {
-        String[] data = argument.split(",");
+    public static ParserResult importFile(String argument){
+    	String[] data = argument.split(",");
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Globals.lang("Importing") + ": " + data[0]);
-                List entries =
-                    Globals.importFormatReader.importFromFile(data[1],
-                        data[0].replaceAll("~", System.getProperty("user.home")));
-                BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                ParserResult pr = new ParserResult(base, null, new HashMap());
-                pr.setToOpenTab(true);
-                //loaded.add(pr);
-                return pr;
+                List<BibtexEntry> entries =
+                        Globals.importFormatReader.importFromFile(data[1],
+                                data[0].replaceAll("~", System.getProperty("user.home")));
+                return new ParserResult(entries);
             } else {
                 // * means "guess the format":
                 System.out.println(Globals.lang("Importing in unknown format")
-                    + ": " + data[0]);
-
-                Object[] o =
+                        + ": " + data[0]);
+                
+            	Pair<String, ParserResult> importResult = 
                     Globals.importFormatReader.importUnknownFormat(data[0]
-                        .replaceAll("~", System.getProperty("user.home")));
-                String formatName = (String) o[0];
-
-                if (formatName.equals(ImportFormatReader.BIBTEX_FORMAT)) {
-                    ParserResult pr = (ParserResult)o[1];
-                    pr.setToOpenTab(true);
-                    //loaded.add(pr);
-                    return pr;
-                }
-                else {
-                    List entries = (java.util.List) o[1];
-                    if (entries != null)
-                        System.out.println(Globals.lang("Format used") + ": "
-                            + formatName);
-                    else
-                        System.out.println(Globals.lang(
+                            .replaceAll("~", System.getProperty("user.home")));
+            	
+            	if (importResult != null){
+            		System.out.println(Globals.lang("Format used") + ": "
+                        + importResult.p);
+            		
+            		return importResult.v;
+            	} else {
+            		System.out.println(Globals.lang(
                                 "Could not find a suitable import format."));
-
-                    if (entries != null) {
-                        BibtexDatabase base = ImportFormatReader.createDatabase(entries);
-                        ParserResult pr = new ParserResult(base, null, new HashMap());
-
-                        //pr.setFile(new File(data[0]));
-                        pr.setToOpenTab(true);
-                        //loaded.add(pr);
-                        return pr;
-                    }
                 }
-
             }
         } catch (IOException ex) {
             System.err.println(Globals.lang("Error opening file") + " '"
-                + data[0] + "': " + ex.getMessage());
+                    + data[0] + "': " + ex.getLocalizedMessage());
         }
-
         return null;
+    }
+
+    /**
+     * Will open a file (like importFile), but will also request JabRef to focus on this database 
+     * @param argument See importFile.
+     * @return ParserResult with setToOpenTab(true)
+     */
+    public static ParserResult importToOpenBase(String argument) {
+    	ParserResult result = importFile(argument);
+    	
+    	if (result != null)
+    		result.setToOpenTab(true);
+    	
+    	return result;
     }
 }

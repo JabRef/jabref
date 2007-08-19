@@ -15,7 +15,7 @@ import net.sf.jabref.Globals;
 */
 public class FileListTableModel extends AbstractTableModel {
 
-    private final ArrayList list = new ArrayList();
+    private final ArrayList<FileListEntry> list = new ArrayList<FileListEntry>();
 
     public FileListTableModel() {
     }
@@ -30,13 +30,13 @@ public class FileListTableModel extends AbstractTableModel {
         return 3;
     }
 
-    public Class getColumnClass(int columnIndex) {
+    public Class<String> getColumnClass(int columnIndex) {
         return String.class;
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         synchronized (list) {
-            FileListEntry entry = (FileListEntry)list.get(rowIndex);
+            FileListEntry entry = list.get(rowIndex);
             switch (columnIndex) {
                 case 0: return entry.getDescription();
                 case 1: return entry.getLink();
@@ -48,7 +48,7 @@ public class FileListTableModel extends AbstractTableModel {
 
     public FileListEntry getEntry(int index) {
         synchronized (list) {
-            return (FileListEntry)list.get(index);
+            return list.get(index);
         }
     }
 
@@ -91,9 +91,9 @@ public class FileListTableModel extends AbstractTableModel {
     public void setContent(String value) {
         if (value == null)
             value = "";
-        ArrayList newList = new ArrayList();
+        ArrayList<FileListEntry> newList = new ArrayList<FileListEntry>();
         StringBuilder sb = new StringBuilder();
-        ArrayList thisEntry = new ArrayList();
+        ArrayList<String> thisEntry = new ArrayList<String>();
         boolean escaped = false;
         for (int i=0; i<value.length(); i++) {
             char c = value.charAt(i);
@@ -126,16 +126,16 @@ public class FileListTableModel extends AbstractTableModel {
         fireTableChanged(new TableModelEvent(this));
     }
 
-    private FileListEntry decodeEntry(ArrayList contents) {
+    private FileListEntry decodeEntry(ArrayList<String> contents) {
         return new FileListEntry(getElementIfAvailable(contents, 0),
                 getElementIfAvailable(contents, 1),
                 Globals.prefs.getExternalFileTypeByName
                         (getElementIfAvailable(contents, 2)));
     }
 
-    private String getElementIfAvailable(ArrayList contents, int index) {
+    private String getElementIfAvailable(ArrayList<String> contents, int index) {
         if (index < contents.size())
-            return (String)contents.get(index);
+            return contents.get(index);
         else return "";
     }
 
@@ -146,8 +146,8 @@ public class FileListTableModel extends AbstractTableModel {
      */
     public String getStringRepresentation() {
         StringBuilder sb = new StringBuilder();
-        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = (FileListEntry) iterator.next();
+        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
+            FileListEntry entry = iterator.next();
             sb.append(encodeEntry(entry));
             if (iterator.hasNext())
                 sb.append(';');
@@ -162,8 +162,8 @@ public class FileListTableModel extends AbstractTableModel {
      */
     public String getToolTipHTMLRepresentation() {
         StringBuilder sb = new StringBuilder("<html>");
-        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry entry = (FileListEntry) iterator.next();
+        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
+            FileListEntry entry = iterator.next();
             sb.append(entry.getDescription()).append(" (").append(entry.getLink()).append(')');
             if (iterator.hasNext())
                 sb.append("<br>");
@@ -194,8 +194,8 @@ public class FileListTableModel extends AbstractTableModel {
 
     public void print() {
         System.out.println("----");
-        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-            FileListEntry fileListEntry = (FileListEntry) iterator.next();
+        for (Iterator<FileListEntry> iterator = list.iterator(); iterator.hasNext();) {
+            FileListEntry fileListEntry = iterator.next();
             System.out.println(fileListEntry);
         }
         System.out.println("----");

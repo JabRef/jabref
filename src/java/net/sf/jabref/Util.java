@@ -1571,15 +1571,12 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	}
 
 	public static double compareEntriesStrictly(BibtexEntry one, BibtexEntry two) {
-		HashSet<Object> allFields = new HashSet<Object>();// one.getAllFields());
-		Object[] o = one.getAllFields();
-		for (int i = 0; i < o.length; i++)
-			allFields.add(o[i]);
-		o = two.getAllFields();
-		for (int i = 0; i < o.length; i++)
-			allFields.add(o[i]);
+		HashSet<String> allFields = new HashSet<String>();// one.getAllFields());
+		allFields.addAll(one.getAllFields());
+		allFields.addAll(two.getAllFields());
+		
 		int score = 0;
-		for (Iterator<Object> fld = allFields.iterator(); fld.hasNext();) {
+		for (Iterator<String> fld = allFields.iterator(); fld.hasNext();) {
 			String field = (String) fld.next();
 			Object en = one.getField(field), to = two.getField(field);
 			if ((en != null) && (to != null) && (en.equals(to)))
@@ -1619,17 +1616,23 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * @param bibs
 	 *            List of bibtex entries
 	 */
-	public static void setAutomaticFields(List<BibtexEntry> bibs) {
+	public static void setAutomaticFields(Collection<BibtexEntry> bibs) {
+		
+		boolean setOwner = Globals.prefs.getBoolean("useOwner");
+		boolean setTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
+		
+		// Do not need to do anything if both options are disabled
+		if (!(setOwner || setTimeStamp))
+			return;
+		
+		String timeStampField = Globals.prefs.get("timeStampField");
 		String defaultOwner = Globals.prefs.get("defaultOwner");
 		String timestamp = easyDateFormat();
-		boolean setOwner = Globals.prefs.getBoolean("useOwner"), setTimeStamp = Globals.prefs
-			.getBoolean("useTimeStamp");
-		String timeStampField = Globals.prefs.get("timeStampField");
+		
 		// Iterate through all entries
 		for (BibtexEntry curEntry : bibs){
 			setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
 				timestamp);
-
 		}
 
 	}
@@ -1757,13 +1760,13 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
         for (BibtexEntry entry : database.getEntryMap().values()){
             FileListTableModel tableModel = new FileListTableModel();
             // If there are already links in the file field, keep those on top:
-            Object oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
+            String oldFileContent = entry.getField(GUIGlobals.FILE_FIELD);
             if (oldFileContent != null) {
                 tableModel.setContent((String) oldFileContent);
             }
             int oldRowCount = tableModel.getRowCount();
             for (int j = 0; j < fields.length; j++) {
-                Object o = entry.getField(fields[j]);
+                String o = entry.getField(fields[j]);
                 if (o != null) {
                     String s = (String) o;
                     if (s.trim().length() > 0) {
@@ -2351,7 +2354,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 
 		NamedCompound ce = new NamedCompound(Globals.lang("Set field"));
 		for (BibtexEntry entry : entries){
-			Object oldVal = entry.getField(field);
+			String oldVal = entry.getField(field);
 			// If we are not allowed to overwrite values, check if there is a
 			// nonempty
 			// value already for this entry:

@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
@@ -33,14 +34,14 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 public class MainTable extends JTable {
 	
     private MainTableFormat tableFormat;
-    private SortedList sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
+    private SortedList<BibtexEntry> sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
     private boolean tableColorCodes, showingFloatSearch=false, showingFloatGrouping=false;
-    private EventSelectionModel selectionModel;
-    private TableComparatorChooser comparatorChooser;
+    private EventSelectionModel<BibtexEntry> selectionModel;
+    private TableComparatorChooser<BibtexEntry> comparatorChooser;
     private JScrollPane pane;
-    private Comparator searchComparator, groupComparator,
+    private Comparator<BibtexEntry> searchComparator, groupComparator,
             markingComparator = new IsMarkedComparator();
-    private Matcher searchMatcher, groupMatcher;
+    private Matcher<BibtexEntry> searchMatcher, groupMatcher;
 
     // Constants used to define how a cell should be rendered.
     public static final int REQUIRED = 1, OPTIONAL = 2,
@@ -56,19 +57,19 @@ public class MainTable extends JTable {
     }
 
 
-    public MainTable(MainTableFormat tableFormat, EventList list, JabRefFrame frame,
+    public MainTable(MainTableFormat tableFormat, EventList<BibtexEntry> list, JabRefFrame frame,
                      BasePanel panel) {
         super();
         this.tableFormat = tableFormat;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selctions:
-        sortedForTable = new SortedList(list, null);
+        sortedForTable = new SortedList<BibtexEntry>(list, null);
         // This SortedList applies afterwards, and floats marked entries:
-        sortedForMarking = new SortedList(sortedForTable, null);
+        sortedForMarking = new SortedList<BibtexEntry>(sortedForTable, null);
         // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList(sortedForMarking, null);
+        sortedForSearch = new SortedList<BibtexEntry>(sortedForMarking, null);
         // This SortedList applies afterwards, and can float grouping hits:
-        sortedForGrouping = new SortedList(sortedForSearch, null);
+        sortedForGrouping = new SortedList<BibtexEntry>(sortedForSearch, null);
 
 
         searchMatcher = null;
@@ -76,11 +77,11 @@ public class MainTable extends JTable {
         searchComparator = null;//new HitOrMissComparator(searchMatcher);
         groupComparator = null;//new HitOrMissComparator(groupMatcher);
 
-        EventTableModel tableModel = new EventTableModel(sortedForGrouping, tableFormat);
+        EventTableModel<BibtexEntry> tableModel = new EventTableModel<BibtexEntry>(sortedForGrouping, tableFormat);
         setModel(tableModel);
 
         tableColorCodes = Globals.prefs.getBoolean("tableColorCodesOn");
-        selectionModel = new EventSelectionModel(sortedForGrouping);
+        selectionModel = new EventSelectionModel<BibtexEntry>(sortedForGrouping);
         setSelectionModel(selectionModel);
         pane = new JScrollPane(this);
         pane.getViewport().setBackground(Globals.prefs.getColor("tableBackground"));
@@ -88,7 +89,8 @@ public class MainTable extends JTable {
         comparatorChooser = new MyTableComparatorChooser(this, sortedForTable,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         
-        final EventList selected = getSelected();
+        // TODO: Figure out, whether this call is needed.
+        getSelected();
 
         // enable DnD
         setDragEnabled(true);
@@ -121,7 +123,7 @@ public class MainTable extends JTable {
      * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
      * @param m The Matcher that determines if an entry is a hit or not.
      */
-    public void showFloatSearch(Matcher m) {
+    public void showFloatSearch(Matcher<BibtexEntry> m) {
         showingFloatSearch = true;
         searchMatcher = m;
         searchComparator = new HitOrMissComparator(m);
@@ -143,7 +145,7 @@ public class MainTable extends JTable {
      * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
      * @param m The Matcher that determines if an entry is a in the current group selection or not.
      */
-    public void showFloatGrouping(Matcher m) {
+    public void showFloatGrouping(Matcher<BibtexEntry> m) {
         showingFloatGrouping = true;
         groupMatcher = m;
         groupComparator = new HitOrMissComparator(m);
@@ -160,10 +162,10 @@ public class MainTable extends JTable {
         refreshSorting();
     }
 
-    public EventList getTableRows() {
+    public EventList<BibtexEntry> getTableRows() {
         return sortedForGrouping;
     }
-    public void addSelectionListener(ListEventListener listener) {
+    public void addSelectionListener(ListEventListener<BibtexEntry> listener) {
         getSelected().addListEventListener(listener);
     }
 
@@ -254,12 +256,12 @@ public class MainTable extends JTable {
     }
 
     public BibtexEntry getEntryAt(int row) {
-        return (BibtexEntry)sortedForGrouping.get(row);
+        return sortedForGrouping.get(row);
     }
 
     public BibtexEntry[] getSelectedEntries() {
         final BibtexEntry[] BE_ARRAY = new BibtexEntry[0];
-        return (BibtexEntry[]) getSelected().toArray(BE_ARRAY);
+        return getSelected().toArray(BE_ARRAY);
     }
 
     /**
@@ -268,9 +270,10 @@ public class MainTable extends JTable {
      * columns, but this is where the Comparators are defined. Also, the ComparatorChooser
      * is initialized with the sort order defined in Preferences.
      */
-    private void setupComparatorChooser() {
+    @SuppressWarnings("unchecked")
+	private void setupComparatorChooser() {
         // First column:
-        java.util.List comparators = comparatorChooser.getComparatorsForColumn(0);
+        List<Comparator<BibtexEntry>> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
         comparators.add(new FirstColumnComparator());
 
@@ -309,7 +312,7 @@ public class MainTable extends JTable {
 
     public int getCellStatus(int row, int col) {
         try {
-            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
+            BibtexEntry be = sortedForGrouping.get(row);
             BibtexEntryType type = be.getType();
             String columnName = tableFormat.getColumnName(col).toLowerCase();
             if (columnName.equals(BibtexFields.KEY_FIELD) || type.isRequired(columnName)) {
@@ -325,7 +328,7 @@ public class MainTable extends JTable {
         }
     }
 
-    public EventList getSelected() {
+    public EventList<BibtexEntry> getSelected() {
         return selectionModel.getSelected();
     }
 
@@ -338,20 +341,13 @@ public class MainTable extends JTable {
         return tableFormat.getIconTypeForColumn(column);
     }
 
-    private boolean nonZeroField(int row, String field) {
-        BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
-        Object o = be.getField(field);
-        return ((o == null) || !o.equals("0"));
-    }
-
-    private boolean matches(int row, Matcher m) {
-        Object o = sortedForGrouping.get(row);
-        return m.matches(o);
+    private boolean matches(int row, Matcher<BibtexEntry> m) {
+        return m.matches(sortedForGrouping.get(row));
     }
 
     private boolean isComplete(int row) {
         try {
-            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
+            BibtexEntry be = sortedForGrouping.get(row);
             return be.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isComplete");
@@ -361,7 +357,7 @@ public class MainTable extends JTable {
 
     private boolean isMarked(int row) {
         try {
-            BibtexEntry be = (BibtexEntry)sortedForGrouping.get(row);
+            BibtexEntry be = sortedForGrouping.get(row);
             return Util.isMarked(be);
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isMarked");
@@ -498,8 +494,8 @@ public class MainTable extends JTable {
         }
     }
 
-    class MyTableComparatorChooser extends TableComparatorChooser {
-        public MyTableComparatorChooser(JTable table, SortedList list,
+    class MyTableComparatorChooser extends TableComparatorChooser<BibtexEntry> {
+        public MyTableComparatorChooser(JTable table, SortedList<BibtexEntry> list,
                                         Object sortingStrategy) {
             super(table, list, sortingStrategy);
             // We need to reset the stack of sorted list each time sorting order
@@ -511,12 +507,6 @@ public class MainTable extends JTable {
                 }
             });
         }
-/*
-        protected void columnClicked(int i, int i1) {
-
-            super.columnClicked(i, i1);
-            refreshSorting();
-        }*/
     }
 
     /**
@@ -538,9 +528,10 @@ public class MainTable extends JTable {
      * @param index The column number.
      * @return The Comparator, or null if none is set.
      */
-    public Comparator getComparatorForColumn(int index) {
-        java.util.List l = comparatorChooser.getComparatorsForColumn(index);
-        return l.size() == 0 ? null : (Comparator)l.get(0);
+    @SuppressWarnings("unchecked")
+	public Comparator<BibtexEntry> getComparatorForColumn(int index) {
+        List<Comparator<BibtexEntry>> l = comparatorChooser.getComparatorsForColumn(index);
+        return l.size() == 0 ? null : l.get(0);
     }
 
     /**
@@ -549,7 +540,7 @@ public class MainTable extends JTable {
      * @return The sort column number.
      */
     public int getSortingColumn(int number) {
-        java.util.List l = comparatorChooser.getSortingColumns();
+        List<Integer> l = comparatorChooser.getSortingColumns();
         if (l.size() <= number)
             return -1;
         else
@@ -563,7 +554,7 @@ public class MainTable extends JTable {
      * Note: The returned List must not be modified from the outside
      * @return The sorted list of entries.
      */
-    public SortedList getSortedForTable() {
+    public SortedList<BibtexEntry> getSortedForTable() {
         return sortedForTable;
     }
 }

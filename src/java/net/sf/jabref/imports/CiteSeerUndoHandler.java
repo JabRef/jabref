@@ -207,7 +207,7 @@ public class CiteSeerUndoHandler extends DefaultHandler {
                 bibEntry.setField("author", newAuthors);
             }
         }
-        Integer newCount = new Integer(citeseerCitationCount);
+        String newCount = new Integer(citeseerCitationCount).toString();
         UndoableFieldChange fieldChange = new UndoableFieldChange(
                 bibEntry, "citeseercitationcount", 
 				bibEntry.getField("citeseercitationcount"), 

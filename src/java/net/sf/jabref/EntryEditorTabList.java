@@ -9,16 +9,16 @@ import java.util.List;
  */
 public final class EntryEditorTabList {
 
-    private List list = null;
-    private List names = null;
+    private List<List<String>> list = null;
+    private List<String> names = null;
 
     public EntryEditorTabList() {
         init();
     }
 
     private void init() {
-        list = new ArrayList();
-        names = new ArrayList();
+        list = new ArrayList<List<String>>();
+        names = new ArrayList<String>();
         int i = 0;
         String name;
         String[] fields;
@@ -27,7 +27,7 @@ public final class EntryEditorTabList {
             while (Globals.prefs.hasKey(Globals.prefs.CUSTOM_TAB_NAME + i)) {
                 name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + i);
                 fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS + i).split(";");
-                List entry = Arrays.asList(fields);
+                List<String> entry = Arrays.asList(fields);
                 names.add(name);
                 list.add(entry);
                 i++;
@@ -37,7 +37,7 @@ public final class EntryEditorTabList {
             while (Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + "_def"+i) != null) {
                 name = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_NAME + "_def" + i);
                 fields = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS + "_def" + i).split(";");
-                List entry = Arrays.asList(fields);
+                List<String> entry = Arrays.asList(fields);
                 names.add(name);
                 list.add(entry);
                 i++;
@@ -53,7 +53,7 @@ public final class EntryEditorTabList {
         return (String) names.get(tab);
     }
 
-    public List getTabFields(int tab) {
-        return (List) list.get(tab);
+    public List<String> getTabFields(int tab) {
+        return list.get(tab);
     }
 }

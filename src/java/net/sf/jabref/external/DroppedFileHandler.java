@@ -136,7 +136,7 @@ public class DroppedFileHandler {
             return false;
         }
 
-        List xmpEntriesInFile = null;
+        List<BibtexEntry> xmpEntriesInFile = null;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class DroppedFileHandler {
          */
 
         boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibtexEntry single = (isSingle ? (BibtexEntry) xmpEntriesInFile.get(0) : null);
+        BibtexEntry single = (isSingle ? xmpEntriesInFile.get(0) : null);
 
         reply = showLinkMoveCopyRenameDialog(Globals.lang("Link to PDF %0", fileName), fileType,
             isSingle, (isSingle ? single.getCiteKey() : Globals.lang("Cannot rename for several entries.")),
@@ -202,11 +202,11 @@ public class DroppedFileHandler {
         }
         if (success) {
 
-            Iterator it = xmpEntriesInFile.iterator();
+            Iterator<BibtexEntry> it = xmpEntriesInFile.iterator();
 
             while (it.hasNext()) {
                 try {
-                    BibtexEntry entry = (BibtexEntry) it.next();
+                    BibtexEntry entry = it.next();
                     entry.setId(Util.createNeutralId());
                     panel.getDatabase().insertEntry(entry);
                     doLink(entry, fileType, destFilename, edits);

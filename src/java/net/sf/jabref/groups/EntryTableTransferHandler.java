@@ -133,7 +133,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 			if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 				// JOptionPane.showMessageDialog(null, "Received
 				// javaFileListFlavor");
-				List l = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+				@SuppressWarnings("unchecked")
+				List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
 				return handleDraggedFiles(l, dropRow);
 			}
 
@@ -246,7 +247,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 	private boolean handleDraggedFilenames(String s, final int dropRow) {
 		// Split into lines:
 		String[] lines = s.replaceAll("\r", "").split("\n");
-		List files = new ArrayList();
+		List<File> files = new ArrayList<File>();
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
 			if (line.startsWith("file:"))
@@ -274,11 +275,11 @@ public class EntryTableTransferHandler extends TransferHandler {
 	 * @param dropRow @param dropRow The row in the table where the files were dragged.
      * @return success status for the operation
 	 */
-	private boolean handleDraggedFiles(List files, final int dropRow) {
+	private boolean handleDraggedFiles(List<File> files, final int dropRow) {
 		final String[] fileNames = new String[files.size()];
 		int i = 0;
-		for (Iterator iterator = files.iterator(); iterator.hasNext();) {
-			File file = (File) iterator.next();
+		for (Iterator<File> iterator = files.iterator(); iterator.hasNext();) {
+			File file = iterator.next();
 			fileNames[i] = file.getAbsolutePath();
 			i++;
 		}
@@ -306,7 +307,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 	private void loadOrImportFiles(String[] fileNames, int dropRow) {
 
 		OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
-		ArrayList notBibFiles = new ArrayList();
+		ArrayList<String> notBibFiles = new ArrayList<String>();
 		String encoding = Globals.prefs.get("defaultEncoding");
 		for (int i = 0; i < fileNames.length; i++) {
 			// Find the file's extension, if any:

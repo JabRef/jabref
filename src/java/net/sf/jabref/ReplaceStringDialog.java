@@ -210,9 +210,8 @@ class ReplaceStringDialog extends JDialog {
     public int replace(BibtexEntry be, NamedCompound ce) {
         int counter = 0;
         if (allFields()) {
-            Object[] os = be.getAllFields();
-            for (int i=0; i<os.length; i++) {
-                String s = (String)os[i];
+        	
+        	for (String s : be.getAllFields()){
                 if (!s.equals(BibtexFields.KEY_FIELD))
                     counter += replaceField(be, s, ce);
             }

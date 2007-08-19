@@ -244,27 +244,15 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 */
 	public void setBibtexEntry(BibtexEntry entry, BibtexDatabase database) {
 		// Set all the values including key and entryType
-		Object[] fields = entry.getAllFields();
-		Object[] results;
-		int resultsSize;
+		Set<String> fields = entry.getAllFields();
 		
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
 		if (prefs.getBoolean("useXmpPrivacyFilter")) {
 			TreeSet<String> filters = new TreeSet<String>(Arrays.asList(prefs.getStringArray("xmpPrivacyFilter")));
-			results = new Object[fields.length];
-			resultsSize = 0;
-			for (int i = 0; i < fields.length; i++) {
-				if (!filters.contains(fields[i])) {
-					results[resultsSize++] = fields[i];
-				}
-			}
-		} else {
-			results = fields;
-			resultsSize = fields.length;
+			fields.removeAll(filters);
 		}
 		
-		for (int i = 0; i < resultsSize; i++){
-			String field = results[i].toString();
+		for (String field : fields){
 			String value = BibtexDatabase.getResolvedField(field, entry, database);
 			if (field.equals("author") || field.equals("editor")) {
 				setPersonList(field, value);

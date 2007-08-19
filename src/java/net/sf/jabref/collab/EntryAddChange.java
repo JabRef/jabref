@@ -23,14 +23,9 @@ public class EntryAddChange extends Change {
   }
 
   public void makeChange(BasePanel panel, NamedCompound undoEdit) {
-    try {
       diskEntry.setId(Util.createNeutralId());
       panel.database().insertEntry(diskEntry);
       undoEdit.addEdit(new UndoableInsertEntry(panel.database(), diskEntry, panel));
-    } catch (KeyCollisionException ex) {
-
-    }
-
   }
 
   JComponent description() {

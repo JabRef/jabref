@@ -30,7 +30,6 @@ package net.sf.jabref.imports;
 import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +61,9 @@ public class BibtexParser {
 
 	private BibtexDatabase _db;
 
-	private HashMap _meta, entryTypes;
+	private HashMap<String, String> _meta;
+	
+	private HashMap<String, BibtexEntryType> entryTypes;
 
 	private boolean _eof = false;
 
@@ -103,7 +104,7 @@ public class BibtexParser {
 	 * 
 	 * @return Returns null if an error occurred, returns an empty collection if no entries where found. 
 	 */
-	public static Collection fromString(String bibtexString){
+	public static Collection<BibtexEntry> fromString(String bibtexString){
 		StringReader reader = new StringReader(bibtexString);
 		BibtexParser parser = new BibtexParser(reader); 
 		try {
@@ -123,7 +124,7 @@ public class BibtexParser {
 	 * @return The bibtexentry or null if non was found or an error occurred.
 	 */
 	public static BibtexEntry singleFromString(String bibtexString) {
-		Collection c = fromString(bibtexString);
+		Collection<BibtexEntry> c = fromString(bibtexString);
 		if (c == null){
 			return null;
 		}
@@ -222,8 +223,8 @@ public class BibtexParser {
 			return _pr;
 
         _db = new BibtexDatabase(); // Bibtex related contents.
-		_meta = new HashMap(); // Metadata in comments for Bibkeeper.
-		entryTypes = new HashMap(); // To store custem entry types parsed.
+		_meta = new HashMap<String, String>(); // Metadata in comments for Bibkeeper.
+		entryTypes = new HashMap<String, BibtexEntryType>(); // To store custem entry types parsed.
 		_pr = new ParserResult(_db, _meta, entryTypes);
 
         // First see if we can find the version number of the JabRef version that
@@ -850,9 +851,8 @@ public class BibtexParser {
 	}
 
 	public void checkEntryTypes(ParserResult _pr) {
-		for (Iterator i = _db.getKeySet().iterator(); i.hasNext();) {
-			Object key = i.next();
-			BibtexEntry be = (BibtexEntry) _db.getEntryById((String) key);
+		
+		for (BibtexEntry be : _db.getEntries()){
 			if (be.getType() instanceof UnknownEntryType) {
 				// Look up the unknown type name in our map of parsed types:
 

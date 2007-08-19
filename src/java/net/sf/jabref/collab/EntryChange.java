@@ -1,7 +1,6 @@
 package net.sf.jabref.collab;
 
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.TreeSet;
 
 import javax.swing.JComponent;
@@ -42,20 +41,12 @@ public class EntryChange extends Change {
     //Util.pr("Modified entry: "+memEntry.getCiteKey()+"\n Modified locally: "+isModifiedLocally
     //        +" Modifications agree: "+modificationsAgree);
 
-    TreeSet allFields = new TreeSet(); //one.getAllFields());
-    Object[] o = memEntry.getAllFields();
-    for (int i = 0; i < o.length; i++)
-      allFields.add(o[i]);
-    o = tmpEntry.getAllFields();
-    for (int i = 0; i < o.length; i++)
-      allFields.add(o[i]);
-    o = diskEntry.getAllFields();
-    for (int i = 0; i < o.length; i++)
-      allFields.add(o[i]);
-
-    int score = 0;
-    for (Iterator fld = allFields.iterator(); fld.hasNext();) {
-      String field = (String)fld.next();
+    TreeSet<String> allFields = new TreeSet<String>();
+    allFields.addAll(memEntry.getAllFields());
+    allFields.addAll(tmpEntry.getAllFields());
+    allFields.addAll(diskEntry.getAllFields());
+  
+    for (String field : allFields){
       String mem = (String)memEntry.getField(field),
           tmp = (String)tmpEntry.getField(field),
           disk = (String)diskEntry.getField(field);
@@ -78,9 +69,11 @@ public class EntryChange extends Change {
     }
   }
 
-  public void makeChange(BasePanel panel, NamedCompound undoEdit) {
+  
+public void makeChange(BasePanel panel, NamedCompound undoEdit) {
 
-    Enumeration e = children();
+	@SuppressWarnings("unchecked")
+    Enumeration<Change> e = children();
     for (; e.hasMoreElements();) {
       Change c = (Change)e.nextElement();
       if (c.isAcceptable() && c.isAccepted())

@@ -120,12 +120,6 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
     public static final String DEFAULT_OPTION_FILENAME = "default.opt";
 
     /**
-     * The current verbosity.
-     */
-
-    private int verbosity;
-
-    /**
      * The program to display in the usage.
      */
 
@@ -177,31 +171,13 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      * A map of option modules.
      */
 
-    private java.util.HashMap modules;
-
-    /**
-     * The help method is invoked when this option is invoked.
-     */
-
-    private NotifyOption helpOption;
-
-    /**
-     * The built-in menu system is invoked when this option is invoked.
-     */
-
-    private NotifyOption menuOption;
+    private java.util.HashMap<String, OptionModule> modules;
 
     /**
      * Version information is displayed when this option is specified.
      */
 
     private NotifyOption versionOption;
-
-    /**
-     * An instance of the built-in menu.
-     */
-
-    private OptionMenu menu;
 
     /**
      * Create an option repository.
@@ -218,17 +194,13 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      */
 
     public Options( String programName ) {
-        verbosity = DEFAULT_VERBOSITY;
         displayUsage = DEFAULT_DISPLAY_USAGE;
         useMenu = DEFAULT_USE_MENU;
         defaultOptionFilename = DEFAULT_OPTION_FILENAME;
         usageProgram = programName;
-        modules = new HashMap();
-        menu = new OptionMenu( this );
-        helpOption = new NotifyOption( this, "help", "" );
+        modules = new HashMap<String, OptionModule>();
         versionOption = new NotifyOption( this, "version", "" );
         version = "Version 1.0";
-        menuOption = new NotifyOption( menu, "menu", "" );
         generalModule = new OptionModule( DEFAULT_GENERAL_MODULE_NAME );
         currentModule = generalModule;
 
@@ -252,9 +224,9 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
             // Mod. Morten A.
             //"Use --menu to invoke the interactive built-in menu.\n\n" +
             Option.getHelpHeader() + "\n\n" + generalModule.getHelp();
-        Iterator it = modules.values().iterator();
+        Iterator<OptionModule> it = modules.values().iterator();
         while ( it.hasNext() ) {
-            OptionModule module = (OptionModule)it.next();
+            OptionModule module = it.next();
             retval += "\n\nOption Listing for " + module.getName() + "\n";
             retval += module.getHelp() + "\n";
         }
@@ -537,7 +509,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
      */
 
     public OptionModule getModule( String name ) {
-        return (OptionModule)modules.get( name.toLowerCase() );
+        return modules.get( name.toLowerCase() );
     }
 
     /**
@@ -596,7 +568,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
 
     public String[] split( String str ) {
         StringBuffer buf = new StringBuffer( str.length() );
-        java.util.List l = new java.util.ArrayList();
+        java.util.List<String> l = new java.util.ArrayList<String>();
         int scnt = Utility.count( str, '"' );
         boolean q = false;
         if ( ((double)scnt) / 2.0 != (double)(scnt / 2) ) {
@@ -617,11 +589,11 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
         if ( buf.length() != 0 ) {
             l.add( buf.toString() );
         }
-        Iterator it = l.iterator();
+        Iterator<String> it = l.iterator();
         String retval[] = new String[ l.size() ];
         int n = 0;
         while ( it.hasNext() ) {
-            retval[ n++ ] = (String)it.next();
+            retval[ n++ ] = it.next();
         }
         return retval;
     }
@@ -634,8 +606,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
 
     public void writeOptionFile( String filename ) {
         BufferedOutputStream writer = null;
-        String line = null;
-        Iterator it = null;
+        Iterator<OptionModule> it = null;
         currentModule = generalModule;
         try {
             writer =
@@ -644,7 +615,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
             generalModule.writeFileToPrintStream( ps );
             it = modules.values().iterator();
             while ( it.hasNext() ) {
-                OptionModule module = (OptionModule)it.next();
+                OptionModule module = it.next();
                 module.writeFileToPrintStream( ps );
             }
         }
@@ -796,9 +767,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
                 }
                 else if ( delim == '\0' ) {
                     String dtext = "+";
-                    char dpeek = '\0';
                     if ( n < args.length - 1 ) {
-                        dpeek = args[ n + 1 ].charAt( 0 );
                         if ( !Utility.contains( args[ n + 1 ].charAt( 0 ),
                                                 "-[@" ) ) {
                             dtext = args[ n + 1 ];
@@ -836,9 +805,7 @@ public class Options implements OptionRegistrar, OptionModuleRegistrar,
                 else {
                     longOption = args[ n ].substring( 2 );
                     String dtext = "+";
-                    char dpeek = '\0';
                     if ( n < args.length - 1 && args[ n + 1 ].length() > 0 ) {
-                        dpeek = args[ n + 1 ].charAt( 0 );
                         if ( !Utility.contains( args[ n + 1 ].charAt( 0 ),
                                                 "-[@" ) ) {
                             dtext = args[ n + 1 ];

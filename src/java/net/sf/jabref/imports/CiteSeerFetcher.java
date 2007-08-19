@@ -151,9 +151,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 
 	class ShowBadIdentifiersDialog implements Runnable {
 
-	    Hashtable rejectedEntries;
+	    Hashtable<Integer, BibtexEntry> rejectedEntries;
 	    
-	    ShowBadIdentifiersDialog(Hashtable entries) {
+	    ShowBadIdentifiersDialog(Hashtable<Integer, BibtexEntry> entries) {
 	        rejectedEntries = entries;
 	    }
 	    
@@ -167,10 +167,10 @@ public class CiteSeerFetcher extends SidePaneComponent {
             	int i;
                 String rowNumbers = "";
                 String oneRowOfNumbers = "";
-                TreeSet rowSet = new TreeSet(rejectedEntries.keySet());
+                TreeSet<Integer> rowSet = new TreeSet<Integer>(rejectedEntries.keySet());
                 int rowSize = rowSet.size();
                 for(i=0; (i < rowSize - 1) && (i < 100); i++) {
-                    Integer next = (Integer) rowSet.first();
+                    Integer next = rowSet.first();
                     if (oneRowOfNumbers.equals(""))
                         oneRowOfNumbers = next.toString();
                     else {
@@ -188,7 +188,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
             	if (i == 100) {
             		rowNumbers = rowNumbers + "..";
             	} else {
-            		rowNumbers = rowNumbers + " "+Globals.lang("and")+" " + ((Integer)rowSet.first()).toString();
+            		rowNumbers = rowNumbers + " "+Globals.lang("and")+" " + rowSet.first().toString();
             	}
                 JOptionPane.showMessageDialog(panel.frame(),
                         Globals.lang("Couldn't parse the 'citeseerurl' field of the following entries") + ':' + '\n' + 
@@ -371,13 +371,12 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 */
 	public int populate(BibtexDatabase newDatabase, BibtexDatabase targetDatabase) {
 		int errorCode = 0;
-		Iterator targetIterator = targetDatabase.getKeySet().iterator();
+		Iterator<String> targetIterator = targetDatabase.getKeySet().iterator();
 		boolean abortOperation = false;
 		String currentKey;
 		BibtexEntry currentEntry;
-		Enumeration newEntryEnum;
-		Hashtable citationHashTable = new Hashtable();
-		Hashtable rejectedEntries = new Hashtable();
+		Map<String, Boolean> citationHashTable = new HashMap<String, Boolean>();
+		Hashtable<Integer, BibtexEntry> rejectedEntries = new Hashtable<Integer, BibtexEntry>();
 		InitializeProgressBar initializeProgressBar = new InitializeProgressBar();
 		InitializeProgressBarTwo initializeProgressBarTwo = new InitializeProgressBarTwo();
 		UpdateProgressBarMaximum updateMaximum = new UpdateProgressBarMaximum(targetDatabase.getEntryCount());		
@@ -407,7 +406,6 @@ public class CiteSeerFetcher extends SidePaneComponent {
 		progressStatus = new UpdateProgressStatus(Globals.lang("Fetching Citations"));
 		SwingUtilities.invokeLater(progressStatus);		
 		generateCitationList(citationHashTable, newDatabase);
-		newEntryEnum = citationHashTable.elements();
 		progressStatus = new UpdateProgressStatus(Globals.lang("Done"));
 		SwingUtilities.invokeLater(progressStatus);
 		if (abortOperation)
@@ -416,16 +414,15 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	}
 
 
-	private Hashtable generateCitationList(Hashtable citationHashTable, BibtexDatabase database)
+	private Map<String, Boolean> generateCitationList(Map<String, Boolean> citationHashTable, BibtexDatabase database)
 	 {
 		try {
 			NamedCompound dummyNamedCompound = new NamedCompound(Globals.lang("Import Data from CiteSeer Database"));
 			BooleanAssign dummyBoolean = new BooleanAssign(false);
 			if ((citationHashTable != null) && (citationHashTable.size() > 0)) {
 			    int citationCounter=0;
-			    for (Enumeration e = citationHashTable.keys() ; e.hasMoreElements() ;) {
-			        String key = (String) e.nextElement();
-					String id = Util.createNeutralId();
+			    for (String key : citationHashTable.keySet()){
+			    	String id = Util.createNeutralId();
 					BibtexEntry newEntry = new BibtexEntry(id);
 					StringBuffer citeseerURLString = new StringBuffer();
 					citeseerURLString.append(OAI_URL);
@@ -492,7 +489,7 @@ public class CiteSeerFetcher extends SidePaneComponent {
         return(generateCanonicalURL((String) be.getField("citeseerurl")));
 	}
 	
-	private boolean generateIdentifierList(BibtexEntry currentEntry, Hashtable citationHashTable, Hashtable rejectedEntries)
+	private boolean generateIdentifierList(BibtexEntry currentEntry, Map<String, Boolean> citationHashTable, Hashtable<Integer, BibtexEntry> rejectedEntries)
 		{
                   boolean abortOperation = false;
                   String identifier = generateCanonicalIdentifier(currentEntry);                  
@@ -525,16 +522,16 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	public boolean importCiteSeerEntries(int[] clickedOn, NamedCompound citeseerNamedCompound) {
 	  	boolean newValues = false;
 	  	boolean abortOperation = false;
-	  	Vector clickedVector = new Vector();
-		Hashtable rejectedEntries = new Hashtable();		
+	  	Vector<Integer> clickedVector = new Vector<Integer>();
+		Hashtable<Integer, BibtexEntry> rejectedEntries = new Hashtable<Integer, BibtexEntry>();		
 		for(int i=0; i < clickedOn.length; i++)
 			clickedVector.add(new Integer(clickedOn[i]));
-		Iterator clickedIterator = clickedVector.iterator();
+		Iterator<Integer> clickedIterator = clickedVector.iterator();
 		BooleanAssign overwriteAll = new BooleanAssign(false);
 		BooleanAssign overwriteNone = new BooleanAssign(false);
 
 		while (clickedIterator.hasNext() && !abortOperation) {
-			int currentIndex = ((Integer) clickedIterator.next()).intValue();
+			int currentIndex = clickedIterator.next().intValue();
 			BooleanAssign newValue = new BooleanAssign(false);
 			BibtexEntry be = panel.mainTable.getEntryAt(currentIndex);
 			abortOperation = importCiteSeerEntry(be, citeseerNamedCompound, overwriteAll, overwriteNone, newValue, rejectedEntries);
@@ -558,9 +555,9 @@ public class CiteSeerFetcher extends SidePaneComponent {
 	 *
 	 */
 	public boolean importCiteSeerEntry(BibtexEntry be, NamedCompound citeseerNC, BooleanAssign overwriteAll, 
-			BooleanAssign overwriteNone, BooleanAssign newValue, Hashtable rejectedEntries) {
+			BooleanAssign overwriteNone, BooleanAssign newValue, Hashtable<Integer, BibtexEntry> rejectedEntries) {
 	    boolean abortOperation = false;
-		SAXParserFactory factory = SAXParserFactory.newInstance();
+		
     	String identifier = generateCanonicalIdentifier(be);			 
 		try {
 			if (identifier != null) {

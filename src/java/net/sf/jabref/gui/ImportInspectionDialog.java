@@ -56,15 +56,15 @@ public class ImportInspectionDialog extends JDialog {
     private MetaData metaData;
     private UIFSplitPane contentPane = new UIFSplitPane(UIFSplitPane.VERTICAL_SPLIT);
     private JTable glTable;
-    private TableComparatorChooser comparatorChooser;
-    private EventSelectionModel selectionModel;
+    private TableComparatorChooser<BibtexEntry> comparatorChooser;
+    private EventSelectionModel<BibtexEntry> selectionModel;
     private String[] fields;
     private JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL);
     private JButton ok = new JButton(Globals.lang("Ok")),
         cancel = new JButton(Globals.lang("Cancel")),
         generate = new JButton(Globals.lang("Generate now"));
-    private EventList entries = new BasicEventList();
-    private SortedList sortedList;
+    private EventList<BibtexEntry> entries = new BasicEventList<BibtexEntry>();
+    private SortedList<BibtexEntry> sortedList;
     private List<BibtexEntry> entriesToDelete = new ArrayList<BibtexEntry>(); // Duplicate resolving may require deletion of old entries.
     private String undoName;
     private ArrayList<CallBack> callBacks = new ArrayList<CallBack>();
@@ -128,8 +128,8 @@ public class ImportInspectionDialog extends JDialog {
 
         duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
 
-        sortedList = new SortedList(entries);
-        EventTableModel tableModelGl = new EventTableModel(sortedList,
+        sortedList = new SortedList<BibtexEntry>(entries);
+        EventTableModel<BibtexEntry> tableModelGl = new EventTableModel<BibtexEntry>(sortedList,
                 new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
         GeneralRenderer renderer = new GeneralRenderer(Color.white, true);
@@ -139,10 +139,10 @@ public class ImportInspectionDialog extends JDialog {
         DeleteListener deleteListener = new DeleteListener();
         glTable.getActionMap().put("delete", deleteListener);
 
-        selectionModel = new EventSelectionModel(sortedList);
+        selectionModel = new EventSelectionModel<BibtexEntry>(sortedList);
         glTable.setSelectionModel(selectionModel);
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
-        comparatorChooser = new TableComparatorChooser(glTable, sortedList,
+        comparatorChooser = new TableComparatorChooser<BibtexEntry>(glTable, sortedList,
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
@@ -283,9 +283,8 @@ public class ImportInspectionDialog extends JDialog {
      * @param entry The entry to search for duplicates of.
      * @return A possible duplicate, if any, or null if none were found.
      */
-    protected BibtexEntry internalDuplicate(Collection entries, BibtexEntry entry) {
-        for (Iterator iterator = entries.iterator(); iterator.hasNext();) {
-            BibtexEntry othEntry = (BibtexEntry) iterator.next();
+    protected BibtexEntry internalDuplicate(Collection<BibtexEntry> entries, BibtexEntry entry) {
+        for (BibtexEntry othEntry : entries) {
             if (othEntry == entry)
                 continue; // Don't compare the entry to itself
             if (Util.isDuplicate(entry, othEntry, Globals.duplicateThreshold))
@@ -298,13 +297,14 @@ public class ImportInspectionDialog extends JDialog {
      * Removes all selected entries from the table. Synchronizes on this.entries to prevent
      * conflict with addition of new entries.
      */
-    public void removeSelectedEntries() {
+    @SuppressWarnings("unchecked")
+	public void removeSelectedEntries() {
         int row = glTable.getSelectedRow();
-        List toRemove = new ArrayList();
+        List<Object> toRemove = new ArrayList<Object>();
         toRemove.addAll(selectionModel.getSelected());
         entries.getReadWriteLock().writeLock().lock();
-        for (Iterator i=toRemove.iterator(); i.hasNext();) {
-            entries.remove(i.next());
+        for (Object o : toRemove){
+            entries.remove(o);
         }
         entries.getReadWriteLock().writeLock().unlock();
         glTable.clearSelection();
@@ -356,7 +356,7 @@ public class ImportInspectionDialog extends JDialog {
     public void generateKeySelectedEntry() {
         if (selectionModel.getSelected().size() != 1)
                 return;
-        BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+        BibtexEntry entry = selectionModel.getSelected().get(0);
         entries.getReadWriteLock().writeLock().lock();
         BibtexDatabase database = null;
         // Relate to the existing database, if any:
@@ -482,8 +482,8 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
 
             selectionModel.getSelected().getReadWriteLock().writeLock().lock();
-            for (Iterator i=selectionModel.getSelected().iterator(); i.hasNext();) {
-                BibtexEntry entry = (BibtexEntry)i.next();
+            for (Iterator<BibtexEntry> i=selectionModel.getSelected().iterator(); i.hasNext();) {
+                BibtexEntry entry = i.next();
                 // We store the groups this entry should be added to in a Set in the Map:
                 Set<GroupTreeNode> groups = groupAdditions.get(entry);
                 if (groups == null) {
@@ -821,7 +821,7 @@ public class ImportInspectionDialog extends JDialog {
               row = glTable.rowAtPoint(e.getPoint());
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
-                BibtexEntry first = (BibtexEntry)sortedList.get(row);
+                BibtexEntry first = sortedList.get(row);
                 BibtexEntry other = Util.containsDuplicate(panel.database(), first);
                 if (other != null) {
                     // This will be true if the duplicate is in the existing
@@ -880,7 +880,7 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             if (selectionModel.getSelected().size() != 1)
                 return;
-            BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            BibtexEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ths, Globals.lang("Enter URL"), entry.getField("url"));
             entries.getReadWriteLock().writeLock().lock();
             if (result != null) {
@@ -908,7 +908,7 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectionModel.getSelected().size() != 1)
                 return;
-            entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            entry = selectionModel.getSelected().get(0);
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
@@ -952,7 +952,7 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectionModel.getSelected().size() != 1)
                 return;
-            final BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            final BibtexEntry entry = selectionModel.getSelected().get(0);
             String bibtexKey = entry.getCiteKey();
             if (bibtexKey == null) {
                 int answer = JOptionPane.showConfirmDialog(frame,
@@ -997,7 +997,7 @@ public class ImportInspectionDialog extends JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
             if (selectionModel.getSelected().size() != 1)
                 return;
-            entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            entry = selectionModel.getSelected().get(0);
             FileListEntry flEntry = new FileListEntry("", "", null);
             FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, metaData);
             editor.setVisible(true);                                                 
@@ -1041,7 +1041,7 @@ public class ImportInspectionDialog extends JDialog {
 
             if (selectionModel.getSelected().size() != 1)
                 return;
-            BibtexEntry entry = (BibtexEntry) selectionModel.getSelected().get(0);
+            BibtexEntry entry = selectionModel.getSelected().get(0);
             // Call up a dialog box that provides Browse, Download and auto buttons:
             AttachFileDialog diag = new AttachFileDialog(ths, metaData, entry, fileType);
             Util.placeDialog(diag, ths);
@@ -1075,7 +1075,7 @@ public class ImportInspectionDialog extends JDialog {
 
     private void setupComparatorChooser() {
         // First column:
-        java.util.List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
+        java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
 
         comparators = comparatorChooser.getComparatorsForColumn(1);
@@ -1129,7 +1129,7 @@ public class ImportInspectionDialog extends JDialog {
             return getDefaultEditor(Boolean.class);
         } */
 
-        public Class getColumnClass(int col) {
+        public Class<?> getColumnClass(int col) {
             if (col == 0)
                 return Boolean.class;
             else if (col < PAD)
@@ -1144,7 +1144,7 @@ public class ImportInspectionDialog extends JDialog {
         public void setValueAt(Object value, int row, int column) {
             // Only column 0, which is controlled by BibtexEntry.searchHit, is editable:
             entries.getReadWriteLock().writeLock().lock();
-            BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+            BibtexEntry entry = sortedList.get(row);
             entry.setSearchHit(((Boolean)value).booleanValue());
             entries.getReadWriteLock().writeLock().unlock();
         }

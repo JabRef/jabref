@@ -66,9 +66,9 @@ import net.sf.jabref.Util;
 public class AuxSubGenerator
 {
 
-  private HashSet mySet ; // all unique bibtex keys in aux file
+  private HashSet<String> mySet ; // all unique bibtex keys in aux file
 
-  private Vector notFoundList ; // all not solved bibtex keys
+  private Vector<String> notFoundList ; // all not solved bibtex keys
 
   private BibtexDatabase db ; // reference database
   private BibtexDatabase auxDB ; // contains only the bibtex keys who found in aux file
@@ -78,8 +78,8 @@ public class AuxSubGenerator
 
   public AuxSubGenerator(BibtexDatabase refDBase)
   {
-    mySet = new HashSet(20) ;
-    notFoundList = new Vector() ;
+    mySet = new HashSet<String>(20) ;
+    notFoundList = new Vector<String>() ;
     db = refDBase ;
   }
 
@@ -148,14 +148,14 @@ public class AuxSubGenerator
     BufferedReader br = null ;
 
     // filelist, used for nested aux files
-    Vector fileList = new Vector(5) ;
+    Vector<String> fileList = new Vector<String>(5) ;
     fileList.add( filename );
 
     // get the file path
     File dummy = new File( filename ) ;
     String path = dummy.getParent() ;
     if (path != null)
-      path = path + dummy.separator ;
+      path = path + File.separator ;
     else
       path = "" ;
 
@@ -166,7 +166,7 @@ public class AuxSubGenerator
 
     while (fileIndex < fileList.size())
     {
-      String fName = (String) fileList.elementAt( fileIndex ) ;
+      String fName = fileList.elementAt( fileIndex ) ;
       try
       {
 //        System.out.println("read #"+fName +"#") ;
@@ -274,13 +274,13 @@ public class AuxSubGenerator
     auxDB = new BibtexDatabase() ;
     notFoundList.clear();
 
-    Iterator it = mySet.iterator() ;
+    Iterator<String> it = mySet.iterator() ;
 
     // forall bibtex keys (found in aux-file) try to find an equivalent
     // entry into reference database
     while (it.hasNext())
     {
-      String str = (String) it.next() ;
+      String str = it.next() ;
       BibtexEntry entry = db.getEntryByKey(str);
 
       if (entry == null)
@@ -330,7 +330,7 @@ public class AuxSubGenerator
      * @param bibDB BibtexDatabase - reference database
      * @return Vector - contains all not resolved bibtex entries
      */
-    public final Vector generate(String auxFileName, BibtexDatabase bibDB)
+    public final Vector<String> generate(String auxFileName, BibtexDatabase bibDB)
     {
       setReferenceDatabase(bibDB);
       parseAuxFile(auxFileName) ;
@@ -382,7 +382,7 @@ public class AuxSubGenerator
   }
 
   /** returns a vector off all not resolved bibtex entries found in auxfile */
-  public Vector getNotFoundList()
+  public Vector<String> getNotFoundList()
   {
     return notFoundList ;
   }

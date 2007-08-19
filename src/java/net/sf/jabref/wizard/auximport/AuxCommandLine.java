@@ -56,7 +56,7 @@ public class AuxCommandLine
     if ( (auxName.length() > 0) && (bib != null) )
     {
       AuxSubGenerator auxParser = new AuxSubGenerator(bib) ;
-      Vector returnValue = auxParser.generate(auxName, bib) ;
+      Vector<String> returnValue = auxParser.generate(auxName, bib) ;
       back = auxParser.getGeneratedDatabase() ;
 
       // print statistics

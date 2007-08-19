@@ -22,7 +22,7 @@ import net.sf.jabref.Globals;
 public class ColorSetupPanel extends JPanel {
 
     private final static int ICON_WIDTH=30, ICON_HEIGHT=20;
-    private ArrayList buttons = new ArrayList();
+    private ArrayList<ColorButton> buttons = new ArrayList<ColorButton>();
 
     public ColorSetupPanel() {
 
@@ -40,8 +40,8 @@ public class ColorSetupPanel extends JPanel {
 
 
 
-        for (Iterator i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = (ColorButton)i.next();
+        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
+            ColorButton but = i.next();
             builder.append(but);
             builder.append(but.getDefaultButton());
             builder.append(but.getName());
@@ -58,16 +58,16 @@ public class ColorSetupPanel extends JPanel {
     }
 
     public void setValues() {
-        for (Iterator i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = (ColorButton)i.next();
+        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
+            ColorButton but = i.next();
             but.setColor(Globals.prefs.getColor(but.getKey()));
         }
 
     }
 
     public void storeSettings() {
-        for (Iterator i=buttons.iterator(); i.hasNext();) {
-            ColorButton but = (ColorButton)i.next();
+        for (Iterator<ColorButton> i=buttons.iterator(); i.hasNext();) {
+            ColorButton but = i.next();
             Globals.prefs.putColor(but.getKey(), but.getColor());
         }
     }

@@ -1,5 +1,6 @@
 package net.sf.jabref.remote;
 
+import net.sf.jabref.BibtexEntry;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.BasePanel;
 import net.sf.jabref.Globals;
@@ -85,7 +86,7 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                                 // There is no open tab to add to, so we create a new tab:
                                 jabref.jrf.addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), (i == 0));
                             } else {
-                                List entries = new ArrayList(pr.getDatabase().getEntries());
+                                List<BibtexEntry> entries = new ArrayList<BibtexEntry>(pr.getDatabase().getEntries());
                                 jabref.jrf.addImportedEntries(panel, entries, "", false, this);
                             }
                         }

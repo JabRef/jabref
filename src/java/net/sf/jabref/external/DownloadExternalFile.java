@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -28,7 +27,6 @@ import net.sf.jabref.net.URLDownload;
  */
 public class DownloadExternalFile {
     private JabRefFrame frame;
-    private JDialog dialog;
     private MetaData metaData;
     private String bibtexKey;
     private FileListEntryEditor editor;

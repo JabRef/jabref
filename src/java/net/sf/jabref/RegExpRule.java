@@ -27,6 +27,7 @@
 package net.sf.jabref;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -53,19 +54,18 @@ public class RegExpRule implements SearchRule {
         //System.out.println(searchString);
         Pattern pattern = Pattern.compile(searchString, flags);
 
-        Object[] fields = bibtexEntry.getAllFields();
-        score += searchFields(fields, bibtexEntry, pattern);
+        score += searchFields(bibtexEntry.getAllFields(), bibtexEntry, pattern);
 
         return score;
     }
 
-    protected int searchFields(Object[] fields, BibtexEntry bibtexEntry,
+    protected int searchFields(Set<String> fields, BibtexEntry bibtexEntry,
                                Pattern pattern) {
         int score = 0;
         if (fields != null) {
-            for (int i = 0; i < fields.length; i++) {
+        	for (String field : fields){
                 try {
-                    Object value = bibtexEntry.getField((String)fields[i]);
+                    Object value = bibtexEntry.getField(field);
                     if (value != null) {
                         Matcher m = pattern.matcher(removeBrackets.format((String)value));
                         if (m.find())

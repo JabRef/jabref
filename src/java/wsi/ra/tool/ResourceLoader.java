@@ -22,12 +22,7 @@
 package wsi.ra.tool;
 
 import java.io.*;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.Vector;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 /*==========================================================================*
  * IMPORTS
@@ -121,7 +116,7 @@ public class ResourceLoader
             return getBytesFromFile(resourceLocation);
         }
 
-        InputStream in = this.getClass().getClassLoader()
+        InputStream in = ClassLoader
                              .getSystemResourceAsStream(resourceLocation);
 
         if (in == null)
@@ -220,7 +215,7 @@ public class ResourceLoader
      * @param  resourceFile  Description of the Parameter
      * @return               Description of the Return Value
      */
-    public static Vector readLines(String resourceFile)
+    public static Vector<String> readLines(String resourceFile)
     {
         return readLines(resourceFile, false);
     }
@@ -232,7 +227,7 @@ public class ResourceLoader
      * @param  ignoreComments  Description of the Parameter
      * @return                 Description of the Return Value
      */
-    public static Vector readLines(String resourceFile,
+    public static Vector<String> readLines(String resourceFile,
         boolean ignoreCommentedLines)
     {
         if (resourceFile == null)
@@ -252,7 +247,7 @@ public class ResourceLoader
                     sReader));
 
         String line;
-        Vector vector = new Vector(100);
+        Vector<String> vector = new Vector<String>(100);
 
         try
         {
@@ -284,91 +279,6 @@ public class ResourceLoader
     /*-------------------------------------------------------------------------*
      * private methods
      *-------------------------------------------------------------------------  */
-
-    /**
-     *  Gets the byte data from a file contained in a JAR or ZIP file.
-     *
-     * @param  urlToZipArchive      Description of the Parameter
-     * @param  internalArchivePath  Description of the Parameter
-     * @return                      the byte array of the file.
-     */
-    private byte[] getBytesFromArchive(String urlToZipArchive,
-        String internalArchivePath)
-    {
-        URL url = null;
-        int size = -1;
-        byte[] b = null;
-
-        try
-        {
-            url = new URL(urlToZipArchive);
-
-            // extracts just sizes only.
-            ZipFile zf = new ZipFile(url.getFile());
-            Enumeration e = zf.entries();
-
-            while (e.hasMoreElements())
-            {
-                ZipEntry ze = (ZipEntry) e.nextElement();
-
-                if (ze.getName().equals(internalArchivePath))
-                {
-                    if (ze.isDirectory())
-                    {
-                        return null;
-                    }
-
-                    // only files with <65536 bytes are allowed
-                    if (ze.getSize() > 65536)
-                    {
-                        System.out.println(
-                            "Resource files should be smaller than 65536 bytes...");
-                    }
-
-                    size = (int) ze.getSize();
-                }
-            }
-
-            zf.close();
-
-            FileInputStream fis = new FileInputStream(url.getFile());
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            ZipInputStream zis = new ZipInputStream(bis);
-            ZipEntry ze = null;
-
-            while ((ze = zis.getNextEntry()) != null)
-            {
-                if (ze.getName().equals(internalArchivePath))
-                {
-                    b = new byte[(int) size];
-
-                    int rb = 0;
-                    int chunk = 0;
-
-                    while (((int) size - rb) > 0)
-                    {
-                        chunk = zis.read(b, rb, (int) size - rb);
-
-                        if (chunk == -1)
-                        {
-                            break;
-                        }
-
-                        rb += chunk;
-                    }
-                }
-            }
-        }
-         catch (Exception e)
-        {
-            //logger.error("error while loading", e);
-            System.err.println("error while loading");
-
-            return null;
-        }
-
-        return b;
-    }
 
     /**
      *  Gets the byte data from a file.

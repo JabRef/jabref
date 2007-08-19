@@ -1,20 +1,22 @@
 package net.sf.jabref.search;
 
 import java.util.Comparator;
+
+import net.sf.jabref.BibtexEntry;
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * This Comparator compares two objects based on whether none, one of them, or both
  * match a given Matcher. It is used to "float" group and search hits in the main table.
  */
-public class HitOrMissComparator implements Comparator {
-    private Matcher hitOrMiss;
+public class HitOrMissComparator implements Comparator<BibtexEntry> {
+    private Matcher<BibtexEntry> hitOrMiss;
 
-    public HitOrMissComparator(Matcher hitOrMiss) {
+    public HitOrMissComparator(Matcher<BibtexEntry> hitOrMiss) {
         this.hitOrMiss = hitOrMiss;
     }
 
-    public int compare(Object o1, Object o2) {
+    public int compare(BibtexEntry o1, BibtexEntry o2) {
         if (hitOrMiss == null)
             return 0;
         

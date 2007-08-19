@@ -39,8 +39,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 package net.sf.jabref.wizard.integrity ;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import net.sf.jabref.BibtexDatabase;
@@ -48,38 +46,28 @@ import net.sf.jabref.BibtexEntry;
 
 public class IntegrityCheck
 {
-  private Vector messages ;
+  private Vector<IntegrityMessage> messages ;
 
   public IntegrityCheck()
   {
-    messages = new Vector() ;
+    messages = new Vector<IntegrityMessage>() ;
   }
 
-  public Vector checkBibtexDatabase(BibtexDatabase base)
-  {
-    messages.clear();
-    if (base != null)
-    {
-      Collection col = base.getEntries() ;
-      for( Iterator myIt = col.iterator() ; myIt.hasNext() ;)
-      {
-        Object dat = myIt.next() ;
-        if (dat != null)
-        {
-          checkSingleEntry(( BibtexEntry ) dat) ;
-        }
-      }
-   }
-   return (Vector) messages.clone() ;
-  }
+  public Vector<IntegrityMessage> checkBibtexDatabase(BibtexDatabase base) {
+		messages.clear();
+		if (base != null) {
+			for (BibtexEntry entry : base.getEntries()) {
+				checkSingleEntry(entry);
+			}
+		}
+		return new Vector<IntegrityMessage>(messages);
+	}
 
-  public Vector checkBibtexEntry(BibtexEntry entry)
-  {
-    messages.clear();
-    checkSingleEntry(entry) ;
-    return (Vector) messages.clone() ;
-//    return messages ;
-  }
+	public Vector<IntegrityMessage> checkBibtexEntry(BibtexEntry entry) {
+		messages.clear();
+		checkSingleEntry(entry);
+		return new Vector<IntegrityMessage>(messages);
+	}
 
   public void checkSingleEntry(BibtexEntry entry)
   {
@@ -164,15 +152,11 @@ public class IntegrityCheck
     len = structure.length() ;
     if (len > 0)
     {
-      boolean failed = false ;
-      char z1 = structure.charAt(0) ;
-
       if (structure.charAt(0) != 'N')  // must start by name
       {
         messages.add( new IntegrityMessage( IntegrityMessage.NAME_START_WARNING,
                                             entry, fieldName, null))  ;
 //        back.add("beginning of " +fieldName +" field");
-        failed = true ;
       }
 
       if (structure.charAt( structure.length() -1) != 'N')  // end without seperator
@@ -180,18 +164,13 @@ public class IntegrityCheck
         messages.add( new IntegrityMessage( IntegrityMessage.NAME_END_WARNING,
                                             entry, fieldName, null))  ;
 //        back.add("bad end (" +fieldName +" field)");
-        failed = true ;
       }
       if (structure.indexOf("NN,NN") > -1)
       {
         messages.add( new IntegrityMessage( IntegrityMessage.NAME_SEMANTIC_WARNING,
                                             entry, fieldName, null))  ;
 //        back.add("something could be wrong in " +fieldName +" field") ;
-        failed = true ;
       }
-
-//      if (failed)
-//        System.out.println(authors +" #" +structure.toString() +"#") ;
     }
 //    messages.add( new IntegrityMessage( IntegrityMessage.NAME_END_WARNING,
 //                                        entry, fieldName, null))  ;

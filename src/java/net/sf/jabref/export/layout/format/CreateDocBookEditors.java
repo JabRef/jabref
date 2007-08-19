@@ -37,9 +37,6 @@ public class CreateDocBookEditors extends CreateDocBookAuthors
     {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
 
-        int index = 0;
-        int oldPos = 0;
-        String author;
         StringBuffer sb = new StringBuffer(100);
         //fieldText = (new ConvertSpecialCharactersForXML()).format(fieldText);
 

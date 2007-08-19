@@ -27,16 +27,20 @@ http://www.gnu.org/copyleft/gpl.ja.html
 package net.sf.jabref.imports;
 
 import java.io.File;
+import net.sf.jabref.BibtexEntryType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.BibtexEntry;
 
 public class ParserResult {
 
     public static ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
     private BibtexDatabase base;
-    private HashMap<String, String> metaData, entryTypes;
+    private HashMap<String, String> metaData;
+    private HashMap<String, BibtexEntryType> entryTypes;
     private File file = null;
     private ArrayList<String> warnings = new ArrayList<String>();
     private String encoding = null; // Which encoding was used?
@@ -46,10 +50,14 @@ public class ParserResult {
     private int jabrefMajorVersion = 0, jabrefMinorVersion = 0; // Numeric version representation
     private boolean toOpenTab = false;
 
-    public ParserResult(BibtexDatabase base, HashMap<String, String> metaData, HashMap entryTypes) {
-	this.base = base;
-	this.metaData = metaData;
-	this.entryTypes = entryTypes;
+    public ParserResult(Collection<BibtexEntry> entries){
+    	this(ImportFormatReader.createDatabase(entries), null, new HashMap<String, BibtexEntryType>());
+    }
+    
+    public ParserResult(BibtexDatabase base, HashMap<String, String> metaData, HashMap<String, BibtexEntryType> entryTypes) {
+		this.base = base;
+		this.metaData = metaData;
+		this.entryTypes = entryTypes;
     }
 
     /**
@@ -106,8 +114,8 @@ public class ParserResult {
 	return metaData;
     }
 
-    public HashMap getEntryTypes() {
-	return entryTypes;
+    public HashMap<String, BibtexEntryType> getEntryTypes() {
+    	return entryTypes;
     }
 
     public File getFile() {
@@ -152,7 +160,7 @@ public class ParserResult {
     public String[] warnings() {
       String[] s = new String[warnings.size()];
       for (int i=0; i<warnings.size(); i++)
-        s[i] = (String)warnings.get(i);
+        s[i] = warnings.get(i);
       return s;
     }
 

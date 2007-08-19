@@ -316,11 +316,11 @@ public class FontSelectorDialog extends JDialog {
         // GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()
         private String[] getFontList(){
                 try{
-                        Class GEClass = Class.forName("java.awt.GraphicsEnvironment");
+                        Class<?> GEClass = Class.forName("java.awt.GraphicsEnvironment");
                         Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
                         String[] nameArray = (String[])GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
-                        Vector nameVector = new Vector(nameArray.length);
+                        Vector<String> nameVector = new Vector<String>(nameArray.length);
 
                         for(int i = 0, j; i < nameArray.length; i++){
                                 for(j = 0; j < HIDEFONTS.length; j++){

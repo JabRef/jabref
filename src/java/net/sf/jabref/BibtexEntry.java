@@ -37,8 +37,8 @@ import java.beans.VetoableChangeSupport;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.export.FieldFormatter;
@@ -49,7 +49,7 @@ public class BibtexEntry
     public final static String ID_FIELD = "id";
     private String _id;
     private BibtexEntryType _type;
-    private Map _fields = new HashMap();
+    private Map<String, String> _fields = new HashMap<String, String>();
     VetoableChangeSupport _changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
@@ -99,11 +99,11 @@ public class BibtexEntry
     }
 
     /**
-     * Returns an array containing the names of all fields that are
+     * Returns an set containing the names of all fields that are
      * set for this particular entry.
      */
-    public Object[] getAllFields() {
-        return _fields.keySet().toArray();
+    public Set<String> getAllFields() {
+        return new TreeSet<String>(_fields.keySet());
     }
 
     /**
@@ -199,13 +199,13 @@ public class BibtexEntry
     /**
      * Returns the contents of the given field, or null if it is not set.
      */
-    public Object getField(String name) {
+    public String getField(String name) {
         return _fields.get(name);
     }
 
     public String getCiteKey() {
         return (_fields.containsKey(BibtexFields.KEY_FIELD) ?
-                (String)_fields.get(BibtexFields.KEY_FIELD) : null);
+                _fields.get(BibtexFields.KEY_FIELD) : null);
     }
 
     /**
@@ -215,7 +215,7 @@ public class BibtexEntry
      * be used for entries that are being displayed in the GUI. Furthermore, it
      * does not check values for content, so e.g. empty strings will be set as such.
      */
-    public void setField(Map fields){
+    public void setField(Map<String, String> fields){
         _fields.putAll(fields);
     }
 
@@ -225,14 +225,14 @@ public class BibtexEntry
      * @param name The field to set.
      * @param value The value to set.
      */
-    public void setField(String name, Object value) {
+    public void setField(String name, String value) {
 
         if (ID_FIELD.equals(name)) {
             throw new IllegalArgumentException("The field name '" + name +
                                                "' is reserved");
         }
 
-        Object oldValue = _fields.get(name);
+        String oldValue = _fields.get(name);
 
         try {
             // We set the field before throwing the changeEvent, to enable
@@ -320,7 +320,7 @@ public class BibtexEntry
 
         String str = Util.shaveString((String)getField(BibtexFields.KEY_FIELD));
         out.write(((str == null) ? "" : str)+","+Globals.NEWLINE);
-        HashMap written = new HashMap();
+        HashMap<String, String> written = new HashMap<String, String>();
         written.put(BibtexFields.KEY_FIELD, null);
         boolean hasWritten = false;
         // Write required fields first.
@@ -339,17 +339,15 @@ public class BibtexEntry
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet remainingFields = new TreeSet();
-        for (Iterator i = _fields.keySet().iterator(); i.hasNext(); ) {
-            String key = (String)i.next();
+        TreeSet<String> remainingFields = new TreeSet<String>();
+        for (String key : _fields.keySet()){
             boolean writeIt = (write ? BibtexFields.isWriteableField(key) :
                                BibtexFields.isDisplayableField(key));
             if (!written.containsKey(key) && writeIt)
                        remainingFields.add(key);
         }
-        for (Iterator i = remainingFields.iterator(); i.hasNext(); )
-            hasWritten = hasWritten | writeField((String)i.next(), out, ff, hasWritten);
-            //writeField((String)i.next(),out,ff);
+        for (String field: remainingFields)
+            hasWritten = hasWritten | writeField(field, out, ff, hasWritten);
 
         // Finally, end the entry.
         out.write((hasWritten ? Globals.NEWLINE : "")+"}"+Globals.NEWLINE);
@@ -392,7 +390,7 @@ public class BibtexEntry
      */
     public Object clone() {
         BibtexEntry clone = new BibtexEntry(_id, _type);
-        clone._fields = (Map)((HashMap)_fields).clone();
+        clone._fields = new HashMap<String, String>(_fields); 
         return clone;
     }
 

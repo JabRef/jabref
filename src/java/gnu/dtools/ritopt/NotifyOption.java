@@ -94,7 +94,7 @@ public class NotifyOption extends Option implements OptionNotifier {
      * A list of listeners to notify whenever a modification event occurs.
      */
 
-    private java.util.List listeners;
+    private java.util.List<OptionListener> listeners;
 
     /**
      * Construct a NotifyOption with an empty list of listeners. Set the
@@ -152,7 +152,7 @@ public class NotifyOption extends Option implements OptionNotifier {
     public NotifyOption( NotifyOption op ) {
 	super( op );
 	op.value = op.getValue();
-	listeners = new java.util.ArrayList( op.listeners );
+	listeners = new java.util.ArrayList<OptionListener>( op.listeners );
     }
 
     /**
@@ -202,7 +202,7 @@ public class NotifyOption extends Option implements OptionNotifier {
     public NotifyOption( String value, String longOption, char shortOption ) {
 	super( longOption, shortOption );
 	this.value = value;
-	listeners = new java.util.ArrayList();
+	listeners = new java.util.ArrayList<OptionListener>();
     }
 
     /**
@@ -225,10 +225,10 @@ public class NotifyOption extends Option implements OptionNotifier {
 
     public void modify( String value ) throws OptionModificationException {
 	this.value = value;
-	java.util.Iterator iterator = listeners.iterator();
+	java.util.Iterator<OptionListener> iterator = listeners.iterator();
 	OptionEvent event = new OptionEvent( command, value, this );
 	while ( iterator.hasNext() ) {
-	    OptionListener listener = (OptionListener)iterator.next();
+	    OptionListener listener = iterator.next();
 	    listener.optionInvoked( event );
 	}
     }

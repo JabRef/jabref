@@ -30,7 +30,7 @@ public class ContentSelectorDialog2 extends JDialog {
 	FIELD_FIRST_LINE = Globals.lang("<field name>");
     MetaData metaData;
     String currentField = null;
-    TreeSet fieldSet, wordSet;
+    TreeSet<String> fieldSet, wordSet;
     JabRefFrame frame;
     BasePanel panel;
     JButton help = new JButton(Globals.lang("Help")),
@@ -50,8 +50,8 @@ public class ContentSelectorDialog2 extends JDialog {
     JScrollPane fPane = new JScrollPane(fieldList),
 	wPane = new JScrollPane(wordList);
 
-    HashMap wordListModels = new HashMap();
-    ArrayList removedFields = new ArrayList();
+    HashMap<String, DefaultListModel> wordListModels = new HashMap<String, DefaultListModel>();
+    ArrayList<String> removedFields = new ArrayList<String>();
 
     public ContentSelectorDialog2(Frame owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
               String fieldName) {
@@ -248,29 +248,29 @@ public class ContentSelectorDialog2 extends JDialog {
 	// First remove the mappings for fields that have been deleted.
 	// If these were re-added, they will be added below, so it doesn't
 	// cause any harm to remove them here.
-	for (Iterator i=removedFields.iterator(); i.hasNext();) {
-	    String fieldName = (String)i.next();
+	for (Iterator<String> i=removedFields.iterator(); i.hasNext();) {
+	    String fieldName = i.next();
 	    metaData.remove(Globals.SELECTOR_META_PREFIX+fieldName);
 	    changedFieldSet = true;
 	}
 
 	// Cycle through all fields that we have created listmodels for:
-	loop: for (Iterator i=wordListModels.keySet().iterator(); i.hasNext();) {
+	loop: for (Iterator<String> i=wordListModels.keySet().iterator(); i.hasNext();) {
 	    // For each field name, store the values:
-	    String fieldName = (String)i.next();
+	    String fieldName = i.next();
 	    if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName))
 		continue loop;
-	    DefaultListModel lm = (DefaultListModel)wordListModels.get(fieldName);
+	    DefaultListModel lm = wordListModels.get(fieldName);
 	    int start = 0;
 	    // Avoid storing the <new word> marker if it is there:
 	    if (lm.size() > 0)
 		while ((start<lm.size()) && ((String)lm.get(start)).equals(WORD_FIRSTLINE_TEXT))
 		    start++;
-	    Vector data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
+	    Vector<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX+fieldName);
 	    boolean newField = false;
 	    if (data == null) {
 		newField = true;
-		data = new Vector();
+		data = new Vector<String>();
 		changedFieldSet = true;
 
 	    } else
@@ -299,41 +299,38 @@ public class ContentSelectorDialog2 extends JDialog {
      *
      */
     private void setupFieldSelector() {
-	fieldListModel.clear();
-	//fieldListModel.addElement(FIELD_FIRST_LINE);
-	for (Iterator i=metaData.iterator(); i.hasNext();) {
-	    String s = (String)i.next();
-	    if (s.startsWith(Globals.SELECTOR_META_PREFIX))
-		fieldListModel.addElement(s.substring(Globals.SELECTOR_META_PREFIX.length()));
-	}
-
+		fieldListModel.clear();
+		for (String s : metaData){
+		    if (s.startsWith(Globals.SELECTOR_META_PREFIX))
+		    	fieldListModel.addElement(s.substring(Globals.SELECTOR_META_PREFIX.length()));
+		}
     }
 
 
     private void setupWordSelector() {
 
-	// Have we already created a listmodel for this field?
-	Object o = wordListModels.get(currentField);
-	if (o != null) {
-	    wordListModel = (DefaultListModel)o;
-	    wordList.setModel(wordListModel);
-	} else {
-	    wordListModel = new DefaultListModel();
-	    wordList.setModel(wordListModel);
-	    wordListModels.put(currentField, wordListModel);
-	    wordListModel.clear();
-	    //wordListModel.addElement(WORD_FIRSTLINE_TEXT);
-	    Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX+currentField);
-	    if ((items != null)) { // && (items.size() > 0)) {
-		wordSet = new TreeSet(items);
-		for (Iterator i=wordSet.iterator(); i.hasNext();) {
-		    String s = (String)i.next();
-		    int index = findPos(wordListModel, s);
-		    wordListModel.add(index, s);
+		// Have we already created a listmodel for this field?
+		Object o = wordListModels.get(currentField);
+		if (o != null) {
+			wordListModel = (DefaultListModel) o;
+			wordList.setModel(wordListModel);
+		} else {
+			wordListModel = new DefaultListModel();
+			wordList.setModel(wordListModel);
+			wordListModels.put(currentField, wordListModel);
+			wordListModel.clear();
+			// wordListModel.addElement(WORD_FIRSTLINE_TEXT);
+			Vector<String> items = metaData
+				.getData(Globals.SELECTOR_META_PREFIX + currentField);
+			if ((items != null)) { // && (items.size() > 0)) {
+				wordSet = new TreeSet<String>(items);
+				for (String s : wordSet){
+					int index = findPos(wordListModel, s);
+					wordListModel.add(index, s);
+				}
+			}
 		}
-	    }
 	}
-    }
 
     private int findPos(DefaultListModel lm, String item) {
 	for (int i=0; i<lm.size(); i++) {

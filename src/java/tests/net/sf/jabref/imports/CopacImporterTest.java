@@ -48,7 +48,7 @@ public class CopacImporterTest extends TestCase {
 	public void testImportEntries() throws IOException {
 		CopacImporter importer = new CopacImporter();
 
-		List entries = importer.importEntries(CopacImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
 			.getResourceAsStream("CopacImporterTest1.txt"));
 		assertEquals(1, entries.size());
 		BibtexEntry entry = (BibtexEntry) entries.get(0);
@@ -66,7 +66,7 @@ public class CopacImporterTest extends TestCase {
 	public void testImportEntries2() throws IOException {
 		CopacImporter importer = new CopacImporter();
 
-		List entries = importer.importEntries(CopacImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(CopacImporterTest.class
 			.getResourceAsStream("CopacImporterTest2.txt"));
 		assertEquals(2, entries.size());
 		BibtexEntry one = (BibtexEntry) entries.get(0);

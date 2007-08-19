@@ -47,8 +47,6 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.export.LatexFieldFormatter;
 import net.sf.jabref.external.ExternalFilePanel;
-import net.sf.jabref.groups.AbstractGroup;
-import net.sf.jabref.groups.ExplicitGroup;
 import net.sf.jabref.gui.AutoCompleter;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.imports.BibtexParser;
@@ -126,14 +124,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     EntryEditor ths = this;
 
-    HashSet contentSelectors = new HashSet();
+    HashSet<FieldContentSelector> contentSelectors = new HashSet<FieldContentSelector>();
 
     Logger logger = Logger.getLogger(EntryEditor.class.getName());
 
     boolean updateSource = true; // This can be set to false to stop the
                                     // source
 
-    List tabs = new ArrayList();
+    List<Object> tabs = new ArrayList<Object>();
 
     // text area from gettin updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
@@ -194,7 +192,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         tabs.clear();
         String[] fields = entry.getRequiredFields();
 
-        List fieldList = null;
+        List<String> fieldList = null;
         if (fields != null)
             fieldList = java.util.Arrays.asList(fields);
         reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, Globals.lang("Required fields"));
@@ -539,12 +537,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         im.put(Globals.prefs.getKey("Previous tab"), "prevtab");
         am.put("prevtab", frame.prevTab);
         try {
-            HashSet keys = new HashSet(ta
+            HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(ta
                 .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
             ta.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-            keys = new HashSet(ta
+            keys = new HashSet<AWTKeyStroke>(ta
                 .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
             keys.clear();
             keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
@@ -581,7 +579,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * Sets the enabled status of all text fields of the entry editor.
      */
     public void setEnabled(boolean enabled) {
-        for (Iterator i = tabs.iterator(); i.hasNext();) {
+        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
             Object o = i.next();
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEnabled(enabled);
@@ -721,32 +719,28 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                 // First, remove fields that the user have removed.
             }
 
-            Object[] fields = entry.getAllFields();
-
-            for (int i = 0; i < fields.length; i++) {
-                if (BibtexFields.isDisplayableField(fields[i].toString())) {
-                    if (nu.getField(fields[i].toString()) == null) {
-                        compound.addEdit(new UndoableFieldChange(entry, fields[i].toString(), entry
-                            .getField(fields[i].toString()), (Object) null));
-                        entry.clearField(fields[i].toString());
+            for (String field : entry.getAllFields()){
+                if (BibtexFields.isDisplayableField(field.toString())) {
+                    if (nu.getField(field.toString()) == null) {
+                        compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
+                            .getField(field.toString()), null));
+                        entry.clearField(field.toString());
                         anyChanged = true;
                     }
                 }
             }
 
             // Then set all fields that have been set by the user.
-            fields = nu.getAllFields();
-
-            for (int i = 0; i < fields.length; i++) {
-                if (entry.getField(fields[i].toString()) != nu.getField(fields[i].toString())) {
-                    String toSet = (String) nu.getField(fields[i].toString());
+            for (String field : nu.getAllFields()){
+                if (entry.getField(field.toString()) != nu.getField(field.toString())) {
+                    String toSet = (String) nu.getField(field.toString());
 
                     // Test if the field is legally set.
-                    (new LatexFieldFormatter()).format(toSet, fields[i].toString());
+                    (new LatexFieldFormatter()).format(toSet, field.toString());
 
-                    compound.addEdit(new UndoableFieldChange(entry, fields[i].toString(), entry
-                        .getField(fields[i].toString()), toSet));
-                    entry.setField(fields[i].toString(), toSet);
+                    compound.addEdit(new UndoableFieldChange(entry, field.toString(), entry
+                        .getField(field.toString()), toSet));
+                    entry.setField(field.toString(), toSet);
                     anyChanged = true;
                 }
             }
@@ -812,7 +806,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     public void setField(String fieldName, String newFieldData) {
 
-        for (Iterator i = tabs.iterator(); i.hasNext();) {
+        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
             Object o = i.next();
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).updateField(fieldName, newFieldData);
@@ -825,7 +819,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * Sets all the text areas according to the shown entry.
      */
     public void updateAllFields() {
-        for (Iterator i = tabs.iterator(); i.hasNext();) {
+        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
             Object o = i.next();
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).setEntry(entry);
@@ -837,7 +831,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      * Removes the "invalid field" color from all text areas.
      */
     public void validateAllFields() {
-        for (Iterator i = tabs.iterator(); i.hasNext();) {
+        for (Iterator<Object> i = tabs.iterator(); i.hasNext();) {
             Object o = i.next();
             if (o instanceof EntryEditorTab) {
                 ((EntryEditorTab) o).validateAllFields();
@@ -847,8 +841,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
 
     public void updateAllContentSelectors() {
         if (contentSelectors.size() > 0) {
-            for (Iterator i = contentSelectors.iterator(); i.hasNext();)
-                ((FieldContentSelector) i.next()).rebuildComboBox();
+            for (Iterator<FieldContentSelector> i = contentSelectors.iterator(); i.hasNext();)
+                i.next().rebuildComboBox();
         }
     }
 
@@ -882,10 +876,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         JPopupMenu typeMenu = new JPopupMenu();
 
                         // typeMenu.addSeparator();
-                        for (Iterator i = BibtexEntryType.ALL_TYPES.keySet().iterator(); i
-                            .hasNext();)
-                            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType((String) i
-                                .next()), panel));
+                        for (String s: BibtexEntryType.ALL_TYPES.keySet())
+                            typeMenu.add(new ChangeTypeAction(BibtexEntryType.getType(s), panel));
 
                         typeMenu.show(ths, e.getX(), e.getY());
                     }
@@ -1096,7 +1088,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         if (toSet != null)
                             (new LatexFieldFormatter()).format(toSet, fe.getFieldName());
 
-                        Object oldValue = entry.getField(fe.getFieldName());
+                        String oldValue = entry.getField(fe.getFieldName());
 
                         if (toSet != null)
                             entry.setField(fe.getFieldName(), toSet);
@@ -1360,22 +1352,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         public void actionPerformed(ActionEvent evt) {
             panel.changeType(entry, type);
         }
-    }
-
-    /**
-     * Scans all groups.
-     * 
-     * @return true if the specified entry is contained in any ExplicitGroup,
-     *         false otherwise.
-     */
-    private boolean containedInExplicitGroup(BibtexEntry entry) {
-        AbstractGroup[] matchingGroups = panel.getGroupSelector().getGroupTreeRoot()
-            .getMatchingGroups(entry);
-        for (int i = 0; i < matchingGroups.length; ++i) {
-            if (matchingGroups[i] instanceof ExplicitGroup)
-                return true;
-        }
-        return false;
     }
 
     private void warnDuplicateBibtexkey() {

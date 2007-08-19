@@ -137,15 +137,14 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                         diag.setVisible(true);
                         diag.setProgress(0, 1);
                     }
-                    NamedCompound undoEdit =
-                            new NamedCompound(Globals.lang("CiteSeer import entries")),
-                            // Use a dummy UndoEdit to avoid storing the information on
-                            // every field change, since we are importing new entries:
+                    // Use a dummy UndoEdit to avoid storing the information on
+                    // every field change, since we are importing new entries:
+                    NamedCompound 
                             dummyCompound = new NamedCompound(Globals.lang("Ok"));
                     BooleanAssign overwriteAll = new BooleanAssign(true),
                             overwriteNone = new BooleanAssign(false),
                             newValue = new BooleanAssign(false);
-                    Hashtable rejectedEntries = new Hashtable();
+                    Hashtable<Integer, BibtexEntry> rejectedEntries = new Hashtable<Integer, BibtexEntry>();
                     String text = tf.getText().replaceAll(",", ";");
                     String[] ids = text.split(";");
                     BibtexEntry[] entries = new BibtexEntry[ids.length];
@@ -157,7 +156,7 @@ public class CiteSeerFetcherPanel extends SidePaneComponent implements ActionLis
                         // Set its citeseerurl field:
                         entries[i].setField("citeseerurl", ids[i].trim());
                         // Try to import based on the id:
-                        boolean newValues = citeSeerFetcher.importCiteSeerEntry
+                        citeSeerFetcher.importCiteSeerEntry
                                 (entries[i], dummyCompound, overwriteAll, overwriteNone,
                                         newValue, rejectedEntries);
 

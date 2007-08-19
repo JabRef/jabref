@@ -59,16 +59,14 @@ public class EntryEditorTab {
 
 	private EntryEditor parent;
 
-	private HashMap editors = new HashMap();
+	private HashMap<String, FieldEditor> editors = new HashMap<String, FieldEditor>();
 
 	private FieldEditor activeField = null;
 
-	private Component firstComponent;
-
-	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List fields, EntryEditor parent,
+	public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
                           boolean addKeyField, String name) {
 		if (fields != null)
-			this.fields = (String[]) fields.toArray(new String[0]);
+			this.fields = fields.toArray(new String[0]);
 		else
 			this.fields = new String[] {};
 
@@ -231,7 +229,7 @@ public class EntryEditorTab {
 		return activeField;
 	}
 
-	public List getFields() {
+	public List<String> getFields() {
 		return java.util.Arrays.asList(fields);
 	}
 
@@ -257,9 +255,9 @@ public class EntryEditorTab {
 	public void setEntry(BibtexEntry entry) {
 		try {
 			updating = true;
-			Iterator i = editors.values().iterator();
+			Iterator<FieldEditor> i = editors.values().iterator();
 			while (i.hasNext()) {
-				FieldEditor editor = (FieldEditor) i.next();
+				FieldEditor editor = i.next();
 				Object content = entry.getField(editor.getFieldName());
 				editor.setText((content == null) ? "" : content.toString());
 			}
@@ -272,15 +270,15 @@ public class EntryEditorTab {
 	public boolean updateField(String field, String content) {
 		if (!editors.containsKey(field))
 			return false;
-		FieldEditor ed = (FieldEditor) editors.get(field);
+		FieldEditor ed = editors.get(field);
 		ed.setText(content);
 		return true;
 	}
 
 	public void validateAllFields() {
-		for (Iterator i = editors.keySet().iterator(); i.hasNext();) {
-			String field = (String) i.next();
-			FieldEditor ed = (FieldEditor) editors.get(field);
+		for (Iterator<String> i = editors.keySet().iterator(); i.hasNext();) {
+			String field = i.next();
+			FieldEditor ed = editors.get(field);
 			ed.setEnabled(true);
 			if (((Component) ed).hasFocus())
 				ed.setBackground(GUIGlobals.activeEditor);
@@ -290,9 +288,9 @@ public class EntryEditorTab {
 	}
 
 	public void setEnabled(boolean enabled) {
-		Iterator i = editors.values().iterator();
+		Iterator<FieldEditor> i = editors.values().iterator();
 		while (i.hasNext()) {
-			FieldEditor editor = (FieldEditor) i.next();
+			FieldEditor editor = i.next();
 			editor.setEnabled(enabled);
 		}
 	}
@@ -336,12 +334,12 @@ public class EntryEditorTab {
 		am.put("prevtab", parent.frame.prevTab);
 
 		try {
-			HashSet keys = new HashSet(component
+			HashSet<AWTKeyStroke> keys = new HashSet<AWTKeyStroke>(component
 				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
 			keys.clear();
 			keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
 			component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-			keys = new HashSet(component
+			keys = new HashSet<AWTKeyStroke>(component
 				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
 			keys.clear();
 			keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));

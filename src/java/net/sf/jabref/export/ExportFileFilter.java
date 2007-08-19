@@ -7,7 +7,7 @@ import java.io.File;
  * File filter that lets the user choose export format while choosing file to
  * export to. Contains a reference to the ExportFormat in question.
  */
-public class ExportFileFilter extends FileFilter implements Comparable {
+public class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter> {
     private ExportFormat format;
     private String extension, name;
 
@@ -33,7 +33,7 @@ public class ExportFileFilter extends FileFilter implements Comparable {
         return name;
     }
 
-    public int compareTo(Object o) {
-        return name.compareTo(((ExportFileFilter)o).name);
+    public int compareTo(ExportFileFilter o) {
+        return name.compareTo(o.name);
     }
 }

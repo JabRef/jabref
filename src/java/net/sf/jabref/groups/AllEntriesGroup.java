@@ -80,7 +80,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return null;
     }
 
-    public boolean contains(Map searchOptions, BibtexEntry entry) {
+    public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
         return true; // contains everything
     }
 
@@ -88,7 +88,7 @@ public class AllEntriesGroup extends AbstractGroup implements SearchRule {
         return new AllEntriesGroup();
     }
 
-    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
         return 1; // contains everything
     }
 

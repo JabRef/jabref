@@ -35,7 +35,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
 
 import javax.swing.*;
 
@@ -52,18 +51,18 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     CancelAction cancelAction = new CancelAction();
     private final int COLNUM = 3;
 
-    class TypeButton extends JButton implements Comparable {
-	BibtexEntryType type;
-	public TypeButton(String label, BibtexEntryType type_) {
-	    super(label);
-	    type = type_;
+    class TypeButton extends JButton implements Comparable<TypeButton> {
+		BibtexEntryType type;
+
+		public TypeButton(String label, BibtexEntryType type_) {
+			super(label);
+			type = type_;
+		}
+
+		public int compareTo(TypeButton o) {
+			return type.getName().compareTo(o.type.getName());
+		}
 	}
-	public int compareTo(Object o) {
-	    if (! (o instanceof TypeButton))
-		throw new ClassCastException();
-	    return type.getName().compareTo(((TypeButton)o).type.getName());
-	}
-    }
 
     public EntryTypeDialog(JabRefFrame baseFrame_) {
 	super(baseFrame_, true); // Set modal on.
@@ -107,9 +106,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 	con.insets = new Insets(4, 4, 4, 4);
 	int col = 0;
 
-	Iterator iter = BibtexEntryType.ALL_TYPES.keySet().iterator();
-	while (iter.hasNext()) {
-	    BibtexEntryType tp = BibtexEntryType.getType((String)iter.next());
+	for (BibtexEntryType tp : BibtexEntryType.ALL_TYPES.values()){
             //System.out.println(tp.getName()+"\n"+tp);
 	    TypeButton b = new TypeButton(Util.nCase(tp.getName()), tp);
 	    b.setAlignmentX(SwingConstants.LEFT);

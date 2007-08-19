@@ -15,7 +15,7 @@ import ca.odell.glazedlists.matchers.Matcher;
  * Time: 7:37:48 PM
  * To change this template use File | Settings | File Templates.
  */
-public class MainTableFormat implements TableFormat {
+public class MainTableFormat implements TableFormat<BibtexEntry> {
 
     public static final String[]
             PDF = {"pdf", "ps"}
@@ -30,7 +30,7 @@ public class MainTableFormat implements TableFormat {
     String[] columns; // Contains the current column names.
     public int padleft = -1; // padleft indicates how many columns (starting from left) are
     // special columns (number column or icon column).
-    private HashMap iconCols = new HashMap();
+    private HashMap<Integer, String[]> iconCols = new HashMap<Integer, String[]>();
     int[] nameCols = null;
     boolean namesAsIs, abbr_names, namesNatbib, namesFf, namesLf, namesLastOnly, showShort;
 
@@ -85,9 +85,8 @@ public class MainTableFormat implements TableFormat {
         return -1;
     }
 
-    public Object getColumnValue(Object object, int col) {
+    public Object getColumnValue(BibtexEntry be, int col) {
         Object o;
-        BibtexEntry be = (BibtexEntry) object;
         String[] iconType = getIconTypeForColumn(col); // If non-null, indicates an icon column's type.
         if (col == 0) {
             o = "#";// + (row + 1);
@@ -168,7 +167,7 @@ public class MainTableFormat implements TableFormat {
         // Set up the int[] nameCols, to mark which columns should be
         // treated as lists of names. This is to provide a correct presentation
         // of names as efficiently as possible.
-        Vector tmp = new Vector(2, 1);
+        Vector<Integer> tmp = new Vector<Integer>(2, 1);
         for (int i = 0; i < columns.length; i++) {
             if (columns[i].equals("author")
                     || columns[i].equals("editor")) {
@@ -177,7 +176,7 @@ public class MainTableFormat implements TableFormat {
         }
         nameCols = new int[tmp.size()];
         for (int i = 0; i < nameCols.length; i++) {
-            nameCols[i] = ((Integer) tmp.elementAt(i)).intValue();
+            nameCols[i] = tmp.elementAt(i).intValue();
         }
     }
 
@@ -187,23 +186,21 @@ public class MainTableFormat implements TableFormat {
 
 
 
-    static class NoSearchMatcher implements Matcher {
-        public boolean matches(Object object) {
+    static class NoSearchMatcher implements Matcher<BibtexEntry> {
+        public boolean matches(BibtexEntry object) {
             return true;
         }
     }
 
-    static class SearchMatcher implements Matcher {
-        private String field = BibtexFields.SEARCH;
+    static class SearchMatcher implements Matcher<BibtexEntry> {
         private SearchRuleSet ruleSet;
-        private Hashtable searchOptions;
+        private Hashtable<String, String> searchOptions;
 
-        public SearchMatcher(SearchRuleSet ruleSet, Hashtable searchOptions) {
+        public SearchMatcher(SearchRuleSet ruleSet, Hashtable<String, String> searchOptions) {
             this.ruleSet = ruleSet;
             this.searchOptions = searchOptions;
         }
-        public boolean matches(Object object) {
-            BibtexEntry entry = (BibtexEntry)object;
+        public boolean matches(BibtexEntry entry) {
             int result = ruleSet.applyRule(searchOptions, entry);
             return result > 0;
         }

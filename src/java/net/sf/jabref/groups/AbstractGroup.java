@@ -144,7 +144,7 @@ public abstract class AbstractGroup {
 	 *            The search options to apply.
 	 * @return true if this group contains the specified entry, false otherwise.
 	 */
-	public abstract boolean contains(Map searchOptions, BibtexEntry entry);
+	public abstract boolean contains(Map<String, String> searchOptions, BibtexEntry entry);
 
 	/**
 	 * @return true if this group contains the specified entry, false otherwise.

@@ -1,15 +1,14 @@
 package net.sf.jabref.search;
 
-import net.sf.jabref.SearchRule;
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.export.layout.format.RemoveBrackets;
-
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.SearchRule;
+import net.sf.jabref.export.layout.format.RemoveBrackets;
 
 /**
  * Search rule for simple search.
@@ -27,35 +26,27 @@ public class BasicSearch implements SearchRule {
         this.regExp = regExp;
     }
 
-    private static void print(ArrayList list) {
-        for (Iterator i = list.iterator(); i.hasNext();) {
-            String s = (String) i.next();
-            System.out.print("'"+s+"' ");
-        }
-        System.out.println();
-    }
-
     public int applyRule(String query, BibtexEntry bibtexEntry) {
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         map.put("1", query);
         return applyRule(map, bibtexEntry);
     }
 
-    public int applyRule(Map searchStrings, BibtexEntry bibtexEntry) {
+    public int applyRule(Map<String, String> searchStrings, BibtexEntry bibtexEntry) {
 
         int flags = 0;
-        String searchString = (String) searchStrings.values().iterator().next();
+        String searchString = searchStrings.values().iterator().next();
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
             flags = Pattern.CASE_INSENSITIVE;
         }
 
-        ArrayList words = parseQuery(searchString);
+        ArrayList<String> words = parseQuery(searchString);
 
         if (regExp) {
             pattern = new Pattern[words.size()];
             for (int i = 0; i < pattern.length; i++) {
-                pattern[i] = Pattern.compile((String)words.get(i), flags);
+                pattern[i] = Pattern.compile(words.get(i), flags);
             }
         }
 
@@ -65,9 +56,9 @@ public class BasicSearch implements SearchRule {
 
         Object fieldContentAsObject;
         String fieldContent;
-        Object[] fields = bibtexEntry.getAllFields();
-        for (int i = 0; i < fields.length; i++) {
-            fieldContentAsObject = bibtexEntry.getField(fields[i].toString());
+        
+        for (String field : bibtexEntry.getAllFields()){
+            fieldContentAsObject = bibtexEntry.getField(field);
             if (fieldContentAsObject != null) {
                 fieldContent = removeBrackets.format(fieldContentAsObject.toString());
                 if (!caseSensitive)
@@ -77,7 +68,7 @@ public class BasicSearch implements SearchRule {
                 // those words for which we already have a match:
                 for (int j=0; j<words.size(); j++) {
                     if (!regExp) {
-                        String s = (String) words.get(j);
+                        String s = words.get(j);
                         matchFound[index] = matchFound[index]
                             || (fieldContent.indexOf(s) >= 0);
                     } else {
@@ -101,9 +92,9 @@ public class BasicSearch implements SearchRule {
         return 1; // Matched all words.
     }
 
-    private ArrayList parseQuery(String query) {
+    private ArrayList<String> parseQuery(String query) {
         StringBuffer sb = new StringBuffer();
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         int c;
         boolean escaped = false, quoted = false;
         for (int i=0; i<query.length(); i++) {

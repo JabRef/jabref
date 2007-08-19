@@ -29,9 +29,9 @@ import net.sf.jabref.Util;
  *
  * @author alver
  */
-public class FieldSetComponent extends JPanel implements ActionListener/*, ItemListener*/ {
+public class FieldSetComponent extends JPanel implements ActionListener {
 
-    protected Set additionListeners = new HashSet();
+    protected Set<ActionListener> additionListeners = new HashSet<ActionListener>();
     protected JList list;
     protected JScrollPane sp = null;
     protected DefaultListModel listModel;
@@ -42,13 +42,13 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
     protected boolean forceLowerCase, changesMade = false;
-    protected Set modelListeners = new HashSet();
+    protected Set<ListDataListener> modelListeners = new HashSet<ListDataListener>();
     
     /** 
      * Creates a new instance of FieldSetComponent, with preset selection
      * values. These are put into a JComboBox.
      */
-    public FieldSetComponent(String title, List fields, List preset, boolean arrows, boolean forceLowerCase) {
+    public FieldSetComponent(String title, List<String> fields, List<String> preset, boolean arrows, boolean forceLowerCase) {
         this(title, fields, preset, "Add", "Remove", arrows, forceLowerCase);
     }
     
@@ -56,11 +56,11 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
      * Creates a new instance of FieldSetComponent without preset selection
      * values. Replaces the JComboBox with a JTextField.
      */
-    public FieldSetComponent(String title, List fields, boolean arrows, boolean forceLowerCase) {
+    public FieldSetComponent(String title, List<String> fields, boolean arrows, boolean forceLowerCase) {
         this(title, fields, null, "Add", "Remove", arrows, forceLowerCase);
     }
     
-    public FieldSetComponent(String title, List fields, List preset, String addText, String removeText, 
+    public FieldSetComponent(String title, List<String> fields, List<String> preset, String addText, String removeText, 
             boolean arrows, boolean forceLowerCase) {
         this.forceLowerCase = forceLowerCase;                
         add = new JButton(Globals.lang(addText));
@@ -69,8 +69,8 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
         if (title != null)
             this.title = new JLabel(title);
         
-        for (Iterator i=fields.iterator(); i.hasNext();)
-            listModel.addElement(i.next());
+        for (String field : fields)
+            listModel.addElement(field);
         list = new JList(listModel);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         // Set up GUI:
@@ -183,26 +183,15 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
         remove.setEnabled(en);
     }
     
-    public void setFields(List fields) {
+    public void setFields(List<String> fields) {
         DefaultListModel newListModel = new DefaultListModel();
-        for (Iterator i=fields.iterator(); i.hasNext();)
-            newListModel.addElement(i.next());
+        for (String field : fields)
+            newListModel.addElement(field);
         this.listModel = newListModel;
-        for (Iterator i=modelListeners.iterator(); i.hasNext();)
-            newListModel.addListDataListener((ListDataListener)i.next());
+        for (Iterator<ListDataListener> i=modelListeners.iterator(); i.hasNext();)
+            newListModel.addListDataListener(i.next());
         list.setModel(newListModel);
     }
-    
-    /*public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == e.DESELECTED)
-            return;
-        //sel.is
-        if (sel.isPopupVisible())
-            return;
-        String s = sel.getSelectedItem().toString();
-        addField(s);
-        sel.getEditor().selectAll();
-    }*/
 
     /**
      * This method is called when a new field should be added to the list. Performs validation of the 
@@ -234,8 +223,8 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
     protected void addFieldUncritically(String s) {
         listModel.addElement(s);
         changesMade = true;
-        for (Iterator i=additionListeners.iterator(); i.hasNext();) {
-            ((ActionListener)i.next()).actionPerformed(new ActionEvent(this, 0, s));
+        for (Iterator<ActionListener> i=additionListeners.iterator(); i.hasNext();) {
+            i.next().actionPerformed(new ActionEvent(this, 0, s));
         }
         
     }
@@ -264,9 +253,10 @@ public class FieldSetComponent extends JPanel implements ActionListener/*, ItemL
     /**
      * Return the current list.
      */
-    public List getFields() {
+    @SuppressWarnings("unchecked")
+	public List<String> getFields() {
         Object[] o = listModel.toArray();
-        return java.util.Arrays.asList(o);
+        return (List<String>)(List)java.util.Arrays.asList(o);
     }
     
     /**

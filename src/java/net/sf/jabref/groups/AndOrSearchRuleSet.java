@@ -26,7 +26,6 @@
  */
 package net.sf.jabref.groups;
 
-import java.util.Enumeration;
 import java.util.Map;
 
 import net.sf.jabref.BibtexEntry;
@@ -46,15 +45,13 @@ class AndOrSearchRuleSet extends SearchRuleSet {
         this.invert = invert;
     }
 
-    public int applyRule(Map searchString, BibtexEntry bibtexEntry) {
+    public int applyRule(Map<String, String> searchString, BibtexEntry bibtexEntry) {
         int score = 0;
-        Enumeration e = ruleSet.elements();
-
+        
         // We let each rule add a maximum of 1 to the score.
-        while (e.hasMoreElements()) {
-            score += (((SearchRule) e.nextElement()).applyRule(searchString,
-                    bibtexEntry) > 0 ? 1 : 0);
-        }
+        for (SearchRule rule : ruleSet) {
+			score += rule.applyRule(searchString, bibtexEntry) > 0 ? 1 : 0;
+		}
 
         // Then an AND rule demands that score == number of rules, and
         // an OR rule demands score > 0.

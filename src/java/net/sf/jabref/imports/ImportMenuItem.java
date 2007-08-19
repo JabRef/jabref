@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -18,8 +18,12 @@ import net.sf.jabref.labelPattern.LabelPatternUtil;
 import net.sf.jabref.undo.NamedCompound;
 import net.sf.jabref.undo.UndoableInsertEntry;
 import net.sf.jabref.undo.UndoableRemoveEntry;
+import net.sf.jabref.util.Pair;
 
-// TODO: could separate the "menu item" functionality from the importing functionality
+/* 
+ * TODO: could separate the "menu item" functionality from the importing functionality
+ * 
+ */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     JabRefFrame frame;
@@ -91,24 +95,31 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 return;
 
             // We import all files and collect their results:
-            List imports = new ArrayList();
-            for (int i = 0; i < filenames.length; i++) {
-                String filename = filenames[i];
-                if (importer != null)
-                    // Specific importer:
-                    try {
-                        imports.add(new Object[] { importer.getFormatName(),
-                                Globals.importFormatReader.importFromFile(importer, filename)});
-                    } catch (IOException e) {
-                        // No entries found...
-                    }
-                else
-                    // Unknown format:
-                    imports.add(Globals.importFormatReader.importUnknownFormat(filename));
-            }
+			List<Pair<String, ParserResult>> imports = new ArrayList<Pair<String, ParserResult>>();
+			for (String filename : filenames) {
+				try {
+					if (importer != null) {
+						// Specific importer:
+						ParserResult pr = new ParserResult(
+							Globals.importFormatReader.importFromFile(importer,
+								filename));
 
-            // Ok, done. Then try to gather in all we have found. Since we might have found
-            // one or more bibtex results, it's best to gather them in a BibtexDatabase.
+						imports.add(new Pair<String, ParserResult>(importer
+							.getFormatName(), pr));
+					} else {
+						// Unknown format:
+						imports.add(Globals.importFormatReader
+							.importUnknownFormat(filename));
+					}
+				} catch (IOException e) {
+					// No entries found...
+				}
+			}
+
+            // Ok, done. Then try to gather in all we have found. Since we might
+			// have found
+            // one or more bibtex results, it's best to gather them in a
+			// BibtexDatabase.
             bibtexResult = mergeImportResults(imports);
         }
 
@@ -140,9 +151,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     } else {
                         boolean generateKeys = Globals.prefs.getBoolean("generateKeysAfterInspection");
                         NamedCompound ce = new NamedCompound(Globals.lang("Import entries"));
-                        for (Iterator i = bibtexResult.getDatabase().getEntries().iterator();
-                             i.hasNext();) {
-                            BibtexEntry entry = (BibtexEntry) i.next();
+                        
+                        for (BibtexEntry entry : bibtexResult.getDatabase().getEntries()){
                             try {
                                 // Check if the entry is a duplicate of an existing one:
                                 boolean keepEntry = true;
@@ -249,29 +259,16 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
 
 
-    public static ParserResult mergeImportResults(List imports) {
+    public static ParserResult mergeImportResults(List<Pair<String, ParserResult>> imports) {
         BibtexDatabase database = new BibtexDatabase();
         ParserResult directParserResult = null;
         boolean anythingUseful = false;
 
-        for (Iterator iterator = imports.iterator(); iterator.hasNext();) {
-            Object[] o = (Object[]) iterator.next();
-            if (o[1] instanceof List) {
-                List entries = (List) o[1];
-                anythingUseful = anythingUseful | (entries.size() > 0);
-                Util.setAutomaticFields(entries); // set timestamp and owner
-                for (Iterator j = entries.iterator(); j.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry) j.next();
-                    try {
-                        entry.setId(Util.createNeutralId());
-                        database.insertEntry(entry);
-                    } catch (KeyCollisionException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else if (o[1] instanceof ParserResult) {
-                // Bibtex result. We must merge it into our main base.
-                ParserResult pr = (ParserResult) o[1];
+        for (Pair<String, ParserResult> importResult : imports){
+
+        	if (importResult.p.equals(ImportFormatReader.BIBTEX_FORMAT)){
+        	    // Bibtex result. We must merge it into our main base.
+                ParserResult pr = importResult.v;
 
                 anythingUseful = anythingUseful
                         || ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0));
@@ -282,28 +279,33 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
 
                 // Merge entries:
-                for (Iterator j = pr.getDatabase().getEntries().iterator(); j.hasNext();) {
-                    BibtexEntry entry = (BibtexEntry) j.next();
-                    try {
-                        database.insertEntry(entry);
-                    } catch (KeyCollisionException e) {
-                        e.printStackTrace(); // This should never happen
-                    }
+                for (BibtexEntry entry : pr.getDatabase().getEntries()) {
+                    database.insertEntry(entry);
                 }
+                
                 // Merge strings:
-                for (Iterator j = pr.getDatabase().getStringKeySet().iterator(); j.hasNext();) {
-                    BibtexString bs = (BibtexString)
-                            (pr.getDatabase().getString(j.next()).clone());
-
+                for (BibtexString bs : pr.getDatabase().getStringValues()){
                     try {
-                        database.addString(bs);
+                        database.addString((BibtexString)bs.clone());
                     } catch (KeyCollisionException e) {
-                        // This means a duplicate string name exists, so it's not
+                        // TODO: This means a duplicate string name exists, so it's not
                         // a very exceptional situation. We should maybe give a warning...?
                     }
                 }
+            } else {
+            	
+            	ParserResult pr = importResult.v;
+				Collection<BibtexEntry> entries = pr.getDatabase().getEntries();
 
-            }
+				anythingUseful = anythingUseful | (entries.size() > 0);
+
+				// set timestamp and owner
+				Util.setAutomaticFields(entries); 
+				
+				for (BibtexEntry entry : entries){
+					database.insertEntry(entry);
+				}
+			}
         }
 
         if (!anythingUseful)
@@ -313,7 +315,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            ParserResult pr = new ParserResult(database, new HashMap(), new HashMap());
+            ParserResult pr = new ParserResult(database, new HashMap<String, String>(), new HashMap<String, BibtexEntryType>());
             return pr;
 
         }

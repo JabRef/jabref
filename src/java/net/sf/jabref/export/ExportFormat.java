@@ -117,7 +117,7 @@ public class ExportFormat {
 	 * @throws Exception
 	 */
 	public void performExport(final BibtexDatabase database, final String file,
-			final String encoding, Set entries) throws Exception {
+			final String encoding, Set<String> entries) throws Exception {
 
 		File outFile = new File(file);
 		SaveSession ss = getSaveSession(encoding, outFile);
@@ -148,7 +148,7 @@ public class ExportFormat {
 		 * be non-null, and be used to choose entries. Otherwise, it will be
 		 * null, and be ignored.
 		 */
-		List sorted = FileActions.getSortedEntries(database, entries, false);
+		List<BibtexEntry> sorted = FileActions.getSortedEntries(database, entries, false);
 
 		// Load default layout
 		reader = getReader(lfFileName + ".layout");
@@ -157,17 +157,17 @@ public class ExportFormat {
 		Layout defLayout = layoutHelper
 				.getLayoutFromText(Globals.FORMATTER_PACKAGE);
 		reader.close();
-		HashMap layouts = new HashMap();
+		HashMap<String, Layout> layouts = new HashMap<String, Layout>();
 		Layout layout;
-		Iterator i = sorted.iterator();
+		Iterator<BibtexEntry> i = sorted.iterator();
 		for (; i.hasNext();) {
 			// Get the entry
-			BibtexEntry entry = (BibtexEntry) (i.next());
+			BibtexEntry entry = (i.next());
 
 			// Get the layout
 			String type = entry.getType().getName().toLowerCase();
 			if (layouts.containsKey(type))
-				layout = (Layout) layouts.get(type);
+				layout = layouts.get(type);
 			else {
 				try {
 					// We try to get a type-specific layout for this entry.

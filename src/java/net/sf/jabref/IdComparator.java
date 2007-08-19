@@ -7,11 +7,9 @@ import java.util.Comparator;
  * can be used to sort entries back into the order they were created,
  * provided the IDs given to entries are lexically monotonically increasing.
  */
-public class IdComparator implements Comparator {
+public class IdComparator implements Comparator<BibtexEntry> {
 
-    public int compare(Object o1, Object o2) {
-        BibtexEntry one = (BibtexEntry)o1,
-                two = (BibtexEntry)o2;
+    public int compare(BibtexEntry one, BibtexEntry two) {
         return one.getId().compareTo(two.getId());
     }
 }

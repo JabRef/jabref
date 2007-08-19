@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import net.sf.jabref.BibtexEntry;
@@ -25,14 +26,14 @@ public class BibtexParserTest extends TestCase {
 		ParserResult result = BibtexParser.parse(new StringReader(
 			"@article{test,author={Ed von Test}}"));
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
-		BibtexEntry e = (BibtexEntry) c.iterator().next();
+		BibtexEntry e = c.iterator().next();
 		assertEquals("test", e.getCiteKey());
-		assertEquals(2, e.getAllFields().length);
-		Object[] o = e.getAllFields();
-		assertTrue(o[0].toString().equals("author") || o[1].toString().equals("author"));
+		assertEquals(2, e.getAllFields().size());
+		Set<String> o = e.getAllFields();
+		assertTrue(o.contains("author"));
 		assertEquals("Ed von Test", e.getField("author"));
 	}
 
@@ -99,23 +100,22 @@ public class BibtexParserTest extends TestCase {
 	public void testFromString() throws Exception {
 
 		{ // Simple case
-			Collection c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
+			Collection<BibtexEntry> c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
 			assertEquals(1, c.size());
 
-			BibtexEntry e = (BibtexEntry) c.iterator().next();
+			BibtexEntry e = c.iterator().next();
 			assertEquals("test", e.getCiteKey());
-			assertEquals(2, e.getAllFields().length);
-			Object[] o = e.getAllFields();
-			assertTrue(o[0].toString().equals("author") || o[1].toString().equals("author"));
+			assertEquals(2, e.getAllFields().size());
+			assertTrue(e.getAllFields().contains("author"));
 			assertEquals("Ed von Test", e.getField("author"));
 		}
 		{ // Empty String
-			Collection c = BibtexParser.fromString("");
+			Collection<BibtexEntry> c = BibtexParser.fromString("");
 			assertEquals(0, c.size());
 
 		}
 		{ // Error
-			Collection c = BibtexParser.fromString("@@article@@{{{{{{}");
+			Collection<BibtexEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
 			assertEquals(null, c);
 		}
 
@@ -125,15 +125,15 @@ public class BibtexParserTest extends TestCase {
 		/**
 		 * More
 		 */
-		Collection c = BibtexParser.fromString("@article{canh05,"
+		Collection<BibtexEntry> c = BibtexParser.fromString("@article{canh05,"
 			+ "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
 			+ "@inProceedings{foo," + "  author={Norton Bar}}");
 
 		assertEquals(2, c.size());
 
-		Iterator i = c.iterator();
-		BibtexEntry a = (BibtexEntry) i.next();
-		BibtexEntry b = (BibtexEntry) i.next();
+		Iterator<BibtexEntry> i = c.iterator();
+		BibtexEntry a = i.next();
+		BibtexEntry b = i.next();
 
 		if (a.getCiteKey().equals("foo")) {
 			BibtexEntry tmp = a;
@@ -176,14 +176,13 @@ public class BibtexParserTest extends TestCase {
 			"@article{test,author={Ed von Test}}"));
 		ParserResult result = parser.parse();
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
 		BibtexEntry e = (BibtexEntry) c.iterator().next();
 		assertEquals("test", e.getCiteKey());
-		assertEquals(2, e.getAllFields().length);
-		Object[] o = e.getAllFields();
-		assertTrue(o[0].toString().equals("author") || o[1].toString().equals("author"));
+		assertEquals(2, e.getAllFields().size());
+		assertTrue(e.getAllFields().contains("author"));
 		assertEquals("Ed von Test", e.getField("author"));
 
 		// Calling parse again will return the same result
@@ -200,17 +199,16 @@ public class BibtexParserTest extends TestCase {
 		e.setField("author", "Ed von Test");
 		e.setField("bibtexkey", "test");
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
 		BibtexEntry e2 = (BibtexEntry) c.iterator().next();
 
 		assertNotSame(e.getId(), e2.getId());
 
-		Object[] o = e.getAllFields();
-		for (int i = 0; i < o.length; i++) {
-			if (!e.getField(o[i].toString()).equals(e2.getField(o[i].toString()))) {
-				fail("e and e2 differ in field " + o[i].toString());
+		for (String field : e.getAllFields()){
+			if (!e.getField(field.toString()).equals(e2.getField(field.toString()))) {
+				fail("e and e2 differ in field " + field.toString());
 			}
 		}
 	}
@@ -228,7 +226,7 @@ public class BibtexParserTest extends TestCase {
 			+ "isbn = 1234567890123456789,\n" + "isbn2 = {1234567890123456789},\n"
 			+ "small = 1234,\n" + "}"));
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		BibtexEntry e = (BibtexEntry) c.iterator().next();
 
 		assertEquals("1234567890123456789", (String) e.getField("isbn"));
@@ -244,7 +242,7 @@ public class BibtexParserTest extends TestCase {
 			+ "	Author = bourdieu," + "	Isbn = 2707318256," + "	Publisher = {Minuit},"
 			+ "	Title = {Questions de sociologie}," + "	Year = 2002" + "}"));
 
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
 
 		BibtexEntry e = (BibtexEntry) c.iterator().next();

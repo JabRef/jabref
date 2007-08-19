@@ -6,7 +6,10 @@
  */
 package net.sf.jabref.export;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,12 +34,12 @@ import ca.odell.glazedlists.SortedList;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class OpenDocumentRepresentation {
-    protected Collection entries;
+    protected Collection<BibtexEntry> entries;
 
-
-    public OpenDocumentRepresentation(BibtexDatabase bibtex, Set keySet) {
+    @SuppressWarnings("unchecked")
+	public OpenDocumentRepresentation(BibtexDatabase bibtex, Set<String> keySet) {
         // Make a list of comparators for sorting the entries:
-        List comparators = new ArrayList();
+        List<FieldComparator> comparators = new ArrayList<FieldComparator>();
         comparators.add(new FieldComparator("author"));
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibtexFields.KEY_FIELD));
@@ -48,8 +51,8 @@ public class OpenDocumentRepresentation {
         if (keySet == null)
             entryList.addAll(bibtex.getEntries());
         else {
-            for (Iterator i=keySet.iterator(); i.hasNext();)
-                entryList.add(bibtex.getEntryById((String)i.next()));
+            for (String key : keySet)
+                entryList.add(bibtex.getEntryById(key));
         }
 
         entries = new SortedList(entryList, new FieldComparatorStack(comparators));
@@ -133,8 +136,7 @@ public class OpenDocumentRepresentation {
             addTableCell(result, row, "ISBN");
             table.appendChild(row);
 
-            for(Iterator iter = entries.iterator(); iter.hasNext(); ) {
-                BibtexEntry e = (BibtexEntry)iter.next();
+            for(BibtexEntry e : entries){
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, getField(e, BibtexFields.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));

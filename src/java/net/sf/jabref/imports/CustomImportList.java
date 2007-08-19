@@ -47,7 +47,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
    * 
    * <p>Is also responsible for instantiating the class loader.</p>
    */
-  public class Importer implements Comparable {
+  public class Importer implements Comparable<Importer> {
     
     private String name;
     private String cliId;
@@ -114,8 +114,8 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
       return name.hashCode();
     }
     
-    public int compareTo(Object o) {
-      return this.getName().compareTo( ((Importer)o).getName() );
+    public int compareTo(Importer o) {
+      return this.getName().compareTo( o.getName() );
     }
     
     public String toString() {
@@ -124,7 +124,7 @@ public class CustomImportList extends TreeSet<CustomImportList.Importer> {
     
     public ImportFormat getInstance() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
       URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()});
-      Class clazz = Class.forName(className, true, cl);
+      Class<?> clazz = Class.forName(className, true, cl);
       ImportFormat importFormat = (ImportFormat)clazz.newInstance();
       importFormat.setIsCustomImporter(true);
       return importFormat;

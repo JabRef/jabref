@@ -105,7 +105,7 @@ public class DatabasePropertiesDialog extends JDialog {
     public void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        Vector fileD = metaData.getData(GUIGlobals.FILE_FIELD+"Directory");
+        Vector<String> fileD = metaData.getData(GUIGlobals.FILE_FIELD+"Directory");
         if (fileD == null)
             fileDir.setText("");
         else {
@@ -114,7 +114,7 @@ public class DatabasePropertiesDialog extends JDialog {
                 fileDir.setText(((String)fileD.get(0)).trim());
         }
 
-        Vector pdfD = metaData.getData("pdfDirectory");
+        Vector<String> pdfD = metaData.getData("pdfDirectory");
         if (pdfD == null)
             pdfDir.setText("");
         else {
@@ -123,7 +123,7 @@ public class DatabasePropertiesDialog extends JDialog {
                 pdfDir.setText(((String)pdfD.get(0)).trim());
         }
 
-        Vector psD = metaData.getData("psDirectory");
+        Vector<String> psD = metaData.getData("psDirectory");
         if (psD == null)
             psDir.setText("");
         else {
@@ -143,7 +143,7 @@ public class DatabasePropertiesDialog extends JDialog {
         String newEncoding = (String)encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        Vector dir = new Vector(1);
+        Vector<String> dir = new Vector<String>(1);
         String text = fileDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
@@ -152,7 +152,7 @@ public class DatabasePropertiesDialog extends JDialog {
         else
             metaData.remove(GUIGlobals.FILE_FIELD+"Directory");
 
-        dir = new Vector(1);
+        dir = new Vector<String>(1);
         text = pdfDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);
@@ -161,7 +161,7 @@ public class DatabasePropertiesDialog extends JDialog {
         else
             metaData.remove("pdfDirectory");
 
-        dir = new Vector(1);
+        dir = new Vector<String>(1);
         text = psDir.getText().trim();
         if (text.length() > 0) {
             dir.add(text);

@@ -16,7 +16,7 @@ import net.sf.jabref.MnemonicAwareAction;
  * This action rearranges all tabs in the main tabbed pane of the given JabRefFrame
  * in alphabetical order.
  */
-public class SortTabsAction extends MnemonicAwareAction implements Comparator {
+public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
     private JabRefFrame frame;
 
     public SortTabsAction(JabRefFrame frame) {
@@ -28,21 +28,21 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator {
     public void actionPerformed(ActionEvent e) {
         JTabbedPane tabbedPane = frame.getTabbedPane();
        // Make a sorted Map that compares case-insensitively:
-        TreeMap map = new TreeMap(this);
+        TreeMap<String, BasePanel> map = new TreeMap<String, BasePanel>(this);
 
         for (int i=0; i<tabbedPane.getTabCount(); i++) {
             BasePanel panel = (BasePanel)tabbedPane.getComponent(i);
             map.put(tabbedPane.getTitleAt(i), panel);
         }
         tabbedPane.removeAll();
-        for (Iterator i=map.keySet().iterator(); i.hasNext();) {
-            String title = (String)i.next();
-            BasePanel panel = (BasePanel)map.get(title);
+        for (Iterator<String> i=map.keySet().iterator(); i.hasNext();) {
+            String title = i.next();
+            BasePanel panel = map.get(title);
             tabbedPane.addTab(title, panel);
         }
     }
 
-    public int compare(Object o1, Object o2) {
-        return ((String)o1).toLowerCase().compareTo(((String)o2).toLowerCase());
+    public int compare(String o1, String o2) {
+        return o1.toLowerCase().compareTo(o2.toLowerCase());
     }
 }

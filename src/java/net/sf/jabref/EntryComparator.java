@@ -38,13 +38,13 @@ import java.util.Comparator;
  * decide the ordering. Consequently, this comparator can never return 0 unless the entries are the same
  * object.
  */
-public class EntryComparator implements Comparator {
+public class EntryComparator implements Comparator<BibtexEntry> {
 
     String sortField;
     boolean descending, binary=false;
-    Comparator next;
+    Comparator<BibtexEntry> next;
 
-    public EntryComparator(boolean binary, boolean desc, String field, Comparator next) {
+    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibtexEntry> next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = desc;
@@ -59,19 +59,7 @@ public class EntryComparator implements Comparator {
     }
 
 
-    public int compare(Object o1, Object o2) throws ClassCastException {
-      //if (o1 == null) Util.pr("o1 == null");
-     //if (o2 == null) Util.pr("o2 == null");
-
-    /*  The explicit instanceof test is unnecessary, since the
-         explicit casts below will throw ClassCastException anyway
-         if there is trouble.
-
-     if (!(o1 instanceof BibtexEntry) || !(o2 instanceof BibtexEntry))
-       throw new ClassCastException("Trouble comparing objects: "+o1.toString()+"\n\n"+o2.toString());*/
-
-    BibtexEntry e1 = (BibtexEntry)o1,
-        e2 = (BibtexEntry)o2;
+    public int compare(BibtexEntry e1, BibtexEntry e2) throws ClassCastException {
 
     if (e1 == e2)
         return 0;
@@ -84,9 +72,9 @@ public class EntryComparator implements Comparator {
         // We just separate on set and unset fields:
         if (f1 != null)
             return (f2 == null) ? -1 :
-                    (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+                    (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
         else
-            return (f2 == null) ? (next != null ? next.compare(o1, o2) : idCompare(e1, e2))
+            return (f2 == null) ? (next != null ? next.compare(e1, e2) : idCompare(e1, e2))
                     : 1;
     }
 
@@ -107,7 +95,7 @@ public class EntryComparator implements Comparator {
         }
 
 
-    if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(o1, o2) : idCompare(e1, e2));
+    if ((f1 == null) && (f2 == null)) return (next != null ? next.compare(e1, e2) : idCompare(e1, e2));
 	if ((f1 != null) && (f2 == null)) return -1;
 	if ((f1 == null) && (f2 != null)) return 1;
 
@@ -132,7 +120,7 @@ public class EntryComparator implements Comparator {
 	if (result != 0)
 	    return (descending ? result : -result); // Primary sort.
 	if (next != null)
-	    return next.compare(o1, o2); // Secondary sort if existent.
+	    return next.compare(e1, e2); // Secondary sort if existent.
 	else {
 
         return idCompare(e1, e2); // If still equal, we use the unique IDs.
