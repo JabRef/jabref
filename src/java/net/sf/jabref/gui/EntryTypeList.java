@@ -6,6 +6,7 @@
 
 package net.sf.jabref.gui;
 
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -30,13 +31,13 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     protected JButton def = new JButton(Globals.lang("Default"));
     
     /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List fields) {
+    public EntryTypeList(List<String> fields) {
         super(Globals.lang("Entry types"), fields, false, true);
         
         con.gridx = 0;
         con.gridy = 2;
-        con.fill = con.VERTICAL;
-        con.anchor = con.EAST;
+        con.fill = GridBagConstraints.VERTICAL;
+        con.anchor = GridBagConstraints.EAST;
         gbl.setConstraints(def, con);
         add(def);
         list.addListSelectionListener(this);
@@ -72,10 +73,6 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         for (int i=0; i<selected.length; i++) {
             String typeName = (String)listModel.get(selected[selected.length-1-i]);
             BibtexEntryType type = BibtexEntryType.getType(typeName);
-            // Check if there is a standard type for this name:
-            boolean standardTypeExists = (BibtexEntryType.getStandardType(typeName) != null);
-            
-            //System.out.println(typeName+"\t"+type.toString());
             
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it

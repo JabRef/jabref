@@ -169,20 +169,8 @@ public class TextInputDialog
     tabbed.add( warnPanel, Globals.lang( "Messages_and_Hints" ) ) ;
 
     // Panel Layout
-    GridBagLayout gbl = new GridBagLayout() ;
-    GridBagConstraints con = new GridBagConstraints() ;
-    con.weightx = 1 ;
-    con.weighty = 1 ;
-    con.insets = new Insets( 5, 10, 0, 10 ) ;
-    con.fill = GridBagConstraints.HORIZONTAL ;
-
     panel1.setLayout( new BorderLayout() ) ;
-
-    con.gridwidth = GridBagConstraints.REMAINDER ;
-    con.fill = GridBagConstraints.BOTH;
-    //gbl.setConstraints( tabbed, con ) ;
     panel1.add( tabbed, BorderLayout.CENTER ) ;
-    //gbl.setConstraints( buttons, con ) ;
     panel1.add( buttons, BorderLayout.SOUTH ) ;
 
     // Key bindings:

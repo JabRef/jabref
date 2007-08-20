@@ -589,7 +589,7 @@ public JabRefPreferences prefs() {
         else {
           String[] names = new String[filenames.size()];
           for (int i = 0; i < filenames.size(); i++) {
-            names[i] = (String) filenames.elementAt(i);
+            names[i] = filenames.elementAt(i);
 
           }
           prefs.putStringArray("lastEdited", names);
@@ -1851,7 +1851,7 @@ class FetchCiteSeerAction
           if ((panel != null) && (entries.size() == 1)) {
               SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                      panel.highlightEntry((BibtexEntry)entries.get(0));
+                      panel.highlightEntry(entries.get(0));
                   }
               });
 
@@ -1993,13 +1993,12 @@ class FetchCiteSeerAction
       // Add custom importers
       importMenu.addSeparator();
 
-      SortedSet customImporters = Globals.importFormatReader.getCustomImportFormats();
+      SortedSet<ImportFormat> customImporters = Globals.importFormatReader.getCustomImportFormats();
       JMenu submenu = new JMenu(Globals.lang("Custom importers"));
       submenu.setMnemonic(KeyEvent.VK_S);
       
       // Put in all formatters registered in ImportFormatReader:
-        for (Iterator i=customImporters.iterator(); i.hasNext();) {
-            ImportFormat imFo = (ImportFormat)i.next();
+        for (ImportFormat imFo : customImporters){
             submenu.add(new ImportMenuItem(ths, intoNew, imFo));
         }
       
@@ -2012,8 +2011,7 @@ class FetchCiteSeerAction
       importMenu.addSeparator();
 
       // Put in all formatters registered in ImportFormatReader:
-      for (Iterator i=Globals.importFormatReader.getBuiltInInputFormats().iterator(); i.hasNext();) {
-          ImportFormat imFo = (ImportFormat)i.next();
+      for (ImportFormat imFo : Globals.importFormatReader.getBuiltInInputFormats()){
           importMenu.add(new ImportMenuItem(ths, intoNew, imFo));
       }
   }
@@ -2126,7 +2124,7 @@ class SaveSessionAction
       // Here we store the names of allcurrent filea. If
       // there is no current file, we remove any
       // previously stored file name.
-      Vector filenames = new Vector();
+      Vector<String> filenames = new Vector<String>();
       if (tabbedPane.getTabCount() > 0) {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
           if (tabbedPane.getTitleAt(i).equals(GUIGlobals.untitledTitle)) {
@@ -2158,7 +2156,7 @@ class SaveSessionAction
       else {
         String[] names = new String[filenames.size()];
         for (int i = 0; i < filenames.size(); i++) {
-          names[i] = (String) filenames.elementAt(i);
+          names[i] = filenames.elementAt(i);
         }
         prefs.putStringArray("savedSession", names);
         output(Globals.lang("Saved session") + ".");
@@ -2187,7 +2185,7 @@ class SaveSessionAction
       output(Globals.lang("Loading session..."));
       (new Thread() {
         public void run() {
-          HashSet currentFiles = new HashSet();
+          HashSet<String> currentFiles = new HashSet<String>();
           if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (baseAt(i).getFile() != null)

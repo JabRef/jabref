@@ -88,10 +88,10 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 	 */
 	public String getTreeAsString() {
 		StringBuffer sb = new StringBuffer();
-		Enumeration e = preorderEnumeration();
+		Enumeration<GroupTreeNode> e = preorderEnumeration();
 		GroupTreeNode cursor;
 		while (e.hasMoreElements()) {
-			cursor = (GroupTreeNode) e.nextElement();
+			cursor = e.nextElement();
             sb.append(cursor.getLevel()).append(" ").append(cursor.getGroup().toString()).append("\n");
 		}
 		return sb.toString();
@@ -200,6 +200,30 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 		return searchRule;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public Enumeration<GroupTreeNode> preorderEnumeration(){
+		return super.preorderEnumeration();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Enumeration<GroupTreeNode> depthFirstEnumeration(){
+		return super.depthFirstEnumeration();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Enumeration<GroupTreeNode> breadthFirstEnumeration(){
+		return super.breadthFirstEnumeration();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Enumeration<GroupTreeNode> children(){
+		return super.children();
+	}
+	
 	/**
 	 * Scans the subtree rooted at this node.
 	 * 
@@ -207,7 +231,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements
 	 */
 	public AbstractGroup[] getMatchingGroups(BibtexEntry entry) {
 		Vector<AbstractGroup> matchingGroups = new Vector<AbstractGroup>();
-		Enumeration e = preorderEnumeration();
+		Enumeration<GroupTreeNode> e = preorderEnumeration();
 		AbstractGroup group;
 		while (e.hasMoreElements()) {
 			group = ((GroupTreeNode) e.nextElement()).getGroup();

@@ -128,7 +128,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         String s = typeComp.getFirstSelected();
         if (s == null)
             return;
-        Object rl = reqLists.get(s);
+        List<String> rl = reqLists.get(s);
         if (rl == null) {
             BibtexEntryType type = BibtexEntryType.getType(s);
             if (type != null) {
@@ -157,7 +157,7 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
                 new FocusRequester(reqComp);
             }
         } else {
-            reqComp.setFields((List<String>)rl);
+            reqComp.setFields(rl);
             optComp.setFields(optLists.get(s));
         }
 
@@ -169,18 +169,18 @@ public class EntryCustomizationDialog2 extends JDialog implements ListSelectionL
         valueChanged(new ListSelectionEvent(new JList(), 0, 0, false));
         // Iterate over our map of required fields, and list those types if necessary:
 
-        List types = typeComp.getFields();
+        List<String> types = typeComp.getFields();
         for (Iterator<String> i=reqLists.keySet().iterator(); i.hasNext();) {
             String typeName = i.next();
             if (!types.contains(typeName))
                 continue;
 
-            List reqFields = reqLists.get(typeName);
-            List optFields = optLists.get(typeName);
+            List<String> reqFields = reqLists.get(typeName);
+            List<String> optFields = optLists.get(typeName);
             String[] reqStr = new String[reqFields.size()];
-            reqFields.toArray(reqStr);
+            reqStr = reqFields.toArray(reqStr);
             String[] optStr = new String[optFields.size()];
-            optFields.toArray(optStr);
+            optStr = optFields.toArray(optStr);
 
             // If this type is already existing, check if any changes have
             // been made
@@ -297,26 +297,15 @@ public void actionPerformed(ActionEvent e) {
 private void updateTypesForEntries(String typeName) {
     if (frame.getTabbedPane().getTabCount() == 0)
         return;
-    //messageLabel.setText(Globals.lang("Updating entries..."));
-    BibtexDatabase base;
-    Iterator iter;
     for (int i=0; i<frame.getTabbedPane().getTabCount(); i++) {
         BasePanel bp = (BasePanel)frame.getTabbedPane().getComponentAt(i);
-        boolean anyChanges = false;
 
+        // Invalidate associated cached entry editor
         bp.entryEditors.remove(typeName);
 
-        //bp.rcm.populateTypeMenu(); // Update type menu for change type.
-        base = bp.database();
-        iter = base.getKeySet().iterator();
-        while (iter.hasNext()) {
-            anyChanges = anyChanges |
-                    !(base.getEntryById((String)iter.next())).updateType();
+        for (BibtexEntry entry : bp.database().getEntries()){
+            entry.updateType();
         }
-            /*if (anyChanges) {
-                bp.refreshTable();
-                bp.markBaseChanged();
-            }*/
     }
 
 }

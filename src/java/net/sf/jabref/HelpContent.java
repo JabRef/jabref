@@ -48,7 +48,7 @@ public class HelpContent extends JTextPane {
 
 	JScrollPane pane;
 
-	private Stack history, forw;
+	private Stack<URL> history, forw;
 
 	JabRefPreferences prefs;
 
@@ -58,8 +58,8 @@ public class HelpContent extends JTextPane {
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		pane.setDoubleBuffered(true);
 		prefs = prefs_;
-		history = new Stack();
-		forw = new Stack();
+		history = new Stack<URL>();
+		forw = new Stack<URL>();
 		setEditorKitForContentType("text/html", new MyEditorKit());
 		setContentType("text/html");
 		setText("");
@@ -78,7 +78,7 @@ public class HelpContent extends JTextPane {
 
 	public boolean back() {
 		if (!history.empty()) {
-			URL prev = (URL) (history.pop());
+			URL prev = (history.pop());
 			forw.push(getPage());
 			setPageOnly(prev);
 		}
@@ -87,7 +87,7 @@ public class HelpContent extends JTextPane {
 
 	public boolean forward() {
 		if (!forw.empty()) {
-			URL next = (URL) (forw.pop());
+			URL next = (forw.pop());
 			history.push(getPage());
 			setPageOnly(next);
 		}

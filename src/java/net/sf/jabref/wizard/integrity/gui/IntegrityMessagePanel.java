@@ -163,7 +163,7 @@ public class IntegrityMessagePanel
   public void keyReleased( KeyEvent e )
   {
     applyButton.setEnabled(true);
-    if (e.getKeyCode() == e.VK_ENTER)
+    if (e.getKeyCode() == KeyEvent.VK_ENTER)
     {
       applyButton.doClick();
     }

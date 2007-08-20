@@ -598,7 +598,7 @@ public class GroupSelector extends SidePaneComponent implements
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
     public void revalidateGroups(TreePath[] selectionPaths,
-            Enumeration expandedNodes) {
+            Enumeration<TreePath> expandedNodes) {
             revalidateGroups(selectionPaths, expandedNodes, null);
     }
 
@@ -608,7 +608,7 @@ public class GroupSelector extends SidePaneComponent implements
      * @param node If this is non-null, the view is scrolled to make it visible.
      */
     public void revalidateGroups(TreePath[] selectionPaths,
-            Enumeration expandedNodes, GroupTreeNode node) {
+            Enumeration<TreePath> expandedNodes, GroupTreeNode node) {
         groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
@@ -617,7 +617,7 @@ public class GroupSelector extends SidePaneComponent implements
         // tree is completely collapsed here
         if (expandedNodes != null) {
             while (expandedNodes.hasMoreElements())
-                groupsTree.expandPath((TreePath)expandedNodes.nextElement());
+                groupsTree.expandPath(expandedNodes.nextElement());
         }
         groupsTree.revalidate();
         if (node != null) {
@@ -1170,7 +1170,7 @@ public class GroupSelector extends SidePaneComponent implements
         return groupsRoot;
     }
 
-    public Enumeration getExpandedPaths() {
+    public Enumeration<TreePath> getExpandedPaths() {
         return groupsTree.getExpandedDescendants(
                 new TreePath(groupsRoot.getPath()));
     }
@@ -1243,8 +1243,8 @@ public class GroupSelector extends SidePaneComponent implements
         GroupTreeNode node;
         AbstractGroup group;
         Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
-        for (Enumeration e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
-            node = (GroupTreeNode) e.nextElement();
+        for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements(); ) {
+            node = e.nextElement();
             group = node.getGroup();
             int i;
             for (i = 0; i < entries.length; ++i) {
@@ -1277,7 +1277,7 @@ public class GroupSelector extends SidePaneComponent implements
       BibtexEntry entry;
       Vector<GroupTreeNode> vec = new Vector<GroupTreeNode>();
       Map<String, String> dummyMap = new HashMap<String, String>(); // just because I don't want to use null...
-      for (Enumeration e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
+      for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements(); ) {
           node = (GroupTreeNode) e.nextElement();
           rule = node.getSearchRule();
           for (Iterator<BibtexEntry> it = matches.iterator(); it.hasNext(); ) {

@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -67,7 +66,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
                 Globals.lang("Remove double braces around BibTeX fields when loading."));
         useImportInspector = new JCheckBox(Globals.lang("Display imported entries in an inspection window before they are added."));
         useImportInspectorForSingle = new JCheckBox(Globals.lang("Use inspection window also when a single entry is imported.")); 
-        JPanel general = new JPanel();
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();
@@ -205,18 +203,18 @@ public class GeneralTab extends JPanel implements PrefsTab {
         nonWrappableFields.setText(_prefs.get("nonWrappableFields"));
 
         String enc = _prefs.get("defaultEncoding");
-        outer: for (int i = 0; i < Globals.ENCODINGS.length; i++) {
+        for (int i = 0; i < Globals.ENCODINGS.length; i++) {
             if (Globals.ENCODINGS[i].equalsIgnoreCase(enc)) {
                 encodings.setSelectedIndex(i);
-                break outer;
+                break;
             }
         }
         String oldLan = _prefs.get("language");
 
         // Language choice
         int ilk = 0;
-        for (Iterator i = GUIGlobals.LANGUAGES.keySet().iterator(); i.hasNext();) {
-            if (GUIGlobals.LANGUAGES.get(i.next()).equals(oldLan)) {
+        for (String lan : GUIGlobals.LANGUAGES.values()){
+            if (lan.equals(oldLan)) {
                 language.setSelectedIndex(ilk);
             }
             ilk++;
@@ -272,15 +270,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
                     + "You must restart JabRef for this to come into effect."), Globals.lang("Changed language settings"),
                     JOptionPane.WARNING_MESSAGE);
         }
-
-
-
     }
 
     public boolean readyToClose() {
         try {
             // Test if date format is legal:
-            SimpleDateFormat sdf = new SimpleDateFormat(timeStampFormat.getText());
+            new SimpleDateFormat(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog

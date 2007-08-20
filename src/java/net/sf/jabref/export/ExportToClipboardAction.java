@@ -6,7 +6,6 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
 import java.io.*;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -42,31 +41,17 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        Map m = ExportFormats.getExportFormats();
+        Map<String, ExportFormat> m = ExportFormats.getExportFormats();
         ExportFormat[] formats = new ExportFormat[m.size()];
-        int piv=0;
-        for (Iterator iterator = m.keySet().iterator(); iterator.hasNext();) {
-            formats[piv++] = (ExportFormat)m.get(iterator.next());
-        }
-        //ExportFormat[] formats = (ExportFormat[])(m.entrySet().toArray
-        //        (new ExportFormat[m.size()]));
-
-        // Make a list of possible formats:
-        /*Map formats = new HashMap();
-        formats.put("BibTeXML", "bibtexml");
-        formats.put("DocBook", "docbook");
-        formats.put("HTML", "html");
-        formats.put("RTF (Harvard)", "harvard/harvard");
-        formats.put("Simple HTML", "simplehtml");
-        for (int i = 0; i < Globals.prefs.customExports.size(); i++) {
-            Object o = (Globals.prefs.customExports.getElementAt(i))[0];
-            formats.put(o, o);
-        }*/
         String[] array = new String[formats.length];
-        for (int i=0; i<formats.length; i++) {
-            array[i] = formats[i].getDisplayName();
-        }
-        //Arrays.sort(array);
+        
+        int piv = 0;
+		for (ExportFormat format : m.values()) {
+			formats[piv] = format;
+			array[piv] = format.getDisplayName();
+			piv++;
+		}
+        
         JList list = new JList(array);
         list.setBorder(BorderFactory.createEtchedBorder());
         list.setSelectionInterval(0, 0);
@@ -104,9 +89,10 @@ public class ExportToClipboardAction extends AbstractWorker {
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
             BibtexEntry[] bes = panel.getSelectedEntries();
-            HashSet entries = new HashSet(bes.length);
-            for (int i = 0; i < bes.length; i++)
-                entries.add(bes[i].getId());
+            HashSet<String> entries = new HashSet<String>(bes.length);
+            for (BibtexEntry be : bes)
+                entries.add(be.getId());
+            
             // Write to file:
             format.performExport(database, tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:

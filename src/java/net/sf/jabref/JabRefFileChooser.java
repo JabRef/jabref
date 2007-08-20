@@ -25,7 +25,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 
 */
 package net.sf.jabref;
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -43,13 +42,9 @@ import javax.swing.plaf.metal.MetalFileChooserUI;
 public class JabRefFileChooser extends JFileChooser
 {
 
-    // Remember size at previous use, so the user doesn't need to resize every time:
-    private static Dimension lastSize = null;
-
     public JabRefFileChooser()
     {
         super();
-        
     }
 
     public JabRefFileChooser(File file){
@@ -94,7 +89,7 @@ public class JabRefFileChooser extends JFileChooser
         JabRefFileChooser fc = new JabRefFileChooser();
         int returnVal = fc.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+            fc.getSelectedFile();
         }
     }
 }

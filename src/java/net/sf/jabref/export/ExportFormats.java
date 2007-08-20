@@ -63,9 +63,8 @@ public class ExportFormats {
 		}
         
         // Now add custom export formats
-        TreeMap customExports = Globals.prefs.customExports.getCustomExportFormats();
-        for (Iterator i=customExports.keySet().iterator(); i.hasNext();) {
-            putFormat((ExportFormat)customExports.get(i.next()));
+        for (ExportFormat format : Globals.prefs.customExports.getCustomExportFormats().values()){
+            putFormat(format);
         }
     }
 

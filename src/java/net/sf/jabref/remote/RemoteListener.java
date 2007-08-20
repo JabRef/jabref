@@ -73,7 +73,7 @@ public class RemoteListener extends Thread implements ImportInspectionDialog.Cal
                         continue;
                     }
                     String[] args = sb.toString().split("\n");
-                    Vector loaded = jabref.processArguments(args, false);
+                    Vector<ParserResult> loaded = jabref.processArguments(args, false);
 
                     for (int i=0; i<loaded.size(); i++) {
                         ParserResult pr = (ParserResult) loaded.elementAt(i);

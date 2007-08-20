@@ -35,8 +35,6 @@
 
 package net.sf.jabref ;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -167,12 +165,8 @@ public class FieldTextMenu implements MouseListener
 
     public void actionPerformed(ActionEvent e)
     {
-      Clipboard systemClip = Toolkit.getDefaultToolkit().getSystemClipboard();
-
       try
       {
-//        String data = ( String ) systemClip.getContents( null ).getTransferData(
-//            DataFlavor.stringFlavor ) ;
         String data = ClipBoardManager.clipBoard.getClipboardContents() ;
         if (data != null)
           if (data.length() > 0)

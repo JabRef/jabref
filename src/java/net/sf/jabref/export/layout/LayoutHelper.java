@@ -56,7 +56,7 @@ public class LayoutHelper {
     private static String currentGroup = null;
     
     private PushbackReader _in;
-    private Vector parsedEntries = new Vector();
+    private Vector<StringInt> parsedEntries = new Vector<StringInt>();
 
     private boolean _eof = false;
     private int line = 1;
@@ -79,7 +79,7 @@ public class LayoutHelper {
 
         for (int i = 0; i < parsedEntries.size(); i++)
         {
-            si = (StringInt) parsedEntries.get(i);
+            si = parsedEntries.get(i);
 
             if ((si.i == IS_SIMPLE_FIELD) || (si.i == IS_FIELD_START) ||
                     (si.i == IS_FIELD_END) || (si.i == IS_GROUP_START) ||
@@ -106,7 +106,6 @@ public class LayoutHelper {
     private String getBracketedField(int _field) throws IOException
     {
         StringBuffer buffer = null;
-        int previous = -1;
         int c;
         boolean start = false;
 
@@ -169,8 +168,6 @@ public class LayoutHelper {
                     }
                 }
             }
-
-            previous = c;
         }
 
         return null;
@@ -183,7 +180,6 @@ public class LayoutHelper {
         throws IOException
     {
         StringBuffer buffer = null;
-        int previous = -1;
         int c;
         boolean start = false;
         String option = null;
@@ -294,8 +290,6 @@ public class LayoutHelper {
                     }
                 }
             }
-
-            previous = c;
         }
 
         return null;

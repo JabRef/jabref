@@ -228,12 +228,12 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 	 * @see net.sf.jabref.groups.AbstractGroup#contains(java.util.Map,
 	 *      net.sf.jabref.BibtexEntry)
 	 */
-	public boolean contains(Map searchOptions, BibtexEntry entry) {
+	public boolean contains(Map<String, String> searchOptions, BibtexEntry entry) {
 		return contains(entry);
 	}
 
 	public boolean contains(BibtexEntry entry) {
-		String content = (String) entry.getField(m_searchField);
+		String content = entry.getField(m_searchField);
 		if (content == null)
 			return false;
 		if (m_regExp)
@@ -277,7 +277,7 @@ public class KeywordGroup extends AbstractGroup implements SearchRule {
 		entry.setField(m_searchField, (result.length() > 0 ? result : null));
 	}
 
-	public int applyRule(Map searchOptions, BibtexEntry entry) {
+	public int applyRule(Map<String, String> searchOptions, BibtexEntry entry) {
 		return contains(searchOptions, entry) ? 1 : 0;
 	}
 

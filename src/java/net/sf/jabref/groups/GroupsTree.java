@@ -238,7 +238,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 					dtde.rejectDrop();
 					return;
 				}
-				Enumeration expandedPaths = groupSelector.getExpandedPaths();
+				Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
 				UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
 						groupSelector.getGroupTreeRoot(), source, target,
 						target.getChildCount());
@@ -326,11 +326,11 @@ public class GroupsTree extends JTree implements DragSourceListener,
      *            Paths that may have become invalid.
      * @return Refreshed paths that are all valid.
      */
-    public Enumeration<TreePath> refreshPaths(Enumeration paths) {
+    public Enumeration<TreePath> refreshPaths(Enumeration<TreePath> paths) {
         Vector<TreePath> freshPaths = new Vector<TreePath>();
         while (paths.hasMoreElements()) {
             freshPaths.add(new TreePath(
-                    ((DefaultMutableTreeNode) ((TreePath) paths.nextElement())
+                    ((DefaultMutableTreeNode)paths.nextElement()
                             .getLastPathComponent()).getPath()));
         }
         return freshPaths.elements();
@@ -414,13 +414,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
 	/** Expand this node and all its children. */
 	public void expandSubtree(GroupTreeNode node) {
-		for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements();)
-			expandPath(new TreePath(((GroupTreeNode) e.nextElement()).getPath()));
+		for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();)
+			expandPath(new TreePath(e.nextElement().getPath()));
 	}
 
 	/** Collapse this node and all its children. */
 	public void collapseSubtree(GroupTreeNode node) {
-		for (Enumeration e = node.depthFirstEnumeration(); e.hasMoreElements();)
+		for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();)
 			collapsePath(new TreePath(((GroupTreeNode) e.nextElement())
 					.getPath()));
 	}
@@ -431,8 +431,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
 	 */
 	public boolean hasExpandedDescendant(TreePath path) {
 		GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-		for (Enumeration e = node.children(); e.hasMoreElements();) {
-			GroupTreeNode child = (GroupTreeNode) e.nextElement();
+		for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
+			GroupTreeNode child = e.nextElement();
 			if (child.isLeaf())
 				continue; // don't care about this case
 			TreePath pathToChild = path.pathByAddingChild(child);
@@ -448,8 +448,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
 	 */
 	public boolean hasCollapsedDescendant(TreePath path) {
 		GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-		for (Enumeration e = node.children(); e.hasMoreElements();) {
-			GroupTreeNode child = (GroupTreeNode) e.nextElement();
+		for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
+			GroupTreeNode child = e.nextElement();
 			if (child.isLeaf())
 				continue; // don't care about this case
 			TreePath pathToChild = path.pathByAddingChild(child);

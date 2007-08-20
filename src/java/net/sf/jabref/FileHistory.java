@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class FileHistory extends JMenu implements ActionListener {
 
     JabRefPreferences prefs;
-    LinkedList history = new LinkedList();
+    LinkedList<String> history = new LinkedList<String>();
     JabRefFrame frame;
 
     public FileHistory(JabRefPreferences prefs, JabRefFrame frame) {
@@ -47,7 +47,7 @@ public class FileHistory extends JMenu implements ActionListener {
     public void newFile(String filename) {
         int i = 0;
         while (i < history.size()) {
-            if (((String) history.get(i)).equals(filename))
+            if (history.get(i).equals(filename))
                 history.remove(i--);
             i++;
         }
@@ -62,10 +62,10 @@ public class FileHistory extends JMenu implements ActionListener {
 
     private void setItems() {
         removeAll();
-        Iterator i = history.iterator();
+        Iterator<String> i = history.iterator();
         int count = 1;
         while (i.hasNext()) {
-            addItem((String) i.next(), count++);
+            addItem(i.next(), count++);
         }
     }
 
@@ -82,7 +82,7 @@ public class FileHistory extends JMenu implements ActionListener {
     private void removeItem(String filename) {
         int i=0;
         while (i < history.size()) {
-            if (((String) history.get(i)).equals(filename)) {
+            if (history.get(i).equals(filename)) {
                 history.remove(i);
                 setItems();
                 return;
@@ -95,7 +95,7 @@ public class FileHistory extends JMenu implements ActionListener {
         if (history.size() > 0) {
             String[] names = new String[history.size()];
             for (int i = 0; i < names.length; i++)
-                names[i] = (String) history.get(i);
+                names[i] = history.get(i);
             prefs.putStringArray("recentFiles", names);
         }
     }

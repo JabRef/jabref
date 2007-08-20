@@ -46,21 +46,19 @@ public class Layout
 
     //~ Constructors ///////////////////////////////////////////////////////////
 
-    public Layout(Vector parsedEntries, String classPrefix)  throws Exception
+    public Layout(Vector<StringInt> parsedEntries, String classPrefix)  throws Exception
     {
         StringInt si;
-        Vector tmpEntries = new Vector(parsedEntries.size());
+        Vector<LayoutEntry> tmpEntries = new Vector<LayoutEntry>(parsedEntries.size());
 
-        //layoutEntries=new LayoutEntry[parsedEntries.size()];
-        Vector blockEntries = null;
+        Vector<StringInt> blockEntries = null;
         LayoutEntry le;
         String blockStart = null;
 
         for (int i = 0; i < parsedEntries.size(); i++)
         {
-            si = (StringInt) parsedEntries.get(i);
+            si = parsedEntries.get(i);
 
-            //System.out.println("PARSED: "+si.s+"="+si.i);
             if (si.i == LayoutHelper.IS_LAYOUT_TEXT)
             {
             }
@@ -69,7 +67,7 @@ public class Layout
             }
             else if (si.i == LayoutHelper.IS_FIELD_START)
             {
-                blockEntries = new Vector();
+                blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             }
             else if (si.i == LayoutHelper.IS_FIELD_END)
@@ -92,7 +90,7 @@ public class Layout
             }
             else if (si.i == LayoutHelper.IS_GROUP_START)
             {
-                blockEntries = new Vector();
+                blockEntries = new Vector<StringInt>();
                 blockStart = si.s;
             }
             else if (si.i == LayoutHelper.IS_GROUP_END)
@@ -132,7 +130,7 @@ public class Layout
 
         for (int i = 0; i < tmpEntries.size(); i++)
         {
-            layoutEntries[i] = (LayoutEntry) tmpEntries.get(i);
+            layoutEntries[i] = tmpEntries.get(i);
 
             //System.out.println(layoutEntries[i].text);
         }

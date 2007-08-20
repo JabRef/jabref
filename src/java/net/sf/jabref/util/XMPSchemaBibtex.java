@@ -52,7 +52,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 * @return
 	 * @derived Uses XMPSchema methods
 	 */
-	public List getPersonList(String field) {
+	public List<String> getPersonList(String field) {
 		return getSequenceList(field);
 	}
 
@@ -79,7 +79,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.setTextProperty(makeProperty(field), value);
 	}
 
-	public List getBagList(String bagName) {
+	@SuppressWarnings("unchecked")
+	public List<String> getBagList(String bagName) {
 		return super.getBagList(makeProperty(bagName));
 	}
 
@@ -91,7 +92,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.addBagValue(makeProperty(bagName), value);
 	}
 
-	public List getSequenceList(String seqName) {
+	@SuppressWarnings("unchecked")
+	public List<String> getSequenceList(String seqName) {
 		return super.getSequenceList(makeProperty(seqName));
 	}
 
@@ -103,7 +105,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 		super.addSequenceValue(makeProperty(seqName), value);
 	}
 
-	public List getSequenceDateList(String seqName) throws IOException {
+	@SuppressWarnings("unchecked")
+	public List<String> getSequenceDateList(String seqName) throws IOException {
 		return super.getSequenceDateList(makeProperty(seqName));
 	}
 
@@ -144,7 +147,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 	 *         instance: "year" => "2005". Empty map if none found.
 	 * @throws TransformerException
 	 */
-	public static Map getAllProperties(XMPSchema schema, String namespaceName) {
+	public static Map<String, String> getAllProperties(XMPSchema schema, String namespaceName) {
 		NodeList nodes = schema.getElement().getChildNodes();
 
 		Map<String, String> result = new HashMap<String, String>();
@@ -220,7 +223,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 			String key = entry.getKey();
 			if (preserveWhiteSpace.contains(key))
 				continue;
-			entry.setValue(((String) entry.getValue()).replaceAll("\\s+", " ").trim());
+			entry.setValue(entry.getValue().replaceAll("\\s+", " ").trim());
 		}
 
 		return result;
@@ -275,7 +278,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 		BibtexEntry e = new BibtexEntry(Util.createNeutralId(), t);
 
 		// Get Text Properties
-		Map text = getAllProperties(this, "bibtex");
+		Map<String, String> text = getAllProperties(this, "bibtex");
 		text.remove("entrytype");
 		e.setField(text);
 		return e;

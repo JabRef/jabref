@@ -186,18 +186,17 @@ public class SimpleProcess extends Process {
      */
 
     private int waitForImpl() throws InterruptedException {
-	process = process;
-	in = new StreamPrinter( processInput,
-				new PrintStream( process.getOutputStream() ) );
-	in.setFlush( true );
-	out = new StreamPrinter( process.getInputStream(), yourOutput );
-	error = new StreamPrinter( process.getErrorStream(), yourError );
-	in.start();
-	out.start();
-	error.start();
-	out.join();
-	error.join();
-	return process.waitFor();
+		in = new StreamPrinter( processInput,
+					new PrintStream( process.getOutputStream() ) );
+		in.setFlush( true );
+		out = new StreamPrinter( process.getInputStream(), yourOutput );
+		error = new StreamPrinter( process.getErrorStream(), yourError );
+		in.start();
+		out.start();
+		error.start();
+		out.join();
+		error.join();
+		return process.waitFor();
     }
 
     /**

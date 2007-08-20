@@ -36,14 +36,9 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         databases = frame.getTabbedPane().getTabCount();
         saved = 0;
         frame.output(Globals.lang("Saving all databases..."));
-        Worker worker = (Worker)Spin.off(this);
+        Spin.off(this);
         run();
-        //if (saved == databases)
         frame.output(Globals.lang("Save all finished."));
-        /*else if (saved > 0)
-            frame.output(Globals.lang("Saved %0 databases."));
-        else
-            frame.output(Globals.lang("No databases saved."));*/
     }
 
     public void run() {

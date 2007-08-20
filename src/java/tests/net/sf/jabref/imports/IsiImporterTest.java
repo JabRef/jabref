@@ -95,7 +95,7 @@ public class IsiImporterTest extends TestCase {
 	public void testImportEntries() throws IOException {
 		IsiImporter importer = new IsiImporter();
 
-		List entries = importer.importEntries(IsiImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTest1.isi"));
 		assertEquals(1, entries.size());
 		BibtexEntry entry = (BibtexEntry) entries.get(0);
@@ -118,7 +118,7 @@ public class IsiImporterTest extends TestCase {
 	public void testImportEntriesINSPEC() throws IOException {
 		IsiImporter importer = new IsiImporter();
 
-		List entries = importer.importEntries(IsiImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTestInspec.isi"));
 
 		assertEquals(2, entries.size());
@@ -203,7 +203,7 @@ public class IsiImporterTest extends TestCase {
 	public void testImportEntriesWOS() throws IOException {
 		IsiImporter importer = new IsiImporter();
 
-		List entries = importer.importEntries(IsiImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTestWOS.isi"));
 
 		assertEquals(2, entries.size());
@@ -274,7 +274,7 @@ public class IsiImporterTest extends TestCase {
 	public void testImportIEEEExport() throws IOException {
 		IsiImporter importer = new IsiImporter();
 
-		List entries = importer.importEntries(IsiImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IEEEImport1.txt"));
 
 		assertEquals(1, entries.size());
@@ -325,7 +325,7 @@ public class IsiImporterTest extends TestCase {
 	public void testImportEntriesMedline() throws IOException {
 		IsiImporter importer = new IsiImporter();
 
-		List entries = importer.importEntries(IsiImporterTest.class
+		List<BibtexEntry> entries = importer.importEntries(IsiImporterTest.class
 			.getResourceAsStream("IsiImporterTestMedline.isi"));
 
 		assertEquals(2, entries.size());

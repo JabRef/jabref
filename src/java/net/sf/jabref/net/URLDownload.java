@@ -55,7 +55,6 @@ public class URLDownload {
       {
         InputStream _in = new ProgressMonitorInputStream(parent, "Downloading " + source.toString(), in);
         byte[] buffer = new byte[512];
-        int reps=0;
         while(true)
         {
             int bytesRead = _in.read(buffer);

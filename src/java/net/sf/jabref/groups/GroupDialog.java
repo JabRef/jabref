@@ -34,7 +34,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -469,13 +468,10 @@ class GroupDialog extends JDialog {
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (i == JOptionPane.NO_OPTION)
                         return;
-                BibtexEntry entry;
-                Vector vec = new Vector();
-                for (Iterator it = m_basePanel.database().getEntries().iterator(); it
-                                .hasNext();) {
-                        entry = (BibtexEntry) it.next();
+                Vector<BibtexEntry> vec = new Vector<BibtexEntry>();
+                for (BibtexEntry entry : m_basePanel.database().getEntries()){
                         if (m_editedGroup.contains(entry))
-                                vec.add(entry);
+                        	vec.add(entry);
                 }
                 if (vec.size() > 0) {
                         BibtexEntry[] entries = new BibtexEntry[vec.size()];

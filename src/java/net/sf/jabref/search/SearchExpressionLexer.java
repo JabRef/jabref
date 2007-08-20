@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import antlr.*;
 import antlr.collections.impl.BitSet;
 
+@SuppressWarnings({"unchecked", "unused"})
 public class SearchExpressionLexer extends antlr.CharScanner implements SearchExpressionLexerTokenTypes, TokenStream
  {
 public SearchExpressionLexer(InputStream in) {
@@ -20,11 +21,12 @@ public SearchExpressionLexer(Reader in) {
 public SearchExpressionLexer(InputBuffer ib) {
 	this(new LexerSharedInputState(ib));
 }
+
 public SearchExpressionLexer(LexerSharedInputState state) {
 	super(state);
 	caseSensitiveLiterals = false;
 	setCaseSensitive(false);
-	literals = new Hashtable();
+	literals = new Hashtable<ANTLRHashString, Integer>();
 	literals.put(new ANTLRHashString("matches", this), new Integer(8));
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
@@ -115,6 +117,7 @@ tryAgain:
 	public final void mWS(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = WS;
+		
 		int _saveIndex;
 		
 		{

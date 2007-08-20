@@ -81,7 +81,7 @@ public class ImportInspectionDialog extends JDialog {
     private boolean generatedKeys = false; // Set to true after keys have been generated.
     private boolean defaultSelected = true;
     private Rectangle toRect = new Rectangle(0, 0, 1, 1);
-    private Map<BibtexEntry, Set> groupAdditions = new HashMap<BibtexEntry, Set>();
+    private Map<BibtexEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<BibtexEntry, Set<GroupTreeNode>>();
     private JCheckBox autoGenerate = new JCheckBox(Globals.lang("Generate keys"), Globals.prefs.getBoolean("generateKeysAfterInspection"));
     private JLabel
         duplLabel = new JLabel(GUIGlobals.getImage("duplicate")),
@@ -165,7 +165,7 @@ public class ImportInspectionDialog extends JDialog {
         if (!newDatabase) {
             GroupTreeNode node = metaData.getGroups();
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
-            insertNodes(groupsAdd, node, true);
+            insertNodes(groupsAdd, node);
             popup.add(groupsAdd);
         }
 
@@ -425,8 +425,8 @@ public class ImportInspectionDialog extends JDialog {
     }
 
 
-    public void insertNodes(JMenu menu, GroupTreeNode node, boolean add) {
-        final AbstractAction action = getAction(node, add);
+    public void insertNodes(JMenu menu, GroupTreeNode node) {
+        final AbstractAction action = getAction(node);
 
         if (node.getChildCount() == 0) {
             menu.add(action);
@@ -438,7 +438,7 @@ public class ImportInspectionDialog extends JDialog {
         JMenu submenu = null;
         if (node.getGroup() instanceof AllEntriesGroup) {
             for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu, (GroupTreeNode) node.getChildAt(i), add);
+                insertNodes(menu, (GroupTreeNode) node.getChildAt(i));
             }
         } else {
             submenu = new JMenu("[" + node.getGroup().getName() + "]");
@@ -448,19 +448,17 @@ public class ImportInspectionDialog extends JDialog {
             submenu.add(action);
             submenu.add(new JPopupMenu.Separator());
             for (int i = 0; i < node.getChildCount(); ++i)
-                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i), add);
+                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i));
             menu.add(submenu);
             if (submenu.isEnabled())
                 menu.setEnabled(true);
         }
     }
 
-    private AbstractAction getAction(GroupTreeNode node, boolean add) {
-        AbstractAction action = add ? (AbstractAction) new AddToGroupAction(node)
-                : (AbstractAction) new RemoveFromGroupAction(node);
+    private AbstractAction getAction(GroupTreeNode node) {
+        AbstractAction action = new AddToGroupAction(node);
         AbstractGroup group = node.getGroup();
-        action.setEnabled(/*add ? */group.supportsAdd());// && !group.containsAll(selection)
-        //        : group.supportsRemove() && group.containsAny(selection));
+        action.setEnabled(group.supportsAdd());
         return action;
     }
 
@@ -499,12 +497,6 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     class RemoveFromGroupAction extends AbstractAction {
-        private GroupTreeNode node;
-
-        public RemoveFromGroupAction(GroupTreeNode node) {
-            this.node = node;
-        }
-
         public void actionPerformed(ActionEvent event) {
         }
     }
@@ -574,7 +566,7 @@ public class ImportInspectionDialog extends JDialog {
                 if (newDatabase) {
                     // Create a new BasePanel for the entries:
                     BibtexDatabase base = new BibtexDatabase();
-                    panel = new BasePanel(frame, base, null, new HashMap(), Globals.prefs.get("defaultEncoding"));
+                    panel = new BasePanel(frame, base, null, new HashMap<String, String>(), Globals.prefs.get("defaultEncoding"));
                 }
 
                 boolean groupingCanceled = false;
@@ -592,7 +584,7 @@ public class ImportInspectionDialog extends JDialog {
                     entry.setGroupHit(false);
 
                     // If this entry should be added to any groups, do it now:
-                    Set groups = groupAdditions.get(entry);
+                    Set<GroupTreeNode> groups = groupAdditions.get(entry);
                     if (!groupingCanceled && (groups != null)) {
                         if (entry.getField(BibtexFields.KEY_FIELD) == null) {
                             // The entry has no key, so it can't be added to the group.
@@ -609,8 +601,8 @@ public class ImportInspectionDialog extends JDialog {
 
                         // If the key was list, or has been list now, go ahead:
                         if (entry.getField(BibtexFields.KEY_FIELD) != null) {
-                            for (Iterator i2 = groups.iterator(); i2.hasNext();) {
-                                GroupTreeNode node = (GroupTreeNode) i2.next();
+                            for (Iterator<GroupTreeNode> i2 = groups.iterator(); i2.hasNext();) {
+                                GroupTreeNode node = i2.next();
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:
                                     AbstractUndoableEdit undo = node.getGroup().add(new BibtexEntry[]{entry});
@@ -767,11 +759,11 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
     
-    class EntrySelectionListener implements ListEventListener {
+    class EntrySelectionListener implements ListEventListener<BibtexEntry> {
 
-        public void listChanged(ListEvent listEvent) {
+        public void listChanged(ListEvent<BibtexEntry>  listEvent) {
             if (listEvent.getSourceList().size() == 1) {
-                preview.setEntry((BibtexEntry) listEvent.getSourceList().get(0));
+                preview.setEntry(listEvent.getSourceList().get(0));
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -1073,7 +1065,8 @@ public class ImportInspectionDialog extends JDialog {
     }
 
 
-    private void setupComparatorChooser() {
+    @SuppressWarnings("unchecked")
+	private void setupComparatorChooser() {
         // First column:
         java.util.List<Comparator<BibtexEntry>> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
@@ -1150,7 +1143,7 @@ public class ImportInspectionDialog extends JDialog {
         }
     }
 
-    class EntryTableFormat implements TableFormat {
+    class EntryTableFormat implements TableFormat<BibtexEntry> {
         public int getColumnCount() {
             return PAD+fields.length;
         }
@@ -1164,8 +1157,7 @@ public class ImportInspectionDialog extends JDialog {
             return "";
         }
 
-        public Object getColumnValue(Object object, int i) {
-            BibtexEntry entry = (BibtexEntry)object;
+        public Object getColumnValue(BibtexEntry entry, int i) {
             if (i == 0)
                 return entry.isSearchHit() ? Boolean.TRUE : Boolean.FALSE;
             else if (i < PAD) {

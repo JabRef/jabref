@@ -132,11 +132,9 @@ public class ExternalFileTypeEntryEditor {
     }
 
     class BrowseListener implements ActionListener {
-        private JDialog parent;
         private JTextField comp;
 
         public BrowseListener(JDialog parent, JTextField comp) {
-            this.parent = parent;
             this.comp = comp;
         }
 

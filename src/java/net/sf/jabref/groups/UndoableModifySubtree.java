@@ -28,6 +28,7 @@ package net.sf.jabref.groups;
 
 import java.util.Vector;
 
+import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.Globals;
@@ -39,7 +40,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private final int[] m_subtreeRootPath;
     private final GroupSelector m_groupSelector;
     /** This holds the new subtree (the root's modified children) to allow redo. */
-    private Vector m_modifiedSubtree = new Vector();
+    private Vector<TreeNode> m_modifiedSubtree = new Vector<TreeNode>();
     private boolean m_revalidate = true;
     private final String m_name;
 

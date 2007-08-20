@@ -16,7 +16,7 @@ public class FileUpdateMonitor extends Thread {
   final int WAIT = 4000;
   static int tmpNum = 0;
   int no = 0;
-  HashMap entries = new HashMap();
+  HashMap<String, Entry> entries = new HashMap<String, Entry>();
   boolean running;
 
   public FileUpdateMonitor() {
@@ -29,9 +29,9 @@ public class FileUpdateMonitor extends Thread {
     // The running variable is used to make the thread stop when needed.
     while (running) {
       //System.out.println("Polling...");
-      Iterator i = entries.keySet().iterator();
+      Iterator<String> i = entries.keySet().iterator();
       for (;i.hasNext();) {
-        Entry e = (Entry)entries.get(i.next());
+        Entry e = entries.get(i.next());
         try {
           if (e.hasBeenUpdated())
             e.notifyListener();

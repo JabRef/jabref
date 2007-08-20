@@ -22,7 +22,7 @@
 
 package net.sf.jabref.export.layout.format;
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
@@ -30,83 +30,75 @@ import net.sf.jabref.export.layout.LayoutFormatter;
 
 /**
  * Changes {\^o} or {\^{o}} to ?
- *
+ * 
  * @author $author$
  * @version $Revision$
  */
-public class XMLChars implements LayoutFormatter
-{
-    //~ Methods ////////////////////////////////////////////////////////////////
-    //Pattern pattern = Pattern.compile(".*\\{..[a-zA-Z].\\}.*");
-    Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
-  
-    public String format(String fieldText)
-    {
- 
-	fieldText = firstFormat(fieldText);
+public class XMLChars implements LayoutFormatter {
+	Pattern pattern = Pattern.compile(".*\\{\\\\.*[a-zA-Z]\\}.*");
 
-	//if (!pattern.matcher(fieldText).matches())
-	//    return restFormat(fieldText);
-        
-	for (Iterator i=Globals.HTML_CHARS.keySet().iterator(); i.hasNext();) {
-	    String s = (String)i.next();         
-            String repl = (String)Globals.XML_CHARS.get(s);
-            if (repl != null)
-                fieldText = fieldText.replaceAll(s, repl);
+	public String format(String fieldText) {
+
+		fieldText = firstFormat(fieldText);
+
+		for (Map.Entry<String, String> entry : Globals.XML_CHARS.entrySet()){
+			String s = entry.getKey();
+			String repl = entry.getValue();
+			if (repl != null)
+				fieldText = fieldText.replaceAll(s, repl);
+		}
+		return restFormat(fieldText);
 	}
-	//RemoveBrackets rb = new RemoveBrackets();
-	return restFormat(fieldText);
-    }
 
-    private String firstFormat(String s) {
-	return s.replaceAll("&|\\\\&","&#x0026;").replaceAll("--", "&#x2013;");
-    }
+	private String firstFormat(String s) {
+		return s.replaceAll("&|\\\\&", "&#x0026;").replaceAll("--", "&#x2013;");
+	}
 
-    private String restFormat(String s) {
-		String fieldText=s.replaceAll("\\}","").replaceAll("\\{","");
+	boolean[] forceReplace;
+	
+	private String restFormat(String toFormat) {
 		
-		// now some copy-paste problems most often occuring in abstracts when copied from PDF
-		// AND: this is accepted in the abstract of bibtex files, so are forced to catch those cases
-		int code;
-		char character;
-		StringBuffer buffer=new StringBuffer(fieldText.length()<<1);
-    for ( int i = 0; i < fieldText.length(); i++)
-    {
-    	character = fieldText.charAt(i);
-      code = ((int) character);
-      //System.out.println(""+character+" "+code);
-      if((code<40 && code!=32)||code>125){
-      	buffer.append("&#" + code+";");
-      }
-      else 
-      {
-      	// TODO: highly inefficient, create look-up array with all 255 codes only once and use code as key!!!
-      	int[] forceReplace=new int[]{44,45,63,64,94,95,96,124};
-      	boolean alphabet=true;
-      	for(int ii=0;ii<forceReplace.length;ii++){
-      		if(code==forceReplace[ii]){
-      			buffer.append("&#" + code+";");
-      			alphabet=false;
-      			break;
-      		}
-      	}
-    		// force roundtripping
-      	if(alphabet)buffer.append((char)code);
-      }
-    }
-    fieldText=buffer.toString();
+		String fieldText = toFormat.replaceAll("\\}", "").replaceAll("\\{", "");
+
+		// now some copy-paste problems most often occuring in abstracts when
+		// copied from PDF
+		// AND: this is accepted in the abstract of bibtex files, so are forced
+		// to catch those cases
+
+		if (forceReplace == null){
+			 forceReplace = new boolean[126];
+			 for (int i = 0; i < 40; i++){
+				 forceReplace[i] = true;
+			 }
+			 forceReplace[32] = false;
+			 for (int i : new int[] { 44, 45, 63, 64, 94, 95, 96, 124 }){
+				 forceReplace[i] = true;
+			 }
+		}
+		
+		StringBuffer buffer = new StringBuffer(fieldText.length() * 2);
+		
+		for (int i = 0; i < fieldText.length(); i++) {
+			int code = ((int) fieldText.charAt(i));
+		
+			// TODO: Check whether > 125 is correct here or whether it should rather be >=  
+			if (code > 125 || forceReplace[code]) {
+				buffer.append("&#" + code + ";");
+			} else {
+				buffer.append((char) code);
+			}
+		}
+		fieldText = buffer.toString();
 
 		// use common abbreviations for <, > instead of code
-		for (Iterator i=Globals.ASCII2XML_CHARS.keySet().iterator(); i.hasNext();) {
-	    String ss = (String)i.next();         
-            String repl = (String)Globals.ASCII2XML_CHARS.get(ss);
-            if (repl != null)
-                fieldText = fieldText.replaceAll(ss, repl);
-	  }
+		for (Map.Entry<String, String> entry : Globals.ASCII2XML_CHARS.entrySet()){
+			String s = entry.getKey();
+			String repl = entry.getValue();
 		
+			if (repl != null)
+				fieldText = fieldText.replaceAll(s, repl);
+		}
+
 		return fieldText;
-    }
+	}
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////

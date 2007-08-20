@@ -21,14 +21,12 @@ import org.w3c.dom.Node;
 /**
  * @author Michael Wrighton
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class MODSEntry {
 	protected String entryType = "mods"; // could also be relatedItem
 	protected String id;
 	protected List<PersonName> authors = null;
-	protected List editors = null;
+
 	// should really be handled with an enum
 	protected String issuance = "monographic";
 	protected PageNumbers pages = null;
@@ -44,7 +42,7 @@ public class MODSEntry {
 	protected String number;
 	protected String volume;
 	protected String genre = null;
-	protected Set handledExtensions;
+	protected Set<String> handledExtensions;
 	
 	protected MODSEntry host;
 	Map<String, String> extensionFields;
@@ -55,7 +53,7 @@ public class MODSEntry {
 	
 	public MODSEntry() {
 		extensionFields = new HashMap<String, String>();
-		handledExtensions = new HashSet();
+		handledExtensions = new HashSet<String>();
 	
 	}
 	
@@ -161,21 +159,19 @@ public class MODSEntry {
 	// must be from http://www.loc.gov/marc/sourcecode/genre/genrelist.html
 	protected String getMODSgenre(BibtexEntry bibtex) {
 		String bibtexType = bibtex.getType().getName();
-		String result;
-		if (bibtexType.equals("Mastersthesis"))
-			result = "theses";
-		else
-			result = "conference publication";
-		// etc...
+		/**
+		 * <pre> String result; if (bibtexType.equals("Mastersthesis")) result =
+		 * "theses"; else result = "conference publication"; // etc... </pre>
+		 */
 		return bibtexType;		
 	}
 	
-	public Document getDOMrepresentation() {
-		Document result = null;
+	public Node getDOMrepresentation() {
+		Node result = null;
 		try {
 			DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
-		//	result = getDOMrepresentation(d);
+			result = getDOMrepresentation(d.newDocument());
 		}
 		catch (Exception e) 
 		{
@@ -186,7 +182,6 @@ public class MODSEntry {
 		
 	
 	public Element getDOMrepresentation(Document d) {
-		Node result = null;
 	   	try {
 	   		Element mods = d.createElement(entryType);
 	   		mods.setAttribute("version", "3.0");
@@ -270,11 +265,10 @@ public class MODSEntry {
 	   		}
 	   		
 	   		/* now generate extension fields for unhandled data */
-	   		for(Iterator iter = extensionFields.entrySet().iterator(); iter.hasNext(); ) {
+	   		for(Map.Entry<String, String> theEntry : extensionFields.entrySet()){
 	   			Element extension = d.createElement("extension");
-	   			Map.Entry theEntry = (Map.Entry) iter.next();
-	   			String field = (String) theEntry.getKey();
-	   			String value = (String) theEntry.getValue();
+	   			String field = theEntry.getKey();
+	   			String value = theEntry.getValue();
 	   			if (handledExtensions.contains(field))
 	   				continue;
 	   			Element theData = d.createElement(field);
@@ -326,6 +320,9 @@ public class MODSEntry {
 
 	/*
 	 * render as XML
+	 * 
+	 * TODO This is untested.
+	 * 
 	 */
 	public String toString() {
 		StringWriter sresult = new StringWriter();

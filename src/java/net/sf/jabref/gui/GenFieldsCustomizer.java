@@ -159,17 +159,18 @@ public class GenFieldsCustomizer extends JDialog {
 
     void setFieldsText() {
         StringBuffer sb = new StringBuffer();
-        String name = null, fields = null;
+
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i=0; i<tabList.getTabCount(); i++) {
             sb.append(tabList.getTabName(i));
             sb.append(":");
-            for (Iterator j=tabList.getTabFields(i).iterator(); j.hasNext();) {
-                String field = (String)j.next();
-                sb.append(field);
-                if (j.hasNext())
-                    sb.append(";");
-            }
+            for (Iterator<String> j = tabList.getTabFields(i).iterator(); j
+				.hasNext();) {
+				String field = j.next();
+				sb.append(field);
+				if (j.hasNext())
+					sb.append(";");
+			}
             sb.append("\n");
         }
 

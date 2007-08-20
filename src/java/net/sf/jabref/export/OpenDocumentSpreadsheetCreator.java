@@ -33,7 +33,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         super(Globals.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws Exception {
+    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws Exception {
         exportOpenDocumentSpreadsheet(new File(file), database, keySet);
     }
 
@@ -61,7 +61,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    public static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set keySet) throws Exception {
+    public static void exportOpenDocumentSpreadsheet(File file, BibtexDatabase database, Set<String> keySet) throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
@@ -75,7 +75,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    public static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set keySet) {
+    public static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
         try {

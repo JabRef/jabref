@@ -23,7 +23,7 @@ public class TestVM extends TestCase {
 
 	public void testAbbrv() throws RecognitionException, IOException {
 		VM vm = new VM(new File("src/tests/net/sf/jabref/bst/abbrv.bst"));
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 		
 		String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -40,7 +40,7 @@ public class TestVM extends TestCase {
 			+ " #1 'mid.sentence :=  #2 'after.sentence :=  #3 'after.block := } "
 			+ "STRINGS { s t } " + "READ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 
 		vm.run(v);
@@ -59,7 +59,7 @@ public class TestVM extends TestCase {
 			+ "FUNCTION { test } { label #0 = title 'label := #5 label #6 pop$ } " + "READ "
 			+ "ITERATE { test }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 
 		vm.run(v);
@@ -73,7 +73,7 @@ public class TestVM extends TestCase {
 
 		VM vm = new VM("FUNCTION {a}{ quote$ quote$ * } EXECUTE {a}");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
 		assertEquals("\"\"", vm.getStack().pop());
@@ -83,7 +83,7 @@ public class TestVM extends TestCase {
 
 		VM vm = new VM("FUNCTION {init.state.consts}{ #0 'before.all := } ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
 		assertEquals(38, vm.getFunctions().size());
@@ -101,7 +101,7 @@ public class TestVM extends TestCase {
 				+ "FUNCTION {init.state.consts}{ #5 'variable.a := } "
 				+ "EXECUTE {init.state.consts}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals(new Integer(5), (Integer) vm.getIntegers().get("variable.a"));
 		}
@@ -110,7 +110,7 @@ public class TestVM extends TestCase {
 				+ "#4 #4 < " + "#3 #4 > " + "#4 #3 > " + "#4 #4 > " + "\"H\" \"H\" = "
 				+ "\"H\" \"Ha\" = } " + "EXECUTE {a}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 
 			assertEquals(VM.FALSE, vm.getStack().pop());
@@ -134,7 +134,7 @@ public class TestVM extends TestCase {
 			+ "#1 #1 and #0 #1 and #1 #0 and #0 #0 and " + "#0 not #1 not "
 			+ "#1 #1 or #0 #1 or #1 #0 or #0 #0 or }" + "EXECUTE {test}");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals(VM.FALSE, vm.getStack().pop());
 		assertEquals(VM.TRUE, vm.getStack().pop());
@@ -153,7 +153,7 @@ public class TestVM extends TestCase {
 		{
 			VM vm = new VM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals(new Integer(3), vm.getStack().pop());
 			assertEquals(new Integer(2), vm.getStack().pop());
@@ -162,7 +162,7 @@ public class TestVM extends TestCase {
 		{
 			VM vm = new VM("FUNCTION {test} { " + "#1 \"HELLO\" + #5 #2 - }" + "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 
 			try {
 				vm.run(v);
@@ -178,7 +178,7 @@ public class TestVM extends TestCase {
 			VM vm = new VM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }"
 				+ "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals(new Integer(2), vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
@@ -187,7 +187,7 @@ public class TestVM extends TestCase {
 			VM vm = new VM("FUNCTION {test} { \"Johnny Foo { and } Mary Bar\" num.names$ }"
 				+ "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals(new Integer(1), vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
@@ -202,7 +202,7 @@ public class TestVM extends TestCase {
 					+ "\"Johnny!}\" add.period$ \"Johnny?}\" add.period$ \"Johnny.}\" add.period$ }"
 					+ "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals("Johnny.}", vm.getStack().pop());
 			assertEquals("Johnny?}", vm.getStack().pop());
@@ -231,7 +231,7 @@ public class TestVM extends TestCase {
 
 			"} EXECUTE {test} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals("78", vm.getStack().pop());
 		assertEquals("789", vm.getStack().pop());
@@ -253,7 +253,7 @@ public class TestVM extends TestCase {
 			" title empty$ " + // FALSE
 			" \" HALLO \" empty$ } ITERATE {test} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
 		vm.run(v);
 		assertEquals(VM.FALSE, vm.getStack().pop());
@@ -269,7 +269,7 @@ public class TestVM extends TestCase {
 			+ "  { \"{\\em \" swap$ * \"}\" * } " + "  if$ " + "} " + "FUNCTION {test} {"
 			+ "  \"\" emphasize " + "  \"Hello\" emphasize " + "}" + "EXECUTE {test} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals("{\\em Hello}", vm.getStack().pop());
 		assertEquals("", vm.getStack().pop());
@@ -293,7 +293,7 @@ public class TestVM extends TestCase {
 				+ "  \"{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase\" \"u\" change.case$ format.title "
 				+ "}" + "EXECUTE {test} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals(
 			"{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
@@ -313,7 +313,7 @@ public class TestVM extends TestCase {
 			+ "  \"{\\And this too\" text.length$ " + "  \"These are {\\11}\" text.length$ " + "} "
 			+ "EXECUTE {test} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals(new Integer(11), vm.getStack().pop());
 		assertEquals(new Integer(1), vm.getStack().pop());
@@ -329,7 +329,7 @@ public class TestVM extends TestCase {
 	public void testVMIntToStr() throws RecognitionException, IOException {
 		VM vm = new VM("FUNCTION {test} { #3 int.to.str$ #9999 int.to.str$}" + "EXECUTE {test}");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 		assertEquals("9999", (String) vm.getStack().pop());
 		assertEquals("3", vm.getStack().pop());
@@ -340,7 +340,7 @@ public class TestVM extends TestCase {
 		{
 			VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals(new Integer(72), vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
@@ -348,7 +348,7 @@ public class TestVM extends TestCase {
 		{
 			VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ int.to.chr$ }" + "EXECUTE {test}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals("H", vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
@@ -360,24 +360,24 @@ public class TestVM extends TestCase {
 		VM vm = new VM("" + "ENTRY  { title }  { }  { label }"
 			+ "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
 		v.add(bibtexString2BibtexEntry("@article{b, author=\"BBB\"}"));
 		v.add(bibtexString2BibtexEntry("@article{d, author=\"DDD\"}"));
 		v.add(bibtexString2BibtexEntry("@article{c, author=\"CCC\"}"));
 		vm.run(v);
 
-		Vector v2 = vm.getEntries();
-		assertEquals("a", ((BstEntry)v2.get(0)).getBibtexEntry().getCiteKey());
-		assertEquals("b", ((BstEntry)v2.get(1)).getBibtexEntry().getCiteKey());
-		assertEquals("c", ((BstEntry)v2.get(2)).getBibtexEntry().getCiteKey());
-		assertEquals("d", ((BstEntry)v2.get(3)).getBibtexEntry().getCiteKey());
+		Vector<BstEntry> v2 = vm.getEntries();
+		assertEquals("a", v2.get(0).getBibtexEntry().getCiteKey());
+		assertEquals("b", v2.get(1).getBibtexEntry().getCiteKey());
+		assertEquals("c", v2.get(2).getBibtexEntry().getCiteKey());
+		assertEquals("d", v2.get(3).getBibtexEntry().getCiteKey());
 	}
 
 	public void testBuildIn() throws RecognitionException, IOException {
 		VM vm = new VM("EXECUTE {global.max$}");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
 		assertEquals(new Integer(Integer.MAX_VALUE), vm.getStack().pop());
@@ -391,7 +391,7 @@ public class TestVM extends TestCase {
 			+ " FUNCTION {n.dashify} { \"HELLO-WORLD\" 't := t empty$ not } "
 			+ " EXECUTE {n.dashify}                    ");
 
-		vm.run(new Vector());
+		vm.run(new Vector<BibtexEntry>());
 
 		assertEquals(VM.TRUE, vm.getStack().pop());
 	}
@@ -429,7 +429,7 @@ public class TestVM extends TestCase {
 				+ "	}                                                                  "
 				+ " EXECUTE {n.dashify} ");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
 		assertEquals(1, vm.getStack().size());
@@ -443,7 +443,7 @@ public class TestVM extends TestCase {
 				+ "ENTRY  { title }  { }  { label }"
 				+ "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT FUNCTION {test} { type$ } ITERATE { test }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
 		v.add(bibtexString2BibtexEntry("@book{b, author=\"BBB\"}"));
 		v.add(bibtexString2BibtexEntry("@misc{c, author=\"CCC\"}"));
@@ -467,7 +467,7 @@ public class TestVM extends TestCase {
 				"FUNCTION {test}{ title missing$ cite$ } " + //
 				"ITERATE  { test }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 		v.add(bibtexString2BibtexEntry("@article{test, author=\"No title\"}"));
 		vm.run(v);
@@ -486,7 +486,7 @@ public class TestVM extends TestCase {
 				"FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
 					+ "EXECUTE {format}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			vm.run(v);
 			assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", (String) vm.getStack().pop());
 			assertEquals(0, vm.getStack().size());
@@ -497,7 +497,7 @@ public class TestVM extends TestCase {
 				+ "SORT " + "FUNCTION {format}{ author #2 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
 				+ "ITERATE {format}");
 
-			Vector v = new Vector();
+			Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 			v.add(t1BibtexEntry());
 			v
 				.add(bibtexString2BibtexEntry("@book{test, author=\"Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\"}"));
@@ -515,7 +515,7 @@ public class TestVM extends TestCase {
 				+ "FUNCTION {inproceedings}{ \"InProceedings called on \" title * } "
 				+ "FUNCTION {book}{ \"Book called on \" title * } " + " ITERATE { call.type$ }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 		v.add(bibtexString2BibtexEntry("@book{test, title=\"Test\"}"));
 		vm.run(v);
@@ -534,7 +534,7 @@ public class TestVM extends TestCase {
 		VM vm = new VM("" + "ENTRY  { " + "  address " + "  author " + "  title " + "  type "
 			+ "}  {}  { label } " + "FUNCTION {test}{ cite$ } " + "READ " + "ITERATE { test }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 
 		v.add(bibtexString2BibtexEntry("@article{test, title=\"BLA\"}"));
@@ -590,7 +590,7 @@ public class TestVM extends TestCase {
 			"EXECUTE {begin.bib}" + //
 			"");//
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(t1BibtexEntry());
 
 		vm.run(v);
@@ -603,7 +603,7 @@ public class TestVM extends TestCase {
 
 		VM vm = new VM("FUNCTION {a}{ #3 \"Hallo\" swap$ } EXECUTE { a }");
 
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		vm.run(v);
 
 		assertEquals(2, vm.getStack().size());
@@ -613,9 +613,9 @@ public class TestVM extends TestCase {
 
 	public static BibtexEntry bibtexString2BibtexEntry(String s) throws IOException {
 		ParserResult result = BibtexParser.parse(new StringReader(s));
-		Collection c = result.getDatabase().getEntries();
+		Collection<BibtexEntry> c = result.getDatabase().getEntries();
 		assertEquals(1, c.size());
-		return (BibtexEntry) c.iterator().next();
+		return c.iterator().next();
 	}
 
 	public static String bibtexEntry2BibtexString(BibtexEntry e) throws IOException {
@@ -636,7 +636,7 @@ public class TestVM extends TestCase {
 
 	public void testHypthenatedName() throws RecognitionException, IOException {
 		VM vm = new VM(new File("src/tests/net/sf/jabref/bst/abbrv.bst"));
-		Vector v = new Vector();
+		Vector<BibtexEntry> v = new Vector<BibtexEntry>();
 		v.add(bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
 		assertTrue(vm.run(v).indexOf("J.-P. Sartre") != -1);
 	}

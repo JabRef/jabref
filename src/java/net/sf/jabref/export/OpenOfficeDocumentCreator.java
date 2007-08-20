@@ -33,7 +33,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         super(Globals.lang("OpenOffice Calc"), "oocalc", null, null, ".sxc");
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws Exception {
+    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws Exception {
         exportOpenOfficeCalc(new File(file), database, keySet);
     }
 
@@ -62,7 +62,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     public static void exportOpenOfficeCalc(File file, BibtexDatabase database,
-        Set keySet) throws Exception {
+        Set<String> keySet) throws Exception {
 
 
         // First store the xml formatted content to a temporary file.
@@ -77,7 +77,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         tmpFile.delete();
     }
 
-    public static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set keySet) {
+    public static void exportOpenOfficeCalcXML(File tmpFile, BibtexDatabase database, Set<String> keySet) {
         OOCalcDatabase od = new OOCalcDatabase(database, keySet);
 
         try {

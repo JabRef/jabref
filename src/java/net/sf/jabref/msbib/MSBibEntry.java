@@ -29,6 +29,7 @@ import net.sf.jabref.mods.PersonName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -595,13 +596,12 @@ public class MSBibEntry {
 		return result;
 	}
 	
-	public Document getDOMrepresentation() {
-		Document result = null;
+	public Node getDOMrepresentation() {
+		Node result = null;
 		try {
-			// TODO No clue what this is doing!!
 			DocumentBuilder d = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
-		//	result = getDOMrepresentation(d);
+			result = getDOMrepresentation(d.newDocument());
 		}
 		catch (Exception e) 
 		{
@@ -1128,6 +1128,8 @@ public class MSBibEntry {
 
 	/*
 	 * render as XML
+	 * 
+	 * TODO This is untested.
 	 */
 	public String toString() {
 		StringWriter sresult = new StringWriter();

@@ -1,6 +1,5 @@
 package net.sf.jabref.external;
 
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -130,8 +129,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      *  false otherwise.
      */
     public boolean linksFound(BibtexDatabase database, String[] fields) {
-        for (Iterator iterator = database.getEntries().iterator(); iterator.hasNext();) {
-            BibtexEntry entry = (BibtexEntry)iterator.next();
+        for (BibtexEntry entry : database.getEntries()){
             for (int i = 0; i < fields.length; i++) {
                 if (entry.getField(fields[i]) != null)
                     return true;

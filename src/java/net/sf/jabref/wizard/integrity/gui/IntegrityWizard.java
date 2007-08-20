@@ -47,12 +47,8 @@ import javax.swing.border.EtchedBorder;
 
 import net.sf.jabref.*;
 
-public class IntegrityWizard
-    extends JDialog
-    implements ActionListener
-{
+public class IntegrityWizard extends JDialog implements ActionListener {
 
-  private JabRefFrame _frame ;
   private BibtexDatabase dbase ;
   private BasePanel basePanel;
   private JButton closeButton ;
@@ -63,7 +59,6 @@ public class IntegrityWizard
   {
     super( frame, "dialog", false ) ;  // no modal
 
-    _frame = frame ;
     this.basePanel = basePanel;
     dbase = basePanel.database();
 

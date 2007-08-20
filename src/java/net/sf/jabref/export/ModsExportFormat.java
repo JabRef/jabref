@@ -22,12 +22,12 @@ class ModsExportFormat extends ExportFormat {
 
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set keySet) throws IOException {
+    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
 
-        // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
+        // TODO: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
 
         try {
             DOMSource source = new DOMSource(md.getDOMrepresentation());

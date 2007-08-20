@@ -50,77 +50,60 @@ public class TagToMarkedTextStore
     int end ;
   }
 
-  private HashMap tagMap ;
+  private HashMap<String, LinkedList<TMarkedStoreItem>> tagMap ;
 
   public TagToMarkedTextStore()
   {
-    tagMap = new HashMap(10) ;
+    tagMap = new HashMap<String, LinkedList<TMarkedStoreItem>>(10) ;
   }
 
   /** appends a selection propertie for tag */
-  public void appendPosition(String tag, int start, int end)
-  {
-    LinkedList ll ;
-    Object dummy = tagMap.get(tag) ;
-    if (dummy == null)
-    {
-      ll = new LinkedList() ;
-      tagMap.put(tag, ll) ;
-    }
-    else
-    {
-      ll = (LinkedList) dummy ;
-    }
+	public void appendPosition(String tag, int start, int end) {
+		LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
+		if (ll == null) {
+			ll = new LinkedList<TMarkedStoreItem>();
+			tagMap.put(tag, ll);
+		}
 
-    TMarkedStoreItem item = new TMarkedStoreItem() ;
-    ll.add(item);
-    item.end = end ;
-    item.start = start ;
-  }
+		TMarkedStoreItem item = new TMarkedStoreItem();
+		ll.add(item);
+		item.end = end;
+		item.start = start;
+	}
 
   /** insert selection propertie for tag, old entries were deleted */
-  public void insertPosition(String tag, int start, int end)
-  {
-    LinkedList ll ;
-    Object dummy = tagMap.get(tag) ;
-    if (dummy == null)
-    {
-      ll = new LinkedList() ;
-      tagMap.put(tag, ll) ;
-    }
-    else
-    {
-      ll = (LinkedList) dummy ;
-      ll.clear();
-    }
+	public void insertPosition(String tag, int start, int end) {
+		LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
 
-    TMarkedStoreItem item = new TMarkedStoreItem() ;
-    ll.add(item);
-    item.end = end ;
-    item.start = start ;
-  }
+		if (ll == null) {
+			ll = new LinkedList<TMarkedStoreItem>();
+			tagMap.put(tag, ll);
+		} else {
+			ll.clear();
+		}
+
+		TMarkedStoreItem item = new TMarkedStoreItem();
+		ll.add(item);
+		item.end = end;
+		item.start = start;
+	}
 
   /** set the Style for the tag if an entry is available */
-  public void setStyleForTag(String tag, String style, StyledDocument doc)
-  {
-    Object dummy = tagMap.get(tag) ;
-    if (dummy != null)
-    {
-      LinkedList ll = (LinkedList) dummy ;
+	public void setStyleForTag(String tag, String style, StyledDocument doc) {
+		LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
 
-      // iterate over all saved selections
-      for (ListIterator lIt = ll.listIterator() ; lIt.hasNext() ; )
-      {
-        Object du2 = lIt.next() ;
-        if (du2 != null)
-        {
-          TMarkedStoreItem item = ( TMarkedStoreItem ) du2 ;
-          doc.setCharacterAttributes( item.start, item.end - item.start,
-                                      doc.getStyle( style ), true ) ;
-        }
-      }
-    }
-  }
-
+		if (ll != null) {
+			// iterate over all saved selections
+			for (ListIterator<TMarkedStoreItem> lIt = ll.listIterator(); lIt
+				.hasNext();) {
+				Object du2 = lIt.next();
+				if (du2 != null) {
+					TMarkedStoreItem item = (TMarkedStoreItem) du2;
+					doc.setCharacterAttributes(item.start, item.end
+						- item.start, doc.getStyle(style), true);
+				}
+			}
+		}
+	}
 
 }

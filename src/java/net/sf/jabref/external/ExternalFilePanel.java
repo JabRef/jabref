@@ -39,8 +39,6 @@ public class ExternalFilePanel extends JPanel {
 
 	private EntryEditor entryEditor;
 
-    private FieldEditor fieldEditor;
-
     private JabRefFrame frame;
 
 	private OpenFileFilter off;
@@ -53,10 +51,9 @@ public class ExternalFilePanel extends JPanel {
 
 	public ExternalFilePanel(final String fieldName, final MetaData metaData,
 		final BibtexEntry entry, final FieldEditor editor, final OpenFileFilter off) {
-		this(null, metaData, null, fieldName, off, null);
+		this(null, metaData, null, fieldName, off, editor);
 		this.entry = entry;
         this.entryEditor = null;
-        this.fieldEditor = editor;
     }
 
 	public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,
@@ -67,7 +64,6 @@ public class ExternalFilePanel extends JPanel {
 		this.metaData = metaData;
 		this.off = off;
 		this.entryEditor = entryEditor;
-        this.fieldEditor = null;
 
         setLayout(new GridLayout(2, 2));
 

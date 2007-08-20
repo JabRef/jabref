@@ -43,27 +43,27 @@ public class VersionHandling {
      * 
      * @return the root of the generated tree.
      */
-    public static GroupTreeNode importFlatGroups(Vector groups)
+    public static GroupTreeNode importFlatGroups(Vector<String> groups)
             throws IllegalArgumentException {
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
         final int number = groups.size() / 3;
         String name, field, regexp;
         for (int i = 0; i < number; ++i) {
-            field = (String) groups.elementAt(3 * i + 0);
-            name = (String) groups.elementAt(3 * i + 1);
-            regexp = (String) groups.elementAt(3 * i + 2);
+            field = (String) groups.get(3 * i + 0);
+            name = (String) groups.get(3 * i + 1);
+            regexp = (String) groups.get(3 * i + 2);
             root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
                     false, true, AbstractGroup.INDEPENDENT)));
         }
         return root;
     }
 
-    public static GroupTreeNode importGroups(Vector orderedData,
+    public static GroupTreeNode importGroups(Vector<String> orderedData,
             BibtexDatabase db, int version) throws Exception {
         switch (version) {
         case 0:
         case 1:
-            return Version0_1.fromString((String) orderedData.firstElement(),
+            return Version0_1.fromString(orderedData.firstElement(),
                     db, version);
         case 2:
         case 3:
@@ -174,7 +174,7 @@ public class VersionHandling {
     }
     
     private static class Version2_3 {
-        private static GroupTreeNode fromString(Vector data, BibtexDatabase db,
+        private static GroupTreeNode fromString(Vector<String> data, BibtexDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;

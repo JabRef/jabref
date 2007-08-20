@@ -18,36 +18,33 @@ import net.sf.jabref.BibtexEntry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 /**
  * @author Michael Wrighton
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class MODSDatabase {
-	protected Set entries;
+	protected Set<MODSEntry> entries;
 	
 	public MODSDatabase() {
 		// maybe make this sorted later...
-		entries = new HashSet();
+		entries = new HashSet<MODSEntry>();
 	}
 	
 	public MODSDatabase(BibtexDatabase bibtex) {
-		Set keySet = bibtex.getKeySet();
-        addEntries(bibtex, keySet);
+        addEntries(bibtex, bibtex.getKeySet());
     }
 
-    public MODSDatabase(BibtexDatabase bibtex, Set keySet) {
+    public MODSDatabase(BibtexDatabase bibtex, Set<String> keySet) {
         if (keySet == null)
             keySet = bibtex.getKeySet();
         addEntries(bibtex, keySet);
     }
 
-
-    private void addEntries(BibtexDatabase database, Set keySet) {
-        entries = new HashSet();
-        for(Iterator iter = keySet.iterator(); iter.hasNext(); ) {
-			BibtexEntry entry = database.getEntryById((String)iter.next());
+    private void addEntries(BibtexDatabase database, Set<String> keySet) {
+        entries = new HashSet<MODSEntry>();
+        for(Iterator<String> iter = keySet.iterator(); iter.hasNext(); ) {
+			BibtexEntry entry = database.getEntryById(iter.next());
 			MODSEntry newMods = new MODSEntry(entry);
 			entries.add(newMods);
 		}
@@ -64,8 +61,8 @@ public class MODSDatabase {
 	   		modsCollection.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 	   		modsCollection.setAttribute("xsi:schemaLocation", "http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
 	   		
-	   		for(Iterator iter = entries.iterator(); iter.hasNext(); ) {
-	   			MODSEntry entry = (MODSEntry) iter.next();
+	   		for(Iterator<MODSEntry> iter = entries.iterator(); iter.hasNext(); ) {
+	   			MODSEntry entry = iter.next();
 	   			Node node = entry.getDOMrepresentation(result);
 	   			modsCollection.appendChild(node);
 	   		}

@@ -248,9 +248,9 @@ public class LatexFieldFormatter implements FieldFormatter {
 
     private void checkBraces(String text) throws IllegalArgumentException {
 
-    Vector
-        left = new Vector(5, 3),
-        right = new Vector(5, 3);
+    Vector<Integer>
+        left = new Vector<Integer>(5, 3),
+        right = new Vector<Integer>(5, 3);
     int current = -1;
 
     // First we collect all occurences:

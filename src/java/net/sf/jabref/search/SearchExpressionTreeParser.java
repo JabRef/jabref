@@ -11,7 +11,7 @@ import antlr.NoViableAltException;
 import antlr.RecognitionException;
 import antlr.collections.AST;
 
-
+@SuppressWarnings({"unchecked", "unused"})
 public class SearchExpressionTreeParser extends antlr.TreeParser       implements SearchExpressionTreeParserTokenTypes
  {
 
@@ -139,7 +139,6 @@ public SearchExpressionTreeParser() {
 	public final boolean  tExpressionSearch(AST _t) throws RecognitionException, PatternSyntaxException {
 		 boolean ret = false;
 
-        AST tExpressionSearch_AST_in = (_t == ASTNULL) ? null : (AST)_t;
 		AST var_f = null;
 		AST var_v = null;
 		
@@ -162,7 +161,6 @@ public SearchExpressionTreeParser() {
 			
 						Pattern fieldSpec = ((RegExNode)var_f).getPattern();
 						Pattern valueSpec = ((RegExNode)var_v).getPattern();
-						int pseudoField = 0;
 			boolean noSuchField = true;
 						// this loop iterates over all regular keys, then over pseudo keys like "type"
 						for (int i = 0; i < searchKeys.length + PSEUDOFIELD_TYPE && !ret; ++i) {
