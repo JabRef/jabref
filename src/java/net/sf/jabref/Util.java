@@ -1055,19 +1055,44 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 
 					String method = calls.substring(start, i);
 
+					// Skip the brace
 					i++;
-					i++;
-
-					int startParam = i;
-					i++;
-
-					while (i + 1 < c.length && !(c[i] == '"' && c[i + 1] == ')')) {
-						i++;
+					if (i < c.length){
+						if (c[i] == '"'){
+							// Parameter is in format "xxx"
+							
+							// Skip "
+							i++;
+		
+							int startParam = i;
+							i++;
+		
+							while (i + 1 < c.length && !(c[i] == '"' && c[i + 1] == ')')) {
+								i++;
+							}
+		
+							String param = calls.substring(startParam, i);
+		
+							result.add(new String[] { method, param });
+						} else {
+							// Parameter is in format xxx
+							
+							int startParam = i;
+	
+							while (i < c.length && c[i] != ')') {
+								i++;
+							}
+		
+							String param = calls.substring(startParam, i);
+		
+							result.add(new String[] { method, param });
+							
+							
+						}
+					} else {
+						// Incorrecly terminated open brace
+						result.add(new String[] { method });
 					}
-
-					String param = calls.substring(startParam, i);
-
-					result.add(new String[] { method, param });
 				} else {
 					String method = calls.substring(start, i);
 					result.add(new String[] { method });

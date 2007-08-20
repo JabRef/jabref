@@ -212,6 +212,12 @@ public class UtilTest extends TestCase {
 		assertEquals("foo", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[0]);
 		assertEquals("test", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)))[1]);
 		assertEquals("fark", ((String[])(Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)))[1]);
+		
+		assertEquals(2, Util.parseMethodsCalls("bla(test),foo(fark)").size());
+		assertEquals("bla", ((String[])(Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[0]);
+		assertEquals("foo", ((String[])(Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[0]);
+		assertEquals("test", ((String[])(Util.parseMethodsCalls("bla(test),foo(fark)").get(0)))[1]);
+		assertEquals("fark", ((String[])(Util.parseMethodsCalls("bla(test),foo(fark)").get(1)))[1]);
 	}
 	
 	
