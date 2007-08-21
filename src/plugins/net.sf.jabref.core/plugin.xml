@@ -58,7 +58,7 @@
 			value="Fetch Entries from OAI2 Archives like ArXiv." />
 	</extension>
 
-	<!-- Layout Formatters -->
+	<!-- To extend JabRef with an Layout Formatters use the following extension point -->
 	<extension-point id="LayoutFormatter">
 		<parameter-def type="string" id="layoutFormatter"
 			custom-data="net.sf.jabref.export.layout.LayoutFormatter" />
@@ -77,8 +77,39 @@
 		<parameter id="description"
 			value="Format according to Bibtex name.format$ method. Define in preferences." />
 	</extension>
+	
+	<!-- To extend JabRef with an Full Export Format use the following extension point -->
+	<extension-point id="ExportFormat">
+		<!-- 
+			The class given in this string needs to implement the 
+			IExportFormat interface.
+		 
+		 	Caution: Only the method performExport will be called 
+		 	of this class. The other methods will be automatically 
+		 	filled by the plug-in framework according to the values
+		 	given below (this allows us to initialize lazyly). 
+		 --> 
+		<parameter-def type="string" id="exportFormat"
+			custom-data="net.sf.jabref.export.IExportFormat" />
+		<!-- Name of this export format to display to the user -->
+		<parameter-def type="string" id="displayName" />
+		<!-- Identifier to use as a parameter on the console -->
+		<parameter-def type="string" id="consoleName" />
+		<!-- file extension this export format should use -->
+		<parameter-def type="string" id="extension" />
+	</extension-point>
 
-	<!-- Export Formats-->
+	<!-- Format Provider -->
+	<extension-point id="ExportFormatProvider">
+		<parameter-def type="string" id="formatProvider"
+			custom-data="net.sf.jabref.export.IExportFormatProvider" />
+		<!-- Name of this export format to display to the user -->
+		<parameter-def type="string" id="name" />
+		<!-- Identifier to use as a parameter on the console -->
+		<parameter-def type="string" id="description" />
+	</extension-point>
+	
+	<!-- To extend JabRef with an Template based Export Format use the following extension point -->
 	<extension-point id="ExportFormatTemplate">
 		<!-- Name of this export format to display to the user -->
 		<parameter-def type="string" id="displayName" />

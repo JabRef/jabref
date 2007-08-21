@@ -41,12 +41,12 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
 
-        Map<String, ExportFormat> m = ExportFormats.getExportFormats();
-        ExportFormat[] formats = new ExportFormat[m.size()];
+        Map<String, IExportFormat> m = ExportFormats.getExportFormats();
+        IExportFormat[] formats = new ExportFormat[m.size()];
         String[] array = new String[formats.length];
         
         int piv = 0;
-		for (ExportFormat format : m.values()) {
+		for (IExportFormat format : m.values()) {
 			formats[piv] = format;
 			array[piv] = format.getDisplayName();
 			piv++;
@@ -65,7 +65,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         if (answer == JOptionPane.NO_OPTION)
             return;
 
-        ExportFormat format = formats[list.getSelectedIndex()];
+        IExportFormat format = formats[list.getSelectedIndex()];
 
         /*final boolean custom = (list.getSelectedIndex() >= Globals.STANDARD_EXPORT_COUNT);
         String dir = null;

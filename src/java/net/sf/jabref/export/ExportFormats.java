@@ -9,12 +9,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.MnemonicAwareAction;
+import net.sf.jabref.*;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatExtension;
+import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatProviderExtension;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExtension;
 
 /**
@@ -26,7 +25,7 @@ import net.sf.jabref.plugin.core.generated._JabRefPlugin.ExportFormatTemplateExt
  */
 public class ExportFormats {
 
-	private static Map<String,ExportFormat> exportFormats = new TreeMap<String,ExportFormat>();
+	private static Map<String,IExportFormat> exportFormats = new TreeMap<String,IExportFormat>();
 
     public static void initAllExports() {
         exportFormats.clear();
@@ -60,10 +59,45 @@ public class ExportFormats {
 					putFormat(format);
 				}
 			}
+			// add generic exports contributed by Plugins
+			for (final ExportFormatExtension e : plugin.getExportFormatExtensions()) {
+				putFormat(new IExportFormat(){
+
+					public String getConsoleName() {
+						return e.getConsoleName();
+					}
+
+					public String getDisplayName() {
+						return e.getDisplayName();
+					}
+
+					public FileFilter getFileFilter() {
+						return new ExportFileFilter(this, e.getExtension());
+					}
+
+					IExportFormat wrapped;
+					public void performExport(BibtexDatabase database,
+						String file, String encoding, Set<String> entryIds)
+						throws Exception {
+
+						if (wrapped == null)
+							wrapped = e.getExportFormat();
+						wrapped.performExport(database, file, encoding, entryIds);
+					}
+				});
+			}
+		
+			// formatters provided by Plugins
+			for (ExportFormatProviderExtension e : plugin.getExportFormatProviderExtensions()) {
+				IExportFormatProvider formatProvider = e.getFormatProvider();
+				for (IExportFormat exportFormat : formatProvider.getExportFormats()) {
+					putFormat(exportFormat);
+				}
+			}
 		}
-        
+		
         // Now add custom export formats
-        for (ExportFormat format : Globals.prefs.customExports.getCustomExportFormats().values()){
+        for (IExportFormat format : Globals.prefs.customExports.getCustomExportFormats().values()){
             putFormat(format);
         }
     }
@@ -101,7 +135,7 @@ public class ExportFormats {
      * Get a Map of all export formats.
      * @return A Map containing all export formats, mapped to their console names.
      */
-    public static Map<String, ExportFormat> getExportFormats() {
+    public static Map<String, IExportFormat> getExportFormats() {
         // It is perhaps overly paranoid to make a defensive copy in this case:
         return Collections.unmodifiableMap(exportFormats);
     } 
@@ -114,7 +148,7 @@ public class ExportFormats {
 	 * @return The ExportFormat, or null if no exportformat with that name is
 	 *         registered.
 	 */
-	public static ExportFormat getExportFormat(String consoleName) {
+	public static IExportFormat getExportFormat(String consoleName) {
 		return exportFormats.get(consoleName);
 	}
 
@@ -157,8 +191,8 @@ public class ExportFormats {
 					try {
 						ExportFileFilter eff = (ExportFileFilter) ff;
 						String path = file.getPath();
-						if (!path.endsWith(eff.getExportFormat().getExtension()))
-							path = path + eff.getExportFormat().getExtension();
+						if (!path.endsWith(eff.getExtension()))
+							path = path + eff.getExtension();
 						file = new File(path);
 						if (file.exists()) {
 							// Warn that the file exists:
@@ -167,7 +201,7 @@ public class ExportFormats {
 								JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)
 								return;
 						}
-						ExportFormat format = eff.getExportFormat();
+						IExportFormat format = eff.getExportFormat();
 						Set<String> entryIds = null;
 						if (selectedOnly) {
 							BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
@@ -209,15 +243,15 @@ public class ExportFormats {
 		FileFilter defaultFilter = null;
 		JFileChooser fc = new JFileChooser(currentDir);
 		TreeSet<FileFilter> filters = new TreeSet<FileFilter>();
-		for (Iterator<String> i = exportFormats.keySet().iterator(); i.hasNext();) {
-			String formatName = i.next();
-			ExportFormat format = exportFormats.get(formatName);
+		for (Map.Entry<String, IExportFormat> e : exportFormats.entrySet()) {
+			String formatName = e.getKey() ;
+			IExportFormat format = e.getValue();
 			filters.add(format.getFileFilter());
 			if (formatName.equals(lastUsedFormat))
 				defaultFilter = format.getFileFilter();
 		}
-		for (Iterator<FileFilter> i = filters.iterator(); i.hasNext();) {
-			fc.addChoosableFileFilter((ExportFileFilter) i.next());
+		for (FileFilter ff : filters) {
+			fc.addChoosableFileFilter(ff);
 		}
 		fc.setAcceptAllFileFilterUsed(false);
 		if (defaultFilter != null)
@@ -225,7 +259,7 @@ public class ExportFormats {
 		return fc;
 	}
 
-	private static void putFormat(ExportFormat format) {
+	private static void putFormat(IExportFormat format) {
 		exportFormats.put(format.getConsoleName(), format);
 	}
 

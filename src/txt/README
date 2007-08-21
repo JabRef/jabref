@@ -80,11 +80,12 @@ appear in your chosen languages.
 
 Change log:
 
-2.4b1
+2.4xx
 	- JabRef can now be extended by plugins (using the Java Plugin Framework (JPF) as the
 	  underlying technology). Currently extension points exist for:
 		- ImportFormat
-		- ExportFormat
+		- ExportFormat based on Templates
+		- ExportFormat based on IExportFormat (thanks Kariem!)
 		- LayoutFormatter
 		- EntryFetcher 
 	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper

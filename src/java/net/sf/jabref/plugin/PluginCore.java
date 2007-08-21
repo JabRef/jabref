@@ -2,6 +2,7 @@ package net.sf.jabref.plugin;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -27,8 +28,8 @@ import org.java.plugin.util.ExtendedProperties;
  * {@link net.sf.jabref.export.layout.LayoutEntry#getLayoutFormatterFromPlugins(String)}
  * 
  * The PluginCore relies on the generated class
- * {@link net.sf.jabref.plugin.core.JabRefPlugin} in the sub-package core for
- * methods in finding the plug-ins that extend JabRef.
+ * {@link net.sf.jabref.plugin.core.JabRefPlugin} in the sub-package "core" for
+ * finding the plugins and their extension.
  * 
  * @author Christopher Oezbek
  */
@@ -39,13 +40,23 @@ public class PluginCore {
 	static PluginLocation getLocationInsideJar(String context, String manifest) {
 		URL jar = PluginCore.class
 			.getResource(Util.joinPath(context, manifest));
-		if (jar != null && jar.getProtocol().toLowerCase().startsWith("jar")) {
-			try {
+		
+		if (jar == null) {
+			return null;
+		}
+		String protocol = jar.getProtocol().toLowerCase();
+		try {
+			if (protocol.startsWith("jar")) {
 				return new StandardPluginLocation(new URL(jar.toExternalForm()
 					.replaceFirst("!(.*?)$", Util.joinPath("!", context))), jar);
-			} catch (MalformedURLException e) {
-				return null;
+			} else if (protocol.startsWith("file")) {
+				File f = new File(jar.toURI());
+				return new StandardPluginLocation(f.getParentFile(), manifest);
 			}
+		} catch (URISyntaxException e) {
+			return null;
+		} catch (MalformedURLException e) {
+			return null;
 		}
 		return null;
 	}
@@ -96,6 +107,7 @@ public class PluginCore {
 				"/plugins/net.sf.jabref.core/",
 				"/plugins/net.sf.jabref.export.misq/" };
 
+			// Collection locations
 			for (String jarLocation : jarLocationsToSearch) {
 				PluginLocation location = getLocationInsideJar(jarLocation,
 					"plugin.xml");

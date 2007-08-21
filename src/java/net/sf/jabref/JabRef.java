@@ -327,7 +327,7 @@ public class JabRef {
                     // format to the given file.
                     ParserResult pr = loaded.elementAt(loaded.size() - 1);
                     System.out.println(Globals.lang("Exporting") + ": " + data[0]);
-                    ExportFormat format = ExportFormats.getExportFormat(data[1]);
+                    IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format != null) {
                         // We have an ExportFormat instance:
                         try {

@@ -19,7 +19,6 @@ import java.io.File;
 class ModsExportFormat extends ExportFormat {
     public ModsExportFormat() {
         super(Globals.lang("MODS"), "mods", null, null, ".xml");
-
     }
 
     public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws IOException {
