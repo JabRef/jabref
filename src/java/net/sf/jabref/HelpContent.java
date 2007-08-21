@@ -44,8 +44,13 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class HelpContent extends JTextPane {
 
+	static Log log = LogFactory.getLog(HelpContent.class);
+	
 	JScrollPane pane;
 
 	private Stack<URL> history, forw;
@@ -120,25 +125,24 @@ public class HelpContent extends JTextPane {
 		
 		URL old = getPage();
 		try {
-            URL resource = JabRef.class.getResource(GUIGlobals.helpPre + middle + file);
-            // Because of the call to toString(), we must test for null, or the fallback
-            // to english won't work if the page is missing in the selected langugage:
-            if (resource != null) {
-                super.setPage(new URL(resource.toString() + "#" + reference));
+			// First check in specified language
+			URL resource = JabRef.class.getResource(GUIGlobals.helpPre + middle + file);
+            
+			// If not available fallback to english
+			if (resource == null) {
+            	resource = JabRef.class.getResource(GUIGlobals.helpPre + file);
             }
-            else {
-                setPageOnly(new URL(HelpContent.class.getResource(GUIGlobals.helpPre + file) + "#" + reference));
+			
+			// If still not available print a warning
+            if (resource == null){
+            	// TODO show warning to user
+            	log.error("Could not find html-help for file '" + file + "'.");
+            	return;
             }
+            setPageOnly(new URL(resource.toString() + "#" + reference));
+            
         } catch (IOException ex) {
             ex.printStackTrace();
-            // The fallback below shouldn't bee needed any more, because of the null
-            // check above.
-            /*
-            try {
-				setPageOnly(new URL(HelpContent.class.getResource(GUIGlobals.helpPre + file) + "#" + reference));
-			} catch (MalformedURLException e) {
-				setPageOnly(HelpContent.class.getResource(GUIGlobals.helpPre + file));
-			}*/
 		}
 
 		forw.removeAllElements();
