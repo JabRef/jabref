@@ -85,12 +85,13 @@ Change log:
 	  underlying technology). Currently extension points exist for:
 		- ImportFormat
 		- ExportFormat based on Templates
-		- ExportFormat based on IExportFormat (thanks Kariem!)
+		- ExportFormat based on IExportFormat (patch contributed by Kariem Hussein)
 		- LayoutFormatter
 		- EntryFetcher 
 	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
 	  classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
+	- [ 1717849 ] Fix bug in aux import (patch contributed by Kai Eckert)
 
 2.3b1   
 	- Added MIS Quarterly export format.

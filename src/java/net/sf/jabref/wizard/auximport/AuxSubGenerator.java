@@ -295,7 +295,10 @@ public class AuxSubGenerator
           String crossref = (String)entry.getField("crossref");
           if ((crossref != null) && (!mySet.contains(crossref))) {
               BibtexEntry refEntry = db.getEntryByKey(crossref);
-              if (entry == null) {
+              /**
+               * [ 1717849 ] Patch for aux import by Kai Eckert
+               */
+              if (refEntry == null) {
                   notFoundList.add(crossref);
               } else {
                   insertEntry(auxDB, refEntry);
@@ -393,20 +396,4 @@ public class AuxSubGenerator
   {
     return this.nestedAuxCounter ;
   }
-
-/*
-  public class FileNameString extends String
-  {
-    public boolean equals(Object anObject)
-    {
-      if (anObject == null)
-        return false ;
-
-      if (anObject.hashCode() == this.hashCode())
-        return true ;
-
-      return false ;
-    }
-  }
-*/
 }
