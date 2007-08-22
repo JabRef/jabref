@@ -182,7 +182,7 @@ public class LabelPatternUtil {
                   }
                   else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                                        _sbvalue.append(authIniN(authString,num));
+                    _sbvalue.append(authIniN(authString,num));
                   }
                   else if (val.equals("auth.auth.ea")) {
                     _sbvalue.append(authAuthEa(authString));
