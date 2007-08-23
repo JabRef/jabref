@@ -107,7 +107,7 @@ public class FieldComparator implements Comparator<BibtexEntry> {
 			result = -(((Integer) f1).compareTo(f2AsInteger));
 		} else {
 			String ours = ((String) f1).toLowerCase(), theirs = ((String) f2).toLowerCase();
-			result = ours.compareTo(theirs);
+            result = ours.compareTo(theirs);
 		}
 
 		return result * localMultiplier;

@@ -333,11 +333,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
      *            Field name
      * @return Component to show, or null if none.
      */
-    public JComponent getExtra(String string, FieldEditor editor) {
-        final FieldEditor ed = editor;
+    public JComponent getExtra(String string, final FieldEditor ed) {
 
         // fieldName and parameter string identically ????
-        final String fieldName = editor.getFieldName();
+        final String fieldName = ed.getFieldName();
 
         String s = BibtexFields.getFieldExtras(string);
 
@@ -365,7 +364,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         if ((s != null) && s.equals("external")) {
 
             // Add external viewer listener for "pdf" and "url" fields.
-            ((JComponent) editor).addMouseListener(new ExternalViewerListener());
+            ((JComponent) ed).addMouseListener(new ExternalViewerListener());
 
             return null;
         } else if ((s != null) && s.equals("journalNames")) {
@@ -375,25 +374,25 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             // these.
             JPanel controls = new JPanel();
             controls.setLayout(new BorderLayout());
-            if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
+            if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + ed.getFieldName()) != null) {
+                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, ed,
                     panel.metaData, storeFieldAction, false, ", ");
                 contentSelectors.add(ws);
                 controls.add(ws, BorderLayout.NORTH);
             }
-            controls.add(JournalAbbreviations.getNameSwitcher(this, editor, panel.undoManager),
+            controls.add(JournalAbbreviations.getNameSwitcher(this, ed, panel.undoManager),
                 BorderLayout.SOUTH);
             return controls;
-        } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
+        } else if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + ed.getFieldName()) != null) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, ed,
                 panel.metaData, storeFieldAction, false,
-                (editor.getFieldName().equals("author") ? " and " : ", "));
+                (ed.getFieldName().equals("author") ? " and " : ", "));
             contentSelectors.add(ws);
 
             return ws;
         } else if ((s != null) && s.equals("browse")) {
             JButton but = new JButton(Globals.lang("Browse"));
-            ((JComponent) editor).addMouseListener(new ExternalViewerListener());
+            ((JComponent) ed).addMouseListener(new ExternalViewerListener());
 
             // but.setBackground(GUIGlobals.lightGray);
             but.addActionListener(new ActionListener() {
@@ -435,18 +434,28 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
          * new ExternalFilePanel(frame, this, "ps", off, ed); return pan; }
          */
         else if ((s != null) && s.equals("url")) {
-            ((JComponent) editor).setDropTarget(new DropTarget((Component) editor,
-                DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(editor, storeFieldAction)));
+            ((JComponent) ed).setDropTarget(new DropTarget((Component) ed,
+                DnDConstants.ACTION_NONE, new SimpleUrlDragDrop(ed, storeFieldAction)));
 
             return null;
         }
 
+        else if ((s != null) && (s.equals("setOwner"))) {
+            JButton button = new JButton(Globals.lang("Auto"));
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    ed.setText(Globals.prefs.get("defaultOwner"));
+                    storeFieldAction.actionPerformed(new ActionEvent(ed, 0, ""));
+                }
+            });
+            return button;
+        }
         else
             return null;
     }
 
     private void setupSourcePanel() {
-        source = new JTextArea() {
+        source = new JTextArea();/* {
             private boolean antialias = Globals.prefs.getBoolean("antialias");
 
             public void paint(Graphics g) {
@@ -456,7 +465,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
                         RenderingHints.VALUE_ANTIALIAS_ON);
                 super.paint(g2);
             }
-        };
+        };*/
 
         //DefaultFormBuilder builder = new DefaultFormBuilder
         //        (srcPanel, new FormLayout( "fill:pref:grow", "fill:pref:grow"));

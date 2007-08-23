@@ -92,8 +92,37 @@ Change log:
 	  classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
 	- [ 1717849 ] Fix bug in aux import (patch contributed by Kai Eckert)
-
-2.3b1   
+2.3b2
+	- Added % at start of signature text in BibTeX output. Parser now reads both
+	  old and new style.
+    - When user chooses to save to an existing file, and answers that the file should not be
+      overwritten, a new file dialog now appears instead of the operation cancelling.
+    - Removed antialias setting for main table, because it interferes with proper rendering
+      on LCDs when running under JRE 6. Removed non-optional antialias settings for entry
+      editor for the same reason.
+    - Changed external link handling so remote (http) links can be sent to the external
+      application. Applications like Evince and Gimp can open remote links.
+    - Replaced Simle HTML export filter with improved version by Mark Schenk.
+    - Introduced ParamLayoutFormatter interface for layout formatters that can take an
+      argument by the following syntax: \format[MyFormatter(argument)]{\field}
+      Implementing classes contain a setArgument(String) method that receives the argument
+      (if any) before the format() method is called.
+    - Timestamp and owner fields are now set also when appending a bib file, and new options
+      have been introduced to control whether imported/appended/pasted entries should have
+      these fields overwritten if already set.
+    - Added operations for adding file links in import inspection window, and made file
+      and URL icons in the table clickable.
+    - Removed PDF and PS columns and operations in import inspection window (replaced by
+      operations on the "file" field).
+    - Added "Auto" button to automatically set "owner" field to the default username. 
+    - Added \encoding tag for begin/end layouts in export filters to print the name of the
+      character encoding used for the export. The tag is not available in entry layouts.
+    - Added \% as a supported LaTeX command, producing '%'.
+    - Fixed bug in HTMLChars: commands like {\aa} and {\o} were not processed properly, even
+      though defined in Globals.HTMLCHARS.
+    - Fixed bug that made it possible to accidentally close database without saving, when error
+      occurs during the save operation.
+2.3b
 	- Added MIS Quarterly export format.
 	- Added support for COPAC file format.
 	- Added RemoveTilde LayoutFormatter to deal with Bibtex non-breakable spaces.
@@ -105,11 +134,14 @@ Change log:
 	- Added new field marker [auth.etal] for key generation.
 	- Added support in XMP metadata handling for bibtex string resolution.
 	- When opening databases, already open files are now skipped.
+	- Option to use native instead of Swing file dialogs is now available on all OSes.
 	- Synchronize external links now searches entire database, not selected entries.
 	- Medline import now adds <Affiliation> information into the "institution" field.
 	- Improved handling of external links. The 'file' field can now specify a list
 	  of external links, and arbitrary file types are supported. Old-style PDF and
 	  PS links can be moved automatically into the 'file' field.
+	- Fixed minor bug in importing preferences. General fields for entry editors are
+	  now updated without restarting JabRef.
 	- Fixed bug in RIS and Refer/Endnote imports. Entries with editors but no authors
 	  are now imported properly.
 	- Fixed missing export formatter AuthorFirstFirstCommas.

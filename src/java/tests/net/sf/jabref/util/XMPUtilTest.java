@@ -133,7 +133,7 @@ public class XMPUtilTest extends TestCase {
 
 	public String t2XMP() {
 		return "<rdf:Description rdf:about='' xmlns:bibtex='http://jabref.sourceforge.net/bibteXMP/' "
-				+ "bibtex:title='öptímzàtîôn' "
+				+ "bibtex:title='ï¿½ptï¿½mzï¿½tï¿½ï¿½n' "
 				+ "bibtex:bibtexkey='OezbekC06' "
 				+ "bibtex:entrytype='INCOLLECTION' "
 				+ "bibtex:year='2003' "
@@ -150,7 +150,7 @@ public class XMPUtilTest extends TestCase {
 	public BibtexEntry t2BibtexEntry() {
 		BibtexEntry e = new BibtexEntry(Util.createNeutralId(),
 				BibtexEntryType.INCOLLECTION);
-		e.setField("title", "öptímzàtîôn");
+		e.setField("title", "ï¿½ptï¿½mzï¿½tï¿½ï¿½n");
 		e.setField("bibtexkey", "OezbekC06");
 		e.setField("year", "2003");
 		e
@@ -177,7 +177,7 @@ public class XMPUtilTest extends TestCase {
 		e
 				.setField(
 						"abstract",
-						"The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
+						"The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
 		return e;
 	}
 
@@ -204,7 +204,7 @@ public class XMPUtilTest extends TestCase {
 				+ "<bibtex:entrytype>Inproceedings</bibtex:entrytype>"
 				+ "<bibtex:year>1982</bibtex:year>"
 				+ "<bibtex:month>#jul#</bibtex:month>"
-				+ "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development – open source software – that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
+				+ "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class XMPUtilTest extends TestCase {
 	public void testReadXMPUTF8() throws Exception {
 
 		String bibtex = "<bibtex:year>2003</bibtex:year>\n"
-				+ "<bibtex:title>öptímzàtîôn</bibtex:title>\n"
+				+ "<bibtex:title>ï¿½ptï¿½mzï¿½tï¿½ï¿½n</bibtex:title>\n"
 				+ "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
 
 		writeManually(pdfFile, bibtexXPacket(bibtexDescription(bibtex)));
@@ -307,7 +307,7 @@ public class XMPUtilTest extends TestCase {
 		assertNotNull(e);
 		assertEquals("OezbekC06", e.getCiteKey());
 		assertEquals("2003", e.getField("year"));
-		assertEquals("öptímzàtîôn", e.getField("title"));
+		assertEquals("ï¿½ptï¿½mzï¿½tï¿½ï¿½n", e.getField("title"));
 		assertEquals(BibtexEntryType.OTHER, e.getType());
 	}
 
@@ -361,9 +361,7 @@ public class XMPUtilTest extends TestCase {
 			List<BibtexEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile());
 			assertEquals(1, l.size());
 			BibtexEntry x = (BibtexEntry) l.get(0);
-
 			Set<String> ts = x.getAllFields();
-
 			assertEquals(8, ts.size());
 
 			ts.contains("bibtextype");
@@ -462,7 +460,7 @@ public class XMPUtilTest extends TestCase {
 	public void testWriteReadManually() throws Exception {
 
 		String bibtex = "<bibtex:year>2003</bibtex:year>\n"
-				+ "<bibtex:title>öptímzàtîôn</bibtex:title>\n"
+				+ "<bibtex:title>ï¿½ptï¿½mzï¿½tï¿½ï¿½n</bibtex:title>\n"
 				+ "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
 
 		writeManually(pdfFile, bibtexXPacket(bibtexDescription(bibtex)));
@@ -878,7 +876,6 @@ public class XMPUtilTest extends TestCase {
 
 		assertEquals(expected.getAllFields().size(),
 				actual.getAllFields().size());
-
 	}
 
 	/**
@@ -1047,7 +1044,6 @@ public class XMPUtilTest extends TestCase {
 			// Check Dublin Core
 			List<XMPSchema> schemas = meta
 					.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
-
 			assertEquals(1, schemas.size());
 
 			XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas
@@ -1510,7 +1506,7 @@ public class XMPUtilTest extends TestCase {
 	 * A better testcase for resolveStrings. Makes sure that also the document
 	 * information and dublin core are written correctly.
 	 * 
-	 * Data was contributed by Philip K.F. Hölzenspies (p.k.f.holzenspies [at] utwente.nl).
+	 * Data was contributed by Philip K.F. Hï¿½lzenspies (p.k.f.holzenspies [at] utwente.nl).
 	 * 
 	 * @throws IOException
 	 * @throws FileNotFoundException

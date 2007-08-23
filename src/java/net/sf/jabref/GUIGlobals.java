@@ -40,6 +40,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -317,7 +318,15 @@ public class GUIGlobals {
 		return u != null ? new ImageIcon(getIconUrl(name)) : null;
 	}
 
-	/**
+    /**
+     * Get a Map of all application icons mapped from their keys.
+     * @return A Map containing all icons used in the application.
+     */
+    public static Map getAllIcons() {
+        return Collections.unmodifiableMap(iconMap);
+    }
+                       
+    /**
 	 * Read a typical java property file into a HashMap. Currently doesn't support escaping
 	 * of the '=' character - it simply looks for the first '=' to determine where the key ends.
 	 * Both the key and the value is trimmed for whitespace at the ends.

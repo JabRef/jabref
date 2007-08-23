@@ -16,10 +16,10 @@ import com.jgoodies.forms.layout.FormLayout;
 public class GeneralTab extends JPanel implements PrefsTab {
 
     private JCheckBox backup, openLast,
-    defSort, ctrlClick,
-    useOwner, keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
+    defSort, ctrlClick, useOwner, overwriteOwner,
+    keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
     confirmDelete, allowEditing, /*preserveFormatting, */useImportInspector,
-    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp;
+    useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp;
     private JRadioButton
         saveOriginalOrder, saveAuthorOrder, saveTableOrder,
         resolveStringsStandard, resolveStringsAll;
@@ -44,6 +44,12 @@ public class GeneralTab extends JPanel implements PrefsTab {
         useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
         useTimeStamp = new JCheckBox(Globals.lang("Mark new entries with addition date") + ". "
             +Globals.lang("Date format")+ ":");
+        overwriteOwner = new JCheckBox(Globals.lang("Overwrite"));
+        overwriteTimeStamp = new JCheckBox(Globals.lang("Overwrite"));
+        overwriteOwner.setToolTipText(Globals.lang("If a pasted or imported entry already has "
+            +"the field set, overwrite."));
+        overwriteTimeStamp.setToolTipText(Globals.lang("If a pasted or imported entry already has "
+            +"the field set, overwrite."));
         keyDuplicateWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when a duplicate BibTeX key is entered"));
         keyEmptyWarningDialog = new JCheckBox(Globals.lang("Show warning dialog when an empty BibTeX key is entered")); // JZTODO lyrics
         confirmDelete = new JCheckBox(Globals.lang("Show confirmation dialog when deleting entries"));
@@ -133,19 +139,23 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.add(keyEmptyWarningDialog, cc.xy(2, 29));
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
-                ("left:pref, 8dlu, fill:60dlu, 4dlu, left:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
+                ("left:pref, 8dlu, fill:50dlu, 4dlu, left:pref, 4dlu, left:pref, 4dlu, fill:50dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder2 = new DefaultFormBuilder(layout2);
         builder2.append(useOwner);
         builder2.append(defOwnerField);
+        builder2.append(overwriteOwner);
         JButton hlp = new JButton(ownerHelp);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
         builder2.append(hlp);
+        //builder2.nextLine();
+
         builder2.nextLine();
         builder2.append(useTimeStamp);
-        builder2.append(timeStampFormat);
-        builder2.append(Globals.lang("Field name")+":");
         builder2.append(timeStampField);
+        builder2.append(overwriteTimeStamp);
+        builder2.append(Globals.lang("Field name")+":");
+        builder2.append(timeStampFormat);
         hlp = new JButton(timeStampHelp);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
@@ -176,7 +186,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         defSort.setSelected(_prefs.getBoolean("defaultAutoSort"));
         ctrlClick.setSelected(_prefs.getBoolean("ctrlClick"));
         useOwner.setSelected(_prefs.getBoolean("useOwner"));
+        overwriteOwner.setSelected(_prefs.getBoolean("overwriteOwner"));
         useTimeStamp.setSelected(_prefs.getBoolean("useTimeStamp"));
+        overwriteTimeStamp.setSelected(_prefs.getBoolean("overwriteTimeStamp"));
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
         confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
@@ -226,7 +238,9 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("backup", backup.isSelected());
         _prefs.putBoolean("openLastEdited", openLast.isSelected());
         _prefs.putBoolean("useOwner", useOwner.isSelected());
+        _prefs.putBoolean("overwriteOwner", overwriteOwner.isSelected());
         _prefs.putBoolean("useTimeStamp", useTimeStamp.isSelected());
+        _prefs.putBoolean("overwriteTimeStamp", overwriteTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());

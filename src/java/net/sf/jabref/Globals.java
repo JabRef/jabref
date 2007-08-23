@@ -155,7 +155,10 @@ public class Globals {
 	public static final String NEWLINE = System.getProperty("line.separator");
     public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
 
-	/**
+    // Instantiate logger:
+    private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+    /**
 	 * true if we have unix newlines
 	 */
 	public static final boolean UNIX_NEWLINE = NEWLINE.equals("\n");
@@ -167,28 +170,28 @@ public class Globals {
 	public static final String BIBTEX_STRING = "__string";
 
 	public static void logger(String s) {
-		Logger.global.info(s);
+		logger.info(s);
 	}
 
 	public static void turnOffLogging() { // only log exceptions
-		Logger.global.setLevel(java.util.logging.Level.SEVERE);
+		logger.setLevel(java.util.logging.Level.SEVERE);
 	}
 
 	/**
 	 * Should be only called once
 	 */
 	public static void turnOnConsoleLogging() {
-		Logger.global.addHandler(consoleHandler);
+		logger.addHandler(consoleHandler);
 	}
 
 	/**
 	 * Should be only called once
 	 */
 	public static void turnOnFileLogging() {
-		Logger.global.setLevel(java.util.logging.Level.ALL);
+		logger.setLevel(java.util.logging.Level.ALL);
 		java.util.logging.Handler handler;
 		handler = new ConsoleHandler();
-		Logger.global.addHandler(handler);
+		logger.addHandler(handler);
 
 		handler.setFilter(new Filter() { // select what gets logged
 				public boolean isLoggable(LogRecord record) {
@@ -378,7 +381,7 @@ public class Globals {
 	 * @param directory
 	 * @param extension
 	 * @param updateWorkingdirectory
-	 * @return
+	 * @return an array of selected file paths, or an empty array if no selection is made.
 	 */
 	public static String[] getMultipleFiles(JFrame owner, File directory, String extension,
 		boolean updateWorkingdirectory) {
@@ -453,13 +456,13 @@ public class Globals {
 		String description, OpenFileFilter off, int dialogType, boolean updateWorkingDirectory,
 		boolean dirOnly, boolean multipleSelection, JComponent accessory) {
 
-		if (ON_MAC && prefs.getBoolean("useNativeFileDialogOnMac")) {
+		if (/*ON_MAC && */prefs.getBoolean("useNativeFileDialogOnMac")) {
 
 			return getNewFileForMac(owner, directory, extension, dialogType,
 				updateWorkingDirectory, dirOnly, off);
 		}
 
-		JFileChooser fc = null;
+		JFileChooser fc;
 		try {
 			fc = new JabRefFileChooser(directory);
                         if (accessory != null)
@@ -730,7 +733,7 @@ public class Globals {
 		HTMLCHARS.put("vC", "&#268;"); // "Ccaron"
 		HTMLCHARS.put("vc", "&#269;"); // "ccaron"
 		HTMLCHARS.put("vD", "&#270;"); // "Dcaron"
-		// Symbol #271 (d´) has no special Latex command
+		// Symbol #271 (dï¿½) has no special Latex command
 		HTMLCHARS.put("DJ", "&#272;"); // "Dstrok"
 		HTMLCHARS.put("dj", "&#273;"); // "dstrok"
 		HTMLCHARS.put("=E", "&#274;"); // "Emacr"
@@ -776,8 +779,8 @@ public class Globals {
 		HTMLCHARS.put("'l", "&#314;"); // "lacute"
 		HTMLCHARS.put("cL", "&#315;"); // "Lcedil"
 		HTMLCHARS.put("cl", "&#316;"); // "lcedil"
-		// Symbol #317 (L´) has no special Latex command
-		// Symbol #318 (l´) has no special Latex command
+		// Symbol #317 (Lï¿½) has no special Latex command
+		// Symbol #318 (lï¿½) has no special Latex command
 		HTMLCHARS.put("Lmidot", "&#319;"); // "Lmidot"
 		HTMLCHARS.put("lmidot", "&#320;"); // "lmidot"
 		HTMLCHARS.put("L", "&#321;"); // "Lstrok"
@@ -788,7 +791,7 @@ public class Globals {
 		HTMLCHARS.put("cn", "&#326;"); // "ncedil"
 		HTMLCHARS.put("vN", "&#327;"); // "Ncaron"
 		HTMLCHARS.put("vn", "&#328;"); // "ncaron"
-		// Symbol #329 (´n) has no special Latex command
+		// Symbol #329 (ï¿½n) has no special Latex command
 		HTMLCHARS.put("NG", "&#330;"); // "ENG"
 		HTMLCHARS.put("ng", "&#331;"); // "eng"
 		HTMLCHARS.put("=O", "&#332;"); // "Omacr"
@@ -816,7 +819,7 @@ public class Globals {
 		HTMLCHARS.put("cT", "&#354;"); // "Tcedil"
 		HTMLCHARS.put("ct", "&#355;"); // "tcedil"
 		HTMLCHARS.put("vT", "&#356;"); // "Tcaron"
-		// Symbol #357 (t´) has no special Latex command
+		// Symbol #357 (tï¿½) has no special Latex command
 		HTMLCHARS.put("Tstrok", "&#358;"); // "Tstrok"
 		HTMLCHARS.put("tstrok", "&#359;"); // "tstrok"
 		HTMLCHARS.put("~U", "&#360;"); // "Utilde"
@@ -843,8 +846,9 @@ public class Globals {
 		HTMLCHARS.put("vZ", "&#381;"); // "Zcaron"
 		HTMLCHARS.put("vz", "&#382;"); // "zcaron"
 		// Symbol #383 (f) has no special Latex command
+        HTMLCHARS.put("%", "%"); // percent sign
 
-		XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
+        XML_CHARS.put("\\{\\\\\\\"\\{a\\}\\}", "&#x00E4;");
 		XML_CHARS.put("\\{\\\\\\\"\\{A\\}\\}", "&#x00C4;");
 		XML_CHARS.put("\\{\\\\\\\"\\{e\\}\\}", "&#x00EB;");
 		XML_CHARS.put("\\{\\\\\\\"\\{E\\}\\}", "&#x00CB;");
@@ -1207,7 +1211,7 @@ public class Globals {
 		RTFCHARS.put("vC", "\\u268C"); // "Ccaron"
 		RTFCHARS.put("vc", "\\u269c"); // "ccaron"
 		RTFCHARS.put("vD", "\\u270D"); // "Dcaron"
-		// Symbol #271 (d´) has no special Latex command
+		// Symbol #271 (dï¿½) has no special Latex command
 		RTFCHARS.put("DJ", "\\u272D"); // "Dstrok"
 		RTFCHARS.put("dj", "\\u273d"); // "dstrok"
 		RTFCHARS.put("=E", "\\u274E"); // "Emacr"
@@ -1253,8 +1257,8 @@ public class Globals {
 		RTFCHARS.put("'l", "\\u314l"); // "lacute"
 		RTFCHARS.put("cL", "\\u315L"); // "Lcedil"
 		RTFCHARS.put("cl", "\\u316l"); // "lcedil"
-		// Symbol #317 (L´) has no special Latex command
-		// Symbol #318 (l´) has no special Latex command
+		// Symbol #317 (Lï¿½) has no special Latex command
+		// Symbol #318 (lï¿½) has no special Latex command
 		RTFCHARS.put("Lmidot", "\\u319L"); // "Lmidot"
 		RTFCHARS.put("lmidot", "\\u320l"); // "lmidot"
 		RTFCHARS.put("L", "\\u321L"); // "Lstrok"
@@ -1265,7 +1269,7 @@ public class Globals {
 		RTFCHARS.put("cn", "\\u326n"); // "ncedil"
 		RTFCHARS.put("vN", "\\u327N"); // "Ncaron"
 		RTFCHARS.put("vn", "\\u328n"); // "ncaron"
-		// Symbol #329 (´n) has no special Latex command
+		// Symbol #329 (ï¿½n) has no special Latex command
 		RTFCHARS.put("NG", "\\u330G"); // "ENG"
 		RTFCHARS.put("ng", "\\u331g"); // "eng"
 		RTFCHARS.put("=O", "\\u332O"); // "Omacr"
@@ -1293,7 +1297,7 @@ public class Globals {
 		RTFCHARS.put("cT", "\\u354T"); // "Tcedil"
 		RTFCHARS.put("ct", "\\u355t"); // "tcedil"
 		RTFCHARS.put("vT", "\\u356T"); // "Tcaron"
-		// Symbol #357 (t´) has no special Latex command
+		// Symbol #357 (tï¿½) has no special Latex command
 		RTFCHARS.put("Tstrok", "\\u358T"); // "Tstrok"
 		RTFCHARS.put("tstrok", "\\u359t"); // "tstrok"
 		RTFCHARS.put("~U", "\\u360U"); // "Utilde"

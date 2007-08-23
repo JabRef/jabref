@@ -1,15 +1,8 @@
-<font face="arial">
-<b><i>\bibtextype</i><a name="\bibtexkey">\begin{bibtexkey} (\bibtexkey)</a>\end{bibtexkey}</b>
-<br>
-\begin{author} \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}<BR>\end{author}
-\begin{editor} \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\editor} <i>(ed.)</i><BR>\end{editor}
-\begin{title} \format[HTMLChars]{\title} \end{title}<BR>
-\begin{chapter} \format[HTMLChars]{\chapter}<BR>\end{chapter}
-\begin{journal} <em>\format[HTMLChars]{\journal}, </em>\end{journal}
-\begin{school} <em>\format[HTMLChars]{\school}, </em>\end{school}
-\begin{institution} <em>\format[HTMLChars]{\institution}, </em>\end{institution}
-\begin{publisher} <em>\format[HTMLChars]{\publisher}, </em>\end{publisher}
-\begin{year}<b>\year</b>\end{year}\begin{volume}<i>, \volume</i>\end{volume}\begin{pages}, \format[FormatPagesForHTML]{\pages} \end{pages}
-</dd>
-<p></p>
-</font>
+<dt><em>\format[ToLowerCase]{\bibtextype}</em><a name="\bibtexkey">\begin{bibtexkey} (\bibtexkey)</a>\end{bibtexkey}</dt>
+\begin{author}<dd>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\author}</dd>\end{author}\begin{editor}
+<dd>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{title}
+<dd>\format[HTMLChars]{\title}</dd>\end{title}\begin{chapter}
+<dd>\format[HTMLChars]{\chapter}</dd>\end{chapter}\begin{journal}
+<dd><em>\format[HTMLChars]{\journal},</em></dd>\end{journal}
+<dd>\begin{school}<em>\format[HTMLChars]{\school}, </em>\end{school}\begin{institution}<em>\format[HTMLChars]{\institution}, </em>\end{institution}\begin{publisher}<em>\format[HTMLChars]{\publisher}, </em>\end{publisher}\begin{year}<b>\year</b>\end{year}\begin{volume}<i>, \volume</i>\end{volume}\begin{pages}, \format[FormatPagesForHTML]{\pages}\end{pages}</dd>
+

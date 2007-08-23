@@ -61,7 +61,8 @@ public class FieldContentSelector extends JComponent {
 
 	BasePanel panel;
 
-	String delimiter;
+    private AbstractAction action;
+    String delimiter;
 
 	/**
 	 * 
@@ -88,16 +89,17 @@ public class FieldContentSelector extends JComponent {
 	 *            Whether to put a 2 pixel horizontal strut between combobox and
 	 *            button.
 	 */
-	public FieldContentSelector(JabRefFrame jabRefFrame, final BasePanel panel,
-		Window ownerFrameOrDialog, final FieldEditor editor, final MetaData metaData,
+	public FieldContentSelector(JabRefFrame frame, final BasePanel panel,
+		Window owner, final FieldEditor editor, final MetaData metaData,
 		final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
-		this.frame = jabRefFrame;
+		this.frame = frame;
 		this.editor = editor;
 		this.metaData = metaData;
 		this.panel = panel;
-		this.owner = ownerFrameOrDialog;
-		this.delimiter = delimiter;
+		this.owner = owner;
+        this.action = action;
+        this.delimiter = delimiter;
 
 		comboBox = new JComboBox() {
 			public Dimension getPreferredSize() {
@@ -138,40 +140,19 @@ public class FieldContentSelector extends JComponent {
 				if (e.getActionCommand().equals("comboBoxChanged") && (e.getModifiers() == 0))
 					return;
 
-				// The first element is only for show.
-				// CO: Why?
-				if (comboBox.getSelectedIndex() == 0)
-					return;
-
-				String chosen = (String) comboBox.getSelectedItem();
-				if (chosen == null || chosen.equals(""))
-					return;
-
-				// The following is not possible at the moment since the
-				// combobox cannot be edited!
-
-				// User edited in a new word. Add it.
-				// if (comboBox.getSelectedIndex() == -1)
-				// addWord(chosen);
-
-				// TODO: could improve checking as not do add the same item twice
-				if (!editor.getText().equals(""))
-					editor.append(FieldContentSelector.this.delimiter);
-
-				editor.append(chosen);
-
-				comboBox.setSelectedIndex(0);
-
-				// Fire event that we changed the editor
-				if (action != null)
-					action.actionPerformed(new ActionEvent(editor, 0, ""));
-
-				// Transfer focus to the editor.
-				editor.requestFocus();
+				selectionMade();
 			}
 		});
+        // Add an action for the Enter key that signals a selection:
+        comboBox.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enter");
+        comboBox.getActionMap().put("enter", new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                selectionMade();
+                comboBox.setPopupVisible(false);
+            }
+        });
 
-		add(comboBox);
+        add(comboBox);
 
 		if (horizontalLayout)
 			add(Box.createHorizontalStrut(Sizes.dialogUnitXAsPixel(2, this)));
@@ -183,11 +164,11 @@ public class FieldContentSelector extends JComponent {
 		manage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// I don't get the difference here:
-				ContentSelectorDialog2 csd = owner instanceof Frame ? new ContentSelectorDialog2(
-					(Frame) owner, frame, panel, true, metaData, editor.getFieldName())
-					: new ContentSelectorDialog2((Dialog) owner, frame, panel, true, metaData,
+				ContentSelectorDialog2 csd = FieldContentSelector.this.owner instanceof Frame ? new ContentSelectorDialog2(
+					(Frame) FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName())
+					: new ContentSelectorDialog2((Dialog) FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData,
 						editor.getFieldName());
-				Util.placeDialog(csd, frame);
+				Util.placeDialog(csd, FieldContentSelector.this.frame);
 
 				// Calling setVisible(true) will open the modal dialog and block
 				// for the dialog to close.
@@ -199,7 +180,40 @@ public class FieldContentSelector extends JComponent {
 		});
 	}
 
-	void rebuildComboBox() {
+    private void selectionMade() {
+        // The first element is only for show.
+        // CO: Why?
+        if (comboBox.getSelectedIndex() == 0)
+            return;
+
+        String chosen = (String) comboBox.getSelectedItem();
+        if (chosen == null || chosen.equals(""))
+            return;
+
+        // The following is not possible at the moment since the
+        // combobox cannot be edited!
+
+        // User edited in a new word. Add it.
+        // if (comboBox.getSelectedIndex() == -1)
+        // addWord(chosen);
+
+        // TODO: could improve checking as not do add the same item twice
+        if (!editor.getText().equals(""))
+            editor.append(FieldContentSelector.this.delimiter);
+
+        editor.append(chosen);
+
+        comboBox.setSelectedIndex(0);
+
+        // Fire event that we changed the editor
+        if (action != null)
+            action.actionPerformed(new ActionEvent(editor, 0, ""));
+
+        // Transfer focus to the editor.
+        editor.requestFocus();
+    }
+
+    void rebuildComboBox() {
 		comboBox.removeAllItems();
 
 		// TODO: CO - What for?

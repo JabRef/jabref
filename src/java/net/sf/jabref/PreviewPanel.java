@@ -157,14 +157,14 @@ public class PreviewPanel extends JEditorPane implements VetoableChangeListener 
 		return getPreferredSize();
 	}
 
-	public void paintComponent(Graphics g) {
+	/*public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		Object hint = g2.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		super.paintComponent(g2);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, hint);
-	}
+	}*/
 
     /**
      * The PreviewPanel has registered itself as an event listener with the currently displayed

@@ -16,7 +16,7 @@ import com.jgoodies.forms.layout.FormLayout;
 class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     JabRefPreferences _prefs;
-    private JCheckBox colorCodes, antialias, overrideFonts;//, useCustomIconTheme;
+    private JCheckBox colorCodes, overrideFonts;//, useCustomIconTheme;
     private GridBagLayout gbl = new GridBagLayout();
     private JButton fontButton = new JButton(Globals.lang("Set table font"));
     private ColorSetupPanel colorPanel = new ColorSetupPanel();
@@ -40,8 +40,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         colorCodes = new JCheckBox(Globals.lang
                    ("Color codes for required and optional fields"));
-        antialias = new JCheckBox(Globals.lang
-                  ("Use antialiasing font"));
+        /*antialias = new JCheckBox(Globals.lang
+                  ("Use antialiasing font"));*/
         overrideFonts = new JCheckBox(Globals.lang("Override default font settings"));
 
         //useCustomIconTheme = new JCheckBox(Globals.lang("Use custom icon theme"));
@@ -62,8 +62,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.append(overrideFonts);
         builder.nextLine();
         builder.appendSeparator(Globals.lang("Table appearance"));
-        builder.append(antialias);
-        builder.nextLine();
+        //builder.append(antialias);
+        //builder.nextLine();
         builder.append(colorCodes);
         builder.nextLine();
         builder.append(fontButton);
@@ -128,7 +128,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     public void setValues() {
         colorCodes.setSelected(_prefs.getBoolean("tableColorCodesOn"));
-        antialias.setSelected(_prefs.getBoolean("antialias"));
+        //antialias.setSelected(_prefs.getBoolean("antialias"));
         fontSize.setText("" + _prefs.getInt("menuFontSize"));
         oldMenuFontSize = _prefs.getInt("menuFontSize");
         overrideFonts.setSelected(_prefs.getBoolean("overrideDefaultFonts"));
@@ -147,7 +147,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
 
         _prefs.putBoolean("tableColorCodesOn", colorCodes.isSelected());
-        _prefs.putBoolean("antialias", antialias.isSelected());
+        //_prefs.putBoolean("antialias", antialias.isSelected());
         _prefs.put("fontFamily", font.getFamily());
         _prefs.putInt("fontStyle", font.getStyle());
         _prefs.putInt("fontSize", font.getSize());

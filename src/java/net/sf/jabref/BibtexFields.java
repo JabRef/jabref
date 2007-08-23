@@ -181,6 +181,7 @@ public class BibtexFields
     add( dummy ) ;
 
     dummy = new BibtexSingleField( OWNER, false, GUIGlobals.SMALL_W ) ;
+    dummy.setExtras("setOwner");
     dummy.setPrivate();
     add(dummy) ;
 

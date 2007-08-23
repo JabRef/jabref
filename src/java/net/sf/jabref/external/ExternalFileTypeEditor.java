@@ -26,7 +26,8 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
  */
 public class ExternalFileTypeEditor extends JDialog {
 
-    private JabRefFrame frame;
+    private JFrame frame = null;
+    private JDialog dialog = null;
     private ArrayList<ExternalFileType> fileTypes;
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor = null;
@@ -39,9 +40,15 @@ public class ExternalFileTypeEditor extends JDialog {
         toDefaults = new JButton(Globals.lang("Default"));
     private EditListener editListener = new EditListener();
 
-    public ExternalFileTypeEditor(JabRefFrame frame) {
+    public ExternalFileTypeEditor(JFrame frame) {
         super(frame, Globals.lang("Manage external file types"), true);
         this.frame = frame;
+        init();
+    }
+
+    public ExternalFileTypeEditor(JDialog dialog) {
+        super(dialog, Globals.lang("Manage external file types"), true);
+        this.dialog = dialog;
         init();
     }
 
@@ -52,7 +59,8 @@ public class ExternalFileTypeEditor extends JDialog {
         fileTypes.clear();
         ExternalFileType[] types = Globals.prefs.getExternalFileTypeSelection();
         for (int i = 0; i < types.length; i++) {
-            fileTypes.add(types[i]);
+
+            fileTypes.add(types[i].copy());
         }
         Collections.sort(fileTypes);
     }
@@ -140,7 +148,10 @@ public class ExternalFileTypeEditor extends JDialog {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
-        setLocationRelativeTo(frame);
+        if (frame != null)
+            setLocationRelativeTo(frame);
+        else
+            setLocationRelativeTo(dialog);
     }
 
     private ExternalFileTypeEntryEditor getEditor(ExternalFileType type) {
@@ -153,11 +164,20 @@ public class ExternalFileTypeEditor extends JDialog {
 
     /**
      * Get an AbstractAction for opening the external file types editor.
-     * @param frame The JabRefFrame used as parent window for the dialog.
+     * @param frame The JFrame used as parent window for the dialog.
      * @return An Action for opening the editor.
      */
     public static AbstractAction getAction(JabRefFrame frame) {
         return new EditExternalFileTypesAction(frame);
+    }
+
+    /**
+     * Get an AbstractAction for opening the external file types editor.
+     * @param dialog The JDialog used as parent window for the dialog.
+     * @return An Action for opening the editor.
+     */
+    public static AbstractAction getAction(JDialog dialog) {
+        return new EditExternalFileTypesAction(dialog);
     }
 
     class AddListener implements ActionListener {
@@ -283,20 +303,31 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
-        private JabRefFrame frame;
+        private JFrame frame = null;
+        private JDialog dialog = null;
         ExternalFileTypeEditor editor = null;
 
-        public EditExternalFileTypesAction(JabRefFrame frame) {
+        public EditExternalFileTypesAction(JFrame frame) {
             super();
             putValue(NAME, "Manage external file types");
             this.frame = frame;
         }
 
+        public EditExternalFileTypesAction(JDialog dialog) {
+            super();
+            putValue(NAME, "Manage external file types");
+            this.dialog = dialog;
+        }
+
         public void actionPerformed(ActionEvent e) {
             if (editor == null) {
-                editor = new ExternalFileTypeEditor(frame);
+                if (frame != null)
+                    editor = new ExternalFileTypeEditor(frame);
+                else
+                    editor = new ExternalFileTypeEditor(dialog);
             }
-            editor.setVisible(true);            
+            editor.setValues();
+            editor.setVisible(true);
         }
     }
 

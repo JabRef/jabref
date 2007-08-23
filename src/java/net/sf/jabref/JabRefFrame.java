@@ -27,6 +27,13 @@
 
 package net.sf.jabref;
 
+import net.sf.jabref.gui.*;
+import net.sf.jabref.label.*;
+import net.sf.jabref.imports.*;
+import net.sf.jabref.wizard.auximport.gui.*;
+
+import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -41,15 +48,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.export.ExpandEndnoteFilters;
-import net.sf.jabref.export.ExportCustomizationDialog;
-import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.*;
 import net.sf.jabref.export.SaveAllAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.imports.*;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.label.*;
 import net.sf.jabref.plugin.PluginCore;
@@ -255,8 +259,10 @@ public class JabRefFrame extends JFrame {
       writeXmpAction = new GeneralAction("writeXMP", "Write XMP-metadata to PDFs",
                                         Globals.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
                                         prefs.getKey("Write XMP")),
-      
-      openFile = new GeneralAction("openFile", "Open PDF or PS",
+      openFile = new GeneralAction("openExternalFile", "Open file",
+                                   Globals.lang("Open file"),
+                                   prefs.getKey("Open file")),
+      openPdf = new GeneralAction("openFile", "Open PDF or PS",
                                    Globals.lang("Open PDF or PS"),
                                    prefs.getKey("Open PDF or PS")),
       openUrl = new GeneralAction("openUrl", "Open URL or DOI",
@@ -552,7 +558,13 @@ public JabRefPreferences prefs() {
           if (answer == JOptionPane.YES_OPTION) {
             // The user wants to save.
             try {
-              basePanel().runCommand("save");
+              //basePanel().runCommand("save");
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(basePanel());
+                saveAction.runCommand();
+                if (saveAction.isCancelled() || !saveAction.isSuccess())
+                    // The action was either cancelled or unsuccessful.
+                    // Break!
+                    close = false;
             }
             catch (Throwable ex) {
               // Something prevented the file
@@ -1050,19 +1062,9 @@ public JabRefPreferences prefs() {
 
       file.addSeparator();
       file.add(close);
-      //==============================
-      // NB: I added this because my frame borders are so tiny that I cannot click
-      // on the "x" close button. Anyways, I think it is good to have an "exit" button
-      // I was too lazy to make a new ExitAction
-      //JMenuItem exit_mItem = new JMenuItem(Globals.lang("Exit"));
-      //exit_mItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)); //Ctrl-Q to exit
-      // above keybinding should be from user define
-      //exit_mItem.addActionListener(new CloseAction() );
-      //file.add( exit_mItem);
-      //=====================================
       file.add(quit);
       mb.add(file);
-      edit.add(test);
+      //edit.add(test);
       edit.add(undo);
       edit.add(redo);
       edit.addSeparator();
@@ -1137,6 +1139,7 @@ public JabRefPreferences prefs() {
       //tools.add(fetchAuthorMedline);
       tools.addSeparator();
       tools.add(openFile);
+      tools.add(openPdf);
       tools.add(openUrl);
       tools.addSeparator();
       tools.add(newSubDatabaseAction);
@@ -1300,8 +1303,9 @@ public JabRefPreferences prefs() {
       //tlb.addAction(winEdtPushAction);
       tlb.add(pushExternalButton.getComponent());
 
-    tlb.addAction(openFile);
-    tlb.addAction(openUrl);
+      tlb.addAction(openFile);
+    //tlb.addAction(openPdf);
+    //tlb.addAction(openUrl);
 
 
     //tlb.addSeparator();
@@ -1345,7 +1349,7 @@ public JabRefPreferences prefs() {
             selectAll, copyKey, copyCiteKey, editPreamble, editStrings, toggleGroups, toggleSearch,
             makeKeyAction, normalSearch,
             incrementalSearch, replaceAll, importMenu, exportMenu, fetchMedline, fetchCiteSeer,
-            openFile, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
+                openPdf, openUrl, togglePreview, dupliCheck, /*strictDupliCheck,*/ highlightAll,
             highlightAny, citeSeerPanelAction, newEntryAction, plainTextImport,
             closeDatabaseAction, switchPreview, integrityCheckAction, autoSetPdf, autoSetPs,
             toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso,
@@ -1515,7 +1519,12 @@ public JabRefPreferences prefs() {
                 if (answer == JOptionPane.YES_OPTION) {
                     // The user wants to save.
                     try {
-                        basePanel().runCommand("save");
+                        SaveDatabaseAction saveAction = new SaveDatabaseAction(basePanel());
+                        saveAction.runCommand();
+                        if (saveAction.isCancelled() || !saveAction.isSuccess())
+                            // The action either not cancelled or unsuccessful.
+                            // Break! 
+                            close = false;
                     } catch (Throwable ex) {
                         // Something prevented the file
                         // from being saved. Break!!!
@@ -1882,7 +1891,8 @@ class FetchCiteSeerAction
       int addedEntries = 0;
 
     // Set owner and timestamp fields:
-    Util.setAutomaticFields(bibentries);
+    Util.setAutomaticFields(bibentries, Globals.prefs.getBoolean("overwriteOwner"),
+            Globals.prefs.getBoolean("overwriteTimeStamp"));
 
     if (intoNew || (tabbedPane.getTabCount() == 0)) {
       // Import into new database.

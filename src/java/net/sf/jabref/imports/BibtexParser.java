@@ -556,7 +556,12 @@ public class BibtexParser {
 			} else if (Character.isDigit((char) c)) { // value is a number
 
 				String numString = parseTextToken();
-				try {
+                // Morten Alver 2007-07-04: I don't see the point of parsing the integer
+                // and converting it back to a string, so I'm removing the construct below
+                // the following line:
+                value.append(numString);
+                /*
+                try {
 					// Fixme: What is this for?
 					value.append(String.valueOf(Integer.parseInt(numString)));
 				} catch (NumberFormatException e) {
@@ -564,6 +569,7 @@ public class BibtexParser {
 					// Used to fix [ 1594123 ] Failure to import big numbers
 					value.append(numString);
 				}
+				*/
 			} else if (c == '#') {
 				consume('#');
 			} else {
@@ -896,8 +902,9 @@ public class BibtexParser {
         while (keepon) {
             c = peek();
             headerText.append((char) c);
-            if (((piv == 0) && Character.isWhitespace((char) c))
-                    || (c == GUIGlobals.SIGNATURE.charAt(piv))) {
+            if ((piv == 0) && (Character.isWhitespace((char) c) || (c == '%')))
+                read();
+            else if (c == GUIGlobals.SIGNATURE.charAt(piv)) {
                 piv++;
                 read();
             }

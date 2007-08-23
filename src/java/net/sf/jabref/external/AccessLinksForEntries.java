@@ -8,12 +8,15 @@ import java.util.*;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.GUIGlobals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.Util;
+import net.sf.jabref.*;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+
+import javax.swing.*;
+import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.*;
+
 
 /**
  * This class handles the task of looking up all external files linked for a set
@@ -146,5 +149,53 @@ public class AccessLinksForEntries {
             callback.actionPerformed(null);
         }
     }
+
+
+    public static class CopyLinkedFiles extends BaseAction {
+        private BasePanel panel;
+
+        public CopyLinkedFiles(BasePanel panel) {
+
+            this.panel = panel;
+        }
+
+        public void action() throws Throwable {
+
+            ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
+            BibtexEntry[] sel = panel.getSelectedEntries();
+            for (int i = 0; i < sel.length; i++) {
+                BibtexEntry bibtexEntry = sel[i];
+                entries.add(bibtexEntry);
+            }
+            final List<FileListEntry> links =
+                    AccessLinksForEntries.getExternalLinksForEntries(entries);
+            for (Iterator<FileListEntry> iterator = links.iterator(); iterator.hasNext();) {
+                FileListEntry entry = iterator.next();
+                System.out.println("Link: " + entry.getLink());
+            }
+
+            final JProgressBar prog = new JProgressBar();
+            prog.setIndeterminate(true);
+            final JDialog diag = new JDialog(panel.frame(), false);
+            diag.getContentPane().add(prog, BorderLayout.CENTER);
+            diag.pack();
+            diag.setLocationRelativeTo(panel.frame());
+            diag.setVisible(true);
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    AccessLinksForEntries.copyExternalLinksToDirectory(links,
+                            new File("/home/alver/tmp"), panel.metaData(), prog, false,
+                            new ActionListener() {
+                                public void actionPerformed(ActionEvent actionEvent) {
+                                    diag.dispose();
+                                }
+                            });
+                }
+            });
+            t.start();
+
+        }
+    }
+
 
 }

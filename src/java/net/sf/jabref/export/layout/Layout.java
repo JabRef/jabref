@@ -112,10 +112,7 @@ public class Layout
             else if (si.i == LayoutHelper.IS_OPTION_FIELD)
             {
             }
-
-            //			else if (si.i == LayoutHelper.IS_OPTION_FIELD_PARAM)
-            //			{
-            //			}
+            
             if (blockEntries == null)
             {
                 tmpEntries.add(new LayoutEntry(si, classPrefix));
@@ -163,15 +160,13 @@ public class Layout
         return sb.toString();
     }
     
-    // added section - begin (arudert)
-    // note: string resolving not implemented yet
     /**
      * Returns the processed text. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibtexDatabase database)
+    public String doLayout(BibtexDatabase database, String encoding)
     {
         //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuffer sb = new StringBuffer(100);
@@ -180,7 +175,7 @@ public class Layout
 
         for (int i = 0; i < layoutEntries.length; i++)
         {
-            fieldText = layoutEntries[i].doLayout(database);
+            fieldText = layoutEntries[i].doLayout(database, encoding);
 
             if (fieldText == null) 
             {

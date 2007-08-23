@@ -447,27 +447,26 @@ public class MainTable extends JTable {
 
     public static void updateRenderers() {
 
-        boolean antialiasing = Globals.prefs.getBoolean("antialias");
         defRenderer = new GeneralRenderer(Globals.prefs.getColor("tableBackground"),
-                Globals.prefs.getColor("tableText"), antialiasing);
-        reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing);
-        optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"), antialiasing);
-        incRenderer = new IncompleteRenderer(antialiasing);
-        compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"), antialiasing);
-        markedNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("markedEntryBackground"), antialiasing);
-        grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"), antialiasing);
-        veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"), antialiasing);
+                Globals.prefs.getColor("tableText"));
+        reqRenderer = new GeneralRenderer(Globals.prefs.getColor("tableReqFieldBackground"), Globals.prefs.getColor("tableText"));
+        optRenderer = new GeneralRenderer(Globals.prefs.getColor("tableOptFieldBackground"), Globals.prefs.getColor("tableText"));
+        incRenderer = new IncompleteRenderer();
+        compRenderer = new CompleteRenderer(Globals.prefs.getColor("tableBackground"));
+        markedNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("markedEntryBackground"));
+        grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("grayedOutBackground"));
+        veryGrayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor("veryGrayedOutBackground"));
         grayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("grayedOutBackground"),
-            Globals.prefs.getColor("grayedOutText"), antialiasing);
+            Globals.prefs.getColor("grayedOutText"));
         veryGrayedOutRenderer = new GeneralRenderer(Globals.prefs.getColor("veryGrayedOutBackground"),
-                Globals.prefs.getColor("veryGrayedOutText"), antialiasing);
+                Globals.prefs.getColor("veryGrayedOutText"));
         markedRenderer = new GeneralRenderer(Globals.prefs.getColor("markedEntryBackground"),
-                Globals.prefs.getColor("tableText"), antialiasing);
+                Globals.prefs.getColor("tableText"));
     }
 
     static class IncompleteRenderer extends GeneralRenderer {
-        public IncompleteRenderer(boolean antialiasing) {
-            super(Globals.prefs.getColor("incompleteEntryBackground"), antialiasing);
+        public IncompleteRenderer() {
+            super(Globals.prefs.getColor("incompleteEntryBackground"));
             super.setToolTipText(Globals.lang("This entry is incomplete"));
         }
 
@@ -481,8 +480,8 @@ public class MainTable extends JTable {
     }
 
     static class CompleteRenderer extends GeneralRenderer {
-        public CompleteRenderer(Color color, boolean antialiasing) {
-            super(color, antialiasing);
+        public CompleteRenderer(Color color) {
+            super(color);
         }
 
         protected void setNumber(int number) {

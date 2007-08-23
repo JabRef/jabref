@@ -3,11 +3,14 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.external.ExternalFileTypeEditor;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 
@@ -18,11 +21,13 @@ public class ExternalTab extends JPanel implements PrefsTab {
 	JTextField pdfDir, regExpTextField, fileDir, psDir, pdf, ps, html, lyx, winEdt, led,
         citeCommand, vim, vimServer;
 
-	ItemListener regExpListener;
+    JButton editFileTypes;
+    ItemListener regExpListener;
 
 	JCheckBox useRegExpComboBox;
 
-	public ExternalTab(JabRefFrame frame, JabRefPreferences prefs, HelpDialog helpDialog) {
+	public ExternalTab(JabRefFrame frame, PrefsDialog3 prefsDiag, JabRefPreferences prefs, 
+                       HelpDialog helpDialog) {
 		_prefs = prefs;
 		_frame = frame;
 		setLayout(new BorderLayout());
@@ -39,6 +44,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		vimServer = new JTextField(30);
         citeCommand = new JTextField(30);
         led = new JTextField(30);
+        editFileTypes = new JButton(Globals.lang("Manage external file types"));
 
         regExpTextField = new JTextField(30);
 
@@ -59,7 +65,9 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		};
 		useRegExpComboBox.addItemListener(regExpListener);
 
-		BrowseAction browse;
+        editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
+
+        BrowseAction browse;
 
 		FormLayout layout = new FormLayout(
 			"1dlu, 8dlu, left:pref, 4dlu, fill:200dlu, 4dlu, fill:pref",// 4dlu,
@@ -107,7 +115,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 
 		builder.appendSeparator(Globals.lang("External programs"));
 
-		builder.nextLine();
+		/*builder.nextLine();
 		lab = new JLabel(Globals.lang("Path to PDF viewer") + ":");
 		builder.append(pan);
 		builder.append(lab);
@@ -125,6 +133,7 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		if (Globals.ON_WIN)
 			browse.setEnabled(false);
 		builder.append(new JButton(browse));
+		*/
 		builder.nextLine();
 		lab = new JLabel(Globals.lang("Path to HTML viewer") + ":");
 		builder.append(pan);
@@ -176,10 +185,15 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.append(citeCommand);
 		// builder.appendSeparator();
 
-		pan = builder.getPanel();
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(editFileTypes);
+        
+        pan = builder.getPanel();
 		pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		add(pan, BorderLayout.CENTER);
-	}
+
+    }
 
 	public void setValues() {
 		pdfDir.setText(_prefs.get("pdfDirectory"));

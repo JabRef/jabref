@@ -114,8 +114,10 @@ public class FileActions
      * @param encoding String the name of the encoding, which is part of the header.
      */
     private static void writeBibFileHeader(Writer out, String encoding) throws IOException {
+        out.write("% ");
       out.write(GUIGlobals.SIGNATURE);
-      out.write(" "+GUIGlobals.version+"."+Globals.NEWLINE +GUIGlobals.encPrefix+encoding+Globals.NEWLINE +Globals.NEWLINE);
+      out.write(" "+GUIGlobals.version+"."+Globals.NEWLINE + "% " + 
+              GUIGlobals.encPrefix+encoding+Globals.NEWLINE +Globals.NEWLINE);
     }
 
     /**

@@ -7,9 +7,11 @@ import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
 
 import javax.swing.filechooser.FileFilter;
+import javax.swing.*;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Iterator;
 import java.io.File;
 import java.io.Reader;
 import java.io.IOException;
@@ -106,121 +108,113 @@ public class ExportFormat implements IExportFormat {
 		return FileActions.getReader(dir + filename);
 	}
 
-	/** @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.BibtexDatabase, java.lang.String, java.lang.String, java.util.Set) */
-	public void performExport(final BibtexDatabase database, final String file,
-			final String encoding, Set<String> entryIds) throws Exception {
+	    /**
+     * Perform the export.
+     * @param database The database to export from.
+     * @param file The filename to write to.
+     * @param encoding The encoding to use.
+     * @param keySet The set of IDs of the entries to export.
+     * @throws Exception
+     */
+    public void performExport(final BibtexDatabase database, final String file,
+                              final String encoding,
+                              Set<String> keySet) throws Exception {
 
-		File outFile = new File(file);
-		SaveSession ss = getSaveSession(encoding, outFile);
-		VerifyingWriter ps = ss.getWriter();
+        System.out.println(SwingUtilities.isEventDispatchThread());
 
-		performExport(database, entryIds, ps);
+        File outFile = new File(file);
+        SaveSession ss = getSaveSession(encoding, outFile);
+        final String dir;
+        // If this is a custom export, just use the given file name:
+        if (customExport)
+            dir = "";
+        else
+            dir = (directory == null ? Globals.LAYOUT_PREFIX :
+                Globals.LAYOUT_PREFIX + directory + "/");
+        VerifyingWriter ps = ss.getWriter();
+        // Print header
+        Layout beginLayout = null;
+        Reader reader;
+        try {
+            reader = FileActions.getReader(dir + lfFileName + ".begin.layout");
+            LayoutHelper layoutHelper = new LayoutHelper(reader);
+            beginLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            reader.close();
+        } catch (IOException ex) {
+            //  // If an exception was cast, export filter doesn't have a begin file.
+        }
+        // Write the header
+        if (beginLayout != null) {
+            ps.write(beginLayout.doLayout(database, encoding));
+        }
+        // changed section - end (arudert)
 
-		finalizeSaveSession(ss);
-	}
+    // Write database entries; entries will be sorted as they
+    // appear on the screen, or sorted by author, depending on
+    // Preferences.
+    // We also supply the Set entries - if we are to export only certain entries,
+    // it will be non-null, and be used to choose entries. Otherwise, it will be
+    // null, and be ignored.
+    List<BibtexEntry> sorted = FileActions.getSortedEntries(database, keySet, false);
 
-	/**
-	 * Perform the export of {@code database}.
-	 * 
-	 * @param database
-	 *            The database to export from.
-	 * @param writer
-	 *            The writer to use.
-	 * @param entryIds
-	 *            Contains the IDs of all entries that should be exported. If
-	 *            <code>null</code>, all entries will be exported.
-	 * @throws IOException
-	 *             if a problem occurred while trying to write to {@code writer}
-	 *             or read from required resources.
-	 * @throws Exception
-	 *             if any other error occurred during export.
-	 */
-	public void performExport(final BibtexDatabase database,
-			Set<String> entryIds, Writer writer) throws Exception, IOException {
-		// Print header
-		Layout beginLayout = null;
-		Reader reader;
-		try {
-			reader = getReader(lfFileName + ".begin.layout");
-			LayoutHelper layoutHelper = new LayoutHelper(reader);
-			beginLayout = layoutHelper
-					.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-			reader.close();
-		} catch (IOException ex) {
-			// If an exception was cast, export filter doesn't have a begin
-			// file.
-		}
-		// Write the header
-		if (beginLayout != null) {
-			writer.write(beginLayout.doLayout(database));
-		}
-		// changed section - end (arudert)
 
-		/*
-		 * Write database entries; entries will be sorted as they appear on the
-		 * screen, or sorted by author, depending on Preferences. We also supply
-		 * the Set entries - if we are to export only certain entries, it will
-		 * be non-null, and be used to choose entries. Otherwise, it will be
-		 * null, and be ignored.
-		 */
-		List<BibtexEntry> sorted = FileActions.getSortedEntries(database,
-				entryIds, false);
+    // Load default layout
+    reader = FileActions.getReader(dir + lfFileName + ".layout");
 
-		// Load default layout
-		reader = getReader(lfFileName + ".layout");
 
-		LayoutHelper layoutHelper = new LayoutHelper(reader);
-		Layout defLayout = layoutHelper
-				.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-		reader.close();
-		HashMap<String, Layout> layouts = new HashMap<String, Layout>();
-		Layout layout;
-		for (BibtexEntry entry : sorted) {
-			// Get the layout
-			String type = entry.getType().getName().toLowerCase();
-			if (layouts.containsKey(type))
-				layout = layouts.get(type);
-			else {
-				try {
-					// We try to get a type-specific layout for this entry.
-					reader = getReader(lfFileName + "." + type + ".layout");
-					layoutHelper = new LayoutHelper(reader);
-					layout = layoutHelper
-							.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-					layouts.put(type, layout);
-					reader.close();
-				} catch (IOException ex) {
-					// The exception indicates that no type-specific layout
-					// exists, so we
-					// go with the default one.
-					layout = defLayout;
-				}
-			}
+    LayoutHelper layoutHelper = new LayoutHelper(reader);
+    Layout defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+    reader.close();
+    HashMap layouts = new HashMap();
+    Layout layout;
+    Iterator i = sorted.iterator();
+    for (; i.hasNext();) {
+        // Get the entry
+        BibtexEntry entry = (BibtexEntry) (i.next());
 
-			// Write the entry
-			writer.write(layout.doLayout(entry, database));
-		}
+        // Get the layout
+        String type = entry.getType().getName().toLowerCase();
+        if (layouts.containsKey(type))
+                layout = (Layout)layouts.get(type);
+        else {
+                try {
+            // We try to get a type-specific layout for this entry.
+            reader = FileActions.getReader(dir + lfFileName + "."+type+".layout");
+            layoutHelper = new LayoutHelper(reader);
+            layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            layouts.put(type, layout);
+            reader.close();
+                } catch (IOException ex) {
+            // The exception indicates that no type-specific layout exists, so we
+            // go with the default one.
+            layout = defLayout;
+                }
+            }
 
-		// Print footer
+            // Write the entry
+            ps.write(layout.doLayout(entry, database));
+          }
 
-		// changed section - begin (arudert)
-		Layout endLayout = null;
-		try {
-			reader = getReader(lfFileName + ".end.layout");
-			layoutHelper = new LayoutHelper(reader);
-			endLayout = layoutHelper
-					.getLayoutFromText(Globals.FORMATTER_PACKAGE);
-			reader.close();
-		} catch (IOException ex) {
-			// If an exception was thrown, export filter doesn't have an end
-			// file.
-		}
+        // Print footer
 
-		// Write the header
-		if (endLayout != null) {
-			writer.write(endLayout.doLayout(database));
-		}
-	}
+        // changed section - begin (arudert)
+        Layout endLayout = null;
+        try {
+            reader = FileActions.getReader(dir + lfFileName + ".end.layout");
+            layoutHelper = new LayoutHelper(reader);
+            endLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+            reader.close();
+        } catch (IOException ex) {
+            // If an exception was thrown, export filter doesn't have an end file.
+        }
+
+        // Write the header
+        if (endLayout != null) {
+            ps.write(endLayout.doLayout(database, encoding));
+        }
+
+        finalizeSaveSession(ss);
+    }
 
 	protected SaveSession getSaveSession(final String encoding,
 			final File outFile) throws IOException {
@@ -228,17 +222,6 @@ public class ExportFormat implements IExportFormat {
 		return ss;
 	}
 
-	protected void finalizeSaveSession(final SaveSession ss) throws Exception,
-			SaveException {
-		ss.getWriter().flush();
-		ss.getWriter().close();
-
-		if (!ss.getWriter().couldEncodeAll()) {
-			System.err.println("Could not encode...");
-		}
-		ss.commit();
-
-	}
 
 	/** @see net.sf.jabref.export.IExportFormat#getFileFilter() */
 	public FileFilter getFileFilter() {
@@ -247,5 +230,15 @@ public class ExportFormat implements IExportFormat {
 		return fileFilter;
 	}
 
+    public void finalizeSaveSession(final SaveSession ss) throws Exception {
+        ss.getWriter().flush();
+        ss.getWriter().close();
+
+        if (!ss.getWriter().couldEncodeAll()) {
+            System.err.println("Could not encode...");
+        }
+        ss.commit();
+
+    }
 
 }

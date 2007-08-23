@@ -4,7 +4,7 @@
 	<td>\year</td>
 	<td>\format[HTMLChars]{\journal}\format[HTMLChars]{\booktitle}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school} &nbsp;</td>
 	<td>\format[ToLowerCase]{\bibtextype}</td>
-	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a>\end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url} &nbsp;</td>
+	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a>\end{doi}\begin{url}<a href="\format[HTMLChars]{\url}">URL</a>\end{url} &nbsp;</td>
 </tr>\begin{abstract}
 <tr id="abs_\format{\bibtexkey}" class="abstract noshow">
 	<td colspan="6"><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
@@ -13,23 +13,22 @@
 	<td colspan="6"><b>Review</b>: \format[HTMLChars]{\review}</td>
 </tr>\end{review}
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
-<td colspan="6">
-<b>BibTeX</b>:
+<td colspan="6"><b>BibTeX</b>:
 <pre>
 @\format[ToLowerCase]{\bibtextype}{\bibtexkey,\begin{author}
-  author = {\author}\end{author}\begin{title},
-  title = {\title}\end{title}\begin{booktitle},
-  booktitle = {\booktitle}\end{booktitle}\begin{journal},
-  journal = {\journal}\end{journal}\begin{publisher},
-  publisher = {\publisher}\end{publisher}\begin{school},
-  school = {\school}\end{school}\begin{year},
-  year = {\year}\end{year}\begin{volume},
-  volume = {\volume}\end{volume}\begin{number},
-  number = {\number}\end{number}\begin{pages},
-  pages = {\pages}\end{pages}\begin{edition},
-  edition = {\edition}\end{edition}\begin{note},
-  note = {\note}\end{note}\begin{url},
-  url = {\url}\end{url}\begin{doi},
+  author = {\format[HTMLChars]{\author}}\end{author}\begin{title},
+  title = {\format[HTMLChars]{\title}}\end{title}\begin{booktitle},
+  booktitle = {\format[HTMLChars]{\booktitle}}\end{booktitle}\begin{journal},
+  journal = {\format[HTMLChars]{\journal}}\end{journal}\begin{publisher},
+  publisher = {\format[HTMLChars]{\publisher}}\end{publisher}\begin{school},
+  school = {\format[HTMLChars]{\school}}\end{school}\begin{year},
+  year = {\format[HTMLChars]{\year}}\end{year}\begin{volume},
+  volume = {\format[HTMLChars]{\volume}}\end{volume}\begin{number},
+  number = {\format[HTMLChars]{\number}}\end{number}\begin{pages},
+  pages = {\format[HTMLChars]{\pages}}\end{pages}\begin{edition},
+  edition = {\format[HTMLChars]{\edition}}\end{edition}\begin{note},
+  note = {\format[HTMLChars]{\note}}\end{note}\begin{url},
+  url = {\format[HTMLChars]{\url}}\end{url}\begin{doi},
   doi = {\format[DOICheck]{\doi}}\end{doi}
 }
 </pre></td>

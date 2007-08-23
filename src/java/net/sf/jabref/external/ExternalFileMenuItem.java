@@ -5,8 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.Icon;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 import net.sf.jabref.*;
 
@@ -20,7 +19,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private BibtexEntry entry;
     final String link;
     final MetaData metaData;
-    final ExternalFileType fileType;
+    ExternalFileType fileType;
     final JabRefFrame frame;
 
     public ExternalFileMenuItem(JabRefFrame frame, BibtexEntry entry, String name,
@@ -55,6 +54,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     .trim().toLowerCase() : null;
                 // Now we know the extension, check if it is one we know about:
                 type = Globals.prefs.getExternalFileTypeByExt(extension);
+                fileType = type;
             }
 
             if (type instanceof UnknownExternalFileType)
@@ -66,6 +66,21 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
 
         } catch (IOException e1) {
+            // See if we should show an error message concerning the application to open the
+            // link with. We check if the file type is set, and if the file type has a non-empty
+            // application link. If that link is referred by the error message, we can assume
+            // that the problem is in the open-with-application setting:
+            if ((fileType != null) && (fileType.getOpenWith() != null)
+                && (fileType.getOpenWith().length() > 0) &&
+                    (e1.getMessage().indexOf(fileType.getOpenWith()) >= 0)) {
+
+                JOptionPane.showMessageDialog(frame, Globals.lang("Unable to open link. "
+                    +"The application '%0' associated with the file type '%1' could not be called.",
+                        fileType.getOpenWith(), fileType.getName()),
+                        Globals.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             e1.printStackTrace();
         }
 

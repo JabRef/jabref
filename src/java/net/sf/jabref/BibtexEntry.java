@@ -142,7 +142,21 @@ public class BibtexEntry
                 "Every BibtexEntry must have a type.  Instead of null, use type OTHER");
         }
 
-        _type = type;
+        BibtexEntryType oldType = _type;
+
+        try {
+            // We set the type before throwing the changeEvent, to enable
+            // the change listener to access the new value if the change
+            // sets off a change in database sorting etc.
+            _type = type;
+            firePropertyChangedEvent(GUIGlobals.TYPE_HEADER,
+                    oldType != null ? oldType.getName() : null,
+                    type != null ? type.getName() : null);
+        } catch (PropertyVetoException pve) {
+            pve.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -233,7 +247,6 @@ public class BibtexEntry
         }
 
         String oldValue = _fields.get(name);
-
         try {
             // We set the field before throwing the changeEvent, to enable
             // the change listener to access the new value if the change

@@ -203,8 +203,8 @@ public class JabRefPreferences {
 
     // Entry editor tab 0:
     defaults.put(CUSTOM_TAB_NAME+"_def0", Globals.lang("General"));
-        defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;doi;url;citeseerurl;"+
-                     "pdf;comment;owner;timestamp");
+        defaults.put(CUSTOM_TAB_FIELDS+"_def0", "crossref;keywords;file;doi;url;citeseerurl;"+
+                     "comment;owner;timestamp");
 
     // Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS+"_def1", "abstract");
@@ -239,11 +239,12 @@ public class JabRefPreferences {
         defaults.put("antialias", Boolean.FALSE);
         defaults.put("ctrlClick", Boolean.FALSE);
         defaults.put("disableOnMultipleSelection", Boolean.FALSE);
-        defaults.put("pdfColumn", Boolean.TRUE);
+        defaults.put("pdfColumn", Boolean.FALSE);
         defaults.put("urlColumn", Boolean.TRUE);
         defaults.put("fileColumn", Boolean.TRUE);
         defaults.put("citeseerColumn", Boolean.FALSE);
         defaults.put("useOwner", Boolean.TRUE);
+        defaults.put("overwriteOwner", Boolean.FALSE);
         defaults.put("allowTableEditing", Boolean.FALSE);
         defaults.put("dialogWarningForDuplicateKey", Boolean.TRUE);
         defaults.put("dialogWarningForEmptyKey", Boolean.TRUE);
@@ -299,6 +300,7 @@ public class JabRefPreferences {
         defaults.put("generateKeysAfterInspection", Boolean.TRUE);
         defaults.put("warnAboutDuplicatesInInspection", Boolean.TRUE);
         defaults.put("useTimeStamp", Boolean.TRUE);
+        defaults.put("overwriteTimeStamp", Boolean.FALSE);
         defaults.put("timeStampFormat", "yyyy.MM.dd");
 //        defaults.put("timeStampField", "timestamp");
         defaults.put("timeStampField", BibtexFields.TIMESTAMP);
@@ -312,7 +314,7 @@ public class JabRefPreferences {
         defaults.put("citeCommand", "cite");
         defaults.put("floatMarkedEntries", Boolean.TRUE);
 
-        defaults.put("useNativeFileDialogOnMac", Boolean.TRUE);
+        defaults.put("useNativeFileDialogOnMac", Boolean.FALSE);
 
         defaults.put("lastUsedExport", null);
         defaults.put("sidePaneWidth", new Integer(-1));
@@ -741,7 +743,8 @@ public class JabRefPreferences {
         defKeyBinds.put("Previous tab", "ctrl PAGE_UP");
         defKeyBinds.put("Replace string", "ctrl R");
         defKeyBinds.put("Delete", "DELETE");
-        defKeyBinds.put("Open PDF or PS", "F4");
+        defKeyBinds.put("Open file", "F4");
+        defKeyBinds.put("Open PDF or PS", "shift F5");
         defKeyBinds.put("Open URL or DOI", "F3");
         defKeyBinds.put("Toggle entry preview", "ctrl F9");
         defKeyBinds.put("Switch preview layout", "F9");
@@ -868,7 +871,20 @@ public class JabRefPreferences {
         list.add(new ExternalFileType("OpenDocument presentation", "odp", "ooimpress", "openoffice"));
         list.add(new ExternalFileType("PNG image", "png", "gimp", "picture"));
         list.add(new ExternalFileType("GIF image", "gif", "gimp", "picture"));
+        list.add(new ExternalFileType("JPG image", "jpg", "gimp", "picture"));
         list.add(new ExternalFileType("Text file", "txt", "emacs", "emacs"));
+        ExternalFileType tp = new ExternalFileType("URL", "html", "firefox", "www");
+        list.add(tp);
+
+        // Under Windows we initialize all file types with an empty viewer app, to
+        // rely on the default app instead:
+        if (Globals.ON_WIN) {
+            for (Iterator<ExternalFileType> iterator = list.iterator(); iterator.hasNext();) {
+                ExternalFileType type = iterator.next();
+                type.setOpenWith("");
+            }
+        }
+
         return list;
     }
 

@@ -134,7 +134,6 @@ public class GenFieldsCustomizer extends JDialog {
               return;
           }
 
-          System.out.println(Globals.prefs.CUSTOM_TAB_NAME + i);
           Globals.prefs.put((Globals.prefs.CUSTOM_TAB_NAME + i), parts[0]);
           Globals.prefs.put((Globals.prefs.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
       }

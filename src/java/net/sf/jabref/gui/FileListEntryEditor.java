@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -100,26 +102,32 @@ public class FileListEntryEditor {
                 diag.dispose();
             }
         });
-        link.addFocusListener(new FocusListener() {
-            public void focusGained(FocusEvent e) {
+        link.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkExtension();
             }
-            public void focusLost(FocusEvent e) {
+            public void removeUpdate(DocumentEvent documentEvent) {
+            }
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkExtension();
+            }
+            private void checkExtension() {
                 if ((types.getSelectedIndex() == -1) &&
                         (link.getText().trim().length() > 0)) {
                     // Try to guess the file type:
                     String theLink = link.getText().trim();
-                    int index = theLink.indexOf('.');
+                    int index = theLink.lastIndexOf('.');
                     if ((index >= 0) && (index < theLink.length()-1)) {
 
                         ExternalFileType type = Globals.prefs.getExternalFileTypeByExt
                                 (theLink.substring(index+1));
                         if (type != null)
                             types.setSelectedItem(type);
-                            
                     }
                 }
             }
         });
+
 
         diag = new JDialog(parent, Globals.lang("Edit file link"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
@@ -197,7 +205,9 @@ public class FileListEntryEditor {
 
                 // If the file is below the file directory, make the path relative:
                 ArrayList<File> dirs = new ArrayList<File>();
-                dirs.add(new File(metaData.getFileDirectory(GUIGlobals.FILE_FIELD)));
+                String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
+                if (fileDir != null)
+                    dirs.add(new File(fileDir));
                 if (dirs.size() > 0) {
                     newFile = FileListEditor.relativizePath(newFile, dirs);
                 }

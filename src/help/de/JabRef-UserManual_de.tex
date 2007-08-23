@@ -10,7 +10,7 @@
 \usepackage{xspace}
 
 %%%%% author, version of file %%%%%
-\newcommand{\versiondate}{in Bearb.}%8.\,6.\,2007 20:44
+\newcommand{\versiondate}{in Bearb.}%23.\,7.\,2007}
 \def\FileAuthor{Dominik Waßenhoven}
 \def\FileTitle{\jabrefversion{} Benutzerhandbuch}
 
@@ -97,7 +97,7 @@
 %%% for Menu references
 \newcommand{\menu}[1]{\texorpdfstring{{\color{dkred}\textit{#1}}}{#1}}
 %%% Menu separator
-\newcommand{\msep}{{\color{dkred}\textit{\guilsinglright}}}
+\newcommand{\msep}{{\color{dkred}\textit{\guilsinglright}}\xspace}
 %%% yellow box with dark blue text
 \newcommand{\tip}[2][Tipp: ]{%
   \begin{center}%
@@ -105,6 +105,7 @@
     \color{dkblue}\textit{#1}#2}}%
   \end{center}%
 }%
+
 %%% for the FAQ 
 \newcounter{faq}
 \newcommand{\faq}[2]{\refstepcounter{faq}%
@@ -198,6 +199,7 @@ BibTeX
 Da-tei-na-men
 Me-nü-be-feh-le
 For-mat-erken-nung% verhindert Trennung "Formater-kennung"
+Werk-zeug-leis-te
 }
 
 \makeatother
@@ -252,7 +254,6 @@ Waßenhoven}
 
 \newpage
 
-
 \section{Einleitung}
 \secttoc
 
@@ -280,7 +281,7 @@ mit dunkelblauer Schrift dargestellt. Hyperlinks sind ebenfalls dunkelblau
 und anklickbar~-- das gilt sowohl für die Navigation innerhalb des
 Dokuments als auch für Links ins Internet.
 
-Wenn Ihnen in diesem Handbuch Fehler auf"|fallen oder wenn Sie Anregungen zum Handbuch haben, würde ich mich über eine kurze Nachricht per \href{mailto:domwass@users.sourceforge.net}{E-Mail} freuen. Über den Stand und die Versionen dieses Handbuchs gibt der Abschnitt ">\nameref{RevisionHistory}"< Auskunft.
+Wenn Ihnen in diesem Handbuch Fehler auf"|fallen oder wenn Sie Anregungen zum Handbuch haben, würde ich mich über eine kurze Nachricht per \href{mailto:domwass@users.sourceforge.net}{E-Mail} freuen. Über den Stand und die einzelnen Versionen dieses Handbuchs gibt der Abschnitt ">\nameref{RevisionHistory}"< Auskunft.
 
 \subsection{Einführung in \bibtex{}}
 
@@ -350,7 +351,7 @@ Die zweite Form sollte für Autoren mit zwei oder mehr Nachnamen benutzt werden, 
   \item \emph{booktitle}\\
     Der Titel eines Buches, aus dem ein Teil zitiert wird. Falls Sie ein Buch zitieren wollen, nehmen Sie für den Titel stattdessen das \texttt{title}-Feld.
   \item \emph{chapter}\\
-    Eine Kapitelnummer (oder Abschnittsnummer oder was-auch-immer-Nummer).
+    Eine Kapitelnummer (oder Abschnittsnummer oder sonstige Nummer).
   \item \emph{crossref}\\
     Der \texttt{key} eines Eintrags, auf den ein Querverweis gesetzt wird. Damit lassen sich beispielsweise die Daten eines Sammelbandes in einem Eintrag für einen Aufsatztitel wiederverwenden, ohne sie bei jedem Aufsatztitel explizit einzutragen. Die Funktionalität von \texttt{crossref} ist jedoch nicht in jedem Fall praktikabel.
   \item \emph{edition}\\
@@ -552,7 +553,7 @@ ihre Literaturquellen organisieren wollen.
 \subsection{Das Hauptfenster}
 
 \tip[]{Die meisten Menüfunktionen, auf die im Folgenden hingewiesen
-wird, haben Tastenkürzel, und viele Funktionen können über die Werkzeugleiste
+wird, haben Tastenkürzel, und viele Funktionen können über die Werk\-zeug\-leiste
 aufgerufen werden.}
 \label{BaseFrameHelp}Im Hauptfenster, in dem Sie mit Ihrer Datei
 arbeiten, befindet sich unter der Menüleiste und der Werkzeugleiste
@@ -1508,9 +1509,12 @@ klicken Sie auf die Schaltfläche \menu{Übernehmen}. Nun erstellt
 \jabref den neuen Eintrag, der allerdings noch keinen \bibtex{}-Key
 hat.
 
-\subsection{Links zu externen Dateien}
+\subsection{Links zu PDF- und PS"=Dateien, URLs und DOIs}
+\label{ExternalFiles}
 
-\label{ExternalFiles}Mit \jabref können Sie Ihre Einträge mit
+\tip[Anmerkung: ]{Ab \jabref 2.3 gibt es ein verbessertes System für Links zu externen Dateien; siehe dazu den Abschnitt ">\nameref{FileLinks}"<.}
+
+\noindent Mit \jabref können Sie Ihre Einträge mit
 den entsprechenden PDF- oder PS-Dateien, die sich auf Ihrem Computer
 befinden, verlinken. Ebenso ist es möglich, Dateien im Internet über
 einen URL oder DOI zu verlinken.
@@ -1602,6 +1606,31 @@ Die folgende Syntax wird verwendet:
   \item Anderer Text wird als regulärer Ausdruck interpretiert. Aber Vorsicht: \emph{backslashes} müssen mit einem weiteren \emph{backslash} \emph{escaped} werden (\texttt{\textbackslash\textbackslash}), damit sie nicht mit Separatoren in Pfad-Angaben verwechselt werden.
 \end{labeling}
 Der Standard ist \lstinline{**/.*[bibtexkey].*\\.[extension]}. Damit wird in allen Unterverzeichnissen des Ordners der entsprechenden Dateiendung (z.\,B. das PDF-Verzeichnis) nach allen Dateien mit der richtigen Dateiendung gesucht, die den bibtexkey in ihrem Namen haben.
+
+\subsection{Links zu externen Dateien (ab Version 2.3)}
+\label{FileLinks}
+
+\jabref lässt Sie Ihre Einträge mit Dateien jeden Typs verlinken, die Sie auf Ihrem System gespeichert haben. Außerdem sind Links zu Dokumenten im Internet in der Form eines URL oder eines DOI möglich. Jedem Eintrag kann eine beliebige Anzahl von Datei-Links zugeordnet werden und jede verlinkte Datei kann schnell aus JabRef heraus geöffnet werden.
+
+Was \bibtex angeht, werden die Datei"=Links eines Eintrags in ein einzelnes Feld geschrieben. In \jabref erscheinen sie aber als editierbare Liste von Links, die im Eintrags"=Editor zugänglich sind.
+
+\subsubsection{Einrichten der Dateitypen}
+
+Für jeden Datei"=Link muss ein Dateityp gewählt werden, damit das richtige Programm zum Öffnen der Datei und das entsprechende Icon gefunden werden. Die Liste der Dateitypen können Sie einsehen und bearbeiten, indem Sie \menu{Optionen \msep Externe Dateitypen verwalten} wählen oder auf die Schaltfläche \menu{Externe Dateitypen verwalten} im Bereich \menu{Externe Programme} des Einstellungs"=Dialogs klicken.
+
+Ein Dateityp besteht aus einem Namen, einem graphischen Icon, einer Dateierweiterung und einer Anwendung zum Öffnen der Dateien. Wenn Sie Windows benutzen, können Sie den Namen der Anwendung weglassen, wenn Sie das Standardprogramm verwenden wollen.
+
+\subsubsection{Datei"=Links zu einem Eintrag hinzufügen}
+
+Wenn bei den Allgemeinen Feldern (siehe Abschnitt~\ref{GeneralFields}) das Feld \texttt{file} eingetragen ist, können Sie die Liste der externen Links im \nameref{EntryEditorHelp} bearbeiten. Der Editor hat dann Schaltflächen zum Einfügen, Bearbeiten, Löschen und Sortieren der Links.
+
+Eine Datei kann mit Hilfe der \menu{Auto}"=Schaltfläche automatisch verlinkt werden, falls sie in Ihrem Dateiverzeichnis (\menu{Einstellungen \msep Externe Programme \msep Links zu externen Dateien \msep Hauptverzeichnis}) oder einem Unterordner liegt, eine Dateierweiterung hat, die \jabref bekannt ist, und einen Namen hat, der mit dem BibTeX"=Key des Eintrags übereinstimmt. Die Regeln, nach denen Dateinamen mit BibTeX"=Keys automatisch verknüpft werden, können eingestellt werden unter \menu{Einstellungen \msep Externe Programme \msep Links zu externen Dateien \msep Suche mit regulärem Ausdruck benutzen}.
+
+Um eine Datei herunterzuladen und mit einem Eintrag zu verlinken, benutzen Sie die Schaltfläche \menu{Download} im Eintrags"=Editor. Es erscheint ein Dialog, in dem Sie den URL eingeben müssen. Die Datei wird dann in Ihr Hauptverzeichnis gespeichert, anhand des BibTeX-Keys benannt und mit dem Eintrag verknüpft.
+
+\subsubsection{Externe Dateien öffnen}
+
+Es gibt mehrere Möglichkeiten, externe Dateien oder Internetseiten zu öffnen. In der Tabellenansicht können Sie einen Eintrag auswählen und mit dem Menü, einem Tastenkürzel oder dem Kontextmenü den ersten externen Link öffnen. Falls in der Tabellenansicht die Spalte \texttt{file} angezeigt wird (\menu{Einstellungen \msep Tabellenansicht \msep Spezielle Spalten \msep Datei"=Spalten anzeigen}), können Sie auch auf das Icon klicken, um den ersten Link eines Eintrags zu öffnen. Um weitere Links zu öffnen, klicken Sie mit der rechten Maustaste auf das Icon (Mac OS X: \menu{Strg-Klick}); es erscheint dann ein Menü mit allen Links.
 
 \subsection{XMP-Metadaten}
 \label{XMPHelp}
@@ -2102,6 +2131,7 @@ können Sie auch neue spezielle Feldmarken vorschlagen.
 
 
 \subsubsection{Spezielle Feldmarken}
+\label{subsub:SpezielleFeldmarken}
 
 \begin{labeling}{auth.auth.eaMM}
 \item [\texttt{{[}auth{]}}]Der Nachname des ersten Autors.
@@ -2146,6 +2176,7 @@ mehr als ein Herausgeber vorhanden ist. Ein Plus (+) wird angehängt,
 falls es mehr als drei Herausgeber gibt.
 \item [\texttt{{[}firstpage{]}}]Die erste Seitenzahl einer Veröffentlichung
 (pages).
+\item [\texttt{{[}keywordN{]}}]Stichwort Nummer N aus dem Feld ">keywords"<, gesetzt den Fall, dass die Stichworte durch Komma oder Semikolon voneinander getrennt sind.
 \item [\texttt{{[}lastpage{]}}]Die letzte Seitenzahl einer Veröffentlichung
 (pages).
 \item [\texttt{{[}shorttitle{]}}]Die ersten 3 Worte eines Titels (title).
@@ -2218,7 +2249,7 @@ mit der Endung \texttt{.layout} vorhanden ist. Um einen neuen, eigenen
 Exportfilter hinzuzufügen, öffnen Sie das Dialogfenster \menu{Optionen}
 \msep{} \menu{Verwalte externe Exportfilter} und klicken auf die
 Schaltfläche \menu{Neu}. Es öffnet sich ein neues Fenster, in dem
-Sie einen Namen (der als Auswahl im Dateityp"=Dropdownmenü erscheint, wenn man \menu{Datei \msep{} Exportieren} im JabRef"=Hauptfenster wählt), eine Pfadangabe zur \texttt{.layout}-Datei und die
+Sie einen Namen (der als Auswahl im Dateityp"=Dropdownmenü erscheint, wenn man \menu{Datei \msep{} Exportieren} im \jabref"=Hauptfenster wählt), eine Pfadangabe zur \texttt{.layout}-Datei und die
 gewünschte Dateiendung für den Exportfilter angeben können. Wenn Sie
 den Exportfilter benutzen, wird diese Endung im Datei"=Dialog automatisch
 vorgeschlagen.
@@ -2361,6 +2392,7 @@ und >>\}<<).
 \texttt{\textbackslash{}textbf} etc. Zusammen mit \texttt{HTMLChars}
 oder \texttt{XMLChars} sollte dieser Formatierer zuletzt aufgerufen
 werden.
+\item [\texttt{RemoveTilde}]ersetzt das Tilde-Zeichen (\lstinline{~}), das in \LaTeX\ als festes Leerzeichen dient, durch ein normales Leerzeichen. Nützlich in Kombination mit dem Namens"=Formatierer (siehe Abschnitt \nameref{NameFormatter}).
 \item [\texttt{ToLowerCase}]macht aus allen Buchstaben Kleinbuchstaben.
 \item [\texttt{CompositeFormat}]\emph{Dokumentation folgt.}
 \item [\texttt{GetOpenOfficeType}]\emph{Dokumentation folgt.}
@@ -2376,6 +2408,51 @@ mit seinem vollen Namen aufrufen (inklusive Paketname). In jedem Fall
 muss der Formatierer in ihrem classpath sein, wenn Sie \jabref
 starten.
 
+\paragraph{Eigene Namens"=Formatierer verwenden}
+\label{NameFormatter}
+
+Mit \jabref~2.2 ist es jetzt möglich, eigene Namens"=Formatierer zu definieren. Dazu wird die Syntax der Bibliographie"=Stile (bst) verwendet. Das erlaubt äußerste Flexibilität, ist allerdings aufwändig in der Schreibweise.
+
+Sie können unter \menu{Optionen \msep Einstellungen \msep Namens"=Formatierer} Ihren eigenen Formatierer schreiben. Benutzen Sie das folgende Format:
+\begin{lstlisting}
+  <Fall1>@<Bereich11>@<Format>@<Bereich12>@<Format>@<Bereich13>(*\ldots*)@@<br>
+  <Fall2>@<Bereich21>@(*\ldots*)
+\end{lstlisting}
+Dieses Format teilt die Aufgabe, eine Liste von Autoren zu formatieren, in unterschiedliche Fälle abhängig von der Zahl der Autoren (das ist nötig, weil manche Formate sich je nach der Zahl der Autoren unterscheiden). Die einzelnen Fälle werden durch \texttt{@@} voneinander getrennt und enthalten Anweisungen, wie jeder einzelne Autor in diesem Fall zu formatieren ist. Diese Anweisungen werden durch \texttt{@} getrennt.
+
+Fälle werden durch Ganzzahlen (1, 2, 3, etc.) oder das Zeichen \texttt{*} (alle Autoren) definiert. Sie geben die nachfolgenden Anweisungen an den Formatierer weiter, falls weniger oder gleich viele Autoren vorhanden sind.
+
+Bereiche sind entweder \texttt{<Ganzzahl>..<Ganzzahl>}, \texttt{<Ganzzahl>} oder das Zeichen \texttt{*}. Die Liste der Autoren fängt bei 1 an. Die Ganzzahlen können einen negativen Wert haben, um vom letzten Autor der Liste zu starten, wobei -1 der Wert für den letzten Autor ist.
+
+Als Beispiel dient die Autorenliste ">Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"<:
+\begin{itemize}
+  \item 1..3 betrifft Joe, Mary und Bruce
+  \item 4..4 betrifft Arthur 
+  \item * betrifft alle
+  \item 2..-1 betrifft Mary, Bruce und Arthur
+\end{itemize}
+
+Die \texttt{<Format>}-Strings nutzen das BibTeX-Namensschema: Die vier Buchstaben v, f, l, j stehen für die Namensteile von, Vorname (first), Nachname (last) und Junior und werden in geschweiften Klammern gesetzt. Ein einzelner Buchstabe v, f, l, j bedeutet, dass der Name abgekürzt werden soll. Wenn einer dieser Buchstaben oder Buchstabenpaare vorkommen, gibt \jabref alle entsprechenden Namen (eventuell abgekürzt) aus, aber der Ausdruck in geschweiften Klammern wird nur ausgegeben, wenn der Namensteil existiert.
+
+Beispielsweise wird beim Format ">\texttt{\{ll\} \{vv \{von Part\}\} \{ff\}}"< die Autorenliste ">Mary Kay and John von Neumann"< von \jabref als ">Kay~~Mary"< (mit zwei Leerzeichen) und ">Neumann von von Part John"< ausgegeben.
+
+Zwei weitere Beispiele sollen das Ganze verdeutlichen; die Dokumentation von \bibtex gibt weitere Hinweise.
+
+Kurzes Beispiel: ">\texttt{\{ll\}, \{f.\}}"< formatiert ">\lstinline{Joe Doe}"< als ">\lstinline{Doe, J.}"<
+
+Ausführliches Beispiel: Um 
+\begin{quote}
+">Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"<
+\end{quote}
+als
+\begin{quote}
+">Doe, J., Jane, M., Bar, B. and Kay, A."<
+\end{quote}
+zu formatieren, nutzt man
+\begin{lstlisting}
+1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.
+\end{lstlisting}
+Falls jemand eine bessere Dokumentation hierzu verfassen möchte: Wenden Sie sich einfach an die \jabref"=Maililnglisten!
 
 \paragraph{Bedingte Ausgabe}
 
@@ -2546,7 +2623,7 @@ Nun sollte dort auch eine Datei \texttt{/mypath/SimpleCsvImporter.class} liegen.
 
 Öffnen Sie in \jabref \menu{Optionen} \msep{} \menu{Verwaltung externer Importfilter} und klicken Sie
 auf \menu{Aus Klassenpfad hinzufügen}. Navigieren Sie nach \texttt{/meinpfad} und 
-klicken Sie \menu{Klassenpfad auswählen}. Wählen Sie dann die Datei \texttt{SimpleCsvImporter.class}
+klicken Sie \menu{Klassenpfad auswählen}. Wählen Sie anschließend die Datei \texttt{SimpleCsvImporter.class}
 und klicken Sie \menu{Klasse auswählen}. Ihr Importfilter sollte nun in der Liste der
 externen Importfilter unter dem Namen >>Simple CSV Importer<< erscheinen und,
 sobald Sie \menu{Schließen} gewählt haben, auch in den Untermenüs \menu{Datei} \msep{} \menu{Importieren} \msep{} 
@@ -2797,14 +2874,21 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 %\end{revhist}
 
 \begin{revhist}{\versiondate}%endgültiges Datum}
+\item Abschnitt ">\nameref{NameFormatter}"< hinzugefügt
+\item Abschnitte ">\nameref{par:Feldformatierer}"< und ">\nameref{subsub:SpezielleFeldmarken}"< ergänzt
+\end{revhist}
+
+\begin{revhist}{4.\,7.\,2007}
+\item Abschnitt ">\nameref{FileLinks}"< hinzugefügt
+\item Abschnitt ">Links zu externen Dateien"< in \nameref{ExternalFiles} umbenannt
 \item Kleine Änderungen
 \end{revhist}
 
 \begin{revhist}{8.\,6.\,2007}
 \item Abschnitt ">Import und Export"< in zwei Abschnitte unterteilt
-\item Abschnitt \nameref{sec:faq} ergänzt
-\item Abschnitte \nameref{EntryEditorHelp} und \nameref{subsec:System-Voraussetzungen} angepasst
-\item Fehler im Abschnitt \nameref{PreviewHelp} korrigiert
+\item Abschnitt ">\nameref{sec:faq}"< ergänzt
+\item Abschnitte ">\nameref{EntryEditorHelp}"< und ">\nameref{subsec:System-Voraussetzungen}"< angepasst
+\item Fehler im Abschnitt ">\nameref{PreviewHelp}"< korrigiert
 \item Versionsnummer angepasst
 \item Beschreibung der Felder ">doi"< und ">eid"< hinzugefügt
 \item Fehler im Link zum Mail-Archiv beseitigt
@@ -2813,19 +2897,19 @@ geworden ist, was es ist. Wer zum Entwicklerteam gehört und wer alles zum Progra
 \end{revhist}
 
 \begin{revhist}{18.\,4.\,2007}
-\item Abschnitte \nameref{LabelPatterns}, \nameref{par:Feldformatierer} und \nameref{StringEditorHelp} aktualisiert
-\item Fehler in Abschnitt \nameref{subsec:Starten-Kommandozeile} entfernt
+\item Abschnitte ">\nameref{LabelPatterns}"<, ">\nameref{StringEditorHelp}"< und ">\nameref{par:Feldformatierer}"< aktualisiert
+\item Fehler in Abschnitt ">\nameref{subsec:Starten-Kommandozeile}"< entfernt
 \item \jabref-Logo geändert
 \item Ein paar Kleinigkeiten
 \end{revhist}
 
 \begin{revhist}{20.\,3.\,2007}
-\item Abschnitt \nameref{subsubsec:Hinzufuegen-Exportfilter} angepasst
+\item Abschnitt ">\nameref{subsubsec:Hinzufuegen-Exportfilter}"< angepasst
 \item Kleinere Änderungen
 \end{revhist}
 
 \begin{revhist}{1.\,2.\,2007}
-\item Abschnitte \nameref{EndnoteFilters}, \nameref{subsubsec:endnote-jabref}, \nameref{subsec:about} und \nameref{sec:faq} überarbeitet
+\item Abschnitte ">\nameref{EndnoteFilters}"<, ">\nameref{subsubsec:endnote-jabref}"<, ">\nameref{subsec:about}"< und ">\nameref{sec:faq}"< überarbeitet
 \item Literaturverzeichnis um Eintrag von \cite{btxfaq} ergänzt
 \item Und noch ein paar kleine Änderungen
 \end{revhist}

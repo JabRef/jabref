@@ -90,7 +90,7 @@ public class PrefsDialog3 extends JDialog {
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
 		tabs.add(new AppearancePrefsTab(prefs));
-		tabs.add(new ExternalTab(frame, prefs, parent.helpDiag));
+		tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
 		tabs.add(new TablePrefsTab(prefs, parent));
 		tabs.add(new TableColumnsTab(prefs, parent));
 		tabs.add(new TabLabelPattern(prefs, parent.helpDiag));
@@ -199,7 +199,8 @@ public class PrefsDialog3 extends JDialog {
 					setValues();
 					BibtexEntryType.loadCustomEntryTypes(prefs);
 					frame.removeCachedEntryEditors();
-				} catch (IOException ex) {
+                    Globals.prefs.updateEntryEditorTabList();
+                } catch (IOException ex) {
 					JOptionPane.showMessageDialog(PrefsDialog3.this, Globals
 						.lang("Could not import preferences")
 						+ ": " + ex.getMessage(), Globals.lang("Import preferences"),

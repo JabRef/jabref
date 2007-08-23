@@ -282,6 +282,16 @@ public class LabelPatternUtil {
                   _sbvalue.append(getTitleWords(1, _entry));
                 }
 
+               else if (val.matches("keyword\\d+")) {
+                    int num = Integer.parseInt(val.substring(7));
+                    String kw = _entry.getField("keywords").toString();
+                    if (kw != null) {
+                        String[] keywords = kw.split("[,;]\\s*");
+                        if ((num > 0) && (num < keywords.length))
+                            _sbvalue.append(keywords[num-1].trim());
+                    }
+               }
+
                 // we havent seen any special demands
                 else {
                   _sbvalue.append(_entry.getField(val).toString());

@@ -376,7 +376,7 @@ public class BibtexDatabase {
     /**
 	 * Take the given BibtexEntry and resolve any string references.
 	 * 
-	 * @param entriy
+	 * @param entry
 	 *            A BibtexEntry in which all strings of the form #xxx# will be
 	 *            resolved against the hash map of string references stored in
 	 *            the databasee.

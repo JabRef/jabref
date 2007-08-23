@@ -2,9 +2,7 @@ package net.sf.jabref.imports;
 
 import java.awt.BorderLayout;
 import java.io.*;
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,6 +24,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
     String startUrl = "http://ieeexplore.ieee.org";
     String searchUrlPart = "/search/freesearchresult.jsp?queryText=";
     String endUrl = "+%3Cin%3E+metadata&ResultCount=25&ResultStart=";
+    String risUrl = "http://ieeexplore.ieee.org/xpls/citationAct";
     private int perPage = 25, hits = 0, unparseable = 0, parsed = 0;
     private boolean shouldContinue = false;
     private JCheckBox fetchAstracts = new JCheckBox(Globals.lang("Include abstracts"), false);
@@ -59,6 +58,9 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
     Pattern abstractLinkPattern = Pattern.compile(
             "<a href=\"(.+)\" class=\"bodyCopySpaced\">Abstract</a>");
+
+    Pattern ieeeArticleNumberPattern =
+        Pattern.compile("<a href=\".*arnumber=(\\d+).*\">");
 
     public JPanel getOptionsPanel() {
         JPanel pan = new JPanel();
@@ -225,7 +227,43 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
 
     }
 
-    private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber) {
+    private BibtexEntry parseEntryRis(String number)
+        throws IOException
+    {
+        URL url;
+        URLConnection conn;
+        try {
+            url = new URL(risUrl);
+            conn = url.openConnection();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        conn.setRequestProperty("Content-Type",
+                "application/x-www-form-urlencoded");
+        PrintWriter out = new PrintWriter(
+                conn.getOutputStream());
+        out.write(
+                "fileFormate=ris&arnumber="+
+                URLEncoder.encode(
+                    "<arnumber>"+number+"</arnumber>",
+                    "UTF-8"));
+        out.flush();
+        out.close();
+        InputStream inp = conn.getInputStream();
+        List items = new RisImporter().importEntries(inp);
+        inp.close();
+        if (items.size() > 0)
+            return (BibtexEntry)items.get(0);
+        else
+            return null;
+    }
+
+    private BibtexEntry parseNextEntry(String allText, int startIndex, int entryNumber)
+    {
+        BibtexEntry entry = null;
         String toFind = new StringBuffer().append("<div align=\"left\"><strong>")
                 .append(entryNumber).append(".</strong></div>").toString();
         int index = allText.indexOf(toFind, startIndex);
@@ -236,6 +274,31 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         if (index >= 0) {
             piv = index+1;
             String text = allText.substring(index, endIndex);
+            // Fetching abstracts takes time, and causes a lot
+            // of requests, so this should be optional or disabled:
+            if (fetchingAbstracts) {
+                Matcher number =
+                    ieeeArticleNumberPattern.matcher(text);
+                if (number.find()) {
+                    try {
+                        entry = parseEntryRis(number.group(1));
+                    } catch (IOException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                }
+            }
+            if (entry != null) { // fetch successful
+                // we just need to add DOI, it is not included in RIS.
+                int pgInd = text.indexOf("Digital Object Identifier ");
+                if (pgInd >= 0) {
+                    int fieldEnd = text.indexOf("<br>", pgInd);
+                    if (fieldEnd >= 0) {
+                        entry.setField("doi",
+                            text.substring(pgInd+26, fieldEnd).trim());
+                    }
+                }
+                return entry;
+            }
             BibtexEntryType type;
             String sourceField;
             if (text.indexOf("IEEE JNL") >= 0) {
@@ -247,7 +310,7 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
             }
 
             index = 0;
-            BibtexEntry entry = new BibtexEntry(Util.createNeutralId(), type);
+            entry = new BibtexEntry(Util.createNeutralId(), type);
             //System.out.println(text);
             Matcher m1 = entryPattern1.matcher(text);
             Matcher m2 = entryPattern2.matcher(text);
@@ -361,24 +424,6 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
                 }
             }
 
-            // Fetching abstracts takes time, and causes a lot of requests, so this should
-            // be optional or disabled:
-            if (fetchingAbstracts) {
-                Matcher abstractLink = abstractLinkPattern.matcher(text);
-                if (abstractLink.find()) {
-                    StringBuffer sb = new StringBuffer(startUrl).append(abstractLink.group(1));
-                    //System.out.println(sb.toString());
-                    try {
-                        String abstractText = fetchAbstract(sb.toString());
-                        if ((abstractText != null) && (abstractText.length() > 0) &&
-                                !abstractText.equalsIgnoreCase("not available")) {
-                            entry.setField("abstract", convertHTMLChars(abstractText));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                }
-            }
 
             return entry;
         }

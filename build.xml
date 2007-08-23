@@ -112,8 +112,8 @@
 		<include name="microba.jar" />
 		<include name="PDFBox-0.7.3-dev-reduced.jar" />
 		<include name="JempBox-0.1.0-dev.jar" />
-
-		<!-- Plugin runtime dependencies -->
+        <include name="zoom-java.jar" />
+        <!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />
 		<include name="plugin/jpf-boot.jar" />

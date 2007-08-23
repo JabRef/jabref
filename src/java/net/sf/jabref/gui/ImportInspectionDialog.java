@@ -17,6 +17,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -93,10 +96,10 @@ public class ImportInspectionDialog extends JDialog {
     private final int
         DUPL_COL = 1,
         FILE_COL = 2,
-        PDF_COL = 3,
-        PS_COL = 4,
-        URL_COL = 5,
-        PAD = 6;
+        PDF_COL = -1,//3,
+        PS_COL = -2,//4,
+        URL_COL = 3,//5,
+        PAD = 4; // 6;
 
     /**
      * The "defaultSelected" boolean value determines if new entries added are selected for import or not.
@@ -132,7 +135,7 @@ public class ImportInspectionDialog extends JDialog {
         EventTableModel<BibtexEntry> tableModelGl = new EventTableModel<BibtexEntry>(sortedList,
                 new EntryTableFormat());
         glTable = new EntryTable(tableModelGl);
-        GeneralRenderer renderer = new GeneralRenderer(Color.white, true);
+        GeneralRenderer renderer = new GeneralRenderer(Color.white);
         glTable.setDefaultRenderer(JLabel.class, renderer);
         glTable.setDefaultRenderer(String.class, renderer);
         glTable.getInputMap().put(Globals.prefs.getKey("Delete"), "delete");
@@ -173,8 +176,8 @@ public class ImportInspectionDialog extends JDialog {
         popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
         popup.add(new AutoSetLinks());
-        popup.add(new AttachFile("pdf"));
-        popup.add(new AttachFile("ps"));
+        //popup.add(new AttachFile("pdf"));
+        //popup.add(new AttachFile("ps"));
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
@@ -572,7 +575,8 @@ public class ImportInspectionDialog extends JDialog {
                 boolean groupingCanceled = false;
 
                 // Set owner/timestamp if options are enabled:
-                Util.setAutomaticFields(selected);
+                Util.setAutomaticFields(selected, Globals.prefs.getBoolean("overwriteOwner"),
+                    Globals.prefs.getBoolean("overwriteTimeStamp"));
 
 
                 for (Iterator<BibtexEntry> i = selected.iterator(); i.hasNext();) {
@@ -781,8 +785,41 @@ public class ImportInspectionDialog extends JDialog {
      */
     class TableClickListener implements MouseListener {
 
-        public void mouseClicked(MouseEvent e) {
+        public boolean isIconColumn(int col) {
+            return (col == FILE_COL) || (col == PDF_COL) || (col == PS_COL)
+                    || (col == URL_COL);
+        }
 
+        public void mouseClicked(MouseEvent e) {
+            final int col = glTable.columnAtPoint(e.getPoint()),
+              row = glTable.rowAtPoint(e.getPoint());
+            if (isIconColumn(col)) {
+                BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+
+                switch (col) {
+                    case FILE_COL:
+                        Object o = entry.getField(GUIGlobals.FILE_FIELD);
+                        if (o != null) {
+                            FileListTableModel tableModel = new FileListTableModel();
+                            tableModel.setContent((String)o);
+                            if (tableModel.getRowCount() == 0)
+                                return;
+                            FileListEntry fl = tableModel.getEntry(0);
+                            (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null, panel.metaData(), fl.getType())).
+                                    actionPerformed(null);
+                        }
+                        break;
+                    case URL_COL:
+                        openExternalLink("url", e);
+                        break;
+                    case PDF_COL:
+                        openExternalLink("pdf", e);
+                        break;
+                    case PS_COL:
+                        openExternalLink("ps", e);
+                        break;
+                }
+            }
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -793,10 +830,81 @@ public class ImportInspectionDialog extends JDialog {
 
         }
 
+        /**
+         * Show right-click menu. If the click happened in an icon column that presents its own popup menu,
+         * show that. Otherwise, show the ordinary popup menu.
+         * @param e The mouse event that triggered the popup.
+         */
+        public void showPopup(MouseEvent e) {
+            final int col = glTable.columnAtPoint(e.getPoint());
+            switch (col) {
+                case FILE_COL:
+                    showFileFieldMenu(e);
+                    break;
+                default:
+                    showOrdinaryRightClickMenu(e);
+                    break;
+            }
+
+        }
+
+        public void showOrdinaryRightClickMenu(MouseEvent e) {
+            popup.show(glTable, e.getX(), e.getY());
+        }
+
+        /**
+         * Show the popup menu for the FILE field.
+         * @param e The mouse event that triggered the popup.
+         */
+        public void showFileFieldMenu(MouseEvent e) {
+            final int row = glTable.rowAtPoint(e.getPoint());
+            BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+            JPopupMenu menu = new JPopupMenu();
+            int count = 0;
+            Object o = entry.getField(GUIGlobals.FILE_FIELD);
+            FileListTableModel fileList = new FileListTableModel();
+            fileList.setContent((String)o);
+            // If there are one or more links, open the first one:
+            for (int i=0; i<fileList.getRowCount(); i++) {
+                FileListEntry flEntry = fileList.getEntry(i);
+                String description = flEntry.getDescription();
+                if ((description == null) || (description.trim().length() == 0))
+                    description = flEntry.getLink();
+                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
+                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
+                        flEntry.getType()));
+                count++;
+            }
+            if (count == 0) {
+                showOrdinaryRightClickMenu(e);
+            }
+            else
+                menu.show(glTable, e.getX(), e.getY());
+        }
+
+        /**
+         * Open old-style external links after user clicks icon.
+         * @param fieldName The name of the BibTeX field this icon is used for.
+         * @param e The MouseEvent that triggered this operation.
+         */
+        public void openExternalLink(String fieldName, MouseEvent e) {
+            final int row = glTable.rowAtPoint(e.getPoint());
+            BibtexEntry entry = (BibtexEntry)sortedList.get(row);
+
+            Object link = entry.getField(fieldName);
+            try {
+                if (link != null)
+                    Util.openExternalViewer(panel.metaData(), (String) link, fieldName);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
         public void mouseReleased(MouseEvent e) {
             // Check if the user has right-clicked. If so, open the right-click menu.
             if (e.isPopupTrigger()) {
-                popup.show(glTable, e.getX(), e.getY());
+                showPopup(e);
                 return;
             }
         }
@@ -804,7 +912,7 @@ public class ImportInspectionDialog extends JDialog {
         public void mousePressed(MouseEvent e) {
             // Check if the user has right-clicked. If so, open the right-click menu.
             if (e.isPopupTrigger()) {
-                popup.show(glTable, e.getX(), e.getY());
+                showPopup(e);
                 return;
             }
 
@@ -1110,7 +1218,7 @@ public class ImportInspectionDialog extends JDialog {
     }
 
     class EntryTable extends JTable {
-        GeneralRenderer renderer = new GeneralRenderer(Color.white, true);
+        GeneralRenderer renderer = new GeneralRenderer(Color.white);
         public EntryTable(TableModel model) {
             super(model);
         }

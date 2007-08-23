@@ -165,12 +165,13 @@ public class IntegrityCheck
                                             entry, fieldName, null))  ;
 //        back.add("bad end (" +fieldName +" field)");
       }
-      if (structure.indexOf("NN,NN") > -1)
+      /*if (structure.indexOf("NN,NN") > -1)
       {
         messages.add( new IntegrityMessage( IntegrityMessage.NAME_SEMANTIC_WARNING,
                                             entry, fieldName, null))  ;
+
 //        back.add("something could be wrong in " +fieldName +" field") ;
-      }
+      } */
     }
 //    messages.add( new IntegrityMessage( IntegrityMessage.NAME_END_WARNING,
 //                                        entry, fieldName, null))  ;

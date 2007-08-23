@@ -636,6 +636,8 @@ public class Util {
                                                  ExternalFileType fileType) throws IOException {
 
 
+        boolean httpLink = link.toLowerCase().startsWith("http");
+
         // For other platforms we'll try to find the file type:
 		File file = new File(link);
 
@@ -657,34 +659,44 @@ public class Util {
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
 
         // Include the directory of the bib file:
-        String databaseDir = metaData.getFile().getParent();
-        File tmp = expandFilename(link, new String[] { dir, fileDir, databaseDir });
-        if (tmp != null)
-            file = tmp;
+        String[] dirs;
+        if (metaData.getFile() != null) {
+            String databaseDir = metaData.getFile().getParent();
+            dirs = new String[] { dir, fileDir, databaseDir };
+        }
+        else
+            dirs = new String[] { dir, fileDir };
 
+        if (!httpLink) {
+            File tmp = expandFilename(link, dirs);
+            if (tmp != null)
+                file = tmp;
+        }
 
-		// Check if we have arrived at an existing file:
-		if (file.exists() && (fileType != null)) {
+		// Check if we have arrived at a file type, and either an http link or an existing file:
+		if ((httpLink || file.exists()) && (fileType != null)) {
 			// Open the file:
 			try {
-				if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), file.getPath() };
+                String filePath = httpLink ? link : file.getPath();
+                if (Globals.ON_MAC) {
+					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
 					Runtime.getRuntime().exec(cmd);
 				} else if (Globals.ON_WIN) {
                     if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
                         // Application is specified. Use it:
-                        openFileWithApplicationOnWindows(file.getPath(), fileType.getOpenWith());
+                        openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
                     } else
-                        openFileOnWindows(file.getPath(), true);
+                        openFileOnWindows(filePath, true);
 				} else {
-					String[] cmdArray = new String[] { fileType.getOpenWith(), file.getPath() };
+					String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
 					Runtime.getRuntime().exec(cmdArray);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+                throw e;
+                /*e.printStackTrace();
 				System.err.println("An error occured on the command: " + fileType.getOpenWith()
 					+ " #" + link);
-				System.err.println(e.getMessage());
+				System.err.println(e.getMessage());*/
 			}
 
 		} else {
@@ -1057,6 +1069,7 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 
 					// Skip the brace
 					i++;
+
 					if (i < c.length){
 						if (c[i] == '"'){
 							// Parameter is in format "xxx"
@@ -1641,22 +1654,28 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * @param bibs
 	 *            List of bibtex entries
 	 */
-	public static void setAutomaticFields(Collection<BibtexEntry> bibs) {
+	public static void setAutomaticFields(Collection<BibtexEntry> bibs,
+             boolean overwriteOwner, boolean overwriteTimestamp) {
 		
-		boolean setOwner = Globals.prefs.getBoolean("useOwner");
-		boolean setTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
-		
-		// Do not need to do anything if both options are disabled
-		if (!(setOwner || setTimeStamp))
-			return;
-		
+
 		String timeStampField = Globals.prefs.get("timeStampField");
+
 		String defaultOwner = Globals.prefs.get("defaultOwner");
 		String timestamp = easyDateFormat();
-		
-		// Iterate through all entries
+		boolean globalSetOwner = Globals.prefs.getBoolean("useOwner"),
+                globalSetTimeStamp = Globals.prefs.getBoolean("useTimeStamp");
+
+        // Do not need to do anything if both options are disabled
+		if (!(globalSetOwner || globalSetTimeStamp))
+			return;
+
+        // Iterate through all entries
 		for (BibtexEntry curEntry : bibs){
-			setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
+            boolean setOwner = globalSetOwner &&
+                (overwriteOwner || (curEntry.getField(BibtexFields.OWNER)==null));
+            boolean setTimeStamp = globalSetTimeStamp &&
+                (overwriteTimestamp || (curEntry.getField(timeStampField)==null));
+            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField,
 				timestamp);
 		}
 
@@ -1669,13 +1688,21 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * 
 	 * @param entry
 	 *            The entry to set fields for.
+     * @param overwriteOwner
+     *              Indicates whether owner should be set if it is already set.
+     * @param overwriteTimestamp
+     *              Indicates whether timestamp should be set if it is already set.
 	 */
-	public static void setAutomaticFields(BibtexEntry entry) {
+	public static void setAutomaticFields(BibtexEntry entry, boolean overwriteOwner,
+                                          boolean overwriteTimestamp) {
 		String defaultOwner = Globals.prefs.get("defaultOwner");
 		String timestamp = easyDateFormat();
-		boolean setOwner = Globals.prefs.getBoolean("useOwner"), setTimeStamp = Globals.prefs
-			.getBoolean("useTimeStamp");
-		String timeStampField = Globals.prefs.get("timeStampField");
+        String timeStampField = Globals.prefs.get("timeStampField");
+        boolean setOwner = Globals.prefs.getBoolean("useOwner") &&
+            (overwriteOwner || (entry.getField(BibtexFields.OWNER)==null));
+        boolean setTimeStamp = Globals.prefs.getBoolean("useTimeStamp") &&
+            (overwriteTimestamp || (entry.getField(timeStampField)==null));
+
 		setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
 	}
 

@@ -52,7 +52,8 @@ public class LayoutHelper {
     public static final int IS_OPTION_FIELD = 5;
     public static final int IS_GROUP_START = 6;
     public static final int IS_GROUP_END = 7;
-
+    public static final int IS_ENCODING_NAME = 8;
+    
     private static String currentGroup = null;
     
     private PushbackReader _in;
@@ -419,14 +420,22 @@ public class LayoutHelper {
                     {
                         // get field name
                         getBracketedField(IS_FIELD_END);
-                        
                         return;
                     }
                     else if (name.equalsIgnoreCase("endgroup"))
                     {
                         // get field name
-                        getBracketedField(IS_GROUP_END);                        
-                    }                                        
+                        getBracketedField(IS_GROUP_END);
+                        return;
+                    }
+                    else if (name.equalsIgnoreCase("encoding"))
+                    {
+                        // Print the name of the current encoding used for export.
+                        // This is only supported in begin/end layouts, not in
+                        // entry layouts.
+                        parsedEntries.add(new StringInt(name, IS_ENCODING_NAME));
+                        return;
+                    }
                 }
                 
                 // for all other cases

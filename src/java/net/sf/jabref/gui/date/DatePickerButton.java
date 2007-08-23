@@ -61,6 +61,7 @@ public class DatePickerButton implements ActionListener {
     public DatePickerButton(FieldEditor pEditor) {
         datePicker.showButtonOnly(true);
         datePicker.addActionListener(this);
+        datePicker.setShowTodayButton(true);
         panel.setLayout(new BorderLayout());
         panel.add(datePicker, BorderLayout.WEST);
         editor = pEditor;

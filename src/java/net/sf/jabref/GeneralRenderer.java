@@ -10,24 +10,18 @@ import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: May 30, 2005
- * Time: 9:43:45 PM
- * To change this template use File | Settings | File Templates.
+ * Renderer for table cells, which supports both Icons, JLabels and plain text.
  */
 public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ extends DefaultTableCellRenderer {
-    private boolean antialiasing;
 
-    public GeneralRenderer(Color c, boolean antialiasing) {
+    public GeneralRenderer(Color c) {
         super();
-        this.antialiasing = antialiasing;
         setBackground(c);
     }
 
 
-    public GeneralRenderer(Color c, Color fg, boolean antialiasing) {
-        this(c, antialiasing);
+    public GeneralRenderer(Color c, Color fg) {
+        this(c);
         setForeground(fg);
     }
 
@@ -60,7 +54,7 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
         }
     }
 
-      public void paint(Graphics g) {
+    /*  public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
         //System.out.println(antialiasing);
         if (antialiasing) {
@@ -73,6 +67,6 @@ public class GeneralRenderer /*extends JTable implements TableCellRenderer {*/ e
         }
           super.paint(g2);
 
-    }
+    }*/
 
 }

@@ -272,7 +272,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 anythingUseful = anythingUseful
                         || ((pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0));
-
+                
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
                     directParserResult = pr;
@@ -300,9 +300,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 				anythingUseful = anythingUseful | (entries.size() > 0);
 
 				// set timestamp and owner
-				Util.setAutomaticFields(entries); 
-				
-				for (BibtexEntry entry : entries){
+				Util.setAutomaticFields(entries, Globals.prefs.getBoolean("overwriteOwner"),
+                        Globals.prefs.getBoolean("overwriteTimeStamp")); // set timestamp and owner
+
+                for (BibtexEntry entry : entries){
 					database.insertEntry(entry);
 				}
 			}

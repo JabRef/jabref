@@ -633,6 +633,10 @@ lastEdLoop:
                 splashScreen = null;
             }
 
+            /*JOptionPane.showMessageDialog(null, Globals.lang("Please note that this "
+                +"is an early beta version. Do not use it without backing up your files!"),
+                    Globals.lang("Beta version"), JOptionPane.WARNING_MESSAGE);*/
+
             //Util.pr(": Showing frame");
             jrf.setVisible(true);
 

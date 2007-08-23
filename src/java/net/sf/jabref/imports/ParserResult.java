@@ -31,7 +31,6 @@ import net.sf.jabref.BibtexEntryType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
 

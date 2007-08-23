@@ -48,16 +48,14 @@ import javax.swing.undo.CannotUndoException;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.export.ExportToClipboardAction;
-import net.sf.jabref.export.FileActions;
-import net.sf.jabref.export.SaveException;
-import net.sf.jabref.export.SaveSession;
+import net.sf.jabref.export.*;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
+import net.sf.jabref.imports.Z3950Connection;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -142,6 +140,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     StringDialog stringDialog = null;
     // Keeps track of the string dialog if it is open.
+
+    SaveDatabaseAction saveAction;
 
     /**
      * The group selector component for this database. Instantiated by the
@@ -252,6 +252,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void setupActions() {
+        saveAction = new SaveDatabaseAction(this);
         
         actions.put("undo", undoAction);
         actions.put("redo", redoAction);
@@ -293,7 +294,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
-
+                    Z3950Connection conn = new Z3950Connection();
+                    conn.doSearch();
+                    /*
                     ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
                     BibtexEntry[] sel = getSelectedEntries();
                     for (int i = 0; i < sel.length; i++) {
@@ -333,171 +336,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     //ExternalFileTypeEditor efte = new ExternalFileTypeEditor(frame);
                     //efte.setVisible(true);
 
-                    /*NamedCompound ce = Util.upgradePdfPsToFile(database,
-                            new String[] {"pdf", "ps"});
-                    undoManager.addEdit(ce);
-                    markBaseChanged();*/
+                    */
                 }
             });
 
 
         // The action for saving a database.
-        actions.put("save", new AbstractWorker() {
-            private boolean success = false, cancelled = false;
-            public void init() throws Throwable {
-                success = false;
-                cancelled = false;
-                if (getFile() == null)
-                    runCommand("saveAs");
-                else {
-
-                    if (updatedExternally || Globals.fileUpdateMonitor.hasBeenModified(fileMonitorHandle)) {
-                        String[] opts = new String[]{Globals.lang("Review changes"), Globals.lang("Save"),
-                                Globals.lang("Cancel")};
-                        int answer = JOptionPane.showOptionDialog(frame, Globals.lang("File has been updated externally. "
-                                + "What do you want to do?"), Globals.lang("File updated externally"),
-                                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                                null, opts, opts[0]);
-                        /*  int choice = JOptionPane.showConfirmDialog(frame, Globals.lang("File has been updated externally. "
-+"Are you sure you want to save?"), Globals.lang("File updated externally"),
-                       JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);*/
-
-                        if (answer == JOptionPane.CANCEL_OPTION)
-                            return;
-                        else if (answer == JOptionPane.YES_OPTION) {
-                            ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this); //, panel.database(), panel.metaData());
-                            //try {
-                            scanner.changeScan(getFile());
-                            setUpdatedExternally(false);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    sidePaneManager.hide("fileUpdate");
-                                }
-                            });
-
-                            //} catch (IOException ex) {
-                            //    ex.printStackTrace();
-                            //}
-
-                            return;
-                        }
-                    }
-
-                    frame.output(Globals.lang("Saving database") + "...");
-                    saving = true;
-                }
-            }
-
-            public void update() {
-                if (success) {
-                	// Reset title of tab
-                    frame.setTabTitle(BasePanel.this, getFile().getName(),
-                            getFile().getAbsolutePath());
-                    frame.output(Globals.lang("Saved database")+" '"
-                             +getFile().getPath()+"'.");
-                } else if (!cancelled) {
-                    frame.output(Globals.lang("Save failed"));
-                }
-            }
-
-            public void run() {
-                if (getFile() == null) {
-                    cancelled = true;
-                    return;
-                }
-
-                try {
-                    // If the option is set, autogenerate keys for all entries that are
-                    // lacking keys, before saving:
-                    autoGenerateKeysBeforeSaving();
-                    
-                    // Now save the database:
-                    success = saveDatabase(getFile(), false, encoding);
-
-                    //Util.pr("Testing resolve string... BasePanel line 237");
-                    //Util.pr("Resolve aq: "+database.resolveString("aq"));
-                    //Util.pr("Resolve text: "+database.resolveForStrings("A text which refers to the string #aq# and #billball#, hurra."));
-
-                    try {
-                        Globals.fileUpdateMonitor.updateTimeStamp(fileMonitorHandle);
-                    } catch (IllegalArgumentException ex) {
-                        // This means the file has not yet been registered, which is the case
-                        // when doing a "Save as". Maybe we should change the monitor so no
-                        // exception is cast.
-                    }
-                    saving = false;
-                    if (success) {
-                        undoManager.markUnchanged();
-                        // (Only) after a successful save the following
-                        // statement marks that the base is unchanged
-                        // since last save:
-                        nonUndoableChange = false;
-                        baseChanged = false;
-                        updatedExternally = false;
-                    }
-                } catch (SaveException ex2) {
-                    ex2.printStackTrace();
-                }
-            }
-        });
+        actions.put("save", saveAction);
 
         actions.put("saveAs", new BaseAction() {
             public void action() throws Throwable {
-                
-                JPanel options = new JPanel();
-                DefaultFormBuilder builder = new DefaultFormBuilder(options, new FormLayout("left:pref", "pref, pref, pref"));
-                //options.setLayout(new GridLayout(2,1));
-                ButtonGroup bg = new ButtonGroup();
-                JRadioButton sAll = new JRadioButton("<html>All entries</html>");
-                JRadioButton sSel = new JRadioButton("<html>Selected<br>entries</html>");
-                sAll.setSelected(true);
-                bg.add(sAll);
-                bg.add(sSel);
-                builder.append(Globals.lang("Include")+":");
-                builder.append(sAll);
-                builder.append(sSel);
-                builder.appendGlueRow();
-                options.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
-                String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")), ".bib",
-                            JFileChooser.SAVE_DIALOG, false, options);
-                if (chosenFile == null)
-                    return; // cancelled
-                File f = new File(chosenFile);
-                // Check if the file already exists:
-                if (f.exists() && (JOptionPane.showConfirmDialog
-                                (frame, "'"+f.getName()+"' "+Globals.lang("exists. Overwrite file?"),
-                                Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
-                                != JOptionPane.OK_OPTION)) {
-                    return; // cancelled
-                }
-                // Save:
-                if (sAll.isSelected()) {
-                    //
-                    // Normal save
-                    //
-                    if (chosenFile != null) {
-                        metaData.setFile(f);
-                        Globals.prefs.put("workingDirectory", f.getParent());
-                        runCommand("save");
-                        // Register so we get notifications about outside changes to the file.
-                        try {
-                            fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(BasePanel.this,getFile());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        frame.getFileHistory().newFile(metaData.getFile().getPath());
-                    }
-                }
-                else {
-                    //
-                    // Save selected entries
-                    //
-                    File expFile = new File(chosenFile);
-                    saveDatabase(expFile, true, encoding);
-                    frame.getFileHistory().newFile(expFile.getPath());
-                    frame.output(Globals.lang("Saved selected to")+" '"
-                                 +expFile.getPath()+"'.");
-                }
+                saveAction.saveAs();
             }
         });
 
@@ -514,6 +363,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           Globals.lang("exists. Overwrite file?"),
                           Globals.lang("Save database"), JOptionPane.OK_CANCEL_OPTION)
                          == JOptionPane.OK_OPTION)) {
+
                       saveDatabase(expFile, true, Globals.prefs.get("defaultEncoding"));
                       //runCommand("save");
                       frame.getFileHistory().newFile(expFile.getPath());
@@ -691,7 +541,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           for (int i=0; i<bes.length; i++) {
                             try {
                               BibtexEntry be = (BibtexEntry)(bes[i].clone());
-                                Util.setAutomaticFields(be);
+                                Util.setAutomaticFields(be,
+                                        Globals.prefs.getBoolean("overwriteOwner"),
+                                        Globals.prefs.getBoolean("overwriteTimeStamp"));
 
                               // We have to clone the
                               // entries, since the pasted
@@ -973,74 +825,102 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
           actions.put("mergeDatabase", new AppendDatabaseAction(frame, this));
 
-          
-        
-          
-          
-         actions.put("openFile", new BaseAction() {
-           public void action() {
-             (new Thread() {
-               public void run() {
-                 BibtexEntry[] bes = mainTable.getSelectedEntries();
-                 String field = "ps";
-                 if ( (bes != null) && (bes.length == 1)) {
-                   Object link = bes[0].getField("ps");
-                   if (bes[0].getField("pdf") != null) {
-                     link = bes[0].getField("pdf");
-                     field = "pdf";
-                   }
-                   String filepath = null;
-                   if (link != null) {
-                     filepath = link.toString();
-                   }
-                   else {
 
-                     // see if we can fall back to a filename based on the bibtex key
-                     String basefile;
-                     Object key = bes[0].getField(BibtexFields.KEY_FIELD);
-                     if (key != null) {
-                       basefile = key.toString();
-                        final String[] types = new String[] {"pdf", "ps"};
-                        final String sep = System.getProperty("file.separator");
-                        for (int i = 0; i < types.length; i++) {
-                            String dir = Globals.prefs.get(types[i]+"Directory");
-                            if (dir.endsWith(sep)) {
-                                dir = dir.substring(0, dir.length()-sep.length());
+        actions.put("openFile", new BaseAction() {
+            public void action() {
+                (new Thread() {
+                    public void run() {
+                        BibtexEntry[] bes = mainTable.getSelectedEntries();
+                        String field = "ps";
+                        if ((bes != null) && (bes.length == 1)) {
+                            Object link = bes[0].getField("ps");
+                            if (bes[0].getField("pdf") != null) {
+                                link = bes[0].getField("pdf");
+                                field = "pdf";
                             }
-                            String found = Util.findPdf(basefile, types[i], dir, new OpenFileFilter("."+types[i]));
-                            if (found != null) {
-                                filepath = dir+sep+found;
-                                break;
+                            String filepath = null;
+                            if (link != null) {
+                                filepath = link.toString();
+                            } else {
+
+                                // see if we can fall back to a filename based on the bibtex key
+                                String basefile;
+                                Object key = bes[0].getField(BibtexFields.KEY_FIELD);
+                                if (key != null) {
+                                    basefile = key.toString();
+                                    final String[] types = new String[]{"pdf", "ps"};
+                                    final String sep = System.getProperty("file.separator");
+                                    for (int i = 0; i < types.length; i++) {
+                                        String dir = Globals.prefs.get(types[i] + "Directory");
+                                        if (dir != null) {
+                                            if (dir.endsWith(sep)) {
+                                                dir = dir.substring(0, dir.length() - sep.length());
+                                            }
+                                        } else
+                                            dir = "";
+                                        String found = Util.findPdf(basefile, types[i], dir, new OpenFileFilter("." + types[i]));
+                                        if (found != null) {
+                                            filepath = dir + sep + found;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
-                        }
-                     }
-                   }
 
 
-                   if (filepath != null) {
-                     //output(Globals.lang("Calling external viewer..."));
-                     try {
-                       Util.openExternalViewer(metaData(), filepath, field);
-                       output(Globals.lang("External viewer called") + ".");
-                     }
-                     catch (IOException ex) {
-                       output(Globals.lang("Error") + ": " + ex.getMessage());
-                     }
-                   }
-                   else
-                     output(Globals.lang(
-                         "No pdf or ps defined, and no file matching Bibtex key found") +
-                            ".");
-                 }
-                 else
-                   output(Globals.lang("No entries or multiple entries selected."));
-               }
-             }).start();
-           }
-         });
+                            if (filepath != null) {
+                                //output(Globals.lang("Calling external viewer..."));
+                                try {
+                                    Util.openExternalViewer(metaData(), filepath, field);
+                                    output(Globals.lang("External viewer called") + ".");
+                                }
+                                catch (IOException ex) {
+                                    output(Globals.lang("Error") + ": " + ex.getMessage());
+                                }
+                            } else
+                                output(Globals.lang(
+                                        "No pdf or ps defined, and no file matching Bibtex key found") +
+                                        ".");
+                        } else
+                            output(Globals.lang("No entries or multiple entries selected."));
+                    }
+                }).start();
+            }
+        });
+
+        actions.put("openExternalFile", new BaseAction() {
+            public void action() {
+                (new Thread() {
+                    public void run() {
+                        BibtexEntry[] bes = mainTable.getSelectedEntries();
+                        String field = GUIGlobals.FILE_FIELD;
+                        if ((bes != null) && (bes.length == 1)) {
+                            Object link = bes[0].getField(field);
+                            if (link == null) {
+                                runCommand("openFile"); // Fall back on PDF/PS fields???
+                                return;
+                            }
+                            FileListTableModel tableModel = new FileListTableModel();
+                            tableModel.setContent((String)link);
+                            if (tableModel.getRowCount() == 0) {
+                                runCommand("openFile"); // Fall back on PDF/PS fields???
+                                return;
+                            }
+                            FileListEntry flEntry = tableModel.getEntry(0);
+                            ExternalFileMenuItem item = new ExternalFileMenuItem
+                                (frame(), bes[0], "",
+                                flEntry.getLink(), flEntry.getType().getIcon(),
+                                metaData(), flEntry.getType());
+                            item.actionPerformed(null);
+                        } else
+                            output(Globals.lang("No entries or multiple entries selected."));
+                    }
+                }).start();
+            }
+        });
 
 
-              actions.put("openUrl", new BaseAction() {
+        actions.put("openUrl", new BaseAction() {
                       public void action() {
                           BibtexEntry[] bes = mainTable.getSelectedEntries();
                           String field = "doi";
@@ -1129,7 +1009,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                   if (tidialog.okPressed())
                   {
-                      Util.setAutomaticFields(Arrays.asList(new BibtexEntry[] {bibEntry}));
+                      Util.setAutomaticFields(Arrays.asList(new BibtexEntry[] {bibEntry}),
+                              false, false);
                     insertEntry(bibEntry) ;
                   }
                 }
@@ -1456,7 +1337,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibtexEntry> list = new ArrayList<BibtexEntry>();
                 list.add(be);
-                Util.setAutomaticFields(list);
+                Util.setAutomaticFields(list, true, true);
 
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
@@ -2433,6 +2314,39 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public GroupSelector getGroupSelector() {
         return frame.groupSelector;
+    }
+
+
+    public boolean isUpdatedExternally() {
+        return updatedExternally;
+    }
+
+
+    public String getFileMonitorHandle() {
+        return fileMonitorHandle;
+    }
+
+
+    public void setFileMonitorHandle(String fileMonitorHandle) {
+        this.fileMonitorHandle = fileMonitorHandle;
+    }
+
+    public SidePaneManager getSidePaneManager() {
+        return sidePaneManager;
+    }
+
+
+    public void setNonUndoableChange(boolean nonUndoableChange) {
+        this.nonUndoableChange = nonUndoableChange;
+    }
+
+    public void setBaseChanged(boolean baseChanged) {
+        this.baseChanged = baseChanged;
+    }
+
+
+    public void setSaving(boolean saving) {
+        this.saving = saving;
     }
 
 }

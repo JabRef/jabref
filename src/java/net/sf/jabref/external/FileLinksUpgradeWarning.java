@@ -9,6 +9,13 @@ import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
 import net.sf.jabref.undo.NamedCompound;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.regex.Pattern;
+import java.util.Iterator;
+import java.util.List;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -53,7 +60,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     public void performAction(BasePanel panel, ParserResult pr) {
         // Find out which actions should be offered:
         // Only offer to change Preferences if file column is not already visible:
-        boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn");
+        boolean offerChangeSettings = !Globals.prefs.getBoolean("fileColumn") || !showsFileInGenFields();
         // Only offer to upgrade links if the pdf/ps fields are used:
         boolean offerChangeDatabase = linksFound(pr.getDatabase(), FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
@@ -103,6 +110,9 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             JPanel pan = new JPanel();
             pan.add(setFileDir);
             pan.add(fileDir);
+            JButton browse = new JButton(Globals.lang("Browse"));
+            browse.addActionListener(new BrowseAction(null, fileDir, true));
+            pan.add(browse);
             b.append(pan);
             b.nextLine();
         }
@@ -163,35 +173,37 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             Globals.prefs.putBoolean("pdfColumn", Boolean.FALSE);
             Globals.prefs.putBoolean("fileColumn", Boolean.TRUE);
 
-            // Modify General fields:
-            String genF = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+"_def0");
-            if (!Pattern.compile("\\b"+GUIGlobals.FILE_FIELD+"\\b").matcher(genF)
-                .matches()) {
-
-                StringBuilder sb = new StringBuilder(GUIGlobals.FILE_FIELD).append(';').
-                    append(genF);
-                /*int index = sb.indexOf(":");
-                if (index > 0)
-                    sb.insert(index+1, GUIGlobals.FILE_FIELD+";");*/
-
-                Globals.prefs.put(Globals.prefs.CUSTOM_TAB_FIELDS+"_def0", sb.toString());
-                System.out.println(sb.toString());
+            // Modify General fields if necessary:
+            // If we don't find the file field, insert it at the bottom of the first tab:
+            if (!showsFileInGenFields()) {
+                String gfs = Globals.prefs.get(Globals.prefs.CUSTOM_TAB_FIELDS+"0");
+                //System.out.println(gfs);
+                StringBuffer sb = new StringBuffer(gfs);
+                if (gfs.length() > 0)
+                    sb.append(";");
+                sb.append(GUIGlobals.FILE_FIELD);
+                Globals.prefs.put(Globals.prefs.CUSTOM_TAB_FIELDS+"0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
             }
-
-            /*Pattern p1 = Pattern.compile("\\bpdf\\b");
-            Pattern p2 = Pattern.compile("\\bps\\b");
-            boolean mp1 = p1.matcher(genF).matches();
-            boolean mp2 = p2.matcher(genF).matches();
-            // Unfinished...
-            if (mp1 && mp2) {
-                genF = genF.replaceAll("\\bpdf\\b", GUIGlobals.FILE_FIELD);
-                genF = genF.replaceAll("\\bps\\b", "");
-            }*/
-
             panel.frame().setupAllTables();
         }
+    }
+
+    private boolean showsFileInGenFields() {
+        boolean found = false;
+        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+        outer: for (int i=0; i<tabList.getTabCount(); i++) {
+            List fields = tabList.getTabFields(i);
+            for (Iterator j=fields.iterator(); j.hasNext();) {
+                String field = (String)j.next();
+                if (field.equals(GUIGlobals.FILE_FIELD)) {
+                    found = true;
+                    break outer;
+                }
+            }
+        }
+        return found;
     }
 
 }

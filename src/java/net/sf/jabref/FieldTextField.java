@@ -100,12 +100,12 @@ public class FieldTextField extends JTextField implements FieldEditor {
         setFont(GUIGlobals.CURRENTFONT);
     }
 
-    public void paint(Graphics g) {
+    /*public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		if (antialias)
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		super.paint(g2);
-	}
+	}*/
 
     public void paste(String textToInsert) {
 		int sel = getSelectionEnd() - getSelectionStart();

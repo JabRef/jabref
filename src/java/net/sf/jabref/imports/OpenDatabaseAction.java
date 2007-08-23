@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
+import net.sf.jabref.external.FileLinksUpgradeWarning;
 
 // The action concerned with opening an existing database.
 
@@ -28,7 +29,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // the bib file:
         postOpenActions.add(new CheckForNewEntryTypesAction());
         // Add the action for the new external file handling system in version 2.3:
-        //postOpenActions.add(new FileLinksUpgradeWarning());
+        postOpenActions.add(new FileLinksUpgradeWarning());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -275,17 +276,20 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         StringBuffer headerText = new StringBuffer();
         try {
             boolean keepon = true;
-            int piv = 0;
+            int piv = 0, offset = 0;
             int c;
 
             while (keepon) {
                 c = reader.read();
-                headerText.append((char) c);
-                if (((piv == 0) && Character.isWhitespace((char) c))
-                        || (c == GUIGlobals.SIGNATURE.charAt(piv)))
-                    piv++;
-                else //if (((char)c) == '@')
-                    keepon = false;
+                if ((piv == 0) && ((c == '%') || (Character.isWhitespace((char)c))))
+                    offset++;
+                else {
+                    headerText.append((char) c);
+                    if (c == GUIGlobals.SIGNATURE.charAt(piv))
+                        piv++;
+                    else //if (((char)c) == '@')
+                        keepon = false;
+                }
                 //System.out.println(headerText.toString());
                 found:
                 if (piv == GUIGlobals.SIGNATURE.length()) {
@@ -295,10 +299,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     //    System.out.println("'"+headerText.toString().substring(0, headerText.length()-GUIGlobals.SIGNATURE.length())+"'");
                     // Found the signature. The rest of the line is unknown, so we skip
                     // it:
-                    while (reader.read() != '\n') ;
+                    while (reader.read() != '\n');
+                    // If the next line starts with something like "% ", handle this:
+                    while (((c =reader.read()) == '%') || (Character.isWhitespace((char)c)));
+                    // Then we must skip the "Encoding: ". We may already have read the first
+                    // character:
+                    if ((char)c != GUIGlobals.encPrefix.charAt(0))
+                        break found;
 
-                    // Then we must skip the "Encoding: "
-                    for (int i = 0; i < GUIGlobals.encPrefix.length(); i++) {
+                    for (int i = 1; i < GUIGlobals.encPrefix.length(); i++) {
                         if (reader.read() != GUIGlobals.encPrefix.charAt(i))
                             break found; // No,
                         // it
@@ -307,13 +316,16 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         // to
                         // match.
                     }
-
+                    
                     // If ok, then read the rest of the line, which should contain the
                     // name
                     // of the encoding:
                     StringBuffer sb = new StringBuffer();
 
-                    while ((c = reader.read()) != '\n') sb.append((char) c);
+                    while ((c = reader.read()) != '\n') {
+                        sb.append((char) c);
+                    }
+
 
                     suppliedEncoding = sb.toString();
                 }

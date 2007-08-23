@@ -241,7 +241,13 @@ public class LayoutEntry {
 
 			return fieldEntry;
 		}
-		default:
+        case LayoutHelper.IS_ENCODING_NAME: {
+            // Printing the encoding name is not supported in entry layouts, only
+            // in begin/end layouts. This prevents breakage if some users depend
+            // on a field called "encoding". We simply return this field instead:
+            return BibtexDatabase.getResolvedField("encoding", bibtex, database);
+        }
+        default:
 			return "";
 		}
 	}
@@ -254,12 +260,12 @@ public class LayoutEntry {
 	 *            Bibtex Database
 	 * @return
 	 */
-	public String doLayout(BibtexDatabase database) {
+	public String doLayout(BibtexDatabase database, String encoding) {
 		if (type == LayoutHelper.IS_LAYOUT_TEXT) {
 			return text;
 		} else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
 			throw new UnsupportedOperationException(
-				"bibtext entry fields not allowed in begin or end layout");
+				"bibtex entry fields not allowed in begin or end layout");
 		} else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_GROUP_START)) {
 			throw new UnsupportedOperationException(
 				"field and group starts not allowed in begin or end layout");
@@ -275,7 +281,9 @@ public class LayoutEntry {
 			}
 
 			return field;
-		}
+		} else if (type == LayoutHelper.IS_ENCODING_NAME) {
+            return encoding;
+        }
 		return "";
 	}
 
@@ -306,7 +314,7 @@ public class LayoutEntry {
 	
 	public static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
 		throws Exception {
-		
+
 		if (className.length() > 0) {
 			try {
 				try {
@@ -345,10 +353,16 @@ public class LayoutEntry {
 
 			// First load from formatters in formatter folder
 			String className = strings[0].trim();
-			try {
+            try {
 				LayoutFormatter f = getLayoutFormatterByClassName(className,
 						classPrefix);
-				results.add(f);
+                // If this formatter accepts an argument, check if we have one, and
+                // set it if so:
+                if (f instanceof ParamLayoutFormatter) {
+                    if (strings.length >= 2)
+                        ((ParamLayoutFormatter)f).setArgument(strings[1].trim());
+                }
+                results.add(f);
 				continue;
 			} catch (Exception e) {
 			}

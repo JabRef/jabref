@@ -5,6 +5,12 @@
 			<a name="\bibtexkey">\bibtexkey</a>
 		</div>
 
+		\begin{file}
+		<div class="bibtex_pdf">
+			<a href="\format[FileLink(pdf)]{\file}">pdf</a>
+		</div>
+		\end{file}
+
 		\begin{pdf}
 		<div class="bibtex_pdf">
 			<a href="\format[ResolvePDF]{\pdf}">pdf</a>

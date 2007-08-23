@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <title>JabRef References output</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
+<meta http-equiv="Content-Type" content="text/html; charset=\encoding">
 <script type="text/javascript">
 <!--
-// QuickSearch script for tables
+// QuickSearch script for JabRef HTML export 
+// Version: 2.0
 //
-// Copyright (c) 2006, Mark Schenk
+// Copyright (c) 2006-2007, Mark Schenk
 //
 // Permission to use, copy, modify, and distribute this software for any
 // purpose with or without fee is hereby granted, provided that the above
@@ -16,82 +16,129 @@
 //
 
 // Some features:
-// + combination of CSS/JavaScript degrades nicely
-// + easy to set number of columns to search
 // + allows RegExp searches
 //   e.g. to search for entries between 1980 and 1989, type:  198[0-9]
 //   e.g. for any entry ending with 'symmetry', type:  symmetry$
 //   e.g. for all reftypes that are books: ^book$, or ^article$
+//   e.g. for entries by either John or Doe, type john|doe
 
-if (window.opera) { 
-	document.addEventListener("load",initSearch,false) } 
-else if (window.addEventListener) {
-	window.addEventListener("load",initSearch,false) }
+// Acknowledgements:
+// + incorporates speed improvements suggested by Jean-Luc Falcone
+
+// Speed optimisation introduced some esoteric problems with certain RegExp searches
+// e.g. if the previous search is 200[-7] and the next search is 200[4-7] then the search doesn't work properly until the next 'keyup'
+// hence the searchOpt can be turned off for RegExp adepts
+var searchOpt = true;
+
+if (window.addEventListener) {
+	window.addEventListener("load",initSearch,false); }
 else if (window.attachEvent) {
 	window.attachEvent("onload", initSearch); }
 
 function initSearch() {
 	// basic object detection
 	if(!document.getElementById || !document.getElementsByTagName) { return; }
-
-	// check if QuickSearch table AND search area is present 
 	if (!document.getElementById('qstable')||!document.getElementById('qs')) { return; }
 
-	// give id of the table that has QuickSearch
-	// is global variable on purpose
+	// find QS table and appropriate rows
 	searchTable = document.getElementById('qstable');
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-	setStatistics(-1)
+	// split all rows into entryRows and infoRows (e.g. abstract, review, bibtex)
+	entryRows = new Array();
+	infoRows = new Array();
 
+	for (var i=0, k=0, j=0; i<allRows.length;i++) {
+		if (allRows[i].className.indexOf('entry') != -1) {
+			entryRows[j++] = allRows[i];
+		} else {
+			infoRows[k++] = allRows[i];		
+		}
+	}
+
+	//number of entries and rows
+	numRows = allRows.length;
+	numEntries = entryRows.length;
+	numInfo = infoRows.length;
+
+	//find the query field
+	qsfield = document.getElementById('qsfield');
+
+	// previous search term; used for speed optimisation
+	prevSearch = '';
+
+	//find statistics location
+	stats = document.getElementById('stat');
+	setStatistics(-1);
+
+	// shows the searchfield
 	document.getElementById('qs').style.display = 'block';
 	document.getElementById('qsfield').onkeyup = testEvent;
 }
 
 function quickSearch(tInput){
-	searchText = new RegExp(tInput.value,"i");
-	var inRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-	// find/set number of searchable columns
-	// by default script searches all columns
-	var cols = searchTable.getElementsByTagName('thead')[0].getElementsByTagName('th').length;
-	// to set a fixed number of columns, uncomment next line
-	// var cols = 4  // search the left 'cols' columns
-
+	 if (tInput.value.length == 0) {
+		showAll();
+		setStatistics(-1);
+		qsfield.className = '';
+		return;
+	} else {
+		// only search for valid RegExp
+		try {
+			var searchText = new RegExp(tInput.value,"i")
+			closeAllInfo();
+			qsfield.className = '';
+		}
+		catch(err) {
+			prevSearch = tInput.value;
+			qsfield.className = 'invalidsearch';
+			return;
+		}
+	}
+	
 	// count number of hits
 	var hits = 0;
 
-	// start looping through all rows
-	for (var i = 0; cRow = inRows[i]; i++){
-	inCells = cRow.getElementsByTagName('td');
-	var gevonden = false; 
-  
-	for (var j=0; j<cols; j++) { // only first 'cols' columns
-		cCell = inCells[j];
-		var t = cCell.innerText?cCell.innerText:getTextContent(cCell);
-		if ((tInput.value.length == 0) || (t.search(searchText) != -1)){ gevonden=true; } 
-	}
+	// start looping through all entry rows
+	for (var i = 0; cRow = entryRows[i]; i++){
 
-	gevonden == true?cRow.className = 'entry show':cRow.className = 'entry noshow';
-	gevonden == true?hits++:hits=hits;
+		// only show search the cells if it isn't already hidden OR if the search term is getting shorter, then search all
+		// some further optimisation is possible: if the search string is getting shorter, and the row is already visible, skip it. Future work.
+		if(!searchOpt || cRow.className.indexOf('noshow')==-1 || tInput.value.length <= prevSearch.length){
+			var found = false; 
+
+			var inCells = cRow.getElementsByTagName('td');
+			var numCols = inCells.length;
+				
+			for (var j=0; j<numCols; j++) {
+				cCell = inCells[j];
+				var t = cCell.innerText?cCell.innerText:getTextContent(cCell);
+				if (t.search(searchText) != -1){ 
+					found=true; 
+					break;
+				} 
+			}
+			
+			if(found) {
+				cRow.className = 'entry show';
+				hits++;
+			} else {
+				cRow.className = 'entry noshow';
+			}
+		}
 	}
 
 	// update statistics
 	setStatistics(hits)
+	
+	// set previous search value
+	prevSearch = tInput.value;
 }
 
 function setStatistics (hits) {
-	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-	var entries = 0
-	for (var i=0; i<allRows.length;i++) {
-		if (allRows[i].className.indexOf('entry') != -1) {
-	       	entries++;
-		}
-	}
-	
-	if(hits < 0) { hits=entries; }
-
-	var stats = document.getElementById('stat');
-	if(stats) { stats.firstChild.data = hits + '/' + entries}
+	if(hits < 0) { hits=numEntries; }
+	if(stats) { stats.firstChild.data = hits + '/' + numEntries}
 }
 
 function getTextContent(node) {
@@ -110,19 +157,35 @@ function getTextContent(node) {
 	} return ""; // some other node, won't contain text nodes.
 }
 
+function showAll(){
+	// first close all abstracts, reviews, etc.
+	closeAllInfo();
+
+	for (var i = 0; i < numEntries; i++){
+		entryRows[i].className = 'entry show'; 
+	}
+}
+
+function closeAllInfo(){
+	for (var i=0; i < numInfo; i++){
+		if (infoRows[i].className.indexOf('noshow') ==-1) {
+			infoRows[i].className = infoRows[i].className + ' noshow';
+		}
+	}
+}
+
 function testEvent(e){
 	if (!e) var e = window.event;
 	quickSearch(this);
 }
 
 function clearQS() {
-	qsfield = document.getElementById('qsfield'); 
 	qsfield.value = '';
 	quickSearch(qsfield);
 }
 
 function redoQS(){
-	qsfield = document.getElementById('qsfield'); 
+	showAll();
 	quickSearch(qsfield);
 }
 -->
@@ -133,6 +196,8 @@ body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; 
 #qs { width: auto; border-style: solid; border-color: gray; border-width: 1px 1px 0px 1px; padding: 0.5em 0.5em; display:none;  }
 #qs form { padding: 0px; margin: 0px; }
 #qs form p { padding: 0px; margin: 0px; }
+
+.invalidsearch { background-color: red; }
 
 table { border: 1px gray solid; width: 100%; empty-cells: show; }
 th, td { border: 1px gray solid; padding: 0.5em; vertical-align: top;  }
@@ -146,7 +211,7 @@ tr.noshow { display: none;}
 </head>
 <body>
 
-<div id="qs"><form action=""><p>QuickSearch: <input type="text" name="qsfield" id="qsfield" autocomplete="off" title="Allows plain text as wel as RegExp searches" /><input type="button" onclick="clearQS()" value="clear" />&nbsp; Number of matching entries: <span id="stat">0</span>.</p></form></div>
+<div id="qs"><form action=""><p>QuickSearch: <input type="text" name="qsfield" id="qsfield" autocomplete="off" title="Allows plain text as well as RegExp searches" /><input type="button" onclick="clearQS()" value="clear" />&nbsp; Number of matching entries: <span id="stat">0</span>.</p></form></div>
 <table id="qstable" border="1">
 <thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
 <tbody>

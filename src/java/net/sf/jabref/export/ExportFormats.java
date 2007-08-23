@@ -1,5 +1,10 @@
 package net.sf.jabref.export;
 
+import net.sf.jabref.*;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.util.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;
@@ -180,57 +185,80 @@ public class ExportFormats {
 
 			public void actionPerformed(ActionEvent e) {
 				ExportFormats.initAllExports();
-				JFileChooser fc = ExportFormats.createExportFileChooser(Globals.prefs
-					.get("exportWorkingDirectory"));
+				JFileChooser fc = ExportFormats.createExportFileChooser(
+                    Globals.prefs.get("exportWorkingDirectory"));
 				fc.showSaveDialog(frame);
 				File file = fc.getSelectedFile();
 				if (file == null)
 					return;
 				FileFilter ff = fc.getFileFilter();
 				if (ff instanceof ExportFileFilter) {
-					try {
-						ExportFileFilter eff = (ExportFileFilter) ff;
-						String path = file.getPath();
-						if (!path.endsWith(eff.getExtension()))
-							path = path + eff.getExtension();
-						file = new File(path);
-						if (file.exists()) {
-							// Warn that the file exists:
-							if (JOptionPane.showConfirmDialog(frame, "'" + file.getName() + "' "
-								+ Globals.lang("exists. Overwrite file?"), Globals.lang("Export"),
-								JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)
-								return;
-						}
-						IExportFormat format = eff.getExportFormat();
-						Set<String> entryIds = null;
-						if (selectedOnly) {
-							BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
-							entryIds = new HashSet<String>();
-							for (int i = 0; i < selected.length; i++) {
-								BibtexEntry bibtexEntry = selected[i];
-								entryIds.add(bibtexEntry.getId());
-							}
-						}
-						
-						// Make sure we remember which filter was used, to set
-						// the default for next time:
-						Globals.prefs.put("lastUsedExport", format.getConsoleName());
-						Globals.prefs.put("exportWorkingDirectory", file.getParent());
-						
-						format.performExport(frame.basePanel().database(), file.getPath(), frame
-							.basePanel().getEncoding(), entryIds);
-						
-					} catch (Exception ex) {
-						ex.printStackTrace();
 
-						frame.output(Globals.lang("Could not save file") + " - " + ex.getMessage());
-						
-						// Need to warn the user that saving failed!
-						JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file")
-							+ ".\n" + ex.getMessage(), Globals.lang("Save database"),
-							JOptionPane.ERROR_MESSAGE);
-					}
-				}
+
+                    ExportFileFilter eff = (ExportFileFilter) ff;
+                    String path = file.getPath();
+                    if (!path.endsWith(eff.getExtension()))
+                        path = path + eff.getExtension();
+                    file = new File(path);
+                    if (file.exists()) {
+                        // Warn that the file exists:
+                        if (JOptionPane.showConfirmDialog(frame, "'" + file.getName() + "' "
+                            + Globals.lang("exists. Overwrite file?"), Globals.lang("Export"),
+                            JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)
+                            return;
+                    }
+                    final IExportFormat format = eff.getExportFormat();
+                    Set<String> entryIds = null;
+                    if (selectedOnly) {
+                        BibtexEntry[] selected = frame.basePanel().getSelectedEntries();
+                        entryIds = new HashSet<String>();
+                        for (int i = 0; i < selected.length; i++) {
+                            BibtexEntry bibtexEntry = selected[i];
+                            entryIds.add(bibtexEntry.getId());
+                        }
+                    }
+
+                    // Make sure we remember which filter was used, to set
+                    // the default for next time:
+                    Globals.prefs.put("lastUsedExport", format.getConsoleName());
+                    Globals.prefs.put("exportWorkingDirectory", file.getParent());
+                    
+                    final File finFile = file;
+                    final Set<String> finEntryIDs = entryIds;
+                    AbstractWorker exportWorker = new AbstractWorker() {
+                        String errorMessage = null;
+                        public void run() {
+                            try {
+                                format.performExport(frame.basePanel().database(), finFile.getPath(), frame
+                                    .basePanel().getEncoding(), finEntryIDs);
+                            } catch (Exception ex) {
+                                //ex.printStackTrace();
+                                errorMessage = ex.getMessage();
+                            }
+                        }
+
+                        public void update() {
+                            // No error message. Report success:
+                            if (errorMessage == null) {
+                                frame.output(Globals.lang("%0 export successful", format.getDisplayName()));
+                            }
+                            // ... or show an error dialog:
+                            else {
+                                frame.output(Globals.lang("Could not save file")
+                                        + " - " + errorMessage);
+                                // Need to warn the user that saving failed!
+                                JOptionPane.showMessageDialog(frame, Globals.lang("Could not save file")
+                                    + ".\n" + errorMessage, Globals.lang("Save database"),
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    };
+
+                    // Run the export action in a background thread:
+                    (exportWorker.getWorker()).run();
+                    // Run the update method:
+                    exportWorker.update();
+                }
 			}
 		}
 

@@ -90,6 +90,25 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         this.openWith = openWith;
     }
 
+    /**
+     * Set the string associated with this file type's icon. The string is used
+     * to get the actual icon by the method GUIGlobals.getIcon(String)
+     * @param name The icon name to use.
+     */
+    public void setIconName(String name) {
+        this.iconName = name;
+        this.icon = GUIGlobals.getImage(iconName);
+    }
+
+    /**
+     * Get the string associated with this file type's icon. The string is used
+     * to get the actual icon by the method GUIGlobals.getIcon(String)
+     * @return The icon name.
+     */
+    public String getIconName() {
+        return iconName;
+    }
+
     public ImageIcon getIcon() {
         return icon;
     }
@@ -104,5 +123,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     public int compareTo(ExternalFileType o) {
         return getName().compareTo(o.getName());
+    }
+
+    public ExternalFileType copy() {
+        return new ExternalFileType(name, extension, openWith, iconName);
     }
 }

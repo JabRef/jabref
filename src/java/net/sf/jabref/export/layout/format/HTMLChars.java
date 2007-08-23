@@ -41,16 +41,16 @@ public class HTMLChars implements LayoutFormatter {
 				currentCommand = new StringBuffer();
 			} else if (!incommand && (c == '{' || c == '}')) {
 				// Swallow the brace.
-			} else if (Character.isLetter((char) c)
-				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf("" + (char) c) >= 0)) {
+			} else if (Character.isLetter((char) c) || (c == '%')
+				|| (Globals.SPECIAL_COMMAND_CHARS.indexOf(String.valueOf((char)c)) >= 0)) {
 				escaped = false;
-				if (!incommand)
+
+                if (!incommand)
 					sb.append((char) c);
 					// Else we are in a command, and should not keep the letter.
 				else {
 					currentCommand.append((char) c);
-
-					testCharCom: if ((currentCommand.length() == 1)
+                    testCharCom: if ((currentCommand.length() == 1)
 						&& (Globals.SPECIAL_COMMAND_CHARS.indexOf(currentCommand.toString()) >= 0)) {
 						// This indicates that we are in a command of the type
 						// \^o or \~{n}
@@ -81,7 +81,7 @@ public class HTMLChars implements LayoutFormatter {
 						//	Are we already at the end of the string?
 						if (i + 1 == field.length()){
 							String command = currentCommand.toString();
-							Object result = Globals.HTMLCHARS.get(command);
+                            Object result = Globals.HTMLCHARS.get(command);
 							/* If found, then use translated version. If not,
 							 * then keep
 							 * the text of the parameter intact.
@@ -100,13 +100,14 @@ public class HTMLChars implements LayoutFormatter {
 
 				if (!incommand) {
 					sb.append((char) c);
-				} else if (Character.isWhitespace(c) || c == '{') {
+				} else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
 					// First test if we are already at the end of the string.
 					// if (i >= field.length()-1)
 					// break testContent;
 
 					String command = currentCommand.toString();
-					// Then test if we are dealing with a italics or bold
+                                                
+                    // Then test if we are dealing with a italics or bold
 					// command.
 					// If so, handle.
 					if (command.equals("emph") || command.equals("textit")) {
@@ -118,7 +119,7 @@ public class HTMLChars implements LayoutFormatter {
 						IntAndString part = getPart(field, i, true);
 						i += part.i;
 						sb.append("<b>").append(part.s).append("</b>");
-					} else if (c == '{'){
+					} else if (c == '{') {
 						IntAndString part = getPart(field, i, true);
 						i += part.i;
 						argument = part.s;
@@ -136,7 +137,18 @@ public class HTMLChars implements LayoutFormatter {
 								sb.append(argument);
 							}
 						}
-					} else {
+                    } else if (c == '}') {
+                        // This end brace terminates a command. This can be the case in
+                        // constructs like {\aa}. The correct behaviour should be to
+                        // substitute the evaluated command and swallow the brace:
+                        Object result = Globals.HTMLCHARS.get(command);
+                        if (result != null) {
+                            sb.append((String) result);
+                        } else {
+                            // If the command is unknown, just print it:
+                            sb.append(command);
+                        }
+                    } else {
 						Object result = Globals.HTMLCHARS.get(command);
 						if (result != null) {
 							sb.append((String) result);
@@ -145,9 +157,11 @@ public class HTMLChars implements LayoutFormatter {
 						}
 						sb.append(' ');
 					}
-				} else if (c == '}') {
-					argument = "";
-				} else {
+				}/* else if (c == '}') {
+                    System.out.printf("com term by }: '%s'\n", currentCommand.toString());
+
+                    argument = "";
+				}*/ else {
 					/*
 					 * TODO: this point is reached, apparently, if a command is
 					 * terminated in a strange way, such as with "$\omega$".

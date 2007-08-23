@@ -8,17 +8,30 @@ Chris:
   * Allow search relativ to bibtex-file
   
 Morten:
-* Should native file dialog option be visible on all OSes?
-  May be necessary for Vista.
-* Activate OpenDatabaseAction: file links upgrade warning.
-* Test external file types with and without application set on Windows.
-* Add "Copy all externally linked files for this set of entries"-feature. Basic functionality
-  in AccessLinksForEntries.
-* Enable icon customization of external file types.
-* Problem with ArrayIndexOutOfRange exception in DuplicateSearch - solved?
-	- strange performance bug in creation of duplicate resolver dialog?
-* Fix Save/Export file dialog stuff
-
-
+* Look into "DOS short path" bug report.
+* Exporting and "file" field:
+  - Endnote and MODS export "url", not "file".
+  - BibteXML exports both "url", "pdf" and url/pdf from "file". May give doubles.
+  
+* [POSTPONE] Problem setting today with Microba calendar.
+* [POSTPONE] Icon selection for external file types: - select arbitrary images from disk?
+* Improve Help information for external file links
+* [POSTPONE] Add "Copy all externally linked files for this set of entries"-feature.
+  Basic functionality in AccessLinksForEntries.
+* [POSTPONE] Fix Save/Export file dialog stuff
+* [POSTPONE] Look up Vista problem with opening file chooser:
+    Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException:
+    3184
+       at sun.awt.shell.Win32ShellFolder2.getFileChooserIcon(Unknown Source)
+       at sun.awt.shell.Win32ShellFolderManager2.get(Unknown Source)
+       at sun.awt.shell.ShellFolder.get(Unknown Source)
+       at com.sun.java.swing.plaf.windows.WindowsLookAndFeel$LazyWindowsIcon.createVal
+    ue(Unknown Source)
+       at javax.swing.UIDefaults.getFromHashtable(Unknown Source)
+       at javax.swing.UIDefaults.get(Unknown Source)
+       at javax.swing.MultiUIDefaults.get(Unknown Source)
+       at javax.swing.UIDefaults.getIcon(Unknown Source)
+       at javax.swing.UIManager.getIcon(Unknown Source)
+       at javax.swing.plaf.basic.BasicFileChooserUI.installIcons(Unknown Source)
 
 

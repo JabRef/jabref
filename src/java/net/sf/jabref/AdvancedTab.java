@@ -91,13 +91,13 @@ public class AdvancedTab extends JPanel implements PrefsTab {
     p.add(remoteHelp.getIconButton());
     builder.append(p);
 
-    if (Globals.ON_MAC) {
-        builder.nextLine();
-        builder.appendSeparator(Globals.lang("Mac file dialog"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(useNativeFileDialogOnMac);
-    }
+    //if (Globals.ON_MAC) {
+    builder.nextLine();
+    builder.appendSeparator(Globals.lang("Native file dialog"));
+    builder.nextLine();
+    builder.append(new JPanel());
+    builder.append(useNativeFileDialogOnMac);
+    //}
 
     pan = builder.getPanel();
     pan.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
