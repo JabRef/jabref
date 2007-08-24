@@ -53,13 +53,16 @@ public class ExportFormats {
         // Add Export Formats contributed by Plugins
         JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
 		if (plugin != null){
+			
+			// 1. ExportFormats based on Templates
 			for (ExportFormatTemplateExtension e : plugin.getExportFormatTemplateExtensions()){
 				ExportFormat format = PluginBasedExportFormat.getFormat(e);
 				if (format != null){
 					putFormat(format);
 				}
 			}
-			// add generic exports contributed by Plugins
+
+			// 2. ExportFormat classed 
 			for (final ExportFormatExtension e : plugin.getExportFormatExtensions()) {
 				putFormat(new IExportFormat(){
 
@@ -87,7 +90,7 @@ public class ExportFormats {
 				});
 			}
 		
-			// formatters provided by Plugins
+			// 3. Formatters provided by Export Format Providers
 			for (ExportFormatProviderExtension e : plugin.getExportFormatProviderExtensions()) {
 				IExportFormatProvider formatProvider = e.getFormatProvider();
 				for (IExportFormat exportFormat : formatProvider.getExportFormats()) {

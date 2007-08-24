@@ -17,13 +17,14 @@ public class PluginBasedExportFormat extends ExportFormat {
 	public ExportFormatTemplateExtension extension;
 
 	/**
-	 * Load the plugin from the given extension. Might be null if extension could not be loaded.
+	 * Load the plugin from the given extension. Might be null if extension
+	 * could not be loaded.
 	 * 
 	 * @param extension
 	 * @return
 	 */
 	public static PluginBasedExportFormat getFormat(
-			ExportFormatTemplateExtension extension) {
+		ExportFormatTemplateExtension extension) {
 
 		String consoleName = extension.getConsoleName();
 		String displayName = extension.getDisplayName();
@@ -31,48 +32,40 @@ public class PluginBasedExportFormat extends ExportFormat {
 		String fileExtension = extension.getExtension();
 
 		if ("".equals(fileExtension) || "".equals(displayName)
-				|| "".equals(consoleName) || "".equals(layoutFilename)) {
+			|| "".equals(consoleName) || "".equals(layoutFilename)) {
 			Globals.logger("Could not load extension " + extension.getId());
 			return null;
 		}
 
 		return new PluginBasedExportFormat(displayName, consoleName,
-				layoutFilename, fileExtension, extension);
+			layoutFilename, fileExtension, extension);
 	}
 
 	public PluginBasedExportFormat(String displayName, String consoleName,
-			String layoutFileName, String fileExtension, ExportFormatTemplateExtension extension) {
+		String layoutFileName, String fileExtension,
+		ExportFormatTemplateExtension extension) {
 		super(displayName, consoleName, layoutFileName, null, fileExtension);
 		this.extension = extension;
 	}
 
+	@Override
 	public Reader getReader(String filename) throws IOException {
 		URL reso = extension.getDirAsUrl(filename);
 
-		Globals.logger(reso.toExternalForm());
-
-		Reader reader;
-
-		// If that didn't work, try loading as a normal file URL:
 		if (reso != null) {
 			try {
-				reader = new InputStreamReader(reso.openStream());
+				return new InputStreamReader(reso.openStream());
 			} catch (FileNotFoundException ex) {
-				throw new IOException(Globals
-						.lang("Could not find layout file")
-						+ ": '" + filename + "'.");
-			}
-		} else {
-			File f = new File(filename);
-			try {
-				reader = new FileReader(f);
-			} catch (FileNotFoundException ex) {
-				throw new IOException(Globals
-						.lang("Could not find layout file")
-						+ ": '" + filename + "'.");
+				// If that didn't work, try below
 			}
 		}
 
-		return reader;
+		try {
+			return new FileReader(new File(filename));
+		} catch (FileNotFoundException ex) {
+			// If that did not work, throw the IOException below
+		}
+		throw new IOException(Globals.lang("Could not find layout file")
+			+ ": '" + filename + "'.");
 	}
 }
