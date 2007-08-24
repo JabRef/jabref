@@ -1,21 +1,21 @@
 package net.sf.jabref.export;
 
-import net.sf.jabref.Globals;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
+
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
-
-import javax.swing.filechooser.FileFilter;
-import javax.swing.*;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-import java.io.File;
-import java.io.Reader;
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Base class for export formats based on templates.
@@ -165,17 +165,17 @@ public class ExportFormat implements IExportFormat {
     LayoutHelper layoutHelper = new LayoutHelper(reader);
     Layout defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
     reader.close();
-    HashMap layouts = new HashMap();
+    HashMap<String, Layout> layouts = new HashMap<String, Layout>();
     Layout layout;
-    Iterator i = sorted.iterator();
+    Iterator<BibtexEntry> i = sorted.iterator();
     for (; i.hasNext();) {
         // Get the entry
-        BibtexEntry entry = (BibtexEntry) (i.next());
+        BibtexEntry entry = (i.next());
 
         // Get the layout
         String type = entry.getType().getName().toLowerCase();
         if (layouts.containsKey(type))
-                layout = (Layout)layouts.get(type);
+                layout = layouts.get(type);
         else {
                 try {
             // We try to get a type-specific layout for this entry.

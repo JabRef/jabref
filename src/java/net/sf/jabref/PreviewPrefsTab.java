@@ -139,7 +139,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		test1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getTestEntry();
-				PreviewPanel testPanel = new PreviewPanel(entry, new MetaData(), layout1.getText());
+				PreviewPanel testPanel = new PreviewPanel(null, entry, null , new MetaData(), layout1.getText());
 				testPanel.setPreferredSize(new Dimension(800, 350));
 				JOptionPane.showMessageDialog(null, testPanel, Globals.lang("Preview"),
 					JOptionPane.PLAIN_MESSAGE);
@@ -149,7 +149,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 		test2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				getTestEntry();
-				PreviewPanel testPanel = new PreviewPanel(entry, new MetaData(), layout2.getText());
+				PreviewPanel testPanel = new PreviewPanel(null, entry, null, new MetaData(), layout2.getText());
 				testPanel.setPreferredSize(new Dimension(800, 350));
 				JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Globals
 					.lang("Preview"), JOptionPane.PLAIN_MESSAGE);

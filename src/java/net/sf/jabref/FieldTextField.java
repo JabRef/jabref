@@ -27,9 +27,6 @@
 package net.sf.jabref;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -40,8 +37,6 @@ public class FieldTextField extends JTextField implements FieldEditor {
 	protected String fieldName;
 
 	protected JLabel label;
-
-	private boolean antialias = Globals.prefs.getBoolean("antialias");
 
 	public FieldTextField(String fieldName_, String content, boolean changeColorOnFocus) {
 		super(content);

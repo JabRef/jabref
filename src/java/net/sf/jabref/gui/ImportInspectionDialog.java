@@ -18,8 +18,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.*;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.AbstractGroup;
 import net.sf.jabref.groups.AllEntriesGroup;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -127,7 +125,7 @@ public class ImportInspectionDialog extends JDialog {
         this.fields = fields;
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(metaData, Globals.prefs.get("preview1"));
+        preview = new PreviewPanel(null, metaData, Globals.prefs.get("preview1"));
 
         duplLabel.setToolTipText(Globals.lang("Possible duplicate of existing entry. Click to resolve."));
 

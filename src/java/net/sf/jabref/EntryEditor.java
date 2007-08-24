@@ -58,10 +58,14 @@ import net.sf.jabref.undo.UndoableKeyChange;
 import net.sf.jabref.undo.UndoableRemoveEntry;
 
 /**
- * GUI component that allows editing of the fields of a BibtexEntry. EntryEditor
- * also registers itself as a VetoableChangeListener, receiving events whenever
- * a field of the entry changes, enabling the text fields to update themselves
- * if the change is made from somewhere else.
+ * GUI component that allows editing of the fields of a BibtexEntry (i.e. the
+ * one that shows up, when you double click on an entry in the table)
+ * 
+ * It hosts the tabs (required, general, optional) and the buttons to the left.
+ * 
+ * EntryEditor also registers itself as a VetoableChangeListener, receiving
+ * events whenever a field of the entry changes, enabling the text fields to
+ * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements VetoableChangeListener {
 
@@ -241,12 +245,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
     private void setupToolBar() {
         tlb = new JToolBar(JToolBar.VERTICAL);
 
-        // tlb.setMargin(new Insets(2,2,2,2));
         tlb.setMargin(new Insets(0, 0, 0, 2));
 
         // The toolbar carries all the key bindings that are valid for the whole
         // window.
-        // tlb.setBackground(GUIGlobals.lightGray);//Color.white);
         ActionMap am = tlb.getActionMap();
         InputMap im = tlb.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -256,13 +258,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         am.put("store", storeFieldAction);
         im.put(prefs.getKey("Autogenerate BibTeX keys"), "generateKey");
         am.put("generateKey", generateKeyAction);
-        /*
-         * im.put(prefs.getKey("Entry editor, previous panel"), "left");
-         * im.put(prefs.getKey("Entry editor, previous panel 2"), "left");
-         * am.put("left", switchLeftAction); im.put(prefs.getKey("Entry editor,
-         * next panel"), "right"); im.put(prefs.getKey("Entry editor, next panel
-         * 2"), "right"); am.put("right", switchRightAction);
-         */
         im.put(prefs.getKey("Entry editor, previous entry"), "prev");
         am.put("prev", prevEntryAction);
         im.put(prefs.getKey("Entry editor, next entry"), "next");
@@ -275,24 +270,27 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
         am.put("help", helpAction);
 
         tlb.setFloatable(false);
+
+        // Create type-label
+        typeLabel = new TypeLabel(entry.getType().getName());
+        
+        // Add actions (and thus buttons)
         tlb.add(closeAction);
 
-        setLabel();
         tlb.add(typeLabel);
 
-        // tlb.addSeparator();
-        // tlb.add(copyKeyAction);
         tlb.addSeparator();
+        
         tlb.add(generateKeyAction);
+        
         tlb.addSeparator();
 
-        // tlb.add(undoAction);
-        // tlb.add(redoAction);
         tlb.add(deleteAction);
         tlb.add(prevEntryAction);
-
         tlb.add(nextEntryAction);
+        
         tlb.addSeparator();
+        
         tlb.add(helpAction);
 
         Component[] comps = tlb.getComponents();
@@ -301,10 +299,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener {
             ((JComponent) comps[i]).setOpaque(false);
 
         add(tlb, BorderLayout.WEST);
-    }
-
-    private void setLabel() {
-        typeLabel = new TypeLabel(entry.getType().getName());
     }
 
     /**

@@ -50,13 +50,15 @@ public class MainTableSelectionListener implements ListEventListener<BibtexEntry
     }
 
     private void instantiatePreviews() {
-        previewPanel = new PreviewPanel[]
-                {new PreviewPanel(panel.database(), panel.metaData(), Globals.prefs.get("preview0")),
-                        new PreviewPanel(panel.database(), panel.metaData(), Globals.prefs.get("preview1"))};
-        BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
-        previewPanel[0].setEntry(testEntry);
-        previewPanel[1].setEntry(testEntry);
-    }
+		previewPanel = new PreviewPanel[] {
+			new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+				.get("preview0")),
+			new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
+				.get("preview1")) };
+		BibtexEntry testEntry = PreviewPrefsTab.getTestEntry();
+		previewPanel[0].setEntry(testEntry);
+		previewPanel[1].setEntry(testEntry);
+	}
 
     public void updatePreviews() {
         try {

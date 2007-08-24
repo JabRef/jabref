@@ -31,7 +31,6 @@ package net.sf.jabref;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -55,7 +54,6 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.imports.AppendDatabaseAction;
 import net.sf.jabref.imports.BibtexParser;
-import net.sf.jabref.imports.Z3950Connection;
 import net.sf.jabref.journals.AbbreviateAction;
 import net.sf.jabref.journals.UnabbreviateAction;
 import net.sf.jabref.labelPattern.LabelPatternUtil;
@@ -156,7 +154,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         sortingByGroup = false,
         sortingByCiteSeerResults = false,
         coloringByGroup = false;
-        //previewEnabled = Globals.prefs.getBoolean("previewEnabled");
+
     int lastSearchHits = -1; // The number of hits in the latest search.
     // Potential use in hiding non-hits completely.
 
@@ -294,8 +292,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put("test", new BaseAction () {
                 public void action() throws Throwable {
-                    Z3950Connection conn = new Z3950Connection();
-                    conn.doSearch();
+                    // Z3950Connection conn = new Z3950Connection();
+                    // conn.doSearch();
                     /*
                     ArrayList<BibtexEntry> entries = new ArrayList<BibtexEntry>();
                     BibtexEntry[] sel = getSelectedEntries();
@@ -1679,18 +1677,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
       }
     }
 
-    /**
-     * Ensure that no preview is shown. Called when preview is turned off. Must chech if
-     * a preview is in fact visible before doing anything rash.
-     */
-    public void hidePreview() {
-        Globals.prefs.putBoolean("previewEnabled", false);
-
-      Component c = splitPane.getBottomComponent();
-      if ((c != null) && !(c instanceof EntryEditor))
-        splitPane.setBottomComponent(null);
-    }
-
     public boolean isShowingEditor() {
       return ((splitPane.getBottomComponent() != null)
               && (splitPane.getBottomComponent() instanceof EntryEditor));
@@ -1820,7 +1806,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void showPreview(PreviewPanel preview) {
         mode = SHOWING_PREVIEW;
         currentPreview = preview;
-        splitPane.setBottomComponent(preview.getPane());
+        splitPane.setBottomComponent(preview);
     }
 
     /**

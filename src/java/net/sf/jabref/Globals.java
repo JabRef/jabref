@@ -156,7 +156,7 @@ public class Globals {
     public static final int NEWLINE_LENGTH = System.getProperty("line.separator").length();
 
     // Instantiate logger:
-    private static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static Logger logger = Logger.getLogger(Globals.class.getName());
 
     /**
 	 * true if we have unix newlines

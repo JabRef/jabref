@@ -1,13 +1,14 @@
 package net.sf.jabref.external;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
@@ -77,18 +78,13 @@ public class ExternalFileTypeEntryEditor {
             JPanel p1 = new JPanel();
             builder.append(p1);
             JPanel p2 = new JPanel();
-            DefaultFormBuilder b2 = new DefaultFormBuilder(
-                    new FormLayout("left:pref, 4dlu, fill:pref", ""));
             application.setPreferredSize(new Dimension(300, application.getPreferredSize().height));
             BorderLayout bl = new BorderLayout();
             bl.setHgap(4);
-            //b2.append(other);
-            //b2.append(application);
             p2.setLayout(bl);
             p2.add(other, BorderLayout.WEST);
             p2.add(application, BorderLayout.CENTER);
             builder.append(p2);
-            //builder.append(b2.getPanel());
             builder.append(browseBut);
         } else {
             builder.append(application);

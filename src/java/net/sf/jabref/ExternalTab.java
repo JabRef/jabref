@@ -3,14 +3,13 @@ package net.sf.jabref;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 
+import net.sf.jabref.external.ExternalFileTypeEditor;
+
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.external.ExternalFileTypeEditor;
 
 public class ExternalTab extends JPanel implements PrefsTab {
 

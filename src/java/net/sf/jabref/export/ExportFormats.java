@@ -1,10 +1,5 @@
 package net.sf.jabref.export;
 
-import net.sf.jabref.*;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.util.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;

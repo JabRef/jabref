@@ -253,10 +253,10 @@ public class IEEEXploreFetcher implements Runnable, EntryFetcher {
         out.flush();
         out.close();
         InputStream inp = conn.getInputStream();
-        List items = new RisImporter().importEntries(inp);
+        List<BibtexEntry> items = new RisImporter().importEntries(inp);
         inp.close();
         if (items.size() > 0)
-            return (BibtexEntry)items.get(0);
+            return items.get(0);
         else
             return null;
     }

@@ -1,6 +1,7 @@
 package net.sf.jabref.external;
 
-import java.util.regex.Pattern;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -8,13 +9,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.imports.PostOpenAction;
 import net.sf.jabref.undo.NamedCompound;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.regex.Pattern;
-import java.util.Iterator;
-import java.util.List;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -194,8 +188,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         boolean found = false;
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         outer: for (int i=0; i<tabList.getTabCount(); i++) {
-            List fields = tabList.getTabFields(i);
-            for (Iterator j=fields.iterator(); j.hasNext();) {
+            List<String> fields = tabList.getTabFields(i);
+            for (Iterator<String> j=fields.iterator(); j.hasNext();) {
                 String field = (String)j.next();
                 if (field.equals(GUIGlobals.FILE_FIELD)) {
                     found = true;

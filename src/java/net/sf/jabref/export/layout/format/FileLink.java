@@ -1,14 +1,13 @@
 package net.sf.jabref.export.layout.format;
 
-import net.sf.jabref.export.layout.LayoutFormatter;
-import net.sf.jabref.export.layout.ParamLayoutFormatter;
-import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.FileListEntry;
+import java.io.File;
+
+import net.sf.jabref.GUIGlobals;
 import net.sf.jabref.Globals;
 import net.sf.jabref.Util;
-import net.sf.jabref.GUIGlobals;
-
-import java.io.File;
+import net.sf.jabref.export.layout.ParamLayoutFormatter;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
 
 /**
  * Export formatter that handles the file link list of JabRef 2.3 and later, by

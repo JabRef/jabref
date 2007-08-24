@@ -4,8 +4,8 @@ Chris:
   * Think about synchronizing XMP.
   * Document data schema used (BibteXmp)
   * Add build.xml target to export standalone XMPUtil for the CLI.
-  * Plugin-Architecture for LayoutFormatters.
   * Allow search relativ to bibtex-file
+  * Plugin-System may crash...
   
 Morten:
 * Look into "DOS short path" bug report.

@@ -1,16 +1,17 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.GUIGlobals;
-
-import javax.swing.*;
-import java.util.*;
-import java.util.List;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.*;
+import java.util.*;
+
+import javax.swing.*;
+
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -61,10 +62,9 @@ public class IconSelection extends JDialog {
     private void init(String initialSelection) {
         int initSelIndex = -1;
         iconKeys = new ArrayList<String>();
-        Map icns = GUIGlobals.getAllIcons();
+        Map<String, String> icns = GUIGlobals.getAllIcons();
         HashSet<ImageIcon> iconSet = new LinkedHashSet<ImageIcon>();
-        for (Iterator i=icns.keySet().iterator(); i.hasNext();) {
-            String key = (String)i.next();
+        for (String key : icns.keySet()){
             ImageIcon icon = GUIGlobals.getImage(key);
             if (!iconSet.contains(icon)) {
                 iconKeys.add(key);

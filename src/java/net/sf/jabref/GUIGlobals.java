@@ -322,7 +322,7 @@ public class GUIGlobals {
      * Get a Map of all application icons mapped from their keys.
      * @return A Map containing all icons used in the application.
      */
-    public static Map getAllIcons() {
+    public static Map<String, String> getAllIcons() {
         return Collections.unmodifiableMap(iconMap);
     }
                        

@@ -26,10 +26,7 @@
  */
 package net.sf.jabref;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;

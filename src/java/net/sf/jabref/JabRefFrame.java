@@ -27,13 +27,6 @@
 
 package net.sf.jabref;
 
-import net.sf.jabref.gui.*;
-import net.sf.jabref.label.*;
-import net.sf.jabref.imports.*;
-import net.sf.jabref.wizard.auximport.gui.*;
-
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -47,13 +40,13 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.export.ExpandEndnoteFilters;
 import net.sf.jabref.export.*;
-import net.sf.jabref.export.SaveAllAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.imports.*;
 import net.sf.jabref.journals.ManageJournalsAction;
 import net.sf.jabref.label.*;
 import net.sf.jabref.plugin.PluginCore;

@@ -91,7 +91,10 @@ Change log:
 	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
 	  classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
+	- [ 1297576 ] New feature: Printing of entry preview
 	- [ 1717849 ] Fix bug in aux import (patch contributed by Kai Eckert)
+
+
 2.3b2
 	- Added % at start of signature text in BibTeX output. Parser now reads both
 	  old and new style.
