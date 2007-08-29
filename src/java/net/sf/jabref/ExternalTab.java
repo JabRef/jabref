@@ -79,7 +79,14 @@ public class ExternalTab extends JPanel implements PrefsTab {
 		builder.appendSeparator(Globals.lang("External file links"));
 		JPanel pan = new JPanel();
 		builder.append(pan);
-		JLabel lab = new JLabel(Globals.lang("Main %0 directory", GUIGlobals.FILE_FIELD) + ":");
+		/**
+		 * Fix for [ 1749613 ] About translation
+		 * 
+		 * https://sourceforge.net/tracker/index.php?func=detail&aid=1749613&group_id=92314&atid=600306
+		 * 
+		 * Cannot really use %0 to refer to the file type, since this ruins translation.
+		 */
+		JLabel lab = new JLabel(Globals.lang("Main file directory") + ":");
 		builder.append(lab);
 		builder.append(fileDir);
 		browse = new BrowseAction(_frame, fileDir, true);
