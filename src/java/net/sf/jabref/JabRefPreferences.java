@@ -290,6 +290,8 @@ public class JabRefPreferences {
                      +"\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
                      +"\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                      +"</dd>__NEWLINE__<p></p></font>");
+        // TODO: Currently not possible to edit this setting:
+        defaults.put("previewPrintButton", Boolean.FALSE);
         defaults.put("autoDoubleBraces", Boolean.FALSE);
         defaults.put("doNotResolveStringsFor", "url");
         defaults.put("resolveStringsAllFields", Boolean.FALSE);

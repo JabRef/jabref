@@ -46,7 +46,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 
 	public JEditorPane previewPane;
 
-	JScrollPane sp;
+	JScrollPane scrollPane;
 
 	BasePanel panel;
 
@@ -90,10 +90,22 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		this.layoutFile = layoutFile;
 		this.previewPane = createPreviewPane();
 
-		if (panel != null) {
+		// Set up scroll pane for preview pane
+		scrollPane = new JScrollPane(previewPane,
+			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBorder(null);
+		
+		/*
+		 * If we have been given a panel and the preference option
+		 * previewPrintButton is set, show the tool bar
+		 */
+		if (panel != null
+			&& JabRefPreferences.getInstance().getBoolean("previewPrintButton")) {
 			add(createToolBar(), BorderLayout.LINE_START);
 		}
-		add(previewPane, BorderLayout.CENTER);
+
+		add(scrollPane, BorderLayout.CENTER);
 	}
 
 	class PrintAction extends AbstractAction {
@@ -128,6 +140,14 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		}
 	}
 
+	Action printAction;
+
+	public Action getPrintAction() {
+		if (printAction == null)
+			printAction = new PrintAction();
+		return printAction;
+	}
+
 	class CloseAction extends AbstractAction {
 		public CloseAction() {
 			super(Globals.lang("Close window"), GUIGlobals.getImage("close"));
@@ -139,12 +159,27 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		}
 	}
 
+	Action closeAction;
+
+	public Action getCloseAction() {
+		if (closeAction == null)
+			closeAction = new CloseAction();
+		return closeAction;
+	}
+
+	JPopupMenu createPopupMenu() {
+		JPopupMenu menu = new JPopupMenu();
+		menu.add(getPrintAction());
+
+		return menu;
+	}
+
 	JToolBar createToolBar() {
 
 		JToolBar tlb = new JToolBar(JToolBar.VERTICAL);
 		JabRefPreferences prefs = JabRefPreferences.getInstance();
-		AbstractAction printAction = new PrintAction();
-		AbstractAction closeAction = new CloseAction();
+		Action printAction = getPrintAction();
+		Action closeAction = getCloseAction();
 
 		tlb.setMargin(new Insets(0, 0, 0, 2));
 
@@ -176,10 +211,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		return tlb;
 	}
 
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
-
 	JEditorPane createPreviewPane() {
 		JEditorPane previewPane = new JEditorPane() {
 			public Dimension getPreferredScrollableViewportSize() {
@@ -200,11 +231,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		};
 		previewPane.setMargin(new Insets(3, 3, 3, 3));
 
-		sp = new JScrollPane(previewPane,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		sp.setBorder(null);
-
+		previewPane.setComponentPopupMenu(createPopupMenu());
+		
 		previewPane.setEditable(false);
 		previewPane.setContentType("text/html");
 		previewPane.addHyperlinkListener(new HyperlinkListener() {
@@ -220,15 +248,12 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 				}
 			}
 		});
+		
 		return previewPane;
 	}
 
 	public void setDatabase(BibtexDatabase db) {
 		database = db;
-	}
-
-	public JScrollPane getPane() {
-		return sp;
 	}
 
 	public void readLayout(String layoutFormat) throws Exception {
@@ -268,7 +293,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener {
 		previewPane.revalidate();
 
 		// Scroll to top:
-		final JScrollBar bar = sp.getVerticalScrollBar();
+		final JScrollBar bar = scrollPane.getVerticalScrollBar();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				bar.setValue(0);
