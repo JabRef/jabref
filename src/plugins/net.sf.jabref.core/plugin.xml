@@ -11,7 +11,9 @@
 
 	</attributes>
 
-	<!-- The code of the core plugin and all its extensions is in the src/java folder -->
+	<!-- The code of the core plugin and all its extensions is in the src/java folder.
+	     If you write your own plug-in that has resource files or 
+		 code you will need a runtime section with nested library section here. -->
 
 	<!-- To extend JabRef with an ImportFormat use the following extension point -->
 	<extension-point id="ImportFormat">
