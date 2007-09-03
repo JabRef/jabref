@@ -110,14 +110,17 @@
         editors.<br /></li>
 
         <li><b>[<code>firstpage</code>]</b>: The number of the
-        first page of the publication<br /></li>
+        first page of the publication (Caution: this will return 
+        the lowest number found in the pages field, since bibtex 
+        allows <code>7,41,73--97</code> or <code>43+</code>.)<br /></li>
 
         <li><b>[<code>keywordN</code>]</b>: Keyword number N from
         the "keywords" field, assuming keywords are separated by
         commas or semicolons.<br /></li>
 
         <li><b>[<code>lastpage</code>]</b>: The number of the last
-        page of the publication<br /></li>
+        page of the publication (See the remark on 
+        <code>firstpage</code>)<br /></li>
 
         <li><b>[<code>shorttitle</code>]</b>: The first 3 words of
         the title<br /></li>
