@@ -331,7 +331,9 @@ public class JabRef {
                     if (format != null) {
                         // We have an ExportFormat instance:
                         try {
-                            format.performExport(pr.getDatabase(), data[0], pr.getEncoding(), null);
+                            format.performExport(pr.getDatabase(), 
+                                    new MetaData(pr.getMetaData(), pr.getDatabase()),
+                                    data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
                             System.err.println(Globals.lang("Could not export file")
                                 + " '" + data[0] + "': " + ex.getMessage());

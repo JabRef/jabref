@@ -94,7 +94,8 @@ public class ExportToClipboardAction extends AbstractWorker {
                 entries.add(be.getId());
             
             // Write to file:
-            format.performExport(database, tmp.getPath(), panel.getEncoding(), entries);
+            format.performExport(database, panel.metaData(),
+                    tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuffer sb = new StringBuffer();
             reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());

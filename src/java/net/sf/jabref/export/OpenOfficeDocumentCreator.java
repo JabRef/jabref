@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 
 /**
  * @author alver
@@ -33,7 +34,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         super(Globals.lang("OpenOffice Calc"), "oocalc", null, null, ".sxc");
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws Exception {
+    public void performExport(final BibtexDatabase database, final MetaData metaData,
+                              final String file, final String encoding, Set<String> keySet) throws Exception {
         exportOpenOfficeCalc(new File(file), database, keySet);
     }
 

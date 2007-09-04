@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.Globals;
 import net.sf.jabref.export.layout.Layout;
 import net.sf.jabref.export.layout.LayoutHelper;
@@ -118,6 +119,8 @@ public class ExportFormat implements IExportFormat {
 	 * 
 	 * @param database
 	 *            The database to export from.
+     * @param metaData
+     *            The database's meta data.
 	 * @param file
 	 *            the file to write the resulting export to
 	 * @param encoding
@@ -133,9 +136,10 @@ public class ExportFormat implements IExportFormat {
 	 *             if any other error occurred during export.
 	 * 
 	 * @see net.sf.jabref.export.IExportFormat#performExport(net.sf.jabref.BibtexDatabase,
-	 *      java.lang.String, java.lang.String, java.util.Set)
+	 *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
 	 */
-	public void performExport(final BibtexDatabase database, final String file,
+	public void performExport(final BibtexDatabase database,
+            final MetaData metaData, final String file,
 		final String encoding, Set<String> entryIds) throws Exception {
 
 		File outFile = new File(file);

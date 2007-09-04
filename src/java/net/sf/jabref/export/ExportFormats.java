@@ -49,6 +49,7 @@ public class ExportFormats {
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
+        putFormat(new MySqlExport());
     
         // Add Export Formats contributed by Plugins
         JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
@@ -79,13 +80,13 @@ public class ExportFormats {
 					}
 
 					IExportFormat wrapped;
-					public void performExport(BibtexDatabase database,
+					public void performExport(BibtexDatabase database, MetaData metaData,
 						String file, String encoding, Set<String> entryIds)
 						throws Exception {
 
 						if (wrapped == null)
 							wrapped = e.getExportFormat();
-						wrapped.performExport(database, file, encoding, entryIds);
+						wrapped.performExport(database, metaData, file, encoding, entryIds);
 					}
 				});
 			}
@@ -227,7 +228,9 @@ public class ExportFormats {
                         String errorMessage = null;
                         public void run() {
                             try {
-                                format.performExport(frame.basePanel().database(), finFile.getPath(), frame
+                                format.performExport(frame.basePanel().database(),
+                                        frame.basePanel().metaData(),
+                                        finFile.getPath(), frame
                                     .basePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
                                 //ex.printStackTrace();

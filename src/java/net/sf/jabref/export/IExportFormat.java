@@ -1,6 +1,7 @@
 package net.sf.jabref.export;
 
 import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.MetaData;
 
 import java.io.Writer;
 import java.util.Set;
@@ -30,6 +31,8 @@ public interface IExportFormat {
 	 * 
 	 * @param database
 	 *            The database to export from.
+     * @param metaData
+     *            The database's metadata.
 	 * @param file
 	 *            The filename to write to.
 	 * @param encoding
@@ -40,7 +43,8 @@ public interface IExportFormat {
 	 * @throws Exception
 	 * @see #performExport(BibtexDatabase, Set, Writer)
 	 */
-	void performExport(BibtexDatabase database, String file, String encoding,
+	void performExport(BibtexDatabase database, MetaData metaData,
+                       String file, String encoding,
 		Set<String> entryIds) throws Exception;
 
 }

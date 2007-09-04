@@ -12,6 +12,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibtexDatabase;
 import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.msbib.MSBibDatabase;
 
 /**
@@ -23,7 +24,8 @@ class MSBibExportFormat extends ExportFormat {
         super(Globals.lang("MS Office 2007"), "MSBib", null, null, ".xml");
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws IOException {
+    public void performExport(final BibtexDatabase database, final MetaData metaData,
+                              final String file, final String encoding, Set<String> keySet) throws IOException {
     	// forcing to use UTF8 output format for some problems with
     	// xml export in other encodings
         SaveSession ss = getSaveSession("UTF8", new File(file));

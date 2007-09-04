@@ -2,6 +2,7 @@ package net.sf.jabref.export;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.BibtexDatabase;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.mods.MODSDatabase;
 
 import javax.xml.transform.dom.DOMSource;
@@ -21,7 +22,8 @@ class ModsExportFormat extends ExportFormat {
         super(Globals.lang("MODS"), "mods", null, null, ".xml");
     }
 
-    public void performExport(final BibtexDatabase database, final String file, final String encoding, Set<String> keySet) throws IOException {
+    public void performExport(final BibtexDatabase database, final MetaData metaData,
+                              final String file, final String encoding, Set<String> keySet) throws IOException {
         SaveSession ss = getSaveSession("UTF8", new File(file));
         VerifyingWriter ps = ss.getWriter();
         MODSDatabase md = new MODSDatabase(database, keySet);
