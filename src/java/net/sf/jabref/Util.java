@@ -482,9 +482,16 @@ public class Util {
 			}
 		} else if (fieldName.equals("doi")) {
 			fieldName = "url";
+			
+			link = sanitizeUrl(link);
+			
 			// Check to see if link field already contains a well formated URL
 			if (!link.startsWith("http://")) {
-				link = Globals.DOI_LOOKUP_PREFIX + link;
+			    // Remove possible 'doi:'
+			    if (link.matches("^doi:/*.*")){
+	                link = link.replaceFirst("^doi:/*", "");
+	            }
+			    link = Globals.DOI_LOOKUP_PREFIX + link;
 			}
 		} else if (fieldName.equals("citeseerurl")) {
 			fieldName = "url";
@@ -497,12 +504,6 @@ public class Util {
 		String cmdArray[] = new String[2];
 		if (fieldName.equals("url")) { // html
 			try {
-
-				// First check if the url is enclosed in \\url{}. If so, remove
-				// the wrapper.
-				if (link.startsWith("\\url{") && link.endsWith("}"))
-					link = link.substring(5, link.length() - 1);
-
 				link = sanitizeUrl(link);
 
 				if (Globals.ON_MAC) {
@@ -575,7 +576,6 @@ public class Util {
 		} else {
 			System.err
 				.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
-			// ignore
 		}
 	}
 
@@ -647,15 +647,10 @@ public class Util {
 		String extension = ((pos >= 0) && (pos < name.length() - 1)) ? name.substring(pos + 1)
 			.trim().toLowerCase() : null;
 
-		/*
-		 * if ((extension == null) || (extension.length() == 0)) { // No
-		 * extension. What to do? throw new IOException(Globals.lang("No file
-		 * extension. Could not find viewer for file.")); }
-		 */
-
 		// Find the default directory for this field type, if any:
 		String dir = metaData.getFileDirectory(extension);
-        // Include the standard "file" directory:
+
+		// Include the standard "file" directory:
         String fileDir = metaData.getFileDirectory(GUIGlobals.FILE_FIELD);
 
         // Include the directory of the bib file:
@@ -676,42 +671,26 @@ public class Util {
 		// Check if we have arrived at a file type, and either an http link or an existing file:
 		if ((httpLink || file.exists()) && (fileType != null)) {
 			// Open the file:
-			try {
-                String filePath = httpLink ? link : file.getPath();
-                if (Globals.ON_MAC) {
-					String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
-					Runtime.getRuntime().exec(cmd);
-				} else if (Globals.ON_WIN) {
-                    if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
-                        // Application is specified. Use it:
-                        openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
-                    } else
-                        openFileOnWindows(filePath, true);
-				} else {
-					String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
-					Runtime.getRuntime().exec(cmdArray);
-				}
-			} catch (IOException e) {
-                throw e;
-                /*e.printStackTrace();
-				System.err.println("An error occured on the command: " + fileType.getOpenWith()
-					+ " #" + link);
-				System.err.println(e.getMessage());*/
+            String filePath = httpLink ? link : file.getPath();
+            if (Globals.ON_MAC) {
+				String[] cmd = { "/usr/bin/open", "-a", fileType.getOpenWith(), filePath };
+				Runtime.getRuntime().exec(cmd);
+			} else if (Globals.ON_WIN) {
+                if ((fileType.getOpenWith() != null) && (fileType.getOpenWith().length() > 0)) {
+                    // Application is specified. Use it:
+                    openFileWithApplicationOnWindows(filePath, fileType.getOpenWith());
+                } else
+                    openFileOnWindows(filePath, true);
+			} else {
+				String[] cmdArray = new String[] { fileType.getOpenWith(), filePath };
+				Runtime.getRuntime().exec(cmdArray);
 			}
 
 		} else {
 			// No file matched the name, or we didn't know the file type.
 			// Perhaps it is an URL thing.
 
-			// First check if it is enclosed in \\url{}. If so, remove
-			// the wrapper.
-			if (link.startsWith("\\url{") && link.endsWith("}"))
-				link = link.substring(5, link.length() - 1);
-
-			if (link.startsWith("doi:"))
-				link = Globals.DOI_LOOKUP_PREFIX + link;
-
-			link = sanitizeUrl(link);
+		    link = sanitizeUrl(link);
 
 			if (Globals.ON_MAC) {
 				String[] cmd = { "/usr/bin/open", "-a", Globals.prefs.get("htmlviewer"), link };
@@ -807,6 +786,8 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 * Make sure an URL is "portable", in that it doesn't contain bad characters
 	 * that break the open command in some OSes.
 	 * 
+	 * A call to this method will also remove \\url{} enclosings and clean doi links.
+	 * 
 	 * Old Version can be found in CVS version 114 of Util.java.
 	 * 
 	 * @param link
@@ -815,6 +796,27 @@ public static void openExternalFileUnknown(JabRefFrame frame, BibtexEntry entry,
 	 */
 	public static String sanitizeUrl(String link) {
 
+	    // First check if it is enclosed in \\url{}. If so, remove
+        // the wrapper.
+        if (link.startsWith("\\url{") && link.endsWith("}"))
+            link = link.substring(5, link.length() - 1);
+
+        if (link.matches("^doi:/*.*")){
+            // Remove 'doi:'
+            link = link.replaceFirst("^doi:/*", "");
+            link = Globals.DOI_LOOKUP_PREFIX + link;
+        }
+        
+        /*
+         * Poor man's DOI detection
+         * 
+         * Fixes
+         * https://sourceforge.net/tracker/index.php?func=detail&aid=1709449&group_id=92314&atid=600306
+         */
+        if (link.startsWith("10.")) {
+            link = Globals.DOI_LOOKUP_PREFIX + link;
+        }
+	    
 		link = link.replaceAll("\\+", "%2B");
 
 		try {

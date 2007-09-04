@@ -301,6 +301,17 @@ public class UtilTest extends TestCase {
                     Util.sanitizeUrl("http://www.vg.no/fil%20e.html"));
             assertEquals("www.vg.no/fil%20e.html",
                     Util.sanitizeUrl("www.vg.no/fil%20e.html"));
+
+            assertEquals("www.vg.no/fil%20e.html",
+                Util.sanitizeUrl("\\url{www.vg.no/fil%20e.html}"));
+            
+            /**
+             * DOI Test cases
+             */
+            assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("10.1109/VLHCC.2004.20"));
+            assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi://10.1109/VLHCC.2004.20"));
+            assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:/10.1109/VLHCC.2004.20"));
+            assertEquals("http://dx.doi.org/10.1109/VLHCC.2004.20", Util.sanitizeUrl("doi:10.1109/VLHCC.2004.20"));
     
             /**
              * Additional testcases provided by Hannes Restel and Micha Beckmann.

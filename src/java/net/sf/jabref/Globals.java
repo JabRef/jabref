@@ -85,8 +85,6 @@ public class Globals {
 		errorConsole = ErrorConsole.getInstance();
 	}
 
-	// public static ResourceBundle preferences =
-	// ResourceBundle.getBundle("resource/defaultPrefs");
 	public static Locale locale;
 
 	public static final String FILETYPE_PREFS_EXT = "_dir", SELECTOR_META_PREFIX = "selector_",
