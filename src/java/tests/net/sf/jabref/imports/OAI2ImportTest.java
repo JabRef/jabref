@@ -1,8 +1,5 @@
 package tests.net.sf.jabref.imports;
 
-import java.io.File;
-import java.io.FileInputStream;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -31,12 +28,6 @@ public class OAI2ImportTest extends TestCase {
 
 	BibtexEntry be;
 
-	File fis;
-
-	File fis2;
-
-	File fis3;
-
 	protected SAXParserFactory parserFactory;
 
 	protected SAXParser saxParser;
@@ -46,9 +37,6 @@ public class OAI2ImportTest extends TestCase {
 		saxParser = parserFactory.newSAXParser();
 		be = new BibtexEntry(Util.createNeutralId(), BibtexEntryType.getType("article"));
 		handler = new OAI2Handler(be);
-		fis = new File("src/java/tests/net/sf/jabref/imports/oai2.xml");
-		fis2 = new File("src/java/tests/net/sf/jabref/imports/oai22.xml");
-		fis3 = new File("src/java/tests/net/sf/jabref/imports/oai23.xml");
 	}
 
 	public void testCorrectLineBreaks() {
@@ -61,7 +49,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testParse() throws Throwable {
 		try {
-			saxParser.parse(fis, handler);
+			saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai2.xml"), handler);
 			assertEquals("hep-ph/0408155", (String) be.getField("eprint"));
 			assertEquals("G. F. Giudice and A. Riotto and A. Zaffaroni and J. López-Peña",
 				(String) be.getField("author"));
@@ -85,7 +73,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testOai22xml() throws Exception {
 		try {
-			saxParser.parse(fis2, handler);
+			saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai22.xml"), handler);
 			assertEquals("2005", (String) be.getField("year"));
 		} catch (SAXException e) {
 			throw e.getException();
@@ -94,7 +82,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testOai23xml() throws Throwable {
 		try {
-			saxParser.parse(new FileInputStream(fis3), handler);
+            saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai23.xml"), handler);
 			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
 		} catch (SAXException e) {
 			throw e.getException();

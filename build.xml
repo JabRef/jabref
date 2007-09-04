@@ -68,6 +68,7 @@
 	<property name="build.extension-javadocs" value="${build.extensions}/API" />
 	<property name="build.extension-layout" value="${build.extensions}/layout" />
 	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
+	<property name="build.tests" value="${build.dir}/tests"/>
 
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
@@ -85,6 +86,7 @@
 	<property name="extensions.dir" value="${src.dir}/extensions" />
 	<property name="layout.dir" value="${src.dir}/resource/layout" />
 	<property name="lib.dir" value="lib" />
+	<property name="tests.dir" value="${src.dir}/tests" />
 
 	<!--    <property name="nsis.executable" value="makensis.exe"/> -->
 
@@ -134,6 +136,12 @@
 		<pathelement location="${lib.dir}/plugin/jpf-boot.jar" />
 		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
 	</path>
+	
+	<!-- Classpath for tests -->
+	<path id="classpathTest">
+		<path refid="classpath"/>
+		<pathelement location="${lib.dir}/junit.jar"/>
+	</path>
 
 	<target name="run" depends="build">
 		<java classname="net.sf.jabref.JabRef" fork="true">
@@ -166,7 +174,7 @@
 		</java>
 	</target>
 
-	<!-- Compiles project -->
+	<!-- Compiles project excluding tests -->
 	<target name="compile" depends="generate">
 		<mkdir dir="${build.classes}" />
 		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
@@ -176,12 +184,13 @@
 		</javac>
 	</target>
 
-	<!-- Compiles only the tests -->
+	<!-- Compiles project including tests -->
 	<target name="compiletest">
 		<mkdir dir="${build.classes}" />
-		<!--deprecation="on"-->
-		<javac srcdir="${java.dir}/tests" debug="off" destdir="${build.classes}" source="1.5" target="1.5">
-			<classpath refid="classpath" />
+		<javac debug="on" destdir="${build.classes}" source="1.5" target="1.5">
+			<src path="${java.dir}" />
+			<include name="tests/**" />
+			<classpath refid="classpathTest" />
 		</javac>
 	</target>
 
@@ -253,19 +262,9 @@
 			</fileset>
 		</copy>
 
-		<!-- the fonts are used by the new about dialog
-		<mkdir dir="${build.fonts}" />
-		<copy todir="${build.fonts}">
-			<fileset dir="${fonts.dir}">
-				<include name="*" />
-			</fileset>
-		</copy> -->
-
 		<mkdir dir="${build.help}" />
 		<copy todir="${build.help}">
-			<fileset dir="${help.dir}">
-				<!--<include name="*" />-->
-			</fileset>
+			<fileset dir="${help.dir}"/>
 		</copy>
 
 		<!-- Insert version informations -->
@@ -276,6 +275,17 @@
 			<include name="meta.xml" />
 		</replace>
 
+	</target>
+	
+	<!-- Prepare for testing -->
+	<target name="buildtest" depends="build, compiletest" description="Build project for testing">
+
+		<mkdir dir="${build.tests}" />
+		<copy todir="${build.tests}">
+			<fileset dir="${tests.dir}">
+				<include name="**" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- generate and save some build infos !!! necessary for dynamic build infos !!! -->
@@ -435,17 +445,13 @@ version=${jabref.version}</echo>
 
 	</target>
 
-	<target name="test">
-		<junit printsummary="yes" fork="yes" haltonfailure="no">
-			<batchtest fork="yes" todir="/tmp/testres">
-				<fileset dir="${build.classes}">
-					<include name="**/*Tester.class" />
-					<include name="**/*Test.class" />
-				</fileset>
-			</batchtest>
-			<classpath refid="classpath" />
-		</junit>
-	</target>
+	<target name="test" depends="buildtest" description="Runs all unit tests">
+		<java fork="yes" classname="junit.textui.TestRunner" 
+	            failonerror="true">
+	            <arg value="tests.net.sf.jabref.AllTests"/>
+			<classpath refid="classpathTest"/>
+		</java>
+    </target>
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets

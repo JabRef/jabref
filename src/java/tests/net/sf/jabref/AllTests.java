@@ -22,6 +22,7 @@ public class AllTests {
 		suite.addTest(tests.net.sf.jabref.util.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.export.layout.AllTests.suite());
 		suite.addTest(tests.net.sf.jabref.bst.AllTests.suite());
+		suite.addTest(tests.net.sf.jabref.labelPattern.AllTests.suite());
 
 		return suite;
 	}
