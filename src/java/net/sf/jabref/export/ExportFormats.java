@@ -49,7 +49,7 @@ public class ExportFormats {
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
-        putFormat(new MySqlExport());
+        putFormat(new MySQLExport());
     
         // Add Export Formats contributed by Plugins
         JabRefPlugin plugin = JabRefPlugin.getInstance(PluginCore.getManager());
