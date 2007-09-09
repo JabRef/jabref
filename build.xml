@@ -68,7 +68,7 @@
 	<property name="build.extension-javadocs" value="${build.extensions}/API" />
 	<property name="build.extension-layout" value="${build.extensions}/layout" />
 	<property name="build.openoffice.meta" value="${build.resource}/openoffice" />
-	<property name="build.tests" value="${build.dir}/tests"/>
+	<property name="build.tests" value="${build.dir}/tests" />
 
 	<!-- Set the properties for source directories -->
 	<property name="src.dir" value="src" />
@@ -114,8 +114,8 @@
 		<include name="microba.jar" />
 		<include name="PDFBox-0.7.3-dev-reduced.jar" />
 		<include name="JempBox-0.1.0-dev.jar" />
-        <include name="zoom-java.jar" />
-        <!-- Plugin runtime dependencies -->
+		<include name="zoom-java.jar" />
+		<!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />
 		<include name="plugin/jpf-boot.jar" />
@@ -136,11 +136,11 @@
 		<pathelement location="${lib.dir}/plugin/jpf-boot.jar" />
 		<pathelement location="${lib.dir}/plugin/velocity-dep-1.5.jar" />
 	</path>
-	
+
 	<!-- Classpath for tests -->
 	<path id="classpathTest">
-		<path refid="classpath"/>
-		<pathelement location="${lib.dir}/junit.jar"/>
+		<path refid="classpath" />
+		<pathelement location="${lib.dir}/junit.jar" />
 	</path>
 
 	<target name="run" depends="build">
@@ -151,7 +151,7 @@
 
 	<!-- Runs project -->
 	<target name="runFromJar">
-		<java dir="${build.lib}" classname="net.sf.jabref.JabRef" fork="true">
+		<java dir="${build.lib}" jvmversion="1.4" classname="net.sf.jabref.JabRef" fork="true">
 			<classpath>
 				<pathelement location="${build.lib}/${build.jar}" />
 			</classpath>
@@ -180,7 +180,12 @@
 		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.5" target="1.5">
 			<src path="${java.dir}" />
 			<exclude name="tests/**" />
+			<exclude name="**/JabRefMain.java" />
 			<classpath refid="classpath" />
+		</javac>
+		<javac debug="on" deprecation="on" destdir="${build.classes}" source="1.4" target="1.4">
+			<src path="${java.dir}" />
+			<include name="**/JabRefMain.java" />
 		</javac>
 	</target>
 
@@ -223,12 +228,12 @@
 				<include name="help/no/**" />
 				<include name="resource/**" />
 			</fileset>
-			
+
 			<!-- Add Plugins -->
 			<fileset dir="${src.dir}">
-				<include name="plugins/**"/>
+				<include name="plugins/**" />
 			</fileset>
-				
+
 			<fileset dir="${lib.dir}">
 				<include name="EndNote.zip" />
 			</fileset>
@@ -239,7 +244,7 @@
 				<include name="README" />
 			</fileset>
 			<manifest>
-				<attribute name="Main-Class" value="net.sf.jabref.JabRef" />
+				<attribute name="Main-Class" value="net.sf.jabref.JabRefMain" />
 			</manifest>
 		</jar>
 
@@ -264,7 +269,7 @@
 
 		<mkdir dir="${build.help}" />
 		<copy todir="${build.help}">
-			<fileset dir="${help.dir}"/>
+			<fileset dir="${help.dir}" />
 		</copy>
 
 		<!-- Insert version informations -->
@@ -276,7 +281,7 @@
 		</replace>
 
 	</target>
-	
+
 	<!-- Prepare for testing -->
 	<target name="buildtest" depends="build, compiletest" description="Build project for testing">
 
@@ -446,12 +451,11 @@ version=${jabref.version}</echo>
 	</target>
 
 	<target name="test" depends="buildtest" description="Runs all unit tests">
-		<java fork="yes" classname="junit.textui.TestRunner" 
-	            failonerror="true">
-	            <arg value="tests.net.sf.jabref.AllTests"/>
-			<classpath refid="classpathTest"/>
+		<java fork="yes" classname="junit.textui.TestRunner" failonerror="true">
+			<arg value="tests.net.sf.jabref.AllTests" />
+			<classpath refid="classpathTest" />
 		</java>
-    </target>
+	</target>
 
 	<!--+++++++++++++++++++++++++++++++++++++++++++++++++
 	   Auxiliary targets

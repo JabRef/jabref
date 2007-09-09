@@ -91,6 +91,7 @@ Change log:
 	  JabRef uses JPFCodeGenerator (which was written just for JabRef) to generate helper
 	  classes for making JPF easier. Current version used: 0.4
 	  http://forge.spline.inf.fu-berlin.de/projects/jpfcodegen/
+	- Print warnings if insufficient Java version is used or if JRE is not from Sun. 
 	- [ 1297576 ] New feature: Printing of entry preview (use right-click menu)
 	- [ 1717849 ] Fixed: Bug in aux import (patch contributed by Kai Eckert)
     - [ 1749613 ] Fixed: About translation
