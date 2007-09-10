@@ -46,6 +46,8 @@ public class ExportFormats {
                 "harvard", ".rtf"));
         putFormat(new ExportFormat(Globals.lang("Endnote"), "endnote", "EndNote",
                 "endnote", ".txt"));
+        putFormat(new ExportFormat(Globals.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
+            "openoffice", ".csv"));
         putFormat(new OpenOfficeDocumentCreator());
         putFormat(new OpenDocumentSpreadsheetCreator());
         putFormat(new MSBibExportFormat());
