@@ -24,37 +24,26 @@ package net.sf.jabref.export.layout.format;
 
 import net.sf.jabref.export.layout.LayoutFormatter;
 
-
 /**
  * Remove non printable character formatter.
- *
+ * 
  * Based on the RemoveBrackets.java class (Revision 1.2) by mortenalver
+ * 
  * @author $author$
  * @version $Revision$
  */
-public class RemoveWhitespace implements LayoutFormatter
-{
-    //~ Methods ////////////////////////////////////////////////////////////////
+public class RemoveWhitespace implements LayoutFormatter {
 
-    public String format(String fieldText)
-    {
-        String fieldEntry = fieldText;
-        StringBuffer sb = new StringBuffer(fieldEntry.length());
+    public String format(String fieldEntry) {
 
-        for (int i = 0; i < fieldEntry.length(); i++)
-        {
-            //System.out.print(fieldEntry.charAt(i));
-            if ( !Character.isWhitespace(fieldEntry.charAt(i)) || Character.isSpaceChar(fieldEntry.charAt(i)))
-            {
-                //System.out.print(fieldEntry.charAt(i));
-                sb.append(fieldEntry.charAt(i));
+        StringBuilder sb = new StringBuilder(fieldEntry.length());
+
+        for (char c : fieldEntry.toCharArray()) {
+            if (!Character.isWhitespace(c) || Character.isSpaceChar(c)) {
+                sb.append(c);
             }
         }
 
-        fieldEntry = sb.toString();
-        return fieldEntry;
+        return sb.toString();
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-//  END OF FILE.
-///////////////////////////////////////////////////////////////////////////////
