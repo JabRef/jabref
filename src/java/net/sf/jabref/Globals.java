@@ -336,40 +336,6 @@ public class Globals {
 	}
 
 	/**
-	 * This method provides the correct opening brace to use when writing a
-	 * field to BibTeX format.
-	 * 
-	 * @return A String containing the braces to use.
-	 */
-	public static String getOpeningBrace() {
-		return "{";
-		/*
-		 * As of version 2.0, storing all fields with double braces is no longer
-		 * supported, because it causes problems with e.g. the author field.
-		 * 
-		 * if (prefs.getBoolean("autoDoubleBraces")) return "{{"; else return
-		 * "{";
-		 */
-	}
-
-	/**
-	 * This method provides the correct closing brace to use when writing a
-	 * field to BibTeX format.
-	 * 
-	 * @return A String containing the braces to use.
-	 */
-	public static String getClosingBrace() {
-		return "}";
-		/*
-		 * As of version 2.0, storing all fields with double braces is no longer
-		 * supported, because it causes problems with e.g. the author field.
-		 * 
-		 * if (prefs.getBoolean("autoDoubleBraces")) return "}}"; else
-		 */
-
-	}
-
-	/**
 	 * Will return the names of multiple files selected in the given directory
 	 * and the given extensions.
 	 * 

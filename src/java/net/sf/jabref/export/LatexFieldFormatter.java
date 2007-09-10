@@ -83,7 +83,7 @@ public class LatexFieldFormatter implements FieldFormatter {
           if (!ok)
             throw new IllegalArgumentException("Curly braces { and } must be balanced.");
 
-          sb = new StringBuffer(Globals.getOpeningBrace());
+          sb = new StringBuffer('{');
           // No formatting at all for these fields, to allow custom formatting?
           //if (Globals.prefs.getBoolean("preserveFieldFormatting"))
           //  sb.append(text);
@@ -93,7 +93,7 @@ public class LatexFieldFormatter implements FieldFormatter {
           else
             sb.append(text);
 
-          sb.append(Globals.getClosingBrace());
+          sb.append('}');
 
           return sb.toString();
     }
@@ -162,7 +162,7 @@ public class LatexFieldFormatter implements FieldFormatter {
     /*sb.append("{");
      sb.append(text.substring(start_pos, end_pos));
      sb.append("}");*/
-    sb.append(Globals.getOpeningBrace());
+    sb.append('{');
     boolean escape = false, inCommandName = false, inCommand = false,
         inCommandOption = false;
     int nestedEnvironments = 0;
@@ -230,7 +230,7 @@ public class LatexFieldFormatter implements FieldFormatter {
             sb.append(c);
         escape = (c == '\\');
     }
-    sb.append(Globals.getClosingBrace());
+    sb.append('}');
     }
 
     private void writeStringLabel(String text, int start_pos, int end_pos,
