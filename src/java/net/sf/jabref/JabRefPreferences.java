@@ -91,8 +91,15 @@ public class JabRefPreferences {
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
 
+        try {
+            if (new File("jabref.xml").exists()){
+                importPreferences("jabref.xml");
+            }
+        } catch (IOException e) {
+            Globals.logger("Could not import preferences from jabref.xml:" + e.getLocalizedMessage());
+        }
+        
         prefs = Preferences.userNodeForPackage(JabRef.class);
-        //Util.pr(prefs.toString());
         
         if (Globals.osName.equals(Globals.MAC)) {
 			defaults.put("pdfviewer", "/Applications/Preview.app");
@@ -194,6 +201,8 @@ public class JabRefPreferences {
         defaults.put("groupsVisibleRows", new Integer(8));
         defaults.put("defaultOwner", System.getProperty("user.name"));
         defaults.put("preserveFieldFormatting", Boolean.FALSE);
+        defaults.put("memoryStickMode", Boolean.FALSE);
+        
     // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
         defaults.put("generalFields", "crossref;keywords;file;doi;url;urldate;citeseerurl;"+
                      "pdf;comment;owner");
@@ -588,12 +597,22 @@ public class JabRefPreferences {
         return defKeyBinds;
     }
 
+    /**
+     * Calling this method will write all preferences into the preference store.
+     */
     public void flush() {
-    try {
-        prefs.flush();
-    } catch (BackingStoreException ex) {
-        ex.printStackTrace();
-    }
+        if (getBoolean("memoryStickMode")){
+            try {
+                exportPreferences("jabref.xml");
+            } catch (IOException e) {
+                Globals.logger("Could not save preferences for memory stick mode: " + e.getLocalizedMessage());
+            }
+        }
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

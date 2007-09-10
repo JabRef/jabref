@@ -241,8 +241,6 @@ public class PrefsDialog3 extends JDialog {
 						((PrefsTab) comps[i]).storeSettings();
 					}
 					Globals.prefs.flush();
-					// try { Thread.sleep(3000); } catch (InterruptedException
-					// ex) {}
 				}
 
 				public void update() {

@@ -18,7 +18,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
     private JCheckBox backup, openLast,
     defSort, ctrlClick, useOwner, overwriteOwner,
     keyDuplicateWarningDialog, keyEmptyWarningDialog, autoDoubleBraces,
-    confirmDelete, allowEditing, /*preserveFormatting, */useImportInspector,
+    confirmDelete, allowEditing, memoryStick, useImportInspector,
     useImportInspectorForSingle, inspectionWarnDupli, useTimeStamp, overwriteTimeStamp;
     private JRadioButton
         saveOriginalOrder, saveAuthorOrder, saveTableOrder,
@@ -39,6 +39,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         openLast = new JCheckBox(Globals.lang("Open last edited databases at startup"));
         allowEditing = new JCheckBox(Globals.lang("Allow editing in table cells"));
         backup = new JCheckBox(Globals.lang("Backup old file when saving"));
+        memoryStick = new JCheckBox(Globals.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         defSort = new JCheckBox(Globals.lang("Sort Automatically"));
         ctrlClick = new JCheckBox(Globals.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Globals.lang("Mark new entries with owner name") + ":");
@@ -86,6 +87,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setMargin(marg);
         bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
+        
         // We need a listener on useImportInspector to enable and disable the
         // import inspector related choices;
         useImportInspector.addChangeListener(new ChangeListener() {
@@ -93,15 +95,14 @@ public class GeneralTab extends JPanel implements PrefsTab {
                 useImportInspectorForSingle.setEnabled(useImportInspector.isSelected());
                 inspectionWarnDupli.setEnabled(useImportInspector.isSelected());
             }
-        }
-        );
+        });
 
         FormLayout layout = new FormLayout
                 ("8dlu, left:pref, 8dlu, fill:pref, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                         "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
                         +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
                         +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, "
-                                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
+                                    +"pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         CellConstraints cc = new CellConstraints();
         builder.addSeparator(Globals.lang("File"), cc.xyw(1,1, 5));
@@ -126,8 +127,6 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder4.append(resolveStringsAll);
         builder4.append(doNotResolveStringsFor);
         builder.add(builder4.getPanel(), cc.xyw(2, 13, 1));
-        //builder.add(resolveStringsAll, cc.xy(2, 13));
-        //builder.add(doNotResolveStringsFor, cc.xyw(4, 13, 3));
 
         builder.addSeparator(Globals.lang("Miscellaneous"), cc.xyw(1, 15, 5));
         builder.add(useImportInspector, cc.xy(2, 17));
@@ -137,6 +136,8 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder.add(confirmDelete, cc.xy(2, 25));
         builder.add(keyDuplicateWarningDialog, cc.xy(2, 27));
         builder.add(keyEmptyWarningDialog, cc.xy(2, 29));
+        builder.add(memoryStick, cc.xy(2, 31));
+        
         // Create a new panel with its own FormLayout for the last items:
         FormLayout layout2 = new FormLayout
                 ("left:pref, 8dlu, fill:50dlu, 4dlu, left:pref, 4dlu, left:pref, 4dlu, fill:50dlu, 4dlu, fill:pref", "");
@@ -144,13 +145,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.append(useOwner);
         builder2.append(defOwnerField);
         builder2.append(overwriteOwner);
+        
         JButton hlp = new JButton(ownerHelp);
         hlp.setText(null);
         hlp.setPreferredSize(new Dimension(24, 24));
         builder2.append(hlp);
-        //builder2.nextLine();
-
         builder2.nextLine();
+        
         builder2.append(useTimeStamp);
         builder2.append(timeStampField);
         builder2.append(overwriteTimeStamp);
@@ -170,7 +171,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         builder2.append(lab);
         builder2.append(encodings);
 
-        builder.add(builder2.getPanel(), cc.xyw(2, 31, 3));
+        builder.add(builder2.getPanel(), cc.xyw(2, 33, 3));
 
 
         JPanel pan = builder.getPanel();
@@ -191,6 +192,7 @@ public class GeneralTab extends JPanel implements PrefsTab {
         overwriteTimeStamp.setSelected(_prefs.getBoolean("overwriteTimeStamp"));
         keyDuplicateWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForDuplicateKey"));
         keyEmptyWarningDialog.setSelected(_prefs.getBoolean("dialogWarningForEmptyKey"));
+        memoryStick.setSelected(_prefs.getBoolean("memoryStickMode"));
         confirmDelete.setSelected(_prefs.getBoolean("confirmDelete"));
         if (_prefs.getBoolean("saveInStandardOrder"))
             saveAuthorOrder.setSelected(true);
@@ -243,6 +245,13 @@ public class GeneralTab extends JPanel implements PrefsTab {
         _prefs.putBoolean("overwriteTimeStamp", overwriteTimeStamp.isSelected());
         _prefs.putBoolean("dialogWarningForDuplicateKey", keyDuplicateWarningDialog.isSelected());
         _prefs.putBoolean("dialogWarningForEmptyKey", keyEmptyWarningDialog.isSelected());
+        if (_prefs.getBoolean("memoryStickMode") && !memoryStick.isSelected()){
+            JOptionPane.showMessageDialog(null, Globals.lang("To disable the memory stick mode" +
+            		" rename or remove the jabref.xml file in the same folder as JabRef."),
+            		Globals.lang("Memory Stick Mode"),
+            		JOptionPane.INFORMATION_MESSAGE);
+        }
+        _prefs.putBoolean("memoryStickMode", memoryStick.isSelected());
         _prefs.putBoolean("confirmDelete", confirmDelete.isSelected());
         _prefs.putBoolean("saveInStandardOrder", saveAuthorOrder.isSelected());
         _prefs.putBoolean("saveInOriginalOrder", saveOriginalOrder.isSelected());

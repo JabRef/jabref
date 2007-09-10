@@ -611,8 +611,10 @@ public JabRefPreferences prefs() {
       // But which one? Let's use the one that is visible.
       if (basePanel() != null) {
         ((SearchManager2)searchManager).updatePrefs();
-
       }
+      
+      prefs.flush();
+      
       System.exit(0); // End program.
     }
   }
