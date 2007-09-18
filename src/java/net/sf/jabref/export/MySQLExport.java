@@ -1,13 +1,17 @@
 package net.sf.jabref.export;
 
+
 import java.io.File;
 import java.io.PrintStream;
+import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
 import net.sf.jabref.*;
+import net.sf.jabref.groups.*;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -39,10 +43,9 @@ public class MySQLExport extends ExportFormat {
 
         ArrayList<String> fields = new ArrayList<String>();
 
-        // loop through entry types
+        // loop through entry types to get required, optional, general and 
+		// utility fields for this type
         for (BibtexEntryType val : BibtexEntryType.ALL_TYPES.values()) {
-
-            // get required, optional, general and utility fields for this type
             fields = processFields(fields, val.getRequiredFields());
             fields = processFields(fields, val.getOptionalFields());
             fields = processFields(fields, val.getGeneralFields());
@@ -84,7 +87,12 @@ public class MySQLExport extends ExportFormat {
         // populate entries table
         sql_popTabFD(entries, fields, fieldstr, fout);
 
+		// populate groups table
+		GroupTreeNode gtn = metaData.getGroups();
+		int cnt = sql_popTabGP(gtn,1,1,fout);
+
         fout.close();
+
 
     }
 
@@ -141,7 +149,7 @@ public class MySQLExport extends ExportFormat {
      * @return DML to creat all tables.
      */
     private String sql_createTables(String sql1, String sql2) {
-        String sql = "DROP TABLE IF EXISTS entry_type;\n"
+        String sql = "DROP TABLE IF EXISTS entry_types;\n"
             + "CREATE TABLE entry_types\n" + "(\n"
             + "entry_types_id    INT UNSIGNED  NOT NULL AUTO_INCREMENT,\n"
             + "label			 TEXT,\n"
@@ -155,7 +163,7 @@ public class MySQLExport extends ExportFormat {
             + "(\n"
             + "entries_id      INTEGER         NOT NULL AUTO_INCREMENT,\n"
             + "entry_types_id  INTEGER         DEFAULT NULL,\n"
-            + "cite_key 	   VARCHAR(30)     DEFAULT NULL,\n"
+            + "cite_key        VARCHAR(30)     DEFAULT NULL,\n"
             + sql2
             + ",\n"
             + "PRIMARY KEY (entries_id),\n"
@@ -166,7 +174,7 @@ public class MySQLExport extends ExportFormat {
             + "CREATE TABLE groups\n"
             + "(\n"
             + "groups_id       INTEGER         NOT NULL AUTO_INCREMENT,\n"
-            + "label           VARCHAR(30)     DEFAULT NULL,\n"
+            + "label           VARCHAR(100)     DEFAULT NULL,\n"
             + "parent_id       INTEGER         DEFAULT NULL,\n"
             + "PRIMARY KEY (groups_id)\n"
             + ");\n"
@@ -318,5 +326,34 @@ public class MySQLExport extends ExportFormat {
         return;
 
     }
+
+    /**
+     * Generates the DML required to populate the groups table with jabref
+     * data.
+     * 
+     * @param cursor
+     *            The current GroupTreeNode in the GroupsTree
+     * @param parentID
+     *            The integer ID associated with the cursors's parent node
+     * @param ID
+     *            The integer value to associate with the cursor
+     * @param fout
+     *            The printstream to which the DML should be written.
+     */
+	private static int sql_popTabGP(GroupTreeNode cursor, int parentID, int ID, 
+			PrintStream fout){
+
+		// print the DML to insert the cursor's data
+	    fout.println("INSERT INTO groups (groups_id, label, parent_id) " 
+				  + "VALUES (" + ID + ", \"" + cursor.getGroup().getName() 
+				  + "\", " + parentID + ");");
+
+		// recurse on child nodes (depth-first traversal)
+	    int myID = ID;
+	    for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) 
+			ID = sql_popTabGP(e.nextElement(),myID,++ID,fout);
+	    return ID;
+	}
+
 
 }
