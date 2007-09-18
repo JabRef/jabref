@@ -262,4 +262,8 @@ public class ExplicitGroup extends AbstractGroup implements SearchRule {
             m_entries.clear();
             m_entries.addAll(newSet);
         }
+
+		public Set<BibtexEntry> getEntries(){
+			return m_entries;
+		}
 }

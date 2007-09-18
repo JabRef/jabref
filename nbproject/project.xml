@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>JabRef</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>src/extensions</label>
+                    <type>java</type>
+                    <location>src/extensions</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/help</label>
+                    <type>java</type>
+                    <location>src/help</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/images</label>
+                    <type>java</type>
+                    <location>src/images</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/java</label>
+                    <type>java</type>
+                    <location>src/java</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/osx</label>
+                    <type>java</type>
+                    <location>src/osx</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/plugins</label>
+                    <type>java</type>
+                    <location>src/plugins</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/resource</label>
+                    <type>java</type>
+                    <location>src/resource</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/tests</label>
+                    <type>java</type>
+                    <location>src/tests</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/txt</label>
+                    <type>java</type>
+                    <location>src/txt</location>
+                </source-folder>
+                <source-folder>
+                    <label>src/windows</label>
+                    <type>java</type>
+                    <location>src/windows</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="javadoc">
+                    <target>javadocs</target>
+                </action>
+                <action name="run">
+                    <target>run</target>
+                </action>
+                <action name="test">
+                    <target>test</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+                <action name="debug">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>debug-nb</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src/extensions</label>
+                        <location>src/extensions</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/help</label>
+                        <location>src/help</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/images</label>
+                        <location>src/images</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/java</label>
+                        <location>src/java</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/osx</label>
+                        <location>src/osx</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/plugins</label>
+                        <location>src/plugins</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/resource</label>
+                        <location>src/resource</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/tests</label>
+                        <location>src/tests</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/txt</label>
+                        <location>src/txt</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>src/windows</label>
+                        <location>src/windows</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="run"/>
+                    <ide-action name="test"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="debug"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>src/extensions</package-root>
+                <classpath mode="compile">../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/charsets.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/deploy.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/javaws.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/jce.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/jsse.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/plugin.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/rt.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/ext/dnsns.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/ext/localedata.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/ext/sunjce_provider.jar:../../../../../usr/lib/jvm/java-1.5.0-sun/jre/lib/ext/sunpkcs11.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/help</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/images</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/java</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/osx</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/plugins</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/resource</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/tests</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/txt</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>src/windows</package-root>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

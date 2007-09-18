@@ -108,6 +108,10 @@ public class Util {
 		idFormat.setGroupingUsed(false);
 	}
 
+	public static int getMinimumIntegerDigits(){
+		return idFormat.getMinimumIntegerDigits();
+	}
+
 	public static void bool(boolean b) {
 		if (b)
 			System.out.println("true");

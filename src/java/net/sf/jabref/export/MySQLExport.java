@@ -3,11 +3,11 @@ package net.sf.jabref.export;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.jabref.*;
@@ -87,15 +87,19 @@ public class MySQLExport extends ExportFormat {
         // populate entries table
         sql_popTabFD(entries, fields, fieldstr, fout);
 
-		// populate groups table
 		GroupTreeNode gtn = metaData.getGroups();
-		int cnt = sql_popTabGP(gtn,1,1,fout);
+
+		// populate groups table
+		int cnt1 = sql_popTabGP(gtn,1,1,fout);
+		
+		// populate entry_group table
+		int cnt2 = sql_popTabEG(gtn,1,1,fout);
 
         fout.close();
 
-
+		return;
     }
-
+	
     /**
      * Inserts the elements of a String array into an ArrayList making sure not
      * to duplicate entries in the ArrayList
@@ -162,6 +166,9 @@ public class MySQLExport extends ExportFormat {
             + "create table entries\n"
             + "(\n"
             + "entries_id      INTEGER         NOT NULL AUTO_INCREMENT,\n"
+			+ "jabref_eid      VARCHAR("
+			+  Util.getMinimumIntegerDigits()
+		    + ")   DEFAULT NULL,\n"
             + "entry_types_id  INTEGER         DEFAULT NULL,\n"
             + "cite_key        VARCHAR(30)     DEFAULT NULL,\n"
             + sql2
@@ -295,16 +302,20 @@ public class MySQLExport extends ExportFormat {
 
         String sql = "";
         String val = "";
-        String insert = "INSERT INTO entries (entry_types_id, cite_key, "
+        String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, "
             + fieldstr
-            + ") VALUES ((SELECT entry_types_id FROM entry_types WHERE label=\"";
+            + ") VALUES (";
 
         // loop throught the entries that are to be exported
         for (BibtexEntry entry : entries) {
 
             // build SQL insert statement
-            sql = insert + entry.getType().getName().toLowerCase() + "\")";
-            sql = sql + ", \"" + entry.getCiteKey() + "\"";
+            sql = insert 
+			      + "\"" + entry.getId() + "\""
+			      + ", (SELECT entry_types_id FROM entry_types WHERE label=\""
+			      + entry.getType().getName().toLowerCase() + "\"), \""
+                  + entry.getCiteKey() + "\"";
+
             for (int i = 0; i < fields.size(); i++) {
                 sql = sql + ", ";
                 val = entry.getField(fields.get(i));
@@ -355,5 +366,49 @@ public class MySQLExport extends ExportFormat {
 	    return ID;
 	}
 
+    /**
+     * Generates the DML required to populate the entry_group table with jabref
+     * data.
+     * 
+     * @param cursor
+     *            The current GroupTreeNode in the GroupsTree
+     * @param parentID
+     *            The integer ID associated with the cursors's parent node
+     * @param ID
+     *            The integer value to associate with the cursor
+     * @param fout
+     *            The printstream to which the DML should be written.
+     */
+
+	private static int sql_popTabEG(GroupTreeNode cursor, int parentID, int ID, 
+			PrintStream fout){
+
+		// if this group contains entries...
+		if ( cursor.getGroup() instanceof ExplicitGroup) {
+
+			// build INSERT statement for each entry belonging to this group
+			ExplicitGroup grp = (ExplicitGroup)cursor.getGroup();
+			Iterator it = grp.getEntries().iterator();
+			while (it.hasNext()) {
+
+				BibtexEntry be = (BibtexEntry) it.next();
+				fout.println("INSERT INTO entry_group (entries_id, groups_id) " 
+						   + "VALUES (" 
+						   + "(SELECT entries_id FROM entries WHERE jabref_eid="
+						   + "\"" + be.getId() + "\""
+						   + "), "
+						   + "(SELECT groups_id FROM groups WHERE groups_id=" 
+						   + "\"" + ID + "\")"
+						   + ");");
+			}
+		}
+
+		// recurse on child nodes (depth-first traversal)
+	    int myID = ID;
+	    for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) 
+			ID = sql_popTabEG(e.nextElement(),myID,++ID,fout);
+
+	    return ID;
+	}
 
 }
