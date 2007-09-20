@@ -95,7 +95,8 @@ Change log:
 	- Memory Stick Mode: JabRef automatically loads configuration settings from jabref.xml
 	  and also writes them there if enabled.  
 	- Updated dependencies, now using: JempBox-0.2
-	- [ 1795355 ] LatexFieldFormatter omits "{" on beginning of optional field
+	- Improved handling of ArXiv URIs.
+	- [ 1795355 ] Fixed: LatexFieldFormatter omits "{" on beginning of optional field
 	- [ 1297576 ] New feature: Printing of entry preview (use right-click menu)
 	- [ 1717849 ] Fixed: Bug in aux import (patch contributed by Kai Eckert)
     - [ 1749613 ] Fixed: About translation

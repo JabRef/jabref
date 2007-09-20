@@ -14,7 +14,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.GUIGlobals;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.Util;
 import net.sf.jabref.gui.ImportInspectionDialog;
 
 import org.xml.sax.SAXException;
@@ -35,7 +40,7 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
 
     public static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
 
-    public static final String OAI2_ARXIV_HOST = "arxiv.org";
+    public static final String OAI2_ARXIV_HOST = "export.arxiv.org";
 
     public static final String OAI2_ARXIV_SCRIPT = "oai2";
 
@@ -151,6 +156,11 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
      * @return Fixed key.
      */
     public static String fixKey(String key){
+        
+        if (key.toLowerCase().startsWith("arxiv:")){
+            key = key.substring(6);
+        }
+        
         int dot = key.indexOf('.');
         int slash = key.indexOf('/');
         
@@ -199,6 +209,16 @@ public class OAI2Fetcher implements EntryFetcher, Runnable {
             for (String name : be.getAllFields()){
                 be.setField(name, correctLineBreaks(be.getField(name).toString()));
             }
+            
+            if (key.matches("\\d\\d\\d\\d\\..*")){
+                be.setField("year", "20" + key.substring(0,2));
+                
+                int month = Integer.parseInt(key.substring(2,4));
+                if (month >= 1 && month <= 12){
+                    be.setField("month", "#" + Globals.MONTHS[month - 1] + "#");
+                }
+            }
+            
             return be;
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, Globals.lang(

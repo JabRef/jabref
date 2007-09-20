@@ -49,7 +49,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testParse() throws Throwable {
 		try {
-			saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai2.xml"), handler);
+			saxParser.parse(this.getClass().getResourceAsStream("oai2.xml"), handler);
 			assertEquals("hep-ph/0408155", (String) be.getField("eprint"));
 			assertEquals("G. F. Giudice and A. Riotto and A. Zaffaroni and J. López-Peña",
 				(String) be.getField("author"));
@@ -73,7 +73,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testOai22xml() throws Exception {
 		try {
-			saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai22.xml"), handler);
+			saxParser.parse(this.getClass().getResourceAsStream("oai22.xml"), handler);
 			assertEquals("2005", (String) be.getField("year"));
 		} catch (SAXException e) {
 			throw e.getException();
@@ -82,7 +82,7 @@ public class OAI2ImportTest extends TestCase {
 
 	public void testOai23xml() throws Throwable {
 		try {
-            saxParser.parse(OAI2Fetcher.class.getResourceAsStream("oai23.xml"), handler);
+            saxParser.parse(this.getClass().getResourceAsStream("oai23.xml"), handler);
 			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
 		} catch (SAXException e) {
 			throw e.getException();
@@ -93,11 +93,11 @@ public class OAI2ImportTest extends TestCase {
 	public void testUrlConstructor() {
 		OAI2Fetcher fetcher = new OAI2Fetcher();
 		assertEquals(
-			"http://arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Ahep-ph%2F0408155&metadataPrefix=arXiv",
+			"http://export.arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Ahep-ph%2F0408155&metadataPrefix=arXiv",
 			fetcher.constructUrl("hep-ph/0408155"));
 
 		assertEquals(
-			"http://arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Amath%2F0612188&metadataPrefix=arXiv",
+			"http://export.arxiv.org/oai2?verb=GetRecord&identifier=oai%3AarXiv.org%3Amath%2F0612188&metadataPrefix=arXiv",
 			fetcher.constructUrl("math/0612188"));
 
 	}
@@ -108,6 +108,8 @@ public class OAI2ImportTest extends TestCase {
 		assertEquals("math/0601001", OAI2Fetcher.fixKey("math.RA/0601001"));
 		assertEquals("math/0601001", OAI2Fetcher.fixKey("math.QA/0601001"));
 		assertEquals("hep-ph/0408155", OAI2Fetcher.fixKey("hep-ph/0408155"));
+		assertEquals("0709.3040v1", OAI2Fetcher.fixKey("arXiv:0709.3040v1"));
+		assertEquals("", OAI2Fetcher.fixKey("arXiv:"));
 	}
 
 	public void testOnline() throws InterruptedException {
@@ -121,7 +123,7 @@ public class OAI2ImportTest extends TestCase {
 			assertEquals("On the classification and properties of noncommutative duplicates", be
 				.getField("title").toString());
 			assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author").toString());
-			assertEquals("2006", be.getField("year").toString());
+			assertEquals("2007", be.getField("year").toString());
 
 			Thread.sleep(20000);
 		}
@@ -154,7 +156,17 @@ public class OAI2ImportTest extends TestCase {
 			assertNotNull(be);
 			
 			assertEquals("hep-ph/0408155", (String) be.getField("eprint"));
-		}
+			  Thread.sleep(20000);
+        }
+
+        {
+            OAI2Fetcher fetcher = new OAI2Fetcher();
+            be = fetcher.importOai2Entry("0709.3040");
+            assertNotNull(be);
+            
+            assertEquals("2007", be.getField("year"));
+            assertEquals("#sep#", be.getField("month"));
+        }
 
 	}
 }
