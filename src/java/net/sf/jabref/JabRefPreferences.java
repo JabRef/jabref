@@ -29,8 +29,21 @@ package net.sf.jabref;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -404,21 +417,37 @@ public class JabRefPreferences {
     }
 
     public boolean getBoolean(String key) {
-        return prefs.getBoolean(key, ((Boolean)defaults.get(key)).booleanValue());
+        return prefs.getBoolean(key, getBooleanDefault(key));
+    }
+    
+    public boolean getBooleanDefault(String key){
+        return ((Boolean)defaults.get(key)).booleanValue();
     }
 
     public double getDouble(String key) {
-        return prefs.getDouble(key, ((Double)defaults.get(key)).doubleValue());
+        return prefs.getDouble(key, getDoubleDefault(key));
+    }
+    
+    public double getDoubleDefault(String key){
+        return ((Double)defaults.get(key)).doubleValue();
     }
 
     public int getInt(String key) {
-        return prefs.getInt(key, ((Integer)defaults.get(key)).intValue());
+        return prefs.getInt(key, getIntDefault(key));
     }
 
+    public int getIntDefault(String key) {
+        return ((Integer)defaults.get(key)).intValue();
+    }
+    
     public byte[] getByteArray(String key) {
-        return prefs.getByteArray(key, (byte[])defaults.get(key));
+        return prefs.getByteArray(key, getByteArrayDefault(key));
     }
 
+    public byte[] getByteArrayDefault(String key){
+        return (byte[])defaults.get(key);   
+    }
+    
     public void put(String key, String value) {
         prefs.put(key, value);
     }

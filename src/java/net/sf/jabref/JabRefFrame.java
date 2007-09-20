@@ -27,28 +27,90 @@
 
 package net.sf.jabref;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.export.*;
+import net.sf.jabref.export.ExpandEndnoteFilters;
+import net.sf.jabref.export.ExportCustomizationDialog;
+import net.sf.jabref.export.ExportFormats;
+import net.sf.jabref.export.SaveAllAction;
+import net.sf.jabref.export.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.PushToApplicationButton;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.imports.*;
+import net.sf.jabref.gui.DatabasePropertiesDialog;
+import net.sf.jabref.gui.EntryCustomizationDialog2;
+import net.sf.jabref.gui.GenFieldsCustomizer;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.SortTabsAction;
+import net.sf.jabref.imports.CiteSeerFetcher;
+import net.sf.jabref.imports.CiteSeerFetcherPanel;
+import net.sf.jabref.imports.EntryFetcher;
+import net.sf.jabref.imports.GeneralFetcher;
+import net.sf.jabref.imports.ImportCustomizationDialog;
+import net.sf.jabref.imports.ImportFormat;
+import net.sf.jabref.imports.ImportFormats;
+import net.sf.jabref.imports.ImportMenuItem;
+import net.sf.jabref.imports.MedlineFetcher;
+import net.sf.jabref.imports.OpenDatabaseAction;
 import net.sf.jabref.journals.ManageJournalsAction;
-import net.sf.jabref.label.*;
+import net.sf.jabref.label.ArticleLabelRule;
+import net.sf.jabref.label.BookLabelRule;
+import net.sf.jabref.label.IncollectionLabelRule;
+import net.sf.jabref.label.InproceedingsLabelRule;
+import net.sf.jabref.label.LabelMaker;
 import net.sf.jabref.plugin.PluginCore;
 import net.sf.jabref.plugin.core.JabRefPlugin;
 import net.sf.jabref.plugin.core.generated._JabRefPlugin.EntryFetcherExtension;
@@ -373,8 +435,46 @@ public class JabRefFrame extends JFrame {
         initActions();
         
         if (Globals.prefs.getBoolean("rememberWindowLocation")) {
-            setSize(new Dimension(prefs.getInt("sizeX"), prefs.getInt("sizeY")));
-            setLocation(new Point(prefs.getInt("posX"), prefs.getInt("posY")));
+            
+            int sizeX = prefs.getInt("sizeX");
+            int sizeY = prefs.getInt("sizeY");
+            int posX = prefs.getInt("posX");
+            int posY = prefs.getInt("posY");
+            
+            // 
+            // Fix for [ 1738920 ] Windows Position in Multi-Monitor environment
+            // 
+            // Do not put a window outside the screen if the preference values are wrong.
+            //
+            // Useful reference: http://www.exampledepot.com/egs/java.awt/screen_ScreenSize.html?l=rel
+            // googled on forums.java.sun.com graphicsenvironment second screen java
+            //
+            if (GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length == 1){
+            
+                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+                int height = (int) dim.getHeight();
+                int width = (int) dim.getWidth();
+
+                if (posX + sizeX > width) {
+                    if (sizeX <= width) {
+                        posX = width - sizeX;
+                    } else {
+                        posX = prefs.getIntDefault("posX");
+                        sizeX = prefs.getIntDefault("sizeX");
+                    }
+                }
+
+                if (posY + sizeY > height) {
+                    if (sizeY <= height) {
+                        posY = height - sizeY;
+                    } else {
+                        posY = prefs.getIntDefault("posY");
+                        sizeY = prefs.getIntDefault("sizeY");
+                    }
+                }
+            }
+            setBounds(posX, posY, sizeX, sizeY);
         }
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
