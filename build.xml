@@ -113,7 +113,7 @@
 		<include name="glazedlists-1.7.0_java15.jar" />
 		<include name="microba.jar" />
 		<include name="PDFBox-0.7.3-dev-reduced.jar" />
-		<include name="JempBox-0.1.0-dev.jar" />
+		<include name="JempBox-0.2.0.jar" />
 		<include name="zoom-java.jar" />
 		<!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
