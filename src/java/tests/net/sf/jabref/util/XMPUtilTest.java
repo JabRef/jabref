@@ -1,19 +1,45 @@
 package tests.net.sf.jabref.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
 import junit.framework.TestCase;
-import net.sf.jabref.*;
+import net.sf.jabref.AuthorList;
+import net.sf.jabref.BibtexEntry;
+import net.sf.jabref.BibtexEntryType;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.Util;
 import net.sf.jabref.imports.BibtexParser;
 import net.sf.jabref.imports.ParserResult;
 import net.sf.jabref.util.EncryptionNotSupportedException;
 import net.sf.jabref.util.XMPSchemaBibtex;
 import net.sf.jabref.util.XMPUtil;
 
-import org.jempbox.xmp.*;
+import org.jempbox.xmp.XMPMetadata;
+import org.jempbox.xmp.XMPSchema;
+import org.jempbox.xmp.XMPSchemaBasic;
+import org.jempbox.xmp.XMPSchemaDublinCore;
+import org.jempbox.xmp.XMPSchemaMediaManagement;
 import org.pdfbox.exceptions.COSVisitorException;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentCatalog;
@@ -868,7 +894,7 @@ public class XMPUtilTest extends TestCase {
 				assertEquals(expectedAuthors, actualAuthors);
 			} else {
 				assertEquals(
-						"" + expected.getField(field.toString()).toString(),
+						"" + field.toString(),
 						expected.getField(field.toString()).toString(), actual
 								.getField(field.toString()).toString());
 			}
