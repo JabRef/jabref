@@ -379,7 +379,7 @@ public class BibtexEntry
      */
     private boolean writeField(String name, Writer out,
                             FieldFormatter ff, boolean isFirst) throws IOException {
-        Object o = getField(name);
+        String o = getField(name);
         if (o != null) {
             if (isFirst)
                 out.write(","+Globals.NEWLINE);
@@ -392,8 +392,6 @@ public class BibtexEntry
                     (Globals.lang("Error in field")+" '"+name+"': "+ex.getMessage());
             }
             return true;
-            //Util.writeField(name, o, out);
-            //out.write(","+Globals.NEWLINE);
         } else
             return false;
     }
