@@ -35,12 +35,16 @@ import java.util.Vector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.VersionHandling;
 
+import net.sf.jabref.sql.DBStrings;
+
 public class MetaData implements Iterable<String> {
     private HashMap<String, Vector<String>> metaData = new HashMap<String, Vector<String>>();
     private StringReader data;
     private GroupTreeNode groupsRoot = null;
     private File file = null; // The File where this base gets saved.
-    
+
+    private DBStrings dbStrings = new DBStrings();
+
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
      * the data is written correctly to string, the user of a meta data Vector
@@ -278,5 +282,13 @@ public class MetaData implements Iterable<String> {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public DBStrings getDBStrings() {
+        return dbStrings;
+    }
+
+    public void setDBStrings(DBStrings dbStrings) {
+        this.dbStrings = dbStrings;
     }
 }

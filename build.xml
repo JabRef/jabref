@@ -115,6 +115,7 @@
 		<include name="PDFBox-0.7.3-dev-reduced.jar" />
 		<include name="JempBox-0.2.0.jar" />
 		<include name="zoom-java.jar" />
+    <include name="mysql-connector-java-5.0.7-bin.jar" />
 		<!-- Plugin runtime dependencies -->
 		<include name="plugin/JPFCodeGenerator-rt.jar" />
 		<include name="plugin/jpf.jar" />

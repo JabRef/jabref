@@ -354,7 +354,11 @@ public class JabRefFrame extends JFrame {
     upgradeExternalLinks = new GeneralAction("upgradeLinks", "Upgrade external links",
             Globals.lang("Upgrade external PDF/PS links to use the '%0' field.", GUIGlobals.FILE_FIELD)),
       errorConsole = Globals.errorConsole.getAction(this),
-    test = new GeneralAction("test", "Test");
+    test = new GeneralAction("test", "Test"),
+
+    dbConnect = new GeneralAction("dbConnect", "Export to external SQL database",
+         Globals.lang("Export to external SQL database"), 
+          GUIGlobals.getIconUrl("dbConnect") );
 
     PushToApplicationButton pushExternalButton;
   /*setupSelector = new GeneralAction("setupSelector", "", "",
@@ -1144,6 +1148,7 @@ public JabRefPreferences prefs() {
       file.add(importCurrent);
       file.add(exportAll);
       file.add(exportSelected);
+      file.add(dbConnect);
 
       file.addSeparator();
       file.add(databaseProperties);
@@ -1337,6 +1342,7 @@ public JabRefPreferences prefs() {
     tlb.addAction(open);
     tlb.addAction(save);
     tlb.addAction(saveAll);
+    tlb.addAction(dbConnect);
     
     tlb.addSeparator();
     tlb.addAction(cut);

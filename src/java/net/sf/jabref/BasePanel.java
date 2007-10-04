@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 import java.util.List;
+import java.sql.*;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -61,6 +62,9 @@ import net.sf.jabref.search.NoSearchMatcher;
 import net.sf.jabref.search.SearchMatcher;
 import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
+import net.sf.jabref.sql.DBConnectDialog;
+import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.SQLutils;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -619,6 +623,91 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
 
+        // action for dumping database to external SQL database
+        actions.put("dbConnect", new AbstractWorker () {
+           
+            String errorMessage = null;
+
+            // run first, in EDT:
+            public void init() {
+
+
+                DBStrings dbs = metaData.getDBStrings();
+
+                // init DB strings if necessary
+                if (! dbs.isInitialized()) {
+                    String [] servers = {Globals.lang("MySQL")};
+                    dbs.setServerTypes(servers);
+                    dbs.setServerType(Globals.lang("MySQL"));
+                    dbs.setServerHostname(Globals.lang("localhost"));
+                    dbs.setDatabase(Globals.lang("jabref"));
+                    dbs.setUsername(Globals.lang("root"));
+                    dbs.setPassword("");
+                    dbs.isInitialized(true);
+                }
+
+
+                // show connection dialog
+                DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
+                Util.placeDialog(dbd, BasePanel.this );
+                dbd.setVisible(true);
+
+                // store database strings
+                dbs = dbd.getDBStrings();
+                metaData.setDBStrings(dbs);
+                dbd.dispose();
+
+            }
+
+            // run second, on a different thread:
+            public void run() {
+
+                DBStrings dbs = metaData.getDBStrings();
+
+                try {
+
+                    Connection conn = SQLutils.connect_mysql(dbs.getJdbcUrl(),
+                                                             dbs.getUsername(), 
+                                                             dbs.getPassword());
+
+                    // dump the database to the external SQL database
+                    // SQLutils.dumpDB(conn);
+                    conn.close();
+
+                } catch (Exception ex) {
+                    errorMessage = ex.getMessage();
+                }
+
+            }
+
+            // run third, on EDT:
+            public void update() {
+
+                String url = metaData.getDBStrings().getJdbcUrl();
+
+                // if no error, report success
+                if (errorMessage == null) {
+                    frame.output(Globals.lang("%0 export successful", url));
+                }
+
+                // show an error dialog if an error occurred
+                else {
+
+                    String preamble = "Could not export to SQL database";
+                    frame.output(Globals.lang(preamble)
+                            + " - " + errorMessage);
+
+                    JOptionPane.showMessageDialog(frame, Globals.lang(preamble)
+                        + ".\n" + errorMessage, Globals.lang("Export to SQL database"),
+                        JOptionPane.ERROR_MESSAGE);
+                   
+                    errorMessage = null;
+
+                }
+            }
+
+        });
+
         // The action for auto-generating keys.
         actions.put("makeKey", new AbstractWorker() {
         //int[] rows;
@@ -1160,7 +1249,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                           csd.setVisible(true);
                       }
                   });
-
 
           actions.put("exportToClipboard", new ExportToClipboardAction(frame, database()));
         
