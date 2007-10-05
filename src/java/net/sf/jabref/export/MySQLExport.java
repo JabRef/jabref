@@ -1,20 +1,11 @@
 package net.sf.jabref.export;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.Set;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.sql.SQLutil;
+import java.util.Set;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -44,38 +35,9 @@ public class MySQLExport extends ExportFormat {
         final MetaData metaData, final String file, final String encoding,
         Set<String> keySet) throws Exception {
 
-        // open output file
-        File outfile = new File(file);
-        if (outfile.exists())
-            outfile.delete();
+        SQLutil.exportDatabase(database, metaData, keySet, file);
 
-        PrintStream fout = null;
-        fout = new PrintStream(outfile);
-
-        // get entries selected for export
-        List<BibtexEntry> entries = FileActions.getSortedEntries(database,
-            keySet, false);
-
-        // create MySQL tables 
-        SQLutil.dmlCreateTables(SQLutil.DBTYPE.MYSQL, fout);
-
-        // populate entry_type table
-        SQLutil.dmlPopTab_ET(fout);
-
-        // populate entries table
-        SQLutil.dmlPopTab_FD(entries, fout);
-
-		GroupTreeNode gtn = metaData.getGroups();
-
-		// populate groups table
-        SQLutil.dmlPopTab_GP(gtn,fout);
-        
-		// populate entry_group table
-        SQLutil.dmlPopTab_EG(gtn,fout);
-
-        fout.close();
-
-		return;
     }
+
 
 }
