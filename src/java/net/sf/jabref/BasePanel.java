@@ -666,12 +666,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 try {
 
-                    Connection conn = SQLutils.connect_mysql(dbs.getJdbcUrl(),
+                    Connection conn = SQLutil.connect_mysql(dbs.getJdbcUrl(),
                                                              dbs.getUsername(), 
                                                              dbs.getPassword());
 
                     // dump the database to the external SQL database
-                    // SQLutils.dumpDB(conn);
+                    // SQLutil.dumpDB(conn);
                     conn.close();
 
                 } catch (Exception ex) {
