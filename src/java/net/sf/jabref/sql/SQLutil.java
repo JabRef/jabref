@@ -50,29 +50,97 @@ import net.sf.jabref.export.FileActions;
 public class SQLutil {
 
     public enum DBTYPE {
-        MYSQL
+        MYSQL, DERBY
     } 
 
     private static ArrayList<String> fields = null;
     private static String fieldstr = null;
 
+    /**
+     * returns the DBTYPE associated with a DBStrings ServerType
+     *
+     * @param dbstrings
+     *          The DBStrings to query
+     * @return The DBTYPE associated withthe dbstrings ServerType
+     */
+    public static DBTYPE getDBType (DBStrings dbstrings) {
 
-    public static Connection connect_mysql(String url, String username, String password)
-        throws Exception {
+        DBTYPE dbtype = null;
+        String srvtype = dbstrings.getServerType();
+
+        if (srvtype.equalsIgnoreCase("mysql")) {
+            dbtype = DBTYPE.MYSQL;
+        }
+        if (srvtype.equalsIgnoreCase("derby")) {
+            dbtype = DBTYPE.DERBY;
+        }
+
+        return dbtype;
+    }
+
+    /**
+     * This routine returns the JDBC url corresponding to the DBStrings input.
+     *
+     * @param dbstrings
+     *          The DBStrings to use to make the connection
+     * @return The JDBC url corresponding to the input DBStrings
+     */
+    public static String createJDBCurl (DBStrings dbs) {
+
+        String url = "";
+        String servertype = dbs.getServerType();
+
+        if (servertype.equalsIgnoreCase("mysql")) {
+            url = "jdbc:" + dbs.getServerType().toLowerCase() + "://" 
+                          + dbs.getServerHostname() + "/" 
+                          + dbs.getDatabase();
+        }
+
+        if (servertype.equalsIgnoreCase("derby")) {
+            url = "jdbc:" + dbs.getServerType().toLowerCase() + ":"
+                          + dbs.getDatabase() + ";create=true";
+        }
+
+        return url;
+    }
+
+    public static String getJDBCdriver (DBStrings dbstrings) {
+
+        String driver = "";
+        String servertype = dbstrings.getServerType();
+
+        if (servertype.equalsIgnoreCase("mysql")) {
+            driver ="com.mysql.jdbc.Driver";
+        }
+
+        if (servertype.equalsIgnoreCase("derby")) {
+            driver = "org.apache.derby.jdbc.EmbeddedDriver";
+        }
+
+        return driver;
+            
+    }
+
     /**
      * This routine accepts the location of a MySQL database specified as a url as 
      * well as the username and password for the MySQL user with appropriate access
      * to this database.  The routine returns a valid Connection object if the MySQL 
      * database is successfully opened. It returns a null object otherwise.
      */
+    public static Connection connectToDB (DBStrings dbstrings)
+        throws Exception {
 
-        Class.forName ("com.mysql.jdbc.Driver").newInstance ();
-        Connection conn = DriverManager.getConnection (url,username,password);
-              
+        String url = createJDBCurl(dbstrings);
+        String drv = getJDBCdriver(dbstrings);
+
+        Class.forName (drv).newInstance ();
+        Connection conn = DriverManager.getConnection (url,
+                           dbstrings.getUsername(), dbstrings.getPassword());
+       
         return conn;
 
     }    
-
+   
 
     /**
      * Utility method for processing DML with proper output
@@ -107,6 +175,7 @@ public class SQLutil {
      *          The DML statements to be executed
      */
     public static void execDML(Connection conn, String dml) throws SQLException {
+        // System.out.println(dml); // remove
         Statement stmnt = conn.createStatement();
         stmnt.execute(dml);
         SQLWarning warn = stmnt.getWarnings();
@@ -195,7 +264,8 @@ public class SQLutil {
      *          The name of the file to which the DML should be written
      */
     public static void exportDatabase(final BibtexDatabase database,
-        final MetaData metaData, Set<String> keySet, String file ) throws Exception {
+        final MetaData metaData, Set<String> keySet, String file, DBTYPE dbtype ) 
+        throws Exception {
 
         // open output file
         File outfile = new File(file);
@@ -205,7 +275,7 @@ public class SQLutil {
         PrintStream fout = null;
         fout = new PrintStream(outfile);
 
-        exportDatabase_worker(database, metaData, keySet, fout);
+        exportDatabase_worker(dbtype, database, metaData, keySet, fout);
 
         fout.close();
 
@@ -229,13 +299,39 @@ public class SQLutil {
     public static void exportDatabase(final BibtexDatabase database,
         final MetaData metaData, Set<String> keySet, DBStrings dbStrings ) throws Exception {
 
-        Connection conn = SQLutil.connect_mysql(dbStrings.getJdbcUrl(),
-                                                dbStrings.getUsername(), 
-                                                dbStrings.getPassword());
+        DBTYPE dbtype = getDBType(dbStrings);
 
-        exportDatabase_worker(database, metaData, keySet, conn);
+        Connection conn = null;
 
-        conn.close();
+        try {
+
+            conn = SQLutil.connectToDB( dbStrings);
+
+            //conn.setAutoCommit(false);
+
+            exportDatabase_worker(dbtype, database, metaData, keySet, conn);
+
+            if (!conn.getAutoCommit()) {
+                conn.commit();
+                conn.setAutoCommit(true);
+            }
+
+            conn.close();
+
+
+         } catch (SQLException ex) {
+
+             ex.printStackTrace();
+
+             if (conn!=null) {
+                 if (!conn.getAutoCommit()) {
+                    conn.rollback();
+                 }
+             }
+
+            throw (Exception) ex.getCause();
+
+         }
 
     }
 
@@ -243,6 +339,8 @@ public class SQLutil {
    /**
      * Worker method for the exportDatabase methods.
      *
+     * @param dbtype
+     *          The DBTYPE of the database
      * @param database
      *          The BibtexDatabase to export
      * @param metaData
@@ -252,14 +350,15 @@ public class SQLutil {
      * @param out
      *          The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private static void exportDatabase_worker (final BibtexDatabase database,
-        final MetaData metaData, Set<String> keySet, Object out) throws Exception{
+    private static void exportDatabase_worker (DBTYPE dbtype, 
+            final BibtexDatabase database, final MetaData metaData, 
+            Set<String> keySet, Object out) throws Exception{
 
         List<BibtexEntry> entries = FileActions.getSortedEntries(database,
             keySet, false);
 
         // create MySQL tables 
-        dmlCreateTables(SQLutil.DBTYPE.MYSQL,out);
+        dmlCreateTables(dbtype,out);
 
         // populate entry_type table
         dmlPopTab_ET(out);
@@ -274,7 +373,6 @@ public class SQLutil {
         
 		// populate entry_group table
         dmlPopTab_EG(gtn,out);
-
     };
 
     
@@ -294,16 +392,50 @@ public class SQLutil {
             refreshFields();
         }
 
-        // generate DML that specifies DB columns corresponding to fields
-        String dml1 = SQLutil.fieldsAsCols(fields, " VARCHAR(3)  DEFAULT NULL");
-        String dml2 = SQLutil.fieldsAsCols(fields, " TEXT DEFAULT NULL");
-
         // build the DML tables specification
-        String dml = "";
+        String dml = "", dml1 = "", dml2 = "";
         switch (dbtype) {
             case MYSQL:
+
+                // drop tables
+                processDML(out,"DROP TABLE IF EXISTS entry_types;");
+                processDML(out,"DROP TABLE IF EXISTS entries;");
+                processDML(out,"DROP TABLE IF EXISTS groups;");
+                processDML(out,"DROP TABLE IF EXISTS entry_group;");
+
+                // generate DML that specifies DB columns corresponding to fields
+                dml1 = SQLutil.fieldsAsCols(fields, " VARCHAR(3) DEFAULT NULL");
+                dml2 = SQLutil.fieldsAsCols(fields, " TEXT DEFAULT NULL");
+
+                // create tables
                 dmlTable_mysql(dml1, dml2, out);
+
                 break;
+
+            case DERBY:
+
+                // drop tables
+                if (out instanceof Connection) {
+
+                    Connection conn = (Connection) out;
+                    boolean commitNow = conn.getAutoCommit();
+                    conn.setAutoCommit(true);
+
+                    //TODO: determine which tables are present, and drop them
+
+                    conn.setAutoCommit(commitNow);
+
+                }
+
+                // generate DML that specifies DB columns corresponding to fields
+                dml1 = SQLutil.fieldsAsCols(fields, " VARCHAR(3) DEFAULT NULL");
+                dml2 = SQLutil.fieldsAsCols(fields, " LONG VARCHAR DEFAULT NULL");
+
+                // create tables
+                dmlTable_derby(dml1, dml2, out);
+
+                break;
+
             default:
                 System.err.println("Error: Do not recognize database enumeration.");
                 System.exit(0);
@@ -329,12 +461,10 @@ public class SQLutil {
         while (li.hasNext()) {
             str = str + li.next() + " " + datatype;
             if (li.hasNext())
-                str = str + ",\n";
+                str = str + ", ";
         }
         return str;
     }
-
-
 
     /**
      * Generates DML code necessary to create all tables in a MySQL database, 
@@ -350,11 +480,6 @@ public class SQLutil {
      */
     private static void dmlTable_mysql(String dml1, String dml2, Object out)
             throws SQLException {
-
-        processDML(out,"DROP TABLE IF EXISTS entry_types;");
-        processDML(out,"DROP TABLE IF EXISTS entries;");
-        processDML(out,"DROP TABLE IF EXISTS groups;");
-        processDML(out,"DROP TABLE IF EXISTS entry_group;");
 
         processDML(out,"CREATE TABLE entry_types ( \n"
             + "entry_types_id    INT UNSIGNED  NOT NULL AUTO_INCREMENT, \n"
@@ -395,6 +520,60 @@ public class SQLutil {
 
     }
 
+    /**
+     * Generates DML code necessary to create all tables in a Derby database, 
+     * and writes it to appropriate output.
+     *
+     * @param dml1
+     *            Column specifications for fields in entry_type table.
+     * @param dml2
+     *            Column specifications for fields in entries table.
+     * @param out
+     *            The output (PrintStream or Connection) object to which the DML should be written.
+     * @return DML to create all Derby tables.
+     */
+    private static void dmlTable_derby(String dml1, String dml2, Object out)
+            throws SQLException {
+
+        processDML(out,"CREATE TABLE entry_types ( "
+            + "entry_types_id INT  NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
+            + dml1 + ", "
+            + "label LONG VARCHAR"
+            + ")" );
+
+        processDML(out,"CREATE TABLE entries ( "
+            + "entries_id      INTEGER         NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
+			+ "jabref_eid      VARCHAR("
+			+  Util.getMinimumIntegerDigits()
+		    + ")   DEFAULT NULL, "
+            + "entry_types_id  INTEGER         DEFAULT NULL, "
+            + "cite_key        VARCHAR(30)     DEFAULT NULL, "
+            + dml2
+            + ")");
+          
+        processDML(out,"ALTER TABLE entries ADD CONSTRAINT entries_fk "
+                     + "FOREIGN KEY (\"entry_types_id\") REFERENCES \"entry_type\" (\"entry_types_id\")");
+
+        processDML(out,"CREATE TABLE groups ( "
+            + "groups_id       INTEGER         NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
+            + "label           VARCHAR(100)     DEFAULT NULL, "
+            + "parent_id       INTEGER          DEFAULT NULL  "
+            + ")");
+           
+        processDML(out,"CREATE TABLE entry_group ( "
+            + "entries_id       INTEGER        NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, "
+            + "groups_id        INTEGER        DEFAULT NULL "
+            + ")");
+
+        processDML(out,"ALTER TABLE entry_group ADD CONSTRAINT entries_group_fk"
+                     + "FOREIGN KEY (\"entries_id\") REFERENCES \"entry_fields\" (\"entries_id\")");
+
+        processDML(out,"ALTER TABLE entry_group ADD CONSTRAINT groups_fk"
+                     + "FOREIGN KEY (\"groups_id\") REFERENCES \"groups\" (\"groups_id\")");
+
+        return;
+
+    }
 
      /**
      * Generates the DML required to populate the entry_types table with jabref

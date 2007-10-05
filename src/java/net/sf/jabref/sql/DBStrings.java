@@ -36,10 +36,6 @@ public class DBStrings {
         this.isConfigValid(false);
     }
 
-    public String getJdbcUrl () {
-        return "jdbc:" + serverType + "://" + serverHostname + "/" + database;
-    }
-
     public void setServerType(String serverType) {
         this.serverType = serverType;
     }

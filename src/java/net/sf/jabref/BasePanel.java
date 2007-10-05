@@ -636,6 +636,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // init DB strings if necessary
                 if (! dbs.isInitialized()) {
+                    //String [] servers = {Globals.lang("MySQL"), Globals.lang("Derby")};
                     String [] servers = {Globals.lang("MySQL")};
                     dbs.setServerTypes(servers);
                     dbs.setServerType(Globals.lang("MySQL"));
@@ -679,7 +680,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // run third, on EDT:
             public void update() {
 
-                String url = metaData.getDBStrings().getJdbcUrl();
+                String url = SQLutil.createJDBCurl(metaData.getDBStrings());
 
                 // if no error, report success
                 if (errorMessage == null) {

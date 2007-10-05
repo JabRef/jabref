@@ -35,7 +35,7 @@ public class MySQLExport extends ExportFormat {
         final MetaData metaData, final String file, final String encoding,
         Set<String> keySet) throws Exception {
 
-        SQLutil.exportDatabase(database, metaData, keySet, file);
+        SQLutil.exportDatabase(database, metaData, keySet, file, SQLutil.DBTYPE.MYSQL);
 
     }
 
