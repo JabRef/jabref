@@ -64,7 +64,7 @@ import net.sf.jabref.undo.*;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.SQLutils;
+import net.sf.jabref.sql.SQLutil;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
@@ -675,7 +675,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     conn.close();
 
                 } catch (Exception ex) {
-                    errorMessage = ex.getMessage();
+                    if (ex.getMessage()==null) {
+                        errorMessage = ex.toString();
+                    } else {
+                        errorMessage = ex.getMessage();
+                    }
                 }
 
             }

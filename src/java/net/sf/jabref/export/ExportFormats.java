@@ -235,8 +235,11 @@ public class ExportFormats {
                                         finFile.getPath(), frame
                                     .basePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
-                                //ex.printStackTrace();
-                                errorMessage = ex.getMessage();
+                                if (ex.getMessage()==null ) {
+                                    errorMessage = ex.toString();
+                                } else {
+                                    errorMessage = ex.getMessage();
+                                }
                             }
                         }
 
