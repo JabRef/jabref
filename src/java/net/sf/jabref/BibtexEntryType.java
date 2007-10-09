@@ -59,7 +59,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return true;
             }
@@ -95,12 +95,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, JOURNAL and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "author", "title", "journal", "year", "bibtexkey", "volume", "pages"
-                    });
+                    }, database);
             }
         };
 
@@ -133,12 +133,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "TITLE";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "title", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -175,12 +175,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 		    +"EDITOR and/or AUTHOR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "title", "publisher", "year", "bibtexkey"
-                    }) &&
+                    }, database) &&
 		    (((entry.getField("author") != null) ||
 		      (entry.getField("editor") != null)) &&
 		     ((entry.getField("chapter") != null) ||
@@ -218,12 +218,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "TITLE, PUBLISHER, YEAR, and an EDITOR and/or AUTHOR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "title", "publisher", "year", "bibtexkey"
-                    }) &&
+                    }, database) &&
                 ((entry.getField("author") != null) ||
                 (entry.getField("editor") != null));
             }
@@ -260,14 +260,14 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, BOOKTITLE, PUBLISHER and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"author", "title", "booktitle", "publisher", "year",
 			"bibtexkey"
 
-                    });
+                    }, database);
             }
         };
 
@@ -301,12 +301,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, BOOKTITLE and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"author", "title", "booktitle", "year" , "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -340,12 +340,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, BOOKTITLE and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"author", "title", "booktitle", "year" , "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -379,12 +379,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "TITLE and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"title", "year", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -419,12 +419,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "TITLE";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "title", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -457,13 +457,13 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, INSTITUTION and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"author", "title", "institution", "year",
 			"bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -497,12 +497,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, SCHOOL and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "author", "title", "school", "year", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -536,12 +536,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE, SCHOOL and YEAR";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
                         "author", "title", "school", "year", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -574,12 +574,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "AUTHOR, TITLE and NOTE";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
                 return entry.allFieldsPresent(new String[]
                     {
 			"author", "title", "note", "bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -610,12 +610,12 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "None";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
 		return entry.allFieldsPresent(new String[]
                     {
 			"bibtexkey"
-                    });
+                    }, database);
             }
         };
 
@@ -646,7 +646,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
                 return "None";
             }
 
-            public boolean hasAllRequiredFields(BibtexEntry entry)
+            public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database)
             {
 		return false;
            }
@@ -671,7 +671,7 @@ public abstract class BibtexEntryType implements Comparable<BibtexEntryType>
 
     public abstract String describeRequiredFields();
 
-    public abstract boolean hasAllRequiredFields(BibtexEntry entry);
+    public abstract boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database);
 
 
     public String[] getUtilityFields(){

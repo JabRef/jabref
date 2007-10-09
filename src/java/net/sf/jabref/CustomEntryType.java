@@ -61,10 +61,10 @@ public class CustomEntryType extends BibtexEntryType {
 	return sb.toString();
     }
 
-    public boolean hasAllRequiredFields(BibtexEntry entry) {
+    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
 	for (int i=0; i<req.length; i++)
-	    if (entry.getField(req[i]) == null) return false;
-	return true;
+        if (BibtexDatabase.getResolvedField(req[i], entry, database) == null) return false;
+    	return true;
     }
 
     public void save(Writer out) throws IOException {

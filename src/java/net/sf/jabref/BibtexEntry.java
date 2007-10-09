@@ -118,9 +118,9 @@ public class BibtexEntry
      * Returns true if this entry contains the fields it needs to be
      * complete.
      */
-    public boolean hasAllRequiredFields()
+    public boolean hasAllRequiredFields(BibtexDatabase database)
     {
-        return _type.hasAllRequiredFields(this);
+        return _type.hasAllRequiredFields(this, database);
     }
 
     /**
@@ -285,9 +285,19 @@ public class BibtexEntry
 
     }
 
-    protected boolean allFieldsPresent(String[] fields) {
+    /**
+     * Determines whether this entry has all the given fields present. If a non-null
+     * database argument is given, this method will try to look up missing fields in
+     * entries linked by the "crossref" field, if any.
+     *
+     * @param fields An array of field names to be checked.
+     * @param database The database in which to look up crossref'd entries, if any. This
+     *  argument can be null, meaning that no attempt will be made to follow crossrefs.
+     * @return true if all fields are set or could be resolved, false otherwise.
+     */
+    protected boolean allFieldsPresent(String[] fields, BibtexDatabase database) {
         for (int i = 0; i < fields.length; i++) {
-            if (getField(fields[i]) == null) {
+            if (BibtexDatabase.getResolvedField(fields[i], this, database) == null) {
                 return false;
             }
         }

@@ -39,7 +39,7 @@ public class UnknownEntryType extends BibtexEntryType {
 	return "unknown";
     }
 
-    public boolean hasAllRequiredFields(BibtexEntry entry) {
+    public boolean hasAllRequiredFields(BibtexEntry entry, BibtexDatabase database) {
 	return true;
     }
 

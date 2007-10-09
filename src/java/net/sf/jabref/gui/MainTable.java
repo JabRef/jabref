@@ -34,6 +34,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 public class MainTable extends JTable {
 	
     private MainTableFormat tableFormat;
+    private BasePanel panel;
     private SortedList<BibtexEntry> sortedForMarking, sortedForTable, sortedForSearch, sortedForGrouping;
     private boolean tableColorCodes, showingFloatSearch=false, showingFloatGrouping=false;
     private EventSelectionModel<BibtexEntry> selectionModel;
@@ -61,6 +62,7 @@ public class MainTable extends JTable {
                      BasePanel panel) {
         super();
         this.tableFormat = tableFormat;
+        this.panel = panel;
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selctions:
         sortedForTable = new SortedList<BibtexEntry>(list, null);
@@ -280,7 +282,7 @@ public class MainTable extends JTable {
         // First column:
         List<Comparator<BibtexEntry>> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
-        comparators.add(new FirstColumnComparator());
+        comparators.add(new FirstColumnComparator(panel.database()));
 
         // Icon columns:
         for (int i = 1; i < tableFormat.padleft; i++) {
@@ -353,7 +355,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibtexEntry be = sortedForGrouping.get(row);
-            return be.hasAllRequiredFields();
+            return be.hasAllRequiredFields(panel.database());
         } catch (NullPointerException ex) {
             //System.out.println("Exception: isComplete");
             return true;
